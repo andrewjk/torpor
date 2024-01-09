@@ -1,0 +1,63 @@
+<script>
+    import watch from "../../watch/src/watch";
+ 
+    const state = watch({
+        condition: false,
+        count: 0,
+        letters: [],
+        deep: {
+            text: "",
+            class: ""
+        }
+    });
+
+    function increment() {
+        state.count += 1;
+        console.log(state.count);
+    }
+</script>
+
+<div>
+    <p>
+        The count is <strong>{state.count}</strong>.
+        It is {state.count % 2 == 0 ? "even" : "odd"}.
+    </p>
+    <button onclick=increment>Increment</button>
+    <button onclick={() => state.count = 0}>Reset</button>
+    @switch (state.count) {
+        @case 0: {
+            <p>Zero</p>
+        }
+        @case 1: {
+            <p>One</p>
+        }
+        @case 2: {
+            <p>Two</p>
+        }
+        @case 3: {
+            <p>Three</p>
+        }
+        @default: {
+            <p>More</p>
+        }
+    }
+    @if (state.count > 5 && state.count <= 10) {
+        <p>Whoa there!</p>
+    } else if (state.count > 10) {
+        <p>I said whoa there!!</p>
+        <p>BUDDY</p>
+    }
+</div>
+
+<style>
+    :global(html) {
+        font-family: sans-serif;
+        font-size: 15px;
+    }
+
+    .container{
+        text-align: center;
+        margin: 0 auto;
+        max-width: 500px;
+    }
+</style>
