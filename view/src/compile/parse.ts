@@ -36,6 +36,7 @@ const voidTags = [
 ];
 
 const logicalOperations = [
+  "@const",
   "@if",
   "@else",
   "@for",
@@ -45,7 +46,6 @@ const logicalOperations = [
   "@await",
   "@var",
   "@let",
-  "@const",
   "@html",
 ];
 
@@ -309,7 +309,12 @@ function parseAttributeValue(status: ParseStatus): string {
 }
 
 function parseLogic(status: ParseStatus): LogicNode {
-  const element = parseLogicOpen(status);
+  const node = parseLogicOpen(status);
+
+  // Consts can't have children
+  if (node.operation === "@const") {
+    return node;
+  }
 
   // Get the children
   for (status.i; status.i < status.source.length; status.i++) {
@@ -354,6 +359,7 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
     }
   }
 
+  // HACK:
   if (operation === "@default:") {
     operation = "@default";
   }
@@ -375,6 +381,12 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
       } else if (char === ")") {
         parenCount -= 1;
       } else if (char === "{") {
+        if (parenCount === 0) {
+          node.logic = status.source.substring(start + 1, status.i).trim();
+          status.i += 1;
+          break;
+        }
+      } else if (char === "\n" && operation === "@const") {
         if (parenCount === 0) {
           node.logic = status.source.substring(start + 1, status.i).trim();
           status.i += 1;

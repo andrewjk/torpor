@@ -117,6 +117,9 @@ function buildLogicNode(
   anchorName: string,
 ): string {
   switch (node.operation) {
+    case "@const": {
+      return node.logic + (!node.logic.endsWith(";") ? ";" : "");
+    }
     case "@if group": {
       return buildIfNode(node, varNames, parentName, anchorName);
     }
