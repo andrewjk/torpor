@@ -9,8 +9,9 @@ import triggerEffects from "./triggerEffects";
 const handler = {
   get: function (target: Record<string, any>, key: string, receiver: any) {
     // Set the value to a new proxy if it's an object
+    // But not if it's a Promise (i.e. has a `then` method)
     const value = target[key];
-    if (value && !value.$isProxy && typeof value === "object") {
+    if (value && !value.$isProxy && typeof value === "object" && !value.then) {
       target[key] = watch(value);
     }
 

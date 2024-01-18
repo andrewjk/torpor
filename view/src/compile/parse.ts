@@ -44,9 +44,8 @@ const logicalOperations = [
   "@case",
   "@default",
   "@await",
-  "@var",
-  "@let",
-  "@html",
+  "@then",
+  "@catch",
 ];
 
 export default function parse(source: string): ParseResult {
@@ -56,8 +55,11 @@ export default function parse(source: string): ParseResult {
     errors: [],
   };
 
-  // HACK: The laziest way to handle elses:
-  status.source = status.source.replace(/}(\s*)else/g, "}$1@else");
+  // HACK: The laziest way to handle elses etc:
+  status.source = status.source
+    .replace(/}(\s*)else/g, "}$1@else")
+    .replace(/}(\s*)then/g, "}$1@then")
+    .replace(/}(\s*)catch/g, "}$1@catch");
 
   for (status.i; status.i < source.length; status.i++) {
     if (status.source[status.i] === "<") {
@@ -400,15 +402,15 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
 }
 
 function wrangleLogic(logic: LogicNode, parentNode: ElementNode | LogicNode) {
-  // HACK: Wrangle if branches into an ifBlock
+  // HACK: Wrangle if/then/else into an if group and await/then/catch into an await group
   if (logic.operation === "@if") {
-    const ifBlock: LogicNode = {
+    const ifGroup: LogicNode = {
       type: "logic",
       operation: "@if group",
       logic: "",
       children: [logic],
     };
-    parentNode.children.push(ifBlock);
+    parentNode.children.push(ifGroup);
   } else if (logic.operation === "@else") {
     if (/^else\s+if/.test(logic.logic)) {
       logic.operation = "@else if";
@@ -417,6 +419,23 @@ function wrangleLogic(logic: LogicNode, parentNode: ElementNode | LogicNode) {
       const lastChild = parentNode.children[i];
       // TODO: Break if it's an element, do more checking
       if (lastChild.type === "logic" && (lastChild as LogicNode).operation === "@if group") {
+        (lastChild as LogicNode).children.push(logic);
+        break;
+      }
+    }
+  } else if (logic.operation === "@await") {
+    const awaitGroup: LogicNode = {
+      type: "logic",
+      operation: "@await group",
+      logic: "",
+      children: [logic],
+    };
+    parentNode.children.push(awaitGroup);
+  } else if (logic.operation === "@then" || logic.operation === "@catch") {
+    for (let i = parentNode.children.length - 1; i >= 0; i--) {
+      const lastChild = parentNode.children[i];
+      // TODO: Break if it's an element, do more checking
+      if (lastChild.type === "logic" && (lastChild as LogicNode).operation === "@await group") {
         (lastChild as LogicNode).children.push(logic);
         break;
       }

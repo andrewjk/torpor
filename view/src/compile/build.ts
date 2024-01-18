@@ -29,12 +29,7 @@ export default function build(name: string, syntaxTree: SyntaxTree): string {
     // TODO: If it's a component or logic block, build the anchor etc
 
     let varNames: Record<string, number> = {};
-    result += buildNode(
-      syntaxTree.template,
-      varNames,
-      "parent",
-      "anchor && anchor.nextSibling",
-    );
+    result += buildNode(syntaxTree.template, varNames, "parent", "anchor && anchor.nextSibling");
   }
 
   result += `\n}\n};\n\nexport default ${name};`;
@@ -55,20 +50,10 @@ function buildNode(
 ): string {
   switch (node.type) {
     case "element": {
-      return buildElementNode(
-        node as ElementNode,
-        varNames,
-        parentName,
-        anchorName,
-      );
+      return buildElementNode(node as ElementNode, varNames, parentName, anchorName);
     }
     case "logic": {
-      return buildLogicNode(
-        node as LogicNode,
-        varNames,
-        parentName,
-        anchorName,
-      );
+      return buildLogicNode(node as LogicNode, varNames, parentName, anchorName);
     }
     case "text": {
       return buildTextNode(node as TextNode, varNames, parentName, anchorName);
@@ -126,7 +111,7 @@ function buildLogicNode(
     case "@if":
     case "@else if":
     case "@else": {
-      // This gets handled with @if group, above
+      // These get handled with @if group, above
       return "";
     }
     case "@switch": {
@@ -136,7 +121,14 @@ function buildLogicNode(
       // This gets handled with @switch, above
       return "";
     }
-    // TODO: etc
+    case "@await group": {
+      return buildAwaitNode(node, varNames, parentName, anchorName);
+    }
+    case "@then":
+    case "@catch": {
+      // These get handled with @await group, above
+      return "";
+    }
     default: {
       throw new Error(`Invalid operation: ${node.operation}`);
     }
@@ -157,9 +149,7 @@ function buildIfNode(
   const branches = node.children.filter((n) => n.type === "logic");
 
   // Add an else branch if there isn't one, so that the content will be cleared if no branches match
-  if (
-    branches.findIndex((n) => (n as LogicNode).operation === "@else") === -1
-  ) {
+  if (branches.findIndex((n) => (n as LogicNode).operation === "@else") === -1) {
     const elseBranch: LogicNode = {
       type: "logic",
       operation: "@else",
@@ -201,24 +191,19 @@ function buildIfBranch(
   indexName: string,
   index: number,
 ): string {
-  let endElementName = "undefined";
   let result = "";
   result += `${node.logic} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
+  let endElementName = "undefined";
   for (let child of filterChildren(node)) {
     // HACK: Is there a better way to do this
     let childName = nextNodeName(child, varNames, false);
     if (child.type === "element") {
       endElementName = childName;
     }
-    result += buildNode(
-      child,
-      varNames,
-      parentName,
-      `${anchorName}.nextSibling`,
-    );
+    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
     anchorName = childName;
   }
   result += "\n";
@@ -242,9 +227,7 @@ function buildSwitchNode(
   const branches = node.children.filter((n) => n.type === "logic");
 
   // Add a default branch if there isn't one, so that the content will be cleared if no branches match
-  if (
-    branches.findIndex((n) => (n as LogicNode).operation === "@default") === -1
-  ) {
+  if (branches.findIndex((n) => (n as LogicNode).operation === "@default") === -1) {
     const defaultBranch: LogicNode = {
       type: "logic",
       operation: "@default",
@@ -288,24 +271,19 @@ function buildSwitchBranch(
   indexName: string,
   index: number,
 ): string {
-  let endElementName = "undefined";
   let result = "";
   result += `${node.logic} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
+  let endElementName = "undefined";
   for (let child of filterChildren(node)) {
     // HACK: Is there a better way to do this
     let childName = nextNodeName(child, varNames, false);
     if (child.type === "element") {
       endElementName = childName;
     }
-    result += buildNode(
-      child,
-      varNames,
-      parentName,
-      `${anchorName}.nextSibling`,
-    );
+    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
     anchorName = childName;
   }
   result += "\n";
@@ -313,6 +291,101 @@ function buildSwitchBranch(
   result += `${indexName} = ${index};\n`;
   result += "break;\n";
   result += "}\n";
+  return result;
+}
+
+function buildAwaitNode(
+  node: LogicNode,
+  varNames: Record<string, number>,
+  parentName: string,
+  anchorName: string,
+): string {
+  const startAnchorName = nextVarName("logicAnchor", varNames);
+  const endNodeName = nextVarName("logicEndNode", varNames);
+  const awaitTokenName = nextVarName("awaitToken", varNames);
+
+  // Filter non-logic branches (spaces)
+  const branches = node.children.filter((n) => n.type === "logic");
+
+  // Make sure all branches exist
+  let awaitBranch = branches.find((n) => (n as LogicNode).operation === "@await") as LogicNode;
+  let thenBranch = branches.find((n) => (n as LogicNode).operation === "@then") as LogicNode;
+  if (!thenBranch) {
+    thenBranch = {
+      type: "logic",
+      operation: "@then",
+      logic: "then",
+      children: [],
+    };
+  }
+  let catchBranch = branches.find((n) => (n as LogicNode).operation === "@catch") as LogicNode;
+  if (!catchBranch) {
+    catchBranch = {
+      type: "logic",
+      operation: "@catch",
+      logic: "catch",
+      children: [],
+    };
+  }
+
+  const awaiterName = trim(awaitBranch.logic.substring("await".length), "(", ")");
+  const thenVar = trim(thenBranch.logic.substring("then".length), "(", ")");
+  const catchVar = trim(catchBranch.logic.substring("catch".length), "(", ")");
+
+  let result = "";
+  result += "\n";
+  result += `const ${startAnchorName} = document.createComment("@await");\n`;
+  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += "\n";
+  result += `let ${endNodeName}: ChildNode | undefined;\n`;
+  // Use an incrementing token to make sure only the last request gets handled
+  // TODO: This might have unforeseen consequences
+  result += `let ${awaitTokenName} = 0;\n`;
+  result += `watchEffect(() => {\n`;
+  result += `${awaitTokenName}++;\n`;
+  result += "\n";
+  result += buildAwaitBranch(awaitBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += "\n";
+  result += `((token: number) => {\n`;
+  result += `${awaiterName}\n`;
+  result += `.then((${thenVar}) => {\n`;
+  result += `if (token === ${awaitTokenName}) {\n`;
+  result += buildAwaitBranch(thenBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += `}\n`;
+  result += `})\n`;
+  result += `.catch((${catchVar}) => {\n`;
+  result += `if (token === ${awaitTokenName}) {\n`;
+  result += buildAwaitBranch(catchBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += `}\n`;
+  result += `});\n`;
+  result += `})(${awaitTokenName});\n`;
+  result += `});\n\n`;
+
+  return result;
+}
+
+function buildAwaitBranch(
+  node: LogicNode,
+  varNames: Record<string, number>,
+  parentName: string,
+  anchorName: string,
+  endNodeName: string,
+): string {
+  let result = "";
+  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
+  result += "\n";
+  let endElementName = "undefined";
+  for (let child of filterChildren(node)) {
+    // HACK: Is there a better way to do this
+    let childName = nextNodeName(child, varNames, false);
+    if (child.type === "element") {
+      endElementName = childName;
+    }
+    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
+    anchorName = childName;
+  }
+  result += "\n";
+  result += `${endNodeName} = ${endElementName};\n`;
   return result;
 }
 
@@ -341,9 +414,7 @@ function buildElementAttributes(node: ElementNode, varName: string): string {
     if (name.indexOf("on") === 0) {
       // Add an event listener
       let listener = value;
-      if (listener.startsWith("{")) listener = listener.substring(1);
-      if (listener.endsWith("}"))
-        listener = listener.substring(0, listener.length - 1);
+      listener = trim(listener, "{", "}");
       result += `${varName}.addEventListener("${name.substring(2)}", ${listener});\n`;
     } else if (name === "classList" && Array.isArray(value)) {
       // Add a class for each item in the array
@@ -442,11 +513,7 @@ function processChildren(node: ElementNode | LogicNode, cb: (node: Node) => void
 }
 */
 
-function nextVarName(
-  name: string,
-  varNames: Record<string, number>,
-  increment = true,
-): string {
+function nextVarName(name: string, varNames: Record<string, number>, increment = true): string {
   if (!varNames[name]) {
     varNames[name] = 1;
   }
@@ -457,14 +524,21 @@ function nextVarName(
   return varName;
 }
 
-function nextNodeName(
-  node: Node,
-  varNames: Record<string, number>,
-  increment = true,
-) {
+function nextNodeName(node: Node, varNames: Record<string, number>, increment = true) {
   if (node.type === "element") {
     return nextVarName((node as ElementNode).tagName, varNames, false);
   } else {
     return nextVarName("text", varNames, false);
   }
+}
+
+function trim(text: string, startValue: string, endValue: string) {
+  text = text.trim();
+  if (text.startsWith(startValue)) {
+    text = text.substring(startValue.length);
+  }
+  if (text.endsWith(endValue)) {
+    text = text.substring(0, text.length - endValue.length);
+  }
+  return text;
 }

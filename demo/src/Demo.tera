@@ -1,6 +1,15 @@
 <script>
     import watch from "../../watch/src/watch";
  
+    // TODO: Test with async
+    let number = 0;
+    function sleep(ms: number) {
+      number++;
+      return new Promise((ok: any, err: any) => {
+        return setTimeout(number % 3 === 0 ? () => err("uh oh") : () => ok("ok"), ms);
+      });
+    }
+
     const state = watch({
         condition: false,
         count: 0,
@@ -8,7 +17,8 @@
         deep: {
             text: "",
             class: ""
-        }
+        },
+        sleeper: sleep(1000)
     });
 
     function increment() {
@@ -22,6 +32,8 @@
         The count is <strong>{state.count}</strong>.
         It is {state.count % 2 == 0 ? "even" : "odd"}.
     </p>
+    @// Ignore this comment
+    @const x = 5;
     <button onclick=increment>Increment</button>
     <button onclick={() => state.count = 0}>Reset</button>
     @switch (state.count) {
@@ -47,6 +59,20 @@
         <p>I said whoa there!!</p>
         <p>BUDDY</p>
     }
+    <p>x is {x}</p>
+    @await (state.sleeper) {
+        <p>Loading...</p>
+    } then (result) {
+        <p>Loaded: {result}!</p>
+    } catch (ex) {
+        <p>Something went wrong: {ex}</p>
+    }
+    <button onclick={() => {
+      console.log("resetting");
+      state.sleeper = sleep(500);
+    }}>
+        Reset timer
+    </button>
 </div>
 
 <style>
