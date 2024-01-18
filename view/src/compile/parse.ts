@@ -61,7 +61,16 @@ export default function parse(source: string): ParseResult {
 
   for (status.i; status.i < source.length; status.i++) {
     if (status.source[status.i] === "<") {
-      parseTopElement(status);
+      if (
+        status.source[status.i + 1] === "!" &&
+        status.source[status.i + 2] === "-" &&
+        status.source[status.i + 3] === "-"
+      ) {
+        // It's a comment, swallow it
+        status.i = status.source.indexOf("-->", status.i) + 3;
+      } else {
+        parseTopElement(status);
+      }
     }
   }
 
@@ -124,15 +133,31 @@ function parseElement(status: ParseStatus): ElementNode {
           // TODO: Check that it's the correct closing element
           status.i = status.source.indexOf(">", status.i + 1);
           break;
+        } else if (
+          status.source[status.i + 1] === "!" &&
+          status.source[status.i + 2] === "-" &&
+          status.source[status.i + 3] === "-"
+        ) {
+          // It's a comment, swallow it
+          status.i = status.source.indexOf("-->", status.i) + 3;
         } else {
           // It's a child element
           const child = parseElement(status);
           element.children.push(child);
         }
       } else if (char === "@") {
-        // It's some logic
-        const child = parseLogic(status);
-        wrangleLogic(child, element);
+        const nextChars = status.source.substring(status.i, status.i + 3);
+        if (nextChars === "@//") {
+          // Swallow one-line comments
+          status.i = status.source.indexOf("\n", status.i) + 1;
+        } else if (nextChars === "@/*") {
+          // Swallow multi-line comments
+          status.i = status.source.indexOf("*/", status.i) + 2;
+        } else {
+          // It's some logic
+          const child = parseLogic(status);
+          wrangleLogic(child, element);
+        }
         /*
       } else if (char === "}") {
         // Check for an else
@@ -288,7 +313,7 @@ function parseLogic(status: ParseStatus): LogicNode {
 
   // Get the children
   for (status.i; status.i < status.source.length; status.i++) {
-    addSpaceElement(element, status);
+    addSpaceElement(node, status);
     const char = status.source[status.i];
     if (char === "}") {
       // It's the end of the logic block, so we're done here
@@ -296,18 +321,27 @@ function parseLogic(status: ParseStatus): LogicNode {
     } else if (char === "<") {
       // It's a child element
       const child = parseElement(status);
-      element.children.push(child);
+      node.children.push(child);
     } else if (char === "@") {
-      // It's some logic
-      const child = parseLogic(status);
-      wrangleLogic(child, element);
+      const nextChars = status.source.substring(status.i, status.i + 3);
+      if (nextChars === "@//") {
+        // Swallow one-line comments
+        status.i = status.source.indexOf("\n", status.i) + 1;
+      } else if (nextChars === "@/*") {
+        // Swallow multi-line comments
+        status.i = status.source.indexOf("*/", status.i) + 2;
+      } else {
+        // It's some logic
+        const child = parseLogic(status);
+        wrangleLogic(child, node);
+      }
     } else {
       // Can't have text content in logic blocks
       addError(status, `Unexpected token in logic block: ${char}`, status.i);
     }
   }
 
-  return element;
+  return node;
 }
 
 function parseLogicOpen(status: ParseStatus): LogicNode {
