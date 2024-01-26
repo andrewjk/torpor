@@ -13,17 +13,21 @@
     const state = watch({
         condition: false,
         count: 0,
-        letters: [],
+        letters: ["a", "b", "c", "d", "e", "f", "g"],
         deep: {
             text: "",
             class: ""
         },
-        sleeper: sleep(1000)
+        sleeper: sleep(1000),
     });
 
     function increment() {
         state.count += 1;
         console.log(state.count);
+    }
+
+    function nextLetter() {
+        return Array.from("abcdefghijklmnopqrstuvwxyz").filter(f => !state.letters.includes(f))[0];
     }
 </script>
 
@@ -59,6 +63,48 @@
         <p>I said whoa there!!</p>
         <p>BUDDY</p>
     }
+
+    @// FOR ===
+    <p>
+        @for (let i = 0; i < state.letters.length; i++) {
+            @key = state.letters[i];
+            @// TODO: replace with <text> tags
+            <span>{i > 0 ? ", " : ""}{state.letters[i]}</span>
+        }
+    </p>
+    <button onclick={() => {
+      state.letters = state.letters
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+    }}>
+        Shuffle letters
+    </button>
+    <button onclick={() => {
+      // HACK: should be able to push
+      state.letters = [...state.letters, nextLetter()]
+    }}>
+        Add a letter
+    </button>
+    <button onclick={() => {
+      // HACK: should be able to update
+      state.letters = [...state.letters.slice(0, 3), nextLetter(), ...state.letters.slice(4)];
+    }}>
+        Change a letter
+    </button>
+    <button onclick={() => {
+      // HACK: should be able to update
+      state.letters = [...state.letters.slice(0, 5), nextLetter(), ...state.letters.slice(5)];
+    }}>
+        Insert a letter
+    </button>
+    <button onclick={() => {
+      // HACK: should be able to update
+      state.letters = state.letters.map((l, i) => state.letters[state.letters.length - 1 - i]);
+    }}>
+        Reverse letters
+    </button>
+
     <p>x is {x}</p>
     @await (state.sleeper) {
         <p>Loading...</p>

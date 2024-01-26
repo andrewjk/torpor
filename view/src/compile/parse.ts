@@ -40,6 +40,7 @@ const logicalOperations = [
   "@if",
   "@else",
   "@for",
+  "@key",
   "@switch",
   "@case",
   "@default",
@@ -82,11 +83,11 @@ export default function parse(source: string): ParseResult {
     errors: status.errors,
     syntaxTree: ok
       ? {
-          imports: status.imports,
-          script: status.script,
-          template: status.template,
-          style: status.style,
-        }
+        imports: status.imports,
+        script: status.script,
+        template: status.template,
+        style: status.style,
+      }
       : undefined,
   };
 }
@@ -313,8 +314,8 @@ function parseAttributeValue(status: ParseStatus): string {
 function parseLogic(status: ParseStatus): LogicNode {
   const node = parseLogicOpen(status);
 
-  // Consts can't have children
-  if (node.operation === "@const") {
+  // Consts and keys can't have children
+  if (node.operation === "@const" || node.operation === "@key") {
     return node;
   }
 
@@ -388,7 +389,7 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
           status.i += 1;
           break;
         }
-      } else if (char === "\n" && operation === "@const") {
+      } else if (char === "\n" && (operation === "@const" || operation === "@key")) {
         if (parenCount === 0) {
           node.logic = status.source.substring(start + 1, status.i).trim();
           status.i += 1;
@@ -396,6 +397,9 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
         }
       }
     }
+  } else {
+    // TODO: Should probably advance until a lt
+    addError(status, `Unknown operation: ${node.operation}`, status.i);
   }
 
   return node;

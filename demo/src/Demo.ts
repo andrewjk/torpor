@@ -1,5 +1,6 @@
 import watchEffect from '../../watch/src/watchEffect';
 import clearRange from '../../view/src/render/clearRange';
+import reconcileList from '../../view/src/render/reconcileList';
 import watch from "../../watch/src/watch";
 
 const Demo = {
@@ -17,17 +18,21 @@ render: (parent: Node, anchor: Node | null) => {
     const state = watch({
         condition: false,
         count: 0,
-        letters: [],
+        letters: ["a", "b", "c", "d", "e", "f", "g"],
         deep: {
             text: "",
             class: ""
         },
-        sleeper: sleep(1000)
+        sleeper: sleep(1000),
     });
 
     function increment() {
         state.count += 1;
         console.log(state.count);
+    }
+
+    function nextLetter() {
+        return Array.from("abcdefghijklmnopqrstuvwxyz").filter(f => !state.letters.includes(f))[0];
     }
 
 const div1 = document.createElement("div");
@@ -189,71 +194,168 @@ logicIndex2 = 2;
 const text20 = document.createTextNode(" ");
 div1.insertBefore(text20, null);
 const p10 = document.createElement("p");
-const text21 = document.createTextNode("");
-p10.insertBefore(text21, null);
-watchEffect(() => text21.textContent = `x is ${x}`);
-div1.insertBefore(p10, null);
-const text22 = document.createTextNode(" ");
-div1.insertBefore(text22, null);
 
-const logicAnchor3 = document.createComment("@await");
-div1.insertBefore(logicAnchor3, null);
+const logicAnchor3 = document.createComment("@for");
+p10.insertBefore(logicAnchor3, null);
+
+let forItems1: any[] = [];
+watchEffect(() => {
+let newForItems: any[] = [];
+for (let i = 0; i < state.letters.length; i++) {
+let item: any = {};
+item["key"] = state.letters[i];;
+item.data = {};
+item.data["i"] = i;
+newForItems.push(item);
+}
+
+reconcileList(
+p10,
+forItems1,
+newForItems,
+logicAnchor3.nextSibling,
+(parent: Node, item: any, before: Node | null) => {
+let { i } = item.data;
+item.anchor = document.createComment("@for item " + item.key);
+parent.insertBefore(item.anchor, before);
+
+
+const text21 = document.createTextNode(" ");
+parent.insertBefore(text21, before);
+const span1 = document.createElement("span");
+const text22 = document.createTextNode("");
+span1.insertBefore(text22, null);
+watchEffect(() => text22.textContent = `${i > 0 ? ", " : ""}${state.letters[i]}`);
+parent.insertBefore(span1, before);
+
+item.endNode = span1;
+},
+);
+
+forItems1 = newForItems;
+});
+
+div1.insertBefore(p10, null);
+const text23 = document.createTextNode(" ");
+div1.insertBefore(text23, null);
+const button3 = document.createElement("button");
+button3.addEventListener("click", () => {
+      state.letters = state.letters
+        .map(value => ({ value, sort: Math.random() }))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({ value }) => value)
+    });
+const text24 = document.createTextNode("Shuffle letters");
+button3.insertBefore(text24, null);
+div1.insertBefore(button3, null);
+const text25 = document.createTextNode(" ");
+div1.insertBefore(text25, null);
+const button4 = document.createElement("button");
+button4.addEventListener("click", () => {
+      // HACK: should be able to push
+      state.letters = [...state.letters, nextLetter()]
+    });
+const text26 = document.createTextNode("Add a letter");
+button4.insertBefore(text26, null);
+div1.insertBefore(button4, null);
+const text27 = document.createTextNode(" ");
+div1.insertBefore(text27, null);
+const button5 = document.createElement("button");
+button5.addEventListener("click", () => {
+      // HACK: should be able to update
+      state.letters = [...state.letters.slice(0, 3), nextLetter(), ...state.letters.slice(4)];
+    });
+const text28 = document.createTextNode("Change a letter");
+button5.insertBefore(text28, null);
+div1.insertBefore(button5, null);
+const text29 = document.createTextNode(" ");
+div1.insertBefore(text29, null);
+const button6 = document.createElement("button");
+button6.addEventListener("click", () => {
+      // HACK: should be able to update
+      state.letters = [...state.letters.slice(0, 5), nextLetter(), ...state.letters.slice(5)];
+    });
+const text30 = document.createTextNode("Insert a letter");
+button6.insertBefore(text30, null);
+div1.insertBefore(button6, null);
+const text31 = document.createTextNode(" ");
+div1.insertBefore(text31, null);
+const button7 = document.createElement("button");
+button7.addEventListener("click", () => {
+      // HACK: should be able to update
+      state.letters = state.letters.map((l, i) => state.letters[state.letters.length - 1 - i]);
+    });
+const text32 = document.createTextNode("Reverse letters");
+button7.insertBefore(text32, null);
+div1.insertBefore(button7, null);
+const text33 = document.createTextNode(" ");
+div1.insertBefore(text33, null);
+const p11 = document.createElement("p");
+const text34 = document.createTextNode("");
+p11.insertBefore(text34, null);
+watchEffect(() => text34.textContent = `x is ${x}`);
+div1.insertBefore(p11, null);
+const text35 = document.createTextNode(" ");
+div1.insertBefore(text35, null);
+
+const logicAnchor4 = document.createComment("@await");
+div1.insertBefore(logicAnchor4, null);
 
 let logicEndNode3: ChildNode | undefined;
 let awaitToken1 = 0;
 watchEffect(() => {
 awaitToken1++;
 
-if (logicEndNode3) clearRange(logicAnchor3, logicEndNode3);
+if (logicEndNode3) clearRange(logicAnchor4, logicEndNode3);
 
-const p11 = document.createElement("p");
-const text23 = document.createTextNode("Loading...");
-p11.insertBefore(text23, null);
-div1.insertBefore(p11, logicAnchor3.nextSibling);
+const p12 = document.createElement("p");
+const text36 = document.createTextNode("Loading...");
+p12.insertBefore(text36, null);
+div1.insertBefore(p12, logicAnchor4.nextSibling);
 
-logicEndNode3 = p11;
+logicEndNode3 = p12;
 
 ((token: number) => {
 state.sleeper
 .then((result) => {
 if (token === awaitToken1) {
-if (logicEndNode3) clearRange(logicAnchor3, logicEndNode3);
+if (logicEndNode3) clearRange(logicAnchor4, logicEndNode3);
 
-const p12 = document.createElement("p");
-const text24 = document.createTextNode("");
-p12.insertBefore(text24, null);
-watchEffect(() => text24.textContent = `Loaded: ${result}!`);
-div1.insertBefore(p12, logicAnchor3.nextSibling);
+const p13 = document.createElement("p");
+const text37 = document.createTextNode("");
+p13.insertBefore(text37, null);
+watchEffect(() => text37.textContent = `Loaded: ${result}!`);
+div1.insertBefore(p13, logicAnchor4.nextSibling);
 
-logicEndNode3 = p12;
+logicEndNode3 = p13;
 }
 })
 .catch((ex) => {
 if (token === awaitToken1) {
-if (logicEndNode3) clearRange(logicAnchor3, logicEndNode3);
+if (logicEndNode3) clearRange(logicAnchor4, logicEndNode3);
 
-const p13 = document.createElement("p");
-const text25 = document.createTextNode("");
-p13.insertBefore(text25, null);
-watchEffect(() => text25.textContent = `Something went wrong: ${ex}`);
-div1.insertBefore(p13, logicAnchor3.nextSibling);
+const p14 = document.createElement("p");
+const text38 = document.createTextNode("");
+p14.insertBefore(text38, null);
+watchEffect(() => text38.textContent = `Something went wrong: ${ex}`);
+div1.insertBefore(p14, logicAnchor4.nextSibling);
 
-logicEndNode3 = p13;
+logicEndNode3 = p14;
 }
 });
 })(awaitToken1);
 });
 
-const text26 = document.createTextNode(" ");
-div1.insertBefore(text26, null);
-const button3 = document.createElement("button");
-button3.addEventListener("click", () => {
+const text39 = document.createTextNode(" ");
+div1.insertBefore(text39, null);
+const button8 = document.createElement("button");
+button8.addEventListener("click", () => {
       console.log("resetting");
       state.sleeper = sleep(500);
     });
-const text27 = document.createTextNode("Reset timer");
-button3.insertBefore(text27, null);
-div1.insertBefore(button3, null);
+const text40 = document.createTextNode("Reset timer");
+button8.insertBefore(text40, null);
+div1.insertBefore(button8, null);
 parent.insertBefore(div1, anchor && anchor.nextSibling);
 
 }

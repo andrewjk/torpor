@@ -9,6 +9,7 @@ export default function build(name: string, syntaxTree: SyntaxTree): string {
 
   result += "import watchEffect from '../../watch/src/watchEffect';\n";
   result += "import clearRange from '../../view/src/render/clearRange';\n";
+  result += "import reconcileList from '../../view/src/render/reconcileList';\n";
   if (syntaxTree.imports) {
     result += syntaxTree.imports.join("\n") + "\n\n";
   }
@@ -120,6 +121,9 @@ function buildLogicNode(
     case "@case": {
       // This gets handled with @switch, above
       return "";
+    }
+    case "@for": {
+      return buildForNode(node, varNames, parentName, anchorName);
     }
     case "@await group": {
       return buildAwaitNode(node, varNames, parentName, anchorName);
@@ -292,6 +296,129 @@ function buildSwitchBranch(
   result += "break;\n";
   result += "}\n";
   return result;
+}
+
+const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
+const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;
+const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
+
+function buildForNode(
+  node: LogicNode,
+  varNames: Record<string, number>,
+  parentName: string,
+  anchorName: string,
+): string {
+  // HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
+  // TODO: Handle destructuring, quotes, comments etc
+  const forVarNames: string[] = [];
+  const cforMatches = node.logic.match(forLoopRegex);
+  if (cforMatches) {
+    const forVarMatches = cforMatches[1].matchAll(forLoopVarsRegex);
+    for (let match of forVarMatches) {
+      forVarNames.push(match[1]);
+    }
+  } else {
+    const forOfMatch = node.logic.match(forOfRegex);
+    if (forOfMatch) {
+      forVarNames.push(forOfMatch[1]);
+    }
+  }
+
+  const startAnchorName = nextVarName("logicAnchor", varNames);
+  const forItemsName = nextVarName("forItems", varNames);
+
+  // Filter non-logic branches (spaces)
+  const key = node.children.find(
+    (n) => n.type === "logic" && (n as LogicNode).operation === "@key",
+  );
+
+  let result = "";
+  result += "\n";
+  result += `const ${startAnchorName} = document.createComment("@for");\n`;
+  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += "\n";
+  result += `let ${forItemsName}: any[] = [];\n`;
+  result += `watchEffect(() => {\n`;
+  result += `let newForItems: any[] = [];\n`;
+  result += `${node.logic} {\n`;
+  result += `let item: any = {};\n`;
+  if (key) {
+    const keyLogic = (key as LogicNode).logic;
+    result += `item["key"] = ${keyLogic.substring(keyLogic.indexOf("=") + 1).trim()};\n`;
+  }
+  result += `item.data = {};\n`;
+  for (let v of forVarNames) {
+    result += `item.data["${v}"] = ${v};\n`;
+  }
+  result += `newForItems.push(item);\n`;
+  result += `}\n`;
+  result += "\n";
+  result += `reconcileList(\n`;
+  result += `${parentName},\n`;
+  result += `${forItemsName},\n`;
+  result += `newForItems,\n`;
+  result += `${startAnchorName}.nextSibling,\n`;
+  result += `(parent: Node, item: any, before: Node | null) => {\n`;
+  result += `let { ${forVarNames.join(", ")} } = item.data;\n`;
+  result += buildForItem(node, varNames, "parent");
+  result += `},\n`;
+  result += `);\n`;
+  result += "\n";
+  result += `${forItemsName} = newForItems;\n`;
+  result += "});\n\n";
+  return result;
+}
+
+function buildForItem(
+  node: LogicNode,
+  varNames: Record<string, number>,
+  parentName: string,
+): string {
+  let result = "";
+  result += `item.anchor = document.createComment("@for item " + item.key);\n`;
+  result += `${parentName}.insertBefore(item.anchor, before);\n`;
+  result += `\n`;
+  result += "\n";
+  let endElementName = "undefined";
+  for (let child of filterChildren(node)) {
+    if (child.type === "logic" && (child as LogicNode).operation === "@key") {
+      continue;
+    }
+
+    // HACK: Is there a better way to do this
+    let childName = nextNodeName(child, varNames, false);
+    if (child.type === "element") {
+      endElementName = childName;
+    }
+    result += buildNode(child, varNames, parentName, "before");
+  }
+  result += "\n";
+  result += `item.endNode = ${endElementName};\n`;
+  return result;
+
+  /*
+  let result = "";
+  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
+  result += "let abcd = 0;\n";
+  result += `${node.logic} {\n`;
+  result += "console.log(abcd++);\n";
+  result += "\n";
+  let endElementName = "undefined";
+  for (let child of filterChildren(node)) {
+    // HACK: Is there a better way to do this
+    let childName = nextNodeName(child, varNames, false);
+    if (child.type === "element") {
+      endElementName = childName;
+    }
+    result += buildNode(child, varNames, parentName, `${cursorName}.nextSibling`);
+    //anchorName = childName;
+  }
+  result += "\n";
+  result += `${endNodeName} = ${endElementName};\n`;
+  result += `${cursorName} = ${endElementName};\n`;
+  result += "}\n";
+  return result;
+  */
 }
 
 function buildAwaitNode(

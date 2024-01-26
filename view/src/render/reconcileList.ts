@@ -1,3 +1,6 @@
+// Adapted from https://github.com/snabbdom/snabbdom
+// With changes from https://github.com/luwes/js-diff-benchmark
+
 /*
  * The MIT License (MIT)
  *
@@ -21,90 +24,144 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import type ListItem from "../types/ListItem";
+import clearRange from "./clearRange";
+import moveRange from "./moveRange";
 
-function updateChildren(
+/**
+ * @param parent The parent DOM element
+ * @param oldCh The list of current items
+ * @param newCh The list of future items
+ * @param before The element to insert new items before
+ * @param create A function that creates a new item
+ */
+export default (
   parentElm: Node,
-  oldCh: VNode[],
-  newCh: VNode[],
-  insertedVnodeQueue: VNodeQueue,
-) {
+  oldCh: ListItem[],
+  newCh: ListItem[],
+  before: Node | null,
+  create: (parent: Node, data: ListItem, before: Node | null) => void,
+) => {
   let oldStartIdx = 0;
-  let newStartIdx = 0;
   let oldEndIdx = oldCh.length - 1;
   let oldStartVnode = oldCh[0];
   let oldEndVnode = oldCh[oldEndIdx];
+
+  let newStartIdx = 0;
   let newEndIdx = newCh.length - 1;
   let newStartVnode = newCh[0];
   let newEndVnode = newCh[newEndIdx];
-  let oldKeyToIdx: KeyToIndexMap | undefined;
-  let idxInOld: number;
-  let elmToMove: VNode;
-  let before: any;
+
+  let oldKeyToIdx: Map<any, number> | undefined;
+  let newKeyToIdx: Map<any, number> | undefined;
 
   while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
     if (oldStartVnode == null) {
-      oldStartVnode = oldCh[++oldStartIdx]; // Vnode might have been moved left
+      oldStartVnode = oldCh[++oldStartIdx];
     } else if (oldEndVnode == null) {
       oldEndVnode = oldCh[--oldEndIdx];
     } else if (newStartVnode == null) {
       newStartVnode = newCh[++newStartIdx];
     } else if (newEndVnode == null) {
       newEndVnode = newCh[--newEndIdx];
-    } else if (sameVnode(oldStartVnode, newStartVnode)) {
-      patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
+    } else if (oldStartVnode.key === newStartVnode.key) {
+      transferRangeMarkers(oldStartVnode, newStartVnode);
       oldStartVnode = oldCh[++oldStartIdx];
       newStartVnode = newCh[++newStartIdx];
-    } else if (sameVnode(oldEndVnode, newEndVnode)) {
-      patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
+    } else if (oldEndVnode.key === newEndVnode.key) {
+      transferRangeMarkers(oldEndVnode, newEndVnode);
       oldEndVnode = oldCh[--oldEndIdx];
       newEndVnode = newCh[--newEndIdx];
-    } else if (sameVnode(oldStartVnode, newEndVnode)) {
-      // Vnode moved right
-      patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
-      api.insertBefore(parentElm, oldStartVnode.elm!, api.nextSibling(oldEndVnode.elm!));
+    } else if (oldStartVnode.key === newEndVnode.key) {
+      // Move to the end
+      //console.log("move", oldStartVnode.key, "to the end");
+      moveRange(
+        parentElm,
+        oldStartVnode.anchor,
+        oldStartVnode.endNode,
+        oldEndVnode?.endNode?.nextSibling,
+      );
+      transferRangeMarkers(oldStartVnode, newEndVnode);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
-    } else if (sameVnode(oldEndVnode, newStartVnode)) {
-      // Vnode moved left
-      patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
-      api.insertBefore(parentElm, oldEndVnode.elm!, oldStartVnode.elm!);
+    } else if (oldEndVnode.key === newStartVnode.key) {
+      // Move to the start
+      //console.log("move", oldEndVnode.key, "to the start");
+      moveRange(parentElm, oldEndVnode.anchor, oldEndVnode.endNode, oldStartVnode?.anchor);
+      transferRangeMarkers(oldEndVnode, newStartVnode);
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
     } else {
-      if (oldKeyToIdx === undefined) {
-        oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
-      }
-      idxInOld = oldKeyToIdx[newStartVnode.key as string];
-      if (isUndef(idxInOld)) {
-        // New element
-        api.insertBefore(
-          parentElm,
-          createElm(newStartVnode, insertedVnodeQueue),
-          oldStartVnode.elm!,
-        );
-      } else {
-        elmToMove = oldCh[idxInOld];
-        if (elmToMove.sel !== newStartVnode.sel) {
-          api.insertBefore(
-            parentElm,
-            createElm(newStartVnode, insertedVnodeQueue),
-            oldStartVnode.elm!,
-          );
-        } else {
-          patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
-          oldCh[idxInOld] = undefined as any;
-          api.insertBefore(parentElm, elmToMove.elm!, oldStartVnode.elm!);
+      // Lazily build maps of keys to indexes here
+      // They are relevant only if there has been a move, or a mid-list
+      // insertion or deletion, and not if there has been an insertion
+      // at the end or deletion from the front
+      if (!oldKeyToIdx || !newKeyToIdx) {
+        oldKeyToIdx = new Map();
+        for (let i = oldStartIdx; i < oldEndIdx; i++) {
+          oldKeyToIdx.set(oldCh[i].key, i);
+        }
+        newKeyToIdx = new Map();
+        for (let i = newStartIdx; i < newEndIdx; i++) {
+          newKeyToIdx.set(newCh[i].key, i);
         }
       }
-      newStartVnode = newCh[++newStartIdx];
+
+      let oldIndex = oldKeyToIdx.get(newStartVnode.key);
+      let newIndex = newKeyToIdx.get(oldStartVnode.key);
+
+      if (oldIndex === undefined && newIndex === undefined) {
+        // Replace
+        //console.log("replace", oldStartVnode.key, "with", newStartVnode.key);
+        create(parentElm, newStartVnode, oldStartVnode.anchor);
+        clearRange(oldStartVnode.anchor, oldStartVnode.endNode);
+        oldStartVnode = oldCh[++oldStartIdx];
+        newStartVnode = newCh[++newStartIdx];
+      } else if (oldIndex === undefined) {
+        // Insert
+        //console.log("insert", newStartVnode.key);
+        create(parentElm, newStartVnode, oldStartVnode.anchor);
+        newStartVnode = newCh[++newStartIdx];
+      } else if (newIndex === undefined) {
+        // Delete
+        //console.log("delete", oldStartVnode.key);
+        clearRange(oldStartVnode.anchor, oldStartVnode.endNode, true);
+        oldStartVnode = oldCh[++oldStartIdx];
+      } else {
+        // Move
+        //console.log("move", newStartVnode.key, "before", oldStartVnode.key);
+        const oldData = oldCh[oldIndex];
+        moveRange(parentElm, oldData.anchor, oldData.endNode, oldStartVnode.anchor);
+        transferRangeMarkers(oldData, newStartVnode);
+        // @ts-ignore TODO: Set key null instead?
+        oldCh[oldIndex] = null;
+        newStartVnode = newCh[++newStartIdx];
+      }
     }
   }
 
-  if (newStartIdx <= newEndIdx) {
-    before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
-    addVnodes(parentElm, before, newCh, newStartIdx, newEndIdx, insertedVnodeQueue);
+  // HACK: I haven't found a situation in which these if statements
+  // make a difference, but they might need to go back in
+  //if (oldStartIdx <= oldEndIdx || newStartIdx <= newEndIdx) {
+  //  if (oldStartIdx > oldEndIdx) {
+  // The old list is exhausted; process new list additions
+  for (newStartIdx; newStartIdx <= newEndIdx; newStartVnode = newCh[++newStartIdx]) {
+    //console.log("create", newStartVnode.key);
+    create(parentElm, newStartVnode, oldStartVnode?.anchor);
   }
-  if (oldStartIdx <= oldEndIdx) {
-    removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+  //  } else {
+  // The new list is exhausted; process old list removals
+  for (oldStartIdx; oldStartIdx <= oldEndIdx; oldStartVnode = oldCh[++oldStartIdx]) {
+    //console.log("clear", oldCh[oldStartIdx].key);
+    clearRange(oldStartVnode.anchor, oldStartVnode.endNode, true);
   }
+  //  }
+  //}
+
+  //return newCh;
+};
+
+function transferRangeMarkers(oldData: ListItem, newData: ListItem) {
+  newData.anchor = oldData.anchor;
+  newData.endNode = oldData.endNode;
 }
