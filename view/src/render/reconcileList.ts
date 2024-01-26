@@ -30,130 +30,128 @@ import moveRange from "./moveRange";
 
 /**
  * @param parent The parent DOM element
- * @param oldCh The list of current items
- * @param newCh The list of future items
- * @param before The element to insert new items before
- * @param create A function that creates a new item
+ * @param oldItems The list of current items
+ * @param newItems The list of future items
+ * @param create A function that creates the DOM elements for a new item
  */
 export default (
-  parentElm: Node,
-  oldCh: ListItem[],
-  newCh: ListItem[],
-  before: Node | null,
+  parent: Node,
+  oldItems: ListItem[],
+  newItems: ListItem[],
   create: (parent: Node, data: ListItem, before: Node | null) => void,
 ) => {
-  let oldStartIdx = 0;
-  let oldEndIdx = oldCh.length - 1;
-  let oldStartVnode = oldCh[0];
-  let oldEndVnode = oldCh[oldEndIdx];
+  let oldStartIndex = 0;
+  let oldEndIndex = oldItems.length - 1;
+  let oldStartItem = oldItems[0];
+  let oldEndItem = oldItems[oldEndIndex];
 
-  let newStartIdx = 0;
-  let newEndIdx = newCh.length - 1;
-  let newStartVnode = newCh[0];
-  let newEndVnode = newCh[newEndIdx];
+  let newStartIndex = 0;
+  let newEndIndex = newItems.length - 1;
+  let newStartItem = newItems[0];
+  let newEndItem = newItems[newEndIndex];
 
-  let oldKeyToIdx: Map<any, number> | undefined;
-  let newKeyToIdx: Map<any, number> | undefined;
+  let oldKeyToIndex: Map<any, number> | undefined;
+  let newKeyToIndex: Map<any, number> | undefined;
 
-  while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
-    if (oldStartVnode == null) {
-      oldStartVnode = oldCh[++oldStartIdx];
-    } else if (oldEndVnode == null) {
-      oldEndVnode = oldCh[--oldEndIdx];
-    } else if (newStartVnode == null) {
-      newStartVnode = newCh[++newStartIdx];
-    } else if (newEndVnode == null) {
-      newEndVnode = newCh[--newEndIdx];
-    } else if (oldStartVnode.key === newStartVnode.key) {
-      transferRangeMarkers(oldStartVnode, newStartVnode);
-      oldStartVnode = oldCh[++oldStartIdx];
-      newStartVnode = newCh[++newStartIdx];
-    } else if (oldEndVnode.key === newEndVnode.key) {
-      transferRangeMarkers(oldEndVnode, newEndVnode);
-      oldEndVnode = oldCh[--oldEndIdx];
-      newEndVnode = newCh[--newEndIdx];
-    } else if (oldStartVnode.key === newEndVnode.key) {
+  while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
+    if (oldStartItem == null) {
+      oldStartItem = oldItems[++oldStartIndex];
+    } else if (oldEndItem == null) {
+      oldEndItem = oldItems[--oldEndIndex];
+    } else if (newStartItem == null) {
+      newStartItem = newItems[++newStartIndex];
+    } else if (newEndItem == null) {
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldStartItem.key === newStartItem.key) {
+      transferRangeMarkers(oldStartItem, newStartItem);
+      oldStartItem = oldItems[++oldStartIndex];
+      newStartItem = newItems[++newStartIndex];
+    } else if (oldEndItem.key === newEndItem.key) {
+      transferRangeMarkers(oldEndItem, newEndItem);
+      oldEndItem = oldItems[--oldEndIndex];
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldStartItem.key === newEndItem.key) {
       // Move to the end
-      //console.log("move", oldStartVnode.key, "to the end");
+      //console.log("move", oldStartItem.key, "to the end");
       moveRange(
-        parentElm,
-        oldStartVnode.anchor,
-        oldStartVnode.endNode,
-        oldEndVnode?.endNode?.nextSibling,
+        parent,
+        oldStartItem.anchor,
+        oldStartItem.endNode,
+        oldEndItem?.endNode?.nextSibling,
       );
-      transferRangeMarkers(oldStartVnode, newEndVnode);
-      oldStartVnode = oldCh[++oldStartIdx];
-      newEndVnode = newCh[--newEndIdx];
-    } else if (oldEndVnode.key === newStartVnode.key) {
+      transferRangeMarkers(oldStartItem, newEndItem);
+      oldStartItem = oldItems[++oldStartIndex];
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldEndItem.key === newStartItem.key) {
       // Move to the start
-      //console.log("move", oldEndVnode.key, "to the start");
-      moveRange(parentElm, oldEndVnode.anchor, oldEndVnode.endNode, oldStartVnode?.anchor);
-      transferRangeMarkers(oldEndVnode, newStartVnode);
-      oldEndVnode = oldCh[--oldEndIdx];
-      newStartVnode = newCh[++newStartIdx];
+      //console.log("move", oldEndItem.key, "to the start");
+      moveRange(parent, oldEndItem.anchor, oldEndItem.endNode, oldStartItem?.anchor);
+      transferRangeMarkers(oldEndItem, newStartItem);
+      oldEndItem = oldItems[--oldEndIndex];
+      newStartItem = newItems[++newStartIndex];
     } else {
       // Lazily build maps of keys to indexes here
       // They are relevant only if there has been a move, or a mid-list
       // insertion or deletion, and not if there has been an insertion
       // at the end or deletion from the front
-      if (!oldKeyToIdx || !newKeyToIdx) {
-        oldKeyToIdx = new Map();
-        for (let i = oldStartIdx; i < oldEndIdx; i++) {
-          oldKeyToIdx.set(oldCh[i].key, i);
+      if (!oldKeyToIndex || !newKeyToIndex) {
+        oldKeyToIndex = new Map();
+        for (let i = oldStartIndex; i < oldEndIndex; i++) {
+          oldKeyToIndex.set(oldItems[i].key, i);
         }
-        newKeyToIdx = new Map();
-        for (let i = newStartIdx; i < newEndIdx; i++) {
-          newKeyToIdx.set(newCh[i].key, i);
+        newKeyToIndex = new Map();
+        for (let i = newStartIndex; i < newEndIndex; i++) {
+          newKeyToIndex.set(newItems[i].key, i);
         }
       }
 
-      let oldIndex = oldKeyToIdx.get(newStartVnode.key);
-      let newIndex = newKeyToIdx.get(oldStartVnode.key);
+      let oldIndex = oldKeyToIndex.get(newStartItem.key);
+      let newIndex = newKeyToIndex.get(oldStartItem.key);
 
       if (oldIndex === undefined && newIndex === undefined) {
         // Replace
-        //console.log("replace", oldStartVnode.key, "with", newStartVnode.key);
-        create(parentElm, newStartVnode, oldStartVnode.anchor);
-        clearRange(oldStartVnode.anchor, oldStartVnode.endNode);
-        oldStartVnode = oldCh[++oldStartIdx];
-        newStartVnode = newCh[++newStartIdx];
+        //console.log("replace", oldStartItem.key, "with", newStartItem.key);
+        create(parent, newStartItem, oldStartItem.anchor);
+        clearRange(oldStartItem.anchor, oldStartItem.endNode);
+        oldStartItem = oldItems[++oldStartIndex];
+        newStartItem = newItems[++newStartIndex];
       } else if (oldIndex === undefined) {
         // Insert
-        //console.log("insert", newStartVnode.key);
-        create(parentElm, newStartVnode, oldStartVnode.anchor);
-        newStartVnode = newCh[++newStartIdx];
+        //console.log("insert", newStartItem.key);
+        create(parent, newStartItem, oldStartItem.anchor);
+        newStartItem = newItems[++newStartIndex];
       } else if (newIndex === undefined) {
         // Delete
-        //console.log("delete", oldStartVnode.key);
-        clearRange(oldStartVnode.anchor, oldStartVnode.endNode, true);
-        oldStartVnode = oldCh[++oldStartIdx];
+        //console.log("delete", oldStartItem.key);
+        clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
+        oldStartItem = oldItems[++oldStartIndex];
       } else {
         // Move
-        //console.log("move", newStartVnode.key, "before", oldStartVnode.key);
-        const oldData = oldCh[oldIndex];
-        moveRange(parentElm, oldData.anchor, oldData.endNode, oldStartVnode.anchor);
-        transferRangeMarkers(oldData, newStartVnode);
+        //console.log("move", newStartItem.key, "before", oldStartItem.key);
+        const oldData = oldItems[oldIndex];
+        moveRange(parent, oldData.anchor, oldData.endNode, oldStartItem.anchor);
+        transferRangeMarkers(oldData, newStartItem);
         // @ts-ignore TODO: Set key null instead?
-        oldCh[oldIndex] = null;
-        newStartVnode = newCh[++newStartIdx];
+        oldItems[oldIndex] = null;
+        newStartItem = newItems[++newStartIndex];
       }
     }
   }
 
   // HACK: I haven't found a situation in which these if statements
   // make a difference, but they might need to go back in
-  //if (oldStartIdx <= oldEndIdx || newStartIdx <= newEndIdx) {
-  //  if (oldStartIdx > oldEndIdx) {
+  //if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
+  //  if (oldStartIndex > oldEndIndex) {
   // The old list is exhausted; process new list additions
-  for (newStartIdx; newStartIdx <= newEndIdx; newStartVnode = newCh[++newStartIdx]) {
-    //console.log("create", newStartVnode.key);
-    create(parentElm, newStartVnode, oldStartVnode?.anchor);
+  for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
+    //console.log("create", newStartItem.key);
+    create(parent, newStartItem, oldStartItem?.anchor);
   }
   //  } else {
   // The new list is exhausted; process old list removals
-  for (oldStartIdx; oldStartIdx <= oldEndIdx; oldStartVnode = oldCh[++oldStartIdx]) {
-    //console.log("clear", oldCh[oldStartIdx].key);
-    clearRange(oldStartVnode.anchor, oldStartVnode.endNode, true);
+  for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
+    //console.log("clear", oldCh[oldStartIndex].key);
+    clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
   }
   //  }
   //}
@@ -161,7 +159,7 @@ export default (
   //return newCh;
 };
 
-function transferRangeMarkers(oldData: ListItem, newData: ListItem) {
-  newData.anchor = oldData.anchor;
-  newData.endNode = oldData.endNode;
+function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {
+  newItem.anchor = oldItem.anchor;
+  newItem.endNode = oldItem.endNode;
 }

@@ -213,7 +213,6 @@ reconcileList(
 p10,
 forItems1,
 newForItems,
-logicAnchor3.nextSibling,
 (parent: Node, item: any, before: Node | null) => {
 let { i } = item.data;
 item.anchor = document.createComment("@for item " + item.key);

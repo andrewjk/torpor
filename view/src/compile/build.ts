@@ -357,7 +357,6 @@ function buildForNode(
   result += `${parentName},\n`;
   result += `${forItemsName},\n`;
   result += `newForItems,\n`;
-  result += `${startAnchorName}.nextSibling,\n`;
   result += `(parent: Node, item: any, before: Node | null) => {\n`;
   result += `let { ${forVarNames.join(", ")} } = item.data;\n`;
   result += buildForItem(node, varNames, "parent");
