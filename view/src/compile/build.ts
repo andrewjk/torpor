@@ -16,7 +16,7 @@ export default function build(name: string, syntaxTree: SyntaxTree): string {
 
   result += `const ${name} = {\n`;
   result += `name: "${name}",\n`;
-  result += `render: (parent: Node, anchor: Node | null) => {\n`;
+  result += `render: (parent/*: Node*/, anchor/*: Node | null*/) => {\n`;
 
   if (syntaxTree.script) {
     // TODO: Mangling
@@ -168,7 +168,7 @@ function buildIfNode(
   result += `const ${startAnchorName} = document.createComment("@if");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += `let ${endNodeName}: ChildNode | undefined;\n`;
+  result += `let ${endNodeName}/*: ChildNode | undefined*/;\n`;
   result += `let ${indexName} = -1;\n`;
   result += `watchEffect(() => {\n`;
   for (let [i, branch] of branches.entries()) {
@@ -246,7 +246,7 @@ function buildSwitchNode(
   result += `const ${startAnchorName} = document.createComment("@switch");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += `let ${endNodeName}: ChildNode | undefined;\n`;
+  result += `let ${endNodeName}/*: ChildNode | undefined*/;\n`;
   result += `let ${indexName} = -1;\n`;
   result += `watchEffect(() => {\n`;
   result += `${node.logic} {\n`;
@@ -337,11 +337,11 @@ function buildForNode(
   result += `const ${startAnchorName} = document.createComment("@for");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += `let ${forItemsName}: any[] = [];\n`;
+  result += `let ${forItemsName}/*: any[]*/ = [];\n`;
   result += `watchEffect(() => {\n`;
-  result += `let newForItems: any[] = [];\n`;
+  result += `let newForItems/*: any[]*/ = [];\n`;
   result += `${node.logic} {\n`;
-  result += `let item: any = {};\n`;
+  result += `let item/*: any*/ = {};\n`;
   if (key) {
     const keyLogic = (key as LogicNode).logic;
     result += `item["key"] = ${keyLogic.substring(keyLogic.indexOf("=") + 1).trim()};\n`;
@@ -357,7 +357,7 @@ function buildForNode(
   result += `${parentName},\n`;
   result += `${forItemsName},\n`;
   result += `newForItems,\n`;
-  result += `(parent: Node, item: any, before: Node | null) => {\n`;
+  result += `(parent/*: Node*/, item/*: any*/, before/*: Node | null*/) => {\n`;
   result += `let { ${forVarNames.join(", ")} } = item.data;\n`;
   result += buildForItem(node, varNames, "parent");
   result += `},\n`;
@@ -463,7 +463,7 @@ function buildAwaitNode(
   result += `const ${startAnchorName} = document.createComment("@await");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += `let ${endNodeName}: ChildNode | undefined;\n`;
+  result += `let ${endNodeName}/*: ChildNode | undefined*/;\n`;
   // Use an incrementing token to make sure only the last request gets handled
   // TODO: This might have unforeseen consequences
   result += `let ${awaitTokenName} = 0;\n`;
@@ -472,7 +472,7 @@ function buildAwaitNode(
   result += "\n";
   result += buildAwaitBranch(awaitBranch, varNames, parentName, startAnchorName, endNodeName);
   result += "\n";
-  result += `((token: number) => {\n`;
+  result += `((token/*: number*/) => {\n`;
   result += `${awaiterName}\n`;
   result += `.then((${thenVar}) => {\n`;
   result += `if (token === ${awaitTokenName}) {\n`;

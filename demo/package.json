@@ -1,27 +1,18 @@
 {
   "name": "@tera/demo",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "build": "tsm ./build.ts && tsup",
-    "tsup": "tsup",
-    "dev": "tsup --watch",
-    "check": "tsc -p tsconfig-check.json --noEmit",
-    "test": "vitest",
-    "format": "prettier --write ."
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "@types/node": "^20.11.1",
-    "prettier": "^3.2.2",
-    "tsm": "^2.3.0",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3",
-    "vitest": "^1.2.0"
+    "typescript": "^5.2.2",
+    "vite": "^5.0.8"
   }
 }

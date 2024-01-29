@@ -3,9 +3,9 @@
  
     // TODO: Test with async
     let number = 0;
-    function sleep(ms: number) {
+    function sleep(ms) {
       number++;
-      return new Promise((ok: any, err: any) => {
+      return new Promise((ok, err) => {
         return setTimeout(number % 3 === 0 ? () => err("uh oh") : () => ok("ok"), ms);
       });
     }
@@ -31,7 +31,7 @@
     }
 </script>
 
-<div>
+<div id="app">
     <p>
         The count is <strong>{state.count}</strong>.
         It is {state.count % 2 == 0 ? "even" : "odd"}.
