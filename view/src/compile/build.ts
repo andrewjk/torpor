@@ -551,7 +551,7 @@ function buildElementAttributes(node: ElementNode, varName: string): string {
     } else {
       // Set the attribute value
       // TODO: Call a function that does the stuff
-      result += `${varName}.setAttribute(${name}, ${value});\n`;
+      result += `${varName}.setAttribute("${name}", ${value});\n`;
     }
   }
 
