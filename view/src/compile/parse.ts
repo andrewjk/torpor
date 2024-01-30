@@ -3,6 +3,7 @@ import LogicNode from "../nodes/LogicNode";
 import TextNode from "../nodes/TextNode";
 import Attribute from "../types/Attribute";
 import CompileError from "../types/CompileError";
+import Import from "../types/Import";
 import ParseResult from "../types/ParseResult";
 
 interface ParseStatus {
@@ -12,7 +13,7 @@ interface ParseStatus {
   script?: string;
   template?: ElementNode;
   style?: string;
-  imports?: string[];
+  imports?: Import[];
   // Errors that have been encountered
   errors: CompileError[];
 }
@@ -83,11 +84,11 @@ export default function parse(source: string): ParseResult {
     errors: status.errors,
     syntaxTree: ok
       ? {
-        imports: status.imports,
-        script: status.script,
-        template: status.template,
-        style: status.style,
-      }
+          imports: status.imports,
+          script: status.script,
+          template: status.template,
+          style: status.style,
+        }
       : undefined,
   };
 }
@@ -124,6 +125,11 @@ function parseTopElement(status: ParseStatus) {
 
 function parseElement(status: ParseStatus): ElementNode {
   const element = parseTagOpen(status);
+
+  // TODO: this check could also go in build?
+  if (status.imports?.find((i) => i.component && i.name === element.tagName)) {
+    element.type = "component";
+  }
 
   if (!element.selfClosed && !voidTags.includes(element.tagName)) {
     // Get the children
@@ -178,24 +184,26 @@ function parseElement(status: ParseStatus): ElementNode {
         // It's text content
         const start = status.i;
         const end = status.source.indexOf("<", status.i + 1);
-        const content = status.source.substring(start, end).trimEnd();
-        if (content) {
-          const text: TextNode = {
-            type: "text",
-            content,
-          };
-          element.children.push(text);
+        if (end !== -1) {
+          const content = status.source.substring(start, end).trimEnd();
+          if (content) {
+            const text: TextNode = {
+              type: "text",
+              content,
+            };
+            element.children.push(text);
+          }
+          const spaceContent = status.source.substring(start + content.length, end);
+          if (spaceContent) {
+            const space: TextNode = {
+              type: "space",
+              content: spaceContent,
+            };
+            element.children.push(space);
+          }
+          // Rewind to the < so that it will get checked in the next loop, above
+          status.i = end - 1;
         }
-        const spaceContent = status.source.substring(start + content.length, end);
-        if (spaceContent) {
-          const space: TextNode = {
-            type: "space",
-            content: spaceContent,
-          };
-          element.children.push(space);
-        }
-        // Rewind to the < so that it will get checked in the next loop, above
-        status.i = end - 1;
       }
     }
   }
@@ -229,11 +237,20 @@ function parseTagOpen(status: ParseStatus): ElementNode {
 }
 
 function parseTagAttributes(element: ElementNode, status: ParseStatus) {
-  // TODO: This will infinitely recurse if there's no >
-  while (!accept(">", status)) {
-    const attribute = parseAttribute(status);
-    element.attributes.push(attribute);
-    consumeSpace(status);
+  for (status.i; status.i < status.source.length; status.i++) {
+    const char = status.source[status.i];
+    if (char === "/") {
+      element.selfClosed = true;
+      status.i += 2;
+      return;
+    } else if (char === ">") {
+      status.i += 1;
+      return;
+    } else if (!isSpaceChar(status.source, status.i)) {
+      const attribute = parseAttribute(status);
+      element.attributes.push(attribute);
+      //consumeSpace(status);
+    }
   }
 }
 
@@ -260,16 +277,16 @@ function parseAttributeValue(status: ParseStatus): string {
     const char = status.source[status.i];
     if (startChar === '"' || startChar === "'") {
       if (char === startChar) {
-        status.i++;
-        return status.source.substring(start, status.i);
+        //status.i++;
+        return status.source.substring(start, status.i + 1);
       }
     } else if (startChar === "{") {
       if (char === "{") {
         braceCount += 1;
       } else if (char === "}") {
         if (braceCount === 0) {
-          status.i++;
-          return status.source.substring(start, status.i);
+          //status.i++;
+          return status.source.substring(start, status.i + 1);
         } else {
           braceCount -= 1;
         }
@@ -299,11 +316,17 @@ function parseAttributeValue(status: ParseStatus): string {
               break;
             }
           }
+        } else if (nextChar === ">") {
+          // HACK: Go back to the start of the slash so that it gets parsed in parseTagAttributes
+          status.i -= 1;
+          return status.source.substring(start, status.i);
         }
       }
     } else {
       if (char === ">" || isSpaceChar(status.source, status.i)) {
-        return status.source.substring(start, status.i);
+        // HACK: Go back to the start of the > so that it gets parsed in parseTagAttributes
+        status.i -= 1;
+        return status.source.substring(start, status.i + 1);
       }
     }
   }
@@ -511,7 +534,18 @@ function extractScriptImports(status: ParseStatus) {
         if (line.length) {
           if (line.startsWith("import ")) {
             status.imports = status.imports || [];
-            status.imports.push(line);
+            const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/g;
+            const importMatches = line.matchAll(importRegex);
+            for (let match of importMatches) {
+              const name = match[1];
+              const path = trimAny(match[2], `'"`);
+              const componentRegex = /\.tera$/gm;
+              status.imports.push({
+                name,
+                path,
+                component: componentRegex.test(path),
+              });
+            }
           } else {
             // Imports are done!
             // TODO: Make sure there aren't any more with a regex
@@ -613,4 +647,18 @@ function isAlphaNumericChar(input: string, i: number) {
     // a-z
     (code > 96 && code < 123)
   );
+}
+
+// From https://stackoverflow.com/a/55292366
+function trimAny(input: string, chars: string): string {
+  let totrim = Array.from(chars);
+  let start = 0;
+  let end = input.length;
+  while (start < end && totrim.indexOf(input[start]) >= 0) {
+    start += 1;
+  }
+  while (end > start && totrim.indexOf(input[end - 1]) >= 0) {
+    end -= 1;
+  }
+  return start > 0 || end < input.length ? input.substring(start, end) : input;
 }

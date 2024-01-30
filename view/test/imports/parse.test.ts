@@ -16,7 +16,10 @@ test("imports", () => {
     ok: true,
     errors: [],
     syntaxTree: {
-      imports: ["import * from 'somewhere';", "import * from 'somewhere-else';"],
+      imports: [
+        { name: "*", path: "somewhere", component: false },
+        { name: "*", path: "somewhere-else", component: false },
+      ],
       script: "const x = 7;",
     },
   };

@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
+import { trimCode } from "../helpers";
 
 // TODO: Preserve space
 
@@ -18,25 +19,30 @@ test("template", () => {
   if (parseResult.ok && parseResult.syntaxTree) {
     const output = build("Template", parseResult.syntaxTree);
     const expected = `
-import { renderElement as $el, renderText as $text } from "../../dist";
+import watchEffect from '../../watch/src/watchEffect';
+import clearRange from '../../view/src/render/clearRange';
+import reconcileList from '../../view/src/render/reconcileList';
 
-export default function Template($parent, $anchor) {
-  // TODO: Script stuff here
-
-  // TODO: Push this scope onto the stack, for tracking subscriptions
-
-  let $el1 = $el($anchor, "h2", {}, [
-    $text("Section heading")
-  ]);
-  let $el2 = $el($el1, "p", {}, [
-    $text("Article content.")
-  ])
-
-  // TODO: Pop this scope off the stack
-
-  // TODO: Return a destroy function that will get stored with the anchor and removes listeners etc
+const Template = {
+name: "Template",
+render: (parent, anchor, $props) => {
+const section1 = document.createElement("section");
+const h21 = document.createElement("h2");
+const text1 = document.createTextNode("Section heading");
+h21.insertBefore(text1, null);
+section1.insertBefore(h21, null);
+const text2 = document.createTextNode(" ");
+section1.insertBefore(text2, null);
+const p1 = document.createElement("p");
+const text3 = document.createTextNode("Article content.");
+p1.insertBefore(text3, null);
+section1.insertBefore(p1, null);
+parent.insertBefore(section1, anchor && anchor.nextSibling);
 }
-`;
-    expect(output).toEqual(expected);
+};
+
+export default Template;
+`.trim();
+    expect(trimCode(output)).toEqual(expected);
   }
 });

@@ -5,12 +5,33 @@ import TextNode from "../src/nodes/TextNode";
 import Attribute from "../src/types/Attribute";
 import ParseResult from "../src/types/ParseResult";
 
-export function el(tagName: string, attributes?: Attribute[], children?: Node[]): ElementNode {
+export function cmp(
+  name: string,
+  attributes?: Attribute[],
+  children?: Node[],
+  selfClosed?: boolean,
+): ElementNode {
+  return {
+    type: "component",
+    tagName: name,
+    attributes: attributes || [],
+    children: children || [],
+    selfClosed,
+  };
+}
+
+export function el(
+  tagName: string,
+  attributes?: Attribute[],
+  children?: Node[],
+  selfClosed?: boolean,
+): ElementNode {
   return {
     type: "element",
     tagName,
     attributes: attributes || [],
     children: children || [],
+    selfClosed,
   };
 }
 
@@ -61,4 +82,9 @@ function trimElement(el: ElementNode | LogicNode) {
       trimElement(child as ElementNode);
     }
   }
+}
+
+export function trimCode(code: string) {
+  //return code.split('\n').filter(l => !l.trim().startsWith("import"))
+  return code.replace(/\/\*\*.+\*\/\n/gms, "");
 }

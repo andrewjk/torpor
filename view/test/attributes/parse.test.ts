@@ -57,7 +57,7 @@ test("attribute with no quotes", () => {
   expect(output).toEqual(expected);
 });
 
-test("mulitple attributes", () => {
+test("multiple attributes", () => {
   const input = `
 <a href1="http://example.com" href2='http://example.com' href3=http://example.com>
   Link

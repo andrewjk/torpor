@@ -1,5 +1,6 @@
 <script>
     import watch from "../../watch/src/watch";
+    import Header from "./Header.tera";
  
     // TODO: Test with async
     let number = 0;
@@ -63,6 +64,8 @@
         <p>I said whoa there!!</p>
         <p>BUDDY</p>
     }
+
+    <Header name="Bob"/>
 
     @// FOR ===
     <p>
