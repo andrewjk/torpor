@@ -31,7 +31,7 @@ test("switch statement", () => {
     ),
   };
   expect(output.errors).toEqual([]);
-  expect(output.syntaxTree).toEqual(expected);
+  expect(output.parts).toEqual(expected);
 });
 
 test("switch statement with default", () => {
@@ -62,5 +62,5 @@ test("switch statement with default", () => {
     ),
   };
   expect(output.errors).toEqual([]);
-  expect(output.syntaxTree).toEqual(expected);
+  expect(output.parts).toEqual(expected);
 });

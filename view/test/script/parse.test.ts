@@ -15,7 +15,7 @@ ${script}
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       script: script.trim(),
     },
   };
@@ -37,7 +37,7 @@ ${script}
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       script: script.trim(),
     },
   };
@@ -62,7 +62,7 @@ ${script}
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       script: script.trim(),
     },
   };

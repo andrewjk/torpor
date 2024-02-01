@@ -18,7 +18,7 @@ test("template", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -49,7 +49,7 @@ test("template with logic", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],

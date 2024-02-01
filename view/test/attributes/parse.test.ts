@@ -14,7 +14,7 @@ test("attribute with double quotes", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("a", [att("href", '"http://example.com"')], [text("Link")]),
     },
   };
@@ -32,7 +32,7 @@ test("attribute with single quotes", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("a", [att("href", "'http://example.com'")], [text("Link")]),
     },
   };
@@ -50,7 +50,7 @@ test("attribute with no quotes", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("a", [att("href", "http://example.com")], [text("Link")]),
     },
   };
@@ -68,7 +68,7 @@ test("multiple attributes", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "a",
         [
@@ -94,7 +94,7 @@ test("event attribute with name", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("button", [att("onclick", "{increment}")], [text("Increment")]),
     },
   };
@@ -114,7 +114,7 @@ test("event attribute with code", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("button", [att("onclick", "{() => {\n  increment();\n}}")], [text("Increment")]),
     },
   };

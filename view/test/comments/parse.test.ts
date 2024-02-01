@@ -18,7 +18,7 @@ test("html comments", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("section", [], [el("p", [], [text("The"), text("content")])]),
     },
   };
@@ -39,7 +39,7 @@ test("one line js comments", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("section", [], [el("p", [], [text("The content")])]),
     },
   };
@@ -63,7 +63,7 @@ test("multi line js comments", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("section", [], [el("p", [], [text("The content")])]),
     },
   };

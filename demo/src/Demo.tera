@@ -33,6 +33,7 @@
 </script>
 
 <div id="app">
+    <h2>Demo and test</h2>
     <p>
         The count is <strong>{state.count}</strong>.
         It is {state.count % 2 == 0 ? "even" : "odd"}.
@@ -125,14 +126,7 @@
 </div>
 
 <style>
-    :global(html) {
-        font-family: sans-serif;
-        font-size: 15px;
-    }
-
-    .container{
-        text-align: center;
-        margin: 0 auto;
-        max-width: 500px;
+    h2 {
+        color: lavender;
     }
 </style>

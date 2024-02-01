@@ -13,8 +13,8 @@ test("import component", () => {
 
   const parseResult = parse(input);
   expect(parseResult.errors).toEqual([]);
-  if (parseResult.ok && parseResult.syntaxTree) {
-    const output = build("Template", parseResult.syntaxTree);
+  if (parseResult.ok && parseResult.parts) {
+    const output = build("Template", parseResult.parts).code;
     const expected = `
 import watchEffect from '../../watch/src/watchEffect';
 import clearRange from '../../view/src/render/clearRange';
@@ -44,8 +44,8 @@ test("import component with props", () => {
 
   const parseResult = parse(input);
   expect(parseResult.errors).toEqual([]);
-  if (parseResult.ok && parseResult.syntaxTree) {
-    const output = build("Template", parseResult.syntaxTree);
+  if (parseResult.ok && parseResult.parts) {
+    const output = build("Template", parseResult.parts).code;
     const expected = `
 import watchEffect from '../../watch/src/watchEffect';
 import clearRange from '../../view/src/render/clearRange';

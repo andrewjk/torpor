@@ -16,7 +16,7 @@ test("simple await", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -46,7 +46,7 @@ test("await/then", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -79,7 +79,7 @@ test("await/then/catch", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],

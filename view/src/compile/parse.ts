@@ -1,10 +1,15 @@
 import ElementNode from "../nodes/ElementNode";
 import LogicNode from "../nodes/LogicNode";
+import Node from "../nodes/Node";
 import TextNode from "../nodes/TextNode";
 import Attribute from "../types/Attribute";
 import CompileError from "../types/CompileError";
 import Import from "../types/Import";
 import ParseResult from "../types/ParseResult";
+import Style from "../types/Style";
+import StyleBlock from "../types/StyleBlock";
+import hash from "./hash";
+import { isAlphaNumericChar, isSpaceChar, trimAny } from "./utils";
 
 interface ParseStatus {
   source: string;
@@ -12,7 +17,8 @@ interface ParseStatus {
   i: number;
   script?: string;
   template?: ElementNode;
-  style?: string;
+  style?: Style;
+  styleHash?: string;
   imports?: Import[];
   // Errors that have been encountered
   errors: CompileError[];
@@ -57,6 +63,27 @@ export default function parse(source: string): ParseResult {
     errors: [],
   };
 
+  parseSource(status, source);
+
+  checkAndApplyStyles(status);
+
+  const ok = !status.errors.length;
+  return {
+    ok,
+    errors: status.errors,
+    parts: ok
+      ? {
+          imports: status.imports,
+          script: status.script,
+          template: status.template,
+          style: status.style,
+          styleHash: status.styleHash,
+        }
+      : undefined,
+  };
+}
+
+function parseSource(status: ParseStatus, source: string) {
   // HACK: The laziest way to handle elses etc:
   status.source = status.source
     .replace(/}(\s*)else/g, "}$1@else")
@@ -77,20 +104,6 @@ export default function parse(source: string): ParseResult {
       }
     }
   }
-
-  const ok = !status.errors.length;
-  return {
-    ok,
-    errors: status.errors,
-    syntaxTree: ok
-      ? {
-          imports: status.imports,
-          script: status.script,
-          template: status.template,
-          style: status.style,
-        }
-      : undefined,
-  };
 }
 
 function parseTopElement(status: ParseStatus) {
@@ -101,13 +114,13 @@ function parseTopElement(status: ParseStatus) {
       if (!element.selfClosed) {
         status.script = parseScriptElement(status);
         extractScriptImports(status);
-      } else {
-        status.script = "";
       }
       break;
     }
     case "style": {
-      status.style = element.selfClosed ? "" : parseStyleElement(status);
+      if (!element.selfClosed) {
+        status.style = parseStyleElement(status);
+      }
       break;
     }
     default: {
@@ -561,19 +574,160 @@ function extractScriptImports(status: ParseStatus) {
   }
 }
 
-function parseStyleElement(status: ParseStatus): string {
-  // TODO: Parse CSS
+interface StyleStatus {
+  source: string;
+  i: number;
+  errors: CompileError[];
+}
+
+function parseStyleElement(status: ParseStatus): Style {
+  const style: Style = {
+    global: false,
+    blocks: [],
+  };
+
+  // Extract the content between the style tags without comments
+  const source = getStyleSource(status).trim();
+  status.styleHash = hash(source);
+
+  const styleStatus: StyleStatus = {
+    source,
+    i: 0,
+    errors: [],
+  };
+
+  for (styleStatus.i; styleStatus.i < styleStatus.source.length; styleStatus.i++) {
+    consumeSpace(styleStatus);
+    const block = parseStyleBlock(styleStatus);
+    style.blocks.push(block);
+  }
+
+  status.errors = status.errors.concat(styleStatus.errors);
+
+  return style;
+}
+
+function getStyleSource(status: ParseStatus): string {
   const start = status.i;
+
+  let style = "";
   for (status.i; status.i < status.source.length; status.i++) {
     const char = status.source[status.i];
     if (char === "<" && status.source.substring(status.i, status.i + 8) === "</style>") {
-      const style = status.source.substring(start, status.i).trim();
       status.i += 8;
       return style;
+    } else if (char === "/") {
+      const nextChar = status.source[status.i + 1];
+      if (nextChar === "/") {
+        // Ignore the content of one-line comments
+        status.i += 2;
+        for (status.i; status.i < status.source.length; status.i++) {
+          if (status.source[status.i] === "\n") {
+            break;
+          }
+        }
+      } else if (nextChar === "*") {
+        // Ignore the content of multiple-line comments
+        status.i += 2;
+        for (status.i; status.i < status.source.length; status.i++) {
+          if (status.source[status.i] === "/" && status.source[status.i - 1] === "*") {
+            break;
+          }
+        }
+      }
+    } else {
+      style += char;
     }
   }
+
   addError(status, "Unclosed style element", start);
   return "";
+}
+
+function parseStyleBlock(status: ParseStatus): StyleBlock {
+  const selector = consumeUntil("{", status).trim();
+  accept("{", status);
+  const block: StyleBlock = {
+    selector,
+    attributes: [],
+    children: [],
+  };
+  consumeSpace(status);
+  while (status.source[status.i] !== "}") {
+    // HACK: Is it an attribute or a child block?
+    let nextColon = status.source.indexOf(":", status.i);
+    if (nextColon === -1) nextColon = status.source.length;
+    let nextOpenBrace = status.source.indexOf("{", status.i);
+    if (nextOpenBrace === -1) nextOpenBrace = status.source.length;
+    if (nextColon < nextOpenBrace) {
+      const attribute = parseStyleAttribute(status);
+      block.attributes.push(attribute);
+    } else if (nextOpenBrace < nextColon) {
+      const child = parseStyleBlock(status);
+      block.children.push(child);
+    }
+    consumeSpace(status);
+  }
+  accept("}", status);
+  return block;
+}
+
+function parseStyleAttribute(status: ParseStatus): Attribute {
+  const name = consumeUntil(":", status).trim();
+  accept(":", status);
+  const value = consumeUntil(";", status).trim();
+  accept(";", status);
+  const attribute: Attribute = {
+    name,
+    value,
+  };
+  return attribute;
+}
+
+function checkAndApplyStyles(status: ParseStatus) {
+  let selectors: string[] = [];
+  if (status.style && status.styleHash && status.template) {
+    for (let block of status.style.blocks) {
+      collectStyleSelectors(block, selectors);
+    }
+    checkAndApplyStylesOnNode(status.template, selectors, status.styleHash);
+  }
+}
+
+function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: string) {
+  if (node.type === "element") {
+    const element = node as ElementNode;
+    let addClass = selectors.includes(element.tagName);
+    if (!addClass) {
+      for (let a of element.attributes) {
+        if (a.name === "id") {
+          addClass = selectors.includes(`#${trimAny(a.value, `'"`)}`);
+        } else if (a.name === "class") {
+          addClass = selectors.includes(`.${trimAny(a.value, `'"`)}`);
+        }
+        if (addClass) break;
+      }
+    }
+    if (addClass) {
+      element.attributes.push({
+        name: "class",
+        value: `tera-${styleHash}`,
+      });
+    }
+  }
+
+  if (node.type === "element" || node.type === "logic") {
+    for (let child of (node as ElementNode).children) {
+      checkAndApplyStylesOnNode(child, selectors, styleHash);
+    }
+  }
+}
+
+function collectStyleSelectors(block: StyleBlock, selectors: string[]) {
+  // HACK: We should be collecting the actual selectors and then checking attributes, parents, children, siblings etc
+  for (let s of block.selector.split(/[\s*,>+~]/)) {
+    selectors.push(s);
+  }
 }
 
 function addError(status: ParseStatus, message: string, start: number = status.i) {
@@ -590,10 +744,30 @@ function consumeSpace(status: ParseStatus): string {
   return "";
 }
 
+function consumeNonSpace(status: ParseStatus): string {
+  const start = status.i;
+  for (status.i; status.i < status.source.length; status.i++) {
+    if (isSpaceChar(status.source, status.i)) {
+      return status.source.substring(start, status.i);
+    }
+  }
+  return "";
+}
+
 function consumeWord(status: ParseStatus): string {
   const start = status.i;
   for (status.i; status.i < status.source.length; status.i++) {
     if (!isAlphaNumericChar(status.source, status.i)) {
+      return status.source.substring(start, status.i);
+    }
+  }
+  return "";
+}
+
+function consumeUntil(char: string, status: ParseStatus) {
+  const start = status.i;
+  for (status.i; status.i < status.source.length; status.i++) {
+    if (status.source[status.i] === char) {
       return status.source.substring(start, status.i);
     }
   }
@@ -621,44 +795,4 @@ function expect(value: string, status: ParseStatus, advance = true): boolean {
     addError(status, "Expected token");
   }
   return false;
-}
-
-function isSpace(input: string) {
-  for (let i = 0; i < input.length; i++) {
-    if (!isSpaceChar(input, i)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-function isSpaceChar(input: string, i: number) {
-  let code = input.charCodeAt(i);
-  return code === 32 || (code >= 9 && code <= 13);
-}
-
-function isAlphaNumericChar(input: string, i: number) {
-  let code = input.charCodeAt(i);
-  return (
-    // 0-9
-    (code > 47 && code < 58) ||
-    // A-Z
-    (code > 64 && code < 91) ||
-    // a-z
-    (code > 96 && code < 123)
-  );
-}
-
-// From https://stackoverflow.com/a/55292366
-function trimAny(input: string, chars: string): string {
-  let totrim = Array.from(chars);
-  let start = 0;
-  let end = input.length;
-  while (start < end && totrim.indexOf(input[start]) >= 0) {
-    start += 1;
-  }
-  while (end > start && totrim.indexOf(input[end - 1]) >= 0) {
-    end -= 1;
-  }
-  return start > 0 || end < input.length ? input.substring(start, end) : input;
 }

@@ -18,7 +18,7 @@ test("if statement", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -51,7 +51,7 @@ test("if/else statement", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -90,7 +90,7 @@ test("if/else if/else statement", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],

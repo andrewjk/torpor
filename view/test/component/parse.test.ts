@@ -15,7 +15,7 @@ test("import component", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       imports: [{ name: "Component", path: "./Component.tera", component: true }],
       script: "",
       template: cmp("Component", [], [], true),
@@ -36,7 +36,7 @@ test("import component with props", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       imports: [{ name: "Component", path: "./Component.tera", component: true }],
       script: "",
       template: cmp(

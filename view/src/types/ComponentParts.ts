@@ -1,9 +1,11 @@
 import ElementNode from "../nodes/ElementNode";
 import Import from "./Import";
+import Style from "./Style";
 
-export default interface SyntaxTree {
+export default interface ComponentParts {
   imports?: Import[];
   script?: string;
   template?: ElementNode;
-  style?: string;
+  style?: Style;
+  styleHash?: string;
 }

@@ -1,8 +1,8 @@
 import CompileError from "./CompileError";
-import SyntaxTree from "./SyntaxTree";
+import ComponentParts from "./ComponentParts";
 
 export default interface ParseResult {
   ok: boolean;
   errors: CompileError[];
-  syntaxTree?: SyntaxTree;
+  parts?: ComponentParts;
 }

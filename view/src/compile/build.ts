@@ -2,16 +2,28 @@ import ElementNode from "../nodes/ElementNode";
 import LogicNode from "../nodes/LogicNode";
 import Node from "../nodes/Node";
 import TextNode from "../nodes/TextNode";
-import SyntaxTree from "../types/SyntaxTree";
+import Attribute from "../types/Attribute";
+import BuildResult from "../types/BuildResult";
+import ComponentParts from "../types/ComponentParts";
+import StyleBlock from "../types/StyleBlock";
 
-export default function build(name: string, syntaxTree: SyntaxTree): string {
+export default function build(name: string, parts: ComponentParts): BuildResult {
+  const result: BuildResult = {
+    code: buildCode(name, parts),
+    styles: parts.style ? buildStyles(name, parts) : undefined,
+    styleHash: parts.styleHash,
+  };
+  return result;
+}
+
+function buildCode(name: string, parts: ComponentParts): string {
   let result = "";
 
   result += "import watchEffect from '../../watch/src/watchEffect';\n";
   result += "import clearRange from '../../view/src/render/clearRange';\n";
   result += "import reconcileList from '../../view/src/render/reconcileList';\n";
-  if (syntaxTree.imports) {
-    result += syntaxTree.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
+  if (parts.imports) {
+    result += parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
   }
   result += "\n";
 
@@ -24,26 +36,26 @@ export default function build(name: string, syntaxTree: SyntaxTree): string {
   result += ` */\n`;
   result += `render: (parent, anchor, $props) => {\n`;
 
-  if (syntaxTree.script) {
+  if (parts.script) {
     // TODO: Mangling
-    result += syntaxTree.script + "\n\n";
+    result += parts.script + "\n\n";
   }
 
-  if (syntaxTree.template) {
+  if (parts.template) {
     // We could create a document fragment with a string and assign the created elements to variables
     // It would mean we could use the same code for hydration too
 
     // TODO: If it's a component or logic block, build the anchor etc
 
     let varNames: Record<string, number> = {};
-    result += buildNode(syntaxTree.template, varNames, "parent", "anchor && anchor.nextSibling");
+    result += buildNode(parts.template, varNames, "parent", "anchor && anchor.nextSibling");
   }
 
   result += `}\n};\n\nexport default ${name};`;
 
-  if (syntaxTree.style) {
+  if (parts.style) {
     // TODO: Mangling
-    //result += syntaxTree.style;
+    //result += parts.style;
   }
 
   return result;
@@ -413,30 +425,6 @@ function buildForItem(
   result += "\n";
   result += `item.endNode = ${endElementName};\n`;
   return result;
-
-  /*
-  let result = "";
-  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
-  result += "let abcd = 0;\n";
-  result += `${node.logic} {\n`;
-  result += "console.log(abcd++);\n";
-  result += "\n";
-  let endElementName = "undefined";
-  for (let child of filterChildren(node)) {
-    // HACK: Is there a better way to do this
-    let childName = nextNodeName(child, varNames, false);
-    if (child.type === "element") {
-      endElementName = childName;
-    }
-    result += buildNode(child, varNames, parentName, `${cursorName}.nextSibling`);
-    //anchorName = childName;
-  }
-  result += "\n";
-  result += `${endNodeName} = ${endElementName};\n`;
-  result += `${cursorName} = ${endElementName};\n`;
-  result += "}\n";
-  return result;
-  */
 }
 
 function buildAwaitNode(
@@ -585,6 +573,9 @@ function buildElementAttributes(node: ElementNode, varName: string): string {
       for (let i = 0; i < value.length; i++) {
         //result += addClass(node, def, attribute[i]);
       }
+    } else if (name === "class") {
+      // TODO: Watch etc
+      result += `${varName}.classList.add("${value}");\n`;
     } else {
       // Set the attribute value
       // TODO: Call a function that does the stuff
@@ -693,6 +684,52 @@ function nextNodeName(node: Node, varNames: Record<string, number>, increment = 
   } else {
     return nextVarName("text", varNames, false);
   }
+}
+
+function buildStyles(name: string, parts: ComponentParts): string {
+  let result = "";
+
+  for (let block of parts.style!.blocks) {
+    result += buildStyleBlock(block, parts.styleHash!);
+  }
+
+  return result;
+}
+
+const globalStyleRegex = /\:global\((.+)\)/;
+
+function buildStyleBlock(block: StyleBlock, styleHash: string): string {
+  let result = "";
+
+  // TODO: This should probably be done while parsing
+  // And handle attribute selectors
+  const selectors = block.selector
+    .split(/([\s*,>+~])/)
+    .filter((s) => !!s.trim())
+    .map((s) => {
+      if (s.length === 1 && "*,>+~".includes(s)) {
+        return s;
+      } else if (globalStyleRegex.test(s)) {
+        return s.match(globalStyleRegex)![1];
+      } else {
+        return `${s}.tera-${styleHash}`;
+      }
+    });
+
+  result += `${selectors.join(" ")} {\n`;
+  for (let attribute of block.attributes) {
+    result += buildStyleAttribute(attribute);
+  }
+  for (let child of block.children) {
+    result += buildStyleBlock(child, styleHash);
+  }
+  result += "}\n";
+
+  return result;
+}
+
+function buildStyleAttribute(attribute: Attribute): string {
+  return `${attribute.name}: ${attribute.value};\n`;
 }
 
 function trim(text: string, startValue: string, endValue: string) {

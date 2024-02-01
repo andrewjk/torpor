@@ -66,8 +66,11 @@ export function space(content: string): TextNode {
 }
 
 export function trimParsed(result: ParseResult): ParseResult {
-  if (result.syntaxTree?.template) {
-    trimElement(result.syntaxTree.template as ElementNode);
+  if (result.parts?.template) {
+    trimElement(result.parts.template as ElementNode);
+  }
+  if (result.parts?.styleHash) {
+    result.parts.styleHash = undefined;
   }
   return result;
 }

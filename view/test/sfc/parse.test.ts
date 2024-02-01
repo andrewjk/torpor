@@ -10,7 +10,7 @@ test("empty file", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {},
+    parts: {},
   };
   expect(output).toEqual(expected);
 });
@@ -27,8 +27,7 @@ test("basic file", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
-      script: "",
+    parts: {
       template: {
         type: "element",
         tagName: "template",
@@ -36,7 +35,6 @@ test("basic file", () => {
         attributes: [],
         children: [],
       },
-      style: "",
     },
   };
   expect(output).toEqual(expected);

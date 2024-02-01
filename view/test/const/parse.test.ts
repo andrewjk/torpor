@@ -14,7 +14,7 @@ test("simple constant", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el("section", [], [logic("@const", "const x = 5", [])]),
     },
   };

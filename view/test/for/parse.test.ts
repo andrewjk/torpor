@@ -18,7 +18,7 @@ test("for i loop", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -43,7 +43,7 @@ test("for/of statement", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -68,7 +68,7 @@ test("for/in statement", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
@@ -94,7 +94,7 @@ test("for statement with key", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    syntaxTree: {
+    parts: {
       template: el(
         "section",
         [],
