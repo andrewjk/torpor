@@ -11,7 +11,7 @@
       });
     }
 
-    const state = watch({
+    const $state = watch({
         condition: false,
         count: 0,
         letters: ["a", "b", "c", "d", "e", "f", "g"],
@@ -23,26 +23,26 @@
     });
 
     function increment() {
-        state.count += 1;
-        console.log(state.count);
+        $state.count += 1;
+        console.log($state.count);
     }
 
     function nextLetter() {
-        return Array.from("abcdefghijklmnopqrstuvwxyz").filter(f => !state.letters.includes(f))[0];
+        return Array.from("abcdefghijklmnopqrstuvwxyz").filter(f => !$state.letters.includes(f))[0];
     }
 </script>
 
 <div id="app">
     <h2>Demo and test</h2>
     <p>
-        The count is <strong>{state.count}</strong>.
-        It is {state.count % 2 == 0 ? "even" : "odd"}.
+        The count is <strong>{$state.count}</strong>.
+        It is {$state.count % 2 == 0 ? "even" : "odd"}.
     </p>
     @// Ignore this comment
     @const x = 5;
     <button onclick=increment>Increment</button>
-    <button onclick={() => state.count = 0}>Reset</button>
-    @switch (state.count) {
+    <button onclick={() => $state.count = 0}>Reset</button>
+    @switch ($state.count) {
         @case 0: {
             <p>Zero</p>
         }
@@ -59,9 +59,9 @@
             <p>More</p>
         }
     }
-    @if (state.count > 5 && state.count <= 10) {
+    @if ($state.count > 5 && $state.count <= 10) {
         <p>Whoa there!</p>
-    } else if (state.count > 10) {
+    } else if ($state.count > 10) {
         <p>I said whoa there!!</p>
         <p>BUDDY</p>
     }
@@ -70,14 +70,14 @@
 
     @// FOR ===
     <p>
-        @for (let i = 0; i < state.letters.length; i++) {
-            @key = state.letters[i];
+        @for (let i = 0; i < $state.letters.length; i++) {
+            @key = $state.letters[i];
             @// TODO: replace with <text> tags
-            <span>{i > 0 ? ", " : ""}{state.letters[i]}</span>
+            <span>{i > 0 ? ", " : ""}{$state.letters[i]}</span>
         }
     </p>
     <button onclick={() => {
-      state.letters = state.letters
+      $state.letters = $state.letters
         .map(value => ({ value, sort: Math.random() }))
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
@@ -86,31 +86,31 @@
     </button>
     <button onclick={() => {
       // HACK: should be able to push
-      state.letters = [...state.letters, nextLetter()]
+      $state.letters = [...$state.letters, nextLetter()]
     }}>
         Add a letter
     </button>
     <button onclick={() => {
       // HACK: should be able to update
-      state.letters = [...state.letters.slice(0, 3), nextLetter(), ...state.letters.slice(4)];
+      $state.letters = [...$state.letters.slice(0, 3), nextLetter(), ...$state.letters.slice(4)];
     }}>
         Change a letter
     </button>
     <button onclick={() => {
       // HACK: should be able to update
-      state.letters = [...state.letters.slice(0, 5), nextLetter(), ...state.letters.slice(5)];
+      $state.letters = [...$state.letters.slice(0, 5), nextLetter(), ...$state.letters.slice(5)];
     }}>
         Insert a letter
     </button>
     <button onclick={() => {
       // HACK: should be able to update
-      state.letters = state.letters.map((l, i) => state.letters[state.letters.length - 1 - i]);
+      $state.letters = $state.letters.map((l, i) => $state.letters[$state.letters.length - 1 - i]);
     }}>
         Reverse letters
     </button>
 
     <p>x is {x}</p>
-    @await (state.sleeper) {
+    @await ($state.sleeper) {
         <p>Loading...</p>
     } then (result) {
         <p>Loaded: {result}!</p>
@@ -119,7 +119,7 @@
     }
     <button onclick={() => {
       console.log("resetting");
-      state.sleeper = sleep(500);
+      $state.sleeper = sleep(500);
     }}>
         Reset timer
     </button>
