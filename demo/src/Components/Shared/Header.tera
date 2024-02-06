@@ -1,0 +1,11 @@
+﻿<script>
+	/*
+	TODO: Type checking on $props
+	*/
+</script>
+
+<h2>Hello {$props.name}</h2>
+
+<style>
+	h2 { color: cornflowerblue; }
+</style>

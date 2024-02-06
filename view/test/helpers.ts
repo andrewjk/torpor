@@ -35,6 +35,21 @@ export function el(
   };
 }
 
+export function sp(
+  name: string,
+  attributes?: Attribute[],
+  children?: Node[],
+  selfClosed?: boolean,
+): ElementNode {
+  return {
+    type: "special",
+    tagName: name,
+    attributes: attributes || [],
+    children: children || [],
+    selfClosed,
+  };
+}
+
 export function logic(operation: string, logic: string, children?: Node[]): LogicNode {
   return {
     type: "logic",

@@ -1,0 +1,130 @@
+<script>
+	import Header from '../../Components/Shared/Header.tera';
+	import Article from '../../Components/Home/Article.tera';
+	import FancyList from '../../Components/Home/FancyList.tera';
+	import Event from '../../Components/Home/Event.tera';
+	import LetterItem from '../../Components/Home/LetterItem.tera';
+ 
+	$context["info"] = "Context from Index";
+
+	const $state = watch({
+		//name: "",
+		condition: false,
+		count: 0,
+		letters: [],
+		deep: {
+			text: "",
+			class: ""
+		},
+		items: [{ text: "first" }, { text: "second" }]
+	});
+
+	function increment(e) {
+		$state.condition = !$state.condition;
+
+		$state.count += 1;
+		// TODO:
+		//$state.letters.push('abcdefghijklmnopqrstuvwxyz'[$state.count - 1 % 26]);
+		$state.letters = [...$state.letters, 'abcdefghijklmnopqrstuvwxyz'[$state.count - 1 % 26]];
+
+		$state.deep.text = 'Changed deep state';
+		$state.deep.class = $state.condition ? undefined : 'festive';
+	}
+
+	function splice(e) {
+		$state.letters.splice(1, 1, 'x', 'y');
+	}
+
+	function eventBubbled(e) {
+		alert("bubbled");
+	}
+</script>
+
+<div id="app">
+	<!-- Testing binding -->
+	<p>
+		Enter your name: <input type='text' bind:value={$state.name}>
+	</p>
+
+	<!-- Testing a component with scoped styles and props -->
+	<Header name={$state.name} />
+
+	<!-- Testing slots -->
+	<Article>
+		<p>
+			Here's the regular slot!!
+		</p>
+		<:fill name="footer">
+			<p>
+				Here's the footer slot!
+			</p>
+		</:fill>
+	</Article>
+	
+	<!-- TODO: Testing slots with let:prop={item} -- I don't think we need it? -->
+	<FancyList items={$state.items}>
+		{$sprops.item.text}!
+	</FancyList>
+
+	<p id='countdiv'>
+		<span>Number</span>   <span>of items: {$state.count}</span>
+	</p>
+	<p class={$state.deep.class}>{$state.deep.text}</p>
+	<p class:festive={$state.condition}>{$state.deep.text}</p>
+
+	<button onclick={increment}>
+		Increment...
+	</button>
+	<button onclick={splice}>
+		Splice...
+	</button>
+	<Event onbubble={eventBubbled}/>
+
+	<ul>
+		@for (let [index, letter] of $state.letters.entries()) {
+			<LetterItem {index} {letter} />
+		}
+	</ul>
+	
+	<p>
+		@for (let [index, letter] of $state.letters.entries()) {
+			<span>{letter}</span>
+		}
+	</p>
+
+	@if ($state.condition) {
+		<p>It's true!</p>
+
+		@if ($state.count > 10) {
+			<p>hey, too fast!!</p>
+		} else if ($state.count > 5) {
+			<p>slow down there!</p>
+		} else {
+			<p>keep going...</p>
+		}
+
+		<p>It's really true!</p>
+	}
+</div>
+
+<style>
+	.festive {
+		color: lightcoral;
+	}
+
+	button {
+		background-color: limegreen;
+		border-radius: 2px;
+		border-style: none;
+		color: white;
+		padding: 6px 8px;
+	}
+
+	button:hover {
+		background-color: forestgreen;
+	}
+
+	#countdiv {
+		color: deeppink;
+	}
+</style>

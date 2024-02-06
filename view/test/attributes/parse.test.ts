@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { att, el, logic, text, trimParsed } from "../helpers";
+import { att, el, text, trimParsed } from "../helpers";
 
 test("attribute with double quotes", () => {
   const input = `
@@ -116,6 +116,38 @@ test("event attribute with code", () => {
     errors: [],
     parts: {
       template: el("button", [att("onclick", "{() => {\n  increment();\n}}")], [text("Increment")]),
+    },
+  };
+  expect(output).toEqual(expected);
+});
+
+test("shorthand attribute", () => {
+  const input = `
+<a {href}></a>
+`;
+
+  const output = trimParsed(parse(input));
+  const expected: ParseResult = {
+    ok: true,
+    errors: [],
+    parts: {
+      template: el("a", [att("{href}", "")]),
+    },
+  };
+  expect(output).toEqual(expected);
+});
+
+test("multiple shorthand attributes", () => {
+  const input = `
+<a {href1} {href2}></a>
+`;
+
+  const output = trimParsed(parse(input));
+  const expected: ParseResult = {
+    ok: true,
+    errors: [],
+    parts: {
+      template: el("a", [att("{href1}", ""), att("{href2}", "")]),
     },
   };
   expect(output).toEqual(expected);

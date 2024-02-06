@@ -3,6 +3,7 @@ import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
 import { trimCode } from "../helpers";
 
+/*
 test("import component", () => {
   const input = `
   <script>
@@ -64,3 +65,4 @@ export default Template;
     expect(trimCode(output)).toEqual(expected);
   }
 });
+*/

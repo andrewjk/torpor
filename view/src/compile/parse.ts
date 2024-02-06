@@ -228,7 +228,8 @@ function parseTagOpen(status: ParseStatus): ElementNode {
   accept("<", status);
 
   consumeSpace(status);
-  const tagName = consumeWord(status);
+  let special = accept(":", status);
+  let tagName = consumeWord(status);
   consumeSpace(status);
 
   const element: ElementNode = {
@@ -237,6 +238,11 @@ function parseTagOpen(status: ParseStatus): ElementNode {
     attributes: [],
     children: [],
   };
+
+  if (special) {
+    element.type = "special";
+    element.tagName = ":" + element.tagName;
+  }
 
   if (accept(">", status)) {
     // Don't need to do anything
@@ -262,13 +268,12 @@ function parseTagAttributes(element: ElementNode, status: ParseStatus) {
     } else if (!isSpaceChar(status.source, status.i)) {
       const attribute = parseAttribute(status);
       element.attributes.push(attribute);
-      //consumeSpace(status);
     }
   }
 }
 
 function parseAttribute(status: ParseStatus): Attribute {
-  const name = consumeWord(status);
+  let name = consumeUntil("= \t\r\n/>", status);
   const attribute: Attribute = {
     name,
     value: "",
@@ -277,6 +282,11 @@ function parseAttribute(status: ParseStatus): Attribute {
   if (accept("=", status)) {
     consumeSpace(status);
     attribute.value = parseAttributeValue(status);
+  }
+  // HACK: Really have to sort out this parsing stuff
+  const char = status.source[status.i];
+  if (char === "/" || char === ">" || char === "{") {
+    status.i -= 1;
   }
   return attribute;
 }
@@ -697,7 +707,11 @@ function checkAndApplyStyles(status: ParseStatus) {
 function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: string) {
   if (node.type === "element") {
     const element = node as ElementNode;
-    let addClass = selectors.includes(element.tagName);
+    let addClass = false;
+    addClass =
+      addClass ||
+      !!element.attributes.find((a) => a.name === "class" || a.name.startsWith("class:"));
+    addClass = addClass || selectors.includes(element.tagName);
     if (!addClass) {
       for (let a of element.attributes) {
         if (a.name === "id") {
@@ -711,7 +725,7 @@ function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: s
     if (addClass) {
       element.attributes.push({
         name: "class",
-        value: `tera-${styleHash}`,
+        value: `"tera-${styleHash}"`,
       });
     }
   }
@@ -764,10 +778,10 @@ function consumeWord(status: ParseStatus): string {
   return "";
 }
 
-function consumeUntil(char: string, status: ParseStatus) {
+function consumeUntil(value: string, status: ParseStatus) {
   const start = status.i;
   for (status.i; status.i < status.source.length; status.i++) {
-    if (status.source[status.i] === char) {
+    if (value.includes(status.source[status.i])) {
       return status.source.substring(start, status.i);
     }
   }

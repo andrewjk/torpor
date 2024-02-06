@@ -24,11 +24,15 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
     // Check for *.tera files
     return /\.tera$/.test(id);
   },
-  transform(code /*, id*/) {
+  transform(code, id) {
     const parsed = parse(code);
     if (parsed.ok && parsed.parts) {
+      const name = id
+        .split(/[\\\/]/)
+        .at(-1)
+        ?.replace(/\.tera$/, "");
       // TODO: Compile typescript if script lang="ts" or config.lang="ts"
-      const built = build("Demo", parsed.parts);
+      const built = build(name!, parsed.parts);
       let transformed = built.code;
 
       if (built.styles && built.styleHash) {
@@ -40,7 +44,21 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 
       return transformed;
     } else {
-      throw new Error("Uh");
+      console.log("\nERRORS\n======");
+      for (let error of parsed.errors) {
+        //const line = (input.slice(0, error.i).match(/\n/g) || "").length + 1;
+        let slice = code.slice(0, error.start);
+        let line = 1;
+        let last_line_index = 0;
+        for (let i = 0; i < slice.length; i++) {
+          if (code[i] === "\n") {
+            line += 1;
+            last_line_index = i;
+          }
+        }
+        console.log(`${line},${error.start - last_line_index - 1}: ${error.message}`);
+      }
+      throw new Error("Uh oh");
     }
   },
 });

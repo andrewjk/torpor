@@ -2,7 +2,7 @@
 //import viteLogo from '/vite.svg'
 //import { setupCounter } from './counter.ts'
 import render from "../../view/src/render/render";
-import Demo from "./Demo.tera";
+import Index from "./Components/Home/Index.tera";
 import "./style.css";
 
 /*
@@ -29,5 +29,5 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 
 const root = document.getElementById("tera-container");
 if (root) {
-  render(root, Demo, null);
+  render(root, Index, null);
 }

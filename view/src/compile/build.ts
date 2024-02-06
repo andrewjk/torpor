@@ -6,6 +6,12 @@ import Attribute from "../types/Attribute";
 import BuildResult from "../types/BuildResult";
 import ComponentParts from "../types/ComponentParts";
 import StyleBlock from "../types/StyleBlock";
+import { trimAny } from "./utils";
+
+interface BuildStatus {
+  varNames: Record<string, number>;
+  lastNodeName: string;
+}
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
   const result: BuildResult = {
@@ -19,22 +25,32 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 function buildCode(name: string, parts: ComponentParts): string {
   let result = "";
 
-  result += "import watchEffect from '../../watch/src/watchEffect';\n";
-  result += "import clearRange from '../../view/src/render/clearRange';\n";
-  result += "import reconcileList from '../../view/src/render/reconcileList';\n";
+  result += "import watch from '../../../../watch/src/watch';\n";
+  result += "import watchEffect from '../../../../watch/src/watchEffect';\n";
+  result += "import clearRange from '../../../../view/src/render/clearRange';\n";
+  result += "import reconcileList from '../../../../view/src/render/reconcileList';\n";
+  //result += "import { watch, watchEffect } from '../../../../../tera/watch/dist/index.js';\n";
+  //result += "import { clearRange, reconcileList } from '../../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
     result += parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
   }
   result += "\n";
 
+  // HACK: Move into utils
+  result += "function defText(text) { return text != null ? text : '' }";
+
   result += `const ${name} = {\n`;
   result += `name: "${name}",\n`;
   result += `/**\n`;
-  result += ` * @param {Node} parent\n`;
-  result += ` * @param {Node | null} anchor\n`;
+  result += ` * @param {Node} $parent\n`;
+  result += ` * @param {Node | null} $anchor\n`;
   result += ` * @param {any} $props\n`;
+  result += ` * @param {any} $slots\n`;
   result += ` */\n`;
-  result += `render: (parent, anchor, $props) => {\n`;
+  result += `render: ($parent, $anchor, $props, $slots, $context) => {\n`;
+
+  // Redefine context so that any newly added properties will only be passed to children
+  result += `$context = Object.assign({}, $context);\n`;
 
   if (parts.script) {
     // TODO: Mangling
@@ -45,40 +61,39 @@ function buildCode(name: string, parts: ComponentParts): string {
     // We could create a document fragment with a string and assign the created elements to variables
     // It would mean we could use the same code for hydration too
 
-    // TODO: If it's a component or logic block, build the anchor etc
-
-    let varNames: Record<string, number> = {};
-    result += buildNode(parts.template, varNames, "parent", "anchor && anchor.nextSibling");
+    const status: BuildStatus = {
+      varNames: {},
+      lastNodeName: "",
+    };
+    result += buildNode(parts.template, status, "$parent", "$anchor && $anchor.nextSibling");
   }
 
   result += `}\n};\n\nexport default ${name};`;
-
-  if (parts.style) {
-    // TODO: Mangling
-    //result += parts.style;
-  }
 
   return result;
 }
 
 function buildNode(
   node: Node,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
   switch (node.type) {
     case "component": {
-      return buildComponentNode(node as ElementNode, varNames, parentName, anchorName);
+      return buildComponentNode(node as ElementNode, status, parentName, anchorName);
     }
     case "element": {
-      return buildElementNode(node as ElementNode, varNames, parentName, anchorName);
+      return buildElementNode(node as ElementNode, status, parentName, anchorName);
+    }
+    case "special": {
+      return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
     }
     case "logic": {
-      return buildLogicNode(node as LogicNode, varNames, parentName, anchorName);
+      return buildLogicNode(node as LogicNode, status, parentName, anchorName);
     }
     case "text": {
-      return buildTextNode(node as TextNode, varNames, parentName, anchorName);
+      return buildTextNode(node as TextNode, status, parentName, anchorName);
     }
     default: {
       throw new Error(`Invalid node type: ${node.type}`);
@@ -88,7 +103,7 @@ function buildNode(
 
 function buildTextNode(
   node: TextNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
@@ -97,16 +112,33 @@ function buildTextNode(
   let content = node.content || "";
   // Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
   content = content.replace(/\s+/g, " ");
+
   // TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
-  // TODO: We also shouldn't be string interpolating if there is only code
   let generated = content.includes("{") && content.includes("}");
+  let generatedCount = 0;
+  let braceCount = 0;
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === "{") {
+      generated = true;
+      braceCount += 1;
+      if (braceCount === 0) {
+        generatedCount += 1;
+      }
+    } else if (content[i] === "}") {
+      braceCount -= 1;
+    }
+  }
   if (generated) {
-    content = `\`${content.replaceAll("{", "${")}\``;
+    if (generatedCount === 1 && content.startsWith("{") && content.endsWith("}")) {
+      content = content.substring(1, content.length - 1);
+    } else {
+      content = `\`${content.replaceAll("{", "${defText(").replaceAll("}", ")}")}\``;
+    }
   } else {
-    content = `"${content.replaceAll('"', '\\"')}"`;
+    content = `defText("${content.replaceAll('"', '\\"')}")`;
   }
 
-  const varName = nextVarName("text", varNames);
+  const varName = nextVarName("text", status);
   result += `const ${varName} = document.createTextNode(${generated ? '""' : content});\n`;
   result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
 
@@ -119,7 +151,7 @@ function buildTextNode(
 
 function buildLogicNode(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
@@ -128,7 +160,7 @@ function buildLogicNode(
       return node.logic + (!node.logic.endsWith(";") ? ";" : "");
     }
     case "@if group": {
-      return buildIfNode(node, varNames, parentName, anchorName);
+      return buildIfNode(node, status, parentName, anchorName);
     }
     case "@if":
     case "@else if":
@@ -137,17 +169,17 @@ function buildLogicNode(
       return "";
     }
     case "@switch": {
-      return buildSwitchNode(node, varNames, parentName, anchorName);
+      return buildSwitchNode(node, status, parentName, anchorName);
     }
     case "@case": {
       // This gets handled with @switch, above
       return "";
     }
     case "@for": {
-      return buildForNode(node, varNames, parentName, anchorName);
+      return buildForNode(node, status, parentName, anchorName);
     }
     case "@await group": {
-      return buildAwaitNode(node, varNames, parentName, anchorName);
+      return buildAwaitNode(node, status, parentName, anchorName);
     }
     case "@then":
     case "@catch": {
@@ -162,13 +194,13 @@ function buildLogicNode(
 
 function buildIfNode(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("logicAnchor", varNames);
-  const endNodeName = nextVarName("logicEndNode", varNames);
-  const indexName = nextVarName("logicIndex", varNames);
+  const startAnchorName = nextVarName("anchor", status);
+  const endNodeName = nextVarName("end", status);
+  const indexName = nextVarName("index", status);
 
   // Filter non-logic branches (spaces)
   const branches = node.children.filter((n) => n.type === "logic");
@@ -196,7 +228,7 @@ function buildIfNode(
   for (let [i, branch] of branches.entries()) {
     result += buildIfBranch(
       branch as LogicNode,
-      varNames,
+      status,
       parentName,
       startAnchorName,
       endNodeName,
@@ -205,12 +237,15 @@ function buildIfNode(
     );
   }
   result += "});\n\n";
+
+  status.lastNodeName = startAnchorName;
+
   return result;
 }
 
 function buildIfBranch(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
   endNodeName: string,
@@ -222,18 +257,13 @@ function buildIfBranch(
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
-  let endElementName = "undefined";
+  status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
-    // HACK: Is there a better way to do this
-    let childName = nextNodeName(child, varNames, false);
-    if (child.type === "element") {
-      endElementName = childName;
-    }
-    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
-    anchorName = childName;
+    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
+    anchorName = status.lastNodeName;
   }
   result += "\n";
-  result += `${endNodeName} = ${endElementName};\n`;
+  result += `${endNodeName} = ${status.lastNodeName};\n`;
   result += `${indexName} = ${index};\n`;
   result += "}\n";
   return result;
@@ -241,13 +271,13 @@ function buildIfBranch(
 
 function buildSwitchNode(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("logicAnchor", varNames);
-  const endNodeName = nextVarName("logicEndNode", varNames);
-  const indexName = nextVarName("logicIndex", varNames);
+  const startAnchorName = nextVarName("anchor", status);
+  const endNodeName = nextVarName("end", status);
+  const indexName = nextVarName("index", status);
 
   // Filter non-logic branches (spaces)
   const branches = node.children.filter((n) => n.type === "logic");
@@ -276,7 +306,7 @@ function buildSwitchNode(
   for (let [i, branch] of branches.entries()) {
     result += buildSwitchBranch(
       branch as LogicNode,
-      varNames,
+      status,
       parentName,
       startAnchorName,
       endNodeName,
@@ -291,7 +321,7 @@ function buildSwitchNode(
 
 function buildSwitchBranch(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
   endNodeName: string,
@@ -303,18 +333,13 @@ function buildSwitchBranch(
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
-  let endElementName = "undefined";
+  status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
-    // HACK: Is there a better way to do this
-    let childName = nextNodeName(child, varNames, false);
-    if (child.type === "element") {
-      endElementName = childName;
-    }
-    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
-    anchorName = childName;
+    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
+    anchorName = status.lastNodeName;
   }
   result += "\n";
-  result += `${endNodeName} = ${endElementName};\n`;
+  result += `${endNodeName} = ${status.lastNodeName};\n`;
   result += `${indexName} = ${index};\n`;
   result += "break;\n";
   result += "}\n";
@@ -327,28 +352,40 @@ const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 
 function buildForNode(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
   // HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
   // TODO: Handle destructuring, quotes, comments etc
   const forVarNames: string[] = [];
-  const cforMatches = node.logic.match(forLoopRegex);
-  if (cforMatches) {
-    const forVarMatches = cforMatches[1].matchAll(forLoopVarsRegex);
+  const forIndexMatch = node.logic.match(forLoopRegex);
+  if (forIndexMatch) {
+    const forVarMatches = forIndexMatch[1].matchAll(forLoopVarsRegex);
     for (let match of forVarMatches) {
       forVarNames.push(match[1]);
     }
   } else {
     const forOfMatch = node.logic.match(forOfRegex);
     if (forOfMatch) {
-      forVarNames.push(forOfMatch[1]);
+      const match = forOfMatch[1];
+      if (
+        (match.startsWith("{") && match.endsWith("}")) ||
+        (match.startsWith("[") && match.endsWith("]"))
+      ) {
+        forVarNames.push(
+          ...trimAny(match, "{}[]")
+            .split(",")
+            .map((m) => m.trim()),
+        );
+      } else {
+        forVarNames.push(match);
+      }
     }
   }
 
-  const startAnchorName = nextVarName("logicAnchor", varNames);
-  const forItemsName = nextVarName("forItems", varNames);
+  const startAnchorName = nextVarName("anchor", status);
+  const forItemsName = nextVarName("for_items", status);
 
   // Filter non-logic branches (spaces)
   const key = node.children.find(
@@ -364,78 +401,69 @@ function buildForNode(
   result += `let ${forItemsName} = [];\n`;
   result += `watchEffect(() => {\n`;
   result += "/** @type {any[]} */\n";
-  result += `let newForItems = [];\n`;
+  result += `let t_for_items = [];\n`;
   result += `${node.logic} {\n`;
   result += "/** @type {any} */\n";
-  result += `let item = {};\n`;
+  // TODO: Handle name collisions
+  result += `let t_item = {};\n`;
   if (key) {
     const keyLogic = (key as LogicNode).logic;
-    result += `item["key"] = ${keyLogic.substring(keyLogic.indexOf("=") + 1).trim()};\n`;
+    result += `t_item["t_key"] = ${keyLogic.substring(keyLogic.indexOf("=") + 1).trim()};\n`;
   }
-  result += `item.data = {};\n`;
+  result += `t_item.data = {};\n`;
   for (let v of forVarNames) {
-    result += `item.data["${v}"] = ${v};\n`;
+    result += `t_item.data["${v}"] = ${v};\n`;
   }
-  result += `newForItems.push(item);\n`;
+  result += `t_for_items.push(t_item);\n`;
   result += `}\n`;
   result += "\n";
   result += `reconcileList(\n`;
   result += `${parentName},\n`;
   result += `${forItemsName},\n`;
-  result += `newForItems,\n`;
+  result += `t_for_items,\n`;
   result += "/**\n";
-  result += " * @param {Node} parent\n";
-  result += " * @param {any} item\n";
-  result += " * @param {Node | null} before\n";
+  result += " * @param {Node} t_parent\n";
+  result += " * @param {any} t_item\n";
+  result += " * @param {Node | null} t_before\n";
   result += " */\n";
-  result += `(parent, item, before) => {\n`;
-  result += `let { ${forVarNames.join(", ")} } = item.data;\n`;
-  result += buildForItem(node, varNames, "parent");
+  result += `(t_parent, t_item, t_before) => {\n`;
+  result += `let { ${forVarNames.join(", ")} } = t_item.data;\n`;
+  result += buildForItem(node, status, "t_parent");
   result += `},\n`;
   result += `);\n`;
   result += "\n";
-  result += `${forItemsName} = newForItems;\n`;
+  result += `${forItemsName} = t_for_items;\n`;
   result += "});\n\n";
   return result;
 }
 
-function buildForItem(
-  node: LogicNode,
-  varNames: Record<string, number>,
-  parentName: string,
-): string {
+function buildForItem(node: LogicNode, status: BuildStatus, parentName: string): string {
   let result = "";
-  result += `item.anchor = document.createComment("@for item " + item.key);\n`;
-  result += `${parentName}.insertBefore(item.anchor, before);\n`;
+  result += `t_item.anchor = document.createComment("@for item " + t_item.t_key);\n`;
+  result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
   result += `\n`;
   result += "\n";
-  let endElementName = "undefined";
+  status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
     if (child.type === "logic" && (child as LogicNode).operation === "@key") {
       continue;
     }
-
-    // HACK: Is there a better way to do this
-    let childName = nextNodeName(child, varNames, false);
-    if (child.type === "element") {
-      endElementName = childName;
-    }
-    result += buildNode(child, varNames, parentName, "before");
+    result += buildNode(child, status, parentName, "t_before");
   }
   result += "\n";
-  result += `item.endNode = ${endElementName};\n`;
+  result += `t_item.endNode = ${status.lastNodeName};\n`;
   return result;
 }
 
 function buildAwaitNode(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("logicAnchor", varNames);
-  const endNodeName = nextVarName("logicEndNode", varNames);
-  const awaitTokenName = nextVarName("awaitToken", varNames);
+  const startAnchorName = nextVarName("anchor", status);
+  const endNodeName = nextVarName("end", status);
+  const awaitTokenName = nextVarName("token", status);
 
   // Filter non-logic branches (spaces)
   const branches = node.children.filter((n) => n.type === "logic");
@@ -478,19 +506,19 @@ function buildAwaitNode(
   result += `watchEffect(() => {\n`;
   result += `${awaitTokenName}++;\n`;
   result += "\n";
-  result += buildAwaitBranch(awaitBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += buildAwaitBranch(awaitBranch, status, parentName, startAnchorName, endNodeName);
   result += "\n";
   result += "/** @param {number} token */\n";
   result += `((token) => {\n`;
   result += `${awaiterName}\n`;
   result += `.then((${thenVar}) => {\n`;
   result += `if (token === ${awaitTokenName}) {\n`;
-  result += buildAwaitBranch(thenBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += buildAwaitBranch(thenBranch, status, parentName, startAnchorName, endNodeName);
   result += `}\n`;
   result += `})\n`;
   result += `.catch((${catchVar}) => {\n`;
   result += `if (token === ${awaitTokenName}) {\n`;
-  result += buildAwaitBranch(catchBranch, varNames, parentName, startAnchorName, endNodeName);
+  result += buildAwaitBranch(catchBranch, status, parentName, startAnchorName, endNodeName);
   result += `}\n`;
   result += `});\n`;
   result += `})(${awaitTokenName});\n`;
@@ -501,7 +529,7 @@ function buildAwaitNode(
 
 function buildAwaitBranch(
   node: LogicNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
   endNodeName: string,
@@ -509,87 +537,281 @@ function buildAwaitBranch(
   let result = "";
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
-  let endElementName = "undefined";
+  status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
-    // HACK: Is there a better way to do this
-    let childName = nextNodeName(child, varNames, false);
-    if (child.type === "element") {
-      endElementName = childName;
-    }
-    result += buildNode(child, varNames, parentName, `${anchorName}.nextSibling`);
-    anchorName = childName;
+    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
+    anchorName = status.lastNodeName;
   }
   result += "\n";
-  result += `${endNodeName} = ${endElementName};\n`;
+  result += `${endNodeName} = ${status.lastNodeName};\n`;
   return result;
 }
 
 function buildComponentNode(
   node: ElementNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
   let result = "";
-  result += `${node.tagName}.render(${parentName}, ${anchorName}`;
-  // TODO: defaults etc props
-  if (node.attributes && node.attributes.length) {
-    result += `, { ${node.attributes.map((a) => a.name + ": " + a.value)} }`;
+
+  // Props
+  const propsName = nextVarName("props", status);
+  const componentHasProps = node.attributes.length;
+  if (componentHasProps) {
+    // TODO: defaults etc props
+    result += `const ${propsName} = watch({});\n`;
+    for (let { name, value } of node.attributes) {
+      if (name.startsWith("{") && name.endsWith("}")) {
+        name = name.substring(1, name.length - 1);
+        result += `watchEffect(() => `;
+        result += `${propsName}["${name}"] = ${name}`;
+        result += `);\n`;
+      } else {
+        let generated = value.startsWith("{") && value.endsWith("}");
+        if (generated) {
+          value = value.substring(1, value.length - 1);
+        }
+        result += generated ? `watchEffect(() => ` : "";
+        result += `${propsName}["${name}"] = ${value || "true"}`;
+        result += generated ? `)` : "";
+        result += ";\n";
+      }
+    }
   }
-  result += `);\n`;
+
+  // Slots
+  const slotsName = nextVarName("slots", status);
+  const componentHasSlots = node.children.length;
+  if (componentHasSlots) {
+    const slots = gatherSlotNodes(node);
+    result += `const ${slotsName} = {};\n`;
+    for (let [key, value] of Object.entries(slots)) {
+      result += `${slotsName}["${key}"] = ($parent, $anchor, $sprops) => {\n`;
+      for (let child of filterChildren(value)) {
+        result += buildNode(child, status, "$parent", "$anchor");
+      }
+      result += "};\n";
+    }
+  }
+
+  // Call the component's render function
+  result += `${node.tagName}.render(${parentName}, ${anchorName}, ${componentHasProps ? propsName : "undefined"}, ${componentHasSlots ? slotsName : "undefined"}, $context);\n`;
+
   return result;
 }
+
+function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
+  const slots: Record<string, Node[]> = {};
+
+  // Add named slots
+  for (let child of node.children) {
+    if (child.type === "special") {
+      const el = child as ElementNode;
+      if (el.tagName === ":fill") {
+        let slotName = el.attributes.find((a) => a.name === "name")?.value;
+        if (slotName) slotName = trimAny(slotName, `'"`);
+        slots[slotName || "_"] = el.children;
+      }
+    }
+  }
+
+  // Add the default slot, if not already done
+  // TODO: Check that this excludes spaces etc
+  if (!slots["_"]) {
+    const children: Node[] = [];
+    for (let child of filterChildren(node)) {
+      if (child.type === "special" && (child as ElementNode).tagName === ":fill") {
+        continue;
+      }
+      children.push(child);
+    }
+    if (children.length) {
+      slots["_"] = children;
+    }
+  }
+
+  return slots;
+}
+
+/*
+function buildSlot(
+  slotsName: string,
+  name: string,
+  children: Node[],
+  node: LogicNode,
+  status: BuildStatus,
+  parentName: string,
+  anchorName: string,
+  endNodeName: string,
+  indexName: string,
+  index: number,
+) {
+  let result = "";
+  result += `${slotsName}["${name}"] = () => {\n`;
+  for (let child of filterChildren(children)) {
+    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
+  }
+  result += "};";
+  return result;
+}
+*/
 
 function buildElementNode(
   node: ElementNode,
-  varNames: Record<string, number>,
+  status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
-  const varName = nextVarName(node.tagName, varNames);
+  const varName = nextVarName(node.tagName, status);
+
   let result = "";
   result += `const ${varName} = document.createElement("${node.tagName}");\n`;
-  result += buildElementAttributes(node, varName);
+  result += buildElementAttributes(node, varName, status);
   for (let child of filterChildren(node)) {
-    result += buildNode(child, varNames, varName, "null");
+    result += buildNode(child, status, varName, "null");
   }
   result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
+
+  status.lastNodeName = varName;
+
   return result;
 }
 
-function buildElementAttributes(node: ElementNode, varName: string): string {
+function buildElementAttributes(node: ElementNode, varName: string, status: BuildStatus): string {
   let result = "";
 
   for (let attribute of node.attributes) {
-    const { name, value } = attribute;
-    if (name.indexOf("on") === 0) {
-      // Add an event listener
-      let listener = value;
-      listener = trim(listener, "{", "}");
-      result += `${varName}.addEventListener("${name.substring(2)}", ${listener});\n`;
-    } else if (name === "classList" && Array.isArray(value)) {
-      // Add a class for each item in the array
-      // TODO: Call a function that does the stuff
-      for (let i = 0; i < value.length; i++) {
-        //result += addClass(node, def, attribute[i]);
-      }
-    } else if (name === "class") {
-      // TODO: Watch etc
-      result += `${varName}.classList.add("${value}");\n`;
+    let { name, value } = attribute;
+    if (name.startsWith("{") && name.endsWith("}")) {
+      name = name.substring(1, name.length - 1);
+      result += `watchEffect(() => `;
+      result += `${varName}.setAttribute("${name}", ${name})`;
+      result += `);\n`;
     } else {
-      // Set the attribute value
-      // TODO: Call a function that does the stuff
-      result += `${varName}.setAttribute("${name}", ${value});\n`;
+      let generated = value.startsWith("{") && value.endsWith("}");
+      if (generated) {
+        value = value.substring(1, value.length - 1);
+      }
+
+      if (name.indexOf("on") === 0) {
+        // Add an event listener
+        const eventName = name.substring(2);
+        result += `${varName}.addEventListener("${eventName}", ${value});\n`;
+      } else if (name.indexOf("bind:") === 0) {
+        // TODO: Don't love the bind: syntax -- $value? @value? :value?
+        // Automatically add an event to bind the value
+        // TODO: need to check the element to find out what type of event to add
+        const eventName = "input";
+        const defaultValue = '""';
+        const propName = name.substring(5);
+        result += generated ? `watchEffect(() => ` : "";
+        result += `${varName}.setAttribute("${propName}", ${value} || ${defaultValue})`;
+        result += generated ? `)` : "";
+        result += ";\n";
+        result += `${varName}.addEventListener("${eventName}", (e) => ${value} = e.target.value);\n`;
+      } else if (name.indexOf("class:") === 0) {
+        const propName = name.substring(6);
+        result += generated ? `watchEffect(() => {\n` : "";
+        result += `${varName}.classList.toggle("${propName}", ${value});\n`;
+        result += generated ? `});\n` : "";
+      } else if (name === "class") {
+        // NOTE: Clear any previously set values from the element
+        const classVarName = nextVarName("class_name", status);
+        result += generated ? `let ${classVarName} = ${value};\n` : "";
+        result += generated ? `watchEffect(() => {\n` : "";
+        result += generated
+          ? `if (${classVarName}) ${varName}.classList.remove(${classVarName});\n`
+          : "";
+        result += generated ? `if (${value}) {\n` : "";
+        result += `${varName}.classList.add(${value});\n`;
+        result += generated ? `${classVarName} = ${value};\n` : "";
+        result += generated ? `}\n` : "";
+        result += generated ? `});\n` : "";
+      } else {
+        // Set the attribute value
+        result += generated ? `watchEffect(() => ` : "";
+        result += `${varName}.setAttribute("${name}", ${value})`;
+        result += generated ? `)` : "";
+        result += ";\n";
+      }
     }
   }
 
   return result;
 }
 
-function* filterChildren(node: ElementNode | LogicNode) {
-  const endIndex = node.children.length - 1;
-  for (let i = 0; i < node.children.length; i++) {
-    const child = node.children[i];
+function buildSpecialNode(
+  node: ElementNode,
+  status: BuildStatus,
+  parentName: string,
+  anchorName: string,
+): string {
+  switch (node.tagName) {
+    case ":slot": {
+      return buildSlotNode(node, status, parentName, anchorName);
+    }
+  }
+  return "";
+}
+
+function buildSlotNode(
+  node: ElementNode,
+  status: BuildStatus,
+  parentName: string,
+  anchorName: string,
+): string {
+  // If there's a slot, build that, otherwise build the default nodes
+  let slotName = node.attributes.find((a) => a.name === "name")?.value;
+  if (slotName) {
+    slotName = trimAny(slotName, `'"`);
+  } else {
+    slotName = "_";
+  }
+
+  let result = "";
+
+  // Slot props
+  const propsName = nextVarName("sprops", status);
+  const slotAttributes = node.attributes.filter((a) => a.name !== "name");
+  const slotHasProps = slotAttributes.length;
+  if (slotHasProps) {
+    // TODO: defaults etc props
+    result += `const ${propsName} = watch({});\n`;
+    for (let { name, value } of slotAttributes) {
+      if (name.startsWith("{") && name.endsWith("}")) {
+        name = name.substring(1, name.length - 1);
+        result += `watchEffect(() => `;
+        result += `${propsName}["${name}"] = ${name}`;
+        result += `);\n`;
+      } else {
+        let generated = value.startsWith("{") && value.endsWith("}");
+        if (generated) {
+          value = value.substring(1, value.length - 1);
+        }
+        result += generated ? `watchEffect(() => ` : "";
+        result += `${propsName}["${name}"] = ${value}`;
+        result += generated ? `)` : "";
+        result += ";\n";
+      }
+    }
+  }
+
+  result += `if ($slots["${slotName}"]) {\n`;
+  result += `$slots["${slotName}"](${parentName}, ${anchorName}, ${slotHasProps ? propsName : "undefined"});\n`;
+  result += "} else {\n";
+  for (let child of filterChildren(node)) {
+    result += buildNode(child, status, parentName, anchorName);
+  }
+  result += "}\n";
+  return result;
+}
+
+function* filterChildren(node: ElementNode | LogicNode | Node[]) {
+  const children = Array.isArray(node) ? node : node.children;
+  const endIndex = children.length - 1;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
 
     // Skip the first and last spaces
     if ((i === 0 || i === endIndex) && child.type === "space") {
@@ -602,8 +824,8 @@ function* filterChildren(node: ElementNode | LogicNode) {
         type: "text",
         content: (child as TextNode).content || "",
       };
-      for (i = i + 1; i < node.children.length; i++) {
-        const nextChild = node.children[i];
+      for (i = i + 1; i < children.length; i++) {
+        const nextChild = children[i];
 
         // Skip the first and last spaces
         if ((i === 0 || i === endIndex) && nextChild.type === "space") {
@@ -667,23 +889,13 @@ function processChildren(node: ElementNode | LogicNode, cb: (node: Node) => void
 }
 */
 
-function nextVarName(name: string, varNames: Record<string, number>, increment = true): string {
-  if (!varNames[name]) {
-    varNames[name] = 1;
+function nextVarName(name: string, status: BuildStatus): string {
+  if (!status.varNames[name]) {
+    status.varNames[name] = 1;
   }
-  let varName = `${name}${varNames[name]}`;
-  if (increment) {
-    varNames[name] += 1;
-  }
+  let varName = `t_${name}_${status.varNames[name]}`;
+  status.varNames[name] += 1;
   return varName;
-}
-
-function nextNodeName(node: Node, varNames: Record<string, number>, increment = true) {
-  if (node.type === "element") {
-    return nextVarName((node as ElementNode).tagName, varNames, false);
-  } else {
-    return nextVarName("text", varNames, false);
-  }
 }
 
 function buildStyles(name: string, parts: ComponentParts): string {

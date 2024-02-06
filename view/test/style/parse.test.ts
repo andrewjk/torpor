@@ -16,7 +16,7 @@ test("simple style", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el("h1", [{ name: "class", value: "tera-1wvcb3a" }], [text("Hi")]),
+      template: el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")]),
       style: {
         global: false,
         blocks: [
