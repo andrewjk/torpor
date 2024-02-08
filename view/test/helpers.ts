@@ -1,5 +1,5 @@
+import ControlNode from "../src/nodes/ControlNode";
 import ElementNode from "../src/nodes/ElementNode";
-import LogicNode from "../src/nodes/LogicNode";
 import Node from "../src/nodes/Node";
 import TextNode from "../src/nodes/TextNode";
 import Attribute from "../src/types/Attribute";
@@ -50,11 +50,11 @@ export function sp(
   };
 }
 
-export function logic(operation: string, logic: string, children?: Node[]): LogicNode {
+export function control(operation: string, statement: string, children?: Node[]): ControlNode {
   return {
-    type: "logic",
+    type: "control",
     operation,
-    logic,
+    statement,
     children: children || [],
   };
 }
@@ -90,12 +90,12 @@ export function trimParsed(result: ParseResult): ParseResult {
   return result;
 }
 
-function trimElement(el: ElementNode | LogicNode) {
+function trimElement(el: ElementNode | ControlNode) {
   for (let i = el.children.length - 1; i >= 0; i--) {
     const child = el.children[i];
     if (child.type === "space") {
       el.children.splice(i, 1);
-    } else if (child.type === "element" || child.type === "logic") {
+    } else if (child.type === "element" || child.type === "control") {
       // HACK:
       trimElement(child as ElementNode);
     }

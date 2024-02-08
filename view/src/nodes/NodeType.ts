@@ -1,3 +1,3 @@
-type NodeType = "component" | "element" | "special" | "logic" | "text" | "space";
+type NodeType = "component" | "element" | "special" | "control" | "text" | "space";
 
 export default NodeType;

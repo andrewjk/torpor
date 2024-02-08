@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, logic, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("simple await", () => {
   const input = `
@@ -21,8 +21,8 @@ test("simple await", () => {
         "section",
         [],
         [
-          logic("@await group", "", [
-            logic("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
+          control("@await group", "", [
+            control("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
           ]),
         ],
       ),
@@ -51,9 +51,9 @@ test("await/then", () => {
         "section",
         [],
         [
-          logic("@await group", "", [
-            logic("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
-            logic("@then", "then", [el("p", [], [text("Loaded!")])]),
+          control("@await group", "", [
+            control("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
+            control("@then", "then", [el("p", [], [text("Loaded!")])]),
           ]),
         ],
       ),
@@ -84,10 +84,10 @@ test("await/then/catch", () => {
         "section",
         [],
         [
-          logic("@await group", "", [
-            logic("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
-            logic("@then", "then", [el("p", [], [text("Loaded!")])]),
-            logic("@catch", "catch", [el("p", [], [text("Something went wrong.")])]),
+          control("@await group", "", [
+            control("@await", "await sleep()", [el("p", [], [text("Loading...")])]),
+            control("@then", "then", [el("p", [], [text("Loaded!")])]),
+            control("@catch", "catch", [el("p", [], [text("Something went wrong.")])]),
           ]),
         ],
       ),

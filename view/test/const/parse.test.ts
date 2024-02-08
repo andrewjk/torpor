@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, logic, trimParsed } from "../helpers";
+import { control, el, trimParsed } from "../helpers";
 
 test("simple constant", () => {
   const input = `
@@ -15,7 +15,7 @@ test("simple constant", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el("section", [], [logic("@const", "const x = 5", [])]),
+      template: el("section", [], [control("@const", "const x = 5", [])]),
     },
   };
   expect(output).toEqual(expected);

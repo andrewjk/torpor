@@ -1,5 +1,5 @@
+import ControlNode from "../nodes/ControlNode";
 import ElementNode from "../nodes/ElementNode";
-import LogicNode from "../nodes/LogicNode";
 import Node from "../nodes/Node";
 import TextNode from "../nodes/TextNode";
 import Attribute from "../types/Attribute";
@@ -46,7 +46,7 @@ const voidTags = [
   "wbr",
 ];
 
-const logicalOperations = [
+const controlOperations = [
   "@const",
   "@if",
   "@else",
@@ -90,7 +90,7 @@ export default function parse(source: string): ParseResult {
           template: status.template,
           style: status.style,
           styleHash: status.styleHash,
-          props,
+          props: props.length ? props : undefined,
         }
       : undefined,
   };
@@ -193,9 +193,9 @@ function parseElement(status: ParseStatus): ElementNode {
           // Swallow multi-line comments
           status.i = status.source.indexOf("*/", status.i) + 2;
         } else {
-          // It's some logic
-          const child = parseLogic(status);
-          wrangleLogic(child, element);
+          // It's a control statement
+          const child = parseControl(status);
+          wrangleControl(child, element);
         }
         /*
       } else if (char === "}") {
@@ -204,7 +204,7 @@ function parseElement(status: ParseStatus): ElementNode {
         status.i += 1;
         consumeSpace(status);
         if (accept("else", status, false)) {
-          const child = parseLogic(status, "@each");
+          const child = parseControl(status, "@each");
           element.children.push(child);
         } else {
           status.i = end;
@@ -374,8 +374,8 @@ function parseAttributeValue(status: ParseStatus): string {
   return "";
 }
 
-function parseLogic(status: ParseStatus): LogicNode {
-  const node = parseLogicOpen(status);
+function parseControl(status: ParseStatus): ControlNode {
+  const node = parseControlOpen(status);
 
   // Consts and keys can't have children
   if (node.operation === "@const" || node.operation === "@key") {
@@ -387,7 +387,7 @@ function parseLogic(status: ParseStatus): LogicNode {
     addSpaceElement(node, status);
     const char = status.source[status.i];
     if (char === "}") {
-      // It's the end of the logic block, so we're done here
+      // It's the end of the control block, so we're done here
       break;
     } else if (char === "<") {
       // It's a child element
@@ -402,20 +402,20 @@ function parseLogic(status: ParseStatus): LogicNode {
         // Swallow multi-line comments
         status.i = status.source.indexOf("*/", status.i) + 2;
       } else {
-        // It's some logic
-        const child = parseLogic(status);
-        wrangleLogic(child, node);
+        // It's some control
+        const child = parseControl(status);
+        wrangleControl(child, node);
       }
     } else {
-      // Can't have text content in logic blocks
-      addError(status, `Unexpected token in logic block: ${char}`, status.i);
+      // Can't have text content in control blocks
+      addError(status, `Unexpected token in control block: ${char}`, status.i);
     }
   }
 
   return node;
 }
 
-function parseLogicOpen(status: ParseStatus): LogicNode {
+function parseControlOpen(status: ParseStatus): ControlNode {
   const start = status.i;
   let operation = "";
   for (status.i; status.i < status.source.length; status.i++) {
@@ -430,14 +430,14 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
     operation = "@default";
   }
 
-  const node: LogicNode = {
-    type: "logic",
+  const node: ControlNode = {
+    type: "control",
     operation,
-    logic: "",
+    statement: "",
     children: [],
   };
 
-  if (logicalOperations.includes(operation)) {
+  if (controlOperations.includes(operation)) {
     // TODO: Ignore chars in strings, comments and parentheses
     let parenCount = 0;
     for (status.i; status.i < status.source.length; status.i++) {
@@ -448,13 +448,13 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
         parenCount -= 1;
       } else if (char === "{") {
         if (parenCount === 0) {
-          node.logic = status.source.substring(start + 1, status.i).trim();
+          node.statement = status.source.substring(start + 1, status.i).trim();
           status.i += 1;
           break;
         }
       } else if (char === "\n" && (operation === "@const" || operation === "@key")) {
         if (parenCount === 0) {
-          node.logic = status.source.substring(start + 1, status.i).trim();
+          node.statement = status.source.substring(start + 1, status.i).trim();
           status.i += 1;
           break;
         }
@@ -468,51 +468,51 @@ function parseLogicOpen(status: ParseStatus): LogicNode {
   return node;
 }
 
-function wrangleLogic(logic: LogicNode, parentNode: ElementNode | LogicNode) {
+function wrangleControl(control: ControlNode, parentNode: ElementNode | ControlNode) {
   // HACK: Wrangle if/then/else into an if group and await/then/catch into an await group
-  if (logic.operation === "@if") {
-    const ifGroup: LogicNode = {
-      type: "logic",
+  if (control.operation === "@if") {
+    const ifGroup: ControlNode = {
+      type: "control",
       operation: "@if group",
-      logic: "",
-      children: [logic],
+      statement: "",
+      children: [control],
     };
     parentNode.children.push(ifGroup);
-  } else if (logic.operation === "@else") {
-    if (/^else\s+if/.test(logic.logic)) {
-      logic.operation = "@else if";
+  } else if (control.operation === "@else") {
+    if (/^else\s+if/.test(control.statement)) {
+      control.operation = "@else if";
     }
     for (let i = parentNode.children.length - 1; i >= 0; i--) {
       const lastChild = parentNode.children[i];
       // TODO: Break if it's an element, do more checking
-      if (lastChild.type === "logic" && (lastChild as LogicNode).operation === "@if group") {
-        (lastChild as LogicNode).children.push(logic);
+      if (lastChild.type === "control" && (lastChild as ControlNode).operation === "@if group") {
+        (lastChild as ControlNode).children.push(control);
         break;
       }
     }
-  } else if (logic.operation === "@await") {
-    const awaitGroup: LogicNode = {
-      type: "logic",
+  } else if (control.operation === "@await") {
+    const awaitGroup: ControlNode = {
+      type: "control",
       operation: "@await group",
-      logic: "",
-      children: [logic],
+      statement: "",
+      children: [control],
     };
     parentNode.children.push(awaitGroup);
-  } else if (logic.operation === "@then" || logic.operation === "@catch") {
+  } else if (control.operation === "@then" || control.operation === "@catch") {
     for (let i = parentNode.children.length - 1; i >= 0; i--) {
       const lastChild = parentNode.children[i];
       // TODO: Break if it's an element, do more checking
-      if (lastChild.type === "logic" && (lastChild as LogicNode).operation === "@await group") {
-        (lastChild as LogicNode).children.push(logic);
+      if (lastChild.type === "control" && (lastChild as ControlNode).operation === "@await group") {
+        (lastChild as ControlNode).children.push(control);
         break;
       }
     }
   } else {
-    parentNode.children.push(logic);
+    parentNode.children.push(control);
   }
 }
 
-function addSpaceElement(parent: ElementNode | LogicNode, status: ParseStatus) {
+function addSpaceElement(parent: ElementNode | ControlNode, status: ParseStatus) {
   const content = consumeSpace(status);
   if (content) {
     const space: TextNode = {
@@ -747,7 +747,7 @@ function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: s
     }
   }
 
-  if (node.type === "element" || node.type === "logic") {
+  if (node.type === "element" || node.type === "control") {
     for (let child of (node as ElementNode).children) {
       checkAndApplyStylesOnNode(child, selectors, styleHash);
     }

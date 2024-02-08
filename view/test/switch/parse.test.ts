@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import SyntaxTree from "../../src/types/SyntaxTree";
-import { el, logic, text, trimParsed } from "../helpers";
+import ComponentParts from "../../src/types/ComponentParts";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("switch statement", () => {
   const input = `
@@ -18,14 +18,14 @@ test("switch statement", () => {
 `;
 
   const output = trimParsed(parse(input));
-  const expected: SyntaxTree = {
+  const expected: ComponentParts = {
     template: el(
       "section",
       [],
       [
-        logic("@switch", "switch (x)", [
-          logic("@case", "case 1:", [el("p", [], [text("It's one.")])]),
-          logic("@case", "case 2:", [el("p", [], [text("It's two.")])]),
+        control("@switch", "switch (x)", [
+          control("@case", "case 1:", [el("p", [], [text("It's one.")])]),
+          control("@case", "case 2:", [el("p", [], [text("It's two.")])]),
         ]),
       ],
     ),
@@ -49,14 +49,14 @@ test("switch statement with default", () => {
 `;
 
   const output = trimParsed(parse(input));
-  const expected: SyntaxTree = {
+  const expected: ComponentParts = {
     template: el(
       "section",
       [],
       [
-        logic("@switch", "switch (x)", [
-          logic("@case", "case 1:", [el("p", [], [text("It's one.")])]),
-          logic("@default", "default:", [el("p", [], [text("It's more than one.")])]),
+        control("@switch", "switch (x)", [
+          control("@case", "case 1:", [el("p", [], [text("It's one.")])]),
+          control("@default", "default:", [el("p", [], [text("It's more than one.")])]),
         ]),
       ],
     ),

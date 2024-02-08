@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, logic, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("for i loop", () => {
   const input = `
@@ -22,7 +22,7 @@ test("for i loop", () => {
       template: el(
         "section",
         [],
-        [logic("@for", "for (let i = 0; i < 5; i++)", [el("p", [], [text("{i}")])])],
+        [control("@for", "for (let i = 0; i < 5; i++)", [el("p", [], [text("{i}")])])],
       ),
     },
   };
@@ -47,7 +47,7 @@ test("for/of statement", () => {
       template: el(
         "section",
         [],
-        [logic("@for", "for (let item of things)", [el("p", [], [text("{item.name}")])])],
+        [control("@for", "for (let item of things)", [el("p", [], [text("{item.name}")])])],
       ),
     },
   };
@@ -72,7 +72,7 @@ test("for/in statement", () => {
       template: el(
         "section",
         [],
-        [logic("@for", "for (let prop in thing)", [el("p", [], [text("{thing[prop]}")])])],
+        [control("@for", "for (let prop in thing)", [el("p", [], [text("{thing[prop]}")])])],
       ),
     },
   };
@@ -99,8 +99,8 @@ test("for statement with key", () => {
         "section",
         [],
         [
-          logic("@for", "for (let item of things)", [
-            logic("@key", "key = item.id"),
+          control("@for", "for (let item of things)", [
+            control("@key", "key = item.id"),
             el("p", [], [text("{item.name}")]),
           ]),
         ],

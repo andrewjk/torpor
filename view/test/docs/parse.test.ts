@@ -21,6 +21,7 @@ test("simple docs", () => {
         slots: [],
       },
       template: el("h2", [], [text("{$props.name}")]),
+      props: ["name"],
     },
   };
   expect(output).toEqual(expected);
@@ -65,6 +66,7 @@ test("prop docs", () => {
         slots: [],
       },
       template: el("h2", [], [text("{$props.name}")]),
+      props: ["name"],
     },
   };
   expect(output).toEqual(expected);
@@ -102,6 +104,7 @@ test("slot docs", () => {
         ],
       },
       template: el("h2", [], [text("{$props.name}")]),
+      props: ["name"],
     },
   };
   expect(output).toEqual(expected);
@@ -156,6 +159,7 @@ test("all docs", () => {
         ],
       },
       template: el("h2", [], [text("{$props.name}")]),
+      props: ["name"],
     },
   };
   expect(output).toEqual(expected);

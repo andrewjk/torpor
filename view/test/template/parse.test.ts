@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, logic, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 // TODO: Preserve space
 
@@ -29,7 +29,7 @@ test("template", () => {
   expect(output).toEqual(expected);
 });
 
-test("template with logic", () => {
+test("template with control", () => {
   const input = `
 <section>
   <h2>Section heading</h2>
@@ -55,16 +55,16 @@ test("template with logic", () => {
         [],
         [
           el("h2", [], [text("Section heading")]),
-          logic("@if group", "", [
-            logic("@if", "if (true)", [
-              logic("@if group", "", [
-                logic("@if", "if (false)", [
+          control("@if group", "", [
+            control("@if", "if (true)", [
+              control("@if group", "", [
+                control("@if", "if (false)", [
                   el(
                     "p",
                     [],
                     [
-                      logic("@if group", "", [
-                        logic("@if", "if (true)", [el("span", [], [text("Article content.")])]),
+                      control("@if group", "", [
+                        control("@if", "if (true)", [el("span", [], [text("Article content.")])]),
                       ]),
                     ],
                   ),

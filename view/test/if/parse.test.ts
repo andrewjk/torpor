@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, logic, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("if statement", () => {
   const input = `
@@ -23,8 +23,8 @@ test("if statement", () => {
         "section",
         [],
         [
-          logic("@if group", "", [
-            logic("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
+          control("@if group", "", [
+            control("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
           ]),
         ],
       ),
@@ -56,9 +56,9 @@ test("if/else statement", () => {
         "section",
         [],
         [
-          logic("@if group", "", [
-            logic("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
-            logic("@else", "else", [el("p", [], [text("Nah, it's false")])]),
+          control("@if group", "", [
+            control("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
+            control("@else", "else", [el("p", [], [text("Nah, it's false")])]),
           ]),
         ],
       ),
@@ -95,10 +95,10 @@ test("if/else if/else statement", () => {
         "section",
         [],
         [
-          logic("@if group", "", [
-            logic("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
-            logic("@else if", "else if (false)", [el("p", [], [text("Nah, it's false")])]),
-            logic("@else", "else", [el("p", [], [text("It's something else")])]),
+          control("@if group", "", [
+            control("@if", "if (true)", [el("p", [], [text("Yeah, it's true")])]),
+            control("@else if", "else if (false)", [el("p", [], [text("Nah, it's false")])]),
+            control("@else", "else", [el("p", [], [text("It's something else")])]),
           ]),
         ],
       ),

@@ -1,5 +1,5 @@
+import ControlNode from "../nodes/ControlNode";
 import ElementNode from "../nodes/ElementNode";
-import LogicNode from "../nodes/LogicNode";
 import Node from "../nodes/Node";
 import TextNode from "../nodes/TextNode";
 import Attribute from "../types/Attribute";
@@ -96,8 +96,8 @@ function buildNode(
     case "special": {
       return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
     }
-    case "logic": {
-      return buildLogicNode(node as LogicNode, status, parentName, anchorName);
+    case "control": {
+      return buildControlNode(node as ControlNode, status, parentName, anchorName);
     }
     case "text": {
       return buildTextNode(node as TextNode, status, parentName, anchorName);
@@ -156,15 +156,15 @@ function buildTextNode(
   return result;
 }
 
-function buildLogicNode(
-  node: LogicNode,
+function buildControlNode(
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
 ): string {
   switch (node.operation) {
     case "@const": {
-      return node.logic + (!node.logic.endsWith(";") ? ";" : "");
+      return node.statement + (!node.statement.endsWith(";") ? ";" : "");
     }
     case "@if group": {
       return buildIfNode(node, status, parentName, anchorName);
@@ -200,7 +200,7 @@ function buildLogicNode(
 }
 
 function buildIfNode(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -209,15 +209,15 @@ function buildIfNode(
   const endNodeName = nextVarName("end", status);
   const indexName = nextVarName("index", status);
 
-  // Filter non-logic branches (spaces)
-  const branches = node.children.filter((n) => n.type === "logic");
+  // Filter non-control branches (spaces)
+  const branches = node.children.filter((n) => n.type === "control");
 
   // Add an else branch if there isn't one, so that the content will be cleared if no branches match
-  if (branches.findIndex((n) => (n as LogicNode).operation === "@else") === -1) {
-    const elseBranch: LogicNode = {
-      type: "logic",
+  if (branches.findIndex((n) => (n as ControlNode).operation === "@else") === -1) {
+    const elseBranch: ControlNode = {
+      type: "control",
       operation: "@else",
-      logic: "else",
+      statement: "else",
       children: [],
     };
     branches.push(elseBranch);
@@ -234,7 +234,7 @@ function buildIfNode(
   result += `watchEffect(() => {\n`;
   for (let [i, branch] of branches.entries()) {
     result += buildIfBranch(
-      branch as LogicNode,
+      branch as ControlNode,
       status,
       parentName,
       startAnchorName,
@@ -251,7 +251,7 @@ function buildIfNode(
 }
 
 function buildIfBranch(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -260,7 +260,7 @@ function buildIfBranch(
   index: number,
 ): string {
   let result = "";
-  result += `${node.logic} {\n`;
+  result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
@@ -277,7 +277,7 @@ function buildIfBranch(
 }
 
 function buildSwitchNode(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -286,15 +286,15 @@ function buildSwitchNode(
   const endNodeName = nextVarName("end", status);
   const indexName = nextVarName("index", status);
 
-  // Filter non-logic branches (spaces)
-  const branches = node.children.filter((n) => n.type === "logic");
+  // Filter non-control branches (spaces)
+  const branches = node.children.filter((n) => n.type === "control");
 
   // Add a default branch if there isn't one, so that the content will be cleared if no branches match
-  if (branches.findIndex((n) => (n as LogicNode).operation === "@default") === -1) {
-    const defaultBranch: LogicNode = {
-      type: "logic",
+  if (branches.findIndex((n) => (n as ControlNode).operation === "@default") === -1) {
+    const defaultBranch: ControlNode = {
+      type: "control",
       operation: "@default",
-      logic: "default",
+      statement: "default",
       children: [],
     };
     branches.push(defaultBranch);
@@ -309,10 +309,10 @@ function buildSwitchNode(
   result += `let ${endNodeName};\n`;
   result += `let ${indexName} = -1;\n`;
   result += `watchEffect(() => {\n`;
-  result += `${node.logic} {\n`;
+  result += `${node.statement} {\n`;
   for (let [i, branch] of branches.entries()) {
     result += buildSwitchBranch(
-      branch as LogicNode,
+      branch as ControlNode,
       status,
       parentName,
       startAnchorName,
@@ -327,7 +327,7 @@ function buildSwitchNode(
 }
 
 function buildSwitchBranch(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -336,7 +336,7 @@ function buildSwitchBranch(
   index: number,
 ): string {
   let result = "";
-  result += `${node.logic} {\n`;
+  result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
   result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
   result += "\n";
@@ -358,7 +358,7 @@ const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,
 const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 
 function buildForNode(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -366,14 +366,14 @@ function buildForNode(
   // HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
   // TODO: Handle destructuring, quotes, comments etc
   const forVarNames: string[] = [];
-  const forIndexMatch = node.logic.match(forLoopRegex);
+  const forIndexMatch = node.statement.match(forLoopRegex);
   if (forIndexMatch) {
     const forVarMatches = forIndexMatch[1].matchAll(forLoopVarsRegex);
     for (let match of forVarMatches) {
       forVarNames.push(match[1]);
     }
   } else {
-    const forOfMatch = node.logic.match(forOfRegex);
+    const forOfMatch = node.statement.match(forOfRegex);
     if (forOfMatch) {
       const match = forOfMatch[1];
       if (
@@ -394,9 +394,9 @@ function buildForNode(
   const startAnchorName = nextVarName("anchor", status);
   const forItemsName = nextVarName("for_items", status);
 
-  // Filter non-logic branches (spaces)
+  // Filter non-control branches (spaces)
   const key = node.children.find(
-    (n) => n.type === "logic" && (n as LogicNode).operation === "@key",
+    (n) => n.type === "control" && (n as ControlNode).operation === "@key",
   );
 
   let result = "";
@@ -409,13 +409,13 @@ function buildForNode(
   result += `watchEffect(() => {\n`;
   result += "/** @type {any[]} */\n";
   result += `let t_for_items = [];\n`;
-  result += `${node.logic} {\n`;
+  result += `${node.statement} {\n`;
   result += "/** @type {any} */\n";
   // TODO: Handle name collisions
   result += `let t_item = {};\n`;
   if (key) {
-    const keyLogic = (key as LogicNode).logic;
-    result += `t_item["t_key"] = ${keyLogic.substring(keyLogic.indexOf("=") + 1).trim()};\n`;
+    const keyStatement = (key as ControlNode).statement;
+    result += `t_item["t_key"] = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};\n`;
   }
   result += `t_item.data = {};\n`;
   for (let v of forVarNames) {
@@ -444,7 +444,7 @@ function buildForNode(
   return result;
 }
 
-function buildForItem(node: LogicNode, status: BuildStatus, parentName: string): string {
+function buildForItem(node: ControlNode, status: BuildStatus, parentName: string): string {
   let result = "";
   result += `t_item.anchor = document.createComment("@for item " + t_item.t_key);\n`;
   result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
@@ -452,7 +452,7 @@ function buildForItem(node: LogicNode, status: BuildStatus, parentName: string):
   result += "\n";
   status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
-    if (child.type === "logic" && (child as LogicNode).operation === "@key") {
+    if (child.type === "control" && (child as ControlNode).operation === "@key") {
       continue;
     }
     result += buildNode(child, status, parentName, "t_before");
@@ -463,7 +463,7 @@ function buildForItem(node: LogicNode, status: BuildStatus, parentName: string):
 }
 
 function buildAwaitNode(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -472,33 +472,33 @@ function buildAwaitNode(
   const endNodeName = nextVarName("end", status);
   const awaitTokenName = nextVarName("token", status);
 
-  // Filter non-logic branches (spaces)
-  const branches = node.children.filter((n) => n.type === "logic");
+  // Filter non-control branches (spaces)
+  const branches = node.children.filter((n) => n.type === "control");
 
   // Make sure all branches exist
-  let awaitBranch = branches.find((n) => (n as LogicNode).operation === "@await") as LogicNode;
-  let thenBranch = branches.find((n) => (n as LogicNode).operation === "@then") as LogicNode;
+  let awaitBranch = branches.find((n) => (n as ControlNode).operation === "@await") as ControlNode;
+  let thenBranch = branches.find((n) => (n as ControlNode).operation === "@then") as ControlNode;
   if (!thenBranch) {
     thenBranch = {
-      type: "logic",
+      type: "control",
       operation: "@then",
-      logic: "then",
+      statement: "then",
       children: [],
     };
   }
-  let catchBranch = branches.find((n) => (n as LogicNode).operation === "@catch") as LogicNode;
+  let catchBranch = branches.find((n) => (n as ControlNode).operation === "@catch") as ControlNode;
   if (!catchBranch) {
     catchBranch = {
-      type: "logic",
+      type: "control",
       operation: "@catch",
-      logic: "catch",
+      statement: "catch",
       children: [],
     };
   }
 
-  const awaiterName = trim(awaitBranch.logic.substring("await".length), "(", ")");
-  const thenVar = trim(thenBranch.logic.substring("then".length), "(", ")");
-  const catchVar = trim(catchBranch.logic.substring("catch".length), "(", ")");
+  const awaiterName = trim(awaitBranch.statement.substring("await".length), "(", ")");
+  const thenVar = trim(thenBranch.statement.substring("then".length), "(", ")");
+  const catchVar = trim(catchBranch.statement.substring("catch".length), "(", ")");
 
   let result = "";
   result += "\n";
@@ -535,7 +535,7 @@ function buildAwaitNode(
 }
 
 function buildAwaitBranch(
-  node: LogicNode,
+  node: ControlNode,
   status: BuildStatus,
   parentName: string,
   anchorName: string,
@@ -655,29 +655,6 @@ function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
 
   return slots;
 }
-
-/*
-function buildSlot(
-  slotsName: string,
-  name: string,
-  children: Node[],
-  node: LogicNode,
-  status: BuildStatus,
-  parentName: string,
-  anchorName: string,
-  endNodeName: string,
-  indexName: string,
-  index: number,
-) {
-  let result = "";
-  result += `${slotsName}["${name}"] = () => {\n`;
-  for (let child of filterChildren(children)) {
-    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
-  }
-  result += "};";
-  return result;
-}
-*/
 
 function buildElementNode(
   node: ElementNode,
@@ -837,7 +814,7 @@ function buildSlotNode(
   return result;
 }
 
-function* filterChildren(node: ElementNode | LogicNode | Node[]) {
+function* filterChildren(node: ElementNode | ControlNode | Node[]) {
   const children = Array.isArray(node) ? node : node.children;
   const endIndex = children.length - 1;
   for (let i = 0; i < children.length; i++) {
@@ -878,7 +855,7 @@ function* filterChildren(node: ElementNode | LogicNode | Node[]) {
 }
 
 /*
-function processChildren(node: ElementNode | LogicNode, cb: (node: Node) => void) {
+function processChildren(node: ElementNode | ControlNode, cb: (node: Node) => void) {
   const endIndex = node.children.length - 1;
   for (let i = 0; i < node.children.length; i++) {
     const child = node.children[i];
