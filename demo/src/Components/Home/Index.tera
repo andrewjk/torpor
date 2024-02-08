@@ -3,7 +3,7 @@
 	import Article from '../../Components/Home/Article.tera';
 	import FancyList from '../../Components/Home/FancyList.tera';
 	import Event from '../../Components/Home/Event.tera';
-	import LetterItem from '../../Components/Home/LetterItem.tera';
+	import LetterItemDelegate from '../../Components/Home/LetterItemDelegate.tera';
  
 	$context["info"] = "Context from Index";
 
@@ -82,7 +82,7 @@
 
 	<ul>
 		@for (let [index, letter] of $state.letters.entries()) {
-			<LetterItem {index} {letter} />
+			<LetterItemDelegate class="letter" {index} {letter} />
 		}
 	</ul>
 	
@@ -126,5 +126,9 @@
 
 	#countdiv {
 		color: deeppink;
+	}
+
+	.letter {
+		color: purple;
 	}
 </style>

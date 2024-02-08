@@ -10,4 +10,5 @@ export default interface ComponentParts {
   template?: ElementNode;
   style?: Style;
   styleHash?: string;
+  props?: string[];
 }

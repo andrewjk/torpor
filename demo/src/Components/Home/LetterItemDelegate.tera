@@ -1,0 +1,5 @@
+﻿<script>
+	import LetterItem from './LetterItem.tera';
+</script>
+
+<LetterItem />

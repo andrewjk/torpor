@@ -9,6 +9,8 @@ import StyleBlock from "../types/StyleBlock";
 import { trimAny } from "./utils";
 
 interface BuildStatus {
+  props: string[];
+  styleHash: string;
   varNames: Record<string, number>;
   lastNodeName: string;
 }
@@ -29,6 +31,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   result += "import watchEffect from '../../../../watch/src/watchEffect';\n";
   result += "import clearRange from '../../../../view/src/render/clearRange';\n";
   result += "import reconcileList from '../../../../view/src/render/reconcileList';\n";
+  result += "import applyAttributes from '../../../../view/src/render/applyAttributes';\n";
   //result += "import { watch, watchEffect } from '../../../../../tera/watch/dist/index.js';\n";
   //result += "import { clearRange, reconcileList } from '../../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
@@ -37,7 +40,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   result += "\n";
 
   // HACK: Move into utils
-  result += "function defText(text) { return text != null ? text : '' }";
+  result += "function defText(text) { return text != null ? text : '' }\n\n";
 
   result += `const ${name} = {\n`;
   result += `name: "${name}",\n`;
@@ -45,6 +48,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   result += ` * @param {Node} $parent\n`;
   result += ` * @param {Node | null} $anchor\n`;
   result += ` * @param {any} $props\n`;
+  result += ` * @param {any} $pass\n`;
   result += ` * @param {any} $slots\n`;
   result += ` */\n`;
   result += `render: ($parent, $anchor, $props, $slots, $context) => {\n`;
@@ -62,10 +66,12 @@ function buildCode(name: string, parts: ComponentParts): string {
     // It would mean we could use the same code for hydration too
 
     const status: BuildStatus = {
+      props: parts.props || [],
+      styleHash: parts.styleHash || "",
       varNames: {},
       lastNodeName: "",
     };
-    result += buildNode(parts.template, status, "$parent", "$anchor && $anchor.nextSibling");
+    result += buildNode(parts.template, status, "$parent", "$anchor && $anchor.nextSibling", true);
   }
 
   result += `}\n};\n\nexport default ${name};`;
@@ -78,13 +84,14 @@ function buildNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
+  root = false,
 ): string {
   switch (node.type) {
     case "component": {
-      return buildComponentNode(node as ElementNode, status, parentName, anchorName);
+      return buildComponentNode(node as ElementNode, status, parentName, anchorName, root);
     }
     case "element": {
-      return buildElementNode(node as ElementNode, status, parentName, anchorName);
+      return buildElementNode(node as ElementNode, status, parentName, anchorName, root);
     }
     case "special": {
       return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
@@ -552,31 +559,46 @@ function buildComponentNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
+  root = false,
 ): string {
   let result = "";
 
   // Props
   const propsName = nextVarName("props", status);
-  const componentHasProps = node.attributes.length;
+  const componentHasProps = node.attributes.length || root;
   if (componentHasProps) {
     // TODO: defaults etc props
     result += `const ${propsName} = watch({});\n`;
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        result += `watchEffect(() => `;
-        result += `${propsName}["${name}"] = ${name}`;
-        result += `);\n`;
+        result += `watchEffect(() => ${propsName}["${name}"] = ${name});\n`;
       } else {
         let generated = value.startsWith("{") && value.endsWith("}");
         if (generated) {
           value = value.substring(1, value.length - 1);
+        }
+        if (name === "class") {
+          // TODO: How to handle dynamic classes etc
+          // Probably just compile down to a string?
+          value = `"${trimAny(value, `'"`)} tera-${status.styleHash}"`;
         }
         result += generated ? `watchEffect(() => ` : "";
         result += `${propsName}["${name}"] = ${value || "true"}`;
         result += generated ? `)` : "";
         result += ";\n";
       }
+    }
+    // PERF: Does this have much of an impact??
+    if (root) {
+      result += `if ($props) {\n`;
+      result += `const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];\n`;
+      result += `for (let name of Object.keys($props)) {\n`;
+      result += `if (!name.startsWith("$") && !propNames.includes(name)) {\n`;
+      result += `watchEffect(() => ${propsName}[name] = $props[name]);\n`;
+      result += `}\n`;
+      result += `}\n`;
+      result += `}\n`;
     }
   }
 
@@ -662,11 +684,19 @@ function buildElementNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
+  root = false,
 ): string {
   const varName = nextVarName(node.tagName, status);
 
   let result = "";
   result += `const ${varName} = document.createElement("${node.tagName}");\n`;
+  // PERF: Does this have much of an impact??
+  if (root) {
+    result += `if ($props) {\n`;
+    result += `const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];\n`;
+    result += `applyAttributes(${varName}, $props, propNames);\n`;
+    result += `}\n`;
+  }
   result += buildElementAttributes(node, varName, status);
   for (let child of filterChildren(node)) {
     result += buildNode(child, status, varName, "null");

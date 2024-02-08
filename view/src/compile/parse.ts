@@ -71,6 +71,13 @@ export default function parse(source: string): ParseResult {
 
   checkAndApplyStyles(status);
 
+  // HACK: get all usages of $props.name
+  const propsMatches = source.matchAll(/\$props\s*\.([\d\w]+)/g);
+  const props: string[] = [];
+  for (let match of propsMatches) {
+    props.push(match[1]);
+  }
+
   const ok = !status.errors.length;
   return {
     ok,
@@ -83,6 +90,7 @@ export default function parse(source: string): ParseResult {
           template: status.template,
           style: status.style,
           styleHash: status.styleHash,
+          props,
         }
       : undefined,
   };
