@@ -1,8 +1,7 @@
-﻿<script>
-	/*
-	TODO: Type checking on $props
-	*/
-</script>
+﻿/**
+ * A header component
+ * @prop {string} name The name to display in the header
+ */
 
 <h2>Hello {$props.name}</h2>
 

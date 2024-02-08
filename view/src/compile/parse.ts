@@ -4,17 +4,21 @@ import Node from "../nodes/Node";
 import TextNode from "../nodes/TextNode";
 import Attribute from "../types/Attribute";
 import CompileError from "../types/CompileError";
+import Documentation from "../types/Documentation";
 import Import from "../types/Import";
 import ParseResult from "../types/ParseResult";
+import PropDocumentation from "../types/PropDocumentation";
+import SlotDocumentation from "../types/SlotDocumentation";
 import Style from "../types/Style";
 import StyleBlock from "../types/StyleBlock";
 import hash from "./hash";
-import { isAlphaNumericChar, isSpaceChar, trimAny } from "./utils";
+import { isAlphaNumericChar, isSpace, isSpaceChar, trimAny } from "./utils";
 
 interface ParseStatus {
   source: string;
   // The current index
   i: number;
+  docs?: Documentation;
   script?: string;
   template?: ElementNode;
   style?: Style;
@@ -73,6 +77,7 @@ export default function parse(source: string): ParseResult {
     errors: status.errors,
     parts: ok
       ? {
+          docs: status.docs,
           imports: status.imports,
           script: status.script,
           template: status.template,
@@ -91,7 +96,8 @@ function parseSource(status: ParseStatus, source: string) {
     .replace(/}(\s*)catch/g, "}$1@catch");
 
   for (status.i; status.i < source.length; status.i++) {
-    if (status.source[status.i] === "<") {
+    const char = status.source[status.i];
+    if (char === "<") {
       if (
         status.source[status.i + 1] === "!" &&
         status.source[status.i + 2] === "-" &&
@@ -102,6 +108,9 @@ function parseSource(status: ParseStatus, source: string) {
       } else {
         parseTopElement(status);
       }
+    } else if (accept("/**", status)) {
+      status.i -= 1;
+      status.docs = parseDocs(status);
     }
   }
 }
@@ -744,6 +753,134 @@ function collectStyleSelectors(block: StyleBlock, selectors: string[]) {
   }
 }
 
+function parseDocs(status: ParseStatus): Documentation {
+  const docs: Documentation = {
+    description: "",
+    props: [],
+    slots: [],
+  };
+
+  while (accept("*", status)) {
+    consumeSpace(status);
+    if (accept("/", status)) {
+      // It is the end of the comments
+      break;
+    } else if (accept("@", status)) {
+      const key = consumeWord(status);
+      switch (key) {
+        case "prop": {
+          const prop = parseDocsProp(status);
+          docs.props.push(prop);
+          break;
+        }
+        case "slot": {
+          const slot = parseDocsSlot(status);
+          docs.slots.push(slot);
+          break;
+        }
+        default: {
+          addError(status, `Unknown keyword: ${key}`, status.i - key.length - 1);
+          break;
+        }
+      }
+    } else if (status.i === status.source.length - 1) {
+      addError(status, "Unclosed doc comments", status.i);
+      break;
+    } else {
+      docs.description += consumeUntil("\n*@", status).trim();
+      consumeSpace(status);
+    }
+  }
+
+  return docs;
+}
+
+function parseDocsProp(status: ParseStatus): PropDocumentation {
+  const docs: PropDocumentation = {
+    name: "",
+    type: "",
+    description: "",
+  };
+
+  // Parse the type
+  consumeSpace(status);
+  if (accept("{", status)) {
+    consumeSpace(status);
+    docs.type = consumeWord(status);
+    consumeSpace(status);
+    expect("}", status);
+    consumeSpace(status);
+  }
+
+  // Parse the name
+  docs.name = consumeWord(status);
+  consumeSpace(status);
+
+  // Maybe parse the description
+  if (!accept("*", status, false)) {
+    // Ignore leading dashes
+    while (accept("-", status)) {}
+    docs.description = consumeUntil("\n", status).trim();
+    consumeSpace(status);
+  }
+
+  while (accept("*", status)) {
+    const start = status.i - 1;
+    consumeSpace(status);
+    if (accept("*", status)) {
+      // It was an empty line; move on to the next
+      status.i -= 1;
+      continue;
+    } else if (accept("/", status) || accept("@", status)) {
+      // It's the end of the comments or this prop
+      status.i = start;
+      break;
+    } else {
+      // Ignore leading dashes
+      while (accept("-", status)) {}
+      docs.description += consumeUntil("\n", status).trim();
+      consumeSpace(status);
+    }
+  }
+
+  return docs;
+}
+
+function parseDocsSlot(status: ParseStatus): SlotDocumentation {
+  const docs: SlotDocumentation = {
+    name: "",
+    props: [],
+  };
+
+  consumeSpace(status);
+
+  // Maybe parse the name
+  if (!accept("*", status, false)) {
+    docs.name = consumeUntil("\n", status);
+    consumeSpace(status);
+  }
+
+  while (accept("*", status)) {
+    const start = status.i - 1;
+    consumeSpace(status);
+    if (accept("*", status)) {
+      // It was an empty line; move on to the next
+      status.i -= 1;
+      continue;
+    } else if (accept("@sprop", status)) {
+      // Process @sprop
+      const prop = parseDocsProp(status);
+      docs.props.push(prop);
+    } else if (accept("/", status) || accept("@", status)) {
+      // It's the end of the comments or this slot
+      status.i = start;
+      break;
+    }
+  }
+
+  return docs;
+}
+
 function addError(status: ParseStatus, message: string, start: number = status.i) {
   status.errors.push({ message, start });
 }
@@ -790,7 +927,7 @@ function consumeUntil(value: string, status: ParseStatus) {
 
 function accept(value: string, status: ParseStatus, advance = true): boolean {
   const check = status.source.substring(status.i, status.i + value.length);
-  if (status.source.substring(status.i, status.i + value.length) == value) {
+  if (check == value) {
     status.i += advance ? value.length : 0;
     return true;
   }
