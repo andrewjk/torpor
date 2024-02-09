@@ -1,7 +1,7 @@
-import ElementNode from "../nodes/ElementNode";
-import Documentation from "./Documentation";
 import Import from "./Import";
-import Style from "./Style";
+import Documentation from "./docs/Documentation";
+import ElementNode from "./nodes/ElementNode";
+import Style from "./styles/Style";
 
 export default interface ComponentParts {
   docs?: Documentation;

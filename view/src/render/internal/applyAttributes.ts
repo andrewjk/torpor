@@ -1,4 +1,4 @@
-import watchEffect from "../../../watch/src/watchEffect";
+import watchEffect from "../../watch/watchEffect";
 
 export default function applyAttributes(
   el: Element,

@@ -1,12 +1,12 @@
-import ControlNode from "../nodes/ControlNode";
-import ElementNode from "../nodes/ElementNode";
-import Node from "../nodes/Node";
-import TextNode from "../nodes/TextNode";
-import Attribute from "../types/Attribute";
 import BuildResult from "../types/BuildResult";
 import ComponentParts from "../types/ComponentParts";
-import StyleBlock from "../types/StyleBlock";
-import { trimAny } from "./utils";
+import Attribute from "../types/nodes/Attribute";
+import ControlNode from "../types/nodes/ControlNode";
+import ElementNode from "../types/nodes/ElementNode";
+import Node from "../types/nodes/Node";
+import TextNode from "../types/nodes/TextNode";
+import StyleBlock from "../types/styles/StyleBlock";
+import { trimAny } from "./internal/utils";
 
 interface BuildStatus {
   props: string[];
@@ -27,13 +27,13 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 function buildCode(name: string, parts: ComponentParts): string {
   let result = "";
 
-  result += "import watch from '../../../../watch/src/watch';\n";
-  result += "import watchEffect from '../../../../watch/src/watchEffect';\n";
-  result += "import clearRange from '../../../../view/src/render/clearRange';\n";
-  result += "import reconcileList from '../../../../view/src/render/reconcileList';\n";
-  result += "import applyAttributes from '../../../../view/src/render/applyAttributes';\n";
-  //result += "import { watch, watchEffect } from '../../../../../tera/watch/dist/index.js';\n";
-  //result += "import { clearRange, reconcileList } from '../../../../../tera/view/dist/index.js';\n";
+  result += "import watch from '../../../../view/src/watch/watch';\n";
+  result += "import watchEffect from '../../../../view/src/watch/watchEffect';\n";
+  result += "import clearRange from '../../../../view/src/render/internal/clearRange';\n";
+  result += "import reconcileList from '../../../../view/src/render/internal/reconcileList';\n";
+  result += "import applyAttributes from '../../../../view/src/render/internal/applyAttributes';\n";
+  //result +=
+  //  "import { clearRange, reconcileList, applyAttributes, watch, watchEffect } from '../../../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
     result += parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
   }

@@ -1,9 +1,9 @@
-import ControlNode from "../src/nodes/ControlNode";
-import ElementNode from "../src/nodes/ElementNode";
-import Node from "../src/nodes/Node";
-import TextNode from "../src/nodes/TextNode";
-import Attribute from "../src/types/Attribute";
 import ParseResult from "../src/types/ParseResult";
+import Attribute from "../src/types/nodes/Attribute";
+import ControlNode from "../src/types/nodes/ControlNode";
+import ElementNode from "../src/types/nodes/ElementNode";
+import Node from "../src/types/nodes/Node";
+import TextNode from "../src/types/nodes/TextNode";
 
 export function cmp(
   name: string,

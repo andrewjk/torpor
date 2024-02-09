@@ -1,4 +1,4 @@
-import Attribute from "../types/Attribute";
+import Attribute from "./Attribute";
 import Node from "./Node";
 
 export default interface ElementNode extends Node {

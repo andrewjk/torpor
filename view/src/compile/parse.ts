@@ -1,18 +1,18 @@
-import ControlNode from "../nodes/ControlNode";
-import ElementNode from "../nodes/ElementNode";
-import Node from "../nodes/Node";
-import TextNode from "../nodes/TextNode";
-import Attribute from "../types/Attribute";
 import CompileError from "../types/CompileError";
-import Documentation from "../types/Documentation";
 import Import from "../types/Import";
 import ParseResult from "../types/ParseResult";
-import PropDocumentation from "../types/PropDocumentation";
-import SlotDocumentation from "../types/SlotDocumentation";
-import Style from "../types/Style";
-import StyleBlock from "../types/StyleBlock";
-import hash from "./hash";
-import { isAlphaNumericChar, isSpace, isSpaceChar, trimAny } from "./utils";
+import Documentation from "../types/docs/Documentation";
+import PropDocumentation from "../types/docs/PropDocumentation";
+import SlotDocumentation from "../types/docs/SlotDocumentation";
+import Attribute from "../types/nodes/Attribute";
+import ControlNode from "../types/nodes/ControlNode";
+import ElementNode from "../types/nodes/ElementNode";
+import Node from "../types/nodes/Node";
+import TextNode from "../types/nodes/TextNode";
+import Style from "../types/styles/Style";
+import StyleBlock from "../types/styles/StyleBlock";
+import hash from "./internal/hash";
+import { isAlphaNumericChar, isSpace, isSpaceChar, trimAny } from "./internal/utils";
 
 interface ParseStatus {
   source: string;
