@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import watch from "../src/watch";
-import watchEffect from "../src/watchEffect";
+import watch from "../../src/watch/watch";
+import watchEffect from "../../src/watch/watchEffect";
 
 test("watching a simple effect", () => {
   const person = watch({

@@ -8,10 +8,17 @@ import triggerEffects from "./triggerEffects";
 // Adapted from https://stackoverflow.com/a/50723478
 const handler = {
   get: function (target: Record<string, any>, key: string, receiver: any) {
+    //console.log("getting", key, "on", target);
+
     // Set the value to a new proxy if it's an object
     // But not if it's a Promise (i.e. has a `then` method)
     const value = target[key];
-    if (value && !value.$isProxy && typeof value === "object" && !value.then) {
+    if (
+      value &&
+      !value.$isProxy &&
+      typeof value === "object" /*|| typeof value === "function")*/ &&
+      !value.then
+    ) {
       target[key] = watch(value);
     }
 
@@ -25,7 +32,10 @@ const handler = {
     const oldValue = target[key];
 
     // Set the property value on the target
+
     // If the value was previously a proxy, watch the new value
+    // NOTE: Won't this get done on get?
+    /*
     let newValue: any;
     if (oldValue && oldValue.$isProxy) {
       // TODO: Should we unsubscribe here?!
@@ -33,6 +43,8 @@ const handler = {
     } else {
       newValue = value;
     }
+    */
+    //console.log("setting", key, "on", target);
 
     Reflect.set(target, key, value, receiver);
 
@@ -43,6 +55,13 @@ const handler = {
 
     return true;
   },
+  /*
+  apply: function (target: Function, thisArg: any, args: any[]): any {
+    //console.log("APPLY?", target, thisArg);
+    // TODO: re-run effects on the target
+    return Reflect.apply(target, thisArg, args);
+  },
+  */
 };
 
 export default handler;
