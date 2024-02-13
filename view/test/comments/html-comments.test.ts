@@ -1,13 +1,17 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { control, el, trimParsed } from "../helpers";
+import { el, text, trimParsed } from "../helpers";
 
-test("simple constant", () => {
+test("html comments", () => {
   const input = `
-  <section>
-    @const x = 5
-  </section>
+<!-- A comment at the top -->
+<section>
+  <!-- A comment inside -->
+  <p>
+    The <!-- A comment inside some text --> content
+  </p>
+</section>
 `;
 
   const output = trimParsed(parse(input));
@@ -15,7 +19,7 @@ test("simple constant", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el("section", [], [control("@const", "const x = 5", [])]),
+      template: el("section", [], [el("p", [], [text("The"), text("content")])]),
     },
   };
   expect(output).toEqual(expected);

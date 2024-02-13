@@ -1,11 +1,11 @@
 import Component from "../types/Component";
 
-export default function render(parent: Node, component: Component, anchor: Node | null) {
+export default function render(parent: Node, component: Component, props?: Object) {
   // Add an anchor element at the start of the component
-  anchor = createAnchor(parent, anchor && anchor.nextSibling, `#comp ${component.name}`);
+  /*const anchor =*/ createAnchor(parent, null, `@comp ${component.name}`);
 
   // Call the component's render function
-  component.render(parent, anchor);
+  component.render(parent, null, props);
 }
 
 /*export default*/ function createAnchor(parent: Node, nextSibling: Node | null, comment: string) {

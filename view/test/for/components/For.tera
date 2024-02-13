@@ -1,0 +1,7 @@
+<section>
+  @for (let i = 0; i < 5; i++) {
+    <p>
+      {i}
+    </p>
+  }
+</section>

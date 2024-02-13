@@ -1,0 +1,12 @@
+
+<div>
+    @if ($props.counter > 7) {
+        <p>
+            It's true!
+        </p>
+    } else {
+        <p>
+            It's not true...
+        </p>
+    }
+</div>

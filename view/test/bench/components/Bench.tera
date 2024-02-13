@@ -1,0 +1,169 @@
+<script>
+    let rowId = 1;
+    let $state = watch({
+        data: [],
+        selected: null,
+    });
+
+    const adjectives = [
+        "pretty",
+        "large",
+        "big",
+        "small",
+        "tall",
+        "short",
+        "long",
+        "handsome",
+        "plain",
+        "quaint",
+        "clean",
+        "elegant",
+        "easy",
+        "angry",
+        "crazy",
+        "helpful",
+        "mushy",
+        "odd",
+        "unsightly",
+        "adorable",
+        "important",
+        "inexpensive",
+        "cheap",
+        "expensive",
+        "fancy",
+    ];
+    const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+    const nouns = [
+        "table",
+        "chair",
+        "house",
+        "bbq",
+        "desk",
+        "car",
+        "pony",
+        "cookie",
+        "sandwich",
+        "burger",
+        "pizza",
+        "mouse",
+        "keyboard",
+    ];
+
+    function append() {
+        $state.data = [...$state.data, ...buildData(1000)];
+    }
+
+    function clear() {
+        $state.data = [];
+    }
+
+    function partialUpdate() {
+        for (let i = 0; i < $state.data.length; i += 10) {
+            const row = $state.data[i];
+            row.label = row.label + " !!!";
+        }
+    }
+
+    function remove(row) {
+        const clone = $state.data.slice();
+        clone.splice(clone.indexOf(row), 1);
+        $state.data = clone;
+    }
+
+    function create() {
+        // TODO: Build this up to 1000:
+        $state.data = buildData(10);
+    }
+
+    function createLots() {
+        $state.data = buildData(10000);
+    }
+
+    function swapRows() {
+        if ($state.data.length > 998) {
+            const clone = $state.data.slice();
+            const tmp = clone[1];
+            clone[1] = clone[998];
+            clone[998] = tmp;
+            $state.data = clone;
+        }
+    }
+
+    function _random(max) {
+        return Math.round(Math.random() * 1000) % max;
+    }
+
+    class Item {
+        id = rowId++;
+        label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
+    }
+
+    function buildData(count = 1000) {
+        const data = new Array(count);
+        for (let i = 0; i < count; i++) {
+            data[i] = watch(new Item());
+        }
+        return data;
+    }
+</script>
+
+<div id="main" class="container">
+  <div class="jumbotron">
+    <div class="row">
+      <div class="col-md-6">
+        <h1>Tera (keyed)</h1>
+      </div>
+      <div class="col-md-6">
+        <div class="row">
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="create" onclick={create}>Create 1,000 rows</button>
+          </div>
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="createlots" onclick={createLots}>
+                Create 10,000 rows
+            </button>
+          </div>
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="append" onclick={append}>
+                Append 1,000 rows
+            </button>
+          </div>
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="update" onclick={partialUpdate}>
+                Update every 10th row
+            </button>
+          </div>
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="clear" onclick={clear}>Clear</button>
+          </div>
+          <div class="col-sm-6 smallpad">
+            <button type="button" class="btn btn-primary btn-block" id="swaprows" onclick={swapRows}>Swap Rows</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <table class="table table-hover table-striped test-data">
+    <tbody>
+        @for (let row of $state.data) {
+            @key = row.id
+            @//<tr class={$state.selected === row.id ? "danger" : ""}>
+            <tr class:selected={$state.selected === row.id}>
+                <td class="col-md-1">{row.id}</td>
+                <td class="col-md-4">
+                    <a onclick={() => $state.selected = row.id}>
+                        {row.label}
+                    </a>
+                </td>
+                <td class="col-md-1">
+                    <a onclick={() => remove(row)}>
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true" />
+                    </a>
+                </td>
+                <td class="col-md-6" />
+            </tr>
+        }
+    </tbody>
+  </table>
+  <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+</div>

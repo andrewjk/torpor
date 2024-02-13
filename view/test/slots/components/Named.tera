@@ -1,0 +1,12 @@
+<script>
+    import Article from './Article.tera'
+</script>
+
+<Article>
+    <:fill name="header">
+        The article's header
+    </:fill>
+    <p>
+        The article's body
+    </p>
+</Article>

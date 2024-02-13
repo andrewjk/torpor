@@ -1,0 +1,7 @@
+<section>
+  @for (let item of $props.items) {
+    <p>
+      {item}
+    </p>
+  }
+</section>

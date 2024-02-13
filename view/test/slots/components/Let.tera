@@ -1,0 +1,9 @@
+<script>
+    import List from './List.tera'
+</script>
+
+<List items={$props.items}>
+    <:fill>
+        {$sprops.item.text}
+    </:fill>
+</List>

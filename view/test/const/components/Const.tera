@@ -1,0 +1,7 @@
+
+<div>
+    @const name = "Boris"
+    <p>
+        Hello, {name}!
+    </p>
+</div>

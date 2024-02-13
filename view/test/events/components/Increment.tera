@@ -1,0 +1,19 @@
+<script>
+    const $state = watch({ counter: 0 })
+
+    function increment(e, num) {
+        $state.counter += num || 1;
+    }
+</script>
+
+<div>
+    <button id="increment" onclick={increment}>
+        Increment
+    </button>
+    <button id="increment5" onclick={(e) => increment(e, 5)}>
+        Increment
+    </button>
+    <p>
+        The count is {$state.counter}.
+    </p>
+</div>

@@ -1,0 +1,7 @@
+<ul>
+    @for (let item of $props.items) {
+        <li>
+            <:slot item={item} />
+        </li> 
+    }
+</ul>

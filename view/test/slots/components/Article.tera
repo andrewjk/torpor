@@ -1,0 +1,7 @@
+<section>
+    <h2>
+        <:slot name="header" />
+    </h2>
+    <:slot />
+    <:slot name="footer" />
+</section>

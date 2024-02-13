@@ -1,0 +1,19 @@
+<div>
+    @switch ($props.value) {
+        @case 1: {
+            <p>
+                A small value.
+            </p>
+        }
+        @case 100: {
+            <p>
+                A large value.
+            </p>
+        }
+        @default: {
+            <p>
+                Another value.
+            </p>
+        }
+    }
+</div>

@@ -1,0 +1,7 @@
+<script>
+    import Header from './Header.tera'
+</script>
+
+<Header>
+    Basic stuff
+</Header>

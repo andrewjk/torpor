@@ -1,0 +1,8 @@
+<script>
+    let $state = watch({ name: "Alice" });
+</script>
+
+<div>
+    <input bind:value={$state.name} />
+    <p>Hello, {$state.name}</p>
+</div>
