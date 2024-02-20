@@ -13,6 +13,7 @@ interface BuildStatus {
   styleHash: string;
   varNames: Record<string, number>;
   lastNodeName: string;
+  endNodes: string[];
 }
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
@@ -27,38 +28,52 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 function buildCode(name: string, parts: ComponentParts): string {
   let result = "";
 
-  result += "import watch from '../../../../view/src/watch/watch';\n";
-  result += "import watchEffect from '../../../../view/src/watch/watchEffect';\n";
-  result += "import clearRange from '../../../../view/src/render/internal/clearRange';\n";
-  result += "import reconcileList from '../../../../view/src/render/internal/reconcileList';\n";
-  result += "import applyAttributes from '../../../../view/src/render/internal/applyAttributes';\n";
+  const folder = "../../../../../tera/view/src";
+  result += `import watch from '${folder}/watch/watch';\n`;
+  result += `import watchEffect from '${folder}/watch/watchEffect';\n`;
+  result += `import t_clear_range from '${folder}/render/internal/clearRange';\n`;
+  result += `import t_reconcile_list from '${folder}/render/internal/reconcileList';\n`;
+  result += `import t_apply_attributes from '${folder}/render/internal/applyAttributes';\n`;
+  result += `import t_context from '${folder}/watch/internal/context';\n`;
+  result += `import t_set_active_node from '${folder}/watch/internal/setActiveNode';\n`;
   //result +=
-  //  "import { clearRange, reconcileList, applyAttributes, watch, watchEffect } from '../../../../../../tera/view/dist/index.js';\n";
+  //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, watch, watchEffect } from '../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
     result += parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
   }
   result += "\n";
 
   // HACK: Move into utils
-  result += "function defText(text) { return text != null ? text : '' }\n\n";
+  result += "function t_text(text) { return text != null ? text : '' }\n";
+  //result += "function t_doc(node) { return node.ownerDocument }\n";
+  result += "\n";
 
   result += `const ${name} = {\n`;
   result += `name: "${name}",\n`;
   result += `/**\n`;
   result += ` * @param {Node} $parent\n`;
   result += ` * @param {Node | null} $anchor\n`;
-  result += ` * @param {any} $props\n`;
-  result += ` * @param {any} $pass\n`;
-  result += ` * @param {any} $slots\n`;
+  result += ` * @param {Object} [$props]\n`;
+  result += ` * @param {Object} [$slots]\n`;
+  result += ` * @param {Object} [$context]\n`;
   result += ` */\n`;
   result += `render: ($parent, $anchor, $props, $slots, $context) => {\n`;
 
-  // Redefine context so that any newly added properties will only be passed to children
+  // Redefine $context so that any newly added properties will only be passed to children
+  // TODO: Only if there's a mention of $context in here??
   result += `$context = Object.assign({}, $context);\n`;
+
+  // Build an anchor here, so that effects set in the script can be cleaned up if/when the
+  // component is removed
+  result += `const t_componentAnchor = document.createComment("@comp");\n`;
+  result += `$parent.insertBefore(t_componentAnchor, $anchor && $anchor.nextSibling);\n`;
+  result += `const t_originalActiveNode = t_context.activeNode;\n`;
+  result += `t_set_active_node(t_componentAnchor);\n`;
 
   if (parts.script) {
     // TODO: Mangling
-    result += parts.script + "\n\n";
+    result += parts.script;
+    result += "\n\n";
   }
 
   if (parts.template) {
@@ -70,11 +85,15 @@ function buildCode(name: string, parts: ComponentParts): string {
       styleHash: parts.styleHash || "",
       varNames: {},
       lastNodeName: "",
+      endNodes: [],
     };
     result += buildNode(parts.template, status, "$parent", "$anchor && $anchor.nextSibling", true);
   }
 
-  result += `}\n};\n\nexport default ${name};`;
+  result += `t_context.activeNode = t_originalActiveNode;\n`;
+  result += `}\n`;
+  result += `};\n\n`;
+  result += `export default ${name};`;
 
   return result;
 }
@@ -139,10 +158,10 @@ function buildTextNode(
     if (generatedCount === 1 && content.startsWith("{") && content.endsWith("}")) {
       content = content.substring(1, content.length - 1);
     } else {
-      content = `\`${content.replaceAll("{", "${defText(").replaceAll("}", ")}")}\``;
+      content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
     }
   } else {
-    content = `defText("${content.replaceAll('"', '\\"')}")`;
+    content = `t_text("${content.replaceAll('"', '\\"')}")`;
   }
 
   const varName = nextVarName("text", status);
@@ -206,6 +225,7 @@ function buildIfNode(
   anchorName: string,
 ): string {
   const startAnchorName = nextVarName("anchor", status);
+  const activeNodeName = nextVarName("active_node", status);
   const endNodeName = nextVarName("end", status);
   const indexName = nextVarName("index", status);
 
@@ -225,13 +245,19 @@ function buildIfNode(
 
   let result = "";
   result += "\n";
+  result += "//\n";
+  result += "// === IF ===\n";
+  result += "//\n";
   result += `const ${startAnchorName} = document.createComment("@if");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += `const ${activeNodeName} = t_context.activeNode;\n`;
+  result += `t_set_active_node(${startAnchorName});\n`;
   result += "\n";
   result += "/** @type {ChildNode | undefined} */\n";
   result += `let ${endNodeName};\n`;
   result += `let ${indexName} = -1;\n`;
   result += `watchEffect(() => {\n`;
+  status.endNodes.push(endNodeName);
   for (let [i, branch] of branches.entries()) {
     result += buildIfBranch(
       branch as ControlNode,
@@ -243,9 +269,11 @@ function buildIfNode(
       i,
     );
   }
-  result += "});\n\n";
+  status.endNodes.pop();
+  result += "});\n";
+  result += `t_context.activeNode = ${activeNodeName};\n\n`;
 
-  status.lastNodeName = startAnchorName;
+  status.lastNodeName = endNodeName;
 
   return result;
 }
@@ -262,16 +290,30 @@ function buildIfBranch(
   let result = "";
   result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
+  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
   result += "\n";
-  status.lastNodeName = "undefined";
+  // Create another anchor in each branch to store effects on, and clear when the branch is cleared
+  result += `const t_anchor = document.createComment("@${node.statement}");\n`;
+  result += `${parentName}.insertBefore(t_anchor, ${anchorName}.nextSibling);\n`;
+  result += `const t_active_node = t_context.activeNode;\n`;
+  result += `t_set_active_node(t_anchor);\n`;
+  result += "\n";
+  anchorName = status.lastNodeName = "t_anchor";
   for (let child of filterChildren(node)) {
     result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
     anchorName = status.lastNodeName;
   }
   result += "\n";
   result += `${endNodeName} = ${status.lastNodeName};\n`;
+  // HACK: Set other end node names from parent if statements if there are no more element nodes
+  // This will need to be fixed to work with all nesting combos
+  /*if (!ifnode.children.find(n => ))
+  status.endNodes.forEach((en) => {
+    result += `${en} = ${status.lastNodeName};\n`;
+  });
+  */
   result += `${indexName} = ${index};\n`;
+  result += `t_context.activeNode = t_active_node;\n\n`;
   result += "}\n";
   return result;
 }
@@ -285,6 +327,7 @@ function buildSwitchNode(
   const startAnchorName = nextVarName("anchor", status);
   const endNodeName = nextVarName("end", status);
   const indexName = nextVarName("index", status);
+  const activeNodeName = nextVarName("active_node", status);
 
   // Filter non-control branches (spaces)
   const branches = node.children.filter((n) => n.type === "control");
@@ -302,8 +345,13 @@ function buildSwitchNode(
 
   let result = "";
   result += "\n";
+  result += "//\n";
+  result += "// === SWITCH ===\n";
+  result += "//\n";
   result += `const ${startAnchorName} = document.createComment("@switch");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += `const ${activeNodeName} = t_context.activeNode;\n`;
+  result += `t_set_active_node(${startAnchorName});\n`;
   result += "\n";
   result += "/** @type {ChildNode | undefined} */\n";
   result += `let ${endNodeName};\n`;
@@ -322,7 +370,8 @@ function buildSwitchNode(
     );
   }
   result += "}\n";
-  result += "});\n\n";
+  result += "});\n";
+  result += `t_context.activeNode = ${activeNodeName};\n\n`;
   return result;
 }
 
@@ -338,7 +387,7 @@ function buildSwitchBranch(
   let result = "";
   result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
+  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
   result += "\n";
   status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
@@ -392,6 +441,7 @@ function buildForNode(
   }
 
   const startAnchorName = nextVarName("anchor", status);
+  const activeNodeName = nextVarName("active_node", status);
   const forItemsName = nextVarName("for_items", status);
 
   // Filter non-control branches (spaces)
@@ -401,8 +451,13 @@ function buildForNode(
 
   let result = "";
   result += "\n";
+  result += "//\n";
+  result += "// === FOR ===\n";
+  result += "//\n";
   result += `const ${startAnchorName} = document.createComment("@for");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += `const ${activeNodeName} = t_context.activeNode;\n`;
+  result += `t_set_active_node(${startAnchorName});\n`;
   result += "\n";
   result += "/** @type {any[]} */\n";
   result += `let ${forItemsName} = [];\n`;
@@ -411,11 +466,12 @@ function buildForNode(
   result += `let t_for_items = [];\n`;
   result += `${node.statement} {\n`;
   result += "/** @type {any} */\n";
-  // TODO: Handle name collisions
+  // TODO: Because we're accessing item properties out here, they get attached to the @for anchor and don't get cleaned up
+  // Somehow we need to attach them to the appropriate @foritem anchor instead
   result += `let t_item = {};\n`;
   if (key) {
     const keyStatement = (key as ControlNode).statement;
-    result += `t_item["t_key"] = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};\n`;
+    result += `t_item.key = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};\n`;
   }
   result += `t_item.data = {};\n`;
   for (let v of forVarNames) {
@@ -424,7 +480,7 @@ function buildForNode(
   result += `t_for_items.push(t_item);\n`;
   result += `}\n`;
   result += "\n";
-  result += `reconcileList(\n`;
+  result += `t_reconcile_list(\n`;
   result += `${parentName},\n`;
   result += `${forItemsName},\n`;
   result += `t_for_items,\n`;
@@ -440,14 +496,20 @@ function buildForNode(
   result += `);\n`;
   result += "\n";
   result += `${forItemsName} = t_for_items;\n`;
-  result += "});\n\n";
+  result += "});\n";
+  result += `t_context.activeNode = ${activeNodeName};\n\n`;
   return result;
 }
 
 function buildForItem(node: ControlNode, status: BuildStatus, parentName: string): string {
   let result = "";
-  result += `t_item.anchor = document.createComment("@for item " + t_item.t_key);\n`;
+  result += "//\n";
+  result += "// === FOR ITEM ===\n";
+  result += "//\n";
+  result += `t_item.anchor = document.createComment("@foritem " + t_item.key);\n`;
   result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
+  result += `const t_active_node = t_context.activeNode;\n`;
+  result += `t_set_active_node(t_item.anchor);\n`;
   result += `\n`;
   result += "\n";
   status.lastNodeName = "undefined";
@@ -459,6 +521,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, parentName: string
   }
   result += "\n";
   result += `t_item.endNode = ${status.lastNodeName};\n`;
+  result += `t_context.activeNode = t_active_node;\n\n`;
   return result;
 }
 
@@ -469,6 +532,7 @@ function buildAwaitNode(
   anchorName: string,
 ): string {
   const startAnchorName = nextVarName("anchor", status);
+  const activeNodeName = nextVarName("active_node", status);
   const endNodeName = nextVarName("end", status);
   const awaitTokenName = nextVarName("token", status);
 
@@ -502,8 +566,13 @@ function buildAwaitNode(
 
   let result = "";
   result += "\n";
+  result += "//\n";
+  result += "// === AWAIT ===\n";
+  result += "//\n";
   result += `const ${startAnchorName} = document.createComment("@await");\n`;
   result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
+  result += `const ${activeNodeName} = t_context.activeNode;\n`;
+  result += `t_set_active_node(${startAnchorName});\n`;
   result += "\n";
   result += "/** @type {ChildNode | undefined} */\n";
   result += `let ${endNodeName};\n`;
@@ -529,7 +598,8 @@ function buildAwaitNode(
   result += `}\n`;
   result += `});\n`;
   result += `})(${awaitTokenName});\n`;
-  result += `});\n\n`;
+  result += `});\n`;
+  result += `t_context.activeNode = ${activeNodeName};\n\n`;
 
   return result;
 }
@@ -542,7 +612,7 @@ function buildAwaitBranch(
   endNodeName: string,
 ): string {
   let result = "";
-  result += `if (${endNodeName}) clearRange(${anchorName}, ${endNodeName});\n`;
+  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
   result += "\n";
   status.lastNodeName = "undefined";
   for (let child of filterChildren(node)) {
@@ -671,7 +741,7 @@ function buildElementNode(
   if (root) {
     result += `if ($props) {\n`;
     result += `const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];\n`;
-    result += `applyAttributes(${varName}, $props, propNames);\n`;
+    result += `t_apply_attributes(${varName}, $props, propNames);\n`;
     result += `}\n`;
   }
   result += buildElementAttributes(node, varName, status);
@@ -731,7 +801,7 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
           ? `if (${classVarName}) ${varName}.classList.remove(${classVarName});\n`
           : "";
         result += generated ? `if (${value}) {\n` : "";
-        result += `${varName}.classList.add(${value});\n`;
+        result += `${varName}.classList.add(...${value}.split(" "));\n`;
         result += generated ? `${classVarName} = ${value};\n` : "";
         result += generated ? `}\n` : "";
         result += generated ? `});\n` : "";
@@ -804,7 +874,7 @@ function buildSlotNode(
     }
   }
 
-  result += `if ($slots["${slotName}"]) {\n`;
+  result += `if ($slots && $slots["${slotName}"]) {\n`;
   result += `$slots["${slotName}"](${parentName}, ${anchorName}, ${slotHasProps ? propsName : "undefined"});\n`;
   result += "} else {\n";
   for (let child of filterChildren(node)) {

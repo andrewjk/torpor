@@ -112,7 +112,7 @@ export default (
         // Replace
         //console.log("replace", oldStartItem.key, "with", newStartItem.key);
         create(parent, newStartItem, oldStartItem.anchor);
-        clearRange(oldStartItem.anchor, oldStartItem.endNode);
+        clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
         oldStartItem = oldItems[++oldStartIndex];
         newStartItem = newItems[++newStartIndex];
       } else if (oldIndex === undefined) {
@@ -138,25 +138,25 @@ export default (
     }
   }
 
-  // HACK: I haven't found a situation in which these if statements
-  // make a difference, but they might need to go back in
-  //if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
-  //  if (oldStartIndex > oldEndIndex) {
-  // The old list is exhausted; process new list additions
-  for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-    //console.log("create", newStartItem.key);
-    create(parent, newStartItem, oldStartItem?.anchor);
+  if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
+    if (oldStartIndex > oldEndIndex) {
+      // The old list is exhausted; process new list additions
+      // HACK: I think it would be better to move anchors to the end?
+      let before: Node | null =
+        oldStartItem?.anchor || oldItems[oldItems.length - 1]?.endNode?.nextSibling;
+      for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
+        //console.log("create", newStartItem.key, newStartItem.endNode);
+        create(parent, newStartItem, before);
+        before = newStartItem.endNode.nextSibling;
+      }
+    } else {
+      // The new list is exhausted; process old list removals
+      //console.log("clear", oldItems[oldStartIndex].key, oldItems[oldEndIndex].key);
+      const startNode = oldItems[oldStartIndex].anchor;
+      const endNode = oldItems[oldEndIndex].endNode;
+      clearRange(startNode, endNode, true);
+    }
   }
-  //  } else {
-  // The new list is exhausted; process old list removals
-  for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
-    //console.log("clear", oldCh[oldStartIndex].key);
-    clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
-  }
-  //  }
-  //}
-
-  //return newCh;
 };
 
 function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {

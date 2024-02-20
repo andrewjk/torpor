@@ -1,6 +1,5 @@
+import arrayHandler from "./internal/arrayHandler";
 import handler from "./internal/handler";
-
-type ProxyType = object & { $isProxy?: boolean };
 
 /**
  * Watches an object for changes to its properties
@@ -8,16 +7,13 @@ type ProxyType = object & { $isProxy?: boolean };
  */
 export default function watch<T extends Record<string, any>>(object: T): T {
   // Return the object itself if it is undefined or null, or if it is already a proxy
-  if (!object || object.$isProxy) {
+  if (object == null || object.$isProxy) {
     return object;
   }
 
-  // Wrap the object in a Proxy
-  const proxy = new Proxy(object, handler);
-
-  // Set $isProxy so that we can know whether the object is already a proxy (as above)
-  // and so that we can create nested proxies when an object property is accessed
-  proxy.$isProxy = true;
+  // Wrap the object in a Proxy with a plain object or array handler
+  const proxyHandler = Array.isArray(object) ? arrayHandler : handler;
+  const proxy = new Proxy(object, proxyHandler);
 
   return proxy as T;
 }

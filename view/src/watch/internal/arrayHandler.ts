@@ -1,85 +1,92 @@
-/*
 import watch from "../watch";
+import trackEffect from "./trackEffect";
+import triggerEffects from "./triggerEffects";
+import updateEffects from "./updateEffects";
 
-// From https://stackoverflow.com/a/50723478
-const handler = {
-  get: function (target: Record<string, any>, key: string) {
-    // Get the property value from the target
-    const value = target[key];
-
-    // Return the property value if it is undefined or null
-    if (value === undefined || value === null) {
-      return value;
+const arrayHandler = {
+  get: function (target: Record<string | symbol, any>, prop: string | symbol, receiver: any) {
+    if (prop === "$isProxy") {
+      return true;
+    }
+    if (prop === "$target") {
+      return target;
     }
 
+    //console.log(`array get '${String(prop)}' on`, target);
+
     // Set the value to a new proxy if it's an object
-    // HACK: Should probably be putting listeners somewhere nicer?
-    if (!value.$isProxy && typeof value === "object" && key !== "__listeners") {
-      target[key] = watch(value);
+    // TODO: Do we need to check if it's a Promise?
+    const value = target[prop];
+    if (value && !value.$isProxy && typeof value === "object") {
+      //Reflect.set(target, prop, watch(value), receiver);
+      target[prop] = watch(value);
     }
 
     // From https://stackoverflow.com/a/54136394
-    // NOTE: Should we have a special proxyArrayhandler to avoid doing this with every property check?
     // PERF: Because we know what methods are being called, we could potentially run them manually
     //       on DOM nodes (i.e. if it's a splice, we know which to remove and add etc)
-    const listeners = target.__listeners;
-    if (Array.isArray(target)) {
-      if (
-        key === "pop" ||
-        key === "push" ||
-        key === "reverse" ||
-        key === "shift" ||
-        key === "sort" ||
-        key === "splice" ||
-        key === "unshift"
-      ) {
-        // Get the array method
-        const targetMethod: Function = target[key];
+    if (
+      prop === "pop" ||
+      prop === "push" ||
+      prop === "reverse" ||
+      prop === "shift" ||
+      prop === "sort" ||
+      prop === "splice" ||
+      prop === "unshift"
+    ) {
+      // Get the array method
+      const targetFunction: Function = target[prop];
 
-        // Run the array method
-        return function (...args: any[]) {
-          targetMethod.apply(target, args);
+      // Run the array method
+      return function (...args: any[]) {
+        targetFunction.apply(target, args);
 
-          // If this array has change functions, call them now
-          // HACK: TypeScript complains about this...
-          // const listeners = target.__listeners
-          if (listeners["."]) {
-            for (let i = 0; i < listeners["."].length; i++) {
-              listeners["."][i](target);
-            }
-          }
-        };
-      }
-    }
-
-    return target[key];
-  },
-  set: function (target: Record<string, any>, key: string, value: any) {
-    const old_value = target[key];
-
-    // Set the property value on the target
-    // If the value was already a proxy, watch the new value and store any listeners that have been set
-    // TODO: store listeners recursively?
-    if (old_value && old_value.$isProxy) {
-      target[key] = watch(value);
-      target[key].__listeners = old_value.__listeners;
+        // If this array has change functions, call them now via the
+        // length property, which gets accessed in most functions
+        triggerEffects(target, "length");
+      };
+    } else if (prop === Symbol.iterator) {
+      // Ignore the iterator
     } else {
-      target[key] = value;
+      // If this property is being accessed in the course of setting up an effect, track it
+      // TODO: Only if it's a property and not a function?
+      trackEffect(target, prop);
     }
 
-    // If the value has changed and this path has change functions, call them now
-    if (value !== old_value) {
-      const listeners = target.__listeners;
-      if (listeners && listeners[key]) {
-        for (let i = 0; i < listeners[key].length; i++) {
-          listeners[key][i](value);
-        }
+    // Return the property value
+    return Reflect.get(target, prop, receiver);
+  },
+  set: function (
+    target: Record<string | symbol, any>,
+    prop: string | symbol,
+    value: any,
+    receiver: any,
+  ) {
+    //console.log(`array set '${String(prop)}' on`, target);
+
+    //const oldValue = Reflect.get(target, prop, receiver);
+    const oldValue = target[prop];
+
+    // TODO: We should trigger effects for each item, just in case their props have been changed
+
+    // Only do things if the value has changed
+    if (value !== oldValue) {
+      // If the value was previously a proxy, watch the new value and update effect subscriptions
+      let newValue = value;
+      if (oldValue && oldValue.$isProxy) {
+        newValue = watch(value);
+        updateEffects(oldValue, value);
       }
+
+      // Set the property value on the target
+      Reflect.set(target, prop, newValue, receiver);
+
+      // Re-run effects
+      triggerEffects(target, prop);
     }
 
     return true;
   },
 };
 
-export default handler;
-*/
+export default arrayHandler;

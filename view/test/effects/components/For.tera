@@ -1,0 +1,5 @@
+<div>
+    @for (let item of $props.items) {
+        <p>{item.text}</p>
+    }
+</div>
