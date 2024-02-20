@@ -75,7 +75,9 @@ export default function parse(source: string): ParseResult {
   const propsMatches = source.matchAll(/\$props\s*\.([\d\w]+)/g);
   const props: string[] = [];
   for (let match of propsMatches) {
-    props.push(match[1]);
+    if (!props.includes(match[1])) {
+      props.push(match[1]);
+    }
   }
 
   const ok = !status.errors.length;
