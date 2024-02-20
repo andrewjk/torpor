@@ -5,7 +5,7 @@ import render from "../../src/render/render";
 import Component from "./components/For.tera";
 
 test("for", () => {
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component);
 

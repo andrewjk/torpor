@@ -10,7 +10,7 @@ test("let slot", () => {
     items: [{ text: "item 1" }, { text: "item 2" }, { text: "item 3" }],
   });
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component, state);
 

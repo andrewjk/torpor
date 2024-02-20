@@ -8,7 +8,7 @@ import Component from "./components/Switch.tera";
 test("switch values", () => {
   const state = watch({ value: 1 });
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component, state);
 

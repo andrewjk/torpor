@@ -8,7 +8,7 @@ import Component from "./components/IfNested.tera";
 test("if nested", () => {
   const state = watch({ counter: 8 });
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component, state);
 

@@ -14,7 +14,7 @@ test("for in", () => {
     },
   });
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component, state);
 

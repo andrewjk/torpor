@@ -8,7 +8,7 @@ import Component from "./components/IfElse.tera";
 test("if false", () => {
   const state = watch({ counter: 5 });
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component, state);
 

@@ -8,7 +8,7 @@ import Component from "./components/Increment.tera";
 test("events", async () => {
   const user = userEvent.setup();
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component);
 
@@ -16,7 +16,6 @@ test("events", async () => {
 
   const increment = document.getElementById("increment")!;
   await user.click(increment);
-  console.log(container.innerText);
 
   expect(queryByText(container, "The count is 1.")).toBeInTheDocument();
 

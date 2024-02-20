@@ -7,7 +7,7 @@ import Component from "./components/BindText.tera";
 test("bind text value", async () => {
   const user = userEvent.setup();
 
-  const container = document.createElement("container");
+  const container = document.createElement("div");
   document.body.appendChild(container);
   render(container, Component);
 
