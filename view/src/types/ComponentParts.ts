@@ -11,4 +11,5 @@ export default interface ComponentParts {
   style?: Style;
   styleHash?: string;
   props?: string[];
+  contexts?: string[];
 }

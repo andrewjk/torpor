@@ -66,8 +66,9 @@ function buildCode(name: string, parts: ComponentParts): string {
   result += `render: ($parent, $anchor, $props, $slots, $context) => {\n`;
 
   // Redefine $context so that any newly added properties will only be passed to children
-  // TODO: Only if there's a mention of $context in here??
-  result += `$context = Object.assign({}, $context);\n`;
+  if (parts.contexts?.length) {
+    result += `$context = Object.assign({}, $context);\n`;
+  }
 
   // Build an anchor here, so that effects set in the script can be cleaned up if/when the
   // component is removed

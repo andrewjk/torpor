@@ -71,12 +71,23 @@ export default function parse(source: string): ParseResult {
 
   checkAndApplyStyles(status);
 
-  // HACK: get all usages of $props.name
-  const propsMatches = source.matchAll(/\$props\s*\.([\d\w]+)/g);
+  // HACK: get all usages of $props.name and $props["name"]
+  const propsMatches = source.matchAll(/\$props\s*(?:\.([\d\w]+)|\["(.+)"\]|\['(.+)'\])/g);
   const props: string[] = [];
   for (let match of propsMatches) {
-    if (!props.includes(match[1])) {
-      props.push(match[1]);
+    const name = match[1] || match[2] || match[3];
+    if (!props.includes(name)) {
+      props.push(name);
+    }
+  }
+
+  // HACK: get all usages of $context.name and $context["name"]
+  const contextsMatches = source.matchAll(/\$context\s*(?:\.([\d\w]+)|\["(.+)"\]|\['(.+)'\])/g);
+  const contexts: string[] = [];
+  for (let match of contextsMatches) {
+    const name = match[1] || match[2] || match[3];
+    if (!contexts.includes(name)) {
+      contexts.push(name);
     }
   }
 
@@ -93,6 +104,7 @@ export default function parse(source: string): ParseResult {
           style: status.style,
           styleHash: status.styleHash,
           props: props.length ? props : undefined,
+          contexts: contexts.length ? contexts : undefined,
         }
       : undefined,
   };
