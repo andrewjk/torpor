@@ -1,5 +1,7 @@
 export default interface ListItem {
   key: any;
-  anchor: Node;
+  startNode: Node;
   endNode: Node;
+  // HACK:
+  title: string;
 }

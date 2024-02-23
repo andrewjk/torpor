@@ -12,8 +12,14 @@ interface BuildStatus {
   props: string[];
   styleHash: string;
   varNames: Record<string, number>;
+  startNodeNames: StartNodeInfo[];
   lastNodeName: string;
-  endNodes: string[];
+}
+
+interface StartNodeInfo {
+  name: string;
+  // TODO: scopedset
+  status: "unset" | "scoped" | "scopedset" | "set";
 }
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
@@ -35,7 +41,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   result += `import t_reconcile_list from '${folder}/render/internal/reconcileList';\n`;
   result += `import t_apply_attributes from '${folder}/render/internal/applyAttributes';\n`;
   result += `import t_context from '${folder}/watch/internal/context';\n`;
-  result += `import t_set_active_node from '${folder}/watch/internal/setActiveNode';\n`;
+  result += `import t_set_active_range from '${folder}/watch/internal/setActiveRange';\n`;
   //result +=
   //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, watch, watchEffect } from '../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
@@ -65,10 +71,10 @@ function buildCode(name: string, parts: ComponentParts): string {
 
   // Build an anchor here, so that effects set in the script can be cleaned up if/when the
   // component is removed
-  result += `const t_componentAnchor = document.createComment("@comp");\n`;
-  result += `$parent.insertBefore(t_componentAnchor, $anchor && $anchor.nextSibling);\n`;
-  result += `const t_originalActiveNode = t_context.activeNode;\n`;
-  result += `t_set_active_node(t_componentAnchor);\n`;
+  result += `const t_component_anchor = document.createComment("@comp");\n`;
+  result += `$parent.insertBefore(t_component_anchor, $anchor);\n`;
+  result += `const t_original_active_range = t_context.activeRange;\n`;
+  result += `t_set_active_range({ title: "@comp ${name}" });\n`;
 
   if (parts.script) {
     // TODO: Mangling
@@ -77,6 +83,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   }
 
   if (parts.template) {
+    // TODO:
     // We could create a document fragment with a string and assign the created elements to variables
     // It would mean we could use the same code for hydration too
 
@@ -84,13 +91,13 @@ function buildCode(name: string, parts: ComponentParts): string {
       props: parts.props || [],
       styleHash: parts.styleHash || "",
       varNames: {},
+      startNodeNames: [],
       lastNodeName: "",
-      endNodes: [],
     };
-    result += buildNode(parts.template, status, "$parent", "$anchor && $anchor.nextSibling", true);
+    result += buildNode(parts.template, status, "$parent", "$anchor", true);
   }
 
-  result += `t_context.activeNode = t_originalActiveNode;\n`;
+  result += `t_context.activeRange = t_original_active_range;\n`;
   result += `}\n`;
   result += `};\n\n`;
   result += `export default ${name};`;
@@ -106,73 +113,25 @@ function buildNode(
   root = false,
 ): string {
   switch (node.type) {
+    case "control": {
+      return buildControlNode(node as ControlNode, status, parentName, anchorName);
+    }
     case "component": {
       return buildComponentNode(node as ElementNode, status, parentName, anchorName, root);
     }
     case "element": {
       return buildElementNode(node as ElementNode, status, parentName, anchorName, root);
     }
-    case "special": {
-      return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
-    }
-    case "control": {
-      return buildControlNode(node as ControlNode, status, parentName, anchorName);
-    }
     case "text": {
       return buildTextNode(node as TextNode, status, parentName, anchorName);
+    }
+    case "special": {
+      return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
     }
     default: {
       throw new Error(`Invalid node type: ${node.type}`);
     }
   }
-}
-
-function buildTextNode(
-  node: TextNode,
-  status: BuildStatus,
-  parentName: string,
-  anchorName: string,
-): string {
-  let result = "";
-
-  let content = node.content || "";
-  // Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
-  content = content.replace(/\s+/g, " ");
-
-  // TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
-  let generated = content.includes("{") && content.includes("}");
-  let generatedCount = 0;
-  let braceCount = 0;
-  for (let i = 0; i < content.length; i++) {
-    if (content[i] === "{") {
-      generated = true;
-      braceCount += 1;
-      if (braceCount === 0) {
-        generatedCount += 1;
-      }
-    } else if (content[i] === "}") {
-      braceCount -= 1;
-    }
-  }
-  if (generated) {
-    if (generatedCount === 1 && content.startsWith("{") && content.endsWith("}")) {
-      content = content.substring(1, content.length - 1);
-    } else {
-      content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
-    }
-  } else {
-    content = `t_text("${content.replaceAll('"', '\\"')}")`;
-  }
-
-  const varName = nextVarName("text", status);
-  result += `const ${varName} = document.createTextNode(${generated ? '""' : content});\n`;
-  result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
-
-  if (generated) {
-    result += `watchEffect(() => ${varName}.textContent = ${content});\n`;
-  }
-
-  return result;
 }
 
 function buildControlNode(
@@ -224,16 +183,17 @@ function buildIfNode(
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("anchor", status);
-  const activeNodeName = nextVarName("active_node", status);
-  const endNodeName = nextVarName("end", status);
-  const indexName = nextVarName("index", status);
+  const ifAnchorName = nextVarName("if_anchor", status);
+  const ifIndexName = nextVarName("if_index", status);
+  const oldRangeName = nextVarName("old_range", status);
+  const ifRangeName = nextVarName("if_range", status);
+  const ifBranchRangesName = nextVarName("if_branch_ranges", status);
 
   // Filter non-control branches (spaces)
-  const branches = node.children.filter((n) => n.type === "control");
+  const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
 
   // Add an else branch if there isn't one, so that the content will be cleared if no branches match
-  if (branches.findIndex((n) => (n as ControlNode).operation === "@else") === -1) {
+  if (branches.findIndex((n) => n.operation === "@else") === -1) {
     const elseBranch: ControlNode = {
       type: "control",
       operation: "@else",
@@ -248,32 +208,35 @@ function buildIfNode(
   result += "//\n";
   result += "// === IF ===\n";
   result += "//\n";
-  result += `const ${startAnchorName} = document.createComment("@if");\n`;
-  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
-  result += `const ${activeNodeName} = t_context.activeNode;\n`;
-  result += `t_set_active_node(${startAnchorName});\n`;
+  result += `const ${ifAnchorName} = document.createComment("@if");\n`;
+  result += `${parentName}.insertBefore(${ifAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += "/** @type {ChildNode | undefined} */\n";
-  result += `let ${endNodeName};\n`;
-  result += `let ${indexName} = -1;\n`;
+  result += `let ${ifIndexName} = -1;\n`;
+  result += `let ${ifRangeName} = { title: "@if ${branches[0].statement}" };\n`;
+  result += `let ${ifBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
+  result += "\n";
+  result += `const ${oldRangeName} = t_context.activeRange;\n`;
+  result += `t_set_active_range(${ifRangeName});\n`;
+  result += "\n";
   result += `watchEffect(() => {\n`;
-  status.endNodes.push(endNodeName);
+  result += `t_context.activeRange = ${ifRangeName};\n`;
+
   for (let [i, branch] of branches.entries()) {
+    status.startNodeNames.push({ name: `${ifBranchRangesName}[${i}].startNode`, status: "unset" });
     result += buildIfBranch(
-      branch as ControlNode,
+      branch,
       status,
       parentName,
-      startAnchorName,
-      endNodeName,
-      indexName,
+      ifAnchorName,
+      ifBranchRangesName,
+      ifIndexName,
       i,
     );
+    status.startNodeNames.pop();
   }
-  status.endNodes.pop();
-  result += "});\n";
-  result += `t_context.activeNode = ${activeNodeName};\n\n`;
 
-  status.lastNodeName = endNodeName;
+  result += "});\n";
+  result += `t_context.activeRange = ${oldRangeName};\n\n`;
 
   return result;
 }
@@ -283,38 +246,41 @@ function buildIfBranch(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-  endNodeName: string,
+  branchRangesName: string,
   indexName: string,
   index: number,
 ): string {
+  const startNodeNames = scopeNodeNames(status);
+
+  const branchRangeName = `${branchRangesName}[${index}]`;
+
   let result = "";
+  result += "\n";
+  result += "//\n";
+  result += "// === IF BRANCH ===\n";
+  result += "//\n";
   result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
+  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
   result += "\n";
-  // Create another anchor in each branch to store effects on, and clear when the branch is cleared
-  result += `const t_anchor = document.createComment("@${node.statement}");\n`;
-  result += `${parentName}.insertBefore(t_anchor, ${anchorName}.nextSibling);\n`;
-  result += `const t_active_node = t_context.activeNode;\n`;
-  result += `t_set_active_node(t_anchor);\n`;
+  result += `const t_old_range = t_context.activeRange;\n`;
+  result += `t_set_active_range(${branchRangeName});\n`;
   result += "\n";
-  anchorName = status.lastNodeName = "t_anchor";
+  status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
-    anchorName = status.lastNodeName;
+    result += buildNode(child, status, parentName, anchorName);
   }
   result += "\n";
-  result += `${endNodeName} = ${status.lastNodeName};\n`;
-  // HACK: Set other end node names from parent if statements if there are no more element nodes
-  // This will need to be fixed to work with all nesting combos
-  /*if (!ifnode.children.find(n => ))
-  status.endNodes.forEach((en) => {
-    result += `${en} = ${status.lastNodeName};\n`;
-  });
-  */
   result += `${indexName} = ${index};\n`;
-  result += `t_context.activeNode = t_active_node;\n\n`;
+  if (status.lastNodeName) {
+    // TODO: get the last node name (element or text) that has the same parent
+    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+  }
+  result += `t_context.activeRange = t_old_range;\n`;
   result += "}\n";
+
+  unscopeNodeNames(status, startNodeNames);
+
   return result;
 }
 
@@ -324,16 +290,17 @@ function buildSwitchNode(
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("anchor", status);
-  const endNodeName = nextVarName("end", status);
-  const indexName = nextVarName("index", status);
-  const activeNodeName = nextVarName("active_node", status);
+  const switchAnchorName = nextVarName("switch_anchor", status);
+  const switchIndexName = nextVarName("switch_index", status);
+  const oldRangeName = nextVarName("old_range", status);
+  const switchRangeName = nextVarName("switch_range", status);
+  const switchBranchRangesName = nextVarName("switch_branch_ranges", status);
 
   // Filter non-control branches (spaces)
-  const branches = node.children.filter((n) => n.type === "control");
+  const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
 
   // Add a default branch if there isn't one, so that the content will be cleared if no branches match
-  if (branches.findIndex((n) => (n as ControlNode).operation === "@default") === -1) {
+  if (branches.findIndex((n) => n.operation === "@default") === -1) {
     const defaultBranch: ControlNode = {
       type: "control",
       operation: "@default",
@@ -344,34 +311,46 @@ function buildSwitchNode(
   }
 
   let result = "";
+
   result += "\n";
   result += "//\n";
   result += "// === SWITCH ===\n";
   result += "//\n";
-  result += `const ${startAnchorName} = document.createComment("@switch");\n`;
-  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
-  result += `const ${activeNodeName} = t_context.activeNode;\n`;
-  result += `t_set_active_node(${startAnchorName});\n`;
+  result += `const ${switchAnchorName} = document.createComment("@switch");\n`;
+  result += `${parentName}.insertBefore(${switchAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += "/** @type {ChildNode | undefined} */\n";
-  result += `let ${endNodeName};\n`;
-  result += `let ${indexName} = -1;\n`;
+  result += `let ${switchIndexName} = -1;\n`;
+  result += `let ${switchRangeName} = { title: "@switch ${node.statement}" };\n`;
+  result += `let ${switchBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
+  result += "\n";
+  result += `const ${oldRangeName} = t_context.activeRange;\n`;
+  result += `t_set_active_range(${switchRangeName});\n`;
+  result += "\n";
   result += `watchEffect(() => {\n`;
+  result += `t_context.activeRange = ${switchRangeName};\n`;
   result += `${node.statement} {\n`;
+
   for (let [i, branch] of branches.entries()) {
+    status.startNodeNames.push({
+      name: `${switchBranchRangesName}[${i}].startNode`,
+      status: "unset",
+    });
     result += buildSwitchBranch(
       branch as ControlNode,
       status,
       parentName,
-      startAnchorName,
-      endNodeName,
-      indexName,
+      switchAnchorName,
+      switchBranchRangesName,
+      switchIndexName,
       i,
     );
+    status.startNodeNames.pop();
   }
+
   result += "}\n";
   result += "});\n";
-  result += `t_context.activeNode = ${activeNodeName};\n\n`;
+  result += `t_context.activeRange = ${oldRangeName};\n\n`;
+
   return result;
 }
 
@@ -380,25 +359,37 @@ function buildSwitchBranch(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-  endNodeName: string,
+  branchRangesName: string,
   indexName: string,
   index: number,
 ): string {
+  const startNodeNames = scopeNodeNames(status);
+
+  const branchRangeName = `${branchRangesName}[${index}]`;
+
   let result = "";
   result += `${node.statement} {\n`;
   result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
+  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
   result += "\n";
-  status.lastNodeName = "undefined";
+  result += `const t_old_range = t_context.activeRange;\n`;
+  result += `t_set_active_range(${branchRangeName});\n`;
+  result += "\n";
+  status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
-    anchorName = status.lastNodeName;
+    result += buildNode(child, status, parentName, anchorName);
   }
   result += "\n";
-  result += `${endNodeName} = ${status.lastNodeName};\n`;
   result += `${indexName} = ${index};\n`;
+  if (status.lastNodeName) {
+    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+  }
+  result += `t_context.activeRange = t_old_range;\n`;
   result += "break;\n";
   result += "}\n";
+
+  unscopeNodeNames(status, startNodeNames);
+
   return result;
 }
 
@@ -440,11 +431,12 @@ function buildForNode(
     }
   }
 
-  const startAnchorName = nextVarName("anchor", status);
-  const activeNodeName = nextVarName("active_node", status);
+  const forAnchorName = nextVarName("for_anchor", status);
+  const oldRangeName = nextVarName("old_range", status);
+  const forRangeName = nextVarName("for_range", status);
   const forItemsName = nextVarName("for_items", status);
 
-  // Filter non-control branches (spaces)
+  // Get the key node if it's been set
   const key = node.children.find(
     (n) => n.type === "control" && (n as ControlNode).operation === "@key",
   );
@@ -454,18 +446,19 @@ function buildForNode(
   result += "//\n";
   result += "// === FOR ===\n";
   result += "//\n";
-  result += `const ${startAnchorName} = document.createComment("@for");\n`;
-  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
-  result += `const ${activeNodeName} = t_context.activeNode;\n`;
-  result += `t_set_active_node(${startAnchorName});\n`;
+  result += `const ${forAnchorName} = document.createComment("@for");\n`;
+  result += `${parentName}.insertBefore(${forAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += "/** @type {any[]} */\n";
   result += `let ${forItemsName} = [];\n`;
+  result += `let ${forRangeName} = { title: "@for ${node.statement}" };\n`;
+  result += "\n";
+  result += `const ${oldRangeName} = t_context.activeRange;\n`;
+  result += `t_set_active_range(${forRangeName});\n`;
+  result += "\n";
   result += `watchEffect(() => {\n`;
-  result += "/** @type {any[]} */\n";
+  result += `t_context.activeRange = ${forRangeName};\n`;
   result += `let t_for_items = [];\n`;
   result += `${node.statement} {\n`;
-  result += "/** @type {any} */\n";
   // TODO: Because we're accessing item properties out here, they get attached to the @for anchor and don't get cleaned up
   // Somehow we need to attach them to the appropriate @foritem anchor instead
   result += `let t_item = {};\n`;
@@ -491,13 +484,16 @@ function buildForNode(
   result += " */\n";
   result += `(t_parent, t_item, t_before) => {\n`;
   result += `let { ${forVarNames.join(", ")} } = t_item.data;\n`;
+  status.startNodeNames.push({ name: `t_item.startNode`, status: "unset" });
   result += buildForItem(node, status, "t_parent");
+  status.startNodeNames.pop();
   result += `},\n`;
   result += `);\n`;
   result += "\n";
   result += `${forItemsName} = t_for_items;\n`;
   result += "});\n";
-  result += `t_context.activeNode = ${activeNodeName};\n\n`;
+  result += `t_context.activeRange = ${oldRangeName};\n\n`;
+
   return result;
 }
 
@@ -506,13 +502,12 @@ function buildForItem(node: ControlNode, status: BuildStatus, parentName: string
   result += "//\n";
   result += "// === FOR ITEM ===\n";
   result += "//\n";
-  result += `t_item.anchor = document.createComment("@foritem " + t_item.key);\n`;
-  result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
-  result += `const t_active_node = t_context.activeNode;\n`;
-  result += `t_set_active_node(t_item.anchor);\n`;
+  //result += `t_item.anchor = document.createComment("@foritem " + t_item.key);\n`;
+  //result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
+  result += `const t_old_range = t_context.activeRange;\n`;
+  result += `t_set_active_range(t_item);\n`;
   result += `\n`;
-  result += "\n";
-  status.lastNodeName = "undefined";
+  status.lastNodeName = "";
   for (let child of filterChildren(node)) {
     if (child.type === "control" && (child as ControlNode).operation === "@key") {
       continue;
@@ -520,8 +515,11 @@ function buildForItem(node: ControlNode, status: BuildStatus, parentName: string
     result += buildNode(child, status, parentName, "t_before");
   }
   result += "\n";
-  result += `t_item.endNode = ${status.lastNodeName};\n`;
-  result += `t_context.activeNode = t_active_node;\n\n`;
+  if (status.lastNodeName) {
+    // TODO: get the last node name (element or text) that has the same parent
+    result += `t_item.endNode = ${status.lastNodeName};\n`;
+  }
+  result += `t_context.activeRange = t_old_range;\n\n`;
   return result;
 }
 
@@ -531,17 +529,24 @@ function buildAwaitNode(
   parentName: string,
   anchorName: string,
 ): string {
-  const startAnchorName = nextVarName("anchor", status);
-  const activeNodeName = nextVarName("active_node", status);
-  const endNodeName = nextVarName("end", status);
-  const awaitTokenName = nextVarName("token", status);
+  // TODO: Would this all be better as a component?
+
+  const awaitAnchorName = nextVarName("await_anchor", status);
+  const awaitTokenName = nextVarName("await_token", status);
+  const awaitIndexName = nextVarName("await_index", status);
+  const oldRangeName = nextVarName("old_range", status);
+  const awaitRangeName = nextVarName("await_range", status);
+  const awaitBranchRangesName = nextVarName("await_branch_ranges", status);
 
   // Filter non-control branches (spaces)
-  const branches = node.children.filter((n) => n.type === "control");
+  const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
 
   // Make sure all branches exist
-  let awaitBranch = branches.find((n) => (n as ControlNode).operation === "@await") as ControlNode;
-  let thenBranch = branches.find((n) => (n as ControlNode).operation === "@then") as ControlNode;
+  let awaitBranch = branches.find((n) => n.operation === "@await")!;
+  if (!awaitBranch) {
+    // TODO: Error handling
+  }
+  let thenBranch = branches.find((n) => n.operation === "@then");
   if (!thenBranch) {
     thenBranch = {
       type: "control",
@@ -550,7 +555,7 @@ function buildAwaitNode(
       children: [],
     };
   }
-  let catchBranch = branches.find((n) => (n as ControlNode).operation === "@catch") as ControlNode;
+  let catchBranch = branches.find((n) => n.operation === "@catch");
   if (!catchBranch) {
     catchBranch = {
       type: "control",
@@ -565,41 +570,81 @@ function buildAwaitNode(
   const catchVar = trim(catchBranch.statement.substring("catch".length), "(", ")");
 
   let result = "";
+
   result += "\n";
   result += "//\n";
   result += "// === AWAIT ===\n";
   result += "//\n";
-  result += `const ${startAnchorName} = document.createComment("@await");\n`;
-  result += `${parentName}.insertBefore(${startAnchorName}, ${anchorName});\n`;
-  result += `const ${activeNodeName} = t_context.activeNode;\n`;
-  result += `t_set_active_node(${startAnchorName});\n`;
+  result += `const ${awaitAnchorName} = document.createComment("@await");\n`;
+  result += `${parentName}.insertBefore(${awaitAnchorName}, ${anchorName});\n`;
   result += "\n";
-  result += "/** @type {ChildNode | undefined} */\n";
-  result += `let ${endNodeName};\n`;
   // Use an incrementing token to make sure only the last request gets handled
   // TODO: This might have unforeseen consequences
   result += `let ${awaitTokenName} = 0;\n`;
+  result += `let ${awaitIndexName} = -1;\n`;
+  result += `let ${awaitRangeName} = { title: "@await ${branches[0].statement}" };\n`;
+  result += `let ${awaitBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
+  result += "\n";
+  result += `const ${oldRangeName} = t_context.activeRange;\n`;
+  result += `t_set_active_range(${awaitRangeName});\n`;
+  result += "\n";
   result += `watchEffect(() => {\n`;
   result += `${awaitTokenName}++;\n`;
+  result += `t_context.activeRange = ${awaitRangeName};\n`;
   result += "\n";
-  result += buildAwaitBranch(awaitBranch, status, parentName, startAnchorName, endNodeName);
+
+  status.startNodeNames.push({ name: `${awaitBranchRangesName}[0].startNode`, status: "unset" });
+  result += buildAwaitBranch(
+    awaitBranch,
+    status,
+    parentName,
+    awaitAnchorName,
+    awaitBranchRangesName,
+    awaitIndexName,
+    0,
+  );
+  status.startNodeNames.pop();
+
   result += "\n";
-  result += "/** @param {number} token */\n";
   result += `((token) => {\n`;
   result += `${awaiterName}\n`;
   result += `.then((${thenVar}) => {\n`;
   result += `if (token === ${awaitTokenName}) {\n`;
-  result += buildAwaitBranch(thenBranch, status, parentName, startAnchorName, endNodeName);
+
+  status.startNodeNames.push({ name: `${awaitBranchRangesName}[1].startNode`, status: "unset" });
+  result += buildAwaitBranch(
+    thenBranch,
+    status,
+    parentName,
+    awaitAnchorName,
+    awaitBranchRangesName,
+    awaitIndexName,
+    1,
+  );
+  status.startNodeNames.pop();
+
   result += `}\n`;
   result += `})\n`;
   result += `.catch((${catchVar}) => {\n`;
   result += `if (token === ${awaitTokenName}) {\n`;
-  result += buildAwaitBranch(catchBranch, status, parentName, startAnchorName, endNodeName);
+
+  status.startNodeNames.push({ name: `${awaitBranchRangesName}[2].startNode`, status: "unset" });
+  result += buildAwaitBranch(
+    catchBranch,
+    status,
+    parentName,
+    awaitAnchorName,
+    awaitBranchRangesName,
+    awaitIndexName,
+    2,
+  );
+  status.startNodeNames.pop();
+
   result += `}\n`;
   result += `});\n`;
   result += `})(${awaitTokenName});\n`;
   result += `});\n`;
-  result += `t_context.activeNode = ${activeNodeName};\n\n`;
+  result += `t_context.activeRange = ${oldRangeName};\n\n`;
 
   return result;
 }
@@ -609,18 +654,33 @@ function buildAwaitBranch(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-  endNodeName: string,
+  branchRangesName: string,
+  indexName: string,
+  index: number,
 ): string {
+  const startNodeNames = scopeNodeNames(status);
+
+  const branchRangeName = `${branchRangesName}[${index}]`;
+
   let result = "";
-  result += `if (${endNodeName}) t_clear_range(${anchorName}, ${endNodeName});\n`;
+  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
   result += "\n";
-  status.lastNodeName = "undefined";
+  result += `const t_old_range = t_context.activeRange;\n`;
+  result += `t_set_active_range(${branchRangeName});\n`;
+  result += "\n";
+  status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, `${anchorName}.nextSibling`);
-    anchorName = status.lastNodeName;
+    result += buildNode(child, status, parentName, anchorName);
   }
   result += "\n";
-  result += `${endNodeName} = ${status.lastNodeName};\n`;
+  result += `${indexName} = ${index};\n`;
+  if (status.lastNodeName) {
+    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+  }
+  result += `t_context.activeRange = t_old_range;\n`;
+
+  unscopeNodeNames(status, startNodeNames);
+
   return result;
 }
 
@@ -750,7 +810,8 @@ function buildElementNode(
   }
   result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
 
-  status.lastNodeName = varName;
+  // TODO: Do this for text nodes too
+  result += setScopedNodes(status, varName);
 
   return result;
 }
@@ -779,14 +840,24 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
         // TODO: Don't love the bind: syntax -- $value? @value? :value?
         // Automatically add an event to bind the value
         // TODO: need to check the element to find out what type of event to add
-        const eventName = "input";
-        const defaultValue = '""';
+        let eventName = "input";
+        let defaultValue = '""';
+        let typeAttribute = node.attributes.find((a) => a.name === "type");
+        let inputValue = "e.target.value";
+        if (typeAttribute) {
+          if (trimAny(typeAttribute.value, `'"`) === "number") {
+            defaultValue = "0";
+            inputValue = "Number(e.target.value)";
+          }
+        }
+        let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
         result += generated ? `watchEffect(() => ` : "";
-        result += `${varName}.setAttribute("${propName}", ${value} || ${defaultValue})`;
+        result += `${varName}.setAttribute("${propName}", ${set})`;
         result += generated ? `)` : "";
         result += ";\n";
-        result += `${varName}.addEventListener("${eventName}", (e) => ${value} = e.target.value);\n`;
+        // TODO: Add a parseInput method that handles NaN etc
+        result += `${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});\n`;
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
         result += generated ? `watchEffect(() => {\n` : "";
@@ -814,6 +885,56 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
       }
     }
   }
+
+  return result;
+}
+
+function buildTextNode(
+  node: TextNode,
+  status: BuildStatus,
+  parentName: string,
+  anchorName: string,
+): string {
+  let result = "";
+
+  let content = node.content || "";
+  // Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
+  content = content.replace(/\s+/g, " ");
+
+  // TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
+  let generated = content.includes("{") && content.includes("}");
+  let generatedCount = 0;
+  let braceCount = 0;
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === "{") {
+      generated = true;
+      braceCount += 1;
+      if (braceCount === 0) {
+        generatedCount += 1;
+      }
+    } else if (content[i] === "}") {
+      braceCount -= 1;
+    }
+  }
+  if (generated) {
+    if (generatedCount === 1 && content.startsWith("{") && content.endsWith("}")) {
+      content = content.substring(1, content.length - 1);
+    } else {
+      content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
+    }
+  } else {
+    content = `t_text("${content.replaceAll('"', '\\"')}")`;
+  }
+
+  const varName = nextVarName("text", status);
+  result += `const ${varName} = document.createTextNode(${generated ? '""' : content});\n`;
+  result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
+
+  if (generated) {
+    result += `watchEffect(() => ${varName}.textContent = ${content});\n`;
+  }
+
+  //result += setScopedNodes(status, varName);
 
   return result;
 }
@@ -973,6 +1094,53 @@ function nextVarName(name: string, status: BuildStatus): string {
   let varName = `t_${name}_${status.varNames[name]}`;
   status.varNames[name] += 1;
   return varName;
+}
+
+function scopeNodeNames(status: BuildStatus) {
+  // Set all start node names that haven't been set yet to branch
+  // They will get set in the current scope, and the next scope(s), and maybe outside the scopes
+  const copy = status.startNodeNames.map((n) => ({ name: n.name, status: n.status }));
+  status.startNodeNames.forEach((n) => {
+    if (n.status === "unset") {
+      n.status = "scoped";
+    }
+  });
+  return copy;
+}
+
+function unscopeNodeNames(status: BuildStatus, copy: StartNodeInfo[]) {
+  // Set all start node names that have been branch back to unset so they can get set in the next
+  // scope(s), and maybe outside the scopes
+  //status.startNodeNames.forEach((n) => {
+  //  if (n.status === "scoped") {
+  //    n.status = "unset";
+  //  }
+  //});
+  status.startNodeNames = copy;
+
+  // We can't use any nodes created in this scope from outside it
+  status.lastNodeName = "";
+}
+
+function setScopedNodes(status: BuildStatus, varName: string) {
+  let result = "";
+
+  for (let startNodeName of status.startNodeNames) {
+    if (startNodeName.status === "unset") {
+      result += `if (!${startNodeName.name}) {\n`;
+      result += `${startNodeName.name} = ${varName};\n`;
+      result += `}\n`;
+      startNodeName.status = "set";
+    } else if (startNodeName.status === "scoped") {
+      result += `${startNodeName.name} = ${varName};\n`;
+      //result += `console.log("setting", "${startNodeName.name}", JSON.stringify(${startNodeName.name}, null, 2), "${varName}", ${varName});\n`;
+      startNodeName.status = "scopedset";
+    }
+  }
+
+  status.lastNodeName = varName;
+
+  return result;
 }
 
 function buildStyles(name: string, parts: ComponentParts): string {

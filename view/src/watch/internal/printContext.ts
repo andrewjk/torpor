@@ -2,55 +2,60 @@ import hash from "../../compile/internal/hash";
 import context from "./context";
 
 export default function printContext(message?: string) {
+  const print: any = {};
+  const effectsMap = new Map<string, string>();
+
+  print.effectSubscriptions = [];
+  for (let [target, propEffects] of context.effectSubscriptions.entries()) {
+    for (let [prop, effects] of propEffects.entries()) {
+      for (let x of effects) {
+        print.effectSubscriptions.push({
+          target,
+          prop,
+          effect: hash(String(x)),
+        });
+        effectsMap.set(hash(String(x)), String(x));
+      }
+    }
+  }
+
+  print.rangeEffects = [];
+  for (let [range, effect] of context.rangeEffects.entries()) {
+    if (effect.size) {
+      for (let x of effect) {
+        print.rangeEffects.push({
+          title: range.title,
+          startNode: range.startNode?.textContent,
+          endNode: range.endNode?.textContent,
+          children: (range.children || []).map((c) => c.title),
+          target: x.target,
+          prop: x.prop,
+          effect: hash(String(x.effect)),
+        });
+        effectsMap.set(hash(String(x)), String(x));
+      }
+    } else {
+      print.rangeEffects.push({
+        title: range.title,
+        startNode: range.startNode?.textContent,
+        endNode: range.endNode?.textContent,
+        children: (range.children || []).map((c) => c.title),
+        target: undefined,
+        prop: undefined,
+        effect: undefined,
+      });
+      //effectsMap.set(hash(String(x)), String(x));
+    }
+  }
+
+  print.effects = [];
+  for (let [hash, value] of effectsMap.entries()) {
+    print.effects.push({ hash, value });
+  }
+
   if (message) {
     console.log(message);
   }
-
-  const print: any = {};
-  const effects = new Map<string, string>();
-
-  print.effectSubscriptions = [];
-  for (let [key, value] of context.effectSubscriptions.entries()) {
-    const sub: any = {
-      target: key,
-      props: [],
-    };
-    for (let [key2, value2] of value.entries()) {
-      const prop: any = {
-        name: key2,
-        effects: [],
-      };
-      for (let x of value2) {
-        prop.effects.push(hash(String(x)));
-        effects.set(hash(String(x)), String(x));
-      }
-      sub.props.push(prop);
-    }
-    print.effectSubscriptions.push(sub);
-  }
-
-  print.nodeEffects = [];
-  for (let [key, value] of context.nodeEffects.entries()) {
-    const sub: any = {
-      node: key.textContent,
-      effects: [],
-      children: value.children.map((c) => c.textContent),
-    };
-    for (let x of value.effects) {
-      sub.effects.push({
-        target: x.target,
-        prop: x.prop,
-        effect: hash(String(x.effect)),
-      });
-      effects.set(hash(String(x)), String(x));
-    }
-    print.nodeEffects.push(sub);
-  }
-
-  //print.effects = [];
-  //for (let [hash, value] of effects.entries()) {
-  //  print.effects.push({ hash, value });
-  //}
-
-  console.dir(print, { depth: null });
+  console.log(print);
+  //console.dir(print, { depth: null });
 }

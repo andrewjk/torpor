@@ -1,14 +1,15 @@
+import type Range from "./Range";
+
 type EffectFunction = () => void;
 type PropertyEffectsMap = Map<string | symbol, Set<EffectFunction>>;
-type NodeEffectsSet = Set<{ target: object; prop: string | symbol; effect: EffectFunction }>;
-type NodeEffects = { children: Node[]; effects: NodeEffectsSet };
+type RangeEffectsSet = Set<{ target: object; prop: string | symbol; effect: EffectFunction }>;
 
 interface Context {
   activeEffect?: EffectFunction;
   effectSubscriptions: Map<object, PropertyEffectsMap>;
 
-  activeNode?: Node;
-  nodeEffects: Map<Node, NodeEffects>;
+  activeRange?: Range;
+  rangeEffects: Map<Range, RangeEffectsSet>;
 }
 
 /**
@@ -23,11 +24,11 @@ const context: Context = {
    */
   effectSubscriptions: new Map<object, PropertyEffectsMap>(),
   /**
-   * A map of nodes and the object/property/effects attached to them.
+   * A map of ranges and the object/property/effects attached to them.
    *
-   * This is used to remove effects from the effectSubscriptions map when a node is removed.
+   * This is used to remove effects from the effectSubscriptions map when a range is removed.
    */
-  nodeEffects: new Map<Node, NodeEffects>(),
+  rangeEffects: new Map<Range, RangeEffectsSet>(),
 };
 
 export default context;

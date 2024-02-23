@@ -22,8 +22,8 @@ test("nested if effect", async () => {
   // 2 properties
   expect(context.effectSubscriptions.get(_state)).toBeTruthy();
   expect(context.effectSubscriptions.get(_state)!.size).toBe(2);
-  // 2 if nodes
-  expect(context.nodeEffects.size).toBe(2);
+  // 1 component node, 2 if nodes, 2 branches
+  expect(context.rangeEffects.size).toBe(5);
 
   state.condition = false;
 
@@ -34,6 +34,6 @@ test("nested if effect", async () => {
   // 1 property
   expect(context.effectSubscriptions.get(_state)).toBeTruthy();
   expect(context.effectSubscriptions.get(_state)!.size).toBe(1);
-  // 1 if node
-  expect(context.nodeEffects.size).toBe(1);
+  // 1 component node, 1 if node, 1 branch
+  expect(context.rangeEffects.size).toBe(3);
 });

@@ -1,40 +1,34 @@
-import context from "../../watch/internal/context";
-import removeNodeEffects from "../../watch/internal/removeNodeEffects";
+import type Range from "../../watch/internal/Range";
+import removeRangeEffects from "../../watch/internal/removeRangeEffects";
 
-export default function clearRange(anchor: Node, endNode: Node, clearAnchor = false) {
-  // HACK: range.deleteContents hangs in JSDOM
-  /*
-  const range = document.createRange();
-  if (clearAnchor) {
-    range.setStartBefore(anchor);
-  } else {
-    range.setStartAfter(anchor);
+export default function clearRange(range: Range) {
+  // NOTE: range.deleteContents hangs in JSDOM (or at least in benching/testing with JSDOM),
+  // so we need to do our own deleting
+  if (!range.startNode) {
+    //console.log("not clearing; no start node");
+    return;
   }
-  range.setEndAfter(endNode);
-  range.deleteContents();
-  */
-  //console.log("clearing", anchor.textContent, "to", endNode.textContent);
-  const parent = anchor.parentNode!;
-  let currentNode = clearAnchor ? anchor : anchor.nextSibling;
-  while (currentNode !== endNode) {
+  range.endNode = range.endNode || range.startNode;
+
+  //console.log("clearing", range.startNode.textContent, "to", range.endNode.textContent, range);
+  const parent = range.startNode.parentNode!;
+  //console.log("parent", parent?.textContent || "undefined");
+  //if (!parent) {
+  //  return;
+  //}
+  let currentNode = range.startNode;
+  while (currentNode !== range.endNode) {
     let nextNode = currentNode!.nextSibling;
     parent.removeChild(currentNode!);
-    currentNode = nextNode;
+    currentNode = nextNode!;
   }
   parent.removeChild(currentNode);
 
+  // @ts-ignore
+  delete range.startNode;
+  // @ts-ignore
+  delete range.endNode;
+
   // TODO: Put this somewhere better?
-  if (clearAnchor) {
-    removeNodeEffects(anchor);
-  } else {
-    // HACK:
-    const nodeEffects = context.nodeEffects.get(anchor);
-    if (nodeEffects) {
-      nodeEffects.children.forEach((child, i) => {
-        removeNodeEffects(child);
-        // @ts-ignore Make sure it's not held onto
-        nodeEffects.children[i] = undefined;
-      });
-    }
-  }
+  removeRangeEffects(range);
 }

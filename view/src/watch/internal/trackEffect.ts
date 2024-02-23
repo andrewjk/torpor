@@ -1,6 +1,9 @@
 import context from "./context";
+import printContext from "./printContext";
 
 export default function trackEffect(target: Record<string | symbol, any>, prop: string | symbol) {
+  //console.log(`tracking effect for '${String(prop)}' with value '${target[prop]}'`);
+
   // If there's an active effect, register this target/prop with it,
   // so that it will be called when this prop is set
   if (context.activeEffect) {
@@ -22,36 +25,22 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
       subscriptions.add(context.activeEffect);
     }
 
-    // If there's an active DOM node, register the active effect with it,
-    // so that it will be cleaned up when the node is removed
-    if (context.activeNode) {
-      //console.log(`registering effect with node for '${prop}' with value '${target[prop]}'`);
-      let nodeEffects = context.nodeEffects.get(context.activeNode);
+    // If there's an active DOM range, register the active effect with it,
+    // so that it will be cleaned up when the range is removed
+    if (context.activeRange) {
+      let rangeEffects = context.rangeEffects.get(context.activeRange);
       const subscriptionPointer = {
         target,
         prop,
         effect: context.activeEffect,
       };
-      if (nodeEffects) {
-        // de-dupe -- I think this wouldn't be necessary if we put anchors inside branches??
-        let addEffect = true;
-        for (let eff of nodeEffects.effects) {
-          if (eff.target === target && eff.prop === prop && eff.effect === context.activeEffect) {
-            addEffect = false;
-            break;
-          }
-        }
-        if (addEffect) {
-          nodeEffects.effects.add(subscriptionPointer);
-        }
-      } else {
-        nodeEffects = {
-          children: [],
-          effects: new Set(),
-        };
-        nodeEffects.effects.add(subscriptionPointer);
-        context.nodeEffects.set(context.activeNode, nodeEffects);
+      if (!rangeEffects) {
+        rangeEffects = new Set();
+        context.rangeEffects.set(context.activeRange, rangeEffects);
       }
+      rangeEffects.add(subscriptionPointer);
     }
+
+    //printContext(`added effect for '${String(prop)}' with value '${target[prop]}'`);
   }
 }

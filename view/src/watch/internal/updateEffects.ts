@@ -12,10 +12,11 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, va
   }
 
   // TODO: Update node subscriptions somehow -- probably need a node array on the effect subscription
-  for (let [node, nodeEffects] of context.nodeEffects) {
-    for (let effect of nodeEffects.effects) {
+  for (let [_, nodeEffects] of context.rangeEffects) {
+    for (let effect of nodeEffects) {
       if (effect.target === oldTarget) {
-        nodeEffects.effects.delete(effect);
+        //nodeEffects.delete(effect);
+        effect.target = value;
       }
     }
   }

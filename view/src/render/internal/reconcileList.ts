@@ -73,19 +73,14 @@ export default (
     } else if (oldStartItem.key === newEndItem.key) {
       // Move to the end
       //console.log("move", oldStartItem.key, "to the end");
-      moveRange(
-        parent,
-        oldStartItem.anchor,
-        oldStartItem.endNode,
-        oldEndItem?.endNode?.nextSibling,
-      );
+      moveRange(parent, oldStartItem, oldEndItem?.endNode?.nextSibling);
       transferRangeMarkers(oldStartItem, newEndItem);
       oldStartItem = oldItems[++oldStartIndex];
       newEndItem = newItems[--newEndIndex];
     } else if (oldEndItem.key === newStartItem.key) {
       // Move to the start
       //console.log("move", oldEndItem.key, "to the start");
-      moveRange(parent, oldEndItem.anchor, oldEndItem.endNode, oldStartItem?.anchor);
+      moveRange(parent, oldEndItem, oldStartItem?.startNode);
       transferRangeMarkers(oldEndItem, newStartItem);
       oldEndItem = oldItems[--oldEndIndex];
       newStartItem = newItems[++newStartIndex];
@@ -111,25 +106,25 @@ export default (
       if (oldIndex === undefined && newIndex === undefined) {
         // Replace
         //console.log("replace", oldStartItem.key, "with", newStartItem.key);
-        create(parent, newStartItem, oldStartItem.anchor);
-        clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
+        create(parent, newStartItem, oldStartItem.startNode);
+        clearRange(oldStartItem);
         oldStartItem = oldItems[++oldStartIndex];
         newStartItem = newItems[++newStartIndex];
       } else if (oldIndex === undefined) {
         // Insert
         //console.log("insert", newStartItem.key);
-        create(parent, newStartItem, oldStartItem.anchor);
+        create(parent, newStartItem, oldStartItem.startNode);
         newStartItem = newItems[++newStartIndex];
       } else if (newIndex === undefined) {
         // Delete
         //console.log("delete", oldStartItem.key);
-        clearRange(oldStartItem.anchor, oldStartItem.endNode, true);
+        clearRange(oldStartItem);
         oldStartItem = oldItems[++oldStartIndex];
       } else {
         // Move
         //console.log("move", newStartItem.key, "before", oldStartItem.key);
         const oldData = oldItems[oldIndex];
-        moveRange(parent, oldData.anchor, oldData.endNode, oldStartItem.anchor);
+        moveRange(parent, oldData, oldStartItem.startNode);
         transferRangeMarkers(oldData, newStartItem);
         // @ts-ignore TODO: Set key null instead?
         oldItems[oldIndex] = null;
@@ -143,23 +138,23 @@ export default (
       // The old list is exhausted; process new list additions
       // HACK: I think it would be better to move anchors to the end?
       let before: Node | null =
-        oldStartItem?.anchor || oldItems[oldItems.length - 1]?.endNode?.nextSibling;
+        oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling;
       for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-        //console.log("create", newStartItem.key, newStartItem.endNode);
+        //console.log("create", newStartItem.key);
         create(parent, newStartItem, before);
         before = newStartItem.endNode.nextSibling;
       }
     } else {
       // The new list is exhausted; process old list removals
-      //console.log("clear", oldItems[oldStartIndex].key, oldItems[oldEndIndex].key);
-      const startNode = oldItems[oldStartIndex].anchor;
-      const endNode = oldItems[oldEndIndex].endNode;
-      clearRange(startNode, endNode, true);
+      for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
+        //console.log("clear", oldStartItem.key);
+        clearRange(oldStartItem);
+      }
     }
   }
 };
 
 function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {
-  newItem.anchor = oldItem.anchor;
+  newItem.startNode = oldItem.startNode;
   newItem.endNode = oldItem.endNode;
 }

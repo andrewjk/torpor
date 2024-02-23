@@ -1,9 +1,11 @@
-export default function moveRange(parent: Node, anchor: Node, endNode: Node, before: Node | null) {
-  let el: Node | null = anchor;
+import type Range from "../../watch/internal/Range";
+
+export default function moveRange(parent: Node, range: Range, before: Node | null) {
+  let el: Node | null = range.startNode;
   while (el) {
     const nextel: Node | null = el.nextSibling;
     parent.insertBefore(el, before);
-    if (el === endNode) break;
+    if (el === range.endNode) break;
     el = nextel;
   }
 }

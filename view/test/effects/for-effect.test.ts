@@ -21,6 +21,6 @@ test("for effect", async () => {
 
   // 1 state object, 1 array object and 3 array items
   expect(context.effectSubscriptions.size).toBe(5);
-  // 1 for node and 3 for items
-  expect(context.nodeEffects.size).toBe(4);
+  // 1 component, 1 for node, 3 items
+  expect(context.rangeEffects.size).toBe(5);
 });
