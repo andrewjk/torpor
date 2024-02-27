@@ -7,7 +7,7 @@ import Node from "../types/nodes/Node";
 import TextNode from "../types/nodes/TextNode";
 import StyleBlock from "../types/styles/StyleBlock";
 import Builder from "./internal/Builder";
-import { trimMatched, trimQuotes } from "./internal/utils";
+import { maybeAppend, trimMatched, trimQuotes } from "./internal/utils";
 
 interface BuildStatus {
   props: string[];
@@ -175,7 +175,7 @@ function buildControlNode(
 ) {
   switch (node.operation) {
     case "@const": {
-      b.append(`${node.statement}${node.statement.endsWith(";") ? "" : ";"}`);
+      b.append(`${maybeAppend(node.statement, ";")}`);
       break;
     }
     case "@if group": {
@@ -493,7 +493,9 @@ function buildForNode(
   b.append(`let t_item = {};`);
   if (key) {
     const keyStatement = (key as ControlNode).statement;
-    b.append(`t_item.key = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};`);
+    b.append(
+      `t_item.key = ${maybeAppend(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")}`,
+    );
   }
   b.append(`t_item.data = {};`);
   for (let v of forVarNames) {

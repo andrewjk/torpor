@@ -48,7 +48,6 @@ export function trimAny(input: string, chars: string): string {
 }
 
 export function trimQuotes(text: string) {
-  text = text.trim();
   while (
     (text.startsWith("'") && text.endsWith("'")) ||
     (text.startsWith('"') && text.endsWith('"'))
@@ -59,9 +58,15 @@ export function trimQuotes(text: string) {
 }
 
 export function trimMatched(text: string, start: string, end: string) {
-  text = text.trim();
   while (text.startsWith(start) && text.endsWith(end)) {
     text = text.substring(start.length, text.length - end.length).trim();
+  }
+  return text;
+}
+
+export function maybeAppend(text: string, end: string) {
+  if (!text.endsWith(end)) {
+    text += end;
   }
   return text;
 }
