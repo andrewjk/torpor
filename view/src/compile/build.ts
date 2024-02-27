@@ -7,7 +7,7 @@ import Node from "../types/nodes/Node";
 import TextNode from "../types/nodes/TextNode";
 import StyleBlock from "../types/styles/StyleBlock";
 import Builder from "./internal/Builder";
-import { trimAny } from "./internal/utils";
+import { trimMatched, trimQuotes } from "./internal/utils";
 
 interface BuildStatus {
   props: string[];
@@ -451,7 +451,7 @@ function buildForNode(
         (match.startsWith("[") && match.endsWith("]"))
       ) {
         forVarNames.push(
-          ...trimAny(match, "{}[]")
+          ...trimMatched(trimMatched(match, "{", "}"), "[", "]")
             .split(",")
             .map((m) => m.trim()),
         );
@@ -589,9 +589,9 @@ function buildAwaitNode(
     };
   }
 
-  const awaiterName = trim(awaitBranch.statement.substring("await".length), "(", ")");
-  const thenVar = trim(thenBranch.statement.substring("then".length), "(", ")");
-  const catchVar = trim(catchBranch.statement.substring("catch".length), "(", ")");
+  const awaiterName = trimMatched(awaitBranch.statement.substring("await".length), "(", ")");
+  const thenVar = trimMatched(thenBranch.statement.substring("then".length), "(", ")");
+  const catchVar = trimMatched(catchBranch.statement.substring("catch".length), "(", ")");
 
   b.gap();
   b.append(`// AWAIT`);
@@ -744,7 +744,7 @@ function buildComponentNode(
         if (name === "class") {
           // TODO: How to handle dynamic classes etc
           // Probably just compile down to a string?
-          value = `"${trimAny(value, `'"`)} tera-${status.styleHash}"`;
+          value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
         }
         const setProp = `${propsName}["${name}"] = ${value || "true"}`;
         b.append(generated ? `watchEffect(() => ${setProp});` : `${setProp};`);
@@ -801,7 +801,7 @@ function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
       const el = child as ElementNode;
       if (el.tagName === ":fill") {
         let slotName = el.attributes.find((a) => a.name === "name")?.value;
-        if (slotName) slotName = trimAny(slotName, `'"`);
+        if (slotName) slotName = trimQuotes(slotName);
         slots[slotName || "_"] = el.children;
       }
     }
@@ -885,7 +885,7 @@ function buildElementAttributes(
         let typeAttribute = node.attributes.find((a) => a.name === "type");
         let inputValue = "e.target.value";
         if (typeAttribute) {
-          if (trimAny(typeAttribute.value, `'"`) === "number") {
+          if (trimQuotes(typeAttribute.value) === "number") {
             defaultValue = "0";
             inputValue = "Number(e.target.value)";
           }
@@ -1000,7 +1000,7 @@ function buildSlotNode(
   // If there's a slot, build that, otherwise build the default nodes
   let slotName = node.attributes.find((a) => a.name === "name")?.value;
   if (slotName) {
-    slotName = trimAny(slotName, `'"`);
+    slotName = trimQuotes(slotName);
   } else {
     slotName = "_";
   }
@@ -1215,15 +1215,4 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 
 function buildStyleAttribute(attribute: Attribute, b: Builder) {
   b.append(`${attribute.name}: ${attribute.value};`);
-}
-
-function trim(text: string, startValue: string, endValue: string) {
-  text = text.trim();
-  if (text.startsWith(startValue)) {
-    text = text.substring(startValue.length);
-  }
-  if (text.endsWith(endValue)) {
-    text = text.substring(0, text.length - endValue.length);
-  }
-  return text;
 }

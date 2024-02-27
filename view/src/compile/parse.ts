@@ -13,7 +13,7 @@ import TextNode from "../types/nodes/TextNode";
 import Style from "../types/styles/Style";
 import StyleBlock from "../types/styles/StyleBlock";
 import hash from "./internal/hash";
-import { isAlphaNumericChar, isSpace, isSpaceChar, trimAny } from "./internal/utils";
+import { isAlphaNumericChar, isSpace, isSpaceChar, trimQuotes } from "./internal/utils";
 
 interface ParseStatus {
   source: string;
@@ -165,9 +165,8 @@ function parseTopElement(status: ParseStatus) {
     case "template": {
       if (!element.selfClosed) {
         const source = extractElementText("template", status);
-        const childName = trimAny(
+        const childName = trimQuotes(
           element.attributes.find((a) => a.name === "name")?.value || "ChildComponent",
-          `'"`,
         );
         parseChildTemplate(childName, source, status);
       }
@@ -618,7 +617,7 @@ function extractScriptImports(status: ParseStatus) {
             const importMatches = line.matchAll(importRegex);
             for (let match of importMatches) {
               const name = match[1];
-              const path = trimAny(match[2], `'"`);
+              const path = trimQuotes(match[2]);
               const componentRegex = /\.tera$/gm;
               status.imports.push({
                 name,
@@ -797,9 +796,9 @@ function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: s
     if (!addClass) {
       for (let a of element.attributes) {
         if (a.name === "id") {
-          addClass = selectors.includes(`#${trimAny(a.value, `'"`)}`);
+          addClass = selectors.includes(`#${trimQuotes(a.value)}`);
         } else if (a.name === "class") {
-          addClass = selectors.includes(`.${trimAny(a.value, `'"`)}`);
+          addClass = selectors.includes(`.${trimQuotes(a.value)}`);
         }
         if (addClass) break;
       }
