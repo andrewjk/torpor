@@ -1,22 +1,26 @@
 export default class Builder {
-  result = "";
-  space = 0;
+  #text = "";
+  #space = 0;
 
   append(text: string) {
-    this.result += " ".repeat(this.space * 2);
-    this.result += text;
-    this.result += "\n";
+    this.#text += " ".repeat(this.#space * 2);
+    this.#text += text;
+    this.#text += "\n";
   }
 
   gap() {
-    this.result += "\n";
+    this.#text += "\n";
   }
 
   indent() {
-    this.space += 1;
+    this.#space += 1;
   }
 
   outdent() {
-    this.space -= 1;
+    this.#space -= 1;
+  }
+
+  toString() {
+    return this.#text;
   }
 }

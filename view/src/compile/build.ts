@@ -71,7 +71,7 @@ function buildCode(name: string, parts: ComponentParts): string {
 
   b.append(`export default ${name};`);
 
-  return b.result;
+  return b.toString();
 }
 
 function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
@@ -1182,7 +1182,7 @@ function buildStyles(name: string, parts: ComponentParts): string {
     buildStyleBlock(block, b, parts.styleHash!);
   }
 
-  return b.result;
+  return b.toString();
 }
 
 const globalStyleRegex = /\:global\((.+)\)/;
