@@ -146,7 +146,7 @@
   <table class="table table-hover table-striped test-data">
     <tbody>
         @for (let row of $state.data) {
-            @key = row.id
+            key = row.id
             @//<tr class={$state.selected === row.id ? "danger" : ""}>
             <tr class:selected={$state.selected === row.id}>
                 <td class="col-md-1">{row.id}</td>

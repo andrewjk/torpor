@@ -7,7 +7,7 @@ test("for statement with key", () => {
   const input = `
 <section>
   @for (let item of things) {
-    @key = item.id
+    key = item.id
     <p>
       {item.name}
     </p>
