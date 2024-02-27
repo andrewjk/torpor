@@ -22,9 +22,6 @@ interface StartNodeInfo {
   status: "unset" | "scoped" | "scopedset" | "set";
 }
 
-let b: Builder;
-//let status: BuildStatus;
-
 export default function build(name: string, parts: ComponentParts): BuildResult {
   const result: BuildResult = {
     code: buildCode(name, parts),
@@ -35,7 +32,7 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 }
 
 function buildCode(name: string, parts: ComponentParts): string {
-  b = new Builder();
+  const b = new Builder();
 
   const folder = "../../../../../tera/view/src";
   b.append(`import watch from '${folder}/watch/watch';`);
@@ -65,10 +62,10 @@ function buildCode(name: string, parts: ComponentParts): string {
   //b.add(`function t_doc(node) { return node.ownerDocument }`);
   b.gap();
 
-  buildTemplate(name, parts);
+  buildTemplate(name, parts, b);
   if (parts.childComponents) {
     for (let child of parts.childComponents) {
-      buildTemplate(child.name || "ChildComponent", child);
+      buildTemplate(child.name || "ChildComponent", child, b);
     }
   }
 
@@ -77,7 +74,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   return b.result;
 }
 
-function buildTemplate(name: string, parts: ComponentParts) {
+function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
   b.append(`const ${name} = {`);
   b.indent();
   b.append(`name: "${name}",`);
@@ -123,7 +120,7 @@ function buildTemplate(name: string, parts: ComponentParts) {
       lastNodeName: "",
     };
     b.append("// USER INTERFACE");
-    buildNode(parts.template, status, "$parent", "$anchor", true);
+    buildNode(parts.template, status, b, "$parent", "$anchor", true);
   }
 
   b.append(`t_context.activeRange = t_original_active_range;`);
@@ -137,29 +134,30 @@ function buildTemplate(name: string, parts: ComponentParts) {
 function buildNode(
   node: Node,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   root = false,
 ) {
   switch (node.type) {
     case "control": {
-      buildControlNode(node as ControlNode, status, parentName, anchorName);
+      buildControlNode(node as ControlNode, status, b, parentName, anchorName);
       break;
     }
     case "component": {
-      buildComponentNode(node as ElementNode, status, parentName, anchorName, root);
+      buildComponentNode(node as ElementNode, status, b, parentName, anchorName, root);
       break;
     }
     case "element": {
-      buildElementNode(node as ElementNode, status, parentName, anchorName, root);
+      buildElementNode(node as ElementNode, status, b, parentName, anchorName, root);
       break;
     }
     case "text": {
-      buildTextNode(node as TextNode, status, parentName, anchorName);
+      buildTextNode(node as TextNode, status, b, parentName, anchorName);
       break;
     }
     case "special": {
-      buildSpecialNode(node as ElementNode, status, parentName, anchorName);
+      buildSpecialNode(node as ElementNode, status, b, parentName, anchorName);
       break;
     }
     default: {
@@ -171,6 +169,7 @@ function buildNode(
 function buildControlNode(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -180,7 +179,7 @@ function buildControlNode(
       break;
     }
     case "@if group": {
-      buildIfNode(node, status, parentName, anchorName);
+      buildIfNode(node, status, b, parentName, anchorName);
       break;
     }
     case "@if":
@@ -190,18 +189,18 @@ function buildControlNode(
       break;
     }
     case "@switch": {
-      buildSwitchNode(node, status, parentName, anchorName);
+      buildSwitchNode(node, status, b, parentName, anchorName);
     }
     case "@case": {
       // This gets handled with @switch, above
       break;
     }
     case "@for": {
-      buildForNode(node, status, parentName, anchorName);
+      buildForNode(node, status, b, parentName, anchorName);
       break;
     }
     case "@await group": {
-      buildAwaitNode(node, status, parentName, anchorName);
+      buildAwaitNode(node, status, b, parentName, anchorName);
       break;
     }
     case "@then":
@@ -218,6 +217,7 @@ function buildControlNode(
 function buildIfNode(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -261,7 +261,7 @@ function buildIfNode(
 
   for (let [i, branch] of branches.entries()) {
     status.startNodeNames.push({ name: `${ifBranchRangesName}[${i}].startNode`, status: "unset" });
-    buildIfBranch(branch, status, parentName, ifAnchorName, ifBranchRangesName, ifIndexName, i);
+    buildIfBranch(branch, status, b, parentName, ifAnchorName, ifBranchRangesName, ifIndexName, i);
     status.startNodeNames.pop();
   }
 
@@ -274,6 +274,7 @@ function buildIfNode(
 function buildIfBranch(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   branchRangesName: string,
@@ -294,7 +295,7 @@ function buildIfBranch(
   b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, b, parentName, anchorName);
   }
   b.gap();
   b.append(`${indexName} = ${index};`);
@@ -312,6 +313,7 @@ function buildIfBranch(
 function buildSwitchNode(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -363,6 +365,7 @@ function buildSwitchNode(
     buildSwitchBranch(
       branch as ControlNode,
       status,
+      b,
       parentName,
       switchAnchorName,
       switchBranchRangesName,
@@ -383,6 +386,7 @@ function buildSwitchNode(
 function buildSwitchBranch(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   branchRangesName: string,
@@ -403,7 +407,7 @@ function buildSwitchBranch(
   b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, b, parentName, anchorName);
   }
   b.gap();
   b.append(`${indexName} = ${index};`);
@@ -425,6 +429,7 @@ const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 function buildForNode(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -508,7 +513,7 @@ function buildForNode(
   b.append(`let { ${forVarNames.join(", ")} } = t_item.data;`);
   b.gap();
   status.startNodeNames.push({ name: `t_item.startNode`, status: "unset" });
-  buildForItem(node, status, "t_parent");
+  buildForItem(node, status, b, "t_parent");
   status.startNodeNames.pop();
   b.outdent();
   b.append(`}`);
@@ -522,7 +527,7 @@ function buildForNode(
   b.gap();
 }
 
-function buildForItem(node: ControlNode, status: BuildStatus, parentName: string) {
+function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
   b.append(`const t_old_range = t_context.activeRange;`);
   b.append(`t_set_active_range(t_item);`);
   b.gap();
@@ -531,7 +536,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, parentName: string
     if (child.type === "control" && (child as ControlNode).operation === "@key") {
       continue;
     }
-    buildNode(child, status, parentName, "t_before");
+    buildNode(child, status, b, parentName, "t_before");
   }
   b.gap();
   if (status.lastNodeName) {
@@ -544,6 +549,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, parentName: string
 function buildAwaitNode(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -614,6 +620,7 @@ function buildAwaitNode(
   buildAwaitBranch(
     awaitBranch,
     status,
+    b,
     parentName,
     awaitAnchorName,
     awaitBranchRangesName,
@@ -636,6 +643,7 @@ function buildAwaitNode(
   buildAwaitBranch(
     thenBranch,
     status,
+    b,
     parentName,
     awaitAnchorName,
     awaitBranchRangesName,
@@ -656,6 +664,7 @@ function buildAwaitNode(
   buildAwaitBranch(
     catchBranch,
     status,
+    b,
     parentName,
     awaitAnchorName,
     awaitBranchRangesName,
@@ -679,6 +688,7 @@ function buildAwaitNode(
 function buildAwaitBranch(
   node: ControlNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   branchRangesName: string,
@@ -696,7 +706,7 @@ function buildAwaitBranch(
   b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, b, parentName, anchorName);
   }
   b.gap();
   b.append(`${indexName} = ${index};`);
@@ -711,6 +721,7 @@ function buildAwaitBranch(
 function buildComponentNode(
   node: ElementNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   root = false,
@@ -768,7 +779,7 @@ function buildComponentNode(
       b.append(`${slotsName}["${key}"] = ($parent, $anchor, $sprops) => {`);
       b.indent();
       for (let child of filterChildren(value)) {
-        buildNode(child, status, "$parent", "$anchor");
+        buildNode(child, status, b, "$parent", "$anchor");
       }
       b.outdent();
       b.append(`}`);
@@ -817,6 +828,7 @@ function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
 function buildElementNode(
   node: ElementNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
   root = false,
@@ -833,17 +845,22 @@ function buildElementNode(
     b.outdent();
     b.append(`}`);
   }
-  buildElementAttributes(node, varName, status);
+  buildElementAttributes(node, varName, status, b);
   for (let child of filterChildren(node)) {
-    buildNode(child, status, varName, "null");
+    buildNode(child, status, b, varName, "null");
   }
   b.append(`${parentName}.insertBefore(${varName}, ${anchorName});`);
 
   // TODO: Do this for text nodes too
-  setScopedNodes(status, varName);
+  setScopedNodes(status, b, varName);
 }
 
-function buildElementAttributes(node: ElementNode, varName: string, status: BuildStatus) {
+function buildElementAttributes(
+  node: ElementNode,
+  varName: string,
+  status: BuildStatus,
+  b: Builder,
+) {
   for (let attribute of node.attributes) {
     let { name, value } = attribute;
     if (name.startsWith("{") && name.endsWith("}")) {
@@ -914,6 +931,7 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
 function buildTextNode(
   node: TextNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -960,12 +978,13 @@ function buildTextNode(
 function buildSpecialNode(
   node: ElementNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
   switch (node.tagName) {
     case ":slot": {
-      buildSlotNode(node, status, parentName, anchorName);
+      buildSlotNode(node, status, b, parentName, anchorName);
     }
   }
   return "";
@@ -974,6 +993,7 @@ function buildSpecialNode(
 function buildSlotNode(
   node: ElementNode,
   status: BuildStatus,
+  b: Builder,
   parentName: string,
   anchorName: string,
 ) {
@@ -1016,7 +1036,7 @@ function buildSlotNode(
   b.append(`} else {`);
   b.indent();
   for (let child of filterChildren(node)) {
-    buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, b, parentName, anchorName);
   }
   b.outdent();
   b.append(`}`);
@@ -1139,7 +1159,7 @@ function unscopeNodeNames(status: BuildStatus, copy: StartNodeInfo[]) {
   status.lastNodeName = "";
 }
 
-function setScopedNodes(status: BuildStatus, varName: string) {
+function setScopedNodes(status: BuildStatus, b: Builder, varName: string) {
   for (let startNodeName of status.startNodeNames) {
     if (startNodeName.status === "unset") {
       b.append(`if (!${startNodeName.name}) ${startNodeName.name} = ${varName};`);
@@ -1154,10 +1174,10 @@ function setScopedNodes(status: BuildStatus, varName: string) {
 }
 
 function buildStyles(name: string, parts: ComponentParts): string {
-  b = new Builder();
+  const b = new Builder();
 
   for (let block of parts.style!.blocks) {
-    buildStyleBlock(block, parts.styleHash!);
+    buildStyleBlock(block, b, parts.styleHash!);
   }
 
   return b.result;
@@ -1165,7 +1185,7 @@ function buildStyles(name: string, parts: ComponentParts): string {
 
 const globalStyleRegex = /\:global\((.+)\)/;
 
-function buildStyleBlock(block: StyleBlock, styleHash: string) {
+function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
   // TODO: This should probably be done while parsing
   // And handle attribute selectors
   const selectors = block.selector
@@ -1182,17 +1202,19 @@ function buildStyleBlock(block: StyleBlock, styleHash: string) {
     });
 
   b.append(`${selectors.join(" ")} {`);
+  b.indent();
   for (let attribute of block.attributes) {
-    buildStyleAttribute(attribute);
+    buildStyleAttribute(attribute, b);
   }
   for (let child of block.children) {
-    buildStyleBlock(child, styleHash);
+    buildStyleBlock(child, b, styleHash);
   }
+  b.outdent();
   b.append(`}`);
 }
 
-function buildStyleAttribute(attribute: Attribute): string {
-  return `${attribute.name}: ${attribute.value};\n`;
+function buildStyleAttribute(attribute: Attribute, b: Builder) {
+  b.append(`${attribute.name}: ${attribute.value};`);
 }
 
 function trim(text: string, startValue: string, endValue: string) {

@@ -148,7 +148,6 @@ function parseSource(status: ParseStatus, source: string) {
 function parseTopElement(status: ParseStatus) {
   const start = status.i;
   const element = parseTagOpen(status);
-  console.log(element.tagName);
   switch (element.tagName) {
     case "script": {
       if (!element.selfClosed) {
