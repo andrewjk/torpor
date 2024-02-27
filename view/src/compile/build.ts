@@ -6,6 +6,7 @@ import ElementNode from "../types/nodes/ElementNode";
 import Node from "../types/nodes/Node";
 import TextNode from "../types/nodes/TextNode";
 import StyleBlock from "../types/styles/StyleBlock";
+import Builder from "./internal/Builder";
 import { trimAny } from "./internal/utils";
 
 interface BuildStatus {
@@ -18,9 +19,11 @@ interface BuildStatus {
 
 interface StartNodeInfo {
   name: string;
-  // TODO: scopedset
   status: "unset" | "scoped" | "scopedset" | "set";
 }
+
+let b: Builder;
+//let status: BuildStatus;
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
   const result: BuildResult = {
@@ -32,62 +35,65 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 }
 
 function buildCode(name: string, parts: ComponentParts): string {
-  let result = "";
+  b = new Builder();
 
   const folder = "../../../../../tera/view/src";
-  result += `import watch from '${folder}/watch/watch';\n`;
-  result += `import watchEffect from '${folder}/watch/watchEffect';\n`;
-  result += `import t_clear_range from '${folder}/render/internal/clearRange';\n`;
-  result += `import t_reconcile_list from '${folder}/render/internal/reconcileList';\n`;
-  result += `import t_apply_attributes from '${folder}/render/internal/applyAttributes';\n`;
-  result += `import t_context from '${folder}/watch/internal/context';\n`;
-  result += `import t_set_active_range from '${folder}/watch/internal/setActiveRange';\n`;
+  b.append(`import watch from '${folder}/watch/watch';`);
+  b.append(`import watchEffect from '${folder}/watch/watchEffect';`);
+  b.append(`import t_clear_range from '${folder}/render/internal/clearRange';`);
+  b.append(`import t_reconcile_list from '${folder}/render/internal/reconcileList';`);
+  b.append(`import t_apply_attributes from '${folder}/render/internal/applyAttributes';`);
+  b.append(`import t_context from '${folder}/watch/internal/context';`);
+  b.append(`import t_set_active_range from '${folder}/watch/internal/setActiveRange';`);
   //result +=
   //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, watch, watchEffect } from '../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
-    result += parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n") + "\n";
+    b.append(parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n"));
   }
-  result += "\n";
+  b.gap();
 
   // HACK: Move into utils
-  result += "function t_text(text) { return text != null ? text : '' }\n";
-  //result += "function t_doc(node) { return node.ownerDocument }\n";
-  result += "\n";
+  b.append(`function t_text(text) { return text != null ? text : '' }`);
+  //b.add(`function t_doc(node) { return node.ownerDocument }`);
+  b.gap();
 
-  result += `const ${name} = {\n`;
-  result += `name: "${name}",\n`;
-  result += `/**\n`;
-  result += ` * @param {Node} $parent\n`;
-  result += ` * @param {Node | null} $anchor\n`;
-  result += ` * @param {Object} [$props]\n`;
-  result += ` * @param {Object} [$slots]\n`;
-  result += ` * @param {Object} [$context]\n`;
-  result += ` */\n`;
-  result += `render: ($parent, $anchor, $props, $slots, $context) => {\n`;
+  b.append(`const ${name} = {`);
+  b.indent();
+  b.append(`name: "${name}",`);
+  b.append(`/**`);
+  b.append(` * @param {Node} $parent`);
+  b.append(` * @param {Node | null} $anchor`);
+  b.append(` * @param {Object} [$props]`);
+  b.append(` * @param {Object} [$slots]`);
+  b.append(` * @param {Object} [$context]`);
+  b.append(` */`);
+  b.append(`render: ($parent, $anchor, $props, $slots, $context) => {`);
+  b.indent();
 
   // Redefine $context so that any newly added properties will only be passed to children
   if (parts.contexts?.length) {
-    result += `$context = Object.assign({}, $context);\n`;
+    b.append(`$context = Object.assign({}, $context);`);
   }
 
   // Build an anchor here, so that effects set in the script can be cleaned up if/when the
   // component is removed
-  result += `const t_component_anchor = document.createComment("@comp");\n`;
-  result += `$parent.insertBefore(t_component_anchor, $anchor);\n`;
-  result += `const t_original_active_range = t_context.activeRange;\n`;
-  result += `t_set_active_range({ title: "@comp ${name}" });\n`;
+  b.append(`const t_component_anchor = document.createComment("@comp");`);
+  b.append(`$parent.insertBefore(t_component_anchor, $anchor);`);
+  b.append(`const t_original_active_range = t_context.activeRange;`);
+  b.append(`t_set_active_range({ title: "@comp ${name}" });`);
+  b.gap();
 
   if (parts.script) {
     // TODO: Mangling
-    result += parts.script;
-    result += "\n\n";
+    b.append("// USER SCRIPT");
+    b.append(parts.script);
+    b.gap();
   }
 
   if (parts.template) {
     // TODO:
     // We could create a document fragment with a string and assign the created elements to variables
     // It would mean we could use the same code for hydration too
-
     const status: BuildStatus = {
       props: parts.props || [],
       styleHash: parts.styleHash || "",
@@ -95,15 +101,19 @@ function buildCode(name: string, parts: ComponentParts): string {
       startNodeNames: [],
       lastNodeName: "",
     };
-    result += buildNode(parts.template, status, "$parent", "$anchor", true);
+    b.append("// USER INTERFACE");
+    buildNode(parts.template, status, "$parent", "$anchor", true);
   }
 
-  result += `t_context.activeRange = t_original_active_range;\n`;
-  result += `}\n`;
-  result += `};\n\n`;
-  result += `export default ${name};`;
+  b.append(`t_context.activeRange = t_original_active_range;`);
+  b.outdent();
+  b.append(`}`);
+  b.outdent();
+  b.append(`}`);
+  b.gap();
+  b.append(`export default ${name};`);
 
-  return result;
+  return b.result;
 }
 
 function buildNode(
@@ -112,22 +122,27 @@ function buildNode(
   parentName: string,
   anchorName: string,
   root = false,
-): string {
+) {
   switch (node.type) {
     case "control": {
-      return buildControlNode(node as ControlNode, status, parentName, anchorName);
+      buildControlNode(node as ControlNode, status, parentName, anchorName);
+      break;
     }
     case "component": {
-      return buildComponentNode(node as ElementNode, status, parentName, anchorName, root);
+      buildComponentNode(node as ElementNode, status, parentName, anchorName, root);
+      break;
     }
     case "element": {
-      return buildElementNode(node as ElementNode, status, parentName, anchorName, root);
+      buildElementNode(node as ElementNode, status, parentName, anchorName, root);
+      break;
     }
     case "text": {
-      return buildTextNode(node as TextNode, status, parentName, anchorName);
+      buildTextNode(node as TextNode, status, parentName, anchorName);
+      break;
     }
     case "special": {
-      return buildSpecialNode(node as ElementNode, status, parentName, anchorName);
+      buildSpecialNode(node as ElementNode, status, parentName, anchorName);
+      break;
     }
     default: {
       throw new Error(`Invalid node type: ${node.type}`);
@@ -140,37 +155,41 @@ function buildControlNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   switch (node.operation) {
     case "@const": {
-      return node.statement + (!node.statement.endsWith(";") ? ";" : "");
+      b.append(`${node.statement}${node.statement.endsWith(";") ? "" : ";"}`);
+      break;
     }
     case "@if group": {
-      return buildIfNode(node, status, parentName, anchorName);
+      buildIfNode(node, status, parentName, anchorName);
+      break;
     }
     case "@if":
     case "@else if":
     case "@else": {
       // These get handled with @if group, above
-      return "";
+      break;
     }
     case "@switch": {
-      return buildSwitchNode(node, status, parentName, anchorName);
+      buildSwitchNode(node, status, parentName, anchorName);
     }
     case "@case": {
       // This gets handled with @switch, above
-      return "";
+      break;
     }
     case "@for": {
-      return buildForNode(node, status, parentName, anchorName);
+      buildForNode(node, status, parentName, anchorName);
+      break;
     }
     case "@await group": {
-      return buildAwaitNode(node, status, parentName, anchorName);
+      buildAwaitNode(node, status, parentName, anchorName);
+      break;
     }
     case "@then":
     case "@catch": {
       // These get handled with @await group, above
-      return "";
+      break;
     }
     default: {
       throw new Error(`Invalid operation: ${node.operation}`);
@@ -183,7 +202,7 @@ function buildIfNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   const ifAnchorName = nextVarName("if_anchor", status);
   const ifIndexName = nextVarName("if_index", status);
   const oldRangeName = nextVarName("old_range", status);
@@ -204,42 +223,34 @@ function buildIfNode(
     branches.push(elseBranch);
   }
 
-  let result = "";
-  result += "\n";
-  result += "//\n";
-  result += "// === IF ===\n";
-  result += "//\n";
-  result += `const ${ifAnchorName} = document.createComment("@if");\n`;
-  result += `${parentName}.insertBefore(${ifAnchorName}, ${anchorName});\n`;
-  result += "\n";
-  result += `let ${ifIndexName} = -1;\n`;
-  result += `let ${ifRangeName} = { title: "@if ${branches[0].statement}" };\n`;
-  result += `let ${ifBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
-  result += "\n";
-  result += `const ${oldRangeName} = t_context.activeRange;\n`;
-  result += `t_set_active_range(${ifRangeName});\n`;
-  result += "\n";
-  result += `watchEffect(() => {\n`;
-  result += `t_context.activeRange = ${ifRangeName};\n`;
+  b.gap();
+  b.append(`// IF`);
+  b.append(`const ${ifAnchorName} = document.createComment("@if");`);
+  b.append(`${parentName}.insertBefore(${ifAnchorName}, ${anchorName});`);
+  b.gap();
+  b.append(`let ${ifIndexName} = -1;`);
+  b.append(`let ${ifRangeName} = { title: "@if ${branches[0].statement}" };`);
+  b.append(
+    `let ${ifBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}]`,
+  );
+  b.gap();
+  b.append(`const ${oldRangeName} = t_context.activeRange;`);
+  b.append(`t_set_active_range(${ifRangeName});`);
+  b.gap();
+  b.append(`watchEffect(() => {`);
+  b.indent();
+  b.append(`t_context.activeRange = ${ifRangeName};`);
 
   for (let [i, branch] of branches.entries()) {
     status.startNodeNames.push({ name: `${ifBranchRangesName}[${i}].startNode`, status: "unset" });
-    result += buildIfBranch(
-      branch,
-      status,
-      parentName,
-      ifAnchorName,
-      ifBranchRangesName,
-      ifIndexName,
-      i,
-    );
+    buildIfBranch(branch, status, parentName, ifAnchorName, ifBranchRangesName, ifIndexName, i);
     status.startNodeNames.pop();
   }
 
-  result += "});\n";
-  result += `t_context.activeRange = ${oldRangeName};\n\n`;
-
-  return result;
+  b.outdent();
+  b.append(`});`);
+  b.append(`t_context.activeRange = ${oldRangeName};`);
+  b.gap();
 }
 
 function buildIfBranch(
@@ -250,39 +261,34 @@ function buildIfBranch(
   branchRangesName: string,
   indexName: string,
   index: number,
-): string {
+) {
   const startNodeNames = scopeNodeNames(status);
 
   const branchRangeName = `${branchRangesName}[${index}]`;
 
-  let result = "";
-  result += "\n";
-  result += "//\n";
-  result += "// === IF BRANCH ===\n";
-  result += "//\n";
-  result += `${node.statement} {\n`;
-  result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
-  result += "\n";
-  result += `const t_old_range = t_context.activeRange;\n`;
-  result += `t_set_active_range(${branchRangeName});\n`;
-  result += "\n";
+  b.append(`${node.statement} {`);
+  b.indent();
+  b.append(`if (${indexName} === ${index}) return;`);
+  b.append(`if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);`);
+  b.gap();
+  b.append(`const t_old_range = t_context.activeRange;`);
+  b.append(`t_set_active_range(${branchRangeName});`);
+  b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, parentName, anchorName);
   }
-  result += "\n";
-  result += `${indexName} = ${index};\n`;
+  b.gap();
+  b.append(`${indexName} = ${index};`);
   if (status.lastNodeName) {
     // TODO: get the last node name (element or text) that has the same parent
-    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+    b.append(`${branchRangeName}.endNode = ${status.lastNodeName};`);
   }
-  result += `t_context.activeRange = t_old_range;\n`;
-  result += "}\n";
+  b.append(`t_context.activeRange = t_old_range;`);
+  b.outdent();
+  b.append(`}`);
 
   unscopeNodeNames(status, startNodeNames);
-
-  return result;
 }
 
 function buildSwitchNode(
@@ -290,7 +296,7 @@ function buildSwitchNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   const switchAnchorName = nextVarName("switch_anchor", status);
   const switchIndexName = nextVarName("switch_index", status);
   const oldRangeName = nextVarName("old_range", status);
@@ -311,32 +317,32 @@ function buildSwitchNode(
     branches.push(defaultBranch);
   }
 
-  let result = "";
-
-  result += "\n";
-  result += "//\n";
-  result += "// === SWITCH ===\n";
-  result += "//\n";
-  result += `const ${switchAnchorName} = document.createComment("@switch");\n`;
-  result += `${parentName}.insertBefore(${switchAnchorName}, ${anchorName});\n`;
-  result += "\n";
-  result += `let ${switchIndexName} = -1;\n`;
-  result += `let ${switchRangeName} = { title: "@switch ${node.statement}" };\n`;
-  result += `let ${switchBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
-  result += "\n";
-  result += `const ${oldRangeName} = t_context.activeRange;\n`;
-  result += `t_set_active_range(${switchRangeName});\n`;
-  result += "\n";
-  result += `watchEffect(() => {\n`;
-  result += `t_context.activeRange = ${switchRangeName};\n`;
-  result += `${node.statement} {\n`;
+  b.gap();
+  b.append(`// SWITCH`);
+  b.append(`const ${switchAnchorName} = document.createComment("@switch");`);
+  b.append(`${parentName}.insertBefore(${switchAnchorName}, ${anchorName});`);
+  b.gap();
+  b.append(`let ${switchIndexName} = -1;`);
+  b.append(`let ${switchRangeName} = { title: "@switch ${node.statement}" };`);
+  b.append(
+    `let ${switchBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}]`,
+  );
+  b.gap();
+  b.append(`const ${oldRangeName} = t_context.activeRange;`);
+  b.append(`t_set_active_range(${switchRangeName});`);
+  b.gap();
+  b.append(`watchEffect(() => {`);
+  b.indent();
+  b.append(`t_context.activeRange = ${switchRangeName};`);
+  b.append(`${node.statement} {`);
+  b.indent();
 
   for (let [i, branch] of branches.entries()) {
     status.startNodeNames.push({
       name: `${switchBranchRangesName}[${i}].startNode`,
       status: "unset",
     });
-    result += buildSwitchBranch(
+    buildSwitchBranch(
       branch as ControlNode,
       status,
       parentName,
@@ -348,11 +354,12 @@ function buildSwitchNode(
     status.startNodeNames.pop();
   }
 
-  result += "}\n";
-  result += "});\n";
-  result += `t_context.activeRange = ${oldRangeName};\n\n`;
-
-  return result;
+  b.outdent();
+  b.append(`}`);
+  b.outdent();
+  b.append(`});`);
+  b.append(`t_context.activeRange = ${oldRangeName};`);
+  b.gap();
 }
 
 function buildSwitchBranch(
@@ -363,35 +370,34 @@ function buildSwitchBranch(
   branchRangesName: string,
   indexName: string,
   index: number,
-): string {
+) {
   const startNodeNames = scopeNodeNames(status);
 
   const branchRangeName = `${branchRangesName}[${index}]`;
 
-  let result = "";
-  result += `${node.statement} {\n`;
-  result += `if (${indexName} === ${index}) return;\n`;
-  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
-  result += "\n";
-  result += `const t_old_range = t_context.activeRange;\n`;
-  result += `t_set_active_range(${branchRangeName});\n`;
-  result += "\n";
+  b.append(`${node.statement} {`);
+  b.indent();
+  b.append(`if (${indexName} === ${index}) return;`);
+  b.append(`if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);`);
+  b.gap();
+  b.append(`const t_old_range = t_context.activeRange;`);
+  b.append(`t_set_active_range(${branchRangeName});`);
+  b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, parentName, anchorName);
   }
-  result += "\n";
-  result += `${indexName} = ${index};\n`;
+  b.gap();
+  b.append(`${indexName} = ${index};`);
   if (status.lastNodeName) {
-    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+    b.append(`${branchRangeName}.endNode = ${status.lastNodeName};`);
   }
-  result += `t_context.activeRange = t_old_range;\n`;
-  result += "break;\n";
-  result += "}\n";
+  b.append(`t_context.activeRange = t_old_range;`);
+  b.append(`break;`);
+  b.outdent();
+  b.append(`}`);
 
   unscopeNodeNames(status, startNodeNames);
-
-  return result;
 }
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
@@ -403,7 +409,7 @@ function buildForNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   // HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
   // TODO: Handle destructuring, quotes, comments etc
   const forVarNames: string[] = [];
@@ -442,86 +448,79 @@ function buildForNode(
     (n) => n.type === "control" && (n as ControlNode).operation === "@key",
   );
 
-  let result = "";
-  result += "\n";
-  result += "//\n";
-  result += "// === FOR ===\n";
-  result += "//\n";
-  result += `const ${forAnchorName} = document.createComment("@for");\n`;
-  result += `${parentName}.insertBefore(${forAnchorName}, ${anchorName});\n`;
-  result += "\n";
-  result += `let ${forItemsName} = [];\n`;
-  result += `let ${forRangeName} = { title: "@for ${node.statement}" };\n`;
-  result += "\n";
-  result += `const ${oldRangeName} = t_context.activeRange;\n`;
-  result += `t_set_active_range(${forRangeName});\n`;
-  result += "\n";
-  result += `watchEffect(() => {\n`;
-  result += `t_context.activeRange = ${forRangeName};\n`;
-  result += `let t_for_items = [];\n`;
-  result += `${node.statement} {\n`;
+  b.gap();
+  b.append(`// FOR`);
+  b.append(`const ${forAnchorName} = document.createComment("@for");`);
+  b.append(`${parentName}.insertBefore(${forAnchorName}, ${anchorName});`);
+  b.gap();
+  b.append(`let ${forItemsName} = [];`);
+  b.append(`let ${forRangeName} = { title: "@for ${node.statement}" };`);
+  b.gap();
+  b.append(`const ${oldRangeName} = t_context.activeRange;`);
+  b.append(`t_set_active_range(${forRangeName});`);
+  b.gap();
+  b.append(`watchEffect(() => {`);
+  b.indent();
+  b.append(`t_context.activeRange = ${forRangeName};`);
+  b.append(`let t_for_items = [];`);
+  b.append(`${node.statement} {`);
+  b.indent();
   // TODO: Because we're accessing item properties out here, they get attached to the @for anchor and don't get cleaned up
   // Somehow we need to attach them to the appropriate @foritem anchor instead
-  result += `let t_item = {};\n`;
+  b.append(`let t_item = {};`);
   if (key) {
     const keyStatement = (key as ControlNode).statement;
-    result += `t_item.key = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};\n`;
+    b.append(`t_item.key = ${keyStatement.substring(keyStatement.indexOf("=") + 1).trim()};`);
   }
-  result += `t_item.data = {};\n`;
+  b.append(`t_item.data = {};`);
   for (let v of forVarNames) {
-    result += `t_item.data["${v}"] = ${v};\n`;
+    b.append(`t_item.data["${v}"] = ${v};`);
   }
-  result += `t_for_items.push(t_item);\n`;
-  result += `}\n`;
-  result += "\n";
-  result += `t_reconcile_list(\n`;
-  result += `${parentName},\n`;
-  result += `${forItemsName},\n`;
-  result += `t_for_items,\n`;
-  result += "/**\n";
-  result += " * @param {Node} t_parent\n";
-  result += " * @param {any} t_item\n";
-  result += " * @param {Node | null} t_before\n";
-  result += " */\n";
-  result += `(t_parent, t_item, t_before) => {\n`;
-  result += `let { ${forVarNames.join(", ")} } = t_item.data;\n`;
+  b.append(`t_for_items.push(t_item);`);
+  b.outdent();
+  b.append(`}`);
+  b.gap();
+  b.append(`t_reconcile_list(`);
+  b.indent();
+  b.append(`${parentName},`);
+  b.append(`${forItemsName},`);
+  b.append(`t_for_items,`);
+  b.append(`(t_parent, t_item, t_before) => {`);
+  b.indent();
+  b.append(`let { ${forVarNames.join(", ")} } = t_item.data;`);
+  b.gap();
   status.startNodeNames.push({ name: `t_item.startNode`, status: "unset" });
-  result += buildForItem(node, status, "t_parent");
+  buildForItem(node, status, "t_parent");
   status.startNodeNames.pop();
-  result += `},\n`;
-  result += `);\n`;
-  result += "\n";
-  result += `${forItemsName} = t_for_items;\n`;
-  result += "});\n";
-  result += `t_context.activeRange = ${oldRangeName};\n\n`;
-
-  return result;
+  b.outdent();
+  b.append(`}`);
+  b.outdent();
+  b.append(`);`);
+  b.gap();
+  b.append(`${forItemsName} = t_for_items;`);
+  b.outdent();
+  b.append(`});`);
+  b.append(`t_context.activeRange = ${oldRangeName};`);
+  b.gap();
 }
 
-function buildForItem(node: ControlNode, status: BuildStatus, parentName: string): string {
-  let result = "";
-  result += "//\n";
-  result += "// === FOR ITEM ===\n";
-  result += "//\n";
-  //result += `t_item.anchor = document.createComment("@foritem " + t_item.key);\n`;
-  //result += `${parentName}.insertBefore(t_item.anchor, t_before);\n`;
-  result += `const t_old_range = t_context.activeRange;\n`;
-  result += `t_set_active_range(t_item);\n`;
-  result += `\n`;
+function buildForItem(node: ControlNode, status: BuildStatus, parentName: string) {
+  b.append(`const t_old_range = t_context.activeRange;`);
+  b.append(`t_set_active_range(t_item);`);
+  b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
     if (child.type === "control" && (child as ControlNode).operation === "@key") {
       continue;
     }
-    result += buildNode(child, status, parentName, "t_before");
+    buildNode(child, status, parentName, "t_before");
   }
-  result += "\n";
+  b.gap();
   if (status.lastNodeName) {
     // TODO: get the last node name (element or text) that has the same parent
-    result += `t_item.endNode = ${status.lastNodeName};\n`;
+    b.append(`t_item.endNode = ${status.lastNodeName};`);
   }
-  result += `t_context.activeRange = t_old_range;\n\n`;
-  return result;
+  b.append(`t_context.activeRange = t_old_range;`);
 }
 
 function buildAwaitNode(
@@ -529,7 +528,7 @@ function buildAwaitNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   // TODO: Would this all be better as a component?
 
   const awaitAnchorName = nextVarName("await_anchor", status);
@@ -570,32 +569,31 @@ function buildAwaitNode(
   const thenVar = trim(thenBranch.statement.substring("then".length), "(", ")");
   const catchVar = trim(catchBranch.statement.substring("catch".length), "(", ")");
 
-  let result = "";
-
-  result += "\n";
-  result += "//\n";
-  result += "// === AWAIT ===\n";
-  result += "//\n";
-  result += `const ${awaitAnchorName} = document.createComment("@await");\n`;
-  result += `${parentName}.insertBefore(${awaitAnchorName}, ${anchorName});\n`;
-  result += "\n";
+  b.gap();
+  b.append(`// AWAIT`);
+  b.append(`const ${awaitAnchorName} = document.createComment("@await");`);
+  b.append(`${parentName}.insertBefore(${awaitAnchorName}, ${anchorName});`);
+  b.gap();
   // Use an incrementing token to make sure only the last request gets handled
   // TODO: This might have unforeseen consequences
-  result += `let ${awaitTokenName} = 0;\n`;
-  result += `let ${awaitIndexName} = -1;\n`;
-  result += `let ${awaitRangeName} = { title: "@await ${branches[0].statement}" };\n`;
-  result += `let ${awaitBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];\n`;
-  result += "\n";
-  result += `const ${oldRangeName} = t_context.activeRange;\n`;
-  result += `t_set_active_range(${awaitRangeName});\n`;
-  result += "\n";
-  result += `watchEffect(() => {\n`;
-  result += `${awaitTokenName}++;\n`;
-  result += `t_context.activeRange = ${awaitRangeName};\n`;
-  result += "\n";
+  b.append(`let ${awaitTokenName} = 0;`);
+  b.append(`let ${awaitIndexName} = -1;`);
+  b.append(`let ${awaitRangeName} = { title: "@await ${branches[0].statement}" };`);
+  b.append(
+    `let ${awaitBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}]`,
+  );
+  b.gap();
+  b.append(`const ${oldRangeName} = t_context.activeRange;`);
+  b.append(`t_set_active_range(${awaitRangeName});`);
+  b.gap();
+  b.append(`watchEffect(() => {`);
+  b.indent();
+  b.append(`${awaitTokenName}++;`);
+  b.append(`t_context.activeRange = ${awaitRangeName};`);
+  b.gap();
 
   status.startNodeNames.push({ name: `${awaitBranchRangesName}[0].startNode`, status: "unset" });
-  result += buildAwaitBranch(
+  buildAwaitBranch(
     awaitBranch,
     status,
     parentName,
@@ -606,14 +604,18 @@ function buildAwaitNode(
   );
   status.startNodeNames.pop();
 
-  result += "\n";
-  result += `((token) => {\n`;
-  result += `${awaiterName}\n`;
-  result += `.then((${thenVar}) => {\n`;
-  result += `if (token === ${awaitTokenName}) {\n`;
+  b.gap();
+  b.append(`((token) => {`);
+  b.indent();
+  b.append(awaiterName);
+  b.indent();
+  b.append(`.then((${thenVar}) => {`);
+  b.indent();
+  b.append(`if (token === ${awaitTokenName}) {`);
+  b.indent();
 
   status.startNodeNames.push({ name: `${awaitBranchRangesName}[1].startNode`, status: "unset" });
-  result += buildAwaitBranch(
+  buildAwaitBranch(
     thenBranch,
     status,
     parentName,
@@ -624,13 +626,16 @@ function buildAwaitNode(
   );
   status.startNodeNames.pop();
 
-  result += `}\n`;
-  result += `})\n`;
-  result += `.catch((${catchVar}) => {\n`;
-  result += `if (token === ${awaitTokenName}) {\n`;
+  b.outdent();
+  b.append(`}`);
+  b.outdent();
+  b.append(`})`);
+  b.append(`.catch((${catchVar}) => {`);
+  b.indent();
+  b.append(`if (token === ${awaitTokenName}) {`);
 
   status.startNodeNames.push({ name: `${awaitBranchRangesName}[2].startNode`, status: "unset" });
-  result += buildAwaitBranch(
+  buildAwaitBranch(
     catchBranch,
     status,
     parentName,
@@ -641,13 +646,16 @@ function buildAwaitNode(
   );
   status.startNodeNames.pop();
 
-  result += `}\n`;
-  result += `});\n`;
-  result += `})(${awaitTokenName});\n`;
-  result += `});\n`;
-  result += `t_context.activeRange = ${oldRangeName};\n\n`;
-
-  return result;
+  b.outdent();
+  b.append(`}`);
+  b.outdent();
+  b.append(`});`);
+  b.outdent();
+  b.append(`})(${awaitTokenName});`);
+  b.outdent();
+  b.append(`});`);
+  b.append(`t_context.activeRange = ${oldRangeName};`);
+  b.gap();
 }
 
 function buildAwaitBranch(
@@ -658,31 +666,28 @@ function buildAwaitBranch(
   branchRangesName: string,
   indexName: string,
   index: number,
-): string {
+) {
   const startNodeNames = scopeNodeNames(status);
 
   const branchRangeName = `${branchRangesName}[${index}]`;
 
-  let result = "";
-  result += `if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);\n`;
-  result += "\n";
-  result += `const t_old_range = t_context.activeRange;\n`;
-  result += `t_set_active_range(${branchRangeName});\n`;
-  result += "\n";
+  b.append(`if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);`);
+  b.gap();
+  b.append(`const t_old_range = t_context.activeRange;`);
+  b.append(`t_set_active_range(${branchRangeName});`);
+  b.gap();
   status.lastNodeName = "";
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, parentName, anchorName);
   }
-  result += "\n";
-  result += `${indexName} = ${index};\n`;
+  b.gap();
+  b.append(`${indexName} = ${index};`);
   if (status.lastNodeName) {
-    result += `${branchRangeName}.endNode = ${status.lastNodeName};\n`;
+    b.append(`${branchRangeName}.endNode = ${status.lastNodeName};`);
   }
-  result += `t_context.activeRange = t_old_range;\n`;
+  b.append(`t_context.activeRange = t_old_range;`);
 
   unscopeNodeNames(status, startNodeNames);
-
-  return result;
 }
 
 function buildComponentNode(
@@ -691,19 +696,17 @@ function buildComponentNode(
   parentName: string,
   anchorName: string,
   root = false,
-): string {
-  let result = "";
-
+) {
   // Props
   const propsName = nextVarName("props", status);
   const componentHasProps = node.attributes.length || root;
   if (componentHasProps) {
     // TODO: defaults etc props
-    result += `const ${propsName} = watch({});\n`;
+    b.append(`const ${propsName} = watch({});`);
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        result += `watchEffect(() => ${propsName}["${name}"] = ${name});\n`;
+        b.append(`watchEffect(() => ${propsName}["${name}"] = ${name});`);
       } else {
         let generated = value.startsWith("{") && value.endsWith("}");
         if (generated) {
@@ -714,22 +717,26 @@ function buildComponentNode(
           // Probably just compile down to a string?
           value = `"${trimAny(value, `'"`)} tera-${status.styleHash}"`;
         }
-        result += generated ? `watchEffect(() => ` : "";
-        result += `${propsName}["${name}"] = ${value || "true"}`;
-        result += generated ? `)` : "";
-        result += ";\n";
+        const setProp = `${propsName}["${name}"] = ${value || "true"}`;
+        b.append(generated ? `watchEffect(() => ${setProp});` : `${setProp};`);
       }
     }
     // PERF: Does this have much of an impact??
     if (root) {
-      result += `if ($props) {\n`;
-      result += `const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];\n`;
-      result += `for (let name of Object.keys($props)) {\n`;
-      result += `if (!name.startsWith("$") && !propNames.includes(name)) {\n`;
-      result += `watchEffect(() => ${propsName}[name] = $props[name]);\n`;
-      result += `}\n`;
-      result += `}\n`;
-      result += `}\n`;
+      b.append(`if ($props) {`);
+      b.indent();
+      b.append(`const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];`);
+      b.append(`for (let name of Object.keys($props)) {`);
+      b.indent();
+      b.append(`if (!name.startsWith("$") && !propNames.includes(name)) {`);
+      b.indent();
+      b.append(`watchEffect(() => ${propsName}[name] = $props[name]);`);
+      b.outdent();
+      b.append(`}`);
+      b.outdent();
+      b.append(`}`);
+      b.outdent();
+      b.append(`}`);
     }
   }
 
@@ -738,20 +745,22 @@ function buildComponentNode(
   const componentHasSlots = node.children.length;
   if (componentHasSlots) {
     const slots = gatherSlotNodes(node);
-    result += `const ${slotsName} = {};\n`;
+    b.append(`const ${slotsName} = {};`);
     for (let [key, value] of Object.entries(slots)) {
-      result += `${slotsName}["${key}"] = ($parent, $anchor, $sprops) => {\n`;
+      b.append(`${slotsName}["${key}"] = ($parent, $anchor, $sprops) => {`);
+      b.indent();
       for (let child of filterChildren(value)) {
-        result += buildNode(child, status, "$parent", "$anchor");
+        buildNode(child, status, "$parent", "$anchor");
       }
-      result += "};\n";
+      b.outdent();
+      b.append(`}`);
     }
   }
 
   // Call the component's render function
-  result += `${node.tagName}.render(${parentName}, ${anchorName}, ${componentHasProps ? propsName : "undefined"}, ${componentHasSlots ? slotsName : "undefined"}, $context);\n`;
-
-  return result;
+  b.append(
+    `${node.tagName}.render(${parentName}, ${anchorName}, ${componentHasProps ? propsName : "undefined"}, ${componentHasSlots ? slotsName : "undefined"}, $context)`,
+  );
 }
 
 function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
@@ -793,40 +802,35 @@ function buildElementNode(
   parentName: string,
   anchorName: string,
   root = false,
-): string {
+) {
   const varName = nextVarName(node.tagName, status);
 
-  let result = "";
-  result += `const ${varName} = document.createElement("${node.tagName}");\n`;
+  b.append(`const ${varName} = document.createElement("${node.tagName}");`);
   // PERF: Does this have much of an impact??
   if (root) {
-    result += `if ($props) {\n`;
-    result += `const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];\n`;
-    result += `t_apply_attributes(${varName}, $props, propNames);\n`;
-    result += `}\n`;
+    b.append(`if ($props) {`);
+    b.indent();
+    b.append(`const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];`);
+    b.append(`t_apply_attributes(${varName}, $props, propNames);`);
+    b.outdent();
+    b.append(`}`);
   }
-  result += buildElementAttributes(node, varName, status);
+  buildElementAttributes(node, varName, status);
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, varName, "null");
+    buildNode(child, status, varName, "null");
   }
-  result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
+  b.append(`${parentName}.insertBefore(${varName}, ${anchorName});`);
 
   // TODO: Do this for text nodes too
-  result += setScopedNodes(status, varName);
-
-  return result;
+  setScopedNodes(status, varName);
 }
 
-function buildElementAttributes(node: ElementNode, varName: string, status: BuildStatus): string {
-  let result = "";
-
+function buildElementAttributes(node: ElementNode, varName: string, status: BuildStatus) {
   for (let attribute of node.attributes) {
     let { name, value } = attribute;
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
-      result += `watchEffect(() => `;
-      result += `${varName}.setAttribute("${name}", ${name})`;
-      result += `);\n`;
+      b.append(`watchEffect(() => ${varName}.setAttribute("${name}", ${name}));`);
     } else {
       let generated = value.startsWith("{") && value.endsWith("}");
       if (generated) {
@@ -836,7 +840,7 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
       if (name.indexOf("on") === 0) {
         // Add an event listener
         const eventName = name.substring(2);
-        result += `${varName}.addEventListener("${eventName}", ${value});\n`;
+        b.append(`${varName}.addEventListener("${eventName}", ${value});`);
       } else if (name.indexOf("bind:") === 0) {
         // TODO: Don't love the bind: syntax -- $value? @value? :value?
         // Automatically add an event to bind the value
@@ -853,41 +857,40 @@ function buildElementAttributes(node: ElementNode, varName: string, status: Buil
         }
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
-        result += generated ? `watchEffect(() => ` : "";
-        result += `${varName}.setAttribute("${propName}", ${set})`;
-        result += generated ? `)` : "";
-        result += ";\n";
+        const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
+        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
         // TODO: Add a parseInput method that handles NaN etc
-        result += `${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});\n`;
+        b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
-        result += generated ? `watchEffect(() => {\n` : "";
-        result += `${varName}.classList.toggle("${propName}", ${value});\n`;
-        result += generated ? `});\n` : "";
+        const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
+        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
       } else if (name === "class") {
         // NOTE: Clear any previously set values from the element
         const classVarName = nextVarName("class_name", status);
-        result += generated ? `let ${classVarName} = ${value};\n` : "";
-        result += generated ? `watchEffect(() => {\n` : "";
-        result += generated
-          ? `if (${classVarName}) ${varName}.classList.remove(${classVarName});\n`
-          : "";
-        result += generated ? `if (${value}) {\n` : "";
-        result += `${varName}.classList.add(...${value}.split(" "));\n`;
-        result += generated ? `${classVarName} = ${value};\n` : "";
-        result += generated ? `}\n` : "";
-        result += generated ? `});\n` : "";
+        if (generated) {
+          b.append(`let ${classVarName} = ${value};`);
+          b.append(`watchEffect(() => {`);
+          b.indent();
+          b.append(`if (${classVarName}) ${varName}.classList.remove(${classVarName});`);
+          b.append(`if (${value}) {`);
+          b.indent();
+        }
+        b.append(`${varName}.classList.add(...${value}.split(" "));`);
+        if (generated) {
+          b.append(`${classVarName} = ${value};`);
+          b.outdent();
+          b.append(`}`);
+          b.outdent();
+          b.append(`});`);
+        }
       } else {
         // Set the attribute value
-        result += generated ? `watchEffect(() => ` : "";
-        result += `${varName}.setAttribute("${name}", ${value})`;
-        result += generated ? `)` : "";
-        result += ";\n";
+        const setAttribute = `${varName}.setAttribute("${name}", ${value})`;
+        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
       }
     }
   }
-
-  return result;
 }
 
 function buildTextNode(
@@ -895,9 +898,7 @@ function buildTextNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
-  let result = "";
-
+) {
   let content = node.content || "";
   // Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
   content = content.replace(/\s+/g, " ");
@@ -928,16 +929,14 @@ function buildTextNode(
   }
 
   const varName = nextVarName("text", status);
-  result += `const ${varName} = document.createTextNode(${generated ? '""' : content});\n`;
-  result += `${parentName}.insertBefore(${varName}, ${anchorName});\n`;
+  b.append(`const ${varName} = document.createTextNode(${generated ? '""' : content});`);
+  b.append(`${parentName}.insertBefore(${varName}, ${anchorName});`);
 
   if (generated) {
-    result += `watchEffect(() => ${varName}.textContent = ${content});\n`;
+    b.append(`watchEffect(() => ${varName}.textContent = ${content});`);
   }
 
   //result += setScopedNodes(status, varName);
-
-  return result;
 }
 
 function buildSpecialNode(
@@ -945,10 +944,10 @@ function buildSpecialNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   switch (node.tagName) {
     case ":slot": {
-      return buildSlotNode(node, status, parentName, anchorName);
+      buildSlotNode(node, status, parentName, anchorName);
     }
   }
   return "";
@@ -959,7 +958,7 @@ function buildSlotNode(
   status: BuildStatus,
   parentName: string,
   anchorName: string,
-): string {
+) {
   // If there's a slot, build that, otherwise build the default nodes
   let slotName = node.attributes.find((a) => a.name === "name")?.value;
   if (slotName) {
@@ -968,42 +967,41 @@ function buildSlotNode(
     slotName = "_";
   }
 
-  let result = "";
-
   // Slot props
   const propsName = nextVarName("sprops", status);
   const slotAttributes = node.attributes.filter((a) => a.name !== "name");
   const slotHasProps = slotAttributes.length;
   if (slotHasProps) {
     // TODO: defaults etc props
-    result += `const ${propsName} = watch({});\n`;
+    b.append(`const ${propsName} = watch({});`);
     for (let { name, value } of slotAttributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        result += `watchEffect(() => `;
-        result += `${propsName}["${name}"] = ${name}`;
-        result += `);\n`;
+        b.append(`watchEffect(() => ${propsName}["${name}"] = ${name});`);
       } else {
         let generated = value.startsWith("{") && value.endsWith("}");
         if (generated) {
           value = value.substring(1, value.length - 1);
         }
-        result += generated ? `watchEffect(() => ` : "";
-        result += `${propsName}["${name}"] = ${value}`;
-        result += generated ? `)` : "";
-        result += ";\n";
+        const setProp = `${propsName}["${name}"] = ${value}`;
+        b.append(generated ? `watchEffect(() => ${setProp});` : `${setProp};`);
       }
     }
   }
 
-  result += `if ($slots && $slots["${slotName}"]) {\n`;
-  result += `$slots["${slotName}"](${parentName}, ${anchorName}, ${slotHasProps ? propsName : "undefined"});\n`;
-  result += "} else {\n";
+  b.append(`if ($slots && $slots["${slotName}"]) {`);
+  b.indent();
+  b.append(
+    `$slots["${slotName}"](${parentName}, ${anchorName}, ${slotHasProps ? propsName : "undefined"})`,
+  );
+  b.outdent();
+  b.append(`} else {`);
+  b.indent();
   for (let child of filterChildren(node)) {
-    result += buildNode(child, status, parentName, anchorName);
+    buildNode(child, status, parentName, anchorName);
   }
-  result += "}\n";
-  return result;
+  b.outdent();
+  b.append(`}`);
 }
 
 function* filterChildren(node: ElementNode | ControlNode | Node[]) {
@@ -1124,41 +1122,32 @@ function unscopeNodeNames(status: BuildStatus, copy: StartNodeInfo[]) {
 }
 
 function setScopedNodes(status: BuildStatus, varName: string) {
-  let result = "";
-
   for (let startNodeName of status.startNodeNames) {
     if (startNodeName.status === "unset") {
-      result += `if (!${startNodeName.name}) {\n`;
-      result += `${startNodeName.name} = ${varName};\n`;
-      result += `}\n`;
+      b.append(`if (!${startNodeName.name}) ${startNodeName.name} = ${varName};`);
       startNodeName.status = "set";
     } else if (startNodeName.status === "scoped") {
-      result += `${startNodeName.name} = ${varName};\n`;
-      //result += `console.log("setting", "${startNodeName.name}", JSON.stringify(${startNodeName.name}, null, 2), "${varName}", ${varName});\n`;
+      b.append(`${startNodeName.name} = ${varName};`);
       startNodeName.status = "scopedset";
     }
   }
 
   status.lastNodeName = varName;
-
-  return result;
 }
 
 function buildStyles(name: string, parts: ComponentParts): string {
-  let result = "";
+  b = new Builder();
 
   for (let block of parts.style!.blocks) {
-    result += buildStyleBlock(block, parts.styleHash!);
+    buildStyleBlock(block, parts.styleHash!);
   }
 
-  return result;
+  return b.result;
 }
 
 const globalStyleRegex = /\:global\((.+)\)/;
 
-function buildStyleBlock(block: StyleBlock, styleHash: string): string {
-  let result = "";
-
+function buildStyleBlock(block: StyleBlock, styleHash: string) {
   // TODO: This should probably be done while parsing
   // And handle attribute selectors
   const selectors = block.selector
@@ -1174,16 +1163,14 @@ function buildStyleBlock(block: StyleBlock, styleHash: string): string {
       }
     });
 
-  result += `${selectors.join(" ")} {\n`;
+  b.append(`${selectors.join(" ")} {`);
   for (let attribute of block.attributes) {
-    result += buildStyleAttribute(attribute);
+    buildStyleAttribute(attribute);
   }
   for (let child of block.children) {
-    result += buildStyleBlock(child, styleHash);
+    buildStyleBlock(child, styleHash);
   }
-  result += "}\n";
-
-  return result;
+  b.append(`}`);
 }
 
 function buildStyleAttribute(attribute: Attribute): string {
