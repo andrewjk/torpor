@@ -5,13 +5,7 @@ import ParseResult from "../../src/types/ParseResult";
 // TODO: Preserve space
 
 test("basic file", () => {
-  const input = `
-<script />
-
-<template />
-
-<style />
-`;
+  const input = `<script/><div/><style/>`;
   const output = parse(input);
   const expected: ParseResult = {
     ok: true,
@@ -19,7 +13,7 @@ test("basic file", () => {
     parts: {
       template: {
         type: "element",
-        tagName: "template",
+        tagName: "div",
         selfClosed: true,
         attributes: [],
         children: [],

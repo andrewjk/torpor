@@ -50,6 +50,14 @@ function buildCode(name: string, parts: ComponentParts): string {
   if (parts.imports) {
     b.append(parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n"));
   }
+  if (parts.childComponents) {
+    for (let child of parts.childComponents) {
+      if (child.imports) {
+        // TODO: De-duplication
+        b.append(child.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n"));
+      }
+    }
+  }
   b.gap();
 
   // HACK: Move into utils
@@ -57,6 +65,19 @@ function buildCode(name: string, parts: ComponentParts): string {
   //b.add(`function t_doc(node) { return node.ownerDocument }`);
   b.gap();
 
+  buildTemplate(name, parts);
+  if (parts.childComponents) {
+    for (let child of parts.childComponents) {
+      buildTemplate(child.name || "ChildComponent", child);
+    }
+  }
+
+  b.append(`export default ${name};`);
+
+  return b.result;
+}
+
+function buildTemplate(name: string, parts: ComponentParts) {
   b.append(`const ${name} = {`);
   b.indent();
   b.append(`name: "${name}",`);
@@ -111,9 +132,6 @@ function buildCode(name: string, parts: ComponentParts): string {
   b.outdent();
   b.append(`}`);
   b.gap();
-  b.append(`export default ${name};`);
-
-  return b.result;
 }
 
 function buildNode(

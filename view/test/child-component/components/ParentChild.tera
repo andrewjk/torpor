@@ -1,0 +1,7 @@
+<div>
+    <Child name="Anna" />
+</div>
+
+<template name="Child">
+    <h2>Hello, {$props.name}</h2>
+</template>

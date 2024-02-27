@@ -1,4 +1,5 @@
 import CompileError from "../types/CompileError";
+import ComponentParts from "../types/ComponentParts";
 import Import from "../types/Import";
 import ParseResult from "../types/ParseResult";
 import Documentation from "../types/docs/Documentation";
@@ -21,6 +22,7 @@ interface ParseStatus {
   docs?: Documentation;
   script?: string;
   template?: ElementNode;
+  childTemplates?: ComponentParts[];
   style?: Style;
   styleHash?: string;
   imports?: Import[];
@@ -101,6 +103,7 @@ export default function parse(source: string): ParseResult {
           imports: status.imports,
           script: status.script,
           template: status.template,
+          childComponents: status.childTemplates,
           style: status.style,
           styleHash: status.styleHash,
           props: props.length ? props : undefined,
@@ -132,6 +135,9 @@ function parseSource(status: ParseStatus, source: string) {
       } else {
         parseTopElement(status);
       }
+      // HACK: Go back 1 char so it can be incremented by the loop
+      // TODO: Really need to fix loops
+      status.i -= 1;
     } else if (accept("/**", status)) {
       status.i -= 1;
       status.docs = parseDocs(status);
@@ -142,10 +148,11 @@ function parseSource(status: ParseStatus, source: string) {
 function parseTopElement(status: ParseStatus) {
   const start = status.i;
   const element = parseTagOpen(status);
+  console.log(element.tagName);
   switch (element.tagName) {
     case "script": {
       if (!element.selfClosed) {
-        status.script = parseScriptElement(status);
+        status.script = extractElementText("script", status);
         extractScriptImports(status);
       }
       break;
@@ -153,6 +160,17 @@ function parseTopElement(status: ParseStatus) {
     case "style": {
       if (!element.selfClosed) {
         status.style = parseStyleElement(status);
+      }
+      break;
+    }
+    case "template": {
+      if (!element.selfClosed) {
+        const source = extractElementText("template", status);
+        const childName = trimAny(
+          element.attributes.find((a) => a.name === "name")?.value || "ChildComponent",
+          `'"`,
+        );
+        parseChildTemplate(childName, source, status);
       }
       break;
     }
@@ -173,7 +191,10 @@ function parseElement(status: ParseStatus): ElementNode {
   const element = parseTagOpen(status);
 
   // TODO: this check could also go in build?
-  if (status.imports?.find((i) => i.component && i.name === element.tagName)) {
+  if (
+    status.imports?.find((i) => i.component && i.name === element.tagName) ||
+    status.childTemplates?.find((c) => c.name === element.tagName)
+  ) {
     element.type = "component";
   }
 
@@ -539,15 +560,19 @@ function addSpaceElement(parent: ElementNode | ControlNode, status: ParseStatus)
   }
 }
 
-function parseScriptElement(status: ParseStatus): string {
+function extractElementText(tagName: string, status: ParseStatus): string {
   const start = status.i;
+  const closeTag = `</${tagName}>`;
   for (status.i; status.i < status.source.length; status.i++) {
     const char = status.source[status.i];
-    if (char === "<" && status.source.substring(status.i, status.i + 9) === "</script>") {
+    if (
+      char === "<" &&
+      status.source.substring(status.i, status.i + closeTag.length) === closeTag
+    ) {
       // Return on </script>
-      const script = status.source.substring(start, status.i).trim();
-      status.i += 9;
-      return script;
+      const result = status.source.substring(start, status.i).trim();
+      status.i += closeTag.length - 1;
+      return result;
     } else if (char === '"' || char === "'" || char === "`") {
       // Ignore the content of strings
       status.i += 1;
@@ -577,7 +602,7 @@ function parseScriptElement(status: ParseStatus): string {
       }
     }
   }
-  addError(status, "Unclosed script element", start);
+  addError(status, `Unclosed ${tagName} element`, start);
   return "";
 }
 
@@ -613,6 +638,31 @@ function extractScriptImports(status: ParseStatus) {
     }
     if (status.imports) {
       status.script = status.script.substring(start).trim();
+    }
+  }
+}
+
+function parseChildTemplate(name: string, source: string, status: ParseStatus) {
+  const parsed = parse(source);
+  if (parsed.ok && parsed.parts) {
+    parsed.parts.name = name;
+    status.childTemplates = status.childTemplates || [];
+    status.childTemplates.push(parsed.parts);
+    if (status.template) {
+      setChildComponentNodes(name, status.template);
+    }
+  } else {
+    status.errors = status.errors.concat(parsed.errors);
+  }
+}
+
+function setChildComponentNodes(name: string, node: Node) {
+  if (node.type === "element" && (node as ElementNode).tagName === name) {
+    node.type = "component";
+  }
+  if (node.type === "element" || node.type == "control") {
+    for (let child of (node as ElementNode).children) {
+      setChildComponentNodes(name, child);
     }
   }
 }
