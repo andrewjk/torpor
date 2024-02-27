@@ -114,6 +114,8 @@ function parseSource(status: ParseStatus, source: string) {
   // HACK: The laziest way to handle elses etc:
   status.source = status.source
     .replace(/}(\s*)else/g, "}$1@else")
+    .replace(/(\{|\})(\s*)case/g, "$1$2@case")
+    .replace(/(\{|\})(\s*)default/g, "$1$2@default")
     .replace(/}(\s*)then/g, "}$1@then")
     .replace(/}(\s*)catch/g, "}$1@catch");
 
