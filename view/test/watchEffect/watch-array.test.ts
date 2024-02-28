@@ -1,15 +1,15 @@
 import { expect, test } from "vitest";
-import watch from "../../src/watch/watch";
-import watchEffect from "../../src/watch/watchEffect";
+import $run from "../../src/watch/$run";
+import $watch from "../../src/watch/$watch";
 
 test("watching an array effect", () => {
-  const items = watch(["h", "i"]);
+  const items = $watch(["h", "i"]);
   let word = "";
   let lastitem = "";
-  watchEffect(() => {
+  $run(() => {
     word = items.join("");
   });
-  watchEffect(() => {
+  $run(() => {
     lastitem = items[items.length - 1];
   });
   expect(word).toBe("hi");

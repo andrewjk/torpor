@@ -1,7 +1,7 @@
+import $run from "./$run";
+import $watch from "./$watch";
 import stream from "./stream";
-import watch from "./watch";
-import watchEffect from "./watchEffect";
 
 // TODO: Do we need this?
 
-export { watch, watchEffect, stream };
+export { $watch, $run, stream };

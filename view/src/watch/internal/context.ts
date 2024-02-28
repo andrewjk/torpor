@@ -36,7 +36,7 @@ interface Context {
   /**
    * A map of objects, their properties, and the object/property effects.
    *
-   * When a property of a proxied object (created via the watch function) is changed, we look up
+   * When a property of a proxied object (created via the $watch function) is changed, we look up
    * the object, then the property, and run any effects that are found.
    */
   effectSubs: ObjectEffectsMap;

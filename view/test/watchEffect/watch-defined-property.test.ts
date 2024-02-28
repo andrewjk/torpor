@@ -1,9 +1,9 @@
 import { expect, test } from "vitest";
-import watch from "../../src/watch/watch";
-import watchEffect from "../../src/watch/watchEffect";
+import $run from "../../src/watch/$run";
+import $watch from "../../src/watch/$watch";
 
 test("watching a defined property effect", () => {
-  let person = watch({
+  let person = $watch({
     firstName: "Andrew",
     lastName: "Smith",
   });
@@ -15,7 +15,7 @@ test("watching a defined property effect", () => {
   });
 
   let greeting = "";
-  const effect = watchEffect(() => {
+  const effect = $run(() => {
     // @ts-ignore TODO
     greeting = `Hi, ${person.fullName}!`;
   });

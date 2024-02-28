@@ -2,11 +2,11 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import render from "../../src/render/render";
-import watch from "../../src/watch/watch";
+import $watch from "../../src/watch/$watch";
 import Component from "./components/Switch.tera";
 
 test("switch values", () => {
-  const state = watch({ value: 1 });
+  const state = $watch({ value: 1 });
 
   const container = document.createElement("div");
   document.body.appendChild(container);

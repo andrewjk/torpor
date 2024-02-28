@@ -1,9 +1,9 @@
 import { expect, test } from "vitest";
-import watch from "../../src/watch/watch";
-import watchEffect from "../../src/watch/watchEffect";
+import $run from "../../src/watch/$run";
+import $watch from "../../src/watch/$watch";
 
 test("watching a function effect", () => {
-  const person = watch({
+  const person = $watch({
     firstName: "Andrew",
     lastName: "Smith",
     fullName: function () {
@@ -11,7 +11,7 @@ test("watching a function effect", () => {
     },
   });
   let greeting = "";
-  const effect = watchEffect(() => {
+  const effect = $run(() => {
     greeting = `Hi, ${person.fullName()}!`;
   });
   expect(greeting).toBe("Hi, Andrew Smith!");

@@ -3,9 +3,9 @@ import parse from "./compile/parse";
 // HACK: Shouldn't need to export this?
 import reconcileList from "./render/internal/reconcileList";
 import render from "./render/render";
-import watch from "./watch/watch";
-import watchEffect from "./watch/watchEffect";
+import $run from "./watch/$run";
+import $watch from "./watch/$watch";
 
 // TODO: Do we need this?
 
-export { parse, build, render, reconcileList, watch, watchEffect };
+export { parse, build, render, reconcileList, $watch, $run };

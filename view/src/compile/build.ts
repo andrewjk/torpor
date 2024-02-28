@@ -36,15 +36,15 @@ function buildCode(name: string, parts: ComponentParts): string {
   const b = new Builder();
 
   const folder = "../../../../../tera/view/src";
-  b.append(`import watch from '${folder}/watch/watch';`);
-  b.append(`import watchEffect from '${folder}/watch/watchEffect';`);
+  b.append(`import $watch from '${folder}/watch/$watch';`);
+  b.append(`import $run from '${folder}/watch/$run';`);
   b.append(`import t_clear_range from '${folder}/render/internal/clearRange';`);
   b.append(`import t_reconcile_list from '${folder}/render/internal/reconcileList';`);
   b.append(`import t_apply_attributes from '${folder}/render/internal/applyAttributes';`);
   b.append(`import t_context from '${folder}/watch/internal/context';`);
   b.append(`import t_set_active_range from '${folder}/watch/internal/setActiveRange';`);
   //result +=
-  //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, watch, watchEffect } from '../../../../tera/view/dist/index.js';\n";
+  //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, $watch, $run } from '../../../../tera/view/dist/index.js';\n";
   if (parts.imports) {
     b.append(parts.imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n"));
   }
@@ -248,7 +248,7 @@ function buildIfNode(
   b.append(`const ${oldRangeName} = t_context.activeRange;`);
   b.append(`t_set_active_range(${ifRangeName});`);
   b.gap();
-  b.append(`watchEffect(() => {`);
+  b.append(`$run(() => {`);
   b.indent();
   b.append(`t_context.activeRange = ${ifRangeName};`);
 
@@ -344,7 +344,7 @@ function buildSwitchNode(
   b.append(`const ${oldRangeName} = t_context.activeRange;`);
   b.append(`t_set_active_range(${switchRangeName});`);
   b.gap();
-  b.append(`watchEffect(() => {`);
+  b.append(`$run(() => {`);
   b.indent();
   b.append(`t_context.activeRange = ${switchRangeName};`);
   b.append(`${node.statement} {`);
@@ -475,7 +475,7 @@ function buildForNode(
   b.append(`const ${oldRangeName} = t_context.activeRange;`);
   b.append(`t_set_active_range(${forRangeName});`);
   b.gap();
-  b.append(`watchEffect(() => {`);
+  b.append(`$run(() => {`);
   b.indent();
   b.append(`t_context.activeRange = ${forRangeName};`);
   b.append(`let t_for_items = [];`);
@@ -605,7 +605,7 @@ function buildAwaitNode(
   b.append(`const ${oldRangeName} = t_context.activeRange;`);
   b.append(`t_set_active_range(${awaitRangeName});`);
   b.gap();
-  b.append(`watchEffect(() => {`);
+  b.append(`$run(() => {`);
   b.indent();
   b.append(`${awaitTokenName}++;`);
   b.append(`t_context.activeRange = ${awaitRangeName};`);
@@ -726,11 +726,11 @@ function buildComponentNode(
   const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
   if (componentHasProps) {
     // TODO: defaults etc props
-    b.append(`const ${propsName} = watch({});`);
+    b.append(`const ${propsName} = $watch({});`);
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        b.append(`watchEffect(() => ${propsName}["${name}"] = ${name});`);
+        b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
       } else {
         let generated = value.startsWith("{") && value.endsWith("}");
         if (generated) {
@@ -742,7 +742,7 @@ function buildComponentNode(
           value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
         }
         const setProp = `${propsName}["${name}"] = ${value || "true"}`;
-        b.append(generated ? `watchEffect(() => ${setProp});` : `${setProp};`);
+        b.append(generated ? `$run(() => ${setProp});` : `${setProp};`);
       }
     }
     // PERF: Does this have much of an impact??
@@ -754,7 +754,7 @@ function buildComponentNode(
       b.indent();
       b.append(`if (!name.startsWith("$") && !propNames.includes(name)) {`);
       b.indent();
-      b.append(`watchEffect(() => ${propsName}[name] = $props[name]);`);
+      b.append(`$run(() => ${propsName}[name] = $props[name]);`);
       b.outdent();
       b.append(`}`);
       b.outdent();
@@ -882,7 +882,7 @@ function buildElementAttributes(
     let { name, value } = attribute;
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
-      b.append(`watchEffect(() => ${varName}.setAttribute("${name}", ${name}));`);
+      b.append(`$run(() => ${varName}.setAttribute("${name}", ${name}));`);
     } else {
       let generated = value.startsWith("{") && value.endsWith("}");
       if (generated) {
@@ -910,19 +910,19 @@ function buildElementAttributes(
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
         const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
-        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
         // TODO: Add a parseInput method that handles NaN etc
         b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
         const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
-        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
       } else if (name === "class") {
         // NOTE: Clear any previously set values from the element
         const classVarName = nextVarName("class_name", status);
         if (generated) {
           b.append(`let ${classVarName} = ${value};`);
-          b.append(`watchEffect(() => {`);
+          b.append(`$run(() => {`);
           b.indent();
           b.append(`if (${classVarName}) ${varName}.classList.remove(${classVarName});`);
           b.append(`if (${value}) {`);
@@ -939,7 +939,7 @@ function buildElementAttributes(
       } else {
         // Set the attribute value
         const setAttribute = `${varName}.setAttribute("${name}", ${value})`;
-        b.append(generated ? `watchEffect(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
       }
     }
   }
@@ -986,7 +986,7 @@ function buildTextNode(
   b.append(`${parentName}.insertBefore(${varName}, ${anchorName});`);
 
   if (generated) {
-    b.append(`watchEffect(() => ${varName}.textContent = ${content});`);
+    b.append(`$run(() => ${varName}.textContent = ${content});`);
   }
 
   //result += setScopedNodes(status, varName);
@@ -1028,18 +1028,18 @@ function buildSlotNode(
   const slotHasProps = slotAttributes.length;
   if (slotHasProps) {
     // TODO: defaults etc props
-    b.append(`const ${propsName} = watch({});`);
+    b.append(`const ${propsName} = $watch({});`);
     for (let { name, value } of slotAttributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        b.append(`watchEffect(() => ${propsName}["${name}"] = ${name});`);
+        b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
       } else {
         let generated = value.startsWith("{") && value.endsWith("}");
         if (generated) {
           value = value.substring(1, value.length - 1);
         }
         const setProp = `${propsName}["${name}"] = ${value}`;
-        b.append(generated ? `watchEffect(() => ${setProp});` : `${setProp};`);
+        b.append(generated ? `$run(() => ${setProp});` : `${setProp};`);
       }
     }
   }

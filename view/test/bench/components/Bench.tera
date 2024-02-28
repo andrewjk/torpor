@@ -1,6 +1,6 @@
 <script>
     let rowId = 1;
-    let $state = watch({
+    let $state = $watch({
         data: [],
         selected: null,
     });
@@ -101,7 +101,7 @@
     function buildData(count = 1000) {
         const data = new Array(count);
         for (let i = 0; i < count; i++) {
-            data[i] = watch(new Item());
+            data[i] = $watch(new Item());
         }
         return data;
     }

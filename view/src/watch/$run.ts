@@ -1,6 +1,6 @@
 import context from "./internal/context";
 
-export default function watchEffect(effect: () => (() => void) | undefined) {
+export default function $run(effect: () => (() => void) | undefined) {
   context.activeEffect = effect;
   context.activeEffectSubbed = false;
 

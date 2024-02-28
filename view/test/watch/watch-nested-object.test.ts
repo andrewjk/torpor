@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import watch from "../../src/watch/watch";
+import $watch from "../../src/watch/$watch";
 
 test("watching a nested object", () => {
   const input = {
@@ -7,7 +7,7 @@ test("watching a nested object", () => {
       name: "Andrew",
     },
   };
-  const output = watch(input);
+  const output = $watch(input);
   // @ts-ignore $isProxy is hidden
   expect(output.$isProxy).toBe(true);
   // @ts-ignore $isProxy is hidden

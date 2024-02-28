@@ -1,4 +1,4 @@
-import watch from "../watch";
+import $watch from "../$watch";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";
 import updateEffects from "./updateEffects";
@@ -18,8 +18,8 @@ const arrayHandler = {
     // TODO: Do we need to check if it's a Promise?
     const value = target[prop];
     if (value && !value.$isProxy && typeof value === "object") {
-      //Reflect.set(target, prop, watch(value), receiver);
-      target[prop] = watch(value);
+      //Reflect.set(target, prop, $watch(value), receiver);
+      target[prop] = $watch(value);
     }
 
     // From https://stackoverflow.com/a/54136394
@@ -71,10 +71,10 @@ const arrayHandler = {
 
     // Only do things if the value has changed
     if (value !== oldValue) {
-      // If the value was previously a proxy, watch the new value and update effect subscriptions
+      // If the value was previously a proxy, $watch the new value and update effect subscriptions
       let newValue = value;
       if (oldValue && oldValue.$isProxy) {
-        newValue = watch(value);
+        newValue = $watch(value);
         updateEffects(oldValue, value);
       }
 

@@ -1,15 +1,15 @@
 import { expect, test } from "vitest";
-import watch from "../../src/watch/watch";
-import watchEffect from "../../src/watch/watchEffect";
+import $run from "../../src/watch/$run";
+import $watch from "../../src/watch/$watch";
 
 test("setting the same value doesn't call effect again", () => {
-  const person = watch({
+  const person = $watch({
     firstName: "Andrew",
     lastName: "Smith",
   });
   let fullName = "";
   let counter = 0;
-  const effect = watchEffect(() => {
+  const effect = $run(() => {
     fullName = `${person.firstName} ${person.lastName}`;
     counter++;
   });

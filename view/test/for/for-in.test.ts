@@ -2,11 +2,11 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import render from "../../src/render/render";
-import watch from "../../src/watch/watch";
+import $watch from "../../src/watch/$watch";
 import Component from "./components/ForIn.tera";
 
 test("for in", () => {
-  const state = watch({
+  const state = $watch({
     item: {
       first: "1",
       second: "2",

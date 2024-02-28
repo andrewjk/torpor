@@ -1,5 +1,5 @@
 <script>
-    let $state = watch({ name: "Alice" });
+    let $state = $watch({ name: "Alice" });
 </script>
 
 <div>

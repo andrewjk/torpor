@@ -3,13 +3,13 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import render from "../../src/render/render";
+import $watch from "../../src/watch/$watch";
 import context from "../../src/watch/internal/context";
 import printContext from "../../src/watch/internal/printContext";
-import watch from "../../src/watch/watch";
 import Component from "./components/If.tera";
 
 test("if effect", async () => {
-  const state = watch({ counter: 0 });
+  const state = $watch({ counter: 0 });
 
   const container = document.createElement("div");
   document.body.appendChild(container);
