@@ -20,6 +20,6 @@ test("if effect", async () => {
   // 1 state object
   expect(context.effectSubscriptions.size).toBe(1);
 
-  // 1 component, 1 if node, 1 branch node
-  expect(context.rangeEffects.size).toBe(3);
+  // 1 if node, 1 branch node
+  expect(context.rangeEffects.size).toBe(2);
 });

@@ -9,13 +9,9 @@ export default function clearRange(range: Range) {
     return;
   }
   range.endNode = range.endNode || range.startNode;
-
   //console.log("clearing", range.startNode.textContent, "to", range.endNode.textContent, range);
+
   const parent = range.startNode.parentNode!;
-  //console.log("parent", parent?.textContent || "undefined");
-  //if (!parent) {
-  //  return;
-  //}
   let currentNode = range.startNode;
   while (currentNode !== range.endNode) {
     let nextNode = currentNode!.nextSibling;

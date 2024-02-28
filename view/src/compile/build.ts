@@ -15,6 +15,7 @@ interface BuildStatus {
   varNames: Record<string, number>;
   startNodeNames: StartNodeInfo[];
   lastNodeName: string;
+  isFirstElement: boolean;
 }
 
 interface StartNodeInfo {
@@ -93,14 +94,6 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
     b.append(`$context = Object.assign({}, $context);`);
   }
 
-  // Build an anchor here, so that effects set in the script can be cleaned up if/when the
-  // component is removed
-  b.append(`const t_component_anchor = document.createComment("@comp");`);
-  b.append(`$parent.insertBefore(t_component_anchor, $anchor);`);
-  b.append(`const t_original_active_range = t_context.activeRange;`);
-  b.append(`t_set_active_range({ title: "@comp ${name}" });`);
-  b.gap();
-
   if (parts.script) {
     // TODO: Mangling
     b.append("// USER SCRIPT");
@@ -118,12 +111,12 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       varNames: {},
       startNodeNames: [],
       lastNodeName: "",
+      isFirstElement: true,
     };
     b.append("// USER INTERFACE");
     buildNode(parts.template, status, b, "$parent", "$anchor", true);
   }
 
-  b.append(`t_context.activeRange = t_original_active_range;`);
   b.outdent();
   b.append(`}`);
   b.outdent();
@@ -729,8 +722,8 @@ function buildComponentNode(
   root = false,
 ) {
   // Props
-  const propsName = nextVarName("props", status);
   const componentHasProps = node.attributes.length || root;
+  const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
   if (componentHasProps) {
     // TODO: defaults etc props
     b.append(`const ${propsName} = watch({});`);
@@ -772,8 +765,8 @@ function buildComponentNode(
   }
 
   // Slots
-  const slotsName = nextVarName("slots", status);
   const componentHasSlots = node.children.length;
+  const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
   if (componentHasSlots) {
     const slots = gatherSlotNodes(node);
     b.append(`const ${slotsName} = {};`);
@@ -788,10 +781,23 @@ function buildComponentNode(
     }
   }
 
+  // Build an anchor here, so that effects set in the script can be cleaned up if/when the
+  // component is removed
+  // And also so that we have an end node for the active range, if needed
+  const componentAnchorName = nextVarName("component_anchor", status);
+  b.append(`const ${componentAnchorName} = document.createComment("@comp ${node.tagName}");`);
+  b.append(`${parentName}.insertBefore(${componentAnchorName}, ${anchorName});`);
+  b.gap();
+
   // Call the component's render function
   b.append(
-    `${node.tagName}.render(${parentName}, ${anchorName}, ${componentHasProps ? propsName : "undefined"}, ${componentHasSlots ? slotsName : "undefined"}, $context)`,
+    `${node.tagName}.render(${parentName}, ${componentAnchorName}, ${propsName}, ${slotsName}, $context)`,
   );
+
+  // NOTE: this will have been set in the component's render function to the first element node
+  setScopedNodes(status, b, "t_context.activeRange.startNode");
+
+  status.lastNodeName = componentAnchorName;
 }
 
 function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
@@ -855,6 +861,15 @@ function buildElementNode(
 
   // TODO: Do this for text nodes too
   setScopedNodes(status, b, varName);
+
+  // HACK: Can we do this through scoped nodes somehow?
+  // If this element is the first one being added for a component, set the active range's start node
+  if (status.isFirstElement) {
+    b.append(
+      `if (t_context.activeRange && !t_context.activeRange.startNode) t_context.activeRange.startNode = ${varName};`,
+    );
+    status.isFirstElement = false;
+  }
 }
 
 function buildElementAttributes(
@@ -1136,7 +1151,7 @@ function nextVarName(name: string, status: BuildStatus): string {
 }
 
 function scopeNodeNames(status: BuildStatus) {
-  // Set all start node names that haven't been set yet to branch
+  // Set all start node names that haven't been set yet to scoped
   // They will get set in the current scope, and the next scope(s), and maybe outside the scopes
   const copy = status.startNodeNames.map((n) => ({ name: n.name, status: n.status }));
   status.startNodeNames.forEach((n) => {
@@ -1148,7 +1163,7 @@ function scopeNodeNames(status: BuildStatus) {
 }
 
 function unscopeNodeNames(status: BuildStatus, copy: StartNodeInfo[]) {
-  // Set all start node names that have been branch back to unset so they can get set in the next
+  // Set all start node names that have been scoped back to unset so they can get set in the next
   // scope(s), and maybe outside the scopes
   //status.startNodeNames.forEach((n) => {
   //  if (n.status === "scoped") {
