@@ -591,9 +591,9 @@ function buildAwaitNode(
     };
   }
 
-  const awaiterName = trimMatched(awaitBranch.statement.substring("await".length), "(", ")");
-  const thenVar = trimMatched(thenBranch.statement.substring("then".length), "(", ")");
-  const catchVar = trimMatched(catchBranch.statement.substring("catch".length), "(", ")");
+  const awaiterName = trimMatched(awaitBranch.statement.substring("await".length).trim(), "(", ")");
+  const thenVar = trimMatched(thenBranch.statement.substring("then".length).trim(), "(", ")");
+  const catchVar = trimMatched(catchBranch.statement.substring("catch".length).trim(), "(", ")");
 
   b.gap();
   b.append(`// AWAIT`);
