@@ -7,11 +7,13 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
   // If there's an active effect, register this target/prop with it,
   // so that it will be called when this prop is set
   if (context.activeEffect) {
+    context.activeEffectSubbed = true;
+
     // Get the properties with effect subscriptions for the target object
-    let propSubscriptions = context.effectSubscriptions.get(target);
+    let propSubscriptions = context.effectSubs.get(target);
     if (!propSubscriptions) {
       propSubscriptions = new Map();
-      context.effectSubscriptions.set(target, propSubscriptions);
+      context.effectSubs.set(target, propSubscriptions);
     }
 
     // Get the effect subscriptions for the supplied property
@@ -21,6 +23,7 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
       propSubscriptions.set(prop, subscriptions);
     }
 
+    // TODO: Do we need to be checking duplicates?
     if (!subscriptions.has(context.activeEffect)) {
       subscriptions.add(context.activeEffect);
     }
@@ -28,7 +31,7 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
     // If there's an active DOM range, register the active effect with it,
     // so that it will be cleaned up when the range is removed
     if (context.activeRange) {
-      let rangeEffects = context.rangeEffects.get(context.activeRange);
+      let rangeEffects = context.rangeEffectSubs.get(context.activeRange);
       const subscriptionPointer = {
         target,
         prop,
@@ -36,7 +39,7 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
       };
       if (!rangeEffects) {
         rangeEffects = new Set();
-        context.rangeEffects.set(context.activeRange, rangeEffects);
+        context.rangeEffectSubs.set(context.activeRange, rangeEffects);
       }
       rangeEffects.add(subscriptionPointer);
     }

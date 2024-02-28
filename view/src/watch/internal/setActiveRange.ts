@@ -11,10 +11,6 @@ export default function setActiveRange(range: Range) {
     range.parent = parentRange;
   }
 
-  // Add the new range to the list of ranges in the context, so that we can
-  // get it when it's time to be deleted
-  context.rangeEffects.set(range, new Set());
-
   // Set the new active range
   context.activeRange = range;
 }
