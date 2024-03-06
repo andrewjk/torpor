@@ -3,21 +3,41 @@ export default class Builder {
   #space = 0;
 
   append(text: string) {
-    this.#text += " ".repeat(this.#space * 2);
-    this.#text += text;
+    let i = text.startsWith("\n") ? 1 : 0;
+    while (i < text.length) {
+      // Skip spaces
+      while (text[i] === " " || text[i] === "\t") {
+        i++;
+      }
+      if (text[i] === ";") {
+        // HACK: we just set ; to ignore the line
+        i++;
+      } else if (text[i] === "\n") {
+        this.#text += "\n";
+      } else {
+        // Maybe outdent
+        if (text[i] === "}" || text[i] === ")") {
+          this.#space -= 1;
+        }
+
+        // Add indentation
+        this.#text += " ".repeat(this.#space * 2);
+
+        // Add from text until the next newline or the end of text
+        const start = i;
+        while (i < text.length && text[i] !== "\n") {
+          i++;
+        }
+        this.#text += text.substring(start, i + 1);
+
+        // Maybe indent
+        if (text[i - 1] === "{" || text[i - 1] === "(") {
+          this.#space += 1;
+        }
+      }
+      i++;
+    }
     this.#text += "\n";
-  }
-
-  gap() {
-    this.#text += "\n";
-  }
-
-  indent() {
-    this.#space += 1;
-  }
-
-  outdent() {
-    this.#space -= 1;
   }
 
   toString() {
