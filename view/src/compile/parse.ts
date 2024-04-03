@@ -9,7 +9,12 @@ import Attribute from "../types/nodes/Attribute";
 import ControlNode from "../types/nodes/ControlNode";
 import ElementNode from "../types/nodes/ElementNode";
 import Node from "../types/nodes/Node";
+import OperationType from "../types/nodes/OperationType";
 import TextNode from "../types/nodes/TextNode";
+import isElementNode from "../types/nodes/isElementNode";
+import isParentNode from "../types/nodes/isParentNode";
+import isSpecialNode from "../types/nodes/isSpecialNode";
+import isTextNode from "../types/nodes/isTextNode";
 import Style from "../types/styles/Style";
 import StyleBlock from "../types/styles/StyleBlock";
 import hash from "./internal/hash";
@@ -102,7 +107,14 @@ export default function parse(source: string): ParseResult {
           docs: status.docs,
           imports: status.imports,
           script: status.script,
-          template: status.template,
+          template: status.template
+            ? {
+                type: "control",
+                operation: "@root",
+                statement: "",
+                children: [status.template],
+              }
+            : undefined,
           childComponents: status.childTemplates,
           style: status.style,
           styleHash: status.styleHash,
@@ -189,14 +201,6 @@ function parseTopElement(status: ParseStatus) {
 function parseElement(status: ParseStatus): ElementNode {
   const element = parseTagOpen(status);
 
-  // TODO: this check could also go in build?
-  if (
-    status.imports?.find((i) => i.component && i.name === element.tagName) ||
-    status.childTemplates?.find((c) => c.name === element.tagName)
-  ) {
-    element.type = "component";
-  }
-
   if (!element.selfClosed && !voidTags.includes(element.tagName)) {
     // Get the children
     for (status.i; status.i < status.source.length; status.i++) {
@@ -252,26 +256,43 @@ function parseElement(status: ParseStatus): ElementNode {
         const end = status.source.indexOf("<", status.i + 1);
         if (end !== -1) {
           const content = status.source.substring(start, end).trimEnd();
-          if (content) {
-            const text: TextNode = {
-              type: "text",
-              content,
-            };
-            element.children.push(text);
-          }
           const spaceContent = status.source.substring(start + content.length, end);
-          if (spaceContent) {
-            const space: TextNode = {
-              type: "space",
-              content: spaceContent,
-            };
-            element.children.push(space);
+          if (content || spaceContent) {
+            const previousNode = element.children[element.children.length - 1];
+            if (previousNode?.type === "text") {
+              (previousNode as TextNode).content += content + spaceContent;
+            } else {
+              const text: TextNode = {
+                type: "text",
+                content: content + spaceContent,
+              };
+              element.children.push(text);
+            }
           }
           // Rewind to the < so that it will get checked in the next loop, above
           status.i = end - 1;
         }
       }
     }
+  }
+
+  /*
+  if (
+    element.children.length === 1 &&
+    isTextNode(element.children[0]) &&
+    !element.children[0].content.trim()
+  ) {
+    element.selfClosed = true;
+    element.children = [];
+  }
+  */
+
+  if (
+    status.imports?.some((i) => i.component && i.name === element.tagName) ||
+    status.childTemplates?.some((c) => c.name === element.tagName)
+  ) {
+    element.type = "component";
+    slottifyComponentChildNodes(element);
   }
 
   return element;
@@ -468,7 +489,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 
   const node: ControlNode = {
     type: "control",
-    operation,
+    operation: operation as OperationType,
     statement: "",
     children: [],
   };
@@ -505,7 +526,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 }
 
 function wrangleControl(control: ControlNode, parentNode: ElementNode | ControlNode) {
-  // HACK: Wrangle if/then/else into an if group and await/then/catch into an await group
+  // HACK: Wrangle if/then/else into an if group, for into a for group, and await/then/catch into an await group
   if (control.operation === "@if") {
     const ifGroup: ControlNode = {
       type: "control",
@@ -526,6 +547,19 @@ function wrangleControl(control: ControlNode, parentNode: ElementNode | ControlN
         break;
       }
     }
+    // @ts-ignore
+  } else if (control.operation === "@for") {
+    const forGroup: ControlNode = {
+      type: "control",
+      operation: "@for group",
+      statement: "",
+      children: [control],
+    };
+    parentNode.children.push(forGroup);
+    // @ts-ignore
+  } else if (control.operation === "@switch") {
+    control.operation = "@switch group";
+    parentNode.children.push(control);
   } else if (control.operation === "@await") {
     const awaitGroup: ControlNode = {
       type: "control",
@@ -551,11 +585,16 @@ function wrangleControl(control: ControlNode, parentNode: ElementNode | ControlN
 function addSpaceElement(parent: ElementNode | ControlNode, status: ParseStatus) {
   const content = consumeSpace(status);
   if (content) {
-    const space: TextNode = {
-      type: "space",
-      content,
-    };
-    parent.children.push(space);
+    const previousNode = parent.children[parent.children.length - 1];
+    if (previousNode?.type === "text") {
+      (previousNode as TextNode).content += content;
+    } else {
+      const space: TextNode = {
+        type: "text",
+        content,
+      };
+      parent.children.push(space);
+    }
   }
 }
 
@@ -656,14 +695,37 @@ function parseChildTemplate(name: string, source: string, status: ParseStatus) {
 }
 
 function setChildComponentNodes(name: string, node: Node) {
-  if (node.type === "element" && (node as ElementNode).tagName === name) {
+  if (isElementNode(node) && node.tagName === name) {
     node.type = "component";
+    slottifyComponentChildNodes(node);
   }
-  if (node.type === "element" || node.type == "control") {
-    for (let child of (node as ElementNode).children) {
+  if (isParentNode(node)) {
+    for (let child of node.children) {
       setChildComponentNodes(name, child);
     }
   }
+}
+
+function slottifyComponentChildNodes(node: ElementNode) {
+  // Move any child nodes that aren't already in a <:fill> node into a default <:fill> node
+  const isFillNode = (n: Node): n is ElementNode => isSpecialNode(n) && n.tagName === ":fill";
+  const nonFillNodes = node.children.filter((c) => !isFillNode(c));
+  // TODO: Not if it's only spaces??
+  if (nonFillNodes.length) {
+    let defaultFillNode = node.children.find(
+      (n) => isFillNode(n) && !n.attributes.find((a) => a.name === "name"),
+    ) as ElementNode | undefined;
+    if (!defaultFillNode) {
+      defaultFillNode = {
+        type: "special",
+        tagName: ":fill",
+        attributes: [],
+        children: nonFillNodes,
+      };
+      node.children.unshift(defaultFillNode);
+    }
+  }
+  node.children = node.children.filter((c) => isFillNode(c));
 }
 
 interface StyleStatus {
@@ -791,8 +853,7 @@ function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: s
     const element = node as ElementNode;
     let addClass = false;
     addClass =
-      addClass ||
-      !!element.attributes.find((a) => a.name === "class" || a.name.startsWith("class:"));
+      addClass || element.attributes.some((a) => a.name === "class" || a.name.startsWith("class:"));
     addClass = addClass || selectors.includes(element.tagName);
     if (!addClass) {
       for (let a of element.attributes) {

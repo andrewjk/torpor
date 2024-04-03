@@ -1,5 +1,5 @@
-import type Range from "./Range";
-import context from "./context";
+import type Range from "../../global/Range";
+import context from "../../global/context";
 
 export default function removeRangeEffects(range: Range) {
   // Delete the effect subcriptions for this range (which are keyed by target, property and effect)
@@ -63,8 +63,9 @@ export default function removeRangeEffects(range: Range) {
     range.children.forEach((child, i) => {
       removeRangeEffects(child);
       // @ts-ignore Make sure it's not held onto
-      range.children[i] = undefined;
+      //range.children[i] = undefined;
     });
+    range.children.length = 0;
   }
 
   // Delete this range from its parent's children collection

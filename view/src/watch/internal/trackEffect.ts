@@ -1,5 +1,4 @@
-import context from "./context";
-import printContext from "./printContext";
+import context from "../../global/context";
 
 export default function trackEffect(target: Record<string | symbol, any>, prop: string | symbol) {
   //console.log(`tracking effect for '${String(prop)}' with value '${target[prop]}'`);

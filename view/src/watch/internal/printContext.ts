@@ -1,5 +1,5 @@
 import hash from "../../compile/internal/hash";
-import context from "./context";
+import context from "../../global/context";
 
 export default function printContext(message?: string) {
   const print: any = {};

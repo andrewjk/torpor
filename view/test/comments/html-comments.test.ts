@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("html comments", () => {
   const input = `
@@ -19,7 +19,7 @@ test("html comments", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el("section", [], [el("p", [], [text("The"), text("content")])]),
+      template: control("@root", "", [el("section", [], [el("p", [], [text("The content")])])]),
     },
   };
   expect(output).toEqual(expected);

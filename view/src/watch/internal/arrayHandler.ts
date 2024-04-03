@@ -1,4 +1,5 @@
 import $watch from "../$watch";
+import checkObject from "./checkObject";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";
 import updateEffects from "./updateEffects";
@@ -18,7 +19,6 @@ const arrayHandler = {
     // TODO: Do we need to check if it's a Promise?
     const value = target[prop];
     if (value && !value.$isProxy && typeof value === "object") {
-      //Reflect.set(target, prop, $watch(value), receiver);
       target[prop] = $watch(value);
     }
 
@@ -64,15 +64,15 @@ const arrayHandler = {
   ) {
     //console.log(`array set '${String(prop)}' on`, target);
 
-    //const oldValue = Reflect.get(target, prop, receiver);
     const oldValue = target[prop];
+    let newValue = value;
 
-    // TODO: We should trigger effects for each item, just in case their props have been changed
+    // Don't run effects multiple times, by keeping track of which effects have been run
+    const alreadyTriggered: any[] = [];
 
     // Only do things if the value has changed
     if (value !== oldValue) {
-      // If the value was previously a proxy, $watch the new value and update effect subscriptions
-      let newValue = value;
+      // If the value was previously a proxy, watch the new value and update effect subscriptions
       if (oldValue && oldValue.$isProxy) {
         newValue = $watch(value);
         updateEffects(oldValue, value);
@@ -82,7 +82,13 @@ const arrayHandler = {
       Reflect.set(target, prop, newValue, receiver);
 
       // Re-run effects
-      triggerEffects(target, prop);
+      triggerEffects(target, prop, alreadyTriggered);
+    }
+
+    // If setting an object we should update each prop to handle any changes,
+    // regardless of whether it has changed or not
+    if (oldValue && oldValue.$isProxy) {
+      checkObject(oldValue, newValue, [], alreadyTriggered);
     }
 
     return true;

@@ -3,6 +3,7 @@ import Attribute from "../src/types/nodes/Attribute";
 import ControlNode from "../src/types/nodes/ControlNode";
 import ElementNode from "../src/types/nodes/ElementNode";
 import Node from "../src/types/nodes/Node";
+import OperationType from "../src/types/nodes/OperationType";
 import TextNode from "../src/types/nodes/TextNode";
 
 export function cmp(
@@ -50,7 +51,11 @@ export function sp(
   };
 }
 
-export function control(operation: string, statement: string, children?: Node[]): ControlNode {
+export function control(
+  operation: OperationType,
+  statement: string,
+  children?: Node[],
+): ControlNode {
   return {
     type: "control",
     operation,
@@ -73,16 +78,9 @@ export function att(name: string, value: string): Attribute {
   };
 }
 
-export function space(content: string): TextNode {
-  return {
-    type: "space",
-    content,
-  };
-}
-
 export function trimParsed(result: ParseResult): ParseResult {
   if (result.parts?.template) {
-    trimElement(result.parts.template as ElementNode);
+    trimElement(result.parts.template);
   }
   if (result.parts?.styleHash) {
     result.parts.styleHash = undefined;
@@ -93,8 +91,12 @@ export function trimParsed(result: ParseResult): ParseResult {
 function trimElement(el: ElementNode | ControlNode) {
   for (let i = el.children.length - 1; i >= 0; i--) {
     const child = el.children[i];
-    if (child.type === "space") {
-      el.children.splice(i, 1);
+    if (child.type === "text") {
+      const textChild = child as TextNode;
+      textChild.content = textChild.content.trim();
+      if (!textChild.content) {
+        el.children.splice(i, 1);
+      }
     } else if (child.type === "element" || child.type === "control") {
       // HACK:
       trimElement(child as ElementNode);

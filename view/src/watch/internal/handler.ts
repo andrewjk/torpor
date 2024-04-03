@@ -1,4 +1,5 @@
 import $watch from "../$watch";
+import checkObject from "./checkObject";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";
 import updateEffects from "./updateEffects";
@@ -20,10 +21,8 @@ const handler = {
 
     // Set the value to a new proxy if it's an object
     // But not if it's a Promise (i.e. has a `then` method)
-    //let value = Reflect.get(target, prop, receiver);
     let value = target[prop];
     if (value && !value.$isProxy && typeof value === "object" && !value.then) {
-      //Reflect.set(target, prop, $watch(value), receiver);
       target[prop] = $watch(value);
     }
 
@@ -40,17 +39,17 @@ const handler = {
     value: any,
     receiver: any,
   ) {
-    //console.log(`object set '${String(prop)}' on`, target);
+    //console.log(`object set '${String(prop)}' to '${value}' on`, target);
 
-    //const oldValue = Reflect.get(target, prop, receiver);
     const oldValue = target[prop];
+    let newValue = value;
 
-    // TODO: If setting an array we should trigger effects for each item, just in case their props have been changed
+    // Don't run effects multiple times, by keeping track of which effects have been run
+    const alreadyTriggered: any[] = [];
 
     // Only do things if the value has changed
     if (value !== oldValue) {
-      // If the value was previously a proxy, $watch the new value and update effect subscriptions
-      let newValue = value;
+      // If the value was previously a proxy, watch the new value and update effect subscriptions
       if (oldValue && oldValue.$isProxy) {
         newValue = $watch(value);
         updateEffects(oldValue, value);
@@ -60,7 +59,14 @@ const handler = {
       Reflect.set(target, prop, newValue, receiver);
 
       // Re-run effects
-      triggerEffects(target, prop);
+      triggerEffects(target, prop, alreadyTriggered);
+    }
+
+    // If setting an object we should update each prop to handle any changes,
+    // regardless of whether it has changed or not
+    // TODO: Handle recursion
+    if (oldValue && oldValue.$isProxy) {
+      checkObject(oldValue, newValue, [], alreadyTriggered);
     }
 
     return true;

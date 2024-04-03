@@ -1,7 +1,7 @@
 <section>
   @for (let i = 0; i < 5; i++) {
     <p>
-      {i}
+      {$for.i}
     </p>
   }
 </section>

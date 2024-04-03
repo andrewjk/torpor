@@ -1,0 +1,7 @@
+<div>
+    <p>
+        {$props.text}
+        {$props.child.childText}
+        {$props.child.item.itemText}
+    </p>
+</div>

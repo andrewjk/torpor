@@ -1,9 +1,9 @@
 <section>
   <p>^</p>
   @for (let item of $props.items) {
-    key = item.id
+    @key = item.id
     <p>
-      {item.text}
+      {$for.item.text}
     </p>
   }
   <p>$</p>

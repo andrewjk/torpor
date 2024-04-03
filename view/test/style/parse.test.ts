@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { el, text, trimParsed } from "../helpers";
+import { control, el, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
   const input = `
@@ -16,7 +16,9 @@ test("simple style", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")]),
+      template: control("@root", "", [
+        el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")]),
+      ]),
       style: {
         global: false,
         blocks: [

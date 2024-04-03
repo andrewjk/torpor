@@ -1,10 +1,11 @@
-import type Range from "./Range";
-import context from "./context";
+/*
+import type Range from "../../global/Range";
+import context from "../../global/context";
 
 export default function setActiveRange(range: Range) {
   // Add the new range to the currently active range's children, so that we
   // can delete the children with the parent
-  const parentRange = context.activeRange;
+  const parentRange = context.rangeStack[context.rangeStack.length - 1];
   if (parentRange) {
     parentRange.children = parentRange.children || [];
     parentRange.children.push(range);
@@ -12,5 +13,6 @@ export default function setActiveRange(range: Range) {
   }
 
   // Set the new active range
-  context.activeRange = range;
+  context.rangeStack = range;
 }
+*/

@@ -1,7 +1,7 @@
 import type Range from "./Range";
 
 type Cleanup = () => void;
-type Effect = () => Cleanup | undefined;
+type Effect = () => Cleanup | void;
 
 type ObjectEffectsMap = Map<object, PropertyEffectsMap>;
 type PropertyEffectsMap = Map<string | symbol, Set<Effect>>;
@@ -32,7 +32,7 @@ interface Context {
    * the effect to the rangeEffects collection so that any effect cleanup can be run when the range
    * is deleted.
    */
-  activeEffectSubbed?: boolean;
+  activeEffectSubbed: boolean;
   /**
    * A map of objects, their properties, and the object/property effects.
    *
@@ -45,9 +45,13 @@ interface Context {
    */
   effectCleanups: EffectCleanupsMap;
   /**
+   * A stack with the range that is currently being created on top.
+   */
+  rangeStack: Range[];
+  /**
    * The range that is currently being created.
    */
-  activeRange?: Range;
+  activeRange: Range | null;
   /**
    * A map of ranges and the object/property/effects attached to them.
    *
@@ -64,8 +68,14 @@ interface Context {
 }
 
 const context: Context = {
+  activeEffect: undefined,
+  activeEffectSubbed: false,
   effectSubs: new Map<object, PropertyEffectsMap>(),
   effectCleanups: new Map<Effect, Cleanup>(),
+  rangeStack: [],
+  get activeRange() {
+    return this.rangeStack[this.rangeStack.length - 1];
+  },
   rangeEffectSubs: new Map<Range, RangeEffectsSet>(),
   rangeEffects: new Map<Range, Set<Effect>>(),
 };

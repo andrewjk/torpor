@@ -4,15 +4,15 @@ import { expect, test } from "vitest";
 import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
 import type ArrayState from "./ArrayState";
-import Component from "./components/Array.tera";
+import Component from "./components/ArrayIndexes.tera";
 
-test("array reassign and update", () => {
+test("array indexes", () => {
   const state = $watch({
     items: [
-      { id: 1, text: "a" },
-      { id: 2, text: "b" },
-      { id: 3, text: "c" },
-      { id: 4, text: "d" },
+      { id: 1, text: "b" },
+      { id: 2, text: "a" },
+      { id: 3, text: "d" },
+      { id: 4, text: "c" },
     ],
   } as ArrayState);
 
@@ -20,14 +20,10 @@ test("array reassign and update", () => {
   document.body.appendChild(container);
   render(container, Component, state);
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+  // TODO: Should have spaces between letter items
+  expect(container.textContent!.replace(/\s/g, "")).toBe("^b,a,d,c$");
 
-  state.items = [
-    { id: 1, text: "b" },
-    { id: 2, text: "d" },
-    { id: 3, text: "a" },
-    { id: 4, text: "c" },
-  ];
+  state.items.sort((a, b) => a.text.localeCompare(b.text));
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("^bdac$");
+  expect(container.textContent!.replace(/\s/g, "")).toBe("^a,b,c,d$");
 });

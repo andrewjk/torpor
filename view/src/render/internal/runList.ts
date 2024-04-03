@@ -30,12 +30,14 @@ import moveRange from "./moveRange";
 
 /**
  * @param parent The parent DOM element
+ * @param anchor The DOM element to create new items before
  * @param oldItems The list of current items
  * @param newItems The list of future items
  * @param create A function that creates the DOM elements for a new item
  */
 export default (
   parent: Node,
+  anchor: Node | null,
   oldItems: ListItem[],
   newItems: ListItem[],
   create: (parent: Node, data: ListItem, before: Node | null) => void,
@@ -138,7 +140,7 @@ export default (
       // The old list is exhausted; process new list additions
       // HACK: I think it would be better to move anchors to the end?
       let before: Node | null =
-        oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling;
+        oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
       for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
         //console.log("create", newStartItem.key);
         create(parent, newStartItem, before);
@@ -157,4 +159,28 @@ export default (
 function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {
   newItem.startNode = oldItem.startNode;
   newItem.endNode = oldItem.endNode;
+
+  for (let prop in oldItem.data) {
+    oldItem.data[prop] = newItem.data[prop];
+    //console.log("SETTING", oldItem.data[prop], newItem.data[prop]);
+  }
+  newItem.data = oldItem.data;
+
+  /*
+  printContext("TRANSFERRING RANGE MARKERS");
+  // @ts-ignore HACK:
+  updateEffects(oldItem.data, newItem.data);
+*/
+
+  /*
+  // @ts-ignore HACK:
+  for (let prop in oldItem.data) {
+    // @ts-ignore HACK:
+    //oldItem.data[prop] = newItem.data[prop];
+    // @ts-ignore HACK:
+    //console.log("SETTING", oldItem.data[prop], newItem.data[prop]);
+    // @ts-ignore HACK:
+    updateEffects(oldItem.data[prop], newItem.data[prop]);
+  }
+  */
 }

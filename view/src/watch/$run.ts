@@ -1,6 +1,6 @@
-import context from "./internal/context";
+import context from "../global/context";
 
-export default function $run(effect: () => (() => void) | undefined) {
+export default function $run(effect: () => (() => void) | void) {
   context.activeEffect = effect;
   context.activeEffectSubbed = false;
 

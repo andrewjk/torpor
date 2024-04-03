@@ -1,8 +1,8 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
+import context from "../../src/global/context";
 import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
-import context from "../../src/watch/internal/context";
 import Component from "./components/For.tera";
 
 test("for effect", async () => {

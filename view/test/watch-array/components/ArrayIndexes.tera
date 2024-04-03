@@ -1,0 +1,11 @@
+<section>
+  <p>^</p>
+  @for (let i = 0; i < $props.items.length; i++) {
+    key = $props.items[i].id
+    <span>
+      {$for.i > 0 ? ", " : ""}
+      {$props.items[$for.i].text}
+    </span>
+  }
+  <p>$</p>
+</section>

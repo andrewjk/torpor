@@ -4,24 +4,25 @@ import Import from "../types/Import";
 import Attribute from "../types/nodes/Attribute";
 import ControlNode from "../types/nodes/ControlNode";
 import ElementNode from "../types/nodes/ElementNode";
+import Fragment from "../types/nodes/Fragment";
 import Node from "../types/nodes/Node";
 import TextNode from "../types/nodes/TextNode";
+import isSpecialNode from "../types/nodes/isSpecialNode";
 import StyleBlock from "../types/styles/StyleBlock";
 import Builder from "./internal/Builder";
-import { maybeAppend, trimMatched, trimQuotes } from "./internal/utils";
+import { maybeAppend, trimAny, trimMatched, trimQuotes } from "./internal/utils";
+
+// TODO: Too many branches for ifs etc?
 
 interface BuildStatus {
   props: string[];
   styleHash: string;
   varNames: Record<string, number>;
-  startNodeNames: StartNodeInfo[];
-  lastNodeName: string;
-  isFirstElement: boolean;
-}
-
-interface StartNodeInfo {
-  name: string;
-  status: "unset" | "scoped" | "scopedset" | "set";
+  fragmentStack: {
+    fragment?: Fragment;
+    path: string;
+  }[];
+  fragmentVars: Map<string, string>;
 }
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
@@ -36,19 +37,22 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 function buildCode(name: string, parts: ComponentParts): string {
   const b = new Builder();
 
-  const folder = "../../../../../tera/view/src";
+  let folder = "../../../../../tera/view/src";
+  //folder = "../view/src";
   b.append(`
     import $watch from '${folder}/watch/$watch';
     import $run from '${folder}/watch/$run';
-    import t_clear_range from '${folder}/render/internal/clearRange';
-    import t_reconcile_list from '${folder}/render/internal/reconcileList';
-    import t_apply_attributes from '${folder}/render/internal/applyAttributes';
+    import t_push_range from '${folder}/render/internal/pushRange';
+    import t_pop_range from '${folder}/render/internal/popRange';
+    import t_run_control from '${folder}/render/internal/runControl';
+    import t_run_branch from '${folder}/render/internal/runBranch';
+    import t_run_list from '${folder}/render/internal/runList';
+    import t_apply_props from '${folder}/render/internal/applyProps';
     import t_text from '${folder}/render/internal/formatText';
-    import t_context from '${folder}/watch/internal/context';
-    import t_set_active_range from '${folder}/watch/internal/setActiveRange';
+    import t_fragment from '${folder}/render/internal/createFragment';
+    import t_add_fragment from '${folder}/render/internal/addFragment';
+    import t_context from '${folder}/global/context';
   `);
-  //result +=
-  //  "import { t_clear_range, t_reconcile_list, t_apply_attributes, $watch, $run } from '../../../../tera/view/dist/index.js';\n";
   // TODO: De-duplication
   let imports: Import[] = [];
   if (parts.imports) {
@@ -100,30 +104,388 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
   if (parts.script) {
     // TODO: Mangling
     b.append(`
-      // USER SCRIPT
+      /* User script */
       ${parts.script}
     `);
   }
 
   if (parts.template) {
-    // TODO:
-    // We could create a document fragment with a string and assign the created elements to variables
-    // It would mean we could use the same code for hydration too
     const status: BuildStatus = {
       props: parts.props || [],
       styleHash: parts.styleHash || "",
       varNames: {},
-      startNodeNames: [],
-      lastNodeName: "",
-      isFirstElement: true,
+      fragmentStack: [],
+      fragmentVars: new Map(),
     };
-    b.append("// USER INTERFACE");
+    b.append("/* User interface */");
+    buildFragments(parts.template, status, b);
+    b.append("");
     buildNode(parts.template, status, b, "$parent", "$anchor", true);
   }
 
   b.append(`}
     }
   `);
+}
+
+function buildFragments(node: ControlNode, status: BuildStatus, b: Builder) {
+  b.append(`const t_fragments = [];`);
+
+  const fragments: Fragment[] = [];
+  gatherFragments(node, status, fragments);
+}
+
+function gatherFragments(
+  node: Node,
+  status: BuildStatus,
+  fragments: Fragment[],
+  currentFragment?: Fragment,
+) {
+  switch (node.type) {
+    case "control": {
+      gatherControlFragments(node as ControlNode, status, fragments, currentFragment!);
+      break;
+    }
+    case "component": {
+      gatherComponentFragments(node as ElementNode, status, fragments, currentFragment!);
+      break;
+    }
+    case "element": {
+      gatherElementFragments(node as ElementNode, status, fragments, currentFragment!);
+      break;
+    }
+    case "text": {
+      const content = (node as TextNode).content;
+      if (currentFragment) {
+        currentFragment.text += isReactive(content) ? "#" : content;
+      }
+      break;
+    }
+    case "special": {
+      gatherSpecialFragments(node as ElementNode, status, fragments, currentFragment!);
+      break;
+    }
+  }
+}
+
+function gatherControlFragments(
+  node: ControlNode,
+  status: BuildStatus,
+  allFragments: Fragment[],
+  currentFragment: Fragment,
+) {
+  switch (node.operation) {
+    case "@if group":
+    case "@switch group":
+    case "@for group":
+    case "@await group": {
+      // Add a placeholder if it's a branching control node
+      currentFragment.text += "<!>";
+      for (let child of node.children) {
+        gatherFragments(child, status, allFragments, currentFragment);
+      }
+      break;
+    }
+    default: {
+      // Add a new fragment if it's a control branch and it has children
+      node.fragment = { number: allFragments.length, text: "", events: [] };
+      allFragments.push(node.fragment);
+      for (let child of node.children) {
+        gatherFragments(child, status, allFragments, node.fragment);
+      }
+      break;
+    }
+  }
+}
+
+function gatherComponentFragments(
+  node: ElementNode,
+  status: BuildStatus,
+  allFragments: Fragment[],
+  currentFragment: Fragment,
+) {
+  currentFragment.text += "<!>";
+
+  // Add fragments for slots if there are children
+  if (node.children.length) {
+    node.fragment = { number: allFragments.length, text: "", events: [] };
+    allFragments.push(node.fragment);
+    for (let child of node.children) {
+      // TODO: Make sure it's not a :fill node
+      gatherFragments(child, status, allFragments, node.fragment);
+    }
+  }
+}
+
+function gatherElementFragments(
+  node: ElementNode,
+  status: BuildStatus,
+  fragments: Fragment[],
+  currentFragment: Fragment,
+) {
+  currentFragment.text += `<${node.tagName}`;
+  currentFragment.text += node.attributes
+    .filter((a) => !a.name.startsWith("on") && !isReactive(a.value))
+    .map((a) => ` ${a.name}${a.value != null ? `=${a.value}` : ""}`);
+  currentFragment.text += ">";
+  for (let child of node.children) {
+    gatherFragments(child, status, fragments, currentFragment);
+  }
+  currentFragment.text += `</${node.tagName}>`;
+}
+
+function gatherSpecialFragments(
+  node: ElementNode,
+  status: BuildStatus,
+  allFragments: Fragment[],
+  currentFragment: Fragment,
+) {
+  switch (node.tagName) {
+    case ":slot": {
+      currentFragment.text += "<!>";
+
+      // Add a new fragment for default slot content
+      node.fragment = { number: allFragments.length, text: "", events: [] };
+      allFragments.push(node.fragment);
+      for (let child of node.children) {
+        gatherFragments(child, status, allFragments, node.fragment);
+      }
+      break;
+    }
+    case ":fill": {
+      // Add a new fragment for filled slot content
+      node.fragment = { number: allFragments.length, text: "", events: [] };
+      allFragments.push(node.fragment);
+      for (let child of node.children) {
+        gatherFragments(child, status, allFragments, node.fragment);
+      }
+      break;
+    }
+  }
+}
+
+function declareFragment(node: ControlNode | ElementNode, status: BuildStatus, b: Builder) {
+  if (node.fragment) {
+    const fragment = node.fragment;
+    const fragmentName = `t_fragment_${fragment.number}`;
+    const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
+    b.append(
+      `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
+    );
+    const root = node.type === "control" && (node as ControlNode).operation === "@root";
+    declareFragmentVars(node.fragment, node, ["0:ch"], status, b, root);
+  }
+}
+
+function declareFragmentVars(
+  fragment: Fragment,
+  node: Node,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+  root = false,
+) {
+  switch (node.type) {
+    case "control": {
+      declareControlFragmentVars(fragment, node as ControlNode, path, status, b, root);
+      break;
+    }
+    case "component": {
+      declareComponentFragmentVars(fragment, node as ElementNode, path, status, b);
+      break;
+    }
+    case "element": {
+      declareElementFragmentVars(fragment, node as ElementNode, path, status, b, root);
+      break;
+    }
+    case "text": {
+      declareTextFragmentVars(fragment, node as TextNode, path, status, b);
+      break;
+    }
+    case "special": {
+      declareSpecialFragmentVars(fragment, node as ElementNode, path, status, b);
+      break;
+    }
+  }
+}
+
+function declareControlFragmentVars(
+  fragment: Fragment,
+  node: ControlNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+  root = false,
+) {
+  switch (node.operation) {
+    case "@if group":
+    case "@switch group":
+    case "@for group":
+    case "@await group": {
+      const operation = node.operation.substring(1).replace(" group", "");
+      declareParentAnchorFragmentVars(fragment, node, path, status, b, operation);
+      break;
+    }
+    default: {
+      for (let child of node.children) {
+        declareFragmentVars(fragment, child, path, status, b, root);
+      }
+      break;
+    }
+  }
+}
+
+function declareComponentFragmentVars(
+  fragment: Fragment,
+  node: ElementNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+) {
+  declareParentAnchorFragmentVars(fragment, node, path, status, b, "comp");
+}
+
+function declareElementFragmentVars(
+  fragment: Fragment,
+  node: ElementNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+  root = false,
+) {
+  const pathIndex = path.slice(path.lastIndexOf("0:ch")).length - 1;
+  path.push(`${pathIndex}:el:${node.tagName}`);
+
+  const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
+  const setAttributes = root || hasReactiveAttribute;
+
+  if (setAttributes) {
+    node.varName = nextVarName(node.tagName, status);
+    const varPath = getFragmentVarPath(fragment, path, b);
+    b.append(`const ${node.varName} = ${varPath};`);
+    status.fragmentVars.set(varPath, node.varName);
+  }
+
+  const oldPathLength = path.length;
+  path.push("0:ch");
+  for (let child of node.children) {
+    declareFragmentVars(fragment, child, path, status, b);
+  }
+  path.splice(oldPathLength);
+}
+
+function declareTextFragmentVars(
+  fragment: Fragment,
+  node: TextNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+) {
+  // Text nodes get merged together
+  if (!path[path.length - 1].endsWith("txt")) {
+    const pathIndex = path.slice(path.lastIndexOf("0:ch")).length - 1;
+    path.push(`${pathIndex}:txt`);
+  }
+
+  if (isReactive(node.content)) {
+    node.varName = nextVarName("text", status);
+    const varPath = getFragmentVarPath(fragment, path, b);
+    b.append(`const ${node.varName} = ${varPath};`);
+    status.fragmentVars.set(varPath, node.varName);
+  }
+}
+
+function declareSpecialFragmentVars(
+  fragment: Fragment,
+  node: ElementNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+) {
+  switch (node.tagName) {
+    case ":slot": {
+      declareParentAnchorFragmentVars(fragment, node, path, status, b, "slot");
+      break;
+    }
+    case ":fill": {
+      for (let child of node.children) {
+        declareFragmentVars(fragment, child, path, status, b);
+      }
+      break;
+    }
+  }
+}
+
+function declareParentAnchorFragmentVars(
+  fragment: Fragment,
+  node: ControlNode | ElementNode,
+  path: string[],
+  status: BuildStatus,
+  b: Builder,
+  name: string,
+) {
+  const parentIndex = path.lastIndexOf("0:ch");
+
+  // If the parent index is 0 it means it is the fragment, which can't be used as a parent
+  // In that case we don't set the parentName so that the existing parent will be used
+  //if (parentIndex > 0) {
+  const parentPath = path.slice(0, parentIndex);
+  const parentVarPath = getFragmentVarPath(fragment, parentPath, b);
+  if (parentIndex === 0) {
+    node.parentName = parentVarPath;
+  } else if (status.fragmentVars.has(parentVarPath)) {
+    node.parentName = status.fragmentVars.get(parentVarPath);
+  } else {
+    // TODO: Get the actual element that it is, which may involve getting parents of control nodes too
+    node.parentName = nextVarName(`${name}_parent`, status);
+    b.append(`const ${node.parentName} = ${parentVarPath};`);
+    status.fragmentVars.set(parentVarPath, node.parentName);
+  }
+  //}
+
+  const pathIndex = path.length - parentIndex - 1;
+  path.push(`${pathIndex}:${name}`);
+  node.varName = nextVarName(`${name}_anchor`, status);
+  const varPath = getFragmentVarPath(fragment, path, b);
+  b.append(`const ${node.varName} = ${varPath};`);
+  status.fragmentVars.set(varPath, node.varName);
+}
+
+function getFragmentVarPath(fragment: Fragment, path: string[], b: Builder): string {
+  let varPath = `t_fragment_${fragment.number}`;
+  let childIndex = -2;
+  for (let i = 0; i < path.length; i++) {
+    const part = path[i].split(":")[1];
+    if (part === "ch") {
+      if (childIndex != -2) {
+        varPath += `.childNodes[${childIndex}]`;
+      }
+      childIndex = -1;
+    } else {
+      childIndex += 1;
+    }
+  }
+  if (childIndex != -2) {
+    varPath += `.childNodes[${childIndex}]`;
+  }
+  return varPath;
+}
+
+function addFragment(
+  node: ControlNode | ElementNode,
+  status: BuildStatus,
+  b: Builder,
+  parentName: string,
+  anchorName: string,
+) {
+  if (node.fragment) {
+    const fragment = node.fragment;
+    const fragmentName = `t_fragment_${fragment.number}`;
+    b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
+    for (let ev of fragment.events) {
+      b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
+    }
+  }
 }
 
 function buildNode(
@@ -169,7 +531,13 @@ function buildControlNode(
   anchorName: string,
 ) {
   switch (node.operation) {
+    case "@root": {
+      buildRootNode(node, status, b, parentName, anchorName);
+      break;
+    }
     case "@const": {
+      b.append("");
+      b.append("/* @const */");
       b.append(`${maybeAppend(node.statement, ";")}`);
       break;
     }
@@ -183,21 +551,28 @@ function buildControlNode(
       // These get handled with @if group, above
       break;
     }
-    case "@switch": {
+    case "@switch group": {
       buildSwitchNode(node, status, b, parentName, anchorName);
     }
-    case "@case": {
-      // This gets handled with @switch, above
+    case "@case":
+    case "@default": {
+      // These get handled with @switch, above
       break;
     }
-    case "@for": {
+    case "@for group": {
       buildForNode(node, status, b, parentName, anchorName);
+      break;
+    }
+    case "@for":
+    case "@key": {
+      // These get handled with @for, above
       break;
     }
     case "@await group": {
       buildAwaitNode(node, status, b, parentName, anchorName);
       break;
     }
+    case "@await":
     case "@then":
     case "@catch": {
       // These get handled with @await group, above
@@ -209,6 +584,25 @@ function buildControlNode(
   }
 }
 
+function buildRootNode(
+  node: ControlNode,
+  status: BuildStatus,
+  b: Builder,
+  parentName: string,
+  anchorName: string,
+) {
+  declareFragment(node, status, b);
+
+  status.fragmentStack.push({
+    fragment: node.fragment,
+    path: "0:ch/",
+  });
+  buildNode(node.children[0], status, b, parentName, anchorName, true);
+  status.fragmentStack.pop();
+
+  addFragment(node, status, b, parentName, anchorName);
+}
+
 function buildIfNode(
   node: ControlNode,
   status: BuildStatus,
@@ -216,11 +610,9 @@ function buildIfNode(
   parentName: string,
   anchorName: string,
 ) {
-  const ifAnchorName = nextVarName("if_anchor", status);
-  const ifIndexName = nextVarName("if_index", status);
-  const oldRangeName = nextVarName("old_range", status);
+  const ifAnchorName = node.varName!;
+  const ifParentName = node.parentName || ifAnchorName + ".parentNode";
   const ifRangeName = nextVarName("if_range", status);
-  const ifBranchRangesName = nextVarName("if_branch_ranges", status);
 
   // Filter non-control branches (spaces)
   const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
@@ -236,31 +628,17 @@ function buildIfNode(
     branches.push(elseBranch);
   }
 
+  b.append("");
   b.append(`
-
-    // IF
-    const ${ifAnchorName} = document.createComment("@if");
-    ${parentName}.insertBefore(${ifAnchorName}, ${anchorName});
-
-    let ${ifIndexName} = -1;
-    let ${ifRangeName} = { title: "@if ${branches[0].statement}" };
-    let ${ifBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];
-
-    const ${oldRangeName} = t_context.activeRange;
-    t_set_active_range(${ifRangeName});
-
-    $run(() => {
-      t_context.activeRange = ${ifRangeName};`);
+      /* @if */
+      const ${ifRangeName} = { title: "if" };
+      t_run_control(${ifRangeName}, () => {`);
 
   for (let [i, branch] of branches.entries()) {
-    status.startNodeNames.push({ name: `${ifBranchRangesName}[${i}].startNode`, status: "unset" });
-    buildIfBranch(branch, status, b, parentName, ifAnchorName, ifBranchRangesName, ifIndexName, i);
-    status.startNodeNames.pop();
+    buildIfBranch(branch, status, b, ifParentName, ifAnchorName, ifRangeName, i);
   }
 
-  b.append(`});
-    t_context.activeRange = ${oldRangeName};
-  `);
+  b.append(`});`);
 }
 
 function buildIfBranch(
@@ -269,39 +647,27 @@ function buildIfBranch(
   b: Builder,
   parentName: string,
   anchorName: string,
-  branchRangesName: string,
-  indexName: string,
+  rangeName: string,
   index: number,
 ) {
-  const startNodeNames = scopeNodeNames(status);
+  b.append(`${node.statement} {`);
+  b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
-  const branchRangeName = `${branchRangesName}[${index}]`;
+  declareFragment(node, status, b);
 
-  b.append(`
-    ${node.statement} {
-      if (${indexName} === ${index}) return;
-      if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);
-    
-      const t_old_range = t_context.activeRange;
-      t_set_active_range(${branchRangeName});
-  `);
-
-  status.lastNodeName = "";
-  for (let child of filterChildren(node)) {
+  status.fragmentStack.push({
+    fragment: node.fragment,
+    path: "",
+  });
+  for (let child of node.children) {
     buildNode(child, status, b, parentName, anchorName);
   }
+  status.fragmentStack.pop();
 
-  b.append(`
+  addFragment(node, status, b, parentName, anchorName);
 
-    ${indexName} = ${index};`);
-  if (status.lastNodeName) {
-    // TODO: get the last node name (element or text) that has the same parent
-    b.append(`${branchRangeName}.endNode = ${status.lastNodeName};`);
-  }
-  b.append(`t_context.activeRange = t_old_range;`);
+  b.append(`});`);
   b.append(`}`);
-
-  unscopeNodeNames(status, startNodeNames);
 }
 
 function buildSwitchNode(
@@ -311,11 +677,9 @@ function buildSwitchNode(
   parentName: string,
   anchorName: string,
 ) {
-  const switchAnchorName = nextVarName("switch_anchor", status);
-  const switchIndexName = nextVarName("switch_index", status);
-  const oldRangeName = nextVarName("old_range", status);
+  const switchParentName = node.parentName!;
+  const switchAnchorName = node.varName!;
   const switchRangeName = nextVarName("switch_range", status);
-  const switchBranchRangesName = nextVarName("switch_branch_ranges", status);
 
   // Filter non-control branches (spaces)
   const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
@@ -331,45 +695,27 @@ function buildSwitchNode(
     branches.push(defaultBranch);
   }
 
+  b.append("");
   b.append(`
-
-    // SWITCH
-    const ${switchAnchorName} = document.createComment("@switch");
-    ${parentName}.insertBefore(${switchAnchorName}, ${anchorName});
-
-    let ${switchIndexName} = -1;
-    let ${switchRangeName} = { title: "@switch ${node.statement}" };
-    let ${switchBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];
-    
-    const ${oldRangeName} = t_context.activeRange;
-    t_set_active_range(${switchRangeName});
-
-    $run(() => {
-      t_context.activeRange = ${switchRangeName};
-      ${node.statement} {`);
+      /* @switch */
+      const ${switchRangeName} = { title: "switch" };
+      t_run_control(${switchRangeName}, () => {
+        ${node.statement} {`);
 
   for (let [i, branch] of branches.entries()) {
-    status.startNodeNames.push({
-      name: `${switchBranchRangesName}[${i}].startNode`,
-      status: "unset",
-    });
     buildSwitchBranch(
       branch as ControlNode,
       status,
       b,
-      parentName,
+      switchParentName,
       switchAnchorName,
-      switchBranchRangesName,
-      switchIndexName,
+      switchRangeName,
       i,
     );
-    status.startNodeNames.pop();
   }
 
   b.append(`}
-    });
-    t_context.activeRange = ${oldRangeName};
-  `);
+    });`);
 }
 
 function buildSwitchBranch(
@@ -378,37 +724,28 @@ function buildSwitchBranch(
   b: Builder,
   parentName: string,
   anchorName: string,
-  branchRangesName: string,
-  indexName: string,
+  rangeName: string,
   index: number,
 ) {
-  const startNodeNames = scopeNodeNames(status);
-  const branchRangeName = `${branchRangesName}[${index}]`;
+  b.append(`${node.statement} {`);
+  b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
-  b.append(`
-    ${node.statement} {
-      if (${indexName} === ${index}) return;
-      if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);
+  declareFragment(node, status, b);
 
-      const t_old_range = t_context.activeRange;
-      t_set_active_range(${branchRangeName});
-  `);
-
-  status.lastNodeName = "";
-  for (let child of filterChildren(node)) {
+  status.fragmentStack.push({
+    fragment: node.fragment,
+    path: "",
+  });
+  for (let child of node.children) {
     buildNode(child, status, b, parentName, anchorName);
   }
+  status.fragmentStack.pop();
 
-  b.append(`
-  
-    ${indexName} = ${index};
-    ${status.lastNodeName ? `${branchRangeName}.endNode = ${status.lastNodeName};` : ";"}    
-    t_context.activeRange = t_old_range;
+  addFragment(node, status, b, parentName, anchorName);
 
-    break;
-  }`);
-
-  unscopeNodeNames(status, startNodeNames);
+  b.append(`});`);
+  b.append(`break;`);
+  b.append(`}`);
 }
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
@@ -422,6 +759,12 @@ function buildForNode(
   parentName: string,
   anchorName: string,
 ) {
+  const forParentName = node.parentName!;
+  const forAnchorName = node.varName!;
+
+  // HACK:
+  node = node.children[0] as ControlNode;
+
   // HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
   // TODO: Handle destructuring, quotes, comments etc
   const forVarNames: string[] = [];
@@ -450,8 +793,7 @@ function buildForNode(
     }
   }
 
-  const forAnchorName = nextVarName("for_anchor", status);
-  const oldRangeName = nextVarName("old_range", status);
+  const forFirstRunName = nextVarName("for_first_run", status);
   const forRangeName = nextVarName("for_range", status);
   const forItemsName = nextVarName("for_items", status);
 
@@ -461,67 +803,65 @@ function buildForNode(
   );
   const keyStatement = key ? (key as ControlNode).statement : "";
 
+  b.append("");
   b.append(`
+      /* @for */
+      let ${forFirstRunName} = true;
+      let ${forItemsName} = [];
+      let ${forRangeName} = { title: "for" };
+      t_push_range(${forRangeName});
+      $run(() => {
+        if (!${forFirstRunName}) t_context.rangeStack.push(${forRangeName});
+        let t_new_items = [];
+        ${node.statement} {
+          let t_item = {
+            ${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ""}
+            data: { ${forVarNames.join(",\n")} }
+          };
+          t_new_items.push(t_item);
+        }
+        t_run_list(
+          ${forParentName},
+          ${forAnchorName},
+          ${forItemsName},
+          t_new_items,
+          (t_parent, t_item, t_before) => {
+            const $for = t_item.data = $watch(t_item.data);
+    `);
 
-    // FOR
-    const ${forAnchorName} = document.createComment("@for");
-    ${parentName}.insertBefore(${forAnchorName}, ${anchorName});
-
-    let ${forItemsName} = [];
-    let ${forRangeName} = { title: "@for ${node.statement}" };
-
-    const ${oldRangeName} = t_context.activeRange;
-    t_set_active_range(${forRangeName});
-
-    $run(() => {
-      t_context.activeRange = ${forRangeName};
-      let t_for_items = [];
-      ${node.statement} {
-        let t_item = {};
-        ${keyStatement ? `t_item.key = ${maybeAppend(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")}` : ";"}
-        t_item.data = {};
-        ${forVarNames.length ? forVarNames.map((v) => `t_item.data["${v}"] = ${v};`).join("\n") : ";"}
-        t_for_items.push(t_item);
-      }
-
-      t_reconcile_list(
-        ${parentName},
-        ${forItemsName},
-        t_for_items,
-        (t_parent, t_item, t_before) => {
-          ${forVarNames.length ? `let { ${forVarNames.join(", ")} } = t_item.data;` : ";"}
-  `);
-
-  status.startNodeNames.push({ name: `t_item.startNode`, status: "unset" });
   buildForItem(node, status, b, "t_parent");
-  status.startNodeNames.pop();
 
   b.append(`}
-      );      
-      ${forItemsName} = t_for_items;
-    });
-    t_context.activeRange = ${oldRangeName};
-  `);
+        );
+        ${forItemsName} = t_new_items;
+        if (!${forFirstRunName}) t_context.rangeStack.pop();
+        ${forFirstRunName} = false;
+      });
+      t_pop_range();`);
 }
 
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
-  b.append(`
-    const t_old_range = t_context.activeRange;
-    t_set_active_range(t_item);
-  `);
+  b.append(`$run(() => {`);
+  b.append(`t_push_range(t_item);`);
 
-  status.lastNodeName = "";
-  for (let child of filterChildren(node)) {
+  declareFragment(node, status, b);
+
+  status.fragmentStack.push({
+    fragment: node.fragment!,
+    path: "",
+  });
+  for (let child of node.children) {
     if (child.type === "control" && (child as ControlNode).operation === "@key") {
       continue;
     }
     buildNode(child, status, b, parentName, "t_before");
   }
+  status.fragmentStack.pop();
 
-  // TODO: get the last node name (element or text) that has the same parent
-  b.append(`
-    ${status.lastNodeName ? `t_item.endNode = ${status.lastNodeName};` : ";"}
-   t_context.activeRange = t_old_range;`);
+  addFragment(node, status, b, parentName, "t_before");
+
+  b.append(`t_pop_range();`);
+  b.append(`});`);
 }
 
 function buildAwaitNode(
@@ -531,14 +871,10 @@ function buildAwaitNode(
   parentName: string,
   anchorName: string,
 ) {
-  // TODO: Would this all be better as a component?
-
-  const awaitAnchorName = nextVarName("await_anchor", status);
-  const awaitTokenName = nextVarName("await_token", status);
-  const awaitIndexName = nextVarName("await_index", status);
-  const oldRangeName = nextVarName("old_range", status);
+  const awaitParentName = node.parentName!;
+  const awaitAnchorName = node.varName!;
   const awaitRangeName = nextVarName("await_range", status);
-  const awaitBranchRangesName = nextVarName("await_branch_ranges", status);
+  const awaitTokenName = nextVarName("await_token", status);
 
   // Filter non-control branches (spaces)
   const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
@@ -573,81 +909,39 @@ function buildAwaitNode(
 
   // Use an incrementing token to make sure only the last request gets handled
   // TODO: This might have unforeseen consequences
+  b.append("");
   b.append(`
-
-    // AWAIT
-    const ${awaitAnchorName} = document.createComment("@await");
-    ${parentName}.insertBefore(${awaitAnchorName}, ${anchorName});
-
+    /* @await */
+    const ${awaitRangeName} = { title: "await", index: -1 };
     let ${awaitTokenName} = 0;
-    let ${awaitIndexName} = -1;
-    let ${awaitRangeName} = { title: "@await ${branches[0].statement}" };
-    let ${awaitBranchRangesName} = [${branches.map((x) => `{ title: '@branch ${x.statement}' }`).join(", ")}];
+    t_run_control(${awaitRangeName}, () => {
+      ${awaitTokenName}++;`);
 
-    const ${oldRangeName} = t_context.activeRange;
-    t_set_active_range(${awaitRangeName});
-
-    $run(() => {
-      ${awaitTokenName}++;
-      t_context.activeRange = ${awaitRangeName};
-  `);
-
-  status.startNodeNames.push({ name: `${awaitBranchRangesName}[0].startNode`, status: "unset" });
-  buildAwaitBranch(
-    awaitBranch,
-    status,
-    b,
-    parentName,
-    awaitAnchorName,
-    awaitBranchRangesName,
-    awaitIndexName,
-    0,
-  );
-  status.startNodeNames.pop();
+  buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 0);
 
   b.append(`
     ((token) => {
       ${awaiterName}
       .then((${thenVar}) => {
-      if (token === ${awaitTokenName}) {`);
+      if (token === ${awaitTokenName}) {
+        t_context.rangeStack.push(${awaitRangeName});`);
 
-  status.startNodeNames.push({ name: `${awaitBranchRangesName}[1].startNode`, status: "unset" });
-  buildAwaitBranch(
-    thenBranch,
-    status,
-    b,
-    parentName,
-    awaitAnchorName,
-    awaitBranchRangesName,
-    awaitIndexName,
-    1,
-  );
-  status.startNodeNames.pop();
+  buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 1);
 
-  b.append(`}
+  b.append(`t_context.rangeStack.pop();
+      }
     })
     .catch((${catchVar}) => {
-      if (token === ${awaitTokenName}) {`);
+      if (token === ${awaitTokenName}) {
+        t_context.rangeStack.push(${awaitRangeName});`);
 
-  status.startNodeNames.push({ name: `${awaitBranchRangesName}[2].startNode`, status: "unset" });
-  buildAwaitBranch(
-    catchBranch,
-    status,
-    b,
-    parentName,
-    awaitAnchorName,
-    awaitBranchRangesName,
-    awaitIndexName,
-    2,
-  );
-  status.startNodeNames.pop();
+  buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 2);
 
-  b.append(`}
+  b.append(`t_context.rangeStack.pop();
+          }
         });
       })(${awaitTokenName});
-    });
-    t_context.activeRange = ${oldRangeName};
-  `);
+    });`);
 }
 
 function buildAwaitBranch(
@@ -656,32 +950,25 @@ function buildAwaitBranch(
   b: Builder,
   parentName: string,
   anchorName: string,
-  branchRangesName: string,
-  indexName: string,
+  rangeName: string,
   index: number,
 ) {
-  const startNodeNames = scopeNodeNames(status);
+  b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
-  const branchRangeName = `${branchRangesName}[${index}]`;
+  declareFragment(node, status, b);
 
-  b.append(`
-    if (${indexName} !== -1) t_clear_range(${branchRangesName}[${indexName}]);
-  
-    const t_old_range = t_context.activeRange;
-    t_set_active_range(${branchRangeName});
-  `);
-
-  status.lastNodeName = "";
-  for (let child of filterChildren(node)) {
+  status.fragmentStack.push({
+    fragment: node.fragment!,
+    path: "",
+  });
+  for (let child of node.children) {
     buildNode(child, status, b, parentName, anchorName);
   }
+  status.fragmentStack.pop();
 
-  b.append(`
-    ${indexName} = ${index};
-    ${status.lastNodeName ? `${branchRangeName}.endNode = ${status.lastNodeName};` : ";"}
-    t_context.activeRange = t_old_range;`);
+  addFragment(node, status, b, parentName, anchorName);
 
-  unscopeNodeNames(status, startNodeNames);
+  b.append(`});`);
 }
 
 function buildComponentNode(
@@ -692,6 +979,9 @@ function buildComponentNode(
   anchorName: string,
   root = false,
 ) {
+  b.append("");
+  b.append("/* @component */");
+
   // Props
   const componentHasProps = node.attributes.length || root;
   const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
@@ -703,8 +993,8 @@ function buildComponentNode(
         name = name.substring(1, name.length - 1);
         b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
       } else {
-        let generated = value.startsWith("{") && value.endsWith("}");
-        if (generated) {
+        let reactive = value.startsWith("{") && value.endsWith("}");
+        if (reactive) {
           value = value.substring(1, value.length - 1);
         }
         if (name === "class") {
@@ -713,20 +1003,20 @@ function buildComponentNode(
           value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
         }
         const setProp = `${propsName}["${name}"] = ${value || "true"}`;
-        b.append(generated ? `$run(() => ${setProp});` : `${setProp};`);
+        b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
       }
     }
     // PERF: Does this have much of an impact??
     if (root) {
-      b.append(`if ($props) {`);
       b.append(`
-        const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
-        for (let name of Object.keys($props)) {`);
-      b.append(`if (!name.startsWith("$") && !propNames.includes(name)) {`);
-      b.append(`$run(() => ${propsName}[name] = $props[name]);`);
-      b.append(`}`);
-      b.append(`}`);
-      b.append(`}`);
+        if ($props) {
+          const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
+          for (let name of Object.keys($props)) {
+            if (!name.startsWith("$") && !propNames.includes(name)) {
+              $run(() => ${propsName}[name] = $props[name]);
+            }
+          }
+        }`);
     }
   }
 
@@ -734,64 +1024,38 @@ function buildComponentNode(
   const componentHasSlots = node.children.length;
   const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
   if (componentHasSlots) {
-    const slots = gatherSlotNodes(node);
     b.append(`const ${slotsName} = {};`);
-    for (let [key, value] of Object.entries(slots)) {
-      b.append(`${slotsName}["${key}"] = ($parent, $anchor, $sprops) => {`);
-      for (let child of filterChildren(value)) {
-        buildNode(child, status, b, "$parent", "$anchor");
+    for (let slot of node.children) {
+      if (isSpecialNode(slot)) {
+        const nameAttribute = slot.attributes.find((a) => a.name === "name");
+        const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
+        b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops) => {`);
+
+        declareFragment(slot, status, b);
+
+        status.fragmentStack.push({
+          fragment: slot.fragment,
+          path: "",
+        });
+        for (let child of slot.children) {
+          buildNode(child, status, b, "$sparent", "$sanchor");
+        }
+        status.fragmentStack.pop();
+
+        addFragment(slot, status, b, "$sparent", "$sanchor");
+
+        b.append(`}`);
       }
-      b.append(`}`);
     }
   }
 
   // Build an anchor here, so that effects set in the script can be cleaned up if/when the
   // component is removed
   // And also so that we have an end node for the active range, if needed
-  const componentAnchorName = nextVarName("component_anchor", status);
+  const compParentName = node.parentName!;
+  const compAnchorName = node.varName!;
   b.append(`
-    const ${componentAnchorName} = document.createComment("@comp ${node.tagName}");
-    ${parentName}.insertBefore(${componentAnchorName}, ${anchorName});
-
-    ${node.tagName}.render(${parentName}, ${componentAnchorName}, ${propsName}, ${slotsName}, $context)`);
-
-  // NOTE: this will have been set in the component's render function to the first element node
-  setScopedNodes(status, b, "t_context.activeRange.startNode");
-
-  status.lastNodeName = componentAnchorName;
-}
-
-function gatherSlotNodes(node: ElementNode): Record<string, Node[]> {
-  const slots: Record<string, Node[]> = {};
-
-  // Add named slots
-  for (let child of node.children) {
-    if (child.type === "special") {
-      const el = child as ElementNode;
-      if (el.tagName === ":fill") {
-        let slotName = el.attributes.find((a) => a.name === "name")?.value;
-        if (slotName) slotName = trimQuotes(slotName);
-        slots[slotName || "_"] = el.children;
-      }
-    }
-  }
-
-  // Add the default slot, if not already done
-  // TODO: Check that this excludes spaces etc
-  if (!slots["_"]) {
-    const children: Node[] = [];
-    for (let child of filterChildren(node)) {
-      if (child.type === "special" && (child as ElementNode).tagName === ":fill") {
-        continue;
-      }
-      children.push(child);
-    }
-    if (children.length) {
-      slots["_"] = children;
-    }
-  }
-
-  return slots;
+    ${node.tagName}.render(${compParentName}, ${compAnchorName}, ${propsName}, ${slotsName}, $context)`);
 }
 
 function buildElementNode(
@@ -802,33 +1066,20 @@ function buildElementNode(
   anchorName: string,
   root = false,
 ) {
-  const varName = nextVarName(node.tagName, status);
-
-  b.append(`const ${varName} = document.createElement("${node.tagName}");`);
-  // PERF: Does this have much of an impact??
-  if (root) {
-    b.append(`if ($props) {`);
-    b.append(`
-      const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
-      t_apply_attributes(${varName}, $props, propNames);`);
-    b.append(`}`);
+  const varName = node.varName;
+  if (varName) {
+    // PERF: Does this have much of an impact??
+    if (root) {
+      b.append("");
+      b.append(
+        `t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
+      );
+    }
+    buildElementAttributes(node, varName, status, b);
   }
-  buildElementAttributes(node, varName, status, b);
-  for (let child of filterChildren(node)) {
-    buildNode(child, status, b, varName, "null");
-  }
-  b.append(`${parentName}.insertBefore(${varName}, ${anchorName});`);
 
-  // TODO: Do this for text nodes too
-  setScopedNodes(status, b, varName);
-
-  // HACK: Can we do this through scoped nodes somehow?
-  // If this element is the first one being added for a component, set the active range's start node
-  if (status.isFirstElement) {
-    b.append(
-      `if (t_context.activeRange && !t_context.activeRange.startNode) t_context.activeRange.startNode = ${varName};`,
-    );
-    status.isFirstElement = false;
+  for (let child of node.children) {
+    buildNode(child, status, b, parentName, "null");
   }
 }
 
@@ -838,22 +1089,30 @@ function buildElementAttributes(
   status: BuildStatus,
   b: Builder,
 ) {
-  for (let attribute of node.attributes) {
-    let { name, value } = attribute;
+  for (let { name, value } of node.attributes) {
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
       b.append(`$run(() => ${varName}.setAttribute("${name}", ${name}));`);
-    } else {
-      let generated = value.startsWith("{") && value.endsWith("}");
-      if (generated) {
-        value = value.substring(1, value.length - 1);
-      }
 
-      if (name.indexOf("on") === 0) {
-        // Add an event listener
-        const eventName = name.substring(2);
-        b.append(`${varName}.addEventListener("${eventName}", ${value});`);
-      } else if (name.indexOf("bind:") === 0) {
+      const path = getFragmentPath(status, b);
+      if (path) {
+        b.append(`
+          $run(() => ${varName}.setAttribute("${name}", ${name}));`);
+      }
+    } else if (name.startsWith("on")) {
+      value = trimMatched(value, "{", "}");
+
+      // Add an event listener
+      const eventName = name.substring(2);
+
+      const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
+      if (fragment) {
+        fragment.events.push({ varName, eventName, handler: value });
+      }
+    } else if (value.startsWith("{") && value.endsWith("}")) {
+      value = value.substring(1, value.length - 1);
+
+      if (name.indexOf("bind:") === 0) {
         // TODO: Don't love the bind: syntax -- $value? @value? :value?
         // Automatically add an event to bind the value
         // TODO: need to check the element to find out what type of event to add
@@ -870,37 +1129,39 @@ function buildElementAttributes(
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
         const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
-        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(`$run(() => ${setAttribute});`);
         // TODO: Add a parseInput method that handles NaN etc
         b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
         const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
-        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(`$run(() => ${setAttribute});`);
       } else if (name === "class") {
         // NOTE: Clear any previously set values from the element
         const classVarName = nextVarName("class_name", status);
-        if (generated) {
-          b.append(`
+        b.append(`
             let ${classVarName} = ${value};
-            $run(() => {`);
-          b.append(`
-            if (${classVarName}) ${varName}.classList.remove(${classVarName});
-            if (${value}) {`);
-        }
-        b.append(`${varName}.classList.add(...${value}.split(" "));`);
-        if (generated) {
-          b.append(`${classVarName} = ${value};`);
-          b.append(`}`);
-          b.append(`});`);
-        }
+            $run(() => {
+              if (${classVarName}) ${varName}.classList.remove(${classVarName});
+              if (${value}) {
+                ${varName}.classList.add(...${value}.split(" "));
+                ${classVarName} = ${value};
+              }
+            });`);
       } else {
-        // Set the attribute value
-        const setAttribute = `${varName}.setAttribute("${name}", ${value})`;
-        b.append(generated ? `$run(() => ${setAttribute});` : `${setAttribute};`);
+        b.append(`$run(() => ${varName}.setAttribute("${name}", ${value}));`);
       }
     }
   }
+}
+
+function isReactiveAttribute(name: string, value: string) {
+  // HACK: Better checking of whether an attribute is reactive
+  return (
+    (name.startsWith("{") && name.endsWith("}")) ||
+    (value.startsWith("{") && value.endsWith("}")) ||
+    name.startsWith("on")
+  );
 }
 
 function buildTextNode(
@@ -915,40 +1176,59 @@ function buildTextNode(
   content = content.replace(/\s+/g, " ");
 
   // TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
-  let generated = content.includes("{") && content.includes("}");
-  let generatedCount = 0;
-  let braceCount = 0;
+  let reactiveStarted = false;
+  let reactiveCount = 0;
   for (let i = 0; i < content.length; i++) {
     if (content[i] === "{") {
-      generated = true;
-      braceCount += 1;
-      if (braceCount === 0) {
-        generatedCount += 1;
-      }
+      reactiveStarted = true;
     } else if (content[i] === "}") {
-      braceCount -= 1;
+      if (reactiveStarted) {
+        reactiveCount += 1;
+        reactiveStarted = false;
+      }
     }
   }
-  if (generated) {
-    if (generatedCount === 1 && content.startsWith("{") && content.endsWith("}")) {
-      content = content.substring(1, content.length - 1);
+
+  if (reactiveCount) {
+    if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
+      content = `t_text(${content.substring(1, content.length - 1)})`;
     } else {
       content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
     }
-  } else {
-    content = `t_text("${content.replaceAll('"', '\\"')}")`;
+    b.append(`$run(() => ${node.varName}.textContent = ${content});`);
+  }
+}
+
+function getFragmentPath(status: BuildStatus, b: Builder): string {
+  const fragment = status.fragmentStack[status.fragmentStack.length - 1];
+  if (fragment && fragment.fragment) {
+    //b.append(`console.log("${fragment.path}");`);
+    //b.append(`//// t_fragment_${fragment.fragment.number} ${fragment.path}`);
+    const parts = fragment.path.substring(0, fragment.path.length - 1).split("/");
+    let path = `t_fragment_${fragment.fragment.number}`;
+    let parentPath = "";
+    let childIndex = -2;
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i].split(":")[1];
+      if (part === "ch") {
+        parentPath = path;
+        if (childIndex != -2) {
+          path += `.childNodes[${childIndex}]`;
+        }
+        childIndex = -1;
+      } else {
+        childIndex += 1;
+      }
+    }
+    if (childIndex != -2) {
+      parentPath = path;
+      path += `.childNodes[${childIndex}]`;
+    }
+
+    return path;
   }
 
-  const varName = nextVarName("text", status);
-  b.append(`
-    const ${varName} = document.createTextNode(${generated ? '""' : content});
-    ${parentName}.insertBefore(${varName}, ${anchorName});`);
-
-  if (generated) {
-    b.append(`$run(() => ${varName}.textContent = ${content});`);
-  }
-
-  //result += setScopedNodes(status, varName);
+  return "";
 }
 
 function buildSpecialNode(
@@ -975,11 +1255,7 @@ function buildSlotNode(
 ) {
   // If there's a slot, build that, otherwise build the default nodes
   let slotName = node.attributes.find((a) => a.name === "name")?.value;
-  if (slotName) {
-    slotName = trimQuotes(slotName);
-  } else {
-    slotName = "_";
-  }
+  slotName = slotName ? trimQuotes(slotName) : "_";
 
   // Slot props
   const propsName = nextVarName("sprops", status);
@@ -993,108 +1269,44 @@ function buildSlotNode(
         name = name.substring(1, name.length - 1);
         b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
       } else {
-        let generated = value.startsWith("{") && value.endsWith("}");
-        if (generated) {
+        let reactive = value.startsWith("{") && value.endsWith("}");
+        if (reactive) {
           value = value.substring(1, value.length - 1);
         }
         const setProp = `${propsName}["${name}"] = ${value}`;
-        b.append(generated ? `$run(() => ${setProp});` : `${setProp};`);
+        b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
       }
     }
   }
+
+  const slotParentName = node.parentName!;
+  const slotAnchorName = node.varName!;
 
   b.append(`if ($slots && $slots["${slotName}"]) {`);
   b.append(
-    `$slots["${slotName}"](${parentName}, ${anchorName}, ${slotHasProps ? propsName : "undefined"})`,
+    `$slots["${slotName}"](${slotParentName}, ${slotAnchorName}, ${slotHasProps ? propsName : "undefined"})`,
   );
-  b.append(`} else {`);
-  for (let child of filterChildren(node)) {
-    buildNode(child, status, b, parentName, anchorName);
+
+  // TODO: Not if there's only a single space node -- maybe check in parse
+  if (node.children.length) {
+    b.append(`} else {`);
+
+    declareFragment(node, status, b);
+
+    status.fragmentStack.push({
+      fragment: node.fragment,
+      path: "0:ch/",
+    });
+    for (let child of node.children) {
+      buildNode(child, status, b, slotParentName, slotAnchorName);
+    }
+    status.fragmentStack.pop();
+
+    addFragment(node, status, b, slotParentName, slotAnchorName);
   }
+
   b.append(`}`);
 }
-
-function* filterChildren(node: ElementNode | ControlNode | Node[]) {
-  const children = Array.isArray(node) ? node : node.children;
-  const endIndex = children.length - 1;
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i];
-
-    // Skip the first and last spaces
-    if ((i === 0 || i === endIndex) && child.type === "space") {
-      continue;
-    }
-
-    // Merge text and spaces
-    if (child.type === "text" || child.type === "space") {
-      const joinedChild: TextNode = {
-        type: "text",
-        content: (child as TextNode).content || "",
-      };
-      for (i = i + 1; i < children.length; i++) {
-        const nextChild = children[i];
-
-        // Skip the first and last spaces
-        if ((i === 0 || i === endIndex) && nextChild.type === "space") {
-          continue;
-        }
-
-        if (nextChild.type === "text" || nextChild.type === "space") {
-          joinedChild.content += (nextChild as TextNode).content;
-        } else {
-          i--;
-          break;
-        }
-      }
-
-      yield joinedChild;
-    } else {
-      yield child;
-    }
-  }
-}
-
-/*
-function processChildren(node: ElementNode | ControlNode, cb: (node: Node) => void) {
-  const endIndex = node.children.length - 1;
-  for (let i = 0; i < node.children.length; i++) {
-    const child = node.children[i];
-
-    // Skip the first and last spaces
-    if ((i === 0 || i === endIndex) && child.type === "space") {
-      continue;
-    }
-
-    // Merge text and spaces
-    if (child.type === "text" || child.type === "space") {
-      const joinedChild: TextNode = {
-        type: "text",
-        content: (child as TextNode).content || "",
-      };
-
-      for (i = i + 1; i < node.children.length; i++) {
-        const nextChild = node.children[i];
-
-        // Skip the first and last spaces
-        if ((i === 0 || i === endIndex) && nextChild.type === "space") {
-          continue;
-        }
-
-        if (nextChild.type === "text" || nextChild.type === "space") {
-          joinedChild.content += (nextChild as TextNode).content;
-        } else {
-          i--;
-          break;
-        }
-      }
-
-      cb(joinedChild);
-    } else {
-      cb(child);
-    }
-  }
-}
-*/
 
 function nextVarName(name: string, status: BuildStatus): string {
   if (!status.varNames[name]) {
@@ -1105,44 +1317,14 @@ function nextVarName(name: string, status: BuildStatus): string {
   return varName;
 }
 
-function scopeNodeNames(status: BuildStatus) {
-  // Set all start node names that haven't been set yet to scoped
-  // They will get set in the current scope, and the next scope(s), and maybe outside the scopes
-  const copy = status.startNodeNames.map((n) => ({ name: n.name, status: n.status }));
-  status.startNodeNames.forEach((n) => {
-    if (n.status === "unset") {
-      n.status = "scoped";
-    }
-  });
-  return copy;
+function isReactive(content: string) {
+  // TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
+  return content.includes("{") && content.includes("}");
 }
 
-function unscopeNodeNames(status: BuildStatus, copy: StartNodeInfo[]) {
-  // Set all start node names that have been scoped back to unset so they can get set in the next
-  // scope(s), and maybe outside the scopes
-  //status.startNodeNames.forEach((n) => {
-  //  if (n.status === "scoped") {
-  //    n.status = "unset";
-  //  }
-  //});
-  status.startNodeNames = copy;
-
-  // We can't use any nodes created in this scope from outside it
-  status.lastNodeName = "";
-}
-
-function setScopedNodes(status: BuildStatus, b: Builder, varName: string) {
-  for (let startNodeName of status.startNodeNames) {
-    if (startNodeName.status === "unset") {
-      b.append(`if (!${startNodeName.name}) ${startNodeName.name} = ${varName};`);
-      startNodeName.status = "set";
-    } else if (startNodeName.status === "scoped") {
-      b.append(`${startNodeName.name} = ${varName};`);
-      startNodeName.status = "scopedset";
-    }
-  }
-
-  status.lastNodeName = varName;
+function isFullyReactive(content: string) {
+  // TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
+  return content.trim().startsWith("{") && content.trim().endsWith("}");
 }
 
 function buildStyles(name: string, parts: ComponentParts): string {

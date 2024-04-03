@@ -19,16 +19,20 @@ test("for statement with key", () => {
     ok: true,
     errors: [],
     parts: {
-      template: el(
-        "section",
-        [],
-        [
-          control("@for", "for (let item of things)", [
-            control("@key", "key = item.id"),
-            el("p", [], [text("{item.name}")]),
-          ]),
-        ],
-      ),
+      template: control("@root", "", [
+        el(
+          "section",
+          [],
+          [
+            control("@for group", "", [
+              control("@for", "for (let item of things)", [
+                control("@key", "key = item.id"),
+                el("p", [], [text("{item.name}")]),
+              ]),
+            ]),
+          ],
+        ),
+      ]),
     },
   };
   expect(output).toEqual(expected);
