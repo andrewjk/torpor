@@ -1,7 +1,4 @@
 <script>
-    import watch from "../../watch/src/watch";
-    import Header from "./Header.tera";
- 
     // TODO: Test with async
     let number = 0;
     function sleep(ms) {
@@ -11,16 +8,25 @@
       });
     }
 
-    const $state = watch({
+    const $state = $watch({
         condition: false,
         count: 0,
-        letters: ["a", "b", "c", "d", "e", "f", "g"],
+        letters: ["a", "b", "c"], //, "d", "e", "f", "g"],
         deep: {
             text: "",
             class: ""
         },
         sleeper: sleep(1000),
+        showeffects: false
     });
+
+    const $derived = $watch({
+        get isEven() { return $state.count % 2 == 0 },
+    })
+
+    $run(() => {
+        console.log("the count is " + $state.count)
+    })
 
     function increment() {
         $state.count += 1;
@@ -33,29 +39,34 @@
 </script>
 
 <div id="app">
-    <h2>Demo and test</h2>
+    <h2>Demo</h2>
+
     <p>
         The count is <strong>{$state.count}</strong>.
-        It is {$state.count % 2 == 0 ? "even" : "odd"}.
+        It is {$derived.isEven ? "even" : "odd"}.
     </p>
+    @if ($state.showeffects) {
+        <Effects />
+    }
     @// Ignore this comment
     @const x = 5;
     <button onclick=increment>Increment</button>
     <button onclick={() => $state.count = 0}>Reset</button>
+    <button onclick={() => $state.showeffects = !$state.showeffects}>Show/hide effects</button>
     @switch ($state.count) {
-        @case 0: {
+        case 0: {
             <p>Zero</p>
         }
-        @case 1: {
+        case 1: {
             <p>One</p>
         }
-        @case 2: {
+        case 2: {
             <p>Two</p>
         }
-        @case 3: {
+        case 3: {
             <p>Three</p>
         }
-        @default: {
+        default: {
             <p>More</p>
         }
     }
@@ -67,44 +78,45 @@
     }
 
     <Header name="Bob"/>
+    <SlottedHeader />
 
     @// FOR ===
     <p>
         @for (let i = 0; i < $state.letters.length; i++) {
             @key = $state.letters[i];
             @// TODO: replace with <text> tags
-            <span>{i > 0 ? ", " : ""}{$state.letters[i]}</span>
+            <span>{$for.i > 0 ? ", " : ""}{$state.letters[$for.i]}</span>
         }
     </p>
     <button onclick={() => {
-      $state.letters = $state.letters
+      const newLetters = $state.letters
         .map(value => ({ value, sort: Math.random() }))
         .sort((a, b) => a.sort - b.sort)
         .map(({ value }) => value)
+      console.log(newLetters);
+      $state.letters = newLetters;
     }}>
         Shuffle letters
     </button>
     <button onclick={() => {
-      // HACK: should be able to push
-      $state.letters = [...$state.letters, nextLetter()]
+        console.log($state.letters)
+      $state.letters.push(nextLetter());
     }}>
         Add a letter
     </button>
     <button onclick={() => {
-      // HACK: should be able to update
-      $state.letters = [...$state.letters.slice(0, 3), nextLetter(), ...$state.letters.slice(4)];
+      $state.letters.splice(3, 1, nextLetter());
     }}>
         Change a letter
     </button>
     <button onclick={() => {
-      // HACK: should be able to update
-      $state.letters = [...$state.letters.slice(0, 5), nextLetter(), ...$state.letters.slice(5)];
+      //$state.letters.splice(5, 0, nextLetter());
+      $state.letters.unshift(nextLetter());
     }}>
         Insert a letter
     </button>
     <button onclick={() => {
-      // HACK: should be able to update
-      $state.letters = $state.letters.map((l, i) => $state.letters[$state.letters.length - 1 - i]);
+      $state.letters.reverse();
     }}>
         Reverse letters
     </button>
@@ -123,6 +135,10 @@
     }}>
         Reset timer
     </button>
+
+    <p>
+        <a href="/">Index</a>
+    </p>
 </div>
 
 <style>
@@ -130,3 +146,28 @@
         color: lavender;
     }
 </style>
+
+<template name="Header">
+    <h2>Hi, {$props.name}!</h2>
+</template>
+
+<template name="SlottedHeader">
+    <h2>
+        <:slot>
+            Default header...
+        </:slot>
+    </h2>
+</template>
+
+<template name="Effects">
+    <script>
+        $run(() => {
+            console.log("on mounting");
+            return () => {
+                console.log("on unmounting");
+            }
+        })
+    </script>
+
+    <p>Effects are in effect</p>
+</template>
