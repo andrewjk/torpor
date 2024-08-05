@@ -5,8 +5,8 @@ export default function addFragment(
   parent: ParentNode,
   before?: HTMLElement,
 ) {
-  const startNode = fragment.childNodes[0];
-  const endNode = fragment.childNodes[fragment.childNodes.length - 1];
+  const startNode = fragment.firstChild;
+  const endNode = fragment.lastChild;
 
   // TODO: Ranges for components, so that we always have an activerange
   if (context.activeRange) {
