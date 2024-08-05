@@ -273,7 +273,9 @@ function declareFragment(node: ControlNode | ElementNode, status: BuildStatus, b
       `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
     );
     const root = node.type === "control" && (node as ControlNode).operation === "@root";
-    declareFragmentVars(node.fragment, node, ["0:ch"], status, b, root);
+
+    let existingVarPaths = new Map<string, string>();
+    declareFragmentVars(node.fragment, node, ["0:ch"], status, b, existingVarPaths, root);
   }
 }
 
@@ -283,27 +285,51 @@ function declareFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
   root = false,
 ) {
   switch (node.type) {
     case "control": {
-      declareControlFragmentVars(fragment, node as ControlNode, path, status, b, root);
+      declareControlFragmentVars(
+        fragment,
+        node as ControlNode,
+        path,
+        status,
+        b,
+        existingVarPaths,
+        root,
+      );
       break;
     }
     case "component": {
-      declareComponentFragmentVars(fragment, node as ElementNode, path, status, b);
+      declareComponentFragmentVars(
+        fragment,
+        node as ElementNode,
+        path,
+        status,
+        b,
+        existingVarPaths,
+      );
       break;
     }
     case "element": {
-      declareElementFragmentVars(fragment, node as ElementNode, path, status, b, root);
+      declareElementFragmentVars(
+        fragment,
+        node as ElementNode,
+        path,
+        status,
+        b,
+        existingVarPaths,
+        root,
+      );
       break;
     }
     case "text": {
-      declareTextFragmentVars(fragment, node as TextNode, path, status, b);
+      declareTextFragmentVars(fragment, node as TextNode, path, status, b, existingVarPaths);
       break;
     }
     case "special": {
-      declareSpecialFragmentVars(fragment, node as ElementNode, path, status, b);
+      declareSpecialFragmentVars(fragment, node as ElementNode, path, status, b, existingVarPaths);
       break;
     }
   }
@@ -315,6 +341,7 @@ function declareControlFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
   root = false,
 ) {
   switch (node.operation) {
@@ -323,12 +350,12 @@ function declareControlFragmentVars(
     case "@for group":
     case "@await group": {
       const operation = node.operation.substring(1).replace(" group", "");
-      declareParentAnchorFragmentVars(fragment, node, path, status, b, operation);
+      declareParentAnchorFragmentVars(fragment, node, path, status, b, existingVarPaths, operation);
       break;
     }
     default: {
       for (let child of node.children) {
-        declareFragmentVars(fragment, child, path, status, b, root);
+        declareFragmentVars(fragment, child, path, status, b, existingVarPaths, root);
       }
       break;
     }
@@ -341,8 +368,9 @@ function declareComponentFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
 ) {
-  declareParentAnchorFragmentVars(fragment, node, path, status, b, "comp");
+  declareParentAnchorFragmentVars(fragment, node, path, status, b, existingVarPaths, "comp");
 }
 
 function declareElementFragmentVars(
@@ -351,6 +379,7 @@ function declareElementFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
   root = false,
 ) {
   const pathIndex = path.slice(path.lastIndexOf("0:ch")).length - 1;
@@ -361,7 +390,7 @@ function declareElementFragmentVars(
 
   if (setAttributes) {
     node.varName = nextVarName(node.tagName, status);
-    const varPath = getFragmentVarPath(fragment, path, b);
+    const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
     b.append(`const ${node.varName} = ${varPath};`);
     status.fragmentVars.set(varPath, node.varName);
   }
@@ -369,7 +398,7 @@ function declareElementFragmentVars(
   const oldPathLength = path.length;
   path.push("0:ch");
   for (let child of node.children) {
-    declareFragmentVars(fragment, child, path, status, b);
+    declareFragmentVars(fragment, child, path, status, b, existingVarPaths);
   }
   path.splice(oldPathLength);
 }
@@ -380,6 +409,7 @@ function declareTextFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
 ) {
   // Text nodes get merged together
   if (!path[path.length - 1].endsWith("txt")) {
@@ -389,7 +419,7 @@ function declareTextFragmentVars(
 
   if (isReactive(node.content)) {
     node.varName = nextVarName("text", status);
-    const varPath = getFragmentVarPath(fragment, path, b);
+    const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
     b.append(`const ${node.varName} = ${varPath};`);
     status.fragmentVars.set(varPath, node.varName);
   }
@@ -401,15 +431,16 @@ function declareSpecialFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
 ) {
   switch (node.tagName) {
     case ":slot": {
-      declareParentAnchorFragmentVars(fragment, node, path, status, b, "slot");
+      declareParentAnchorFragmentVars(fragment, node, path, status, b, existingVarPaths, "slot");
       break;
     }
     case ":fill": {
       for (let child of node.children) {
-        declareFragmentVars(fragment, child, path, status, b);
+        declareFragmentVars(fragment, child, path, status, b, existingVarPaths);
       }
       break;
     }
@@ -422,6 +453,7 @@ function declareParentAnchorFragmentVars(
   path: string[],
   status: BuildStatus,
   b: Builder,
+  existingVarPaths: Map<string, string>,
   name: string,
 ) {
   const parentIndex = path.lastIndexOf("0:ch");
@@ -430,7 +462,7 @@ function declareParentAnchorFragmentVars(
   // In that case we don't set the parentName so that the existing parent will be used
   //if (parentIndex > 0) {
   const parentPath = path.slice(0, parentIndex);
-  const parentVarPath = getFragmentVarPath(fragment, parentPath, b);
+  const parentVarPath = getFragmentVarPath(fragment, "?", parentPath, existingVarPaths);
   if (parentIndex === 0) {
     node.parentName = parentVarPath;
   } else if (status.fragmentVars.has(parentVarPath)) {
@@ -446,19 +478,29 @@ function declareParentAnchorFragmentVars(
   const pathIndex = path.length - parentIndex - 1;
   path.push(`${pathIndex}:${name}`);
   node.varName = nextVarName(`${name}_anchor`, status);
-  const varPath = getFragmentVarPath(fragment, path, b);
+  const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
   b.append(`const ${node.varName} = ${varPath};`);
   status.fragmentVars.set(varPath, node.varName);
 }
 
-function getFragmentVarPath(fragment: Fragment, path: string[], b: Builder): string {
+function getFragmentVarPath(
+  fragment: Fragment,
+  name: string,
+  path: string[],
+  existingVarPaths: Map<string, string>,
+): string {
   let varPath = `t_fragment_${fragment.number}`;
   let childIndex = -2;
   for (let i = 0; i < path.length; i++) {
     const part = path[i].split(":")[1];
     if (part === "ch") {
       if (childIndex != -2) {
-        varPath += `.childNodes[${childIndex}]`;
+        //varPath += `.childNodes[${childIndex}]`;
+        // This seems a little faster:
+        varPath += ".firstChild";
+        for (let i = 0; i < childIndex; i++) {
+          varPath += ".nextSibling";
+        }
       }
       childIndex = -1;
     } else {
@@ -466,8 +508,24 @@ function getFragmentVarPath(fragment: Fragment, path: string[], b: Builder): str
     }
   }
   if (childIndex != -2) {
-    varPath += `.childNodes[${childIndex}]`;
+    //varPath += `.childNodes[${childIndex}]`;
+    // This seems a little faster:
+    varPath += ".firstChild";
+    for (let i = 0; i < childIndex; i++) {
+      varPath += ".nextSibling";
+    }
   }
+
+  // HACK: allow passing in "?" to ignore the parentVarPath
+  if (name !== "?") {
+    for (let [existingName, existingPath] of existingVarPaths) {
+      if (varPath.includes(existingPath)) {
+        varPath = varPath.replace(existingPath, existingName);
+      }
+    }
+    existingVarPaths.set(name, varPath);
+  }
+
   return varPath;
 }
 
