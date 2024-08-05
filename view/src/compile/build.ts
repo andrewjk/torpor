@@ -1195,17 +1195,7 @@ function buildElementAttributes(
         const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
         b.append(`$run(() => ${setAttribute});`);
       } else if (name === "class") {
-        // NOTE: Clear any previously set values from the element
-        const classVarName = nextVarName("class_name", status);
-        b.append(`
-            let ${classVarName} = ${value};
-            $run(() => {
-              if (${classVarName}) ${varName}.classList.remove(${classVarName});
-              if (${value}) {
-                ${varName}.classList.add(...${value}.split(" "));
-                ${classVarName} = ${value};
-              }
-            });`);
+        b.append(`$run(() => ${varName}.className = ${value});`);
       } else {
         b.append(`$run(() => ${varName}.setAttribute("${name}", ${value}));`);
       }
