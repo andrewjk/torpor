@@ -689,7 +689,7 @@ function buildIfNode(
   b.append("");
   b.append(`
       /* @if */
-      const ${ifRangeName} = { title: "if" };
+      const ${ifRangeName} = {};
       t_run_control(${ifRangeName}, () => {`);
 
   for (let [i, branch] of branches.entries()) {
@@ -756,7 +756,7 @@ function buildSwitchNode(
   b.append("");
   b.append(`
       /* @switch */
-      const ${switchRangeName} = { title: "switch" };
+      const ${switchRangeName} = {};
       t_run_control(${switchRangeName}, () => {
         ${node.statement} {`);
 
@@ -866,7 +866,7 @@ function buildForNode(
       /* @for */
       let ${forFirstRunName} = true;
       let ${forItemsName} = [];
-      let ${forRangeName} = { title: "for" };
+      let ${forRangeName} = {};
       t_push_range(${forRangeName});
       $run(() => {
         if (!${forFirstRunName}) t_context.rangeStack.push(${forRangeName});
@@ -970,7 +970,7 @@ function buildAwaitNode(
   b.append("");
   b.append(`
     /* @await */
-    const ${awaitRangeName} = { title: "await", index: -1 };
+    const ${awaitRangeName} = { index: -1 };
     let ${awaitTokenName} = 0;
     t_run_control(${awaitRangeName}, () => {
       ${awaitTokenName}++;`);
