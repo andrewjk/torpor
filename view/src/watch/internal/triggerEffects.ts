@@ -25,11 +25,12 @@ export default function triggerEffects(
         //console.log(`effect triggered for '${String(prop)}' on`, target, String(effect));
 
         // Run any cleanup function
-        const cleanup = context.effectCleanups.get(effect);
-        if (cleanup) cleanup();
+        if (effect.cleanup) {
+          effect.cleanup();
+        }
 
         // Run the effect
-        effect();
+        effect.run();
       }
     }
   }

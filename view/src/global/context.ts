@@ -1,18 +1,6 @@
+import type Effect from "./Effect";
 import type Range from "./Range";
 
-type Cleanup = () => void;
-type Effect = () => Cleanup | void;
-
-type ObjectEffectsMap = Map<object, PropertyEffectsMap>;
-type PropertyEffectsMap = Map<string | symbol, Set<Effect>>;
-type EffectCleanupsMap = Map<Effect, Cleanup>;
-
-type RangeEffectsMap = Map<Range, RangeEffectsSet>;
-type RangeEffectsSet = Set<{
-  target: object;
-  prop: string | symbol;
-  effect: Effect;
-}>;
 
 /**
  * The global context for setting up effects and updating subscriptions.
@@ -39,11 +27,7 @@ interface Context {
    * When a property of a proxied object (created via the $watch function) is changed, we look up
    * the object, then the property, and run any effects that are found.
    */
-  effectSubs: ObjectEffectsMap;
-  /**
-   * A map of cleanup functions to run, keyed by effect.
-   */
-  effectCleanups: EffectCleanupsMap;
+  effectSubs: Map<object, Map<string | symbol, Set<Effect>>>;
   /**
    * A stack with the range that is currently being created on top.
    */
@@ -57,8 +41,7 @@ interface Context {
 const context: Context = {
   activeEffect: undefined,
   activeEffectSubbed: false,
-  effectSubs: new Map<object, PropertyEffectsMap>(),
-  effectCleanups: new Map<Effect, Cleanup>(),
+  effectSubs: new Map<object, Map<string | symbol, Set<Effect>>>(),
   rangeStack: [],
   get activeRange() {
     return this.rangeStack[this.rangeStack.length - 1];
