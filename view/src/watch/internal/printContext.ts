@@ -19,6 +19,7 @@ export default function printContext(message?: string) {
     }
   }
 
+  /*
   print.effectCleanups = [];
   for (let [effect, cleanup] of context.effectCleanups.entries()) {
     print.effectCleanups.push({
@@ -27,16 +28,16 @@ export default function printContext(message?: string) {
     });
     effectsMap.set(hash(String(cleanup)), String(cleanup));
   }
-
+  */
+  /*
   print.rangeEffectSubs = [];
   for (let [range, effect] of context.rangeEffectSubs.entries()) {
     if (effect.size) {
       for (let x of effect) {
         print.rangeEffectSubs.push({
-          title: range.title,
           startNode: range.startNode?.textContent,
           endNode: range.endNode?.textContent,
-          children: (range.children || []).map((c) => c.title),
+          //children: (range.children || []).map((c) => c.title),
           target: x.target,
           prop: x.prop,
           effect: hash(String(x.effect)),
@@ -45,40 +46,40 @@ export default function printContext(message?: string) {
       }
     } else {
       print.rangeEffectSubs.push({
-        title: range.title,
         startNode: range.startNode?.textContent,
         endNode: range.endNode?.textContent,
-        children: (range.children || []).map((c) => c.title),
+        //children: (range.children || []).map((c) => c.title),
         target: undefined,
         prop: undefined,
         effect: undefined,
       });
     }
   }
-
+  */
+  /*
   print.rangeEffects = [];
   for (let [range, effect] of context.rangeEffects.entries()) {
     if (effect.size) {
       for (let x of effect) {
         print.rangeEffectSubs.push({
-          title: range.title,
           startNode: range.startNode?.textContent,
           endNode: range.endNode?.textContent,
-          children: (range.children || []).map((c) => c.title),
+          //children: (range.children || []).map((c) => c.title),
           effect: hash(String(x)),
         });
         effectsMap.set(hash(String(x)), String(x));
       }
     } else {
       print.rangeEffects.push({
-        title: range.title,
         startNode: range.startNode?.textContent,
         endNode: range.endNode?.textContent,
-        children: (range.children || []).map((c) => c.title),
+        //children: (range.children || []).map((c) => c.title),
         effect: undefined,
       });
     }
   }
+  */
+
   print.effects = [];
   for (let [hash, value] of effectsMap.entries()) {
     print.effects.push({ hash, value });

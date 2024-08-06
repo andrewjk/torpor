@@ -52,19 +52,6 @@ interface Context {
    * The range that is currently being created.
    */
   activeRange: Range | null;
-  /**
-   * A map of ranges and the object/property/effects attached to them.
-   *
-   * This is used to remove effects from the effectSubs collection when a range is removed.
-   */
-  rangeEffectSubs: RangeEffectsMap;
-  /**
-   * A map of ranges and the effects attached to them that don't have an associated object/property
-   * subscription.
-   *
-   * This is used to run effect cleanups when a range is removed.
-   */
-  rangeEffects: Map<Range, Set<Effect>>;
 }
 
 const context: Context = {
@@ -76,8 +63,6 @@ const context: Context = {
   get activeRange() {
     return this.rangeStack[this.rangeStack.length - 1];
   },
-  rangeEffectSubs: new Map<Range, RangeEffectsSet>(),
-  rangeEffects: new Map<Range, Set<Effect>>(),
 };
 
 export default context;

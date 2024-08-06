@@ -12,6 +12,17 @@ export default function clearRange(range: Range) {
     range.endNode = null;
   }
 
-  // TODO: Put this somewhere better?
+  // Clear any effects that take place within this range and its children
   removeRangeEffects(range);
+
+  // Delete this range from its parent's children collection
+  // NOTE: Maybe range.parent should be required
+  // NOTE: Maybe parent.children should be a Set
+  if (range.parent && range.parent.children) {
+    let index = range.parent.children.indexOf(range);
+    if (index === -1) {
+      throw new Error("Range not found among parent's children");
+    }
+    range.parent.children.splice(index, 1);
+  }
 }

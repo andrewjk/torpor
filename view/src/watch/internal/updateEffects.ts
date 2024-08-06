@@ -14,6 +14,8 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
     context.effectSubs.delete(oldTarget);
   }
 
+  // ANDREW:
+  /*
   // TODO: Update node subscriptions somehow -- probably need a node array on the effect subscription
   for (let [_, nodeEffects] of context.rangeEffectSubs) {
     for (let effect of nodeEffects) {
@@ -23,4 +25,5 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
       }
     }
   }
+  */
 }

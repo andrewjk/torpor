@@ -30,17 +30,13 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
     // If there's an active DOM range, register the active effect with it,
     // so that it will be cleaned up when the range is removed
     if (context.activeRange) {
-      let rangeEffects = context.rangeEffectSubs.get(context.activeRange);
-      const subscriptionPointer = {
+      const effectPath = {
         target,
         prop,
         effect: context.activeEffect,
       };
-      if (!rangeEffects) {
-        rangeEffects = new Set();
-        context.rangeEffectSubs.set(context.activeRange, rangeEffects);
-      }
-      rangeEffects.add(subscriptionPointer);
+      context.activeRange.objectEffects = context.activeRange.objectEffects || new Set();
+      context.activeRange.objectEffects.add(effectPath);
     }
 
     //printContext(`added effect for '${String(prop)}' with value '${target[prop]}'`);
