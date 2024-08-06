@@ -1,8 +1,6 @@
-export default interface ListItem {
+import Range from "../global/Range";
+
+export default interface ListItem extends Range {
   key: any;
-  startNode: Node;
-  endNode: Node;
   data: Record<string, any>;
-  // HACK:
-  title: string;
 }

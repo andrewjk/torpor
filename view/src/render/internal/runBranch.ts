@@ -15,7 +15,15 @@ export default function runBranch(range: Range, index: number, create: () => voi
   }
 
   // TODO: Should I cache the branch ranges?
-  pushRange({ title: `${range.title} / branch ${index + 1}` });
+  pushRange({
+    startNode: null,
+    endNode: null,
+    parent: null,
+    children: null,
+    index: 0,
+    objectEffects: null,
+    emptyEffects: null,
+  });
 
   // Run the create function
   create();
