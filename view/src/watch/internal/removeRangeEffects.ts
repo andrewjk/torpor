@@ -4,7 +4,7 @@ import context from "../../global/context";
 export default function removeRangeEffects(range: Range) {
   // Delete the effect subcriptions for this range (which are keyed by target, property and effect)
   if (range.objectEffects) {
-    range.objectEffects.forEach((e) => {
+    for (let e of range.objectEffects) {
       let propSubscriptions = context.effectSubs.get(e.target);
       if (propSubscriptions) {
         let subscriptions = propSubscriptions.get(e.prop);
@@ -25,26 +25,26 @@ export default function removeRangeEffects(range: Range) {
           }
         }
       }
-    });
+    }
 
     //printContext(`removed effect for '${range.title}'`);
   }
 
   // Delete the effects for this range that have no effects
   if (range.emptyEffects) {
-    range.emptyEffects.forEach((effect) => {
+    for (let effect of range.emptyEffects) {
       // Run any cleanup function
       if (effect.cleanup) {
         effect.cleanup();
       }
-    });
+    }
   }
 
   // Delete the effects for each child of this range, along with the children
   if (range.children) {
-    range.children.forEach((child, i) => {
+    for (let child of range.children) {
       removeRangeEffects(child);
-    });
+    }
     range.children.length = 0;
   }
 }
