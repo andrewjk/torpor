@@ -1199,6 +1199,9 @@ function buildElementAttributes(
         b.append(`$run(() => ${setAttribute});`);
       } else if (name === "class") {
         b.append(`$run(() => ${varName}.className = ${value});`);
+      } else if (name.indexOf("data-") === 0) {
+        const propName = name.substring(5);
+        b.append(`$run(() => ${varName}.dataset.${propName} = ${value});`);
       } else {
         b.append(`$run(() => ${varName}.setAttribute("${name}", ${value}));`);
       }
