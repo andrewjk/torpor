@@ -42,6 +42,7 @@ function buildCode(name: string, parts: ComponentParts): string {
   b.append(`
     import $watch from '${folder}/watch/$watch';
     import $run from '${folder}/watch/$run';
+    import t_push_range_to_parent from '${folder}/render/internal/pushRangeToParent';
     import t_push_range from '${folder}/render/internal/pushRange';
     import t_pop_range from '${folder}/render/internal/popRange';
     import t_run_control from '${folder}/render/internal/runControl';
@@ -851,7 +852,8 @@ function buildForNode(
     }
   }
 
-  const forFirstRunName = nextVarName("for_first_run", status);
+  const oldRangeName = nextVarName("old_range", status);
+  const oldItemRangeName = nextVarName("old_range", status);
   const forRangeName = nextVarName("for_range", status);
   const forItemsName = nextVarName("for_items", status);
 
@@ -864,12 +866,11 @@ function buildForNode(
   b.append("");
   b.append(`
       /* @for */
-      let ${forFirstRunName} = true;
       let ${forItemsName} = [];
       let ${forRangeName} = {};
-      t_push_range(${forRangeName});
+      let ${oldRangeName} = t_push_range_to_parent(${forRangeName});
       $run(() => {
-        if (!${forFirstRunName}) t_context.rangeStack.push(${forRangeName});
+        let ${oldItemRangeName} = t_push_range(${forRangeName});
         let t_new_items = [];
         ${node.statement} {
           let t_item = {
@@ -892,15 +893,16 @@ function buildForNode(
   b.append(`}
         );
         ${forItemsName} = t_new_items;
-        if (!${forFirstRunName}) t_context.rangeStack.pop();
-        ${forFirstRunName} = false;
+        t_pop_range(${oldItemRangeName});
       });
-      t_pop_range();`);
+      t_pop_range(${oldRangeName});`);
 }
 
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
+  const oldRangeName = nextVarName("old_range", status);
+
   b.append(`$run(() => {`);
-  b.append(`t_push_range(t_item);`);
+  b.append(`let ${oldRangeName} = t_push_range_to_parent(t_item);`);
 
   declareFragment(node, status, b);
 
@@ -918,7 +920,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 
   addFragment(node, status, b, parentName, "t_before");
 
-  b.append(`t_pop_range();`);
+  b.append(`t_pop_range(${oldRangeName});`);
   b.append(`});`);
 }
 
@@ -933,6 +935,7 @@ function buildAwaitNode(
   const awaitAnchorName = node.varName!;
   const awaitRangeName = nextVarName("await_range", status);
   const awaitTokenName = nextVarName("await_token", status);
+  const oldRangeName = nextVarName("old_range", status);
 
   // Filter non-control branches (spaces)
   const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
@@ -982,20 +985,20 @@ function buildAwaitNode(
       ${awaiterName}
       .then((${thenVar}) => {
       if (token === ${awaitTokenName}) {
-        t_context.rangeStack.push(${awaitRangeName});`);
+        let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
   buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 1);
 
-  b.append(`t_context.rangeStack.pop();
+  b.append(`t_pop_range(${oldRangeName});
       }
     })
     .catch((${catchVar}) => {
       if (token === ${awaitTokenName}) {
-        t_context.rangeStack.push(${awaitRangeName});`);
+        let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
   buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 2);
 
-  b.append(`t_context.rangeStack.pop();
+  b.append(`t_pop_range(${oldRangeName});
           }
         });
       })(${awaitTokenName});
