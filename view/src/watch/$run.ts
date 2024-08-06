@@ -22,8 +22,8 @@ export default function $run(fn: () => (() => void) | void) {
     // the effect doesn't depend on any watched properties), register the active effect with the
     // active range, so that it will be cleaned up when the range is removed
     if (context.activeRange && !context.activeEffectSubbed) {
-      context.activeRange.emptyEffects = context.activeRange.emptyEffects || new Set();
-      context.activeRange.emptyEffects.add(context.activeEffect);
+      context.activeRange.emptyEffects = context.activeRange.emptyEffects || [];
+      context.activeRange.emptyEffects.push(context.activeEffect);
     }
   }
 

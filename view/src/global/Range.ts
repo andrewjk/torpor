@@ -16,7 +16,7 @@ export default interface Range {
    *
    * This is used to remove effects from the effectSubs collection when a range is removed.
    */
-  objectEffects: Set<EffectPath> | null;
+  objectEffects: EffectPath[] | null;
 
   /**
    * A map of ranges and the effects attached to them that don't have an associated object/property
@@ -24,5 +24,5 @@ export default interface Range {
    *
    * This is used to run effect cleanups when a range is removed.
    */
-  emptyEffects: Set<Effect> | null;
+  emptyEffects: Effect[] | null;
 }

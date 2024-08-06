@@ -27,7 +27,7 @@ interface Context {
    * When a property of a proxied object (created via the $watch function) is changed, we look up
    * the object, then the property, and run any effects that are found.
    */
-  effectSubs: Map<object, Map<string | symbol, Set<Effect>>>;
+  effectSubs: Map<object, Map<string | symbol, Effect[]>>;
   /**
    * The range that is currently being created.
    */
@@ -37,7 +37,7 @@ interface Context {
 const context: Context = {
   activeEffect: undefined,
   activeEffectSubbed: false,
-  effectSubs: new Map<object, Map<string | symbol, Set<Effect>>>(),
+  effectSubs: new Map<object, Map<string | symbol, Effect[]>>(),
   activeRange: null,
 };
 

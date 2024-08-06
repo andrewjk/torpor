@@ -9,18 +9,26 @@ export default function removeRangeEffects(range: Range) {
       if (propSubscriptions) {
         let subscriptions = propSubscriptions.get(e.prop);
         if (subscriptions) {
-          if (subscriptions.delete(e.effect)) {
-            // Run any cleanup function
-            if (e.effect.cleanup) {
-              e.effect.cleanup();
-            }
-
-            // If that was the last effect for this subscription, delete the subscription too
-            if (!subscriptions.size) {
-              propSubscriptions.delete(e.prop);
-              if (!propSubscriptions.size) {
-                context.effectSubs.delete(propSubscriptions);
+          for (let i = 0; i < subscriptions.length; i++) {
+            if (subscriptions[i] === e.effect) {
+              // Run any cleanup function
+              if (e.effect.cleanup) {
+                e.effect.cleanup();
               }
+
+              // Quick delete
+              subscriptions[i] = subscriptions[subscriptions.length - 1];
+              subscriptions.pop();
+
+              // If that was the last effect for this subscription, delete the subscription too
+              if (!subscriptions.length) {
+                propSubscriptions.delete(e.prop);
+                if (!propSubscriptions.size) {
+                  context.effectSubs.delete(propSubscriptions);
+                }
+              }
+
+              break;
             }
           }
         }
