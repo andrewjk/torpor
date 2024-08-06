@@ -1,7 +1,7 @@
 import Range from "../../global/Range";
 import clearRange from "./clearRange";
 import popRange from "./popRange";
-import pushRange from "./pushRange";
+import pushRangeToParent from "./pushRangeToParent";
 
 export default function runBranch(range: Range, index: number, create: () => void) {
   // Only run the branch if it's not the current branch
@@ -15,7 +15,7 @@ export default function runBranch(range: Range, index: number, create: () => voi
   }
 
   // TODO: Should I cache the branch ranges?
-  pushRange({
+  let oldRange = pushRangeToParent({
     startNode: null,
     endNode: null,
     parent: null,
@@ -28,7 +28,7 @@ export default function runBranch(range: Range, index: number, create: () => voi
   // Run the create function
   create();
 
-  popRange();
+  popRange(oldRange);
 
   // Set the index on the branching range
   range.index = index;

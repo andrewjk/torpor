@@ -29,10 +29,6 @@ interface Context {
    */
   effectSubs: Map<object, Map<string | symbol, Set<Effect>>>;
   /**
-   * A stack with the range that is currently being created on top.
-   */
-  rangeStack: Range[];
-  /**
    * The range that is currently being created.
    */
   activeRange: Range | null;
@@ -42,10 +38,7 @@ const context: Context = {
   activeEffect: undefined,
   activeEffectSubbed: false,
   effectSubs: new Map<object, Map<string | symbol, Set<Effect>>>(),
-  rangeStack: [],
-  get activeRange() {
-    return this.rangeStack[this.rangeStack.length - 1];
-  },
+  activeRange: null,
 };
 
 export default context;
