@@ -9,7 +9,7 @@ interface Context {
   /**
    * The effect that is currently being run.
    */
-  activeEffect?: Effect;
+  activeEffect: Effect | null;
   /**
    * Whether the active effect has been subscribed to by accessing a property of a watched object.
    *
@@ -35,7 +35,8 @@ interface Context {
 }
 
 const context: Context = {
-  activeEffect: undefined,
+  activeEffect: null,
+  // TODO: Get rid of this?
   activeEffectSubbed: false,
   effectSubs: new Map<object, Map<string | symbol, Effect[]>>(),
   activeRange: null,

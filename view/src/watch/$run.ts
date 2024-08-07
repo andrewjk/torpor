@@ -27,5 +27,5 @@ export default function $run(fn: () => (() => void) | void) {
     }
   }
 
-  context.activeEffect = undefined;
+  context.activeEffect = null;
 }
