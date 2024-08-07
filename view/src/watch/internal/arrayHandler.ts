@@ -1,15 +1,16 @@
 import $watch from "../$watch";
 import checkObject from "./checkObject";
+import { isProxySymbol, proxyTargetSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";
 import updateEffects from "./updateEffects";
 
 const arrayHandler = {
   get: function (target: Record<string | symbol, any>, prop: string | symbol, receiver: any) {
-    if (prop === "$isProxy") {
+    if (prop === isProxySymbol) {
       return true;
     }
-    if (prop === "$target") {
+    if (prop === proxyTargetSymbol) {
       return target;
     }
 
@@ -18,7 +19,7 @@ const arrayHandler = {
     // Set the value to a new proxy if it's an object
     // TODO: Do we need to check if it's a Promise?
     const value = target[prop];
-    if (value && !value.$isProxy && typeof value === "object") {
+    if (value && !value[isProxySymbol] && typeof value === "object") {
       target[prop] = $watch(value);
     }
 
@@ -73,7 +74,7 @@ const arrayHandler = {
     // Only do things if the value has changed
     if (value !== oldValue) {
       // If the value was previously a proxy, watch the new value and update effect subscriptions
-      if (oldValue && oldValue.$isProxy) {
+      if (oldValue && oldValue[isProxySymbol]) {
         newValue = $watch(value);
         updateEffects(oldValue, value);
       }
@@ -87,7 +88,7 @@ const arrayHandler = {
 
     // If setting an object we should update each prop to handle any changes,
     // regardless of whether it has changed or not
-    if (oldValue && oldValue.$isProxy) {
+    if (oldValue && oldValue[isProxySymbol]) {
       checkObject(oldValue, newValue, [], alreadyTriggered);
     }
 

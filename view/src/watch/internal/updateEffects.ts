@@ -1,11 +1,12 @@
 import context from "../../global/context";
+import { proxyTargetSymbol } from "./symbols";
 
 export default function updateEffects(oldValue: Record<string | symbol, any>, newValue: any) {
   // Update effect subscriptions
   // NOTE: Effect subscriptions are keyed on the target object, not the proxy, so we need
   // to retrieve the target for the values first
-  const oldTarget = oldValue["$target"];
-  const newTarget = newValue["$target"] || newValue;
+  const oldTarget = oldValue[proxyTargetSymbol];
+  const newTarget = newValue[proxyTargetSymbol] || newValue;
   const effectSubs = context.effectSubs.get(oldTarget);
   //console.log("moving subs from", oldTarget, "to", newTarget);
   if (effectSubs) {

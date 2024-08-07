@@ -1,4 +1,5 @@
 import context from "../../global/context";
+import { proxyTargetSymbol } from "./symbols";
 
 export default function triggerEffects(
   target: Record<string | symbol, any>,
@@ -6,7 +7,7 @@ export default function triggerEffects(
   alreadyTriggered?: any[],
 ) {
   // Get the properties with effect subscriptions for the target object
-  let propSubscriptions = context.effectSubs.get(target["$target"] || target);
+  let propSubscriptions = context.effectSubs.get(target[proxyTargetSymbol] || target);
   if (propSubscriptions) {
     // Get the effect subscriptions for the supplied property
     let subscriptions = propSubscriptions.get(prop);

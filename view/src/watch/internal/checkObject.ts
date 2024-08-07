@@ -1,4 +1,5 @@
 import $watch from "../$watch";
+import { isProxySymbol } from "./symbols";
 import triggerEffects from "./triggerEffects";
 import updateEffects from "./updateEffects";
 
@@ -20,7 +21,7 @@ export default function checkObject(
     alreadyChecked.push(oldValue);
 
     // If the value was previously a proxy, watch the new value and update effect subscriptions
-    if (oldValue && oldValue.$isProxy) {
+    if (oldValue && oldValue[isProxySymbol]) {
       newValue = $watch(newValue);
       updateEffects(oldValue, newValue);
     }
@@ -30,7 +31,7 @@ export default function checkObject(
       triggerEffects(newObject, prop, alreadyTriggered);
     }
 
-    if (oldValue && oldValue.$isProxy) {
+    if (oldValue && oldValue[isProxySymbol]) {
       checkObject(oldValue, newValue, alreadyChecked, alreadyTriggered);
     }
   }
