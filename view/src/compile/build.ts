@@ -869,7 +869,7 @@ function buildForNode(
       let ${forItemsName} = [];
       let ${forRangeName} = {};
       let ${oldRangeName} = t_push_range_to_parent(${forRangeName});
-      $run(() => {
+      $run(function runFor() {
         let ${oldItemRangeName} = t_push_range(${forRangeName});
         let t_new_items = [];
         ${node.statement} {
@@ -901,7 +901,7 @@ function buildForNode(
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
   const oldRangeName = nextVarName("old_range", status);
 
-  b.append(`$run(() => {`);
+  b.append(`$run(function runForItem() {`);
   b.append(`let ${oldRangeName} = t_push_range_to_parent(t_item);`);
 
   declareFragment(node, status, b);
@@ -1153,12 +1153,12 @@ function buildElementAttributes(
   for (let { name, value } of node.attributes) {
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
-      b.append(`$run(() => ${varName}.setAttribute("${name}", ${name}));`);
+      b.append(`$run(function setAttribute() { ${varName}.setAttribute("${name}", ${name}); });`);
 
       const path = getFragmentPath(status, b);
       if (path) {
         b.append(`
-          $run(() => ${varName}.setAttribute("${name}", ${name}));`);
+          $run(function setAttribute() { ${varName}.setAttribute("${name}", ${name}); });`);
       }
     } else if (name.startsWith("on")) {
       value = trimMatched(value, "{", "}");
@@ -1190,20 +1190,24 @@ function buildElementAttributes(
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
         const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
-        b.append(`$run(() => ${setAttribute});`);
+        b.append(`$run(function setBinding() { ${setAttribute}; });`);
         // TODO: Add a parseInput method that handles NaN etc
         b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
         const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
-        b.append(`$run(() => ${setAttribute});`);
+        b.append(`$run(function setClassList() { ${setAttribute}; });`);
       } else if (name === "class") {
-        b.append(`$run(() => ${varName}.className = ${value});`);
+        b.append(`$run(function setClassName() { ${varName}.className = ${value}; });`);
       } else if (name.indexOf("data-") === 0) {
         const propName = name.substring(5);
-        b.append(`$run(() => ${varName}.dataset.${propName} = ${value});`);
+        b.append(
+          `$run(function setDataAttribute() { ${varName}.dataset.${propName} = ${value}; });`,
+        );
       } else {
-        b.append(`$run(() => ${varName}.setAttribute("${name}", ${value}));`);
+        b.append(
+          `$run(function setAttribute() { ${varName}.setAttribute("${name}", ${value}); });`,
+        );
       }
     }
   }
@@ -1249,7 +1253,7 @@ function buildTextNode(
     } else {
       content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
     }
-    b.append(`$run(() => ${node.varName}.textContent = ${content});`);
+    b.append(`$run(function setTextContent() { ${node.varName}.textContent = ${content}; });`);
   }
 }
 

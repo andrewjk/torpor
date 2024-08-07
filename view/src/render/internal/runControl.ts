@@ -14,7 +14,7 @@ export default function runControl(range: Range, create: () => void) {
   let oldRange = pushRangeToParent(range);
 
   // Run the control statement in an effect
-  $run(() => {
+  $run(function runControl() {
     // Push and pop the control statement on subsequent runs, so that new branch ranges will be
     // added to its children
     let oldBranchRange = pushRange(range);
