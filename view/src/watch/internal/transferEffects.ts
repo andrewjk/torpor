@@ -2,7 +2,7 @@ import Effect from "../../global/Effect";
 import context from "../../global/context";
 import { proxyTargetSymbol } from "./symbols";
 
-export default function updateEffects(oldValue: Record<string | symbol, any>, newValue: any) {
+export default function transferEffects(oldValue: Record<string | symbol, any>, newValue: any) {
   // Update effect subscriptions
   // NOTE: Effect subscriptions are keyed on the target object, not the proxy, so we need
   // to retrieve the target for the values first
@@ -11,9 +11,9 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
   const effectSubs = context.effectSubs.get(oldTarget);
   if (effectSubs) {
     // If the newValue is nullish, just delete the old target's prop effects,
-    // as there are no props anymore
+    // as there are no props to track anymore
     if (newValue != null) {
-      updateChildEffects(effectSubs, oldValue, newValue);
+      moveChildEffects(effectSubs, oldValue, newValue);
       context.effectSubs.set(newTarget, effectSubs);
     }
     context.effectSubs.delete(oldTarget);
@@ -33,7 +33,7 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
   */
 }
 
-function updateChildEffects(
+function moveChildEffects(
   objectEffects: Map<string | symbol, Effect[]>,
   oldValue: Record<string | symbol, any>,
   newValue: any,

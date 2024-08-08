@@ -1,8 +1,8 @@
 import $watch from "../$watch";
 import { isProxySymbol, proxyTargetSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
+import transferEffects from "./transferEffects";
 import triggerEffects from "./triggerEffects";
-import updateEffects from "./updateEffects";
 
 const arrayHandler = {
   get: function (target: Record<string | symbol, any>, prop: string | symbol, receiver: any) {
@@ -82,7 +82,7 @@ const arrayHandler = {
       triggerEffects(target, prop);
 
       if (isProxy) {
-        updateEffects(oldValue, newValue);
+        transferEffects(oldValue, newValue);
       }
     }
 
