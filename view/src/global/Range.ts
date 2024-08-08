@@ -2,8 +2,8 @@ import type Effect from "./Effect";
 import type EffectPath from "./EffectPath";
 
 export default interface Range {
-  startNode: Node | null;
-  endNode: Node | null;
+  startNode: ChildNode | null;
+  endNode: ChildNode | null;
 
   parent: Range | null;
   children: Range[] | null;

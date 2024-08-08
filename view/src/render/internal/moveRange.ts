@@ -1,11 +1,12 @@
 import type Range from "../../global/Range";
 
-export default function moveRange(parent: Node, range: Range, before: Node | null) {
-  let el: Node | undefined | null = range.startNode;
-  while (el) {
-    const nextel: Node | undefined | null = el.nextSibling;
-    parent.insertBefore(el, before);
-    if (el === range.endNode) break;
-    el = nextel;
+export default function moveRange(parent: Node, range: Range, before: ChildNode | null) {
+  const endNode = range.endNode || range.startNode;
+  let currentNode = range.startNode;
+  while (currentNode) {
+    const nextNode = currentNode.nextSibling;
+    parent.insertBefore(currentNode, before);
+    if (currentNode === endNode) break;
+    currentNode = nextNode;
   }
 }

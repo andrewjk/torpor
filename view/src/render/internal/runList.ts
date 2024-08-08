@@ -150,6 +150,7 @@ export default (
       for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
         //console.log("create", newStartItem.key);
         create(parent, newStartItem, before);
+        // @ts-ignore
         before = newStartItem.endNode.nextSibling;
       }
     } else {
