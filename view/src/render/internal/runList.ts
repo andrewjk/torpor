@@ -110,6 +110,9 @@ export default (
         //console.log("replace", oldStartItem.key, "with", newStartItem.key);
         create(parent, newStartItem, oldStartItem.startNode);
         clearRange(oldStartItem);
+        // @ts-ignore We know we have an active range (the for loop) and that it
+        // has children (because we're replacing one)
+        context.activeRange.children.splice(oldStartIndex, 1);
         oldStartItem = oldItems[++oldStartIndex];
         newStartItem = newItems[++newStartIndex];
       } else if (oldIndex === undefined) {
@@ -121,6 +124,9 @@ export default (
         // Delete
         //console.log("delete", oldStartItem.key);
         clearRange(oldStartItem);
+        // @ts-ignore We know we have an active range (the for loop) and that it
+        // has children (because we're deleting one)
+        context.activeRange.children.splice(oldStartIndex, 1);
         oldStartItem = oldItems[++oldStartIndex];
       } else {
         // Move
@@ -150,6 +156,7 @@ export default (
       // The new list is exhausted; process old list removals
       // Just truncate the parent range's children collection
       if (oldStartItem.parent?.children) {
+        oldStartItem.parent.children.length = oldStartIndex;
       }
       for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
         //console.log("clear", oldStartItem.key);

@@ -5,13 +5,11 @@ export default function addFragment(
   parent: ParentNode,
   before?: HTMLElement,
 ) {
-  const startNode = fragment.firstChild;
-  const endNode = fragment.lastChild;
-
   // TODO: Ranges for components, so that we always have an activerange
   if (context.activeRange) {
-    context.activeRange.startNode = startNode;
-    context.activeRange.endNode = endNode;
+    context.activeRange.startNode = fragment.firstChild;
+    // TODO: Set this to null if it's the same as startNode to save memory
+    context.activeRange.endNode = fragment.lastChild;
   }
 
   // HACK:

@@ -10,8 +10,10 @@ export default function runBranch(range: Range, index: number, create: () => voi
   }
 
   if (range.index !== -1) {
-    // @ts-ignore Branching ranges can only have one child
+    // @ts-ignore Branching ranges can only have exactly one child
     clearRange(range.children[0]);
+    // @ts-ignore
+    range.children.length = 0;
   }
 
   // TODO: Should I cache the branch ranges?
