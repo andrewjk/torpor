@@ -23,25 +23,25 @@ test("watch object", async () => {
   document.body.appendChild(container);
   render(container, Component, state);
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("topchilditem");
+  expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child item");
 
   state.child.item = {
     itemText: "changed",
   };
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("topchildchanged");
+  expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child changed");
 
   state.child = {
-    childText: "new child",
+    childText: "new_child",
     item: {
-      itemText: "new item",
+      itemText: "new_item",
     },
   };
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("topnewchildnewitem");
+  expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child new_item");
   //printContext();
   // Make sure that effects have been transferred across
-  state.child.item.itemText = "even newer item";
+  state.child.item.itemText = "even_newer_item";
 
-  expect(container.textContent!.replace(/\s/g, "")).toBe("topnewchildevenneweritem");
+  expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child even_newer_item");
 });

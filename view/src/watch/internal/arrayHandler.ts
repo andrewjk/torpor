@@ -1,5 +1,4 @@
 import $watch from "../$watch";
-import checkObject from "./checkObject";
 import { isProxySymbol, proxyTargetSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";
@@ -68,28 +67,23 @@ const arrayHandler = {
     const oldValue = target[prop];
     let newValue = value;
 
-    // Don't run effects multiple times, by keeping track of which effects have been run
-    const alreadyTriggered: any[] = [];
-
     // Only do things if the value has changed
     if (value !== oldValue) {
       // If the value was previously a proxy, watch the new value and update effect subscriptions
-      if (oldValue && oldValue[isProxySymbol]) {
+      let isProxy = oldValue && oldValue[isProxySymbol];
+      if (isProxy) {
         newValue = $watch(value);
-        updateEffects(oldValue, value);
       }
 
       // Set the property value on the target
       Reflect.set(target, prop, newValue, receiver);
 
       // Re-run effects
-      triggerEffects(target, prop, alreadyTriggered);
-    }
+      triggerEffects(target, prop);
 
-    // If setting an object we should update each prop to handle any changes,
-    // regardless of whether it has changed or not
-    if (oldValue && oldValue[isProxySymbol]) {
-      checkObject(oldValue, newValue, [], alreadyTriggered);
+      if (isProxy) {
+        updateEffects(oldValue, newValue);
+      }
     }
 
     return true;

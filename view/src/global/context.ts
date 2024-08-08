@@ -32,6 +32,7 @@ interface Context {
    * The range that is currently being created.
    */
   activeRange: Range | null;
+  // TODO: Need to do this for lists somehow
 }
 
 const context: Context = {

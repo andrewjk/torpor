@@ -1,3 +1,4 @@
+import Effect from "../../global/Effect";
 import context from "../../global/context";
 import { proxyTargetSymbol } from "./symbols";
 
@@ -6,18 +7,21 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
   // NOTE: Effect subscriptions are keyed on the target object, not the proxy, so we need
   // to retrieve the target for the values first
   const oldTarget = oldValue[proxyTargetSymbol];
-  const newTarget = newValue[proxyTargetSymbol] || newValue;
+  const newTarget = newValue != null ? newValue[proxyTargetSymbol] : null;
   const effectSubs = context.effectSubs.get(oldTarget);
-  //console.log("moving subs from", oldTarget, "to", newTarget);
   if (effectSubs) {
-    //console.log("moved", effectSubs.size, "subs from", oldTarget, "to", newTarget);
-    context.effectSubs.set(newTarget, effectSubs);
+    // If the newValue is nullish, just delete the old target's prop effects,
+    // as there are no props anymore
+    if (newValue != null) {
+      updateChildEffects(effectSubs, oldValue, newValue);
+      context.effectSubs.set(newTarget, effectSubs);
+    }
     context.effectSubs.delete(oldTarget);
   }
 
-  // ANDREW:
   /*
-  // TODO: Update node subscriptions somehow -- probably need a node array on the effect subscription
+  // TODO: Update range subscriptions somehow -- probably need a range array on the effect subscription
+  // Could this be solved by combining ranges and effects??
   for (let [_, nodeEffects] of context.rangeEffectSubs) {
     for (let effect of nodeEffects) {
       if (effect.target === oldTarget) {
@@ -27,4 +31,19 @@ export default function updateEffects(oldValue: Record<string | symbol, any>, ne
     }
   }
   */
+}
+
+function updateChildEffects(
+  objectEffects: Map<string | symbol, Effect[]>,
+  oldValue: Record<string | symbol, any>,
+  newValue: any,
+) {
+  // Set values of child properties that have effects, so that they will get updated too
+  // TODO: Top down or bottom up?? Doing top down for now...
+  for (let prop of objectEffects.keys()) {
+    // HACK: can't set length to the old value...
+    if (prop !== "length") {
+      oldValue[prop] = newValue[prop];
+    }
+  }
 }

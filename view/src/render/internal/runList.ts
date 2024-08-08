@@ -148,6 +148,9 @@ export default (
       }
     } else {
       // The new list is exhausted; process old list removals
+      // Just truncate the parent range's children collection
+      if (oldStartItem.parent?.children) {
+      }
       for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
         //console.log("clear", oldStartItem.key);
         clearRange(oldStartItem);

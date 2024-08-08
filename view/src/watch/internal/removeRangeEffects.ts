@@ -9,7 +9,8 @@ export default function removeRangeEffects(range: Range) {
       if (propSubscriptions) {
         let subscriptions = propSubscriptions.get(e.prop);
         if (subscriptions) {
-          for (let i = 0; i < subscriptions.length; i++) {
+          let length = subscriptions.length;
+          for (let i = 0; i < length; i++) {
             if (subscriptions[i] === e.effect) {
               // Run any cleanup function
               if (e.effect.cleanup) {
@@ -17,14 +18,14 @@ export default function removeRangeEffects(range: Range) {
               }
 
               // Quick delete
-              subscriptions[i] = subscriptions[subscriptions.length - 1];
+              subscriptions[i] = subscriptions[length - 1];
               subscriptions.pop();
 
               // If that was the last effect for this subscription, delete the subscription too
               if (!subscriptions.length) {
                 propSubscriptions.delete(e.prop);
                 if (!propSubscriptions.size) {
-                  context.effectSubs.delete(propSubscriptions);
+                  context.effectSubs.delete(e.target);
                 }
               }
 
@@ -48,7 +49,7 @@ export default function removeRangeEffects(range: Range) {
     }
   }
 
-  // Delete the effects for each child of this range, along with the children
+  // Delete the effects for each child of this range
   if (range.children) {
     for (let child of range.children) {
       removeRangeEffects(child);

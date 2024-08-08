@@ -23,9 +23,9 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
     }
 
     // TODO: Do we need to be checking duplicates?
-    //if (!subscriptions.has(context.activeEffect)) {
-    subscriptions.push(context.activeEffect);
-    //}
+    if (!subscriptions.includes(context.activeEffect)) {
+      subscriptions.push(context.activeEffect);
+    }
 
     // If there's an active DOM range, register the active effect with it,
     // so that it will be cleaned up when the range is removed
