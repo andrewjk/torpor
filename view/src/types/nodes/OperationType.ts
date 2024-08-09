@@ -16,6 +16,7 @@ type OperationType =
   | "@catch"
   | "@const"
   | "@console"
-  | "@debugger";
+  | "@debugger"
+  | "@function";
 
 export default OperationType;

@@ -67,6 +67,7 @@ const controlOperations = [
   "@const",
   "@console",
   "@debugger",
+  "@function",
 ];
 
 export default function parse(source: string): ParseResult {
@@ -442,6 +443,7 @@ function parseControl(status: ParseStatus): ControlNode {
     node.operation === "@const" ||
     node.operation === "@console" ||
     node.operation === "@debugger" ||
+    node.operation === "@function" ||
     node.operation === "@key"
   ) {
     return node;
@@ -509,6 +511,24 @@ function parseControlOpen(status: ParseStatus): ControlNode {
   // HACK:
   if (operation === "@debugger") {
     node.statement = "debugger";
+    return node;
+  }
+  if (operation === "@function") {
+    // TODO: Ignore chars in strings, comments and parentheses
+    let braceCount = 0;
+    for (status.i; status.i < status.source.length; status.i++) {
+      const char = status.source[status.i];
+      if (char === "{") {
+        braceCount += 1;
+      } else if (char === "}") {
+        braceCount -= 1;
+        if (braceCount === 0) {
+          node.statement = status.source.substring(start + 1, status.i + 1).trim();
+          status.i += 1;
+          break;
+        }
+      }
+    }
     return node;
   }
 

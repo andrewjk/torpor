@@ -637,6 +637,12 @@ function buildControlNode(
       buildScriptNode(node, b);
       break;
     }
+    case "@function": {
+      b.append("");
+      buildScriptNode(node, b);
+      b.append("");
+      break;
+    }
     default: {
       throw new Error(`Invalid operation: ${node.operation}`);
     }
