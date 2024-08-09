@@ -54,7 +54,6 @@ const voidTags = [
 ];
 
 const controlOperations = [
-  "@const",
   "@if",
   "@else",
   "@for",
@@ -65,6 +64,9 @@ const controlOperations = [
   "@await",
   "@then",
   "@catch",
+  "@const",
+  "@console",
+  "@debugger",
 ];
 
 export default function parse(source: string): ParseResult {
@@ -434,8 +436,14 @@ function parseAttributeValue(status: ParseStatus): string {
 function parseControl(status: ParseStatus): ControlNode {
   const node = parseControlOpen(status);
 
-  // Consts and keys can't have children
-  if (node.operation === "@const" || node.operation === "@key") {
+  // Some operations can't have children
+  // TODO: Should probably make operations objects with this information
+  if (
+    node.operation === "@const" ||
+    node.operation === "@console" ||
+    node.operation === "@debugger" ||
+    node.operation === "@key"
+  ) {
     return node;
   }
 
@@ -486,6 +494,10 @@ function parseControlOpen(status: ParseStatus): ControlNode {
   if (operation === "@default:") {
     operation = "@default";
   }
+  if (operation.startsWith("@console.")) {
+    status.i -= operation.length + 1;
+    operation = "@console";
+  }
 
   const node: ControlNode = {
     type: "control",
@@ -493,6 +505,12 @@ function parseControlOpen(status: ParseStatus): ControlNode {
     statement: "",
     children: [],
   };
+
+  // HACK:
+  if (operation === "@debugger") {
+    node.statement = "debugger";
+    return node;
+  }
 
   if (controlOperations.includes(operation)) {
     // TODO: Ignore chars in strings, comments and parentheses
@@ -509,7 +527,13 @@ function parseControlOpen(status: ParseStatus): ControlNode {
           status.i += 1;
           break;
         }
-      } else if (char === "\n" && (operation === "@const" || operation === "@key")) {
+      } else if (
+        char === "\n" &&
+        (operation === "@const" ||
+          operation === "@console" ||
+          operation === "@debugger" ||
+          operation === "@key")
+      ) {
         if (parenCount === 0) {
           node.statement = status.source.substring(start + 1, status.i).trim();
           status.i += 1;

@@ -1,6 +1,5 @@
 type OperationType =
   | "@root"
-  | "@const"
   | "@if group"
   | "@if"
   | "@else if"
@@ -14,6 +13,9 @@ type OperationType =
   | "@await group"
   | "@await"
   | "@then"
-  | "@catch";
+  | "@catch"
+  | "@const"
+  | "@console"
+  | "@debugger";
 
 export default OperationType;

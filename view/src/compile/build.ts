@@ -594,12 +594,6 @@ function buildControlNode(
       buildRootNode(node, status, b, parentName, anchorName);
       break;
     }
-    case "@const": {
-      b.append("");
-      b.append("/* @const */");
-      b.append(`${maybeAppend(node.statement, ";")}`);
-      break;
-    }
     case "@if group": {
       buildIfNode(node, status, b, parentName, anchorName);
       break;
@@ -635,6 +629,12 @@ function buildControlNode(
     case "@then":
     case "@catch": {
       // These get handled with @await group, above
+      break;
+    }
+    case "@const":
+    case "@console":
+    case "@debugger": {
+      buildScriptNode(node, b);
       break;
     }
     default: {
@@ -1211,6 +1211,11 @@ function buildElementAttributes(
       }
     }
   }
+}
+
+function buildScriptNode(node: ControlNode, b: Builder) {
+  b.append(`/* ${node.operation} */`);
+  b.append(`${maybeAppend(node.statement, ";")}`);
 }
 
 function isReactiveAttribute(name: string, value: string) {
