@@ -1,7 +1,7 @@
 <section>
   @for (let key in $props.item) {
     <p>
-      {$props.item[$for.key]}
+      {$props.item[key]}
     </p>
   }
 </section>

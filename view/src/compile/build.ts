@@ -23,6 +23,7 @@ interface BuildStatus {
     path: string;
   }[];
   fragmentVars: Map<string, string>;
+  forVarNames: string[];
 }
 
 export default function build(name: string, parts: ComponentParts): BuildResult {
@@ -37,7 +38,9 @@ export default function build(name: string, parts: ComponentParts): BuildResult 
 function buildCode(name: string, parts: ComponentParts): string {
   const b = new Builder();
 
+  // For test and demo
   let folder = "../../../../../tera/view/src";
+  // For the external bench
   //folder = "../view/src";
   b.append(`
     import $watch from '${folder}/watch/$watch';
@@ -117,6 +120,7 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       varNames: {},
       fragmentStack: [],
       fragmentVars: new Map(),
+      forVarNames: [],
     };
     b.append("/* User interface */");
     buildFragments(parts.template, status, b);
@@ -879,22 +883,22 @@ function buildForNode(
         let ${oldItemRangeName} = t_push_range(${forRangeName});
         let t_new_items = [];
         ${node.statement} {
-          let t_item = {
+          t_new_items.push({
             ${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ""}
-            data: { ${forVarNames.join(",\n")} }
-          };
-          t_new_items.push(t_item);
+            data: $watch({ ${forVarNames.join(",\n")} })
+          });
         }
         t_run_list(
           ${forParentName},
           ${forAnchorName},
           ${forItemsName},
           t_new_items,
-          (t_parent, t_item, t_before) => {
-            const $for = t_item.data = $watch(t_item.data);
+          function createForItem(t_parent, t_item, t_before) {
     `);
 
+  status.forVarNames = forVarNames;
   buildForItem(node, status, b, "t_parent");
+  status.forVarNames = [];
 
   b.append(`}
         );
@@ -907,7 +911,6 @@ function buildForNode(
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
   const oldRangeName = nextVarName("old_range", status);
 
-  b.append(`$run(function runForItem() {`);
   b.append(`let ${oldRangeName} = t_push_range_to_parent(t_item);`);
 
   declareFragment(node, status, b);
@@ -1159,12 +1162,11 @@ function buildElementAttributes(
   for (let { name, value } of node.attributes) {
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
-      b.append(`$run(function setAttribute() { ${varName}.setAttribute("${name}", ${name}); });`);
+      buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
 
       const path = getFragmentPath(status, b);
       if (path) {
-        b.append(`
-          $run(function setAttribute() { ${varName}.setAttribute("${name}", ${name}); });`);
+        buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
       }
     } else if (name.startsWith("on")) {
       value = trimMatched(value, "{", "}");
@@ -1196,24 +1198,20 @@ function buildElementAttributes(
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
         const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
-        b.append(`$run(function setBinding() { ${setAttribute}; });`);
+        buildRun("setBinding", `${setAttribute};`, status, b);
         // TODO: Add a parseInput method that handles NaN etc
         b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
       } else if (name.indexOf("class:") === 0) {
         const propName = name.substring(6);
         const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
-        b.append(`$run(function setClassList() { ${setAttribute}; });`);
+        buildRun("setClassList", `${setAttribute};`, status, b);
       } else if (name === "class") {
-        b.append(`$run(function setClassName() { ${varName}.className = ${value}; });`);
+        buildRun("setClassName", `${varName}.className = ${value};`, status, b);
       } else if (name.indexOf("data-") === 0) {
         const propName = name.substring(5);
-        b.append(
-          `$run(function setDataAttribute() { ${varName}.dataset.${propName} = ${value}; });`,
-        );
+        buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
       } else {
-        b.append(
-          `$run(function setAttribute() { ${varName}.setAttribute("${name}", ${value}); });`,
-        );
+        buildRun("setAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
       }
     }
   }
@@ -1264,7 +1262,7 @@ function buildTextNode(
     } else {
       content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
     }
-    b.append(`$run(function setTextContent() { ${node.varName}.textContent = ${content}; });`);
+    buildRun("setTextContent", `${node.varName}.textContent = ${content};`, status, b);
   }
 }
 
@@ -1336,14 +1334,20 @@ function buildSlotNode(
     for (let { name, value } of slotAttributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
+        //b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
+        buildRun("setProp", `${propsName}["${name}"] = ${name});`, status, b);
       } else {
         let reactive = value.startsWith("{") && value.endsWith("}");
         if (reactive) {
           value = value.substring(1, value.length - 1);
         }
         const setProp = `${propsName}["${name}"] = ${value}`;
-        b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
+        //b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
+        if (reactive) {
+          buildRun("setProp", `${setProp};`, status, b);
+        } else {
+          b.append(`${setProp};`);
+        }
       }
     }
   }
@@ -1375,6 +1379,20 @@ function buildSlotNode(
   }
 
   b.append(`}`);
+}
+
+function buildRun(functionName: string, functionBody: string, status: BuildStatus, b: Builder) {
+  b.append(`$run(function ${functionName}() {`);
+  // If a value from a for loop is used in the function body, get it from the
+  // loop data to trigger an update when it is changed
+  // We could potentially directly replace using the regex? Might introduce issues though
+  for (let varName of status.forVarNames) {
+    if (new RegExp(`\\b${varName}\\b`).test(functionBody)) {
+      b.append(`let ${varName} = t_item.data.${varName}; `);
+    }
+  }
+  b.append(functionBody);
+  b.append("});");
 }
 
 function nextVarName(name: string, status: BuildStatus): string {

@@ -1,10 +1,10 @@
 <section>
   <p>^</p>
   @for (let [i, item] of $props.items.entries()) {
-    @key = item.id
+    key = item.id
     <span>
-      {$for.i > 0 ? ", " : ""}
-      {$for.item.text}
+      {i > 0 ? ", " : ""}
+      {item.text}
     </span>
   }
   <p>$</p>

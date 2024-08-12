@@ -1,7 +1,7 @@
 <ul>
     @for (let item of $props.items) {
         <li>
-            <:slot item={$for.item} />
+            <:slot item={item} />
         </li> 
     }
 </ul>

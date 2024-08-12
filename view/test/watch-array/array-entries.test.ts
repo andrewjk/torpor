@@ -26,4 +26,8 @@ test("array entries", () => {
   state.items.sort((a, b) => a.text.localeCompare(b.text));
 
   expect(container.textContent!.replace(/\s/g, "")).toBe("^a,b,c,d$");
+
+  state.items[1].text = "e";
+
+  expect(container.textContent!.replace(/\s/g, "")).toBe("^a,e,c,d$");
 });

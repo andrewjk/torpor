@@ -1,5 +1,5 @@
 <div>
     @for (let item of $props.items) {
-        <p>{$for.item.text}</p>
+        <p>{item.text}</p>
     }
 </div>
