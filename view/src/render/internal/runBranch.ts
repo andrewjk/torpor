@@ -1,4 +1,4 @@
-import Range from "../../global/Range";
+import Range from "../../global/types/Range";
 import clearRange from "./clearRange";
 import popRange from "./popRange";
 import pushRangeToParent from "./pushRangeToParent";

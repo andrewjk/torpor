@@ -1,5 +1,5 @@
-import type Effect from "./Effect";
-import type Range from "./Range";
+import type Effect from "./types/Effect";
+import type Range from "./types/Range";
 
 /**
  * The global context for setting up effects and updating subscriptions.

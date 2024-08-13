@@ -1,4 +1,4 @@
-import type Range from "../../global/Range";
+import type Range from "../../global/types/Range";
 import removeRangeEffects from "../../watch/internal/removeRangeEffects";
 
 export default function clearRange(range: Range) {

@@ -1,5 +1,5 @@
-import type Range from "../../global/Range";
 import context from "../../global/context";
+import type Range from "../../global/types/Range";
 
 export default function removeRangeEffects(range: Range) {
   // Delete the effect subcriptions for this range (which are keyed by target, property and effect)

@@ -1,5 +1,5 @@
-import Effect from "../../global/Effect";
 import context from "../../global/context";
+import type Effect from "../../global/types/Effect";
 import { proxyTargetSymbol } from "./symbols";
 
 export default function transferEffects(oldValue: Record<string | symbol, any>, newValue: any) {

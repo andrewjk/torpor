@@ -24,7 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import type ListItem from "../../types/ListItem";
+import context from "../../global/context";
+import $watch from "../../watch/$watch";
+import type ListItem from "../types/ListItem";
 import clearRange from "./clearRange";
 import moveRange from "./moveRange";
 

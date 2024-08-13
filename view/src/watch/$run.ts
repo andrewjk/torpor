@@ -1,5 +1,5 @@
-import type Effect from "../global/Effect";
 import context from "../global/context";
+import type Effect from "../global/types/Effect";
 
 export default function $run(fn: () => (() => void) | void) {
   let effect: Effect = {

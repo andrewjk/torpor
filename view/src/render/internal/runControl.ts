@@ -1,4 +1,4 @@
-import Range from "../../global/Range";
+import Range from "../../global/types/Range";
 import $run from "../../watch/$run";
 import popRange from "./popRange";
 import pushRange from "./pushRange";

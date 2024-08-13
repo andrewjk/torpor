@@ -1,4 +1,4 @@
-import type Range from "../../global/Range";
+import type Range from "../../global/types/Range";
 
 export default function moveRange(parent: Node, range: Range, before: ChildNode | null) {
   const endNode = range.endNode || range.startNode;

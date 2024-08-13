@@ -1,5 +1,5 @@
-import Range from "../../global/Range";
 import context from "../../global/context";
+import type Range from "../../global/types/Range";
 
 export default function pushRangeToParent(range: Range): Range | null {
   // Add the new range to the currently active range's children, so that we
