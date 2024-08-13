@@ -7,12 +7,13 @@ export default function transferEffects(oldValue: Record<string | symbol, any>, 
   // NOTE: Effect subscriptions are keyed on the target object, not the proxy, so we need
   // to retrieve the target for the values first
   const oldTarget = oldValue[proxyTargetSymbol];
-  const newTarget = newValue != null ? newValue[proxyTargetSymbol] : null;
+  const newValueIsNotNull = newValue != null;
+  const newTarget = newValueIsNotNull ? newValue[proxyTargetSymbol] : null;
   const effectSubs = context.effectSubs.get(oldTarget);
   if (effectSubs) {
     // If the newValue is nullish, just delete the old target's prop effects,
-    // as there are no props to track anymore
-    if (newValue != null) {
+    // as there are no props to track anymore (as there is no object)
+    if (newValueIsNotNull) {
       moveChildEffects(effectSubs, oldValue, newValue);
       context.effectSubs.set(newTarget, effectSubs);
     }
