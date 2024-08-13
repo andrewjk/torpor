@@ -1,11 +1,11 @@
 import $watch from "../$watch";
 import { isProxySymbol, proxyTargetSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
+import transferEffects from "./transferEffects";
 import triggerEffects from "./triggerEffects";
-import updateEffects from "./updateEffects";
 
 // TODO: The rest of the stuff from ProxyHandler
-// TODO: Cache property accesses
+// TODO: Cache property accesses?
 
 // Adapted from https://stackoverflow.com/a/50723478
 const handler = {
@@ -22,7 +22,7 @@ const handler = {
     // Set the value to a new proxy if it's an object
     // But not if it's a Promise (i.e. has a `then` method)
     let value = target[prop];
-    if (value && !value[isProxySymbol] && typeof value === "object" && !value.then) {
+    if (value && typeof value === "object" && !value[isProxySymbol] && !value.then) {
       target[prop] = $watch(value);
     }
 
@@ -47,9 +47,9 @@ const handler = {
     // Only do things if the value has changed
     if (value !== oldValue) {
       // If the value was previously a proxy, watch the new value and update effect subscriptions
-      let isProxy = oldValue && oldValue[isProxySymbol];
-      if (isProxy) {
+      if (oldValue && oldValue[isProxySymbol]) {
         newValue = $watch(value);
+        transferEffects(oldValue, newValue);
       }
 
       // Set the property value on the target
@@ -57,10 +57,6 @@ const handler = {
 
       // Re-run effects
       triggerEffects(target, prop);
-
-      if (isProxy) {
-        updateEffects(oldValue, newValue);
-      }
     }
 
     return true;

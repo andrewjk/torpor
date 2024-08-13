@@ -18,7 +18,7 @@ const arrayHandler = {
     // Set the value to a new proxy if it's an object
     // TODO: Do we need to check if it's a Promise?
     const value = target[prop];
-    if (value && !value[isProxySymbol] && typeof value === "object") {
+    if (value && typeof value === "object" && !value[isProxySymbol]) {
       target[prop] = $watch(value);
     }
 
@@ -70,9 +70,9 @@ const arrayHandler = {
     // Only do things if the value has changed
     if (value !== oldValue) {
       // If the value was previously a proxy, watch the new value and update effect subscriptions
-      let isProxy = oldValue && oldValue[isProxySymbol];
-      if (isProxy) {
+      if (oldValue && oldValue[isProxySymbol]) {
         newValue = $watch(value);
+        transferEffects(oldValue, newValue);
       }
 
       // Set the property value on the target
@@ -80,10 +80,6 @@ const arrayHandler = {
 
       // Re-run effects
       triggerEffects(target, prop);
-
-      if (isProxy) {
-        transferEffects(oldValue, newValue);
-      }
     }
 
     return true;
