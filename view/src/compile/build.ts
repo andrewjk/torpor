@@ -229,9 +229,21 @@ function gatherElementFragments(
   currentFragment: Fragment,
 ) {
   currentFragment.text += `<${node.tagName}`;
-  currentFragment.text += node.attributes
-    .filter((a) => !a.name.startsWith("on") && !isReactive(a.value))
-    .map((a) => ` ${a.name}${a.value != null ? `=${a.value}` : ""}`);
+  let attributesText = node.attributes
+    .filter((a) => !a.name.startsWith("on"))
+    .map((a) => {
+      if (isReactive(a.value)) {
+        // Adding a placeholder for reactive attributes seems to speed things
+        // up, especially in the case of data attributes
+        return `${a.name}=""`;
+      } else {
+        return `${a.name}${a.value != null ? `=${a.value}` : ""}`;
+      }
+    })
+    .join(" ");
+  if (attributesText) {
+    currentFragment.text += " " + attributesText;
+  }
   currentFragment.text += ">";
   for (let child of node.children) {
     gatherFragments(child, status, fragments, currentFragment);
@@ -1208,8 +1220,10 @@ function buildElementAttributes(
       } else if (name === "class") {
         buildRun("setClassName", `${varName}.className = ${value};`, status, b);
       } else if (name.indexOf("data-") === 0) {
-        const propName = name.substring(5);
-        buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
+        // dataset seems to be a tiny bit slower?
+        //const propName = name.substring(5);
+        //buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
+        buildRun("setDataAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
       } else {
         buildRun("setAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
       }
