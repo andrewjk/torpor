@@ -75,7 +75,7 @@ export default (
     } else if (oldStartItem.key === newEndItem.key) {
       // Move to the end
       //console.log("move", oldStartItem.key, "to the end");
-      moveRange(parent, oldStartItem, oldEndItem?.endNode?.nextSibling);
+      moveRange(parent, oldStartItem, oldEndItem.endNode?.nextSibling!);
       transferRangeMarkers(oldStartItem, newEndItem);
       oldStartItem = oldItems[++oldStartIndex];
       newEndItem = newItems[--newEndIndex];
@@ -149,9 +149,8 @@ export default (
         oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
       for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
         //console.log("create", newStartItem.key);
-        create(parent, newStartItem, before);
-        // @ts-ignore
-        before = newStartItem.endNode.nextSibling;
+        create(parent, newStartItem, before!);
+        before = newStartItem.endNode?.nextSibling!;
       }
     } else {
       // The new list is exhausted; process old list removals
@@ -171,27 +170,10 @@ function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {
   newItem.startNode = oldItem.startNode;
   newItem.endNode = oldItem.endNode;
 
+  // Manually transfer the new data's props to the old ones (to run effects)
+  // and then set the new data to the old one
   for (let prop in oldItem.data) {
     oldItem.data[prop] = newItem.data[prop];
-    //console.log("SETTING", oldItem.data[prop], newItem.data[prop]);
   }
   newItem.data = oldItem.data;
-
-  /*
-  printContext("TRANSFERRING RANGE MARKERS");
-  // @ts-ignore HACK:
-  updateEffects(oldItem.data, newItem.data);
-*/
-
-  /*
-  // @ts-ignore HACK:
-  for (let prop in oldItem.data) {
-    // @ts-ignore HACK:
-    //oldItem.data[prop] = newItem.data[prop];
-    // @ts-ignore HACK:
-    //console.log("SETTING", oldItem.data[prop], newItem.data[prop]);
-    // @ts-ignore HACK:
-    updateEffects(oldItem.data[prop], newItem.data[prop]);
-  }
-  */
 }
