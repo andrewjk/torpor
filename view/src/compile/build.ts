@@ -1,16 +1,16 @@
 import Builder from "./internal/Builder";
 import { maybeAppend, trimAny, trimMatched, trimQuotes } from "./internal/utils";
-import BuildResult from "./types/BuildResult";
-import ComponentParts from "./types/ComponentParts";
-import Import from "./types/Import";
-import Attribute from "./types/nodes/Attribute";
-import ControlNode from "./types/nodes/ControlNode";
-import ElementNode from "./types/nodes/ElementNode";
-import Fragment from "./types/nodes/Fragment";
-import Node from "./types/nodes/Node";
-import TextNode from "./types/nodes/TextNode";
+import type BuildResult from "./types/BuildResult";
+import type ComponentParts from "./types/ComponentParts";
+import type Import from "./types/Import";
+import type Attribute from "./types/nodes/Attribute";
+import type ControlNode from "./types/nodes/ControlNode";
+import type ElementNode from "./types/nodes/ElementNode";
+import type Fragment from "./types/nodes/Fragment";
+import type Node from "./types/nodes/Node";
+import type TextNode from "./types/nodes/TextNode";
 import isSpecialNode from "./types/nodes/isSpecialNode";
-import StyleBlock from "./types/styles/StyleBlock";
+import type StyleBlock from "./types/styles/StyleBlock";
 
 // TODO: Too many branches for ifs etc?
 

@@ -1,4 +1,4 @@
-import Range from "../../global/types/Range";
+import type Range from "../../global/types/Range";
 
 export default interface ListItem extends Range {
   key: any;
