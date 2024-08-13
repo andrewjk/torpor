@@ -1,7 +1,6 @@
 import type Effect from "./Effect";
 import type Range from "./Range";
 
-
 /**
  * The global context for setting up effects and updating subscriptions.
  */
@@ -32,7 +31,6 @@ interface Context {
    * The range that is currently being created.
    */
   activeRange: Range | null;
-  // TODO: Need to do this for lists somehow
 }
 
 const context: Context = {
