@@ -905,8 +905,7 @@ function buildForNode(
           ${forAnchorName},
           ${forItemsName},
           t_new_items,
-          function createForItem(t_parent, t_item, t_before) {
-    `);
+          function createForItem(t_parent, t_item, t_before) {`);
 
   status.forVarNames = forVarNames;
   buildForItem(node, status, b, "t_parent");
