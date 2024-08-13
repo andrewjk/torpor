@@ -185,7 +185,9 @@ function gatherControlFragments(
     case "@for group":
     case "@await group": {
       // Add a placeholder if it's a branching control node
+      //if (!node.singleRooted) {
       currentFragment.text += "<!>";
+      //}
       for (let child of node.children) {
         gatherFragments(child, status, allFragments, currentFragment);
       }

@@ -10,7 +10,9 @@ import ControlNode from "../types/nodes/ControlNode";
 import ElementNode from "../types/nodes/ElementNode";
 import Node from "../types/nodes/Node";
 import OperationType from "../types/nodes/OperationType";
+import ParentNode from "../types/nodes/ParentNode";
 import TextNode from "../types/nodes/TextNode";
+import isControlNode from "../types/nodes/isControlNode";
 import isElementNode from "../types/nodes/isElementNode";
 import isParentNode from "../types/nodes/isParentNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
@@ -78,6 +80,11 @@ export default function parse(source: string): ParseResult {
   };
 
   parseSource(status, source);
+
+  if (status.template) {
+    processSpace(status.template);
+    //setSingleRootedControlNodes(status.template);
+  }
 
   checkAndApplyStyles(status);
 
@@ -1058,6 +1065,70 @@ function parseDocsSlot(status: ParseStatus): SlotDocumentation {
 
   return docs;
 }
+
+function processSpace(node: ParentNode) {
+  // Remove spaces at the start of the node
+  while (
+    node.children.length &&
+    isTextNode(node.children[0]) &&
+    isSpace((node.children[0] as TextNode).content)
+  ) {
+    // HACK: But not before control nodes. Otherwise we can end up with a situation
+    // where a control has a nested control and they both share start nodes. Then if
+    // the inner control has its range cleared and then the outer control has its
+    // range cleared, the start node will have already been cleared and everything
+    // will go horribly wrong. Leaving a space is a cheap way to deal with this
+    if (isControlNode(node.children[1])) {
+      break;
+    }
+
+    node.children.shift();
+  }
+
+  // Remove spaces at the end of the node
+  while (
+    node.children.length &&
+    isTextNode(node.children[node.children.length - 1]) &&
+    isSpace((node.children[node.children.length - 1] as TextNode).content)
+  ) {
+    node.children.pop();
+  }
+
+  for (let child of node.children) {
+    // Collapse whitespace between nodes
+    if (isTextNode(child)) {
+      if (isSpace(child.content)) {
+        child.content = " ";
+      } else {
+        // Might be better gathering space nodes separately from text nodes
+        // so this gets done consistently with the above?
+        child.content = child.content.trim();
+      }
+    }
+    // Recurse
+    if (isParentNode(child)) {
+      processSpace(child);
+    }
+  }
+}
+
+// This might still be handy, but I haven't got it to make a huge difference
+// while messing around on perf. In theory, instead of adding and removing
+// ranges in a control node that is the only node in its parent, we could
+// just replace the whole thing
+/*
+function setSingleRootedControlNodes(node: ParentNode) {
+  for (let child of node.children) {
+    if (isControlNode(child) && node.children.length === 1) {
+      child.singleRooted = true;
+    }
+    // Recurse
+    if (isParentNode(child)) {
+      setSingleRootedControlNodes(child);
+    }
+  }
+}
+*/
 
 function addError(status: ParseStatus, message: string, start: number = status.i) {
   status.errors.push({ message, start });
