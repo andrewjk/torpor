@@ -1,5 +1,5 @@
-import hash from "../../compile/internal/hash";
-import context from "../../global/context";
+import hash from "../compile/internal/hash";
+import context from "../global/context";
 
 export default function printContext(message?: string) {
   const print: any = {};
@@ -7,28 +7,24 @@ export default function printContext(message?: string) {
 
   print.effectSubscriptions = [];
   for (let [target, propEffects] of context.effectSubs.entries()) {
+    let effectTarget = { target: JSON.stringify(target), props: [] } as any;
     for (let [prop, effects] of propEffects.entries()) {
+      let effectProp = { prop, effects: [] } as any;
+      effectTarget.props.push(effectProp);
       for (let x of effects) {
-        print.effectSubscriptions.push({
-          target,
-          prop,
-          effect: hash(String(x)),
+        let runText = String(x.run);
+        let runName = runText.substring("function ".length, runText.indexOf("{") - 1).trim();
+        let cleanupText = String(x.cleanup);
+        effectProp.effects.push({
+          effect: `${runName} => ${hash(runText)}`,
+          cleanup: cleanupText,
         });
-        effectsMap.set(hash(String(x)), String(x));
+        effectsMap.set(hash(String(x.run)), String(x.run));
       }
     }
+    print.effectSubscriptions.push(effectTarget);
   }
 
-  /*
-  print.effectCleanups = [];
-  for (let [effect, cleanup] of context.effectCleanups.entries()) {
-    print.effectCleanups.push({
-      effect,
-      cleanup: hash(String(cleanup)),
-    });
-    effectsMap.set(hash(String(cleanup)), String(cleanup));
-  }
-  */
   /*
   print.rangeEffectSubs = [];
   for (let [range, effect] of context.rangeEffectSubs.entries()) {
@@ -80,14 +76,14 @@ export default function printContext(message?: string) {
   }
   */
 
-  print.effects = [];
-  for (let [hash, value] of effectsMap.entries()) {
-    print.effects.push({ hash, value });
-  }
+  //print.effects = [];
+  //for (let [hash, value] of effectsMap.entries()) {
+  //  print.effects.push({ hash, value });
+  //}
 
   if (message) {
     console.log(message);
   }
   console.log(print);
-  //console.dir(print, { depth: null });
+  console.dir(print, { depth: null });
 }

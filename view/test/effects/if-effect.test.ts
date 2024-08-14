@@ -5,7 +5,6 @@ import { expect, test } from "vitest";
 import context from "../../src/global/context";
 import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
-import printContext from "../../src/watch/internal/printContext";
 import Component from "./components/If.tera";
 
 test("if effect", async () => {
