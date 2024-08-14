@@ -18,22 +18,22 @@ test("nested if effect", async () => {
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
-  expect(context.effectSubs.size).toBe(1);
+  expect(context.objectEffects.size).toBe(1);
   // 2 properties
-  expect(context.effectSubs.get(_state)).toBeTruthy();
-  expect(context.effectSubs.get(_state)!.size).toBe(2);
+  expect(context.objectEffects.get(_state)).toBeTruthy();
+  expect(context.objectEffects.get(_state)!.size).toBe(2);
   // 2 if nodes with effects
-  //expect(context.rangeEffectSubs.size).toBe(2);
+  //expect(context.rangeEffects.size).toBe(2);
 
   state.condition = false;
 
   expect(queryByText(container, "It's small")).toBeNull();
 
   // 1 state object
-  expect(context.effectSubs.size).toBe(1);
+  expect(context.objectEffects.size).toBe(1);
   // 1 property
-  expect(context.effectSubs.get(_state)).toBeTruthy();
-  expect(context.effectSubs.get(_state)!.size).toBe(1);
+  expect(context.objectEffects.get(_state)).toBeTruthy();
+  expect(context.objectEffects.get(_state)!.size).toBe(1);
   // 1 if node with an effect
-  //expect(context.rangeEffectSubs.size).toBe(1);
+  //expect(context.rangeEffects.size).toBe(1);
 });

@@ -3,27 +3,27 @@ import type Effect from "../../global/types/Effect";
 import { proxyTargetSymbol } from "./symbols";
 
 export default function transferEffects(oldValue: Record<string | symbol, any>, newValue: any) {
-  // Update effect subscriptions
-  // NOTE: Effect subscriptions are keyed on the target object, not the proxy, so we need
-  // to retrieve the target for the values first
+  // Transfer effects from one object to another
+  // NOTE: The context's effects map is keyed on the target object, not the
+  // proxy, so we first need to retrieve the target for the values
   const oldTarget = oldValue[proxyTargetSymbol];
   const newValueIsNotNull = newValue != null;
   const newTarget = newValueIsNotNull ? newValue[proxyTargetSymbol] : null;
-  const effectSubs = context.effectSubs.get(oldTarget);
-  if (effectSubs) {
+  const objectEffects = context.objectEffects.get(oldTarget);
+  if (objectEffects) {
     // If the newValue is nullish, just delete the old target's prop effects,
     // as there are no props to track anymore (as there is no object)
     if (newValueIsNotNull) {
-      moveChildEffects(effectSubs, oldValue, newValue);
-      context.effectSubs.set(newTarget, effectSubs);
+      moveChildEffects(objectEffects, oldValue, newValue);
+      context.objectEffects.set(newTarget, objectEffects);
     }
-    context.effectSubs.delete(oldTarget);
+    context.objectEffects.delete(oldTarget);
   }
 
   /*
   // TODO: Update range subscriptions somehow -- probably need a range array on the effect subscription
   // Could this be solved by combining ranges and effects??
-  for (let [_, nodeEffects] of context.rangeEffectSubs) {
+  for (let [_, nodeEffects] of context.rangeEffects) {
     for (let effect of nodeEffects) {
       if (effect.target === oldTarget) {
         //nodeEffects.delete(effect);

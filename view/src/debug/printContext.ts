@@ -5,8 +5,8 @@ export default function printContext(message?: string) {
   const print: any = {};
   const effectsMap = new Map<string, string>();
 
-  print.effectSubscriptions = [];
-  for (let [target, propEffects] of context.effectSubs.entries()) {
+  print.objectEffects = [];
+  for (let [target, propEffects] of context.objectEffects.entries()) {
     let effectTarget = { target: JSON.stringify(target), props: [] } as any;
     for (let [prop, effects] of propEffects.entries()) {
       let effectProp = { prop, effects: [] } as any;
@@ -22,15 +22,15 @@ export default function printContext(message?: string) {
         effectsMap.set(hash(String(x.run)), String(x.run));
       }
     }
-    print.effectSubscriptions.push(effectTarget);
+    print.objectEffects.push(effectTarget);
   }
 
   /*
-  print.rangeEffectSubs = [];
-  for (let [range, effect] of context.rangeEffectSubs.entries()) {
+  print.rangeEffects = [];
+  for (let [range, effect] of context.rangeEffects.entries()) {
     if (effect.size) {
       for (let x of effect) {
-        print.rangeEffectSubs.push({
+        print.rangeEffects.push({
           startNode: range.startNode?.textContent,
           endNode: range.endNode?.textContent,
           //children: (range.children || []).map((c) => c.title),
@@ -41,7 +41,7 @@ export default function printContext(message?: string) {
         effectsMap.set(hash(String(x.effect)), String(x.effect));
       }
     } else {
-      print.rangeEffectSubs.push({
+      print.rangeEffects.push({
         startNode: range.startNode?.textContent,
         endNode: range.endNode?.textContent,
         //children: (range.children || []).map((c) => c.title),
@@ -57,7 +57,7 @@ export default function printContext(message?: string) {
   for (let [range, effect] of context.rangeEffects.entries()) {
     if (effect.size) {
       for (let x of effect) {
-        print.rangeEffectSubs.push({
+        print.rangeEffects.push({
           startNode: range.startNode?.textContent,
           endNode: range.endNode?.textContent,
           //children: (range.children || []).map((c) => c.title),

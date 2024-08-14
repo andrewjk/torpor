@@ -14,13 +14,13 @@ export default interface Range {
   /**
    * A map of ranges and the object/property/effects attached to them.
    *
-   * This is used to remove effects from the effectSubs collection when a range is removed.
+   * This is used to remove effects from the global context when a range is removed.
    */
   objectEffects: EffectPath[] | null;
 
   /**
-   * A map of ranges and the effects attached to them that don't have an associated object/property
-   * subscription.
+   * A map of ranges and the effects attached to them that don't have an
+   * associated object/property.
    *
    * This is used to run effect cleanups when a range is removed.
    */

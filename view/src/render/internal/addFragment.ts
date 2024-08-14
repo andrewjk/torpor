@@ -5,7 +5,8 @@ export default function addFragment(
   parent: ParentNode,
   before: Node | null,
 ) {
-  // TODO: Ranges for components, so that we always have an activerange
+  // Set the active range's start and end nodes to the first and last nodes
+  // in the fragment
   const range = context.activeRange;
   if (range) {
     range.startNode = fragment.firstChild;
@@ -23,5 +24,6 @@ export default function addFragment(
     parent = before!.parentNode!;
   }
 
+  // Add the fragment
   parent.insertBefore(fragment, before);
 }

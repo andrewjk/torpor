@@ -17,8 +17,8 @@ test("if effect", async () => {
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
-  expect(context.effectSubs.size).toBe(1);
+  expect(context.objectEffects.size).toBe(1);
 
   // 1 if node with an effect
-  //expect(context.rangeEffectSubs.size).toBe(1);
+  //expect(context.rangeEffects.size).toBe(1);
 });

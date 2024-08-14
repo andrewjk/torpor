@@ -13,7 +13,7 @@ interface Context {
    * Whether the active effect has been subscribed to by accessing a property of a watched object.
    *
    * If there is an active range, and the active effect has been subscribed to, we know that the
-   * effect has been added to the rangeEffectSubs collection during effect tracking.
+   * effect has been added to the range's objectEffects collection during effect tracking.
    *
    * If there is an active range, and the active effect has NOT been subscribed to, we need to add
    * the effect to the rangeEffects collection so that any effect cleanup can be run when the range
@@ -26,7 +26,7 @@ interface Context {
    * When a property of a proxied object (created via the $watch function) is changed, we look up
    * the object, then the property, and run any effects that are found.
    */
-  effectSubs: Map<object, Map<string | symbol, Effect[]>>;
+  objectEffects: Map<object, Map<string | symbol, Effect[]>>;
   /**
    * The range that is currently being created.
    */
@@ -37,7 +37,7 @@ const context: Context = {
   activeEffect: null,
   // TODO: Get rid of this?
   activeEffectSubbed: false,
-  effectSubs: new Map<object, Map<string | symbol, Effect[]>>(),
+  objectEffects: new Map<object, Map<string | symbol, Effect[]>>(),
   activeRange: null,
 };
 
