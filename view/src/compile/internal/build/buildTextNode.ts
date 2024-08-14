@@ -30,9 +30,9 @@ export default function buildTextNode(
 
   if (reactiveCount) {
     if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
-      content = `t_text(${content.substring(1, content.length - 1)})`;
+      content = `t_fmt(${content.substring(1, content.length - 1)})`;
     } else {
-      content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
+      content = `\`${content.replaceAll("{", "${t_fmt(").replaceAll("}", ")}")}\``;
     }
     buildRun("setTextContent", `${node.varName}.textContent = ${content};`, status, b);
   }

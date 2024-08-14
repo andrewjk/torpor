@@ -13,16 +13,15 @@ export default function buildCode(name: string, parts: ComponentParts): string {
   b.append(`
     import $watch from '${folder}/watch/$watch';
     import $run from '${folder}/watch/$run';
-    import t_context from '${folder}/global/context';
     import t_push_range_to_parent from '${folder}/render/internal/pushRangeToParent';
     import t_push_range from '${folder}/render/internal/pushRange';
     import t_pop_range from '${folder}/render/internal/popRange';
     import t_run_control from '${folder}/render/internal/runControl';
     import t_run_branch from '${folder}/render/internal/runBranch';
     import t_run_list from '${folder}/render/internal/runList';
+    import t_add_fragment from '${folder}/render/internal/addFragment';
     import t_apply_props from '${folder}/render/internal/applyProps';
-    import t_text from '${folder}/render/internal/formatText';
-    import t_add_fragment from '${folder}/render/internal/addFragment';`);
+    import t_fmt from '${folder}/render/internal/formatText';`);
   if (buildConfig.fragmentsUseCreateElement) {
     b.append(`
       import t_frg from '${folder}/render/internal/createFragment';
