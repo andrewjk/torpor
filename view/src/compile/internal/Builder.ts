@@ -16,7 +16,7 @@ export default class Builder {
         this.#text += "\n";
       } else {
         // Maybe outdent
-        if (text[i] === "}" || text[i] === ")") {
+        if (text[i] === "}" || text[i] === ")" || text[i] === "]") {
           this.#space -= 1;
         }
 
@@ -31,7 +31,7 @@ export default class Builder {
         this.#text += text.substring(start, i + 1);
 
         // Maybe indent
-        if (text[i - 1] === "{" || text[i - 1] === "(") {
+        if (text[i - 1] === "{" || text[i - 1] === "(" || text[i - 1] === "[") {
           this.#space += 1;
         }
       }
