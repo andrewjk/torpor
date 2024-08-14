@@ -31,7 +31,7 @@ export default function buildCode(name: string, parts: ComponentParts): string {
       import t_cmt from '${folder}/render/internal/createComment';`);
   } else {
     b.append(`
-      import t_fragment from '${folder}/render/internal/createFragment';`);
+      import t_fragment from '${folder}/render/internal/getFragment';`);
   }
   // TODO: De-duplication
   let imports: Import[] = [];
