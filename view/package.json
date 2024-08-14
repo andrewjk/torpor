@@ -9,7 +9,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "check": "tsc -p tsconfig-check.json --noEmit",
-    "test": "vitest",
+    "test": "npm run build && cd ../unplugin-tera && npm run build && cd ../view && vitest",
     "bench": "tsm ./bench/bench.ts",
     "format": "prettier --write ."
   },
