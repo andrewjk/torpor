@@ -1,7 +1,7 @@
 import type ParseStatus from "./internal/parse/ParseStatus";
 import checkAndApplyStyles from "./internal/parse/checkAndApplyStyles";
 import parseTemplate from "./internal/parse/parseTemplate";
-import { isSpace } from "./internal/utils";
+import { isSpace } from "./internal/parse/parseUtils";
 import type ParseResult from "./types/ParseResult";
 import type ParentNode from "./types/nodes/ParentNode";
 import type TextNode from "./types/nodes/TextNode";

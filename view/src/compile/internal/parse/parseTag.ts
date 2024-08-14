@@ -1,8 +1,7 @@
 import Attribute from "../../types/nodes/Attribute";
 import ElementNode from "../../types/nodes/ElementNode";
-import { isSpaceChar } from "../utils";
 import ParseStatus from "./ParseStatus";
-import { accept, consumeSpace, consumeUntil, consumeWord } from "./parseUtils";
+import { accept, consumeSpace, consumeUntil, consumeWord, isSpaceChar } from "./parseUtils";
 
 export default function parseTag(status: ParseStatus): ElementNode {
   accept("<", status);

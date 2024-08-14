@@ -1,10 +1,9 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type OperationType from "../../types/nodes/OperationType";
-import { isSpaceChar } from "../utils";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
-import { addError } from "./parseUtils";
+import { addError, isSpaceChar } from "./parseUtils";
 import wrangleControl from "./wrangleControl";
 
 const controlOperations = [
