@@ -1,0 +1,39 @@
+import type TextNode from "../../types/nodes/TextNode";
+import type BuildStatus from "./BuildStatus";
+import Builder from "./Builder";
+import buildRun from "./buildRun";
+
+export default function buildTextNode(
+  node: TextNode,
+  status: BuildStatus,
+  b: Builder,
+  parentName: string,
+  anchorName: string,
+) {
+  let content = node.content || "";
+  // Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
+  content = content.replace(/\s+/g, " ");
+
+  // TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
+  let reactiveStarted = false;
+  let reactiveCount = 0;
+  for (let i = 0; i < content.length; i++) {
+    if (content[i] === "{") {
+      reactiveStarted = true;
+    } else if (content[i] === "}") {
+      if (reactiveStarted) {
+        reactiveCount += 1;
+        reactiveStarted = false;
+      }
+    }
+  }
+
+  if (reactiveCount) {
+    if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
+      content = `t_text(${content.substring(1, content.length - 1)})`;
+    } else {
+      content = `\`${content.replaceAll("{", "${t_text(").replaceAll("}", ")}")}\``;
+    }
+    buildRun("setTextContent", `${node.varName}.textContent = ${content};`, status, b);
+  }
+}
