@@ -25,7 +25,7 @@ export default function buildCode(name: string, parts: ComponentParts): string {
     import t_add_fragment from '${folder}/render/internal/addFragment';`);
   if (buildConfig.fragmentsUseCreateElement) {
     b.append(`
-      import t_frg from '${folder}/render/internal/createFragment2';
+      import t_frg from '${folder}/render/internal/createFragment';
       import t_elm from '${folder}/render/internal/createElement';
       import t_txt from '${folder}/render/internal/createText';
       import t_cmt from '${folder}/render/internal/createComment';`);
