@@ -110,6 +110,7 @@ export default (
       if (oldIndex === undefined && newIndex === undefined) {
         // Replace
         //console.log("replace", oldStartItem.key, "with", newStartItem.key);
+        newStartItem.data = $watch(newStartItem.data);
         create(parent, newStartItem, oldStartItem.startNode);
         clearRange(oldStartItem);
         // @ts-ignore We know we have an active range (the for loop) and that it
@@ -120,6 +121,7 @@ export default (
       } else if (oldIndex === undefined) {
         // Insert
         //console.log("insert", newStartItem.key);
+        newStartItem.data = $watch(newStartItem.data);
         create(parent, newStartItem, oldStartItem.startNode);
         newStartItem = newItems[++newStartIndex];
       } else if (newIndex === undefined) {
@@ -151,6 +153,7 @@ export default (
         oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
       for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
         //console.log("create", newStartItem.key);
+        newStartItem.data = $watch(newStartItem.data);
         create(parent, newStartItem, before!);
         before = newStartItem.endNode?.nextSibling!;
       }
