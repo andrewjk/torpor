@@ -9,7 +9,7 @@ export default interface ControlNode extends ParentNode {
   statement: string;
   children: Node[];
 
-  //singleRooted?: boolean;
+  singleRooted?: boolean;
 
   // This gets set when building
   fragment?: Fragment;
