@@ -1,4 +1,5 @@
 export default function printNode(node: Node | null | undefined) {
+  let textContent = node?.textContent;
   let paths: string[] = [];
 
   while (node != null) {
@@ -27,5 +28,5 @@ export default function printNode(node: Node | null | undefined) {
     node = node.parentNode;
   }
 
-  return paths.reverse().join(" > ") || "null";
+  return `'${textContent}' [ ${paths.reverse().join(" > ") || "null"} ]`;
 }
