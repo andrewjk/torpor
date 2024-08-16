@@ -1,20 +1,39 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import context from "../../src/global/context";
-import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
+import hydrateComponent from "../hydrateComponent";
+import mountComponent from "../mountComponent";
 import Component from "./components/NestedIf.tera";
 
-test("nested if effect", async () => {
+interface State {
+  condition: boolean;
+  counter: number;
+}
+
+test("nested if effect -- mounted", async () => {
   const _state = { condition: true, counter: 0 };
   const state = $watch(_state);
 
   const container = document.createElement("div");
-  document.body.appendChild(container);
-  render(container, Component, state);
+  mountComponent(container, Component, state);
 
+  check(container, _state, state);
+});
+
+test("nested if effect -- hydrated", async () => {
+  const _state = { condition: true, counter: 0 };
+  const state = $watch(_state);
+
+  const container = document.createElement("div");
+  const path = "./test/effects/components/NestedIf.tera";
+  hydrateComponent(container, path, Component, state);
+
+  check(container, _state, state);
+});
+
+function check(container: HTMLElement, _state: State, state: State) {
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
@@ -36,4 +55,4 @@ test("nested if effect", async () => {
   expect(context.objectEffects.get(_state)!.size).toBe(1);
   // 1 if node with an effect
   //expect(context.rangeEffects.size).toBe(1);
-});
+}

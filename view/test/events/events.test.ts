@@ -2,15 +2,27 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
-import render from "../../src/render/render";
+import hydrateComponent from "../hydrateComponent";
+import mountComponent from "../mountComponent";
 import Component from "./components/Increment.tera";
 
-test("events", async () => {
-  const user = userEvent.setup();
-
+test("events -- mounted", async () => {
   const container = document.createElement("div");
-  document.body.appendChild(container);
-  render(container, Component);
+  mountComponent(container, Component);
+
+  check(container);
+});
+
+test("events -- hydrated", async () => {
+  const container = document.createElement("div");
+  const path = "./test/events/components/Increment.tera";
+  hydrateComponent(container, path, Component);
+
+  check(container);
+});
+
+async function check(container: HTMLElement) {
+  const user = userEvent.setup();
 
   expect(queryByText(container, "The count is 0.")).toBeInTheDocument();
 
@@ -23,4 +35,4 @@ test("events", async () => {
   await user.click(increment5);
 
   expect(queryByText(container, "The count is 6.")).toBeInTheDocument();
-});
+}

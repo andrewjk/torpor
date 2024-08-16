@@ -1,17 +1,35 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
+import hydrateComponent from "../hydrateComponent";
+import mountComponent from "../mountComponent";
 import Component from "./components/IfElse.tera";
 
-test("if true", () => {
+interface State {
+  counter: number;
+}
+
+test("if true -- mounted", () => {
   const state = $watch({ counter: 10 });
 
   const container = document.createElement("div");
-  document.body.appendChild(container);
-  render(container, Component, state);
+  mountComponent(container, Component, state);
 
+  check(container, state);
+});
+
+test("if true -- hydrated", () => {
+  const state = $watch({ counter: 10 });
+
+  const container = document.createElement("div");
+  const path = "./test/if/components/IfElse.tera";
+  hydrateComponent(container, path, Component, state);
+
+  check(container, state);
+});
+
+function check(container: HTMLElement, state: State) {
   expect(queryByText(container, "It's true!")).toBeInTheDocument();
   expect(queryByText(container, "It's not true...")).toBeNull();
 
@@ -24,4 +42,4 @@ test("if true", () => {
 
   expect(queryByText(container, "It's true!")).toBeInTheDocument();
   expect(queryByText(container, "It's not true...")).toBeNull();
-});
+}

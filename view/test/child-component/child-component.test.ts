@@ -1,13 +1,25 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import render from "../../src/render/render";
+import hydrateComponent from "../hydrateComponent";
+import mountComponent from "../mountComponent";
 import Component from "./components/ParentChild.tera";
 
-test("child component", () => {
+test("child component -- mounted", () => {
   const container = document.createElement("div");
-  document.body.appendChild(container);
-  render(container, Component);
+  mountComponent(container, Component);
 
-  expect(queryByText(container, "Hello, Anna")).toBeInTheDocument();
+  check(container);
 });
+
+test("child component -- hydrated", () => {
+  const container = document.createElement("div");
+  const path = "./test/child-component/components/ParentChild.tera";
+  hydrateComponent(container, path, Component);
+
+  check(container);
+});
+
+function check(container: HTMLElement) {
+  expect(queryByText(container, "Hello, Anna")).toBeInTheDocument();
+}

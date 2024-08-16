@@ -1,12 +1,13 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import render from "../../src/render/render";
 import $watch from "../../src/watch/$watch";
+import hydrateComponent from "../hydrateComponent";
+import mountComponent from "../mountComponent";
 import type ArrayState from "./ArrayState";
 import Component from "./components/ArrayEntries.tera";
 
-test("array entries", () => {
+test("array entries -- mounted", () => {
   const state = $watch({
     items: [
       { id: 1, text: "b" },
@@ -14,12 +15,32 @@ test("array entries", () => {
       { id: 3, text: "d" },
       { id: 4, text: "c" },
     ],
-  } as ArrayState);
+  });
 
   const container = document.createElement("div");
-  document.body.appendChild(container);
-  render(container, Component, state);
+  mountComponent(container, Component, state);
 
+  check(container, state);
+});
+
+test("array entries -- hydrated", () => {
+  const state = $watch({
+    items: [
+      { id: 1, text: "b" },
+      { id: 2, text: "a" },
+      { id: 3, text: "d" },
+      { id: 4, text: "c" },
+    ],
+  });
+
+  const container = document.createElement("div");
+  const path = "./test/watch-array/components/ArrayEntries.tera";
+  hydrateComponent(container, path, Component, state);
+
+  check(container, state);
+});
+
+function check(container: HTMLElement, state: ArrayState) {
   // TODO: Should have spaces between letter items
   expect(container.textContent!.replace(/\s/g, "")).toBe("^b,a,d,c$");
 
@@ -30,4 +51,4 @@ test("array entries", () => {
   state.items[1].text = "e";
 
   expect(container.textContent!.replace(/\s/g, "")).toBe("^a,e,c,d$");
-});
+}
