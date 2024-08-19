@@ -9,7 +9,7 @@ import Builder from "./Builder";
 import buildConfig from "./buildConfig";
 import { isReactive, isReactiveAttribute, nextVarName } from "./buildUtils";
 
-export default function declareFragment(
+export default function buildDeclareFragment(
   node: ControlNode | ElementNode,
   status: BuildStatus,
   b: Builder,
