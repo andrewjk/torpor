@@ -1,5 +1,7 @@
 import fs from "fs";
+import { dirname } from "path";
 import { expect } from "vitest";
+import build from "../src/compile/build";
 import buildServer from "../src/compile/buildServer";
 import parse from "../src/compile/parse";
 import type Component from "../src/compile/types/Component";
@@ -15,8 +17,17 @@ export default function hydrateComponent(
   const parsed = parse(source);
   expect(parsed.ok).toBe(true);
   expect(parsed.parts).not.toBeUndefined();
-  const rendered = buildServer(component.name, parsed.parts!);
-  const html = eval(rendered.code).render(state);
+  const server = buildServer(component.name, parsed.parts!);
+  const html = eval(server.code).render(state);
+
+  // Write everything to files so we can keep an eye on regressions
+  // TODO: Should probably have a script instead
+  const folder = path.replace("/components/", "/components/output/");
+  if (!fs.existsSync(dirname(folder))) fs.mkdirSync(dirname(folder));
+  fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
+  fs.writeFileSync(folder.replace(".tera", ".html"), html);
+  const client = build(component.name, parsed.parts!);
+  fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
 
   container.innerHTML = html;
   document.body.appendChild(container);

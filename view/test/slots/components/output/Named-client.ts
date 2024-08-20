@@ -1,0 +1,57 @@
+import $watch from '../../../../../tera/view/src/watch/$watch';
+import $run from '../../../../../tera/view/src/watch/$run';
+import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
+import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
+import t_pop_range from '../../../../../tera/view/src/render/internal/popRange';
+import t_run_control from '../../../../../tera/view/src/render/internal/runControl';
+import t_run_branch from '../../../../../tera/view/src/render/internal/runControlBranch';
+import t_run_list from '../../../../../tera/view/src/render/internal/runList';
+import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
+import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
+import t_fmt from '../../../../../tera/view/src/render/internal/formatText';
+import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
+import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
+import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
+import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
+import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
+import Article from './Article.tera';
+
+const Named = {
+  name: "Named",
+  /**
+  * @param {Node} $parent
+  * @param {Node | null} $anchor
+  * @param {Object} [$props]
+  * @param {Object} [$slots]
+  * @param {Object} [$context]
+  */
+  render: ($parent, $anchor, $props, $slots, $context) => {
+    /* User interface */
+    const t_fragments = [];
+
+    const t_fragment_0 = t_fragment(t_fragments, 0, `<!>`);
+    const t_root_0 = t_root(t_fragment_0);
+    const t_comp_anchor_1 = t_anchor(t_root_0);
+
+    /* @component */
+    const t_slots_1 = {};
+    t_slots_1["_"] = ($sparent, $sanchor, $sprops) => {
+      const t_fragment_2 = t_fragment(t_fragments, 2, ` <p> The article's body </p> `);
+      const t_root_2 = t_root(t_fragment_2);
+      const t_text_1 = t_next(t_next(t_root_2));
+      t_add_fragment(t_fragment_2, $sparent, $sanchor);
+      t_next(t_text_1);
+    }
+    t_slots_1["header"] = ($sparent, $sanchor, $sprops) => {
+      const t_fragment_3 = t_fragment(t_fragments, 3, ` The article's header `);
+      const t_root_3 = t_root(t_fragment_3);
+      const t_text_2 = t_root_3;
+      t_add_fragment(t_fragment_3, $sparent, $sanchor);
+      t_next(t_text_2);
+    }
+    Article.render(t_fragment_0, t_comp_anchor_1, undefined, t_slots_1, $context)
+    t_add_fragment(t_fragment_0, $parent, $anchor);
+  }
+}
+
+export default Named;
