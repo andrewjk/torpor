@@ -3,7 +3,6 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
-import isTextNode from "../../types/nodes/isTextNode";
 import Builder from "../Builder";
 import { isSpace } from "../parse/parseUtils";
 import { trimQuotes } from "../utils";
@@ -17,7 +16,10 @@ interface VariablePath {
   children: VariablePath[];
 }
 
-export default function buildDeclareFragment(
+/**
+ * Builds the variables and code in a fragment
+ */
+export default function buildFragment(
   node: ControlNode | ElementNode,
   status: BuildStatus,
   b: Builder,
@@ -42,11 +44,10 @@ export default function buildDeclareFragment(
       // Text, then declarations
       const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
       const rootName = `t_root_${fragment.number}`;
-      const firstNodeIsSpace =
-        node.children.length && isTextNode(node.children[0]) && isSpace(node.children[0].content);
-      const rootFunction = `t_root(${fragmentName}${firstNodeIsSpace ? ", true" : ""})`;
+      const rootFunction = `t_root(${fragmentName})`;
       b.append(
         `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);
+         //console.log("~~~")
          const ${rootName} = ${rootFunction};`,
       );
       let rootPath = { parent: null, type: "root", children: [] };
@@ -402,7 +403,12 @@ function declareParentAndAnchorFragmentVars(
   lastChild: boolean,
   declare: boolean,
 ) {
-  if (path.parent) {
+  const topLevel = !path.parent;
+
+  if (topLevel) {
+    // If there is no parent, it means the parent is the fragment
+    node.parentName = `t_fragment_${fragment.number}`;
+  } else {
     const parentPath = path;
     const oldChildren = parentPath.children;
     parentPath.children = [];
@@ -413,7 +419,8 @@ function declareParentAndAnchorFragmentVars(
       node.parentName = status.fragmentVars.get(parentVarPath);
     } else {
       if (declare) {
-        // TODO: Get the actual element that it is, which may involve getting parents of control nodes too
+        // TODO: Get the actual element that it is, which may involve getting
+        // parents of control nodes too
         node.parentName = nextVarName(`${name}_parent`, status);
         if (buildConfig.fragmentsUseCreateElement) {
           b.append(`let ${node.parentName};`);
@@ -425,9 +432,6 @@ function declareParentAndAnchorFragmentVars(
         // HACK: For the createElement option, this gets done in the parent
       }
     }
-  } else {
-    // If there is no parent, it means the parent is the fragment
-    node.parentName = `t_fragment_${fragment.number}`;
   }
 
   if (declare) {
@@ -476,17 +480,13 @@ function getFragmentVarPath(
 
 function getFragmentVarPathPart(path: VariablePath, varPath: string, root = false): string {
   if (root) {
-    if (path.children.length && path.children[0].type === "space") {
-      varPath = `t_root(${varPath}, true)`;
-    } else {
-      varPath = `t_root(${varPath})`;
-    }
+    varPath = `t_root(${varPath})`;
   } else {
     varPath = `t_child(${varPath})`;
   }
   for (let [i, child] of path.children.entries()) {
     if (i > 0) {
-      varPath = `t_next(${varPath}${child.type === "text" ? ", true" : ""})`;
+      varPath = `t_next(${varPath})`;
     }
 
     if (i === path.children.length - 1 && child.children.length) {
