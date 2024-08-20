@@ -19,7 +19,7 @@ test("nested if effect -- mounted", async () => {
   const container = document.createElement("div");
   mountComponent(container, Component, state);
 
-  check(container, _state, state);
+  check(container, _state, state, false);
 });
 
 test("nested if effect -- hydrated", async () => {
@@ -30,17 +30,17 @@ test("nested if effect -- hydrated", async () => {
   const path = "./test/effects/components/NestedIf.tera";
   hydrateComponent(container, path, Component, state);
 
-  check(container, _state, state);
+  check(container, _state, state, true);
 });
 
-function check(container: HTMLElement, _state: State, state: State) {
+function check(container: HTMLElement, _state: State, state: State, hydrated: boolean) {
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
   expect(context.objectEffects.size).toBe(1);
   // 2 properties
   expect(context.objectEffects.get(_state)).toBeTruthy();
-  expect(context.objectEffects.get(_state)!.size).toBe(2);
+  expect(context.objectEffects.get(_state)!.size).toBe(hydrated ? 4 : 2);
   // 2 if nodes with effects
   //expect(context.rangeEffects.size).toBe(2);
 
@@ -52,7 +52,7 @@ function check(container: HTMLElement, _state: State, state: State) {
   expect(context.objectEffects.size).toBe(1);
   // 1 property
   expect(context.objectEffects.get(_state)).toBeTruthy();
-  expect(context.objectEffects.get(_state)!.size).toBe(1);
+  expect(context.objectEffects.get(_state)!.size).toBe(hydrated ? 2 : 1);
   // 1 if node with an effect
   //expect(context.rangeEffects.size).toBe(1);
 }

@@ -15,12 +15,8 @@ export default function hydrateComponent(
   const parsed = parse(source);
   expect(parsed.ok).toBe(true);
   expect(parsed.parts).not.toBeUndefined();
-  const rendered = buildServer("IfNested", parsed.parts!);
-  console.log("=== code");
-  console.log(rendered.code);
+  const rendered = buildServer(component.name, parsed.parts!);
   const html = eval(rendered.code).render(state);
-  console.log("=== html");
-  console.log(html);
 
   container.innerHTML = html;
   document.body.appendChild(container);

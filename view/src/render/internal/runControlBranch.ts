@@ -3,21 +3,19 @@ import clearRange from "./clearRange";
 import popRange from "./popRange";
 import pushRangeToParent from "./pushRangeToParent";
 
-export default function runBranch(range: Range, index: number, create: () => void) {
+export default function runControlBranch(range: Range, index: number, create: () => void) {
   // Only run the branch if it's not the current branch
   if (range.index === index) {
     return;
   }
 
-  if (range.index !== -1) {
-    // @ts-ignore Branching ranges can only have exactly one child
+  if (range.children?.length) {
+    // Branching ranges have exactly one child
     clearRange(range.children[0]);
-    // @ts-ignore
     range.children.length = 0;
   }
 
-  // TODO: Should I cache the branch ranges?
-  let oldRange = pushRangeToParent({
+  const oldRange = pushRangeToParent({
     startNode: null,
     endNode: null,
     parent: null,

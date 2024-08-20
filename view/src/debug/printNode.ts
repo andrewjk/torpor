@@ -9,13 +9,20 @@ export default function printNode(node: Node | null | undefined) {
       let p = el.tagName.toLowerCase();
       if (el.id) p += "#" + el.id;
       if (el.classList.length) p += Array.from(el.classList).join(".");
+      if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(el)}]`;
       paths.push(p);
     } else if (node.nodeType === 3) {
       // Text
-      paths.push(`'${node.textContent}'`);
+      let txt = node as Text;
+      let p = `'${txt.textContent}'`;
+      if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(txt)}]`;
+      paths.push(p);
     } else if (node.nodeType === 8) {
       // Comment
-      paths.push("#com");
+      let com = node as Comment;
+      let p = `<!${com.data}>`;
+      if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(com)}]`;
+      paths.push(p);
     } else if (node.nodeType === 9) {
       // Document
       paths.push("#doc");

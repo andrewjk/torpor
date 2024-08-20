@@ -1,10 +1,10 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
-import addFragment from "./addFragment";
+import addFragment from "./buildAddFragment";
+import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
-import declareFragment from "./declareFragment";
 
 export default function buildSwitchNode(
   node: ControlNode,
@@ -35,23 +35,16 @@ export default function buildSwitchNode(
   b.append(`
       /* @switch */
       const ${switchRangeName} = {};
-      t_run_control(${switchRangeName}, () => {
+      t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
         ${node.statement} {`);
 
   for (let [i, branch] of branches.entries()) {
-    buildSwitchBranch(
-      branch as ControlNode,
-      status,
-      b,
-      switchParentName,
-      switchAnchorName,
-      switchRangeName,
-      i,
-    );
+    buildSwitchBranch(branch as ControlNode, status, b, switchParentName, switchRangeName, i);
   }
 
   b.append(`}
     });`);
+  b.append("");
 }
 
 function buildSwitchBranch(
@@ -59,7 +52,6 @@ function buildSwitchBranch(
   status: BuildStatus,
   b: Builder,
   parentName: string,
-  anchorName: string,
   rangeName: string,
   index: number,
 ) {
@@ -73,11 +65,11 @@ function buildSwitchBranch(
     path: "",
   });
   for (let child of node.children) {
-    buildNode(child, status, b, parentName, anchorName);
+    buildNode(child, status, b, parentName, "t_before");
   }
   status.fragmentStack.pop();
 
-  addFragment(node, status, b, parentName, anchorName);
+  addFragment(node, status, b, parentName, "t_before");
 
   b.append(`});`);
   b.append(`break;`);

@@ -7,11 +7,13 @@ import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
 import { isReactive } from "./buildUtils";
 
-export default function buildFragments(node: ControlNode, status: BuildStatus, b: Builder) {
-  b.append(`const t_fragments = [];`);
-
+export default function buildGatherFragments(node: ControlNode, status: BuildStatus, b: Builder) {
   const fragments: Fragment[] = [];
   gatherFragments(node, status, fragments);
+
+  if (fragments.length) {
+    b.append(`const t_fragments = [];`);
+  }
 }
 
 function gatherFragments(

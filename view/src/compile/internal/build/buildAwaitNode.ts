@@ -2,10 +2,10 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import { trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
-import addFragment from "./addFragment";
+import addFragment from "./buildAddFragment";
+import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
-import declareFragment from "./declareFragment";
 
 export default function buildAwaitNode(
   node: ControlNode,
@@ -58,10 +58,10 @@ export default function buildAwaitNode(
     /* @await */
     const ${awaitRangeName} = { index: -1 };
     let ${awaitTokenName} = 0;
-    t_run_control(${awaitRangeName}, () => {
+    t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
       ${awaitTokenName}++;`);
 
-  buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 0);
+  buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName, 0);
 
   b.append(`
     ((token) => {
@@ -70,7 +70,7 @@ export default function buildAwaitNode(
       if (token === ${awaitTokenName}) {
         let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
-  buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 1);
+  buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitRangeName, 1);
 
   b.append(`t_pop_range(${oldRangeName});
       }
@@ -79,13 +79,14 @@ export default function buildAwaitNode(
       if (token === ${awaitTokenName}) {
         let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
-  buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitAnchorName, awaitRangeName, 2);
+  buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitRangeName, 2);
 
   b.append(`t_pop_range(${oldRangeName});
           }
         });
       })(${awaitTokenName});
     });`);
+  b.append("");
 }
 
 function buildAwaitBranch(
@@ -93,7 +94,6 @@ function buildAwaitBranch(
   status: BuildStatus,
   b: Builder,
   parentName: string,
-  anchorName: string,
   rangeName: string,
   index: number,
 ) {
@@ -106,11 +106,11 @@ function buildAwaitBranch(
     path: "",
   });
   for (let child of node.children) {
-    buildNode(child, status, b, parentName, anchorName);
+    buildNode(child, status, b, parentName, "t_before");
   }
   status.fragmentStack.pop();
 
-  addFragment(node, status, b, parentName, anchorName);
+  addFragment(node, status, b, parentName, "t_before");
 
   b.append(`});`);
 }

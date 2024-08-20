@@ -5,14 +5,14 @@ import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/Named.tera";
 
-test("basic slot -- mounted", () => {
+test("named slot -- mounted", () => {
   const container = document.createElement("div");
   mountComponent(container, Component);
 
   check(container);
 });
 
-test("basic slot -- hydrated", () => {
+test("named slot -- hydrated", () => {
   const container = document.createElement("div");
   const path = "./test/slots/components/Named.tera";
   hydrateComponent(container, path, Component);

@@ -3,11 +3,19 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
+import isTextNode from "../../types/nodes/isTextNode";
+import { isSpace } from "../parse/parseUtils";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
 import buildConfig from "./buildConfig";
 import { isReactive, isReactiveAttribute, nextVarName } from "./buildUtils";
+
+interface VariablePath {
+  parent: VariablePath | null;
+  type: string;
+  children: VariablePath[];
+}
 
 export default function buildDeclareFragment(
   node: ControlNode | ElementNode,
@@ -20,22 +28,31 @@ export default function buildDeclareFragment(
     const root = node.type === "control" && (node as ControlNode).operation === "@root";
     if (buildConfig.fragmentsUseCreateElement) {
       // Declarations, then createXxx calls
-      let existingVarPaths = new Map<string, string>();
-      declareFragmentVars(node.fragment, node, ["0:ch"], status, b, existingVarPaths, root, true);
+      let rootPath = { parent: null, type: "root", children: [] };
+      let varPaths = new Map<string, string>();
+      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, true);
 
-      existingVarPaths.clear();
+      rootPath.children.length = 0;
+      varPaths.clear();
       status.fragmentVars.clear();
       b.append(`const ${fragmentName} = t_frg([`);
-      declareFragmentVars(node.fragment, node, ["0:ch"], status, b, existingVarPaths, root, false);
+      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, false);
       b.append(`]);`);
     } else {
       // Text, then declarations
       const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
+      const rootName = `t_root_${fragment.number}`;
+      const firstNodeIsSpace =
+        node.children.length && isTextNode(node.children[0]) && isSpace(node.children[0].content);
+      const rootFunction = `t_root(${fragmentName}${firstNodeIsSpace ? ", true" : ""})`;
       b.append(
-        `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
+        `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);
+         const ${rootName} = ${rootFunction};`,
       );
-      let existingVarPaths = new Map<string, string>();
-      declareFragmentVars(node.fragment, node, ["0:ch"], status, b, existingVarPaths, root, true);
+      let rootPath = { parent: null, type: "root", children: [] };
+      let varPaths = new Map<string, string>();
+      varPaths.set(rootName, rootFunction);
+      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, true);
     }
   }
 }
@@ -43,11 +60,12 @@ export default function buildDeclareFragment(
 function declareFragmentVars(
   fragment: Fragment,
   node: Node,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
   root: boolean,
+  lastChild: boolean,
   declare: boolean,
 ) {
   switch (node.type) {
@@ -58,8 +76,9 @@ function declareFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
         root,
+        lastChild,
         declare,
       );
       break;
@@ -71,7 +90,8 @@ function declareFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
+        lastChild,
         declare,
       );
       break;
@@ -83,8 +103,9 @@ function declareFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
         root,
+        lastChild,
         declare,
       );
       break;
@@ -96,7 +117,8 @@ function declareFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
+        lastChild,
         declare,
       );
       break;
@@ -108,7 +130,8 @@ function declareFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
+        lastChild,
         declare,
       );
       break;
@@ -119,11 +142,12 @@ function declareFragmentVars(
 function declareControlFragmentVars(
   fragment: Fragment,
   node: ControlNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
   root: boolean,
+  lastChild: boolean,
   declare: boolean,
 ) {
   switch (node.operation) {
@@ -138,15 +162,26 @@ function declareControlFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
         operation,
+        lastChild,
         declare,
       );
       break;
     }
     default: {
-      for (let child of node.children) {
-        declareFragmentVars(fragment, child, path, status, b, existingVarPaths, root, declare);
+      for (let [i, child] of node.children.entries()) {
+        declareFragmentVars(
+          fragment,
+          child,
+          path,
+          status,
+          b,
+          varPaths,
+          root,
+          i === node.children.length - 1,
+          declare,
+        );
       }
       break;
     }
@@ -156,10 +191,11 @@ function declareControlFragmentVars(
 function declareComponentFragmentVars(
   fragment: Fragment,
   node: ElementNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
+  lastChild: boolean,
   declare: boolean,
 ) {
   declareParentAndAnchorFragmentVars(
@@ -168,8 +204,9 @@ function declareComponentFragmentVars(
     path,
     status,
     b,
-    existingVarPaths,
+    varPaths,
     "comp",
+    lastChild,
     declare,
   );
 }
@@ -177,28 +214,37 @@ function declareComponentFragmentVars(
 function declareElementFragmentVars(
   fragment: Fragment,
   node: ElementNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
   root: boolean,
+  lastChild: boolean,
   declare: boolean,
 ) {
-  const pathIndex = path.slice(path.lastIndexOf("0:ch")).length - 1;
-  path.push(`${pathIndex}:el:${node.tagName}`);
+  const topLevel = !path.parent;
+
+  let elementPath = { parent: path, type: node.tagName, children: [] };
+  path.children.push(elementPath);
 
   const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
-  const setAttributes = root || hasReactiveAttribute;
+  const setVariable = hasReactiveAttribute || root || (topLevel && lastChild);
 
-  if (declare && setAttributes) {
-    node.varName = nextVarName(node.tagName, status);
-    const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
-    if (buildConfig.fragmentsUseCreateElement) {
-      b.append(`let ${node.varName};`);
-    } else {
-      b.append(`const ${node.varName} = ${varPath};`);
+  if (declare) {
+    if (setVariable) {
+      node.varName = nextVarName(node.tagName, status);
+      if (topLevel) {
+        fragment.endVarName = node.varName;
+      }
+      const varPath = getFragmentVarPath(fragment, node.varName, elementPath, varPaths);
+      if (buildConfig.fragmentsUseCreateElement) {
+        b.append(`let ${node.varName};`);
+      } else {
+        //b.append("console.log('~~~');");
+        b.append(`const ${node.varName} = ${varPath};`);
+      }
+      status.fragmentVars.set(varPath, node.varName);
     }
-    status.fragmentVars.set(varPath, node.varName);
   }
 
   // If there is an immediate child of this element that has this element as its parent,
@@ -219,7 +265,7 @@ function declareElementFragmentVars(
         }
       })
       .join(", ");
-    if (setAttributes) {
+    if (setVariable) {
       b.append(
         `(${childParentName ? `${childParentName} = ` : ""}${node.varName} = t_elm("${node.tagName}", {${attributes}}, [`,
       );
@@ -230,15 +276,22 @@ function declareElementFragmentVars(
     }
   }
 
-  const oldPathLength = path.length;
-  path.push("0:ch");
-  for (let child of node.children) {
-    declareFragmentVars(fragment, child, path, status, b, existingVarPaths, false, declare);
+  for (let [i, child] of node.children.entries()) {
+    declareFragmentVars(
+      fragment,
+      child,
+      elementPath,
+      status,
+      b,
+      varPaths,
+      false,
+      i === node.children.length - 1,
+      declare,
+    );
   }
-  path.splice(oldPathLength);
 
   if (!declare) {
-    if (setAttributes || childParentName) {
+    if (setVariable || childParentName) {
       b.append("])),");
     } else {
       b.append("]),");
@@ -249,31 +302,44 @@ function declareElementFragmentVars(
 function declareTextFragmentVars(
   fragment: Fragment,
   node: TextNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
+  lastChild: boolean,
   declare: boolean,
 ) {
-  // Text nodes get merged together
-  if (!path[path.length - 1].endsWith("txt")) {
-    const pathIndex = path.slice(path.lastIndexOf("0:ch")).length - 1;
-    path.push(`${pathIndex}:txt`);
+  const topLevel = !path.parent;
+
+  // HACK: Text nodes get merged together
+  // Is this because of control nodes like @key and @const??
+  // TODO: We should do this when building for the server too
+  const lastType = path.children[path.children.length - 1]?.type;
+  if (lastType === "text" || lastType === "space") {
+    return;
   }
+  let textPath = { parent: path, type: isSpace(node.content) ? "space" : "text", children: [] };
+  path.children.push(textPath);
+
+  const setVariable = isReactive(node.content) || (topLevel && lastChild);
 
   if (declare) {
-    if (isReactive(node.content)) {
+    if (setVariable) {
       node.varName = nextVarName("text", status);
-      const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
+      if (topLevel) {
+        fragment.endVarName = node.varName;
+      }
+      const varPath = getFragmentVarPath(fragment, node.varName, textPath, varPaths);
       if (buildConfig.fragmentsUseCreateElement) {
         b.append(`let ${node.varName};`);
       } else {
+        //b.append("console.log('~~~');");
         b.append(`const ${node.varName} = ${varPath};`);
       }
       status.fragmentVars.set(varPath, node.varName);
     }
   } else {
-    if (isReactive(node.content)) {
+    if (setVariable) {
       b.append(`(${node.varName} = t_txt(" ")),`);
     } else {
       b.append(`t_txt("${node.content}"),`);
@@ -284,10 +350,11 @@ function declareTextFragmentVars(
 function declareSpecialFragmentVars(
   fragment: Fragment,
   node: ElementNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
+  lastChild: boolean,
   declare: boolean,
 ) {
   switch (node.tagName) {
@@ -298,15 +365,26 @@ function declareSpecialFragmentVars(
         path,
         status,
         b,
-        existingVarPaths,
+        varPaths,
         "slot",
+        lastChild,
         declare,
       );
       break;
     }
     case ":fill": {
-      for (let child of node.children) {
-        declareFragmentVars(fragment, child, path, status, b, existingVarPaths, false, declare);
+      for (let [i, child] of node.children.entries()) {
+        declareFragmentVars(
+          fragment,
+          child,
+          path,
+          status,
+          b,
+          varPaths,
+          false,
+          i === node.children.length - 1,
+          declare,
+        );
       }
       break;
     }
@@ -316,47 +394,53 @@ function declareSpecialFragmentVars(
 function declareParentAndAnchorFragmentVars(
   fragment: Fragment,
   node: ControlNode | ElementNode,
-  path: string[],
+  path: VariablePath,
   status: BuildStatus,
   b: Builder,
-  existingVarPaths: Map<string, string>,
+  varPaths: Map<string, string>,
   name: string,
+  lastChild: boolean,
   declare: boolean,
 ) {
-  // If the parent index is 0 it means it is the fragment, which can't be used as a parent
-  // In that case we don't set the parentName so that the existing parent will be used
-  const parentIndex = path.lastIndexOf("0:ch");
-  const parentPath = path.slice(0, parentIndex);
-  // TODO: This is not shortening the path correctly
-  const parentVarPath = getFragmentVarPath(fragment, "?", parentPath, existingVarPaths);
-  if (parentIndex === 0) {
-    node.parentName = parentVarPath;
-  } else if (status.fragmentVars.has(parentVarPath)) {
-    node.parentName = status.fragmentVars.get(parentVarPath);
-  } else {
-    if (declare) {
-      // TODO: Get the actual element that it is, which may involve getting parents of control nodes too
-      node.parentName = nextVarName(`${name}_parent`, status);
-      if (buildConfig.fragmentsUseCreateElement) {
-        b.append(`let ${node.parentName};`);
-      } else {
-        b.append(`const ${node.parentName} = ${parentVarPath};`);
-      }
-      status.fragmentVars.set(parentVarPath, node.parentName);
+  if (path.parent) {
+    const parentPath = path;
+    const oldChildren = parentPath.children;
+    parentPath.children = [];
+    // TODO: This is not shortening the path correctly
+    const parentVarPath = getFragmentVarPath(fragment, "?", parentPath, varPaths);
+    parentPath.children = oldChildren;
+    if (status.fragmentVars.has(parentVarPath)) {
+      node.parentName = status.fragmentVars.get(parentVarPath);
     } else {
-      // HACK: For the createElement option, this gets done in the parent
+      if (declare) {
+        // TODO: Get the actual element that it is, which may involve getting parents of control nodes too
+        node.parentName = nextVarName(`${name}_parent`, status);
+        if (buildConfig.fragmentsUseCreateElement) {
+          b.append(`let ${node.parentName};`);
+        } else {
+          b.append(`const ${node.parentName} = ${parentVarPath};`);
+        }
+        status.fragmentVars.set(parentVarPath, node.parentName);
+      } else {
+        // HACK: For the createElement option, this gets done in the parent
+      }
     }
+  } else {
+    // If there is no parent, it means the parent is the fragment
+    node.parentName = `t_fragment_${fragment.number}`;
   }
 
   if (declare) {
-    const pathIndex = path.length - parentIndex - 1;
-    path.push(`${pathIndex}:${name}`);
+    const anchorPath = { parent: path, type: "#", children: [] };
+    path.children.push(anchorPath);
+
     node.varName = nextVarName(`${name}_anchor`, status);
-    const varPath = getFragmentVarPath(fragment, node.varName, path, existingVarPaths);
+    const varPath = getFragmentVarPath(fragment, node.varName, anchorPath, varPaths);
     if (buildConfig.fragmentsUseCreateElement) {
       b.append(`let ${node.varName};`);
     } else {
-      b.append(`const ${node.varName} = ${varPath};`);
+      //b.append("console.log('~~~');");
+      b.append(`const ${node.varName} = t_anchor(${varPath});`);
     }
     status.fragmentVars.set(varPath, node.varName);
   } else {
@@ -367,45 +451,64 @@ function declareParentAndAnchorFragmentVars(
 function getFragmentVarPath(
   fragment: Fragment,
   name: string,
-  path: string[],
-  existingVarPaths: Map<string, string>,
+  path: VariablePath,
+  varPaths: Map<string, string>,
 ): string {
+  let node = path;
+  while (node.parent) {
+    node = node.parent;
+  }
   let varPath = `t_fragment_${fragment.number}`;
-  let childIndex = -2;
-  for (let i = 0; i < path.length; i++) {
-    const part = path[i].split(":")[1];
-    if (part === "ch") {
-      if (childIndex != -2) {
-        //varPath += `.childNodes[${childIndex}]`;
-        // This seems a little faster:
-        varPath += ".firstChild";
-        for (let i = 0; i < childIndex; i++) {
-          varPath += ".nextSibling";
-        }
-      }
-      childIndex = -1;
-    } else {
-      childIndex += 1;
-    }
-  }
-  if (childIndex != -2) {
-    //varPath += `.childNodes[${childIndex}]`;
-    // This seems a little faster:
-    varPath += ".firstChild";
-    for (let i = 0; i < childIndex; i++) {
-      varPath += ".nextSibling";
-    }
-  }
+  varPath = getFragmentVarPathPart(node, varPath, true);
 
   // HACK: allow passing in "?" to ignore the parentVarPath
   if (name !== "?") {
-    for (let [existingName, existingPath] of existingVarPaths) {
+    for (let [existingName, existingPath] of varPaths) {
       if (varPath.includes(existingPath)) {
         varPath = varPath.replace(existingPath, existingName);
       }
     }
-    existingVarPaths.set(name, varPath);
+    varPaths.set(name, varPath);
   }
 
   return varPath;
 }
+
+function getFragmentVarPathPart(path: VariablePath, varPath: string, root = false): string {
+  if (root) {
+    if (path.children.length && path.children[0].type === "space") {
+      varPath = `t_root(${varPath}, true)`;
+    } else {
+      varPath = `t_root(${varPath})`;
+    }
+  } else {
+    varPath = `t_child(${varPath})`;
+  }
+  for (let [i, child] of path.children.entries()) {
+    if (i > 0) {
+      varPath = `t_next(${varPath}${child.type === "text" ? ", true" : ""})`;
+    }
+
+    if (i === path.children.length - 1 && child.children.length) {
+      varPath = getFragmentVarPathPart(child, varPath);
+    }
+  }
+  return varPath;
+}
+
+/*
+function printPath(path: VariablePath) {
+  let parent = path;
+  while (parent.parent) {
+    parent = parent.parent;
+  }
+  printPathPart(parent);
+}
+
+function printPathPart(path: VariablePath, indent = 0) {
+  console.log(`${" ".repeat(indent * 2)}${path.type}`);
+  for (let child of path.children) {
+    printPathPart(child, indent + 1);
+  }
+}
+*/

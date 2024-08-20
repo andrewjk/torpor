@@ -1,10 +1,12 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
-import addFragment from "./addFragment";
+import addFragment from "./buildAddFragment";
+import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
-import declareFragment from "./declareFragment";
+
+// TODO: Are there too many branches for ifs etc?
 
 export default function buildIfNode(
   node: ControlNode,
@@ -35,13 +37,14 @@ export default function buildIfNode(
   b.append(`
       /* @if */
       const ${ifRangeName} = {};
-      t_run_control(${ifRangeName}, () => {`);
+      t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {`);
 
   for (let [i, branch] of branches.entries()) {
-    buildIfBranch(branch, status, b, ifParentName, ifAnchorName, ifRangeName, i);
+    buildIfBranch(branch, status, b, ifParentName, ifRangeName, i);
   }
 
-  b.append(`});`);
+  b.append("});");
+  b.append("");
 }
 
 function buildIfBranch(
@@ -49,7 +52,6 @@ function buildIfBranch(
   status: BuildStatus,
   b: Builder,
   parentName: string,
-  anchorName: string,
   rangeName: string,
   index: number,
 ) {
@@ -63,11 +65,11 @@ function buildIfBranch(
     path: "",
   });
   for (let child of node.children) {
-    buildNode(child, status, b, parentName, anchorName);
+    buildNode(child, status, b, parentName, "t_before");
   }
   status.fragmentStack.pop();
 
-  addFragment(node, status, b, parentName, anchorName);
+  addFragment(node, status, b, parentName, "t_before");
 
   b.append(`});`);
   b.append(`}`);

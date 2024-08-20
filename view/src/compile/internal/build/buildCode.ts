@@ -3,11 +3,11 @@ import type Import from "../../types/Import";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
 import buildConfig from "./buildConfig";
-import buildFragments from "./buildFragments";
+import buildGatherFragments from "./buildGatherFragments";
 import buildNode from "./buildNode";
 
 export default function buildCode(name: string, parts: ComponentParts): string {
-  const b = new Builder();
+  let b = new Builder();
 
   let folder = buildConfig.folder;
   b.append(`
@@ -17,7 +17,7 @@ export default function buildCode(name: string, parts: ComponentParts): string {
     import t_push_range from '${folder}/render/internal/pushRange';
     import t_pop_range from '${folder}/render/internal/popRange';
     import t_run_control from '${folder}/render/internal/runControl';
-    import t_run_branch from '${folder}/render/internal/runBranch';
+    import t_run_branch from '${folder}/render/internal/runControlBranch';
     import t_run_list from '${folder}/render/internal/runList';
     import t_add_fragment from '${folder}/render/internal/addFragment';
     import t_apply_props from '${folder}/render/internal/applyProps';
@@ -30,7 +30,11 @@ export default function buildCode(name: string, parts: ComponentParts): string {
       import t_cmt from '${folder}/render/internal/createComment';`);
   } else {
     b.append(`
-      import t_fragment from '${folder}/render/internal/getFragment';`);
+      import t_fragment from '${folder}/render/internal/getFragment';
+      import t_anchor from '${folder}/render/internal/findAnchor';
+      import t_root from '${folder}/render/internal/nodeRoot';
+      import t_child from '${folder}/render/internal/nodeChild';
+      import t_next from '${folder}/render/internal/nodeNext';`);
   }
   // TODO: De-duplication
   let imports: Import[] = [];
@@ -98,7 +102,7 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       forVarNames: [],
     };
     b.append("/* User interface */");
-    buildFragments(parts.template, status, b);
+    buildGatherFragments(parts.template, status, b);
     b.append("");
     buildNode(parts.template, status, b, "$parent", "$anchor", true);
   }

@@ -1,3 +1,4 @@
+import printNode from "../debug/printNode";
 import type Effect from "./types/Effect";
 import type Range from "./types/Range";
 
@@ -5,10 +6,9 @@ import type Range from "./types/Range";
  * The global context for setting up effects and updating subscriptions.
  */
 interface Context {
-  /**
-   * The effect that is currently being run.
-   */
+  /** The effect that is currently being run. */
   activeEffect: Effect | null;
+
   /**
    * Whether the active effect has been subscribed to by accessing a property of a watched object.
    *
@@ -20,6 +20,7 @@ interface Context {
    * is deleted.
    */
   activeEffectSubbed: boolean;
+
   /**
    * A map of objects, their properties, and the object/property effects.
    *
@@ -27,10 +28,13 @@ interface Context {
    * the object, then the property, and run any effects that are found.
    */
   objectEffects: Map<object, Map<string | symbol, Effect[]>>;
-  /**
-   * The range that is currently being created.
-   */
+
+  /** The range that is currently being created. */
   activeRange: Range | null;
+
+  /** The node that is actively being hydrated. */
+  hydrationNode: Node | null;
+  //hn: Node | null;
 }
 
 const context: Context = {
@@ -39,6 +43,17 @@ const context: Context = {
   activeEffectSubbed: false,
   objectEffects: new Map<object, Map<string | symbol, Effect[]>>(),
   activeRange: null,
+  hydrationNode: null,
+  /*
+  hn: null,
+  get hydrationNode() {
+    return this.hn;
+  },
+  set hydrationNode(value) {
+    console.log(`set hydration ${printNode(value)}`);
+    this.hn = value;
+  },
+  */
 };
 
 export default context;

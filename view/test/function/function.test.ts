@@ -26,8 +26,9 @@ async function check(container: HTMLElement) {
 
   expect(queryByText(container, "The count is 0.")).toBeInTheDocument();
 
-  const increment = document.getElementById("increment")!;
-  await user.click(increment);
+  const increment = Array.from(container.children).find((e) => e.id === "increment");
+  expect(increment).not.toBeNull();
+  await user.click(increment!);
 
   expect(queryByText(container, "The count is 1.")).toBeInTheDocument();
 }

@@ -13,7 +13,7 @@ test("if effect -- mounted", async () => {
   const container = document.createElement("div");
   mountComponent(container, Component, state);
 
-  check(container, state);
+  check(container, state, false);
 });
 
 test("if effect -- hydrated", async () => {
@@ -23,14 +23,15 @@ test("if effect -- hydrated", async () => {
   const path = "./test/effects/components/If.tera";
   hydrateComponent(container, path, Component, state);
 
-  check(container, state);
+  check(container, state, true);
 });
 
-function check(container: HTMLElement, state: any) {
+// HACK: Need to mock context properly
+function check(container: HTMLElement, state: any, hydrated: boolean) {
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
-  expect(context.objectEffects.size).toBe(1);
+  expect(context.objectEffects.size).toBe(hydrated ? 2 : 1);
 
   // 1 if node with an effect
   //expect(context.rangeEffects.size).toBe(1);

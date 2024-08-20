@@ -6,4 +6,5 @@ export default interface Fragment {
     eventName: string;
     handler: string;
   }[];
+  endVarName?: string;
 }

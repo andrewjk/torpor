@@ -17,6 +17,7 @@ export default function buildElementNode(
   if (varName) {
     // PERF: Does this have much of an impact??
     if (root) {
+      // TODO: I think we know what the props are at this stage, so we could be more direct?
       b.append("");
       b.append(
         `t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
@@ -40,11 +41,6 @@ function buildElementAttributes(
     if (name.startsWith("{") && name.endsWith("}")) {
       name = name.substring(1, name.length - 1);
       buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
-
-      const path = getFragmentPath(status, b);
-      if (path) {
-        buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
-      }
     } else if (name.startsWith("on")) {
       value = trimMatched(value, "{", "}");
 
@@ -94,36 +90,4 @@ function buildElementAttributes(
       }
     }
   }
-}
-
-function getFragmentPath(status: BuildStatus, b: Builder): string {
-  const fragment = status.fragmentStack[status.fragmentStack.length - 1];
-  if (fragment && fragment.fragment) {
-    //b.append(`console.log("${fragment.path}");`);
-    //b.append(`//// t_fragment_${fragment.fragment.number} ${fragment.path}`);
-    const parts = fragment.path.substring(0, fragment.path.length - 1).split("/");
-    let path = `t_fragment_${fragment.fragment.number}`;
-    let parentPath = "";
-    let childIndex = -2;
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i].split(":")[1];
-      if (part === "ch") {
-        parentPath = path;
-        if (childIndex != -2) {
-          path += `.childNodes[${childIndex}]`;
-        }
-        childIndex = -1;
-      } else {
-        childIndex += 1;
-      }
-    }
-    if (childIndex != -2) {
-      parentPath = path;
-      path += `.childNodes[${childIndex}]`;
-    }
-
-    return path;
-  }
-
-  return "";
 }

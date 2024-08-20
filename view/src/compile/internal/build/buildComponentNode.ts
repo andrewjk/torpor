@@ -3,10 +3,10 @@ import isSpecialNode from "../../types/nodes/isSpecialNode";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import Builder from "./Builder";
-import addFragment from "./addFragment";
+import addFragment from "./buildAddFragment";
+import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
-import declareFragment from "./declareFragment";
 
 export default function buildComponentNode(
   node: ElementNode,
