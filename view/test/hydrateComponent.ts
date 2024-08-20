@@ -25,7 +25,7 @@ export default function hydrateComponent(
   const folder = path.replace("/components/", "/components/output/");
   if (!fs.existsSync(dirname(folder))) fs.mkdirSync(dirname(folder));
   fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
-  fs.writeFileSync(folder.replace(".tera", ".html"), html);
+  //fs.writeFileSync(folder.replace(".tera", ".html"), html);
   const client = build(component.name, parsed.parts!);
   fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
 
