@@ -7,16 +7,19 @@ import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 import { isReactive } from "./buildUtils";
 
-export default function buildGatherFragments(node: ControlNode, status: BuildStatus, b: Builder) {
+/**
+ * Builds the HTML template text for all of the fragments in a component
+ */
+export default function buildFragmentText(node: ControlNode, status: BuildStatus, b: Builder) {
   const fragments: Fragment[] = [];
-  gatherFragments(node, status, fragments);
+  buildNodeFragmentText(node, status, fragments);
 
   if (fragments.length) {
     b.append(`const t_fragments = [];`);
   }
 }
 
-function gatherFragments(
+function buildNodeFragmentText(
   node: Node,
   status: BuildStatus,
   fragments: Fragment[],
@@ -24,15 +27,15 @@ function gatherFragments(
 ) {
   switch (node.type) {
     case "control": {
-      gatherControlFragments(node as ControlNode, status, fragments, currentFragment!);
+      buildControlFragmentText(node as ControlNode, status, fragments, currentFragment!);
       break;
     }
     case "component": {
-      gatherComponentFragments(node as ElementNode, status, fragments, currentFragment!);
+      buildComponentFragmentText(node as ElementNode, status, fragments, currentFragment!);
       break;
     }
     case "element": {
-      gatherElementFragments(node as ElementNode, status, fragments, currentFragment!);
+      buildElementFragmentText(node as ElementNode, status, fragments, currentFragment!);
       break;
     }
     case "text": {
@@ -43,13 +46,13 @@ function gatherFragments(
       break;
     }
     case "special": {
-      gatherSpecialFragments(node as ElementNode, status, fragments, currentFragment!);
+      buildSpecialFragmentText(node as ElementNode, status, fragments, currentFragment!);
       break;
     }
   }
 }
 
-function gatherControlFragments(
+function buildControlFragmentText(
   node: ControlNode,
   status: BuildStatus,
   fragments: Fragment[],
@@ -65,7 +68,7 @@ function gatherControlFragments(
       currentFragment.text += "<!>";
       //}
       for (let child of node.children) {
-        gatherFragments(child, status, fragments, currentFragment);
+        buildNodeFragmentText(child, status, fragments, currentFragment);
       }
       break;
     }
@@ -74,14 +77,14 @@ function gatherControlFragments(
       node.fragment = { number: fragments.length, text: "", events: [] };
       fragments.push(node.fragment);
       for (let child of node.children) {
-        gatherFragments(child, status, fragments, node.fragment);
+        buildNodeFragmentText(child, status, fragments, node.fragment);
       }
       break;
     }
   }
 }
 
-function gatherComponentFragments(
+function buildComponentFragmentText(
   node: ElementNode,
   status: BuildStatus,
   fragments: Fragment[],
@@ -95,12 +98,12 @@ function gatherComponentFragments(
     fragments.push(node.fragment);
     for (let child of node.children) {
       // TODO: Make sure it's not a :fill node
-      gatherFragments(child, status, fragments, node.fragment);
+      buildNodeFragmentText(child, status, fragments, node.fragment);
     }
   }
 }
 
-function gatherElementFragments(
+function buildElementFragmentText(
   node: ElementNode,
   status: BuildStatus,
   fragments: Fragment[],
@@ -124,12 +127,12 @@ function gatherElementFragments(
   }
   currentFragment.text += ">";
   for (let child of node.children) {
-    gatherFragments(child, status, fragments, currentFragment);
+    buildNodeFragmentText(child, status, fragments, currentFragment);
   }
   currentFragment.text += `</${node.tagName}>`;
 }
 
-function gatherSpecialFragments(
+function buildSpecialFragmentText(
   node: ElementNode,
   status: BuildStatus,
   fragments: Fragment[],
@@ -143,7 +146,7 @@ function gatherSpecialFragments(
       node.fragment = { number: fragments.length, text: "", events: [] };
       fragments.push(node.fragment);
       for (let child of node.children) {
-        gatherFragments(child, status, fragments, node.fragment);
+        buildNodeFragmentText(child, status, fragments, node.fragment);
       }
       break;
     }
@@ -152,7 +155,7 @@ function gatherSpecialFragments(
       node.fragment = { number: fragments.length, text: "", events: [] };
       fragments.push(node.fragment);
       for (let child of node.children) {
-        gatherFragments(child, status, fragments, node.fragment);
+        buildNodeFragmentText(child, status, fragments, node.fragment);
       }
       break;
     }
