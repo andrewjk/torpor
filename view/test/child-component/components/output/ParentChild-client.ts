@@ -30,13 +30,12 @@ const ParentChild = {
     const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!></div>`);
     const t_root_0 = t_root(t_fragment_0);
     const t_div_1 = t_root_0;
-    const t_comp_parent_1 = t_root(t_fragment_0);
     const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
     /* @component */
     const t_props_1 = $watch({});
     t_props_1["name"] = "Anna";
-    Child.render(t_comp_parent_1, t_comp_anchor_1, t_props_1, undefined, $context)
+    Child.render(t_root_0, t_comp_anchor_1, t_props_1, undefined, $context)
 
     t_apply_props(t_div_1, $props, ['name']);
     t_add_fragment(t_fragment_0, $parent, $anchor);

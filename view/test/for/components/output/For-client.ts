@@ -30,14 +30,13 @@ const For = {
     const t_fragment_0 = t_fragment(t_fragments, 0, `<section> <!> </section>`);
     const t_root_0 = t_root(t_fragment_0);
     const t_section_1 = t_root_0;
-    const t_for_parent_1 = t_root(t_fragment_0);
     const t_for_anchor_1 = t_anchor(t_next(t_child(t_section_1)));
 
     /* @for */
     let t_for_range_1 = {};
     t_run_list(
       t_for_range_1,
-      t_for_parent_1,
+      t_root_0,
       t_for_anchor_1,
       function createNewItems() {
         let t_new_items = [];
@@ -58,7 +57,7 @@ const For = {
           let i = t_item.data.i; 
           t_text_1.textContent = ` ${t_fmt(i)} `;
         });
-        t_add_fragment(t_fragment_1, t_for_parent_1, t_before);
+        t_add_fragment(t_fragment_1, t_root_0, t_before);
         t_next(t_text_2);
         t_pop_range(t_old_range_1);
       }

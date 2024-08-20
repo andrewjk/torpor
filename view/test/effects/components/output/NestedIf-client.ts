@@ -30,7 +30,6 @@ const NestedIf = {
     const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!> </div>`);
     const t_root_0 = t_root(t_fragment_0);
     const t_div_1 = t_root_0;
-    const t_if_parent_1 = t_root(t_fragment_0);
     const t_if_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
     /* @if */
@@ -66,7 +65,7 @@ const NestedIf = {
           });
 
           const t_text_3 = t_next(t_if_anchor_2);
-          t_add_fragment(t_fragment_1, t_if_parent_1, t_before);
+          t_add_fragment(t_fragment_1, t_root_0, t_before);
           t_next(t_text_3);
         });
       }
