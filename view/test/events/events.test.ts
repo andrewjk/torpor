@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import userEvent from "@testing-library/user-event";
-import { expect, test } from "vitest";
+import userEvent, { UserEvent } from "@testing-library/user-event";
+import { expect, test, vi } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/Increment.tera";
@@ -22,6 +22,11 @@ test("events -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
+  // HACK: this useFakeTimers call seems to prevent intermittent exceptions
+  // being thrown
+  vi.useFakeTimers({
+    shouldAdvanceTime: true,
+  });
   const user = userEvent.setup();
 
   expect(queryByText(container, "The count is 0.")).toBeInTheDocument();
