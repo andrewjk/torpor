@@ -1,5 +1,6 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../Builder";
+import type BuildServerStatus from "./BuildServerStatus";
 //import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerIfNode from "./buildServerIfNode";
@@ -7,14 +8,18 @@ import buildServerRootNode from "./buildServerRootNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
 
-export default function buildServerControlNode(node: ControlNode, b: Builder) {
+export default function buildServerControlNode(
+  node: ControlNode,
+  status: BuildServerStatus,
+  b: Builder,
+) {
   switch (node.operation) {
     case "@root": {
-      buildServerRootNode(node, b);
+      buildServerRootNode(node, status, b);
       break;
     }
     case "@if group": {
-      buildServerIfNode(node, b);
+      buildServerIfNode(node, status, b);
       break;
     }
     case "@if":
@@ -24,7 +29,7 @@ export default function buildServerControlNode(node: ControlNode, b: Builder) {
       break;
     }
     case "@switch group": {
-      buildServerSwitchNode(node, b);
+      buildServerSwitchNode(node, status, b);
     }
     case "@case":
     case "@default": {
@@ -32,7 +37,7 @@ export default function buildServerControlNode(node: ControlNode, b: Builder) {
       break;
     }
     case "@for group": {
-      buildServerForNode(node, b);
+      buildServerForNode(node, status, b);
       break;
     }
     case "@for":
@@ -53,10 +58,18 @@ export default function buildServerControlNode(node: ControlNode, b: Builder) {
     }
       */
     case "@const": {
+      if (status.output) {
+        b.append(`$output += \`${status.output}\`;`);
+        status.output = "";
+      }
       buildServerScriptNode(node, b);
       break;
     }
     case "@function": {
+      if (status.output) {
+        b.append(`$output += \`${status.output}\`;`);
+        status.output = "";
+      }
       b.append("");
       buildServerScriptNode(node, b);
       b.append("");

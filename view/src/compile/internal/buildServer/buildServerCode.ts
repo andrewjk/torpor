@@ -71,11 +71,16 @@ function buildServerTemplate(name: string, parts: ComponentParts, b: Builder) {
   }
 
   if (parts.template) {
+    const status = { output: "" };
     b.append("/* User interface */");
     // HACK: Replace this with imports
     b.append('const t_fmt = (text) => text != null ? text : "";');
     b.append('let $output = "";');
-    buildServerNode(parts.template, b, true);
+    buildServerNode(parts.template, status, b);
+    if (status.output) {
+      b.append(`$output += \`${status.output}\`;`);
+      status.output = "";
+    }
   }
 
   b.append(`return $output;

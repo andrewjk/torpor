@@ -3,16 +3,17 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
+import BuildServerStatus from "./BuildServerStatus";
 //import buildServerComponentNode from "./buildServerComponentNode";
 import buildServerControlNode from "./buildServerControlNode";
 import buildServerElementNode from "./buildServerElementNode";
 //import buildServerSpecialNode from "./buildServerSpecialNode";
 import buildServerTextNode from "./buildServerTextNode";
 
-export default function buildServerNode(node: Node, b: Builder, root = false) {
+export default function buildServerNode(node: Node, status: BuildServerStatus, b: Builder) {
   switch (node.type) {
     case "control": {
-      buildServerControlNode(node as ControlNode, b);
+      buildServerControlNode(node as ControlNode, status, b);
       break;
     }
     case "component": {
@@ -20,11 +21,11 @@ export default function buildServerNode(node: Node, b: Builder, root = false) {
       break;
     }
     case "element": {
-      buildServerElementNode(node as ElementNode, b, root);
+      buildServerElementNode(node as ElementNode, status, b);
       break;
     }
     case "text": {
-      buildServerTextNode(node as TextNode, b);
+      buildServerTextNode(node as TextNode, status, b);
       break;
     }
     case "special": {

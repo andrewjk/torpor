@@ -1,7 +1,9 @@
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
+import { trimQuotes } from "../utils";
+import BuildServerStatus from "./BuildServerStatus";
 
-export default function buildServerTextNode(node: TextNode, b: Builder) {
+export default function buildServerTextNode(node: TextNode, status: BuildServerStatus, b: Builder) {
   let content = node.content || "";
   // Replace all spaces with a single space, both to save space and to remove
   // newlines from generated JS strings
@@ -24,8 +26,9 @@ export default function buildServerTextNode(node: TextNode, b: Builder) {
 
   if (reactiveCount) {
     content = content.replaceAll("{", "${t_fmt(").replaceAll("}", ")}");
-    b.append(`$output += \`${content}\`;`);
+    status.output += content;
   } else {
-    b.append(`$output += "${content}";`);
+    content = trimQuotes(content);
+    status.output += `${content}`;
   }
 }

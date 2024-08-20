@@ -1,19 +1,24 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../Builder";
-import { trimMatched, trimQuotes } from "../utils";
-import buildNode from "./buildServerNode";
+import { trimQuotes } from "../utils";
+import BuildServerStatus from "./BuildServerStatus";
+import buildServerNode from "./buildServerNode";
 
-export default function buildServerElementNode(node: ElementNode, b: Builder, root = false) {
+export default function buildServerElementNode(
+  node: ElementNode,
+  status: BuildServerStatus,
+  b: Builder,
+) {
   let attributes = buildElementAttributes(node);
   if (attributes.length) {
     attributes = " " + attributes;
   }
-  b.append(`$output += \`<${node.tagName}${attributes}${node.selfClosed ? "/" : ""}>\`;`);
+  status.output += `<${node.tagName}${attributes}${node.selfClosed ? "/" : ""}>`;
   if (!node.selfClosed) {
     for (let child of node.children) {
-      buildNode(child, b);
+      buildServerNode(child, status, b);
     }
-    b.append(`$output += "</${node.tagName}>";`);
+    status.output += `</${node.tagName}>`;
   }
 }
 

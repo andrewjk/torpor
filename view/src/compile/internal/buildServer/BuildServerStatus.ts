@@ -1,3 +1,3 @@
-export default interface BuildStatus {
+export default interface BuildServerStatus {
   output: string;
 }
