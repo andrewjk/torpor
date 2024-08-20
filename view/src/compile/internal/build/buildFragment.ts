@@ -49,7 +49,6 @@ export default function buildFragment(
 
       fragmentPath.children.length = 0;
       varPaths.clear();
-      varPaths.clear();
       b.append(`const ${fragmentName} = t_frg([`);
       declareFragmentVars(
         node.fragment,
@@ -289,7 +288,6 @@ function declareElementFragmentVars(
       } else {
         b.append(`const ${node.varName} = ${varPath};`);
       }
-      //varPaths.set(node.varName, varPath);
     }
   }
 
@@ -382,7 +380,6 @@ function declareTextFragmentVars(
       } else {
         b.append(`const ${node.varName} = ${varPath};`);
       }
-      //varPaths.set(node.varName, varPath);
     }
   } else {
     if (setVariable) {
@@ -459,15 +456,11 @@ function declareParentAndAnchorFragmentVars(
     parentPath.children = [];
     const parentVarPath = getFragmentVarPath(fragment, "?", parentPath, varPaths);
     parentPath.children = oldChildren;
-    console.log("CEHCKING PARENT");
-    console.log(varPaths);
-    console.log(parentVarPath);
+    // TODO: Should do this thing for the last child as well
     if (varPaths.has(parentVarPath)) {
       node.parentName = varPaths.get(parentVarPath);
     } else {
       if (declare) {
-        // TODO: Get the actual element that it is, which may involve getting
-        // parents of control nodes too
         node.parentName = nextVarName(`${name}_parent`, status);
         if (buildConfig.fragmentsUseCreateElement) {
           b.append(`let ${node.parentName};`);
@@ -492,7 +485,6 @@ function declareParentAndAnchorFragmentVars(
     } else {
       b.append(`const ${node.varName} = t_anchor(${varPath});`);
     }
-    //varPaths.set(varPath, node.varName);
   } else {
     b.append(`(${node.varName} = t_cmt()),`);
   }

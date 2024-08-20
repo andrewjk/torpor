@@ -8,6 +8,5 @@ export default interface BuildStatus {
     fragment?: Fragment;
     path: string;
   }[];
-  fragmentVars: Map<string, string>;
   forVarNames: string[];
 }

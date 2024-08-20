@@ -98,7 +98,6 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       styleHash: parts.styleHash || "",
       varNames: {},
       fragmentStack: [],
-      fragmentVars: new Map(),
       forVarNames: [],
     };
     b.append("/* User interface */");
