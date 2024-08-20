@@ -1,7 +1,7 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import addFragment from "./buildAddFragment";
 import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";

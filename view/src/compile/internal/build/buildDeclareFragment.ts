@@ -4,10 +4,10 @@ import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
 import isTextNode from "../../types/nodes/isTextNode";
+import Builder from "../Builder";
 import { isSpace } from "../parse/parseUtils";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildConfig from "./buildConfig";
 import { isReactive, isReactiveAttribute, nextVarName } from "./buildUtils";
 

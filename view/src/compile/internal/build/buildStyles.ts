@@ -1,7 +1,7 @@
 import type ComponentParts from "../../types/ComponentParts";
 import type Attribute from "../../types/nodes/Attribute";
 import type StyleBlock from "../../types/styles/StyleBlock";
-import Builder from "./Builder";
+import Builder from "../Builder";
 
 export default function buildStyles(name: string, parts: ComponentParts): string {
   const b = new Builder();

@@ -1,6 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import Builder from "../Builder";
 import { trimMatched, trimQuotes } from "../utils";
-import Builder from "./Builder";
 import buildNode from "./buildServerNode";
 
 export default function buildServerElementNode(node: ElementNode, b: Builder, root = false) {

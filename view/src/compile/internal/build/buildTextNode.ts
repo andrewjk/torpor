@@ -1,6 +1,6 @@
 import type TextNode from "../../types/nodes/TextNode";
+import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildRun from "./buildRun";
 
 export default function buildTextNode(

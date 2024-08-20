@@ -1,5 +1,5 @@
 import type ControlNode from "../../types/nodes/ControlNode";
-import Builder from "./Builder";
+import Builder from "../Builder";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerRootNode(node: ControlNode, b: Builder) {

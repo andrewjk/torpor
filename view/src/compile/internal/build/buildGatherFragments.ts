@@ -3,8 +3,8 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
+import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import { isReactive } from "./buildUtils";
 
 export default function buildGatherFragments(node: ControlNode, status: BuildStatus, b: Builder) {

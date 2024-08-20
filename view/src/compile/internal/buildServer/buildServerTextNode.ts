@@ -1,5 +1,5 @@
 import type TextNode from "../../types/nodes/TextNode";
-import Builder from "./Builder";
+import Builder from "../Builder";
 
 export default function buildServerTextNode(node: TextNode, b: Builder) {
   let content = node.content || "";

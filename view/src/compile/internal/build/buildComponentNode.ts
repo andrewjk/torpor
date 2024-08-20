@@ -1,8 +1,8 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
+import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import addFragment from "./buildAddFragment";
 import declareFragment from "./buildDeclareFragment";
 import buildNode from "./buildNode";

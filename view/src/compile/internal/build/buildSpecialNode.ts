@@ -1,6 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildSlotNode from "./buildSlotNode";
 
 export default function buildSpecialNode(

@@ -1,5 +1,5 @@
 import type ControlNode from "../../types/nodes/ControlNode";
-import Builder from "./Builder";
+import Builder from "../Builder";
 
 export default function buildServerScriptNode(node: ControlNode, b: Builder) {
   b.append(`${maybeAppend(node.statement, ";")}`);

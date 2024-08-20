@@ -1,7 +1,7 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import Builder from "../Builder";
 import { trimMatched, trimQuotes } from "../utils";
 import BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 

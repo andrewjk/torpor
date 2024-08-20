@@ -1,6 +1,6 @@
 import type ControlNode from "../../types/nodes/ControlNode";
+import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
 import buildIfNode from "./buildIfNode";

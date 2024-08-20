@@ -1,6 +1,6 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
-import Builder from "./Builder";
+import Builder from "../Builder";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerIfNode(node: ControlNode, b: Builder) {

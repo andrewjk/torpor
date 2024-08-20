@@ -2,7 +2,7 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Node from "../../types/nodes/Node";
 import type TextNode from "../../types/nodes/TextNode";
-import Builder from "./Builder";
+import Builder from "../Builder";
 //import buildServerComponentNode from "./buildServerComponentNode";
 import buildServerControlNode from "./buildServerControlNode";
 import buildServerElementNode from "./buildServerElementNode";

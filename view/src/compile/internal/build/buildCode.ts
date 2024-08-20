@@ -1,7 +1,7 @@
 import type ComponentParts from "../../types/ComponentParts";
 import type Import from "../../types/Import";
+import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
-import Builder from "./Builder";
 import buildConfig from "./buildConfig";
 import buildGatherFragments from "./buildGatherFragments";
 import buildNode from "./buildNode";

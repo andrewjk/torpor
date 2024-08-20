@@ -1,7 +1,7 @@
 import type ComponentParts from "../../types/ComponentParts";
 import type Import from "../../types/Import";
+import Builder from "../Builder";
 import buildConfig from "../build/buildConfig";
-import Builder from "./Builder";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerCode(name: string, parts: ComponentParts): string {
