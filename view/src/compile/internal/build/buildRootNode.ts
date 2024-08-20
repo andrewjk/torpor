@@ -2,7 +2,7 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../Builder";
 import BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
-import declareFragment from "./buildDeclareFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
 export default function buildRootNode(
@@ -12,7 +12,7 @@ export default function buildRootNode(
   parentName: string,
   anchorName: string,
 ) {
-  declareFragment(node, status, b);
+  buildFragment(node, status, b, parentName, anchorName);
 
   status.fragmentStack.push({
     fragment: node.fragment,

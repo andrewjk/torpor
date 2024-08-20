@@ -14,7 +14,6 @@ export default function buildAddFragment(
     const fragment = node.fragment;
     const fragmentName = `t_fragment_${fragment.number}`;
     b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
-    //b.append("console.log('~~~');");
     // TODO: Don't need to do this if the last thing we hydrated was the end node
     if (fragment.endVarName) {
       b.append(`t_next(${fragment.endVarName});`);

@@ -3,7 +3,7 @@ import type Import from "../../types/Import";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 import buildConfig from "./buildConfig";
-import buildGatherFragments from "./buildGatherFragments";
+import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
 export default function buildCode(name: string, parts: ComponentParts): string {
@@ -102,7 +102,7 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       forVarNames: [],
     };
     b.append("/* User interface */");
-    buildGatherFragments(parts.template, status, b);
+    buildFragmentText(parts.template, status, b);
     b.append("");
     buildNode(parts.template, status, b, "$parent", "$anchor", true);
   }

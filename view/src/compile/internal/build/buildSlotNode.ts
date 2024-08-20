@@ -3,7 +3,7 @@ import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
-import declareFragment from "./buildDeclareFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 import { nextVarName } from "./buildUtils";
@@ -59,7 +59,7 @@ export default function buildSlotNode(
   if (node.children.length) {
     b.append(`} else {`);
 
-    declareFragment(node, status, b);
+    buildFragment(node, status, b, slotParentName, slotAnchorName);
 
     status.fragmentStack.push({
       fragment: node.fragment,

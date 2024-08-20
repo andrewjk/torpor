@@ -4,7 +4,7 @@ import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
-import declareFragment from "./buildDeclareFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
 
@@ -68,7 +68,7 @@ export default function buildComponentNode(
         const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
         b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops) => {`);
 
-        declareFragment(slot, status, b);
+        buildFragment(slot, status, b, "$sparent", "$sanchor");
 
         status.fragmentStack.push({
           fragment: slot.fragment,

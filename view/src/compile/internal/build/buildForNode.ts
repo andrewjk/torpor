@@ -3,7 +3,7 @@ import Builder from "../Builder";
 import { trimAny, trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
-import declareFragment from "./buildDeclareFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
 
@@ -52,10 +52,7 @@ export default function buildForNode(
     }
   }
 
-  const oldRangeName = nextVarName("old_range", status);
-  const oldItemRangeName = nextVarName("old_range", status);
   const forRangeName = nextVarName("for_range", status);
-  const forItemsName = nextVarName("for_items", status);
 
   // Get the key node if it's been set
   const key = node.children.find(
@@ -90,42 +87,6 @@ export default function buildForNode(
   b.append(`}`);
   b.append(`);`);
   b.append("");
-
-  return;
-
-  b.append("");
-  b.append(`
-      /* @for */
-      let ${forRangeName} = {};
-      let ${forItemsName} = [];
-      let ${oldRangeName} = t_push_range_to_parent(${forRangeName});
-      $run(function runFor() {
-        let ${oldItemRangeName} = t_push_range(${forRangeName});
-        let t_new_items = [];
-        ${node.statement} {
-          t_new_items.push({
-            ${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
-            data: { ${forVarNames.join(",\n")} }
-          });
-        }
-        t_run_items(
-          ${forParentName},
-          ${forAnchorName},
-          ${forItemsName},
-          t_new_items,
-          function createForItem(t_parent, t_item, t_before) {`);
-
-  status.forVarNames = forVarNames;
-  buildForItem(node, status, b, "t_parent");
-  status.forVarNames = [];
-
-  b.append(`}
-        );
-        ${forItemsName} = t_new_items;
-        t_pop_range(${oldItemRangeName});
-      });
-      t_pop_range(${oldRangeName});`);
-  b.append("");
 }
 
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
@@ -133,7 +94,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 
   b.append(`let ${oldRangeName} = t_push_range_to_parent(t_item);`);
 
-  declareFragment(node, status, b);
+  buildFragment(node, status, b, parentName, "t_before");
 
   status.fragmentStack.push({
     fragment: node.fragment!,

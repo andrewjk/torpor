@@ -18,6 +18,12 @@ export default function buildNode(
   anchorName: string,
   root = false,
 ) {
+  // Nodes with anchors will have been handled when their containing fragment
+  // was built so we want to skip them here
+  if (node.handled) {
+    return;
+  }
+
   switch (node.type) {
     case "control": {
       buildControlNode(node as ControlNode, status, b, parentName, anchorName);

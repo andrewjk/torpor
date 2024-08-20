@@ -1,4 +1,3 @@
-import printNode from "../../debug/printNode";
 import type Range from "../../global/types/Range";
 import removeRangeEffects from "../../watch/internal/removeRangeEffects";
 

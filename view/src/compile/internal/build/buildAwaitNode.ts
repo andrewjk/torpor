@@ -3,7 +3,7 @@ import Builder from "../Builder";
 import { trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
-import declareFragment from "./buildDeclareFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
 
@@ -99,7 +99,7 @@ function buildAwaitBranch(
 ) {
   b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
-  declareFragment(node, status, b);
+  buildFragment(node, status, b, parentName, "t_before");
 
   status.fragmentStack.push({
     fragment: node.fragment!,

@@ -37,10 +37,10 @@ function check(container: HTMLElement, _state: State, state: State, hydrated: bo
   expect(queryByText(container, "It's small")).toBeInTheDocument();
 
   // 1 state object
-  expect(context.objectEffects.size).toBe(1);
+  expect(context.objectEffects.size).toBe(hydrated ? 2 : 1);
   // 2 properties
   expect(context.objectEffects.get(_state)).toBeTruthy();
-  expect(context.objectEffects.get(_state)!.size).toBe(hydrated ? 4 : 2);
+  expect(context.objectEffects.get(_state)!.size).toBe(2);
   // 2 if nodes with effects
   //expect(context.rangeEffects.size).toBe(2);
 
@@ -49,10 +49,10 @@ function check(container: HTMLElement, _state: State, state: State, hydrated: bo
   expect(queryByText(container, "It's small")).toBeNull();
 
   // 1 state object
-  expect(context.objectEffects.size).toBe(1);
+  expect(context.objectEffects.size).toBe(hydrated ? 2 : 1);
   // 1 property
   expect(context.objectEffects.get(_state)).toBeTruthy();
-  expect(context.objectEffects.get(_state)!.size).toBe(hydrated ? 2 : 1);
+  expect(context.objectEffects.get(_state)!.size).toBe(1);
   // 1 if node with an effect
   //expect(context.rangeEffects.size).toBe(1);
 }

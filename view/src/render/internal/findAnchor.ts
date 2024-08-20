@@ -1,30 +1,39 @@
-import printNode from "../../debug/printNode";
 import context from "../../global/context";
+import { HYDRATION_END, HYDRATION_START } from "./_global";
+import isComment from "./isComment";
 import nodeNext from "./nodeNext";
 
-export default function findAnchor(node: Node) {
-  // NOTE: We're assuming no intervening nodes such as spaces
-  if (context.hydrationNode && node.nodeType === 8 && (node as Comment).data === "[") {
-    // Skip the start node
-    nodeNext(node);
+export default function findAnchor(node: ChildNode) {
+  // If we are hydrating, the anchor will be at the end of the paired <![> and
+  // <!]> comments
+  if (context.hydrationNode && isComment(node) && node.data === HYDRATION_START) {
+    // Skip and remove the start node
+    let currentNode = nodeNext(node);
+    node.remove();
 
     // Go through siblings until we get to the end
     let level = 1;
-    let currentNode: Node | null = node;
     while (currentNode) {
-      if (currentNode.nodeType === 8) {
-        if ((currentNode as Comment).data === "[") {
+      if (isComment(currentNode)) {
+        if (currentNode.data === HYDRATION_START) {
           level += 1;
-        } else if ((currentNode as Comment).data === "]") {
+        } else if (currentNode.data === HYDRATION_END) {
           level -= 1;
         }
         if (level === 0) {
-          // TODO: Remove the comment nodes
-          return currentNode.nextSibling;
+          // Remove the end node and return the next one
+          const endNode = currentNode.nextSibling;
+          currentNode.remove();
+          return endNode;
         }
       }
       currentNode = currentNode.nextSibling;
     }
+
+    if (!currentNode) {
+      throw new Error("End hydration comment not found");
+    }
   }
+
   return node;
 }

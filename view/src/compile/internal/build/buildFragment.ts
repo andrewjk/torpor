@@ -8,6 +8,7 @@ import { isSpace } from "../parse/parseUtils";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
 import buildConfig from "./buildConfig";
+import buildNode from "./buildNode";
 import { isReactive, isReactiveAttribute, nextVarName } from "./buildUtils";
 
 interface VariablePath {
@@ -23,6 +24,8 @@ export default function buildFragment(
   node: ControlNode | ElementNode,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
 ) {
   if (node.fragment) {
     const fragment = node.fragment;
@@ -32,13 +35,37 @@ export default function buildFragment(
       // Declarations, then createXxx calls
       let rootPath = { parent: null, type: "root", children: [] };
       let varPaths = new Map<string, string>();
-      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, true);
+      declareFragmentVars(
+        node.fragment,
+        node,
+        rootPath,
+        status,
+        b,
+        parentName,
+        anchorName,
+        varPaths,
+        root,
+        false,
+        true,
+      );
 
       rootPath.children.length = 0;
       varPaths.clear();
       status.fragmentVars.clear();
       b.append(`const ${fragmentName} = t_frg([`);
-      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, false);
+      declareFragmentVars(
+        node.fragment,
+        node,
+        rootPath,
+        status,
+        b,
+        parentName,
+        anchorName,
+        varPaths,
+        root,
+        false,
+        false,
+      );
       b.append(`]);`);
     } else {
       // Text, then declarations
@@ -47,13 +74,24 @@ export default function buildFragment(
       const rootFunction = `t_root(${fragmentName})`;
       b.append(
         `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);
-         //console.log("~~~")
          const ${rootName} = ${rootFunction};`,
       );
       let rootPath = { parent: null, type: "root", children: [] };
       let varPaths = new Map<string, string>();
       varPaths.set(rootName, rootFunction);
-      declareFragmentVars(node.fragment, node, rootPath, status, b, varPaths, root, false, true);
+      declareFragmentVars(
+        node.fragment,
+        node,
+        rootPath,
+        status,
+        b,
+        parentName,
+        anchorName,
+        varPaths,
+        root,
+        false,
+        true,
+      );
     }
   }
 }
@@ -64,6 +102,8 @@ function declareFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   root: boolean,
   lastChild: boolean,
@@ -77,6 +117,8 @@ function declareFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         root,
         lastChild,
@@ -91,6 +133,8 @@ function declareFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         lastChild,
         declare,
@@ -104,6 +148,8 @@ function declareFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         root,
         lastChild,
@@ -118,6 +164,8 @@ function declareFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         lastChild,
         declare,
@@ -131,6 +179,8 @@ function declareFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         lastChild,
         declare,
@@ -138,6 +188,8 @@ function declareFragmentVars(
       break;
     }
   }
+
+  //buildNode(node, status, b, parentName, anchorName, root);
 }
 
 function declareControlFragmentVars(
@@ -146,6 +198,8 @@ function declareControlFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   root: boolean,
   lastChild: boolean,
@@ -163,11 +217,19 @@ function declareControlFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         operation,
         lastChild,
         declare,
       );
+
+      // Build nodes with anchors immediately, while we have their anchor node,
+      // rather than at the end of the fragment
+      buildNode(node, status, b, parentName, anchorName, false);
+      node.handled = true;
+
       break;
     }
     default: {
@@ -178,6 +240,8 @@ function declareControlFragmentVars(
           path,
           status,
           b,
+          parentName,
+          anchorName,
           varPaths,
           root,
           i === node.children.length - 1,
@@ -195,6 +259,8 @@ function declareComponentFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   lastChild: boolean,
   declare: boolean,
@@ -205,11 +271,18 @@ function declareComponentFragmentVars(
     path,
     status,
     b,
+    parentName,
+    anchorName,
     varPaths,
     "comp",
     lastChild,
     declare,
   );
+
+  // Build nodes with anchors immediately, while we have their anchor node,
+  // rather than at the end of the fragment
+  buildNode(node, status, b, parentName, anchorName, false);
+  node.handled = true;
 }
 
 function declareElementFragmentVars(
@@ -218,6 +291,8 @@ function declareElementFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   root: boolean,
   lastChild: boolean,
@@ -241,7 +316,6 @@ function declareElementFragmentVars(
       if (buildConfig.fragmentsUseCreateElement) {
         b.append(`let ${node.varName};`);
       } else {
-        //b.append("console.log('~~~');");
         b.append(`const ${node.varName} = ${varPath};`);
       }
       status.fragmentVars.set(varPath, node.varName);
@@ -284,6 +358,8 @@ function declareElementFragmentVars(
       elementPath,
       status,
       b,
+      parentName,
+      anchorName,
       varPaths,
       false,
       i === node.children.length - 1,
@@ -306,6 +382,8 @@ function declareTextFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   lastChild: boolean,
   declare: boolean,
@@ -334,7 +412,6 @@ function declareTextFragmentVars(
       if (buildConfig.fragmentsUseCreateElement) {
         b.append(`let ${node.varName};`);
       } else {
-        //b.append("console.log('~~~');");
         b.append(`const ${node.varName} = ${varPath};`);
       }
       status.fragmentVars.set(varPath, node.varName);
@@ -354,6 +431,8 @@ function declareSpecialFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   lastChild: boolean,
   declare: boolean,
@@ -366,6 +445,8 @@ function declareSpecialFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         "slot",
         lastChild,
@@ -381,6 +462,8 @@ function declareSpecialFragmentVars(
           path,
           status,
           b,
+          parentName,
+          anchorName,
           varPaths,
           false,
           i === node.children.length - 1,
@@ -398,6 +481,8 @@ function declareParentAndAnchorFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   name: string,
   lastChild: boolean,
@@ -443,7 +528,6 @@ function declareParentAndAnchorFragmentVars(
     if (buildConfig.fragmentsUseCreateElement) {
       b.append(`let ${node.varName};`);
     } else {
-      //b.append("console.log('~~~');");
       b.append(`const ${node.varName} = t_anchor(${varPath});`);
     }
     status.fragmentVars.set(varPath, node.varName);
