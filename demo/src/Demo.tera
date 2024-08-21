@@ -1,5 +1,4 @@
 <script>
-    import watch from "../../watch/src/watch";
     import Header from "./Header.tera";
  
     // TODO: Test with async
@@ -11,7 +10,7 @@
       });
     }
 
-    const $state = watch({
+    const $state = $watch({
         condition: false,
         count: 0,
         letters: ["a", "b", "c", "d", "e", "f", "g"],
