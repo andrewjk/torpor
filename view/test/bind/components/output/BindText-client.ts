@@ -38,7 +38,7 @@ const BindText = {
 
     t_apply_props(t_div_1, $props, []);
     $run(function setBinding() {
-      t_input_1.setAttribute("value", $state.name || "");
+      t_input_1.value = $state.name || "";
     });
     t_input_1.addEventListener("input", (e) => $state.name = e.target.value);
     $run(function setTextContent() {
