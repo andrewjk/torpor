@@ -1,8 +1,12 @@
 import type Component from "../compile/types/Component";
 
-// TODO: Should we have ClientComponent and ServerComponent types?
-
-export default function render(parent: ParentNode, component: Component, props?: Object) {
+/**
+ * Mounts a component into the DOM
+ * @param parent The parent node
+ * @param component The component to mount
+ * @param props An object containing component props
+ */
+export default function mount(parent: ParentNode, component: Component, props?: Object) {
   // The parent must have no child elements, so that we can hydrate without
   // worrying about where to start
   if (parent.childElementCount) {

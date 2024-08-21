@@ -2,6 +2,8 @@ import arrayHandler from "./internal/arrayHandler";
 import handler from "./internal/handler";
 import { isProxySymbol } from "./internal/symbols";
 
+// TODO: Take an options object with e.g. shallow etc
+
 /**
  * Watches an object for changes to its properties
  * @param object The object to watch

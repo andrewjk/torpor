@@ -1,6 +1,12 @@
 import type Component from "../compile/types/Component";
 import context from "../global/context";
 
+/**
+ * Hydrates a component into an existing DOM tree
+ * @param parent The parent node
+ * @param component The component to mount
+ * @param props An object containing component props
+ */
 export default function hydrate(parent: Node, component: Component, props?: Object) {
   // When mounting, the parent must have no child elements, so  we can just set
   // the hydration node to the first child node

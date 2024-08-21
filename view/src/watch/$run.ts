@@ -1,6 +1,12 @@
 import context from "../global/context";
 import type Effect from "../global/types/Effect";
 
+// TODO: Take a pipeline of operators e.g. debounce
+
+/**
+ * Runs and re-runs a function that depends on a watched object
+ * @param fn The function to run
+ */
 export default function $run(fn: () => (() => void) | void) {
   let effect: Effect = {
     run: fn,
