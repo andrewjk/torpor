@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import build from "../../view/src/compile/build";
@@ -34,6 +36,18 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
       // TODO: Compile typescript if script lang="ts" or config.lang="ts"
       const built = build(name!, parsed.parts);
       let transformed = built.code;
+
+      // HACK: Replace random paths with absolute paths
+      if (transformed.includes("../../../tera")) {
+        const pathParts = id.split(/[\\\/]/);
+        for (let i = pathParts.length - 1; i >= 0; i--) {
+          let pathToCheck = path.resolve(path.join(...["/", ...pathParts.slice(0, i), "tera"]));
+          if (fs.existsSync(pathToCheck)) {
+            transformed = transformed.replaceAll(/from ("|')(..\/)+tera/g, `from $1${pathToCheck}`);
+            break;
+          }
+        }
+      }
 
       if (built.styles && built.styleHash) {
         // Add a dynamic import for the component's CSS with a name from the hash and add the styles to a map
