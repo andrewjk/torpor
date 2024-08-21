@@ -6,6 +6,7 @@ import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import buildRun from "./buildRun";
 import { nextVarName } from "./buildUtils";
 
 export default function buildComponentNode(
@@ -28,7 +29,7 @@ export default function buildComponentNode(
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
+        buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
       } else {
         let reactive = value.startsWith("{") && value.endsWith("}");
         if (reactive) {
@@ -39,8 +40,12 @@ export default function buildComponentNode(
           // Probably just compile down to a string?
           value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
         }
-        const setProp = `${propsName}["${name}"] = ${value || "true"}`;
-        b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
+        const setProp = `${propsName}["${name}"] = ${value || "true"};`;
+        if (reactive) {
+          buildRun("setProp", setProp, status, b);
+        } else {
+          b.append(setProp);
+        }
       }
     }
     // PERF: Does this have much of an impact??

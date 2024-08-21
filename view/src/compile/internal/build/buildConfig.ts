@@ -5,8 +5,6 @@ export default {
    * Using createElement is a bit slower, but may be useful in the future
    */
   fragmentsUseCreateElement: false,
-  // For test and demo
+  // For test
   folder: "../../../../../tera/view/src",
-  // For the external bench
-  //folder = "../view/src",
 };

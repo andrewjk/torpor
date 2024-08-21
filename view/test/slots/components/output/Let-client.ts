@@ -35,7 +35,9 @@ const Let = {
 
     /* @component */
     const t_props_1 = $watch({});
-    $run(() => t_props_1["items"] = $props.items);
+    $run(function setProp() {
+      t_props_1["items"] = $props.items;
+    });
     const t_slots_1 = {};
     t_slots_1["_"] = ($sparent, $sanchor, $sprops) => {
       const t_fragment_2 = t_fragment(t_fragments, 2, `#`);
