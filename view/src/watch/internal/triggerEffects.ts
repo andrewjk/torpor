@@ -21,8 +21,14 @@ export default function triggerEffects(
           effect.cleanup();
         }
 
+        // Set the active effect just in case there are new items that need to
+        // be subscribed to (e.g. when iterating an array)
+        context.activeEffect = effect;
+
         // Run the effect
         effect.run();
+
+        context.activeEffect = null;
       }
     }
   }
