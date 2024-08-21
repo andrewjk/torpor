@@ -1,14 +1,7 @@
 import type ParseStatus from "./internal/parse/ParseStatus";
 import checkAndApplyStyles from "./internal/parse/checkAndApplyStyles";
 import parseMarkup from "./internal/parse/parseMarkup";
-import { isSpace } from "./internal/parse/parseUtils";
 import type ParseResult from "./types/ParseResult";
-import ControlNode from "./types/nodes/ControlNode";
-import type ParentNode from "./types/nodes/ParentNode";
-import type TextNode from "./types/nodes/TextNode";
-import isControlNode from "./types/nodes/isControlNode";
-import isParentNode from "./types/nodes/isParentNode";
-import isTextNode from "./types/nodes/isTextNode";
 
 /**
  * Parses source code into a component template

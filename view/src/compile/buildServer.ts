@@ -1,5 +1,5 @@
 import buildStyles from "./internal/build/buildStyles";
-import buildCode from "./internal/buildServer/buildServerCode";
+import buildServerCode from "./internal/buildServer/buildServerCode";
 import type BuildResult from "./types/BuildResult";
 import type ComponentTemplate from "./types/ComponentTemplate";
 
@@ -11,7 +11,7 @@ import type ComponentTemplate from "./types/ComponentTemplate";
  */
 export default function buildServer(name: string, parts: ComponentTemplate): BuildResult {
   const result: BuildResult = {
-    code: buildCode(name, parts),
+    code: buildServerCode(name, parts),
     styles: parts.style ? buildStyles(name, parts) : undefined,
     styleHash: parts.styleHash,
   };
