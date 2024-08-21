@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { control, el, text, trimParsed } from "../helpers";
+import { control, el, root, text, trimParsed } from "../helpers";
 
 test("for statement with key", () => {
   const input = `
@@ -19,7 +19,7 @@ test("for statement with key", () => {
     ok: true,
     errors: [],
     parts: {
-      template: control("@root", "", [
+      template: root([
         el(
           "section",
           [],

@@ -44,9 +44,7 @@ export default function parse(source: string): ParseResult {
           script: status.script,
           template: status.template
             ? {
-                type: "control",
-                operation: "@root",
-                statement: "",
+                type: "root",
                 children: [status.template],
               }
             : undefined,

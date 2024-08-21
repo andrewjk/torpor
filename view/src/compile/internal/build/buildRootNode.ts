@@ -1,4 +1,4 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../Builder";
 import BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
@@ -6,7 +6,7 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
 export default function buildRootNode(
-  node: ControlNode,
+  node: RootNode,
   status: BuildStatus,
   b: Builder,
   parentName: string,

@@ -1,10 +1,11 @@
-import ParseResult from "../src/types/ParseResult";
-import Attribute from "../src/types/nodes/Attribute";
-import ControlNode from "../src/types/nodes/ControlNode";
-import ElementNode from "../src/types/nodes/ElementNode";
-import Node from "../src/types/nodes/Node";
-import OperationType from "../src/types/nodes/OperationType";
-import TextNode from "../src/types/nodes/TextNode";
+import type ParseResult from "../src/compile/types/ParseResult";
+import type Attribute from "../src/compile/types/nodes/Attribute";
+import type ControlNode from "../src/compile/types/nodes/ControlNode";
+import type ElementNode from "../src/compile/types/nodes/ElementNode";
+import type Node from "../src/compile/types/nodes/Node";
+import type OperationType from "../src/compile/types/nodes/OperationType";
+import type RootNode from "../src/compile/types/nodes/RootNode";
+import type TextNode from "../src/compile/types/nodes/TextNode";
 
 export function cmp(
   name: string,
@@ -51,6 +52,13 @@ export function sp(
   };
 }
 
+export function root(children?: Node[]): RootNode {
+  return {
+    type: "root",
+    children: children || [],
+  };
+}
+
 export function control(
   operation: OperationType,
   statement: string,
@@ -88,7 +96,7 @@ export function trimParsed(result: ParseResult): ParseResult {
   return result;
 }
 
-function trimElement(el: ElementNode | ControlNode) {
+function trimElement(el: RootNode | ElementNode | ControlNode) {
   for (let i = el.children.length - 1; i >= 0; i--) {
     const child = el.children[i];
     if (child.type === "text") {

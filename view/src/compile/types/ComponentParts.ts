@@ -1,6 +1,6 @@
 import Import from "./Import";
 import Documentation from "./docs/Documentation";
-import ControlNode from "./nodes/ControlNode";
+import RootNode from "./nodes/RootNode";
 import Style from "./styles/Style";
 
 export default interface ComponentParts {
@@ -8,7 +8,7 @@ export default interface ComponentParts {
   docs?: Documentation;
   imports?: Import[];
   script?: string;
-  template?: ControlNode;
+  template?: RootNode;
   childComponents?: ComponentParts[];
   style?: Style;
   styleHash?: string;

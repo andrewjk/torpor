@@ -2,6 +2,7 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
+import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import { isSpace } from "../parse/parseUtils";
@@ -21,7 +22,7 @@ interface VariablePath {
  * Builds the variables and code in a fragment
  */
 export default function buildFragment(
-  node: ControlNode | ElementNode,
+  node: RootNode | ControlNode | ElementNode,
   status: BuildStatus,
   b: Builder,
   parentName: string,
@@ -105,6 +106,20 @@ function declareFragmentVars(
   declare: boolean,
 ) {
   switch (node.type) {
+    case "root": {
+      declareRootFragmentVars(
+        fragment,
+        node as RootNode,
+        path,
+        status,
+        b,
+        parentName,
+        anchorName,
+        varPaths,
+        declare,
+      );
+      break;
+    }
     case "control": {
       declareControlFragmentVars(
         fragment,
@@ -115,7 +130,6 @@ function declareFragmentVars(
         parentName,
         anchorName,
         varPaths,
-        lastChild,
         declare,
       );
       break;
@@ -176,9 +190,37 @@ function declareFragmentVars(
       );
       break;
     }
+    default: {
+      throw new Error(`Invalid node type: ${node.type}`);
+    }
   }
+}
 
-  //buildNode(node, status, b, parentName, anchorName, root);
+function declareRootFragmentVars(
+  fragment: Fragment,
+  node: RootNode,
+  path: VariablePath,
+  status: BuildStatus,
+  b: Builder,
+  parentName: string,
+  anchorName: string,
+  varPaths: Map<string, string>,
+  declare: boolean,
+) {
+  for (let [i, child] of node.children.entries()) {
+    declareFragmentVars(
+      fragment,
+      child,
+      path,
+      status,
+      b,
+      parentName,
+      anchorName,
+      varPaths,
+      i === node.children.length - 1,
+      declare,
+    );
+  }
 }
 
 function declareControlFragmentVars(
@@ -190,7 +232,6 @@ function declareControlFragmentVars(
   parentName: string,
   anchorName: string,
   varPaths: Map<string, string>,
-  lastChild: boolean,
   declare: boolean,
 ) {
   switch (node.operation) {

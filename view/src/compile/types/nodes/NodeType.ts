@@ -1,3 +1,3 @@
-type NodeType = "control" | "component" | "element" | "text" | "special";
+type NodeType = "root" | "control" | "component" | "element" | "text" | "special";
 
 export default NodeType;

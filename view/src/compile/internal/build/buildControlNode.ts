@@ -4,7 +4,6 @@ import type BuildStatus from "./BuildStatus";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
 import buildIfNode from "./buildIfNode";
-import buildRootNode from "./buildRootNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
 
@@ -16,10 +15,6 @@ export default function buildControlNode(
   anchorName: string,
 ) {
   switch (node.operation) {
-    case "@root": {
-      buildRootNode(node, status, b, parentName, anchorName);
-      break;
-    }
     case "@if group": {
       buildIfNode(node, status, b, parentName, anchorName);
       break;

@@ -1,10 +1,11 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
+import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 
 export default function buildAddFragment(
-  node: ControlNode | ElementNode,
+  node: RootNode | ControlNode | ElementNode,
   status: BuildStatus,
   b: Builder,
   parentName: string,

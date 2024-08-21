@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { control, el, text, trimParsed } from "../helpers";
+import { control, el, root, text, trimParsed } from "../helpers";
 
 test("simple await", () => {
   const input = `
@@ -17,7 +17,7 @@ test("simple await", () => {
     ok: true,
     errors: [],
     parts: {
-      template: control("@root", "", [
+      template: root([
         el(
           "section",
           [],
@@ -49,7 +49,7 @@ test("await/then", () => {
     ok: true,
     errors: [],
     parts: {
-      template: control("@root", "", [
+      template: root([
         el(
           "section",
           [],
@@ -84,7 +84,7 @@ test("await/then/catch", () => {
     ok: true,
     errors: [],
     parts: {
-      template: control("@root", "", [
+      template: root([
         el(
           "section",
           [],

@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/types/ParseResult";
-import { control, el } from "../helpers";
+import { el, root } from "../helpers";
 
 // TODO: Preserve space
 
@@ -12,7 +12,7 @@ test("basic file", () => {
     ok: true,
     errors: [],
     parts: {
-      template: control("@root", "", [el("div", undefined, undefined, true)]),
+      template: root([el("div", undefined, undefined, true)]),
     },
   };
   expect(output).toEqual(expected);

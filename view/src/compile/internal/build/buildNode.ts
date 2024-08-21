@@ -1,12 +1,14 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Node from "../../types/nodes/Node";
+import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 import buildComponentNode from "./buildComponentNode";
 import buildControlNode from "./buildControlNode";
 import buildElementNode from "./buildElementNode";
+import buildRootNode from "./buildRootNode";
 import buildSpecialNode from "./buildSpecialNode";
 import buildTextNode from "./buildTextNode";
 
@@ -25,6 +27,10 @@ export default function buildNode(
   }
 
   switch (node.type) {
+    case "root": {
+      buildRootNode(node as RootNode, status, b, parentName, anchorName);
+      break;
+    }
     case "control": {
       buildControlNode(node as ControlNode, status, b, parentName, anchorName);
       break;

@@ -1,5 +1,4 @@
 type OperationType =
-  | "@root"
   | "@if group"
   | "@if"
   | "@else if"

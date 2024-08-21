@@ -4,7 +4,6 @@ import type BuildServerStatus from "./BuildServerStatus";
 //import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerIfNode from "./buildServerIfNode";
-import buildServerRootNode from "./buildServerRootNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
 
@@ -14,10 +13,6 @@ export default function buildServerControlNode(
   b: Builder,
 ) {
   switch (node.operation) {
-    case "@root": {
-      buildServerRootNode(node, status, b);
-      break;
-    }
     case "@if group": {
       buildServerIfNode(node, status, b);
       break;

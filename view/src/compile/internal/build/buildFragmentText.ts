@@ -2,6 +2,7 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
+import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
@@ -10,7 +11,11 @@ import { isReactive } from "./buildUtils";
 /**
  * Builds the HTML template text for all of the fragments in a component
  */
-export default function buildFragmentText(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildFragmentText(
+  node: RootNode | ControlNode,
+  status: BuildStatus,
+  b: Builder,
+) {
   const fragments: Fragment[] = [];
   buildNodeFragmentText(node, status, fragments);
 
@@ -26,6 +31,10 @@ function buildNodeFragmentText(
   currentFragment?: Fragment,
 ) {
   switch (node.type) {
+    case "root": {
+      buildRootFragmentText(node as RootNode, status, fragments);
+      break;
+    }
     case "control": {
       buildControlFragmentText(node as ControlNode, status, fragments, currentFragment!);
       break;
@@ -49,6 +58,14 @@ function buildNodeFragmentText(
       buildSpecialFragmentText(node as ElementNode, status, fragments, currentFragment!);
       break;
     }
+  }
+}
+
+function buildRootFragmentText(node: RootNode, status: BuildStatus, fragments: Fragment[]) {
+  node.fragment = { number: fragments.length, text: "", events: [] };
+  fragments.push(node.fragment);
+  for (let child of node.children) {
+    buildNodeFragmentText(child, status, fragments, node.fragment);
   }
 }
 
