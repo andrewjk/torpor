@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
 
 test("attribute with double quotes", () => {
@@ -15,7 +15,7 @@ test("attribute with double quotes", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
+      markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
     },
   };
   expect(output).toEqual(expected);
@@ -33,7 +33,7 @@ test("attribute with single quotes", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
+      markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
     },
   };
   expect(output).toEqual(expected);
@@ -51,7 +51,7 @@ test("attribute with no quotes", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
+      markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
     },
   };
   expect(output).toEqual(expected);
@@ -69,7 +69,7 @@ test("multiple attributes", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el(
           "a",
           [
@@ -97,7 +97,7 @@ test("event attribute with name", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
+      markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
     },
   };
   expect(output).toEqual(expected);
@@ -117,7 +117,7 @@ test("event attribute with code", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el("button", [att("onclick", "{() => {\n  increment();\n}}")], [text("Increment")]),
       ]),
     },
@@ -135,7 +135,7 @@ test("shorthand attribute", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("a", [att("{href}", "")])]),
+      markup: root([el("a", [att("{href}", "")])]),
     },
   };
   expect(output).toEqual(expected);
@@ -151,7 +151,7 @@ test("multiple shorthand attributes", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("a", [att("{href1}", ""), att("{href2}", "")])]),
+      markup: root([el("a", [att("{href1}", ""), att("{href2}", "")])]),
     },
   };
   expect(output).toEqual(expected);

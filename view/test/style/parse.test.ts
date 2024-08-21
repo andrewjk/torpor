@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
@@ -16,7 +16,7 @@ test("simple style", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
+      markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
       style: {
         global: false,
         blocks: [

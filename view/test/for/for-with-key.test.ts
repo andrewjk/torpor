@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { control, el, root, text, trimParsed } from "../helpers";
 
 test("for statement with key", () => {
@@ -19,7 +19,7 @@ test("for statement with key", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el(
           "section",
           [],

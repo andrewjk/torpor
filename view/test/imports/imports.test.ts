@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 
 test("imports", () => {
   const input = `

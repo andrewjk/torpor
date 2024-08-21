@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("simple docs", () => {
@@ -20,7 +20,7 @@ test("simple docs", () => {
         props: [],
         slots: [],
       },
-      template: root([el("h2", [], [text("{$props.name}")])]),
+      markup: root([el("h2", [], [text("{$props.name}")])]),
       props: ["name"],
     },
   };
@@ -65,7 +65,7 @@ test("prop docs", () => {
         ],
         slots: [],
       },
-      template: root([el("h2", [], [text("{$props.name}")])]),
+      markup: root([el("h2", [], [text("{$props.name}")])]),
       props: ["name"],
     },
   };
@@ -103,7 +103,7 @@ test("slot docs", () => {
           },
         ],
       },
-      template: root([el("h2", [], [text("{$props.name}")])]),
+      markup: root([el("h2", [], [text("{$props.name}")])]),
       props: ["name"],
     },
   };
@@ -158,7 +158,7 @@ test("all docs", () => {
           },
         ],
       },
-      template: root([el("h2", [], [text("{$props.name}")])]),
+      markup: root([el("h2", [], [text("{$props.name}")])]),
       props: ["name"],
     },
   };

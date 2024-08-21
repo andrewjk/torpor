@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("html comments", () => {
@@ -19,7 +19,7 @@ test("html comments", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([el("section", [], [el("p", [], [text("The content")])])]),
+      markup: root([el("section", [], [el("p", [], [text("The content")])])]),
     },
   };
   expect(output).toEqual(expected);

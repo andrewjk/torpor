@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import ParseResult from "../../src/types/ParseResult";
+import ParseResult from "../../src/compile/types/ParseResult";
 import { control, el, root, text, trimParsed } from "../helpers";
 
 test("simple await", () => {
@@ -17,7 +17,7 @@ test("simple await", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el(
           "section",
           [],
@@ -49,7 +49,7 @@ test("await/then", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el(
           "section",
           [],
@@ -84,7 +84,7 @@ test("await/then/catch", () => {
     ok: true,
     errors: [],
     parts: {
-      template: root([
+      markup: root([
         el(
           "section",
           [],
