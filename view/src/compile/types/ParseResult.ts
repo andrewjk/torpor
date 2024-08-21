@@ -1,8 +1,8 @@
 import CompileError from "./CompileError";
-import ComponentParts from "./ComponentParts";
+import ComponentTemplate from "./ComponentTemplate";
 
 export default interface ParseResult {
   ok: boolean;
   errors: CompileError[];
-  parts?: ComponentParts;
+  parts?: ComponentTemplate;
 }

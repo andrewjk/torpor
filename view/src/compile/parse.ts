@@ -1,6 +1,6 @@
 import type ParseStatus from "./internal/parse/ParseStatus";
 import checkAndApplyStyles from "./internal/parse/checkAndApplyStyles";
-import parseTemplate from "./internal/parse/parseTemplate";
+import parseMarkup from "./internal/parse/parseMarkup";
 import { isSpace } from "./internal/parse/parseUtils";
 import type ParseResult from "./types/ParseResult";
 import ControlNode from "./types/nodes/ControlNode";
@@ -23,14 +23,14 @@ export default function parse(source: string): ParseResult {
     errors: [],
   };
 
-  parseTemplate(status, source);
+  parseMarkup(status, source);
 
   checkAndApplyStyles(status);
 
   // HACK: get all usages of $props.name and $props["name"]
   // HACK: get all usages of $context.name and $context["name"]
   const props = getPropsUsage(source);
-  const contexts = getContextUsage(source);
+  const contextProps = getContextUsage(source);
 
   const ok = !status.errors.length;
 
@@ -42,7 +42,7 @@ export default function parse(source: string): ParseResult {
           docs: status.docs,
           imports: status.imports,
           script: status.script,
-          template: status.template
+          markup: status.template
             ? {
                 type: "root",
                 children: [status.template],
@@ -52,7 +52,7 @@ export default function parse(source: string): ParseResult {
           style: status.style,
           styleHash: status.styleHash,
           props: props.length ? props : undefined,
-          contexts: contexts.length ? contexts : undefined,
+          contextProps: contextProps.length ? contextProps : undefined,
         }
       : undefined,
   };

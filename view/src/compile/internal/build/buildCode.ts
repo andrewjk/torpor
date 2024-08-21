@@ -1,4 +1,4 @@
-import type ComponentParts from "../../types/ComponentParts";
+import type ComponentTemplate from "../../types/ComponentTemplate";
 import type Import from "../../types/Import";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
@@ -6,7 +6,7 @@ import buildConfig from "./buildConfig";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
-export default function buildCode(name: string, parts: ComponentParts): string {
+export default function buildCode(name: string, parts: ComponentTemplate): string {
   let b = new Builder();
 
   let folder = buildConfig.folder;
@@ -66,7 +66,7 @@ export default function buildCode(name: string, parts: ComponentParts): string {
   return b.toString();
 }
 
-function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
+function buildTemplate(name: string, parts: ComponentTemplate, b: Builder) {
   b.append(`
     const ${name} = {
       name: "${name}",
@@ -80,7 +80,7 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       render: ($parent, $anchor, $props, $slots, $context) => {`);
 
   // Redefine $context so that any newly added properties will only be passed to children
-  if (parts.contexts?.length) {
+  if (parts.contextProps?.length) {
     b.append(`$context = Object.assign({}, $context);`);
   }
 
@@ -92,7 +92,7 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
     `);
   }
 
-  if (parts.template) {
+  if (parts.markup) {
     const status: BuildStatus = {
       props: parts.props || [],
       styleHash: parts.styleHash || "",
@@ -101,9 +101,9 @@ function buildTemplate(name: string, parts: ComponentParts, b: Builder) {
       forVarNames: [],
     };
     b.append("/* User interface */");
-    buildFragmentText(parts.template, status, b);
+    buildFragmentText(parts.markup, status, b);
     b.append("");
-    buildNode(parts.template, status, b, "$parent", "$anchor", true);
+    buildNode(parts.markup, status, b, "$parent", "$anchor", true);
   }
 
   b.append(`}

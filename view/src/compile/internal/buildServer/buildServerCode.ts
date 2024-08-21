@@ -1,10 +1,10 @@
-import type ComponentParts from "../../types/ComponentParts";
+import type ComponentTemplate from "../../types/ComponentTemplate";
 import type Import from "../../types/Import";
 import Builder from "../Builder";
 import buildConfig from "../build/buildConfig";
 import buildServerNode from "./buildServerNode";
 
-export default function buildServerCode(name: string, parts: ComponentParts): string {
+export default function buildServerCode(name: string, parts: ComponentTemplate): string {
   let b = new Builder();
 
   // TODO: Imports
@@ -46,7 +46,7 @@ export default function buildServerCode(name: string, parts: ComponentParts): st
   return b.toString();
 }
 
-function buildServerTemplate(name: string, parts: ComponentParts, b: Builder) {
+function buildServerTemplate(name: string, parts: ComponentTemplate, b: Builder) {
   b.append(`
     const ${name} = {
       name: "${name}",
@@ -58,7 +58,7 @@ function buildServerTemplate(name: string, parts: ComponentParts, b: Builder) {
       render: ($props, $slots, $context) => {`);
 
   // Redefine $context so that any newly added properties will only be passed to children
-  if (parts.contexts?.length) {
+  if (parts.contextProps?.length) {
     b.append(`$context = Object.assign({}, $context);`);
   }
 
@@ -70,13 +70,13 @@ function buildServerTemplate(name: string, parts: ComponentParts, b: Builder) {
     b.append(parts.script);
   }
 
-  if (parts.template) {
+  if (parts.markup) {
     const status = { output: "" };
     b.append("/* User interface */");
     // HACK: Replace this with imports
     b.append('const t_fmt = (text) => text != null ? text : "";');
     b.append('let $output = "";');
-    buildServerNode(parts.template, status, b);
+    buildServerNode(parts.markup, status, b);
     if (status.output) {
       b.append(`$output += \`${status.output}\`;`);
       status.output = "";

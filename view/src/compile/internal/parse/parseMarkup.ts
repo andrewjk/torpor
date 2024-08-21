@@ -7,7 +7,7 @@ import parseStyleElement from "./parseStyles";
 import parseTag from "./parseTag";
 import { accept, addError } from "./parseUtils";
 
-export default function parseTemplate(status: ParseStatus, source: string) {
+export default function parseMarkup(status: ParseStatus, source: string) {
   // HACK: The laziest way to handle elses etc:
   status.source = status.source
     .replace(/}(\s*)else/g, "}$1@else")

@@ -1,5 +1,5 @@
 import type CompileError from "../../types/CompileError";
-import type ComponentParts from "../../types/ComponentParts";
+import type ComponentTemplate from "../../types/ComponentTemplate";
 import type Import from "../../types/Import";
 import type Documentation from "../../types/docs/Documentation";
 import type ElementNode from "../../types/nodes/ElementNode";
@@ -12,7 +12,7 @@ export default interface ParseStatus {
   docs?: Documentation;
   script?: string;
   template?: ElementNode;
-  childTemplates?: ComponentParts[];
+  childTemplates?: ComponentTemplate[];
   style?: Style;
   styleHash?: string;
   imports?: Import[];

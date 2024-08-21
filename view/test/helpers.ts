@@ -87,8 +87,8 @@ export function att(name: string, value: string): Attribute {
 }
 
 export function trimParsed(result: ParseResult): ParseResult {
-  if (result.parts?.template) {
-    trimElement(result.parts.template);
+  if (result.parts?.markup) {
+    trimElement(result.parts.markup);
   }
   if (result.parts?.styleHash) {
     result.parts.styleHash = undefined;
