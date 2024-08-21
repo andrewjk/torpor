@@ -1,5 +1,7 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Node from "../../types/nodes/Node";
+import isElementNode from "../../types/nodes/isElementNode";
+import isParentNode from "../../types/nodes/isParentNode";
 import type StyleBlock from "../../types/styles/StyleBlock";
 import { trimQuotes } from "../utils";
 import type ParseStatus from "./ParseStatus";
@@ -15,15 +17,13 @@ export default function checkAndApplyStyles(status: ParseStatus) {
 }
 
 function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: string) {
-  if (node.type === "element") {
-    const element = node as ElementNode;
-    let addClass = false;
-    addClass =
-      addClass || element.attributes.some((a) => a.name === "class" || a.name.startsWith("class:"));
-    addClass = addClass || selectors.includes(element.tagName);
+  if (isElementNode(node)) {
+    let addClass = selectors.includes(node.tagName);
     if (!addClass) {
-      for (let a of element.attributes) {
-        if (a.name === "id") {
+      for (let a of node.attributes) {
+        if (a.name === "class" || a.name.startsWith("class:")) {
+          addClass = true;
+        } else if (a.name === "id") {
           addClass = selectors.includes(`#${trimQuotes(a.value)}`);
         } else if (a.name === "class") {
           addClass = selectors.includes(`.${trimQuotes(a.value)}`);
@@ -32,15 +32,20 @@ function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: s
       }
     }
     if (addClass) {
-      element.attributes.push({
-        name: "class",
-        value: `"tera-${styleHash}"`,
-      });
+      let classAttribute = node.attributes.find((a) => a.name === "class");
+      if (classAttribute) {
+        classAttribute.value = `"${trimQuotes(classAttribute.value)} tera-${styleHash}"`;
+      } else {
+        node.attributes.push({
+          name: "class",
+          value: `"tera-${styleHash}"`,
+        });
+      }
     }
   }
 
-  if (node.type === "element" || node.type === "control") {
-    for (let child of (node as ElementNode).children) {
+  if (isParentNode(node)) {
+    for (let child of node.children) {
       checkAndApplyStylesOnNode(child, selectors, styleHash);
     }
   }

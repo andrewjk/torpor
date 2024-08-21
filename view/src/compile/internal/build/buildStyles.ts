@@ -6,8 +6,20 @@ import Builder from "../Builder";
 export default function buildStyles(name: string, parts: ComponentTemplate): string {
   const b = new Builder();
 
-  for (let block of parts.style!.blocks) {
-    buildStyleBlock(block, b, parts.styleHash!);
+  if (parts.style && parts.styleHash) {
+    for (let block of parts.style.blocks) {
+      buildStyleBlock(block, b, parts.styleHash);
+    }
+
+    if (parts.childComponents) {
+      for (let child of parts.childComponents) {
+        if (child.style && child.styleHash) {
+          for (let block of child.style.blocks) {
+            buildStyleBlock(block, b, child.styleHash);
+          }
+        }
+      }
+    }
   }
 
   return b.toString();
