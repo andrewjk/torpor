@@ -1,4 +1,5 @@
 import type ControlNode from "../../types/nodes/ControlNode";
+import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../Builder";
 import { trimAny, trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
@@ -101,7 +102,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
     path: "",
   });
   for (let child of node.children) {
-    if (child.type === "control" && (child as ControlNode).operation === "@key") {
+    if (isControlNode(child) && child.operation === "@key") {
       continue;
     }
     buildNode(child, status, b, parentName, "t_before");

@@ -1,5 +1,6 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
+import isControlNode from "../../types/nodes/isControlNode";
 
 export default function wrangleControl(
   control: ControlNode,
@@ -22,8 +23,8 @@ export default function wrangleControl(
     for (let i = parentNode.children.length - 1; i >= 0; i--) {
       const lastChild = parentNode.children[i];
       // TODO: Break if it's an element, do more checking
-      if (lastChild.type === "control" && (lastChild as ControlNode).operation === "@if group") {
-        (lastChild as ControlNode).children.push(control);
+      if (isControlNode(lastChild) && lastChild.operation === "@if group") {
+        lastChild.children.push(control);
         break;
       }
     }
@@ -52,8 +53,8 @@ export default function wrangleControl(
     for (let i = parentNode.children.length - 1; i >= 0; i--) {
       const lastChild = parentNode.children[i];
       // TODO: Break if it's an element, do more checking
-      if (lastChild.type === "control" && (lastChild as ControlNode).operation === "@await group") {
-        (lastChild as ControlNode).children.push(control);
+      if (isControlNode(lastChild) && lastChild.operation === "@await group") {
+        lastChild.children.push(control);
         break;
       }
     }

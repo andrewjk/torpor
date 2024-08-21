@@ -1,4 +1,5 @@
 import type ControlNode from "../../types/nodes/ControlNode";
+import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../Builder";
 import { trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
@@ -21,7 +22,7 @@ export default function buildAwaitNode(
   const oldRangeName = nextVarName("old_range", status);
 
   // Filter non-control branches (spaces)
-  const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
+  const branches = node.children.filter((n) => isControlNode(n));
 
   // Make sure all branches exist
   let awaitBranch = branches.find((n) => n.operation === "@await")!;

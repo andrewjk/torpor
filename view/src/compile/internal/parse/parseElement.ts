@@ -1,5 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import type TextNode from "../../types/nodes/TextNode";
+import isTextNode from "../../types/nodes/isTextNode";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
@@ -86,8 +87,8 @@ export default function parseElement(status: ParseStatus): ElementNode {
           const spaceContent = status.source.substring(start + content.length, end);
           if (content || spaceContent) {
             const previousNode = element.children[element.children.length - 1];
-            if (previousNode?.type === "text") {
-              (previousNode as TextNode).content += content + spaceContent;
+            if (previousNode && isTextNode(previousNode)) {
+              previousNode.content += content + spaceContent;
             } else {
               const text: TextNode = {
                 type: "text",

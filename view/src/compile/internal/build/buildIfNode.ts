@@ -1,4 +1,5 @@
 import type ControlNode from "../../types/nodes/ControlNode";
+import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 import addFragment from "./buildAddFragment";
@@ -20,7 +21,7 @@ export default function buildIfNode(
   const ifRangeName = nextVarName("if_range", status);
 
   // Filter non-control branches (spaces)
-  const branches = node.children.filter((n) => n.type === "control") as ControlNode[];
+  const branches = node.children.filter((n) => isControlNode(n));
 
   // Add an else branch if there isn't one, so that the content will be cleared if no branches match
   if (branches.findIndex((n) => n.operation === "@else") === -1) {

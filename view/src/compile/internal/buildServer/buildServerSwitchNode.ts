@@ -20,7 +20,7 @@ export default function buildServerSwitchNode(
 
   // Build the switch statement
   b.append(`${node.statement} {`);
-  for (let [i, branch] of node.children.filter((c) => c.type === "control").entries()) {
+  for (let [i, branch] of node.children.filter((c) => isControlNode(c)).entries()) {
     if (isControlNode(branch)) {
       buildServerSwitchBranch(branch, status, b);
     }
