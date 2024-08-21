@@ -57,20 +57,28 @@ function buildElementAttributes(
       if (name.indexOf("bind:") === 0) {
         // TODO: Don't love the bind: syntax -- $value? @value? :value?
         // Automatically add an event to bind the value
-        // TODO: need to check the element to find out what type of event to add
+        // TODO: Need to check the element to find out what type of event to add
         let eventName = "input";
         let defaultValue = '""';
         let typeAttribute = node.attributes.find((a) => a.name === "type");
         let inputValue = "e.target.value";
         if (typeAttribute) {
-          if (trimQuotes(typeAttribute.value) === "number") {
-            defaultValue = "0";
-            inputValue = "Number(e.target.value)";
+          switch (trimQuotes(typeAttribute.value)) {
+            case "number": {
+              defaultValue = "0";
+              inputValue = "Number(e.target.value)";
+              break;
+            }
+            case "checkbox": {
+              defaultValue = "false";
+              inputValue = "e.target.checked";
+              break;
+            }
           }
         }
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
-        const setAttribute = `${varName}.setAttribute("${propName}", ${set})`;
+        const setAttribute = `${varName}.${propName} = ${set}`;
         buildRun("setBinding", `${setAttribute};`, status, b);
         // TODO: Add a parseInput method that handles NaN etc
         b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);

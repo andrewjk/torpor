@@ -34,14 +34,17 @@ function buildElementAttributes(node: ElementNode) {
       value = value.substring(1, value.length - 1);
 
       if (name.startsWith("bind:")) {
-        // TODO: need to check the element to find out what type of event to add
         let defaultValue = '""';
         let typeAttribute = node.attributes.find((a) => a.name === "type");
-        let inputValue = "e.target.value";
         if (typeAttribute) {
-          if (trimQuotes(typeAttribute.value) === "number") {
-            defaultValue = "0";
-            inputValue = "Number(e.target.value)";
+          switch (trimQuotes(typeAttribute.value)) {
+            case "number": {
+              defaultValue = "0";
+              break;
+            }
+            case "checkbox": {
+              defaultValue = "false";
+            }
           }
         }
         let set = `${value} || ${defaultValue}`;
