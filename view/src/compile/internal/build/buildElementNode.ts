@@ -54,27 +54,48 @@ function buildElementAttributes(
     } else if (value.startsWith("{") && value.endsWith("}")) {
       value = value.substring(1, value.length - 1);
 
-      if (name.indexOf("bind:") === 0) {
-        // TODO: Don't love the bind: syntax -- $value? @value? :value?
+      if (name === "bind:group") {
+        // Automatically add an event to bind the value
+        // TODO: Only tested this with radio buttons
+        let eventName = "change";
+        let inputValue = node.attributes.find((a) => a.name === "value")?.value;
+        let set = `${value} == ${inputValue}`;
+        let propName = "checked";
+        const setAttribute = `${varName}.${propName} = ${set}`;
+        buildRun("setBinding", `${setAttribute};`, status, b);
+        // TODO: Add a parseInput method that handles NaN etc
+        b.append(`${varName}.addEventListener("${eventName}", (e) => {
+          if (e.target.${propName}) ${value} = ${inputValue};
+        });`);
+      } else if (name.indexOf("bind:") === 0) {
         // Automatically add an event to bind the value
         // TODO: Need to check the element to find out what type of event to add
         let eventName = "input";
         let defaultValue = '""';
-        let typeAttribute = node.attributes.find((a) => a.name === "type");
         let inputValue = "e.target.value";
-        if (typeAttribute) {
-          switch (trimQuotes(typeAttribute.value)) {
-            case "number": {
-              defaultValue = "0";
-              inputValue = "Number(e.target.value)";
-              break;
-            }
-            case "checkbox": {
-              defaultValue = "false";
-              inputValue = "e.target.checked";
-              break;
+        if (node.tagName === "input") {
+          let typeAttribute = node.attributes.find((a) => a.name === "type");
+          if (typeAttribute) {
+            switch (trimQuotes(typeAttribute.value)) {
+              case "number": {
+                defaultValue = "0";
+                inputValue = "Number(e.target.value)";
+                break;
+              }
+              case "checkbox": {
+                defaultValue = "false";
+                inputValue = "e.target.checked";
+                break;
+              }
+              case "radio": {
+                eventName = "change";
+                inputValue = "e.target.value";
+                break;
+              }
             }
           }
+        } else if (node.tagName === "select") {
+          eventName = "change";
         }
         let set = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
@@ -89,12 +110,14 @@ function buildElementAttributes(
       } else if (name === "class") {
         buildRun("setClassName", `${varName}.className = ${value};`, status, b);
       } else if (name.indexOf("data-") === 0) {
-        // dataset seems to be a tiny bit slower?
+        // NOTE: dataset seems to be a tiny bit slower?
         //const propName = name.substring(5);
         //buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
         buildRun("setDataAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
       } else {
-        buildRun("setAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
+        // Don't use setAttribute, it doesn't work with boolean attributes like
+        // disabled
+        buildRun("setAttribute", `${varName}.${name} = ${value};`, status, b);
       }
     }
   }
