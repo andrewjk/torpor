@@ -1,5 +1,5 @@
 import fs from "fs";
-import { dirname } from "path";
+import path from "path";
 import { expect } from "vitest";
 import build from "../src/compile/build";
 import buildServer from "../src/compile/buildServer";
@@ -9,24 +9,50 @@ import hydrate from "../src/render/hydrate";
 
 export default function hydrateComponent(
   container: HTMLElement,
-  path: string,
+  componentPath: string,
   component: Component,
   state?: any,
 ) {
-  const source = fs.readFileSync(path).toString();
+  const source = fs.readFileSync(componentPath).toString();
   const parsed = parse(source);
   expect(parsed.ok).toBe(true);
   expect(parsed.parts).not.toBeUndefined();
+
+  const imports = parsed
+    .parts!.imports?.map((imp) => {
+      let importPath = path.join(path.dirname(componentPath), imp.path);
+      let importSource = fs.readFileSync(importPath).toString();
+      let importParsed = parse(importSource);
+      expect(importParsed.ok).toBe(true);
+      expect(importParsed.parts).not.toBeUndefined();
+      const importServer = buildServer(imp.name, importParsed.parts!);
+      return importServer.code;
+    })
+    .join("\n");
+
   const server = buildServer(component.name, parsed.parts!);
-  const html = eval(server.code).render(state);
+  const code = `
+const x = {
+render: ($state) => {
+${imports}
+${server.code}
+
+return ${component.name}.render($state);
+}
+};
+
+x;`;
+  const html = eval(code).render(state).replaceAll(/\s+/g, " ");
   //console.log("===");
   //console.log(html);
   //console.log("===");
 
   // Write everything to files so we can keep an eye on regressions
   // TODO: Should probably have a script instead
-  const folder = path.replace("/components/", "/components/output/");
-  if (!fs.existsSync(dirname(folder))) fs.mkdirSync(dirname(folder));
+  const folder = componentPath.replace("/components/", "/components/output/");
+  if (!fs.existsSync(path.dirname(folder))) {
+    fs.mkdirSync(path.dirname(folder));
+  }
   fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
   //fs.writeFileSync(folder.replace(".tera", ".html"), html);
   const client = build(component.name, parsed.parts!);
