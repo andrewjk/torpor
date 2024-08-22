@@ -19,6 +19,9 @@ export default function hydrateComponent(
   expect(parsed.parts).not.toBeUndefined();
   const server = buildServer(component.name, parsed.parts!);
   const html = eval(server.code).render(state);
+  //console.log("===");
+  //console.log(html);
+  //console.log("===");
 
   // Write everything to files so we can keep an eye on regressions
   // TODO: Should probably have a script instead

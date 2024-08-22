@@ -1,4 +1,5 @@
 import $watch from '../../../../../tera/view/src/watch/$watch';
+import $unwrap from '../../../../../tera/view/src/watch/$unwrap';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
 import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
@@ -41,8 +42,7 @@ const Let = {
     const t_slots_1 = {};
     t_slots_1["_"] = ($sparent, $sanchor, $sprops) => {
       const t_fragment_2 = t_fragment(t_fragments, 2, `#`);
-      const t_root_2 = t_root(t_fragment_2);
-      const t_text_1 = t_root_2;
+      const t_text_1 = t_root(t_fragment_2);
       $run(function setTextContent() {
         t_text_1.textContent = ` ${t_fmt($sprops.item.text)} `;
       });

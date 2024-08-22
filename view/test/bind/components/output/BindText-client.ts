@@ -1,4 +1,5 @@
 import $watch from '../../../../../tera/view/src/watch/$watch';
+import $unwrap from '../../../../../tera/view/src/watch/$unwrap';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
 import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
@@ -31,8 +32,7 @@ const BindText = {
     const t_fragments = [];
 
     const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <input></input> <p>#</p> </div>`);
-    const t_root_0 = t_root(t_fragment_0);
-    const t_div_1 = t_root_0;
+    const t_div_1 = t_root(t_fragment_0);
     const t_input_1 = t_next(t_child(t_div_1));
     const t_text_1 = t_child(t_next(t_next(t_input_1)));
 

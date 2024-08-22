@@ -1,4 +1,5 @@
 import $watch from '../../../../../tera/view/src/watch/$watch';
+import $unwrap from '../../../../../tera/view/src/watch/$unwrap';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
 import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
@@ -28,8 +29,7 @@ const If = {
     const t_fragments = [];
 
     const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!> </div>`);
-    const t_root_0 = t_root(t_fragment_0);
-    const t_div_1 = t_root_0;
+    const t_div_1 = t_root(t_fragment_0);
     const t_if_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
     /* @if */
@@ -40,7 +40,7 @@ const If = {
           const t_fragment_1 = t_fragment(t_fragments, 1, ` <p>It's big</p> `);
           const t_root_1 = t_root(t_fragment_1);
           const t_text_1 = t_next(t_next(t_root_1));
-          t_add_fragment(t_fragment_1, t_root_0, t_before);
+          t_add_fragment(t_fragment_1, t_div_1, t_before);
           t_next(t_text_1);
         });
       }
@@ -49,7 +49,7 @@ const If = {
           const t_fragment_2 = t_fragment(t_fragments, 2, ` <p>It's small</p> `);
           const t_root_2 = t_root(t_fragment_2);
           const t_text_2 = t_next(t_next(t_root_2));
-          t_add_fragment(t_fragment_2, t_root_0, t_before);
+          t_add_fragment(t_fragment_2, t_div_1, t_before);
           t_next(t_text_2);
         });
       }

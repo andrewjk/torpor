@@ -1,4 +1,5 @@
 import $watch from '../../../../../tera/view/src/watch/$watch';
+import $unwrap from '../../../../../tera/view/src/watch/$unwrap';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
 import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
@@ -44,8 +45,7 @@ const Named = {
     }
     t_slots_1["header"] = ($sparent, $sanchor, $sprops) => {
       const t_fragment_3 = t_fragment(t_fragments, 3, ` The article's header `);
-      const t_root_3 = t_root(t_fragment_3);
-      const t_text_2 = t_root_3;
+      const t_text_2 = t_root(t_fragment_3);
       t_add_fragment(t_fragment_3, $sparent, $sanchor);
       t_next(t_text_2);
     }

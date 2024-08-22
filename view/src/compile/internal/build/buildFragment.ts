@@ -4,6 +4,9 @@ import type Fragment from "../../types/nodes/Fragment";
 import type Node from "../../types/nodes/Node";
 import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
+import isControlNode from "../../types/nodes/isControlNode";
+import isElementNode from "../../types/nodes/isElementNode";
+import isTextNode from "../../types/nodes/isTextNode";
 import Builder from "../Builder";
 import { isSpace } from "../parse/parseUtils";
 import { trimQuotes } from "../utils";
@@ -67,16 +70,12 @@ export default function buildFragment(
     } else {
       // Text, then declarations
       const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
-      // We need to store the root node of the fragment for subsequent updates of the fragment
-      const rootName = `t_root_${fragment.number}`;
-      const rootPath = `t_root(${fragmentName})`;
       b.append(
-        `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);
-         const ${rootName} = ${rootPath};`,
+        `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
       );
       let fragmentPath = { parent: null, type: "fragment", children: [] };
       let varPaths = new Map<string, string>();
-      varPaths.set(rootPath, rootName);
+      maybeAddRootNodeDeclaration(node, fragment, fragmentName, b, varPaths);
       declareFragmentVars(
         node.fragment,
         node,
@@ -90,6 +89,32 @@ export default function buildFragment(
         true,
       );
     }
+  }
+}
+
+function maybeAddRootNodeDeclaration(
+  node: RootNode | ControlNode | ElementNode,
+  fragment: Fragment,
+  fragmentName: string,
+  b: Builder,
+  varPaths: Map<string, string>,
+) {
+  // We need to store the root node of the fragment for subsequent updates of the fragment
+  // But not if there the node would be declared anyway
+  let firstNode = node.children[0];
+  let firstNodeIsLastNode = node.children.length === 1;
+  if (
+    (isControlNode(firstNode) && firstNode.operation.endsWith(" group")) ||
+    (isElementNode(firstNode) &&
+      elementNodeNeedsDeclaration(firstNode, true, firstNodeIsLastNode)) ||
+    (isTextNode(firstNode) && textNodeNeedsDeclaration(firstNode, true, firstNodeIsLastNode))
+  ) {
+    // It's going to be declared later on
+  } else {
+    const rootName = `t_root_${fragment.number}`;
+    const rootPath = `t_root(${fragmentName})`;
+    b.append(`const ${rootName} = ${rootPath};`);
+    varPaths.set(rootPath, rootName);
   }
 }
 
@@ -309,16 +334,14 @@ function declareElementFragmentVars(
   lastChild: boolean,
   declare: boolean,
 ) {
-  const topLevel = !path.parent;
-
   let elementPath = { parent: path, type: node.tagName, children: [] };
   path.children.push(elementPath);
 
-  const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
-  const setVariable = hasReactiveAttribute || (topLevel && lastChild);
+  const topLevel = !path.parent;
+  const declareVariable = elementNodeNeedsDeclaration(node, topLevel, lastChild);
 
   if (declare) {
-    if (setVariable) {
+    if (declareVariable) {
       node.varName = nextVarName(node.tagName, status);
       if (topLevel) {
         fragment.endVarName = node.varName;
@@ -328,6 +351,7 @@ function declareElementFragmentVars(
         b.append(`let ${node.varName};`);
       } else {
         b.append(`const ${node.varName} = ${varPath};`);
+        //b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
       }
     }
   }
@@ -350,7 +374,7 @@ function declareElementFragmentVars(
         }
       })
       .join(", ");
-    if (setVariable) {
+    if (declareVariable) {
       b.append(
         `(${childParentName ? `${childParentName} = ` : ""}${node.varName} = t_elm("${node.tagName}", {${attributes}}, [`,
       );
@@ -377,12 +401,17 @@ function declareElementFragmentVars(
   }
 
   if (!declare) {
-    if (setVariable || childParentName) {
+    if (declareVariable || childParentName) {
       b.append("])),");
     } else {
       b.append("]),");
     }
   }
+}
+
+function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
+  const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
+  return hasReactiveAttribute || (topLevel && lastChild);
 }
 
 function declareTextFragmentVars(
@@ -395,8 +424,6 @@ function declareTextFragmentVars(
   lastChild: boolean,
   declare: boolean,
 ) {
-  const topLevel = !path.parent;
-
   // HACK: Text nodes get merged together
   // Is this because of control nodes like @key and @const??
   // TODO: We should do this when building for the server too
@@ -404,13 +431,15 @@ function declareTextFragmentVars(
   if (lastType === "text" || lastType === "space") {
     return;
   }
+
   let textPath = { parent: path, type: isSpace(node.content) ? "space" : "text", children: [] };
   path.children.push(textPath);
 
-  const setVariable = isReactive(node.content) || (topLevel && lastChild);
+  const topLevel = !path.parent;
+  const declareVariable = textNodeNeedsDeclaration(node, topLevel, lastChild);
 
   if (declare) {
-    if (setVariable) {
+    if (declareVariable) {
       node.varName = nextVarName("text", status);
       if (topLevel) {
         fragment.endVarName = node.varName;
@@ -423,12 +452,16 @@ function declareTextFragmentVars(
       }
     }
   } else {
-    if (setVariable) {
+    if (declareVariable) {
       b.append(`(${node.varName} = t_txt(" ")),`);
     } else {
       b.append(`t_txt("${node.content}"),`);
     }
   }
+}
+
+function textNodeNeedsDeclaration(node: TextNode, topLevel: boolean, lastChild: boolean) {
+  return isReactive(node.content) || (topLevel && lastChild);
 }
 
 function declareSpecialFragmentVars(
@@ -555,7 +588,12 @@ function getFragmentVarPath(
   // HACK: allow passing in "?" to not add the parentVarPath to the existing
   // paths
   if (name !== "?") {
+    // Add the path, so that we can shorten subsequent paths e.g.
+    // const div = t_next(t_child(root));
+    // const p = t_next(t_next(t_next(t_child(root)))) => t_next(t_next(div))
     varPaths.set(varPath, name);
+    // Add the name, so that we are always using the last declared name
+    varPaths.set(name, name);
   }
 
   return varPath;

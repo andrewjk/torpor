@@ -1,4 +1,5 @@
 import $watch from '../../../../../tera/view/src/watch/$watch';
+import $unwrap from '../../../../../tera/view/src/watch/$unwrap';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
 import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
@@ -28,14 +29,13 @@ const ParentChild = {
     const t_fragments = [];
 
     const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!></div>`);
-    const t_root_0 = t_root(t_fragment_0);
-    const t_div_1 = t_root_0;
+    const t_div_1 = t_root(t_fragment_0);
     const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
     /* @component */
     const t_props_1 = $watch({});
     t_props_1["name"] = "Anna";
-    Child.render(t_root_0, t_comp_anchor_1, t_props_1, undefined, $context)
+    Child.render(t_div_1, t_comp_anchor_1, t_props_1, undefined, $context)
 
     t_apply_props(t_div_1, $props, ['name']);
     t_add_fragment(t_fragment_0, $parent, $anchor);
@@ -57,8 +57,7 @@ const Child = {
     const t_fragments = [];
 
     const t_fragment_0 = t_fragment(t_fragments, 0, `<h2>#</h2>`);
-    const t_root_0 = t_root(t_fragment_0);
-    const t_h2_1 = t_root_0;
+    const t_h2_1 = t_root(t_fragment_0);
     const t_text_1 = t_child(t_h2_1);
 
     t_apply_props(t_h2_1, $props, ['name']);
