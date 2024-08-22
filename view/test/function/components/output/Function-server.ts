@@ -12,7 +12,7 @@ const Function = {
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
     let $output = "";
-    $output += `<div> <button>Increment</button> `;
+    $output += `<div> <button id="increment">Increment</button> `;
 
     function increment() {
       $state.counter += 1;

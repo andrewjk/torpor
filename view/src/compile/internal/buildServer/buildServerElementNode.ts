@@ -44,6 +44,7 @@ function buildElementAttributes(node: ElementNode) {
             }
             case "checkbox": {
               defaultValue = "false";
+              break;
             }
           }
         }
@@ -55,8 +56,10 @@ function buildElementAttributes(node: ElementNode) {
         const className = name.substring(6);
         attributes.push(`${className}="${value}"`);
       } else {
-        attributes.push(`${name}="${value}"`);
+        attributes.push(`${name}="${trimQuotes(value)}"`);
       }
+    } else {
+      attributes.push(`${name}="${trimQuotes(value)}"`);
     }
   }
   return attributes.join(" ");
