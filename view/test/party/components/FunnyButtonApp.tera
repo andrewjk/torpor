@@ -1,0 +1,8 @@
+<script>
+  import FunnyButton from "./FunnyButton.tera";
+</script>
+
+<div>
+  <FunnyButton />
+  <FunnyButton>Click me!</FunnyButton>
+</div>

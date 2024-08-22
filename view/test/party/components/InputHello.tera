@@ -1,0 +1,10 @@
+<script>
+  let $state = $watch({
+    text: "Hello World"
+  });
+</script>
+
+<div>
+  <p>{$state.text}</p>
+  <input bind:value={$state.text} />
+</div>

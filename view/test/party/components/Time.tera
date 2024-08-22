@@ -1,0 +1,15 @@
+<script>
+  let $state = $watch({
+    time: new Date().toLocaleTimeString()
+  });
+
+  $run(() => {
+    const timer = setInterval(() => {
+      $state.time = new Date().toLocaleTimeString();
+    }, 1000);
+
+    return () => clearInterval(timer);
+  });
+</script>
+
+<p>Current time: {$state.time}</p>
