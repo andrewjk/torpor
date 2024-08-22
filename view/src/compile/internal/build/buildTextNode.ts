@@ -29,6 +29,7 @@ export default function buildTextNode(
   }
 
   if (reactiveCount) {
+    status.imports.add("t_fmt");
     if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
       content = `t_fmt(${content.substring(1, content.length - 1)})`;
     } else {

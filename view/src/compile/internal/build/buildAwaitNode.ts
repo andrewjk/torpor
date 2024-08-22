@@ -54,6 +54,7 @@ export default function buildAwaitNode(
 
   // Use an incrementing token to make sure only the last request gets handled
   // TODO: This might have unforeseen consequences
+  status.imports.add("t_run_control");
   b.append("");
   b.append(`
     /* @await */
@@ -64,6 +65,8 @@ export default function buildAwaitNode(
 
   buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName, 0);
 
+  status.imports.add("t_push_range");
+  status.imports.add("t_pop_range");
   b.append(`
     ((token) => {
       ${awaiterName}

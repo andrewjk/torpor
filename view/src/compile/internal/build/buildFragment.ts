@@ -53,6 +53,7 @@ export default function buildFragment(
 
       fragmentPath.children.length = 0;
       varPaths.clear();
+      status.imports.add("t_frg");
       b.append(`const ${fragmentName} = t_frg([`);
       declareFragmentVars(
         node.fragment,
@@ -69,13 +70,14 @@ export default function buildFragment(
       b.append(`]);`);
     } else {
       // Text, then declarations
+      status.imports.add("t_fragment");
       const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
       b.append(
         `const ${fragmentName} = t_fragment(t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
       );
       let fragmentPath = { parent: null, type: "fragment", children: [] };
       let varPaths = new Map<string, string>();
-      maybeAddRootNodeDeclaration(node, fragment, fragmentName, b, varPaths);
+      maybeAddRootNodeDeclaration(node, fragment, fragmentName, status, b, varPaths);
       declareFragmentVars(
         node.fragment,
         node,
@@ -96,6 +98,7 @@ function maybeAddRootNodeDeclaration(
   node: RootNode | ControlNode | ElementNode,
   fragment: Fragment,
   fragmentName: string,
+  status: BuildStatus,
   b: Builder,
   varPaths: Map<string, string>,
 ) {
@@ -111,10 +114,12 @@ function maybeAddRootNodeDeclaration(
   ) {
     // It's going to be declared later on
   } else {
+    status.imports.add("t_root");
     const rootName = `t_root_${fragment.number}`;
     const rootPath = `t_root(${fragmentName})`;
     b.append(`const ${rootName} = ${rootPath};`);
     varPaths.set(rootPath, rootName);
+    //b.append(`console.log("${rootName}", ${rootName}, ${rootName}.textContent);`);
   }
 }
 
@@ -346,7 +351,7 @@ function declareElementFragmentVars(
       if (topLevel) {
         fragment.endVarName = node.varName;
       }
-      const varPath = getFragmentVarPath(fragment, node.varName, elementPath, varPaths);
+      const varPath = getFragmentVarPath(fragment, status, node.varName, elementPath, varPaths);
       if (buildConfig.fragmentsUseCreateElement) {
         b.append(`let ${node.varName};`);
       } else {
@@ -374,6 +379,8 @@ function declareElementFragmentVars(
         }
       })
       .join(", ");
+
+    status.imports.add("t_elm");
     if (declareVariable) {
       b.append(
         `(${childParentName ? `${childParentName} = ` : ""}${node.varName} = t_elm("${node.tagName}", {${attributes}}, [`,
@@ -444,14 +451,16 @@ function declareTextFragmentVars(
       if (topLevel) {
         fragment.endVarName = node.varName;
       }
-      const varPath = getFragmentVarPath(fragment, node.varName, textPath, varPaths);
+      const varPath = getFragmentVarPath(fragment, status, node.varName, textPath, varPaths);
       if (buildConfig.fragmentsUseCreateElement) {
         b.append(`let ${node.varName};`);
       } else {
         b.append(`const ${node.varName} = ${varPath};`);
+        //b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
       }
     }
   } else {
+    status.imports.add("t_txt");
     if (declareVariable) {
       b.append(`(${node.varName} = t_txt(" ")),`);
     } else {
@@ -528,7 +537,7 @@ function declareParentAndAnchorFragmentVars(
     const parentPath = path;
     const oldChildren = parentPath.children;
     parentPath.children = [];
-    const parentVarPath = getFragmentVarPath(fragment, "?", parentPath, varPaths);
+    const parentVarPath = getFragmentVarPath(fragment, status, "?", parentPath, varPaths);
     parentPath.children = oldChildren;
     // TODO: Should do this thing for the last child as well
     if (varPaths.has(parentVarPath)) {
@@ -553,19 +562,23 @@ function declareParentAndAnchorFragmentVars(
     path.children.push(anchorPath);
 
     node.varName = nextVarName(`${name}_anchor`, status);
-    const varPath = getFragmentVarPath(fragment, node.varName, anchorPath, varPaths);
+    const varPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
     if (buildConfig.fragmentsUseCreateElement) {
       b.append(`let ${node.varName};`);
     } else {
+      status.imports.add("t_anchor");
       b.append(`const ${node.varName} = t_anchor(${varPath});`);
+      //b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
     }
   } else {
+    status.imports.add("t_cmt");
     b.append(`(${node.varName} = t_cmt()),`);
   }
 }
 
 function getFragmentVarPath(
   fragment: Fragment,
+  status: BuildStatus,
   name: string,
   path: VariablePath,
   varPaths: Map<string, string>,
@@ -575,7 +588,7 @@ function getFragmentVarPath(
     node = node.parent;
   }
   let varPath = `t_fragment_${fragment.number}`;
-  varPath = getFragmentVarPathPart(node, varPath, true);
+  varPath = getFragmentVarPathPart(node, varPath, status, true);
 
   // Check for parts of the path that have already been run to shorten our
   // traversal
@@ -599,19 +612,27 @@ function getFragmentVarPath(
   return varPath;
 }
 
-function getFragmentVarPathPart(path: VariablePath, varPath: string, root = false): string {
+function getFragmentVarPathPart(
+  path: VariablePath,
+  varPath: string,
+  status: BuildStatus,
+  root = false,
+): string {
   if (root) {
+    status.imports.add("t_root");
     varPath = `t_root(${varPath})`;
   } else {
+    status.imports.add("t_child");
     varPath = `t_child(${varPath})`;
   }
   for (let [i, child] of path.children.entries()) {
     if (i > 0) {
+      status.imports.add("t_next");
       varPath = `t_next(${varPath})`;
     }
 
     if (i === path.children.length - 1 && child.children.length) {
-      varPath = getFragmentVarPathPart(child, varPath);
+      varPath = getFragmentVarPathPart(child, varPath, status);
     }
   }
   return varPath;

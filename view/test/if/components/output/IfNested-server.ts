@@ -6,9 +6,9 @@ const IfNested = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<div> <![>`;
     if ($props.counter > 5) {
       $output += `<!^> <![>`;

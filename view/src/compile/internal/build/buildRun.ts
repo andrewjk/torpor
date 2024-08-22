@@ -7,6 +7,7 @@ export default function buildRun(
   status: BuildStatus,
   b: Builder,
 ) {
+  status.imports.add("$run");
   b.append(`$run(function ${functionName}() {`);
   // If a value from a for loop is used in the function body, get it from the
   // loop data to trigger an update when it is changed

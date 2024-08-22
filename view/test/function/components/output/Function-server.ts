@@ -8,10 +8,11 @@ const Function = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
+    const $run = (fn) => null;
     let $state = $watch({ counter: 0 })
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<div> <button id="increment">Increment</button> `;
 
     function increment() {

@@ -6,9 +6,9 @@ const Switch = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<div> <![>`;
     switch ($props.value) {
       case 1: {

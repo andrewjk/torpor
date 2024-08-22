@@ -25,6 +25,7 @@ export default function buildSlotNode(
   const slotHasProps = slotAttributes.length;
   if (slotHasProps) {
     // TODO: defaults etc props
+    status.imports.add("$watch");
     b.append(`const ${propsName} = $watch({});`);
     for (let { name, value } of slotAttributes) {
       if (name.startsWith("{") && name.endsWith("}")) {

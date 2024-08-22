@@ -8,10 +8,11 @@ const BindText = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
+    const $run = (fn) => null;
     let $state = $watch({ name: "Alice" });
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<div> <input value="${$state.name || ""}"/> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
     return $output;
   }

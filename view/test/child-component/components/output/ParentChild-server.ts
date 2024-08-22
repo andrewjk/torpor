@@ -6,10 +6,14 @@ const ParentChild = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
-    $output += `<div> </div>`;
+    $output += `<div> `;
+    const t_props_1 = {};
+    t_props_1["name"] = "Anna";
+    $output += Child.render(t_props_1, undefined, $context)
+    $output += `</div>`;
     return $output;
   }
 }
@@ -22,9 +26,9 @@ const Child = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
     return $output;
   }

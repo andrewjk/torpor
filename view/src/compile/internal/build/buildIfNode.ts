@@ -34,6 +34,8 @@ export default function buildIfNode(
     branches.push(elseBranch);
   }
 
+  status.imports.add("t_run_control");
+
   b.append("");
   b.append(`
       /* @if */
@@ -56,6 +58,8 @@ function buildIfBranch(
   rangeName: string,
   index: number,
 ) {
+  status.imports.add("t_run_branch");
+
   b.append(`${node.statement} {`);
   b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 

@@ -25,6 +25,7 @@ export default function buildComponentNode(
   const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
   if (componentHasProps) {
     // TODO: defaults etc props
+    status.imports.add("$watch");
     b.append(`const ${propsName} = $watch({});`);
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
@@ -50,6 +51,7 @@ export default function buildComponentNode(
     }
     // PERF: Does this have much of an impact??
     if (root) {
+      status.imports.add("$run");
       b.append(`
         if ($props) {
           const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];

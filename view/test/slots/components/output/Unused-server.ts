@@ -6,9 +6,10 @@ const Unused = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
+    $output += Header.render(undefined, undefined, $context)
     return $output;
   }
 }

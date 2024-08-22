@@ -6,9 +6,9 @@ const ForIn = {
   * @param {Object} [$context]
   */
   render: ($props, $slots, $context) => {
+    let $output = "";
     /* User interface */
     const t_fmt = (text) => text != null ? text : "";
-    let $output = "";
     $output += `<section> <![>`;
     for (let key in $props.item) {
       $output += `<!^> <p> ${t_fmt($props.item[key])} </p> `;
