@@ -5,11 +5,11 @@ import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import BuildServerStatus from "./BuildServerStatus";
-//import buildServerComponentNode from "./buildServerComponentNode";
+import buildServerComponentNode from "./buildServerComponentNode";
 import buildServerControlNode from "./buildServerControlNode";
 import buildServerElementNode from "./buildServerElementNode";
 import buildServerRootNode from "./buildServerRootNode";
-//import buildServerSpecialNode from "./buildServerSpecialNode";
+import buildServerSpecialNode from "./buildServerSpecialNode";
 import buildServerTextNode from "./buildServerTextNode";
 
 export default function buildServerNode(node: Node, status: BuildServerStatus, b: Builder) {
@@ -23,7 +23,7 @@ export default function buildServerNode(node: Node, status: BuildServerStatus, b
       break;
     }
     case "component": {
-      //buildComponentNode(node as ElementNode,b, root);
+      buildServerComponentNode(node as ElementNode, status, b);
       break;
     }
     case "element": {
@@ -35,7 +35,7 @@ export default function buildServerNode(node: Node, status: BuildServerStatus, b
       break;
     }
     case "special": {
-      //buildSpecialNode(node as ElementNode,b);
+      buildServerSpecialNode(node as ElementNode, status, b);
       break;
     }
     default: {

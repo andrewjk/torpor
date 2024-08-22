@@ -1,35 +1,32 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import isControlNode from "../../types/nodes/isControlNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../Builder";
 import { trimQuotes } from "../utils";
-import type BuildStatus from "./BuildStatus";
-import addFragment from "./buildAddFragment";
-import buildFragment from "./buildFragment";
-import buildNode from "./buildNode";
-import buildRun from "./buildRun";
-import { nextVarName } from "./buildUtils";
+import type BuildServerStatus from "./BuildServerStatus";
+import buildServerNode from "./buildServerNode";
+import { nextVarName } from "./buildServerUtils";
 
-export default function buildComponentNode(
+export default function buildServerComponentNode(
   node: ElementNode,
-  status: BuildStatus,
+  status: BuildServerStatus,
   b: Builder,
-  parentName: string,
-  anchorName: string,
-  root = false,
 ) {
-  b.append("");
-  b.append("/* @component */");
+  if (status.output) {
+    b.append(`$output += \`${status.output}\`;`);
+    status.output = "";
+  }
 
   // Props
-  const componentHasProps = node.attributes.length || root;
+  const componentHasProps = node.attributes.length; // || root;
   const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
   if (componentHasProps) {
     // TODO: defaults etc props
-    b.append(`const ${propsName} = $watch({});`);
+    b.append(`const ${propsName} = {};`);
     for (let { name, value } of node.attributes) {
       if (name.startsWith("{") && name.endsWith("}")) {
         name = name.substring(1, name.length - 1);
-        buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
+        b.append(`${propsName}["${name}"] = ${name}`);
       } else {
         let reactive = value.startsWith("{") && value.endsWith("}");
         if (reactive) {
@@ -38,28 +35,25 @@ export default function buildComponentNode(
         if (name === "class") {
           // TODO: How to handle dynamic classes etc
           // Probably just compile down to a string?
-          value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
+          b.append(`"${trimQuotes(value)} tera-${status.styleHash}"`);
         }
-        const setProp = `${propsName}["${name}"] = ${value || "true"};`;
-        if (reactive) {
-          buildRun("setProp", setProp, status, b);
-        } else {
-          b.append(setProp);
-        }
+        b.append(`${propsName}["${name}"] = ${value || "true"};`);
       }
     }
-    // PERF: Does this have much of an impact??
+    // NOTE: Not sure if this is needed
+    /*
     if (root) {
       b.append(`
         if ($props) {
           const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
           for (let name of Object.keys($props)) {
             if (!name.startsWith("$") && !propNames.includes(name)) {
-              $run(() => ${propsName}[name] = $props[name]);
+              ${propsName}[name] = $props[name];
             }
           }
         }`);
     }
+    */
   }
 
   // Slots
@@ -71,29 +65,28 @@ export default function buildComponentNode(
       if (isSpecialNode(slot)) {
         const nameAttribute = slot.attributes.find((a) => a.name === "name");
         const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
-        b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops) => {`);
+        b.append(`${slotsName}["${slotName}"] = ($sprops) => {`);
+        b.append(`let $output = "";`);
 
-        buildFragment(slot, status, b, "$sparent", "$sanchor");
+        // Separate spaces across boundaries with a careted comment
+        status.output += "<!^>";
 
-        status.fragmentStack.push({
-          fragment: slot.fragment,
-          path: "",
-        });
         for (let child of slot.children) {
-          buildNode(child, status, b, "$sparent", "$sanchor");
+          buildServerNode(child, status, b);
         }
-        status.fragmentStack.pop();
 
-        addFragment(slot, status, b, "$sparent", "$sanchor");
+        if (status.output) {
+          b.append(`$output += \`${status.output}\`;`);
+          status.output = "";
+        }
 
+        b.append("return $output;");
         b.append(`}`);
       }
     }
   }
 
   // Render the component
-  const compParentName = node.parentName;
-  const compAnchorName = node.varName;
   b.append(`
-    ${node.tagName}.render(${compParentName}, ${compAnchorName}, ${propsName}, ${slotsName}, $context)`);
+    $output += ${node.tagName}.render(${propsName}, ${slotsName}, $context)`);
 }

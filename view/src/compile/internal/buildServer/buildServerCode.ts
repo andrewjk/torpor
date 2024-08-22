@@ -65,17 +65,23 @@ function buildServerTemplate(name: string, parts: ComponentTemplate, b: Builder)
   if (parts.script) {
     // TODO: Mangling
     b.append("/* User script */");
-    // HACK: Replace this with proper functions
+    // HACK: Replace these with proper functions
     b.append("const $watch = (obj) => obj;");
+    b.append("const $run = (fn) => null;");
     b.append(parts.script);
   }
 
+  b.append(`let $output = "";`);
+
   if (parts.markup) {
-    const status = { output: "" };
+    const status = {
+      output: "",
+      styleHash: parts.styleHash || "",
+      varNames: {},
+    };
     b.append("/* User interface */");
     // HACK: Replace this with imports
     b.append('const t_fmt = (text) => text != null ? text : "";');
-    b.append('let $output = "";');
     buildServerNode(parts.markup, status, b);
     if (status.output) {
       b.append(`$output += \`${status.output}\`;`);
