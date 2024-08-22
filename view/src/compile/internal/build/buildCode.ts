@@ -12,6 +12,7 @@ export default function buildCode(name: string, parts: ComponentTemplate): strin
   let folder = buildConfig.folder;
   b.append(`
     import $watch from '${folder}/watch/$watch';
+    import $unwrap from '${folder}/watch/$unwrap';
     import $run from '${folder}/watch/$run';
     import t_push_range_to_parent from '${folder}/render/internal/pushRangeToParent';
     import t_push_range from '${folder}/render/internal/pushRange';
