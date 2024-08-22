@@ -2,7 +2,7 @@ import type Documentation from "../../types/docs/Documentation";
 import type PropDocumentation from "../../types/docs/PropDocumentation";
 import type SlotDocumentation from "../../types/docs/SlotDocumentation";
 import type ParseStatus from "./ParseStatus";
-import { accept, addError, consumeSpace, consumeUntil, consumeWord, expect } from "./parseUtils";
+import { accept, addError, consumeSpace, consumeUntil, consumeWord } from "./parseUtils";
 
 export default function parseDocs(status: ParseStatus): Documentation {
   const docs: Documentation = {
@@ -56,10 +56,8 @@ function parseDocsProp(status: ParseStatus): PropDocumentation {
   // Parse the type
   consumeSpace(status);
   if (accept("{", status)) {
-    consumeSpace(status);
-    docs.type = consumeWord(status);
-    consumeSpace(status);
-    expect("}", status);
+    docs.type = consumeUntil("}", status).trim();
+    accept("}", status);
     consumeSpace(status);
   }
 
