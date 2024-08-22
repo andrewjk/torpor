@@ -81,7 +81,12 @@ export default function parseElement(status: ParseStatus): ElementNode {
       } else {
         // It's text content
         const start = status.i;
-        const end = status.source.indexOf("<", status.i + 1);
+        const end = Math.min(
+          ...[
+            status.source.indexOf("<", status.i + 1),
+            status.source.indexOf("@", status.i + 1),
+          ].filter((e) => e !== -1),
+        );
         if (end !== -1) {
           const content = status.source.substring(start, end).trimEnd();
           const spaceContent = status.source.substring(start + content.length, end);
