@@ -76,7 +76,7 @@ export default function buildFragment(
       );
       let fragmentPath = { parent: null, type: "fragment", children: [] };
       let varPaths = new Map<string, string>();
-      varPaths.set(rootName, rootPath);
+      varPaths.set(rootPath, rootName);
       declareFragmentVars(
         node.fragment,
         node,
@@ -508,7 +508,7 @@ function declareParentAndAnchorFragmentVars(
         } else {
           b.append(`const ${node.parentName} = ${parentVarPath};`);
         }
-        varPaths.set(node.parentName, parentVarPath);
+        varPaths.set(parentVarPath, node.parentName);
       } else {
         // HACK: For the createElement option, this gets done in the parent
       }
@@ -546,7 +546,7 @@ function getFragmentVarPath(
 
   // Check for parts of the path that have already been run to shorten our
   // traversal
-  for (let [existingName, existingPath] of varPaths) {
+  for (let [existingPath, existingName] of varPaths) {
     if (varPath.includes(existingPath)) {
       varPath = varPath.replace(existingPath, existingName);
     }
@@ -555,7 +555,7 @@ function getFragmentVarPath(
   // HACK: allow passing in "?" to not add the parentVarPath to the existing
   // paths
   if (name !== "?") {
-    varPaths.set(name, varPath);
+    varPaths.set(varPath, name);
   }
 
   return varPath;
