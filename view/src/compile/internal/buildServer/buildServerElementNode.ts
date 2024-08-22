@@ -48,17 +48,21 @@ function buildElementAttributes(node: ElementNode) {
             }
           }
         }
-        let set = `${value} || ${defaultValue}`;
+        let valueOrDefault = `${value} || ${defaultValue}`;
         const propName = name.substring(5);
-        attributes.push(`${propName}="\${${set}}"`);
+        attributes.push(`${propName}="\${${valueOrDefault}}"`);
       } else if (name.startsWith("class:")) {
         // TODO: Collect all the classes that are true and add them at the end
         const className = name.substring(6);
         attributes.push(`${className}="${value}"`);
       } else {
-        attributes.push(`${name}="${trimQuotes(value)}"`);
+        // Only set the attribute if the value is truthy
+        // e.g. `... ${className ? `class="${className}"` : ''} ...`
+        attributes.push(`\${${value} ? \`${name}="\${${value}}"\` : ''}`);
       }
     } else {
+      // Just set the attribute
+      // TODO: Probably check if it's a boolean attribute e.g. disabled
       attributes.push(`${name}="${trimQuotes(value)}"`);
     }
   }

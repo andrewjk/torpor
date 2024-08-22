@@ -132,12 +132,15 @@ function buildElementFragmentText(
     .map((a) => {
       if (isReactive(a.value) && !a.name.includes(":")) {
         // Adding a placeholder for reactive attributes seems to speed things
-        // up, especially in the case of data attributes
-        return `${a.name}=""`;
+        // up, especially in the case of data attributes. Otherwise don't set it
+        if (a.name.startsWith("data-")) {
+          return `${a.name}=""`;
+        }
       } else {
         return `${a.name}${a.value != null ? `=${a.value}` : ""}`;
       }
     })
+    .filter(Boolean)
     .join(" ");
   if (attributesText) {
     currentFragment.text += " " + attributesText;
