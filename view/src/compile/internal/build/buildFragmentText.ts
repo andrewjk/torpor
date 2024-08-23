@@ -5,6 +5,7 @@ import type Node from "../../types/nodes/Node";
 import type RootNode from "../../types/nodes/RootNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
+import { ANCHOR_COMMENT } from "../comments";
 import type BuildStatus from "./BuildStatus";
 import { isReactive } from "./buildUtils";
 
@@ -82,7 +83,7 @@ function buildControlFragmentText(
     case "@await group": {
       // Add a placeholder if it's a branching control node
       //if (!node.singleRooted) {
-      currentFragment.text += "<!>";
+      currentFragment.text += ANCHOR_COMMENT;
       //}
       for (let child of node.children) {
         buildNodeFragmentText(child, status, fragments, currentFragment);
@@ -107,7 +108,7 @@ function buildComponentFragmentText(
   fragments: Fragment[],
   currentFragment: Fragment,
 ) {
-  currentFragment.text += "<!>";
+  currentFragment.text += ANCHOR_COMMENT;
 
   // Add fragments for slots if there are children
   if (node.children.length) {
@@ -161,7 +162,7 @@ function buildSpecialFragmentText(
   switch (node.tagName) {
     case ":slot": {
       // Add an anchor for the slot
-      currentFragment.text += "<!>";
+      currentFragment.text += ANCHOR_COMMENT;
       for (let child of node.children) {
         buildNodeFragmentText(child, status, fragments, node.fragment);
       }

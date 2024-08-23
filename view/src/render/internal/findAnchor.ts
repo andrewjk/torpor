@@ -1,5 +1,5 @@
 import context from "../../global/context";
-import { HYDRATION_END, HYDRATION_START } from "./_global";
+import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
 import isComment from "./isComment";
 import nodeNext from "./nodeNext";
 

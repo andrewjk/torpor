@@ -1,6 +1,7 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../Builder";
+import { ANCHOR_COMMENT, HYDRATION_END_COMMENT, HYDRATION_START_COMMENT } from "../comments";
 import { trimQuotes } from "../utils";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -13,7 +14,7 @@ export default function buildServerSlotNode(
 ) {
   // Surround the entire control statement with bracketed comments, so that we
   // can skip to the end to set the anchor node when hydrating
-  status.output += "<![>";
+  status.output += HYDRATION_START_COMMENT;
 
   if (status.output) {
     b.append(`$output += \`${status.output}\`;`);
@@ -66,8 +67,8 @@ export default function buildServerSlotNode(
   b.append(`}`);
 
   // End the control statement
-  status.output += "<!]>";
+  status.output += HYDRATION_END_COMMENT;
 
   // Add the anchor node
-  status.output += "<!>";
+  status.output += ANCHOR_COMMENT;
 }

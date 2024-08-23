@@ -1,5 +1,5 @@
 import context from "../../global/context";
-import { HYDRATION_BRANCH } from "./_global";
+import { HYDRATION_BRANCH } from "./hydrationMarkers";
 import isComment from "./isComment";
 
 // TODO: Should have t_next(node, 3) to get the sibling 3 nodes along
