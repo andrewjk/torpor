@@ -12,7 +12,7 @@ const Basic = {
     const t_slots_1 = {};
     t_slots_1["_"] = ($sprops) => {
       let $output = "";
-      $output += `<!^> Basic stuff `;
+      $output += ` Basic stuff `;
       return $output;
     }
     $output += Header.render(undefined, t_slots_1, $context)

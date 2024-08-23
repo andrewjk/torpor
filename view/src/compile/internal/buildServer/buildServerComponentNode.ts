@@ -68,9 +68,6 @@ export default function buildServerComponentNode(
         b.append(`${slotsName}["${slotName}"] = ($sprops) => {`);
         b.append(`let $output = "";`);
 
-        // Separate spaces across boundaries with a careted comment
-        status.output += "<!^>";
-
         for (let child of slot.children) {
           buildServerNode(child, status, b);
         }

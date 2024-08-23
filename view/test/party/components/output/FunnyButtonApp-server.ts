@@ -15,7 +15,7 @@ const FunnyButtonApp = {
     const t_slots_1 = {};
     t_slots_1["_"] = ($sprops) => {
       let $output = "";
-      $output += `<!^>Click me!`;
+      $output += `Click me!`;
       return $output;
     }
     $output += FunnyButton.render(undefined, t_slots_1, $context)

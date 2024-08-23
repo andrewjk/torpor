@@ -25,13 +25,13 @@ const TrafficLight = {
     const t_fmt = (text) => text != null ? text : "";
     $output += `<div> <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
     if ($state.light === "red") {
-      $output += `<!^> <span>STOP</span> `;
+      $output += ` <span>STOP</span> `;
     }
     else if ($state.light === "orange") {
-      $output += `<!^> <span>SLOW DOWN</span> `;
+      $output += ` <span>SLOW DOWN</span> `;
     }
     else if ($state.light === "green") {
-      $output += `<!^> <span>GO</span> `;
+      $output += ` <span>GO</span> `;
     }
     $output += `<!]><!> </p> </div>`;
     return $output;

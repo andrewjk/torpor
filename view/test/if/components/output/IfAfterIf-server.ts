@@ -11,11 +11,11 @@ const IfAfterIf = {
     const t_fmt = (text) => text != null ? text : "";
     $output += `<div> <![>`;
     if ($props.counter > 10) {
-      $output += `<!^> <p> It's true! </p> `;
+      $output += ` <p> It's true! </p> `;
     }
     $output += `<!]><!> <![>`;
     if ($props.counter > 5) {
-      $output += `<!^> <p> It's also true! </p> `;
+      $output += ` <p> It's also true! </p> `;
     }
     $output += `<!]><!> </div>`;
     return $output;

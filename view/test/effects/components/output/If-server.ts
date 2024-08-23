@@ -11,10 +11,10 @@ const If = {
     const t_fmt = (text) => text != null ? text : "";
     $output += `<div> <![>`;
     if ($props.counter > 5) {
-      $output += `<!^> <p>It's big</p> `;
+      $output += ` <p>It's big</p> `;
     }
     else {
-      $output += `<!^> <p>It's small</p> `;
+      $output += ` <p>It's small</p> `;
     }
     $output += `<!]><!> </div>`;
     return $output;

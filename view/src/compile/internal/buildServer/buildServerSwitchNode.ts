@@ -37,9 +37,6 @@ export default function buildServerSwitchNode(
 function buildServerSwitchBranch(node: ControlNode, status: BuildServerStatus, b: Builder) {
   b.append(`${node.statement} {`);
 
-  // Separate spaces across boundaries with a careted comment
-  status.output += "<!^>";
-
   for (let child of node.children) {
     buildServerNode(child, status, b);
   }

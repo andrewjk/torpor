@@ -11,13 +11,13 @@ const IfElseIf = {
     const t_fmt = (text) => text != null ? text : "";
     $output += `<div> <![>`;
     if ($props.counter > 10) {
-      $output += `<!^> <p> It's over ten! </p> `;
+      $output += ` <p> It's over ten! </p> `;
     }
     else if ($props.counter > 5) {
-      $output += `<!^> <p> It's over five! </p> `;
+      $output += ` <p> It's over five! </p> `;
     }
     else {
-      $output += `<!^> <p> It's not there yet </p> `;
+      $output += ` <p> It's not there yet </p> `;
     }
     $output += `<!]><!> </div>`;
     return $output;
