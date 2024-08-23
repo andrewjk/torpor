@@ -9,6 +9,8 @@ const importsMap: Record<string, string> = {
   $watch: "import $watch from '${folder}/watch/$watch';",
   $unwrap: "import $unwrap from '${folder}/watch/$unwrap';",
   $run: "import $run from '${folder}/watch/$run';",
+  $mount: "import $mount from '${folder}/watch/$mount';",
+  t_flush: "import t_flush from '${folder}/watch/internal/flushMountEffects';",
   t_push_range_to_parent:
     "import t_push_range_to_parent from '${folder}/render/internal/pushRangeToParent';",
   t_push_range: "import t_push_range from '${folder}/render/internal/pushRange';",
@@ -90,6 +92,7 @@ function buildTemplate(
     if (/\$watch\b/.test(template.script)) imports.add("$watch");
     if (/\$unwrap\b/.test(template.script)) imports.add("$unwrap");
     if (/\$run\b/.test(template.script)) imports.add("$run");
+    if (/\$mount\b/.test(template.script)) imports.add("$mount");
 
     // TODO: Mangling
     b.append(`
@@ -111,6 +114,12 @@ function buildTemplate(
     buildFragmentText(template.markup, status, b);
     b.append("");
     buildNode(template.markup, status, b, "$parent", "$anchor", true);
+
+    if (imports.has("$mount")) {
+      status.imports.add("t_flush");
+      b.append("");
+      b.append("t_flush();");
+    }
   }
 
   b.append(`}

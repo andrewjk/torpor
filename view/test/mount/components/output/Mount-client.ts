@@ -6,8 +6,8 @@ import t_add_fragment from '../../../../../tera/view/src/render/internal/addFrag
 import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
 import t_flush from '../../../../../tera/view/src/watch/internal/flushMountEffects';
 
-const InputFocused = {
-  name: "InputFocused",
+const Mount = {
+  name: "Mount",
   /**
   * @param {Node} $parent
   * @param {Node | null} $anchor
@@ -20,7 +20,6 @@ const InputFocused = {
     let inputElement;
 
     $mount(() => {
-      // HACK: This is easier to test for
       inputElement.value = "hi";
     });
     
@@ -39,4 +38,4 @@ const InputFocused = {
   }
 }
 
-export default InputFocused;
+export default Mount;

@@ -1,5 +1,5 @@
-const InputFocused = {
-  name: "InputFocused",
+const Mount = {
+  name: "Mount",
   /**
   * @param {Object} [$props]
   * @param {Object} [$slots]
@@ -13,7 +13,6 @@ const InputFocused = {
     let inputElement;
 
     $mount(() => {
-      // HACK: This is easier to test for
       inputElement.value = "hi";
     });
     let $output = "";
@@ -24,4 +23,4 @@ const InputFocused = {
   }
 }
 
-InputFocused;
+Mount;

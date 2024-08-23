@@ -2,7 +2,6 @@
   let inputElement;
 
   $mount(() => {
-    // HACK: This is easier to test for
     inputElement.value = "hi";
   });
 </script>

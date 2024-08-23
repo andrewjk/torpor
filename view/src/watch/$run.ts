@@ -1,4 +1,5 @@
 import context from "../global/context";
+import type Cleanup from "../global/types/Cleanup";
 import type Effect from "../global/types/Effect";
 
 // TODO: Take a pipeline of operators e.g. debounce
@@ -7,7 +8,7 @@ import type Effect from "../global/types/Effect";
  * Runs and re-runs a function that depends on a watched object
  * @param fn The function to run
  */
-export default function $run(fn: () => (() => void) | void) {
+export default function $run(fn: () => Cleanup | void) {
   let effect: Effect = {
     run: fn,
     cleanup: null,
