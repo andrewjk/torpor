@@ -1,0 +1,9 @@
+<script>
+  let inputElement;
+
+  $run(() => {
+    inputElement.focus();
+  });
+</script>
+
+<input bind:this={inputElement} />

@@ -1,0 +1,12 @@
+<script>
+    $context.user = $watch($context.user);
+</script>
+
+<div>
+  <h2>My Profile</h2>
+  <p>Username: {$context.user.username}</p>
+  <p>Email: {$context.user.email}</p>
+  <button onclick={() => ($context.user.username = "Jane")}>
+    Update username to Jane
+  </button>
+</div>

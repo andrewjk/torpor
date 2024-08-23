@@ -1,0 +1,10 @@
+/**
+ * @prop {function} onYes
+ * @prop {function} onNo
+ */
+
+<div>
+  <button onclick={$props.onYes}> YES </button>
+
+  <button onclick={$props.onNo}> NO </button>
+</div>

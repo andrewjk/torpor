@@ -1,0 +1,14 @@
+<script>
+  let $state = $watch({
+    count: 0
+  });
+
+  function incrementCount() {
+    $state.count++;
+  }
+</script>
+
+<div>
+  <p>Counter: {$state.count}</p>
+  <button onclick={incrementCount}>+1</button>
+</div>

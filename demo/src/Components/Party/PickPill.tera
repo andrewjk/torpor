@@ -1,0 +1,15 @@
+<script>
+  let $state = $watch({
+    picked: "red"
+  });
+</script>
+
+<div>
+  <div>Picked: {$state.picked}</div>
+
+  <input id="blue-pill" bind:group={$state.picked} type="radio" value="blue" />
+  <label for="blue-pill">Blue pill</label>
+
+  <input id="red-pill" bind:group={$state.picked} type="radio" value="red" />
+  <label for="red-pill">Red pill</label>
+</div>

@@ -1,0 +1,10 @@
+<script>
+  let $state = $watch({
+    pageTitle: ""
+  });
+  $run(() => {
+    $state.pageTitle = document.title;
+  });
+</script>
+
+<p>Page title: {$state.pageTitle}</p>
