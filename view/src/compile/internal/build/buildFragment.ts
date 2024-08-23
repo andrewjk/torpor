@@ -276,16 +276,12 @@ function declareControlFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         operation,
         declare,
       );
-
-      // Build nodes with anchors immediately, while we have their anchor node,
-      // rather than at the end of the fragment
-      buildNode(node, status, b, parentName, anchorName, false);
-      node.handled = true;
-
       break;
     }
     default: {
@@ -319,12 +315,18 @@ function declareComponentFragmentVars(
   varPaths: Map<string, string>,
   declare: boolean,
 ) {
-  declareParentAndAnchorFragmentVars(fragment, node, path, status, b, varPaths, "comp", declare);
-
-  // Build nodes with anchors immediately, while we have their anchor node,
-  // rather than at the end of the fragment
-  buildNode(node, status, b, parentName, anchorName, false);
-  node.handled = true;
+  declareParentAndAnchorFragmentVars(
+    fragment,
+    node,
+    path,
+    status,
+    b,
+    parentName,
+    anchorName,
+    varPaths,
+    "comp",
+    declare,
+  );
 }
 
 function declareElementFragmentVars(
@@ -492,13 +494,16 @@ function declareSpecialFragmentVars(
         path,
         status,
         b,
+        parentName,
+        anchorName,
         varPaths,
         "slot",
         declare,
       );
       break;
     }
-    case ":fill": {
+    case ":fill":
+    case ":fallback": {
       for (let [i, child] of node.children.entries()) {
         declareFragmentVars(
           fragment,
@@ -524,14 +529,17 @@ function declareParentAndAnchorFragmentVars(
   path: VariablePath,
   status: BuildStatus,
   b: Builder,
+  parentName: string,
+  anchorName: string,
   varPaths: Map<string, string>,
   name: string,
   declare: boolean,
 ) {
   const topLevel = !path.parent;
 
+  // Declare the parent
   if (topLevel) {
-    // If there is no parent, it means the parent is the fragment
+    // If this is a top-level element, then the parent is the fragment
     node.parentName = `t_fragment_${fragment.number}`;
   } else {
     const parentPath = path;
@@ -557,6 +565,7 @@ function declareParentAndAnchorFragmentVars(
     }
   }
 
+  // Declare the anchor
   if (declare) {
     const anchorPath = { parent: path, type: "#", children: [] };
     path.children.push(anchorPath);
@@ -574,6 +583,11 @@ function declareParentAndAnchorFragmentVars(
     status.imports.add("t_cmt");
     b.append(`(${node.varName} = t_cmt()),`);
   }
+
+  // Build nodes with anchors immediately, while we have their anchor node,
+  // rather than at the end of the fragment
+  buildNode(node, status, b, parentName, anchorName);
+  node.handled = true;
 }
 
 function getFragmentVarPath(

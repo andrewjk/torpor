@@ -60,6 +60,11 @@ export default function buildSlotNode(
   if (node.children.length) {
     b.append(`} else {`);
 
+    // HACK: Change the node from :slot to :fill now that we want the content to be created
+    // Otherwise we would just keep infinitely creating anchors
+    // It would probably be better to wrangle a new :fill node under the :slot?
+    node.tagName = ":fill";
+
     buildFragment(node, status, b, slotParentName, slotAnchorName);
 
     status.fragmentStack.push({

@@ -13,6 +13,7 @@ export default function buildSpecialNode(
   switch (node.tagName) {
     case ":slot": {
       buildSlotNode(node, status, b, parentName, anchorName);
+      break;
     }
   }
   return "";
