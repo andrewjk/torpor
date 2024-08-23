@@ -28,13 +28,13 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
   },
   transform(code, id) {
     const parsed = parse(code);
-    if (parsed.ok && parsed.parts) {
+    if (parsed.ok && parsed.template) {
       const name = id
         .split(/[\\\/]/)
         .at(-1)
         ?.replace(/\.tera$/, "");
       // TODO: Compile typescript if script lang="ts" or config.lang="ts"
-      const built = build(name!, parsed.parts);
+      const built = build(name!, parsed.template);
       let transformed = built.code;
 
       // HACK: Replace random paths with absolute paths
