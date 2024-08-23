@@ -7,10 +7,10 @@ import slottifyComponentChildNodes from "./slottifyComponentChildNodes";
 
 export default function parseChildTemplate(name: string, source: string, status: ParseStatus) {
   const parsed = parse(source);
-  if (parsed.ok && parsed.parts) {
-    parsed.parts.name = name;
+  if (parsed.ok && parsed.template) {
+    parsed.template.name = name;
     status.childTemplates = status.childTemplates || [];
-    status.childTemplates.push(parsed.parts);
+    status.childTemplates.push(parsed.template);
     if (status.template) {
       setChildComponentNodes(name, status.template);
     }

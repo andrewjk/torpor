@@ -11,7 +11,7 @@ test("basic file", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       markup: root([el("div", undefined, undefined, true)]),
     },
   };

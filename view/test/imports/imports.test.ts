@@ -15,7 +15,7 @@ test("imports", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       imports: [
         { name: "*", path: "somewhere", component: false },
         { name: "*", path: "somewhere-else", component: false },

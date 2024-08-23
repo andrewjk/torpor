@@ -20,7 +20,7 @@ test("multi line js comments", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       markup: root([el("section", [], [el("p", [], [text("The content")])])]),
     },
   };

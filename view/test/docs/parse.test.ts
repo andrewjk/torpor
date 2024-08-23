@@ -14,7 +14,7 @@ test("simple docs", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       docs: {
         description: "A header component",
         props: [],
@@ -43,7 +43,7 @@ test("prop docs", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       docs: {
         description: "",
         props: [
@@ -86,7 +86,7 @@ test("slot docs", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       docs: {
         description: "",
         props: [],
@@ -130,7 +130,7 @@ test("all docs", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       docs: {
         description: "A header component",
         props: [

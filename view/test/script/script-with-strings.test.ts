@@ -19,7 +19,7 @@ ${script}
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       script: script.trim(),
     },
   };

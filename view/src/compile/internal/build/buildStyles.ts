@@ -3,16 +3,16 @@ import type Attribute from "../../types/nodes/Attribute";
 import type StyleBlock from "../../types/styles/StyleBlock";
 import Builder from "../Builder";
 
-export default function buildStyles(name: string, parts: ComponentTemplate): string {
+export default function buildStyles(name: string, template: ComponentTemplate): string {
   const b = new Builder();
 
-  if (parts.style && parts.styleHash) {
-    for (let block of parts.style.blocks) {
-      buildStyleBlock(block, b, parts.styleHash);
+  if (template.style && template.styleHash) {
+    for (let block of template.style.blocks) {
+      buildStyleBlock(block, b, template.styleHash);
     }
 
-    if (parts.childComponents) {
-      for (let child of parts.childComponents) {
+    if (template.childComponents) {
+      for (let child of template.childComponents) {
         if (child.style && child.styleHash) {
           for (let block of child.style.blocks) {
             buildStyleBlock(block, b, child.styleHash);

@@ -30,13 +30,13 @@ const importsMap: Record<string, string> = {
   t_cmt: "import t_cmt from '${folder}/render/internal/createComment';",
 };
 
-export default function buildCode(name: string, parts: ComponentTemplate): string {
+export default function buildCode(name: string, template: ComponentTemplate): string {
   let imports = new Set<string>();
   let b = new Builder();
 
-  buildTemplate(name, parts, imports, b);
-  if (parts.childComponents) {
-    for (let child of parts.childComponents) {
+  buildTemplate(name, template, imports, b);
+  if (template.childComponents) {
+    for (let child of template.childComponents) {
       buildTemplate(child.name || "ChildComponent", child, imports, b);
     }
   }
@@ -57,9 +57,14 @@ export default function buildCode(name: string, parts: ComponentTemplate): strin
   );
 }
 
-function buildTemplate(name: string, parts: ComponentTemplate, imports: Set<string>, b: Builder) {
-  if (parts.imports) {
-    for (let i of parts.imports) {
+function buildTemplate(
+  name: string,
+  template: ComponentTemplate,
+  imports: Set<string>,
+  b: Builder,
+) {
+  if (template.imports) {
+    for (let i of template.imports) {
       imports.add(`import ${i.name} from '${i.path}';`);
     }
   }
@@ -77,35 +82,35 @@ function buildTemplate(name: string, parts: ComponentTemplate, imports: Set<stri
       render: ($parent, $anchor, $props, $slots, $context) => {`);
 
   // Redefine $context so that any newly added properties will only be passed to children
-  if (parts.contextProps?.length) {
+  if (template.contextProps?.length) {
     b.append(`$context = Object.assign({}, $context);`);
   }
 
-  if (parts.script) {
-    if (/\$watch\b/.test(parts.script)) imports.add("$watch");
-    if (/\$unwrap\b/.test(parts.script)) imports.add("$unwrap");
-    if (/\$run\b/.test(parts.script)) imports.add("$run");
+  if (template.script) {
+    if (/\$watch\b/.test(template.script)) imports.add("$watch");
+    if (/\$unwrap\b/.test(template.script)) imports.add("$unwrap");
+    if (/\$run\b/.test(template.script)) imports.add("$run");
 
     // TODO: Mangling
     b.append(`
       /* User script */
-      ${parts.script}
+      ${template.script}
     `);
   }
 
-  if (parts.markup) {
+  if (template.markup) {
     const status: BuildStatus = {
       imports,
-      props: parts.props || [],
-      styleHash: parts.styleHash || "",
+      props: template.props || [],
+      styleHash: template.styleHash || "",
       varNames: {},
       fragmentStack: [],
       forVarNames: [],
     };
     b.append("/* User interface */");
-    buildFragmentText(parts.markup, status, b);
+    buildFragmentText(template.markup, status, b);
     b.append("");
-    buildNode(parts.markup, status, b, "$parent", "$anchor", true);
+    buildNode(template.markup, status, b, "$parent", "$anchor", true);
   }
 
   b.append(`}

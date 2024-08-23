@@ -15,7 +15,7 @@ test("simple style", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
       style: {
         global: false,
@@ -47,7 +47,7 @@ test("style with multiple selectors", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       style: {
         global: false,
         blocks: [
@@ -81,7 +81,7 @@ test("style with multiple values", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       style: {
         global: false,
         blocks: [
@@ -120,7 +120,7 @@ test("media query", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       style: {
         global: false,
         blocks: [
@@ -167,7 +167,7 @@ test("comments in style", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       style: {
         global: false,
         blocks: [

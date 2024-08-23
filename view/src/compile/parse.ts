@@ -30,7 +30,7 @@ export default function parse(source: string): ParseResult {
   return {
     ok,
     errors: status.errors,
-    parts: ok
+    template: ok
       ? {
           docs: status.docs,
           imports: status.imports,

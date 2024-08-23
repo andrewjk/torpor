@@ -1,10 +1,8 @@
 import type ComponentTemplate from "../../types/ComponentTemplate";
-import type Import from "../../types/Import";
 import Builder from "../Builder";
-import buildConfig from "../build/buildConfig";
 import buildServerNode from "./buildServerNode";
 
-export default function buildServerCode(name: string, parts: ComponentTemplate): string {
+export default function buildServerCode(name: string, template: ComponentTemplate): string {
   let b = new Builder();
 
   // TODO: Imports
@@ -32,9 +30,9 @@ export default function buildServerCode(name: string, parts: ComponentTemplate):
   }
     */
 
-  buildServerTemplate(name, parts, b);
-  if (parts.childComponents) {
-    for (let child of parts.childComponents) {
+  buildServerTemplate(name, template, b);
+  if (template.childComponents) {
+    for (let child of template.childComponents) {
       buildServerTemplate(child.name || "ChildComponent", child, b);
     }
   }
@@ -46,7 +44,7 @@ export default function buildServerCode(name: string, parts: ComponentTemplate):
   return b.toString();
 }
 
-function buildServerTemplate(name: string, parts: ComponentTemplate, b: Builder) {
+function buildServerTemplate(name: string, template: ComponentTemplate, b: Builder) {
   b.append(`
     const ${name} = {
       name: "${name}",
@@ -58,31 +56,31 @@ function buildServerTemplate(name: string, parts: ComponentTemplate, b: Builder)
       render: ($props, $slots, $context) => {`);
 
   // Redefine $context so that any newly added properties will only be passed to children
-  if (parts.contextProps?.length) {
+  if (template.contextProps?.length) {
     b.append(`$context = Object.assign({}, $context);`);
   }
 
-  if (parts.script) {
+  if (template.script) {
     // TODO: Mangling
     b.append("/* User script */");
     // HACK: Replace these with proper functions
     b.append("const $watch = (obj) => obj;");
     b.append("const $run = (fn) => null;");
-    b.append(parts.script);
+    b.append(template.script);
   }
 
   b.append(`let $output = "";`);
 
-  if (parts.markup) {
+  if (template.markup) {
     const status = {
       output: "",
-      styleHash: parts.styleHash || "",
+      styleHash: template.styleHash || "",
       varNames: {},
     };
     b.append("/* User interface */");
     // HACK: Replace this with imports
     b.append('const t_fmt = (text) => text != null ? text : "";');
-    buildServerNode(parts.markup, status, b);
+    buildServerNode(template.markup, status, b);
     if (status.output) {
       b.append(`$output += \`${status.output}\`;`);
       status.output = "";

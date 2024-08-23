@@ -10,7 +10,7 @@ test("empty file", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {},
+    template: {},
   };
   expect(output).toEqual(expected);
 });

@@ -18,7 +18,7 @@ test("for statement with key", () => {
   const expected: ParseResult = {
     ok: true,
     errors: [],
-    parts: {
+    template: {
       markup: root([
         el(
           "section",
