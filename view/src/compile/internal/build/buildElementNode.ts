@@ -55,7 +55,10 @@ function buildElementAttributes(
     } else if (value.startsWith("{") && value.endsWith("}")) {
       value = value.substring(1, value.length - 1);
 
-      if (name === "bind:group") {
+      if (name === "bind:this") {
+        // Bind the DOM element to a user-defined variable
+        b.append(`${value} = ${varName};`);
+      } else if (name === "bind:group") {
         // Automatically add an event to bind the value
         // TODO: Only tested this with radio buttons
         let eventName = "change";
