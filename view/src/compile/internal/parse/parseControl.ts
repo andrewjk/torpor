@@ -4,7 +4,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import { addError, isSpaceChar } from "./parseUtils";
-import wrangleControl from "./wrangleControl";
+import wrangleControlNode from "./wrangleControlNode";
 
 const controlOperations = [
   "@if",
@@ -60,7 +60,7 @@ export default function parseControl(status: ParseStatus): ControlNode {
       } else {
         // It's some control
         const child = parseControl(status);
-        wrangleControl(child, node);
+        wrangleControlNode(child, node);
       }
     } else {
       // Can't have text content in control blocks

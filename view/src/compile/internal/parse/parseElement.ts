@@ -1,5 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import type TextNode from "../../types/nodes/TextNode";
+import isSpecialNode from "../../types/nodes/isSpecialNode";
 import isTextNode from "../../types/nodes/isTextNode";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
@@ -7,7 +8,8 @@ import parseControl from "./parseControl";
 import parseTag from "./parseTag";
 import { isSpaceChar } from "./parseUtils";
 import slottifyComponentChildNodes from "./slottifyComponentChildNodes";
-import wrangleControl from "./wrangleControl";
+import wrangleControlNode from "./wrangleControlNode";
+import wrangleSpecialNode from "./wrangleSpecialNode";
 
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
 const voidTags = [
@@ -64,7 +66,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
         } else {
           // It's a control statement
           const child = parseControl(status);
-          wrangleControl(child, element);
+          wrangleControlNode(child, element);
         }
         /*
       } else if (char === "}") {
@@ -143,6 +145,10 @@ export default function parseElement(status: ParseStatus): ElementNode {
   ) {
     element.type = "component";
     slottifyComponentChildNodes(element);
+  }
+
+  if (isSpecialNode(element)) {
+    wrangleSpecialNode(element);
   }
 
   return element;

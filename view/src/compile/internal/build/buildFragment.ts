@@ -486,24 +486,24 @@ function declareSpecialFragmentVars(
   varPaths: Map<string, string>,
   declare: boolean,
 ) {
+  if (node.tagName === ":slot") {
+    declareParentAndAnchorFragmentVars(
+      fragment,
+      node,
+      path,
+      status,
+      b,
+      parentName,
+      anchorName,
+      varPaths,
+      "slot",
+      declare,
+    );
+  }
+
   switch (node.tagName) {
-    case ":slot": {
-      declareParentAndAnchorFragmentVars(
-        fragment,
-        node,
-        path,
-        status,
-        b,
-        parentName,
-        anchorName,
-        varPaths,
-        "slot",
-        declare,
-      );
-      break;
-    }
-    case ":fill":
-    case ":fallback": {
+    case ":slot":
+    case ":fill": {
       for (let [i, child] of node.children.entries()) {
         declareFragmentVars(
           fragment,

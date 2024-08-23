@@ -1,4 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import BuildServerStatus from "./BuildServerStatus";
@@ -48,10 +49,11 @@ export default function buildServerSlotNode(
   b.append(`$output += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"});`);
 
   // TODO: Not if there's only a single space node -- maybe check in parse
-  if (node.children.length) {
+  const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");
+  if (fill && isSpecialNode(fill) && fill.children.length) {
     b.append(`} else {`);
 
-    for (let child of node.children) {
+    for (let child of fill.children) {
       buildServerNode(child, status, b);
     }
 

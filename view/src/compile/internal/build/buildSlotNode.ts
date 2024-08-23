@@ -1,4 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
@@ -56,27 +57,23 @@ export default function buildSlotNode(
     `$slots["${slotName}"](${slotParentName}, ${slotAnchorName}, ${slotHasProps ? propsName : "undefined"})`,
   );
 
-  // TODO: Not if there's only a single space node -- maybe check in parse
-  if (node.children.length) {
+  // TODO: Maybe not if there's only a single space node?
+  const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");
+  if (fill && isSpecialNode(fill) && fill.children.length) {
     b.append(`} else {`);
 
-    // HACK: Change the node from :slot to :fill now that we want the content to be created
-    // Otherwise we would just keep infinitely creating anchors
-    // It would probably be better to wrangle a new :fill node under the :slot?
-    node.tagName = ":fill";
-
-    buildFragment(node, status, b, slotParentName, slotAnchorName);
+    buildFragment(fill, status, b, slotParentName, slotAnchorName);
 
     status.fragmentStack.push({
-      fragment: node.fragment,
+      fragment: fill.fragment,
       path: "0:ch/",
     });
-    for (let child of node.children) {
+    for (let child of fill.children) {
       buildNode(child, status, b, slotParentName, slotAnchorName);
     }
     status.fragmentStack.pop();
 
-    addFragment(node, status, b, slotParentName, slotAnchorName);
+    addFragment(fill, status, b, slotParentName, slotAnchorName);
   }
 
   b.append(`}`);

@@ -160,11 +160,8 @@ function buildSpecialFragmentText(
 ) {
   switch (node.tagName) {
     case ":slot": {
+      // Add an anchor for the slot
       currentFragment.text += "<!>";
-
-      // Add a new fragment for default slot content
-      node.fragment = { number: fragments.length, text: "", events: [] };
-      fragments.push(node.fragment);
       for (let child of node.children) {
         buildNodeFragmentText(child, status, fragments, node.fragment);
       }
