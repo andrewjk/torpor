@@ -5,6 +5,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
+import { isSpaceChar } from "./parseUtils";
 import slottifyComponentChildNodes from "./slottifyComponentChildNodes";
 import wrangleControl from "./wrangleControl";
 
@@ -81,12 +82,28 @@ export default function parseElement(status: ParseStatus): ElementNode {
       } else {
         // It's text content
         const start = status.i;
-        const end = Math.min(
-          ...[
-            status.source.indexOf("<", status.i + 1),
-            status.source.indexOf("@", status.i + 1),
-          ].filter((e) => e !== -1),
-        );
+        // It ends at the next element, or at the next control statement
+        // But only if the control statement is after a newline, so we don't
+        // mess with emails etc. This may need more finessing
+        let end = -1;
+        for (let j = status.i + 1; j < status.source.length; j++) {
+          if (status.source[j] === "<") {
+            end = j;
+          } else if (status.source[j] === "@") {
+            // Backtrack
+            for (let k = j - 1; k > status.i; k--) {
+              if (status.source[k] === "\n") {
+                end = j;
+                break;
+              } else if (!isSpaceChar(status.source, k)) {
+                break;
+              }
+            }
+          }
+          if (end !== -1) {
+            break;
+          }
+        }
         if (end !== -1) {
           const content = status.source.substring(start, end).trimEnd();
           const spaceContent = status.source.substring(start + content.length, end);
