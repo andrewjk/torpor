@@ -8,7 +8,6 @@ const ColorSelect = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
     let $state = $watch({
       selectedColorId: 2
     });

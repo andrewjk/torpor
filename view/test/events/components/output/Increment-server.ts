@@ -8,7 +8,6 @@ const Increment = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
     const $state = $watch({ counter: 0 })
 
     function increment(e, num) {

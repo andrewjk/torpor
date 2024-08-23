@@ -64,9 +64,10 @@ function buildServerTemplate(name: string, template: ComponentTemplate, b: Build
     // TODO: Mangling
     b.append("/* User script */");
     // HACK: Replace these with proper functions
+    if (/\$watch\b/.test(template.script)) b.append("const $watch = (obj) => obj;");
+    if (/\$unwrap\b/.test(template.script)) b.append("const $unwrap = (obj) => obj;");
+    if (/\$run\b/.test(template.script)) b.append("const $run = (fn) => null;");
     if (/\$mount\b/.test(template.script)) b.append("const $mount = (fn) => null;");
-    b.append("const $watch = (obj) => obj;");
-    b.append("const $run = (fn) => null;");
     b.append(template.script);
   }
 

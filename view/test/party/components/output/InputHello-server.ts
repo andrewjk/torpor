@@ -8,7 +8,6 @@ const InputHello = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
     let $state = $watch({
       text: "Hello World"
     });

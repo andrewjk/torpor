@@ -8,7 +8,6 @@ const TrafficLight = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
     const TRAFFIC_LIGHTS = ["red", "orange", "green"];
     let $state = $watch({
       lightIndex: 0,

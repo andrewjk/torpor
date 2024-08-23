@@ -7,8 +7,6 @@ const Colors = {
   */
   render: ($props, $slots, $context) => {
     /* User script */
-    const $watch = (obj) => obj;
-    const $run = (fn) => null;
     const colors = ["red", "green", "blue"];
     let $output = "";
     /* User interface */

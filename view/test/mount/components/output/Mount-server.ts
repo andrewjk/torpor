@@ -8,8 +8,6 @@ const Mount = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $mount = (fn) => null;
-    const $watch = (obj) => obj;
-    const $run = (fn) => null;
     let inputElement;
 
     $mount(() => {

@@ -8,7 +8,6 @@ const Name = {
   render: ($props, $slots, $context) => {
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
     let $state = $watch({
       name: "John"
     });

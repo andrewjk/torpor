@@ -9,7 +9,7 @@ const UserProfileContextApp = {
     $context = Object.assign({}, $context);
     /* User script */
     const $watch = (obj) => obj;
-    const $run = (fn) => null;
+    const $unwrap = (obj) => obj;
     const $user = $watch({
       id: 1,
       username: "unicorn42",
