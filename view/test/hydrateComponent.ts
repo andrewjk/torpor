@@ -16,21 +16,21 @@ export default function hydrateComponent(
   const source = fs.readFileSync(componentPath).toString();
   const parsed = parse(source);
   expect(parsed.ok).toBe(true);
-  expect(parsed.parts).not.toBeUndefined();
+  expect(parsed.template).not.toBeUndefined();
 
   const imports = parsed
-    .parts!.imports?.map((imp) => {
+    .template!.imports?.map((imp) => {
       let importPath = path.join(path.dirname(componentPath), imp.path);
       let importSource = fs.readFileSync(importPath).toString();
       let importParsed = parse(importSource);
       expect(importParsed.ok).toBe(true);
-      expect(importParsed.parts).not.toBeUndefined();
-      const importServer = buildServer(imp.name, importParsed.parts!);
+      expect(importParsed.template).not.toBeUndefined();
+      const importServer = buildServer(imp.name, importParsed.template!);
       return importServer.code;
     })
     .join("\n");
 
-  const server = buildServer(component.name, parsed.parts!);
+  const server = buildServer(component.name, parsed.template!);
   const code = `
 const x = {
 render: ($state) => {
@@ -55,7 +55,7 @@ x;`;
   }
   fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
   //fs.writeFileSync(folder.replace(".tera", ".html"), html);
-  const client = build(component.name, parsed.parts!);
+  const client = build(component.name, parsed.template!);
   fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
 
   container.innerHTML = html;

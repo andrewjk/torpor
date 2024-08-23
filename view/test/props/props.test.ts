@@ -12,5 +12,5 @@ test("props", () => {
 `;
   const output = parse(input);
   const expected = ["name", "age", "address"];
-  expect(output.parts?.props).toEqual(expected);
+  expect(output.template?.props).toEqual(expected);
 });

@@ -13,11 +13,11 @@ export default function buildServerCode(name: string, template: ComponentTemplat
   // TODO: De-duplication
   // This is also the same as build, could it be merged
   let imports: Import[] = [];
-  if (parts.imports) {
-    imports = imports.concat(parts.imports);
+  if (template.imports) {
+    imports = imports.concat(template.imports);
   }
-  if (parts.childComponents) {
-    for (let child of parts.childComponents) {
+  if (template.childComponents) {
+    for (let child of template.childComponents) {
       if (child.imports) {
         imports = imports.concat(child.imports);
       }
