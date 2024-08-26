@@ -56,6 +56,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
         styles.set(built.styleHash + ".css", built.styles);
       }
 
+      //printOutput(transformed);
       return transformed;
     } else {
       console.log("\nERRORS\n======");
@@ -76,6 +77,15 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
     }
   },
 });
+
+function printOutput(transformed: string) {
+  console.log(
+    transformed
+      .split("\n")
+      .map((l, i) => `${(i + 1).toString().padEnd(3)} ${l}`)
+      .join("\n"),
+  );
+}
 
 export const unplugin = /* #__PURE__ */ createUnplugin(unpluginFactory);
 
