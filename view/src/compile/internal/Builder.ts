@@ -21,7 +21,7 @@ export default class Builder {
         }
 
         // Add indentation
-        this.#text += " ".repeat(this.#space * 2);
+        this.#text += " ".repeat(Math.max(0, this.#space) * 2);
 
         // Add from text until the next newline or the end of text
         const start = i;
