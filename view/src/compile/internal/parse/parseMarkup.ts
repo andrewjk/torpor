@@ -133,7 +133,9 @@ function extractScriptImports(status: ParseStatus) {
       if (status.script[i] === "\n" || status.script[i] === undefined) {
         const line = status.script.substring(start, i).trim();
         if (line.length) {
-          if (line.startsWith("import ")) {
+          if (line.startsWith("//")) {
+            // TODO: More comment handling
+          } else if (line.startsWith("import ")) {
             status.imports = status.imports || [];
             const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/g;
             const importMatches = line.matchAll(importRegex);
