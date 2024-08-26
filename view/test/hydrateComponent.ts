@@ -7,6 +7,8 @@ import parse from "../src/compile/parse";
 import type Component from "../src/compile/types/Component";
 import hydrate from "../src/render/hydrate";
 
+const debugPrint = false;
+
 export default function hydrateComponent(
   container: HTMLElement,
   componentPath: string,
@@ -18,6 +20,13 @@ export default function hydrateComponent(
   expect(parsed.ok).toBe(true);
   expect(parsed.template).not.toBeUndefined();
 
+  if (debugPrint) {
+    const built = build(component.name, parsed.template!);
+    console.log("=== client");
+    console.log(built.code);
+    console.log("===");
+  }
+
   const imports = parsed
     .template!.imports?.map((imp) => {
       let importPath = path.join(path.dirname(componentPath), imp.path);
@@ -25,6 +34,12 @@ export default function hydrateComponent(
       let importParsed = parse(importSource);
       expect(importParsed.ok).toBe(true);
       expect(importParsed.template).not.toBeUndefined();
+      if (debugPrint) {
+        const importBuilt = build(imp.name, importParsed.template!);
+        console.log("=== client");
+        console.log(importBuilt.code);
+        console.log("===");
+      }
       const importServer = buildServer(imp.name, importParsed.template!);
       return importServer.code;
     })
@@ -43,9 +58,11 @@ return ${component.name}.render($state);
 
 x;`;
   const html = eval(code).render(state).replaceAll(/\s+/g, " ");
-  //console.log("===");
-  //console.log(html);
-  //console.log("===");
+  if (debugPrint) {
+    console.log("=== server html");
+    console.log(html);
+    console.log("===");
+  }
 
   // Write everything to files so we can keep an eye on regressions
   // TODO: Should probably have a script instead
