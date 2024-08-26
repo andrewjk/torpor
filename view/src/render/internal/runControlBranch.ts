@@ -4,32 +4,32 @@ import popRange from "./popRange";
 import pushRangeToParent from "./pushRangeToParent";
 
 export default function runControlBranch(range: Range, index: number, create: () => void) {
-  // Only run the branch if it's not the current branch
-  if (range.index === index) {
-    return;
-  }
+	// Only run the branch if it's not the current branch
+	if (range.index === index) {
+		return;
+	}
 
-  if (range.children?.length) {
-    // Branching ranges have exactly one child
-    clearRange(range.children[0]);
-    range.children.length = 0;
-  }
+	if (range.children?.length) {
+		// Branching ranges have exactly one child
+		clearRange(range.children[0]);
+		range.children.length = 0;
+	}
 
-  const oldRange = pushRangeToParent({
-    startNode: null,
-    endNode: null,
-    parent: null,
-    children: null,
-    index: 0,
-    objectEffects: null,
-    emptyEffects: null,
-  });
+	const oldRange = pushRangeToParent({
+		startNode: null,
+		endNode: null,
+		parent: null,
+		children: null,
+		index: 0,
+		objectEffects: null,
+		emptyEffects: null,
+	});
 
-  // Run the create function
-  create();
+	// Run the create function
+	create();
 
-  popRange(oldRange);
+	popRange(oldRange);
 
-  // Set the index on the branching range
-  range.index = index;
+	// Set the index on the branching range
+	range.index = index;
 }

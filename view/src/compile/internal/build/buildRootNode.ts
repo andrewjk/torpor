@@ -6,20 +6,20 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
 export default function buildRootNode(
-  node: RootNode,
-  status: BuildStatus,
-  b: Builder,
-  parentName: string,
-  anchorName: string,
+	node: RootNode,
+	status: BuildStatus,
+	b: Builder,
+	parentName: string,
+	anchorName: string,
 ) {
-  buildFragment(node, status, b, parentName, anchorName);
+	buildFragment(node, status, b, parentName, anchorName);
 
-  status.fragmentStack.push({
-    fragment: node.fragment,
-    path: "0:ch/",
-  });
-  buildNode(node.children[0], status, b, parentName, anchorName, true);
-  status.fragmentStack.pop();
+	status.fragmentStack.push({
+		fragment: node.fragment,
+		path: "0:ch/",
+	});
+	buildNode(node.children[0], status, b, parentName, anchorName, true);
+	status.fragmentStack.pop();
 
-  addFragment(node, status, b, parentName, anchorName);
+	addFragment(node, status, b, parentName, anchorName);
 }

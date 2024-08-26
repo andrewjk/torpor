@@ -4,5 +4,5 @@ import TextNode from "./TextNode";
 import isTextNode from "./isTextNode";
 
 export default function isSpaceNode(node: Node): node is TextNode {
-  return isTextNode(node) && isSpace(node.content);
+	return isTextNode(node) && isSpace(node.content);
 }

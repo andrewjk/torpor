@@ -6,5 +6,5 @@ import type Cleanup from "../global/types/Cleanup";
  * @param fn The function to run
  */
 export default function $mount(fn: () => Cleanup | void) {
-  context.mountedFunctions.push(fn);
+	context.mountedFunctions.push(fn);
 }

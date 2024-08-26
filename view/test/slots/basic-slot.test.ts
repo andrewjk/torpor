@@ -6,21 +6,21 @@ import mountComponent from "../mountComponent";
 import Component from "./components/Basic.tera";
 
 test("basic slot -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("basic slot -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/slots/components/Basic.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/slots/components/Basic.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "Basic stuff")).toBeInTheDocument();
-  expect(queryByText(container, "Default header...")).toBeNull();
+	expect(queryByText(container, "Basic stuff")).toBeInTheDocument();
+	expect(queryByText(container, "Default header...")).toBeNull();
 }

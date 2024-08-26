@@ -1,6 +1,6 @@
 export default interface ArrayState {
-  items: {
-    id: number;
-    text: string;
-  }[];
+	items: {
+		id: number;
+		text: string;
+	}[];
 }

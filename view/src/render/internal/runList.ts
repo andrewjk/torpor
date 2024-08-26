@@ -12,39 +12,39 @@ import runListItems from "./runListItems";
  * @param create A function that creates the control statement's branches
  */
 export default function runList(
-  range: Range,
-  parent: ParentNode,
-  anchor: Node | null,
-  buildItems: () => ListItem[],
-  create: (item: ListItem, anchor: Node | null) => void,
+	range: Range,
+	parent: ParentNode,
+	anchor: Node | null,
+	buildItems: () => ListItem[],
+	create: (item: ListItem, anchor: Node | null) => void,
 ) {
-  const oldRange = pushRangeToParent(range);
+	const oldRange = pushRangeToParent(range);
 
-  let listItems: ListItem[] = [];
+	let listItems: ListItem[] = [];
 
-  // Run the list in an effect
-  $run(function runList() {
-    // Push and pop the control statement on subsequent runs, so that new item
-    // ranges will be added to its children
-    const oldBranchRange = pushRange(range);
+	// Run the list in an effect
+	$run(function runList() {
+		// Push and pop the control statement on subsequent runs, so that new item
+		// ranges will be added to its children
+		const oldBranchRange = pushRange(range);
 
-    // Build the array of items with keys and data
-    const newItems = buildItems();
+		// Build the array of items with keys and data
+		const newItems = buildItems();
 
-    // Run the function that updates the list's items
-    runListItems(parent, anchor, listItems, newItems, create);
+		// Run the function that updates the list's items
+		runListItems(parent, anchor, listItems, newItems, create);
 
-    listItems = newItems;
+		listItems = newItems;
 
-    popRange(oldBranchRange);
-  });
+		popRange(oldBranchRange);
+	});
 
-  // If we're mounting, the anchor will be the one that is passed in, but if
-  // we're hydrating it will be after the items' HTML elements, so we need to
-  // update it after all of the items have been hydrated
-  if (context.hydrationNode) {
-    anchor = context.hydrationNode.nextSibling;
-  }
+	// If we're mounting, the anchor will be the one that is passed in, but if
+	// we're hydrating it will be after the items' HTML elements, so we need to
+	// update it after all of the items have been hydrated
+	if (context.hydrationNode) {
+		anchor = context.hydrationNode.nextSibling;
+	}
 
-  popRange(oldRange);
+	popRange(oldRange);
 }

@@ -4,7 +4,7 @@ import ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("one line js comments", () => {
-  const input = `
+	const input = `
 <section>
   @// A comment at the top
   <p>
@@ -13,13 +13,13 @@ test("one line js comments", () => {
 </section>
 `;
 
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      markup: root([el("section", [], [el("p", [], [text("The content")])])]),
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			markup: root([el("section", [], [el("p", [], [text("The content")])])]),
+		},
+	};
+	expect(output).toEqual(expected);
 });

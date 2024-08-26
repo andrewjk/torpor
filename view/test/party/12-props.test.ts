@@ -6,25 +6,25 @@ import mountComponent from "../mountComponent";
 import Component from "./components/UserProfileApp.tera";
 
 test("props -- mounted", () => {
-  document.title = "Document Title";
+	document.title = "Document Title";
 
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("props -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/UserProfileApp.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/UserProfileApp.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "My name is John!")).toBeInTheDocument();
-  expect(queryByText(container, "My age is 20!")).toBeInTheDocument();
-  expect(queryByText(container, "My favourite colors are green, blue, red!")).toBeInTheDocument();
-  expect(queryByText(container, "I am available")).toBeInTheDocument();
+	expect(queryByText(container, "My name is John!")).toBeInTheDocument();
+	expect(queryByText(container, "My age is 20!")).toBeInTheDocument();
+	expect(queryByText(container, "My favourite colors are green, blue, red!")).toBeInTheDocument();
+	expect(queryByText(container, "I am available")).toBeInTheDocument();
 }

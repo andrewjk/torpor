@@ -33,11 +33,11 @@ npm i unplugin-starter
 import Starter from "unplugin-starter/vite";
 
 export default defineConfig({
-  plugins: [
-    Starter({
-      /* options */
-    }),
-  ],
+	plugins: [
+		Starter({
+			/* options */
+		}),
+	],
 });
 ```
 
@@ -53,11 +53,11 @@ Example: [`playground/`](./playground/)
 import Starter from "unplugin-starter/rollup";
 
 export default {
-  plugins: [
-    Starter({
-      /* options */
-    }),
-  ],
+	plugins: [
+		Starter({
+			/* options */
+		}),
+	],
 };
 ```
 
@@ -69,12 +69,12 @@ export default {
 ```ts
 // webpack.config.js
 module.exports = {
-  /* ... */
-  plugins: [
-    require("unplugin-starter/webpack")({
-      /* options */
-    }),
-  ],
+	/* ... */
+	plugins: [
+		require("unplugin-starter/webpack")({
+			/* options */
+		}),
+	],
 };
 ```
 
@@ -86,14 +86,14 @@ module.exports = {
 ```ts
 // nuxt.config.js
 export default defineNuxtConfig({
-  modules: [
-    [
-      "unplugin-starter/nuxt",
-      {
-        /* options */
-      },
-    ],
-  ],
+	modules: [
+		[
+			"unplugin-starter/nuxt",
+			{
+				/* options */
+			},
+		],
+	],
 });
 ```
 
@@ -107,13 +107,13 @@ export default defineNuxtConfig({
 ```ts
 // vue.config.js
 module.exports = {
-  configureWebpack: {
-    plugins: [
-      require("unplugin-starter/webpack")({
-        /* options */
-      }),
-    ],
-  },
+	configureWebpack: {
+		plugins: [
+			require("unplugin-starter/webpack")({
+				/* options */
+			}),
+		],
+	},
 };
 ```
 
@@ -128,7 +128,7 @@ import { build } from "esbuild";
 import Starter from "unplugin-starter/esbuild";
 
 build({
-  plugins: [Starter()],
+	plugins: [Starter()],
 });
 ```
 

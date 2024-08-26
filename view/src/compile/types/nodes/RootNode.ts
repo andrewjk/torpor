@@ -4,9 +4,9 @@ import OperationType from "./OperationType";
 import ParentNode from "./ParentNode";
 
 export default interface RootNode extends ParentNode {
-  type: "root";
-  children: Node[];
+	type: "root";
+	children: Node[];
 
-  // This gets set when building
-  fragment?: Fragment;
+	// This gets set when building
+	fragment?: Fragment;
 }

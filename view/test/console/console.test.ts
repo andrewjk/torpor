@@ -5,17 +5,17 @@ import mountComponent from "../mountComponent";
 import Component from "./components/Console.tera";
 
 describe("console", () => {
-  const consoleMock = vi.spyOn(console, "log").mockImplementation(() => undefined);
+	const consoleMock = vi.spyOn(console, "log").mockImplementation(() => undefined);
 
-  afterAll(() => {
-    consoleMock.mockReset();
-  });
+	afterAll(() => {
+		consoleMock.mockReset();
+	});
 
-  test("console", () => {
-    const container = document.createElement("div");
-    mountComponent(container, Component);
+	test("console", () => {
+		const container = document.createElement("div");
+		mountComponent(container, Component);
 
-    //expect(consoleMock).toHaveBeenCalledOnce();
-    expect(consoleMock).toHaveBeenCalledWith("@console is logging here");
-  });
+		//expect(consoleMock).toHaveBeenCalledOnce();
+		expect(consoleMock).toHaveBeenCalledWith("@console is logging here");
+	});
 });

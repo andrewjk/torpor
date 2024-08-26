@@ -6,20 +6,20 @@ import mountComponent from "../mountComponent";
 import Component from "./components/Const.tera";
 
 test("const -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("const -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/const/components/Const.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/const/components/Const.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "Hello, Boris!")).toBeInTheDocument();
+	expect(queryByText(container, "Hello, Boris!")).toBeInTheDocument();
 }

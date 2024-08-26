@@ -10,10 +10,10 @@ import type ComponentTemplate from "./types/ComponentTemplate";
  * @returns the component's code and styles
  */
 export default function buildServer(name: string, template: ComponentTemplate): BuildResult {
-  const result: BuildResult = {
-    code: buildServerCode(name, template),
-    styles: template.style ? buildStyles(name, template) : undefined,
-    styleHash: template.styleHash,
-  };
-  return result;
+	const result: BuildResult = {
+		code: buildServerCode(name, template),
+		styles: template.style ? buildStyles(name, template) : undefined,
+		styleHash: template.styleHash,
+	};
+	return result;
 }

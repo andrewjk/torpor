@@ -6,20 +6,20 @@ import mountComponent from "../mountComponent";
 import Component from "./components/Unused.tera";
 
 test("unused slot -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("unused slot -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/slots/components/Unused.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/slots/components/Unused.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "Default header...")).toBeInTheDocument();
+	expect(queryByText(container, "Default header...")).toBeInTheDocument();
 }

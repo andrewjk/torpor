@@ -6,47 +6,47 @@ import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerSwitchNode(
-  node: ControlNode,
-  status: BuildServerStatus,
-  b: Builder,
+	node: ControlNode,
+	status: BuildServerStatus,
+	b: Builder,
 ) {
-  // Surround the entire control statement with bracketed comments, so that we
-  // can skip to the end to set the anchor node when hydrating
-  status.output += HYDRATION_START_COMMENT;
+	// Surround the entire control statement with bracketed comments, so that we
+	// can skip to the end to set the anchor node when hydrating
+	status.output += HYDRATION_START_COMMENT;
 
-  if (status.output) {
-    b.append(`$output += \`${status.output}\`;`);
-    status.output = "";
-  }
+	if (status.output) {
+		b.append(`$output += \`${status.output}\`;`);
+		status.output = "";
+	}
 
-  // Build the switch statement
-  b.append(`${node.statement} {`);
-  for (let [i, branch] of node.children.filter((c) => isControlNode(c)).entries()) {
-    if (isControlNode(branch)) {
-      buildServerSwitchBranch(branch, status, b);
-    }
-  }
-  b.append("}");
+	// Build the switch statement
+	b.append(`${node.statement} {`);
+	for (let [i, branch] of node.children.filter((c) => isControlNode(c)).entries()) {
+		if (isControlNode(branch)) {
+			buildServerSwitchBranch(branch, status, b);
+		}
+	}
+	b.append("}");
 
-  // End the control statement
-  status.output += HYDRATION_END_COMMENT;
+	// End the control statement
+	status.output += HYDRATION_END_COMMENT;
 
-  // Add the anchor node
-  status.output += ANCHOR_COMMENT;
+	// Add the anchor node
+	status.output += ANCHOR_COMMENT;
 }
 
 function buildServerSwitchBranch(node: ControlNode, status: BuildServerStatus, b: Builder) {
-  b.append(`${node.statement} {`);
+	b.append(`${node.statement} {`);
 
-  for (let child of node.children) {
-    buildServerNode(child, status, b);
-  }
+	for (let child of node.children) {
+		buildServerNode(child, status, b);
+	}
 
-  if (status.output) {
-    b.append(`$output += \`${status.output}\`;`);
-    status.output = "";
-  }
+	if (status.output) {
+		b.append(`$output += \`${status.output}\`;`);
+		status.output = "";
+	}
 
-  b.append("break;");
-  b.append("}");
+	b.append("break;");
+	b.append("}");
 }

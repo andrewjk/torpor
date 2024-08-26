@@ -6,21 +6,21 @@ import mountComponent from "../mountComponent";
 import Component from "./components/CssStyle.tera";
 
 test("minimal template -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("minimal template -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/CssStyle.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/CssStyle.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "I am red")).toHaveClass("title");
-  expect(queryByText(container, "I am a button")).toHaveStyle("font-size: 10rem");
+	expect(queryByText(container, "I am red")).toHaveClass("title");
+	expect(queryByText(container, "I am a button")).toHaveStyle("font-size: 10rem");
 }

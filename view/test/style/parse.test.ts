@@ -4,72 +4,72 @@ import ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
-  const input = `
+	const input = `
 <h1>Hi</h1>
 
 <style>
   h1 { color: blue; }
 </style>
 `;
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
-      style: {
-        global: false,
-        blocks: [
-          {
-            selector: "h1",
-            attributes: [
-              {
-                name: "color",
-                value: "blue",
-              },
-            ],
-            children: [],
-          },
-        ],
-      },
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
+			style: {
+				global: false,
+				blocks: [
+					{
+						selector: "h1",
+						attributes: [
+							{
+								name: "color",
+								value: "blue",
+							},
+						],
+						children: [],
+					},
+				],
+			},
+		},
+	};
+	expect(output).toEqual(expected);
 });
 
 test("style with multiple selectors", () => {
-  const input = `
+	const input = `
 <style>
 .h1, p { color: blue; }
 </style>
 `;
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      style: {
-        global: false,
-        blocks: [
-          {
-            selector: ".h1, p",
-            attributes: [
-              {
-                name: "color",
-                value: "blue",
-              },
-            ],
-            children: [],
-          },
-        ],
-      },
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			style: {
+				global: false,
+				blocks: [
+					{
+						selector: ".h1, p",
+						attributes: [
+							{
+								name: "color",
+								value: "blue",
+							},
+						],
+						children: [],
+					},
+				],
+			},
+		},
+	};
+	expect(output).toEqual(expected);
 });
 
 test("style with multiple values", () => {
-  const input = `
+	const input = `
 <style>
 .h1, p {
   color: blue;
@@ -77,37 +77,37 @@ test("style with multiple values", () => {
 }
 </style>
 `;
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      style: {
-        global: false,
-        blocks: [
-          {
-            selector: ".h1, p",
-            attributes: [
-              {
-                name: "color",
-                value: "blue",
-              },
-              {
-                name: "background-color",
-                value: "green",
-              },
-            ],
-            children: [],
-          },
-        ],
-      },
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			style: {
+				global: false,
+				blocks: [
+					{
+						selector: ".h1, p",
+						attributes: [
+							{
+								name: "color",
+								value: "blue",
+							},
+							{
+								name: "background-color",
+								value: "green",
+							},
+						],
+						children: [],
+					},
+				],
+			},
+		},
+	};
+	expect(output).toEqual(expected);
 });
 
 test("media query", () => {
-  const input = `
+	const input = `
 <style>
 @media screen and (min-width: 480px) {
   button {
@@ -116,39 +116,39 @@ test("media query", () => {
 }
 </style>
 `;
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      style: {
-        global: false,
-        blocks: [
-          {
-            selector: "@media screen and (min-width: 480px)",
-            attributes: [],
-            children: [
-              {
-                selector: "button",
-                attributes: [
-                  {
-                    name: "color",
-                    value: "green",
-                  },
-                ],
-                children: [],
-              },
-            ],
-          },
-        ],
-      },
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			style: {
+				global: false,
+				blocks: [
+					{
+						selector: "@media screen and (min-width: 480px)",
+						attributes: [],
+						children: [
+							{
+								selector: "button",
+								attributes: [
+									{
+										name: "color",
+										value: "green",
+									},
+								],
+								children: [],
+							},
+						],
+					},
+				],
+			},
+		},
+	};
+	expect(output).toEqual(expected);
 });
 
 test("comments in style", () => {
-  const input = `
+	const input = `
 <style>
   /*
   p {
@@ -163,27 +163,27 @@ test("comments in style", () => {
   //}
 </style>
 `;
-  const output = trimParsed(parse(input));
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      style: {
-        global: false,
-        blocks: [
-          {
-            selector: "button",
-            attributes: [
-              {
-                name: "color",
-                value: "green",
-              },
-            ],
-            children: [],
-          },
-        ],
-      },
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			style: {
+				global: false,
+				blocks: [
+					{
+						selector: "button",
+						attributes: [
+							{
+								name: "color",
+								value: "green",
+							},
+						],
+						children: [],
+					},
+				],
+			},
+		},
+	};
+	expect(output).toEqual(expected);
 });

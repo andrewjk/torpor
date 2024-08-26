@@ -7,5 +7,5 @@ import "./style.css";
 
 const root = document.getElementById("tera-container");
 if (root) {
-  mount(root, Index);
+	mount(root, Index);
 }

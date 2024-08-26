@@ -1,5 +1,5 @@
 export default interface Import {
-  name: string;
-  path: string;
-  component: boolean;
+	name: string;
+	path: string;
+	component: boolean;
 }

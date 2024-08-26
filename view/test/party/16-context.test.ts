@@ -7,29 +7,29 @@ import mountComponent from "../mountComponent";
 import Component from "./components/UserProfileContextApp.tera";
 
 test("context -- mounted", async () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  await check(container);
+	await check(container);
 });
 
 test("context -- hydrated", async () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/UserProfileContextApp.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/UserProfileContextApp.tera";
+	hydrateComponent(container, path, Component);
 
-  await check(container);
+	await check(container);
 });
 
 async function check(container: HTMLElement) {
-  const user = userEvent.setup();
-  const button = container.getElementsByTagName("button")[0];
+	const user = userEvent.setup();
+	const button = container.getElementsByTagName("button")[0];
 
-  expect(queryByText(container, "Welcome back, unicorn42")).toBeInTheDocument();
-  expect(queryByText(container, "Username: unicorn42")).toBeInTheDocument();
+	expect(queryByText(container, "Welcome back, unicorn42")).toBeInTheDocument();
+	expect(queryByText(container, "Username: unicorn42")).toBeInTheDocument();
 
-  await user.click(button);
+	await user.click(button);
 
-  expect(queryByText(container, "Welcome back, Jane")).toBeInTheDocument();
-  expect(queryByText(container, "Username: Jane")).toBeInTheDocument();
+	expect(queryByText(container, "Welcome back, Jane")).toBeInTheDocument();
+	expect(queryByText(container, "Username: Jane")).toBeInTheDocument();
 }

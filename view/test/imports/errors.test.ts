@@ -4,7 +4,7 @@ import parse from "../../src/compile/parse";
 // TODO:
 
 test("imports after code", () => {
-  /*
+	/*
   const input = `
 <div/>
 <div/>

@@ -2,30 +2,30 @@ import hash from "../compile/internal/hash";
 import context from "../global/context";
 
 export default function printContext(message?: string) {
-  const print: any = {};
-  const effectsMap = new Map<string, string>();
+	const print: any = {};
+	const effectsMap = new Map<string, string>();
 
-  print.objectEffects = [];
-  for (let [target, propEffects] of context.objectEffects.entries()) {
-    let effectTarget = { target: JSON.stringify(target), props: [] } as any;
-    for (let [prop, effects] of propEffects.entries()) {
-      let effectProp = { prop, effects: [] } as any;
-      effectTarget.props.push(effectProp);
-      for (let x of effects) {
-        let runText = String(x.run);
-        let runName = runText.substring("function ".length, runText.indexOf("{") - 1).trim();
-        let cleanupText = String(x.cleanup);
-        effectProp.effects.push({
-          effect: `${runName} => ${hash(runText)}`,
-          cleanup: cleanupText,
-        });
-        effectsMap.set(hash(String(x.run)), String(x.run));
-      }
-    }
-    print.objectEffects.push(effectTarget);
-  }
+	print.objectEffects = [];
+	for (let [target, propEffects] of context.objectEffects.entries()) {
+		let effectTarget = { target: JSON.stringify(target), props: [] } as any;
+		for (let [prop, effects] of propEffects.entries()) {
+			let effectProp = { prop, effects: [] } as any;
+			effectTarget.props.push(effectProp);
+			for (let x of effects) {
+				let runText = String(x.run);
+				let runName = runText.substring("function ".length, runText.indexOf("{") - 1).trim();
+				let cleanupText = String(x.cleanup);
+				effectProp.effects.push({
+					effect: `${runName} => ${hash(runText)}`,
+					cleanup: cleanupText,
+				});
+				effectsMap.set(hash(String(x.run)), String(x.run));
+			}
+		}
+		print.objectEffects.push(effectTarget);
+	}
 
-  /*
+	/*
   print.rangeEffects = [];
   for (let [range, effect] of context.rangeEffects.entries()) {
     if (effect.size) {
@@ -52,7 +52,7 @@ export default function printContext(message?: string) {
     }
   }
   */
-  /*
+	/*
   print.rangeEffects = [];
   for (let [range, effect] of context.rangeEffects.entries()) {
     if (effect.size) {
@@ -76,14 +76,14 @@ export default function printContext(message?: string) {
   }
   */
 
-  //print.effects = [];
-  //for (let [hash, value] of effectsMap.entries()) {
-  //  print.effects.push({ hash, value });
-  //}
+	//print.effects = [];
+	//for (let [hash, value] of effectsMap.entries()) {
+	//  print.effects.push({ hash, value });
+	//}
 
-  if (message) {
-    console.log(message);
-  }
-  console.log(print);
-  console.dir(print, { depth: null });
+	if (message) {
+		console.log(message);
+	}
+	console.log(print);
+	console.dir(print, { depth: null });
 }

@@ -1,3 +1,3 @@
 export interface Options {
-  // define your plugin options here
+	// define your plugin options here
 }

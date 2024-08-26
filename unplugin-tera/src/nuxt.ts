@@ -7,17 +7,17 @@ import webpack from "./webpack";
 export interface ModuleOptions extends Options {}
 
 export default defineNuxtModule<ModuleOptions>({
-  meta: {
-    name: "nuxt-unplugin-tera",
-    configKey: "unpluginStarter",
-  },
-  defaults: {
-    // ...default options
-  },
-  setup(options, _nuxt) {
-    addVitePlugin(() => vite(options));
-    addWebpackPlugin(() => webpack(options));
+	meta: {
+		name: "nuxt-unplugin-tera",
+		configKey: "unpluginStarter",
+	},
+	defaults: {
+		// ...default options
+	},
+	setup(options, _nuxt) {
+		addVitePlugin(() => vite(options));
+		addWebpackPlugin(() => webpack(options));
 
-    // ...
-  },
+		// ...
+	},
 });

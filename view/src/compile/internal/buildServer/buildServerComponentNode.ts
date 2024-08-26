@@ -8,40 +8,40 @@ import buildServerNode from "./buildServerNode";
 import { nextVarName } from "./buildServerUtils";
 
 export default function buildServerComponentNode(
-  node: ElementNode,
-  status: BuildServerStatus,
-  b: Builder,
+	node: ElementNode,
+	status: BuildServerStatus,
+	b: Builder,
 ) {
-  if (status.output) {
-    b.append(`$output += \`${status.output}\`;`);
-    status.output = "";
-  }
+	if (status.output) {
+		b.append(`$output += \`${status.output}\`;`);
+		status.output = "";
+	}
 
-  // Props
-  const componentHasProps = node.attributes.length; // || root;
-  const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
-  if (componentHasProps) {
-    // TODO: defaults etc props
-    b.append(`const ${propsName} = {};`);
-    for (let { name, value } of node.attributes) {
-      if (name.startsWith("{") && name.endsWith("}")) {
-        name = name.substring(1, name.length - 1);
-        b.append(`${propsName}["${name}"] = ${name}`);
-      } else {
-        let reactive = value.startsWith("{") && value.endsWith("}");
-        if (reactive) {
-          value = value.substring(1, value.length - 1);
-        }
-        if (name === "class") {
-          // TODO: How to handle dynamic classes etc
-          // Probably just compile down to a string?
-          b.append(`"${trimQuotes(value)} tera-${status.styleHash}"`);
-        }
-        b.append(`${propsName}["${name}"] = ${value || "true"};`);
-      }
-    }
-    // NOTE: Not sure if this is needed
-    /*
+	// Props
+	const componentHasProps = node.attributes.length; // || root;
+	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
+	if (componentHasProps) {
+		// TODO: defaults etc props
+		b.append(`const ${propsName} = {};`);
+		for (let { name, value } of node.attributes) {
+			if (name.startsWith("{") && name.endsWith("}")) {
+				name = name.substring(1, name.length - 1);
+				b.append(`${propsName}["${name}"] = ${name}`);
+			} else {
+				let reactive = value.startsWith("{") && value.endsWith("}");
+				if (reactive) {
+					value = value.substring(1, value.length - 1);
+				}
+				if (name === "class") {
+					// TODO: How to handle dynamic classes etc
+					// Probably just compile down to a string?
+					b.append(`"${trimQuotes(value)} tera-${status.styleHash}"`);
+				}
+				b.append(`${propsName}["${name}"] = ${value || "true"};`);
+			}
+		}
+		// NOTE: Not sure if this is needed
+		/*
     if (root) {
       b.append(`
         if ($props) {
@@ -54,36 +54,36 @@ export default function buildServerComponentNode(
         }`);
     }
     */
-  }
+	}
 
-  // Slots
-  const componentHasSlots = node.children.length;
-  const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
-  if (componentHasSlots) {
-    b.append(`const ${slotsName} = {};`);
-    for (let slot of node.children) {
-      if (isSpecialNode(slot)) {
-        const nameAttribute = slot.attributes.find((a) => a.name === "name");
-        const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
-        b.append(`${slotsName}["${slotName}"] = ($sprops) => {`);
-        b.append(`let $output = "";`);
+	// Slots
+	const componentHasSlots = node.children.length;
+	const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
+	if (componentHasSlots) {
+		b.append(`const ${slotsName} = {};`);
+		for (let slot of node.children) {
+			if (isSpecialNode(slot)) {
+				const nameAttribute = slot.attributes.find((a) => a.name === "name");
+				const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
+				b.append(`${slotsName}["${slotName}"] = ($sprops) => {`);
+				b.append(`let $output = "";`);
 
-        for (let child of slot.children) {
-          buildServerNode(child, status, b);
-        }
+				for (let child of slot.children) {
+					buildServerNode(child, status, b);
+				}
 
-        if (status.output) {
-          b.append(`$output += \`${status.output}\`;`);
-          status.output = "";
-        }
+				if (status.output) {
+					b.append(`$output += \`${status.output}\`;`);
+					status.output = "";
+				}
 
-        b.append("return $output;");
-        b.append(`}`);
-      }
-    }
-  }
+				b.append("return $output;");
+				b.append(`}`);
+			}
+		}
+	}
 
-  // Render the component
-  b.append(`
+	// Render the component
+	b.append(`
     $output += ${node.tagName}.render(${propsName}, ${slotsName}, $context)`);
 }

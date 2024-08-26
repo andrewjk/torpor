@@ -7,37 +7,37 @@ import mountComponent from "../mountComponent";
 import Component from "./components/TrafficLight.tera";
 
 test("conditional -- mounted", async () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  await check(container);
+	await check(container);
 });
 
 test("conditional -- hydrated", async () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/TrafficLight.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/TrafficLight.tera";
+	hydrateComponent(container, path, Component);
 
-  await check(container);
+	await check(container);
 });
 
 async function check(container: HTMLElement) {
-  const user = userEvent.setup();
+	const user = userEvent.setup();
 
-  expect(queryByText(container, "STOP")).toBeInTheDocument();
-  expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
-  expect(queryByText(container, "GO")).not.toBeInTheDocument();
+	expect(queryByText(container, "STOP")).toBeInTheDocument();
+	expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
+	expect(queryByText(container, "GO")).not.toBeInTheDocument();
 
-  const button = container.getElementsByTagName("button")[0];
-  await user.click(button);
+	const button = container.getElementsByTagName("button")[0];
+	await user.click(button);
 
-  expect(queryByText(container, "STOP")).not.toBeInTheDocument();
-  expect(queryByText(container, "SLOW DOWN")).toBeInTheDocument();
-  expect(queryByText(container, "GO")).not.toBeInTheDocument();
+	expect(queryByText(container, "STOP")).not.toBeInTheDocument();
+	expect(queryByText(container, "SLOW DOWN")).toBeInTheDocument();
+	expect(queryByText(container, "GO")).not.toBeInTheDocument();
 
-  await user.click(button);
+	await user.click(button);
 
-  expect(queryByText(container, "STOP")).not.toBeInTheDocument();
-  expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
-  expect(queryByText(container, "GO")).toBeInTheDocument();
+	expect(queryByText(container, "STOP")).not.toBeInTheDocument();
+	expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
+	expect(queryByText(container, "GO")).toBeInTheDocument();
 }

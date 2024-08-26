@@ -6,22 +6,22 @@ import mountComponent from "../mountComponent";
 import Component from "./components/PageTitle.tera";
 
 test("on mount -- mounted", () => {
-  document.title = "Document Title";
+	document.title = "Document Title";
 
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("on mount -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/PageTitle.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/PageTitle.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "Page title: Document Title")).toBeInTheDocument();
+	expect(queryByText(container, "Page title: Document Title")).toBeInTheDocument();
 }

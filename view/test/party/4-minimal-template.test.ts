@@ -6,20 +6,20 @@ import mountComponent from "../mountComponent";
 import Component from "./components/HelloWorld.tera";
 
 test("minimal template -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("minimal template -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/HelloWorld.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/HelloWorld.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "Hello world")).toBeInTheDocument();
+	expect(queryByText(container, "Hello world")).toBeInTheDocument();
 }

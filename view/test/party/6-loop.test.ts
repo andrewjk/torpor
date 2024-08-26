@@ -6,22 +6,22 @@ import mountComponent from "../mountComponent";
 import Component from "./components/Colors.tera";
 
 test("loop -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("loop -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/Colors.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/Colors.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "red")).toBeInTheDocument();
-  expect(queryByText(container, "green")).toBeInTheDocument();
-  expect(queryByText(container, "blue")).toBeInTheDocument();
+	expect(queryByText(container, "red")).toBeInTheDocument();
+	expect(queryByText(container, "green")).toBeInTheDocument();
+	expect(queryByText(container, "blue")).toBeInTheDocument();
 }

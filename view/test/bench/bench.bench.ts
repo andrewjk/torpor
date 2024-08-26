@@ -12,26 +12,26 @@ document.body.appendChild(div);
 render(div, Bench);
 
 bench("bench", async () => {
-  const createButton = document.getElementById("create")!;
-  const createLotsButton = document.getElementById("createlots")!;
-  const appendButton = document.getElementById("append")!;
-  const updateButton = document.getElementById("update")!;
-  const swapButton = document.getElementById("swaprows")!;
-  const clearButton = document.getElementById("clear")!;
+	const createButton = document.getElementById("create")!;
+	const createLotsButton = document.getElementById("createlots")!;
+	const appendButton = document.getElementById("append")!;
+	const updateButton = document.getElementById("update")!;
+	const swapButton = document.getElementById("swaprows")!;
+	const clearButton = document.getElementById("clear")!;
 
-  try {
-    // Press a bunch of buttons
-    await user.click(createButton);
-    await user.click(appendButton);
-    await user.click(updateButton);
-    await user.click(swapButton);
-    await user.click(clearButton);
-  } catch {
-    console.log("ERROR");
-  }
+	try {
+		// Press a bunch of buttons
+		await user.click(createButton);
+		await user.click(appendButton);
+		await user.click(updateButton);
+		await user.click(swapButton);
+		await user.click(clearButton);
+	} catch {
+		console.log("ERROR");
+	}
 });
 
 const ev = new MouseEvent("click");
 function click(button: HTMLElement) {
-  fireEvent(button, ev);
+	fireEvent(button, ev);
 }

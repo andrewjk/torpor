@@ -7,22 +7,22 @@ import mountComponent from "../mountComponent";
 import Component from "./components/InputFocused.tera";
 
 test("dom ref -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("dom ref -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/InputFocused.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/InputFocused.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 async function check(container: HTMLElement) {
-  const input = container.getElementsByTagName("input")[0];
+	const input = container.getElementsByTagName("input")[0];
 
-  expect(input.value).toBe("hi");
+	expect(input.value).toBe("hi");
 }

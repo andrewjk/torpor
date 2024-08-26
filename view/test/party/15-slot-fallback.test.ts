@@ -6,20 +6,20 @@ import mountComponent from "../mountComponent";
 import Component from "./components/FunnyButtonApp.tera";
 
 test("slot fallback -- mounted", () => {
-  const container = document.createElement("div");
-  mountComponent(container, Component);
+	const container = document.createElement("div");
+	mountComponent(container, Component);
 
-  check(container);
+	check(container);
 });
 
 test("slot fallback -- hydrated", () => {
-  const container = document.createElement("div");
-  const path = "./test/party/components/FunnyButtonApp.tera";
-  hydrateComponent(container, path, Component);
+	const container = document.createElement("div");
+	const path = "./test/party/components/FunnyButtonApp.tera";
+	hydrateComponent(container, path, Component);
 
-  check(container);
+	check(container);
 });
 
 function check(container: HTMLElement) {
-  expect(queryByText(container, "No content found")).toBeInTheDocument();
+	expect(queryByText(container, "No content found")).toBeInTheDocument();
 }

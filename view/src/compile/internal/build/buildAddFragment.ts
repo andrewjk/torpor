@@ -5,24 +5,24 @@ import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
 
 export default function buildAddFragment(
-  node: RootNode | ControlNode | ElementNode,
-  status: BuildStatus,
-  b: Builder,
-  parentName: string,
-  anchorName: string,
+	node: RootNode | ControlNode | ElementNode,
+	status: BuildStatus,
+	b: Builder,
+	parentName: string,
+	anchorName: string,
 ) {
-  if (node.fragment) {
-    const fragment = node.fragment;
-    const fragmentName = `t_fragment_${fragment.number}`;
-    status.imports.add("t_add_fragment");
-    b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
-    // TODO: Don't need to do this if the last thing we hydrated was the end node
-    if (fragment.endVarName) {
-      status.imports.add("t_next");
-      b.append(`t_next(${fragment.endVarName});`);
-    }
-    for (let ev of fragment.events) {
-      b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
-    }
-  }
+	if (node.fragment) {
+		const fragment = node.fragment;
+		const fragmentName = `t_fragment_${fragment.number}`;
+		status.imports.add("t_add_fragment");
+		b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
+		// TODO: Don't need to do this if the last thing we hydrated was the end node
+		if (fragment.endVarName) {
+			status.imports.add("t_next");
+			b.append(`t_next(${fragment.endVarName});`);
+		}
+		for (let ev of fragment.events) {
+			b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
+		}
+	}
 }

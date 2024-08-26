@@ -13,46 +13,46 @@ import buildSpecialNode from "./buildSpecialNode";
 import buildTextNode from "./buildTextNode";
 
 export default function buildNode(
-  node: Node,
-  status: BuildStatus,
-  b: Builder,
-  parentName: string,
-  anchorName: string,
-  root = false,
+	node: Node,
+	status: BuildStatus,
+	b: Builder,
+	parentName: string,
+	anchorName: string,
+	root = false,
 ) {
-  // Nodes with anchors will have been handled when their containing fragment
-  // was built so we want to skip them here
-  if (node.handled) {
-    return;
-  }
+	// Nodes with anchors will have been handled when their containing fragment
+	// was built so we want to skip them here
+	if (node.handled) {
+		return;
+	}
 
-  switch (node.type) {
-    case "root": {
-      buildRootNode(node as RootNode, status, b, parentName, anchorName);
-      break;
-    }
-    case "control": {
-      buildControlNode(node as ControlNode, status, b, parentName, anchorName);
-      break;
-    }
-    case "component": {
-      buildComponentNode(node as ElementNode, status, b, parentName, anchorName, root);
-      break;
-    }
-    case "element": {
-      buildElementNode(node as ElementNode, status, b, parentName, anchorName, root);
-      break;
-    }
-    case "text": {
-      buildTextNode(node as TextNode, status, b, parentName, anchorName);
-      break;
-    }
-    case "special": {
-      buildSpecialNode(node as ElementNode, status, b, parentName, anchorName);
-      break;
-    }
-    default: {
-      throw new Error(`Invalid node type: ${node.type}`);
-    }
-  }
+	switch (node.type) {
+		case "root": {
+			buildRootNode(node as RootNode, status, b, parentName, anchorName);
+			break;
+		}
+		case "control": {
+			buildControlNode(node as ControlNode, status, b, parentName, anchorName);
+			break;
+		}
+		case "component": {
+			buildComponentNode(node as ElementNode, status, b, parentName, anchorName, root);
+			break;
+		}
+		case "element": {
+			buildElementNode(node as ElementNode, status, b, parentName, anchorName, root);
+			break;
+		}
+		case "text": {
+			buildTextNode(node as TextNode, status, b, parentName, anchorName);
+			break;
+		}
+		case "special": {
+			buildSpecialNode(node as ElementNode, status, b, parentName, anchorName);
+			break;
+		}
+		default: {
+			throw new Error(`Invalid node type: ${node.type}`);
+		}
+	}
 }

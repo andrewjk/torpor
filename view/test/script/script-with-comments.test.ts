@@ -5,7 +5,7 @@ import ParseResult from "../../src/compile/types/ParseResult";
 // TODO: Preserve space
 
 test("script with comments", () => {
-  const script = `
+	const script = `
 const x = 5; //</script>
 const y = 10;
 /*
@@ -13,18 +13,18 @@ const y = 10;
 */
 const z = 15;
 `;
-  const input = `
+	const input = `
 <script>
 ${script}
 </script>
 `;
-  const output = parse(input);
-  const expected: ParseResult = {
-    ok: true,
-    errors: [],
-    template: {
-      script: script.trim(),
-    },
-  };
-  expect(output).toEqual(expected);
+	const output = parse(input);
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			script: script.trim(),
+		},
+	};
+	expect(output).toEqual(expected);
 });

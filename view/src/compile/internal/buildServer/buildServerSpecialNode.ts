@@ -4,13 +4,13 @@ import type BuildServerStatus from "./BuildServerStatus";
 import buildServerSlotNode from "./buildServerSlotNode";
 
 export default function buildServerSpecialNode(
-  node: ElementNode,
-  status: BuildServerStatus,
-  b: Builder,
+	node: ElementNode,
+	status: BuildServerStatus,
+	b: Builder,
 ) {
-  switch (node.tagName) {
-    case ":slot": {
-      buildServerSlotNode(node, status, b);
-    }
-  }
+	switch (node.tagName) {
+		case ":slot": {
+			buildServerSlotNode(node, status, b);
+		}
+	}
 }

@@ -1,6 +1,6 @@
 import PropDocumentation from "./PropDocumentation";
 
 export default interface SlotDocumentation {
-  name: string;
-  props: PropDocumentation[];
+	name: string;
+	props: PropDocumentation[];
 }

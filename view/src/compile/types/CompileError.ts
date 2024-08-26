@@ -1,4 +1,4 @@
 export default interface CompileError {
-  message: string;
-  start: number;
+	message: string;
+	start: number;
 }

@@ -6,16 +6,16 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type Style from "../../types/styles/Style";
 
 export default interface ParseStatus {
-  source: string;
-  // The current index
-  i: number;
-  docs?: Documentation;
-  script?: string;
-  template?: ElementNode;
-  childTemplates?: ComponentTemplate[];
-  style?: Style;
-  styleHash?: string;
-  imports?: Import[];
-  // Errors that have been encountered
-  errors: CompileError[];
+	source: string;
+	// The current index
+	i: number;
+	docs?: Documentation;
+	script?: string;
+	template?: ElementNode;
+	childTemplates?: ComponentTemplate[];
+	style?: Style;
+	styleHash?: string;
+	imports?: Import[];
+	// Errors that have been encountered
+	errors: CompileError[];
 }
