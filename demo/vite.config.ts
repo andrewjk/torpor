@@ -1,9 +1,9 @@
 import { defineConfig } from "vite";
-import Tera from "../unplugin-tera/dist/vite";
+import tera from "../unplugin-tera/dist/vite";
 
 export default defineConfig({
 	plugins: [
-		Tera({
+		tera({
 			/* options */
 		}),
 	],
