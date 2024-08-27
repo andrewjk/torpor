@@ -20,6 +20,7 @@ const importsMap: Record<string, string> = {
 	t_run_list: "import t_run_list from '${folder}/render/internal/runList';",
 	t_add_fragment: "import t_add_fragment from '${folder}/render/internal/addFragment';",
 	t_apply_props: "import t_apply_props from '${folder}/render/internal/applyProps';",
+	t_attribute: "import t_attribute from '${folder}/render/internal/setAttribute';",
 	t_fmt: "import t_fmt from '${folder}/render/internal/formatText';",
 	t_fragment: "import t_fragment from '${folder}/render/internal/getFragment';",
 	t_anchor: "import t_anchor from '${folder}/render/internal/findAnchor';",

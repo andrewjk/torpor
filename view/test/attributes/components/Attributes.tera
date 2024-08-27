@@ -1,0 +1,3 @@
+<div thing={$props.thing} data-thing={$props.dataThing}>
+    Hello!
+</div>

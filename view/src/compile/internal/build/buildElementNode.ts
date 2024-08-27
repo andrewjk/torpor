@@ -114,15 +114,15 @@ function buildElementAttributes(
 			} else if (name === "class") {
 				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
 			} else if (name.includes("-")) {
-				// Should handle data-, aria- etc
+				// Handle data-, aria- etc
+				status.imports.add("t_attribute");
+				buildRun("setDataAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
 				// NOTE: dataset seems to be a tiny bit slower?
 				//const propName = name.substring(5);
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
-				buildRun("setDataAttribute", `${varName}.setAttribute("${name}", ${value});`, status, b);
 			} else {
-				// Don't use setAttribute, it doesn't work with boolean attributes like
-				// disabled
-				buildRun("setAttribute", `${varName}.${name} = ${value};`, status, b);
+				status.imports.add("t_attribute");
+				buildRun("setAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
 			}
 		}
 	}
