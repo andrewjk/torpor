@@ -85,7 +85,7 @@ function buildTemplate(
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {
-		b.append(`$props = Object.assign({}, $props);`);
+		b.append(`$props ||= {};`);
 		b.append("");
 	}
 
