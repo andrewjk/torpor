@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
+import { transformWithEsbuild } from "vite";
 import build from "../../view/src/compile/build";
 import parse from "../../view/src/compile/parse";
 import type { Options } from "./types";
@@ -33,7 +34,6 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 				.split(/[\\\/]/)
 				.at(-1)
 				?.replace(/\.tera$/, "");
-			// TODO: Compile typescript if script lang="ts" or config.lang="ts"
 			const built = build(name!, parsed.template);
 			let transformed = built.code;
 
@@ -41,23 +41,32 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 			if (transformed.includes("../../../tera")) {
 				const pathParts = id.split(/[\\\/]/);
 				for (let i = pathParts.length - 1; i >= 0; i--) {
-					let pathToCheck = path.resolve(path.join(...["/", ...pathParts.slice(0, i), "tera"]));
-					if (fs.existsSync(pathToCheck)) {
-						transformed = transformed.replaceAll(/from ("|')(..\/)+tera/g, `from $1${pathToCheck}`);
+					let resolvedPath = path.resolve(path.join(...["/", ...pathParts.slice(0, i), "tera"]));
+					if (fs.existsSync(resolvedPath)) {
+						transformed = transformed.replaceAll(
+							/from ("|')(..\/)+tera/g,
+							`from $1${resolvedPath}`,
+						);
 						break;
 					}
 				}
 			}
 
 			if (built.styles && built.styleHash) {
-				// Add a dynamic import for the component's CSS with a name from the hash and add the styles to a map
-				// Then resolveId will pass the CSS id onto load, which will load the the actual CSS from the map
+				// Add a dynamic import for the component's CSS with a name from
+				// the hash and add the styles to a map. Then resolveId will
+				// pass the CSS id onto load, which will load the the actual CSS
+				// from the map
 				transformed = `import '${built.styleHash}.css';\n` + transformed;
 				styles.set(built.styleHash + ".css", built.styles);
 			}
 
 			//printOutput(transformed);
-			return transformed;
+
+			// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
+			return transformWithEsbuild(transformed, id, {
+				loader: "ts",
+			});
 		} else {
 			console.log("\nERRORS\n======");
 			for (let error of parsed.errors) {
