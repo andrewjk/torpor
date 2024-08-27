@@ -1,0 +1,57 @@
+/**
+ * A header button for an AccordionItem, which can be used to reveal or hide an associated AccordionContent.
+ */
+<script>
+	import getId from '../utils/getId';
+	import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+
+	let button: HTMLButtonElement;
+
+	$props.id ||= getId();
+
+	// Get stuff out of the AccordionItemContext
+	const context = $context[AccordionItemContextName] as AccordionItemContext;
+	if (!context) {
+		throw new Error('AccordionTrigger must be contained within an AccordionItem');
+	}
+	let $state = $context[AccordionItemContextName].state;
+
+	// Set the header ID so that it can be used with aria-labelledby in AccordionContent
+	$state.headerId = $props.id;
+
+	// Let the item know how to set the button's focus
+	context.setHeaderFocused = setFocused;
+
+	// This function is called by the parent Accordion to focus this item's button
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		// Pass the value to the toggleItem method in the parent Accordion which will handle toggling
+		// the value of expanded for all items (e.g. to close other items if necessary)
+		context.toggleItem(context.value);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		// Pass the key press up to the parent Accordion which will handle setting the focused button
+		context.handleHeaderKey(context.index, e);
+	}
+</script>
+
+<button
+	type="button"
+	id={$props.id}
+	class='tera-accordion-button'
+	disabled={$state.disabled}
+	aria-expanded={$state.expanded}
+	aria-disabled={$state.disabled || undefined}
+	aria-controls={$state.contentId}
+	data-state={$state.dataState}
+	data-disabled={$state.dataDisabled}
+	bind:this={button}
+	onclick={handleClick}
+	onkeydown={handleKey}
+>
+	<:slot />
+</button>

@@ -1,0 +1,42 @@
+<script>
+	import {
+		Accordion,
+		AccordionItem,
+		AccordionHeader,
+		AccordionTrigger,
+		AccordionContent,
+	} from "../../../src/Accordion/index";
+</script>
+
+<Accordion value={$props.value} type="multiple">
+	<AccordionItem>
+		<AccordionHeader as="h4">
+			<AccordionTrigger>Role Header</AccordionTrigger>
+		</AccordionHeader>
+		<AccordionContent>Role Content</AccordionContent>
+	</AccordionItem>
+	<AccordionItem>
+		<AccordionHeader as="h4">
+			<AccordionTrigger>Open Header</AccordionTrigger>
+		</AccordionHeader>
+		<AccordionContent>Open Content</AccordionContent>
+	</AccordionItem>
+	<AccordionItem>
+		<AccordionHeader as="h4">
+			<AccordionTrigger>Closed Header</AccordionTrigger>
+		</AccordionHeader>
+		<AccordionContent>Closed Content</AccordionContent>
+	</AccordionItem>
+	<AccordionItem>
+		<AccordionHeader as="h4">
+			<AccordionTrigger>Region Header</AccordionTrigger>
+		</AccordionHeader>
+		<AccordionContent ariaRegion>Region Content</AccordionContent>
+	</AccordionItem>
+	<AccordionItem disabled>
+		<AccordionHeader as="h4">
+			<AccordionTrigger>Disabled Header</AccordionTrigger>
+		</AccordionHeader>
+		<AccordionContent>Disabled Content</AccordionContent>
+	</AccordionItem>
+</Accordion>
