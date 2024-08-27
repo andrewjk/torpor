@@ -125,7 +125,7 @@
 		"unplugin": "^1.12.2"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^2.27.1",
+		"@antfu/eslint-config": "^2.27.3",
 		"@nuxt/kit": "^3.13.0",
 		"@nuxt/schema": "^3.13.0",
 		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
@@ -138,7 +138,7 @@
 		"nodemon": "^3.1.4",
 		"prettier": "^3.3.3",
 		"rimraf": "^6.0.1",
-		"rollup": "^4.21.0",
+		"rollup": "^4.21.1",
 		"tsup": "^8.2.4",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.2",
