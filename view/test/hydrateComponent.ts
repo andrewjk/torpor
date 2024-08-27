@@ -15,6 +15,11 @@ export default function hydrateComponent(
 	component: Component,
 	state?: any,
 ) {
+	// HACK: we may be running this from the top level, or from within the view folder
+	if (!fs.existsSync(componentPath)) {
+		componentPath = path.join("view", componentPath);
+	}
+
 	const source = fs.readFileSync(componentPath).toString();
 	const parsed = parse(source);
 	expect(parsed.ok).toBe(true);

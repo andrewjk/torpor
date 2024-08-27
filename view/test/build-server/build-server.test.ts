@@ -10,7 +10,11 @@ test("build for the server and render to HTML", () => {
 	// each test is run in hydration mode
 	const state = { counter: 8 };
 
-	const source = fs.readFileSync("./test/build-server/components/IfNested.tera").toString();
+	let path = "./test/build-server/components/IfNested.tera";
+	if (!fs.existsSync(path)) {
+		path = "./view/test/build-server/components/IfNested.tera";
+	}
+	const source = fs.readFileSync(path).toString();
 
 	const parsed = parse(source);
 	expect(parsed.ok).toBe(true);
