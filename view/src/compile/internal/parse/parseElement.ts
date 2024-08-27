@@ -7,7 +7,7 @@ import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
 import { isSpaceChar } from "./parseUtils";
-import slottifyComponentChildNodes from "./slottifyComponentChildNodes";
+import slottifyChildNodes from "./slottifyChildNodes";
 import wrangleControlNode from "./wrangleControlNode";
 import wrangleSpecialNode from "./wrangleSpecialNode";
 
@@ -145,7 +145,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		status.childTemplates?.some((c) => c.name === element.tagName)
 	) {
 		element.type = "component";
-		slottifyComponentChildNodes(element);
+		slottifyChildNodes(element);
 	}
 
 	if (isSpecialNode(element)) {

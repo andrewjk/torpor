@@ -3,7 +3,7 @@ import type Node from "../../types/nodes/Node";
 import isElementNode from "../../types/nodes/isElementNode";
 import isParentNode from "../../types/nodes/isParentNode";
 import type ParseStatus from "./ParseStatus";
-import slottifyComponentChildNodes from "./slottifyComponentChildNodes";
+import slottifyChildNodes from "./slottifyChildNodes";
 
 export default function parseChildTemplate(name: string, source: string, status: ParseStatus) {
 	const parsed = parse(source);
@@ -22,7 +22,7 @@ export default function parseChildTemplate(name: string, source: string, status:
 function setChildComponentNodes(name: string, node: Node) {
 	if (isElementNode(node) && node.tagName === name) {
 		node.type = "component";
-		slottifyComponentChildNodes(node);
+		slottifyChildNodes(node);
 	}
 	if (isParentNode(node)) {
 		for (let child of node.children) {
