@@ -49,9 +49,9 @@ export default function buildCode(name: string, template: ComponentTemplate): st
 
 	return (
 		Array.from(imports)
-			.map((i) => {
-				i = importsMap[i] || i;
-				return i.replace("${folder}", folder);
+			.map((imp) => {
+				imp = importsMap[imp] || imp;
+				return imp.replace("${folder}", folder);
 			})
 			.join("\n") +
 		"\n\n" +
@@ -66,8 +66,11 @@ function buildTemplate(
 	b: Builder,
 ) {
 	if (template.imports) {
-		for (let i of template.imports) {
-			imports.add(`import ${i.name} from '${i.path}';`);
+		// TODO: Should probably consolidate imports e.g. when we've split them up
+		for (let imp of template.imports) {
+			const name = imp.nonDefault ? `{ ${imp.name} }` : imp.name;
+			const alias = imp.alias ? ` as ${imp.alias}` : "";
+			imports.add(`import ${name}${alias} from '${imp.path}';`);
 		}
 	}
 
@@ -92,6 +95,7 @@ function buildTemplate(
 	// Redefine $context so that any newly added properties will only be passed to children
 	if (template.contextProps?.length) {
 		b.append(`$context = Object.assign({}, $context);`);
+		b.append("");
 	}
 
 	if (template.script) {

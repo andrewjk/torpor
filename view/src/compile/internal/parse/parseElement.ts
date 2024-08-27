@@ -69,18 +69,18 @@ export default function parseElement(status: ParseStatus): ElementNode {
 					wrangleControlNode(child, element);
 				}
 				/*
-      } else if (char === "}") {
-        // Check for an else
-        const end = status.i;
-        status.i += 1;
-        consumeSpace(status);
-        if (accept("else", status, false)) {
-          const child = parseControl(status, "@each");
-          element.children.push(child);
-        } else {
-          status.i = end;
-        }
-        */
+			} else if (char === "}") {
+				// Check for an else
+				const end = status.i;
+				status.i += 1;
+				consumeSpace(status);
+				if (accept("else", status, false)) {
+					const child = parseControl(status, "@each");
+					element.children.push(child);
+				} else {
+					status.i = end;
+				}
+				*/
 			} else {
 				// It's text content
 				const start = status.i;
@@ -129,18 +129,19 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	/*
-  if (
-    element.children.length === 1 &&
-    isTextNode(element.children[0]) &&
-    !element.children[0].content.trim()
-  ) {
-    element.selfClosed = true;
-    element.children = [];
-  }
-  */
-
 	if (
-		status.imports?.some((i) => i.component && i.name === element.tagName) ||
+		element.children.length === 1 &&
+		isTextNode(element.children[0]) &&
+		!element.children[0].content.trim()
+	) {
+		element.selfClosed = true;
+		element.children = [];
+	}
+	*/
+
+	// HACK: Just assume all imports are components for now...
+	if (
+		status.imports?.some((i) => /*i.component &&*/ i.name === element.tagName) ||
 		status.childTemplates?.some((c) => c.name === element.tagName)
 	) {
 		element.type = "component";

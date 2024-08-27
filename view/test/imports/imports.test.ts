@@ -16,10 +16,22 @@ test("imports", () => {
 		errors: [],
 		template: {
 			imports: [
-				{ name: "*", path: "somewhere", component: false },
-				{ name: "*", path: "somewhere-else", component: false },
+				{
+					name: "*",
+					alias: undefined,
+					path: "somewhere",
+					nonDefault: false,
+					component: false,
+				},
+				{
+					name: "*",
+					alias: undefined,
+					path: "somewhere-else",
+					nonDefault: false,
+					component: false,
+				},
 			],
-			script: "const x = 7;",
+			script: "",
 		},
 	};
 	expect(output).toEqual(expected);

@@ -1,4 +1,4 @@
-import { trimQuotes } from "../utils";
+import { trimQuotes, trimStartAndEnd } from "../utils";
 import type ParseStatus from "./ParseStatus";
 import parseChildTemplate from "./parseChildTemplate";
 import parseDocs from "./parseDocs";
@@ -47,6 +47,16 @@ function parseTopElement(status: ParseStatus) {
 		case "script": {
 			if (!element.selfClosed) {
 				status.script = extractElementText("script", status);
+
+				// HACK: un-replace the hacky things we replaced at the top of this file
+				status.script = status.script
+					.replaceAll("@else", "else")
+					.replaceAll("@case", "case")
+					.replaceAll("@default", "default")
+					.replaceAll("@key", "key")
+					.replaceAll("@then", "then")
+					.replaceAll("@catch", "catch");
+
 				extractScriptImports(status);
 			}
 			break;
@@ -129,25 +139,54 @@ function extractElementText(tagName: string, status: ParseStatus): string {
 function extractScriptImports(status: ParseStatus) {
 	if (status.script) {
 		let start = 0;
+		let braceLevel = 0;
 		for (let i = 0; i < status.script.length + 1; i++) {
-			if (status.script[i] === "\n" || status.script[i] === undefined) {
+			// HACK: Really need to properly parse imports
+			if (status.script[i] === "{") {
+				braceLevel += 1;
+			} else if (status.script[i] === "}") {
+				braceLevel -= 1;
+			}
+			if ((status.script[i] === "\n" && braceLevel === 0) || status.script[i] === undefined) {
 				const line = status.script.substring(start, i).trim();
 				if (line.length) {
 					if (line.startsWith("//")) {
 						// TODO: More comment handling
 					} else if (line.startsWith("import ")) {
+						// TODO: More import wrangling
+						// (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
 						status.imports = status.imports || [];
-						const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/g;
+						const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/gms;
+						const componentRegex = /\.tera$/gm;
 						const importMatches = line.matchAll(importRegex);
 						for (let match of importMatches) {
-							const name = match[1];
+							const importName = match[1];
 							const path = trimQuotes(match[2]);
-							const componentRegex = /\.tera$/gm;
-							status.imports.push({
-								name,
-								path,
-								component: componentRegex.test(path),
-							});
+							const component = componentRegex.test(path);
+							let nonDefault = false;
+							for (let name of importName.split(/\s*,\s*/)) {
+								if (name.startsWith("{")) {
+									nonDefault = true;
+								}
+								const nameParts = name.split(/\bas\b/);
+								let newImport = {
+									name: nameParts[0].trim(),
+									alias: nameParts[1]?.trim(),
+									path,
+									nonDefault,
+									component,
+								};
+								if (newImport.name) {
+									newImport.name = trimStartAndEnd(newImport.name, "{", "}").trim();
+								}
+								if (newImport.alias) {
+									newImport.alias = trimStartAndEnd(newImport.alias, "{", "}").trim();
+								}
+								status.imports.push(newImport);
+								if (name.endsWith("}")) {
+									nonDefault = false;
+								}
+							}
 						}
 					} else {
 						// Imports are done!

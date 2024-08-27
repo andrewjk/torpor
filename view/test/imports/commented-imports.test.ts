@@ -15,8 +15,16 @@ test("commented imports", () => {
 		ok: true,
 		errors: [],
 		template: {
-			imports: [{ name: "*", path: "somewhere-else", component: false }],
-			script: "const x = 7;",
+			imports: [
+				{
+					name: "*",
+					alias: undefined,
+					path: "somewhere-else",
+					nonDefault: false,
+					component: false,
+				},
+			],
+			script: "",
 		},
 	};
 	expect(output).toEqual(expected);

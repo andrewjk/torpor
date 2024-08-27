@@ -28,3 +28,21 @@ export function trimMatched(text: string, start: string, end: string) {
 	}
 	return text;
 }
+
+export function trimStart(text: string, value: string) {
+	while (text.startsWith(value)) {
+		text = text.substring(value.length).trim();
+	}
+	return text;
+}
+
+export function trimEnd(text: string, value: string) {
+	while (text.endsWith(value)) {
+		text = text.substring(0, text.length - value.length).trim();
+	}
+	return text;
+}
+
+export function trimStartAndEnd(text: string, start: string, end: string) {
+	return trimEnd(trimStart(text, start), end);
+}

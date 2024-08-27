@@ -1,6 +1,7 @@
 import type ParseStatus from "./internal/parse/ParseStatus";
 import checkAndApplyStyles from "./internal/parse/checkAndApplyStyles";
 import parseMarkup from "./internal/parse/parseMarkup";
+import { trimQuotes } from "./internal/utils";
 import type ParseResult from "./types/ParseResult";
 
 /**
@@ -52,10 +53,10 @@ export default function parse(source: string): ParseResult {
 }
 
 function getPropsUsage(source: string): string[] {
-	const propsMatches = source.matchAll(/\$props\s*(?:\.([\d\w]+)|\["(.+)"\]|\['(.+)'\])/g);
+	const propsMatches = source.matchAll(/\$props\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const props: string[] = [];
 	for (let match of propsMatches) {
-		const name = match[1] || match[2] || match[3];
+		const name = trimQuotes(match[1] || match[2]);
 		if (!props.includes(name)) {
 			props.push(name);
 		}
@@ -64,10 +65,10 @@ function getPropsUsage(source: string): string[] {
 }
 
 function getContextUsage(source: string): string[] {
-	const contextsMatches = source.matchAll(/\$context\s*(?:\.([\d\w]+)|\["(.+)"\]|\['(.+)'\])/g);
+	const contextsMatches = source.matchAll(/\$context\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const contexts: string[] = [];
 	for (let match of contextsMatches) {
-		const name = match[1] || match[2] || match[3];
+		const name = trimQuotes(match[1] || match[2]);
 		if (!contexts.includes(name)) {
 			contexts.push(name);
 		}
