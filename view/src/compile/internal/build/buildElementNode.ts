@@ -113,7 +113,8 @@ function buildElementAttributes(
 				buildRun("setClassList", `${setAttribute};`, status, b);
 			} else if (name === "class") {
 				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
-			} else if (name.indexOf("data-") === 0) {
+			} else if (name.includes("-")) {
+				// Should handle data-, aria- etc
 				// NOTE: dataset seems to be a tiny bit slower?
 				//const propName = name.substring(5);
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
