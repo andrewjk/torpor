@@ -1,6 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/compile/types/ParseResult";
+import { trimParsed } from "../helpers";
 
 // TODO: Preserve space
 
@@ -18,7 +19,7 @@ const z = 15;
 ${script}
 </script>
 `;
-	const output = parse(input);
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

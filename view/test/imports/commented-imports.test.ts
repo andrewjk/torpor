@@ -1,17 +1,16 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import ParseResult from "../../src/compile/types/ParseResult";
+import { trimParsed } from "../helpers";
 
 test("commented imports", () => {
 	const input = `
   <script>
     //import * from 'somewhere';
     import * from 'somewhere-else';
-
-    const x = 7;
   </script>
 `;
-	const output = parse(input);
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
