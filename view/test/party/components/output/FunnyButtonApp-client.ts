@@ -30,7 +30,7 @@ const FunnyButtonApp = {
 
     /* @component */
     const t_slots_1 = {};
-    t_slots_1["_"] = ($sparent, $sanchor, $sprops) => {
+    t_slots_1["_"] = ($sparent, $sanchor, $sprops, $context) => {
       const t_fragment_2 = t_fragment(t_fragments, 2, `Click me!`);
       const t_text_1 = t_root(t_fragment_2);
       t_add_fragment(t_fragment_2, $sparent, $sanchor);

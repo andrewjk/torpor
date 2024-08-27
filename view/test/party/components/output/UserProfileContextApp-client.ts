@@ -21,7 +21,7 @@ const UserProfileContextApp = {
   * @param {Object} [$context]
   */
   render: ($parent, $anchor, $props, $slots, $context) => {
-    $context ||= {};
+    $context = Object.assign({}, $context);
 
     /* User script */
     const $user = $watch({

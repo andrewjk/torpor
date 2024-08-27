@@ -73,7 +73,7 @@ export default function buildComponentNode(
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
-				b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops) => {`);
+				b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops, $context) => {`);
 
 				buildFragment(slot, status, b, "$sparent", "$sanchor");
 

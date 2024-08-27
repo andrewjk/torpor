@@ -54,7 +54,7 @@ export default function buildSlotNode(
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
 	b.append(
-		`$slots["${slotName}"](${slotParentName}, ${slotAnchorName}, ${slotHasProps ? propsName : "undefined"})`,
+		`$slots["${slotName}"](${slotParentName}, ${slotAnchorName}, ${slotHasProps ? propsName : "undefined"}, $context)`,
 	);
 
 	// TODO: Maybe not if there's only a single space node?

@@ -18,7 +18,7 @@ const Let = {
   * @param {Object} [$context]
   */
   render: ($parent, $anchor, $props, $slots, $context) => {
-    $props = Object.assign({}, $props);
+    $props ||= {};
 
     /* User interface */
     const t_fragments = [];
@@ -33,7 +33,7 @@ const Let = {
       t_props_1["items"] = $props.items;
     });
     const t_slots_1 = {};
-    t_slots_1["_"] = ($sparent, $sanchor, $sprops) => {
+    t_slots_1["_"] = ($sparent, $sanchor, $sprops, $context) => {
       const t_fragment_2 = t_fragment(t_fragments, 2, `#`);
       const t_text_1 = t_root(t_fragment_2);
       $run(function setTextContent() {
