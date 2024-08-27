@@ -7,7 +7,7 @@
  
 	$context["info"] = "Context from Index";
 
-	const $state = watch({
+	const $state = $watch({
 		//name: "",
 		condition: false,
 		count: 0,
@@ -20,6 +20,7 @@
 	});
 
 	function increment(e) {
+		console.log("=== INCREMENT ===")
 		$state.condition = !$state.condition;
 
 		$state.count += 1;
@@ -32,7 +33,9 @@
 	}
 
 	function splice(e) {
-		$state.letters.splice(1, 1, 'x', 'y');
+		console.log("=== SPLICE ===")
+		//$state.letters.splice(1, 1, 'x', 'y');
+		$state.items[1].text = "third";
 	}
 
 	function eventBubbled(e) {
@@ -41,8 +44,10 @@
 </script>
 
 <div id="app">
+	<h2>Index</h2>
+
 	<!-- Testing binding -->
-	<p>
+	<p id="run">
 		Enter your name: <input type='text' bind:value={$state.name}>
 	</p>
 
@@ -66,6 +71,10 @@
 		{$sprops.item.text}!
 	</FancyList>
 
+	@for (let item of $state.items) {
+		<div>{$for.item.text}</div>
+	}
+
 	<p id='countdiv'>
 		<span>Number</span>   <span>of items: {$state.count}</span>
 	</p>
@@ -79,19 +88,17 @@
 		Splice...
 	</button>
 	<Event onbubble={eventBubbled}/>
-
 	<ul>
 		@for (let [index, letter] of $state.letters.entries()) {
-			<LetterItemDelegate class="letter" {index} {letter} />
+			<LetterItemDelegate class="letter" {$for.index} {$for.letter} />
 		}
 	</ul>
 	
 	<p>
 		@for (let [index, letter] of $state.letters.entries()) {
-			<span>{letter}</span>
+			<span>{$for.letter}</span>
 		}
 	</p>
-
 	@if ($state.condition) {
 		<p>It's true!</p>
 
@@ -105,6 +112,10 @@
 
 		<p>It's really true!</p>
 	}
+
+    <p>
+        <a href="/Demo">Demo</a>
+    </p>
 </div>
 
 <style>

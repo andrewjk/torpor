@@ -1,0 +1,12 @@
+﻿
+<section>
+	<:slot name="header">
+		<h2>Article (default content)</h2>
+	</:slot>
+
+	<:slot />
+
+	<:slot name="footer">
+		<p>This shouldn't be here</p>
+	</:slot>
+</section>
