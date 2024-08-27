@@ -21,6 +21,8 @@ const ForIn = {
   * @param {Object} [$context]
   */
   render: ($parent, $anchor, $props, $slots, $context) => {
+    $props = Object.assign({}, $props);
+
     /* User interface */
     const t_fragments = [];
 
