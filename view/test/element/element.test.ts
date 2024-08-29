@@ -36,10 +36,8 @@ test("element -- hydrated", () => {
 function check(container: HTMLElement, $state: State) {
 	expect(queryByText(container, "Hello!")).toBeInTheDocument();
 	expect(queryByText(container, "Hello!")?.tagName).toBe("H4");
-	console.log(1, container.outerHTML);
 
 	$state.tag = "p";
-	console.log(1, container.outerHTML);
 
 	expect(queryByText(container, "Hello!")?.tagName).toBe("P");
 }
