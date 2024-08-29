@@ -1,10 +1,10 @@
 const NestedIf = {
 	name: "NestedIf",
 	/**
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($props, $slots, $context) => {
 		let $output = "";
 		/* User interface */

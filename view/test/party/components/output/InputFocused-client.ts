@@ -8,12 +8,12 @@ import t_flush from '../../../../../tera/view/src/watch/internal/flushMountEffec
 const InputFocused = {
 	name: "InputFocused",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		/* User script */
 		let inputElement;

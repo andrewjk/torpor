@@ -14,12 +14,12 @@ import t_apply_props from '../../../../../tera/view/src/render/internal/applyPro
 const Array = {
 	name: "Array",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		$props ||= {};
 

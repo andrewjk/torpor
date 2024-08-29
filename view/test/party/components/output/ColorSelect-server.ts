@@ -1,10 +1,10 @@
 const ColorSelect = {
 	name: "ColorSelect",
 	/**
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($props, $slots, $context) => {
 		/* User script */
 		const $watch = (obj) => obj;

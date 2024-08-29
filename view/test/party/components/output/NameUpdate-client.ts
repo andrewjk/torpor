@@ -10,12 +10,12 @@ import t_add_fragment from '../../../../../tera/view/src/render/internal/addFrag
 const NameUpdate = {
 	name: "NameUpdate",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		/* User script */
 		let $state = $watch({

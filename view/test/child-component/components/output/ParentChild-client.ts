@@ -12,12 +12,12 @@ import $run from '../../../../../tera/view/src/watch/$run';
 const ParentChild = {
 	name: "ParentChild",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		$props ||= {};
 
@@ -41,12 +41,12 @@ const ParentChild = {
 const Child = {
 	name: "Child",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		$props ||= {};
 

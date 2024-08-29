@@ -28,7 +28,12 @@ export default class Builder {
 				while (i < text.length && text[i] !== "\n") {
 					i++;
 				}
-				this.#text += text.substring(start, i + 1);
+				const line = text.substring(start, i + 1);
+				if (line.startsWith("*")) {
+					// JSDoc
+					this.#text += " ";
+				}
+				this.#text += line;
 
 				// Maybe indent
 				if (text[i - 1] === "{" || text[i - 1] === "(" || text[i - 1] === "[") {

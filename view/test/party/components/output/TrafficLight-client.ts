@@ -14,12 +14,12 @@ import $run from '../../../../../tera/view/src/watch/$run';
 const TrafficLight = {
 	name: "TrafficLight",
 	/**
-	* @param {Node} $parent
-	* @param {Node | null} $anchor
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Node} $parent
+	 * @param {Node | null} $anchor
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($parent, $anchor, $props, $slots, $context) => {
 		/* User script */
 		const TRAFFIC_LIGHTS = ["red", "orange", "green"];

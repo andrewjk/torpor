@@ -1,10 +1,10 @@
 const ParentChild = {
 	name: "ParentChild",
 	/**
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($props, $slots, $context) => {
 		let $output = "";
 		/* User interface */
@@ -21,10 +21,10 @@ const ParentChild = {
 const Child = {
 	name: "Child",
 	/**
-	* @param {Object} [$props]
-	* @param {Object} [$slots]
-	* @param {Object} [$context]
-	*/
+	 * @param {Object} [$props]
+	 * @param {Object} [$slots]
+	 * @param {Object} [$context]
+	 */
 	render: ($props, $slots, $context) => {
 		let $output = "";
 		/* User interface */
