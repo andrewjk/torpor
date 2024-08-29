@@ -1,5 +1,5 @@
 {
-	"name": "@tera/unplugin-tera",
+	"name": "@tera/unplugin",
 	"type": "module",
 	"version": "0.0.1",
 	"packageManager": "pnpm@8.6.12",

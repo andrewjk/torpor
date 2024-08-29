@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import tera from "../unplugin-tera/dist/vite";
+import tera from "../unplugin/dist/vite";
 
 export default defineConfig(({ mode }) => ({
 	plugins: [tera()],

@@ -5,7 +5,7 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"test": "cd ./view && npm run build && cd ../unplugin-tera && npm run build && cd .. && vitest",
+		"test": "cd ./view && npm run build && cd ../unplugin && npm run build && cd .. && vitest",
 		"format": "prettier --write ."
 	},
 	"keywords": [],
