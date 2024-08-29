@@ -3,7 +3,7 @@ import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../Builder";
 import { trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import addFragment from "./buildAddFragment";
+import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
@@ -114,7 +114,7 @@ function buildAwaitBranch(
 	}
 	status.fragmentStack.pop();
 
-	addFragment(node, status, b, parentName, "t_before");
+	buildAddFragment(node, status, b, parentName, "t_before");
 
 	b.append(`});`);
 }

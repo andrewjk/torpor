@@ -3,7 +3,7 @@ import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../Builder";
 import { trimAny, trimMatched } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import addFragment from "./buildAddFragment";
+import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { nextVarName } from "./buildUtils";
@@ -112,7 +112,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 	}
 	status.fragmentStack.pop();
 
-	addFragment(node, status, b, parentName, "t_before");
+	buildAddFragment(node, status, b, parentName, "t_before");
 
 	// If we wanted to return the fragment instead:
 	//b.append(`t_item.startNode = t_fragment_1.firstChild;`);

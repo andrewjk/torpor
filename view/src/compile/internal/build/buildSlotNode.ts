@@ -3,7 +3,7 @@ import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../Builder";
 import { trimQuotes } from "../utils";
 import type BuildStatus from "./BuildStatus";
-import addFragment from "./buildAddFragment";
+import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
@@ -73,7 +73,7 @@ export default function buildSlotNode(
 		}
 		status.fragmentStack.pop();
 
-		addFragment(fill, status, b, slotParentName, slotAnchorName);
+		buildAddFragment(fill, status, b, slotParentName, slotAnchorName);
 	}
 
 	b.append(`}`);

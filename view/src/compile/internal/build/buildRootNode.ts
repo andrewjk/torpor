@@ -1,7 +1,7 @@
 import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../Builder";
 import BuildStatus from "./BuildStatus";
-import addFragment from "./buildAddFragment";
+import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
@@ -21,5 +21,5 @@ export default function buildRootNode(
 	buildNode(node.children[0], status, b, parentName, anchorName, true);
 	status.fragmentStack.pop();
 
-	addFragment(node, status, b, parentName, anchorName);
+	buildAddFragment(node, status, b, parentName, anchorName);
 }
