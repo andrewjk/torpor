@@ -103,7 +103,7 @@ function maybeAddRootNodeDeclaration(
 	varPaths: Map<string, string>,
 ) {
 	// We need to store the root node of the fragment for subsequent updates of the fragment
-	// But not if there the node would be declared anyway
+	// But not if the node would be declared anyway
 	let firstNode = node.children[0];
 	let firstNodeIsLastNode = node.children.length === 1;
 	if (
@@ -216,6 +216,7 @@ function declareFragmentVars(
 				parentName,
 				anchorName,
 				varPaths,
+				lastChild,
 				declare,
 			);
 			break;
@@ -341,7 +342,9 @@ function declareElementFragmentVars(
 	lastChild: boolean,
 	declare: boolean,
 ) {
-	let elementPath = { parent: path, type: node.tagName, children: [] };
+	const tagName = node.tagName === ":element" ? "element" : node.tagName;
+
+	let elementPath = { parent: path, type: tagName, children: [] };
 	path.children.push(elementPath);
 
 	const topLevel = !path.parent;
@@ -349,7 +352,7 @@ function declareElementFragmentVars(
 
 	if (declare) {
 		if (declareVariable) {
-			node.varName = nextVarName(node.tagName, status);
+			node.varName = nextVarName(tagName, status);
 			if (topLevel) {
 				fragment.endVarName = node.varName;
 			}
@@ -357,7 +360,7 @@ function declareElementFragmentVars(
 			if (buildConfig.fragmentsUseCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
-				b.append(`const ${node.varName} = ${varPath};`);
+				b.append(`let ${node.varName} = ${varPath};`);
 				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 			}
 		}
@@ -375,7 +378,7 @@ function declareElementFragmentVars(
 				if (isReactive(a.value)) {
 					// Adding a placeholder for reactive attributes seems to speed things
 					// up, especially in the case of data attributes
-					return `"${a.name}": ""`;
+					return `"${a.name}": "#"`;
 				} else {
 					return `"${a.name}": "${trimQuotes(a.value) || a.name}"`;
 				}
@@ -420,7 +423,9 @@ function declareElementFragmentVars(
 
 function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
 	const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
-	return hasReactiveAttribute || (topLevel && lastChild);
+	const isDynamicElement =
+		node.tagName === ":element" && node.attributes.find((a) => a.name === "tag");
+	return hasReactiveAttribute || isDynamicElement || (topLevel && lastChild);
 }
 
 function declareTextFragmentVars(
@@ -484,6 +489,7 @@ function declareSpecialFragmentVars(
 	parentName: string,
 	anchorName: string,
 	varPaths: Map<string, string>,
+	lastChild: boolean,
 	declare: boolean,
 ) {
 	if (node.tagName === ":slot") {
@@ -502,6 +508,21 @@ function declareSpecialFragmentVars(
 	}
 
 	switch (node.tagName) {
+		case ":element": {
+			declareElementFragmentVars(
+				fragment,
+				node,
+				path,
+				status,
+				b,
+				parentName,
+				anchorName,
+				varPaths,
+				lastChild,
+				declare,
+			);
+			break;
+		}
 		case ":slot":
 		case ":fill": {
 			for (let [i, child] of node.children.entries()) {
@@ -519,6 +540,9 @@ function declareSpecialFragmentVars(
 				);
 			}
 			break;
+		}
+		default: {
+			throw new Error(`Invalid special node: ${node.tagName}`);
 		}
 	}
 }

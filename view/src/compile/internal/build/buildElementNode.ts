@@ -2,6 +2,8 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../Builder";
 import { trimMatched, trimQuotes } from "../utils";
 import BuildStatus from "./BuildStatus";
+import buildAddFragment from "./buildAddFragment";
+import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 
@@ -24,11 +26,44 @@ export default function buildElementNode(
 				`t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
 			);
 		}
+
+		if (node.tagName === ":element") {
+			buildDynamicElementNode(node, status, b);
+		}
+
 		buildElementAttributes(node, varName, status, b);
 	}
 
 	for (let child of node.children) {
 		buildNode(child, status, b, parentName, "null");
+	}
+}
+
+function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
+	let tagAttribute = node.attributes.find((a) => a.name === "tag");
+	if (tagAttribute) {
+		status.imports.add("$run");
+		status.imports.add("t_dynamic");
+		let tagValue = trimMatched(tagAttribute.value, "{", "}");
+		b.append(`$run(function setDynamic() {`);
+		b.append(`${node.varName} = t_dynamic(${node.varName}, ${tagValue});`);
+
+		let parentName = node.varName;
+
+		buildFragment(node, status, b, parentName!, "null");
+
+		status.fragmentStack.push({
+			fragment: node.fragment,
+			path: "",
+		});
+		for (let child of node.children) {
+			buildNode(child, status, b, parentName!, "null");
+		}
+		status.fragmentStack.pop();
+
+		buildAddFragment(node, status, b, parentName!, "null");
+
+		b.append(`});`);
 	}
 }
 
@@ -39,7 +74,9 @@ function buildElementAttributes(
 	b: Builder,
 ) {
 	for (let { name, value } of node.attributes) {
-		if (name.startsWith("{") && name.endsWith("}")) {
+		if (name === "tag" && node.tagName === ":element") {
+			// Ignore this special attribute
+		} else if (name.startsWith("{") && name.endsWith("}")) {
 			name = name.substring(1, name.length - 1);
 			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
 		} else if (name.startsWith("on")) {

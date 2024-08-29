@@ -48,7 +48,7 @@ export default function buildNode(
 			break;
 		}
 		case "special": {
-			buildSpecialNode(node as ElementNode, status, b, parentName, anchorName);
+			buildSpecialNode(node as ElementNode, status, b, parentName, anchorName, root);
 			break;
 		}
 		default: {

@@ -13,19 +13,26 @@ export default function buildServerElementNode(
 	if (attributes.length) {
 		attributes = " " + attributes;
 	}
-	status.output += `<${node.tagName}${attributes}${node.selfClosed ? "/" : ""}>`;
+	// TODO: What should I default it to?
+	let tagName =
+		node.tagName === ":element"
+			? `$${node.attributes.find((a) => a.name === "tag")?.value}` || "div"
+			: node.tagName;
+	status.output += `<${tagName}${attributes}${node.selfClosed ? "/" : ""}>`;
 	if (!node.selfClosed) {
 		for (let child of node.children) {
 			buildServerNode(child, status, b);
 		}
-		status.output += `</${node.tagName}>`;
+		status.output += `</${tagName}>`;
 	}
 }
 
 function buildElementAttributes(node: ElementNode) {
 	let attributes: string[] = [];
 	for (let { name, value } of node.attributes) {
-		if (name.startsWith("{") && name.endsWith("}")) {
+		if (name === "tag" && node.tagName === ":element") {
+			// Ignore this special attribute
+		} else if (name.startsWith("{") && name.endsWith("}")) {
 			name = name.substring(1, name.length - 1);
 			attributes.push(`${name}="\${${name}}"`);
 		} else if (name.startsWith("on")) {
