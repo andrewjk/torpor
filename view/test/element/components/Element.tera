@@ -1,0 +1,4 @@
+
+<:element tag={$props.tag}>
+    Hello!
+</:element>
