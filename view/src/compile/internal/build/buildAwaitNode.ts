@@ -57,39 +57,39 @@ export default function buildAwaitNode(
 	status.imports.add("t_run_control");
 	b.append("");
 	b.append(`
-    /* @await */
-    const ${awaitRangeName} = { index: -1 };
-    let ${awaitTokenName} = 0;
-    t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
-      ${awaitTokenName}++;`);
+	/* @await */
+	const ${awaitRangeName} = { index: -1 };
+	let ${awaitTokenName} = 0;
+	t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
+		${awaitTokenName}++;`);
 
 	buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName, 0);
 
 	status.imports.add("t_push_range");
 	status.imports.add("t_pop_range");
 	b.append(`
-    ((token) => {
-      ${awaiterName}
-      .then((${thenVar}) => {
-      if (token === ${awaitTokenName}) {
-        let ${oldRangeName} = t_push_range(${awaitRangeName});`);
+	((token) => {
+		${awaiterName}
+		.then((${thenVar}) => {
+		if (token === ${awaitTokenName}) {
+			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
 	buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitRangeName, 1);
 
 	b.append(`t_pop_range(${oldRangeName});
-      }
-    })
-    .catch((${catchVar}) => {
-      if (token === ${awaitTokenName}) {
-        let ${oldRangeName} = t_push_range(${awaitRangeName});`);
+		}
+	})
+	.catch((${catchVar}) => {
+		if (token === ${awaitTokenName}) {
+			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
 	buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitRangeName, 2);
 
 	b.append(`t_pop_range(${oldRangeName});
-          }
-        });
-      })(${awaitTokenName});
-    });`);
+				}
+			});
+		})(${awaitTokenName});
+	});`);
 	b.append("");
 }
 

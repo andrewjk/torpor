@@ -41,17 +41,17 @@ export default function buildServerControlNode(
 			break;
 		}
 		/*
-    case "@await group": {
-      buildServerAwaitNode(node, b);
-      break;
-    }
-    case "@await":
-    case "@then":
-    case "@catch": {
-      // These get handled with @await group, above
-      break;
-    }
-      */
+		case "@await group": {
+			buildServerAwaitNode(node, b);
+			break;
+		}
+		case "@await":
+		case "@then":
+		case "@catch": {
+			// These get handled with @await group, above
+			break;
+		}
+		*/
 		case "@const": {
 			if (status.output) {
 				b.append(`$output += \`${status.output}\`;`);

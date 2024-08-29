@@ -26,59 +26,59 @@ export default function printContext(message?: string) {
 	}
 
 	/*
-  print.rangeEffects = [];
-  for (let [range, effect] of context.rangeEffects.entries()) {
-    if (effect.size) {
-      for (let x of effect) {
-        print.rangeEffects.push({
-          startNode: range.startNode?.textContent,
-          endNode: range.endNode?.textContent,
-          //children: (range.children || []).map((c) => c.title),
-          target: x.target,
-          prop: x.prop,
-          effect: hash(String(x.effect)),
-        });
-        effectsMap.set(hash(String(x.effect)), String(x.effect));
-      }
-    } else {
-      print.rangeEffects.push({
-        startNode: range.startNode?.textContent,
-        endNode: range.endNode?.textContent,
-        //children: (range.children || []).map((c) => c.title),
-        target: undefined,
-        prop: undefined,
-        effect: undefined,
-      });
-    }
-  }
-  */
+	print.rangeEffects = [];
+	for (let [range, effect] of context.rangeEffects.entries()) {
+		if (effect.size) {
+			for (let x of effect) {
+				print.rangeEffects.push({
+					startNode: range.startNode?.textContent,
+					endNode: range.endNode?.textContent,
+					//children: (range.children || []).map((c) => c.title),
+					target: x.target,
+					prop: x.prop,
+					effect: hash(String(x.effect)),
+				});
+				effectsMap.set(hash(String(x.effect)), String(x.effect));
+			}
+		} else {
+			print.rangeEffects.push({
+				startNode: range.startNode?.textContent,
+				endNode: range.endNode?.textContent,
+				//children: (range.children || []).map((c) => c.title),
+				target: undefined,
+				prop: undefined,
+				effect: undefined,
+			});
+		}
+	}
+	*/
 	/*
-  print.rangeEffects = [];
-  for (let [range, effect] of context.rangeEffects.entries()) {
-    if (effect.size) {
-      for (let x of effect) {
-        print.rangeEffects.push({
-          startNode: range.startNode?.textContent,
-          endNode: range.endNode?.textContent,
-          //children: (range.children || []).map((c) => c.title),
-          effect: hash(String(x)),
-        });
-        effectsMap.set(hash(String(x)), String(x));
-      }
-    } else {
-      print.rangeEffects.push({
-        startNode: range.startNode?.textContent,
-        endNode: range.endNode?.textContent,
-        //children: (range.children || []).map((c) => c.title),
-        effect: undefined,
-      });
-    }
-  }
-  */
+	print.rangeEffects = [];
+	for (let [range, effect] of context.rangeEffects.entries()) {
+		if (effect.size) {
+			for (let x of effect) {
+				print.rangeEffects.push({
+					startNode: range.startNode?.textContent,
+					endNode: range.endNode?.textContent,
+					//children: (range.children || []).map((c) => c.title),
+					effect: hash(String(x)),
+				});
+				effectsMap.set(hash(String(x)), String(x));
+			}
+		} else {
+			print.rangeEffects.push({
+				startNode: range.startNode?.textContent,
+				endNode: range.endNode?.textContent,
+				//children: (range.children || []).map((c) => c.title),
+				effect: undefined,
+			});
+		}
+	}
+	*/
 
 	//print.effects = [];
 	//for (let [hash, value] of effectsMap.entries()) {
-	//  print.effects.push({ hash, value });
+	//	print.effects.push({ hash, value });
 	//}
 
 	if (message) {

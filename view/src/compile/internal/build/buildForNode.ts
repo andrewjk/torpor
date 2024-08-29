@@ -65,23 +65,23 @@ export default function buildForNode(
 
 	b.append("");
 	b.append(`
-      /* @for */
-      let ${forRangeName} = {};
-      t_run_list(
-        ${forRangeName},
-        ${forParentName},
-        ${forAnchorName},
-        function createNewItems() {
-          let t_new_items = [];
-          ${node.statement} {
-            t_new_items.push({
-              ${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
-              data: { ${forVarNames.join(",\n")} }
-            });
-          }
-          return t_new_items;
-        },
-        function createListItem(t_item, t_before) {`);
+	/* @for */
+	let ${forRangeName} = {};
+	t_run_list(
+	${forRangeName},
+	${forParentName},
+	${forAnchorName},
+	function createNewItems() {
+		let t_new_items = [];
+		${node.statement} {
+		t_new_items.push({
+			${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
+			data: { ${forVarNames.join(",\n")} }
+		});
+		}
+		return t_new_items;
+	},
+	function createListItem(t_item, t_before) {`);
 
 	status.forVarNames = forVarNames;
 	buildForItem(node, status, b, forParentName);

@@ -77,16 +77,16 @@ function buildTemplate(
 	}
 
 	b.append(`
-    const ${name} = {
-      name: "${name}",
-      /**
-       * @param {Node} $parent
-       * @param {Node | null} $anchor
-       * @param {Object} [$props]
-       * @param {Object} [$slots]
-       * @param {Object} [$context]
-       */
-      render: ($parent, $anchor, $props, $slots, $context) => {`);
+	const ${name} = {
+		name: "${name}",
+		/**
+		 * @param {Node} $parent
+		 * @param {Node | null} $anchor
+		 * @param {Object} [$props]
+		 * @param {Object} [$slots]
+		 * @param {Object} [$context]
+		 */
+		render: ($parent, $anchor, $props, $slots, $context) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {
@@ -108,9 +108,9 @@ function buildTemplate(
 
 		// TODO: Mangling
 		b.append(`
-      /* User script */
-      ${template.script}
-    `);
+		/* User script */
+		${template.script}
+		`);
 	}
 
 	if (template.markup) {

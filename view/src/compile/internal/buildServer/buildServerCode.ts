@@ -7,28 +7,28 @@ export default function buildServerCode(name: string, template: ComponentTemplat
 
 	// TODO: Imports
 	/*
-  let folder = buildConfig.folder;
-  b.append(`
-    import t_fmt from '${folder}/render/internal/formatText';`);
-  // TODO: De-duplication
-  // This is also the same as build, could it be merged
-  let imports: Import[] = [];
-  if (template.imports) {
-    imports = imports.concat(template.imports);
-  }
-  if (template.childComponents) {
-    for (let child of template.childComponents) {
-      if (child.imports) {
-        imports = imports.concat(child.imports);
-      }
-    }
-  }
-  if (imports.length) {
-    b.append(`
-      ${imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n")}
-    `);
-  }
-    */
+	let folder = buildConfig.folder;
+	b.append(`
+	import t_fmt from '${folder}/render/internal/formatText';`);
+	// TODO: De-duplication
+	// This is also the same as build, could it be merged
+	let imports: Import[] = [];
+	if (template.imports) {
+		imports = imports.concat(template.imports);
+	}
+	if (template.childComponents) {
+		for (let child of template.childComponents) {
+			if (child.imports) {
+				imports = imports.concat(child.imports);
+			}
+		}
+	}
+	if (imports.length) {
+	b.append(`
+		${imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n")}
+	`);
+	}
+	*/
 
 	buildServerTemplate(name, template, b);
 	if (template.childComponents) {
@@ -46,14 +46,14 @@ export default function buildServerCode(name: string, template: ComponentTemplat
 
 function buildServerTemplate(name: string, template: ComponentTemplate, b: Builder) {
 	b.append(`
-    const ${name} = {
-      name: "${name}",
-      /**
-       * @param {Object} [$props]
-       * @param {Object} [$slots]
-       * @param {Object} [$context]
-       */
-      render: ($props, $slots, $context) => {`);
+	const ${name} = {
+		name: "${name}",
+		/**
+		 * @param {Object} [$props]
+		 * @param {Object} [$slots]
+		 * @param {Object} [$context]
+		 */
+		render: ($props, $slots, $context) => {`);
 
 	// Redefine $context so that any newly added properties will only be passed to children
 	if (template.contextProps?.length) {
@@ -90,7 +90,7 @@ function buildServerTemplate(name: string, template: ComponentTemplate, b: Build
 	}
 
 	b.append(`return $output;
-      }
-    }
-  `);
+			}
+		}
+	`);
 }

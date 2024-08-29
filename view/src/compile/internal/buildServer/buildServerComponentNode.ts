@@ -42,18 +42,18 @@ export default function buildServerComponentNode(
 		}
 		// NOTE: Not sure if this is needed
 		/*
-    if (root) {
-      b.append(`
-        if ($props) {
-          const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
-          for (let name of Object.keys($props)) {
-            if (!name.startsWith("$") && !propNames.includes(name)) {
-              ${propsName}[name] = $props[name];
-            }
-          }
-        }`);
-    }
-    */
+		if (root) {
+			b.append(`
+			if ($props) {
+				const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
+				for (let name of Object.keys($props)) {
+					if (!name.startsWith("$") && !propNames.includes(name)) {
+						${propsName}[name] = $props[name];
+					}
+				}
+			}`);
+		}
+		*/
 	}
 
 	// Slots
@@ -85,5 +85,5 @@ export default function buildServerComponentNode(
 
 	// Render the component
 	b.append(`
-    $output += ${node.tagName}.render(${propsName}, ${slotsName}, $context)`);
+	$output += ${node.tagName}.render(${propsName}, ${slotsName}, $context)`);
 }

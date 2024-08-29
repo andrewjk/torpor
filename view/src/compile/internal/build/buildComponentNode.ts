@@ -53,14 +53,14 @@ export default function buildComponentNode(
 		if (root) {
 			status.imports.add("$run");
 			b.append(`
-        if ($props) {
-          const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
-          for (let name of Object.keys($props)) {
-            if (!name.startsWith("$") && !propNames.includes(name)) {
-              $run(() => ${propsName}[name] = $props[name]);
-            }
-          }
-        }`);
+			if ($props) {
+				const propNames = [${status.props.map((p) => `'${p}'`).join(", ")}];
+				for (let name of Object.keys($props)) {
+					if (!name.startsWith("$") && !propNames.includes(name)) {
+						$run(() => ${propsName}[name] = $props[name]);
+					}
+				}
+			}`);
 		}
 	}
 
@@ -97,5 +97,5 @@ export default function buildComponentNode(
 	const compParentName = node.parentName;
 	const compAnchorName = node.varName;
 	b.append(`
-    ${node.tagName}.render(${compParentName}, ${compAnchorName}, ${propsName}, ${slotsName}, $context)`);
+	${node.tagName}.render(${compParentName}, ${compAnchorName}, ${propsName}, ${slotsName}, $context)`);
 }

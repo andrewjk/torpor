@@ -62,12 +62,12 @@ const handler = {
 		return true;
 	},
 	/*
-  apply: function (target: Function, thisArg: any, args: any[]): any {
-    //console.log("APPLY?", target, thisArg);
-    // TODO: re-run effects on the target
-    return Reflect.apply(target, thisArg, args);
-  },
-  */
+	apply: function (target: Function, thisArg: any, args: any[]): any {
+		//console.log("APPLY?", target, thisArg);
+		// TODO: re-run effects on the target
+		return Reflect.apply(target, thisArg, args);
+	},
+	*/
 };
 
 export default handler;

@@ -106,8 +106,8 @@ function buildElementAttributes(
 				buildRun("setBinding", `${setAttribute};`, status, b);
 				// TODO: Add a parseInput method that handles NaN etc
 				b.append(`${varName}.addEventListener("${eventName}", (e) => {
-          if (e.target.${propName}) ${value} = ${inputValue};
-        });`);
+					if (e.target.${propName}) ${value} = ${inputValue};
+				});`);
 			} else if (name.indexOf("bind:") === 0) {
 				// Automatically add an event to bind the value
 				// TODO: Need to check the element to find out what type of event to add

@@ -682,17 +682,17 @@ function getFragmentVarPathPart(
 
 /*
 function printPath(path: VariablePath) {
-  let parent = path;
-  while (parent.parent) {
-    parent = parent.parent;
-  }
-  printPathPart(parent);
+	let parent = path;
+	while (parent.parent) {
+		parent = parent.parent;
+	}
+	printPathPart(parent);
 }
 
 function printPathPart(path: VariablePath, indent = 0) {
-  console.log(`${" ".repeat(indent * 2)}${path.type}`);
-  for (let child of path.children) {
-    printPathPart(child, indent + 1);
-  }
+	console.log(`${" ".repeat(indent * 2)}${path.type}`);
+	for (let child of path.children) {
+		printPathPart(child, indent + 1);
+	}
 }
 */

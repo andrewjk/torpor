@@ -5,11 +5,11 @@ import { control, el, root, text, trimParsed } from "../helpers";
 
 test("simple await", () => {
 	const input = `
-  <section>
-    @await sleep() {
-      <p>Loading...</p>
-    }
-  </section>
+<section>
+	@await sleep() {
+		<p>Loading...</p>
+	}
+</section>
 `;
 
 	const output = trimParsed(parse(input));
@@ -35,13 +35,13 @@ test("simple await", () => {
 
 test("await/then", () => {
 	const input = `
-  <section>
-    @await sleep() {
-      <p>Loading...</p>
-    } then {
-      <p>Loaded!</p>
-    }
-  </section>
+	<section>
+		@await sleep() {
+			<p>Loading...</p>
+		} then {
+			<p>Loaded!</p>
+		}
+	</section>
 `;
 
 	const output = trimParsed(parse(input));
@@ -68,15 +68,15 @@ test("await/then", () => {
 
 test("await/then/catch", () => {
 	const input = `
-  <section>
-    @await sleep() {
-      <p>Loading...</p>
-    } then {
-      <p>Loaded!</p>
-    } catch {
-      <p>Something went wrong.</p>
-    }
-  </section>
+	<section>
+		@await sleep() {
+			<p>Loading...</p>
+		} then {
+			<p>Loaded!</p>
+		} catch {
+			<p>Something went wrong.</p>
+		}
+	</section>
 `;
 
 	const output = trimParsed(parse(input));

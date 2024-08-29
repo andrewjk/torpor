@@ -38,9 +38,9 @@ export default function buildIfNode(
 
 	b.append("");
 	b.append(`
-      /* @if */
-      const ${ifRangeName} = {};
-      t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {`);
+	/* @if */
+	const ${ifRangeName} = {};
+	t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {`);
 
 	for (let [i, branch] of branches.entries()) {
 		buildIfBranch(branch, status, b, ifParentName, ifRangeName, i);

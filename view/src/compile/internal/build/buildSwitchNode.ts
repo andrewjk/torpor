@@ -36,17 +36,17 @@ export default function buildSwitchNode(
 
 	b.append("");
 	b.append(`
-      /* @switch */
-      const ${switchRangeName} = {};
-      t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
-        ${node.statement} {`);
+	/* @switch */
+	const ${switchRangeName} = {};
+	t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
+		${node.statement} {`);
 
 	for (let [i, branch] of branches.entries()) {
 		buildSwitchBranch(branch as ControlNode, status, b, switchParentName, switchRangeName, i);
 	}
 
 	b.append(`}
-    });`);
+	});`);
 	b.append("");
 }
 

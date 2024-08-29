@@ -21,17 +21,17 @@ export default function transferEffects(oldValue: Record<string | symbol, any>, 
 	}
 
 	/*
-  // TODO: Update range subscriptions somehow -- probably need a range array on the effect subscription
-  // Could this be solved by combining ranges and effects??
-  for (let [_, nodeEffects] of context.rangeEffects) {
-    for (let effect of nodeEffects) {
-      if (effect.target === oldTarget) {
-        //nodeEffects.delete(effect);
-        effect.target = newTarget;
-      }
-    }
-  }
-  */
+	// TODO: Update range subscriptions somehow -- probably need a range array on the effect subscription
+	// Could this be solved by combining ranges and effects??
+	for (let [_, nodeEffects] of context.rangeEffects) {
+		for (let effect of nodeEffects) {
+			if (effect.target === oldTarget) {
+				//nodeEffects.delete(effect);
+				effect.target = newTarget;
+			}
+		}
+	}
+	*/
 }
 
 function moveChildEffects(
