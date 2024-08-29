@@ -360,7 +360,11 @@ function declareElementFragmentVars(
 			if (buildConfig.fragmentsUseCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
-				b.append(`let ${node.varName} = ${varPath};`);
+				if (node.tagName === ":element") {
+					b.append(`let ${node.varName} = ${varPath};`);
+				} else {
+					b.append(`const ${node.varName} = ${varPath};`);
+				}
 				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 			}
 		}
