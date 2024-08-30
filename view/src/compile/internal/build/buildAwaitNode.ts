@@ -101,6 +101,8 @@ function buildAwaitBranch(
 	rangeName: string,
 	index: number,
 ) {
+	status.imports.add("t_run_branch");
+
 	b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");

@@ -1,7 +1,7 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../Builder";
 import type BuildServerStatus from "./BuildServerStatus";
-//import buildServerAwaitNode from "./buildServerAwaitNode";
+import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerIfNode from "./buildServerIfNode";
 import buildServerScriptNode from "./buildServerScriptNode";
@@ -40,9 +40,8 @@ export default function buildServerControlNode(
 			// These get handled with @for, above
 			break;
 		}
-		/*
 		case "@await group": {
-			buildServerAwaitNode(node, b);
+			buildServerAwaitNode(node, status, b);
 			break;
 		}
 		case "@await":
@@ -51,7 +50,6 @@ export default function buildServerControlNode(
 			// These get handled with @await group, above
 			break;
 		}
-		*/
 		case "@const": {
 			if (status.output) {
 				b.append(`$output += \`${status.output}\`;`);
