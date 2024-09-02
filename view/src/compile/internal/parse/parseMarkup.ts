@@ -8,9 +8,6 @@ import parseTag from "./parseTag";
 import { accept, addError } from "./parseUtils";
 
 export default function parseMarkup(status: ParseStatus, source: string) {
-	// HACK: Not sure why I still need to add a @ before key
-	status.source = status.source.replace(/{(\s*)key/g, "{$1@key");
-
 	for (status.i; status.i < source.length; status.i++) {
 		const char = status.source[status.i];
 		if (char === "<") {
@@ -41,10 +38,6 @@ function parseTopElement(status: ParseStatus) {
 		case "script": {
 			if (!element.selfClosed) {
 				status.script = extractElementText("script", status);
-
-				// HACK: un-replace the hacky things we replaced at the top of this file
-				status.script = status.script.replaceAll("@key", "key");
-
 				extractScriptImports(status);
 			}
 			break;

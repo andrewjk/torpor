@@ -67,14 +67,12 @@ export default function parseControl(
 				// It's a nested control
 				parseControl(status, node);
 			}
+		} else if (accept("case", status, false) || accept("key", status, false)) {
+			// case and key can be bare in a control block
+			parseControl(status, node);
 		} else {
-			if (accept("case", status, false) || accept("key", status, false)) {
-				// case and key can be bare in a control block
-				parseControl(status, node);
-			} else {
-				// Can't have text content in control blocks
-				addError(status, `Unexpected token in control block: ${char}`, status.i);
-			}
+			// Can't have text content in control blocks
+			addError(status, `Unexpected token in control block: ${char}`, status.i);
 			break;
 		}
 	}
@@ -90,11 +88,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 	const start = status.i;
 	let operation = "";
 	for (status.i; status.i < status.source.length; status.i++) {
-		if (
-			isSpaceChar(status.source, status.i) ||
-			status.source[status.i] === "." ||
-			status.source[status.i] === ":"
-		) {
+		if (isSpaceChar(status.source, status.i)) {
 			operation = status.source.substring(start, status.i);
 			break;
 		}
@@ -103,6 +97,15 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 	// Some operations (else etc) don't start with an @
 	if (!operation.startsWith("@")) operation = "@" + operation;
 
+	if (operation === "@default:") {
+		operation = "@default";
+	}
+
+	if (operation.startsWith("@console.")) {
+		status.i -= operation.length + 1;
+		operation = "@console";
+	}
+
 	const node: ControlNode = {
 		type: "control",
 		operation: operation as OperationType,
@@ -110,13 +113,6 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 		children: [],
 	};
 
-	// HACK: I don't think we need this, but test it
-	if (operation === "@debugger") {
-		node.statement = "debugger";
-		return node;
-	}
-
-	// HACK:
 	if (operation === "@function") {
 		// TODO: Ignore chars in strings, comments and parentheses
 		let braceCount = 0;
