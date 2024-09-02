@@ -35,9 +35,12 @@ const importsMap: Record<string, string> = {
 };
 
 export default function buildCode(name: string, template: ComponentTemplate): string {
-	let imports = new Set<string>();
 	let b = new Builder();
 
+	// Gather imports as we go so they can be placed at the top
+	let imports = new Set<string>();
+
+	// Build the component and any child components
 	buildTemplate(name, template, imports, b);
 	if (template.childComponents) {
 		for (let child of template.childComponents) {
@@ -45,20 +48,19 @@ export default function buildCode(name: string, template: ComponentTemplate): st
 		}
 	}
 
-	let folder = buildConfig.folder;
+	// Add the gathered imports
+	if (imports.size) {
+		b.prepend("");
+		for (let imp of Array.from(imports).reverse()) {
+			imp = importsMap[imp] || imp;
+			b.prepend(imp.replace("${folder}", buildConfig.folder));
+		}
+	}
 
+	// Export the component
 	b.append(`export default ${name};`);
 
-	return (
-		Array.from(imports)
-			.map((imp) => {
-				imp = importsMap[imp] || imp;
-				return imp.replace("${folder}", folder);
-			})
-			.join("\n") +
-		"\n\n" +
-		b.toString()
-	);
+	return b.toString();
 }
 
 function buildTemplate(
@@ -76,8 +78,7 @@ function buildTemplate(
 		}
 	}
 
-	b.append(`
-	const ${name} = {
+	b.append(`const ${name} = {
 		name: "${name}",
 		/**
 		 * @param {Node} $parent
@@ -101,15 +102,16 @@ function buildTemplate(
 	}
 
 	if (template.script) {
+		// Add default imports
 		if (/\$watch\b/.test(template.script)) imports.add("$watch");
 		if (/\$unwrap\b/.test(template.script)) imports.add("$unwrap");
 		if (/\$run\b/.test(template.script)) imports.add("$run");
 		if (/\$mount\b/.test(template.script)) imports.add("$mount");
 
-		// TODO: Mangling
+		// Add the script
 		b.append(`
-		/* User script */
-		${template.script}
+			/* User script */
+			${template.script}
 		`);
 	}
 
@@ -122,11 +124,14 @@ function buildTemplate(
 			fragmentStack: [],
 			forVarNames: [],
 		};
+
+		// Add the interface
 		b.append("/* User interface */");
 		buildFragmentText(template.markup, status, b);
 		b.append("");
 		buildNode(template.markup, status, b, "$parent", "$anchor", true);
 
+		// Flush any $mount calls that were encountered
 		if (imports.has("$mount")) {
 			status.imports.add("t_flush");
 			b.append("");
@@ -135,6 +140,6 @@ function buildTemplate(
 	}
 
 	b.append(`}
-    }
-  `);
+		}
+	`);
 }

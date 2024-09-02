@@ -13,7 +13,7 @@
     const $state = $watch({
         condition: false,
         count: 0,
-        letters: ["a", "b", "c"], //, "d", "e", "f", "g"],
+        letters: ["a", "b", "c", "d", "e", "f", "g"],
         deep: {
             text: "",
             class: ""
@@ -87,7 +87,7 @@
         @for (let i = 0; i < $state.letters.length; i++) {
             @key = $state.letters[i];
             @// TODO: replace with <text> tags
-            <span>{$for.i > 0 ? ", " : ""}{$state.letters[$for.i]}</span>
+            <span>{i > 0 ? ", " : ""}{$state.letters[i]}</span>
         }
     </p>
     <button onclick={() => {

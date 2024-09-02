@@ -2,6 +2,10 @@ export default class Builder {
 	#text = "";
 	#space = 0;
 
+	prepend(text: string) {
+		this.#text = text + "\n" + this.#text;
+	}
+
 	append(text: string) {
 		let i = text.startsWith("\n") ? 1 : 0;
 		while (i < text.length) {

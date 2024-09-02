@@ -46,7 +46,7 @@ export default function hydrateComponent(
 				console.log("===");
 			}
 			const importServer = buildServer(imp.name, importParsed.template!);
-			return importServer.code;
+			return importServer.code.replace("export default ", "");
 		})
 		.join("\n");
 
@@ -55,7 +55,7 @@ export default function hydrateComponent(
 const x = {
 render: ($state) => {
 ${imports}
-${server.code}
+${server.code.replace("export default ", "").replace(/^import.+\n/g, "")}
 
 return ${component.name}.render($state);
 }

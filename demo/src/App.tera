@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
@@ -7,7 +6,10 @@
 		<title>Tera Demo</title>
 	</head>
 	<body>
-		<div id="tera-main" style="display: contents"></div>
-		<script type="module" src="main.ts"></script>
+		<div id="app" style="display: contents">
+			<:slot>
+				<p>404</p>
+			</:slot>
+		</div>
 	</body>
 </html>

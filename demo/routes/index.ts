@@ -4,7 +4,7 @@ import { view } from "../site/server/response";
 function load() {}
 
 function render() {
-  return view(Index);
+	return view(Index);
 }
 
 function post() {}
@@ -14,7 +14,7 @@ function submit() {}
 function del() {}
 
 export function GET() {
-  return view(Index);
+	return view(Index);
 }
 
 // layout option, path option etc for overriding?

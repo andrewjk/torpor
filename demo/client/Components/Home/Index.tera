@@ -24,9 +24,7 @@
 		$state.condition = !$state.condition;
 
 		$state.count += 1;
-		// TODO:
-		//$state.letters.push('abcdefghijklmnopqrstuvwxyz'[$state.count - 1 % 26]);
-		$state.letters = [...$state.letters, 'abcdefghijklmnopqrstuvwxyz'[$state.count - 1 % 26]];
+		$state.letters.push('abcdefghijklmnopqrstuvwxyz'[$state.count - 1 % 26]);
 
 		$state.deep.text = 'Changed deep state';
 		$state.deep.class = $state.condition ? undefined : 'festive';
@@ -34,8 +32,7 @@
 
 	function splice(e) {
 		console.log("=== SPLICE ===")
-		//$state.letters.splice(1, 1, 'x', 'y');
-		$state.items[1].text = "third";
+		$state.letters.splice(1, 1, 'x', 'y');
 	}
 
 	function eventBubbled(e) {
@@ -72,7 +69,7 @@
 	</FancyList>
 
 	@for (let item of $state.items) {
-		<div>{$for.item.text}</div>
+		<div>{item.text}</div>
 	}
 
 	<p id='countdiv'>
@@ -90,13 +87,13 @@
 	<Event onbubble={eventBubbled}/>
 	<ul>
 		@for (let [index, letter] of $state.letters.entries()) {
-			<LetterItemDelegate class="letter" {$for.index} {$for.letter} />
+			<LetterItemDelegate class="letter" {index} {letter} />
 		}
 	</ul>
 	
 	<p>
 		@for (let [index, letter] of $state.letters.entries()) {
-			<span>{$for.letter}</span>
+			<span>{letter}</span>
 		}
 	</p>
 	@if ($state.condition) {

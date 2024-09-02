@@ -3,6 +3,7 @@ import checkAndApplyStyles from "./internal/parse/checkAndApplyStyles";
 import parseMarkup from "./internal/parse/parseMarkup";
 import { trimQuotes } from "./internal/utils";
 import type ParseResult from "./types/ParseResult";
+import isSpaceNode from "./types/nodes/isSpaceNode";
 
 /**
  * Parses source code into a component template
@@ -18,6 +19,18 @@ export default function parse(source: string): ParseResult {
 	};
 
 	parseMarkup(status, source);
+
+	// If the top-level element is <html> and there is whitespace after it,
+	// delete the whitespace, as that's what browsers seem to do
+	// It may be better instead to create whitespace if we don't find it when
+	// hydrating...
+	if (
+		status.template &&
+		status.template.tagName === "html" &&
+		isSpaceNode(status.template.children[0])
+	) {
+		status.template.children.splice(1, 1);
+	}
 
 	checkAndApplyStyles(status);
 

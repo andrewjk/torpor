@@ -6,7 +6,11 @@ import type Component from "../compile/types/Component";
  * @param component The component to mount
  * @param props An object containing component props
  */
-export default function mount(parent: ParentNode, component: Component, props?: Object) {
+export default function mount(
+	parent: ParentNode,
+	component: Component,
+	props?: Record<string, any>,
+) {
 	// The parent must have no child elements, so that we can hydrate without
 	// worrying about where to start
 	if (parent.childElementCount) {
