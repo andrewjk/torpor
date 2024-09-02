@@ -28,4 +28,4 @@ const IfNested = {
 	}
 }
 
-IfNested;
+export default IfNested;

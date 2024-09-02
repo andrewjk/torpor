@@ -21,4 +21,4 @@ const IfElse = {
 	}
 }
 
-IfElse;
+export default IfElse;

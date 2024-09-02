@@ -1,52 +1,53 @@
 import type ComponentTemplate from "../../types/ComponentTemplate";
 import Builder from "../Builder";
+import buildConfig from "../build/buildConfig";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerCode(name: string, template: ComponentTemplate): string {
 	let b = new Builder();
 
-	// TODO: Imports
-	/*
-	let folder = buildConfig.folder;
-	b.append(`
-	import t_fmt from '${folder}/render/internal/formatText';`);
-	// TODO: De-duplication
-	// This is also the same as build, could it be merged
-	let imports: Import[] = [];
-	if (template.imports) {
-		imports = imports.concat(template.imports);
-	}
-	if (template.childComponents) {
-		for (let child of template.childComponents) {
-			if (child.imports) {
-				imports = imports.concat(child.imports);
-			}
-		}
-	}
-	if (imports.length) {
-	b.append(`
-		${imports.map((i) => `import ${i.name} from '${i.path}';`).join("\n")}
-	`);
-	}
-	*/
+	// Gather imports as we go so they can be placed at the top
+	// TODO: Only components?
+	let imports = new Set<string>();
 
-	buildServerTemplate(name, template, b);
+	// Build the component and any child components
+	buildServerTemplate(name, template, imports, b);
 	if (template.childComponents) {
 		for (let child of template.childComponents) {
-			buildServerTemplate(child.name || "ChildComponent", child, b);
+			buildServerTemplate(child.name || "ChildComponent", child, imports, b);
 		}
 	}
 
-	// TODO: export the component
-	//b.append(`export default ${name};`);
-	b.append(`${name};`);
+	// Add the gathered imports
+	if (imports.size) {
+		b.prepend("");
+		for (let imp of Array.from(imports).reverse()) {
+			b.prepend(imp.replace("${folder}", buildConfig.folder));
+		}
+	}
+
+	// Export the component
+	b.append(`export default ${name};`);
 
 	return b.toString();
 }
 
-function buildServerTemplate(name: string, template: ComponentTemplate, b: Builder) {
-	b.append(`
-	const ${name} = {
+function buildServerTemplate(
+	name: string,
+	template: ComponentTemplate,
+	imports: Set<string>,
+	b: Builder,
+) {
+	if (template.imports) {
+		// TODO: Should probably consolidate imports e.g. when we've split them up
+		for (let imp of template.imports) {
+			const name = imp.nonDefault ? `{ ${imp.name} }` : imp.name;
+			const alias = imp.alias ? ` as ${imp.alias}` : "";
+			imports.add(`import ${name}${alias} from '${imp.path}';`);
+		}
+	}
+
+	b.append(`const ${name} = {
 		name: "${name}",
 		/**
 		 * @param {Object} [$props]
@@ -61,28 +62,36 @@ function buildServerTemplate(name: string, template: ComponentTemplate, b: Build
 	}
 
 	if (template.script) {
-		// TODO: Mangling
 		b.append("/* User script */");
-		// HACK: Replace these with proper functions
+
+		// HACK: Stub reactivity functions to do nothing on the server
 		if (/\$watch\b/.test(template.script)) b.append("const $watch = (obj) => obj;");
 		if (/\$unwrap\b/.test(template.script)) b.append("const $unwrap = (obj) => obj;");
 		if (/\$run\b/.test(template.script)) b.append("const $run = (fn) => null;");
 		if (/\$mount\b/.test(template.script)) b.append("const $mount = (fn) => null;");
+
+		// Add the script
 		b.append(template.script);
 	}
 
 	b.append(`let $output = "";`);
 
 	if (template.markup) {
+		b.append("/* User interface */");
+
 		const status = {
 			output: "",
 			styleHash: template.styleHash || "",
 			varNames: {},
 		};
-		b.append("/* User interface */");
-		// HACK: Replace this with imports
+
+		// HACK: Stub the format function to run on the server
+		// TODO: Add this to imports instead
 		b.append('const t_fmt = (text) => text != null ? text : "";');
+
+		// Add the interface
 		buildServerNode(template.markup, status, b);
+
 		if (status.output) {
 			b.append(`$output += \`${status.output}\`;`);
 			status.output = "";

@@ -37,4 +37,4 @@ const TrafficLight = {
 	}
 }
 
-TrafficLight;
+export default TrafficLight;

@@ -22,4 +22,4 @@ const InputFocused = {
 	}
 }
 
-InputFocused;
+export default InputFocused;

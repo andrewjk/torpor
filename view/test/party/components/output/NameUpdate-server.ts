@@ -20,4 +20,4 @@ const NameUpdate = {
 	}
 }
 
-NameUpdate;
+export default NameUpdate;

@@ -18,4 +18,4 @@ const ArrayEntries = {
 	}
 }
 
-ArrayEntries;
+export default ArrayEntries;

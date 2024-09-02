@@ -1,3 +1,5 @@
+import Header from './Header.tera';
+
 const Basic = {
 	name: "Basic",
 	/**
@@ -20,4 +22,4 @@ const Basic = {
 	}
 }
 
-Basic;
+export default Basic;

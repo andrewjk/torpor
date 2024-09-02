@@ -1,3 +1,5 @@
+import List from './List.tera';
+
 const Let = {
 	name: "Let",
 	/**
@@ -22,4 +24,4 @@ const Let = {
 	}
 }
 
-Let;
+export default Let;

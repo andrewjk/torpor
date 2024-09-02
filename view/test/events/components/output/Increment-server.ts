@@ -21,4 +21,4 @@ const Increment = {
 	}
 }
 
-Increment;
+export default Increment;

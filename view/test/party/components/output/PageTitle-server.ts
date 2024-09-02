@@ -23,4 +23,4 @@ const PageTitle = {
 	}
 }
 
-PageTitle;
+export default PageTitle;

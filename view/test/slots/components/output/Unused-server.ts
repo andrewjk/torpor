@@ -1,3 +1,5 @@
+import Header from './Header.tera';
+
 const Unused = {
 	name: "Unused",
 	/**
@@ -14,4 +16,4 @@ const Unused = {
 	}
 }
 
-Unused;
+export default Unused;

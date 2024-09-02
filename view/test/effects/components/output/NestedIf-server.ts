@@ -25,4 +25,4 @@ const NestedIf = {
 	}
 }
 
-NestedIf;
+export default NestedIf;

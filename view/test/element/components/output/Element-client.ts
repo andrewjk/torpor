@@ -1,9 +1,9 @@
 import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
 import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
 import $run from '../../../../../tera/view/src/watch/$run';
 import t_dynamic from '../../../../../tera/view/src/render/internal/setDynamicElement';
 import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
+import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
 
 const Element = {
 	name: "Element",
@@ -23,14 +23,14 @@ const Element = {
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<!>`);
 		const t_root_0 = t_root(t_fragment_0);
 		let t_element_1 = t_root_0;
-
-		t_apply_props(t_element_1, $props, ['tag']);
 		$run(function setDynamic() {
 			t_element_1 = t_dynamic(t_element_1, $props.tag);
 			const t_fragment_1 = t_fragment(t_fragments, 1, ` Hello! `);
 			let t_element_2 = t_root(t_fragment_1);
 			t_add_fragment(t_fragment_1, t_element_1, null);
 		});
+
+		t_apply_props(t_element_1, $props, ['tag']);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

@@ -19,4 +19,4 @@ const Name = {
 	}
 }
 
-Name;
+export default Name;

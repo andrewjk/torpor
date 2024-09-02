@@ -18,4 +18,4 @@ const ForOf = {
 	}
 }
 
-ForOf;
+export default ForOf;

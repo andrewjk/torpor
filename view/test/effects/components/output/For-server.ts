@@ -18,4 +18,4 @@ const For = {
 	}
 }
 
-For;
+export default For;

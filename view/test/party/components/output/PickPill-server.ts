@@ -19,4 +19,4 @@ const PickPill = {
 	}
 }
 
-PickPill;
+export default PickPill;

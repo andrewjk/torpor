@@ -19,4 +19,4 @@ const InputHello = {
 	}
 }
 
-InputHello;
+export default InputHello;

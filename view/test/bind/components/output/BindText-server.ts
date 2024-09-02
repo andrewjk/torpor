@@ -17,4 +17,4 @@ const BindText = {
 	}
 }
 
-BindText;
+export default BindText;

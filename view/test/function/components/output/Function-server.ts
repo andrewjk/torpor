@@ -23,4 +23,4 @@ const Function = {
 	}
 }
 
-Function;
+export default Function;

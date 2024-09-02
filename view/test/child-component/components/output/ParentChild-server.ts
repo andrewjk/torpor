@@ -34,4 +34,4 @@ const Child = {
 	}
 }
 
-ParentChild;
+export default ParentChild;

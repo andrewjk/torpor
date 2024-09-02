@@ -14,4 +14,4 @@ const Object = {
 	}
 }
 
-Object;
+export default Object;

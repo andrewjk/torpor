@@ -19,4 +19,4 @@ const IsAvailable = {
 	}
 }
 
-IsAvailable;
+export default IsAvailable;

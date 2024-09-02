@@ -14,4 +14,4 @@ const Element = {
 	}
 }
 
-Element;
+export default Element;

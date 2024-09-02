@@ -24,4 +24,4 @@ const IfElseIf = {
 	}
 }
 
-IfElseIf;
+export default IfElseIf;

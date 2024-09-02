@@ -30,4 +30,4 @@ const ColorSelect = {
 	}
 }
 
-ColorSelect;
+export default ColorSelect;

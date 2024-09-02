@@ -16,4 +16,4 @@ const Const = {
 	}
 }
 
-Const;
+export default Const;

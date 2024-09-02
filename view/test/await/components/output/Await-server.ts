@@ -6,8 +6,8 @@ const Await = {
 	 * @param {Object} [$context]
 	 */
 	render: ($props, $slots, $context) => {
-		const $watch = (obj) => obj;
 		/* User script */
+		const $watch = (obj) => obj;
 		// Use the $watch function to declare reactive state
 		const $state = $watch({})
 
@@ -25,8 +25,8 @@ const Await = {
 				})
 			}
 			let $output = "";
-			const t_fmt = (text) => text != null ? text : "";
 			/* User interface */
+			const t_fmt = (text) => text != null ? text : "";
 			$output += `<div> <![>`;
 			$output += ` <p>Hmm...</p> `;
 			$output += `<!]><!> <button> Guess again </button> </div>`;

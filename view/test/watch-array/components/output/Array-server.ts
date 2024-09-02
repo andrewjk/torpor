@@ -18,4 +18,4 @@ const Array = {
 	}
 }
 
-Array;
+export default Array;

@@ -18,4 +18,4 @@ const ArrayIndexes = {
 	}
 }
 
-ArrayIndexes;
+export default ArrayIndexes;

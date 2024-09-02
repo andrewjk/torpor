@@ -21,4 +21,4 @@ const If = {
 	}
 }
 
-If;
+export default If;

@@ -23,4 +23,4 @@ const Counter = {
 	}
 }
 
-Counter;
+export default Counter;

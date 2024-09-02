@@ -14,4 +14,4 @@ const Attributes = {
 	}
 }
 
-Attributes;
+export default Attributes;

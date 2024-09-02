@@ -18,4 +18,4 @@ const ForIn = {
 	}
 }
 
-ForIn;
+export default ForIn;

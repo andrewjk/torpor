@@ -1,3 +1,5 @@
+import Header from './Header.tera';
+
 const Component = {
 	name: "Component",
 	/**
@@ -16,4 +18,4 @@ const Component = {
 	}
 }
 
-Component;
+export default Component;

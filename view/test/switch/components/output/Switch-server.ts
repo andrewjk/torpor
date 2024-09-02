@@ -29,4 +29,4 @@ const Switch = {
 	}
 }
 
-Switch;
+export default Switch;

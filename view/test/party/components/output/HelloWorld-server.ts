@@ -14,4 +14,4 @@ const HelloWorld = {
 	}
 }
 
-HelloWorld;
+export default HelloWorld;

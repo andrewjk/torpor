@@ -1,3 +1,5 @@
+import UserProfileContext from './UserProfileContext.tera';
+
 const UserProfileContextApp = {
 	name: "UserProfileContextApp",
 	/**
@@ -28,4 +30,4 @@ const UserProfileContextApp = {
 	}
 }
 
-UserProfileContextApp;
+export default UserProfileContextApp;

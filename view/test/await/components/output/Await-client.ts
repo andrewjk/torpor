@@ -1,18 +1,17 @@
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
-import $run from '../../../../../tera/view/src/watch/$run';
-import t_fmt from '../../../../../tera/view/src/render/internal/formatText';
-import t_pop_range from '../../../../../tera/view/src/render/internal/popRange';
-import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
-import t_run_branch from '../../../../../tera/view/src/render/internal/runControlBranch';
-import t_run_control from '../../../../../tera/view/src/render/internal/runControl';
-import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
-import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
-import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
 import $watch from '../../../../../tera/view/src/watch/$watch';
-
+import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
+import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
+import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
+import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
+import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
+import t_run_control from '../../../../../tera/view/src/render/internal/runControl';
+import t_run_branch from '../../../../../tera/view/src/render/internal/runControlBranch';
+import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
+import t_push_range from '../../../../../tera/view/src/render/internal/pushRange';
+import t_pop_range from '../../../../../tera/view/src/render/internal/popRange';
+import t_fmt from '../../../../../tera/view/src/render/internal/formatText';
+import $run from '../../../../../tera/view/src/watch/$run';
+import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
 
 const Await = {
 	name: "Await",

@@ -1,3 +1,5 @@
+import Article from './Article.tera';
+
 const Named = {
 	name: "Named",
 	/**
@@ -25,4 +27,4 @@ const Named = {
 	}
 }
 
-Named;
+export default Named;

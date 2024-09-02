@@ -14,4 +14,4 @@ const CssStyle = {
 	}
 }
 
-CssStyle;
+export default CssStyle;

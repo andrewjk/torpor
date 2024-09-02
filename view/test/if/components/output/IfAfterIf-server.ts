@@ -22,4 +22,4 @@ const IfAfterIf = {
 	}
 }
 
-IfAfterIf;
+export default IfAfterIf;

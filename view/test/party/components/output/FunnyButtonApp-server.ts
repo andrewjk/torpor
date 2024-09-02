@@ -1,3 +1,5 @@
+import FunnyButton from './FunnyButton.tera';
+
 const FunnyButtonApp = {
 	name: "FunnyButtonApp",
 	/**
@@ -24,4 +26,4 @@ const FunnyButtonApp = {
 	}
 }
 
-FunnyButtonApp;
+export default FunnyButtonApp;

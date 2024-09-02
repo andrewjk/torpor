@@ -21,4 +21,4 @@ const Mount = {
 	}
 }
 
-Mount;
+export default Mount;

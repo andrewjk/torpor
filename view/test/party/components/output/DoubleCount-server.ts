@@ -22,4 +22,4 @@ const DoubleCount = {
 	}
 }
 
-DoubleCount;
+export default DoubleCount;

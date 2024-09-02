@@ -1,3 +1,5 @@
+import AnswerButton from './AnswerButton.tera';
+
 const AnswerButtonApp = {
 	name: "AnswerButtonApp",
 	/**
@@ -32,4 +34,4 @@ const AnswerButtonApp = {
 	}
 }
 
-AnswerButtonApp;
+export default AnswerButtonApp;

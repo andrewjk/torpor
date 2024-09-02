@@ -1,3 +1,5 @@
+import UserProfile from './UserProfile.tera';
+
 const UserProfileApp = {
 	name: "UserProfileApp",
 	/**
@@ -19,4 +21,4 @@ const UserProfileApp = {
 	}
 }
 
-UserProfileApp;
+export default UserProfileApp;
