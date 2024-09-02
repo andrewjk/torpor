@@ -23,6 +23,7 @@ export default function buildNode(
 	// Nodes with anchors will have been handled when their containing fragment
 	// was built so we want to skip them here
 	if (node.handled) {
+		node.handled = false;
 		return;
 	}
 
