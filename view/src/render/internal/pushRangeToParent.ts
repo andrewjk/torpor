@@ -6,7 +6,7 @@ export default function pushRangeToParent(range: Range): Range | null {
 	// can delete the children with the parent
 	const activeRange = context.activeRange;
 	if (activeRange) {
-		activeRange.children = activeRange.children || [];
+		activeRange.children ||= [];
 		activeRange.children.push(range);
 		range.parent = activeRange;
 	}
