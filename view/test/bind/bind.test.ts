@@ -2,10 +2,14 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/BindText.tera";
+
+let componentFile = "./components/BindText.tera";
 
 test("bind text value -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	const container = document.createElement("div");
 	mountComponent(container, Component);
 
@@ -13,9 +17,10 @@ test("bind text value -- mounted", async () => {
 });
 
 test("bind text value -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	const container = document.createElement("div");
-	const path = "./test/bind/components/BindText.tera";
-	hydrateComponent(container, path, Component);
+	hydrateComponent(container, componentPath, Component);
 
 	await check(container);
 });

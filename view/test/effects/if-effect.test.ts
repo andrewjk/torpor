@@ -4,10 +4,14 @@ import { expect, test } from "vitest";
 import context from "../../src/global/context";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/If.tera";
+
+let componentFile = "./components/If.tera";
 
 test("if effect -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	const state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
@@ -17,11 +21,12 @@ test("if effect -- mounted", async () => {
 });
 
 test("if effect -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	const state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
-	const path = "./test/effects/components/If.tera";
-	hydrateComponent(container, path, Component, state);
+	hydrateComponent(container, componentPath, Component, state);
 
 	check(container, state, true);
 });

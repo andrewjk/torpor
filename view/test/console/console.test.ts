@@ -1,8 +1,9 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { afterAll, describe, expect, test, vi } from "vitest";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Console.tera";
+
+let componentFile = "./components/Console.tera";
 
 describe("console", () => {
 	const consoleMock = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -11,7 +12,9 @@ describe("console", () => {
 		consoleMock.mockReset();
 	});
 
-	test("console", () => {
+	test("console", async () => {
+		let { Component } = await importComponent(expect, componentFile);
+
 		const container = document.createElement("div");
 		mountComponent(container, Component);
 

@@ -3,10 +3,14 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/AnswerButtonApp.tera";
+
+let componentFile = "./components/AnswerButtonApp.tera";
 
 test("emit to parent -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	const container = document.createElement("div");
 	mountComponent(container, Component);
 
@@ -14,9 +18,10 @@ test("emit to parent -- mounted", async () => {
 });
 
 test("emit to parent -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	const container = document.createElement("div");
-	const path = "./test/party/components/AnswerButtonApp.tera";
-	hydrateComponent(container, path, Component);
+	hydrateComponent(container, componentPath, Component);
 
 	await check(container);
 });

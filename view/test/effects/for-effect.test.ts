@@ -4,18 +4,21 @@ import printContext from "../../src/debug/printContext";
 import context from "../../src/global/context";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/For.tera";
+
+let componentFile = "./components/For.tera";
 
 test("for effect -- mounted", async () => {
-	const _state = {
+	let { Component } = await importComponent(expect, componentFile);
+
+	const state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },
 			{ id: 2, text: "third" },
 		],
-	};
-	const state = $watch(_state);
+	});
 
 	const container = document.createElement("div");
 	mountComponent(container, Component, state);
@@ -24,18 +27,18 @@ test("for effect -- mounted", async () => {
 });
 
 test("for effect -- hydrated", async () => {
-	const _state = {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
+	const state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },
 			{ id: 2, text: "third" },
 		],
-	};
-	const state = $watch(_state);
+	});
 
 	const container = document.createElement("div");
-	const path = "./test/effects/components/For.tera";
-	hydrateComponent(container, path, Component, state);
+	hydrateComponent(container, componentPath, Component, state);
 
 	check(container, state, true);
 });

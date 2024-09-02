@@ -3,10 +3,14 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/ForIn.tera";
 
-test("for in -- mounted", () => {
+let componentFile = "./components/ForIn.tera";
+
+test("for in -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	const state = $watch({
 		item: {
 			first: "1",
@@ -21,7 +25,9 @@ test("for in -- mounted", () => {
 	check(container);
 });
 
-test("for in -- hydrated", () => {
+test("for in -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	const state = $watch({
 		item: {
 			first: "1",
@@ -31,8 +37,7 @@ test("for in -- hydrated", () => {
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/for/components/ForIn.tera";
-	hydrateComponent(container, path, Component, state);
+	hydrateComponent(container, componentPath, Component, state);
 
 	check(container);
 });

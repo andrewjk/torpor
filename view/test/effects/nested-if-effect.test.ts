@@ -4,8 +4,10 @@ import { expect, test } from "vitest";
 import context from "../../src/global/context";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/NestedIf.tera";
+
+let componentFile = "./components/NestedIf.tera";
 
 interface State {
 	condition: boolean;
@@ -13,6 +15,8 @@ interface State {
 }
 
 test("nested if effect -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	const _state = { condition: true, counter: 0 };
 	const state = $watch(_state);
 
@@ -23,12 +27,13 @@ test("nested if effect -- mounted", async () => {
 });
 
 test("nested if effect -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	const _state = { condition: true, counter: 0 };
 	const state = $watch(_state);
 
 	const container = document.createElement("div");
-	const path = "./test/effects/components/NestedIf.tera";
-	hydrateComponent(container, path, Component, state);
+	hydrateComponent(container, componentPath, Component, state);
 
 	check(container, _state, state, true);
 });

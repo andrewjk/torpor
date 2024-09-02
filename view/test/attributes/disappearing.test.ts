@@ -3,15 +3,19 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Attributes.tera";
+
+let componentFile = "./components/Attributes.tera";
 
 interface State {
 	thing: any;
 	dataThing: any;
 }
 
-test("attributes disappearing -- mounted", () => {
+test("attributes disappearing -- mounted", async () => {
+	let { Component } = await importComponent(expect, componentFile);
+
 	let $state = $watch({
 		thing: "thing1",
 		dataThing: "thing2",
@@ -23,15 +27,16 @@ test("attributes disappearing -- mounted", () => {
 	check(container, $state);
 });
 
-test("attributes disappearing -- hydrated", () => {
+test("attributes disappearing -- hydrated", async () => {
+	let { Component, componentPath } = await importComponent(expect, componentFile);
+
 	let $state = $watch({
 		thing: "thing1",
 		dataThing: "thing2",
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/attributes/components/Attributes.tera";
-	hydrateComponent(container, path, Component, $state);
+	hydrateComponent(container, componentPath, Component, $state);
 
 	check(container, $state);
 });
