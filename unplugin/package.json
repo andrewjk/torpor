@@ -122,14 +122,14 @@
 		}
 	},
 	"dependencies": {
-		"unplugin": "^1.12.2"
+		"unplugin": "^1.12.3"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^3.0.0",
 		"@nuxt/kit": "^3.13.0",
 		"@nuxt/schema": "^3.13.0",
 		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
-		"@types/node": "^22.5.1",
+		"@types/node": "^22.5.2",
 		"bumpp": "^9.5.2",
 		"chalk": "^5.3.0",
 		"eslint": "^9.9.1",
@@ -138,7 +138,7 @@
 		"nodemon": "^3.1.4",
 		"prettier": "^3.3.3",
 		"rimraf": "^6.0.1",
-		"rollup": "^4.21.1",
+		"rollup": "^4.21.2",
 		"tsup": "^8.2.4",
 		"typescript": "^5.5.4",
 		"vite": "^5.4.2",
