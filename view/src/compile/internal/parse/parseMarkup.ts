@@ -8,14 +8,8 @@ import parseTag from "./parseTag";
 import { accept, addError } from "./parseUtils";
 
 export default function parseMarkup(status: ParseStatus, source: string) {
-	// HACK: The laziest way to handle elses etc:
-	status.source = status.source
-		.replace(/}(\s*)else/g, "}$1@else")
-		.replace(/(\{|\})(\s*)case/g, "$1$2@case")
-		.replace(/(\{|\})(\s*)default/g, "$1$2@default")
-		.replace(/{(\s*)key/g, "{$1@key")
-		.replace(/}(\s*)then/g, "}$1@then")
-		.replace(/}(\s*)catch/g, "}$1@catch");
+	// HACK: Not sure why I still need to add a @ before key
+	status.source = status.source.replace(/{(\s*)key/g, "{$1@key");
 
 	for (status.i; status.i < source.length; status.i++) {
 		const char = status.source[status.i];
@@ -49,13 +43,7 @@ function parseTopElement(status: ParseStatus) {
 				status.script = extractElementText("script", status);
 
 				// HACK: un-replace the hacky things we replaced at the top of this file
-				status.script = status.script
-					.replaceAll("@else", "else")
-					.replaceAll("@case", "case")
-					.replaceAll("@default", "default")
-					.replaceAll("@key", "key")
-					.replaceAll("@then", "then")
-					.replaceAll("@catch", "catch");
+				status.script = status.script.replaceAll("@key", "key");
 
 				extractScriptImports(status);
 			}

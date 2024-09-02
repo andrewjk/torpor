@@ -8,8 +8,6 @@ import parseControl from "./parseControl";
 import parseTag from "./parseTag";
 import { isSpaceChar } from "./parseUtils";
 import slottifyChildNodes from "./slottifyChildNodes";
-import wrangleControlNode from "./wrangleControlNode";
-import wrangleSpecialNode from "./wrangleSpecialNode";
 
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
 const voidTags = [
@@ -65,22 +63,8 @@ export default function parseElement(status: ParseStatus): ElementNode {
 					status.i = status.source.indexOf("*/", status.i) + 2;
 				} else {
 					// It's a control statement
-					const child = parseControl(status);
-					wrangleControlNode(child, element);
+					parseControl(status, element);
 				}
-				/*
-			} else if (char === "}") {
-				// Check for an else
-				const end = status.i;
-				status.i += 1;
-				consumeSpace(status);
-				if (accept("else", status, false)) {
-					const child = parseControl(status, "@each");
-					element.children.push(child);
-				} else {
-					status.i = end;
-				}
-				*/
 			} else {
 				// It's text content
 				const start = status.i;
@@ -153,4 +137,12 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	return element;
+}
+
+function wrangleSpecialNode(node: ElementNode) {
+	if (node.tagName === ":slot") {
+		// HACK: Add a :fill node underneath :slot nodes for their fallback content
+		// Anchors will be created for :slot nodes and fragments will be created for the :fill content
+		slottifyChildNodes(node);
+	}
 }
