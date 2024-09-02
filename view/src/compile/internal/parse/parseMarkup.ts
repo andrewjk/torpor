@@ -155,7 +155,7 @@ function extractScriptImports(status: ParseStatus) {
 					} else if (line.startsWith("import ")) {
 						// TODO: More import wrangling
 						// (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
-						status.imports = status.imports || [];
+						status.imports ||= [];
 						const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/gms;
 						const componentRegex = /\.tera$/gm;
 						const importMatches = line.matchAll(importRegex);
