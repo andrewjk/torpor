@@ -17,6 +17,10 @@ export default function buildElementNode(
 ) {
 	const varName = node.varName;
 	if (varName) {
+		if (node.tagName === ":element") {
+			buildDynamicElementNode(node, status, b);
+		}
+
 		// PERF: Does this have much of an impact??
 		if (root) {
 			status.imports.add("t_apply_props");
@@ -25,10 +29,6 @@ export default function buildElementNode(
 			b.append(
 				`t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
 			);
-		}
-
-		if (node.tagName === ":element") {
-			buildDynamicElementNode(node, status, b);
 		}
 
 		buildElementAttributes(node, varName, status, b);
