@@ -41,9 +41,16 @@ function moveChildEffects(
 ) {
 	// Set values of child properties that have effects, so that they will get updated too
 	// TODO: Top down or bottom up?? Doing top down for now...
-	for (let prop of objectEffects.keys()) {
-		// HACK: can't set length to the old value...
-		if (prop !== "length") {
+	if (Array.isArray(oldValue)) {
+		for (let prop of objectEffects.keys()) {
+			// HACK: can't set length to the old value...
+			if (prop === "length" || parseInt(String(prop)) >= newValue.length) {
+				continue;
+			}
+			oldValue[prop as any] = newValue[prop];
+		}
+	} else {
+		for (let prop of objectEffects.keys()) {
 			oldValue[prop] = newValue[prop];
 		}
 	}
