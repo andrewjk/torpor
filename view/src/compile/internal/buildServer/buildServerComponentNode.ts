@@ -65,7 +65,7 @@ export default function buildServerComponentNode(
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
-				b.append(`${slotsName}["${slotName}"] = ($sprops) => {`);
+				b.append(`${slotsName}["${slotName}"] = ($sprops, $context) => {`);
 				b.append(`let $output = "";`);
 
 				for (let child of slot.children) {

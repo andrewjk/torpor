@@ -12,12 +12,12 @@ const Named = {
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
 		const t_slots_1 = {};
-		t_slots_1["_"] = ($sprops) => {
+		t_slots_1["_"] = ($sprops, $context) => {
 			let $output = "";
 			$output += `  <p> The article's body </p> `;
 			return $output;
 		}
-		t_slots_1["header"] = ($sprops) => {
+		t_slots_1["header"] = ($sprops, $context) => {
 			let $output = "";
 			$output += ` The article's header `;
 			return $output;

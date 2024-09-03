@@ -47,7 +47,9 @@ export default function buildServerSlotNode(
 	}
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
-	b.append(`$output += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"});`);
+	b.append(
+		`$output += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
+	);
 
 	// TODO: Not if there's only a single space node -- maybe check in parse
 	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");

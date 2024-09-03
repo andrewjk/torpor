@@ -12,7 +12,7 @@ const Basic = {
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
 		const t_slots_1 = {};
-		t_slots_1["_"] = ($sprops) => {
+		t_slots_1["_"] = ($sprops, $context) => {
 			let $output = "";
 			$output += ` Basic stuff `;
 			return $output;

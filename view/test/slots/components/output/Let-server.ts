@@ -14,7 +14,7 @@ const Let = {
 		const t_props_1 = {};
 		t_props_1["items"] = $props.items;
 		const t_slots_1 = {};
-		t_slots_1["_"] = ($sprops) => {
+		t_slots_1["_"] = ($sprops, $context) => {
 			let $output = "";
 			$output += ` ${t_fmt($sprops.item.text)} `;
 			return $output;
