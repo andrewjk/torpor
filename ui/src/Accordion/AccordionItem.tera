@@ -19,28 +19,17 @@
  */
 
 <script>
-	import {
-		AccordionContextName,
-		AccordionItemContextName,
-		type AccordionContext,
-		type AccordionItemContext
-	} from './AccordionTypes';
+	import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from './AccordionTypes';
 
-	interface State {
-		expanded: boolean;
-		dataState: 'open' | 'closed';
-		dataDisabled: boolean | undefined;
-	}
-
-	let $state: State = $watch({
+	let $state: ItemState = $watch({
+		index: -1,
+		value: "",
 		expanded: false,
 		disabled: $props.disabled,
+		parentDisabled: false,
 		get dataState() {
 			return this.expanded ? 'open' : 'closed';
 		},
-		get dataDisabled() {
-			return this.disabled ? true : undefined;
-		}
 	})
 
 	// Get stuff out of the AccordionContext
@@ -53,21 +42,17 @@
 	const itemContext: AccordionItemContext = {
 		toggleItem: context.toggleItem,
 		handleHeaderKey: context.handleHeaderKey,
-		index: $props.index,
-		value: $props.value,
 		state: $state,
 	};
 	$context[AccordionItemContextName] = itemContext;
 
 	// Register this item with the parent Accordion, which will handle toggling expanded for all items
-	const { newIndex, newValue } = context.registerItem($props.index, $props.value, setExpanded, setFocused, setDisabled);
-	itemContext.index = newIndex;
-	itemContext.value = newValue;
+	context.registerItem($state);
 
 	// Remove the item from the parent Accordion when this item is destroyed
 	$run(() => {
 		return () => {
-			context.removeItem(itemContext.index);
+			context.removeItem($state.index);
 		}
 	});
 
@@ -78,22 +63,6 @@
 			$props.ontoggle($state.expanded);
 		}
 	})
-
-	// Called from the parent Accordion; put the expanded value in the store
-	function setExpanded(value: boolean) {
-		$state.expanded = value;
-	}
-
-	// Called from the parent Accordion; pass the focus command along to the AccordionTrigger
-	function setFocused() {
-		if (itemContext.setHeaderFocused) {
-			itemContext.setHeaderFocused();
-		}
-	}
-
-	function setDisabled(value: boolean) {
-		$state.disabled = value || $state.disabled;
-	}
 </script>
 
 <div

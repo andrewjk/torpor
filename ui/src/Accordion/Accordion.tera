@@ -61,7 +61,6 @@
 				newValue = newValue?.toString();
 				for (let item of $state.itemStates) {
 					item.expanded = item.value === newValue;
-					item.setExpanded(item.expanded);
 				}
 				break;
 			}
@@ -72,7 +71,6 @@
 				}
 				for (let item of $state.itemStates) {
 					item.expanded = newValue.indexOf(item.value) !== -1;
-					item.setExpanded(item.expanded);
 				}
 				break;
 			}
@@ -83,7 +81,7 @@
 	})
 
 	$run(() => {
-		$state.itemStates.forEach((s) => s.setDisabled($props.disabled));
+		$state.itemStates.forEach((s) => s.parentDisabled = $props.disabled);
 	});
 
 	// Dispatch the change event when the value changes
@@ -94,61 +92,59 @@
 		}
 	})
 
-	function registerItem(
-		itemIndex: number | undefined,
-		itemValue: string | undefined,
-		setExpanded: (value: boolean) => void,
-		setFocused: () => void,
-		setDisabled: (value: boolean) => void
-	) {
+	function registerItem(itemState: ItemState) {
 		// If an index wasn't set for the item, set it automatically
-		if (!itemIndex) {
-			itemIndex = nextIndex++;
+		if (itemState.index === -1) {
+			itemState.index = nextIndex++;
 		}
 
 		// If a value wasn't set for the item, set it to the index
-		if (!itemValue) {
-			itemValue = itemIndex.toString();
+		if (!itemState.value) {
+			itemState.value = itemState.index.toString();
 		}
 
-		// Add the item's state to the array
-		const newItemState: ItemState = {
-			index: itemIndex,
-			value: itemValue,
-			expanded: false,
-			setExpanded,
-			setFocused,
-			setDisabled
-		};
-		$state.itemStates.splice(itemIndex, 0, newItemState);
+		// If we have a value, set whether the item should be expanded
+		if ($state.value) {
+			switch ($props.type) {
+				case 'single': {
+					itemState.expanded = $state.value === itemState.value;
+					break;
+				}
+				case 'multiple': {
+					itemState.expanded = $state.value.includes(itemState.value);
+					break;
+				}
+			}
+		}
 
-		// Return the value that was passed to us, or the automatic value
-		return {
-			newIndex: itemIndex,
-			newValue: itemValue
-		};
+		// Set whether the Accordion itself is disabled
+		$state.parentDisabled = $props.disabled
+
+		// Add the item's state to the array
+		$state.itemStates.splice(itemState.index, 0, itemState);
 	}
 
+	// TODO: I think this should be done by value
 	function removeItem(itemIndex: number) {
 		// Remove the item and re-index
-		$state.itemStates.splice(itemIndex, 1);
+		let index = $state.itemStates.findIndex((item) => item.index === itemIndex);
+		if (index !== -1) {
+			$state.itemStates.splice(itemIndex, 1);
+		}
 		$state.itemStates.forEach((item, i) => (item.index = i));
 	}
 
 	function toggleItem(toggleValue: string) {
 		switch ($props.type) {
 			case 'single': {
-				let newValue = '';
 				for (let item of $state.itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
 					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
-					if (item.value === toggleValue && !item.expanded) {
-						newValue = item.value;
+					if (item.value === toggleValue) {
+						$state.value = item.expanded ? '' : item.value;
 						break;
 					}
 				}
-				// Set the value to the value of the expanded item
-				$state.value = newValue;
 				break;
 			}
 			case 'multiple': {

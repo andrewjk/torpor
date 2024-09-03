@@ -20,7 +20,7 @@
 	$state.headerId = $props.id;
 
 	// Let the item know how to set the button's focus
-	context.setHeaderFocused = setFocused;
+	$state.setFocused = setFocused;
 
 	// This function is called by the parent Accordion to focus this item's button
 	function setFocused() {
@@ -30,12 +30,12 @@
 	function handleClick() {
 		// Pass the value to the toggleItem method in the parent Accordion which will handle toggling
 		// the value of expanded for all items (e.g. to close other items if necessary)
-		context.toggleItem(context.value);
+		context.toggleItem($state.value);
 	}
 
 	function handleKey(e: KeyboardEvent) {
 		// Pass the key press up to the parent Accordion which will handle setting the focused button
-		context.handleHeaderKey(context.index, e);
+		context.handleHeaderKey($state.index, e);
 	}
 </script>
 
@@ -43,12 +43,12 @@
 	type="button"
 	id={$props.id}
 	class='tera-accordion-button'
-	disabled={$state.disabled}
-	aria-expanded={$state.expanded}
-	aria-disabled={$state.disabled || undefined}
+	disabled={$state.disabled || $state.parentDisabled}
+	aria-expanded={$state.expanded.toString()}
+	aria-disabled={$state.disabled}
 	aria-controls={$state.contentId}
 	data-state={$state.dataState}
-	data-disabled={$state.dataDisabled}
+	data-disabled={$state.disabled}
 	bind:this={button}
 	onclick={handleClick}
 	onkeydown={handleKey}
