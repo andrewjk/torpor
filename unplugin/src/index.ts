@@ -82,7 +82,7 @@ function transform(name: string, template: ComponentTemplate, id: string) {
 		styles.set(built.styleHash + ".css", built.styles);
 	}
 
-	printOutput(transformed);
+	//printTransformed(transformed);
 
 	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
 	return transformWithEsbuild(transformed, id, {
@@ -107,9 +107,12 @@ function transformForServer(name: string, template: ComponentTemplate, id: strin
 		styles.set(built.styleHash + ".css", built.styles);
 	}
 
-	//printOutput(transformed);
+	//printTransformed(transformed);
 
-	return transformed;
+	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
+	return transformWithEsbuild(transformed, id, {
+		loader: "ts",
+	});
 }
 
 function normalizeImportPaths(transformed: string, id: string): string {
@@ -127,7 +130,7 @@ function normalizeImportPaths(transformed: string, id: string): string {
 	return transformed;
 }
 
-function printOutput(transformed: string) {
+function printTransformed(transformed: string) {
 	console.log(
 		transformed
 			.split("\n")
