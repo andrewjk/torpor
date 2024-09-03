@@ -2,10 +2,10 @@ const Element = {
 	name: "Element",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		$props ||= {};
 
 		let $output = "";

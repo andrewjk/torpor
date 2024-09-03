@@ -96,6 +96,10 @@ export default function buildComponentNode(
 	// Render the component
 	const compParentName = node.parentName;
 	const compAnchorName = node.varName;
-	b.append(`
-	${node.tagName}.render(${compParentName}, ${compAnchorName}, ${propsName}, ${slotsName}, $context)`);
+	let renderParams = `${compParentName}, ${compAnchorName}, ${propsName}, $context`;
+	if (slotsName !== "undefined") {
+		renderParams += `, ${slotsName}`;
+	}
+	b.append("");
+	b.append(`${node.tagName}.render(${renderParams})`);
 }

@@ -4,8 +4,8 @@ type ComponentRender = (
 	parent: Node,
 	anchor: Node | null,
 	$props?: Record<string, any>,
-	$slots?: Record<string, SlotRender>,
 	$context?: Record<string, any>,
+	$slots?: Record<string, SlotRender>,
 ) => void;
 
 export default ComponentRender;

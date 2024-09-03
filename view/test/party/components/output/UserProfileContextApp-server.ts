@@ -4,10 +4,10 @@ const UserProfileContextApp = {
 	name: "UserProfileContextApp",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		$context = Object.assign({}, $context);
 
 		/* User script */
@@ -25,7 +25,8 @@ const UserProfileContextApp = {
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
 		$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
-		$output += UserProfileContext.render(undefined, undefined, $context)
+
+		$output += UserProfileContext.render(undefined, $context)
 		$output += `</div>`;
 		return $output;
 	}

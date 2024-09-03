@@ -2,10 +2,10 @@ const InputFocused = {
 	name: "InputFocused",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		/* User script */
 		const $mount = (fn) => null;
 		let inputElement;

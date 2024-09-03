@@ -10,10 +10,10 @@ const Basic = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		/* User interface */
 		const t_fragments = [];
 
@@ -28,7 +28,8 @@ const Basic = {
 			const t_text_1 = t_root(t_fragment_2);
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
-		Header.render(t_fragment_0, t_comp_anchor_1, undefined, t_slots_1, $context)
+
+		Header.render(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1)
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

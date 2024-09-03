@@ -13,10 +13,10 @@ const Let = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		$props ||= {};
 
 		/* User interface */
@@ -40,7 +40,8 @@ const Let = {
 			});
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
-		List.render(t_fragment_0, t_comp_anchor_1, t_props_1, t_slots_1, $context)
+
+		List.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1)
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

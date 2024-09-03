@@ -10,10 +10,10 @@ const Unused = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		/* User interface */
 		const t_fragments = [];
 
@@ -22,7 +22,8 @@ const Unused = {
 		const t_comp_anchor_1 = t_anchor(t_root_0);
 
 		/* @component */
-		Header.render(t_fragment_0, t_comp_anchor_1, undefined, undefined, $context)
+
+		Header.render(t_fragment_0, t_comp_anchor_1, undefined, $context)
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

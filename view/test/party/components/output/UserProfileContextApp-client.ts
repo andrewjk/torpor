@@ -17,10 +17,10 @@ const UserProfileContextApp = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		$context = Object.assign({}, $context);
 
 		/* User script */
@@ -42,7 +42,8 @@ const UserProfileContextApp = {
 		const t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_div_1)))));
 
 		/* @component */
-		UserProfileContext.render(t_div_1, t_comp_anchor_1, undefined, undefined, $context)
+
+		UserProfileContext.render(t_div_1, t_comp_anchor_1, undefined, $context)
 
 		t_apply_props(t_div_1, $props, []);
 		$run(function setTextContent() {

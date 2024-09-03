@@ -2,10 +2,10 @@ const TrafficLight = {
 	name: "TrafficLight",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		/* User script */
 		const $watch = (obj) => obj;
 		const TRAFFIC_LIGHTS = ["red", "orange", "green"];

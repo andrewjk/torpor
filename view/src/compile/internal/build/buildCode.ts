@@ -84,10 +84,10 @@ function buildTemplate(
 		 * @param {Node} $parent
 		 * @param {Node | null} $anchor
 		 * @param {Object} [$props]
-		 * @param {Object} [$slots]
 		 * @param {Object} [$context]
+		 * @param {Object} [$slots]
 		 */
-		render: ($parent, $anchor, $props, $slots, $context) => {`);
+		render: ($parent, $anchor, $props, $context, $slots) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {

@@ -84,6 +84,10 @@ export default function buildServerComponentNode(
 	}
 
 	// Render the component
-	b.append(`
-	$output += ${node.tagName}.render(${propsName}, ${slotsName}, $context)`);
+	let renderParams = `${propsName}, $context`;
+	if (slotsName !== "undefined") {
+		renderParams += `, ${slotsName}`;
+	}
+	b.append("");
+	b.append(`$output += ${node.tagName}.render(${renderParams})`);
 }

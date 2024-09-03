@@ -4,10 +4,10 @@ const AnswerButtonApp = {
 	name: "AnswerButtonApp",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		/* User script */
 		const $watch = (obj) => obj;
 		let $state = $watch({
@@ -28,7 +28,8 @@ const AnswerButtonApp = {
 		const t_props_1 = {};
 		t_props_1["onYes"] = onAnswerYes;
 		t_props_1["onNo"] = onAnswerNo;
-		$output += AnswerButton.render(t_props_1, undefined, $context)
+
+		$output += AnswerButton.render(t_props_1, $context)
 		$output += ` <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div>`;
 		return $output;
 	}

@@ -13,10 +13,10 @@ const FunnyButtonApp = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		/* User interface */
 		const t_fragments = [];
 
@@ -25,7 +25,8 @@ const FunnyButtonApp = {
 		const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
 		/* @component */
-		FunnyButton.render(t_div_1, t_comp_anchor_1, undefined, undefined, $context)
+
+		FunnyButton.render(t_div_1, t_comp_anchor_1, undefined, $context)
 		const t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1)));
 
 		/* @component */
@@ -35,7 +36,8 @@ const FunnyButtonApp = {
 			const t_text_1 = t_root(t_fragment_2);
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
-		FunnyButton.render(t_div_1, t_comp_anchor_2, undefined, t_slots_1, $context)
+
+		FunnyButton.render(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1)
 
 		t_apply_props(t_div_1, $props, []);
 		t_add_fragment(t_fragment_0, $parent, $anchor);

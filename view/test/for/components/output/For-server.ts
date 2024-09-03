@@ -2,10 +2,10 @@ const For = {
 	name: "For",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";

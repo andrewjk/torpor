@@ -2,10 +2,10 @@ const Colors = {
 	name: "Colors",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		/* User script */
 		const colors = ["red", "green", "blue"];
 		let $output = "";

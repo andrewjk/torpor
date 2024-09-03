@@ -4,10 +4,10 @@ const Let = {
 	name: "Let",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		$props ||= {};
 
 		let $output = "";
@@ -21,7 +21,8 @@ const Let = {
 			$output += ` ${t_fmt($sprops.item.text)} `;
 			return $output;
 		}
-		$output += List.render(t_props_1, t_slots_1, $context)
+
+		$output += List.render(t_props_1, $context, t_slots_1)
 		return $output;
 	}
 }

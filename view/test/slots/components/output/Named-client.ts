@@ -11,10 +11,10 @@ const Named = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		/* User interface */
 		const t_fragments = [];
 
@@ -36,7 +36,8 @@ const Named = {
 			const t_text_2 = t_root(t_fragment_3);
 			t_add_fragment(t_fragment_3, $sparent, $sanchor);
 		}
-		Article.render(t_fragment_0, t_comp_anchor_1, undefined, t_slots_1, $context)
+
+		Article.render(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1)
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

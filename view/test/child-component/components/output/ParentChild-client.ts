@@ -15,10 +15,10 @@ const ParentChild = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		$props ||= {};
 
 		/* User interface */
@@ -31,7 +31,8 @@ const ParentChild = {
 		/* @component */
 		const t_props_1 = $watch({});
 		t_props_1["name"] = "Anna";
-		Child.render(t_div_1, t_comp_anchor_1, t_props_1, undefined, $context)
+
+		Child.render(t_div_1, t_comp_anchor_1, t_props_1, $context)
 
 		t_apply_props(t_div_1, $props, ['name']);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
@@ -44,10 +45,10 @@ const Child = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		$props ||= {};
 
 		/* User interface */

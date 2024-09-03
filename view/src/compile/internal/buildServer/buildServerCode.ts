@@ -51,10 +51,10 @@ function buildServerTemplate(
 		name: "${name}",
 		/**
 		 * @param {Object} [$props]
-		 * @param {Object} [$slots]
 		 * @param {Object} [$context]
+		 * @param {Object} [$slots]
 		 */
-		render: ($props, $slots, $context) => {`);
+		render: ($props, $context, $slots) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {

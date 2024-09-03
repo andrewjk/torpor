@@ -17,10 +17,10 @@ const TrafficLight = {
 	 * @param {Node} $parent
 	 * @param {Node | null} $anchor
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($parent, $anchor, $props, $slots, $context) => {
+	render: ($parent, $anchor, $props, $context, $slots) => {
 		/* User script */
 		const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 		let $state = $watch({

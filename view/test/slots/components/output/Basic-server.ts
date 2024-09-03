@@ -4,10 +4,10 @@ const Basic = {
 	name: "Basic",
 	/**
 	 * @param {Object} [$props]
-	 * @param {Object} [$slots]
 	 * @param {Object} [$context]
+	 * @param {Object} [$slots]
 	 */
-	render: ($props, $slots, $context) => {
+	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
@@ -17,7 +17,8 @@ const Basic = {
 			$output += ` Basic stuff `;
 			return $output;
 		}
-		$output += Header.render(undefined, t_slots_1, $context)
+
+		$output += Header.render(undefined, $context, t_slots_1)
 		return $output;
 	}
 }
