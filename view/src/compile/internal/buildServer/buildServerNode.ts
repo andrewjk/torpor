@@ -1,7 +1,7 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
-import type Node from "../../types/nodes/Node";
 import type RootNode from "../../types/nodes/RootNode";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import BuildServerStatus from "./BuildServerStatus";
@@ -12,7 +12,7 @@ import buildServerRootNode from "./buildServerRootNode";
 import buildServerSpecialNode from "./buildServerSpecialNode";
 import buildServerTextNode from "./buildServerTextNode";
 
-export default function buildServerNode(node: Node, status: BuildServerStatus, b: Builder) {
+export default function buildServerNode(node: TemplateNode, status: BuildServerStatus, b: Builder) {
 	switch (node.type) {
 		case "root": {
 			buildServerRootNode(node as RootNode, status, b);

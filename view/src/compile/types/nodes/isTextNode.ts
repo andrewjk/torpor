@@ -1,6 +1,6 @@
-import Node from "./Node";
+import TemplateNode from "./TemplateNode";
 import TextNode from "./TextNode";
 
-export default function isTextNode(node: Node): node is TextNode {
+export default function isTextNode(node: TemplateNode): node is TextNode {
 	return node.type === "text";
 }

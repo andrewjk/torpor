@@ -1,8 +1,8 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type Fragment from "../../types/nodes/Fragment";
-import type Node from "../../types/nodes/Node";
 import type RootNode from "../../types/nodes/RootNode";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import isElementNode from "../../types/nodes/isElementNode";
@@ -125,7 +125,7 @@ function maybeAddRootNodeDeclaration(
 
 function declareFragmentVars(
 	fragment: Fragment,
-	node: Node,
+	node: TemplateNode,
 	path: VariablePath,
 	status: BuildStatus,
 	b: Builder,

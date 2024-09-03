@@ -1,6 +1,6 @@
 import ElementNode from "./ElementNode";
-import Node from "./Node";
+import TemplateNode from "./TemplateNode";
 
-export default function isSpecialNode(node: Node): node is ElementNode {
+export default function isSpecialNode(node: TemplateNode): node is ElementNode {
 	return node.type === "special";
 }

@@ -1,5 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
-import type Node from "../../types/nodes/Node";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 
 /**
@@ -26,6 +26,6 @@ export default function slottifyChildNodes(node: ElementNode) {
 	node.children = node.children.filter((c) => isFillNode(c));
 }
 
-function isFillNode(n: Node): n is ElementNode {
+function isFillNode(n: TemplateNode): n is ElementNode {
 	return isSpecialNode(n) && n.tagName === ":fill";
 }

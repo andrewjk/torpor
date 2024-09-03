@@ -1,7 +1,7 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
-import type Node from "../../types/nodes/Node";
 import type RootNode from "../../types/nodes/RootNode";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../Builder";
 import type BuildStatus from "./BuildStatus";
@@ -13,7 +13,7 @@ import buildSpecialNode from "./buildSpecialNode";
 import buildTextNode from "./buildTextNode";
 
 export default function buildNode(
-	node: Node,
+	node: TemplateNode,
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,

@@ -1,6 +1,6 @@
 import ControlNode from "./ControlNode";
-import Node from "./Node";
+import TemplateNode from "./TemplateNode";
 
-export default function isControlNode(node: Node): node is ControlNode {
+export default function isControlNode(node: TemplateNode): node is ControlNode {
 	return node.type === "control";
 }

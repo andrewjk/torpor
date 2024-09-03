@@ -1,6 +1,6 @@
 import NodeType from "./NodeType";
 
-export default interface Node {
+export default interface TemplateNode {
 	type: NodeType;
 
 	// This gets set when building

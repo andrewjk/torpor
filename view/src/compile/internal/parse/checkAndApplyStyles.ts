@@ -1,5 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
-import type Node from "../../types/nodes/Node";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import isElementNode from "../../types/nodes/isElementNode";
 import isParentNode from "../../types/nodes/isParentNode";
 import type StyleBlock from "../../types/styles/StyleBlock";
@@ -16,7 +16,7 @@ export default function checkAndApplyStyles(status: ParseStatus) {
 	}
 }
 
-function checkAndApplyStylesOnNode(node: Node, selectors: string[], styleHash: string) {
+function checkAndApplyStylesOnNode(node: TemplateNode, selectors: string[], styleHash: string) {
 	if (isElementNode(node)) {
 		let addClass = selectors.includes(node.tagName);
 		if (!addClass) {

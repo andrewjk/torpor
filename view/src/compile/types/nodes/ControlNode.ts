@@ -1,13 +1,13 @@
 import Fragment from "./Fragment";
-import Node from "./Node";
 import OperationType from "./OperationType";
 import ParentNode from "./ParentNode";
+import TemplateNode from "./TemplateNode";
 
 export default interface ControlNode extends ParentNode {
 	type: "control";
 	operation: OperationType;
 	statement: string;
-	children: Node[];
+	children: TemplateNode[];
 
 	singleRooted?: boolean;
 

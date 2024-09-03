@@ -1,5 +1,5 @@
 import parse from "../../parse";
-import type Node from "../../types/nodes/Node";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import isElementNode from "../../types/nodes/isElementNode";
 import isParentNode from "../../types/nodes/isParentNode";
 import type ParseStatus from "./ParseStatus";
@@ -19,7 +19,7 @@ export default function parseChildTemplate(name: string, source: string, status:
 	}
 }
 
-function setChildComponentNodes(name: string, node: Node) {
+function setChildComponentNodes(name: string, node: TemplateNode) {
 	if (isElementNode(node) && node.tagName === name) {
 		node.type = "component";
 		slottifyChildNodes(node);
