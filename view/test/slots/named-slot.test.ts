@@ -2,25 +2,20 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
+import Component from "./components/Named.tera";
 
-let componentFile = "./components/Named.tera";
-
-test("named slot -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("named slot -- mounted", () => {
 	const container = document.createElement("div");
 	mountComponent(container, Component);
 
 	check(container);
 });
 
-test("named slot -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("named slot -- hydrated", () => {
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component);
+	const path = "./test/slots/components/Named.tera";
+	hydrateComponent(container, path, Component);
 
 	check(container);
 });

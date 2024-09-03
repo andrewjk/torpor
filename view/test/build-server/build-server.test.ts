@@ -21,8 +21,7 @@ test("build for the server and render to HTML", () => {
 	expect(parsed.template).not.toBeUndefined();
 
 	const rendered = renderer("IfNested", parsed.template!);
-	const code = rendered.code.replace("export default ", "").replace(/^import.+\n/g, "");
-	const html = eval(code).render(state);
+	const html = eval(rendered.code).render(state);
 
 	const container = document.createElement("div");
 	container.innerHTML = html;

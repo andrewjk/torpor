@@ -3,14 +3,10 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
+import Component from "./components/Let.tera";
 
-let componentFile = "./components/Let.tera";
-
-test("let slot -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("let slot -- mounted", () => {
 	const state = $watch({
 		items: [{ text: "item 1" }, { text: "item 2" }, { text: "item 3" }],
 	});
@@ -21,15 +17,14 @@ test("let slot -- mounted", async () => {
 	check(container);
 });
 
-test("let slot -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("let slot -- hydrated", () => {
 	const state = $watch({
 		items: [{ text: "item 1" }, { text: "item 2" }, { text: "item 3" }],
 	});
 
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component, state);
+	const path = "./test/slots/components/Let.tera";
+	hydrateComponent(container, path, Component, state);
 
 	check(container);
 });

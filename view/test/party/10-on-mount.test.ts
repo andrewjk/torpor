@@ -2,14 +2,10 @@ import { queryByAttribute, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
+import Component from "./components/PageTitle.tera";
 
-let componentFile = "./components/PageTitle.tera";
-
-test("on mount -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("on mount -- mounted", () => {
 	document.title = "Document Title";
 
 	const container = document.createElement("div");
@@ -18,11 +14,10 @@ test("on mount -- mounted", async () => {
 	check(container);
 });
 
-test("on mount -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("on mount -- hydrated", () => {
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component);
+	const path = "./test/party/components/PageTitle.tera";
+	hydrateComponent(container, path, Component);
 
 	check(container);
 });

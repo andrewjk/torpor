@@ -3,15 +3,11 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 import type ArrayState from "./ArrayState";
+import Component from "./components/Array.tera";
 
-let componentFile = "./components/Array.tera";
-
-test("array set object -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("array set object -- mounted", () => {
 	const state = $watch({
 		items: [
 			{ id: 1, text: "a" },
@@ -27,9 +23,7 @@ test("array set object -- mounted", async () => {
 	check(container, state);
 });
 
-test("array set object -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("array set object -- hydrated", () => {
 	const state = $watch({
 		items: [
 			{ id: 1, text: "a" },
@@ -40,7 +34,8 @@ test("array set object -- hydrated", async () => {
 	});
 
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component, state);
+	const path = "./test/watch-array/components/Array.tera";
+	hydrateComponent(container, path, Component, state);
 
 	check(container, state);
 });

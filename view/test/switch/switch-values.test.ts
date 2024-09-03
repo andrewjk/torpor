@@ -3,18 +3,14 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-
-let componentFile = "./components/Switch.tera";
+import Component from "./components/Switch.tera";
 
 interface State {
 	value: number;
 }
 
-test("switch values -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("switch values -- mounted", () => {
 	const state = $watch({ value: 1 });
 
 	const container = document.createElement("div");
@@ -23,13 +19,12 @@ test("switch values -- mounted", async () => {
 	check(container, state);
 });
 
-test("switch values -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("switch values -- hydrated", () => {
 	const state = $watch({ value: 1 });
 
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component, state);
+	const path = "./test/switch/components/Switch.tera";
+	hydrateComponent(container, path, Component, state);
 
 	check(container, state);
 });

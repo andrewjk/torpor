@@ -3,18 +3,14 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-
-let componentFile = "./components/IfElse.tera";
+import Component from "./components/IfElse.tera";
 
 interface State {
 	counter: number;
 }
 
-test("if true -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("if true -- mounted", () => {
 	const state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");
@@ -23,13 +19,12 @@ test("if true -- mounted", async () => {
 	check(container, state);
 });
 
-test("if true -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("if true -- hydrated", () => {
 	const state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component, state);
+	const path = "./test/if/components/IfElse.tera";
+	hydrateComponent(container, path, Component, state);
 
 	check(container, state);
 });

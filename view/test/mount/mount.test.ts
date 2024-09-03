@@ -3,25 +3,20 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
+import Component from "./components/Mount.tera";
 
-let componentFile = "./components/Mount.tera";
-
-test("mount -- mounted", async () => {
-	let { Component } = await importComponent(expect, componentFile);
-
+test("mount -- mounted", () => {
 	const container = document.createElement("div");
 	mountComponent(container, Component);
 
 	check(container);
 });
 
-test("mount -- hydrated", async () => {
-	let { Component, componentPath } = await importComponent(expect, componentFile);
-
+test("mount -- hydrated", () => {
 	const container = document.createElement("div");
-	hydrateComponent(container, componentPath, Component);
+	const path = "./test/mount/components/Mount.tera";
+	hydrateComponent(container, path, Component);
 
 	check(container);
 });
