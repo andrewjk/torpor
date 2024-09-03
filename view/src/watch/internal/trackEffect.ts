@@ -35,7 +35,7 @@ export default function trackEffect(target: Record<string | symbol, any>, prop: 
 				prop,
 				effect: context.activeEffect,
 			};
-			context.activeRange.objectEffects = context.activeRange.objectEffects || [];
+			context.activeRange.objectEffects ||= [];
 			context.activeRange.objectEffects.push(effectPath);
 		}
 
