@@ -5,6 +5,7 @@ import BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus, b: Builder) {
 	let content = node.content || "";
+
 	// Replace all spaces with a single space, both to save space and to remove
 	// newlines from generated JS strings
 	content = content.replace(/\s+/g, " ");

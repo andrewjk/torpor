@@ -11,10 +11,13 @@ export default function buildTextNode(
 	anchorName: string,
 ) {
 	let content = node.content || "";
-	// Replace all spaces with a single space, both to save space and to remove newlines from generated JS strings
+
+	// Replace all spaces with a single space, both to save space and to remove
+	// newlines from generated JS strings
 	content = content.replace(/\s+/g, " ");
 
-	// TODO: Should be fancier about this in parse -- e.g. ignore braces in quotes, unclosed, etc
+	// TODO: Should be fancier about this in parse -- e.g. ignore braces in
+	// quotes, unclosed, etc
 	let reactiveStarted = false;
 	let reactiveCount = 0;
 	for (let i = 0; i < content.length; i++) {

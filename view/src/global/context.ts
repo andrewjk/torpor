@@ -1,4 +1,3 @@
-import printNode from "../debug/printNode";
 import type Cleanup from "./types/Cleanup";
 import type Effect from "./types/Effect";
 import type Range from "./types/Range";
