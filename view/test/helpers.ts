@@ -2,15 +2,15 @@ import type ParseResult from "../src/compile/types/ParseResult";
 import type Attribute from "../src/compile/types/nodes/Attribute";
 import type ControlNode from "../src/compile/types/nodes/ControlNode";
 import type ElementNode from "../src/compile/types/nodes/ElementNode";
-import type Node from "../src/compile/types/nodes/Node";
 import type OperationType from "../src/compile/types/nodes/OperationType";
 import type RootNode from "../src/compile/types/nodes/RootNode";
+import type TemplateNode from "../src/compile/types/nodes/TemplateNode";
 import type TextNode from "../src/compile/types/nodes/TextNode";
 
 export function cmp(
 	name: string,
 	attributes?: Attribute[],
-	children?: Node[],
+	children?: TemplateNode[],
 	selfClosed?: boolean,
 ): ElementNode {
 	return {
@@ -25,7 +25,7 @@ export function cmp(
 export function el(
 	tagName: string,
 	attributes?: Attribute[],
-	children?: Node[],
+	children?: TemplateNode[],
 	selfClosed?: boolean,
 ): ElementNode {
 	return {
@@ -40,7 +40,7 @@ export function el(
 export function sp(
 	name: string,
 	attributes?: Attribute[],
-	children?: Node[],
+	children?: TemplateNode[],
 	selfClosed?: boolean,
 ): ElementNode {
 	return {
@@ -52,7 +52,7 @@ export function sp(
 	};
 }
 
-export function root(children?: Node[]): RootNode {
+export function root(children?: TemplateNode[]): RootNode {
 	return {
 		type: "root",
 		children: children || [],
@@ -62,7 +62,7 @@ export function root(children?: Node[]): RootNode {
 export function control(
 	operation: OperationType,
 	statement: string,
-	children?: Node[],
+	children?: TemplateNode[],
 ): ControlNode {
 	return {
 		type: "control",
