@@ -9,6 +9,7 @@ const UserProfileContextApp = {
 	 */
 	render: ($props, $slots, $context) => {
 		$context = Object.assign({}, $context);
+
 		/* User script */
 		const $watch = (obj) => obj;
 		const $unwrap = (obj) => obj;

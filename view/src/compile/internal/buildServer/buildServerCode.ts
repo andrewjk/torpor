@@ -56,9 +56,16 @@ function buildServerTemplate(
 		 */
 		render: ($props, $slots, $context) => {`);
 
+	// Make sure we've got $props if we're going to be using it
+	if (template.props?.length) {
+		b.append(`$props ||= {};`);
+		b.append("");
+	}
+
 	// Redefine $context so that any newly added properties will only be passed to children
 	if (template.contextProps?.length) {
 		b.append(`$context = Object.assign({}, $context);`);
+		b.append("");
 	}
 
 	if (template.script) {

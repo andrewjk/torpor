@@ -6,6 +6,8 @@ const Attributes = {
 	 * @param {Object} [$context]
 	 */
 	render: ($props, $slots, $context) => {
+		$props ||= {};
+
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
