@@ -25,21 +25,16 @@ const controlOperations = [
 	"@function",
 ];
 
+const standaloneOperations = ["@const", "@console", "@debugger", "@key", "@function"];
+
 export default function parseControl(
 	status: ParseStatus,
 	parentNode: ElementNode | ControlNode,
 ): ControlNode {
 	const node = parseControlOpen(status);
 
-	// Some operations can't have children
-	// TODO: Should probably make operations objects with this information
-	if (
-		node.operation === "@const" ||
-		node.operation === "@console" ||
-		node.operation === "@debugger" ||
-		node.operation === "@function" ||
-		node.operation === "@key"
-	) {
+	// Some operations don't have children
+	if (standaloneOperations.includes(node.operation)) {
 		wrangleControlNode(node, parentNode);
 		return node;
 	}
@@ -86,25 +81,22 @@ export default function parseControl(
 
 function parseControlOpen(status: ParseStatus): ControlNode {
 	const start = status.i;
+
 	let operation = "";
 	for (status.i; status.i < status.source.length; status.i++) {
-		if (isSpaceChar(status.source, status.i)) {
-			operation = status.source.substring(start, status.i);
+		const char = status.source[status.i];
+		if (
+			isSpaceChar(status.source, status.i) ||
+			(char === ":" && operation === "default") ||
+			(char === "." && operation === "@console")
+		) {
 			break;
 		}
+		operation += char;
 	}
 
 	// Some operations (else etc) don't start with an @
 	if (!operation.startsWith("@")) operation = "@" + operation;
-
-	if (operation === "@default:") {
-		operation = "@default";
-	}
-
-	if (operation.startsWith("@console.")) {
-		status.i -= operation.length + 1;
-		operation = "@console";
-	}
 
 	const node: ControlNode = {
 		type: "control",
@@ -113,6 +105,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 		children: [],
 	};
 
+	// Special processing for functions -- just read until the closing brace
 	if (operation === "@function") {
 		// TODO: Ignore chars in strings, comments and parentheses
 		let braceCount = 0;
@@ -147,13 +140,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 					status.i += 1;
 					break;
 				}
-			} else if (
-				char === "\n" &&
-				(operation === "@const" ||
-					operation === "@console" ||
-					operation === "@debugger" ||
-					operation === "@key")
-			) {
+			} else if (char === "\n" && standaloneOperations.includes(operation)) {
 				if (parenCount === 0) {
 					node.statement = trimStart(status.source.substring(start, status.i).trim(), "@");
 					status.i += 1;
@@ -169,9 +156,17 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 	return node;
 }
 
+/**
+ * Groups the control node into the correct parent e.g. if/else into an if group
+ * @param node The control node
+ * @param parentNode The parent node
+ */
 function wrangleControlNode(node: ControlNode, parentNode: ElementNode | ControlNode) {
-	// HACK: Wrangle if/then/else into an if group, for into a for group, and
-	// await/then/catch into an await group
+	// Group
+	// * if/else into an if group
+	// * for into a for group
+	// * switch into a switch group (cases will have the correct parent)
+	// * await/then/catch into an await group
 	if (node.operation === "@if") {
 		const ifGroup: ControlNode = {
 			type: "control",
@@ -192,8 +187,9 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 				break;
 			}
 		}
-		// @ts-ignore
-	} else if (node.operation === "@for") {
+	}
+	// @ts-ignore
+	else if (node.operation === "@for") {
 		const forGroup: ControlNode = {
 			type: "control",
 			operation: "@for group",
@@ -201,8 +197,9 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 			children: [node],
 		};
 		parentNode.children.push(forGroup);
-		// @ts-ignore
-	} else if (node.operation === "@switch") {
+	}
+	// @ts-ignore
+	else if (node.operation === "@switch") {
 		node.operation = "@switch group";
 		parentNode.children.push(node);
 	} else if (node.operation === "@await") {
@@ -227,9 +224,15 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 	}
 }
 
+/**
+ * Parses control branches that don't start with an @ symbol e.g. else or case
+ * @param status The parse status
+ * @param parentNode The parent node
+ */
 function parseControlBranches(status: ParseStatus, parentNode: ElementNode | ControlNode) {
 	// Look ahead and see if we have another control statement
-	// TODO: Should be more strict here e.g. else should only be after an if
+	// TODO: Should we be more strict here (e.g. else should only be after an
+	// if), or should we leave it to the JS parser?
 	let gotAnotherBranch = true;
 	while (gotAnotherBranch) {
 		let start = status.i;

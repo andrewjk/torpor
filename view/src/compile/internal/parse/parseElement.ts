@@ -38,7 +38,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			if (char === "<") {
 				if (status.source[status.i + 1] === "/") {
 					// It's a closing element, so we're done here
-					// TODO: Check that it's the correct closing element
+					// TODO: Check that it's the correct closing element?
 					status.i = status.source.indexOf(">", status.i + 1);
 					break;
 				} else if (
@@ -112,37 +112,21 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		}
 	}
 
-	/*
+	// If this is a component element, add a default <:fill> node
 	if (
-		element.children.length === 1 &&
-		isTextNode(element.children[0]) &&
-		!element.children[0].content.trim()
-	) {
-		element.selfClosed = true;
-		element.children = [];
-	}
-	*/
-
-	// HACK: Just assume all imports are components for now...
-	if (
-		status.imports?.some((i) => /*i.component &&*/ i.name === element.tagName) ||
+		status.imports?.some((i) => i.name === element.tagName) ||
 		status.childTemplates?.some((c) => c.name === element.tagName)
 	) {
 		element.type = "component";
 		slottifyChildNodes(element);
 	}
 
-	if (isSpecialNode(element)) {
-		wrangleSpecialNode(element);
+	// If this is a <:slot> element, add a <:fill> node for its fallback
+	// content. Anchors will be created for <:slot> nodes and fragments will
+	// be created for the <:fill> content
+	if (isSpecialNode(element) && element.tagName === ":slot") {
+		slottifyChildNodes(element);
 	}
 
 	return element;
-}
-
-function wrangleSpecialNode(node: ElementNode) {
-	if (node.tagName === ":slot") {
-		// HACK: Add a :fill node underneath :slot nodes for their fallback content
-		// Anchors will be created for :slot nodes and fragments will be created for the :fill content
-		slottifyChildNodes(node);
-	}
 }
