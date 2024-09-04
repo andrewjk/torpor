@@ -2,14 +2,10 @@ import { BaseFileSystemRouter, cleanPath } from "vinxi/fs-router";
 
 export default class FileSystemRouter extends BaseFileSystemRouter {
 	toPath(src: string) {
-		let routePath = cleanPath(src, this.config);
-		if (routePath.startsWith("/")) {
-			routePath = routePath.substring(1);
-		}
-		routePath = routePath.replace(/index$/, "");
-		if (routePath.endsWith("/")) {
-			routePath = routePath.substring(0, routePath.length - 1);
-		}
+		let routePath = cleanPath(src, this.config)
+			.replace(/^\//, "") // remove leading slash
+			.replace(/index$/, "") // remove trailing index
+			.replace(/\/$/, ""); // remove trailing slash
 
 		return routePath?.length > 0 ? `/${routePath}` : "/";
 	}

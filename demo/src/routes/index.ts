@@ -1,4 +1,4 @@
-import Index from "../../client/Index.tera";
+import Index from "@/components/Index.tera";
 
 export function data() {
 	console.log("data");

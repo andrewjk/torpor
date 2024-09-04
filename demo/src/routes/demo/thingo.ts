@@ -1,4 +1,4 @@
-import Demo from "../../../client/Components/Home/Demo.tera";
+import Demo from "@/components/Components/Home/Demo.tera";
 
 export function data() {
 	console.log("data");

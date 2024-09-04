@@ -2,6 +2,7 @@ import path from "path";
 import url from "url";
 import { AppOptions, RouterSchemaInput, createApp } from "vinxi";
 import { config } from "vinxi/plugins/config";
+import tsconfigPaths from "vite-tsconfig-paths";
 import tera from "../unplugin/dist/vite";
 import FileSystemRouter from "./src/router";
 
@@ -10,7 +11,7 @@ export default createApp({
 		{
 			name: "assets",
 			type: "static",
-			dir: "./assets",
+			dir: "./src/assets",
 		},
 		{
 			name: "server",
@@ -20,8 +21,14 @@ export default createApp({
 			routes,
 			plugins: () => [
 				config("custom", {
-					// additional vite options
+					// Vite options
+					resolve: {
+						alias: {
+							"@": path.resolve(__dirname(), "./src"),
+						},
+					},
 				}),
+				tsconfigPaths(),
 				tera({ server: true }),
 			],
 		},
@@ -34,8 +41,14 @@ export default createApp({
 			routes,
 			plugins: () => [
 				config("custom", {
-					// additional vite options
+					// Vite options
+					resolve: {
+						alias: {
+							"@": path.resolve(__dirname(), "./src"),
+						},
+					},
 				}),
+				tsconfigPaths(),
 				tera(),
 			],
 		},
@@ -43,15 +56,16 @@ export default createApp({
 });
 
 function routes(router: RouterSchemaInput, app: AppOptions) {
-	const __filename = url.fileURLToPath(import.meta.url);
-	const __dirname = path.dirname(__filename);
-
 	return new FileSystemRouter(
 		{
-			dir: path.join(__dirname, "src/routes"),
+			dir: path.join(__dirname(), "src/routes"),
 			extensions: ["js", "ts", "tera"],
 		},
 		router,
 		app,
 	);
+}
+
+function __dirname() {
+	return path.dirname(url.fileURLToPath(import.meta.url));
 }
