@@ -1,35 +1,62 @@
 import "vinxi/client";
-import type Component from "../../view/src/compile/types/Component";
 import hydrate from "../../view/src/render/hydrate";
+import mount from "../../view/src/render/mount";
+import Route from "./Route";
+import routeHandlers from "./routeHandlers";
 
-console.log("hydrating client at", document.location);
-
-// TODO: Router here from routes
-// TODO: Get the component and put it in the slot
-let view: Component | null = null;
-switch (document.location.pathname.toLocaleLowerCase()) {
-	case "/": {
-		let component = await import("../client/Index.tera");
-		view = component.default;
-		break;
+// Intercept clicks on links
+window.addEventListener("click", async (e) => {
+	if (e.target && (e.target as HTMLElement).tagName === "A") {
+		e.preventDefault();
+		const path = new URL((e.target as HTMLLinkElement).href).pathname;
+		if (await navigate(path)) {
+			window.history.pushState(null, "", path);
+		} else {
+			window.location.href = path;
+		}
 	}
-	case "/party": {
-		let component = await import("../client/Party.tera");
-		view = component.default;
-		break;
+});
+
+// Listen for changes to the URL that occur when the user navigates using the
+// back or forward buttons
+window.addEventListener("popstate", async () => {
+	await navigate(document.location.pathname);
+});
+
+// Do the initial navigation and hydration
+await navigate(document.location.pathname, true);
+
+async function navigate(path: string, firstTime = false): Promise<boolean> {
+	console.log("navigating client to", path);
+	console.log(JSON.stringify(routeHandlers, null, 2));
+	const route = routeHandlers.find((route) => route.path === path);
+	const handler: Route | undefined = await route?.handler;
+
+	if (!handler?.view) {
+		// TODO: 404
+		console.log("404");
+		return false;
 	}
-}
 
-// Maybe from params??
-let $props: Record<string, any> = {};
+	const view = handler.view();
 
-if (view) {
+	// Maybe from params??
+	let $props: Record<string, any> = {};
+
 	const parent = document.getElementById("app");
-	if (parent) {
-		hydrate(parent, view, $props);
-	} else {
+	if (!parent) {
 		// TODO: 500
+		console.log("500");
+		return false;
 	}
-} else {
-	// TODO: 404
+
+	parent.textContent = "";
+
+	if (firstTime) {
+		hydrate(parent, view as any, $props);
+	} else {
+		mount(parent, view as any, $props);
+	}
+
+	return true;
 }

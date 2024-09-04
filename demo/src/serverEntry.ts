@@ -1,36 +1,26 @@
 import { eventHandler } from "vinxi/http";
 import { getManifest } from "vinxi/manifest";
-import type ServerComponent from "../../view/src/compile/types/ServerComponent";
+import type Route from "./Route";
 import appHtml from "./app.html?raw";
+import routeHandlers from "./routeHandlers";
 
 export default eventHandler(async (event) => {
-	console.log("handling server request for", event.node.req.url?.toLocaleLowerCase());
+	console.log("handling server request for", event.path);
 
-	// TODO: Router here from routes
-	// TODO: Get the component and put it in the slot
-	let view: ServerComponent | null = null;
-	switch (event.node.req.url?.toLocaleLowerCase()) {
-		case "/": {
-			let component = await import("../client/Index.tera");
-			view = component.default;
-			break;
-		}
-		case "/party": {
-			let component = await import("../client/Party.tera");
-			view = component.default;
-			break;
-		}
-	}
+	const route = routeHandlers.find((route) => route.path === event.path);
+	const handler: Route | undefined = await route?.handler;
 
-	if (!view) {
+	if (!handler?.view) {
 		// TODO: 404
 		return;
 	}
 
+	const view = handler.view();
+
 	// HACK: wrangle the view into app.html
 	// We could instead have an App.tera component with a slot, but you can run
 	// into hydration problems that way e.g. if there is a browser plugin that
-	// injects elements into the <head> or <body>
+	// injects elements into <head> or <body>
 	let contentStart = regexIndexOf(appHtml, /\<div\s+id=("app"|'app'|app)\s+/);
 	contentStart = appHtml.indexOf(">", contentStart) + 1;
 	let contentEnd = appHtml.indexOf("</div>", contentStart);

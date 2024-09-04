@@ -1,0 +1,13 @@
+<script>
+
+</script>
+
+<p>
+    <a href="/">Home</a>
+    |
+    <a href="/party">Party</a>
+    |
+    <a href="/demo/thingo">Demo</a>
+    |
+    <a href="/demo/5">Demo 5</a>
+</p>

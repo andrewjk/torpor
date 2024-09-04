@@ -4,6 +4,8 @@
  */
 
 <script>
+    import Nav from "./Nav.tera";
+    
     // Use the $watch function to declare reactive state
     const $state = $watch({
         count: 0,
@@ -42,6 +44,8 @@
 
 <div style="margin: auto">
     <h1>Demo</h1>
+
+    <Nav />
 
     <h2>Basic reactivity</h2>
     <p>Put reactive statements in braces, like {$state.count}.</p>

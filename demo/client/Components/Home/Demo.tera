@@ -1,4 +1,6 @@
 <script>
+    import Nav from "../../Nav.tera";
+    
     import Header from "./Header.tera";
  
     // TODO: Test with async
@@ -42,6 +44,8 @@
 
 <div id="app">
     <h2>Demo</h2>
+
+    <Nav />
 
     <p>
         The count is <strong>{$state.count}</strong>.

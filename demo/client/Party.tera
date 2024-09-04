@@ -1,4 +1,6 @@
 <script>
+  import Nav from "./Nav.tera";
+    
   import Name from "./Components/Party/Name.tera";
   import NameUpdate from "./Components/Party/NameUpdate.tera";
   import DoubleCount from "./Components/Party/DoubleCount.tera";
@@ -22,6 +24,8 @@
 
 <div style="margin: auto">
   <h1>Demo</h1>
+
+  <Nav />
 
   <p>
     Examples from <a href="https://component-party.dev">Component Party</a>
