@@ -27,8 +27,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 	transformInclude(id) {
 		// Check for *.tera files
-		//return /\.tera\?*/.test(id);
-		return id.endsWith(".tera");
+		return /\.tera\?*/.test(id);
 	},
 	transform(code, id) {
 		// Try to parse the code
