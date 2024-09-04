@@ -9,5 +9,5 @@
     |
     <a href="/demo/thingo">Demo</a>
     |
-    <a href="/demo/5">Demo 5</a>
+    <a href="/demo/5?search=hi">Demo 5</a>
 </p>

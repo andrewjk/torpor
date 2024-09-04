@@ -1,6 +1,11 @@
 import Component from "./Component";
 
+interface HandlerRequest {
+	routeParams?: Record<PropertyKey, string>;
+	urlParams?: Record<PropertyKey, string>;
+}
+
 export default interface RouteHandler {
-	data?: () => any;
-	view?: () => Component;
+	data?: (request: HandlerRequest) => any;
+	view?: (request: HandlerRequest) => Component;
 }

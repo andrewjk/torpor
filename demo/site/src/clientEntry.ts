@@ -8,11 +8,12 @@ import Route from "./types/RouteHandler";
 window.addEventListener("click", async (e) => {
 	if (e.target && (e.target as HTMLElement).tagName === "A") {
 		e.preventDefault();
-		const path = new URL((e.target as HTMLLinkElement).href).pathname;
-		if (await navigate(path)) {
+		const href = (e.target as HTMLLinkElement).href;
+		const path = new URL(href);
+		if (await navigate(path.pathname, path.searchParams)) {
 			window.history.pushState(null, "", path);
 		} else {
-			window.location.href = path;
+			window.location.href = href;
 		}
 	}
 });
@@ -20,17 +21,25 @@ window.addEventListener("click", async (e) => {
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
 window.addEventListener("popstate", async () => {
-	await navigate(document.location.pathname);
+	await navigateToLocation(document.location);
 });
 
 // Do the initial navigation and hydration
-await navigate(document.location.pathname, true);
+await navigateToLocation(document.location, true);
 
-async function navigate(path: string, firstTime = false): Promise<boolean> {
-	console.log("navigating client to", path);
-	console.log(JSON.stringify(routeHandlers, null, 2));
-	const route = routeHandlers.find((route) => route.path === path);
-	const handler: Route | undefined = await route?.handler;
+async function navigateToLocation(location: Location, firstTime = false) {
+	return await navigate(location.pathname, new URLSearchParams(location.search), firstTime);
+}
+
+async function navigate(
+	path: string,
+	urlParams: URLSearchParams,
+	firstTime = false,
+): Promise<boolean> {
+	console.log("navigating client to", path, urlParams.toString());
+
+	const route = routeHandlers.match(path, urlParams);
+	const handler: Route | undefined = await route?.handler.handler;
 
 	if (!handler?.view) {
 		// TODO: 404
@@ -38,7 +47,10 @@ async function navigate(path: string, firstTime = false): Promise<boolean> {
 		return false;
 	}
 
-	const view = handler.view();
+	const view = handler.view({
+		routeParams: route?.routeParams,
+		urlParams: route?.urlParams,
+	});
 
 	// Maybe from params??
 	let $props: Record<string, any> = {};

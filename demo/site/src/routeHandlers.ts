@@ -1,88 +1,66 @@
 import { getManifest } from "vinxi/manifest";
 import fileRoutes from "vinxi/routes";
+import lazyRoute from "./lazyRoute";
 
 const clientManifest = getManifest("client");
 const serverManifest = getManifest("server");
 
-const routeHandlers = fileRoutes.map((route) => {
-	return {
-		...route,
-		// TODO: Implement the rest of the lazyRoute stuff from vinxi/react or vinxi/solid
-		handler: lazyRoute(route.$handler, clientManifest, serverManifest),
-	};
-});
+interface Handler {
+	path: string;
+	regex: RegExp;
+	handler: Promise<any>;
+}
+
+interface RouteHandlers {
+	handlers: Handler[];
+	match(path: string, urlParams: URLSearchParams): MatchResult | undefined;
+}
+
+interface MatchResult {
+	handler: Handler;
+	routeParams?: Record<PropertyKey, string>;
+	urlParams?: Record<PropertyKey, string>;
+}
+
+const routeHandlers: RouteHandlers = {
+	handlers: fileRoutes.map((route) => {
+		return {
+			...route,
+			regex: pathToRegExp(route.path),
+			// TODO: Implement the rest of the lazyRoute stuff from vinxi/react or vinxi/solid
+			handler: lazyRoute(route.$handler, clientManifest, serverManifest),
+		};
+	}),
+	match(path, urlParams) {
+		console.log("matching", path);
+		// TODO: Lots of testing etc
+		for (let handler of (this as RouteHandlers).handlers) {
+			let match = path.match(handler.regex);
+			if (match) {
+				console.log("found", match);
+				return {
+					handler,
+					routeParams: match.groups,
+					urlParams: Object.fromEntries(urlParams),
+				};
+			}
+		}
+	},
+};
+
+function pathToRegExp(path: string): RegExp {
+	const pattern = path
+		.split("/")
+		.map((p) => {
+			let match = p.match(/^\[(.+)\]$/);
+			if (match) {
+				return `(?<${match[1]}>.+?)`;
+			} else {
+				return p;
+			}
+		})
+		.join("\\/");
+	return new RegExp(`^${pattern}$`);
+}
 
 export default routeHandlers;
-
-async function lazyRoute(
-	component: { src: string; import(): Promise<any> },
-	clientManifest: any,
-	serverManifest: any,
-	//exported = "default",
-) {
-	if (import.meta.env.DEV) {
-		const manifest = import.meta.env.SSR ? serverManifest : clientManifest;
-		const mod = await manifest.inputs[component.src].import();
-		return mod;
-	} else {
-		const mod = await component.import();
-		return mod;
-	}
-	/*
-	return lazy(async () => {
-		if (import.meta.env.DEV) {
-			let manifest = import.meta.env.SSR ? serverManifest : clientManifest;
-
-			const mod = await manifest.inputs[component.src].import();
-			invariant(mod[exported], `Module ${component.src} does not export ${exported}`);
-			const Component = mod[exported];
-			let assets = await clientManifest.inputs?.[component.src].assets();
-			const styles = assets.filter((asset) => asset.tag === "style");
-
-			if (typeof window !== "undefined" && import.meta.hot) {
-				import.meta.hot.on("css-update", (data) => {
-					updateStyles(styles, data);
-				});
-			}
-
-			const Comp = forwardRef((props, ref) => {
-				if (typeof window !== "undefined") {
-					useLayoutEffect(() => {
-						return () => {
-							// remove style tags added by vite when a CSS file is imported
-							cleanupStyles(styles);
-						};
-					}, []);
-				}
-				return createElement(
-					Fragment,
-					null,
-					...assets.map((asset) => renderAsset(asset)),
-					createElement(Component, { ...props, ref: ref }),
-				);
-			});
-			return { default: Comp };
-		} else {
-			const mod = await component.import();
-
-			const Component = mod[exported];
-			let assets = await clientManifest.inputs?.[component.src].assets();
-
-			if (typeof window !== "undefined") {
-				const styles = assets.filter((asset) => asset.attrs.rel === "stylesheet");
-				preloadStyles(styles);
-			}
-
-			const Comp = forwardRef((props, ref) => {
-				return createElement(
-					Fragment,
-					null,
-					...assets.map((asset) => renderAsset(asset)),
-					createElement(Component, { ...props, ref: ref }),
-				);
-			});
-			return { default: Comp };
-		}
-	});
-    */
-}

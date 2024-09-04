@@ -8,17 +8,24 @@ import routeHandlers from "./routeHandlers";
 import type RouteHandler from "./types/RouteHandler";
 
 export default eventHandler(async (event) => {
-	console.log("handling server request for", event.path);
+	const url = new URL(`http://${process.env.HOST ?? "localhost"}${event.node.req.url}`);
+	const path = url.pathname;
+	const urlParams = url.searchParams;
 
-	const route = routeHandlers.find((route) => route.path === event.path);
-	const handler: RouteHandler | undefined = await route?.handler;
+	console.log("handling server request for", path, urlParams);
+
+	const route = routeHandlers.match(path, urlParams);
+	const handler: RouteHandler | undefined = await route?.handler.handler;
 
 	if (!handler?.view) {
 		// TODO: 404
 		return;
 	}
 
-	const view = handler.view();
+	const view = handler.view({
+		routeParams: route?.routeParams,
+		urlParams: route?.urlParams,
+	});
 
 	// HACK: wrangle the view into app.html
 	// We could instead have an App.tera component with a slot, but you can run
