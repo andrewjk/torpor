@@ -1,14 +1,17 @@
+import fs from "fs";
+import path from "path";
 import { eventHandler } from "vinxi/http";
 import { getManifest } from "vinxi/manifest";
-import type Route from "./Route";
-import appHtml from "./app.html?raw";
+//import appHtml from "../../demo/src/app.html?raw";
+import dirName from "./dirName";
 import routeHandlers from "./routeHandlers";
+import type RouteHandler from "./types/RouteHandler";
 
 export default eventHandler(async (event) => {
 	console.log("handling server request for", event.path);
 
 	const route = routeHandlers.find((route) => route.path === event.path);
-	const handler: Route | undefined = await route?.handler;
+	const handler: RouteHandler | undefined = await route?.handler;
 
 	if (!handler?.view) {
 		// TODO: 404
@@ -21,6 +24,7 @@ export default eventHandler(async (event) => {
 	// We could instead have an App.tera component with a slot, but you can run
 	// into hydration problems that way e.g. if there is a browser plugin that
 	// injects elements into <head> or <body>
+	const appHtml = loadAppHtml();
 	let contentStart = regexIndexOf(appHtml, /\<div\s+id=("app"|'app'|app)\s+/);
 	contentStart = appHtml.indexOf(">", contentStart) + 1;
 	let contentEnd = appHtml.indexOf("</div>", contentStart);
@@ -52,6 +56,15 @@ export default eventHandler(async (event) => {
 
 	return html;
 });
+
+let loadedAppHtml = "";
+function loadAppHtml() {
+	if (!loadedAppHtml) {
+		let file = path.join(dirName(), "..", "../", "src", "app.html");
+		loadedAppHtml = fs.readFileSync(file).toString();
+	}
+	return loadedAppHtml;
+}
 
 // From https://stackoverflow.com/a/274094
 function regexIndexOf(string: string, regex: RegExp, position?: number) {

@@ -1,12 +1,10 @@
 {
-	"name": "@tera/demo",
+	"name": "@tera/site",
 	"private": true,
 	"version": "0.0.1",
 	"type": "module",
 	"scripts": {
-		"dev": "vinxi dev --port 5173",
-		"build": "tsc && vinxi build",
-		"preview": "vinxi serve"
+		"build": "tsc"
 	},
 	"keywords": [],
 	"author": "",

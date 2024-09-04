@@ -1,8 +1,8 @@
 import "vinxi/client";
-import hydrate from "../../view/src/render/hydrate";
-import mount from "../../view/src/render/mount";
-import Route from "./Route";
+import hydrate from "../../../view/src/render/hydrate";
+import mount from "../../../view/src/render/mount";
 import routeHandlers from "./routeHandlers";
+import Route from "./types/RouteHandler";
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
