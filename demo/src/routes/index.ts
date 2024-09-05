@@ -6,6 +6,8 @@ export default {
 		console.log("data");
 	},
 	view: () => {
-		return Index;
+		return {
+			component: Index,
+		};
 	},
 } satisfies EndPoint;

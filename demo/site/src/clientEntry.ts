@@ -1,4 +1,5 @@
 import "vinxi/client";
+import Component from "../../../view/src/compile/types/Component";
 import hydrate from "../../../view/src/render/hydrate";
 import mount from "../../../view/src/render/mount";
 import routeHandlers from "./routeHandlers";
@@ -52,8 +53,11 @@ async function navigate(
 		urlParams: route?.urlParams,
 	});
 
-	// Maybe from params??
-	let $props: Record<string, any> = {};
+	// Pass the data into $props
+	const component = view.component as Component;
+	let $props: Record<string, any> = {
+		data: view.data,
+	};
 
 	const parent = document.getElementById("app");
 	if (!parent) {
@@ -65,9 +69,9 @@ async function navigate(
 	parent.textContent = "";
 
 	if (firstTime) {
-		hydrate(parent, view as any, $props);
+		hydrate(parent, component, $props);
 	} else {
-		mount(parent, view as any, $props);
+		mount(parent, component, $props);
 	}
 
 	return true;

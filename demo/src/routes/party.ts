@@ -6,6 +6,8 @@ export default {
 		console.log("data");
 	},
 	view: () => {
-		return Party;
+		return {
+			component: Party,
+		};
 	},
 } satisfies EndPoint;

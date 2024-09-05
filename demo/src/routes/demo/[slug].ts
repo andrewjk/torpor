@@ -21,7 +21,10 @@ export default {
 	data: () => {
 		console.log("data");
 	},
-	view: () => {
-		return Demo;
+	view: (request) => {
+		return {
+			component: Demo,
+			data: request.urlParams,
+		};
 	},
 } satisfies EndPoint<RouteParams, UrlParams>;

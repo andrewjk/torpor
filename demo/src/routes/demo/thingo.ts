@@ -8,6 +8,8 @@ export default {
 		console.log("data");
 	},
 	view: () => {
-		return Demo;
+		return {
+			component: Demo,
+		};
 	},
 } satisfies EndPoint;

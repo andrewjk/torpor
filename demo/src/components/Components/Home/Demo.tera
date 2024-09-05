@@ -46,6 +46,9 @@
     <h2>Demo</h2>
 
     <Nav />
+    <p>
+        You searched for '{$props.data.search}'.
+    </p>
 
     <p>
         The count is <strong>{$state.count}</strong>.

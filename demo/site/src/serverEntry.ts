@@ -48,13 +48,15 @@ export default eventHandler(async (event) => {
 	const manifestJson = JSON.stringify(clientManifest.json());
 	const hasManifestJson = manifestJson !== "{}";
 
-	// Maybe from params??
-	let $props: Record<string, any> = {};
+	// Pass the data into $props
+	let $props: Record<string, any> = {
+		data: view.data,
+	};
 
 	// Put it all together
 	let html =
 		appHtml.substring(0, contentStart) +
-		view.render($props) +
+		view.component.render($props) +
 		appHtml.substring(contentEnd) +
 		(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
 		(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");
