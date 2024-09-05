@@ -2,7 +2,7 @@ import "vinxi/client";
 import hydrate from "../../../view/src/render/hydrate";
 import mount from "../../../view/src/render/mount";
 import routeHandlers from "./routeHandlers";
-import Route from "./types/RouteHandler";
+import EndPoint from "./types/EndPoint";
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -39,7 +39,7 @@ async function navigate(
 	console.log("navigating client to", path, urlParams.toString());
 
 	const route = routeHandlers.match(path, urlParams);
-	const handler: Route | undefined = await route?.handler.handler;
+	const handler: EndPoint | undefined = (await route?.handler.handler).default;
 
 	if (!handler?.view) {
 		// TODO: 404

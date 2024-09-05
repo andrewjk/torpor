@@ -1,9 +1,13 @@
 import Demo from "@/components/Components/Home/Demo.tera";
+import EndPoint from "../../../site/src/types/EndPoint";
 
-export function data() {
-	console.log("data");
-}
+//import { route as demoRoute } from "./[slug]";
 
-export function view() {
-	return Demo;
-}
+export default {
+	data: () => {
+		console.log("data");
+	},
+	view: () => {
+		return Demo;
+	},
+} satisfies EndPoint;

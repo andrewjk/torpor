@@ -1,9 +1,11 @@
 import Index from "@/components/Index.tera";
+import EndPoint from "../../site/src/types/EndPoint";
 
-export function data() {
-	console.log("data");
-}
-
-export function view() {
-	return Index;
-}
+export default {
+	data: () => {
+		console.log("data");
+	},
+	view: () => {
+		return Index;
+	},
+} satisfies EndPoint;

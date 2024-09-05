@@ -37,7 +37,6 @@ const routeHandlers: RouteHandlers = {
 		for (let handler of (this as RouteHandlers).handlers) {
 			let match = path.match(handler.regex);
 			if (match) {
-				console.log("found", match);
 				return {
 					handler,
 					routeParams: match.groups,

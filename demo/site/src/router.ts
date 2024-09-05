@@ -15,7 +15,7 @@ export default class FileSystemRouter extends BaseFileSystemRouter {
 			path: this.toPath(filePath),
 			$handler: {
 				src: filePath,
-				pick: ["view", "data"],
+				pick: ["default"],
 			},
 		};
 	}

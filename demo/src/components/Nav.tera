@@ -1,5 +1,5 @@
 <script>
-
+    import { route as demoRoute } from "@/routes/demo/[slug]"
 </script>
 
 <p>
@@ -9,5 +9,5 @@
     |
     <a href="/demo/thingo">Demo</a>
     |
-    <a href="/demo/5?search=hi">Demo 5</a>
+    <a href={demoRoute(5, "hi")}>Demo 5</a>
 </p>
