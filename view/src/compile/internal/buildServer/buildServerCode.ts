@@ -41,9 +41,9 @@ function buildServerTemplate(
 	if (template.imports) {
 		// TODO: Should probably consolidate imports e.g. when we've split them up
 		for (let imp of template.imports) {
-			const name = imp.nonDefault ? `{ ${imp.name} }` : imp.name;
 			const alias = imp.alias ? ` as ${imp.alias}` : "";
-			imports.add(`import ${name}${alias} from '${imp.path}';`);
+			const name = imp.nonDefault ? `{ ${imp.name}${alias} }` : imp.name;
+			imports.add(`import ${name} from '${imp.path}';`);
 		}
 	}
 
