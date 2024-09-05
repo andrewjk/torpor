@@ -121,10 +121,29 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		slottifyChildNodes(element);
 	}
 
-	// If this is a <:slot> element, add a <:fill> node for its fallback
-	// content. Anchors will be created for <:slot> nodes and fragments will
-	// be created for the <:fill> content
+	// Not sure about this one:
+	//// If there's a src attribute, convert the element to an imported component
+	//for (let i = 0; i < element.attributes.length; i++) {
+	//	if (element.attributes[i].name === "src") {
+	//		element.type = "component";
+	//		slottifyChildNodes(element);
+	//
+	//		status.imports ||= [];
+	//		status.imports.push({
+	//			name: element.tagName,
+	//			path: trimQuotes(element.attributes[i].value),
+	//			nonDefault: false,
+	//		});
+	//
+	//		element.attributes.splice(i, 1);
+	//		break;
+	//	}
+	//}
+
 	if (isSpecialNode(element) && element.tagName === ":slot") {
+		// If this is a <:slot> element, add a <:fill> node for its fallback
+		// content. Anchors will be created for <:slot> nodes and fragments will
+		// be created for the <:fill> content
 		slottifyChildNodes(element);
 	}
 
