@@ -82,6 +82,15 @@ function buildElementAttributes(
 		} else if (name.startsWith("on")) {
 			value = trimMatched(value, "{", "}");
 
+			// HACK: If a value from a for loop is used in the function body,
+			// get it from the loop data
+			for (let varName of status.forVarNames) {
+				value = value.replaceAll(
+					new RegExp(`([\\s\\(\\[])${varName}([\\s\\.\\(\\)\\[\\];])`, "g"),
+					`$1t_item.data.${varName}$2`,
+				);
+			}
+
 			// Add an event listener
 			const eventName = name.substring(2);
 

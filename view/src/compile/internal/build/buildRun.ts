@@ -9,13 +9,13 @@ export default function buildRun(
 ) {
 	status.imports.add("$run");
 	b.append(`$run(function ${functionName}() {`);
-	// If a value from a for loop is used in the function body, get it from the
-	// loop data to trigger an update when it is changed
-	// We could potentially directly replace using the regex? Might introduce issues though
+	// HACK: If a value from a for loop is used in the function body,
+	// get it from the loop data to trigger an update when it is changed
 	for (let varName of status.forVarNames) {
-		if (new RegExp(`\\b${varName}\\b`).test(functionBody)) {
-			b.append(`let ${varName} = t_item.data.${varName}; `);
-		}
+		functionBody = functionBody.replaceAll(
+			new RegExp(`([\\s\\(\\[])${varName}([\\s\\.\\(\\)\\[\\];])`, "g"),
+			`$1t_item.data.${varName}$2`,
+		);
 	}
 	b.append(functionBody);
 	b.append("});");
