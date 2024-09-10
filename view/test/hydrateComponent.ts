@@ -40,9 +40,9 @@ export default function hydrateComponent(
 			expect(importParsed.ok).toBe(true);
 			expect(importParsed.template).not.toBeUndefined();
 			if (debugPrint) {
-				const importBuilt = build(imp.name, importParsed.template!);
+				const importClient = build(imp.name, importParsed.template!);
 				console.log("=== client");
-				console.log(importBuilt.code);
+				console.log(importClient.code);
 				console.log("===");
 			}
 			const importServer = buildServer(imp.name, importParsed.template!);
@@ -79,6 +79,18 @@ x;`;
 	//fs.writeFileSync(folder.replace(".tera", ".html"), html);
 	const client = build(component.name, parsed.template!);
 	fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
+
+	// TODO: Probably shouldn't be duplicating this code from above
+	parsed.template!.imports?.forEach((imp) => {
+		let importPath = path.join(path.dirname(componentPath), imp.path);
+		let importSource = fs.readFileSync(importPath).toString();
+		let importParsed = parse(importSource);
+		const importClient = build(imp.name, importParsed.template!);
+		const importServer = buildServer(imp.name, importParsed.template!);
+		const folder = importPath.replace("/components/", "/components/output/");
+		fs.writeFileSync(folder.replace(".tera", "-server.ts"), importServer.code);
+		fs.writeFileSync(folder.replace(".tera", "-client.ts"), importClient.code);
+	});
 
 	container.innerHTML = html;
 	document.body.appendChild(container);
