@@ -67,16 +67,13 @@ const ColorSelect = {
 				const t_text_2 = t_child(t_option_1);
 				const t_text_3 = t_next(t_option_1);
 				$run(function setAttribute() {
-					let color = t_item.data.color; 
-					t_attribute(t_option_1, "value", color.id);
+					t_attribute(t_option_1, "value", t_item.data.color.id);
 				});
 				$run(function setAttribute() {
-					let color = t_item.data.color; 
-					t_attribute(t_option_1, "disabled", color.isDisabled);
+					t_attribute(t_option_1, "disabled", t_item.data.color.isDisabled);
 				});
 				$run(function setTextContent() {
-					let color = t_item.data.color; 
-					t_text_2.textContent = ` ${t_fmt(color.text)} `;
+					t_text_2.textContent = ` ${t_fmt(t_item.data.color.text)} `;
 				});
 				t_add_fragment(t_fragment_1, t_select_1, t_before);
 				t_next(t_text_3);

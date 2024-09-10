@@ -53,8 +53,7 @@ const ArrayIndexes = {
 				const t_text_1 = t_child(t_next(t_root_1));
 				const t_text_2 = t_next(t_next(t_root_1));
 				$run(function setTextContent() {
-					let i = t_item.data.i; 
-					t_text_1.textContent = ` ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} `;
+					t_text_1.textContent = ` ${t_fmt(t_item.data.i > 0 ? ", " : "")} ${t_fmt($props.items[t_item.data.i].text)} `;
 				});
 				t_add_fragment(t_fragment_1, t_section_1, t_before);
 				t_next(t_text_2);

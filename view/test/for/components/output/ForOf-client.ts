@@ -52,8 +52,7 @@ const ForOf = {
 				const t_text_1 = t_child(t_next(t_root_1));
 				const t_text_2 = t_next(t_next(t_root_1));
 				$run(function setTextContent() {
-					let item = t_item.data.item; 
-					t_text_1.textContent = ` ${t_fmt(item)} `;
+					t_text_1.textContent = ` ${t_fmt(t_item.data.item)} `;
 				});
 				t_add_fragment(t_fragment_1, t_section_1, t_before);
 				t_next(t_text_2);
