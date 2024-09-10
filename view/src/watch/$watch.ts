@@ -1,24 +1,38 @@
-import arrayHandler from "./internal/arrayHandler";
-import handler from "./internal/handler";
-import { isProxySymbol } from "./internal/symbols";
-
-// TODO: Take an options object with e.g. shallow etc
+import type ProxyState from "../global/types/ProxyState";
+import proxyGet from "./internal/proxyGet";
+import proxySet from "./internal/proxySet";
+import { proxyStateSymbol } from "./internal/symbols";
 
 /**
- * Watches an object for changes to its properties
+ * Watches an object and runs effects when its properties are changed
  * @param object The object to watch
  */
-export default function $watch<T extends Record<string | symbol, any>>(object: T): T {
+export default function $watch<T extends Record<PropertyKey, any>>(object: T): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
-	if (object == null || object[isProxySymbol]) {
+	if (object == null || object[proxyStateSymbol]) {
 		return object;
 	}
 
-	if (typeof object !== "object") {
-		throw new Error(`$watch can't be called with a " + ${typeof object}`);
-	}
+	// Make sure we can proxy this value
+	// TODO: In debug mode maybe?
+	//if (typeof object !== "object") {
+	//	throw new Error(`$watch can't be called with a ${typeof object}`);
+	//}
 
-	// Otherwise, wrap the object in a Proxy with a plain object or array handler
-	const proxyHandler = Array.isArray(object) ? arrayHandler : handler;
-	return new Proxy(object, proxyHandler) as T;
+	// Create a proxy handler for each object, and store some state for it here
+	const state: ProxyState = {
+		target: object,
+		isArray: Array.isArray(object),
+		props: new Map(),
+	};
+	const handler: ProxyHandler<T> = {
+		get: function (target, prop, receiver) {
+			return proxyGet(target, prop, receiver, state);
+		},
+		set: function (target, prop, value, receiver) {
+			return proxySet(target, prop, value, receiver, state);
+		},
+	};
+
+	return new Proxy(object, handler) as T;
 }

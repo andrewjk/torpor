@@ -16,10 +16,6 @@ export default function addFragment(
 		} else {
 			range.endNode = fragment.lastChild;
 		}
-		// TODO: Does this actually help at all?? Like, does it save memory?
-		if (range.endNode === range.startNode) {
-			range.endNode = null;
-		}
 	}
 
 	if (!context.hydrationNode) {

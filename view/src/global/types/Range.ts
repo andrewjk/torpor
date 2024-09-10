@@ -1,5 +1,4 @@
 import type Effect from "./Effect";
-import type EffectPath from "./EffectPath";
 
 export default interface Range {
 	startNode: ChildNode | null;
@@ -11,18 +10,5 @@ export default interface Range {
 	/** The index of the range if it is a branch in e.g. an if, switch or loop */
 	index: number;
 
-	/**
-	 * A map of ranges and the object/property/effects attached to them.
-	 *
-	 * This is used to remove effects from the global context when a range is removed.
-	 */
-	objectEffects: EffectPath[] | null;
-
-	/**
-	 * A map of ranges and the effects attached to them that don't have an
-	 * associated object/property.
-	 *
-	 * This is used to run effect cleanups when a range is removed.
-	 */
-	emptyEffects: Effect[] | null;
+	effects: Effect[] | null;
 }

@@ -1,4 +1,3 @@
-const isProxySymbol = Symbol("_is_proxy");
-const proxyTargetSymbol = Symbol("_proxy_target");
+const proxyStateSymbol = Symbol("_proxy_state");
 
-export { isProxySymbol, proxyTargetSymbol };
+export { proxyStateSymbol };

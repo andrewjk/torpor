@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import context from "../../src/global/context";
 import $watch from "../../src/watch/$watch";
+import { proxyStateSymbol } from "../../src/watch/internal/symbols";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/NestedIf.tera";
@@ -13,34 +14,37 @@ interface State {
 }
 
 test("nested if effect -- mounted", async () => {
-	const _state = { condition: true, counter: 0 };
-	const state = $watch(_state);
+	const state = $watch({
+		condition: true,
+		counter: 0,
+	});
 
 	const container = document.createElement("div");
 	mountComponent(container, Component, state);
 
-	check(container, _state, state, false);
+	check(container, state);
 });
 
 test("nested if effect -- hydrated", async () => {
-	const _state = { condition: true, counter: 0 };
-	const state = $watch(_state);
+	const state = $watch({
+		condition: true,
+		counter: 0,
+	});
 
 	const container = document.createElement("div");
 	const path = "./test/effects/components/NestedIf.tera";
 	hydrateComponent(container, path, Component, state);
 
-	check(container, _state, state, true);
+	check(container, state);
 });
 
-function check(container: HTMLElement, _state: State, state: State, hydrated: boolean) {
+function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's small")).toBeInTheDocument();
 
-	// 1 state object
-	expect(context.objectEffects.size).toBe(hydrated ? 2 : 1);
-	// 2 properties
-	expect(context.objectEffects.get(_state)).toBeTruthy();
-	expect(context.objectEffects.get(_state)!.size).toBe(2);
+	// `condition`, `counter`
+	expect(state[proxyStateSymbol].props.size).toBe(2);
+	//expect(Object.keys(state[proxyStateSymbol].props).length).toBe(2);
+
 	// 2 if nodes with effects
 	//expect(context.rangeEffects.size).toBe(2);
 
@@ -48,11 +52,10 @@ function check(container: HTMLElement, _state: State, state: State, hydrated: bo
 
 	expect(queryByText(container, "It's small")).toBeNull();
 
-	// 1 state object
-	expect(context.objectEffects.size).toBe(hydrated ? 2 : 1);
-	// 1 property
-	expect(context.objectEffects.get(_state)).toBeTruthy();
-	expect(context.objectEffects.get(_state)!.size).toBe(1);
+	// `condition`
+	expect(state[proxyStateSymbol].props.size).toBe(1);
+	//expect(Object.keys(state[proxyStateSymbol].props).length).toBe(1);
+
 	// 1 if node with an effect
 	//expect(context.rangeEffects.size).toBe(1);
 }

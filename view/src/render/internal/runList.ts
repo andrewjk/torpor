@@ -1,7 +1,7 @@
 import context from "../../global/context";
+import type ListItem from "../../global/types/ListItem";
 import Range from "../../global/types/Range";
 import $run from "../../watch/$run";
-import type ListItem from "../types/ListItem";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
 import pushRangeToParent from "./pushRangeToParent";

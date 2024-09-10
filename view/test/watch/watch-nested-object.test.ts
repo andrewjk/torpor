@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
-import { isProxySymbol } from "../../src/watch/internal/symbols";
+import { proxyStateSymbol } from "../../src/watch/internal/symbols";
 
 test("watching a nested object", () => {
 	const input = {
@@ -9,6 +9,6 @@ test("watching a nested object", () => {
 		},
 	};
 	const output = $watch(input);
-	expect(output[isProxySymbol]).toBe(true);
-	expect(output.person[isProxySymbol]).toBe(true);
+	expect(output[proxyStateSymbol]).not.toBeNull();
+	expect(output.person[proxyStateSymbol]).not.toBeNull();
 });

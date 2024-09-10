@@ -1,49 +1,60 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import printContext from "../../src/debug/printContext";
-import context from "../../src/global/context";
 import $watch from "../../src/watch/$watch";
+import { proxyStateSymbol } from "../../src/watch/internal/symbols";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/For.tera";
 
 test("for effect -- mounted", async () => {
-	const _state = {
+	const state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },
 			{ id: 2, text: "third" },
 		],
-	};
-	const state = $watch(_state);
+	});
 
 	const container = document.createElement("div");
 	mountComponent(container, Component, state);
 
-	check(container, state, false);
+	check(container, state);
 });
 
 test("for effect -- hydrated", async () => {
-	const _state = {
+	const state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },
 			{ id: 2, text: "third" },
 		],
-	};
-	const state = $watch(_state);
+	});
 
 	const container = document.createElement("div");
 	const path = "./test/effects/components/For.tera";
 	hydrateComponent(container, path, Component, state);
 
-	check(container, state, true);
+	check(container, state);
 });
 
 // HACK: Need to mock context properly
-function check(container: HTMLElement, state: any, hydrated: boolean) {
-	// 1 state object, 1 array object, 3 array items and 3 for items
-	expect(context.objectEffects.size).toBe(hydrated ? 16 : 8);
+function check(container: HTMLElement, state: any) {
+	// `items`
+	expect(state[proxyStateSymbol].props.size).toBe(1);
+	//expect(Object.keys(state[proxyStateSymbol].props).length).toBe(1);
+
+	// `length`, `0`, `1`, `2`
+	expect(state.items[proxyStateSymbol].props.size).toBe(4);
+	//expect(Object.keys(state.items[proxyStateSymbol].props).length).toBe(4);
+
+	// `text`
+	expect(state.items[0][proxyStateSymbol].props.size).toBe(1);
+	expect(state.items[1][proxyStateSymbol].props.size).toBe(1);
+	expect(state.items[2][proxyStateSymbol].props.size).toBe(1);
+	//expect(Object.keys(state.items[0][proxyStateSymbol].props).length).toBe(1);
+	//expect(Object.keys(state.items[1][proxyStateSymbol].props).length).toBe(1);
+	//expect(Object.keys(state.items[2][proxyStateSymbol].props).length).toBe(1);
 
 	// 1 for node, 3 items with effects
 	//expect(context.rangeEffects.size).toBe(4);

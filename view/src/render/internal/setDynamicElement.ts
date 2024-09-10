@@ -10,6 +10,6 @@ export default function setDynamicElement(el: Element, tag: string) {
 	// TODO: Should we copy attributes just in case they have been set manually?
 	let newElement = document.createElement(tag);
 	el.replaceWith(newElement);
-	console.log("replaced", el.outerHTML, newElement.outerHTML);
+
 	return newElement;
 }

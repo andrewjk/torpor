@@ -1,52 +1,35 @@
-import context from "../../global/context";
 import type Range from "../../global/types/Range";
 
 export default function removeRangeEffects(range: Range) {
-	// Delete the effects for this range (which are keyed by target, property and effect)
-	if (range.objectEffects) {
-		for (let e of range.objectEffects) {
-			let propEffects = context.objectEffects.get(e.target);
-			if (propEffects) {
-				let effects = propEffects.get(e.prop);
-				if (effects) {
-					let length = effects.length;
-					for (let i = 0; i < length; i++) {
-						if (effects[i] === e.effect) {
-							// Run any cleanup function
-							if (e.effect.cleanup) {
-								e.effect.cleanup();
+	// Delete the effects for this range
+	if (range.effects) {
+		for (let effect of range.effects) {
+			// Run any cleanup function
+			if (effect.cleanup) {
+				effect.cleanup();
+			}
+
+			// Delete the effect from any props that are subscribed to it
+			if (effect.props) {
+				for (let prop of effect.props) {
+					if (prop.effects) {
+						let length = prop.effects.length;
+						let i = length;
+						while (i--) {
+							if (prop.effects[i] === effect) {
+								prop.effects[i] = prop.effects[length - 1];
+								prop.effects.pop();
+								length -= 1;
 							}
-
-							// Quick delete
-							effects[i] = effects[length - 1];
-							effects.pop();
-
-							// If that was the last effect for this prop and/or object, delete them too
-							if (!effects.length) {
-								propEffects.delete(e.prop);
-								if (!propEffects.size) {
-									context.objectEffects.delete(e.target);
-								}
-							}
-
-							break;
 						}
+						// TODO: should ideally delete the prop if there
+						// are no more subscriptions??
 					}
 				}
 			}
 		}
 
-		//printContext(`removed effect for '${range.title}'`);
-	}
-
-	// Delete the effects for this range that have no object
-	if (range.emptyEffects) {
-		for (let effect of range.emptyEffects) {
-			// Run any cleanup function
-			if (effect.cleanup) {
-				effect.cleanup();
-			}
-		}
+		range.effects.length = 0;
 	}
 
 	// Delete the effects for each child of this range

@@ -25,8 +25,8 @@
  * SOFTWARE.
  */
 import context from "../../global/context";
+import type ListItem from "../../global/types/ListItem";
 import $watch from "../../watch/$watch";
-import type ListItem from "../types/ListItem";
 import clearRange from "./clearRange";
 import moveRange from "./moveRange";
 
