@@ -27,7 +27,7 @@ const UserProfileContextApp = {
 		$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
 
 		$output += UserProfileContext.render(undefined, $context)
-		$output += `</div>`;
+		$output += ` </div>`;
 		return $output;
 	}
 }

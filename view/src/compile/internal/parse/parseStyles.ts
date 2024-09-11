@@ -4,7 +4,7 @@ import type Style from "../../types/styles/Style";
 import type StyleBlock from "../../types/styles/StyleBlock";
 import hash from "../hash";
 import type ParseStatus from "./ParseStatus";
-import { accept, addError, consumeSpace, consumeUntil } from "./parseUtils";
+import { accept, consumeSpace, consumeUntil, isSpaceChar } from "./parseUtils";
 
 interface StyleStatus {
 	source: string;
@@ -12,15 +12,11 @@ interface StyleStatus {
 	errors: CompileError[];
 }
 
-export default function parseStyleElement(status: ParseStatus): Style {
+export default function parseStyleElement(source: string, status: ParseStatus): Style {
 	const style: Style = {
 		global: false,
 		blocks: [],
 	};
-
-	// Extract the content between the style tags without comments
-	const source = getStyleSource(status).trim();
-	status.styleHash = hash(source);
 
 	const styleStatus: StyleStatus = {
 		source,
@@ -28,52 +24,19 @@ export default function parseStyleElement(status: ParseStatus): Style {
 		errors: [],
 	};
 
-	for (styleStatus.i; styleStatus.i < styleStatus.source.length; styleStatus.i++) {
-		consumeSpace(styleStatus);
-		const block = parseStyleBlock(styleStatus);
-		style.blocks.push(block);
-	}
-
-	status.errors = status.errors.concat(styleStatus.errors);
-
-	return style;
-}
-
-function getStyleSource(status: ParseStatus): string {
-	const start = status.i;
-
-	let style = "";
-	for (status.i; status.i < status.source.length; status.i++) {
-		const char = status.source[status.i];
-		if (char === "<" && status.source.substring(status.i, status.i + 8) === "</style>") {
-			status.i += 8;
-			return style;
-		} else if (char === "/") {
-			const nextChar = status.source[status.i + 1];
-			if (nextChar === "/") {
-				// Ignore the content of one-line comments
-				status.i += 2;
-				for (status.i; status.i < status.source.length; status.i++) {
-					if (status.source[status.i] === "\n") {
-						break;
-					}
-				}
-			} else if (nextChar === "*") {
-				// Ignore the content of multiple-line comments
-				status.i += 2;
-				for (status.i; status.i < status.source.length; status.i++) {
-					if (status.source[status.i] === "/" && status.source[status.i - 1] === "*") {
-						break;
-					}
-				}
-			}
+	while (styleStatus.i < styleStatus.source.length) {
+		if (isSpaceChar(styleStatus.source, styleStatus.i)) {
+			consumeSpace(styleStatus);
 		} else {
-			style += char;
+			const block = parseStyleBlock(styleStatus);
+			style.blocks.push(block);
 		}
 	}
 
-	addError(status, "Unclosed style element", start);
-	return "";
+	status.styleHash = hash(source);
+	status.errors = status.errors.concat(styleStatus.errors);
+
+	return style;
 }
 
 function parseStyleBlock(status: ParseStatus): StyleBlock {
@@ -109,9 +72,8 @@ function parseStyleAttribute(status: ParseStatus): Attribute {
 	accept(":", status);
 	const value = consumeUntil(";", status).trim();
 	accept(";", status);
-	const attribute: Attribute = {
+	return {
 		name,
 		value,
 	};
-	return attribute;
 }

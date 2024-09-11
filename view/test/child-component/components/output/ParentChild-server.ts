@@ -16,7 +16,7 @@ const ParentChild = {
 		t_props_1["name"] = "Anna";
 
 		$output += Child.render(t_props_1, $context)
-		$output += `</div>`;
+		$output += ` </div>`;
 		return $output;
 	}
 }

@@ -4,6 +4,11 @@ export function addError(status: ParseStatus, message: string, start: number = s
 	status.errors.push({ message, start });
 }
 
+export function consumeChar(status: ParseStatus): string {
+	status.i += 1;
+	return status.source[status.i];
+}
+
 export function consumeSpace(status: ParseStatus): string {
 	const start = status.i;
 	for (status.i; status.i < status.source.length; status.i++) {
@@ -38,16 +43,6 @@ export function consumeUntil(value: string, status: ParseStatus) {
 	const start = status.i;
 	for (status.i; status.i < status.source.length; status.i++) {
 		if (value.includes(status.source[status.i])) {
-			return status.source.substring(start, status.i);
-		}
-	}
-	return "";
-}
-
-export function consumeUntilSequence(value: string, status: ParseStatus) {
-	const start = status.i;
-	for (status.i; status.i < status.source.length; status.i++) {
-		if (status.source.substring(status.i, status.i + value.length) === value) {
 			return status.source.substring(start, status.i);
 		}
 	}

@@ -71,10 +71,10 @@ function parseAttributeValue(status: ParseStatus): string {
 		return `'${value}'`;
 	} else if (accept("{", status)) {
 		const value = parseInlineScript(status);
-		accept("}", status);
 		return `{${value}}`;
 	} else {
 		let value = consumeUntil(" \t\r\n>", status);
+		// Check whether we've landed at /> and if so, rewind
 		if (status.source.substring(status.i - 1, status.i + 1) === "/>") {
 			value = value.substring(0, value.length - 1);
 			status.i -= 1;

@@ -32,12 +32,11 @@ export default function parseElement(status: ParseStatus): ElementNode {
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
 		// Get the children
-		for (status.i; status.i < status.source.length; status.i++) {
+		while (status.i < status.source.length) {
 			addSpaceElement(element, status);
 			if (accept("</", status)) {
 				// It's a closing element, so we're done here
-				// TODO: Check that it's the correct closing element?
-				status.i = status.source.indexOf(">", status.i + 1);
+				status.i = status.source.indexOf(">", status.i + 1) + 1;
 				break;
 			} else if (accept("<!--", status)) {
 				// It's a comment, swallow it
@@ -96,7 +95,9 @@ export default function parseElement(status: ParseStatus): ElementNode {
 						}
 					}
 					// Rewind to the < so that it will get checked in the next loop, above
-					status.i = end - 1;
+					status.i = end; // - 1;
+				} else {
+					status.i += 1;
 				}
 			}
 		}

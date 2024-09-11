@@ -19,7 +19,7 @@ test("html comments", () => {
 		ok: true,
 		errors: [],
 		template: {
-			markup: root([el("section", [], [el("p", [], [text("The content")])])]),
+			markup: root([el("section", [], [el("p", [], [text("The  content")])])]),
 		},
 	};
 	expect(output).toEqual(expected);

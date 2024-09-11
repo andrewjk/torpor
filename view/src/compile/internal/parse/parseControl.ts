@@ -7,14 +7,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import parseInlineScript from "./parseInlineScript";
-import {
-	accept,
-	addError,
-	consumeSpace,
-	consumeUntil,
-	consumeUntilSequence,
-	isSpaceChar,
-} from "./parseUtils";
+import { accept, addError, consumeSpace, consumeUntil, isSpaceChar } from "./parseUtils";
 
 const controlOperations = [
 	"@if",
@@ -48,7 +41,7 @@ export default function parseControl(
 	}
 
 	// Get the children
-	for (status.i; status.i < status.source.length; status.i++) {
+	while (status.i < status.source.length) {
 		addSpaceElement(node, status);
 		if (accept("}", status)) {
 			// It's the end of the control block, so we're done here
@@ -92,8 +85,8 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 		const char = status.source[status.i];
 		if (
 			isSpaceChar(status.source, status.i) ||
-			(char === ":" && operation === "default") ||
-			(char === "." && operation === "@console")
+			(accept(":", status) && operation === "default") ||
+			(accept(".", status) && operation === "@console")
 		) {
 			break;
 		}
@@ -112,6 +105,7 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 		// Special processing for functions -- read until the closing brace
 		if (operation === "@function") {
 			statement += ` {${parseInlineScript(status)}}`;
+			accept("}", status);
 		}
 	} else {
 		// TODO: Should probably advance until a lt
@@ -127,42 +121,36 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 }
 
 function parseControlStatement(start: number, operation: string, status: ParseStatus) {
-	let statement = "";
 	let parenCount = 0;
-	for (status.i; status.i < status.source.length; status.i++) {
-		const char = status.source[status.i];
-		if (char === "(") {
+	while (status.i < status.source.length) {
+		if (accept("(", status)) {
 			parenCount += 1;
-		} else if (char === ")") {
+		} else if (accept(")", status)) {
 			parenCount -= 1;
-		} else if (char === "{") {
+		} else if (
+			accept("{", status) ||
+			(accept("\n", status) && standaloneOperations.includes(operation))
+		) {
 			if (parenCount === 0) {
-				statement = trimStart(status.source.substring(start, status.i).trim(), "@");
-				status.i += 1;
-				break;
+				return trimStart(status.source.substring(start, status.i - 1).trim(), "@");
 			}
-		} else if (char === "\n" && standaloneOperations.includes(operation)) {
-			if (parenCount === 0) {
-				statement = trimStart(status.source.substring(start, status.i).trim(), "@");
-				status.i += 1;
-				break;
-			}
-		} else if (char === '"' || char === "'" || char === "`") {
+		} else if (accept('"', status) || accept("'", status) || accept("`", status)) {
 			// Ignore the content of strings
+			const char = status.source[status.i - 1];
 			do {
-				consumeUntil(char, status);
-			} while (status.source[status.i - 1] === "\\");
+				status.i = status.source.indexOf(char, status.i) + 1;
+			} while (status.source[status.i - 2] === "\\");
 		} else if (accept("//", status)) {
 			// Ignore the content of one-line comments
-			consumeUntil("\n", status);
-			accept("\n", status);
+			status.i = status.source.indexOf("\n", status.i) + 1;
 		} else if (accept("/*", status)) {
 			// Ignore the content of multiple-line comments
-			consumeUntilSequence("*/", status);
-			accept("*/", status);
+			status.i = status.source.indexOf("*/", status.i) + 2;
+		} else {
+			status.i += 1;
 		}
 	}
-	return statement;
+	return "";
 }
 
 /**
@@ -240,8 +228,8 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
  */
 function parseControlBranches(status: ParseStatus, parentNode: ElementNode | ControlNode) {
 	// Look ahead and see if we have another control statement
-	// TODO: Should we be more strict here (e.g. else should only be after an
-	// if), or should we leave it to the JS parser?
+	// NOTE: We could be more strict here (e.g. we could check that an else is
+	// after an if), but for now we are just leaving it to the JS parser
 	let gotAnotherBranch = true;
 	while (gotAnotherBranch) {
 		let start = status.i;

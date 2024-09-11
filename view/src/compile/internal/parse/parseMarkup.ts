@@ -3,30 +3,22 @@ import type ParseStatus from "./ParseStatus";
 import parseChildTemplate from "./parseChildTemplate";
 import parseDocs from "./parseDocs";
 import parseElement from "./parseElement";
-import parseStyleElement from "./parseStyles";
+import parseStyles from "./parseStyles";
 import parseTag from "./parseTag";
 import { accept, addError } from "./parseUtils";
 
 export default function parseMarkup(status: ParseStatus, source: string) {
-	for (status.i; status.i < source.length; status.i++) {
-		const char = status.source[status.i];
-		if (char === "<") {
-			if (
-				status.source[status.i + 1] === "!" &&
-				status.source[status.i + 2] === "-" &&
-				status.source[status.i + 3] === "-"
-			) {
-				// It's a comment, swallow it
-				status.i = status.source.indexOf("-->", status.i) + 3;
-			} else {
-				parseTopElement(status);
-			}
-			// HACK: Go back 1 char so it can be incremented by the loop
-			// TODO: Really need to fix loops
-			status.i -= 1;
+	while (status.i < source.length) {
+		if (accept("<!--", status)) {
+			// It's a comment, swallow it
+			status.i = status.source.indexOf("-->", status.i) + 3;
+		} else if (accept("<", status, false)) {
+			parseTopElement(status);
 		} else if (accept("/**", status)) {
 			status.i -= 1;
 			status.docs = parseDocs(status);
+		} else {
+			status.i += 1;
 		}
 	}
 }
@@ -37,20 +29,21 @@ function parseTopElement(status: ParseStatus) {
 	switch (element.tagName) {
 		case "script": {
 			if (!element.selfClosed) {
-				status.script = extractElementText("script", status);
+				status.script = extractElementText("script", false, status);
 				extractScriptImports(status);
 			}
 			break;
 		}
 		case "style": {
 			if (!element.selfClosed) {
-				status.style = parseStyleElement(status);
+				let source = extractElementText("style", true, status);
+				status.style = parseStyles(source, status);
 			}
 			break;
 		}
 		case "template": {
 			if (!element.selfClosed) {
-				const source = extractElementText("template", status);
+				const source = extractElementText("template", false, status);
 				const childName = trimQuotes(
 					element.attributes.find((a) => a.name === "name")?.value || "ChildComponent",
 				);
@@ -71,48 +64,44 @@ function parseTopElement(status: ParseStatus) {
 	}
 }
 
-function extractElementText(tagName: string, status: ParseStatus): string {
+function extractElementText(tagName: string, stripComments: boolean, status: ParseStatus): string {
 	const start = status.i;
+	let content = "";
 	const closeTag = `</${tagName}>`;
-	for (status.i; status.i < status.source.length; status.i++) {
-		const char = status.source[status.i];
-		if (
-			char === "<" &&
-			status.source.substring(status.i, status.i + closeTag.length) === closeTag
-		) {
-			// Return on </script>
-			const result = status.source.substring(start, status.i).trim();
-			status.i += closeTag.length - 1;
-			return result;
-		} else if (char === '"' || char === "'" || char === "`") {
+	while (status.i < status.source.length) {
+		if (accept(closeTag, status)) {
+			return content.trim();
+		} else if (accept('"', status) || accept("'", status) || accept("`", status)) {
 			// Ignore the content of strings
+			const char = status.source[status.i - 1];
+			content += char;
+			let stringStart = status.i;
+			do {
+				status.i = status.source.indexOf(char, status.i) + 1;
+			} while (status.source[status.i - 2] === "\\");
+			content += status.source.substring(stringStart, status.i - 1);
+			content += char;
+		} else if (accept("//", status)) {
+			// Ignore the content of one-line comments
+			let commentStart = status.i;
+			status.i = status.source.indexOf("\n", status.i) + 1;
+			if (!stripComments) {
+				content += `//${status.source.substring(commentStart, status.i - 1)}`;
+			}
+			content += "\n";
+		} else if (accept("/*", status)) {
+			// Ignore the content of multiple-line comments
+			let commentStart = status.i;
+			status.i = status.source.indexOf("*/", status.i) + 2;
+			if (!stripComments) {
+				content += `/*${status.source.substring(commentStart, status.i - 2)}*/`;
+			}
+		} else {
+			content += status.source[status.i];
 			status.i += 1;
-			for (status.i; status.i < status.source.length; status.i++) {
-				if (status.source[status.i] === char && status.source[status.i - 1] !== "\\") {
-					break;
-				}
-			}
-		} else if (char === "/") {
-			const nextChar = status.source[status.i + 1];
-			if (nextChar === "/") {
-				// Ignore the content of one-line comments
-				status.i += 2;
-				for (status.i; status.i < status.source.length; status.i++) {
-					if (status.source[status.i] === "\n") {
-						break;
-					}
-				}
-			} else if (nextChar === "*") {
-				// Ignore the content of multiple-line comments
-				status.i += 2;
-				for (status.i; status.i < status.source.length; status.i++) {
-					if (status.source[status.i] === "/" && status.source[status.i - 1] === "*") {
-						break;
-					}
-				}
-			}
 		}
 	}
+
 	addError(status, `Unclosed ${tagName} element`, start);
 	return "";
 }
@@ -132,7 +121,7 @@ function extractScriptImports(status: ParseStatus) {
 				const line = status.script.substring(start, i).trim();
 				if (line.length) {
 					if (line.startsWith("//")) {
-						// TODO: More comment handling
+						// Ignore commented imports
 					} else if (line.startsWith("import ")) {
 						// TODO: More import wrangling
 						// (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)

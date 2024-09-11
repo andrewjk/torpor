@@ -36,7 +36,7 @@ const UserProfileContextApp = {
 		/* User interface */
 		const t_fragments = [];
 
-		const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <h1>#</h1> <!></div>`);
+		const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <h1>#</h1> <!> </div>`);
 		const t_div_1 = t_root(t_fragment_0);
 		const t_text_1 = t_child(t_next(t_child(t_div_1)));
 		const t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_div_1)))));
