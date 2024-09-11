@@ -25,36 +25,34 @@ export default function hydrateComponent(
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
+	const imports = parsed.template!.imports?.map((imp) => {
+		let importPath = path.join(path.dirname(componentPath), imp.path);
+		let importSource = fs.readFileSync(importPath).toString();
+		let importParsed = parse(importSource);
+		expect(importParsed.ok).toBe(true);
+		expect(importParsed.template).not.toBeUndefined();
+		const importClient = build(imp.name, importParsed.template!);
+		if (debugPrint) {
+			console.log("=== import client");
+			console.log(importClient.code);
+			console.log("===");
+		}
+		const importServer = buildServer(imp.name, importParsed.template!);
+		return { importPath, importClient, importServer };
+	});
+
+	const client = build(component.name, parsed.template!);
 	if (debugPrint) {
-		const built = build(component.name, parsed.template!);
 		console.log("=== client");
-		console.log(built.code);
+		console.log(client.code);
 		console.log("===");
 	}
-
-	const imports = parsed
-		.template!.imports?.map((imp) => {
-			let importPath = path.join(path.dirname(componentPath), imp.path);
-			let importSource = fs.readFileSync(importPath).toString();
-			let importParsed = parse(importSource);
-			expect(importParsed.ok).toBe(true);
-			expect(importParsed.template).not.toBeUndefined();
-			if (debugPrint) {
-				const importClient = build(imp.name, importParsed.template!);
-				console.log("=== client");
-				console.log(importClient.code);
-				console.log("===");
-			}
-			const importServer = buildServer(imp.name, importParsed.template!);
-			return importServer.code.replace("export default ", "");
-		})
-		.join("\n");
 
 	const server = buildServer(component.name, parsed.template!);
 	const code = `
 const x = {
 render: ($state) => {
-${imports}
+${imports?.map((imp) => imp.importServer.code.replace("export default ", "")).join("\n")}
 ${server.code.replace("export default ", "").replace(/^import.+\n/g, "")}
 
 return ${component.name}.render($state);
@@ -70,26 +68,18 @@ x;`;
 	}
 
 	// Write everything to files so we can keep an eye on regressions
-	// TODO: Should probably have a script instead
+	// TODO: Should probably have a script instead, that we run before commit
 	const folder = componentPath.replace("/components/", "/components/output/");
 	if (!fs.existsSync(path.dirname(folder))) {
 		fs.mkdirSync(path.dirname(folder));
 	}
 	fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
-	//fs.writeFileSync(folder.replace(".tera", ".html"), html);
-	const client = build(component.name, parsed.template!);
 	fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
 
-	// TODO: Probably shouldn't be duplicating this code from above
-	parsed.template!.imports?.forEach((imp) => {
-		let importPath = path.join(path.dirname(componentPath), imp.path);
-		let importSource = fs.readFileSync(importPath).toString();
-		let importParsed = parse(importSource);
-		const importClient = build(imp.name, importParsed.template!);
-		const importServer = buildServer(imp.name, importParsed.template!);
-		const folder = importPath.replace("/components/", "/components/output/");
-		fs.writeFileSync(folder.replace(".tera", "-server.ts"), importServer.code);
-		fs.writeFileSync(folder.replace(".tera", "-client.ts"), importClient.code);
+	imports?.forEach((imp) => {
+		const folder = imp.importPath.replace("/components/", "/components/output/");
+		fs.writeFileSync(folder.replace(".tera", "-server.ts"), imp.importServer.code);
+		fs.writeFileSync(folder.replace(".tera", "-client.ts"), imp.importClient.code);
 	});
 
 	container.innerHTML = html;
