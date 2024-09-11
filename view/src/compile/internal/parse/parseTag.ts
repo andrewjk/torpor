@@ -36,7 +36,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 }
 
 function parseTagAttributes(status: ParseStatus): Attribute[] {
-	let attributes = [];
+	let attributes: Attribute[] = [];
 	while (status.i < status.source.length) {
 		consumeSpace(status);
 		if (accept("/>", status, false) || accept(">", status, false)) {

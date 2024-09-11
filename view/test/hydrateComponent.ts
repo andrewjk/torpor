@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { expect } from "vitest";
 import build from "../src/compile/build";
-import buildServer from "../src/compile/buildServer";
 import parse from "../src/compile/parse";
 import type Component from "../src/compile/types/Component";
 import hydrate from "../src/render/hydrate";
@@ -37,7 +36,7 @@ export default function hydrateComponent(
 			console.log(importClient.code);
 			console.log("===");
 		}
-		const importServer = buildServer(imp.name, importParsed.template!);
+		const importServer = build(imp.name, importParsed.template!, { server: true });
 		return { importPath, importClient, importServer };
 	});
 
@@ -48,7 +47,7 @@ export default function hydrateComponent(
 		console.log("===");
 	}
 
-	const server = buildServer(component.name, parsed.template!);
+	const server = build(component.name, parsed.template!, { server: true });
 	const code = `
 const x = {
 render: ($state) => {

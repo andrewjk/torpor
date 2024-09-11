@@ -4,7 +4,6 @@ import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
 import build from "../../view/src/compile/build";
-import buildServer from "../../view/src/compile/buildServer";
 import parse from "../../view/src/compile/parse";
 import ComponentTemplate from "../../view/src/compile/types/ComponentTemplate";
 import type { Options } from "./types";
@@ -90,7 +89,7 @@ function transform(name: string, template: ComponentTemplate, id: string) {
 }
 
 function transformForServer(name: string, template: ComponentTemplate, id: string) {
-	const built = buildServer(name, template);
+	const built = build(name, template, { server: true });
 	let transformed = built.code;
 
 	// HACK: Replace import paths from any depth with absolute paths
