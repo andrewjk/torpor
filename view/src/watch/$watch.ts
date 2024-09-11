@@ -2,12 +2,16 @@ import type ProxyState from "../global/types/ProxyState";
 import proxyGet from "./internal/proxyGet";
 import proxySet from "./internal/proxySet";
 import { proxyStateSymbol } from "./internal/symbols";
+import type WatchOptions from "./types/WatchOptions";
 
 /**
  * Watches an object and runs effects when its properties are changed
  * @param object The object to watch
  */
-export default function $watch<T extends Record<PropertyKey, any>>(object: T): T {
+export default function $watch<T extends Record<PropertyKey, any>>(
+	object: T,
+	options?: WatchOptions,
+): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
 	if (object == null || object[proxyStateSymbol]) {
 		return object;
@@ -23,6 +27,7 @@ export default function $watch<T extends Record<PropertyKey, any>>(object: T): T
 	const state: ProxyState = {
 		target: object,
 		isArray: Array.isArray(object),
+		shallow: !!options?.shallow,
 		props: new Map(),
 	};
 	const handler: ProxyHandler<T> = {

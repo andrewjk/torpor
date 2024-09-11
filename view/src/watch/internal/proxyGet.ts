@@ -20,9 +20,11 @@ export default function proxyGet(
 	// Set the value to a new proxy if it's an object
 	// But not if it's a Promise (i.e. has a `then` method)
 	if (!state.props.has(prop)) {
-		let value = target[prop];
-		if (value && typeof value === "object" && !value[proxyStateSymbol] && !value.then) {
-			target[prop] = $watch(value);
+		if (!state.shallow) {
+			let value = target[prop];
+			if (value && typeof value === "object" && !value[proxyStateSymbol] && !value.then) {
+				target[prop] = $watch(value);
+			}
 		}
 		state.props.set(prop, null);
 	}
