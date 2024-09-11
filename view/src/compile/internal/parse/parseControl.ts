@@ -7,7 +7,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import parseInlineScript from "./parseInlineScript";
-import { accept, addError, consumeSpace, consumeUntil, isSpaceChar } from "./parseUtils";
+import { accept, addError, consumeSpace, isSpaceChar } from "./parseUtils";
 
 const controlOperations = [
 	"@if",

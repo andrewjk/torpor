@@ -21,7 +21,7 @@ export default function buildIfNode(
 	const ifRangeName = nextVarName("if_range", status);
 
 	// Filter non-control branches (spaces)
-	const branches = node.children.filter((n) => isControlNode(n));
+	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
 
 	// Add an else branch if there isn't one, so that the content will be cleared if no branches match
 	if (branches.findIndex((n) => n.operation === "@else") === -1) {

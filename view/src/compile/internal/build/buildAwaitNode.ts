@@ -22,7 +22,7 @@ export default function buildAwaitNode(
 	const oldRangeName = nextVarName("old_range", status);
 
 	// Filter non-control branches (spaces)
-	const branches = node.children.filter((n) => isControlNode(n));
+	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
 
 	// Make sure all branches exist
 	let awaitBranch = branches.find((n) => n.operation === "@await")!;

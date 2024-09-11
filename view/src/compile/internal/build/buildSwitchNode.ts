@@ -19,7 +19,7 @@ export default function buildSwitchNode(
 	const switchRangeName = nextVarName("switch_range", status);
 
 	// Filter non-control branches (spaces)
-	const branches = node.children.filter((n) => isControlNode(n));
+	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
 
 	// Add a default branch if there isn't one, so that the content will be cleared if no branches match
 	if (branches.findIndex((n) => n.operation === "@default") === -1) {
