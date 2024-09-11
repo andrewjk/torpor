@@ -2,6 +2,6 @@
     <p>
         {$props.text}
         {$props.child.childText}
-        {$props.child.item.itemText}
+        {$props.child.grandChild.grandChildText}
     </p>
 </div>

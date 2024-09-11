@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import printContext from "../../src/debug/printContext";
 import $watch from "../../src/watch/$watch";
-import { proxyStateSymbol } from "../../src/watch/internal/symbols";
+import { proxyDataSymbol } from "../../src/watch/internal/symbols";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/For.tera";
@@ -41,20 +41,20 @@ test("for effect -- hydrated", async () => {
 // HACK: Need to mock context properly
 function check(container: HTMLElement, state: any) {
 	// `items`
-	expect(state[proxyStateSymbol].props.size).toBe(1);
-	//expect(Object.keys(state[proxyStateSymbol].props).length).toBe(1);
+	expect(state[proxyDataSymbol].props.size).toBe(1);
+	//expect(Object.keys(state[proxyDataSymbol].props).length).toBe(1);
 
 	// `length`, `0`, `1`, `2`
-	expect(state.items[proxyStateSymbol].props.size).toBe(4);
-	//expect(Object.keys(state.items[proxyStateSymbol].props).length).toBe(4);
+	expect(state.items[proxyDataSymbol].props.size).toBe(4);
+	//expect(Object.keys(state.items[proxyDataSymbol].props).length).toBe(4);
 
 	// `text`
-	expect(state.items[0][proxyStateSymbol].props.size).toBe(1);
-	expect(state.items[1][proxyStateSymbol].props.size).toBe(1);
-	expect(state.items[2][proxyStateSymbol].props.size).toBe(1);
-	//expect(Object.keys(state.items[0][proxyStateSymbol].props).length).toBe(1);
-	//expect(Object.keys(state.items[1][proxyStateSymbol].props).length).toBe(1);
-	//expect(Object.keys(state.items[2][proxyStateSymbol].props).length).toBe(1);
+	expect(state.items[0][proxyDataSymbol].props.size).toBe(1);
+	expect(state.items[1][proxyDataSymbol].props.size).toBe(1);
+	expect(state.items[2][proxyDataSymbol].props.size).toBe(1);
+	//expect(Object.keys(state.items[0][proxyDataSymbol].props).length).toBe(1);
+	//expect(Object.keys(state.items[1][proxyDataSymbol].props).length).toBe(1);
+	//expect(Object.keys(state.items[2][proxyDataSymbol].props).length).toBe(1);
 
 	// 1 for node, 3 items with effects
 	//expect(context.rangeEffects.size).toBe(4);

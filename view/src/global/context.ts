@@ -9,8 +9,6 @@ interface Context {
 	/** The effect that is currently being run. */
 	activeEffect: Effect | null;
 
-	//activeEffects: Effect[];
-
 	/** The range that is currently being created. */
 	activeRange: Range | null;
 

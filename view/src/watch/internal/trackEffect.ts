@@ -1,16 +1,17 @@
 import context from "../../global/context";
-import ProxyState from "../../global/types/ProxyState";
+import Effect from "../../global/types/Effect";
+import ProxyData from "../../global/types/ProxyData";
 
-export default function trackEffect(state: ProxyState, prop: PropertyKey) {
+export default function trackEffect(data: ProxyData, key: PropertyKey) {
 	//console.log(`tracking effect for '${String(prop)}' with value '${target[prop]}'`);
 
 	// If there's an active effect, register this target/prop with it, so that
 	// it will be called when this prop is set
 	if (context.activeEffect) {
-		let propState = state.props.get(prop);
+		let propState = data.propData.get(key);
 		if (!propState) {
 			propState = { effects: [] };
-			state.props.set(prop, propState);
+			data.propData.set(key, propState);
 		}
 
 		// Get the effects for the supplied property
@@ -23,7 +24,5 @@ export default function trackEffect(state: ProxyState, prop: PropertyKey) {
 
 		context.activeEffect.props ||= [];
 		context.activeEffect.props.push(propState);
-
-		//printContext(`added effect for '${String(prop)}' with value '${target[prop]}'`);
 	}
 }

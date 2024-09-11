@@ -11,7 +11,7 @@ const Object = {
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => text != null ? text : "";
-		$output += `<div> <p> ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.item.itemText)} </p> </div>`;
+		$output += `<div> <p> ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.grandChild.grandChildText)} </p> </div>`;
 		return $output;
 	}
 }

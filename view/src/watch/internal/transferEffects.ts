@@ -1,5 +1,6 @@
-import ProxyState from "../../global/types/ProxyState";
-import { proxyStateSymbol } from "./symbols";
+import $watch from "../$watch";
+import ProxyData from "../../global/types/ProxyData";
+import { proxyDataSymbol } from "./symbols";
 
 /**
  * Transfers property effect subscriptions from one object to another
@@ -8,43 +9,56 @@ export default function transferEffects(
 	oldValue: Record<PropertyKey, any>,
 	newValue: Record<PropertyKey, any>,
 ) {
-	if (newValue) {
-		const oldState = oldValue[proxyStateSymbol] as ProxyState;
-		const newState = newValue[proxyStateSymbol] as ProxyState;
-		moveChildEffects(oldValue, newValue, oldState, newState);
-		// TODO: Maybe only transfer these if they are applicable
-		//newState.props = oldState.props;
-	} else {
-		// TODO: Should we clear the old effects?
-	}
+	const oldData = oldValue[proxyDataSymbol] as ProxyData;
+	const newData = newValue[proxyDataSymbol] as ProxyData;
+	moveChildEffects(oldValue, newValue, oldData, newData);
 }
 
 function moveChildEffects(
 	oldValue: Record<PropertyKey, any>,
 	newValue: Record<PropertyKey, any>,
-	oldState: ProxyState,
-	newState: ProxyState,
+	oldData: ProxyData,
+	newData: ProxyData,
 ) {
-	// Set values of child properties that have effects, so that they will get updated too
+	// Recursively transfer and run effects for child properties
 	// TODO: Top down or bottom up?? Doing top down for now...
-	if (oldState.isArray) {
-		for (let prop of oldState.props.keys()) {
-			if (prop === "length") {
-				// Can't set length to the old value, but do transfer its effects
-				newState.props.set(prop, oldState.props.get(prop)!);
-			} else if (+String(prop) >= newValue.length) {
-				// Skip properties past the end of the new value
-			} else {
-				// Set the old value to the new value, and transfer effects
-				oldValue[prop] = newValue[prop];
-				newState.props.set(prop, oldState.props.get(prop)!);
+	for (let key of oldData.propData.keys()) {
+		let props = oldData.propData.get(key);
+		if (props) {
+			// Transfer the prop data
+			newData.propData.set(key, props);
+
+			let oldPropValue = oldValue[key];
+			let oldPropData = oldPropValue[proxyDataSymbol];
+
+			// If the old value was a proxy, make the new value one too
+			// TODO: Make sure we aren't accidentally creating proxies for
+			// things that weren't before...
+			if (oldPropData) {
+				newValue[key] = $watch(newValue[key]);
 			}
-		}
-	} else {
-		for (let prop of oldState.props.keys()) {
-			// Set the old value to the new value, and transfer effects
-			oldValue[prop] = newValue[prop];
-			newState.props.set(prop, oldState.props.get(prop)!);
+
+			let newPropValue = newValue[key];
+
+			// Run the effects for each property
+			if (props.effects) {
+				for (let effect of props.effects) {
+					if (effect.cleanup) {
+						effect.cleanup();
+					}
+
+					// Only run the effect if there is a new value
+					if (newPropValue) {
+						effect.run();
+					}
+				}
+			}
+
+			// Recurse
+			if (oldPropData) {
+				let newPropData = newPropValue[proxyDataSymbol];
+				moveChildEffects(oldPropValue, newPropValue, oldPropData, newPropData);
+			}
 		}
 	}
 }

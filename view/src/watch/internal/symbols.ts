@@ -1,3 +1,3 @@
-const proxyStateSymbol = Symbol("_proxy_state");
+const proxyDataSymbol = Symbol("_proxy_data");
 
-export { proxyStateSymbol };
+export { proxyDataSymbol };

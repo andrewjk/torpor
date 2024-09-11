@@ -2,7 +2,7 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
-import { proxyStateSymbol } from "../../src/watch/internal/symbols";
+import { proxyDataSymbol } from "../../src/watch/internal/symbols";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/If.tera";
@@ -31,8 +31,8 @@ function check(container: HTMLElement, state: any) {
 	expect(queryByText(container, "It's small")).toBeInTheDocument();
 
 	// `counter`
-	expect(state[proxyStateSymbol].props.size).toBe(1);
-	//expect(Object.keys(state[proxyStateSymbol].props).length).toBe(1);
+	expect(state[proxyDataSymbol].props.size).toBe(1);
+	//expect(Object.keys(state[proxyDataSymbol].props).length).toBe(1);
 
 	// 1 if node with an effect
 	//expect(context.rangeEffects.size).toBe(1);

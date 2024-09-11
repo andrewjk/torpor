@@ -1,7 +1,7 @@
-import type ProxyState from "../global/types/ProxyState";
+import type ProxyData from "../global/types/ProxyData";
 import proxyGet from "./internal/proxyGet";
 import proxySet from "./internal/proxySet";
-import { proxyStateSymbol } from "./internal/symbols";
+import { proxyDataSymbol } from "./internal/symbols";
 import type WatchOptions from "./types/WatchOptions";
 
 /**
@@ -13,7 +13,7 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 	options?: WatchOptions,
 ): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
-	if (object == null || object[proxyStateSymbol]) {
+	if (object == null || object[proxyDataSymbol]) {
 		return object;
 	}
 
@@ -23,19 +23,19 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 	//	throw new Error(`$watch can't be called with a ${typeof object}`);
 	//}
 
-	// Create a proxy handler for each object, and store some state for it here
-	const state: ProxyState = {
+	// Create a proxy handler for each object, and store some data for it here
+	const data: ProxyData = {
 		target: object,
 		isArray: Array.isArray(object),
 		shallow: !!options?.shallow,
-		props: new Map(),
+		propData: new Map(),
 	};
 	const handler: ProxyHandler<T> = {
 		get: function (target, prop, receiver) {
-			return proxyGet(target, prop, receiver, state);
+			return proxyGet(target, prop, receiver, data);
 		},
 		set: function (target, prop, value, receiver) {
-			return proxySet(target, prop, value, receiver, state);
+			return proxySet(target, prop, value, receiver, data);
 		},
 	};
 

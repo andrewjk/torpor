@@ -1,6 +1,6 @@
 import context from "../global/context";
 import type Cleanup from "../global/types/Cleanup";
-import type Effect from "../global/types/Effect";
+import Effect from "../global/types/Effect";
 
 // TODO: Take a pipeline of operators e.g. debounce
 
@@ -17,8 +17,7 @@ export default function $run(fn: () => Cleanup | void) {
 	};
 
 	if (context.activeRange) {
-		context.activeRange.effects ||= [];
-		context.activeRange.effects.push(effect);
+		(context.activeRange.effects ??= []).push(effect);
 	}
 
 	context.activeEffect = effect;

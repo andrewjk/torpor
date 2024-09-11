@@ -42,7 +42,6 @@ export default function runListItems(
 	anchor: Node | null,
 	oldItems: ListItem[],
 	newItems: ListItem[],
-	// TODO: arrange params for consistency with other run methods -- and remove parent??
 	create: (data: ListItem, before: Node | null) => void,
 ) {
 	let oldStartIndex = 0;

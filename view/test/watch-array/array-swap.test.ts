@@ -7,13 +7,13 @@ import mountComponent from "../mountComponent";
 import type ArrayState from "./ArrayState";
 import Component from "./components/Array.tera";
 
-test("array sort -- mounted", () => {
+test("array swap -- mounted", () => {
 	const state = $watch({
 		items: [
-			{ id: 1, text: "b" },
-			{ id: 2, text: "a" },
-			{ id: 3, text: "d" },
-			{ id: 4, text: "c" },
+			{ id: 1, text: "a" },
+			{ id: 2, text: "b" },
+			{ id: 3, text: "c" },
+			{ id: 4, text: "d" },
 		],
 	});
 
@@ -23,13 +23,13 @@ test("array sort -- mounted", () => {
 	check(container, state);
 });
 
-test("array sort -- hydrated", () => {
+test("array swap -- hydrated", () => {
 	const state = $watch({
 		items: [
-			{ id: 1, text: "b" },
-			{ id: 2, text: "a" },
-			{ id: 3, text: "d" },
-			{ id: 4, text: "c" },
+			{ id: 1, text: "a" },
+			{ id: 2, text: "b" },
+			{ id: 3, text: "c" },
+			{ id: 4, text: "d" },
 		],
 	});
 
@@ -41,13 +41,13 @@ test("array sort -- hydrated", () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^badc$");
-
-	state.items.sort((a, b) => a.text.localeCompare(b.text));
-
 	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
 
-	state.items.sort((a, b) => b.text.localeCompare(a.text));
+	const clone = state.items.slice();
+	const tmp = clone[1];
+	clone[1] = clone[3];
+	clone[3] = tmp;
+	state.items = clone;
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^dcba$");
+	expect(container.textContent!.replace(/\s/g, "")).toBe("^adcb$");
 }

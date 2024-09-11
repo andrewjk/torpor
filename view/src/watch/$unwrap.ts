@@ -1,9 +1,9 @@
-import { proxyStateSymbol } from "./internal/symbols";
+import { proxyDataSymbol } from "./internal/symbols";
 
 /**
  * Returns the target object of a proxy
  * @param object The proxy object
  */
 export default function $unwrap<T extends Record<PropertyKey, any>>(object: T): T {
-	return object[proxyStateSymbol].target || object;
+	return object[proxyDataSymbol].target || object;
 }

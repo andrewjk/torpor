@@ -10,8 +10,8 @@ interface State {
 	text: string;
 	child: {
 		childText: string;
-		item: {
-			itemText: string;
+		grandChild: {
+			grandChildText: string;
 		};
 	};
 }
@@ -21,8 +21,8 @@ test("watch object -- mounted", async () => {
 		text: "top",
 		child: {
 			childText: "child",
-			item: {
-				itemText: "item",
+			grandChild: {
+				grandChildText: "grandchild",
 			},
 		},
 	});
@@ -38,8 +38,8 @@ test("watch object -- hydrated", async () => {
 		text: "top",
 		child: {
 			childText: "child",
-			item: {
-				itemText: "item",
+			grandChild: {
+				grandChildText: "grandchild",
 			},
 		},
 	});
@@ -52,25 +52,30 @@ test("watch object -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: State) {
-	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child item");
+	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child grandchild");
 
-	state.child.item = {
-		itemText: "changed",
+	console.log("setting state.child.grandChild");
+	state.child.grandChild = {
+		grandChildText: "changed",
 	};
 
 	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child changed");
 
+	console.log("setting state.child");
 	state.child = {
 		childText: "new_child",
-		item: {
-			itemText: "new_item",
+		grandChild: {
+			grandChildText: "new_grandchild",
 		},
 	};
 
-	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child new_item");
-	//printContext();
-	// Make sure that effects have been transferred across
-	state.child.item.itemText = "even_newer_item";
+	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child new_grandchild");
 
-	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child even_newer_item");
+	console.log("setting state.child.grandchild.grandchildtext");
+	// Make sure that effects have been transferred across
+	state.child.grandChild.grandChildText = "even_newer_grandchild";
+
+	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe(
+		"top new_child even_newer_grandchild",
+	);
 }

@@ -1,5 +1,5 @@
 import type Cleanup from "./Cleanup";
-import type ProxyPropState from "./ProxyPropState";
+import type ProxyPropData from "./ProxyPropData";
 import type Range from "./Range";
 
 export default interface Effect {
@@ -7,5 +7,5 @@ export default interface Effect {
 	cleanup: Cleanup | null;
 
 	range: Range | null;
-	props: ProxyPropState[] | null;
+	props: ProxyPropData[] | null;
 }
