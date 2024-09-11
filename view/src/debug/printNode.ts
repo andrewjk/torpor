@@ -8,7 +8,7 @@ export default function printNode(node: Node | null | undefined) {
 			let el = node as Element;
 			let p = el.tagName.toLowerCase();
 			if (el.id) p += "#" + el.id;
-			if (el.classList.length) p += Array.from(el.classList).join(".");
+			if (el.classList.length) p += "." + Array.from(el.classList).join(".");
 			if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(el)}]`;
 			paths.push(p);
 		} else if (node.nodeType === 3) {
@@ -35,5 +35,9 @@ export default function printNode(node: Node | null | undefined) {
 		node = node.parentNode;
 	}
 
-	return `'${textContent}' [ ${paths.reverse().join(" > ") || "null"} ]`;
+	return `[ ${paths.reverse().join(" > ") || "null"} ] '${truncate(textContent || "", 40)}'`;
+}
+
+function truncate(input: string, length: number) {
+	return input.length > length ? `${input.substring(0, length)}…` : input;
 }
