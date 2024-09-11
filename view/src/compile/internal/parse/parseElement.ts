@@ -6,7 +6,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
-import { isSpaceChar } from "./parseUtils";
+import { accept, isSpaceChar } from "./parseUtils";
 import slottifyChildNodes from "./slottifyChildNodes";
 
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
@@ -34,37 +34,27 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		// Get the children
 		for (status.i; status.i < status.source.length; status.i++) {
 			addSpaceElement(element, status);
-			const char = status.source[status.i];
-			if (char === "<") {
-				if (status.source[status.i + 1] === "/") {
-					// It's a closing element, so we're done here
-					// TODO: Check that it's the correct closing element?
-					status.i = status.source.indexOf(">", status.i + 1);
-					break;
-				} else if (
-					status.source[status.i + 1] === "!" &&
-					status.source[status.i + 2] === "-" &&
-					status.source[status.i + 3] === "-"
-				) {
-					// It's a comment, swallow it
-					status.i = status.source.indexOf("-->", status.i) + 3;
-				} else {
-					// It's a child element
-					const child = parseElement(status);
-					element.children.push(child);
-				}
-			} else if (char === "@") {
-				const nextChars = status.source.substring(status.i, status.i + 3);
-				if (nextChars === "@//") {
-					// Swallow one-line comments
-					status.i = status.source.indexOf("\n", status.i) + 1;
-				} else if (nextChars === "@/*") {
-					// Swallow multi-line comments
-					status.i = status.source.indexOf("*/", status.i) + 2;
-				} else {
-					// It's a control statement
-					parseControl(status, element);
-				}
+			if (accept("</", status)) {
+				// It's a closing element, so we're done here
+				// TODO: Check that it's the correct closing element?
+				status.i = status.source.indexOf(">", status.i + 1);
+				break;
+			} else if (accept("<!--", status)) {
+				// It's a comment, swallow it
+				status.i = status.source.indexOf("-->", status.i) + 3;
+			} else if (accept("@//", status)) {
+				// Swallow one-line comments
+				status.i = status.source.indexOf("\n", status.i) + 1;
+			} else if (accept("@/*", status)) {
+				// Swallow multi-line comments
+				status.i = status.source.indexOf("*/", status.i) + 2;
+			} else if (accept("<", status, false)) {
+				// It's a child element
+				const child = parseElement(status);
+				element.children.push(child);
+			} else if (accept("@", status, false)) {
+				// It's a control statement
+				parseControl(status, element);
 			} else {
 				// It's text content
 				const start = status.i;

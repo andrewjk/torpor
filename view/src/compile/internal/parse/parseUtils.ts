@@ -44,6 +44,16 @@ export function consumeUntil(value: string, status: ParseStatus) {
 	return "";
 }
 
+export function consumeUntilSequence(value: string, status: ParseStatus) {
+	const start = status.i;
+	for (status.i; status.i < status.source.length; status.i++) {
+		if (status.source.substring(status.i, status.i + value.length) === value) {
+			return status.source.substring(start, status.i);
+		}
+	}
+	return "";
+}
+
 export function accept(value: string, status: ParseStatus, advance = true): boolean {
 	const check = status.source.substring(status.i, status.i + value.length);
 	if (check == value) {

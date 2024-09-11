@@ -6,7 +6,15 @@ import { trimStart } from "../utils";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
-import { accept, addError, consumeSpace, isSpaceChar } from "./parseUtils";
+import parseInlineScript from "./parseInlineScript";
+import {
+	accept,
+	addError,
+	consumeSpace,
+	consumeUntil,
+	consumeUntilSequence,
+	isSpaceChar,
+} from "./parseUtils";
 
 const controlOperations = [
 	"@if",
@@ -42,31 +50,28 @@ export default function parseControl(
 	// Get the children
 	for (status.i; status.i < status.source.length; status.i++) {
 		addSpaceElement(node, status);
-		const char = status.source[status.i];
-		if (char === "}") {
+		if (accept("}", status)) {
 			// It's the end of the control block, so we're done here
 			break;
-		} else if (char === "<") {
+		} else if (accept("<", status, false)) {
 			// It's a child element
 			const child = parseElement(status);
 			node.children.push(child);
-		} else if (char === "@") {
-			const nextChars = status.source.substring(status.i, status.i + 3);
-			if (nextChars === "@//") {
-				// Swallow one-line comments
-				status.i = status.source.indexOf("\n", status.i) + 1;
-			} else if (nextChars === "@/*") {
-				// Swallow multi-line comments
-				status.i = status.source.indexOf("*/", status.i) + 2;
-			} else {
-				// It's a nested control
-				parseControl(status, node);
-			}
+		} else if (accept("@//", status)) {
+			// Swallow one-line comments
+			status.i = status.source.indexOf("\n", status.i) + 1;
+		} else if (accept("@/*", status)) {
+			// Swallow multi-line comments
+			status.i = status.source.indexOf("*/", status.i) + 2;
+		} else if (accept("@", status, false)) {
+			// It's a nested control
+			parseControl(status, node);
 		} else if (accept("case", status, false) || accept("key", status, false)) {
-			// case and key can be bare in a control block
+			// `case` and `key` can be bare in a control block
 			parseControl(status, node);
 		} else {
 			// Can't have text content in control blocks
+			const char = status.source[status.i];
 			addError(status, `Unexpected token in control block: ${char}`, status.i);
 			break;
 		}
@@ -96,64 +101,68 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 	}
 
 	// Some operations (else etc) don't start with an @
-	if (!operation.startsWith("@")) operation = "@" + operation;
-
-	const node: ControlNode = {
-		type: "control",
-		operation: operation as OperationType,
-		statement: "",
-		children: [],
-	};
-
-	// Special processing for functions -- just read until the closing brace
-	if (operation === "@function") {
-		// TODO: Ignore chars in strings, comments and parentheses
-		let braceCount = 0;
-		for (status.i; status.i < status.source.length; status.i++) {
-			const char = status.source[status.i];
-			if (char === "{") {
-				braceCount += 1;
-			} else if (char === "}") {
-				braceCount -= 1;
-				if (braceCount === 0) {
-					node.statement = status.source.substring(start + 1, status.i + 1).trim();
-					status.i += 1;
-					break;
-				}
-			}
-		}
-		return node;
+	if (!operation.startsWith("@")) {
+		operation = "@" + operation;
 	}
 
+	let statement = "";
 	if (controlOperations.includes(operation)) {
-		// TODO: Ignore chars in strings, comments and parentheses
-		let parenCount = 0;
-		for (status.i; status.i < status.source.length; status.i++) {
-			const char = status.source[status.i];
-			if (char === "(") {
-				parenCount += 1;
-			} else if (char === ")") {
-				parenCount -= 1;
-			} else if (char === "{") {
-				if (parenCount === 0) {
-					node.statement = trimStart(status.source.substring(start, status.i).trim(), "@");
-					status.i += 1;
-					break;
-				}
-			} else if (char === "\n" && standaloneOperations.includes(operation)) {
-				if (parenCount === 0) {
-					node.statement = trimStart(status.source.substring(start, status.i).trim(), "@");
-					status.i += 1;
-					break;
-				}
-			}
+		statement = parseControlStatement(start, operation, status);
+
+		// Special processing for functions -- read until the closing brace
+		if (operation === "@function") {
+			statement += ` {${parseInlineScript(status)}}`;
 		}
 	} else {
 		// TODO: Should probably advance until a lt
-		addError(status, `Unknown operation: ${node.operation}`, status.i);
+		addError(status, `Unknown operation: ${operation}`, status.i);
 	}
 
-	return node;
+	return {
+		type: "control",
+		operation: operation as OperationType,
+		statement,
+		children: [],
+	};
+}
+
+function parseControlStatement(start: number, operation: string, status: ParseStatus) {
+	let statement = "";
+	let parenCount = 0;
+	for (status.i; status.i < status.source.length; status.i++) {
+		const char = status.source[status.i];
+		if (char === "(") {
+			parenCount += 1;
+		} else if (char === ")") {
+			parenCount -= 1;
+		} else if (char === "{") {
+			if (parenCount === 0) {
+				statement = trimStart(status.source.substring(start, status.i).trim(), "@");
+				status.i += 1;
+				break;
+			}
+		} else if (char === "\n" && standaloneOperations.includes(operation)) {
+			if (parenCount === 0) {
+				statement = trimStart(status.source.substring(start, status.i).trim(), "@");
+				status.i += 1;
+				break;
+			}
+		} else if (char === '"' || char === "'" || char === "`") {
+			// Ignore the content of strings
+			do {
+				consumeUntil(char, status);
+			} while (status.source[status.i - 1] === "\\");
+		} else if (accept("//", status)) {
+			// Ignore the content of one-line comments
+			consumeUntil("\n", status);
+			accept("\n", status);
+		} else if (accept("/*", status)) {
+			// Ignore the content of multiple-line comments
+			consumeUntilSequence("*/", status);
+			accept("*/", status);
+		}
+	}
+	return statement;
 }
 
 /**

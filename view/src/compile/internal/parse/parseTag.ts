@@ -1,136 +1,85 @@
 import Attribute from "../../types/nodes/Attribute";
 import ElementNode from "../../types/nodes/ElementNode";
 import ParseStatus from "./ParseStatus";
-import { accept, consumeSpace, consumeUntil, consumeWord, isSpaceChar } from "./parseUtils";
+import parseInlineScript from "./parseInlineScript";
+import { accept, consumeSpace, consumeUntil, consumeWord } from "./parseUtils";
 
 export default function parseTag(status: ParseStatus): ElementNode {
 	accept("<", status);
 
 	consumeSpace(status);
+
 	let special = accept(":", status);
 	let tagName = consumeWord(status);
+	if (special) {
+		tagName = ":" + tagName;
+	}
+
 	consumeSpace(status);
 
-	const element: ElementNode = {
-		type: "element",
+	let attributes = parseTagAttributes(status);
+
+	let selfClosed = false;
+	if (accept("/>", status)) {
+		selfClosed = true;
+	} else {
+		accept(">", status);
+	}
+
+	return {
+		type: special ? "special" : "element",
 		tagName,
-		attributes: [],
+		selfClosed: selfClosed || undefined,
+		attributes,
 		children: [],
 	};
-
-	if (special) {
-		element.type = "special";
-		element.tagName = ":" + element.tagName;
-	}
-
-	if (accept(">", status)) {
-		// Don't need to do anything
-	} else if (accept("/>", status)) {
-		element.selfClosed = true;
-	} else {
-		parseTagAttributes(element, status);
-	}
-
-	return element;
 }
 
-function parseTagAttributes(element: ElementNode, status: ParseStatus) {
-	for (status.i; status.i < status.source.length; status.i++) {
-		const char = status.source[status.i];
-		if (char === "/") {
-			element.selfClosed = true;
-			status.i += 2;
-			return;
-		} else if (char === ">") {
-			status.i += 1;
-			return;
-		} else if (!isSpaceChar(status.source, status.i)) {
+function parseTagAttributes(status: ParseStatus): Attribute[] {
+	let attributes = [];
+	while (status.i < status.source.length) {
+		consumeSpace(status);
+		if (accept("/>", status, false) || accept(">", status, false)) {
+			break;
+		} else {
 			const attribute = parseAttribute(status);
-			element.attributes.push(attribute);
+			attributes.push(attribute);
 		}
 	}
+	return attributes;
 }
 
 function parseAttribute(status: ParseStatus): Attribute {
 	let name = consumeUntil("= \t\r\n/>", status);
-	const attribute: Attribute = {
-		name,
-		value: "",
-	};
+	let value = "";
 	consumeSpace(status);
 	if (accept("=", status)) {
 		consumeSpace(status);
-		attribute.value = parseAttributeValue(status);
+		value = parseAttributeValue(status);
 	}
-	// HACK: Really have to sort out this parsing stuff
-	const char = status.source[status.i];
-	if (char === "/" || char === ">" || char === "{") {
-		status.i -= 1;
-	}
-	return attribute;
+	return { name, value };
 }
 
 function parseAttributeValue(status: ParseStatus): string {
-	const start = status.i;
-	const startChar = status.source[status.i];
-	let braceCount = 0;
-	status.i++;
-	for (status.i; status.i < status.source.length; status.i++) {
-		const char = status.source[status.i];
-		if (startChar === '"' || startChar === "'") {
-			if (char === startChar) {
-				//status.i++;
-				return status.source.substring(start, status.i + 1);
-			}
-		} else if (startChar === "{") {
-			if (char === "{") {
-				braceCount += 1;
-			} else if (char === "}") {
-				if (braceCount === 0) {
-					//status.i++;
-					return status.source.substring(start, status.i + 1);
-				} else {
-					braceCount -= 1;
-				}
-			} else if (char === '"' || char === "'" || char === "`") {
-				// Ignore the content of strings
-				status.i += 1;
-				for (status.i; status.i < status.source.length; status.i++) {
-					if (status.source[status.i] === char && status.source[status.i - 1] !== "\\") {
-						break;
-					}
-				}
-			} else if (char === "/") {
-				const nextChar = status.source[status.i + 1];
-				if (nextChar === "/") {
-					// Ignore the content of one-line comments
-					status.i += 2;
-					for (status.i; status.i < status.source.length; status.i++) {
-						if (status.source[status.i] === "\n") {
-							break;
-						}
-					}
-				} else if (nextChar === "*") {
-					// Ignore the content of multiple-line comments
-					status.i += 2;
-					for (status.i; status.i < status.source.length; status.i++) {
-						if (status.source[status.i] === "/" && status.source[status.i - 1] === "*") {
-							break;
-						}
-					}
-				} else if (nextChar === ">") {
-					// HACK: Go back to the start of the slash so that it gets parsed in parseTagAttributes
-					status.i -= 1;
-					return status.source.substring(start, status.i);
-				}
-			}
-		} else {
-			if (char === ">" || isSpaceChar(status.source, status.i)) {
-				// HACK: Go back to the start of the > so that it gets parsed in parseTagAttributes
-				status.i -= 1;
-				return status.source.substring(start, status.i + 1);
-			}
+	if (accept('"', status)) {
+		const value = consumeUntil('"', status);
+		accept('"', status);
+		return `"${value}"`;
+	} else if (accept("'", status)) {
+		const value = consumeUntil("'", status);
+		accept("'", status);
+		return `'${value}'`;
+	} else if (accept("{", status)) {
+		const value = parseInlineScript(status);
+		accept("}", status);
+		return `{${value}}`;
+	} else {
+		let value = consumeUntil(" \t\r\n>", status);
+		if (status.source.substring(status.i - 1, status.i + 1) === "/>") {
+			value = value.substring(0, value.length - 1);
+			status.i -= 1;
 		}
+		return value;
 	}
 
 	return "";
