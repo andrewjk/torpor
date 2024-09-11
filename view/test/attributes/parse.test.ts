@@ -57,6 +57,22 @@ test("attribute with no quotes", () => {
 	expect(output).toEqual(expected);
 });
 
+test("attribute with no quotes in self-closed element", () => {
+	const input = `
+<a href=http://example.com/>
+`;
+
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			markup: root([el("a", [att("href", "http://example.com")], [], true)]),
+		},
+	};
+	expect(output).toEqual(expected);
+});
+
 test("multiple attributes", () => {
 	const input = `
 <a href1="http://example.com" href2='http://example.com' href3=http://example.com>
