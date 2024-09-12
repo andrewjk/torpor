@@ -1,5 +1,5 @@
 import ParseStatus from "./ParseStatus";
-import { accept } from "./parseUtils";
+import accept from "./utils/accept";
 
 export default function parseInlineScript(status: ParseStatus): string {
 	const start = status.i;

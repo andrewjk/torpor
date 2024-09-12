@@ -2,12 +2,15 @@ import type ControlNode from "../types/nodes/ControlNode";
 import ElementNode from "../types/nodes/ElementNode";
 import type OperationType from "../types/nodes/OperationType";
 import isControlNode from "../types/nodes/isControlNode";
-import { trimStart } from "../utils";
+import trimStart from "../utils/trimStart";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import parseInlineScript from "./parseInlineScript";
-import { accept, addError, consumeSpace, isSpaceChar } from "./parseUtils";
+import accept from "./utils/accept";
+import addError from "./utils/addError";
+import consumeSpace from "./utils/consumeSpace";
+import isSpaceChar from "./utils/isSpaceChar";
 
 const controlOperations = [
 	"@if",

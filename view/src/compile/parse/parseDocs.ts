@@ -2,7 +2,11 @@ import type Documentation from "../types/docs/Documentation";
 import type PropDocumentation from "../types/docs/PropDocumentation";
 import type SlotDocumentation from "../types/docs/SlotDocumentation";
 import type ParseStatus from "./ParseStatus";
-import { accept, addError, consumeSpace, consumeUntil, consumeWord } from "./parseUtils";
+import accept from "./utils/accept";
+import addError from "./utils/addError";
+import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
+import consumeSpace from "./utils/consumeSpace";
+import consumeUntil from "./utils/consumeUntil";
 
 export default function parseDocs(status: ParseStatus): Documentation {
 	const docs: Documentation = {
@@ -17,7 +21,7 @@ export default function parseDocs(status: ParseStatus): Documentation {
 			// It is the end of the comments
 			break;
 		} else if (accept("@", status)) {
-			const key = consumeWord(status);
+			const key = consumeAlphaNumeric(status);
 			switch (key) {
 				case "prop": {
 					const prop = parseDocsProp(status);
@@ -62,7 +66,7 @@ function parseDocsProp(status: ParseStatus): PropDocumentation {
 	}
 
 	// Parse the name
-	docs.name = consumeWord(status);
+	docs.name = consumeAlphaNumeric(status);
 	consumeSpace(status);
 
 	// Maybe parse the description

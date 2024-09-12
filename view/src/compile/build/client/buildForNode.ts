@@ -1,8 +1,10 @@
 import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
-import { trimAny, trimMatched } from "../../utils";
-import { nextVarName } from "../buildUtils";
+import trimAny from "../../utils/trimAny";
+import trimEnd from "../../utils/trimEnd";
+import { trimMatched } from "../../utils/trimMatched";
+import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -74,10 +76,10 @@ export default function buildForNode(
 	function createNewItems() {
 		let t_new_items = [];
 		${node.statement} {
-		t_new_items.push({
-			${keyStatement ? `key: ${trimAny(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
-			data: { ${forVarNames.join(",\n")} }
-		});
+			t_new_items.push({
+				${keyStatement ? `key: ${trimEnd(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
+				data: { ${forVarNames.join(",\n")} }
+			});
 		}
 		return t_new_items;
 	},

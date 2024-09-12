@@ -2,8 +2,8 @@ import Builder from "../../Builder";
 import { ANCHOR_COMMENT, HYDRATION_END_COMMENT, HYDRATION_START_COMMENT } from "../../comments";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
-import { trimQuotes } from "../../utils";
-import { nextVarName } from "../buildUtils";
+import { trimQuotes } from "../../utils/trimQuotes";
+import nextVarName from "../utils/nextVarName";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 

@@ -1,11 +1,13 @@
-import { trimQuotes, trimStartAndEnd } from "../utils";
+import { trimQuotes } from "../utils/trimQuotes";
+import trimStartAndEnd from "../utils/trimStartAndEnd";
 import type ParseStatus from "./ParseStatus";
 import parseChildTemplate from "./parseChildTemplate";
 import parseDocs from "./parseDocs";
 import parseElement from "./parseElement";
 import parseStyles from "./parseStyles";
 import parseTag from "./parseTag";
-import { accept, addError } from "./parseUtils";
+import accept from "./utils/accept";
+import addError from "./utils/addError";
 
 export default function parseMarkup(status: ParseStatus, source: string) {
 	while (status.i < source.length) {

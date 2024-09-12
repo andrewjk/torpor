@@ -1,7 +1,7 @@
 import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
-import { nextVarName } from "../buildUtils";
+import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";

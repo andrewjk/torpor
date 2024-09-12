@@ -6,7 +6,7 @@ import type Fragment from "../../types/nodes/Fragment";
 import type RootNode from "../../types/nodes/RootNode";
 import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
-import { isReactive } from "../buildUtils";
+import isReactive from "../utils/isReactive";
 import type BuildStatus from "./BuildStatus";
 
 /**

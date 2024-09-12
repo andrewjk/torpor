@@ -10,7 +10,8 @@ import type ComponentTemplate from "./types/ComponentTemplate";
  *
  * @param name The name of the component
  * @param template The component template, possibly including script, markup and styles
- * @returns the component's code and styles
+ *
+ * @returns The component's code and styles
  */
 export default function build(
 	name: string,

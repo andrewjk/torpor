@@ -2,7 +2,10 @@ import Attribute from "../types/nodes/Attribute";
 import ElementNode from "../types/nodes/ElementNode";
 import ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
-import { accept, consumeSpace, consumeUntil, consumeWord } from "./parseUtils";
+import accept from "./utils/accept";
+import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
+import consumeSpace from "./utils/consumeSpace";
+import consumeUntil from "./utils/consumeUntil";
 
 export default function parseTag(status: ParseStatus): ElementNode {
 	accept("<", status);
@@ -10,7 +13,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 	consumeSpace(status);
 
 	let special = accept(":", status);
-	let tagName = consumeWord(status);
+	let tagName = consumeAlphaNumeric(status);
 	if (special) {
 		tagName = ":" + tagName;
 	}

@@ -6,8 +6,9 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
-import { accept, isSpaceChar } from "./parseUtils";
 import slottifyChildNodes from "./slottifyChildNodes";
+import accept from "./utils/accept";
+import isSpaceChar from "./utils/isSpaceChar";
 
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
 const voidTags = [
