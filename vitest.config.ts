@@ -8,6 +8,6 @@ export default defineConfig(({ mode }) => ({
 	},
 	test: {
 		environment: "jsdom",
-		setupFiles: "./testSetup.ts",
+		setupFiles: "./vitest.setup.ts",
 	},
 }));
