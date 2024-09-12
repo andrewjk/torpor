@@ -1,6 +1,6 @@
 import Builder from "../../Builder";
 import type TextNode from "../../types/nodes/TextNode";
-import { trimQuotes } from "../../utils/trimQuotes";
+import trimQuotes from "../../utils/trimQuotes";
 import BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus, b: Builder) {

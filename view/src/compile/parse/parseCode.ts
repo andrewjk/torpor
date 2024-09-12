@@ -1,6 +1,6 @@
 import ParseResult from "../types/ParseResult";
 import isSpaceNode from "../types/nodes/isSpaceNode";
-import { trimQuotes } from "../utils/trimQuotes";
+import trimQuotes from "../utils/trimQuotes";
 import ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import scopeStyles from "./scopeStyles";

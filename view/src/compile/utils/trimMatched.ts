@@ -5,7 +5,7 @@
  *
  * @returns The text without the chars at the start or the end
  */
-export function trimMatched(text: string, startChar: string, endChar: string) {
+export default function trimMatched(text: string, startChar: string, endChar: string) {
 	let start = 0;
 	let end = text.length;
 	while (text[start] === startChar && text[end - 1] === endChar) {

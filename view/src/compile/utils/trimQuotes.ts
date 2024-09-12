@@ -5,7 +5,7 @@
  *
  * @returns The text without the quotes at the start or the end
  */
-export function trimQuotes(text: string) {
+export default function trimQuotes(text: string) {
 	let start = 0;
 	let end = text.length;
 	while (

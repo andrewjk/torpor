@@ -3,7 +3,7 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import trimAny from "../../utils/trimAny";
 import trimEnd from "../../utils/trimEnd";
-import { trimMatched } from "../../utils/trimMatched";
+import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";

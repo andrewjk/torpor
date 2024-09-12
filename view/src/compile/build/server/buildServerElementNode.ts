@@ -1,6 +1,6 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
-import { trimQuotes } from "../../utils/trimQuotes";
+import trimQuotes from "../../utils/trimQuotes";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 

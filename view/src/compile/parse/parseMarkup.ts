@@ -1,4 +1,4 @@
-import { trimQuotes } from "../utils/trimQuotes";
+import trimQuotes from "../utils/trimQuotes";
 import trimStartAndEnd from "../utils/trimStartAndEnd";
 import type ParseStatus from "./ParseStatus";
 import parseChildTemplate from "./parseChildTemplate";

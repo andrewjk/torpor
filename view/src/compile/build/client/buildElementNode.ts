@@ -1,9 +1,8 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import trimEnd from "../../utils/trimEnd";
-import { trimMatched } from "../../utils/trimMatched";
-import { trimQuotes } from "../../utils/trimQuotes";
-import nextVarName from "../utils/nextVarName";
+import trimMatched from "../../utils/trimMatched";
+import trimQuotes from "../../utils/trimQuotes";
 import BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
