@@ -1,0 +1,2 @@
+
+<input on:mount={(node) => node.value = "hi"} />

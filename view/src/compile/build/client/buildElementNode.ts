@@ -1,7 +1,9 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
+import trimEnd from "../../utils/trimEnd";
 import { trimMatched } from "../../utils/trimMatched";
 import { trimQuotes } from "../../utils/trimQuotes";
+import nextVarName from "../utils/nextVarName";
 import BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -92,12 +94,17 @@ function buildElementAttributes(
 				);
 			}
 
-			// Add an event listener
-			const eventName = name.substring(2);
+			if (name === "on:mount") {
+				// The on:mount event is faked by us
+				buildRun("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
+			} else {
+				// Add an event listener
+				const eventName = name.substring(2);
 
-			const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
-			if (fragment) {
-				fragment.events.push({ varName, eventName, handler: value });
+				const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
+				if (fragment) {
+					fragment.events.push({ varName, eventName, handler: value });
+				}
 			}
 		} else if (value.startsWith("{") && value.endsWith("}")) {
 			value = value.substring(1, value.length - 1);
