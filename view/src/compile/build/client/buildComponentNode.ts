@@ -2,12 +2,12 @@ import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import { trimQuotes } from "../../utils";
+import { nextVarName } from "../buildUtils";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
-import { nextVarName } from "./buildUtils";
 
 export default function buildComponentNode(
 	node: ElementNode,

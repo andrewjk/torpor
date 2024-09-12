@@ -2,9 +2,9 @@ import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import { trimQuotes } from "../../utils";
+import { nextVarName } from "../buildUtils";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
-import { nextVarName } from "./buildServerUtils";
 
 export default function buildServerComponentNode(
 	node: ElementNode,

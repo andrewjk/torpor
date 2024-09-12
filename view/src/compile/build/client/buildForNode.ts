@@ -2,11 +2,11 @@ import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import { trimAny, trimMatched } from "../../utils";
+import { nextVarName } from "../buildUtils";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
-import { nextVarName } from "./buildUtils";
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
 const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;

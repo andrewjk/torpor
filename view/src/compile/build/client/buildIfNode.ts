@@ -1,11 +1,11 @@
 import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
+import { nextVarName } from "../buildUtils";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
-import { nextVarName } from "./buildUtils";
 
 // TODO: Are there too many branches for ifs etc?
 

@@ -1,6 +1,7 @@
-import type BuildStatus from "./BuildStatus";
+import type BuildStatus from "./client/BuildStatus";
+import type BuildServerStatus from "./server/BuildServerStatus";
 
-export function nextVarName(name: string, status: BuildStatus): string {
+export function nextVarName(name: string, status: BuildStatus | BuildServerStatus): string {
 	if (!status.varNames[name]) {
 		status.varNames[name] = 1;
 	}

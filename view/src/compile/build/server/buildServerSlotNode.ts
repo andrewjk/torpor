@@ -3,9 +3,9 @@ import { ANCHOR_COMMENT, HYDRATION_END_COMMENT, HYDRATION_START_COMMENT } from "
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import { trimQuotes } from "../../utils";
+import { nextVarName } from "../buildUtils";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
-import { nextVarName } from "./buildServerUtils";
 
 export default function buildServerSlotNode(
 	node: ElementNode,

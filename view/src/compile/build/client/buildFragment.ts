@@ -10,10 +10,10 @@ import isControlNode from "../../types/nodes/isControlNode";
 import isElementNode from "../../types/nodes/isElementNode";
 import isTextNode from "../../types/nodes/isTextNode";
 import { trimQuotes } from "../../utils";
+import { isReactive, isReactiveAttribute, nextVarName } from "../buildUtils";
 import type BuildStatus from "./BuildStatus";
 import buildConfig from "./buildConfig";
 import buildNode from "./buildNode";
-import { isReactive, isReactiveAttribute, nextVarName } from "./buildUtils";
 
 interface VariablePath {
 	parent: VariablePath | null;
