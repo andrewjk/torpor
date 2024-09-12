@@ -54,14 +54,14 @@ test("watch object -- hydrated", async () => {
 function check(container: HTMLElement, state: State) {
 	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child grandchild");
 
-	console.log("setting state.child.grandChild");
+	//console.log("setting state.child.grandChild");
 	state.child.grandChild = {
 		grandChildText: "changed",
 	};
 
 	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top child changed");
 
-	console.log("setting state.child");
+	//console.log("setting state.child");
 	state.child = {
 		childText: "new_child",
 		grandChild: {
@@ -71,8 +71,8 @@ function check(container: HTMLElement, state: State) {
 
 	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe("top new_child new_grandchild");
 
-	console.log("setting state.child.grandchild.grandchildtext");
 	// Make sure that effects have been transferred across
+	//console.log("setting state.child.grandchild.grandchildtext");
 	state.child.grandChild.grandChildText = "even_newer_grandchild";
 
 	expect(container.textContent!.replace(/\s+/g, " ").trim()).toBe(
