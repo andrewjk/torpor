@@ -1,7 +1,7 @@
-import Attribute from "./Attribute";
-import Fragment from "./Fragment";
-import ParentNode from "./ParentNode";
-import TemplateNode from "./TemplateNode";
+import type Attribute from "./Attribute";
+import type Fragment from "./Fragment";
+import type ParentNode from "./ParentNode";
+import type TemplateNode from "./TemplateNode";
 
 export default interface ElementNode extends ParentNode {
 	type: "element" | "component" | "special";

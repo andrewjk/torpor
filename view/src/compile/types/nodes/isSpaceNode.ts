@@ -1,6 +1,6 @@
-import { isSpace } from "../../internal/parse/parseUtils";
-import TemplateNode from "./TemplateNode";
-import TextNode from "./TextNode";
+import { isSpace } from "../../parse/parseUtils";
+import type TemplateNode from "./TemplateNode";
+import type TextNode from "./TextNode";
 import isTextNode from "./isTextNode";
 
 export default function isSpaceNode(node: TemplateNode): node is TextNode {

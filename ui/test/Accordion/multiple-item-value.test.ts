@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { describe, expect, it } from "vitest";
-import mount from "../../../view/src/render/mount";
+import mount from "../../../view/src/mount";
 import AccordionMultiple from "./components/AccordionMultiple.tera";
 
 describe("Accordion", () => {

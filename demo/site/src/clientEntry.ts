@@ -1,7 +1,7 @@
 import "vinxi/client";
 import Component from "../../../view/src/compile/types/Component";
+import mount from "../../../view/src/mount";
 import hydrate from "../../../view/src/render/hydrate";
-import mount from "../../../view/src/render/mount";
 import routeHandlers from "./routeHandlers";
 import EndPoint from "./types/EndPoint";
 

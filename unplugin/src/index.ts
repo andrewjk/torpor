@@ -1,11 +1,11 @@
 import fs from "fs";
-import path, { normalize } from "path";
+import path from "path";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
-import build from "../../view/src/compile/build";
-import parse from "../../view/src/compile/parse";
-import ComponentTemplate from "../../view/src/compile/types/ComponentTemplate";
+import build from "../../view/src/build";
+import parse from "../../view/src/parse";
+import ComponentTemplate from "../../view/src/types/ComponentTemplate";
 import type { Options } from "./types";
 
 const styles = new Map<string, string>();

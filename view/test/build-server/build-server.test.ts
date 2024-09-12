@@ -2,8 +2,8 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import fs from "fs";
 import { expect, test } from "vitest";
-import build from "../../src/compile/build";
-import parse from "../../src/compile/parse";
+import build from "../../src/build";
+import parse from "../../src/parse";
 
 test("build for the server and render to HTML", () => {
 	// This is just a simple test -- server building gets tested thoroughly when

@@ -1,15 +1,15 @@
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
-import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
-import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
-import t_run_list from '../../../../../tera/view/src/render/internal/runList';
-import t_push_range_to_parent from '../../../../../tera/view/src/render/internal/pushRangeToParent';
-import t_fmt from '../../../../../tera/view/src/render/internal/formatText';
-import $run from '../../../../../tera/view/src/watch/$run';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
-import t_pop_range from '../../../../../tera/view/src/render/internal/popRange';
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
+import t_fragment from '../../../../../tera/view/src/render/getFragment';
+import t_root from '../../../../../tera/view/src/render/nodeRoot';
+import t_child from '../../../../../tera/view/src/render/nodeChild';
+import t_next from '../../../../../tera/view/src/render/nodeNext';
+import t_anchor from '../../../../../tera/view/src/render/findAnchor';
+import t_run_list from '../../../../../tera/view/src/render/runList';
+import t_push_range_to_parent from '../../../../../tera/view/src/render/pushRangeToParent';
+import t_fmt from '../../../../../tera/view/src/render/formatText';
+import $run from '../../../../../tera/view/src/$run';
+import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import t_pop_range from '../../../../../tera/view/src/render/popRange';
+import t_apply_props from '../../../../../tera/view/src/render/applyProps';
 
 const ArrayIndexes = {
 	name: "ArrayIndexes",

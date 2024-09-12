@@ -1,7 +1,7 @@
-import Fragment from "./Fragment";
-import OperationType from "./OperationType";
-import ParentNode from "./ParentNode";
-import TemplateNode from "./TemplateNode";
+import type Fragment from "./Fragment";
+import type OperationType from "./OperationType";
+import type ParentNode from "./ParentNode";
+import type TemplateNode from "./TemplateNode";
 
 export default interface ControlNode extends ParentNode {
 	type: "control";

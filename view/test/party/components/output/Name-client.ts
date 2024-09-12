@@ -1,11 +1,11 @@
-import $watch from '../../../../../tera/view/src/watch/$watch';
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
-import t_fmt from '../../../../../tera/view/src/render/internal/formatText';
-import $run from '../../../../../tera/view/src/watch/$run';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
+import $watch from '../../../../../tera/view/src/$watch';
+import t_fragment from '../../../../../tera/view/src/render/getFragment';
+import t_root from '../../../../../tera/view/src/render/nodeRoot';
+import t_child from '../../../../../tera/view/src/render/nodeChild';
+import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_fmt from '../../../../../tera/view/src/render/formatText';
+import $run from '../../../../../tera/view/src/$run';
+import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
 const Name = {
 	name: "Name",

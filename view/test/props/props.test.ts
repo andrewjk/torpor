@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import parse from "../../src/compile/parse";
 import ParseResult from "../../src/compile/types/ParseResult";
+import parse from "../../src/parse";
 
 // TODO: Preserve space
 

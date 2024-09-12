@@ -2,7 +2,7 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import mount from "../../../view/src/render/mount";
+import mount from "../../../view/src/mount";
 import AccordionMultiple from "./components/AccordionMultiple.tera";
 
 describe("Accordion", () => {

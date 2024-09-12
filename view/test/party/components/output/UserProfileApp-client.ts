@@ -1,10 +1,10 @@
 import UserProfile from './UserProfile.tera';
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
-import $watch from '../../../../../tera/view/src/watch/$watch';
-import $run from '../../../../../tera/view/src/watch/$run';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
+import t_fragment from '../../../../../tera/view/src/render/getFragment';
+import t_root from '../../../../../tera/view/src/render/nodeRoot';
+import t_anchor from '../../../../../tera/view/src/render/findAnchor';
+import $watch from '../../../../../tera/view/src/$watch';
+import $run from '../../../../../tera/view/src/$run';
+import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
 const UserProfileApp = {
 	name: "UserProfileApp",

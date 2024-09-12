@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { expect } from "vitest";
-import build from "../src/compile/build";
-import parse from "../src/compile/parse";
-import type Component from "../src/compile/types/Component";
-import hydrate from "../src/render/hydrate";
+import build from "../src/build";
+import hydrate from "../src/hydrate";
+import parse from "../src/parse";
+import type Component from "../src/types/Component";
 
 const debugPrint = false;
 

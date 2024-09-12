@@ -1,4 +1,4 @@
-import TemplateNode from "./TemplateNode";
+import type TemplateNode from "./TemplateNode";
 
 export default interface TextNode extends TemplateNode {
 	type: "text";

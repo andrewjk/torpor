@@ -1,9 +1,9 @@
-import $mount from '../../../../../tera/view/src/watch/$mount';
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
-import t_flush from '../../../../../tera/view/src/watch/internal/flushMountEffects';
+import $mount from '../../../../../tera/view/src/$mount';
+import t_fragment from '../../../../../tera/view/src/render/getFragment';
+import t_root from '../../../../../tera/view/src/render/nodeRoot';
+import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import t_flush from '../../../../../tera/view/src/watch/flushMountEffects';
 
 const InputFocused = {
 	name: "InputFocused",

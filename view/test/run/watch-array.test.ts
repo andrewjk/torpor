@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import $run from "../../src/watch/$run";
-import $watch from "../../src/watch/$watch";
+import $run from "../../src/$run";
+import $watch from "../../src/$watch";
 
 test("watching an array effect", () => {
 	const items = $watch(["h", "i"]);

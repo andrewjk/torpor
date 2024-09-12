@@ -1,12 +1,12 @@
-import t_fragment from '../../../../../tera/view/src/render/internal/getFragment';
-import t_root from '../../../../../tera/view/src/render/internal/nodeRoot';
-import t_child from '../../../../../tera/view/src/render/internal/nodeChild';
-import t_next from '../../../../../tera/view/src/render/internal/nodeNext';
-import t_anchor from '../../../../../tera/view/src/render/internal/findAnchor';
-import t_run_control from '../../../../../tera/view/src/render/internal/runControl';
-import t_run_branch from '../../../../../tera/view/src/render/internal/runControlBranch';
-import t_add_fragment from '../../../../../tera/view/src/render/internal/addFragment';
-import t_apply_props from '../../../../../tera/view/src/render/internal/applyProps';
+import t_fragment from '../../../../../tera/view/src/render/getFragment';
+import t_root from '../../../../../tera/view/src/render/nodeRoot';
+import t_child from '../../../../../tera/view/src/render/nodeChild';
+import t_next from '../../../../../tera/view/src/render/nodeNext';
+import t_anchor from '../../../../../tera/view/src/render/findAnchor';
+import t_run_control from '../../../../../tera/view/src/render/runControl';
+import t_run_branch from '../../../../../tera/view/src/render/runControlBranch';
+import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import t_apply_props from '../../../../../tera/view/src/render/applyProps';
 
 const NestedIf = {
 	name: "NestedIf",
