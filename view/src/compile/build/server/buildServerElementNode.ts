@@ -32,12 +32,14 @@ function buildElementAttributes(node: ElementNode) {
 	for (let { name, value } of node.attributes) {
 		if (name === "tag" && node.tagName === ":element") {
 			// Ignore this special attribute
-		} else if (name.startsWith("{") && name.endsWith("}")) {
-			name = name.substring(1, name.length - 1);
-			attributes.push(`${name}="\${${name}}"`);
 		} else if (name.startsWith("transition") || name.startsWith("on")) {
 			// No animation or events on the server
+		} else if (name.startsWith("{") && name.endsWith("}")) {
+			// It's a shortcut attribute
+			name = name.substring(1, name.length - 1);
+			attributes.push(`${name}="\${${name}}"`);
 		} else if (value.startsWith("{") && value.endsWith("}")) {
+			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
 			if (name.startsWith("bind:")) {
