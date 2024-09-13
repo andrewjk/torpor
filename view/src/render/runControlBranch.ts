@@ -22,6 +22,7 @@ export default function runControlBranch(range: Range, index: number, create: ()
 		children: null,
 		index: 0,
 		effects: null,
+		animations: null,
 	});
 
 	// Run the create function

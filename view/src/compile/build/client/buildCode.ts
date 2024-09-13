@@ -11,6 +11,7 @@ const importsMap: Record<string, string> = {
 	$run: "import $run from '${folder}/$run';",
 	$mount: "import $mount from '${folder}/$mount';",
 	t_flush: "import t_flush from '${folder}/watch/flushMountEffects';",
+	t_animate: "import t_animate from '${folder}/motion/animate';",
 	t_push_range_to_parent:
 		"import t_push_range_to_parent from '${folder}/render/pushRangeToParent';",
 	t_push_range: "import t_push_range from '${folder}/render/pushRange';",

@@ -63,7 +63,7 @@ function buildNodeFragmentText(
 }
 
 function buildRootFragmentText(node: RootNode, status: BuildStatus, fragments: Fragment[]) {
-	node.fragment = { number: fragments.length, text: "", events: [] };
+	node.fragment = { number: fragments.length, text: "", events: [], animations: [] };
 	fragments.push(node.fragment);
 	for (let child of node.children) {
 		buildNodeFragmentText(child, status, fragments, node.fragment);
@@ -92,7 +92,7 @@ function buildControlFragmentText(
 		}
 		default: {
 			// Add a new fragment if it's a control branch and it has children
-			node.fragment = { number: fragments.length, text: "", events: [] };
+			node.fragment = { number: fragments.length, text: "", events: [], animations: [] };
 			fragments.push(node.fragment);
 			for (let child of node.children) {
 				buildNodeFragmentText(child, status, fragments, node.fragment);
@@ -112,7 +112,7 @@ function buildComponentFragmentText(
 
 	// Add fragments for slots if there are children
 	if (node.children.length) {
-		node.fragment = { number: fragments.length, text: "", events: [] };
+		node.fragment = { number: fragments.length, text: "", events: [], animations: [] };
 		fragments.push(node.fragment);
 		for (let child of node.children) {
 			// TODO: Make sure it's not a :fill node
@@ -175,7 +175,7 @@ function buildSpecialFragmentText(
 		}
 		case ":fill": {
 			// Add a new fragment for filled slot content
-			node.fragment = { number: fragments.length, text: "", events: [] };
+			node.fragment = { number: fragments.length, text: "", events: [], animations: [] };
 			fragments.push(node.fragment);
 			for (let child of node.children) {
 				buildNodeFragmentText(child, status, fragments, node.fragment);

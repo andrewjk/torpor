@@ -75,17 +75,66 @@ function buildElementAttributes(
 	status: BuildStatus,
 	b: Builder,
 ) {
+	// TODO: Flatten this out
+	// TODO: Add an error if any reactive attributes are used non-reactively
+
 	for (let { name, value } of node.attributes) {
 		if (name === "tag" && node.tagName === ":element") {
 			// Ignore this special attribute
+		} else if (name === "transition" || name.startsWith("transition:")) {
+			value = trimMatched(value, "{", "}");
+
+			// Add an in and out transition, after the fragment has been added
+			// TODO: Separate these -- you should be able to have multiple,
+			// unrelated entry and exit transitions?
+			const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
+			if (fragment) {
+				let entryAnimation = null;
+				let exitAnimation = null;
+				if (name === "transition") {
+					entryAnimation = exitAnimation = getAnimationDetails(value, status);
+				} else if (name === "transition:in") {
+					entryAnimation = getAnimationDetails(value, status);
+					let outAttribute = node.attributes.find((a) => a.name === "transition:out");
+					if (outAttribute) {
+						let outValue = trimMatched(outAttribute.value, "{", "}");
+						exitAnimation = getAnimationDetails(outValue, status);
+					}
+				} else if (name === "transition:out") {
+					let inAttribute = node.attributes.find((a) => a.name === "transition:in");
+					if (inAttribute) {
+						// This has already been handled with transition:in, above
+						continue;
+					}
+					exitAnimation = getAnimationDetails(value, status);
+				} else {
+					// TODO: Add an error
+				}
+
+				let animation = [];
+				if (entryAnimation) {
+					// Effect
+					animation.push(
+						`(${entryAnimation.func})(${[varName, "true", entryAnimation.keyframes, entryAnimation.options].filter(Boolean).join(", ")});`,
+					);
+				}
+				if (exitAnimation) {
+					// Cleanup
+					animation.push(
+						`return () => { (${exitAnimation.func})(${[varName, "false", exitAnimation.keyframes, exitAnimation.options].filter(Boolean).join(", ")}) };`,
+					);
+				}
+				fragment.animations.push(animation.join("\n"));
+			}
 		} else if (name.startsWith("{") && name.endsWith("}")) {
+			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
 			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
 		} else if (name.startsWith("on")) {
 			value = trimMatched(value, "{", "}");
 
 			// HACK: If a value from a for loop is used in the function body,
-			// get it from the loop data
+			// replace it with the value from the loop data
 			for (let varName of status.forVarNames) {
 				value = value.replaceAll(
 					new RegExp(`([\\s\\(\\[])${varName}([\\s\\.\\(\\)\\[\\];])`, "g"),
@@ -94,18 +143,20 @@ function buildElementAttributes(
 			}
 
 			if (name === "on:mount") {
-				// The on:mount event is faked by us
+				// The on:mount event is faked by us by creating a $run. This
+				// also means that you can have unmount functionality by
+				// returning a cleanup function
 				buildRun("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else {
-				// Add an event listener
+				// Add an event listener, after the fragment has been added
 				const eventName = name.substring(2);
-
 				const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
 				if (fragment) {
 					fragment.events.push({ varName, eventName, handler: value });
 				}
 			}
 		} else if (value.startsWith("{") && value.endsWith("}")) {
+			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
 			if (name === "bind:this") {
@@ -179,4 +230,51 @@ function buildElementAttributes(
 			}
 		}
 	}
+}
+
+function getAnimationDetails(value: string, status: BuildStatus) {
+	// HACK: Split by commas, but not when in brackets
+	let parts = [];
+	let start = 0;
+	let squareCount = 0;
+	let curlyCount = 0;
+	for (let i = 0; i < value.length; i++) {
+		let char = value[i];
+		switch (char) {
+			case ",":
+				if (squareCount === 0 && curlyCount === 0) {
+					parts.push(value.substring(start, i));
+					start = i + 1;
+				}
+				break;
+			case "[":
+				squareCount += 1;
+				break;
+			case "]":
+				squareCount -= 1;
+				break;
+			case "{":
+				curlyCount += 1;
+				break;
+			case "}":
+				curlyCount -= 1;
+				break;
+		}
+	}
+	parts.push(value.substring(start));
+
+	let func = parts[0].trim();
+	let isAnimateFunction = func === "animate";
+	let options = isAnimateFunction ? parts[2]?.trim() : parts[1]?.trim();
+	let keyframes = isAnimateFunction ? parts[1]?.trim() : undefined;
+	if (isAnimateFunction) {
+		status.imports.add("t_animate");
+		func = "t_animate";
+	}
+
+	return {
+		func,
+		options,
+		keyframes,
+	};
 }

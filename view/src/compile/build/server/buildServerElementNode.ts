@@ -35,8 +35,8 @@ function buildElementAttributes(node: ElementNode) {
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			name = name.substring(1, name.length - 1);
 			attributes.push(`${name}="\${${name}}"`);
-		} else if (name.startsWith("on")) {
-			// No events on the server
+		} else if (name.startsWith("transition") || name.startsWith("on")) {
+			// No animation or events on the server
 		} else if (value.startsWith("{") && value.endsWith("}")) {
 			value = value.substring(1, value.length - 1);
 

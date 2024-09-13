@@ -6,5 +6,6 @@ export default interface Fragment {
 		eventName: string;
 		handler: string;
 	}[];
+	animations: string[];
 	endVarName?: string;
 }

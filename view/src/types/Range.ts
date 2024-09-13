@@ -17,4 +17,10 @@ export default interface Range {
 	 * cleaned up when it is removed
 	 */
 	effects: Effect[] | null;
+
+	/**
+	 * Animations that are currently running in the range, and which need to
+	 * awaited or canceled before it is removed
+	 */
+	animations: Set<Animation> | null;
 }
