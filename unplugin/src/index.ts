@@ -80,7 +80,7 @@ function transform(name: string, template: ComponentTemplate, id: string) {
 		styles.set(built.styleHash + ".css", built.styles);
 	}
 
-	//printTransformed(transformed);
+	if (id.includes("Motion")) printTransformed(transformed);
 
 	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
 	return transformWithEsbuild(transformed, id, {

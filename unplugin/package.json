@@ -2,23 +2,10 @@
 	"name": "@tera/unplugin",
 	"type": "module",
 	"version": "0.0.1",
-	"packageManager": "pnpm@8.6.12",
-	"description": "",
-	"license": "MIT",
-	"homepage": "https://github.com/antfu/unplugin-starter#readme",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/antfu/unplugin-starter.git"
-	},
-	"bugs": {
-		"url": "https://github.com/antfu/unplugin-starter/issues"
-	},
+	"description": "Unplugin package to compile Tera components for Vite, Rollup, and other bundlers",
 	"keywords": [
-		"unplugin",
-		"vite",
-		"webpack",
-		"rollup",
-		"transform"
+		"tera",
+		"unplugin"
 	],
 	"exports": {
 		".": {

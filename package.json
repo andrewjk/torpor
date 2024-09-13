@@ -1,7 +1,7 @@
 {
 	"name": "tera",
 	"version": "0.0.1",
-	"description": "",
+	"description": "Yet another JavaScript framework, designed for simplicity",
 	"type": "module",
 	"main": "index.js",
 	"scripts": {

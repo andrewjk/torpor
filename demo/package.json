@@ -1,8 +1,9 @@
 {
 	"name": "@tera/demo",
-	"private": true,
 	"version": "0.0.1",
+	"description": "A demo site built with tera/kit",
 	"type": "module",
+	"private": true,
 	"scripts": {
 		"dev": "vinxi dev --port 5173",
 		"build": "tsc && vinxi build",

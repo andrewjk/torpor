@@ -1,7 +1,7 @@
 {
 	"name": "@tera/view",
 	"version": "0.0.1",
-	"description": "",
+	"description": "Tera's view library, for writing and mounting components",
 	"type": "module",
 	"main": "index.js",
 	"private": true,
