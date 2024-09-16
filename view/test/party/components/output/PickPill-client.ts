@@ -6,6 +6,7 @@ import t_next from '../../../../../tera/view/src/render/nodeNext';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import $run from '../../../../../tera/view/src/$run';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
 const PickPill = {
@@ -39,13 +40,13 @@ const PickPill = {
 		$run(function setBinding() {
 			t_input_1.checked = $state.picked == "blue";
 		});
-		t_input_1.addEventListener("change", (e) => {
+		t_event(t_input_1, "change", (e) => {
 			if (e.target.checked) $state.picked = "blue";
 		});
 		$run(function setBinding() {
 			t_input_2.checked = $state.picked == "red";
 		});
-		t_input_2.addEventListener("change", (e) => {
+		t_event(t_input_2, "change", (e) => {
 			if (e.target.checked) $state.picked = "red";
 		});
 		t_add_fragment(t_fragment_0, $parent, $anchor);

@@ -22,11 +22,5 @@ export default function buildAddFragment(
 			status.imports.add("t_next");
 			b.append(`t_next(${fragment.endVarName});`);
 		}
-		for (let ev of fragment.events) {
-			b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
-		}
-		for (let animation of fragment.animations) {
-			buildRun("runTransition", animation, status, b);
-		}
 	}
 }

@@ -14,9 +14,33 @@ interface Context {
 
 	/**
 	 * Functions that were run via $mount, which should be collected and flushed
-	 * when the component is done mounting
+	 * when the component has been mounted in the DOM
 	 */
-	mountedFunctions: (() => Cleanup | void)[];
+	mountEffects: (() => Cleanup | void)[];
+
+	/**
+	 * Events which should be added when their element has been mounted in the
+	 * DOM
+	 */
+	stashedEvents: {
+		range: Range | null;
+		el: Element;
+		type: string;
+		listener: (this: Element, ev: any) => any;
+	}[];
+
+	/**
+	 * Animations which should be added when their element has been mounted in
+	 * the DOM
+	 */
+	stashedAnimations: {
+		range: Range | null;
+		el: HTMLElement;
+		inKeyframes: Keyframe[] | PropertyIndexedKeyframes | null;
+		inOptions: number | KeyframeAnimationOptions | undefined;
+		outKeyframes: Keyframe[] | PropertyIndexedKeyframes | null;
+		outOptions: number | KeyframeAnimationOptions | undefined;
+	}[];
 
 	/** The node that is actively being hydrated. */
 	hydrationNode: Node | null;
@@ -26,7 +50,9 @@ interface Context {
 const context: Context = {
 	activeEffect: null,
 	activeRange: null,
-	mountedFunctions: [],
+	mountEffects: [],
+	stashedEvents: [],
+	stashedAnimations: [],
 	hydrationNode: null,
 	//hn: null,
 	//get hydrationNode() {

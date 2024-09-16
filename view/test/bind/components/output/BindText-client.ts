@@ -5,6 +5,7 @@ import t_child from '../../../../../tera/view/src/render/nodeChild';
 import t_next from '../../../../../tera/view/src/render/nodeNext';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
 import $run from '../../../../../tera/view/src/$run';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
@@ -33,7 +34,7 @@ const BindText = {
 		$run(function setBinding() {
 			t_input_1.value = $state.name || "";
 		});
-		t_input_1.addEventListener("input", (e) => $state.name = e.target.value);
+		t_event(t_input_1, "input", (e) => $state.name = e.target.value);
 		$run(function setTextContent() {
 			t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 		});

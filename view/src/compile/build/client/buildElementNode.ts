@@ -143,7 +143,8 @@ function buildBindGroupAttribute(
 	const setAttribute = `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
-	b.append(`${varName}.addEventListener("${eventName}", (e) => {
+	status.imports.add("t_event");
+	b.append(`t_event(${varName}, "${eventName}", (e) => {
 			if (e.target.${propName}) ${value} = ${inputValue};
 		});`);
 }
@@ -190,7 +191,8 @@ function buildBindAttribute(
 	const setAttribute = `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
-	b.append(`${varName}.addEventListener("${eventName}", (e) => ${value} = ${inputValue});`);
+	status.imports.add("t_event");
+	b.append(`t_event(${varName}, "${eventName}", (e) => ${value} = ${inputValue});`);
 }
 
 function buildEventAttribute(
@@ -212,10 +214,8 @@ function buildEventAttribute(
 
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
-	const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
-	if (fragment) {
-		fragment.events.push({ varName, eventName, handler: value });
-	}
+	status.imports.add("t_event");
+	b.append(`t_event(${varName}, "${eventName}", ${value});`);
 }
 
 function buildTransitionAttribute(
@@ -253,20 +253,23 @@ function buildTransitionAttribute(
 			// TODO: Add an error
 		}
 
-		let animation = [];
-		if (entryAnimation) {
-			// Effect
-			animation.push(
-				`(${entryAnimation.func})(${[varName, "true", entryAnimation.keyframes, entryAnimation.options].filter(Boolean).join(", ")});`,
-			);
-		}
-		if (exitAnimation) {
-			// Cleanup
-			animation.push(
-				`return () => { (${exitAnimation.func})(${[varName, "false", exitAnimation.keyframes, exitAnimation.options].filter(Boolean).join(", ")}) };`,
-			);
-		}
-		fragment.animations.push(animation.join("\n"));
+		////let animation = [];
+		////if (entryAnimation) {
+		////	// Effect
+		////	animation.push(
+		////		`(${entryAnimation.func})(${[varName, "true", entryAnimation.keyframes, entryAnimation.options].filter(Boolean).join(", ")});`,
+		////	);
+		////}
+		////if (exitAnimation) {
+		////	// Cleanup
+		////	animation.push(
+		////		`return () => { (${exitAnimation.func})(${[varName, "false", exitAnimation.keyframes, exitAnimation.options].filter(Boolean).join(", ")}) };`,
+		////	);
+		////}
+		status.imports.add("t_animate");
+		b.append(
+			`t_animate(${varName}, ${entryAnimation?.keyframes || "null"}, ${entryAnimation?.options || "undefined"}, ${exitAnimation?.keyframes || "null"}, ${exitAnimation?.options || "undefined"});`,
+		);
 	}
 }
 
@@ -306,7 +309,7 @@ function getAnimationDetails(value: string, status: BuildStatus) {
 	let options = isAnimateFunction ? parts[2]?.trim() : parts[1]?.trim();
 	let keyframes = isAnimateFunction ? parts[1]?.trim() : undefined;
 	if (isAnimateFunction) {
-		status.imports.add("t_animate");
+		////status.imports.add("t_animate");
 		func = "t_animate";
 	}
 

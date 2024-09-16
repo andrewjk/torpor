@@ -3,6 +3,7 @@ import t_root from '../../../../../tera/view/src/render/nodeRoot';
 import t_child from '../../../../../tera/view/src/render/nodeChild';
 import t_next from '../../../../../tera/view/src/render/nodeNext';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
 const AnswerButton = {
@@ -26,9 +27,9 @@ const AnswerButton = {
 		const t_button_2 = t_next(t_next(t_button_1));
 
 		t_apply_props(t_div_1, $props, ['onYes', 'onNo']);
+		t_event(t_button_1, "click", $props.onYes);
+		t_event(t_button_2, "click", $props.onNo);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
-		t_button_1.addEventListener("click", $props.onYes);
-		t_button_2.addEventListener("click", $props.onNo);
 	}
 }
 

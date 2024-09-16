@@ -4,6 +4,7 @@ import t_root from '../../../../../tera/view/src/render/nodeRoot';
 import t_child from '../../../../../tera/view/src/render/nodeChild';
 import t_next from '../../../../../tera/view/src/render/nodeNext';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import $run from '../../../../../tera/view/src/$run';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
@@ -35,12 +36,12 @@ const Increment = {
 		const t_text_1 = t_child(t_next(t_next(t_button_2)));
 
 		t_apply_props(t_div_1, $props, []);
+		t_event(t_button_1, "click", increment);
+		t_event(t_button_2, "click", (e) => increment(e, 5));
 		$run(function setTextContent() {
 			t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 		});
 		t_add_fragment(t_fragment_0, $parent, $anchor);
-		t_button_1.addEventListener("click", increment);
-		t_button_2.addEventListener("click", (e) => increment(e, 5));
 	}
 }
 

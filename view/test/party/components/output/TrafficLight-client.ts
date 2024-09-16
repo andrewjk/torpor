@@ -8,6 +8,7 @@ import t_run_control from '../../../../../tera/view/src/render/runControl';
 import t_run_branch from '../../../../../tera/view/src/render/runControlBranch';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import $run from '../../../../../tera/view/src/$run';
 
@@ -82,11 +83,11 @@ const TrafficLight = {
 
 
 		t_apply_props(t_div_1, $props, []);
+		t_event(t_button_1, "click", nextLight);
 		$run(function setTextContent() {
 			t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
 		});
 		t_add_fragment(t_fragment_0, $parent, $anchor);
-		t_button_1.addEventListener("click", nextLight);
 	}
 }
 

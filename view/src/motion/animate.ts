@@ -22,8 +22,8 @@ export default async function animate(
 	let animationOptions = Object.assign(
 		{
 			direction: enter ? "normal" : "reverse",
-			// TODO: Should probably have a setting for this somewhere
-			// Or respect browser reduce motion settings
+			// TODO: Should probably have a global setting for this somewhere
+			// And respect browser reduce motion settings
 			duration: 1000,
 			fill: "forwards",
 		},
@@ -32,13 +32,18 @@ export default async function animate(
 
 	const animation = el.animate(keyframes, animationOptions);
 
+	// HACK: I'm not entirely sure why this is needed, but without it,
+	// animations never start
+	animation.timeline = document.timeline;
+
 	// Add the animation to the active range, so that the range won't be cleared
 	// until the animation is completed
 	let activeRange = context.activeRange;
 	if (activeRange) {
 		// TODO: An option for whether to await or cancel events on range remove
 		// e.g. if you are doing a client side navigation, you don't want to run animations
-		(activeRange.animations ??= new Set()).add(animation);
+		activeRange.animations ??= new Set();
+		activeRange.animations.add(animation);
 		await animation.finished;
 		activeRange.animations.delete(animation);
 	}

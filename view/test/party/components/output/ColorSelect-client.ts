@@ -12,6 +12,7 @@ import t_fmt from '../../../../../tera/view/src/render/formatText';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 import t_pop_range from '../../../../../tera/view/src/render/popRange';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 
 const ColorSelect = {
 	name: "ColorSelect",
@@ -89,7 +90,7 @@ const ColorSelect = {
 		$run(function setBinding() {
 			t_select_1.value = $state.selectedColorId || "";
 		});
-		t_select_1.addEventListener("change", (e) => $state.selectedColorId = e.target.value);
+		t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

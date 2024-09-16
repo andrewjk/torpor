@@ -12,6 +12,7 @@ import t_pop_range from '../../../../../tera/view/src/render/popRange';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import $run from '../../../../../tera/view/src/$run';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 
 const Await = {
 	name: "Await",
@@ -98,8 +99,8 @@ const Await = {
 			const t_button_1 = t_next(t_next(t_await_anchor_1));
 
 			t_apply_props(t_div_1, $props, []);
+			t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));
 			t_add_fragment(t_fragment_0, $parent, $anchor);
-			t_button_1.addEventListener("click", () => $state.guesser = guessNumber(100));
 		}
 	}
 	

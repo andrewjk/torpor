@@ -6,6 +6,7 @@ import t_next from '../../../../../tera/view/src/render/nodeNext';
 import t_apply_props from '../../../../../tera/view/src/render/applyProps';
 import t_fmt from '../../../../../tera/view/src/render/formatText';
 import $run from '../../../../../tera/view/src/$run';
+import t_event from '../../../../../tera/view/src/render/addEvent';
 import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
 
 const IsAvailable = {
@@ -38,7 +39,7 @@ const IsAvailable = {
 		$run(function setBinding() {
 			t_input_1.checked = $state.isAvailable || false;
 		});
-		t_input_1.addEventListener("input", (e) => $state.isAvailable = e.target.checked);
+		t_event(t_input_1, "input", (e) => $state.isAvailable = e.target.checked);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

@@ -11,7 +11,6 @@ const importsMap: Record<string, string> = {
 	$run: "import $run from '${folder}/$run';",
 	$mount: "import $mount from '${folder}/$mount';",
 	t_flush: "import t_flush from '${folder}/watch/flushMountEffects';",
-	t_animate: "import t_animate from '${folder}/motion/animate';",
 	t_push_range_to_parent:
 		"import t_push_range_to_parent from '${folder}/render/pushRangeToParent';",
 	t_push_range: "import t_push_range from '${folder}/render/pushRange';",
@@ -25,6 +24,8 @@ const importsMap: Record<string, string> = {
 	t_dynamic: "import t_dynamic from '${folder}/render/setDynamicElement';",
 	t_fmt: "import t_fmt from '${folder}/render/formatText';",
 	t_fragment: "import t_fragment from '${folder}/render/getFragment';",
+	t_event: "import t_event from '${folder}/render/addEvent';",
+	t_animate: "import t_animate from '${folder}/render/addAnimation';",
 	t_anchor: "import t_anchor from '${folder}/render/findAnchor';",
 	t_root: "import t_root from '${folder}/render/nodeRoot';",
 	t_child: "import t_child from '${folder}/render/nodeChild';",
@@ -132,7 +133,8 @@ function buildTemplate(
 		b.append("");
 		buildNode(template.markup, status, b, "$parent", "$anchor", true);
 
-		// Flush any $mount calls that were encountered
+		// Flush any $mount calls that were encountered -- move this to
+		// addFragment, because we also have to flush events and animations
 		if (imports.has("$mount")) {
 			status.imports.add("t_flush");
 			b.append("");
