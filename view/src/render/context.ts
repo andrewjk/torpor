@@ -1,3 +1,4 @@
+import type Animation from "../types/Animation";
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
 import type Range from "../types/Range";
@@ -36,10 +37,8 @@ interface Context {
 	stashedAnimations: {
 		range: Range | null;
 		el: HTMLElement;
-		inKeyframes: Keyframe[] | PropertyIndexedKeyframes | null;
-		inOptions: number | KeyframeAnimationOptions | undefined;
-		outKeyframes: Keyframe[] | PropertyIndexedKeyframes | null;
-		outOptions: number | KeyframeAnimationOptions | undefined;
+		in?: Animation;
+		out?: Animation;
 	}[];
 
 	/** The node that is actively being hydrated. */

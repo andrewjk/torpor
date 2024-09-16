@@ -56,10 +56,12 @@ export default function addFragment(
 		for (let animation of context.stashedAnimations) {
 			context.activeRange = animation.range;
 			$run(() => {
-				animate(animation.el, true, animation.inKeyframes, animation.inOptions);
-				if (animation.outKeyframes) {
+				if (animation.in) {
+					animate(animation.el, true, animation.in.keyframes, animation.in.options);
+				}
+				if (animation.out) {
 					return () => {
-						animate(animation.el, false, animation.outKeyframes, animation.outOptions);
+						animate(animation.el, false, animation.out!.keyframes, animation.out!.options);
 					};
 				}
 			});

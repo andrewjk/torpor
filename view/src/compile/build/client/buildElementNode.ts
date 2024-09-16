@@ -3,6 +3,7 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
+import nextVarName from "../utils/nextVarName";
 import BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -226,50 +227,40 @@ function buildTransitionAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
+	status.imports.add("t_animate");
+
 	// Add an in and out transition, after the fragment has been added
 	// TODO: Separate these -- you should be able to have multiple,
 	// unrelated entry and exit transitions?
-	const fragment = status.fragmentStack[status.fragmentStack.length - 1].fragment;
-	if (fragment) {
-		let entryAnimation = null;
-		let exitAnimation = null;
-		if (name === "transition") {
-			entryAnimation = exitAnimation = getAnimationDetails(value, status);
-		} else if (name === "transition:in") {
-			entryAnimation = getAnimationDetails(value, status);
-			let outAttribute = node.attributes.find((a) => a.name === "transition:out");
-			if (outAttribute) {
-				let outValue = trimMatched(outAttribute.value, "{", "}");
-				exitAnimation = getAnimationDetails(outValue, status);
-			}
-		} else if (name === "transition:out") {
-			let inAttribute = node.attributes.find((a) => a.name === "transition:in");
-			if (inAttribute) {
-				// This has already been handled with transition:in, above
-				return;
-			}
-			exitAnimation = getAnimationDetails(value, status);
-		} else {
-			// TODO: Add an error
-		}
+	let entryVarName = nextVarName("trans_in", status);
+	let exitVarName = nextVarName("trans_out", status);
 
-		////let animation = [];
-		////if (entryAnimation) {
-		////	// Effect
-		////	animation.push(
-		////		`(${entryAnimation.func})(${[varName, "true", entryAnimation.keyframes, entryAnimation.options].filter(Boolean).join(", ")});`,
-		////	);
-		////}
-		////if (exitAnimation) {
-		////	// Cleanup
-		////	animation.push(
-		////		`return () => { (${exitAnimation.func})(${[varName, "false", exitAnimation.keyframes, exitAnimation.options].filter(Boolean).join(", ")}) };`,
-		////	);
-		////}
-		status.imports.add("t_animate");
-		b.append(
-			`t_animate(${varName}, ${entryAnimation?.keyframes || "null"}, ${entryAnimation?.options || "undefined"}, ${exitAnimation?.keyframes || "null"}, ${exitAnimation?.options || "undefined"});`,
-		);
+	if (name === "transition") {
+		b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
+		b.append(`const ${exitVarName} = ${entryVarName};`);
+		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
+	} else if (name === "transition:in") {
+		let outAttribute = node.attributes.find((a) => a.name === "transition:out");
+		if (outAttribute) {
+			let outValue = trimMatched(outAttribute.value, "{", "}");
+			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
+			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue, status)};`);
+			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
+		} else {
+			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
+			b.append(`t_animate(${varName}, ${entryVarName});`);
+		}
+	} else if (name === "transition:out") {
+		let inAttribute = node.attributes.find((a) => a.name === "transition:in");
+		if (inAttribute) {
+			// This has already been handled with transition:in, above
+			return;
+		} else {
+			b.append(`const ${exitVarName} = ${getAnimationDetails(value, status)};`);
+			b.append(`t_animate(${varName}, null, ${entryVarName});`);
+		}
+	} else {
+		// TODO: Add an error
 	}
 }
 
@@ -304,18 +295,17 @@ function getAnimationDetails(value: string, status: BuildStatus) {
 	}
 	parts.push(value.substring(start));
 
-	let func = parts[0].trim();
-	let isAnimateFunction = func === "animate";
-	let options = isAnimateFunction ? parts[2]?.trim() : parts[1]?.trim();
-	let keyframes = isAnimateFunction ? parts[1]?.trim() : undefined;
-	if (isAnimateFunction) {
-		////status.imports.add("t_animate");
-		func = "t_animate";
-	}
+	//let func = parts[0].trim();
+	//let isAnimateFunction = func === "animate";
+	//let options = isAnimateFunction ? parts[2]?.trim() : parts[1]?.trim();
+	//let keyframes = isAnimateFunction ? parts[1]?.trim() : undefined;
+	//if (isAnimateFunction) {
+	//	status.imports.add("t_animate");
+	//	func = "t_animate";
+	//}
 
-	return {
-		func,
-		options,
-		keyframes,
-	};
+	let keyframes = parts[0]?.trim();
+	let options = parts[1]?.trim();
+
+	return `{ ${[`keyframes: ${keyframes}`, options ? `options: ${options}` : null].filter(Boolean).join(", ")} }`;
 }

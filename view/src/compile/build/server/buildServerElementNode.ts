@@ -9,7 +9,7 @@ export default function buildServerElementNode(
 	status: BuildServerStatus,
 	b: Builder,
 ) {
-	let attributes = buildElementAttributes(node);
+	let attributes = buildElementAttributes(node, b);
 	if (attributes.length) {
 		attributes = " " + attributes;
 	}
@@ -27,13 +27,27 @@ export default function buildServerElementNode(
 	}
 }
 
-function buildElementAttributes(node: ElementNode) {
+function buildElementAttributes(node: ElementNode, b: Builder) {
 	let attributes: string[] = [];
 	for (let { name, value } of node.attributes) {
 		if (name === "tag" && node.tagName === ":element") {
 			// Ignore this special attribute
-		} else if (name.startsWith("transition") || name.startsWith("on")) {
-			// No animation or events on the server
+		} else if (name.startsWith("on")) {
+			// No events on the server
+		} else if (name.startsWith("transition")) {
+			// No animation on the server, but we do need to set the attributes
+			// from the first keyframe
+			// HACK: use a regex instead maybe?
+			value = value.substring(1, value.length - 1).trim();
+			value = value.split(",")[0].trim();
+			if (value.startsWith("[")) {
+				value = value.substring(1);
+			} else {
+				value = value + "[0]";
+			}
+			attributes.push(
+				`style="\${Object.entries(${value}).map(([k, v]) => \`$\{k}: $\{v}\`).join("; ")}"`,
+			);
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
