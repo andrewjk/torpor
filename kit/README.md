@@ -4,6 +4,8 @@ A framework for building libraries and/or sites with Tera.
 
 Built with [Vinxi](https://github.com/nksaraf/vinxi).
 
+🚧 WARNING: VERY INCOMPLETE 🚧
+
 ## Installation
 
 TODO:

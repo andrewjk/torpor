@@ -2,6 +2,8 @@
 
 Tera's view library, for writing and mounting components.
 
+🚧 WARNING: VERY INCOMPLETE 🚧
+
 ## Installation
 
 Use `npm` (or `yarn`, or `pnpm`) to add tera/view to your project:

@@ -2,6 +2,8 @@
 
 A demo site built with [tera/kit](./kit).
 
+🚧 WARNING: VERY INCOMPLETE 🚧
+
 ## Running
 
 Clone Tera and use `npm` (or your preferred package manager) to run the demo:

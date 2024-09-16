@@ -2,6 +2,8 @@
 
 Yet another JavaScript framework, designed for simplicity.
 
+🚧 WARNING: VERY INCOMPLETE 🚧
+
 ## Features
 
 - As close to plain JS/TS, HTML and CSS as possible
