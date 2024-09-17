@@ -5,8 +5,7 @@ import context from "./context";
  * */
 export default function nodeRoot(parent: ParentNode) {
 	if (context.hydrationNode) {
-		// If hydrating, set the active range's start node, as it won't have been done in
-		// getFragment
+		// If hydrating, set the active range's start node, while we have it
 		if (context.activeRange && !context.activeRange.startNode) {
 			context.activeRange.startNode = context.hydrationNode as ChildNode;
 		}

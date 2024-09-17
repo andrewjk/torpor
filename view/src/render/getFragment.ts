@@ -17,12 +17,5 @@ export default function getFragment(
 	// fragment unless we really need to
 	let fragment = array[index].cloneNode(true) as DocumentFragment;
 
-	// Set the start node of the active range to the first node in the fragment
-	// The end node will be set when we add the fragment
-	// If we're hydrating, the start node will be set when we call nodeRoot
-	if (!context.hydrationNode && context.activeRange && !context.activeRange.startNode) {
-		context.activeRange.startNode = fragment.firstChild;
-	}
-
 	return fragment;
 }

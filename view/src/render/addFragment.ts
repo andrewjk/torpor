@@ -16,6 +16,7 @@ export default function addFragment(
 		if (context.hydrationNode) {
 			range.endNode = context.hydrationNode as ChildNode;
 		} else {
+			range.startNode = fragment.firstChild;
 			range.endNode = fragment.lastChild;
 		}
 	}
@@ -40,7 +41,8 @@ export default function addFragment(
 	// If we're adding this fragment to the DOM, we can now add our stashed
 	// events and play our stashed animations
 	if (!parentIsFragment) {
-		let oldRange = context.activeRange;
+		// Set the active range for each event and animation so it will get
+		// attached to the right one and set it back afterwards
 
 		for (let event of context.stashedEvents) {
 			context.activeRange = event.range;
@@ -69,5 +71,7 @@ export default function addFragment(
 		context.stashedAnimations.length = 0;
 
 		context.activeRange = oldRange;
+		// Set the active range back
+		context.activeRange = range;
 	}
 }
