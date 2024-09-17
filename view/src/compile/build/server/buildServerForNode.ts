@@ -25,12 +25,11 @@ export default function buildServerForNode(
 	}
 
 	// Build the for statement
-	for (let [i, branch] of node.children.entries()) {
+	for (let branch of node.children) {
 		if (isControlNode(branch)) {
 			buildServerForBranch(branch, status, b);
 		}
 	}
-	b.append("}");
 
 	// End the control statement
 	status.output += HYDRATION_END_COMMENT;
@@ -53,4 +52,6 @@ function buildServerForBranch(node: ControlNode, status: BuildServerStatus, b: B
 		b.append(`$output += \`${status.output}\`;`);
 		status.output = "";
 	}
+
+	b.append("}");
 }

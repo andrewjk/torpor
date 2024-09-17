@@ -20,7 +20,7 @@ export default function buildServerAwaitNode(
 	}
 
 	// Build the await statement
-	for (let [i, branch] of node.children.entries()) {
+	for (let branch of node.children) {
 		if (isControlNode(branch) && branch.operation === "@await") {
 			buildServerAwaitBranch(branch, status, b);
 		}

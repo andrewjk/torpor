@@ -35,7 +35,7 @@ export default function printNode(node: Node | null | undefined) {
 		node = node.parentNode;
 	}
 
-	return `[ ${paths.reverse().join(" > ") || "null"} ] '${truncate(textContent || "", 40)}'`;
+	return `[ ${paths.reverse().join(" > ") || "null"} -- '${truncate(textContent || "", 40)}' ]`;
 }
 
 function truncate(input: string, length: number) {

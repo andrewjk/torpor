@@ -20,7 +20,7 @@ export default function buildServerIfNode(
 	}
 
 	// Build the if statement
-	for (let [i, branch] of node.children.entries()) {
+	for (let branch of node.children) {
 		if (isControlNode(branch)) {
 			buildServerIfBranch(branch, status, b);
 		}
