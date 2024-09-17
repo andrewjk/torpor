@@ -13,8 +13,8 @@ interface UrlParams {
 }
 
 // TODO: Can't build the string part of the path dynamically, but could test it automatically?
-export function route(slug: number, search?: string) {
-	return buildRoutePath<RouteParams, UrlParams>("demo/[slug]", { slug }, { search });
+export function route(slug: number, params?: UrlParams) {
+	return buildRoutePath<RouteParams, UrlParams>("demo/[slug]", { slug }, params);
 }
 
 export default {
