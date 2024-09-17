@@ -6,6 +6,7 @@ import type ElementNode from "../types/nodes/ElementNode";
 import type Style from "../types/styles/Style";
 
 export default interface ParseStatus {
+	name: string;
 	source: string;
 	// The current index
 	i: number;

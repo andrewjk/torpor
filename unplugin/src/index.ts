@@ -29,15 +29,15 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		return /\.tera\?*/.test(id);
 	},
 	transform(code, id) {
-		// Try to parse the code
-		const parsed = parse(code);
-		if (parsed.ok && parsed.template) {
-			// Get the component's name from the file id
-			const name = id
-				.split(/[\\\/]/)
-				.at(-1)
-				?.replace(/\.tera$/, "")!;
+		// Get the component's name from the file id
+		const name = id
+			.split(/[\\\/]/)
+			.at(-1)
+			?.replace(/\.tera$/, "")!;
 
+		// Try to parse the code
+		const parsed = parse(name, code);
+		if (parsed.ok && parsed.template) {
 			// Transform for server or client
 			if (options?.server) {
 				return transformForServer(name, parsed.template, id);

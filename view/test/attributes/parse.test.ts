@@ -10,7 +10,7 @@ test("attribute with double quotes", () => {
 </a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -28,7 +28,7 @@ test("attribute with single quotes", () => {
 </a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -46,7 +46,7 @@ test("attribute with no quotes", () => {
 </a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -62,7 +62,7 @@ test("attribute with no quotes in self-closed element", () => {
 <a href=http://example.com/>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -80,7 +80,7 @@ test("multiple attributes", () => {
 </a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -108,7 +108,7 @@ test("event attribute with name", () => {
 </button>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -128,7 +128,7 @@ test("event attribute with code", () => {
 </button>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -146,7 +146,7 @@ test("shorthand attribute", () => {
 <a {href}></a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -162,7 +162,7 @@ test("multiple shorthand attributes", () => {
 <a {href1} {href2}></a>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

@@ -7,7 +7,7 @@ test("multiple top-level elements", () => {
 <div/>
 <div/>
   `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected = {
 		ok: false,
 		errors: [

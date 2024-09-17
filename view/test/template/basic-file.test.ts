@@ -7,7 +7,7 @@ import { el, root, trimParsed } from "../helpers";
 
 test("basic file", () => {
 	const input = `<script/><div/><style/>`;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

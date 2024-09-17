@@ -41,7 +41,7 @@ const Let = {
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
 
-		List.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1)
+		List.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

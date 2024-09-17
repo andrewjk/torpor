@@ -161,11 +161,6 @@ function buildSpecialFragmentText(
 	currentFragment: Fragment,
 ) {
 	switch (node.tagName) {
-		case ":element": {
-			// HACK: Just treat it as a component node as that does what we need for now
-			buildComponentFragmentText(node, status, fragments, currentFragment);
-			break;
-		}
 		case ":slot": {
 			// Add an anchor for the slot
 			currentFragment.text += ANCHOR_COMMENT;
@@ -181,6 +176,15 @@ function buildSpecialFragmentText(
 			for (let child of node.children) {
 				buildNodeFragmentText(child, status, fragments, node.fragment);
 			}
+			break;
+		}
+		case ":element": {
+			// HACK: Just treat it as a component node as that does what we need for now
+			buildComponentFragmentText(node, status, fragments, currentFragment);
+			break;
+		}
+		case ":component": {
+			buildComponentFragmentText(node, status, fragments, currentFragment);
 			break;
 		}
 		default: {

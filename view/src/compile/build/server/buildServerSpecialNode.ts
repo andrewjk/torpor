@@ -1,6 +1,7 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type BuildServerStatus from "./BuildServerStatus";
+import buildServerComponentNode from "./buildServerComponentNode";
 import buildServerElementNode from "./buildServerElementNode";
 import buildServerSlotNode from "./buildServerSlotNode";
 
@@ -10,12 +11,16 @@ export default function buildServerSpecialNode(
 	b: Builder,
 ) {
 	switch (node.tagName) {
+		case ":slot": {
+			buildServerSlotNode(node, status, b);
+			break;
+		}
 		case ":element": {
 			buildServerElementNode(node, status, b);
 			break;
 		}
-		case ":slot": {
-			buildServerSlotNode(node, status, b);
+		case ":component": {
+			buildServerComponentNode(node, status, b);
 			break;
 		}
 		default: {

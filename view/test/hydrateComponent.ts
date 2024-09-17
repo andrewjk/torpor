@@ -19,15 +19,16 @@ export default function hydrateComponent(
 		componentPath = path.join("view", componentPath);
 	}
 
+	const name = path.basename(componentPath, ".tera");
 	const source = fs.readFileSync(componentPath).toString();
-	const parsed = parse(source);
+	const parsed = parse(name, source);
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
 	const imports = parsed.template!.imports?.map((imp) => {
 		let importPath = path.join(path.dirname(componentPath), imp.path);
 		let importSource = fs.readFileSync(importPath).toString();
-		let importParsed = parse(importSource);
+		let importParsed = parse(imp.name, importSource);
 		expect(importParsed.ok).toBe(true);
 		expect(importParsed.template).not.toBeUndefined();
 		const importClient = build(imp.name, importParsed.template!);
@@ -51,8 +52,8 @@ export default function hydrateComponent(
 	const code = `
 const x = {
 render: ($state) => {
-${imports?.map((imp) => imp.importServer.code.replace("export default ", "")).join("\n")}
-${server.code.replace("export default ", "").replace(/^import.+\n/g, "")}
+${imports?.map((imp) => imp.importServer.code.replace("export default ", "")).join("\n") || ""}
+${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
 
 return ${component.name}.render($state);
 }

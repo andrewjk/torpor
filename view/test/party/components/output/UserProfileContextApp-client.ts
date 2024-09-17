@@ -43,7 +43,7 @@ const UserProfileContextApp = {
 
 		/* @component */
 
-		UserProfileContext.render(t_div_1, t_comp_anchor_1, undefined, $context)
+		UserProfileContext.render(t_div_1, t_comp_anchor_1, undefined, $context);
 
 		t_apply_props(t_div_1, $props, []);
 		$run(function setTextContent() {

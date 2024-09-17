@@ -26,7 +26,7 @@ const FunnyButtonApp = {
 
 		/* @component */
 
-		FunnyButton.render(t_div_1, t_comp_anchor_1, undefined, $context)
+		FunnyButton.render(t_div_1, t_comp_anchor_1, undefined, $context);
 		const t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1)));
 
 		/* @component */
@@ -37,7 +37,7 @@ const FunnyButtonApp = {
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
 
-		FunnyButton.render(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1)
+		FunnyButton.render(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1);
 
 		t_apply_props(t_div_1, $props, []);
 		t_add_fragment(t_fragment_0, $parent, $anchor);

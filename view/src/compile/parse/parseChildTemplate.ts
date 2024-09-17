@@ -6,7 +6,7 @@ import type ParseStatus from "./ParseStatus";
 import slottifyChildNodes from "./slottifyChildNodes";
 
 export default function parseChildTemplate(name: string, source: string, status: ParseStatus) {
-	const parsed = parse(source);
+	const parsed = parse(name, source);
 	if (parsed.ok && parsed.template) {
 		parsed.template.name = name;
 		status.childTemplates ||= [];

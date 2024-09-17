@@ -1,13 +1,16 @@
+import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
 import type TextNode from "../types/nodes/TextNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 import isTextNode from "../types/nodes/isTextNode";
+import trimMatched from "../utils/trimMatched";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
 import slottifyChildNodes from "./slottifyChildNodes";
 import accept from "./utils/accept";
+import addError from "./utils/addError";
 import isSpaceChar from "./utils/isSpaceChar";
 
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
@@ -29,6 +32,8 @@ const voidTags = [
 ];
 
 export default function parseElement(status: ParseStatus): ElementNode {
+	const start = status.i;
+
 	const element = parseTag(status);
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
@@ -106,6 +111,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 
 	// If this is a component element, add a default <:fill> node
 	if (
+		element.tagName === status.name ||
 		status.imports?.some((i) => i.name === element.tagName) ||
 		status.childTemplates?.some((c) => c.name === element.tagName)
 	) {
@@ -132,11 +138,41 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	//	}
 	//}
 
-	if (isSpecialNode(element) && element.tagName === ":slot") {
-		// If this is a <:slot> element, add a <:fill> node for its fallback
-		// content. Anchors will be created for <:slot> nodes and fragments will
-		// be created for the <:fill> content
-		slottifyChildNodes(element);
+	if (isSpecialNode(element)) {
+		if (element.tagName === ":slot") {
+			// If this is a <:slot> element, add a <:fill> node for its fallback
+			// content. Anchors will be created for <:slot> nodes and fragments will
+			// be created for the <:fill> content
+			slottifyChildNodes(element);
+		} else if (element.tagName === ":self") {
+			element.tagName = status.name;
+			element.type = "component";
+			slottifyChildNodes(element);
+		} else if (element.tagName === ":component") {
+			const selfAttribute = element.attributes.find((a) => a.name === "self");
+			if (selfAttribute) {
+				element.type = "component";
+				slottifyChildNodes(element);
+
+				const selfValue = trimMatched(selfAttribute.value, "{", "}");
+				const replace: ControlNode = {
+					type: "control",
+					operation: "@replace",
+					statement: selfValue,
+					children: [element],
+				};
+				const replaceGroup: ControlNode = {
+					type: "control",
+					operation: "@replace group",
+					statement: selfValue,
+					children: [replace],
+				};
+
+				return replaceGroup as any;
+			} else {
+				addError(status, ":component element must have a self attribute", start);
+			}
+		}
 	}
 
 	return element;

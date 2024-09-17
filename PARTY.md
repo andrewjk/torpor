@@ -108,7 +108,7 @@ Examples from [Component Party](https://component-party.dev).
   });
 </script>
 
-<input bind:this={inputElement} />
+<input bind:self={inputElement} />
 ```
 
 ## Conditional

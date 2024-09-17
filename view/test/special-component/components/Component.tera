@@ -1,0 +1,13 @@
+<script>
+    import BigTitle from "./BigTitle.tera";
+    import SmallTitle from "./SmallTitle.tera";
+
+    let components = {
+        BigTitle,
+        SmallTitle
+    };
+</script>
+
+<:component self={components[$props.self]}>
+    Hello!
+</:component>

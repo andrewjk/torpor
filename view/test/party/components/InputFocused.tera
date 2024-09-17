@@ -7,4 +7,4 @@
   });
 </script>
 
-<input bind:this={inputElement} />
+<input bind:self={inputElement} />

@@ -1,0 +1,7 @@
+
+<div>
+    Level {$props.level}
+    @if ($props.level < 3) {
+        <Self level={$props.level + 1} />
+    }
+</div>

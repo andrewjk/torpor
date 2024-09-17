@@ -29,7 +29,7 @@ const Basic = {
 			t_add_fragment(t_fragment_2, $sparent, $sanchor);
 		}
 
-		Header.render(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1)
+		Header.render(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

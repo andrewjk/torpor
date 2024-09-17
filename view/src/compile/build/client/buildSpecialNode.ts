@@ -1,6 +1,7 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type BuildStatus from "./BuildStatus";
+import buildComponentNode from "./buildComponentNode";
 import buildElementNode from "./buildElementNode";
 import buildSlotNode from "./buildSlotNode";
 
@@ -13,12 +14,16 @@ export default function buildSpecialNode(
 	root = false,
 ) {
 	switch (node.tagName) {
+		case ":slot": {
+			buildSlotNode(node, status, b, parentName, anchorName);
+			break;
+		}
 		case ":element": {
 			buildElementNode(node, status, b, parentName, anchorName, root);
 			break;
 		}
-		case ":slot": {
-			buildSlotNode(node, status, b, parentName, anchorName);
+		case ":component": {
+			buildComponentNode(node, status, b, parentName, anchorName, root);
 			break;
 		}
 		default: {

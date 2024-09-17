@@ -12,7 +12,7 @@ test("script", () => {
 ${script}
 </script>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

@@ -32,7 +32,7 @@ const ParentChild = {
 		const t_props_1 = $watch({});
 		t_props_1["name"] = "Anna";
 
-		Child.render(t_div_1, t_comp_anchor_1, t_props_1, $context)
+		Child.render(t_div_1, t_comp_anchor_1, t_props_1, $context);
 
 		t_apply_props(t_div_1, $props, ['name']);
 		t_add_fragment(t_fragment_0, $parent, $anchor);

@@ -37,15 +37,14 @@ npm install tera
   - $mount to create an effect that runs after a component has been mounted
 - Automatic scoping of styles to component
 - Two-way binding with bind:value, bind:checked, etc
-- Element binding to a script variable with bind:this={...}
+- Element binding to a script variable with bind:self={...}
 - Element in and out transitions using the Web Animations API
 - Run an effect when an element is added to the DOM with on:mount={(el) => ...}
 - Special tags (mostly not yet implemented...)
-  - <:self> inserts the containing component
   - <:component self={...}> inserts a dynamic component
   - <:element self={...}> inserts a dynamic element
   - <:trim> trims whitespace around the tag
-  - <:html> renders HTML e.g. from $props
+  - <:render> renders HTML e.g. from $props
   - <:head> for adding attributes, events and content to the <head> tag
   - <:window> for adding events to the `window` object
   - <:document> for adding events to the `document` object

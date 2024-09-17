@@ -49,7 +49,7 @@ const AnswerButtonApp = {
 			t_props_1["onNo"] = onAnswerNo;
 		});
 
-		AnswerButton.render(t_div_1, t_comp_anchor_1, t_props_1, $context)
+		AnswerButton.render(t_div_1, t_comp_anchor_1, t_props_1, $context);
 		const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1)));
 
 		t_apply_props(t_div_1, $props, []);

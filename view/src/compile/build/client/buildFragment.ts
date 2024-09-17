@@ -431,7 +431,7 @@ function declareElementFragmentVars(
 function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
 	const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
 	const isDynamicElement =
-		node.tagName === ":element" && node.attributes.find((a) => a.name === "tag");
+		node.tagName === ":element" && node.attributes.find((a) => a.name === "self");
 	return hasReactiveAttribute || isDynamicElement || (topLevel && lastChild);
 }
 
@@ -515,21 +515,6 @@ function declareSpecialFragmentVars(
 	}
 
 	switch (node.tagName) {
-		case ":element": {
-			declareElementFragmentVars(
-				fragment,
-				node,
-				path,
-				status,
-				b,
-				parentName,
-				anchorName,
-				varPaths,
-				lastChild,
-				declare,
-			);
-			break;
-		}
 		case ":slot":
 		case ":fill": {
 			for (let [i, child] of node.children.entries()) {
@@ -546,6 +531,35 @@ function declareSpecialFragmentVars(
 					declare,
 				);
 			}
+			break;
+		}
+		case ":element": {
+			declareElementFragmentVars(
+				fragment,
+				node,
+				path,
+				status,
+				b,
+				parentName,
+				anchorName,
+				varPaths,
+				lastChild,
+				declare,
+			);
+			break;
+		}
+		case ":component": {
+			declareComponentFragmentVars(
+				fragment,
+				node,
+				path,
+				status,
+				b,
+				parentName,
+				anchorName,
+				varPaths,
+				declare,
+			);
 			break;
 		}
 		default: {

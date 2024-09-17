@@ -13,7 +13,7 @@ test("one line js comments", () => {
 </section>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

@@ -3,7 +3,6 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type RootNode from "../../types/nodes/RootNode";
 import type BuildStatus from "./BuildStatus";
-import buildRun from "./buildRun";
 
 export default function buildAddFragment(
 	node: RootNode | ControlNode | ElementNode,

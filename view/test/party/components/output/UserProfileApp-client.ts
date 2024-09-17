@@ -34,7 +34,7 @@ const UserProfileApp = {
 		});
 		t_props_1["isAvailable"] = true;
 
-		UserProfile.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context)
+		UserProfile.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

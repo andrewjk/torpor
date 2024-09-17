@@ -10,7 +10,7 @@ test("simple docs", () => {
   <h2>{$props.name}</h2>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -39,7 +39,7 @@ test("prop docs", () => {
   <h2>{$props.name}</h2>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -82,7 +82,7 @@ test("slot docs", () => {
   <h2>{$props.name}</h2>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -126,7 +126,7 @@ test("all docs", () => {
   <h2>{$props.name}</h2>
 `;
 
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

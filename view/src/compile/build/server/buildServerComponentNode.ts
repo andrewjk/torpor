@@ -1,6 +1,7 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
+import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -82,11 +83,19 @@ export default function buildServerComponentNode(
 		}
 	}
 
+	let componentName = node.tagName;
+	if (componentName === ":component") {
+		let selfAttribute = node.attributes.find((a) => a.name === "self");
+		if (selfAttribute) {
+			componentName = trimMatched(selfAttribute.value, "{", "}");
+		}
+	}
+
 	// Render the component
 	let renderParams = `${propsName}, $context`;
 	if (slotsName !== "undefined") {
 		renderParams += `, ${slotsName}`;
 	}
 	b.append("");
-	b.append(`$output += ${node.tagName}.render(${renderParams})`);
+	b.append(`$output += ${componentName}.render(${renderParams})`);
 }

@@ -1,6 +1,7 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
+import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -28,7 +29,9 @@ export default function buildComponentNode(
 		status.imports.add("$watch");
 		b.append(`const ${propsName} = $watch({});`);
 		for (let { name, value } of node.attributes) {
-			if (name.startsWith("{") && name.endsWith("}")) {
+			if (name === "self" && node.tagName === ":component") {
+				// Ignore this special attribute
+			} else if (name.startsWith("{") && name.endsWith("}")) {
 				name = name.substring(1, name.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
 			} else {
@@ -100,6 +103,16 @@ export default function buildComponentNode(
 	if (slotsName !== "undefined") {
 		renderParams += `, ${slotsName}`;
 	}
+
 	b.append("");
-	b.append(`${node.tagName}.render(${renderParams})`);
+
+	let componentName = node.tagName;
+	if (componentName === ":component") {
+		let selfAttribute = node.attributes.find((a) => a.name === "self");
+		if (selfAttribute) {
+			componentName = trimMatched(selfAttribute.value, "{", "}");
+		}
+	}
+
+	b.append(`${componentName}.render(${renderParams});`);
 }

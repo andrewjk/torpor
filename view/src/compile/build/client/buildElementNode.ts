@@ -43,13 +43,13 @@ export default function buildElementNode(
 }
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
-	let tagAttribute = node.attributes.find((a) => a.name === "tag");
-	if (tagAttribute) {
+	let selfAttribute = node.attributes.find((a) => a.name === "self");
+	if (selfAttribute) {
 		status.imports.add("$run");
 		status.imports.add("t_dynamic");
-		let tagValue = trimMatched(tagAttribute.value, "{", "}");
+		let selfValue = trimMatched(selfAttribute.value, "{", "}");
 		b.append(`$run(function setDynamic() {`);
-		b.append(`${node.varName} = t_dynamic(${node.varName}, ${tagValue});`);
+		b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
 
 		let parentName = node.varName;
 
@@ -80,7 +80,7 @@ function buildElementAttributes(
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
 	for (let { name, value } of node.attributes) {
-		if (name === "tag" && node.tagName === ":element") {
+		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
@@ -90,7 +90,7 @@ function buildElementAttributes(
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
-			if (name === "bind:this") {
+			if (name === "bind:self") {
 				// Bind the DOM element to a user-defined variable
 				b.append(`${value} = ${varName};`);
 			} else if (name === "bind:group") {

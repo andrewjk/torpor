@@ -1,5 +1,6 @@
 import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
+import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -13,11 +14,15 @@ export default function buildServerElementNode(
 	if (attributes.length) {
 		attributes = " " + attributes;
 	}
-	// TODO: What should I default it to?
-	let tagName =
-		node.tagName === ":element"
-			? `$${node.attributes.find((a) => a.name === "tag")?.value}` || "div"
-			: node.tagName;
+
+	let tagName = node.tagName;
+	if (tagName === ":element") {
+		let selfAttribute = node.attributes.find((a) => a.name === "self");
+		if (selfAttribute) {
+			tagName = `$${selfAttribute.value}`;
+		}
+	}
+
 	status.output += `<${tagName}${attributes}${node.selfClosed ? "/" : ""}>`;
 	if (!node.selfClosed) {
 		for (let child of node.children) {
@@ -30,7 +35,7 @@ export default function buildServerElementNode(
 function buildElementAttributes(node: ElementNode, b: Builder) {
 	let attributes: string[] = [];
 	for (let { name, value } of node.attributes) {
-		if (name === "tag" && node.tagName === ":element") {
+		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
 		} else if (name.startsWith("on")) {
 			// No events on the server

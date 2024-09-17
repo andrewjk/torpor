@@ -10,7 +10,7 @@ test("imports", () => {
     import * from 'somewhere-else';
   </script>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

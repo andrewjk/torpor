@@ -26,7 +26,7 @@ const Component = {
 		const t_props_1 = $watch({});
 		t_props_1["name"] = "Amy";
 
-		Header.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context)
+		Header.render(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}
 }

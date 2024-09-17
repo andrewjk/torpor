@@ -4,15 +4,15 @@ import { expect, test } from "vitest";
 import $watch from "../../src/$watch";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Element.tera";
+import Component from "./components/Component.tera";
 
 interface State {
-	tag: string;
+	self: any;
 }
 
-test("element -- mounted", () => {
+test("special component -- mounted", () => {
 	let $state = $watch({
-		tag: "h4",
+		self: "BigTitle",
 	});
 
 	const container = document.createElement("div");
@@ -21,13 +21,13 @@ test("element -- mounted", () => {
 	check(container, $state);
 });
 
-test("element -- hydrated", () => {
+test("special component -- hydrated", () => {
 	let $state = $watch({
-		tag: "h4",
+		self: "BigTitle",
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/element/components/Element.tera";
+	const path = "./test/special-component/components/Component.tera";
 	hydrateComponent(container, path, Component, $state);
 
 	check(container, $state);
@@ -35,9 +35,9 @@ test("element -- hydrated", () => {
 
 function check(container: HTMLElement, $state: State) {
 	expect(queryByText(container, "Hello!")).toBeInTheDocument();
-	expect(queryByText(container, "Hello!")?.tagName).toBe("H4");
+	expect(queryByText(container, "Hello!")?.tagName).toBe("H2");
 
-	$state.tag = "p";
+	$state.self = "SmallTitle";
 
-	expect(queryByText(container, "Hello!")?.tagName).toBe("P");
+	expect(queryByText(container, "Hello!")?.tagName).toBe("H6");
 }

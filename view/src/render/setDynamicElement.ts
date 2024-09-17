@@ -1,5 +1,7 @@
 import context from "./context";
 
+// TODO: Should we @toggle this instead? That would call on:mount etc again for the new element
+
 export default function setDynamicElement(el: Element, tag: string) {
 	// If hydrating, it should already have been created as the correct element
 	if (context.hydrationNode) {
@@ -7,7 +9,6 @@ export default function setDynamicElement(el: Element, tag: string) {
 	}
 
 	// Replace the old element with the new element
-	// TODO: Should we copy attributes just in case they have been set manually?
 	let newElement = document.createElement(tag);
 	el.replaceWith(newElement);
 

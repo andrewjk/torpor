@@ -11,7 +11,7 @@ test("simple style", () => {
   h1 { color: blue; }
 </style>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -43,7 +43,7 @@ test("style with multiple selectors", () => {
 .h1, p { color: blue; }
 </style>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -77,7 +77,7 @@ test("style with multiple values", () => {
 }
 </style>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -116,7 +116,7 @@ test("media query", () => {
 }
 </style>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -163,7 +163,7 @@ test("comments in style", () => {
   //}
 </style>
 `;
-	const output = trimParsed(parse(input));
+	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

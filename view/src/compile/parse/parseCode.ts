@@ -5,8 +5,9 @@ import ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import scopeStyles from "./scopeStyles";
 
-export default function parseCode(source: string): ParseResult {
+export default function parseCode(name: string, source: string): ParseResult {
 	const status: ParseStatus = {
+		name,
 		source,
 		i: 0,
 		errors: [],

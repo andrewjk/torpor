@@ -1,5 +1,4 @@
 import hash from "../hash";
-import type CompileError from "../types/CompileError";
 import type Attribute from "../types/styles/Attribute";
 import type Style from "../types/styles/Style";
 import type StyleBlock from "../types/styles/StyleBlock";
@@ -9,19 +8,14 @@ import consumeSpace from "./utils/consumeSpace";
 import consumeUntil from "./utils/consumeUntil";
 import isSpaceChar from "./utils/isSpaceChar";
 
-interface StyleStatus {
-	source: string;
-	i: number;
-	errors: CompileError[];
-}
-
 export default function parseStyleElement(source: string, status: ParseStatus): Style {
 	const style: Style = {
 		global: false,
 		blocks: [],
 	};
 
-	const styleStatus: StyleStatus = {
+	const styleStatus: ParseStatus = {
+		name: "",
 		source,
 		i: 0,
 		errors: [],
