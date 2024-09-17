@@ -4,12 +4,14 @@ import context from "./context";
  * Gets the first child in a fragment
  * */
 export default function nodeRoot(parent: ParentNode) {
-	if (context.hydrationNode) {
+	const hydrationNode = context.hydrationNode;
+	if (hydrationNode) {
 		// If hydrating, set the active range's start node, while we have it
-		if (context.activeRange && !context.activeRange.startNode) {
-			context.activeRange.startNode = context.hydrationNode as ChildNode;
+		const range = context.activeRange;
+		if (range && !range.startNode) {
+			range.startNode = hydrationNode as ChildNode;
 		}
-		return context.hydrationNode;
+		return hydrationNode;
 	} else {
 		return parent.firstChild;
 	}

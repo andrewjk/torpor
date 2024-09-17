@@ -10,11 +10,13 @@ export default function addFragment(
 	//console.log(`adding fragment '${fragment.textContent}' to ${printNode(parent)}`);
 	//console.log("before", printNode(before));
 
-	// Set the active range's end node to the last node in the fragment
 	const range = context.activeRange;
+	const hydrationNode = context.hydrationNode;
+
+	// Set the active range's end node to the last node in the fragment
 	if (range) {
-		if (context.hydrationNode) {
-			range.endNode = context.hydrationNode as ChildNode;
+		if (hydrationNode) {
+			range.endNode = hydrationNode as ChildNode;
 		} else {
 			range.startNode = fragment.firstChild;
 			range.endNode = fragment.lastChild;
@@ -23,7 +25,7 @@ export default function addFragment(
 
 	let parentIsFragment = parent.nodeType === 11;
 
-	if (!context.hydrationNode) {
+	if (!hydrationNode) {
 		// HACK: We need to be able to add fragments to new fragments as well as
 		// fragments that have already been added to the document. New fragments will
 		// be ok, but fragments that have been added will not be parents of the before
@@ -70,7 +72,6 @@ export default function addFragment(
 		}
 		context.stashedAnimations.length = 0;
 
-		context.activeRange = oldRange;
 		// Set the active range back
 		context.activeRange = range;
 	}

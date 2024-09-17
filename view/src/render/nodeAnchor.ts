@@ -3,7 +3,7 @@ import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
 import isComment from "./isComment";
 import nodeNext from "./nodeNext";
 
-export default function findAnchor(node: ChildNode) {
+export default function nodeAnchor(node: ChildNode) {
 	// If we are hydrating, the anchor will be at the end of the paired <![> and
 	// <!]> comments
 	if (context.hydrationNode && isComment(node) && node.data === HYDRATION_START) {
