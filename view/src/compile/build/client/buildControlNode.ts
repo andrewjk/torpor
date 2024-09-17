@@ -4,6 +4,7 @@ import type BuildStatus from "./BuildStatus";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
 import buildIfNode from "./buildIfNode";
+import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
 
@@ -50,6 +51,14 @@ export default function buildControlNode(
 		case "@then":
 		case "@catch": {
 			// These get handled with @await group, above
+			break;
+		}
+		case "@replace group": {
+			buildReplaceNode(node, status, b, parentName, anchorName);
+			break;
+		}
+		case "@replace": {
+			// This gets handled with @replace group, above
 			break;
 		}
 		case "@const":

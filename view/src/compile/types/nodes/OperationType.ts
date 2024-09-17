@@ -13,6 +13,8 @@ type OperationType =
 	| "@await"
 	| "@then"
 	| "@catch"
+	| "@replace group"
+	| "@replace"
 	| "@const"
 	| "@console"
 	| "@debugger"

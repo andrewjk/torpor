@@ -80,7 +80,8 @@ function buildControlFragmentText(
 		case "@if group":
 		case "@switch group":
 		case "@for group":
-		case "@await group": {
+		case "@await group":
+		case "@replace group": {
 			// Add a placeholder if it's a branching control node
 			//if (!node.singleRooted) {
 			currentFragment.text += ANCHOR_COMMENT;

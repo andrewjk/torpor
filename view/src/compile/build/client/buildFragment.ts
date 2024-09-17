@@ -271,7 +271,8 @@ function declareControlFragmentVars(
 		case "@if group":
 		case "@switch group":
 		case "@for group":
-		case "@await group": {
+		case "@await group":
+		case "@replace group": {
 			const operation = node.operation.substring(1).replace(" group", "");
 			declareParentAndAnchorFragmentVars(
 				fragment,

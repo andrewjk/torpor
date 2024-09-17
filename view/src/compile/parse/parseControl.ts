@@ -2,6 +2,7 @@ import type ControlNode from "../types/nodes/ControlNode";
 import ElementNode from "../types/nodes/ElementNode";
 import type OperationType from "../types/nodes/OperationType";
 import isControlNode from "../types/nodes/isControlNode";
+import trimMatched from "../utils/trimMatched";
 import trimStart from "../utils/trimStart";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
@@ -23,13 +24,14 @@ const controlOperations = [
 	"@await",
 	"@then",
 	"@catch",
+	"@replace",
 	"@const",
 	"@console",
 	"@debugger",
 	"@function",
 ];
 
-const standaloneOperations = ["@const", "@console", "@debugger", "@key", "@function"];
+const standaloneOperations = ["@key", "@const", "@console", "@debugger", "@function"];
 
 export default function parseControl(
 	status: ParseStatus,
@@ -110,6 +112,13 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 			statement += ` {${parseInlineScript(status)}}`;
 			accept("}", status);
 		}
+
+		// Special processing for replace
+		if (operation === "@replace") {
+			if (statement.startsWith("replace")) {
+				statement = trimMatched(statement.substring("replace".length).trim(), "(", ")");
+			}
+		}
 	} else {
 		// TODO: Should probably advance until a lt
 		addError(status, `Unknown operation: ${operation}`, status.i);
@@ -167,6 +176,7 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 	// * for into a for group
 	// * switch into a switch group (cases will have the correct parent)
 	// * await/then/catch into an await group
+	// * replace into a replace group
 	if (node.operation === "@if") {
 		const ifGroup: ControlNode = {
 			type: "control",
@@ -219,6 +229,14 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 				break;
 			}
 		}
+	} else if (node.operation === "@replace") {
+		const replaceGroup: ControlNode = {
+			type: "control",
+			operation: "@replace group",
+			statement: "",
+			children: [node],
+		};
+		parentNode.children.push(replaceGroup);
 	} else {
 		parentNode.children.push(node);
 	}

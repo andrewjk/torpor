@@ -4,6 +4,7 @@ import type BuildServerStatus from "./BuildServerStatus";
 import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerIfNode from "./buildServerIfNode";
+import buildServerReplaceNode from "./buildServerReplaceNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
 
@@ -48,6 +49,14 @@ export default function buildServerControlNode(
 		case "@then":
 		case "@catch": {
 			// These get handled with @await group, above
+			break;
+		}
+		case "@replace group": {
+			buildServerReplaceNode(node, status, b);
+			break;
+		}
+		case "@replace": {
+			// This gets handled with @replace group, above
 			break;
 		}
 		case "@const": {

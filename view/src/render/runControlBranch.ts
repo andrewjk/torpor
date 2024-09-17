@@ -5,7 +5,7 @@ import pushRangeToParent from "./pushRangeToParent";
 
 export default function runControlBranch(range: Range, index: number, create: () => void) {
 	// Only run the branch if it's not the current branch
-	if (range.index === index) {
+	if (index >= 0 && range.index === index) {
 		return;
 	}
 

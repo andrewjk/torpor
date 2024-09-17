@@ -10,7 +10,7 @@ Yet another JavaScript framework, designed for simplicity.
 - Component templates with script, markup and styles
   - And optional documentation and child components
 - Use plain JS/TS for markup logic with @if, @for, @switch and @await keywords
-  - And @const, @console, @debugger and @function
+  - And @replace, @const, @console, @debugger and @function
 - Runtime reactivity via proxies that can be used in any JS/TS file
 - Two-way binding, scoped styles, child templates and more -- see [tera/view](./view)
 - An accessible, unstyled component library -- see [tera/ui](./ui)
