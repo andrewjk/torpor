@@ -1,6 +1,6 @@
-import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
+import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";

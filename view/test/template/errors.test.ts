@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import parse from "../../src/parse";
+import parse from "../../src/compile/parse";
 import { trimParsed } from "../helpers";
 
 test("multiple top-level elements", () => {

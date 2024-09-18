@@ -1,4 +1,4 @@
-import $run from "../$run";
+import $run from "../render/$run";
 import context from "./context";
 
 export default function flushMountEffects() {

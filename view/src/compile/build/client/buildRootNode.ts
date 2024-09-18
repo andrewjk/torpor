@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type RootNode from "../../types/nodes/RootNode";
+import Builder from "../../utils/Builder";
 import BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";

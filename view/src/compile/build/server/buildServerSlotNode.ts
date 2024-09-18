@@ -1,7 +1,11 @@
-import Builder from "../../Builder";
-import { ANCHOR_COMMENT, HYDRATION_END_COMMENT, HYDRATION_START_COMMENT } from "../../comments";
+import {
+	ANCHOR_COMMENT,
+	HYDRATION_END_COMMENT,
+	HYDRATION_START_COMMENT,
+} from "../../types/comments";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
+import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import BuildServerStatus from "./BuildServerStatus";

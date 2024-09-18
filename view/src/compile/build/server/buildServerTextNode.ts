@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type TextNode from "../../types/nodes/TextNode";
+import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import BuildServerStatus from "./BuildServerStatus";
 

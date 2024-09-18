@@ -36,9 +36,9 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		if (parsed.ok && parsed.template) {
 			// Transform for server or client
 			if (options?.server) {
-				return transformForServer(name, parsed.template, id);
+				return transformForServer(name, parsed.template, id, options);
 			} else {
-				return transform(name, parsed.template, id);
+				return transform(name, parsed.template, id, options);
 			}
 		} else {
 			console.log("\nERRORS\n======");
@@ -60,8 +60,8 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 });
 
-function transform(name: string, template: ComponentTemplate, id: string) {
-	const built = build(name, template);
+function transform(name: string, template: ComponentTemplate, id: string, options?: Options) {
+	const built = build(name, template, options);
 	let transformed = built.code;
 
 	// HACK: Replace import paths from any depth with absolute paths
@@ -84,8 +84,13 @@ function transform(name: string, template: ComponentTemplate, id: string) {
 	});
 }
 
-function transformForServer(name: string, template: ComponentTemplate, id: string) {
-	const built = build(name, template, { server: true });
+function transformForServer(
+	name: string,
+	template: ComponentTemplate,
+	id: string,
+	options?: Options,
+) {
+	const built = build(name, template, options);
 	let transformed = built.code;
 
 	// HACK: Replace import paths from any depth with absolute paths

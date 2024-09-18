@@ -24,7 +24,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import $watch from "../$watch";
+import $watch from "../render/$watch";
 import type ListItem from "../types/ListItem";
 import type Range from "../types/Range";
 import clearRange from "./clearRange";

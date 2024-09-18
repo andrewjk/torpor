@@ -1,6 +1,6 @@
-import context from "./render/context";
-import type Cleanup from "./types/Cleanup";
-import type Effect from "./types/Effect";
+import type Cleanup from "../types/Cleanup";
+import type Effect from "../types/Effect";
+import context from "./context";
 
 // TODO: Take a pipeline of operators e.g. debounce
 

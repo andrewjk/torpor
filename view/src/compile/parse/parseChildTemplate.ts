@@ -1,4 +1,4 @@
-import parse from "../../parse";
+import parse from "../parse";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import isElementNode from "../types/nodes/isElementNode";
 import isParentNode from "../types/nodes/isParentNode";

@@ -1,7 +1,7 @@
+import type BuildOptions from "../../../types/BuildOptions";
 import type ComponentTemplate from "../../../types/ComponentTemplate";
-import Builder from "../../Builder";
+import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
-import buildConfig from "./buildConfig";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
@@ -36,7 +36,11 @@ const importsMap: Record<string, string> = {
 	t_cmt: "import { t_cmt } from '${folder}';",
 };
 
-export default function buildCode(name: string, template: ComponentTemplate): string {
+export default function buildCode(
+	name: string,
+	template: ComponentTemplate,
+	options?: BuildOptions,
+): string {
 	let b = new Builder();
 
 	// Gather imports as we go so they can be placed at the top
@@ -55,7 +59,7 @@ export default function buildCode(name: string, template: ComponentTemplate): st
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
 			imp = importsMap[imp] || imp;
-			b.prepend(imp.replace("${folder}", buildConfig.folder));
+			b.prepend(imp.replace("${folder}", options?.renderFolder || "@tera/view"));
 		}
 	}
 

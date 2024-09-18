@@ -1,6 +1,6 @@
-import context from "./render/context";
-import type Component from "./types/Component";
-import type SlotRender from "./types/SlotRender";
+import type Component from "../types/Component";
+import type SlotRender from "../types/SlotRender";
+import context from "./context";
 
 /**
  * Hydrates a component into an existing HTML document

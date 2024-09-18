@@ -1,3 +1,4 @@
+import type BuildOptions from "../../../types/BuildOptions";
 import type Fragment from "../../types/nodes/Fragment";
 
 export default interface BuildStatus {
@@ -10,4 +11,5 @@ export default interface BuildStatus {
 		path: string;
 	}[];
 	forVarNames: string[];
+	options?: BuildOptions;
 }

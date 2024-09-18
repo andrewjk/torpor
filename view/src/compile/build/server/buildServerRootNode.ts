@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type RootNode from "../../types/nodes/RootNode";
+import Builder from "../../utils/Builder";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 

@@ -1,4 +1,4 @@
-import $watch from "../$watch";
+import $watch from "../render/$watch";
 import context from "../render/context";
 import type ProxyData from "../types/ProxyData";
 import { proxyDataSymbol } from "./symbols";

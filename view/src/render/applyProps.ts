@@ -1,4 +1,4 @@
-import $run from "../$run";
+import $run from "../render/$run";
 
 export default function applyProps(
 	el: Element,

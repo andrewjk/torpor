@@ -1,4 +1,4 @@
-import $run from "../$run";
+import $run from "../render/$run";
 import type Range from "../types/Range";
 import context from "./context";
 import popRange from "./popRange";

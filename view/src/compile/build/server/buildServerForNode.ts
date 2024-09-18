@@ -1,12 +1,12 @@
-import Builder from "../../Builder";
 import {
 	ANCHOR_COMMENT,
 	HYDRATION_BRANCH_COMMENT,
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
-} from "../../comments";
+} from "../../types/comments";
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
+import Builder from "../../utils/Builder";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 

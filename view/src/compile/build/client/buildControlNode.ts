@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
+import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";

@@ -3,8 +3,8 @@ import { hydrate } from "@tera/view";
 import fs from "fs";
 import path from "path";
 import { expect } from "vitest";
-import build from "../src/build";
-import parse from "../src/parse";
+import build from "../src/compile/build";
+import parse from "../src/compile/parse";
 import type Component from "../src/types/Component";
 
 const debugPrint = false;

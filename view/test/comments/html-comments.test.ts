@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
+import parse from "../../src/compile/parse";
 import type ParseResult from "../../src/compile/types/ParseResult";
-import parse from "../../src/parse";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("html comments", () => {

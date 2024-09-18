@@ -1,4 +1,4 @@
-import type Component from "./types/Component";
+import type Component from "../types/Component";
 
 /**
  * Mounts a component into a DOM node

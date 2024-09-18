@@ -1,5 +1,5 @@
-import context from "./render/context";
-import type Component from "./types/Component";
+import type Component from "../types/Component";
+import context from "./context";
 
 /**
  * Hydrates a component into an existing DOM tree

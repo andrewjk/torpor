@@ -1,5 +1,5 @@
-import context from "./render/context";
-import type Cleanup from "./types/Cleanup";
+import type Cleanup from "../types/Cleanup";
+import context from "./context";
 
 /**
  * Runs and re-runs a function on component mount

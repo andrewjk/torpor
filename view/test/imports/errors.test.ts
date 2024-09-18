@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import parse from "../../src/parse";
+import parse from "../../src/compile/parse";
 
 // TODO:
 

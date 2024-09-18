@@ -1,20 +1,23 @@
+import type BuildOptions from "../../../types/BuildOptions";
 import type ComponentTemplate from "../../../types/ComponentTemplate";
-import Builder from "../../Builder";
-import buildConfig from "../client/buildConfig";
+import Builder from "../../utils/Builder";
 import buildServerNode from "./buildServerNode";
 
-export default function buildServerCode(name: string, template: ComponentTemplate): string {
+export default function buildServerCode(
+	name: string,
+	template: ComponentTemplate,
+	options?: BuildOptions,
+): string {
 	let b = new Builder();
 
 	// Gather imports as we go so they can be placed at the top
-	// TODO: Only components?
 	let imports = new Set<string>();
 
 	// Build the component and any child components
-	buildServerTemplate(name, template, imports, b);
+	buildServerTemplate(name, template, imports, b, options);
 	if (template.childComponents) {
 		for (let child of template.childComponents) {
-			buildServerTemplate(child.name || "ChildComponent", child, imports, b);
+			buildServerTemplate(child.name || "ChildComponent", child, imports, b, options);
 		}
 	}
 
@@ -22,7 +25,7 @@ export default function buildServerCode(name: string, template: ComponentTemplat
 	if (imports.size) {
 		b.prepend("");
 		for (let imp of Array.from(imports).reverse()) {
-			b.prepend(imp.replace("${folder}", buildConfig.folder));
+			b.prepend(imp.replace("${folder}", options?.renderFolder || "@tera/view"));
 		}
 	}
 
@@ -37,6 +40,7 @@ function buildServerTemplate(
 	template: ComponentTemplate,
 	imports: Set<string>,
 	b: Builder,
+	options?: BuildOptions,
 ) {
 	if (template.imports) {
 		// TODO: Should probably consolidate imports e.g. when we've split them up
@@ -90,6 +94,7 @@ function buildServerTemplate(
 			output: "",
 			styleHash: template.styleHash || "",
 			varNames: {},
+			options,
 		};
 
 		// HACK: Stub the format function to run on the server

@@ -1,8 +1,8 @@
-import type ProxyData from "./types/ProxyData";
-import type WatchOptions from "./types/WatchOptions";
-import proxyGet from "./watch/proxyGet";
-import proxySet from "./watch/proxySet";
-import { proxyDataSymbol } from "./watch/symbols";
+import type ProxyData from "../types/ProxyData";
+import type WatchOptions from "../types/WatchOptions";
+import proxyGet from "../watch/proxyGet";
+import proxySet from "../watch/proxySet";
+import { proxyDataSymbol } from "../watch/symbols";
 
 /**
  * Watches an object and runs effects when its properties are changed

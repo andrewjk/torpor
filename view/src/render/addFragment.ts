@@ -1,5 +1,5 @@
-import $run from "../$run";
 import animate from "../motion/animate";
+import $run from "../render/$run";
 import context from "./context";
 
 export default function addFragment(

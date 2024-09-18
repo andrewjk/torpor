@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
+import parse from "../../src/compile/parse";
 import type ParseResult from "../../src/compile/types/ParseResult";
-import parse from "../../src/parse";
 import { trimParsed } from "../helpers";
 
 test("multiple imports", () => {

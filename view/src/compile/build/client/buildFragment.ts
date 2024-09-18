@@ -1,4 +1,3 @@
-import Builder from "../../Builder";
 import isSpace from "../../parse/utils/isSpace";
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
@@ -9,12 +8,12 @@ import type TextNode from "../../types/nodes/TextNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import isElementNode from "../../types/nodes/isElementNode";
 import isTextNode from "../../types/nodes/isTextNode";
+import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import isReactive from "../utils/isReactive";
 import isReactiveAttribute from "../utils/isReactiveAttribute";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
-import buildConfig from "./buildConfig";
 import buildNode from "./buildNode";
 
 interface VariablePath {
@@ -36,7 +35,7 @@ export default function buildFragment(
 	if (node.fragment) {
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;
-		if (buildConfig.fragmentsUseCreateElement) {
+		if (status.options?.useCreateElement) {
 			// Declarations, then createXxx calls
 			let fragmentPath = { parent: null, type: "fragment", children: [] };
 			let varPaths = new Map<string, string>();
@@ -360,7 +359,7 @@ function declareElementFragmentVars(
 				fragment.endVarName = node.varName;
 			}
 			const varPath = getFragmentVarPath(fragment, status, node.varName, elementPath, varPaths);
-			if (buildConfig.fragmentsUseCreateElement) {
+			if (status.options?.useCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
 				if (node.tagName === ":element") {
@@ -466,7 +465,7 @@ function declareTextFragmentVars(
 				fragment.endVarName = node.varName;
 			}
 			const varPath = getFragmentVarPath(fragment, status, node.varName, textPath, varPaths);
-			if (buildConfig.fragmentsUseCreateElement) {
+			if (status.options?.useCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
 				b.append(`const ${node.varName} = ${varPath};`);
@@ -598,7 +597,7 @@ function declareParentAndAnchorFragmentVars(
 		} else {
 			if (declare) {
 				node.parentName = nextVarName(`${name}_parent`, status);
-				if (buildConfig.fragmentsUseCreateElement) {
+				if (status.options?.useCreateElement) {
 					b.append(`let ${node.parentName};`);
 				} else {
 					b.append(`const ${node.parentName} = ${parentVarPath};`);
@@ -617,7 +616,7 @@ function declareParentAndAnchorFragmentVars(
 
 		node.varName = nextVarName(`${name}_anchor`, status);
 		const varPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
-		if (buildConfig.fragmentsUseCreateElement) {
+		if (status.options?.useCreateElement) {
 			b.append(`let ${node.varName};`);
 		} else {
 			status.imports.add("t_anchor");

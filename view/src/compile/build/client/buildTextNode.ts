@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type TextNode from "../../types/nodes/TextNode";
+import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import buildRun from "./buildRun";
 

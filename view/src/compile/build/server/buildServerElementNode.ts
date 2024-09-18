@@ -1,5 +1,5 @@
-import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
+import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import BuildServerStatus from "./BuildServerStatus";

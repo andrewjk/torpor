@@ -1,7 +1,7 @@
-import Builder from "../../Builder";
 import type ControlNode from "../../types/nodes/ControlNode";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type RootNode from "../../types/nodes/RootNode";
+import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 
 export default function buildAddFragment(

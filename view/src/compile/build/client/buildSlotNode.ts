@@ -1,6 +1,6 @@
-import Builder from "../../Builder";
 import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
+import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
