@@ -1,4 +1,4 @@
-import Fragment from "../../types/nodes/Fragment";
+import type Fragment from "../../types/nodes/Fragment";
 
 export default interface BuildStatus {
 	imports: Set<string>;

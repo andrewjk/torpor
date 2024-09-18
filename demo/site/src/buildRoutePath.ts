@@ -1,4 +1,4 @@
-import { ParamsType } from "./types/ParamsType";
+import type ParamsType from "./types/ParamsType";
 
 export default function buildRoutePath<RP extends ParamsType, UP extends ParamsType>(
 	path: string,

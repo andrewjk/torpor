@@ -1,4 +1,4 @@
-import { ParamsType } from "./ParamsType";
+import type ParamsType from "./ParamsType";
 
 export default interface EndPointRequest<RP extends ParamsType, UP extends ParamsType> {
 	routeParams?: RP;

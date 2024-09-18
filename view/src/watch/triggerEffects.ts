@@ -1,4 +1,4 @@
-import ProxyData from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 
 export default function triggerEffects(data: ProxyData, key: PropertyKey) {
 	// Get the effects for the supplied property

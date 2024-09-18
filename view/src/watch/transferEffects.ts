@@ -1,5 +1,5 @@
 import $watch from "../$watch";
-import ProxyData from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 import { proxyDataSymbol } from "./symbols";
 
 /**

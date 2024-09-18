@@ -1,6 +1,6 @@
-import Component from "./Component";
-import EndPointRequest from "./EndPointRequest";
-import { ParamsType } from "./ParamsType";
+import type Component from "./Component";
+import type EndPointRequest from "./EndPointRequest";
+import type ParamsType from "./ParamsType";
 
 export default interface EndPoint<RP extends ParamsType = {}, UP extends ParamsType = {}> {
 	route?: (...args: any[]) => string;

@@ -1,6 +1,5 @@
 import context from "../render/context";
-import Effect from "../types/Effect";
-import ProxyData from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 
 export default function trackEffect(data: ProxyData, key: PropertyKey) {
 	//console.log(`tracking effect for '${String(prop)}' with value '${target[prop]}'`);

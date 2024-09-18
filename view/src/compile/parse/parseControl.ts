@@ -1,5 +1,5 @@
 import type ControlNode from "../types/nodes/ControlNode";
-import ElementNode from "../types/nodes/ElementNode";
+import type ElementNode from "../types/nodes/ElementNode";
 import type OperationType from "../types/nodes/OperationType";
 import isControlNode from "../types/nodes/isControlNode";
 import trimMatched from "../utils/trimMatched";

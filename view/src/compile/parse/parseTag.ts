@@ -1,6 +1,6 @@
-import Attribute from "../types/nodes/Attribute";
-import ElementNode from "../types/nodes/ElementNode";
-import ParseStatus from "./ParseStatus";
+import type Attribute from "../types/nodes/Attribute";
+import type ElementNode from "../types/nodes/ElementNode";
+import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import accept from "./utils/accept";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";

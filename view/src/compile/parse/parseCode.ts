@@ -1,4 +1,4 @@
-import ParseResult from "../types/ParseResult";
+import type ParseResult from "../types/ParseResult";
 import isSpaceNode from "../types/nodes/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
 import ParseStatus from "./ParseStatus";
