@@ -1,5 +1,5 @@
+import { $watch } from "@tera/view";
 import { expect, test } from "vitest";
-import $watch from "../../src/$watch";
 
 test("watching an undefined object", () => {
 	const input = undefined;

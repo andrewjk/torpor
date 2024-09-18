@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import ParseResult from "../../src/compile/types/ParseResult";
+import type ParseResult from "../../src/compile/types/ParseResult";
 import parse from "../../src/parse";
 import { el, root, trimParsed } from "../helpers";
 

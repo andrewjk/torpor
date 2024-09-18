@@ -1,6 +1,6 @@
+import { $watch } from "@tera/view";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import $watch from "../../src/$watch";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import type ArrayState from "./ArrayState";

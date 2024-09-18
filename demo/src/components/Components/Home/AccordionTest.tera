@@ -5,7 +5,7 @@
         AccordionHeader,
         AccordionTrigger,
         AccordionContent 
-    } from '../../../../ui/src/Accordion';
+    } from '@tera/ui/Accordion';
 
     let $state = $watch({
         value: "1",

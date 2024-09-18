@@ -1,6 +1,6 @@
 import Demo from "@/components/Components/Home/Demo.tera";
 import buildRoutePath from "../../../site/src/buildRoutePath";
-import EndPoint from "../../../site/src/types/EndPoint";
+import type EndPoint from "../../../site/src/types/EndPoint";
 
 // TODO: Could be generated
 interface RouteParams {

@@ -1,11 +1,7 @@
-import fs from "fs";
-import path from "path";
+import { type ComponentTemplate, build, parse } from "@tera/view/compile";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
-import build from "../../view/src/build";
-import parse from "../../view/src/parse";
-import ComponentTemplate from "../../view/src/types/ComponentTemplate";
 import type { Options } from "./types";
 
 const styles = new Map<string, string>();
@@ -69,7 +65,7 @@ function transform(name: string, template: ComponentTemplate, id: string) {
 	let transformed = built.code;
 
 	// HACK: Replace import paths from any depth with absolute paths
-	transformed = normalizeImportPaths(transformed, id);
+	//transformed = normalizeImportPaths(transformed, id);
 
 	if (built.styles && built.styleHash) {
 		// Add a dynamic import for the component's CSS with a name from
@@ -93,7 +89,7 @@ function transformForServer(name: string, template: ComponentTemplate, id: strin
 	let transformed = built.code;
 
 	// HACK: Replace import paths from any depth with absolute paths
-	transformed = normalizeImportPaths(transformed, id);
+	//transformed = normalizeImportPaths(transformed, id);
 
 	// TODO: What to do with styles
 	if (built.styles && built.styleHash) {
@@ -113,6 +109,7 @@ function transformForServer(name: string, template: ComponentTemplate, id: strin
 	});
 }
 
+/*
 function normalizeImportPaths(transformed: string, id: string): string {
 	// HACK: Replace import paths from any depth with absolute paths
 	if (transformed.includes("../../../tera")) {
@@ -127,6 +124,7 @@ function normalizeImportPaths(transformed: string, id: string): string {
 	}
 	return transformed;
 }
+*/
 
 function printTransformed(transformed: string) {
 	console.log(

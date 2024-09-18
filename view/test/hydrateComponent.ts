@@ -1,8 +1,9 @@
+// Hydrate needs to come from the same source as component compilation
+import { hydrate } from "@tera/view";
 import fs from "fs";
 import path from "path";
 import { expect } from "vitest";
 import build from "../src/build";
-import hydrate from "../src/hydrate";
 import parse from "../src/parse";
 import type Component from "../src/types/Component";
 

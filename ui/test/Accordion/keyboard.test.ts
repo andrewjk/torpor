@@ -1,8 +1,8 @@
+import { mount } from "@tera/view";
 import { fireEvent, getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import mount from "../../../view/src/mount";
 import AccordionKeyboard from "./components/AccordionKeyboard.tera";
 
 describe("Accordion", () => {

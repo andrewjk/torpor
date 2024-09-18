@@ -1,7 +1,5 @@
 <script>
     import Nav from "../../Nav.tera";
-    
-    import Header from "./Header.tera";
  
     // TODO: Test with async
     let number = 0;
@@ -33,6 +31,7 @@
     })
 
     function increment() {
+        console.log("hi")
         $state.count += 1;
         console.log($state.count);
     }
@@ -85,9 +84,6 @@
         <p>I said whoa there!!</p>
         <p>BUDDY</p>
     }
-
-    <Header name="Bob"/>
-    <SlottedHeader />
 
     @// FOR ===
     <p>

@@ -1,13 +1,4 @@
 {
-	"compilerOptions": {
-		"target": "es2022",
-		"lib": ["es2022", "DOM"],
-		"module": "es2022",
-		"moduleResolution": "node",
-		"resolveJsonModule": true,
-		"strict": true,
-		"strictNullChecks": true,
-		"esModuleInterop": true
-	},
-	"exclude": ["dist", "eslint.config.js"]
+	"extends": "../tsconfig",
+	"exclude": ["dist"]
 }

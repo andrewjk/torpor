@@ -1,7 +1,7 @@
+import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import $watch from "../../src/$watch";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
 import Component from "./components/Self.tera";

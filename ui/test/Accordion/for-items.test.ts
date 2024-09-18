@@ -1,9 +1,8 @@
+import { $watch, mount } from "@tera/view";
 import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import $watch from "../../../view/src/$watch";
-import mount from "../../../view/src/mount";
 import AccordionList from "./components/AccordionList.tera";
 
 describe("Accordion", () => {

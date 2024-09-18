@@ -1,9 +1,8 @@
+import { hydrate, mount } from "@tera/view";
 import "vinxi/client";
-import hydrate from "../../../view/src/hydrate";
-import mount from "../../../view/src/mount";
-import Component from "../../../view/src/types/Component";
+import type Component from "../../../view/src/types/Component";
 import routeHandlers from "./routeHandlers";
-import EndPoint from "./types/EndPoint";
+import type EndPoint from "./types/EndPoint";
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {

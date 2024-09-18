@@ -3,14 +3,34 @@
 	"version": "0.0.1",
 	"description": "Accessible, unstyled components for use in your Tera front-end",
 	"type": "module",
-	"main": "index.js",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		"./Accordion": {
+			"types": "./dist/Accordion.d.ts",
+			"import": "./dist/Accordion.js",
+			"require": "./dist/Accordion.cjs"
+		},
+		"./motion": {
+			"types": "./dist/motion.d.ts",
+			"import": "./dist/motion.js",
+			"require": "./dist/motion.cjs"
+		}
+	},
 	"private": true,
 	"scripts": {
-		"test": "vitest"
+		"build": "tsup",
+		"build:fix": "esno scripts/postbuild.ts",
+		"test": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && vitest"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"dependencies": {
+		"@tera/unplugin": "workspace:^",
+		"@tera/view": "workspace:^"
+	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/jest-dom": "^6.5.0",
@@ -18,6 +38,9 @@
 		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
 		"@types/jsdom": "^21.1.7",
 		"@types/node": "^22.5.2",
+		"chalk": "^5.3.0",
+		"esno": "^4.7.0",
+		"fast-glob": "^3.3.2",
 		"jsdom": "^25.0.0",
 		"tsup": "^8.2.4",
 		"typescript": "^5.5.4",

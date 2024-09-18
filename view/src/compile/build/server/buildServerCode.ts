@@ -1,6 +1,6 @@
 import type ComponentTemplate from "../../../types/ComponentTemplate";
 import Builder from "../../Builder";
-import buildConfig from "../../build/client/buildConfig";
+import buildConfig from "../client/buildConfig";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerCode(name: string, template: ComponentTemplate): string {

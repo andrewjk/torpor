@@ -1,8 +1,8 @@
+import { mount } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import mount from "../../../view/src/mount";
 import AccordionAccessibility from "./components/AccordionAccessibility.tera";
 
 describe("Accordion", () => {

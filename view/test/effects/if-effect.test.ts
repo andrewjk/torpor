@@ -1,8 +1,8 @@
+import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
-import $watch from "../../src/$watch";
-import ProxyData from "../../src/types/ProxyData";
+import type ProxyData from "../../src/types/ProxyData";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";

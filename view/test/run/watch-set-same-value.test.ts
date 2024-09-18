@@ -1,6 +1,5 @@
+import { $run, $watch } from "@tera/view";
 import { expect, test } from "vitest";
-import $run from "../../src/$run";
-import $watch from "../../src/$watch";
 
 test("setting the same value doesn't call effect again", () => {
 	const person = $watch({

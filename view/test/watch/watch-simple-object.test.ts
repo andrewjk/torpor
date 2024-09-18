@@ -1,5 +1,5 @@
+import { $watch } from "@tera/view";
 import { expect, test } from "vitest";
-import $watch from "../../src/$watch";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 
 test("watching a simple object", () => {
