@@ -10,7 +10,7 @@ const Switch = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		switch ($props.value) {
 			case 1: {

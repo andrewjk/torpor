@@ -10,7 +10,7 @@ const Unused = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 
 		$output += Header.render(undefined, $context)
 		return $output;

@@ -11,7 +11,7 @@ const Function = {
 		let $state = $watch({ counter: 0 })
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <button id="increment">Increment</button> `;
 
 		function increment() {

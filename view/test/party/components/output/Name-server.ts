@@ -13,7 +13,7 @@ const Name = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<h1>Hello ${t_fmt($state.name)}</h1>`;
 		return $output;
 	}

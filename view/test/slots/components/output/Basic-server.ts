@@ -10,7 +10,7 @@ const Basic = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		const t_slots_1 = {};
 		t_slots_1["_"] = ($sprops, $context) => {
 			let $output = "";

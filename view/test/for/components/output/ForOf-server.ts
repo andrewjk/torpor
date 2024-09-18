@@ -10,7 +10,7 @@ const ForOf = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<section> <![>`;
 		for (let item of $props.items) {
 			$output += `<!^> <p> ${t_fmt(item)} </p> `;

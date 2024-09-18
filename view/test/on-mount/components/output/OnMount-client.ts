@@ -1,8 +1,8 @@
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_apply_props from '../../../../../tera/view/src/render/applyProps';
-import $run from '../../../../../tera/view/src/$run';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { $run } from '@tera/view';
+import { t_add_fragment } from '@tera/view';
+import { t_apply_props } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const OnMount = {
 	name: "OnMount",

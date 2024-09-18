@@ -1,18 +1,18 @@
-import $watch from '../../../../../tera/view/src/$watch';
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_child from '../../../../../tera/view/src/render/nodeChild';
-import t_next from '../../../../../tera/view/src/render/nodeNext';
-import t_anchor from '../../../../../tera/view/src/render/findAnchor';
-import t_run_control from '../../../../../tera/view/src/render/runControl';
-import t_run_branch from '../../../../../tera/view/src/render/runControlBranch';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
-import t_push_range from '../../../../../tera/view/src/render/pushRange';
-import t_pop_range from '../../../../../tera/view/src/render/popRange';
-import t_fmt from '../../../../../tera/view/src/render/formatText';
-import $run from '../../../../../tera/view/src/$run';
-import t_apply_props from '../../../../../tera/view/src/render/applyProps';
-import t_event from '../../../../../tera/view/src/render/addEvent';
+import { $run } from '@tera/view';
+import { $watch } from '@tera/view';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_apply_props } from '@tera/view';
+import { t_child } from '@tera/view';
+import { t_event } from '@tera/view';
+import { t_fmt } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_next } from '@tera/view';
+import { t_pop_range } from '@tera/view';
+import { t_push_range } from '@tera/view';
+import { t_root } from '@tera/view';
+import { t_run_branch } from '@tera/view';
+import { t_run_control } from '@tera/view';
 
 const Await = {
 	name: "Await",

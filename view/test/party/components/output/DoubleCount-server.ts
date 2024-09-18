@@ -16,7 +16,7 @@ const DoubleCount = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div>${t_fmt($state.doubleCount)}</div>`;
 		return $output;
 	}

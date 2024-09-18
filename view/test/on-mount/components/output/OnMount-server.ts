@@ -8,7 +8,7 @@ const OnMount = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<input/>`;
 		return $output;
 	}

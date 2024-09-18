@@ -5,35 +5,35 @@ import buildConfig from "./buildConfig";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
+// We were dynamically creating imports, which might still be useful for creating standalone components
 const importsMap: Record<string, string> = {
 	$watch: "import { $watch } from '${folder}';",
 	$unwrap: "import { $unwrap } from '${folder}';",
 	$run: "import { $run } from '${folder}';",
 	$mount: "import { $mount } from '${folder}';",
-	t_flush: "import { flushMountEffects as t_flush } from '${folder}';",
-	t_push_range_to_parent:
-		"import { pushRangeToParent as t_push_range_to_parent } from '${folder}';",
-	t_push_range: "import { pushRange as t_push_range } from '${folder}';",
-	t_pop_range: "import { popRange as t_pop_range } from '${folder}';",
-	t_run_control: "import { runControl as t_run_control } from '${folder}';",
-	t_run_branch: "import { runControlBranch as t_run_branch } from '${folder}';",
-	t_run_list: "import { runList as t_run_list } from '${folder}';",
-	t_add_fragment: "import { addFragment as t_add_fragment } from '${folder}';",
-	t_apply_props: "import { applyProps as t_apply_props } from '${folder}';",
-	t_attribute: "import { setAttribute as t_attribute } from '${folder}';",
-	t_dynamic: "import { setDynamicElement as t_dynamic } from '${folder}';",
-	t_fmt: "import { formatText as t_fmt } from '${folder}';",
-	t_fragment: "import { getFragment as t_fragment } from '${folder}';",
-	t_event: "import { addEvent as t_event } from '${folder}';",
-	t_animate: "import { addAnimation as t_animate } from '${folder}';",
-	t_root: "import { nodeRoot as t_root } from '${folder}';",
-	t_anchor: "import { nodeAnchor as t_anchor } from '${folder}';",
-	t_child: "import { nodeChild as t_child } from '${folder}';",
-	t_next: "import { nodeNext as t_next } from '${folder}';",
-	t_frg: "import { createFragment as t_frg } from '${folder}';",
-	t_elm: "import { createElement as t_elm } from '${folder}';",
-	t_txt: "import { createText as t_txt } from '${folder}';",
-	t_cmt: "import { createComment as t_cmt } from '${folder}';",
+	t_flush: "import { t_flush } from '${folder}';",
+	t_push_range_to_parent: "import { t_push_range_to_parent } from '${folder}';",
+	t_push_range: "import { t_push_range } from '${folder}';",
+	t_pop_range: "import { t_pop_range } from '${folder}';",
+	t_run_control: "import { t_run_control } from '${folder}';",
+	t_run_branch: "import { t_run_branch } from '${folder}';",
+	t_run_list: "import { t_run_list } from '${folder}';",
+	t_add_fragment: "import { t_add_fragment } from '${folder}';",
+	t_apply_props: "import { t_apply_props } from '${folder}';",
+	t_attribute: "import { t_attribute } from '${folder}';",
+	t_dynamic: "import { t_dynamic } from '${folder}';",
+	t_fmt: "import { t_fmt } from '${folder}';",
+	t_fragment: "import { t_fragment } from '${folder}';",
+	t_event: "import { t_event } from '${folder}';",
+	t_animate: "import { t_animate } from '${folder}';",
+	t_root: "import { t_root } from '${folder}';",
+	t_anchor: "import { t_anchor } from '${folder}';",
+	t_child: "import { t_child } from '${folder}';",
+	t_next: "import { t_next } from '${folder}';",
+	t_frg: "import { t_frg } from '${folder}';",
+	t_elm: "import { t_elm } from '${folder}';",
+	t_txt: "import { t_txt } from '${folder}';",
+	t_cmt: "import { t_cmt } from '${folder}';",
 };
 
 export default function buildCode(name: string, template: ComponentTemplate): string {
@@ -53,7 +53,7 @@ export default function buildCode(name: string, template: ComponentTemplate): st
 	// Add the gathered imports
 	if (imports.size) {
 		b.prepend("");
-		for (let imp of Array.from(imports).reverse()) {
+		for (let imp of Array.from(imports).sort().reverse()) {
 			imp = importsMap[imp] || imp;
 			b.prepend(imp.replace("${folder}", buildConfig.folder));
 		}

@@ -10,7 +10,7 @@ const List = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<ul> <![>`;
 		for (let item of $props.items) {
 			$output += `<!^> <li> <![>`;

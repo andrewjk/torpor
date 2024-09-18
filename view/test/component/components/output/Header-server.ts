@@ -10,7 +10,7 @@ const Header = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<h2>Hi, ${t_fmt($props.name)}</h2>`;
 		return $output;
 	}

@@ -8,7 +8,7 @@ const Article = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<section> <h2> <![>`;
 		if ($slots && $slots["header"]) {
 			$output += $slots["header"](undefined, $context);

@@ -21,7 +21,7 @@ const TrafficLight = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 		if ($state.light === "red") {
 			$output += ` <span>STOP</span> `;

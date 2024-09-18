@@ -1,11 +1,11 @@
+import { $run } from '@tera/view';
+import { $watch } from '@tera/view';
 import List from './List.tera';
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_anchor from '../../../../../tera/view/src/render/findAnchor';
-import $watch from '../../../../../tera/view/src/$watch';
-import $run from '../../../../../tera/view/src/$run';
-import t_fmt from '../../../../../tera/view/src/render/formatText';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_fmt } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const Let = {
 	name: "Let",

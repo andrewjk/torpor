@@ -18,7 +18,7 @@ const Component = {
 		};
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<![>`;
 		components[$props.self];
 		const t_props_1 = {};

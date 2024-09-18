@@ -94,7 +94,7 @@ function buildServerTemplate(
 
 		// HACK: Stub the format function to run on the server
 		// TODO: Add this to imports instead
-		b.append('const t_fmt = (text) => text != null ? text : "";');
+		b.append('const t_fmt = (text) => (text != null ? text : "");');
 
 		// Add the interface
 		buildServerNode(template.markup, status, b);

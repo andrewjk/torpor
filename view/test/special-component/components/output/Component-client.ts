@@ -1,12 +1,12 @@
+import { $watch } from '@tera/view';
 import BigTitle from './BigTitle.tera';
 import SmallTitle from './SmallTitle.tera';
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_anchor from '../../../../../tera/view/src/render/findAnchor';
-import t_run_control from '../../../../../tera/view/src/render/runControl';
-import t_run_branch from '../../../../../tera/view/src/render/runControlBranch';
-import $watch from '../../../../../tera/view/src/$watch';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
+import { t_run_branch } from '@tera/view';
+import { t_run_control } from '@tera/view';
 
 const Component = {
 	name: "Component",

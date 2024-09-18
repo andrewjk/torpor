@@ -17,7 +17,7 @@ const PageTitle = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
 		return $output;
 	}

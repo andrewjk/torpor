@@ -1,9 +1,9 @@
+import { $watch } from '@tera/view';
 import Header from './Header.tera';
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_anchor from '../../../../../tera/view/src/render/findAnchor';
-import $watch from '../../../../../tera/view/src/$watch';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const Component = {
 	name: "Component",

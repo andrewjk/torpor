@@ -23,7 +23,7 @@ const UserProfileContextApp = {
 		$context.user = $user;
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
 
 		$output += UserProfileContext.render(undefined, $context)

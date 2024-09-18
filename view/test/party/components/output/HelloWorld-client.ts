@@ -1,7 +1,7 @@
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_apply_props from '../../../../../tera/view/src/render/applyProps';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { t_add_fragment } from '@tera/view';
+import { t_apply_props } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const HelloWorld = {
 	name: "HelloWorld",

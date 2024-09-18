@@ -17,7 +17,7 @@ const Counter = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> </div>`;
 		return $output;
 	}

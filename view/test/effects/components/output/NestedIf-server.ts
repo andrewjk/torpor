@@ -10,7 +10,7 @@ const NestedIf = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		if ($props.condition) {
 			$output += ` <![>`;

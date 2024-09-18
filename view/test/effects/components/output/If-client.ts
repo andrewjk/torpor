@@ -1,12 +1,12 @@
-import { getFragment as t_fragment } from '@tera/view';
-import { nodeRoot as t_root } from '@tera/view';
-import { nodeChild as t_child } from '@tera/view';
-import { nodeNext as t_next } from '@tera/view';
-import { nodeAnchor as t_anchor } from '@tera/view';
-import { runControl as t_run_control } from '@tera/view';
-import { runControlBranch as t_run_branch } from '@tera/view';
-import { addFragment as t_add_fragment } from '@tera/view';
-import { applyProps as t_apply_props } from '@tera/view';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_apply_props } from '@tera/view';
+import { t_child } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_next } from '@tera/view';
+import { t_root } from '@tera/view';
+import { t_run_branch } from '@tera/view';
+import { t_run_control } from '@tera/view';
 
 const If = {
 	name: "If",

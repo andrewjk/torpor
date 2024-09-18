@@ -12,7 +12,7 @@ const Replace = {
 		let counter = 0;
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		$props.name;
 		$output += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;

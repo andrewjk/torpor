@@ -26,7 +26,7 @@ const Await = {
 			}
 			let $output = "";
 			/* User interface */
-			const t_fmt = (text) => text != null ? text : "";
+			const t_fmt = (text) => (text != null ? text : "");
 			$output += `<div> <![>`;
 			$output += ` <p>Hmm...</p> `;
 			$output += `<!]><!> <button> Guess again </button> </div>`;

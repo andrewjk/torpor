@@ -1,9 +1,9 @@
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_apply_props from '../../../../../tera/view/src/render/applyProps';
-import t_attribute from '../../../../../tera/view/src/render/setAttribute';
-import $run from '../../../../../tera/view/src/$run';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { $run } from '@tera/view';
+import { t_add_fragment } from '@tera/view';
+import { t_apply_props } from '@tera/view';
+import { t_attribute } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const Attributes = {
 	name: "Attributes",

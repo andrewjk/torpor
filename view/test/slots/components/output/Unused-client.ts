@@ -1,8 +1,8 @@
 import Header from './Header.tera';
-import t_fragment from '../../../../../tera/view/src/render/getFragment';
-import t_root from '../../../../../tera/view/src/render/nodeRoot';
-import t_anchor from '../../../../../tera/view/src/render/findAnchor';
-import t_add_fragment from '../../../../../tera/view/src/render/addFragment';
+import { t_add_fragment } from '@tera/view';
+import { t_anchor } from '@tera/view';
+import { t_fragment } from '@tera/view';
+import { t_root } from '@tera/view';
 
 const Unused = {
 	name: "Unused",

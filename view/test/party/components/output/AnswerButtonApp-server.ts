@@ -23,7 +23,7 @@ const AnswerButtonApp = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <p>Are you happy?</p> `;
 		const t_props_1 = {};
 		t_props_1["onYes"] = onAnswerYes;

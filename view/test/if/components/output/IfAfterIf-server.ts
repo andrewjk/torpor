@@ -10,7 +10,7 @@ const IfAfterIf = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		if ($props.counter > 10) {
 			$output += ` <p> It's true! </p> `;

@@ -10,7 +10,7 @@ const Component = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		const t_props_1 = {};
 		t_props_1["name"] = "Amy";
 

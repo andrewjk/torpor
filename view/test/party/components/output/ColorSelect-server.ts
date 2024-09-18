@@ -20,7 +20,7 @@ const ColorSelect = {
 		];
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${$state.selectedColorId || ""}"> <![>`;
 		for (let color of colors) {
 			$output += `<!^> <option ${color.id ? `value="${color.id}"` : ''} ${color.isDisabled ? `disabled="${color.isDisabled}"` : ''}> ${t_fmt(color.text)} </option> `;

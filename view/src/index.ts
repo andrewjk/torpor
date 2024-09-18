@@ -4,50 +4,51 @@ import $unwrap from "./$unwrap";
 import $watch from "./$watch";
 import hydrate from "./hydrate";
 import mount from "./mount";
-import addAnimation from "./render/addAnimation";
-import addEvent from "./render/addEvent";
-import addFragment from "./render/addFragment";
-import applyProps from "./render/applyProps";
-import flushMountEffects from "./render/flushMountEffects";
-import formatText from "./render/formatText";
-import getFragment from "./render/getFragment";
-import nodeAnchor from "./render/nodeAnchor";
-import nodeChild from "./render/nodeChild";
-import nodeNext from "./render/nodeNext";
-import nodeRoot from "./render/nodeRoot";
-import popRange from "./render/popRange";
-import pushRange from "./render/pushRange";
-import pushRangeToParent from "./render/pushRangeToParent";
-import runControl from "./render/runControl";
-import runControlBranch from "./render/runControlBranch";
-import runList from "./render/runList";
-import setAttribute from "./render/setAttribute";
-import setDynamicElement from "./render/setDynamicElement";
+import t_animate from "./render/addAnimation";
+import t_event from "./render/addEvent";
+import t_add_fragment from "./render/addFragment";
+import t_apply_props from "./render/applyProps";
+import t_flush from "./render/flushMountEffects";
+import t_fmt from "./render/formatText";
+import t_fragment from "./render/getFragment";
+import t_anchor from "./render/nodeAnchor";
+import t_child from "./render/nodeChild";
+import t_next from "./render/nodeNext";
+import t_root from "./render/nodeRoot";
+import t_pop_range from "./render/popRange";
+import t_push_range from "./render/pushRange";
+import t_push_range_to_parent from "./render/pushRangeToParent";
+import t_run_control from "./render/runControl";
+import t_run_branch from "./render/runControlBranch";
+import t_run_list from "./render/runList";
+import t_attribute from "./render/setAttribute";
+import t_dynamic from "./render/setDynamicElement";
 
-// Functions for the user that will be called from components and when
-// mounting/hydrating
+// Mount and hydrate
+export { mount, hydrate };
 
-export { mount, hydrate, $watch, $unwrap, $run, $mount };
+// Functions for the user that can be called from components
+export { $watch, $unwrap, $run, $mount };
 
-// TODO: Need to hide these from the user somehow
+// Functions for use within generated code
 export {
-	addAnimation,
-	addEvent,
-	addFragment,
-	applyProps,
-	flushMountEffects,
-	formatText,
-	getFragment,
-	nodeAnchor,
-	nodeChild,
-	nodeNext,
-	nodeRoot,
-	popRange,
-	pushRange,
-	pushRangeToParent,
-	runControl,
-	runControlBranch,
-	runList,
-	setAttribute,
-	setDynamicElement,
+	t_animate,
+	t_event,
+	t_add_fragment,
+	t_apply_props,
+	t_flush,
+	t_fmt,
+	t_fragment,
+	t_anchor,
+	t_child,
+	t_next,
+	t_root,
+	t_pop_range,
+	t_push_range,
+	t_push_range_to_parent,
+	t_run_control,
+	t_run_branch,
+	t_run_list,
+	t_attribute,
+	t_dynamic,
 };

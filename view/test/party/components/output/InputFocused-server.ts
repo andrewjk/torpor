@@ -16,7 +16,7 @@ const InputFocused = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<input self="${inputElement || ""}"/>`;
 		return $output;
 	}

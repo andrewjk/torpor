@@ -10,7 +10,7 @@ const For = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		for (let item of $props.items) {
 			$output += `<!^> <p>${t_fmt(item.text)}</p> `;

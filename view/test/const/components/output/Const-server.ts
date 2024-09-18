@@ -8,7 +8,7 @@ const Const = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> `;
 		const name = "Boris";
 		$output += ` <p> Hello, ${t_fmt(name)}! </p> </div>`;

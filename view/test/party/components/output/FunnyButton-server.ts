@@ -8,7 +8,7 @@ const FunnyButton = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<button style="
 		background: rgba(0, 0, 0, 0.4);
 		color: #fff;

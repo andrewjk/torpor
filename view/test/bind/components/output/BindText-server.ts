@@ -11,7 +11,7 @@ const BindText = {
 		let $state = $watch({ name: "Alice" });
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<div> <input value="${$state.name || ""}"/> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
 		return $output;
 	}

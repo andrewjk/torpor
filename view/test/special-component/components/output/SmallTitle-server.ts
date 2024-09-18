@@ -8,7 +8,7 @@ const SmallTitle = {
 	render: ($props, $context, $slots) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => text != null ? text : "";
+		const t_fmt = (text) => (text != null ? text : "");
 		$output += `<h6> <![>`;
 		if ($slots && $slots["_"]) {
 			$output += $slots["_"](undefined, $context);
