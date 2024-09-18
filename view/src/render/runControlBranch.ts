@@ -1,7 +1,8 @@
 import type Range from "../types/Range";
 import clearRange from "./clearRange";
+import newRange from "./newRange";
 import popRange from "./popRange";
-import pushRangeToParent from "./pushRangeToParent";
+import pushRange from "./pushRange";
 
 export default function runControlBranch(range: Range, index: number, create: () => void) {
 	// Only run the branch if it's not the current branch
@@ -15,15 +16,7 @@ export default function runControlBranch(range: Range, index: number, create: ()
 		range.children.length = 0;
 	}
 
-	const oldRange = pushRangeToParent({
-		startNode: null,
-		endNode: null,
-		parent: null,
-		children: null,
-		index: 0,
-		effects: null,
-		animations: null,
-	});
+	const oldRange = pushRange(newRange(), true);
 
 	// Run the create function
 	create();

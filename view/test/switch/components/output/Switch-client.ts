@@ -4,6 +4,7 @@ import { t_apply_props } from '@tera/view';
 import { t_child } from '@tera/view';
 import { t_fragment } from '@tera/view';
 import { t_next } from '@tera/view';
+import { t_range } from '@tera/view';
 import { t_root } from '@tera/view';
 import { t_run_branch } from '@tera/view';
 import { t_run_control } from '@tera/view';
@@ -28,7 +29,7 @@ const Switch = {
 		const t_switch_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
 		/* @switch */
-		const t_switch_range_1 = {};
+		const t_switch_range_1 = t_range();
 		t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
 			switch ($props.value) {
 				case 1: {

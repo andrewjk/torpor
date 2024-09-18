@@ -32,12 +32,13 @@ export default function buildSwitchNode(
 		branches.push(defaultBranch);
 	}
 
+	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
 	/* @switch */
-	const ${switchRangeName} = {};
+	const ${switchRangeName} = t_range();
 	t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
 		${node.statement} {`);
 

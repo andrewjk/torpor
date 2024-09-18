@@ -8,6 +8,7 @@ import { t_event } from '@tera/view';
 import { t_fmt } from '@tera/view';
 import { t_fragment } from '@tera/view';
 import { t_next } from '@tera/view';
+import { t_range } from '@tera/view';
 import { t_root } from '@tera/view';
 import { t_run_branch } from '@tera/view';
 import { t_run_control } from '@tera/view';
@@ -46,7 +47,7 @@ const TrafficLight = {
 		const t_if_anchor_1 = t_anchor(t_next(t_child(t_if_parent_1)));
 
 		/* @if */
-		const t_if_range_1 = {};
+		const t_if_range_1 = t_range();
 		t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 			if ($state.light === "red") {
 				t_run_branch(t_if_range_1, 0, () => {

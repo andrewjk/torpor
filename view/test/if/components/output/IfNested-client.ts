@@ -4,6 +4,7 @@ import { t_apply_props } from '@tera/view';
 import { t_child } from '@tera/view';
 import { t_fragment } from '@tera/view';
 import { t_next } from '@tera/view';
+import { t_range } from '@tera/view';
 import { t_root } from '@tera/view';
 import { t_run_branch } from '@tera/view';
 import { t_run_control } from '@tera/view';
@@ -28,7 +29,7 @@ const IfNested = {
 		const t_if_anchor_1 = t_anchor(t_next(t_child(t_div_1)));
 
 		/* @if */
-		const t_if_range_1 = {};
+		const t_if_range_1 = t_range();
 		t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 			if ($props.counter > 5) {
 				t_run_branch(t_if_range_1, 0, () => {
@@ -37,7 +38,7 @@ const IfNested = {
 					const t_if_anchor_2 = t_anchor(t_next(t_root_1));
 
 					/* @if */
-					const t_if_range_2 = {};
+					const t_if_range_2 = t_range();
 					t_run_control(t_if_range_2, t_if_anchor_2, (t_before) => {
 						if ($props.counter > 10) {
 							t_run_branch(t_if_range_2, 0, () => {

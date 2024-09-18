@@ -7,7 +7,8 @@ import { t_fmt } from '@tera/view';
 import { t_fragment } from '@tera/view';
 import { t_next } from '@tera/view';
 import { t_pop_range } from '@tera/view';
-import { t_push_range_to_parent } from '@tera/view';
+import { t_push_range } from '@tera/view';
+import { t_range } from '@tera/view';
 import { t_root } from '@tera/view';
 import { t_run_list } from '@tera/view';
 
@@ -31,7 +32,7 @@ const ForIn = {
 		const t_for_anchor_1 = t_anchor(t_next(t_child(t_section_1)));
 
 		/* @for */
-		let t_for_range_1 = {};
+		let t_for_range_1 = t_range();
 		t_run_list(
 			t_for_range_1,
 			t_section_1,
@@ -46,7 +47,7 @@ const ForIn = {
 				return t_new_items;
 			},
 			function createListItem(t_item, t_before) {
-				let t_old_range_1 = t_push_range_to_parent(t_item);
+				let t_old_range_1 = t_push_range(t_item, true);
 				const t_fragment_1 = t_fragment(t_fragments, 1, ` <p>#</p> `);
 				const t_root_1 = t_root(t_fragment_1);
 				const t_text_1 = t_child(t_next(t_root_1));

@@ -12,7 +12,7 @@ const importsMap: Record<string, string> = {
 	$run: "import { $run } from '${folder}';",
 	$mount: "import { $mount } from '${folder}';",
 	t_flush: "import { t_flush } from '${folder}';",
-	t_push_range_to_parent: "import { t_push_range_to_parent } from '${folder}';",
+	t_range: "import { t_range } from '${folder}';",
 	t_push_range: "import { t_push_range } from '${folder}';",
 	t_pop_range: "import { t_pop_range } from '${folder}';",
 	t_run_control: "import { t_run_control } from '${folder}';",

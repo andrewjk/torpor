@@ -3,7 +3,6 @@ import type Range from "../types/Range";
 import context from "./context";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
-import pushRangeToParent from "./pushRangeToParent";
 
 /**
  * Runs an`if`, `switch` or `await` control statement
@@ -18,7 +17,7 @@ export default function runControl(
 	// branches
 	range.index = -1;
 
-	const oldRange = pushRangeToParent(range);
+	const oldRange = pushRange(range, true);
 
 	// Run the control statement in an effect
 	$run(function runControl() {

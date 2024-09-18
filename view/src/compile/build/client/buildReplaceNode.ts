@@ -21,12 +21,13 @@ export default function buildReplaceNode(
 	// HACK:
 	node = node.children[0] as ControlNode;
 
+	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
 	/* @replace */
-	const ${replaceRangeName} = {};
+	const ${replaceRangeName} = t_range();
 	t_run_control(${replaceRangeName}, ${replaceAnchorName}, (t_before) => {`);
 
 	buildReplaceBranch(node, status, b, replaceParentName, replaceRangeName);

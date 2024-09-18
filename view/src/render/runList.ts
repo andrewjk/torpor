@@ -4,7 +4,6 @@ import type Range from "../types/Range";
 import context from "./context";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
-import pushRangeToParent from "./pushRangeToParent";
 import runListItems from "./runListItems";
 
 /**
@@ -18,7 +17,7 @@ export default function runList(
 	buildItems: () => ListItem[],
 	create: (item: ListItem, anchor: Node | null) => void,
 ) {
-	const oldRange = pushRangeToParent(range);
+	const oldRange = pushRange(range, true);
 
 	let listItems: ListItem[] = [];
 
@@ -32,7 +31,7 @@ export default function runList(
 		const newItems = buildItems();
 
 		// Run the function that updates the list's items
-		runListItems(parent, anchor, listItems, newItems, create);
+		runListItems(range, parent, anchor, listItems, newItems, create);
 
 		listItems = newItems;
 

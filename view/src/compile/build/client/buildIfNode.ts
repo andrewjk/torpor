@@ -34,12 +34,13 @@ export default function buildIfNode(
 		branches.push(elseBranch);
 	}
 
+	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
 	/* @if */
-	const ${ifRangeName} = {};
+	const ${ifRangeName} = t_range();
 	t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {`);
 
 	for (let [i, branch] of branches.entries()) {

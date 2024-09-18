@@ -63,12 +63,13 @@ export default function buildForNode(
 	);
 	const keyStatement = key ? (key as ControlNode).statement : "";
 
+	status.imports.add("t_range");
 	status.imports.add("t_run_list");
 
 	b.append("");
 	b.append(`
 	/* @for */
-	let ${forRangeName} = {};
+	let ${forRangeName} = t_range();
 	t_run_list(
 	${forRangeName},
 	${forParentName},
@@ -97,8 +98,8 @@ export default function buildForNode(
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
 	const oldRangeName = nextVarName("old_range", status);
 
-	status.imports.add("t_push_range_to_parent");
-	b.append(`let ${oldRangeName} = t_push_range_to_parent(t_item);`);
+	status.imports.add("t_push_range");
+	b.append(`let ${oldRangeName} = t_push_range(t_item, true);`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

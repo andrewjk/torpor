@@ -4,6 +4,7 @@ import SmallTitle from './SmallTitle.tera';
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_fragment } from '@tera/view';
+import { t_range } from '@tera/view';
 import { t_root } from '@tera/view';
 import { t_run_branch } from '@tera/view';
 import { t_run_control } from '@tera/view';
@@ -33,7 +34,7 @@ const Component = {
 		const t_replace_anchor_1 = t_anchor(t_root(t_fragment_0));
 
 		/* @replace */
-		const t_replace_range_1 = {};
+		const t_replace_range_1 = t_range();
 		t_run_control(t_replace_range_1, t_replace_anchor_1, (t_before) => {
 			components[$props.self];
 			t_run_branch(t_replace_range_1, -1, () => {

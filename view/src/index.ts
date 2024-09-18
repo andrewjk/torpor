@@ -11,13 +11,13 @@ import t_apply_props from "./render/applyProps";
 import t_flush from "./render/flushMountEffects";
 import t_fmt from "./render/formatText";
 import t_fragment from "./render/getFragment";
+import t_range from "./render/newRange";
 import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
 import t_next from "./render/nodeNext";
 import t_root from "./render/nodeRoot";
 import t_pop_range from "./render/popRange";
 import t_push_range from "./render/pushRange";
-import t_push_range_to_parent from "./render/pushRangeToParent";
 import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
@@ -39,13 +39,13 @@ export {
 	t_flush,
 	t_fmt,
 	t_fragment,
+	t_range,
 	t_anchor,
 	t_child,
 	t_next,
 	t_root,
 	t_pop_range,
 	t_push_range,
-	t_push_range_to_parent,
 	t_run_control,
 	t_run_branch,
 	t_run_list,

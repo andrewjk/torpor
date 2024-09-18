@@ -4,7 +4,6 @@ export default interface Range {
 	startNode: ChildNode | null;
 	endNode: ChildNode | null;
 
-	parent: Range | null;
 	children: Range[] | null;
 
 	/**

@@ -26,11 +26,13 @@
  */
 import $watch from "../$watch";
 import type ListItem from "../types/ListItem";
+import type Range from "../types/Range";
 import clearRange from "./clearRange";
 import context from "./context";
 import moveRange from "./moveRange";
 
 /**
+ * @param range The list's range
  * @param parent The parent DOM element
  * @param anchor The DOM element to create new items before
  * @param oldItems The list of current items
@@ -38,6 +40,7 @@ import moveRange from "./moveRange";
  * @param create A function that creates the DOM elements for a new item
  */
 export default function runListItems(
+	range: Range,
 	parent: ParentNode,
 	anchor: Node | null,
 	oldItems: ListItem[],
@@ -160,8 +163,8 @@ export default function runListItems(
 		} else {
 			// The new list is exhausted; process old list removals
 			// Just truncate the parent range's children collection
-			if (oldStartItem.parent?.children) {
-				oldStartItem.parent.children.length = oldStartIndex;
+			if (range.children) {
+				range.children.length = oldStartIndex;
 			}
 			for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
 				//console.log("clear", oldStartItem.key);

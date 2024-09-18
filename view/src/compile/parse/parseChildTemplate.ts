@@ -9,8 +9,7 @@ export default function parseChildTemplate(name: string, source: string, status:
 	const parsed = parse(name, source);
 	if (parsed.ok && parsed.template) {
 		parsed.template.name = name;
-		status.childTemplates ||= [];
-		status.childTemplates.push(parsed.template);
+		(status.childTemplates ??= []).push(parsed.template);
 		if (status.template) {
 			setChildComponentNodes(name, status.template);
 		}
