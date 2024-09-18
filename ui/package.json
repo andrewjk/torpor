@@ -8,9 +8,9 @@
 	"types": "dist/index.d.ts",
 	"exports": {
 		"./Accordion": {
-			"types": "./dist/Accordion.d.ts",
-			"import": "./dist/Accordion.js",
-			"require": "./dist/Accordion.cjs"
+			"types": "./dist/Accordion/index.d.ts",
+			"import": "./dist/Accordion/index.js",
+			"require": "./dist/Accordion/index.cjs"
 		},
 		"./motion": {
 			"types": "./dist/motion.d.ts",

@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-	entry: ["src/Accordion.ts", "src/motion.ts"],
+	entry: ["src/Accordion/index.ts", "src/motion.ts"],
 	//dts: true,
 	dts: {
 		entry: ["src/motion.ts"],
