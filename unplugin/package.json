@@ -77,8 +77,7 @@
 		"play": "npm -C playground run dev",
 		"prepublishOnly": "npm run build",
 		"release": "bumpp && npm publish",
-		"start": "esno src/index.ts",
-		"test": "vitest"
+		"start": "esno src/index.ts"
 	},
 	"peerDependencies": {
 		"@nuxt/kit": "^3",
@@ -126,7 +125,7 @@
 		"nodemon": "^3.1.5",
 		"prettier": "^3.3.3",
 		"rimraf": "^6.0.1",
-		"rollup": "^4.21.3",
+		"rollup": "^4.22.0",
 		"tsup": "^8.3.0",
 		"typescript": "^5.6.2",
 		"vite": "^5.4.6",

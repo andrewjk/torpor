@@ -5,7 +5,8 @@
 	"type": "module",
 	"main": "index.js",
 	"scripts": {
-		"test": "cd ./view && pnpm build && cd ../unplugin && pnpm build && cd .. && vitest",
+		"build": "pnpm -r run build",
+		"test": "vitest run",
 		"format": "prettier --write ."
 	},
 	"keywords": [],

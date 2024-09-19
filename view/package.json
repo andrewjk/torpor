@@ -23,7 +23,7 @@
 		"build": "tsup",
 		"dev": "tsup --watch",
 		"check": "tsc -p tsconfig-check.json --noEmit",
-		"test": "pnpm build && cd ../unplugin && pnpm build && cd ../view && vitest",
+		"test": "vitest run",
 		"bench": "tsm ./bench/bench.ts",
 		"format": "prettier --write ."
 	},

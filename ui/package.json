@@ -22,7 +22,7 @@
 	"scripts": {
 		"build": "tsup",
 		"build:fix": "esno scripts/postbuild.ts",
-		"test": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && vitest"
+		"test": "vitest run"
 	},
 	"keywords": [],
 	"author": "",
@@ -37,13 +37,13 @@
 		"@testing-library/user-event": "^14.5.2",
 		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
 		"@types/jsdom": "^21.1.7",
-		"@types/node": "^22.5.2",
+		"@types/node": "^22.5.5",
 		"chalk": "^5.3.0",
 		"esno": "^4.7.0",
 		"fast-glob": "^3.3.2",
 		"jsdom": "^25.0.0",
-		"tsup": "^8.2.4",
-		"typescript": "^5.5.4",
-		"vitest": "^2.0.5"
+		"tsup": "^8.3.0",
+		"typescript": "^5.6.2",
+		"vitest": "^2.1.1"
 	}
 }
