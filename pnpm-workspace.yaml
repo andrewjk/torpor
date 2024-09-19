@@ -2,3 +2,4 @@ packages:
   - view
   - unplugin
   - ui
+  - kit

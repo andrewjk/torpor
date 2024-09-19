@@ -1,8 +1,8 @@
 import { hydrate, mount } from "@tera/view";
+import { type Component } from "@tera/view/compile";
 import "vinxi/client";
-import type Component from "../../../view/src/types/Component";
+import type EndPoint from "../types/EndPoint";
 import routeHandlers from "./routeHandlers";
-import type EndPoint from "./types/EndPoint";
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -25,7 +25,7 @@ window.addEventListener("popstate", async () => {
 });
 
 // Do the initial navigation and hydration
-await navigateToLocation(document.location, true);
+navigateToLocation(document.location, true);
 
 async function navigateToLocation(location: Location, firstTime = false) {
 	return await navigate(location.pathname, new URLSearchParams(location.search), firstTime);

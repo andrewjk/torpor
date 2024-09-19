@@ -5,21 +5,18 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && pnpm build && cd ../demo && vinxi dev --port 5173",
-		"build": "tsc && vinxi build",
+		"dev": "cd ../kit && pnpm build && cd ../demo && terakit --dev --port 7354",
+		"build": "tsc && terakit --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@tera/kit": "workspace:^",
 		"@tera/ui": "workspace:^",
+		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
 		"vinxi": "^0.4.3"
-	},
-	"devDependencies": {
-		"typescript": "^5.6.2",
-		"unplugin": "^1.14.1",
-		"vite": "^5.4.6"
 	}
 }

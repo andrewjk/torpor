@@ -1,5 +1,5 @@
 import Index from "@/components/Index.tera";
-import type EndPoint from "../../site/src/types/EndPoint";
+import { type EndPoint } from "@tera/kit";
 
 export default {
 	data: () => {

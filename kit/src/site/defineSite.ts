@@ -1,11 +1,15 @@
+import tera from "@tera/unplugin/vite";
 import path from "path";
 import { AppOptions, RouterSchemaInput, createApp } from "vinxi";
 import { config } from "vinxi/plugins/config";
-import tera from "../../../unplugin/dist/vite";
-import dirName from "./dirName";
+import type UserConfig from "../types/UserConfig";
 import FileSystemRouter from "./router";
 
-export default function defineSite() {
+export default function defineSite(options?: UserConfig) {
+	// Set the port
+	process.env.PORT = (options?.port || 5173).toString();
+
+	// Get Vinxi to create and serve the app
 	return createApp({
 		routers: [
 			{
@@ -18,7 +22,7 @@ export default function defineSite() {
 				type: "http",
 				target: "server",
 				// TODO: change this when published
-				handler: "./site/src/serverEntry.ts",
+				handler: "node_modules/@tera/kit/src/site/serverEntry.ts",
 				routes,
 				plugins: () => [config("custom", viteOptions()), tera({ server: true })],
 			},
@@ -27,7 +31,7 @@ export default function defineSite() {
 				type: "client",
 				target: "browser",
 				// TODO: change this when published
-				handler: "./site/src/clientEntry.ts",
+				handler: "node_modules/@tera/kit/src/site/clientEntry.ts",
 				base: "/_build",
 				routes,
 				plugins: () => [config("custom", viteOptions()), tera()],
@@ -39,7 +43,7 @@ export default function defineSite() {
 function routes(router: RouterSchemaInput, app: AppOptions) {
 	return new FileSystemRouter(
 		{
-			dir: path.join(dirName(), "src/routes"),
+			dir: path.resolve("src/routes"),
 			extensions: ["js", "ts", "tera"],
 		},
 		router,
@@ -51,7 +55,7 @@ function viteOptions() {
 	return {
 		resolve: {
 			alias: {
-				"@": path.resolve(dirName(), "./src"),
+				"@": path.resolve("src"),
 			},
 		},
 	};

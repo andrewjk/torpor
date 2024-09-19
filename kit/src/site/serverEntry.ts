@@ -2,10 +2,8 @@ import fs from "fs";
 import path from "path";
 import { eventHandler } from "vinxi/http";
 import { getManifest } from "vinxi/manifest";
-//import appHtml from "../../demo/src/app.html?raw";
-import dirName from "./dirName";
+import type EndPoint from "../types/EndPoint";
 import routeHandlers from "./routeHandlers";
-import type EndPoint from "./types/EndPoint";
 
 export default eventHandler(async (event) => {
 	const url = new URL(`http://${process.env.HOST ?? "localhost"}${event.node.req.url}`);
@@ -15,7 +13,7 @@ export default eventHandler(async (event) => {
 	console.log("handling server request for", path, urlParams);
 
 	const route = routeHandlers.match(path, urlParams);
-	const handler: EndPoint | undefined = (await route?.handler.handler).default;
+	const handler: EndPoint | undefined = (await route?.handler.handler)?.default;
 
 	if (!handler?.view) {
 		// TODO: 404
@@ -69,7 +67,7 @@ export default eventHandler(async (event) => {
 let loadedAppHtml = "";
 function loadAppHtml() {
 	if (!loadedAppHtml) {
-		let file = path.join(dirName(), "..", "../", "src", "app.html");
+		let file = path.resolve("src/app.html");
 		loadedAppHtml = fs.readFileSync(file).toString();
 	}
 	return loadedAppHtml;

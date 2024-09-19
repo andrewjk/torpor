@@ -1,5 +1,5 @@
 import Demo from "@/components/Components/Home/Demo.tera";
-import type EndPoint from "../../../site/src/types/EndPoint";
+import { type EndPoint } from "@tera/kit";
 
 //import { route as demoRoute } from "./[slug]";
 

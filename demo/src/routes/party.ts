@@ -1,5 +1,5 @@
 import Party from "@/components/Party.tera";
-import type EndPoint from "../../site/src/types/EndPoint";
+import { type EndPoint } from "@tera/kit";
 
 export default {
 	data: () => {

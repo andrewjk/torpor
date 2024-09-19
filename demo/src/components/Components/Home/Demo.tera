@@ -58,7 +58,7 @@
     }
     @// Ignore this comment
     @const x = 5;
-    <button onclick=increment>Increment</button>
+    <button onclick={increment}>Increment</button>
     <button onclick={() => $state.count = 0}>Reset</button>
     <button onclick={() => $state.showeffects = !$state.showeffects}>Show/hide effects</button>
     @switch ($state.count) {

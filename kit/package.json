@@ -1,0 +1,30 @@
+{
+	"name": "@tera/kit",
+	"version": "0.0.1",
+	"description": "A framework for building libraries and/or sites with Tera",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"private": true,
+	"bin": {
+		"terakit": "./dist/bin/index.js"
+	},
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsup --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@tera/unplugin": "workspace:^",
+		"@tera/view": "workspace:^",
+		"vinxi": "^0.4.3"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
+		"lilconfig": "^3.1.2",
+		"tsup": "^8.3.0"
+	}
+}
