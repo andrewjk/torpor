@@ -24,6 +24,7 @@
 		"dev": "tsup --watch",
 		"check": "tsc -p tsconfig-check.json --noEmit",
 		"test": "vitest run",
+		"test:watch": "vitest",
 		"test:build": "tsm ./scripts/buildTestOutput.ts",
 		"bench": "tsm ./bench/bench.ts",
 		"format": "prettier --write ."

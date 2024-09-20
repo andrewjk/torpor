@@ -22,7 +22,8 @@
 	"scripts": {
 		"build": "tsup",
 		"build:fix": "esno scripts/postbuild.ts",
-		"test": "vitest run"
+		"test": "vitest run",
+		"test:watch": "vitest"
 	},
 	"keywords": [],
 	"author": "",
