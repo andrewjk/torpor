@@ -1,3 +1,7 @@
+/**
+ * A component with a switch statement in it.
+ * @prop {number} value -- The value to switch on.
+ */
 <div>
     @switch ($props.value) {
         case 1: {

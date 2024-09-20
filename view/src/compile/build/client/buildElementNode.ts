@@ -266,7 +266,7 @@ function buildTransitionAttribute(
 
 function getAnimationDetails(value: string, status: BuildStatus) {
 	// HACK: Split by commas, but not when in brackets
-	let parts = [];
+	let parts: string[] = [];
 	let start = 0;
 	let squareCount = 0;
 	let curlyCount = 0;

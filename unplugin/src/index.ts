@@ -26,7 +26,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 	transform(code, id) {
 		// Get the component's name from the file id
-		const name = id
+		let name = id
 			.split(/[\\\/]/)
 			.at(-1)
 			?.replace(/\.tera$/, "")!;
@@ -35,11 +35,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		const parsed = parse(name, code);
 		if (parsed.ok && parsed.template) {
 			// Transform for server or client
-			if (options?.server) {
-				return transformForServer(name, parsed.template, id, options);
-			} else {
-				return transform(name, parsed.template, id, options);
-			}
+			return transform(name, parsed.template, id, options);
 		} else {
 			console.log("\nERRORS\n======");
 			for (let error of parsed.errors) {
@@ -64,9 +60,6 @@ function transform(name: string, template: ComponentTemplate, id: string, option
 	const built = build(name, template, options);
 	let transformed = built.code;
 
-	// HACK: Replace import paths from any depth with absolute paths
-	//transformed = normalizeImportPaths(transformed, id);
-
 	if (built.styles && built.styleHash) {
 		// Add a dynamic import for the component's CSS with a name from
 		// the hash and add the styles to a map. Then resolveId will
@@ -83,53 +76,6 @@ function transform(name: string, template: ComponentTemplate, id: string, option
 		loader: "ts",
 	});
 }
-
-function transformForServer(
-	name: string,
-	template: ComponentTemplate,
-	id: string,
-	options?: Options,
-) {
-	const built = build(name, template, options);
-	let transformed = built.code;
-
-	// HACK: Replace import paths from any depth with absolute paths
-	//transformed = normalizeImportPaths(transformed, id);
-
-	// TODO: What to do with styles
-	if (built.styles && built.styleHash) {
-		// Add a dynamic import for the component's CSS with a name from
-		// the hash and add the styles to a map. Then resolveId will
-		// pass the CSS id onto load, which will load the the actual CSS
-		// from the map
-		transformed = `import '${built.styleHash}.css';\n` + transformed;
-		styles.set(built.styleHash + ".css", built.styles);
-	}
-
-	//printTransformed(transformed);
-
-	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
-	return transformWithEsbuild(transformed, id, {
-		loader: "ts",
-	});
-}
-
-/*
-function normalizeImportPaths(transformed: string, id: string): string {
-	// HACK: Replace import paths from any depth with absolute paths
-	if (transformed.includes("../../../tera")) {
-		const pathParts = id.split(/[\\\/]/);
-		for (let i = pathParts.length - 1; i >= 0; i--) {
-			let resolvedPath = path.resolve(path.join(...["/", ...pathParts.slice(0, i), "tera"]));
-			if (fs.existsSync(resolvedPath)) {
-				transformed = transformed.replaceAll(/from ("|')(..\/)+tera/g, `from $1${resolvedPath}`);
-				break;
-			}
-		}
-	}
-	return transformed;
-}
-*/
 
 function printTransformed(transformed: string) {
 	console.log(

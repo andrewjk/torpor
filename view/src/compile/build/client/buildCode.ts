@@ -45,6 +45,7 @@ export default function buildCode(
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
+	imports.add(`import type SlotRender from "\${folder}";`);
 
 	// Build the component and any child components
 	buildTemplate(name, template, imports, b);
@@ -84,16 +85,35 @@ function buildTemplate(
 		}
 	}
 
-	b.append(`const ${name} = {
+	if (template.docs?.description) {
+		b.append(`
+		/**
+		 * ${template.docs.description}
+		 */`);
+	}
+
+	let propsInterface = "any";
+	if (template.docs?.props) {
+		propsInterface = `{
+			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}: ${p.type};`).join("\n")}
+		}`;
+	}
+
+	b.append(`
+	const ${name} = {
+		/**
+		 * The component's name.
+		 */
 		name: "${name}",
 		/**
-		 * @param {Node} $parent
-		 * @param {Node | null} $anchor
-		 * @param {Object} [$props]
-		 * @param {Object} [$context]
-		 * @param {Object} [$slots]
+		 * Mounts or hydrates the component into the supplied parent node.
+		 * @param $parent -- The parent node.
+		 * @param $anchor -- The node to mount the component before.
+		 * @param $props -- The values that have been passed into the component as properties.
+		 * @param $context -- Values that have been passed into the component from its ancestors.
+		 * @param $slots -- Functions for rendering children into slot nodes within the component.
 		 */
-		render: ($parent, $anchor, $props, $context, $slots) => {`);
+		render: ($parent: Node, $anchor: Node | null, $props: ${propsInterface}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {

@@ -1,11 +1,17 @@
+import type SlotRender from "@tera/view";
+
 const TrafficLight = {
+	/**
+	 * The component's name.
+	 */
 	name: "TrafficLight",
 	/**
-	 * @param {Object} [$props]
-	 * @param {Object} [$context]
-	 * @param {Object} [$slots]
+	 * Renders the component into a HTML string.
+	 * @param $props -- The values that have been passed into the component as properties.
+	 * @param $context -- Values that have been passed into the component from its ancestors.
+	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($props, $context, $slots) => {
+	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
 		const $watch = (obj) => obj;
 		const TRAFFIC_LIGHTS = ["red", "orange", "green"];

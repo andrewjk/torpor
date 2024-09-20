@@ -231,8 +231,8 @@ Examples from [Component Party](https://component-party.dev).
 
 <template name="AnswerButton">
   /**
-  * @prop {function} onYes
-  * @prop {function} onNo
+  * @prop {Function} onYes
+  * @prop {Function} onNo
   */
 
   <div>

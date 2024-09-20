@@ -12,7 +12,7 @@ test("child component -- mounted", () => {
 	check(container);
 });
 
-test("child component -- hydrated", () => {
+test("child component -- hydrated", async () => {
 	const container = document.createElement("div");
 	const path = "./test/child-component/components/ParentChild.tera";
 	hydrateComponent(container, path, Component);

@@ -23,6 +23,7 @@ import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
+import type SlotRender from "./types/SlotRender";
 
 // Mount and hydrate
 export { mount, hydrate };
@@ -52,3 +53,5 @@ export {
 	t_attribute,
 	t_dynamic,
 };
+
+export type { SlotRender };

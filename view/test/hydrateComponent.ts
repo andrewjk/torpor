@@ -2,6 +2,7 @@
 import { hydrate } from "@tera/view";
 import fs from "fs";
 import path from "path";
+import tsb from "ts-blank-space";
 import { expect } from "vitest";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
@@ -21,14 +22,14 @@ export default function hydrateComponent(
 	}
 
 	const name = path.basename(componentPath, ".tera");
-	const source = fs.readFileSync(componentPath).toString();
+	const source = fs.readFileSync(componentPath, "utf8");
 	const parsed = parse(name, source);
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
 	const imports = parsed.template!.imports?.map((imp) => {
 		let importPath = path.join(path.dirname(componentPath), imp.path);
-		let importSource = fs.readFileSync(importPath).toString();
+		let importSource = fs.readFileSync(importPath, "utf8");
 		let importParsed = parse(imp.name, importSource);
 		expect(importParsed.ok).toBe(true);
 		expect(importParsed.template).not.toBeUndefined();
@@ -50,7 +51,7 @@ export default function hydrateComponent(
 	}
 
 	const server = build(component.name, parsed.template!, { server: true });
-	const code = `
+	const code = tsb(`
 const x = {
 render: ($state) => {
 ${imports?.map((imp) => imp.importServer.code.replace("export default ", "")).join("\n") || ""}
@@ -60,7 +61,8 @@ return ${component.name}.render($state);
 }
 };
 
-x;`;
+x;`);
+
 	const html = eval(code).render(state).replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");

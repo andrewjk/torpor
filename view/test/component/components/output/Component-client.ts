@@ -1,20 +1,25 @@
 import { $watch } from '@tera/view';
 import Header from './Header.tera';
+import type SlotRender from "@tera/view";
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_fragment } from '@tera/view';
 import { t_root } from '@tera/view';
 
 const Component = {
+	/**
+	 * The component's name.
+	 */
 	name: "Component",
 	/**
-	 * @param {Node} $parent
-	 * @param {Node | null} $anchor
-	 * @param {Object} [$props]
-	 * @param {Object} [$context]
-	 * @param {Object} [$slots]
+	 * Mounts or hydrates the component into the supplied parent node.
+	 * @param $parent -- The parent node.
+	 * @param $anchor -- The node to mount the component before.
+	 * @param $props -- The values that have been passed into the component as properties.
+	 * @param $context -- Values that have been passed into the component from its ancestors.
+	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent, $anchor, $props, $context, $slots) => {
+	render: ($parent: Node, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User interface */
 		const t_fragments = [];
 
