@@ -8,5 +8,6 @@ export default defineConfig(({ mode }) => ({
 	},
 	test: {
 		environment: "jsdom",
+		globalSetup: "./test/globalSetup.ts",
 	},
 }));

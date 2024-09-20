@@ -68,21 +68,6 @@ x;`;
 		console.log("===");
 	}
 
-	// Write everything to files so we can keep an eye on regressions
-	// TODO: Should probably have a script instead, that we run before commit
-	const folder = componentPath.replace("/components/", "/components/output/");
-	if (!fs.existsSync(path.dirname(folder))) {
-		fs.mkdirSync(path.dirname(folder));
-	}
-	fs.writeFileSync(folder.replace(".tera", "-server.ts"), server.code);
-	fs.writeFileSync(folder.replace(".tera", "-client.ts"), client.code);
-
-	imports?.forEach((imp) => {
-		const folder = imp.importPath.replace("/components/", "/components/output/");
-		fs.writeFileSync(folder.replace(".tera", "-server.ts"), imp.importServer.code);
-		fs.writeFileSync(folder.replace(".tera", "-client.ts"), imp.importClient.code);
-	});
-
 	container.innerHTML = html;
 	document.body.appendChild(container);
 
