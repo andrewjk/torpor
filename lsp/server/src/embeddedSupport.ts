@@ -31,7 +31,8 @@ export function getDocumentRegions(
 	document: TextDocument,
 ): HTMLDocumentRegions {
 	const regions: EmbeddedRegion[] = [];
-	const scanner = languageService.createScanner(document.getText());
+	const documentText = document.getText();
+	const scanner = languageService.createScanner(documentText);
 	let lastTagName = "";
 	let lastAttributeName: string | null = null;
 	let languageIdFromType: string | undefined = undefined;
@@ -41,7 +42,7 @@ export function getDocumentRegions(
 	while (token !== TokenType.EOS) {
 		switch (token) {
 			case TokenType.StartTag:
-				lastTagName = scanner.getTokenText();
+				lastTagName = scanner.getTokenText().toLowerCase();
 				lastAttributeName = null;
 				languageIdFromType = "javascript";
 				break;
@@ -60,16 +61,16 @@ export function getDocumentRegions(
 				});
 				break;
 			case TokenType.AttributeName:
-				lastAttributeName = scanner.getTokenText();
+				lastAttributeName = scanner.getTokenText().toLowerCase();
 				break;
 			case TokenType.AttributeValue:
-				if (lastAttributeName === "src" && lastTagName.toLowerCase() === "script") {
+				if (lastAttributeName === "src" && lastTagName === "script") {
 					let value = scanner.getTokenText();
 					if (value[0] === "'" || value[0] === '"') {
-						value = value.substr(1, value.length - 1);
+						value = value.substring(1, value.length - 1);
 					}
 					importedScripts.push(value);
-				} else if (lastAttributeName === "type" && lastTagName.toLowerCase() === "script") {
+				} else if (lastAttributeName === "type" && lastTagName === "script") {
 					if (
 						/["'](module|(text|application)\/(java|ecma)script|text\/babel)["']/.test(
 							scanner.getTokenText(),
@@ -82,6 +83,36 @@ export function getDocumentRegions(
 						languageIdFromType = undefined;
 					}
 				} else {
+					// Check for braces in attribute value
+					// HACK: Is there a way to get better tokens?
+					let value = scanner.getTokenText();
+					if (value.startsWith("{")) {
+						let start = scanner.getTokenOffset() + 1;
+						let end = -1;
+						let depth = 0;
+						while (token !== TokenType.EOS) {
+							let nextValue = scanner.getTokenText();
+							for (let i = 0; i < nextValue.length; i++) {
+								if (nextValue[i] === "{") {
+									depth++;
+								} else if (nextValue[i] === "}") {
+									depth--;
+									if (depth === 0) {
+										end = scanner.getTokenOffset() + i;
+										regions.push({ languageId: "javascript", start, end, attributeValue: true });
+										break;
+									}
+								}
+							}
+							if (end != -1) {
+								break;
+							}
+							token = scanner.scan();
+						}
+					}
+
+					/*
+					// Check for style or event attribute name
 					const attributeLanguageId = getAttributeLanguage(lastAttributeName!);
 					if (attributeLanguageId) {
 						let start = scanner.getTokenOffset();
@@ -93,6 +124,7 @@ export function getDocumentRegions(
 						}
 						regions.push({ languageId: attributeLanguageId, start, end, attributeValue: true });
 					}
+					*/
 				}
 				lastAttributeName = null;
 				break;
@@ -280,7 +312,7 @@ function append(result: string, str: string, n: number): string {
 	return result;
 }
 
-function getAttributeLanguage(attributeName: string): string | null {
+function getAttributeLanguage(attributeName: string): "css" | "javascript" | null {
 	const match = attributeName.match(/^(style)$|^(on\w+)$/i);
 	if (!match) {
 		return null;

@@ -5,8 +5,8 @@
 		"Once accepted there, we are happy to receive an update request."
 	],
 	"version": "https://github.com/textmate/html.tmbundle/commit/0c3d5ee54de3a993f747f54186b73a4d2d3c44a2",
-	"name": "html1",
-	"scopeName": "text.html1.basic",
+	"name": "tera",
+	"scopeName": "text.tera.basic",
 	"injections": {
 		"R:text.html - (comment.block, text.html meta.embedded, meta.tag.*.*.html, meta.tag.*.*.*.html, meta.tag.*.*.*.*.html)": {
 			"comment": "Uses R: to ensure this matches after any other injections.",
@@ -190,7 +190,7 @@
 													]
 												}
 											},
-											"match": "(([^\\s\"'=<>`/]|/(?!>))+)",
+											"match": "(([^\\s\"'\\{=<>`/]|/(?!>))+)",
 											"name": "string.unquoted.html"
 										},
 										{
@@ -308,6 +308,9 @@
 													"name": "comment.block.js"
 												}
 											]
+										},
+										{
+											"include": "#braces-interior"
 										}
 									]
 								},
@@ -385,7 +388,7 @@
 					"end": "(?<=[^\\s=])(?!\\s*=)|(?=/?>)",
 					"patterns": [
 						{
-							"match": "([^\\s\"'=<>`/]|/(?!>))+",
+							"match": "([^\\s\"'\\{=<>`/]|/(?!>))+",
 							"name": "string.unquoted.html"
 						},
 						{
@@ -429,8 +432,42 @@
 							]
 						},
 						{
+							"include": "#braces-interior"
+						},
+						{
 							"match": "=",
 							"name": "invalid.illegal.unexpected-equals-sign.html"
+						}
+					]
+				}
+			]
+		},
+		"braces-interior": {
+			"patterns": [
+				{
+					"begin": "\\{",
+					"beginCaptures": {
+						"0": {
+							"name": "punctuation.definition.brace.begin.js"
+						}
+					},
+					"end": "(\\})",
+					"endCaptures": {
+						"0": {
+							"name": "punctuation.definition.brace.end.js"
+						},
+						"1": {
+							"name": "source.js-ignored-vscode"
+						}
+					},
+					"name": "braces-interior",
+					"contentName": "source.js",
+					"patterns": [
+						{
+							"include": "#braces-interior"
+						},
+						{
+							"include": "source.js"
 						}
 					]
 				}

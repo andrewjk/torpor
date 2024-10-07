@@ -9,7 +9,7 @@ import {
 	LanguageClientOptions,
 	ServerOptions,
 	TransportKind,
-} from "vscode-languageclient";
+} from "vscode-languageclient/node";
 
 let client: LanguageClient;
 
@@ -29,7 +29,7 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
-		documentSelector: [{ scheme: "file", language: "html1" }],
+		documentSelector: [{ scheme: "file", language: "tera" }],
 	};
 
 	// Create the language client and start the client.

@@ -2,6 +2,7 @@
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
+import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	CompletionList,
 	Diagnostic,
@@ -10,8 +11,7 @@ import {
 	TextDocumentSyncKind,
 	TextDocuments,
 	createConnection,
-} from "vscode-languageserver";
-import { TextDocument } from "vscode-languageserver-textdocument";
+} from "vscode-languageserver/node";
 import { LanguageModes, getLanguageModes } from "./languageModes";
 
 // Create a connection for the server. The connection uses Node's IPC as a transport.
@@ -25,6 +25,7 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let languageModes: LanguageModes;
 
 connection.onInitialize((_params: InitializeParams) => {
+	console.log("HELLO?!");
 	languageModes = getLanguageModes();
 
 	documents.onDidClose((e) => {
@@ -60,7 +61,7 @@ async function validateTextDocument(textDocument: TextDocument) {
 	try {
 		const version = textDocument.version;
 		const diagnostics: Diagnostic[] = [];
-		if (textDocument.languageId === "html1") {
+		if (textDocument.languageId === "tera") {
 			const modes = languageModes.getAllModesInDocument(textDocument);
 			const latestTextDocument = documents.get(textDocument.uri);
 			if (latestTextDocument && latestTextDocument.version === version) {
