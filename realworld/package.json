@@ -1,0 +1,21 @@
+{
+	"name": "@tera/vite-starter",
+	"version": "0.0.1",
+	"description": "A Vite starter site built with tera/kit",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "terakit --dev",
+		"build": "tsc && terakit --build",
+		"preview": "vinxi serve"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@tera/kit": "workspace:^",
+		"@tera/unplugin": "workspace:^",
+		"@tera/view": "workspace:^",
+		"vinxi": "^0.4.3"
+	}
+}
