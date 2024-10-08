@@ -2,15 +2,11 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
 	entry: ["src/Accordion/index.ts", "src/motion.ts"],
-	//dts: true,
-	dts: {
-		entry: ["src/motion.ts"],
-	},
 	format: ["esm", "cjs"],
-	splitting: false,
-	sourcemap: true,
+	dts: { entry: ["src/motion.ts"] },
 	clean: true,
 	metafile: true,
+	sourcemap: true,
 	loader: {
 		".tera": "file",
 	},

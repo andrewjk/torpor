@@ -1,11 +1,11 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-	entryPoints: ["src/*.ts"],
-	clean: true,
-	format: ["cjs", "esm"],
+	entry: ["src/*.ts"],
+	format: ["esm", "cjs"],
 	dts: true,
 	cjsInterop: true,
+	clean: true,
 	splitting: true,
 	onSuccess: "npm run build:fix",
 });
