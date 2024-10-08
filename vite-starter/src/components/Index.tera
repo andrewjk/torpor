@@ -1,0 +1,27 @@
+/**
+ * The home component
+ */
+
+<script>
+    import viteLogo from '@/assets/vite.svg'
+    import Counter from "./Counter.tera";
+</script>
+
+<div>
+    <a href="https://vitejs.dev" target="_blank">
+        <img src={viteLogo} class="logo" alt="Vite logo" />
+    </a>
+    @/*
+    // TODO: Need a Tera site and logo
+    <a href="https://www.typescriptlang.org/" target="_blank">
+        <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
+    </a>
+    */
+    <h1>Vite + Tera</h1>
+    <div class="card">
+        <Counter />
+    </div>
+    <p class="read-the-docs">
+        Click on the Vite and Tera logos to learn more
+    </p>
+</div>
