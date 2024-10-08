@@ -21,7 +21,7 @@
 	"private": true,
 	"scripts": {
 		"build": "tsup",
-		"dev": "tsup --watch",
+		"build:watch": "tsup --watch",
 		"check": "tsc -p tsconfig-check.json --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest",
