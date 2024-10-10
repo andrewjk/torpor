@@ -54,6 +54,7 @@ function parseDocsProp(status: ParseStatus): PropDocumentation {
 	const docs: PropDocumentation = {
 		name: "",
 		type: "",
+		optional: false,
 		description: "",
 	};
 
@@ -66,7 +67,9 @@ function parseDocsProp(status: ParseStatus): PropDocumentation {
 	}
 
 	// Parse the name
+	docs.optional = accept("[", status);
 	docs.name = consumeAlphaNumeric(status);
+	accept("]", status);
 	consumeSpace(status);
 
 	// Maybe parse the description
