@@ -3,14 +3,13 @@ import parse from "../../src/compile/parse";
 import type ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
-test("multi line js comments", () => {
+test("js line comments", () => {
 	const input = `
+@// A comment outside
 <section>
-  @/*
-    A comment at the top
-    with multiple lines
-   */
+  @// A comment at the top
   <p>
+    @// A comment in text
     The content
   </p>
 </section>
