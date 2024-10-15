@@ -42,7 +42,14 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 	let attributes: Attribute[] = [];
 	while (status.i < status.source.length) {
 		consumeSpace(status);
-		if (accept("/>", status, false) || accept(">", status, false)) {
+		if (accept("@//", status)) {
+			// Swallow one-line comments
+			status.i = status.source.indexOf("\n", status.i) + 1;
+		} else if (accept("@/*", status)) {
+			// Swallow block comments
+			status.i = status.source.indexOf("*/", status.i) + 2;
+		} else if (accept("/>", status, false) || accept(">", status, false)) {
+			// That's the end of the attributes
 			break;
 		} else {
 			const attribute = parseAttribute(status);

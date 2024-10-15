@@ -59,7 +59,7 @@ export default function parseControl(
 			// Swallow one-line comments
 			status.i = status.source.indexOf("\n", status.i) + 1;
 		} else if (accept("@/*", status)) {
-			// Swallow multi-line comments
+			// Swallow block comments
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (accept("@", status, false)) {
 			// It's a nested control
