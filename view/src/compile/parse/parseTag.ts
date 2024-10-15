@@ -61,7 +61,7 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 
 function parseAttribute(status: ParseStatus): Attribute {
 	let name = consumeUntil("= \t\r\n/>", status);
-	let value = "";
+	let value: string | undefined = undefined;
 	consumeSpace(status);
 	if (accept("=", status)) {
 		consumeSpace(status);

@@ -34,7 +34,7 @@ export default function buildComponentNode(
 			} else if (name.startsWith("{") && name.endsWith("}")) {
 				name = name.substring(1, name.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
-			} else {
+			} else if (value != null) {
 				let reactive = value.startsWith("{") && value.endsWith("}");
 				if (reactive) {
 					value = value.substring(1, value.length - 1);
@@ -44,12 +44,14 @@ export default function buildComponentNode(
 					// Probably just compile down to a string?
 					value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
 				}
-				const setProp = `${propsName}["${name}"] = ${value || "true"};`;
+				const setProp = `${propsName}["${name}"] = ${value};`;
 				if (reactive) {
 					buildRun("setProp", setProp, status, b);
 				} else {
 					b.append(setProp);
 				}
+			} else {
+				b.append(`${propsName}["${name}"] = true;`);
 			}
 		}
 		// PERF: Does this have much of an impact??
@@ -75,7 +77,7 @@ export default function buildComponentNode(
 		for (let slot of node.children) {
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
-				const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
+				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				b.append(`${slotsName}["${slotName}"] = ($sparent, $sanchor, $sprops, $context) => {`);
 
 				buildFragment(slot, status, b, "$sparent", "$sanchor");
@@ -109,7 +111,7 @@ export default function buildComponentNode(
 	let componentName = node.tagName;
 	if (componentName === ":component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
-		if (selfAttribute) {
+		if (selfAttribute && selfAttribute.value) {
 			componentName = trimMatched(selfAttribute.value, "{", "}");
 		}
 	}

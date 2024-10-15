@@ -150,7 +150,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			slottifyChildNodes(element);
 		} else if (element.tagName === ":component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
-			if (selfAttribute) {
+			if (selfAttribute && selfAttribute.value) {
 				element.type = "component";
 				slottifyChildNodes(element);
 

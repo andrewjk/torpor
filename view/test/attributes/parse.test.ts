@@ -101,6 +101,22 @@ test("multiple attributes", () => {
 	expect(output).toEqual(expected);
 });
 
+test("multiple attributes with no values", () => {
+	const input = `
+<input text required />
+`;
+
+	const output = trimParsed(parse("x", input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			markup: root([el("input", [att("text"), att("required")], [], true)]),
+		},
+	};
+	expect(output).toEqual(expected);
+});
+
 test("event attribute with name", () => {
 	const input = `
 <button onclick={increment}>
@@ -151,7 +167,7 @@ test("shorthand attribute", () => {
 		ok: true,
 		errors: [],
 		template: {
-			markup: root([el("a", [att("{href}", "")])]),
+			markup: root([el("a", [att("{href}")])]),
 		},
 	};
 	expect(output).toEqual(expected);
@@ -167,7 +183,7 @@ test("multiple shorthand attributes", () => {
 		ok: true,
 		errors: [],
 		template: {
-			markup: root([el("a", [att("{href1}", ""), att("{href2}", "")])]),
+			markup: root([el("a", [att("{href1}"), att("{href2}")])]),
 		},
 	};
 	expect(output).toEqual(expected);

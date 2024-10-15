@@ -27,7 +27,7 @@ export default function buildServerComponentNode(
 			if (name.startsWith("{") && name.endsWith("}")) {
 				name = name.substring(1, name.length - 1);
 				b.append(`${propsName}["${name}"] = ${name}`);
-			} else {
+			} else if (value != null) {
 				let reactive = value.startsWith("{") && value.endsWith("}");
 				if (reactive) {
 					value = value.substring(1, value.length - 1);
@@ -37,7 +37,9 @@ export default function buildServerComponentNode(
 					// Probably just compile down to a string?
 					b.append(`"${trimQuotes(value)} tera-${status.styleHash}"`);
 				}
-				b.append(`${propsName}["${name}"] = ${value || "true"};`);
+				b.append(`${propsName}["${name}"] = ${value};`);
+			} else {
+				b.append(`${propsName}["${name}"] = true;`);
 			}
 		}
 		// NOTE: Not sure if this is needed
@@ -64,7 +66,7 @@ export default function buildServerComponentNode(
 		for (let slot of node.children) {
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
-				const slotName = nameAttribute ? trimQuotes(nameAttribute.value) : "_";
+				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				b.append(`${slotsName}["${slotName}"] = ($sprops, $context) => {`);
 				b.append(`let $output = "";`);
 
@@ -86,7 +88,7 @@ export default function buildServerComponentNode(
 	let componentName = node.tagName;
 	if (componentName === ":component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
-		if (selfAttribute) {
+		if (selfAttribute && selfAttribute.value) {
 			componentName = trimMatched(selfAttribute.value, "{", "}");
 		}
 	}

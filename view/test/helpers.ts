@@ -79,7 +79,7 @@ export function text(content: string): TextNode {
 	};
 }
 
-export function att(name: string, value: string): Attribute {
+export function att(name: string, value?: string): Attribute {
 	return {
 		name,
 		value,
