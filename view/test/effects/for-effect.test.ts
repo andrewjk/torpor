@@ -1,6 +1,6 @@
-import { $watch } from "@tera/view";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
 import type ProxyData from "../../src/types/ProxyData";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 import hydrateComponent from "../hydrateComponent";
