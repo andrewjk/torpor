@@ -67,9 +67,13 @@ function parseDocsProp(status: ParseStatus): PropDocumentation {
 	}
 
 	// Parse the name
-	docs.optional = accept("[", status);
+	if (accept("[", status)) {
+		docs.optional = true;
+	}
 	docs.name = consumeAlphaNumeric(status);
-	accept("]", status);
+	if (docs.optional) {
+		accept("]", status);
+	}
 	consumeSpace(status);
 
 	// Maybe parse the description
