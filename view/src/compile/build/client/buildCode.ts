@@ -95,7 +95,7 @@ function buildTemplate(
 	let propsInterface = "any";
 	if (template.docs?.props) {
 		propsInterface = `{
-			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}${p.optional && "?"}: ${p.type};`).join("\n")}
+			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}${p.optional ? "?" : ""}: ${p.type};`).join("\n")}
 		}`;
 	}
 

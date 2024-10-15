@@ -50,16 +50,19 @@ test("prop docs", () => {
 					{
 						name: "name",
 						type: "string",
+						optional: false,
 						description: "The name to show in the header",
 					},
 					{
 						name: "age",
 						type: "",
+						optional: false,
 						description: "",
 					},
 					{
 						name: "username",
 						type: "string",
+						optional: false,
 						description: "The user's username",
 					},
 				],
@@ -97,6 +100,7 @@ test("slot docs", () => {
 							{
 								name: "color",
 								type: "string",
+								optional: false,
 								description: "The color of the header",
 							},
 						],
@@ -137,11 +141,13 @@ test("all docs", () => {
 					{
 						name: "name",
 						type: "string",
+						optional: false,
 						description: "The name to show in the header",
 					},
 					{
 						name: "username",
 						type: "string",
+						optional: false,
 						description: "The user's username",
 					},
 				],
@@ -152,6 +158,7 @@ test("all docs", () => {
 							{
 								name: "color",
 								type: "string",
+								optional: false,
 								description: "The color of the header",
 							},
 						],
