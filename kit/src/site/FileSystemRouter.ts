@@ -4,9 +4,10 @@ export default class FileSystemRouter extends BaseFileSystemRouter {
 	toPath(src: string) {
 		let routePath = cleanPath(src, this.config)
 			.replace(/^\//, "")
-			.replace(/index$/, "")
+			.replace(/_layout.server$/, "_layout/~server")
+			.replace(/\+page.server$/, "~server")
+			.replace(/\+page$/, "")
 			.replace(/\/$/, "");
-
 		return routePath?.length > 0 ? `/${routePath}` : "/";
 	}
 

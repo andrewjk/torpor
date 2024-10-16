@@ -1,5 +1,6 @@
 #! /usr/bin/env node
-import { existsSync, promises as fs } from "node:fs";
+//import { existsSync, promises as fs } from "node:fs";
+import fs from "node:fs";
 import path from "path";
 import defineSite from "../site/defineSite";
 import type UserConfig from "../types/UserConfig";
@@ -12,17 +13,17 @@ const workingDir = process.cwd();
 const jsConfigFile = path.join(workingDir, "tera.config.js");
 const tsConfigFile = path.join(workingDir, "tera.config.ts");
 let source: string | undefined;
-if (existsSync(jsConfigFile)) {
+if (fs.existsSync(jsConfigFile)) {
 	//const configFile = path.relative(".", tsConfigFile);
 	//options = await import(configFile);
-	source = await fs.readFile(jsConfigFile, "utf8");
+	source = fs.readFileSync(jsConfigFile, "utf8");
 	source = source
 		.replace(
 			/import\s+\{\s+defineConfig\s+\}\s+from\s+["']@tera\/kit["']/,
 			"const defineConfig = (x) => x",
 		)
 		.replace("export default", "");
-} else if (existsSync(tsConfigFile)) {
+} else if (fs.existsSync(tsConfigFile)) {
 	console.log("TS config file is not supported");
 }
 

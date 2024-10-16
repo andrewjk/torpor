@@ -1,7 +1,9 @@
 import { hydrate, mount } from "@tera/view";
-import { type Component } from "@tera/view/compile";
+import type { Component, SlotRender } from "@tera/view";
 import "vinxi/client";
+import $page from "../state/$page";
 import type EndPoint from "../types/EndPoint";
+import ServerEndPoint from "../types/ServerEndPoint";
 import routeHandlers from "./routeHandlers";
 
 // Intercept clicks on links
@@ -9,9 +11,14 @@ window.addEventListener("click", async (e) => {
 	if (e.target && (e.target as HTMLElement).tagName === "A") {
 		e.preventDefault();
 		const href = (e.target as HTMLLinkElement).href;
-		const path = new URL(href);
-		if (await navigate(path.pathname, path.searchParams)) {
-			window.history.pushState(null, "", path);
+		const url = new URL(href);
+
+		// Update $page before building the components
+		// TODO: Find somewhere better to put this
+		$page.url = url;
+
+		if (await navigate(url.pathname, url.searchParams)) {
+			window.history.pushState(null, "", url);
 		} else {
 			window.location.href = href;
 		}
@@ -36,27 +43,7 @@ async function navigate(
 	urlParams: URLSearchParams,
 	firstTime = false,
 ): Promise<boolean> {
-	console.log("navigating client to", path, urlParams.toString());
-
-	const route = routeHandlers.match(path, urlParams);
-	const handler: EndPoint | undefined = (await route?.handler.handler).default;
-
-	if (!handler?.view) {
-		// TODO: 404
-		console.log("404");
-		return false;
-	}
-
-	const view = handler.view({
-		routeParams: route?.routeParams,
-		urlParams: route?.urlParams,
-	});
-
-	// Pass the data into $props
-	const component = view.component as Component;
-	let $props: Record<string, any> = {
-		data: view.data,
-	};
+	console.log("navigating client to", path, "with", urlParams.toString());
 
 	const parent = document.getElementById("app");
 	if (!parent) {
@@ -65,13 +52,143 @@ async function navigate(
 		return false;
 	}
 
-	parent.textContent = "";
+	const route = routeHandlers.match(path, urlParams);
+	if (!route) {
+		// TODO: 404
+		console.log("404");
+		return false;
+	}
+
+	const handler = route.handler;
+
+	// There must be a client endpoint with a component
+	const clientEndPoint: EndPoint | undefined = (await handler.endPoint).default;
+	//console.log("=== cep", clientEndPoint);
+	if (!clientEndPoint?.component) {
+		// TODO: 404
+		console.log("404");
+		return false;
+	}
+
+	// There may be a server endpoint
+	const serverEndPoint: ServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
+	//console.log("=== sep", serverEndPoint);
+
+	// Pass the data into $props
+	/*
+	let data = clientEndPoint.load ? clientEndPoint.load() || {} : {};
+	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
+	// Put it into $props during SSR? no, that's not going to work
+	if (serverEndPoint) {
+		// HACK: Is this always the right URL?
+		const serverUrl = document.location.toString().replace(/\/$/, "") + "/~server";
+		console.log("getting data", serverUrl);
+		const serverResponse = await fetch(serverUrl);
+		if (serverResponse?.ok) {
+			const serverData = await serverResponse.json();
+			Object.assign(data, serverData);
+		}
+	}
+	*/
+	let data = {};
+	if (handler.layouts) {
+		for (let layout of handler.layouts) {
+			const layoutEndPoint: EndPoint | undefined = (await layout.endPoint)?.default;
+			const layoutServerEndPoint: ServerEndPoint | undefined = (await layout.serverEndPoint)
+				?.default;
+			const layoutData = await loadClientAndServerData(
+				data,
+				document.location.origin + layout.path,
+				layoutEndPoint,
+				layoutServerEndPoint,
+			);
+			Object.assign(data, layoutData);
+		}
+	}
+	let endPointData = await loadClientAndServerData(
+		data,
+		document.location.origin + handler.path,
+		clientEndPoint,
+		serverEndPoint,
+	);
+	Object.assign(data, endPointData);
+	let $props: Record<string, any> = { data };
+
+	// If there are layouts, work our way upwards, pushing each component into
+	// the default slot of its parent
+	// TODO: Also handle layout server data
+	// TODO: There's probably a nicer way to do this with reducers or something
+	let component = clientEndPoint.component as Component;
+	let slots: Record<string, SlotRender> | undefined = undefined;
+	if (handler.layouts) {
+		let slotFunctions: SlotRender[] = [];
+		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
+			clientEndPoint.component!.render(parent, anchor, $props, context);
+		let i = handler.layouts.length;
+		while (i--) {
+			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
+			if (layoutEndPoint?.component) {
+				if (i === 0) {
+					component = layoutEndPoint.component as Component;
+					slots = { _: slotFunctions[i + 1] };
+				} else {
+					slotFunctions[i] = (parent, anchor, _, context) =>
+						layoutEndPoint.component!.render(parent, anchor, $props, context, {
+							_: slotFunctions[i + 1],
+						});
+				}
+			}
+		}
+	}
 
 	if (firstTime) {
-		hydrate(parent, component, $props);
+		hydrate(parent, component, $props, slots);
 	} else {
-		mount(parent, component, $props);
+		// TODO: Reuse layouts etc
+		parent.textContent = "";
+
+		mount(parent, component, $props, slots);
 	}
 
 	return true;
+}
+
+async function loadClientAndServerData(
+	data: Record<string, any>,
+	location: string,
+	clientEndPoint?: EndPoint,
+	serverEndPoint?: ServerEndPoint,
+) {
+	let newData = {};
+	if (clientEndPoint?.load) {
+		const url = new URL(document.location.href);
+		const params = buildClientParams(url, data);
+		const clientData = await clientEndPoint.load(params);
+		if (clientData) {
+			Object.assign(newData, clientData);
+		}
+	}
+	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
+	// Put it into $props during SSR? no, that's not going to work
+	if (serverEndPoint?.load) {
+		const serverUrl = location.replace(/\/$/, "") + "/~server";
+		const serverResponse = await fetch(serverUrl);
+		if (
+			serverResponse?.ok &&
+			serverResponse.headers.get("content-type")?.includes("application/json")
+		) {
+			const serverData = await serverResponse.json();
+			Object.assign(newData, serverData);
+		}
+	}
+	return newData;
+}
+
+function buildClientParams(url: URL, data: Record<string, any>) {
+	return {
+		url,
+		// TODO:
+		params: {},
+		data,
+	};
 }

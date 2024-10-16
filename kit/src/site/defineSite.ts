@@ -3,7 +3,7 @@ import path from "path";
 import { AppOptions, RouterSchemaInput, createApp } from "vinxi";
 import { config } from "vinxi/plugins/config";
 import type UserConfig from "../types/UserConfig";
-import FileSystemRouter from "./router";
+import FileSystemRouter from "./FileSystemRouter";
 
 export default function defineSite(options?: UserConfig) {
 	// Set the port
@@ -44,7 +44,7 @@ function routes(router: RouterSchemaInput, app: AppOptions) {
 	return new FileSystemRouter(
 		{
 			dir: path.resolve("src/routes"),
-			extensions: ["js", "ts", "tera"],
+			extensions: ["js", "ts"],
 		},
 		router,
 		app,

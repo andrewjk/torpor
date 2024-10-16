@@ -6,6 +6,23 @@
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
+		},
+		"./response": {
+			"types": "./dist/response.d.ts",
+			"import": "./dist/response.js",
+			"require": "./dist/response.cjs"
+		},
+		"./state": {
+			"types": "./dist/state.d.ts",
+			"import": "./dist/state.js",
+			"require": "./dist/state.cjs"
+		}
+	},
 	"private": true,
 	"bin": {
 		"terakit": "./dist/bin/index.js"

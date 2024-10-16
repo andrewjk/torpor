@@ -8,7 +8,11 @@ Built with [Vinxi](https://github.com/nksaraf/vinxi).
 
 ## Installation
 
-TODO:
+Use `npm` (or your preferred package manager) to create a Vite project:
+
+```bash
+npm create vite
+```
 
 ## Folder structure
 
@@ -23,13 +27,14 @@ TODO:
 
 Ideally, sites built with tera/kit will be easy to get set up and running, with flexible overrides for complex uses.
 
-- middleware setup for routing, auth etc
-- /router: type-safe routing with GETs, POSTs, ACTIONs
-- /socket: type-safe websocket communication
-- /tasks: immediate or scheduled background tasks
-- /auth: authentication and authorization
-- /region: localization and internationalization
-- /logs: logs and (basic) analytics
+- middleware setup for auth etc
+- file-based routing by default, with programmatic overrides
+- type-safe routing and fetching
+- type-safe websocket communication
+- immediate or scheduled background tasks
+- authentication and authorization
+- localization and internationalization
+- logs and (basic) analytics
 
 ## Routing
 
