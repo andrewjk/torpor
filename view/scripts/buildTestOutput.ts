@@ -31,8 +31,8 @@ async function buildOutputFiles(file: string) {
 		await fs.writeFile(outputFile.replace(".tera", "-server.ts"), serverCode);
 		await fs.writeFile(outputFile.replace(".tera", "-client.ts"), clientCode);
 	} else {
-		// TODO: Better errors
-		throw Error("parse failed for " + file);
+		// Just log the message and continue with output/testing
+		console.log("Parse failed for " + file);
 	}
 }
 
