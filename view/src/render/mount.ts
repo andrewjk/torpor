@@ -1,4 +1,5 @@
 import type Component from "../types/Component";
+import type SlotRender from "../types/SlotRender";
 
 /**
  * Mounts a component into a DOM node
@@ -11,6 +12,7 @@ export default function mount(
 	parent: ParentNode,
 	component: Component,
 	props?: Record<string, any>,
+	slots?: Record<string, SlotRender>,
 ) {
 	// The parent node must have no child elements, so that we can hydrate
 	// without worrying about where to start
@@ -24,5 +26,5 @@ export default function mount(
 	}
 
 	// Call the component's render function
-	component.render(parent, null, props);
+	component.render(parent, null, props, undefined, slots);
 }

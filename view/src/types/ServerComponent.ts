@@ -1,4 +1,4 @@
-import type SlotRender from "./SlotRender";
+import type ServerSlotRender from "./ServerSlotRender";
 
 /**
  * A component that generates HTML
@@ -8,6 +8,6 @@ export default interface ServerComponent {
 	render: (
 		$props?: Record<string, any>,
 		$context?: Record<string, any>,
-		$slots?: Record<string, SlotRender>,
+		$slots?: Record<string, ServerSlotRender>,
 	) => void;
 }

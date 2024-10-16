@@ -23,6 +23,9 @@ import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
+import type Component from "./types/Component";
+import type ServerComponent from "./types/ServerComponent";
+import type ServerSlotRender from "./types/ServerSlotRender";
 import type SlotRender from "./types/SlotRender";
 
 // Mount and hydrate
@@ -54,4 +57,4 @@ export {
 	t_dynamic,
 };
 
-export type { SlotRender };
+export type { Component, ServerComponent, SlotRender, ServerSlotRender };
