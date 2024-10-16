@@ -39,7 +39,7 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 			// Ignore this special attribute
 		} else if (name.startsWith("on")) {
 			// No events on the server
-		} else if (name.startsWith("transition")) {
+		} else if (name.startsWith("transition") && value) {
 			// No animation on the server, but we do need to set the attributes
 			// from the first keyframe
 			// HACK: use a regex instead maybe?
@@ -57,14 +57,14 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
 			attributes.push(`${name}="\${${name}}"`);
-		} else if (value.startsWith("{") && value.endsWith("}")) {
+		} else if (value && value.startsWith("{") && value.endsWith("}")) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
 			if (name.startsWith("bind:")) {
 				let defaultValue = '""';
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
-				if (typeAttribute) {
+				if (typeAttribute && typeAttribute.value) {
 					switch (trimQuotes(typeAttribute.value)) {
 						case "number": {
 							defaultValue = "0";
@@ -88,10 +88,12 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
 				attributes.push(`\${${value} ? \`${name}="\${${value}}"\` : ''}`);
 			}
-		} else {
+		} else if (value) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled
 			attributes.push(`${name}="${trimQuotes(value)}"`);
+		} else {
+			attributes.push(`${name}`);
 		}
 	}
 	return attributes.join(" ");

@@ -381,12 +381,14 @@ function declareElementFragmentVars(
 		let attributes = node.attributes
 			.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
 			.map((a) => {
-				if (isReactive(a.value)) {
+				if (a.value && isReactive(a.value)) {
 					// Adding a placeholder for reactive attributes seems to speed things
 					// up, especially in the case of data attributes
 					return `"${a.name}": "#"`;
-				} else {
+				} else if (a.value) {
 					return `"${a.name}": "${trimQuotes(a.value) || a.name}"`;
+				} else {
+					return `"${a.name}": true"`;
 				}
 			})
 			.join(", ");
@@ -428,7 +430,9 @@ function declareElementFragmentVars(
 }
 
 function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
-	const hasReactiveAttribute = node.attributes.some((a) => isReactiveAttribute(a.name, a.value));
+	const hasReactiveAttribute = node.attributes.some(
+		(a) => a.value && isReactiveAttribute(a.name, a.value),
+	);
 	const isDynamicElement =
 		node.tagName === ":element" && node.attributes.find((a) => a.name === "self");
 	return hasReactiveAttribute || isDynamicElement || (topLevel && lastChild);

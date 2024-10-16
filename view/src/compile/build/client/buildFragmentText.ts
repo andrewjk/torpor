@@ -132,7 +132,7 @@ function buildElementFragmentText(
 	let attributesText = node.attributes
 		.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
 		.map((a) => {
-			if (isReactive(a.value) && !a.name.includes(":")) {
+			if (a.value && isReactive(a.value) && !a.name.includes(":")) {
 				// Adding a placeholder for reactive attributes seems to speed things
 				// up, especially in the case of data attributes. Otherwise don't set it
 				if (a.name.startsWith("data-")) {

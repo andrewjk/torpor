@@ -44,7 +44,7 @@ export default function buildElementNode(
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	let selfAttribute = node.attributes.find((a) => a.name === "self");
-	if (selfAttribute) {
+	if (selfAttribute && selfAttribute.value) {
 		status.imports.add("$run");
 		status.imports.add("t_dynamic");
 		let selfValue = trimMatched(selfAttribute.value, "{", "}");
@@ -86,7 +86,7 @@ function buildElementAttributes(
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
 			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
-		} else if (value.startsWith("{") && value.endsWith("}")) {
+		} else if (value && value.startsWith("{") && value.endsWith("}")) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
@@ -165,7 +165,7 @@ function buildBindAttribute(
 	let inputValue = "e.target.value";
 	if (node.tagName === "input") {
 		let typeAttribute = node.attributes.find((a) => a.name === "type");
-		if (typeAttribute) {
+		if (typeAttribute && typeAttribute.value) {
 			switch (trimQuotes(typeAttribute.value)) {
 				case "number": {
 					defaultValue = "0";
@@ -241,7 +241,7 @@ function buildTransitionAttribute(
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 	} else if (name === "transition:in") {
 		let outAttribute = node.attributes.find((a) => a.name === "transition:out");
-		if (outAttribute) {
+		if (outAttribute && outAttribute.value) {
 			let outValue = trimMatched(outAttribute.value, "{", "}");
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
 			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue, status)};`);
