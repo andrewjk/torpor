@@ -28,12 +28,15 @@ const Attributes = {
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div data-thing=""> Hello! </div>`);
 		const t_div_1 = t_root(t_fragment_0);
 
-		t_apply_props(t_div_1, $props, ['thing', 'dataThing']);
+		t_apply_props(t_div_1, $props, ['thing', 'dataThing', 'description']);
 		$run(function setAttribute() {
 			t_attribute(t_div_1, "thing", $props.thing);
 		});
 		$run(function setDataAttribute() {
 			t_attribute(t_div_1, "data-thing", $props.dataThing);
+		});
+		$run(function setAttribute() {
+			t_attribute(t_div_1, "caption", `this attribute is for ${$props.description}`);
 		});
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 	}

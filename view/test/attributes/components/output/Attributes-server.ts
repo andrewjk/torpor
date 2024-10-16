@@ -17,7 +17,7 @@ const Attributes = {
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => (text != null ? text : "");
-		$output += `<div ${$props.thing ? `thing="${$props.thing}"` : ''} ${$props.dataThing ? `data-thing="${$props.dataThing}"` : ''}> Hello! </div>`;
+		$output += `<div ${$props.thing ? `thing="${$props.thing}"` : ''} ${$props.dataThing ? `data-thing="${$props.dataThing}"` : ''} caption="this attribute is for ${$props.description}"> Hello! </div>`;
 		return $output;
 	}
 }

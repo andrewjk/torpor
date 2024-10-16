@@ -3,6 +3,8 @@ import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
@@ -60,7 +62,7 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
 			attributes.push(`${name}="\${${name}}"`);
-		} else if (value && value.startsWith("{") && value.endsWith("}")) {
+		} else if (value != null && isFullyReactive(value)) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
@@ -91,7 +93,9 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
 				attributes.push(`\${${value} ? \`${name}="\${${value}}"\` : ''}`);
 			}
-		} else if (value) {
+		} else if (value != null && isReactive(value)) {
+			attributes.push(`${name}="${trimQuotes(value).replaceAll("{", "${")}"`);
+		} else if (value != null) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled
 			attributes.push(`${name}="${trimQuotes(value)}"`);

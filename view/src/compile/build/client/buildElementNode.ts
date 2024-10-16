@@ -3,6 +3,8 @@ import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
@@ -86,9 +88,13 @@ function buildElementAttributes(
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
 			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
-		} else if (value && value.startsWith("{") && value.endsWith("}")) {
+		} else if (value != null && isReactive(value)) {
 			// It's a reactive attribute
-			value = value.substring(1, value.length - 1);
+			if (isFullyReactive(value)) {
+				value = value.substring(1, value.length - 1);
+			} else {
+				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
+			}
 
 			if (name === "bind:self") {
 				// Bind the DOM element to a user-defined variable

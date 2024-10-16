@@ -7,6 +7,8 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -38,14 +40,20 @@ export default function buildServerSlotNode(
 		b.append(`const ${propsName} = {};`);
 		for (let { name, value } of slotAttributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
+				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
 				b.append(`${propsName}["${name}"] = ${name};`);
-			} else {
-				let reactive = value.startsWith("{") && value.endsWith("}");
-				if (reactive) {
+			} else if (value != null) {
+				let fullyReactive = isFullyReactive(value);
+				let partlyReactive = isReactive(value);
+				if (fullyReactive) {
 					value = value.substring(1, value.length - 1);
+				} else if (partlyReactive) {
+					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 				}
 				b.append(`${propsName}["${name}"] = ${value};`);
+			} else {
+				b.append(`${propsName}["${name}"] = true;`);
 			}
 		}
 	}

@@ -1,3 +1,3 @@
-<div thing={$props.thing} data-thing={$props.dataThing}>
+<div thing={$props.thing} data-thing={$props.dataThing} caption="this attribute is for {$props.description}">
     Hello!
 </div>

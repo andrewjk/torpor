@@ -3,6 +3,8 @@ import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -25,12 +27,16 @@ export default function buildServerComponentNode(
 		b.append(`const ${propsName} = {};`);
 		for (let { name, value } of node.attributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
+				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
 				b.append(`${propsName}["${name}"] = ${name}`);
 			} else if (value != null) {
-				let reactive = value.startsWith("{") && value.endsWith("}");
-				if (reactive) {
+				let fullyReactive = isFullyReactive(value);
+				let partlyReactive = isReactive(value);
+				if (fullyReactive) {
 					value = value.substring(1, value.length - 1);
+				} else if (partlyReactive) {
+					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 				}
 				if (name === "class") {
 					// TODO: How to handle dynamic classes etc

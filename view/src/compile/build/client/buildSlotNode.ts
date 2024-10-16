@@ -2,6 +2,8 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
@@ -30,21 +32,25 @@ export default function buildSlotNode(
 		b.append(`const ${propsName} = $watch({});`);
 		for (let { name, value } of slotAttributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
+				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
-				//b.append(`$run(() => ${propsName}["${name}"] = ${name});`);
 				buildRun("setProp", `${propsName}["${name}"] = ${name});`, status, b);
-			} else {
-				let reactive = value.startsWith("{") && value.endsWith("}");
-				if (reactive) {
+			} else if (value != null) {
+				let fullyReactive = isFullyReactive(value);
+				let partlyReactive = isReactive(value);
+				if (fullyReactive) {
 					value = value.substring(1, value.length - 1);
+				} else if (partlyReactive) {
+					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 				}
 				const setProp = `${propsName}["${name}"] = ${value}`;
-				//b.append(reactive ? `$run(() => ${setProp});` : `${setProp};`);
-				if (reactive) {
+				if (fullyReactive || partlyReactive) {
 					buildRun("setProp", `${setProp};`, status, b);
 				} else {
 					b.append(`${setProp};`);
 				}
+			} else {
+				b.append(`${propsName}["${name}"] = true;`);
 			}
 		}
 	}

@@ -3,6 +3,8 @@ import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
@@ -32,12 +34,16 @@ export default function buildComponentNode(
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute
 			} else if (name.startsWith("{") && name.endsWith("}")) {
+				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
 			} else if (value != null) {
-				let reactive = value.startsWith("{") && value.endsWith("}");
-				if (reactive) {
+				let fullyReactive = isFullyReactive(value);
+				let partlyReactive = isReactive(value);
+				if (fullyReactive) {
 					value = value.substring(1, value.length - 1);
+				} else if (partlyReactive) {
+					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 				}
 				if (name === "class") {
 					// TODO: How to handle dynamic classes etc
@@ -45,7 +51,7 @@ export default function buildComponentNode(
 					value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
 				}
 				const setProp = `${propsName}["${name}"] = ${value};`;
-				if (reactive) {
+				if (fullyReactive || partlyReactive) {
 					buildRun("setProp", setProp, status, b);
 				} else {
 					b.append(setProp);
