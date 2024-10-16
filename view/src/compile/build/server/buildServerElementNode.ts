@@ -2,6 +2,7 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
+import voidTags from "../../utils/voidTags";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
@@ -23,8 +24,10 @@ export default function buildServerElementNode(
 		}
 	}
 
-	status.output += `<${tagName}${attributes}${node.selfClosed ? "/" : ""}>`;
-	if (!node.selfClosed) {
+	// NOTE: Only void tags can be self-closed
+	const selfClosed = node.selfClosed && voidTags.includes(tagName);
+	status.output += `<${tagName}${attributes}${selfClosed ? "/" : ""}>`;
+	if (!selfClosed) {
 		for (let child of node.children) {
 			buildServerNode(child, status, b);
 		}

@@ -4,6 +4,7 @@ import type TextNode from "../types/nodes/TextNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 import isTextNode from "../types/nodes/isTextNode";
 import trimMatched from "../utils/trimMatched";
+import voidTags from "../utils/voidTags";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
@@ -13,28 +14,12 @@ import accept from "./utils/accept";
 import addError from "./utils/addError";
 import isSpaceChar from "./utils/isSpaceChar";
 
-// From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
-const voidTags = [
-	"area",
-	"base",
-	"br",
-	"col",
-	"embed",
-	"hr",
-	"img",
-	"input",
-	"link",
-	"meta",
-	"param",
-	"source",
-	"track",
-	"wbr",
-];
-
 export default function parseElement(status: ParseStatus): ElementNode {
 	const start = status.i;
 
 	const element = parseTag(status);
+
+	// TODO: Should we add children of void tags so that we can show an error to the user about it?
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
 		// Get the children
