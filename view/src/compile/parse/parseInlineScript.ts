@@ -23,7 +23,7 @@ export default function parseInlineScript(status: ParseStatus): string {
 			// Ignore the content of one-line comments
 			status.i = status.source.indexOf("\n", status.i) + 1;
 		} else if (accept("/*", status)) {
-			// Ignore the content of multiple-line comments
+			// Ignore the content of block comments
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else {
 			status.i += 1;

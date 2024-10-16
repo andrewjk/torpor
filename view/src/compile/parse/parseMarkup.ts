@@ -98,7 +98,7 @@ function extractElementText(tagName: string, stripComments: boolean, status: Par
 			}
 			content += "\n";
 		} else if (accept("/*", status)) {
-			// Ignore the content of multiple-line comments
+			// Ignore the content of block comments
 			let commentStart = status.i;
 			status.i = status.source.indexOf("*/", status.i) + 2;
 			if (!stripComments) {
