@@ -3,6 +3,7 @@ import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
+import buildHtmlNode from "./buildHtmlNode";
 import buildIfNode from "./buildIfNode";
 import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
@@ -59,6 +60,14 @@ export default function buildControlNode(
 		}
 		case "@replace": {
 			// This gets handled with @replace group, above
+			break;
+		}
+		case "@html group": {
+			buildHtmlNode(node, status, b, parentName, anchorName);
+			break;
+		}
+		case "@html": {
+			// This gets handled with @html group, above
 			break;
 		}
 		case "@const":

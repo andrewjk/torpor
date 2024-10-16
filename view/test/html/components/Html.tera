@@ -1,0 +1,4 @@
+
+<p>
+    @html($props.html)
+</p>

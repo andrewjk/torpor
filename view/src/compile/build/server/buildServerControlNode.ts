@@ -3,6 +3,7 @@ import Builder from "../../utils/Builder";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
+import buildServerHtmlNode from "./buildServerHtmlNode";
 import buildServerIfNode from "./buildServerIfNode";
 import buildServerReplaceNode from "./buildServerReplaceNode";
 import buildServerScriptNode from "./buildServerScriptNode";
@@ -57,6 +58,14 @@ export default function buildServerControlNode(
 		}
 		case "@replace": {
 			// This gets handled with @replace group, above
+			break;
+		}
+		case "@html group": {
+			buildServerHtmlNode(node, status, b);
+			break;
+		}
+		case "@html": {
+			// This gets handled with @html group, above
 			break;
 		}
 		case "@const": {

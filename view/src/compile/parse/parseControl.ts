@@ -25,24 +25,25 @@ const controlOperations = [
 	"@then",
 	"@catch",
 	"@replace",
+	"@html",
 	"@const",
 	"@console",
 	"@debugger",
 	"@function",
 ];
 
-const standaloneOperations = ["@key", "@const", "@console", "@debugger", "@function"];
+const standaloneOperations = ["@key", "@html", "@const", "@console", "@debugger", "@function"];
 
-export default function parseControl(
-	status: ParseStatus,
-	parentNode: ElementNode | ControlNode,
-): ControlNode {
+export default function parseControl(status: ParseStatus, parentNode: ElementNode | ControlNode) {
 	const node = parseControlOpen(status);
+	if (!node) {
+		return;
+	}
 
 	// Some operations don't have children
 	if (standaloneOperations.includes(node.operation)) {
 		wrangleControlNode(node, parentNode);
-		return node;
+		return;
 	}
 
 	// Get the children
@@ -78,11 +79,9 @@ export default function parseControl(
 	wrangleControlNode(node, parentNode);
 
 	parseControlBranches(status, parentNode);
-
-	return node;
 }
 
-function parseControlOpen(status: ParseStatus): ControlNode {
+function parseControlOpen(status: ParseStatus): ControlNode | null {
 	const start = status.i;
 
 	let operation = "";
@@ -91,7 +90,8 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 		if (
 			isSpaceChar(status.source, status.i) ||
 			(accept(":", status) && operation === "default") ||
-			(accept(".", status) && operation === "@console")
+			(accept(".", status) && operation === "@console") ||
+			(accept("(", status, false) && operation === "@html")
 		) {
 			break;
 		}
@@ -113,15 +113,14 @@ function parseControlOpen(status: ParseStatus): ControlNode {
 			accept("}", status);
 		}
 
-		// Special processing for replace
-		if (operation === "@replace") {
-			if (statement.startsWith("replace")) {
-				statement = trimMatched(statement.substring("replace".length).trim(), "(", ")");
-			}
+		// Special processing for replace and html
+		if (operation === "@replace" || operation === "@html") {
+			statement = trimMatched(statement.substring(statement.indexOf("(")).trim(), "(", ")");
 		}
 	} else {
-		// TODO: Should probably advance until a lt
+		// TODO: Should probably advance until a closing brace or a newline
 		addError(status, `Unknown operation: ${operation}`, status.i);
+		return null;
 	}
 
 	return {
@@ -156,7 +155,7 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
 			// Ignore the content of one-line comments
 			status.i = status.source.indexOf("\n", status.i) + 1;
 		} else if (accept("/*", status)) {
-			// Ignore the content of multiple-line comments
+			// Ignore the content of block comments
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else {
 			status.i += 1;
@@ -177,6 +176,7 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 	// * switch into a switch group (cases will have the correct parent)
 	// * await/then/catch into an await group
 	// * replace into a replace group
+	// * html into a html group
 	if (node.operation === "@if") {
 		const ifGroup: ControlNode = {
 			type: "control",
@@ -237,6 +237,14 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
 			children: [node],
 		};
 		parentNode.children.push(replaceGroup);
+	} else if (node.operation === "@html") {
+		const htmlGroup: ControlNode = {
+			type: "control",
+			operation: "@html group",
+			statement: "",
+			children: [node],
+		};
+		parentNode.children.push(htmlGroup);
 	} else {
 		parentNode.children.push(node);
 	}

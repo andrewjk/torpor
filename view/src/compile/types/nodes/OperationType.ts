@@ -15,6 +15,8 @@ type OperationType =
 	| "@catch"
 	| "@replace group"
 	| "@replace"
+	| "@html group"
+	| "@html"
 	| "@const"
 	| "@console"
 	| "@debugger"

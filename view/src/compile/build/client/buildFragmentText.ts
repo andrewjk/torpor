@@ -81,7 +81,8 @@ function buildControlFragmentText(
 		case "@switch group":
 		case "@for group":
 		case "@await group":
-		case "@replace group": {
+		case "@replace group":
+		case "@html group": {
 			// Add a placeholder if it's a branching control node
 			//if (!node.singleRooted) {
 			currentFragment.text += ANCHOR_COMMENT;

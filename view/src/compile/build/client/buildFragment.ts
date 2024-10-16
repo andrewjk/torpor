@@ -103,6 +103,8 @@ function maybeAddRootNodeDeclaration(
 	b: Builder,
 	varPaths: Map<string, string>,
 ) {
+	if (!node.children.length) return;
+
 	// We need to store the root node of the fragment for subsequent updates of the fragment
 	// But not if the node would be declared anyway
 	let firstNode = node.children[0];
@@ -271,7 +273,8 @@ function declareControlFragmentVars(
 		case "@switch group":
 		case "@for group":
 		case "@await group":
-		case "@replace group": {
+		case "@replace group":
+		case "@html group": {
 			const operation = node.operation.substring(1).replace(" group", "");
 			declareParentAndAnchorFragmentVars(
 				fragment,
