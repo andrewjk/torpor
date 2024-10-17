@@ -20,7 +20,7 @@ const AnswerButton = {
 		let $output = "";
 		/* User interface */
 		const t_fmt = (text) => (text != null ? text : "");
-		$output += `<div> <button> YES </button> <button> NO </button> </div>`;
+		$output += `<div> <button>YES</button> <button>NO</button> </div>`;
 		return $output;
 	}
 }

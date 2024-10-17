@@ -26,6 +26,7 @@ const PageTitle = {
 		let $state = $watch({
 			pageTitle: ""
 		});
+
 		$run(() => {
 			$state.pageTitle = document.title;
 		});

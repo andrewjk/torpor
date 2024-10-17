@@ -151,6 +151,7 @@ Examples from [Component Party](https://component-party.dev).
   let $state = $watch({
     pageTitle: ""
   });
+
   $run(() => {
     $state.pageTitle = document.title;
   });
@@ -236,9 +237,9 @@ Examples from [Component Party](https://component-party.dev).
   */
 
   <div>
-    <button onclick={$props.onYes}> YES </button>
+    <button onclick={$props.onYes}>YES</button>
 
-    <button onclick={$props.onNo}> NO </button>
+    <button onclick={$props.onNo}>NO</button>
   </div>
 </template>
 ```
@@ -291,7 +292,7 @@ Examples from [Component Party](https://component-party.dev).
   <UserProfileContext />
 </div>
 
-<template namem="UserProfileContext">
+<template name="UserProfileContext">
   <script>
       $context.user = $watch($context.user);
   </script>
