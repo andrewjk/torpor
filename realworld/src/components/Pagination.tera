@@ -1,0 +1,17 @@
+/**
+ * @prop {number} pageCount -- The total number of pages
+ * @prop {number} page -- The current page number
+ * @prop {(number) => string} href -- A function to build a page URL
+ */
+
+<div>
+	@if ($props.pageCount > 1) {
+		<nav>
+			<ul class="pagination">
+				@for (let i = 1; i < $props.pageCount; i++) {
+					<li class="page-item" class:active={i == $props.page}><a class="page-link" href={$props.href(i)}>{i}</a></li>
+				}
+			</ul>
+		</nav>
+	}
+</div>

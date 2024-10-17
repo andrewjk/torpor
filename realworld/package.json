@@ -5,17 +5,21 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "terakit --dev",
+		"dev": "cd ../kit && pnpm build && cd ../realworld && terakit --dev",
 		"build": "tsc && terakit --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"dependencies": {
+	"devDependencies": {
 		"@tera/kit": "workspace:^",
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
+		"@types/sanitize-html": "^2.13.0",
+		"marked": "^14.1.2",
+		"sanitize-html": "^2.13.1",
+		"typescript": "^5.6.3",
 		"vinxi": "^0.4.3"
 	}
 }

@@ -1,0 +1,5 @@
+<script>
+	import ArticleList from "@/components/article/ArticleList.tera";
+</script>
+
+<ArticleList articles={$props.data.articles} user={$props.data.user} />

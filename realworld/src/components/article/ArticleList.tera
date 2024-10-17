@@ -1,0 +1,16 @@
+<script>
+	import ArticlePreview from './ArticlePreview.tera';
+</script>
+
+<div>
+	@if ($props.articles.length === 0) {
+		<div class="article-preview">No articles are here... yet.</div>
+	} else {
+		<div>
+			@for (let article of $props.articles) {
+				@key = article.slug
+				<ArticlePreview {article} user={$props.user} />
+			}
+		</div>
+	}
+</div>

@@ -1,0 +1,24 @@
+<script>
+	import CommentInput from './CommentInput.tera';
+	import Comment from './Comment.tera';
+</script>
+
+<div class="col-xs-12 col-md-8 offset-md-2">
+	@if ($props.user) {
+		<div>
+			<CommentInput user={$props.user} />
+		</div>
+	} else {
+		<p>
+			<a href="/login">Sign in</a>
+			or
+			<a href="/register">sign up</a>
+			to add comments on this article.
+		</p>
+	}
+
+	@for (let comment of $props.comments) {
+		@key = comment.id
+		<Comment {comment} user={$props.user} />
+	}
+</div>

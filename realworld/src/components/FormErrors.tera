@@ -1,0 +1,14 @@
+/**
+ * Displays a list of errors from a server action
+ * @prop {Object} [errors] -- The errors to display
+ */
+
+<div>
+	@if ($props.errors) {
+		<ul class="error-messages">
+			@for (let key of Object.keys($props.errors)) {
+				<li>{key} {errors[key]}</li>
+			}
+		</ul>
+	}
+</div>
