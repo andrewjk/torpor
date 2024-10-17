@@ -36,7 +36,7 @@ export default function buildComponentNode(
 			} else if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
-				buildRun("setProp", `${propsName}["${name}"] = ${name}`, status, b);
+				buildRun("setProp", `${propsName}["${name}"] = ${name};`, status, b);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);

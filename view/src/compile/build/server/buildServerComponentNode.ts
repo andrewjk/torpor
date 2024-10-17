@@ -29,7 +29,7 @@ export default function buildServerComponentNode(
 			if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
-				b.append(`${propsName}["${name}"] = ${name}`);
+				b.append(`${propsName}["${name}"] = ${name};`);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);
