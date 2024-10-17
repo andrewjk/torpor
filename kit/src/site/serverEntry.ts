@@ -7,6 +7,7 @@ import type { CookieSerializeOptions, EventHandlerRequest, H3Event } from "vinxi
 import { getManifest } from "vinxi/manifest";
 import notFound from "../response/notFound";
 import ok from "../response/ok";
+import seeOther from "../response/seeOther";
 import serverError from "../response/serverError";
 import $page from "../state/$page";
 import type EndPoint from "../types/EndPoint";
@@ -18,6 +19,7 @@ import routeHandlers from "./routeHandlers";
 export default eventHandler(async (event) => {
 	const url = new URL(`http://${process.env.HOST ?? "localhost"}${event.node.req.url}`);
 	const path = url.pathname;
+
 	const searchParams = url.searchParams;
 
 	console.log("handling server", event.method, "for", path, "with", searchParams);
@@ -31,17 +33,20 @@ export default eventHandler(async (event) => {
 	// TODO: Find somewhere better to put this
 	$page.url = url;
 
+	const handler = route.handler;
+	const params = route.routeParams || {};
+
 	switch (event.method) {
 		case "GET": {
 			// HACK: Is this the best way to signal that we want server data??
 			if (path.endsWith("~server")) {
-				return await loadServerData(event, url, route.handler);
+				return await loadServerData(event, url, handler, params);
 			} else {
-				return await loadView(event, url, route.handler);
+				return await loadView(event, url, handler, params);
 			}
 		}
 		case "POST": {
-			return await runAction(event, url, route.handler, searchParams);
+			return await runAction(event, url, handler, params, searchParams);
 		}
 		// TODO: server endpoints
 	}
@@ -51,17 +56,28 @@ async function loadServerData(
 	event: H3Event<EventHandlerRequest>,
 	url: URL,
 	handler: RouteHandler,
+	params: Record<string, string>,
 ) {
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint?.load) {
-		const params = await buildServerParams(event, url);
-		const result = await serverEndPoint.load(params);
-		return ok(result);
+		const serverParams = await buildServerParams(event, url, params);
+		const result = await serverEndPoint.load(serverParams);
+		// If there was no response returned from load (such as errors or a
+		// redirect), send an ok response
+		return result || ok();
 	}
+
+	// It's ok if there's no load method -- we can't tell whether there will be
+	// when loading routes
 	return ok();
 }
 
-async function loadView(event: H3Event<EventHandlerRequest>, url: URL, handler: RouteHandler) {
+async function loadView(
+	event: H3Event<EventHandlerRequest>,
+	url: URL,
+	handler: RouteHandler,
+	params: Record<string, string>,
+) {
 	// There must be a client endpoint with a component
 	const clientEndPoint: EndPoint | undefined = (await handler.endPoint).default;
 	if (!clientEndPoint?.component) {
@@ -103,6 +119,7 @@ async function loadView(event: H3Event<EventHandlerRequest>, url: URL, handler: 
 			const layoutData = await loadClientAndServerData(
 				event,
 				url,
+				params,
 				data,
 				layoutEndPoint,
 				layoutServerEndPoint,
@@ -113,12 +130,12 @@ async function loadView(event: H3Event<EventHandlerRequest>, url: URL, handler: 
 	let endPointData = await loadClientAndServerData(
 		event,
 		url,
+		params,
 		data,
 		clientEndPoint,
 		serverEndPoint,
 	);
 	Object.assign(data, endPointData);
-	//let data = await loadClientAndServerData(event, clientEndPoint, serverEndPoint);
 	let $props: Record<string, any> = { data };
 
 	// If there are layouts, work our way upwards, pushing each component into
@@ -132,8 +149,7 @@ async function loadView(event: H3Event<EventHandlerRequest>, url: URL, handler: 
 		let slotFunctions: ServerSlotRender[] = [];
 		slotFunctions[handler.layouts.length] = (_, context) =>
 			(clientEndPoint.component as ServerComponent).render($props, context);
-		let i = handler.layouts.length;
-		while (i--) {
+		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
@@ -159,7 +175,7 @@ async function loadView(event: H3Event<EventHandlerRequest>, url: URL, handler: 
 		(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
 		(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");
 
-	console.log(html);
+	//console.log(html);
 
 	return html;
 }
@@ -168,6 +184,7 @@ async function runAction(
 	event: H3Event<EventHandlerRequest>,
 	url: URL,
 	handler: RouteHandler,
+	params: Record<string, string>,
 	searchParams: URLSearchParams,
 ) {
 	const actionName = (Array.from(searchParams.keys())[0] || "default").replace(/^\//, "");
@@ -175,8 +192,12 @@ async function runAction(
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
-			const params = await buildServerParams(event, url);
-			return action(params);
+			// TODO: form.errors etc
+			const actionParams = await buildServerParams(event, url, params);
+			const result = await action(actionParams);
+			// If there was no response returned from the action (such as errors
+			// or a redirect), reload the page by redirecting
+			return result || seeOther(url.pathname);
 		}
 	}
 }
@@ -184,33 +205,33 @@ async function runAction(
 async function loadClientAndServerData(
 	event: H3Event<EventHandlerRequest>,
 	url: URL,
+	params: Record<string, string>,
 	data: Record<string, any>,
 	clientEndPoint?: EndPoint,
 	serverEndPoint?: ServerEndPoint,
 ) {
 	let newData = {};
 	if (clientEndPoint?.load) {
-		const params = buildClientParams(url, data);
-		const clientData = await clientEndPoint.load(params);
+		const clientParams = buildClientParams(url, data, params);
+		const clientData = await clientEndPoint.load(clientParams);
 		if (clientData) {
 			Object.assign(newData, clientData);
 		}
 	}
 	if (serverEndPoint?.load) {
-		const params = await buildServerParams(event, url);
-		const serverData = await serverEndPoint.load(params);
-		if (serverData) {
-			Object.assign(newData, serverData);
+		const serverParams = await buildServerParams(event, url, params);
+		const serverData = await serverEndPoint.load(serverParams);
+		if (serverData?.ok) {
+			Object.assign(newData, await serverData.json());
 		}
 	}
 	return newData;
 }
 
-function buildClientParams(url: URL, data: Record<string, any>) {
+function buildClientParams(url: URL, params: Record<string, string>, data: Record<string, any>) {
 	return {
 		url,
-		// TODO:
-		params: {},
+		params,
 		data,
 	};
 }
@@ -218,12 +239,12 @@ function buildClientParams(url: URL, data: Record<string, any>) {
 async function buildServerParams(
 	event: H3Event<EventHandlerRequest>,
 	url: URL,
+	params: Record<string, string>,
 ): Promise<ServerParams> {
 	return {
 		url,
-		// TODO:
-		params: {},
-		request: await incoming_message_to_request(event.node.req, url),
+		params,
+		request: await incomingMessageToRequest(event.node.req, url),
 		response: event.node.res,
 		cookies: {
 			get: (name: string) => getCookie(event, name),
@@ -236,7 +257,7 @@ async function buildServerParams(
 }
 
 // From https://stackoverflow.com/a/78849544
-async function incoming_message_to_request(req: IncomingMessage, url: URL): Promise<Request> {
+async function incomingMessageToRequest(req: IncomingMessage, url: URL): Promise<Request> {
 	const headers = new Headers();
 	for (const [key, value] of Object.entries(req.headers)) {
 		if (Array.isArray(value)) {
@@ -246,7 +267,7 @@ async function incoming_message_to_request(req: IncomingMessage, url: URL): Prom
 		}
 	}
 	// Convert body to Buffer if applicable
-	const body = req.method !== "GET" && req.method !== "HEAD" ? await get_request_body(req) : null;
+	const body = req.method !== "GET" && req.method !== "HEAD" ? await getRequestBody(req) : null;
 	return new Request(url, {
 		method: req.method,
 		headers: headers,
@@ -254,7 +275,7 @@ async function incoming_message_to_request(req: IncomingMessage, url: URL): Prom
 	});
 }
 
-function get_request_body(req: IncomingMessage): Promise<Buffer> {
+function getRequestBody(req: IncomingMessage): Promise<Buffer> {
 	return new Promise<Buffer>((resolve, reject) => {
 		const chunks: Buffer[] = [];
 		req.on("data", (chunk: Buffer) => {

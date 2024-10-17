@@ -5,5 +5,5 @@ export default interface ServerEndPoint {
 	actions?: Record<string, ServerAction>;
 }
 
-type ServerLoad = (params: ServerParams) => any;
-type ServerAction = (params: ServerParams) => any;
+type ServerLoad = (params: ServerParams) => Response | Promise<Response | undefined> | void;
+type ServerAction = (params: ServerParams) => Response | Promise<Response | undefined> | void;

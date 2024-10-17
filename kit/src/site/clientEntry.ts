@@ -59,11 +59,15 @@ async function navigate(
 		return false;
 	}
 
+	// Update $page before building the components
+	// TODO: Find somewhere better to put this
+	//$page.url = new URL(document.location.href);
+
 	const handler = route.handler;
+	const params = route.routeParams || {};
 
 	// There must be a client endpoint with a component
 	const clientEndPoint: EndPoint | undefined = (await handler.endPoint).default;
-	//console.log("=== cep", clientEndPoint);
 	if (!clientEndPoint?.component) {
 		// TODO: 404
 		console.log("404");
@@ -72,33 +76,23 @@ async function navigate(
 
 	// There may be a server endpoint
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
-	//console.log("=== sep", serverEndPoint);
 
 	// Pass the data into $props
-	/*
-	let data = clientEndPoint.load ? clientEndPoint.load() || {} : {};
 	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
-	// Put it into $props during SSR? no, that's not going to work
-	if (serverEndPoint) {
-		// HACK: Is this always the right URL?
-		const serverUrl = document.location.toString().replace(/\/$/, "") + "/~server";
-		console.log("getting data", serverUrl);
-		const serverResponse = await fetch(serverUrl);
-		if (serverResponse?.ok) {
-			const serverData = await serverResponse.json();
-			Object.assign(data, serverData);
-		}
-	}
-	*/
 	let data = {};
 	if (handler.layouts) {
 		for (let layout of handler.layouts) {
+			let layoutPath = layout.path;
+			for (let key in params) {
+				layoutPath = layoutPath.replace(`[${key}]`, params[key]);
+			}
 			const layoutEndPoint: EndPoint | undefined = (await layout.endPoint)?.default;
 			const layoutServerEndPoint: ServerEndPoint | undefined = (await layout.serverEndPoint)
 				?.default;
 			const layoutData = await loadClientAndServerData(
 				data,
-				document.location.origin + layout.path,
+				document.location.origin + layoutPath,
+				params,
 				layoutEndPoint,
 				layoutServerEndPoint,
 			);
@@ -107,7 +101,8 @@ async function navigate(
 	}
 	let endPointData = await loadClientAndServerData(
 		data,
-		document.location.origin + handler.path,
+		document.location.origin + path,
+		params,
 		clientEndPoint,
 		serverEndPoint,
 	);
@@ -124,8 +119,7 @@ async function navigate(
 		let slotFunctions: SlotRender[] = [];
 		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
 			clientEndPoint.component!.render(parent, anchor, $props, context);
-		let i = handler.layouts.length;
-		while (i--) {
+		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
@@ -156,20 +150,19 @@ async function navigate(
 async function loadClientAndServerData(
 	data: Record<string, any>,
 	location: string,
+	params: Record<string, string>,
 	clientEndPoint?: EndPoint,
 	serverEndPoint?: ServerEndPoint,
 ) {
 	let newData = {};
 	if (clientEndPoint?.load) {
-		const url = new URL(document.location.href);
-		const params = buildClientParams(url, data);
-		const clientData = await clientEndPoint.load(params);
+		const clientUrl = new URL(document.location.href);
+		const clientParams = buildClientParams(clientUrl, params, data);
+		const clientData = await clientEndPoint.load(clientParams);
 		if (clientData) {
 			Object.assign(newData, clientData);
 		}
 	}
-	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
-	// Put it into $props during SSR? no, that's not going to work
 	if (serverEndPoint?.load) {
 		const serverUrl = location.replace(/\/$/, "") + "/~server";
 		const serverResponse = await fetch(serverUrl);
@@ -184,11 +177,10 @@ async function loadClientAndServerData(
 	return newData;
 }
 
-function buildClientParams(url: URL, data: Record<string, any>) {
+function buildClientParams(url: URL, params: Record<string, string>, data: Record<string, any>) {
 	return {
 		url,
-		// TODO:
-		params: {},
+		params,
 		data,
 	};
 }

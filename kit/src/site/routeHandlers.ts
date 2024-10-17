@@ -35,6 +35,7 @@ const routeHandlers: RouteHandlerCollection = {
 					loadHandler(handler);
 					handler.loaded = true;
 				}
+				if (path === "/profile/@[user]/_layout/~server") console.log(handler);
 				return {
 					handler,
 					routeParams: match.groups,
@@ -44,9 +45,9 @@ const routeHandlers: RouteHandlerCollection = {
 		}
 
 		console.log("not found");
-		for (let handler of (this as RouteHandlerCollection).handlers) {
-			console.log("  have", handler.path);
-		}
+		//for (let handler of (this as RouteHandlerCollection).handlers) {
+		//	console.log("  have", handler.path, handler.regex);
+		//}
 	},
 };
 
@@ -54,12 +55,7 @@ function pathToRegExp(path: string): RegExp {
 	const pattern = path
 		.split("/")
 		.map((p) => {
-			let match = p.match(/^\[(.+)\]$/);
-			if (match) {
-				return `(?<${match[1]}>.+?)`;
-			} else {
-				return p;
-			}
+			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
 		})
 		.join("\\/");
 	return new RegExp(`^${pattern}$`);
@@ -71,11 +67,21 @@ function loadHandler(handler: RouteHandler) {
 }
 
 function findLayouts(path: string, fileRoutes: RouteModule[]): RouteLayoutHandler[] | undefined {
-	// PERF: could probably loop less here
 	let layouts: RouteLayoutHandler[] = [];
-	let parts = path.replace(/^\//, "").split("/");
+	let parts = path
+		// Strip the trailing`~/server` (so we don't look for `~/server/_layout`
+		// which will never exist)
+		.replace(/\/~server$/, "")
+		// The path will always start with / so splitting e.g. `/first/second`
+		// will result in ['', 'first', 'second'] and checks for `/_layout`,
+		// `/first/_layout` and `/second/_layout`
+		.split("/");
+	let basePath = "";
 	for (let i = 0; i < parts.length; i++) {
-		let layoutPath = parts.slice(0, i).join("/") + "/_layout";
+		if (i > 0) {
+			basePath += "/" + parts[i];
+		}
+		const layoutPath = basePath + "/_layout";
 		const layoutRoute = fileRoutes.find((r) => r.path === layoutPath);
 		if (layoutRoute) {
 			layouts.push({
