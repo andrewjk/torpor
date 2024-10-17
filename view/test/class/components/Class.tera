@@ -1,0 +1,3 @@
+<div class="hello" class:red={$props.red} class:green={$props.green} class:blue={$props.blue}>
+    Hello!
+</div>

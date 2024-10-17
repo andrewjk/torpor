@@ -39,6 +39,7 @@ export default function buildServerElementNode(
 
 function buildElementAttributes(node: ElementNode, b: Builder) {
 	let attributes: string[] = [];
+	let classIndex = -1;
 	for (let { name, value } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
@@ -85,9 +86,16 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 				const propName = name.substring(5);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name.startsWith("class:")) {
-				// TODO: Collect all the classes that are true and add them at the end
 				const className = name.substring(6);
-				attributes.push(`${className}="${value}"`);
+				if (classIndex === -1) {
+					classIndex = attributes.length;
+					attributes.push(`class="\${${value} ? "${className}" : ""}"`);
+				} else {
+					const classAttribute = attributes[classIndex];
+					attributes[classIndex] =
+						classAttribute.substring(0, classAttribute.length - 1) +
+						` \${${value} ? "${className}" : ""}"`;
+				}
 			} else {
 				// Only set the attribute if the value is truthy
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
