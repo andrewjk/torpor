@@ -1,5 +1,5 @@
 /*
-import { usersLogin, usersRegister } from "@/lib/api/controllers/usersController";
+import usersLogin, usersRegister from "@/lib/api/controllers/usersController/usersLogin, usersRegister";
 import * as validator from "@/lib/api/middleware/userValidator";
 import { Router } from "express";
 

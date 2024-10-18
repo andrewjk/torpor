@@ -13,7 +13,6 @@ export default {
 		const [tag, token] = authorization.split(" ");
 		if (tag === "Token" || tag === "Bearer") {
 			appData.user = jose.decodeJwt(token)?.user;
-			console.log("APPDATA IN HOOK", appData);
 		}
 	},
 } satisfies ServerHook;

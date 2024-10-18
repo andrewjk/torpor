@@ -1,4 +1,5 @@
-import { userGet, userUpdate } from "@/lib/api/controllers/userController";
+import userGet from "@/lib/api/controllers/user/userGet";
+import userUpdate from "@/lib/api/controllers/user/userUpdate";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {

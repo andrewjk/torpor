@@ -9,6 +9,8 @@ interface SendOptions {
 	token?: string;
 }
 
+// TODO: Make this all type-safe
+
 async function send({ method, path, data, token }: SendOptions) {
 	console.log("getting api data from", path);
 

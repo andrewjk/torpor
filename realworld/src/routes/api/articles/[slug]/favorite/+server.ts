@@ -1,18 +1,12 @@
-import {
-	articlesDelete,
-	articlesGet,
-	articlesUpdate,
-} from "@/lib/api/controllers/articlesController";
+import articlesFavorite from "@/lib/api/controllers/articles/articlesFavorite";
+import articlesUnFavorite from "@/lib/api/controllers/articles/articlesUnFavorite";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {
-	get: ({ params, request }) => {
-		return articlesGet(params, request);
-	},
-	put: ({ params, appData, request }) => {
-		return articlesUpdate(params, appData, request);
+	post: ({ params, appData }) => {
+		return articlesFavorite(params, appData);
 	},
 	del: ({ params, request }) => {
-		return articlesDelete(params, request);
+		return articlesUnFavorite(params, request);
 	},
 } satisfies ApiServerEndPoint;

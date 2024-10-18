@@ -1,4 +1,4 @@
-import { usersRegister } from "@/lib/api/controllers/usersController";
+import usersRegister from "@/lib/api/controllers/users/usersRegister";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {

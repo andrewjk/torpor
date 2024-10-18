@@ -1,8 +1,6 @@
-import {
-	articlesDelete,
-	articlesGet,
-	articlesUpdate,
-} from "@/lib/api/controllers/articlesController";
+import articlesDelete from "@/lib/api/controllers/articles/articlesDelete";
+import articlesGet from "@/lib/api/controllers/articles/articlesGet";
+import articlesUpdate from "@/lib/api/controllers/articles/articlesUpdate";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {

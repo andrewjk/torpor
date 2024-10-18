@@ -1,4 +1,4 @@
-import { articlesFeed } from "@/lib/api/controllers/articlesController";
+import articlesFeed from "@/lib/api/controllers/articles/articlesFeed";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {

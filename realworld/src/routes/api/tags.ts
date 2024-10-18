@@ -1,5 +1,5 @@
 /*
-import { getTags } from "@/lib/api/controllers/tagsController";
+import getTags from "@/lib/api/controllers/tagsController/getTags";
 import { Router } from "express";
 
 const router = Router();

@@ -1,8 +1,8 @@
-import { getTags } from "@/lib/api/controllers/tagsController";
+import tagsGet from "@/lib/api/controllers/tags/tagsGet";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {
 	get: () => {
-		return getTags();
+		return tagsGet();
 	},
 } satisfies ApiServerEndPoint;

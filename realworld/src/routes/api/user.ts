@@ -1,5 +1,5 @@
 /*
-import { userGet, userUpdate } from "@/lib/api/controllers/userController";
+import userGet, userUpdate from "@/lib/api/controllers/userController/userGet, userUpdate";
 import { authenticate } from "@/lib/api/middleware/auth/authenticator";
 import { userUpdateValidator } from "@/lib/api/middleware/userValidator";
 import { Router } from "express";

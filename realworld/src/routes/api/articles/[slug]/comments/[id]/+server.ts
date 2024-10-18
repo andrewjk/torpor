@@ -1,8 +1,8 @@
-import { deleteComment } from "@/lib/api/controllers/commentsController";
+import commentsDelete from "@/lib/api/controllers/comments/commentsDelete";
 import type { ApiServerEndPoint } from "@tera/kit";
 
 export default {
 	del: ({ params, request }) => {
-		return deleteComment(params, request);
+		return commentsDelete(params, request);
 	},
 } satisfies ApiServerEndPoint;
