@@ -5,10 +5,8 @@ import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 
 export default {
-	load: async ({ cookies, params }) => {
-		// TODO: Move this into hooks/middleware
-		const jwt = cookies.get("jwt");
-		const user = jwt ? JSON.parse(atob(jwt)) : null;
+	load: async ({ appData, params }) => {
+		const user = appData.user;
 
 		const [{ article }, { comments }] = await Promise.all([
 			api.get(`articles/${params.slug}`, user?.token),
@@ -21,10 +19,8 @@ export default {
 		return ok({ article, comments });
 	},
 	actions: {
-		createComment: async ({ cookies, params, request }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const user = jwt ? JSON.parse(atob(jwt)) : null;
+		createComment: async ({ appData, params, request }) => {
+			const user = appData.user;
 			if (!user) {
 				return unauthorized();
 			}
@@ -44,10 +40,8 @@ export default {
 				return unprocessable(result);
 			}
 		},
-		deleteComment: async ({ cookies, params, url }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const user = jwt ? JSON.parse(atob(jwt)) : null;
+		deleteComment: async ({ appData, params, url }) => {
+			const user = appData.user;
 			if (!user) {
 				return unauthorized();
 			}
@@ -58,10 +52,8 @@ export default {
 				return unprocessable(result);
 			}
 		},
-		deleteArticle: async ({ cookies, params }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const user = jwt ? JSON.parse(atob(jwt)) : null;
+		deleteArticle: async ({ appData, params }) => {
+			const user = appData.user;
 			if (!user) {
 				return unauthorized();
 			}
@@ -73,10 +65,8 @@ export default {
 
 			return redirect("/");
 		},
-		toggleFavorite: async ({ cookies, params, request }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const user = jwt ? JSON.parse(atob(jwt)) : null;
+		toggleFavorite: async ({ appData, params, request }) => {
+			const user = appData.user;
 			if (!user) {
 				return unauthorized();
 			}

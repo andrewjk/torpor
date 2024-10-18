@@ -9,10 +9,8 @@ export default {
 		return ok({ articles, pageCount });
 	},
 	actions: {
-		toggleFollow: async ({ cookies, params, request }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const user = jwt ? JSON.parse(atob(jwt)) : null;
+		toggleFollow: async ({ appData, params, request }) => {
+			const user = appData.user;
 			if (!user) {
 				return unauthorized();
 			}

@@ -1,13 +1,11 @@
 import * as api from "@/lib/api.js";
 import { type ServerEndPoint } from "@tera/kit";
-import { redirect, unprocessable } from "@tera/kit/response";
+import { redirect, seeOther, unprocessable } from "@tera/kit/response";
 
 export default {
-	load: async ({ cookies }) => {
+	load: async ({ appData }) => {
 		// This was coming from parent for some reason?
-		// TODO: Move this into hooks/middleware
-		const jwt = cookies.get("jwt");
-		const user = jwt ? JSON.parse(atob(jwt)) : null;
+		const user = appData.user;
 		if (user) {
 			return redirect("/");
 		}
@@ -30,7 +28,7 @@ export default {
 			const value = btoa(JSON.stringify(result.user));
 			cookies.set("jwt", value, { path: "/" });
 
-			return redirect("/");
+			return seeOther("/");
 		},
 	},
 } satisfies ServerEndPoint;

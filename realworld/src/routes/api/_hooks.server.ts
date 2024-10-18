@@ -1,0 +1,19 @@
+import type { ServerHook } from "@tera/kit";
+import * as jose from "jose";
+
+export default {
+	handle: ({ appData, request }) => {
+		const authorization = request.headers.get("authorization");
+		if (!authorization) {
+			return;
+		}
+		if (authorization.split(" ").length != 2) {
+			return;
+		}
+		const [tag, token] = authorization.split(" ");
+		if (tag === "Token" || tag === "Bearer") {
+			appData.user = jose.decodeJwt(token)?.user;
+			console.log("APPDATA IN HOOK", appData);
+		}
+	},
+} satisfies ServerHook;

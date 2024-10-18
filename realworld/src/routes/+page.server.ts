@@ -4,10 +4,8 @@ import { type ServerEndPoint } from "@tera/kit";
 import { ok } from "@tera/kit/response";
 
 export default {
-	load: async ({ url, cookies }) => {
-		// TODO: Move this into hooks/middleware
-		const jwt = cookies.get("jwt");
-		const user = jwt ? JSON.parse(atob(jwt)) : null;
+	load: async ({ url, appData }) => {
+		const user = appData.user;
 
 		const tab = url.searchParams.get("tab") || "all";
 		const tag = url.searchParams.get("tag");

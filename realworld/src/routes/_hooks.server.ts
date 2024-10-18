@@ -1,17 +1,8 @@
-// The hooks file runs before layout etc and passes things down the line
-/*
+import type { ServerHook } from "@tera/kit";
+
 export default {
-	view: () => {
-		return {
-			component,
-		};
+	handle: ({ appData, cookies }) => {
+		const jwt = cookies.get("jwt");
+		appData.user = jwt ? JSON.parse(atob(jwt)) : null;
 	},
-} satisfies ServerHooks;
-
-export function request({ event, resolve }) {
-	const jwt = event.cookies.get("jwt");
-	event.locals.user = jwt ? JSON.parse(atob(jwt)) : null;
-
-	return resolve(event);
-}
-*/
+} satisfies ServerHook;

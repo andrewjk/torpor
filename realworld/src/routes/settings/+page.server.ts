@@ -3,24 +3,21 @@ import type { ServerEndPoint } from "@tera/kit";
 import { redirect, unauthorized, unprocessable } from "@tera/kit/response";
 
 export default {
-	load: ({ cookies }) => {
-		// TODO: Move this into hooks/middleware
-		const jwt = cookies.get("jwt");
-		const user = jwt ? JSON.parse(atob(jwt)) : null;
+	load: ({ appData }) => {
+		const user = appData.user;
 		if (!user) {
 			return redirect("/login");
 		}
 	},
 	actions: {
-		logout: ({ cookies }) => {
+		logout: ({ appData, cookies }) => {
 			cookies.delete("jwt", { path: "/" });
+
 			// TODO: Is this necessary?
-			//locals.user = null;
+			appData.user = null;
 		},
-		save: async ({ cookies, request }) => {
-			// TODO: Move this into hooks/middleware
-			const jwt = cookies.get("jwt");
-			const exuser = jwt ? JSON.parse(atob(jwt)) : null;
+		save: async ({ appData, cookies, request }) => {
+			const exuser = appData.user;
 			if (!exuser) {
 				return unauthorized();
 			}
@@ -44,7 +41,7 @@ export default {
 			cookies.set("jwt", value, { path: "/" });
 
 			// TODO: Is this necessary?
-			//locals.user = body.user;
+			appData.user = user;
 		},
 	},
 } satisfies ServerEndPoint;

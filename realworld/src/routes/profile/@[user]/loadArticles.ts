@@ -3,12 +3,10 @@ import { pageSize } from "@/lib/constants";
 import type { ServerParams } from "@tera/kit";
 
 export default async function loadArticles(
-	{ url, params, cookies }: ServerParams,
+	{ url, params, appData }: ServerParams,
 	type: "author" | "favorited",
 ) {
-	// TODO: Move this into hooks/middleware
-	const jwt = cookies.get("jwt");
-	const user = jwt ? JSON.parse(atob(jwt)) : null;
+	const user = appData.user;
 
 	const page = +(url.searchParams.get("page") || 1);
 
