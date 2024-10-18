@@ -8,4 +8,5 @@ export default interface RouteHandler {
 	loaded: boolean;
 	layouts?: RouteLayoutHandler[];
 	serverEndPoint?: Promise<any>;
+	serverHook?: Promise<any>;
 }

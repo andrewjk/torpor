@@ -17,6 +17,18 @@ export default function defineSite(options?: UserConfig) {
 				type: "static",
 				dir: "./src/assets",
 			},
+			// Doesn't look like we can have two server routes?
+			// Have to put api in /routes
+			// Maybe we can support having /routes/api and routes/site and stripping /site from the start?
+			//{
+			//	name: "api",
+			//	type: "http",
+			//	target: "server",
+			//	// TODO: change this when published
+			//	handler: "node_modules/@tera/kit/src/site/serverEntry.ts",
+			//	routes: apiRoutes,
+			//	plugins: () => [config("custom", viteOptions())],
+			//},
 			{
 				name: "server",
 				type: "http",

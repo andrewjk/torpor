@@ -7,6 +7,7 @@ export default class FileSystemRouter extends BaseFileSystemRouter {
 			.replace(/_layout.server$/, "_layout/~server")
 			.replace(/\+page.server$/, "~server")
 			.replace(/\+page$/, "")
+			.replace(/\+server$/, "")
 			.replace(/\/$/, "");
 		return routePath?.length > 0 ? `/${routePath}` : "/";
 	}

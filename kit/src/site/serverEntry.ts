@@ -5,6 +5,7 @@ import path from "path";
 import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
 import type { CookieSerializeOptions, EventHandlerRequest, H3Event } from "vinxi/http";
 import { getManifest } from "vinxi/manifest";
+import { ApiServerEndPoint } from "..";
 import notFound from "../response/notFound";
 import ok from "../response/ok";
 import seeOther from "../response/seeOther";
@@ -13,8 +14,11 @@ import $page from "../state/$page";
 import type EndPoint from "../types/EndPoint";
 import type RouteHandler from "../types/RouteHandler";
 import type ServerEndPoint from "../types/ServerEndPoint";
+import type ServerHook from "../types/ServerHook";
 import type ServerParams from "../types/ServerParams";
 import routeHandlers from "./routeHandlers";
+
+let printedRoutes = false;
 
 export default eventHandler(async (event) => {
 	const url = new URL(`http://${process.env.HOST ?? "localhost"}${event.node.req.url}`);
@@ -23,6 +27,17 @@ export default eventHandler(async (event) => {
 	const searchParams = url.searchParams;
 
 	console.log("handling server", event.method, "for", path, "with", searchParams);
+
+	if (!printedRoutes) {
+		printedRoutes = true;
+		console.log(
+			"routes:\n  " +
+				routeHandlers.handlers
+					.map((h) => h.path)
+					.sort()
+					.join("\n  "),
+		);
+	}
 
 	const route = routeHandlers.match(path, searchParams);
 	if (!route) {
@@ -36,21 +51,51 @@ export default eventHandler(async (event) => {
 	const handler = route.handler;
 	const params = route.routeParams || {};
 
-	switch (event.method) {
-		case "GET": {
-			// HACK: Is this the best way to signal that we want server data??
-			if (path.endsWith("~server")) {
-				return await loadServerData(event, url, handler, params);
-			} else {
-				return await loadView(event, url, handler, params);
-			}
+	// TODO: Hit the server hook out here
+
+	// HACK: Support any +server location??
+	if (path.startsWith("/api/")) {
+		return await loadData(event, url, handler, params);
+	} else if (path.endsWith("~server")) {
+		// HACK: Is this the best way to signal that we want server data??
+		// And can we maybe combine this with the above method, or are they too different?
+		if (event.method === "GET") {
+			return await loadServerData(event, url, handler, params);
 		}
-		case "POST": {
+	} else {
+		if (event.method === "GET") {
+			return await loadView(event, url, handler, params);
+		} else if (event.method === "POST") {
 			return await runAction(event, url, handler, params, searchParams);
 		}
-		// TODO: server endpoints
 	}
 });
+
+async function loadData(
+	event: H3Event<EventHandlerRequest>,
+	url: URL,
+	handler: RouteHandler,
+	params: Record<string, string>,
+) {
+	const functionName = event.method.toLowerCase().replace("delete", "del");
+
+	const serverEndPoint: ApiServerEndPoint | undefined = (await handler.endPoint).default;
+	if (serverEndPoint && serverEndPoint[functionName]) {
+		const serverParams = await buildServerParams(event, url, params);
+
+		if (handler.serverHook) {
+			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+			if (serverHook?.handle) {
+				await serverHook.handle(serverParams);
+			}
+		}
+
+		const result = await serverEndPoint[functionName](serverParams);
+		// If there was no response returned from load (such as errors or a
+		// redirect), send an ok response
+		return result || ok();
+	}
+}
 
 async function loadServerData(
 	event: H3Event<EventHandlerRequest>,
@@ -61,6 +106,14 @@ async function loadServerData(
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint?.load) {
 		const serverParams = await buildServerParams(event, url, params);
+
+		if (handler.serverHook) {
+			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+			if (serverHook?.handle) {
+				await serverHook.handle(serverParams);
+			}
+		}
+
 		const result = await serverEndPoint.load(serverParams);
 		// If there was no response returned from load (such as errors or a
 		// redirect), send an ok response
@@ -69,7 +122,7 @@ async function loadServerData(
 
 	// It's ok if there's no load method -- we can't tell whether there will be
 	// when loading routes
-	return ok();
+	//return ok();
 }
 
 async function loadView(
@@ -107,6 +160,15 @@ async function loadView(
 	const manifestJson = JSON.stringify(clientManifest.json());
 	const hasManifestJson = manifestJson !== "{}";
 
+	// Maybe hit the server hook
+	const serverParams = await buildServerParams(event, url, params);
+	if (handler.serverHook) {
+		const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+		if (serverHook?.handle) {
+			await serverHook.handle(serverParams);
+		}
+	}
+
 	// Pass the data into $props
 	// TODO: Promise.all
 	// NOTE: We're loading data from top to bottom, overriding as we go, and I'm not sure if this is the best way to go
@@ -117,9 +179,9 @@ async function loadView(
 			const layoutServerEndPoint: ServerEndPoint | undefined = (await layout.serverEndPoint)
 				?.default;
 			const layoutData = await loadClientAndServerData(
-				event,
 				url,
 				params,
+				serverParams,
 				data,
 				layoutEndPoint,
 				layoutServerEndPoint,
@@ -128,9 +190,9 @@ async function loadView(
 		}
 	}
 	let endPointData = await loadClientAndServerData(
-		event,
 		url,
 		params,
+		serverParams,
 		data,
 		clientEndPoint,
 		serverEndPoint,
@@ -193,8 +255,16 @@ async function runAction(
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
-			const actionParams = await buildServerParams(event, url, params);
-			const result = await action(actionParams);
+			const serverParams = await buildServerParams(event, url, params);
+
+			if (handler.serverHook) {
+				const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+				if (serverHook?.handle) {
+					await serverHook.handle(serverParams);
+				}
+			}
+
+			const result = await action(serverParams);
 			// If there was no response returned from the action (such as errors
 			// or a redirect), reload the page by redirecting
 			return result || seeOther(url.pathname);
@@ -203,9 +273,9 @@ async function runAction(
 }
 
 async function loadClientAndServerData(
-	event: H3Event<EventHandlerRequest>,
 	url: URL,
 	params: Record<string, string>,
+	serverParams: ServerParams,
 	data: Record<string, any>,
 	clientEndPoint?: EndPoint,
 	serverEndPoint?: ServerEndPoint,
@@ -219,7 +289,6 @@ async function loadClientAndServerData(
 		}
 	}
 	if (serverEndPoint?.load) {
-		const serverParams = await buildServerParams(event, url, params);
 		const serverData = await serverEndPoint.load(serverParams);
 		if (serverData?.ok) {
 			Object.assign(newData, await serverData.json());
@@ -244,6 +313,7 @@ async function buildServerParams(
 	return {
 		url,
 		params,
+		appData: {},
 		request: await incomingMessageToRequest(event.node.req, url),
 		response: event.node.res,
 		cookies: {

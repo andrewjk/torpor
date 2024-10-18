@@ -45,9 +45,9 @@ const routeHandlers: RouteHandlerCollection = {
 		}
 
 		console.log("not found");
-		//for (let handler of (this as RouteHandlerCollection).handlers) {
-		//	console.log("  have", handler.path, handler.regex);
-		//}
+		for (let handler of (this as RouteHandlerCollection).handlers) {
+			console.log("  have", handler.path, handler.regex);
+		}
 	},
 };
 
@@ -64,6 +64,7 @@ function pathToRegExp(path: string): RegExp {
 function loadHandler(handler: RouteHandler) {
 	handler.layouts = findLayouts(handler.path, fileRoutes);
 	handler.serverEndPoint = findServer(handler.path, fileRoutes);
+	handler.serverHook = findServerHook(handler.path, fileRoutes);
 }
 
 function findLayouts(path: string, fileRoutes: RouteModule[]): RouteLayoutHandler[] | undefined {
@@ -98,6 +99,16 @@ function findServer(path: string, fileRoutes: RouteModule[]): Promise<any> | und
 	const serverPath = path.replace(/\/$/, "") + "/~server";
 	const serverRoute = fileRoutes.find((r) => r.path === serverPath);
 	return serverRoute && lazyRoute(serverRoute.$handler, clientManifest, serverManifest);
+}
+
+function findServerHook(path: string, fileRoutes: RouteModule[]): Promise<any> | undefined {
+	// TODO: Should this be a collection, like layouts?
+	let hookPath = "/_hooks.server";
+	if (path.startsWith("/api/")) {
+		hookPath = "/api" + hookPath;
+	}
+	const hookRoute = fileRoutes.find((r) => r.path === hookPath);
+	return hookRoute && lazyRoute(hookRoute.$handler, clientManifest, serverManifest);
 }
 
 export default routeHandlers;

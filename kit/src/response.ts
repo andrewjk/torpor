@@ -1,4 +1,5 @@
 import badRequest from "./response/badRequest";
+import created from "./response/created";
 import forbidden from "./response/forbidden";
 import methodNotAllowed from "./response/methodNotAllowed";
 import moved from "./response/moved";
@@ -16,6 +17,7 @@ import unprocessable from "./response/unprocessable";
 export {
 	response,
 	ok,
+	created,
 	transfer,
 	seeOther,
 	notModified,
