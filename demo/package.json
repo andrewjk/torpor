@@ -5,7 +5,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../kit && pnpm build && cd ../demo && terakit --dev --port 7354",
+		"dev": "cd ../kit && pnpm build && cd ../demo && terakit --dev",
 		"build": "tsc && terakit --build",
 		"preview": "vinxi serve"
 	},
