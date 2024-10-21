@@ -335,6 +335,18 @@ function declareComponentFragmentVars(
 	);
 }
 
+function elementTypeName(node: ElementNode) {
+	// TODO: Etc
+	switch (node.tagName.toLowerCase()) {
+		case "div":
+		case "input":
+			return `HTML${node.tagName.substring(0, 1).toUpperCase() + node.tagName.substring(1)}Element`;
+		case "textarea":
+			return "HTMLTextAreaElement";
+	}
+	return "HTMLElement";
+}
+
 function declareElementFragmentVars(
 	fragment: Fragment,
 	node: ElementNode,
@@ -366,9 +378,9 @@ function declareElementFragmentVars(
 				b.append(`let ${node.varName};`);
 			} else {
 				if (node.tagName === ":element") {
-					b.append(`let ${node.varName} = ${varPath};`);
+					b.append(`let ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				} else {
-					b.append(`const ${node.varName} = ${varPath};`);
+					b.append(`const ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				}
 				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 			}
@@ -609,9 +621,9 @@ function declareParentAndAnchorFragmentVars(
 			if (declare) {
 				node.parentName = nextVarName(`${name}_parent`, status);
 				if (status.options?.useCreateElement) {
-					b.append(`let ${node.parentName};`);
+					b.append(`let ${node.parentName} as HTMLElement;`);
 				} else {
-					b.append(`const ${node.parentName} = ${parentVarPath};`);
+					b.append(`const ${node.parentName} = ${parentVarPath} as HTMLElement;`);
 				}
 				varPaths.set(parentVarPath, node.parentName);
 			} else {
@@ -626,12 +638,12 @@ function declareParentAndAnchorFragmentVars(
 		path.children.push(anchorPath);
 
 		node.varName = nextVarName(`${name}_anchor`, status);
-		const varPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
+		const anchorVarPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
 		if (status.options?.useCreateElement) {
 			b.append(`let ${node.varName};`);
 		} else {
 			status.imports.add("t_anchor");
-			b.append(`const ${node.varName} = t_anchor(${varPath});`);
+			b.append(`const ${node.varName} = t_anchor(${anchorVarPath}) as HTMLElement;`);
 			//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 		}
 	} else {
@@ -656,8 +668,8 @@ function getFragmentVarPath(
 	while (node.parent) {
 		node = node.parent;
 	}
-	let varPath = `t_fragment_${fragment.number}`;
-	varPath = getFragmentVarPathPart(node, varPath, status, true);
+	let varName = `t_fragment_${fragment.number}`;
+	let varPath = getFragmentVarPathPart(node, varName, status, true);
 
 	// Check for parts of the path that have already been run to shorten our
 	// traversal

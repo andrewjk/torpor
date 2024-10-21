@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const TrafficLight = {
 	/**
@@ -13,7 +13,7 @@ const TrafficLight = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 		let $state = $watch({
 			lightIndex: 0,
@@ -27,7 +27,7 @@ const TrafficLight = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 		if ($state.light === "red") {
 			$output += ` <span>STOP</span> `;

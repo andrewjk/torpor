@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const NestedIf = {
 	/**
@@ -16,7 +16,7 @@ const NestedIf = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		if ($props.condition) {
 			$output += ` <![>`;

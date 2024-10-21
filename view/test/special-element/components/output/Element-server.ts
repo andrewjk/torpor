@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Element = {
 	/**
@@ -16,7 +16,7 @@ const Element = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<${$props.tag}> Hello! </${$props.tag}>`;
 		return $output;
 	}

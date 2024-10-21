@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const ColorSelect = {
 	/**
@@ -13,7 +13,7 @@ const ColorSelect = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let $state = $watch({
 			selectedColorId: 2
 		});
@@ -26,7 +26,7 @@ const ColorSelect = {
 		];
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${$state.selectedColorId || ""}"> <![>`;
 		for (let color of colors) {
 			$output += `<!^> <option ${color.id ? `value="${color.id}"` : ''} ${color.isDisabled ? `disabled="${color.isDisabled}"` : ''}> ${t_fmt(color.text)} </option> `;

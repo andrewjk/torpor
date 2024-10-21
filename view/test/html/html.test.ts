@@ -40,7 +40,6 @@ function check(container: HTMLElement, $state: State) {
 	);
 
 	$state.html = "<ul><li>A list</li></ul>";
-	console.log(container.textContent);
 
 	expect(queryByText(container, "A list")).not.toBeNull();
 }

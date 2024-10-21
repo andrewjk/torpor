@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const UserProfileContext = {
 	/**
@@ -15,11 +15,11 @@ const UserProfileContext = {
 		$context = Object.assign({}, $context);
 
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		$context.user = $watch($context.user);
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> </div>`;
 		return $output;
 	}

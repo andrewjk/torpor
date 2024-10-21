@@ -42,7 +42,7 @@ interface Context {
 	}[];
 
 	/** The node that is actively being hydrated. */
-	hydrationNode: Node | null;
+	hydrationNode: ChildNode | null;
 	//hn: Node | null;
 }
 

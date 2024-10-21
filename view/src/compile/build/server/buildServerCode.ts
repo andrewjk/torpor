@@ -12,7 +12,7 @@ export default function buildServerCode(
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
-	imports.add(`import type SlotRender from "\${folder}";`);
+	imports.add(`import type { SlotRender } from "\${folder}";`);
 
 	// Build the component and any child components
 	buildServerTemplate(name, template, imports, b, options);
@@ -96,10 +96,12 @@ function buildServerTemplate(
 		b.append("/* User script */");
 
 		// HACK: Stub reactivity functions to do nothing on the server
-		if (/\$watch\b/.test(template.script)) b.append("const $watch = (obj) => obj;");
-		if (/\$unwrap\b/.test(template.script)) b.append("const $unwrap = (obj) => obj;");
-		if (/\$run\b/.test(template.script)) b.append("const $run = (fn) => null;");
-		if (/\$mount\b/.test(template.script)) b.append("const $mount = (fn) => null;");
+		if (/\$watch\b/.test(template.script))
+			b.append("const $watch = (obj: Record<PropertyKey, any>) => obj;");
+		if (/\$unwrap\b/.test(template.script))
+			b.append("const $unwrap = (obj: Record<PropertyKey, any>) => obj;");
+		if (/\$run\b/.test(template.script)) b.append("const $run = (fn: Function) => null;");
+		if (/\$mount\b/.test(template.script)) b.append("const $mount = (fn: Function) => null;");
 
 		// Add the script
 		b.append(template.script);
@@ -119,7 +121,7 @@ function buildServerTemplate(
 
 		// HACK: Stub the format function to run on the server
 		// TODO: Add this to imports instead
-		b.append('const t_fmt = (text) => (text != null ? text : "");');
+		b.append('const t_fmt = (text: string) => (text != null ? text : "");');
 
 		// Add the interface
 		buildServerNode(template.markup, status, b);

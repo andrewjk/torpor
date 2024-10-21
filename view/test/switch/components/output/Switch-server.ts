@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 /**
  * A component with a switch statement in it.
@@ -22,7 +22,7 @@ const Switch = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <![>`;
 		switch ($props.value) {
 			case 1: {

@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const PageTitle = {
 	/**
@@ -13,8 +13,8 @@ const PageTitle = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
-		const $run = (fn) => null;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
+		const $run = (fn: Function) => null;
 		let $state = $watch({
 			pageTitle: ""
 		});
@@ -24,7 +24,7 @@ const PageTitle = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
 		return $output;
 	}

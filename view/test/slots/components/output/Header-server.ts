@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Header = {
 	/**
@@ -14,7 +14,7 @@ const Header = {
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<h2> <![>`;
 		if ($slots && $slots["_"]) {
 			$output += $slots["_"](undefined, $context);

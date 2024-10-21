@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Counter = {
 	/**
@@ -13,7 +13,7 @@ const Counter = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let $state = $watch({
 			count: 0
 		});
@@ -23,7 +23,7 @@ const Counter = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> </div>`;
 		return $output;
 	}

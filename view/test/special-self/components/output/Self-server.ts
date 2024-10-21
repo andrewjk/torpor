@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Self = {
 	/**
@@ -16,7 +16,7 @@ const Self = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> Level ${t_fmt($props.level)} <![>`;
 		if ($props.level < 3) {
 			$output += ` `;

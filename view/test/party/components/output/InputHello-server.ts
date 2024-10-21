@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const InputHello = {
 	/**
@@ -13,13 +13,13 @@ const InputHello = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let $state = $watch({
 			text: "Hello World"
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <p>${t_fmt($state.text)}</p> <input value="${$state.text || ""}"/> </div>`;
 		return $output;
 	}

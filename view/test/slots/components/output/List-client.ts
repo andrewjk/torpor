@@ -1,6 +1,6 @@
 import { $run } from '@tera/view';
 import { $watch } from '@tera/view';
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_apply_props } from '@tera/view';
@@ -26,15 +26,15 @@ const List = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: Node, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		$props ||= {};
 
 		/* User interface */
 		const t_fragments = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<ul> <!> </ul>`);
-		const t_ul_1 = t_root(t_fragment_0);
-		const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1)));
+		const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
+		const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1))) as HTMLElement;
 
 		/* @for */
 		let t_for_range_1 = t_range();
@@ -55,8 +55,8 @@ const List = {
 				let t_old_range_1 = t_push_range(t_item, true);
 				const t_fragment_1 = t_fragment(t_fragments, 1, ` <li> <!> </li> `);
 				const t_root_1 = t_root(t_fragment_1);
-				const t_slot_parent_1 = t_next(t_root_1);
-				const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1)));
+				const t_slot_parent_1 = t_next(t_root_1) as HTMLElement;
+				const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
 				const t_sprops_1 = $watch({});
 				$run(function setProp() {
 					t_sprops_1["item"] = t_item.data.item;

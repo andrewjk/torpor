@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import UserProfile from './UserProfile.tera';
 
 const UserProfileApp = {
@@ -15,7 +15,7 @@ const UserProfileApp = {
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		const t_props_1 = {};
 		t_props_1["name"] = "John";
 		t_props_1["age"] = 20;

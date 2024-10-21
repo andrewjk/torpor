@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Colors = {
 	/**
@@ -16,7 +16,7 @@ const Colors = {
 		const colors = ["red", "green", "blue"];
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<ul> <![>`;
 		for (let color of colors) {
 			$output += `<!^>  <li>${t_fmt(color)}</li> `;

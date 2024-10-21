@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const DoubleCount = {
 	/**
@@ -13,7 +13,7 @@ const DoubleCount = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let $state = $watch({
 			count: 10,
 			get doubleCount() {
@@ -22,7 +22,7 @@ const DoubleCount = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div>${t_fmt($state.doubleCount)}</div>`;
 		return $output;
 	}

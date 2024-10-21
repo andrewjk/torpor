@@ -1,10 +1,10 @@
-import type { SlotRender } from "@tera/view";
+import type SlotRender from "@tera/view";
 
-const Attributes = {
+const Self = {
 	/**
 	 * The component's name.
 	 */
-	name: "Attributes",
+	name: "Self",
 	/**
 	 * Renders the component into a HTML string.
 	 * @param $props -- The values that have been passed into the component as properties.
@@ -16,10 +16,19 @@ const Attributes = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		$output += `<div ${$props.thing ? `thing="${$props.thing}"` : ''} ${$props.dataThing ? `data-thing="${$props.dataThing}"` : ''} caption="this attribute is for ${$props.description}"> Hello! </div>`;
+		const t_fmt = (text) => (text != null ? text : "");
+		$output += `<div> Level ${t_fmt($props.level)} <![>`;
+		if ($props.level < 3) {
+			$output += ` `;
+			const t_props_1 = {};
+			t_props_1["level"] = $props.level + 1;
+
+			$output += Self.render(t_props_1, $context)
+			$output += ` `;
+		}
+		$output += `<!]><!> </div>`;
 		return $output;
 	}
 }
 
-export default Attributes;
+export default Self;

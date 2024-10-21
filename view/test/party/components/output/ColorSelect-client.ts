@@ -1,6 +1,6 @@
 import { $run } from '@tera/view';
 import { $watch } from '@tera/view';
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_apply_props } from '@tera/view';
@@ -29,7 +29,7 @@ const ColorSelect = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: Node, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
 		let $state = $watch({
 			selectedColorId: 2
@@ -46,10 +46,10 @@ const ColorSelect = {
 		const t_fragments = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <div>#</div> <select> <!> </select> </div>`);
-		const t_div_1 = t_root(t_fragment_0);
+		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 		const t_text_1 = t_child(t_next(t_child(t_div_1)));
-		const t_select_1 = t_next(t_next(t_next(t_child(t_div_1))));
-		const t_for_anchor_1 = t_anchor(t_next(t_child(t_select_1)));
+		const t_select_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLElement;
+		const t_for_anchor_1 = t_anchor(t_next(t_child(t_select_1))) as HTMLElement;
 
 		/* @for */
 		let t_for_range_1 = t_range();
@@ -70,7 +70,7 @@ const ColorSelect = {
 				let t_old_range_1 = t_push_range(t_item, true);
 				const t_fragment_1 = t_fragment(t_fragments, 1, ` <option>#</option> `);
 				const t_root_1 = t_root(t_fragment_1);
-				const t_option_1 = t_next(t_root_1);
+				const t_option_1 = t_next(t_root_1) as HTMLElement;
 				const t_text_2 = t_child(t_option_1);
 				const t_text_3 = t_next(t_option_1);
 				$run(function setAttribute() {

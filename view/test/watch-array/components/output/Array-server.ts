@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Array = {
 	/**
@@ -16,7 +16,7 @@ const Array = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<section> <p>^</p> <![>`;
 		for (let item of $props.items) {
 			$output += `<!^>  <p> ${t_fmt(item.text)} </p> `;

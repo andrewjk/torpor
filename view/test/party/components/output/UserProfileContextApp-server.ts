@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import UserProfileContext from './UserProfileContext.tera';
 
 const UserProfileContextApp = {
@@ -16,8 +16,8 @@ const UserProfileContextApp = {
 		$context = Object.assign({}, $context);
 
 		/* User script */
-		const $watch = (obj) => obj;
-		const $unwrap = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
+		const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 		const $user = $watch({
 			id: 1,
 			username: "unicorn42",
@@ -28,7 +28,7 @@ const UserProfileContextApp = {
 		$context.user = $user;
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
 
 		$output += UserProfileContext.render(undefined, $context)

@@ -3,7 +3,7 @@ import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
 import isComment from "./isComment";
 import nodeNext from "./nodeNext";
 
-export default function nodeAnchor(node: ChildNode) {
+export default function nodeAnchor(node: Node): Node {
 	// If we are hydrating, the anchor will be at the end of the paired <![> and
 	// <!]> comments
 	if (context.hydrationNode && isComment(node) && node.data === HYDRATION_START) {
@@ -24,10 +24,12 @@ export default function nodeAnchor(node: ChildNode) {
 					// Remove the end node and return the next one
 					const endNode = currentNode.nextSibling;
 					currentNode.remove();
-					return endNode;
+					// NOTE: We know this is not null as it is being called from
+					// generated code
+					return endNode!;
 				}
 			}
-			currentNode = currentNode.nextSibling;
+			currentNode = currentNode.nextSibling!;
 		}
 
 		if (!currentNode) {

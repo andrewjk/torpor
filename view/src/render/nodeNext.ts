@@ -7,19 +7,20 @@ import isComment from "./isComment";
 /**
  * Gets the next sibling of a node
  */
-export default function nodeNext(node: ChildNode) {
-	let next = node.nextSibling;
+export default function nodeNext(node: Node): Node {
+	let nextNode = node.nextSibling;
 
 	if (context.hydrationNode) {
 		// Remove hydration comments that are inserted at the start of branches
 		// They are just used to split up text nodes that would otherwise be joined in HTML
-		if (next && isComment(next) && next.data === HYDRATION_BRANCH) {
-			let comment = next;
-			next = next.nextSibling;
+		if (nextNode && isComment(nextNode) && nextNode.data === HYDRATION_BRANCH) {
+			let comment = nextNode;
+			nextNode = nextNode.nextSibling;
 			comment.remove();
 		}
-		context.hydrationNode = next;
+		context.hydrationNode = nextNode;
 	}
 
-	return next;
+	// NOTE: We know this is not null as it is being called from generated code
+	return nextNode!;
 }

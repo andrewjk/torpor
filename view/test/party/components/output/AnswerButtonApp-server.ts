@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import AnswerButton from './AnswerButton.tera';
 
 const AnswerButtonApp = {
@@ -14,7 +14,7 @@ const AnswerButtonApp = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let $state = $watch({
 			isHappy: true
 		});
@@ -28,7 +28,7 @@ const AnswerButtonApp = {
 		}
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <p>Are you happy?</p> `;
 		const t_props_1 = {};
 		t_props_1["onYes"] = onAnswerYes;

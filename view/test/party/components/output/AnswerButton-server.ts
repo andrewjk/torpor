@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const AnswerButton = {
 	/**
@@ -19,7 +19,7 @@ const AnswerButton = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> <button>YES</button> <button>NO</button> </div>`;
 		return $output;
 	}

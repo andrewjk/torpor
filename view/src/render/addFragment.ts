@@ -16,7 +16,7 @@ export default function addFragment(
 	// Set the active range's end node to the last node in the fragment
 	if (range) {
 		if (hydrationNode) {
-			range.endNode = hydrationNode as ChildNode;
+			range.endNode = hydrationNode;
 		} else {
 			range.startNode = fragment.firstChild;
 			range.endNode = fragment.lastChild;

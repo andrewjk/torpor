@@ -1,5 +1,5 @@
 import { $run } from '@tera/view';
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_apply_props } from '@tera/view';
@@ -26,7 +26,7 @@ const Colors = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: Node, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
 		const colors = ["red", "green", "blue"];
 		
@@ -34,8 +34,8 @@ const Colors = {
 		const t_fragments = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<ul> <!> </ul>`);
-		const t_ul_1 = t_root(t_fragment_0);
-		const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1)));
+		const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
+		const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1))) as HTMLElement;
 
 		/* @for */
 		let t_for_range_1 = t_range();

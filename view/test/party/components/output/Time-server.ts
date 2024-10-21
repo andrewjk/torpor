@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const Time = {
 	/**
@@ -13,8 +13,8 @@ const Time = {
 	 */
 	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
-		const $watch = (obj) => obj;
-		const $run = (fn) => null;
+		const $watch = (obj: Record<PropertyKey, any>) => obj;
+		const $run = (fn: Function) => null;
 		let $state = $watch({
 			time: new Date().toLocaleTimeString()
 		});
@@ -28,7 +28,7 @@ const Time = {
 		});
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<p>Current time: ${t_fmt($state.time)}</p>`;
 		return $output;
 	}

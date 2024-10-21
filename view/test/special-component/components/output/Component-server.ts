@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import BigTitle from './BigTitle.tera';
 import SmallTitle from './SmallTitle.tera';
 
@@ -23,7 +23,7 @@ const Component = {
 		};
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<![>`;
 		components[$props.self];
 		const t_props_1 = {};

@@ -1,4 +1,4 @@
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 
 const ParentChild = {
 	/**
@@ -16,7 +16,7 @@ const ParentChild = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<div> `;
 		const t_props_1 = {};
 		t_props_1["name"] = "Anna";
@@ -43,7 +43,7 @@ const Child = {
 
 		let $output = "";
 		/* User interface */
-		const t_fmt = (text) => (text != null ? text : "");
+		const t_fmt = (text: string) => (text != null ? text : "");
 		$output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
 		return $output;
 	}

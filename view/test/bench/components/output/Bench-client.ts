@@ -1,6 +1,6 @@
 import { $run } from '@tera/view';
 import { $watch } from '@tera/view';
-import type SlotRender from "@tera/view";
+import type { SlotRender } from "@tera/view";
 import { t_add_fragment } from '@tera/view';
 import { t_anchor } from '@tera/view';
 import { t_apply_props } from '@tera/view';
@@ -28,7 +28,7 @@ const Bench = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: Node, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
 		/* User script */
 		let rowId = 1;
 		let $state = $watch({
@@ -141,15 +141,15 @@ const Bench = {
 		const t_fragments = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Tera (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div>`);
-		const t_div_1 = t_root(t_fragment_0);
-		const t_button_1 = t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))));
-		const t_button_2 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))))));
-		const t_button_3 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))))))));
-		const t_button_4 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))))))))));
-		const t_button_5 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))))))))))));
-		const t_button_6 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1))))))))))))))))))))))));
-		const t_for_parent_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_div_1))))));
-		const t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1)));
+		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
+		const t_button_1 = t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))) as HTMLElement;
+		const t_button_2 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))))) as HTMLElement;
+		const t_button_3 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))))))) as HTMLElement;
+		const t_button_4 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))))))))) as HTMLElement;
+		const t_button_5 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))))))))))) as HTMLElement;
+		const t_button_6 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_div_1)))))))))))))))))))))))) as HTMLElement;
+		const t_for_parent_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_div_1)))))) as HTMLElement;
+		const t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
 
 		/* @for */
 		let t_for_range_1 = t_range();
@@ -171,11 +171,11 @@ const Bench = {
 				let t_old_range_1 = t_push_range(t_item, true);
 				const t_fragment_1 = t_fragment(t_fragments, 1, ` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `);
 				const t_root_1 = t_root(t_fragment_1);
-				const t_tr_1 = t_next(t_root_1);
+				const t_tr_1 = t_next(t_root_1) as HTMLElement;
 				const t_text_1 = t_child(t_next(t_child(t_tr_1)));
-				const t_a_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_tr_1))))));
+				const t_a_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_tr_1)))))) as HTMLElement;
 				const t_text_2 = t_child(t_a_1);
-				const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1))))))));
+				const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)))))))) as HTMLElement;
 				const t_text_3 = t_next(t_tr_1);
 				$run(function setClassList() {
 					t_tr_1.classList.toggle("selected", $state.selected === t_item.data.row.id);
