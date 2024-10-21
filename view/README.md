@@ -6,7 +6,7 @@ Tera's view library, for writing and mounting components.
 
 ## Installation
 
-Use `npm` (or `yarn`, or `pnpm`) to add tera/view to your project:
+Use `npm` (or your preferred package manager) to add tera to your project:
 
 ```bash
 npm install tera
