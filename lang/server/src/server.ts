@@ -25,7 +25,6 @@ const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 let languageModes: LanguageModes;
 
 connection.onInitialize((_params: InitializeParams) => {
-	console.log("HELLO?!");
 	languageModes = getLanguageModes();
 
 	documents.onDidClose((e) => {
