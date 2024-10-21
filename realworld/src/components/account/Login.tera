@@ -3,13 +3,11 @@
 	import FormErrors from '@/components/FormErrors.tera';
 </script>
 
-@/*
-<:head>
-	<title>Sign in • Conduit</title>
-</:head>
-*/
-
 <div class="auth-page">
+	<:head>
+		<title>Sign in • Conduit</title>
+	</:head>
+
 	<div class="container page">
 		<div class="row">
 			<div class="col-md-6 offset-md-3 col-xs-12">

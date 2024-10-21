@@ -2,13 +2,11 @@
 	import { $page } from "@tera/kit/state";
 </script>
 
-@/*
-<:head>
-	<title>{$page.status}</title>
-</:head>
-*/
-
 <div>
+	<:head>
+		<title>{$page.status}</title>
+	</:head>
+
 	@if ($page.status === 404) {
 		<h1>Not found!</h1>
 	} else {

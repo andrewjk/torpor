@@ -138,7 +138,7 @@ async function navigate(
 	if (firstTime) {
 		hydrate(parent, component, $props, slots);
 	} else {
-		// TODO: Reuse layouts etc
+		// TODO: Clear ranges, reuse layouts etc
 		parent.textContent = "";
 
 		mount(parent, component, $props, slots);

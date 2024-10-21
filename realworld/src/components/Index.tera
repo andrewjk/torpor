@@ -12,13 +12,12 @@
 	$state.pageLinkBase = $state.tag ? `tag=${$state.tag}` : `tab=${$state.tab}`
 </script>
 
-@/*
+<div class="home-page">
 	<:head>
 		<title>Conduit</title>
+		<link rel="stylesheet" href="mystyle.css"> 
 	</:head>
-*/
 
-<div class="home-page">
 	@if (!$props.data.user) {
 		<div class="banner">
 			<div class="container">

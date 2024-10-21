@@ -4,13 +4,11 @@
 	import CommentContainer from '../comment/CommentContainer.tera';
 </script>
 
-@/*
-<:head>
-	<title>{$props.data.article.title}</title>
-</:head>
-*/
-
 <div class="article-page">
+	<:head>
+		<title>{$props.data.article.title}</title>
+	</:head>
+
 	<div class="banner">
 		<div class="container">
 			<h1>{$props.data.article.title}</h1>

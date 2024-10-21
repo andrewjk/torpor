@@ -1,4 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
+import TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
@@ -20,6 +21,16 @@ export default function buildElementNode(
 	anchorName: string,
 	root = false,
 ) {
+	if (status.inHead) {
+		if (node.tagName === "title") {
+			buildTitleNode(node, status, b);
+			return;
+		} else {
+			buildHeadNode(node, status, b);
+			return;
+		}
+	}
+
 	const varName = node.varName;
 	if (varName) {
 		if (node.tagName === ":element") {
@@ -70,6 +81,82 @@ function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Buil
 
 		b.append(`});`);
 	}
+}
+
+function buildTitleNode(node: ElementNode, status: BuildStatus, b: Builder) {
+	let content = (node.children[0] as TextNode).content || "";
+
+	// Replace all spaces with a single space, both to save space and to remove
+	// newlines from generated JS strings
+	content = content.replace(/\s+/g, " ");
+
+	// TODO: Should be fancier about this in parse -- e.g. ignore braces in
+	// quotes, unclosed, etc
+	let reactiveStarted = false;
+	let reactiveCount = 0;
+	for (let i = 0; i < content.length; i++) {
+		if (content[i] === "{") {
+			reactiveStarted = true;
+		} else if (content[i] === "}") {
+			if (reactiveStarted) {
+				reactiveCount += 1;
+				reactiveStarted = false;
+			}
+		}
+	}
+
+	if (reactiveCount) {
+		status.imports.add("t_fmt");
+		if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
+			content = `t_fmt(${content.substring(1, content.length - 1)})`;
+		} else {
+			content = `\`${content.replaceAll("{", "${t_fmt(").replaceAll("}", ")}")}\``;
+		}
+	} else {
+		content = `"${content}"`;
+	}
+
+	const varName = nextVarName("old_title", status);
+	status.imports.add("$run");
+	b.append(`
+		$run(function runTitle() {
+			const ${varName} = document.title;
+			document.title = ${content};
+			return () => document.title = ${varName};
+		});`);
+}
+
+function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
+	const varName = nextVarName("head_el", status);
+	status.imports.add("$run");
+	// TODO: dedupe e.g. <meta name="x"> or on special key
+	b.append(`
+		$run(function runHead() {
+			const ${varName} = document.createElement("${node.tagName}");
+			document.getElementsByTagName("head")[0].appendChild(${varName});`);
+	for (let { name, value } of node.attributes) {
+		if (name.startsWith("{") && name.endsWith("}")) {
+			// It's a shortcut attribute
+			name = name.substring(1, name.length - 1);
+			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
+		} else if (value != null && isReactive(value)) {
+			// It's a reactive attribute
+			if (isFullyReactive(value)) {
+				value = value.substring(1, value.length - 1);
+			} else {
+				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
+			}
+
+			status.imports.add("t_attribute");
+			buildRun("setAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
+		} else if (value != null) {
+			status.imports.add("t_attribute");
+			b.append(`t_attribute(${varName}, "${name}", ${value});`);
+		}
+	}
+	b.append(`
+			return () => alert("YO");
+		});`);
 }
 
 function buildElementAttributes(
