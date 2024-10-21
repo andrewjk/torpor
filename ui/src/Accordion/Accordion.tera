@@ -19,7 +19,7 @@
  * @prop {'single' | 'multiple'} type -- Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time
  * @prop {string | string[]} value -- The value of the expanded AccordionItem, or an array of values if the type is 'multiple'
  * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the Accordion
- * @prop {(string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
+ * @prop {(value: string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
  */
 
 <script>
