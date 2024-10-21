@@ -31,12 +31,12 @@ test("if after if -- hydrated", () => {
 
 function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's true!")).toBeNull();
-	expect(queryByText(container, "It's also true!")).toBeInTheDocument();
+	expect(queryByText(container, "It's also true!")).not.toBeNull();
 
 	state.counter = 12;
 
-	expect(queryByText(container, "It's true!")).toBeInTheDocument();
-	expect(queryByText(container, "It's also true!")).toBeInTheDocument();
+	expect(queryByText(container, "It's true!")).not.toBeNull();
+	expect(queryByText(container, "It's also true!")).not.toBeNull();
 
 	state.counter = 3;
 

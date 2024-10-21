@@ -40,7 +40,7 @@ test("class -- hydrated", () => {
 });
 
 function check(container: HTMLElement, state: State) {
-	expect(queryByText(container, "Hello!")).toBeInTheDocument();
+	expect(queryByText(container, "Hello!")).not.toBeNull();
 	expect(queryByText(container, "Hello!")).toHaveClass("hello red blue", { exact: true });
 
 	state.green = true;

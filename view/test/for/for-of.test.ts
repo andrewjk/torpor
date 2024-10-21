@@ -30,10 +30,10 @@ test("for of -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "1")).toBeInTheDocument();
-	expect(queryByText(container, "2")).toBeInTheDocument();
-	expect(queryByText(container, "3")).toBeInTheDocument();
-	expect(queryByText(container, "4")).toBeInTheDocument();
-	expect(queryByText(container, "5")).toBeInTheDocument();
+	expect(queryByText(container, "1")).not.toBeNull();
+	expect(queryByText(container, "2")).not.toBeNull();
+	expect(queryByText(container, "3")).not.toBeNull();
+	expect(queryByText(container, "4")).not.toBeNull();
+	expect(queryByText(container, "5")).not.toBeNull();
 	expect(queryByText(container, "6")).toBeNull();
 }

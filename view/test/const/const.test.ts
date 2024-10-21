@@ -21,5 +21,5 @@ test("const -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Hello, Boris!")).toBeInTheDocument();
+	expect(queryByText(container, "Hello, Boris!")).not.toBeNull();
 }

@@ -21,5 +21,5 @@ test("update state -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Hello Jane")).toBeInTheDocument();
+	expect(queryByText(container, "Hello Jane")).not.toBeNull();
 }

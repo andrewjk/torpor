@@ -34,8 +34,8 @@ test("special self -- hydrated", () => {
 });
 
 function check(container: HTMLElement, $state: State) {
-	expect(queryByText(container, "Level 1")).toBeInTheDocument();
-	expect(queryByText(container, "Level 2")).toBeInTheDocument();
-	expect(queryByText(container, "Level 3")).toBeInTheDocument();
-	expect(queryByText(container, "Level 4")).not.toBeInTheDocument();
+	expect(queryByText(container, "Level 1")).not.toBeNull();
+	expect(queryByText(container, "Level 2")).not.toBeNull();
+	expect(queryByText(container, "Level 3")).not.toBeNull();
+	expect(queryByText(container, "Level 4")).toBeNull();
 }

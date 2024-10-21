@@ -2,7 +2,7 @@ import $run from "../render/$run";
 
 export default function applyProps(
 	el: Element,
-	props: Record<string, any>,
+	props: Record<string, any> | undefined,
 	propNamesUsed: string[],
 ) {
 	if (props) {

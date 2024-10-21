@@ -21,6 +21,6 @@ test("basic slot -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Basic stuff")).toBeInTheDocument();
+	expect(queryByText(container, "Basic stuff")).not.toBeNull();
 	expect(queryByText(container, "Default header...")).toBeNull();
 }

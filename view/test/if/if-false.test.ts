@@ -31,15 +31,15 @@ test("if false -- hydrated", () => {
 
 function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's true!")).toBeNull();
-	expect(queryByText(container, "It's not true...")).toBeInTheDocument();
+	expect(queryByText(container, "It's not true...")).not.toBeNull();
 
 	state.counter = 10;
 
-	expect(queryByText(container, "It's true!")).toBeInTheDocument();
+	expect(queryByText(container, "It's true!")).not.toBeNull();
 	expect(queryByText(container, "It's not true...")).toBeNull();
 
 	state.counter = 3;
 
 	expect(queryByText(container, "It's true!")).toBeNull();
-	expect(queryByText(container, "It's not true...")).toBeInTheDocument();
+	expect(queryByText(container, "It's not true...")).not.toBeNull();
 }

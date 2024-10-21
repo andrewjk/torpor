@@ -21,7 +21,7 @@ export default function buildFragmentText(
 	buildNodeFragmentText(node, status, fragments);
 
 	if (fragments.length) {
-		b.append(`const t_fragments = [];`);
+		b.append(`const t_fragments: DocumentFragment[] = [];`);
 	}
 }
 

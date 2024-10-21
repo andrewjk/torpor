@@ -54,11 +54,13 @@ export default function buildAwaitNode(
 
 	// Use an incrementing token to make sure only the last request gets handled
 	// TODO: This might have unforeseen consequences
+	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 	b.append("");
 	b.append(`
 	/* @await */
-	const ${awaitRangeName} = { index: -1 };
+	const ${awaitRangeName} = t_range();
+	${awaitRangeName}.index = -1;
 	let ${awaitTokenName} = 0;
 	t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
 		${awaitTokenName}++;`);

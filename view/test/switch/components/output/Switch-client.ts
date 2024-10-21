@@ -1,14 +1,14 @@
 import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from '@tera/view';
-import { t_anchor } from '@tera/view';
-import { t_apply_props } from '@tera/view';
-import { t_child } from '@tera/view';
-import { t_fragment } from '@tera/view';
-import { t_next } from '@tera/view';
-import { t_range } from '@tera/view';
-import { t_root } from '@tera/view';
-import { t_run_branch } from '@tera/view';
-import { t_run_control } from '@tera/view';
+import { t_add_fragment } from "@tera/view";
+import { t_anchor } from "@tera/view";
+import { t_apply_props } from "@tera/view";
+import { t_child } from "@tera/view";
+import { t_fragment } from "@tera/view";
+import { t_next } from "@tera/view";
+import { t_range } from "@tera/view";
+import { t_root } from "@tera/view";
+import { t_run_branch } from "@tera/view";
+import { t_run_control } from "@tera/view";
 
 /**
  * A component with a switch statement in it.
@@ -26,14 +26,14 @@ const Switch = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: ParentNode, $anchor: Node | null, $props: {
+	render: ($parent: ParentNode, $anchor: Node | null, $props?: {
 		/** The value to switch on. */
 		value: number;
-	}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	}, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {
 		$props ||= {};
 
 		/* User interface */
-		const t_fragments = [];
+		const t_fragments: DocumentFragment[] = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!> </div>`);
 		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;

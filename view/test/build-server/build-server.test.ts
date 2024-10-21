@@ -29,6 +29,6 @@ test("build for the server and render to HTML", () => {
 	document.body.appendChild(container);
 
 	expect(queryByText(container, "It's both true!")).toBeNull();
-	expect(queryByText(container, "The second is not true!")).toBeInTheDocument();
+	expect(queryByText(container, "The second is not true!")).not.toBeNull();
 	expect(queryByText(container, "The first is not true!")).toBeNull();
 });

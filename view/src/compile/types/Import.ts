@@ -3,4 +3,5 @@ export default interface Import {
 	alias?: string;
 	path: string;
 	nonDefault: boolean;
+	component: boolean;
 }

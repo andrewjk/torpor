@@ -1,4 +1,4 @@
-import type { SlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view";
 
 const Bench = {
 	/**
@@ -11,7 +11,7 @@ const Bench = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
 		/* User script */
 		const $watch = (obj: Record<PropertyKey, any>) => obj;
 		let rowId = 1;

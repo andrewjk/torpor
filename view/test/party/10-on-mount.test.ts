@@ -23,5 +23,5 @@ test("on mount -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Page title: Document Title")).toBeInTheDocument();
+	expect(queryByText(container, "Page title: Document Title")).not.toBeNull();
 }

@@ -11,6 +11,7 @@ import t_fmt from "./render/formatText";
 import t_fragment from "./render/getFragment";
 import hydrate from "./render/hydrate";
 import mount from "./render/mount";
+import t_list_item from "./render/newListItem";
 import t_range from "./render/newRange";
 import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
@@ -24,6 +25,7 @@ import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
 import type Component from "./types/Component";
+import type ListItem from "./types/ListItem";
 import type ServerComponent from "./types/ServerComponent";
 import type ServerSlotRender from "./types/ServerSlotRender";
 import type SlotRender from "./types/SlotRender";
@@ -52,9 +54,10 @@ export {
 	t_push_range,
 	t_run_control,
 	t_run_branch,
+	t_list_item,
 	t_run_list,
 	t_attribute,
 	t_dynamic,
 };
 
-export type { Component, ServerComponent, SlotRender, ServerSlotRender };
+export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem };

@@ -26,16 +26,16 @@ async function check(container: HTMLElement) {
 	const blueRadio = container.getElementsByTagName("input")[0];
 	const redRadio = container.getElementsByTagName("input")[1];
 
-	expect(queryByText(container, "Picked: red")).toBeInTheDocument();
-	expect(queryByText(container, "Picked: blue")).not.toBeInTheDocument();
+	expect(queryByText(container, "Picked: red")).not.toBeNull();
+	expect(queryByText(container, "Picked: blue")).toBeNull();
 
 	await user.click(blueRadio);
 
-	expect(queryByText(container, "Picked: red")).not.toBeInTheDocument();
-	expect(queryByText(container, "Picked: blue")).toBeInTheDocument();
+	expect(queryByText(container, "Picked: red")).toBeNull();
+	expect(queryByText(container, "Picked: blue")).not.toBeNull();
 
 	await user.click(redRadio);
 
-	expect(queryByText(container, "Picked: red")).toBeInTheDocument();
-	expect(queryByText(container, "Picked: blue")).not.toBeInTheDocument();
+	expect(queryByText(container, "Picked: red")).not.toBeNull();
+	expect(queryByText(container, "Picked: blue")).toBeNull();
 }

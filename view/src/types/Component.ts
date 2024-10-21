@@ -6,10 +6,10 @@ import type SlotRender from "./SlotRender";
 export default interface Component {
 	name: string;
 	render: (
-		parent: Node,
-		anchor: Node | null,
-		$props?: Record<string, any>,
-		$context?: Record<string, any>,
+		$parent: ParentNode,
+		$anchor: Node | null,
+		$props?: Record<PropertyKey, any>,
+		$context?: Record<PropertyKey, any>,
 		$slots?: Record<string, SlotRender>,
 	) => void;
 }

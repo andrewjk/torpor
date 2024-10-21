@@ -21,7 +21,7 @@ test("loop -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "red")).toBeInTheDocument();
-	expect(queryByText(container, "green")).toBeInTheDocument();
-	expect(queryByText(container, "blue")).toBeInTheDocument();
+	expect(queryByText(container, "red")).not.toBeNull();
+	expect(queryByText(container, "green")).not.toBeNull();
+	expect(queryByText(container, "blue")).not.toBeNull();
 }

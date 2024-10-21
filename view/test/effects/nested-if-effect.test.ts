@@ -39,7 +39,7 @@ test("nested if effect -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: State) {
-	expect(queryByText(container, "It's small")).toBeInTheDocument();
+	expect(queryByText(container, "It's small")).not.toBeNull();
 
 	// `condition`, `counter`
 	expect(proxyData(state).propData.size).toBe(2);

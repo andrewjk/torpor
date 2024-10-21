@@ -1,4 +1,4 @@
-import type { SlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view";
 
 const UserProfile = {
 	/**
@@ -11,12 +11,12 @@ const UserProfile = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($props: {
+	render: ($props?: {
 		name: string;
 		age: number;
 		favouriteColors: string[];
 		isAvailable: boolean;
-	}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	}, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
 		$props ||= {};
 
 		let $output = "";

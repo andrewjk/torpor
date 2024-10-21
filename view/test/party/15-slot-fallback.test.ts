@@ -21,5 +21,5 @@ test("slot fallback -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "No content found")).toBeInTheDocument();
+	expect(queryByText(container, "No content found")).not.toBeNull();
 }

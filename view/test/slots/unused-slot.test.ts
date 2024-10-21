@@ -21,5 +21,5 @@ test("unused slot -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Default header...")).toBeInTheDocument();
+	expect(queryByText(container, "Default header...")).not.toBeNull();
 }

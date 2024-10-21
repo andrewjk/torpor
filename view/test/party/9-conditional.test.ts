@@ -24,20 +24,20 @@ test("conditional -- hydrated", async () => {
 async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 
-	expect(queryByText(container, "STOP")).toBeInTheDocument();
-	expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
-	expect(queryByText(container, "GO")).not.toBeInTheDocument();
+	expect(queryByText(container, "STOP")).not.toBeNull();
+	expect(queryByText(container, "SLOW DOWN")).toBeNull();
+	expect(queryByText(container, "GO")).toBeNull();
 
 	const button = container.getElementsByTagName("button")[0];
 	await user.click(button);
 
-	expect(queryByText(container, "STOP")).not.toBeInTheDocument();
-	expect(queryByText(container, "SLOW DOWN")).toBeInTheDocument();
-	expect(queryByText(container, "GO")).not.toBeInTheDocument();
+	expect(queryByText(container, "STOP")).toBeNull();
+	expect(queryByText(container, "SLOW DOWN")).not.toBeNull();
+	expect(queryByText(container, "GO")).toBeNull();
 
 	await user.click(button);
 
-	expect(queryByText(container, "STOP")).not.toBeInTheDocument();
-	expect(queryByText(container, "SLOW DOWN")).not.toBeInTheDocument();
-	expect(queryByText(container, "GO")).toBeInTheDocument();
+	expect(queryByText(container, "STOP")).toBeNull();
+	expect(queryByText(container, "SLOW DOWN")).toBeNull();
+	expect(queryByText(container, "GO")).not.toBeNull();
 }

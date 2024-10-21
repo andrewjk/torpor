@@ -1,6 +1,7 @@
 import fg from "fast-glob";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
+import { buildType } from "../src/compile";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 
@@ -23,6 +24,8 @@ async function buildOutputFiles(file: string) {
 	if (parsed.ok && parsed.template) {
 		let serverCode = build(name, parsed.template, { server: true }).code;
 		let clientCode = build(name, parsed.template).code;
+		let typesCode = buildType(name, parsed.template);
+		await fs.writeFile(file.replace(".tera", ".d.ts"), typesCode);
 
 		let outputFile = file.replace("/components/", "/components/output/");
 		if (!existsSync(path.dirname(outputFile))) {

@@ -1,19 +1,20 @@
-import { $run } from '@tera/view';
-import { $watch } from '@tera/view';
+import { $run } from "@tera/view";
+import { $watch } from "@tera/view";
 import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from '@tera/view';
-import { t_anchor } from '@tera/view';
-import { t_apply_props } from '@tera/view';
-import { t_child } from '@tera/view';
-import { t_event } from '@tera/view';
-import { t_fmt } from '@tera/view';
-import { t_fragment } from '@tera/view';
-import { t_next } from '@tera/view';
-import { t_pop_range } from '@tera/view';
-import { t_push_range } from '@tera/view';
-import { t_root } from '@tera/view';
-import { t_run_branch } from '@tera/view';
-import { t_run_control } from '@tera/view';
+import { t_add_fragment } from "@tera/view";
+import { t_anchor } from "@tera/view";
+import { t_apply_props } from "@tera/view";
+import { t_child } from "@tera/view";
+import { t_event } from "@tera/view";
+import { t_fmt } from "@tera/view";
+import { t_fragment } from "@tera/view";
+import { t_next } from "@tera/view";
+import { t_pop_range } from "@tera/view";
+import { t_push_range } from "@tera/view";
+import { t_range } from "@tera/view";
+import { t_root } from "@tera/view";
+import { t_run_branch } from "@tera/view";
+import { t_run_control } from "@tera/view";
 
 const Await = {
 	/**
@@ -28,7 +29,7 @@ const Await = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {
 		/* User script */
 		// Use the $watch function to declare reactive state
 		const $state = $watch({})
@@ -48,14 +49,15 @@ const Await = {
 			}
 			
 			/* User interface */
-			const t_fragments = [];
+			const t_fragments: DocumentFragment[] = [];
 
 			const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!> <button> Guess again </button> </div>`);
 			const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 			const t_await_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
 			/* @await */
-			const t_await_range_1 = { index: -1 };
+			const t_await_range_1 = t_range();
+			t_await_range_1.index = -1;
 			let t_await_token_1 = 0;
 			t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
 				t_await_token_1++;

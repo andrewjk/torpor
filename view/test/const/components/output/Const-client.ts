@@ -1,12 +1,12 @@
-import { $run } from '@tera/view';
+import { $run } from "@tera/view";
 import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from '@tera/view';
-import { t_apply_props } from '@tera/view';
-import { t_child } from '@tera/view';
-import { t_fmt } from '@tera/view';
-import { t_fragment } from '@tera/view';
-import { t_next } from '@tera/view';
-import { t_root } from '@tera/view';
+import { t_add_fragment } from "@tera/view";
+import { t_apply_props } from "@tera/view";
+import { t_child } from "@tera/view";
+import { t_fmt } from "@tera/view";
+import { t_fragment } from "@tera/view";
+import { t_next } from "@tera/view";
+import { t_root } from "@tera/view";
 
 const Const = {
 	/**
@@ -21,9 +21,9 @@ const Const = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {
 		/* User interface */
-		const t_fragments = [];
+		const t_fragments: DocumentFragment[] = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <p>#</p> </div>`);
 		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;

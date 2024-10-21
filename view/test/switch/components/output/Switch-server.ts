@@ -1,4 +1,4 @@
-import type { SlotRender } from "@tera/view";
+import type { ServerComponent, ServerSlotRender } from "@tera/view";
 
 /**
  * A component with a switch statement in it.
@@ -14,10 +14,14 @@ const Switch = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($props: {
-		/** The value to switch on. */
-		value: number;
-	}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: (
+		$props?: {
+			/** The value to switch on. */
+			value: number;
+		},
+		$context?: Record<PropertyKey, any>,
+		$slots?: Record<string, ServerSlotRender>,
+	) => {
 		$props ||= {};
 
 		let $output = "";
@@ -40,7 +44,7 @@ const Switch = {
 		}
 		$output += `<!]><!> </div>`;
 		return $output;
-	}
-}
+	},
+} satisfies ServerComponent;
 
 export default Switch;

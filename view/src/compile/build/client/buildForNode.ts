@@ -61,10 +61,15 @@ export default function buildForNode(
 	const key = node.children.find(
 		(n) => n.type === "control" && (n as ControlNode).operation === "@key",
 	);
-	const keyStatement = key ? (key as ControlNode).statement : "";
+	let keyStatement = key ? (key as ControlNode).statement : "";
+	if (keyStatement) {
+		keyStatement = trimEnd(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";");
+	}
 
 	status.imports.add("t_range");
 	status.imports.add("t_run_list");
+	status.imports.add("t_list_item");
+	status.imports.add("ListItem");
 
 	b.append("");
 	b.append(`
@@ -75,12 +80,13 @@ export default function buildForNode(
 	${forParentName},
 	${forAnchorName},
 	function createNewItems() {
-		let t_new_items = [];
+		let t_new_items: ListItem[] = [];
 		${node.statement} {
-			t_new_items.push({
-				${keyStatement ? `key: ${trimEnd(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";")},` : ";"}
+			t_new_items.push(t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""}));
+			/*t_new_items.push({
+				${keyStatement ? `key: ${keyStatement},` : ";"}
 				data: { ${forVarNames.join(",\n")} }
-			});
+			});*/
 		}
 		return t_new_items;
 	},

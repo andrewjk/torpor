@@ -24,10 +24,10 @@ test("event click -- hydrated", async () => {
 async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 
-	expect(queryByText(container, "Counter: 0")).toBeInTheDocument();
+	expect(queryByText(container, "Counter: 0")).not.toBeNull();
 
 	const button = container.getElementsByTagName("button")[0];
 	await user.click(button);
 
-	expect(queryByText(container, "Counter: 1")).toBeInTheDocument();
+	expect(queryByText(container, "Counter: 1")).not.toBeNull();
 }

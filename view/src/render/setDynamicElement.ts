@@ -2,7 +2,7 @@ import context from "./context";
 
 // TODO: Should we @toggle this instead? That would call on:mount etc again for the new element
 
-export default function setDynamicElement(el: Element, tag: string) {
+export default function setDynamicElement(el: HTMLElement, tag: string) {
 	// If hydrating, it should already have been created as the correct element
 	if (context.hydrationNode) {
 		return el;

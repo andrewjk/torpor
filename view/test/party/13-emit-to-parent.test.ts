@@ -26,16 +26,16 @@ async function check(container: HTMLElement) {
 	const yesButton = container.getElementsByTagName("button")[0];
 	const noButton = container.getElementsByTagName("button")[1];
 
-	expect(queryByText(container, "😀")).toBeInTheDocument();
-	expect(queryByText(container, "😥")).not.toBeInTheDocument();
+	expect(queryByText(container, "😀")).not.toBeNull();
+	expect(queryByText(container, "😥")).toBeNull();
 
 	await user.click(noButton);
 
-	expect(queryByText(container, "😀")).not.toBeInTheDocument();
-	expect(queryByText(container, "😥")).toBeInTheDocument();
+	expect(queryByText(container, "😀")).toBeNull();
+	expect(queryByText(container, "😥")).not.toBeNull();
 
 	await user.click(yesButton);
 
-	expect(queryByText(container, "😀")).toBeInTheDocument();
-	expect(queryByText(container, "😥")).not.toBeInTheDocument();
+	expect(queryByText(container, "😀")).not.toBeNull();
+	expect(queryByText(container, "😥")).toBeNull();
 }

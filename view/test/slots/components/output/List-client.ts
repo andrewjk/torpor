@@ -1,17 +1,19 @@
-import { $run } from '@tera/view';
-import { $watch } from '@tera/view';
+import { $run } from "@tera/view";
+import { $watch } from "@tera/view";
+import type { ListItem } from "@tera/view";
 import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from '@tera/view';
-import { t_anchor } from '@tera/view';
-import { t_apply_props } from '@tera/view';
-import { t_child } from '@tera/view';
-import { t_fragment } from '@tera/view';
-import { t_next } from '@tera/view';
-import { t_pop_range } from '@tera/view';
-import { t_push_range } from '@tera/view';
-import { t_range } from '@tera/view';
-import { t_root } from '@tera/view';
-import { t_run_list } from '@tera/view';
+import { t_add_fragment } from "@tera/view";
+import { t_anchor } from "@tera/view";
+import { t_apply_props } from "@tera/view";
+import { t_child } from "@tera/view";
+import { t_fragment } from "@tera/view";
+import { t_list_item } from "@tera/view";
+import { t_next } from "@tera/view";
+import { t_pop_range } from "@tera/view";
+import { t_push_range } from "@tera/view";
+import { t_range } from "@tera/view";
+import { t_root } from "@tera/view";
+import { t_run_list } from "@tera/view";
 
 const List = {
 	/**
@@ -26,11 +28,11 @@ const List = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {
 		$props ||= {};
 
 		/* User interface */
-		const t_fragments = [];
+		const t_fragments: DocumentFragment[] = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<ul> <!> </ul>`);
 		const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
@@ -43,11 +45,12 @@ const List = {
 			t_ul_1,
 			t_for_anchor_1,
 			function createNewItems() {
-				let t_new_items = [];
+				let t_new_items: ListItem[] = [];
 				for (let item of $props.items) {
-					t_new_items.push({
+					t_new_items.push(t_list_item({ item }));
+					/*t_new_items.push({
 						data: { item }
-					});
+					});*/
 				}
 				return t_new_items;
 			},

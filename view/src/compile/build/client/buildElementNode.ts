@@ -116,29 +116,27 @@ function buildTitleNode(node: ElementNode, status: BuildStatus, b: Builder) {
 		content = `"${content}"`;
 	}
 
-	const varName = nextVarName("old_title", status);
 	status.imports.add("$run");
 	b.append(`
 		$run(function runTitle() {
-			const ${varName} = document.title;
+			const t_old_title = document.title;
 			document.title = ${content};
-			return () => document.title = ${varName};
+			return () => document.title = t_old_title;
 		});`);
 }
 
 function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
-	const varName = nextVarName("head_el", status);
 	status.imports.add("$run");
 	// TODO: dedupe e.g. <meta name="x"> or on special key
 	b.append(`
 		$run(function runHead() {
-			const ${varName} = document.createElement("${node.tagName}");
-			document.getElementsByTagName("head")[0].appendChild(${varName});`);
+			const t_head_el = document.createElement("${node.tagName}");
+			document.getElementsByTagName("head")[0].appendChild(t_head_el);`);
 	for (let { name, value } of node.attributes) {
 		if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
-			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
+			buildRun("setAttribute", `t_head_el.setAttribute("${name}", ${name});`, status, b);
 		} else if (value != null && isReactive(value)) {
 			// It's a reactive attribute
 			if (isFullyReactive(value)) {
@@ -148,10 +146,10 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			}
 
 			status.imports.add("t_attribute");
-			buildRun("setAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
+			buildRun("setAttribute", `t_attribute(t_head_el, "${name}", ${value});`, status, b);
 		} else if (value != null) {
 			status.imports.add("t_attribute");
-			b.append(`t_attribute(${varName}, "${name}", ${value});`);
+			b.append(`t_attribute(t_head_el, "${name}", ${value});`);
 		}
 	}
 	b.append(`

@@ -21,5 +21,5 @@ test("minimal template -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Hello world")).toBeInTheDocument();
+	expect(queryByText(container, "Hello world")).not.toBeNull();
 }

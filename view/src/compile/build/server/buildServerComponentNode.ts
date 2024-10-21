@@ -73,7 +73,9 @@ export default function buildServerComponentNode(
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
-				b.append(`${slotsName}["${slotName}"] = ($sprops, $context) => {`);
+				b.append(
+					`${slotsName}["${slotName}"] = ($sprops: Record<PropertyKey, any>, $context: Record<PropertyKey, any>) => {`,
+				);
 				b.append(`let $output = "";`);
 
 				for (let child of slot.children) {

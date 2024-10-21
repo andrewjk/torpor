@@ -29,7 +29,7 @@ test("if effect -- hydrated", async () => {
 
 // HACK: Need to mock context properly
 function check(container: HTMLElement, state: any) {
-	expect(queryByText(container, "It's small")).toBeInTheDocument();
+	expect(queryByText(container, "It's small")).not.toBeNull();
 
 	// `counter`
 	expect(proxyData(state).propData.size).toBe(1);

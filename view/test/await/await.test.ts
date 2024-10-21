@@ -24,29 +24,29 @@ test("await -- hydrated", async () => {
 async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 
-	expect(queryByText(container, "Hmm...")).toBeInTheDocument();
-	expect(queryByText(container, "Is it a number?")).not.toBeInTheDocument();
+	expect(queryByText(container, "Hmm...")).not.toBeNull();
+	expect(queryByText(container, "Is it a number?")).toBeNull();
 
-	await waitFor(() => expect(queryByText(container, "Hmm...")).not.toBeInTheDocument());
+	await waitFor(() => expect(queryByText(container, "Hmm...")).toBeNull());
 
-	expect(queryByText(container, "Is it a number?")).toBeInTheDocument();
-
-	await user.click(getByText(container, "Guess again"));
-
-	expect(queryByText(container, "Hmm...")).toBeInTheDocument();
-	expect(queryByText(container, "Is it a number?")).not.toBeInTheDocument();
-
-	await waitFor(() => expect(queryByText(container, "Hmm...")).not.toBeInTheDocument());
-
-	expect(queryByText(container, "Is it a number?")).toBeInTheDocument();
+	expect(queryByText(container, "Is it a number?")).not.toBeNull();
 
 	await user.click(getByText(container, "Guess again"));
 
-	expect(queryByText(container, "Hmm...")).toBeInTheDocument();
-	expect(queryByText(container, "Is it a number?")).not.toBeInTheDocument();
+	expect(queryByText(container, "Hmm...")).not.toBeNull();
+	expect(queryByText(container, "Is it a number?")).toBeNull();
 
-	await waitFor(() => expect(queryByText(container, "Hmm...")).not.toBeInTheDocument());
+	await waitFor(() => expect(queryByText(container, "Hmm...")).toBeNull());
 
-	expect(queryByText(container, "Hmm...")).not.toBeInTheDocument();
-	expect(queryByText(container, "Something went wrong: uh oh!")).toBeInTheDocument();
+	expect(queryByText(container, "Is it a number?")).not.toBeNull();
+
+	await user.click(getByText(container, "Guess again"));
+
+	expect(queryByText(container, "Hmm...")).not.toBeNull();
+	expect(queryByText(container, "Is it a number?")).toBeNull();
+
+	await waitFor(() => expect(queryByText(container, "Hmm...")).toBeNull());
+
+	expect(queryByText(container, "Hmm...")).toBeNull();
+	expect(queryByText(container, "Something went wrong: uh oh!")).not.toBeNull();
 }

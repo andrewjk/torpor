@@ -30,19 +30,19 @@ test("switch values -- hydrated", () => {
 });
 
 function check(container: HTMLElement, state: State) {
-	expect(queryByText(container, "A small value.")).toBeInTheDocument();
+	expect(queryByText(container, "A small value.")).not.toBeNull();
 	expect(queryByText(container, "A large value.")).toBeNull();
 	expect(queryByText(container, "Another value.")).toBeNull();
 
 	state.value = 100;
 
 	expect(queryByText(container, "A small value.")).toBeNull();
-	expect(queryByText(container, "A large value.")).toBeInTheDocument();
+	expect(queryByText(container, "A large value.")).not.toBeNull();
 	expect(queryByText(container, "Another value.")).toBeNull();
 
 	state.value = 500;
 
 	expect(queryByText(container, "A small value.")).toBeNull();
 	expect(queryByText(container, "A large value.")).toBeNull();
-	expect(queryByText(container, "Another value.")).toBeInTheDocument();
+	expect(queryByText(container, "Another value.")).not.toBeNull();
 }

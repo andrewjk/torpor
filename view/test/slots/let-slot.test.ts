@@ -30,7 +30,7 @@ test("let slot -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "item 1")).toBeInTheDocument();
-	expect(queryByText(container, "item 2")).toBeInTheDocument();
-	expect(queryByText(container, "item 3")).toBeInTheDocument();
+	expect(queryByText(container, "item 1")).not.toBeNull();
+	expect(queryByText(container, "item 2")).not.toBeNull();
+	expect(queryByText(container, "item 3")).not.toBeNull();
 }

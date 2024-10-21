@@ -34,17 +34,17 @@ test("replace -- hydrated", () => {
 });
 
 function check(container: HTMLElement, $state: State) {
-	expect(queryByText(container, "The replace count is 0.")).toBeInTheDocument();
+	expect(queryByText(container, "The replace count is 0.")).not.toBeNull();
 
 	$state.name = "b";
 
-	expect(queryByText(container, "The replace count is 1.")).toBeInTheDocument();
+	expect(queryByText(container, "The replace count is 1.")).not.toBeNull();
 
 	$state.name = "b";
 
-	expect(queryByText(container, "The replace count is 1.")).toBeInTheDocument();
+	expect(queryByText(container, "The replace count is 1.")).not.toBeNull();
 
 	$state.name = "c";
 
-	expect(queryByText(container, "The replace count is 2.")).toBeInTheDocument();
+	expect(queryByText(container, "The replace count is 2.")).not.toBeNull();
 }

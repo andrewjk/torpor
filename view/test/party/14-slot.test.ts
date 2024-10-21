@@ -21,5 +21,5 @@ test("slot -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Click me!")).toBeInTheDocument();
+	expect(queryByText(container, "Click me!")).not.toBeNull();
 }

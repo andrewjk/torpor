@@ -7,33 +7,36 @@ import buildNode from "./buildNode";
 
 // We were dynamically creating imports, which might still be useful for creating standalone components
 const importsMap: Record<string, string> = {
-	$watch: "import { $watch } from '${folder}';",
-	$unwrap: "import { $unwrap } from '${folder}';",
-	$run: "import { $run } from '${folder}';",
-	$mount: "import { $mount } from '${folder}';",
-	t_flush: "import { t_flush } from '${folder}';",
-	t_range: "import { t_range } from '${folder}';",
-	t_push_range: "import { t_push_range } from '${folder}';",
-	t_pop_range: "import { t_pop_range } from '${folder}';",
-	t_run_control: "import { t_run_control } from '${folder}';",
-	t_run_branch: "import { t_run_branch } from '${folder}';",
-	t_run_list: "import { t_run_list } from '${folder}';",
-	t_add_fragment: "import { t_add_fragment } from '${folder}';",
-	t_apply_props: "import { t_apply_props } from '${folder}';",
-	t_attribute: "import { t_attribute } from '${folder}';",
-	t_dynamic: "import { t_dynamic } from '${folder}';",
-	t_fmt: "import { t_fmt } from '${folder}';",
-	t_fragment: "import { t_fragment } from '${folder}';",
-	t_event: "import { t_event } from '${folder}';",
-	t_animate: "import { t_animate } from '${folder}';",
-	t_root: "import { t_root } from '${folder}';",
-	t_anchor: "import { t_anchor } from '${folder}';",
-	t_child: "import { t_child } from '${folder}';",
-	t_next: "import { t_next } from '${folder}';",
-	t_frg: "import { t_frg } from '${folder}';",
-	t_elm: "import { t_elm } from '${folder}';",
-	t_txt: "import { t_txt } from '${folder}';",
-	t_cmt: "import { t_cmt } from '${folder}';",
+	$watch: 'import { $watch } from "${folder}";',
+	$unwrap: 'import { $unwrap } from "${folder}";',
+	$run: 'import { $run } from "${folder}";',
+	$mount: 'import { $mount } from "${folder}";',
+	t_flush: 'import { t_flush } from "${folder}";',
+	t_range: 'import { t_range } from "${folder}";',
+	t_push_range: 'import { t_push_range } from "${folder}";',
+	t_pop_range: 'import { t_pop_range } from "${folder}";',
+	t_run_control: 'import { t_run_control } from "${folder}";',
+	t_run_branch: 'import { t_run_branch } from "${folder}";',
+	t_list_item: 'import { t_list_item } from "${folder}";',
+	t_run_list: 'import { t_run_list } from "${folder}";',
+	t_add_fragment: 'import { t_add_fragment } from "${folder}";',
+	t_apply_props: 'import { t_apply_props } from "${folder}";',
+	t_attribute: 'import { t_attribute } from "${folder}";',
+	t_dynamic: 'import { t_dynamic } from "${folder}";',
+	t_fmt: 'import { t_fmt } from "${folder}";',
+	t_fragment: 'import { t_fragment } from "${folder}";',
+	t_event: 'import { t_event } from "${folder}";',
+	t_animate: 'import { t_animate } from "${folder}";',
+	t_root: 'import { t_root } from "${folder}";',
+	t_anchor: 'import { t_anchor } from "${folder}";',
+	t_child: 'import { t_child } from "${folder}";',
+	t_next: 'import { t_next } from "${folder}";',
+	t_frg: 'import { t_frg } from "${folder}";',
+	t_elm: 'import { t_elm } from "${folder}";',
+	t_txt: 'import { t_txt } from "${folder}";',
+	t_cmt: 'import { t_cmt } from "${folder}";',
+	ListItem: 'import type { ListItem } from "${folder}";',
+	SlotRender: 'import type { SlotRender } from "${folder}";',
 };
 
 export default function buildCode(
@@ -45,7 +48,7 @@ export default function buildCode(
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
-	imports.add(`import type { SlotRender } from "\${folder}";`);
+	imports.add("SlotRender");
 
 	// Build the component and any child components
 	buildTemplate(name, template, imports, b);
@@ -92,7 +95,7 @@ function buildTemplate(
 		 */`);
 	}
 
-	let propsInterface = "any";
+	let propsInterface = "Record<PropertyKey, any>";
 	if (template.docs?.props) {
 		propsInterface = `{
 			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}${p.optional ? "?" : ""}: ${p.type};`).join("\n")}
@@ -113,7 +116,7 @@ function buildTemplate(
 		 * @param $context -- Values that have been passed into the component from its ancestors.
 		 * @param $slots -- Functions for rendering children into slot nodes within the component.
 		 */
-		render: ($parent: ParentNode, $anchor: Node | null, $props: ${propsInterface}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {`);
+		render: ($parent: ParentNode, $anchor: Node | null, $props?: ${propsInterface}, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {

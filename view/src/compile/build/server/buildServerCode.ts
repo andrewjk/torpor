@@ -12,7 +12,7 @@ export default function buildServerCode(
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
-	imports.add(`import type { SlotRender } from "\${folder}";`);
+	imports.add('import type { ServerSlotRender } from "${folder}";');
 
 	// Build the component and any child components
 	buildServerTemplate(name, template, imports, b, options);
@@ -78,7 +78,7 @@ function buildServerTemplate(
 		 * @param $context -- Values that have been passed into the component from its ancestors.
 		 * @param $slots -- Functions for rendering children into slot nodes within the component.
 		 */
-		render: ($props: ${propsInterface}, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {`);
+		render: ($props?: ${propsInterface}, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {`);
 
 	// Make sure we've got $props if we're going to be using it
 	if (template.props?.length) {

@@ -23,8 +23,8 @@ test("props -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "My name is John!")).toBeInTheDocument();
-	expect(queryByText(container, "My age is 20!")).toBeInTheDocument();
-	expect(queryByText(container, "My favourite colors are green, blue, red!")).toBeInTheDocument();
-	expect(queryByText(container, "I am available")).toBeInTheDocument();
+	expect(queryByText(container, "My name is John!")).not.toBeNull();
+	expect(queryByText(container, "My age is 20!")).not.toBeNull();
+	expect(queryByText(container, "My favourite colors are green, blue, red!")).not.toBeNull();
+	expect(queryByText(container, "I am available")).not.toBeNull();
 }

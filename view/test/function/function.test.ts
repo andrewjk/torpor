@@ -29,11 +29,11 @@ async function check(container: HTMLElement) {
 	});
 	const user = userEvent.setup();
 
-	expect(queryByText(container, "The count is 0.")).toBeInTheDocument();
+	expect(queryByText(container, "The count is 0.")).not.toBeNull();
 
 	const increment = Array.from(container.children).find((e) => e.id === "increment");
 	expect(increment).not.toBeNull();
 	await user.click(increment!);
 
-	expect(queryByText(container, "The count is 1.")).toBeInTheDocument();
+	expect(queryByText(container, "The count is 1.")).not.toBeNull();
 }

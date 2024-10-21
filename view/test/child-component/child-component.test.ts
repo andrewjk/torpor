@@ -21,5 +21,5 @@ test("child component -- hydrated", async () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Hello, Anna")).toBeInTheDocument();
+	expect(queryByText(container, "Hello, Anna")).not.toBeNull();
 }

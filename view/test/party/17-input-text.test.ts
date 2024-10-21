@@ -25,10 +25,10 @@ async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 	const input = container.getElementsByTagName("input")[0];
 
-	expect(queryByText(container, "Hello World")).toBeInTheDocument();
+	expect(queryByText(container, "Hello World")).not.toBeNull();
 
 	await user.clear(input);
 	await user.type(input, "Hello Jane");
 
-	expect(queryByText(container, "Hello Jane")).toBeInTheDocument();
+	expect(queryByText(container, "Hello Jane")).not.toBeNull();
 }

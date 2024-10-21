@@ -21,6 +21,6 @@ test("named slot -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "The article's header")).toBeInTheDocument();
-	expect(queryByText(container, "The article's body")).toBeInTheDocument();
+	expect(queryByText(container, "The article's header")).not.toBeNull();
+	expect(queryByText(container, "The article's body")).not.toBeNull();
 }

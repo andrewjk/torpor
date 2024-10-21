@@ -25,19 +25,19 @@ async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 	const select = container.getElementsByTagName("select")[0];
 
-	expect(queryByText(container, "Selected: blue")).toBeInTheDocument();
+	expect(queryByText(container, "Selected: blue")).not.toBeNull();
 
 	await user.selectOptions(select, "1");
 
-	expect(queryByText(container, "Selected: red")).toBeInTheDocument();
+	expect(queryByText(container, "Selected: red")).not.toBeNull();
 
 	await user.selectOptions(select, "3");
 
-	expect(queryByText(container, "Selected: green")).toBeInTheDocument();
+	expect(queryByText(container, "Selected: green")).not.toBeNull();
 
 	// This shouldn't work because the option is disabled
 	await user.selectOptions(select, "4");
 
-	expect(queryByText(container, "Selected: gray")).not.toBeInTheDocument();
-	expect(queryByText(container, "Selected: green")).toBeInTheDocument();
+	expect(queryByText(container, "Selected: gray")).toBeNull();
+	expect(queryByText(container, "Selected: green")).not.toBeNull();
 }

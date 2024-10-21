@@ -1,19 +1,21 @@
-import { $run } from '@tera/view';
-import { $watch } from '@tera/view';
+import { $run } from "@tera/view";
+import { $watch } from "@tera/view";
+import type { ListItem } from "@tera/view";
 import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from '@tera/view';
-import { t_anchor } from '@tera/view';
-import { t_apply_props } from '@tera/view';
-import { t_child } from '@tera/view';
-import { t_event } from '@tera/view';
-import { t_fmt } from '@tera/view';
-import { t_fragment } from '@tera/view';
-import { t_next } from '@tera/view';
-import { t_pop_range } from '@tera/view';
-import { t_push_range } from '@tera/view';
-import { t_range } from '@tera/view';
-import { t_root } from '@tera/view';
-import { t_run_list } from '@tera/view';
+import { t_add_fragment } from "@tera/view";
+import { t_anchor } from "@tera/view";
+import { t_apply_props } from "@tera/view";
+import { t_child } from "@tera/view";
+import { t_event } from "@tera/view";
+import { t_fmt } from "@tera/view";
+import { t_fragment } from "@tera/view";
+import { t_list_item } from "@tera/view";
+import { t_next } from "@tera/view";
+import { t_pop_range } from "@tera/view";
+import { t_push_range } from "@tera/view";
+import { t_range } from "@tera/view";
+import { t_root } from "@tera/view";
+import { t_run_list } from "@tera/view";
 
 const Bench = {
 	/**
@@ -28,7 +30,7 @@ const Bench = {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	render: ($parent: ParentNode, $anchor: Node | null, $props: any, $context: Record<PropertyKey, any>, $slots: Record<string, SlotRender>) => {
+	render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {
 		/* User script */
 		let rowId = 1;
 		let $state = $watch({
@@ -138,7 +140,7 @@ const Bench = {
 		}
 		
 		/* User interface */
-		const t_fragments = [];
+		const t_fragments: DocumentFragment[] = [];
 
 		const t_fragment_0 = t_fragment(t_fragments, 0, `<div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Tera (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div>`);
 		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
@@ -158,12 +160,13 @@ const Bench = {
 			t_for_parent_1,
 			t_for_anchor_1,
 			function createNewItems() {
-				let t_new_items = [];
+				let t_new_items: ListItem[] = [];
 				for (let row of $state.data) {
-					t_new_items.push({
+					t_new_items.push(t_list_item({ row }, row.id));
+					/*t_new_items.push({
 						key: row.id,
 						data: { row }
-					});
+					});*/
 				}
 				return t_new_items;
 			},

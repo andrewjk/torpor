@@ -21,5 +21,5 @@ test("computed state -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "20")).toBeInTheDocument();
+	expect(queryByText(container, "20")).not.toBeNull();
 }

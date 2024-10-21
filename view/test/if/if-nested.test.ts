@@ -31,12 +31,12 @@ test("if nested -- hydrated", () => {
 
 function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's both true!")).toBeNull();
-	expect(queryByText(container, "The second is not true!")).toBeInTheDocument();
+	expect(queryByText(container, "The second is not true!")).not.toBeNull();
 	expect(queryByText(container, "The first is not true!")).toBeNull();
 
 	state.counter = 12;
 
-	expect(queryByText(container, "It's both true!")).toBeInTheDocument();
+	expect(queryByText(container, "It's both true!")).not.toBeNull();
 	expect(queryByText(container, "The second is not true!")).toBeNull();
 	expect(queryByText(container, "The first is not true!")).toBeNull();
 
@@ -44,5 +44,5 @@ function check(container: HTMLElement, state: State) {
 
 	expect(queryByText(container, "It's both true!")).toBeNull();
 	expect(queryByText(container, "The second is not true!")).toBeNull();
-	expect(queryByText(container, "The first is not true!")).toBeInTheDocument();
+	expect(queryByText(container, "The first is not true!")).not.toBeNull();
 }

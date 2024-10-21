@@ -21,5 +21,5 @@ test("component with props -- hydrated", () => {
 });
 
 function check(container: HTMLElement) {
-	expect(queryByText(container, "Hi, Amy")).toBeInTheDocument();
+	expect(queryByText(container, "Hi, Amy")).not.toBeNull();
 }
