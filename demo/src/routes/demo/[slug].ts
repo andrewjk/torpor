@@ -1,4 +1,4 @@
-import Demo from "@/components/Components/Home/Demo.tera";
+import component from "@/components/Components/Home/Demo.tera";
 import { type EndPoint, buildRoutePath } from "@tera/kit";
 
 // TODO: Could be generated
@@ -12,18 +12,14 @@ interface UrlParams {
 }
 
 // TODO: Can't build the string part of the path dynamically, but could test it automatically?
+// Actually we should be able to make a templated string, I think?
 export function route(slug: number, params?: UrlParams) {
 	return buildRoutePath<RouteParams, UrlParams>("demo/[slug]", { slug }, params);
 }
 
 export default {
-	data: () => {
-		console.log("data");
+	load: ({ params }) => {
+		return { params };
 	},
-	view: (request) => {
-		return {
-			component: Demo,
-			data: request.urlParams,
-		};
-	},
-} satisfies EndPoint<RouteParams, UrlParams>;
+	component,
+} satisfies EndPoint;

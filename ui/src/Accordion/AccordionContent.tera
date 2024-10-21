@@ -1,8 +1,8 @@
 /**
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
  *
- * @prop {string=undefined} [id] -- An ID for the AccordionContent's div container
- * @prop {boolean=false} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion
+ * @prop {string} [id] -- An ID for the AccordionContent's div container
+ * @prop {boolean} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion
  */
 <script>
 	import getId from '../utils/getId';

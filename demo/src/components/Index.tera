@@ -79,7 +79,7 @@
         @function addTask() {
             if ($state.tasks.length < 3) {
                 $state.tasks.push({
-                    id: $state.tasks.length ,
+                    id: $state.tasks.length,
                     text: todo[$state.tasks.length ],
                     done: false
                 })

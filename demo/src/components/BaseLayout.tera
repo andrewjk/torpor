@@ -1,0 +1,8 @@
+<script>
+    console.log("Hi, I'm the base layout")
+</script>
+
+<div>
+    <h1>Oh yeah</h1>
+    <:slot />
+</div>

@@ -12,9 +12,9 @@
  * </AccordionItem>
  * ```
  *
- * @prop {number=undefined} [index] -- The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically
- * @prop {string=undefined} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index
- * @prop {boolean=false} [disabled] -- If set to true, the user cannot interact with this AccordionItem */
+ * @prop {number} [index] -- The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically
+ * @prop {string} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index
+ * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this AccordionItem
  * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
  */
 

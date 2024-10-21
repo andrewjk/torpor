@@ -1,13 +1,9 @@
-import Party from "@/components/Party.tera";
-import { type EndPoint } from "@tera/kit";
+import component from "@/components/Party.tera";
+import type { EndPoint } from "@tera/kit";
 
 export default {
-	data: () => {
+	load: () => {
 		console.log("data");
 	},
-	view: () => {
-		return {
-			component: Party,
-		};
-	},
+	component,
 } satisfies EndPoint;

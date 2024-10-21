@@ -1,4 +1,4 @@
-import component from "@/components/Components/Home/AccordionTest.tera";
+import component from "@/components/Index.tera";
 import type { EndPoint } from "@tera/kit";
 
 export default {
