@@ -1,12 +1,14 @@
-<script>
-    import Article from './Article.tera'
-</script>
+import Article from './Article.tera'
 
-<Article>
-    <:fill name="header">
-        The article's header
-    </:fill>
-    <p>
-        The article's body
-    </p>
-</Article>
+export default function Named() {
+	@render {
+		<Article>
+			<:fill name="header">
+				The article's header
+			</:fill>
+			<p>
+				The article's body
+			</p>
+		</Article>
+	}
+}

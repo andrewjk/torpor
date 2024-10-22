@@ -1,5 +1,7 @@
-﻿<script>
-	import LetterItem from './LetterItem.tera';
-</script>
+﻿import LetterItem from './LetterItem.tera';
 
-<LetterItem />
+export default function LetterItemDelegate() {
+	@render {
+		<LetterItem />
+	}
+}

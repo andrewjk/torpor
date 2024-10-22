@@ -1,23 +1,29 @@
 /**
  * A component with a switch statement in it.
- * @prop {number} value -- The value to switch on.
  */
-<div>
-    @switch ($props.value) {
-        case 1: {
-            <p>
-                A small value.
-            </p>
-        }
-        case 100: {
-            <p>
-                A large value.
-            </p>
-        }
-        default: {
-            <p>
-                Another value.
-            </p>
-        }
-    }
-</div>
+ export default function Switch($props: {
+	/** The value to switch on */
+	value: number
+}) {
+	@render {
+		<div>
+			@switch ($props.value) {
+				case 1: {
+					<p>
+						A small value.
+					</p>
+				}
+				case 100: {
+					<p>
+						A large value.
+					</p>
+				}
+				default: {
+					<p>
+						Another value.
+					</p>
+				}
+			}
+		</div>
+	}
+}

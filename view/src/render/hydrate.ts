@@ -19,7 +19,7 @@ export default function hydrate(
 	context.hydrationNode = parent.firstChild;
 
 	// Call the component's render function
-	component.render(parent, null, props, undefined, slots);
+	component(parent, null, props, undefined, slots);
 
 	context.hydrationNode = null;
 }

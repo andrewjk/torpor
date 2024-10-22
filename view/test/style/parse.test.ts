@@ -5,17 +5,28 @@ import { el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
 	const input = `
-<h1>Hi</h1>
+export default function Test() {
+	@render {
+		<h1>Hi</h1>
+	}
 
-<style>
-  h1 { color: blue; }
-</style>
+	@style {
+		h1 { color: blue; }
+	}
+}
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+
+	
+}
+`,
 			markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
 			style: {
 				global: false,
@@ -39,15 +50,22 @@ test("simple style", () => {
 
 test("style with multiple selectors", () => {
 	const input = `
-<style>
-.h1, p { color: blue; }
-</style>
+export default function Test() {
+	@style {
+		.h1, p { color: blue; }
+	}
+}
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	
+}
+`,
 			style: {
 				global: false,
 				blocks: [
@@ -70,18 +88,25 @@ test("style with multiple selectors", () => {
 
 test("style with multiple values", () => {
 	const input = `
-<style>
-.h1, p {
-  color: blue;
-  background-color: green;
+export default function Test() {
+	@style {
+		.h1, p {
+			color: blue;
+			background-color: green;
+		}
+	}
 }
-</style>
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	
+}
+`,
 			style: {
 				global: false,
 				blocks: [
@@ -108,19 +133,26 @@ test("style with multiple values", () => {
 
 test("media query", () => {
 	const input = `
-<style>
-@media screen and (min-width: 480px) {
-  button {
-    color: green;
-  }
+export default function Test() {
+	@style {
+		@media screen and (min-width: 480px) {
+			button {
+				color: green;
+			}
+		}
+	}
 }
-</style>
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	
+}
+`,
 			style: {
 				global: false,
 				blocks: [
@@ -149,25 +181,32 @@ test("media query", () => {
 
 test("comments in style", () => {
 	const input = `
-<style>
-  /*
-  p {
-    color: blue
-  }
-  */
-  button {
-    color: green;
-  }
-  // span: {
-  // color: purple;
-  //}
-</style>
+export default function Test() {
+	@style {
+		/*
+		p {
+			color: blue
+		}
+		*/
+		button {
+			color: green;
+		}
+		//span: {
+		//	color: purple;
+		//}
+	}
+}
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	
+}
+`,
 			style: {
 				global: false,
 				blocks: [

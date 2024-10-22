@@ -1,12 +1,14 @@
-<script>
-  let $state = $watch({
-    isAvailable: false
-  });
-</script>
+export default function IsAvailable() {
+	let $state = $watch({
+		isAvailable: false
+	});
 
-<div>
-  <div>{$state.isAvailable ? "Available" : "Not available"}</div>
+	@render {
+		<div>
+			<div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-  <input id="is-available" type="checkbox" bind:checked={$state.isAvailable} />
-  <label for="is-available">Is available</label>
-</div>
+			<input id="is-available" type="checkbox" bind:checked={$state.isAvailable} />
+			<label for="is-available">Is available</label>
+		</div>
+	}
+}

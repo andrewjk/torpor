@@ -1,3 +1,7 @@
-<div thing={$props.thing} data-thing={$props.dataThing} caption="this attribute is for {$props.description}">
-    Hello!
-</div>
+export default function For() {
+	@render {
+		<div thing={$props.thing} data-thing={$props.dataThing} caption="this attribute is for {$props.description}">
+			Hello!
+		</div>
+	}
+}

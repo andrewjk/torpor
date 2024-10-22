@@ -1,13 +1,15 @@
-<script>
-    let $state = $watch({ counter: 0 })
-</script>
+export default function Function() {
+	let $state = $watch({ counter: 0 })
 
-<div>
-    <button id=increment onclick={increment}>Increment</button>
-    @function increment() {
-        $state.counter += 1;
-    }
-    <p>
-        The count is {$state.counter}.
-    </p>
-</div>
+	@render {
+		<div>
+			<button id=increment onclick={increment}>Increment</button>
+			@function increment() {
+					$state.counter += 1;
+			}
+			<p>
+					The count is {$state.counter}.
+			</p>
+		</div>
+	}
+}

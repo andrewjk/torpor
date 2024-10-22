@@ -1,8 +1,10 @@
-<script>
-    console.log("Hi, I'm the base layout")
-</script>
+export default function BaseLayout() {
+	console.log("Hi, I'm the base layout")
 
-<div>
-    <h1>Oh yeah</h1>
-    <:slot />
-</div>
+	@render {
+		<div>
+				<h1>Oh yeah</h1>
+				<:slot />
+		</div>
+	}
+}

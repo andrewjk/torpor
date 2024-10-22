@@ -26,5 +26,5 @@ export default function mount(
 	}
 
 	// Call the component's render function
-	component.render(parent, null, props, undefined, slots);
+	component(parent, null, props, undefined, slots);
 }

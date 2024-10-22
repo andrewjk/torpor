@@ -1,4 +1,4 @@
-﻿<script>
+﻿export default function LetterItem() {
 	/*
 	// TODO:
 	$$.onMount = () => {
@@ -14,6 +14,8 @@
 		letter: 'x'
 	});
 	*/
-</script>
 
-<li>{$props.index}: {$props.letter}</li>
+	@render {
+		<li>{$props.index}: {$props.letter}</li>
+	}
+}

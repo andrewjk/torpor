@@ -107,5 +107,5 @@ export default function buildServerComponentNode(
 		renderParams += `, ${slotsName}`;
 	}
 	b.append("");
-	b.append(`$output += ${componentName}.render(${renderParams})`);
+	b.append(`$output += ${componentName}(${renderParams})`);
 }

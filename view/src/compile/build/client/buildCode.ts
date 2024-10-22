@@ -52,13 +52,13 @@ export default function buildCode(
 
 	// Build the component and any child components
 	buildTemplate(name, template, imports, b);
-	if (template.childComponents) {
-		for (let child of template.childComponents) {
-			buildTemplate(child.name || "ChildComponent", child, imports, b);
-		}
-	}
+	//if (template.childComponents) {
+	//	for (let child of template.childComponents) {
+	//		buildTemplate(child.name || "ChildComponent", child, imports, b);
+	//	}
+	//}
 
-	// Add the gathered imports
+	// Add the gathered imports in alphabetical order
 	if (imports.size) {
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
@@ -68,7 +68,7 @@ export default function buildCode(
 	}
 
 	// Export the component
-	b.append(`export default ${name};`);
+	//b.append(`export default ${name};`);
 
 	return b.toString();
 }
@@ -79,6 +79,85 @@ function buildTemplate(
 	imports: Set<string>,
 	b: Builder,
 ) {
+	let script = template.script || "";
+
+	// Add default imports
+	if (/\$watch\b/.test(script)) imports.add("$watch");
+	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
+	if (/\$run\b/.test(script)) imports.add("$run");
+	if (/\$mount\b/.test(script)) imports.add("$mount");
+
+	let marker = 0;
+	for (let i = 0; i < script.length; i++) {
+		if (script.substring(i, i + "/* @params */".length) === "/* @params */") {
+			b.append(script.substring(marker, i));
+
+			// TODO: Support other params, like the user setting $context
+			b.append(
+				`$parent: ParentNode,
+				$anchor: Node | null,
+				${template.params || "$props?: Record<PropertyKey, any>"},
+				$context?: Record<PropertyKey, any>,
+				$slots?: Record<string, SlotRender>`,
+			);
+
+			marker = i + "/* @params */".length;
+		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
+			b.append(script.substring(marker, i));
+
+			if (template.markup) {
+				const status: BuildStatus = {
+					imports,
+					props: template.props || [],
+					styleHash: template.styleHash || "",
+					varNames: {},
+					fragmentStack: [],
+					forVarNames: [],
+				};
+				// Make sure we've got $props if we're going to be using it
+				if (template.props?.length) {
+					b.append(`$props ??= {};`);
+					b.append("");
+				}
+
+				// Redefine $context so that any newly added properties will only be passed to children
+				if (template.contextProps?.length) {
+					b.append(`$context = Object.assign({}, $context);`);
+				}
+
+				// Add the interface
+				b.append("/* User interface */");
+				buildFragmentText(template.markup, status, b);
+				b.append("");
+				buildNode(template.markup, status, b, "$parent", "$anchor", true);
+
+				// Flush any $mount calls that were encountered -- move this to
+				// addFragment, because we also have to flush events and animations
+				if (imports.has("$mount")) {
+					status.imports.add("t_flush");
+					b.append("");
+					b.append("t_flush();");
+				}
+			}
+
+			marker = i + "/* @render */".length;
+		}
+	}
+
+	//let position = script.indexOf("/* @render */");
+
+	// Flush any $mount calls that were encountered -- move this to
+	// addFragment, because we also have to flush events and animations
+	if (imports.has("$mount")) {
+		imports.add("t_flush");
+		b.append("");
+		b.append("t_flush();");
+	}
+
+	b.append(script.substring(marker));
+
+	return;
+
 	if (template.imports) {
 		// TODO: Should probably consolidate imports e.g. when we've split them up
 		for (let imp of template.imports) {

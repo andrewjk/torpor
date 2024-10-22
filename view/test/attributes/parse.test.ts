@@ -5,9 +5,13 @@ import { att, el, root, text, trimParsed } from "../helpers";
 
 test("attribute with double quotes", () => {
 	const input = `
-<a href="http://example.com">
-  Link
-</a>
+export default function Test() {
+	@render {
+		<a href="http://example.com">
+		Link
+		</a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -15,6 +19,11 @@ test("attribute with double quotes", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
 		},
 	};
@@ -23,9 +32,13 @@ test("attribute with double quotes", () => {
 
 test("attribute with single quotes", () => {
 	const input = `
-<a href='http://example.com'>
-  Link
-</a>
+export default function Test() {
+	@render {
+		<a href='http://example.com'>
+		Link
+		</a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -33,6 +46,11 @@ test("attribute with single quotes", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
 		},
 	};
@@ -41,9 +59,13 @@ test("attribute with single quotes", () => {
 
 test("attribute with no quotes", () => {
 	const input = `
-<a href=http://example.com>
-  Link
-</a>
+export default function Test() {
+	@render {
+		<a href=http://example.com>
+		Link
+		</a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -51,6 +73,11 @@ test("attribute with no quotes", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
 		},
 	};
@@ -59,7 +86,11 @@ test("attribute with no quotes", () => {
 
 test("attribute with no quotes in self-closed element", () => {
 	const input = `
-<a href=http://example.com/>
+export default function Test() {
+	@render {
+		<a href=http://example.com/>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -67,6 +98,11 @@ test("attribute with no quotes in self-closed element", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("href", "http://example.com")], [], true)]),
 		},
 	};
@@ -75,9 +111,13 @@ test("attribute with no quotes in self-closed element", () => {
 
 test("multiple attributes", () => {
 	const input = `
-<a href1="http://example.com" href2='http://example.com' href3=http://example.com>
-  Link
-</a>
+export default function Test() {
+	@render {
+		<a href1="http://example.com" href2='http://example.com' href3=http://example.com>
+		Link
+		</a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -85,6 +125,11 @@ test("multiple attributes", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([
 				el(
 					"a",
@@ -103,7 +148,11 @@ test("multiple attributes", () => {
 
 test("multiple attributes with no values", () => {
 	const input = `
-<input text required />
+export default function Test() {
+	@render {
+		<input text required />
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -111,6 +160,11 @@ test("multiple attributes with no values", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("input", [att("text"), att("required")], [], true)]),
 		},
 	};
@@ -119,9 +173,13 @@ test("multiple attributes with no values", () => {
 
 test("event attribute with name", () => {
 	const input = `
-<button onclick={increment}>
-  Increment
-</button>
+export default function Test() {
+	@render {
+		<button onclick={increment}>
+		Increment
+		</button>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -129,6 +187,11 @@ test("event attribute with name", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
 		},
 	};
@@ -137,11 +200,15 @@ test("event attribute with name", () => {
 
 test("event attribute with code", () => {
 	const input = `
-<button onclick={() => {
-  increment();
-}}>
-  Increment
-</button>
+export default function Test() {
+	@render {
+		<button onclick={() => {
+			increment();
+		}}>
+			Increment
+		</button>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -149,8 +216,13 @@ test("event attribute with code", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([
-				el("button", [att("onclick", "{() => {\n  increment();\n}}")], [text("Increment")]),
+				el("button", [att("onclick", "{() => {\n\t\t\tincrement();\n\t\t}}")], [text("Increment")]),
 			]),
 		},
 	};
@@ -159,7 +231,11 @@ test("event attribute with code", () => {
 
 test("shorthand attribute", () => {
 	const input = `
-<a {href}></a>
+export default function Test() {
+	@render {
+		<a {href}></a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -167,6 +243,11 @@ test("shorthand attribute", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("{href}")])]),
 		},
 	};
@@ -175,7 +256,11 @@ test("shorthand attribute", () => {
 
 test("multiple shorthand attributes", () => {
 	const input = `
-<a {href1} {href2}></a>
+export default function Test() {
+	@render {
+		<a {href1} {href2}></a>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -183,6 +268,11 @@ test("multiple shorthand attributes", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("a", [att("{href1}"), att("{href2}")])]),
 		},
 	};

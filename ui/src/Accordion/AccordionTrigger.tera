@@ -1,7 +1,7 @@
 /**
  * A header button for an AccordionItem, which can be used to reveal or hide an associated AccordionContent.
  */
-<script>
+export default function AccordionTrigger() {
 	import getId from '../utils/getId';
 	import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
 
@@ -37,21 +37,23 @@
 		// Pass the key press up to the parent Accordion which will handle setting the focused button
 		context.handleHeaderKey($state.index, e);
 	}
-</script>
 
-<button
-	type="button"
-	id={$props.id}
-	class='tera-accordion-button'
-	disabled={$state.disabled || $state.parentDisabled}
-	aria-expanded={$state.expanded.toString()}
-	aria-disabled={$state.disabled}
-	aria-controls={$state.contentId}
-	data-state={$state.dataState}
-	data-disabled={$state.disabled}
-	bind:self={button}
-	onclick={handleClick}
-	onkeydown={handleKey}
->
-	<:slot />
-</button>
+	@render {
+		<button
+			type="button"
+			id={$props.id}
+			class='tera-accordion-button'
+			disabled={$state.disabled || $state.parentDisabled}
+			aria-expanded={$state.expanded.toString()}
+			aria-disabled={$state.disabled}
+			aria-controls={$state.contentId}
+			data-state={$state.dataState}
+			data-disabled={$state.disabled}
+			bind:self={button}
+			onclick={handleClick}
+			onkeydown={handleKey}
+		>
+			<:slot />
+		</button>
+	}
+}

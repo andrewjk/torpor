@@ -1,4 +1,4 @@
-<script>
+export default function AccordionList() {
 	import {
 		Accordion,
 		AccordionItem,
@@ -6,16 +6,18 @@
 		AccordionTrigger,
 		AccordionContent,
 	} from "../../../src/Accordion/index";
-</script>
 
-<Accordion value={$props.value}>
-	@for (let item of $props.items) {
-		@key = item.id
-		<AccordionItem>
-			<AccordionHeader as="h4">
-				<AccordionTrigger>{item.header}</AccordionTrigger>
-			</AccordionHeader>
-			<AccordionContent>{item.text}</AccordionContent>
-		</AccordionItem>
+	@render {
+		<Accordion value={$props.value}>
+			@for (let item of $props.items) {
+				@key = item.id
+				<AccordionItem>
+					<AccordionHeader as="h4">
+						<AccordionTrigger>{item.header}</AccordionTrigger>
+					</AccordionHeader>
+					<AccordionContent>{item.text}</AccordionContent>
+				</AccordionItem>
+			}
+		</Accordion>
 	}
-</Accordion>
+}

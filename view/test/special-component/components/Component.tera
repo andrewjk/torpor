@@ -1,13 +1,15 @@
-<script>
-    import BigTitle from "./BigTitle.tera";
-    import SmallTitle from "./SmallTitle.tera";
+import BigTitle from "./BigTitle.tera";
+import SmallTitle from "./SmallTitle.tera";
 
-    let components = {
-        BigTitle,
-        SmallTitle
-    };
-</script>
+export default function Component($props) {
+	let components = {
+		BigTitle,
+		SmallTitle
+	};
 
-<:component self={components[$props.self]}>
-    Hello!
-</:component>
+	@render {
+		<:component self={components[$props.self]}>
+			Hello!
+		</:component>
+	}
+}

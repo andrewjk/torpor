@@ -1,11 +1,15 @@
-<section>
-  <p>^</p>
-  @for (let [i, item] of $props.items.entries()) {
-    key = item.id
-    <span>
-      {i > 0 ? ", " : ""}
-      {item.text}
-    </span>
-  }
-  <p>$</p>
-</section>
+export default function ArrayEntries() {
+	@render {
+		<section>
+			<p>^</p>
+			@for (let [i, item] of $props.items.entries()) {
+				key = item.id
+				<span>
+					{i > 0 ? ", " : ""}
+					{item.text}
+				</span>
+			}
+			<p>$</p>
+		</section>
+	}
+}

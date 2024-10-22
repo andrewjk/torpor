@@ -5,13 +5,17 @@ import { el, root, text, trimParsed } from "../helpers";
 
 test("html comments", () => {
 	const input = `
-<!-- A comment at the top -->
-<section>
-  <!-- A comment inside -->
-  <p>
-    The <!-- A comment inside some text --> content
-  </p>
-</section>
+export default function Test() {
+	@render {
+		<!-- A comment at the top -->
+		<section>
+		<!-- A comment inside -->
+		<p>
+			The <!-- A comment inside some text --> content
+		</p>
+		</section>
+	}
+}
 `;
 
 	const output = trimParsed(parse("x", input));
@@ -19,6 +23,11 @@ test("html comments", () => {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([el("section", [], [el("p", [], [text("The  content")])])]),
 		},
 	};

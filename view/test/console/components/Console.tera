@@ -1,4 +1,7 @@
-
-<div>
-    @console.log("@console is logging here")
-</div>
+export default function Console() {
+	@render {
+		<div>
+			@console.log("@console is logging here")
+		</div>
+	}
+}

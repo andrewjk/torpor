@@ -20,20 +20,6 @@ export default function buildType(
 	b.append(`import type { SlotRender } from "${options?.renderFolder || "@tera/view"}";`);
 	b.append("");
 
-	if (template.docs?.description) {
-		b.append(`
-		/**
-		 * ${template.docs.description}
-		 */`);
-	}
-
-	let propsInterface = "Record<PropertyKey, any>";
-	if (template.docs?.props) {
-		propsInterface = `{
-			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}${p.optional ? "?" : ""}: ${p.type};`).join("\n")}
-		}`;
-	}
-
 	b.append(`
 	declare namespace ${name} {
 		/**
@@ -48,7 +34,7 @@ export default function buildType(
 		 * @param $context -- Values that have been passed into the component from its ancestors.
 		 * @param $slots -- Functions for rendering children into slot nodes within the component.
 		 */
-		const render: ($parent: ParentNode, $anchor: Node | null, $props?: ${propsInterface}, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => void;
+		const render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => void;
 	}
 		
 	export default ${name};`);

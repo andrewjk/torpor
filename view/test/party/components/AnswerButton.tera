@@ -1,10 +1,9 @@
-/**
- * @prop {Function} onYes
- * @prop {Function} onNo
- */
+export default function AnswerButton($props: any) {
+	@render {
+		<div>
+			<button onclick={$props.onYes}>YES</button>
 
-<div>
-  <button onclick={$props.onYes}>YES</button>
-
-  <button onclick={$props.onNo}>NO</button>
-</div>
+			<button onclick={$props.onNo}>NO</button>
+		</div>
+	}
+}

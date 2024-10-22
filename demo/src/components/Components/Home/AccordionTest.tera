@@ -1,34 +1,36 @@
-<script>
-    import {
-        Accordion,
-        AccordionItem,
-        AccordionHeader,
-        AccordionTrigger,
-        AccordionContent 
-    } from '@tera/ui/Accordion';
+export default function AccordionTest() {
+	import {
+		Accordion,
+		AccordionItem,
+		AccordionHeader,
+		AccordionTrigger,
+		AccordionContent 
+	} from '@tera/ui/Accordion';
 
-    let $state = $watch({
-        value: "1",
-        items: [
-            { id: 0, header: "Item 1", text: "Content 1" },
-            { id: 1, header: "Item 2", text: "Content 2" },
-            { id: 2, header: "Item 3", text: "Content 3" },
-        ],
-    });
-</script>
+	let $state = $watch({
+		value: "1",
+		items: [
+			{ id: 0, header: "Item 1", text: "Content 1" },
+			{ id: 1, header: "Item 2", text: "Content 2" },
+			{ id: 2, header: "Item 3", text: "Content 3" },
+		],
+	});
 
-<div>
-    <Accordion value={$state.value}>
-        @for (let item of $state.items) {
-            @key = item.id
-            <AccordionItem>
-                <AccordionHeader as="h4">
-                    <AccordionTrigger>{item.header}</AccordionTrigger>
-                </AccordionHeader>
-                <AccordionContent>{item.text}</AccordionContent>
-            </AccordionItem>
-        }
-    </Accordion>
+	@render {
+		<div>
+			<Accordion value={$state.value}>
+				@for (let item of $state.items) {
+					@key = item.id
+					<AccordionItem>
+						<AccordionHeader as="h4">
+							<AccordionTrigger>{item.header}</AccordionTrigger>
+						</AccordionHeader>
+						<AccordionContent>{item.text}</AccordionContent>
+					</AccordionItem>
+				}
+			</Accordion>
 
-    <button onclick={() => $state.items.splice(1, 1)}>REMOVE</button>
-</div>
+			<button onclick={() => $state.items.splice(1, 1)}>REMOVE</button>
+		</div>
+	}
+}

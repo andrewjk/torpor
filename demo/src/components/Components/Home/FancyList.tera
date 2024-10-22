@@ -1,11 +1,13 @@
-﻿<script>
+﻿export default function FancyList() {
 	console.log($context.info)
-</script>
 
-<ul>
-	@for (let item of $props.items) {
-		<li class="fancy">
-			<:slot item={item} />
-		</li>
+	@render {
+		<ul>
+			@for (let item of $props.items) {
+				<li class="fancy">
+					<:slot item={item} />
+				</li>
+			}
+		</ul>
 	}
-</ul>
+}

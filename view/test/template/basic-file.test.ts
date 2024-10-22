@@ -6,13 +6,13 @@ import { el, root, trimParsed } from "../helpers";
 // TODO: Preserve space
 
 test("basic file", () => {
-	const input = `<script/><div/><style/>`;
+	const input = `export default function Test() {}`;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
-			markup: root([el("div", undefined, undefined, true)]),
+			script: "export default function Test(/* @params */) {}",
 		},
 	};
 	expect(output).toEqual(expected);

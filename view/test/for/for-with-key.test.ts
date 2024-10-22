@@ -5,20 +5,29 @@ import { control, el, root, text, trimParsed } from "../helpers";
 
 test("for statement with key", () => {
 	const input = `
-<section>
-  @for (let item of things) {
-    key = item.id
-    <p>
-      {item.name}
-    </p>
-  }
-</section>
+export default function Test() {
+	@render {
+		<section>
+			@for (let item of things) {
+				key = item.id
+				<p>
+					{item.name}
+				</p>
+			}
+		</section>
+	}
+}
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
+			script: `
+export default function Test(/* @params */) {
+	/* @render */
+}
+`,
 			markup: root([
 				el(
 					"section",

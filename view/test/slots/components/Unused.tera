@@ -1,5 +1,7 @@
-<script>
-    import Header from './Header.tera'
-</script>
+import Header from './Header.tera'
 
-<Header />
+export default function Unused() {
+	@render {
+		<Header />
+	}
+}

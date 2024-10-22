@@ -1,17 +1,20 @@
-<script>
-  import UserProfileContext from "./UserProfileContext.tera";
 
-  const $user = $watch({
-    id: 1,
-    username: "unicorn42",
-    email: "unicorn42@example.com",
-  });
+import UserProfileContext from "./UserProfileContext.tera";
 
-  // TODO: I think we're supposed to $unwrap this and pass in an update function?
-  $context.user = $user;
-</script>
+export default function UserProfileContextApp() {
+	const $user = $watch({
+		id: 1,
+		username: "unicorn42",
+		email: "unicorn42@example.com",
+	});
 
-<div>
-  <h1>Welcome back, {$user.username}</h1>
-  <UserProfileContext />
-</div>
+	// TODO: I think we're supposed to $unwrap this and pass in an update function?
+	$context.user = $user;
+
+	@render {
+		<div>
+			<h1>Welcome back, {$user.username}</h1>
+			<UserProfileContext />
+		</div>
+	}
+}

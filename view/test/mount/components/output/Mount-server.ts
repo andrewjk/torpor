@@ -1,30 +1,22 @@
 import type { ServerSlotRender } from "@tera/view";
 
-const Mount = {
-	/**
-	 * The component's name.
-	 */
-	name: "Mount",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		/* User script */
-		const $mount = (fn: Function) => null;
-		let inputElement;
+const $mount = (fn: Function) => null;
+export default function Mount(
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	let inputElement;
 
-		$mount(() => {
-			inputElement.value = "hi";
-		});
-		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		$output += `<input self="${inputElement || ""}"/>`;
-		return $output;
-	}
+	$mount(() => {
+		inputElement.value = "hi";
+	});
+
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<input self="${inputElement || ""}"/>`;
+	return $output;
 }
 
-export default Mount;

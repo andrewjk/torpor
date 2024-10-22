@@ -1,7 +1,11 @@
-<div>
-    @if ($props.counter > 5) {
-        <p>It's big</p>
-    } else {
-        <p>It's small</p>
-    }
-</div>
+export default function If($props: { counter: number }) {
+	@render {
+		<div>
+			@if ($props.counter > 5) {
+				<p>It's big</p>
+			} else {
+				<p>It's small</p>
+			}
+		</div>
+	}
+}

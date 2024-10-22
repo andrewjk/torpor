@@ -1,10 +1,14 @@
-<section>
-  <p>^</p>
-  @for (let item of $props.items) {
-    key = item.id
-    <p>
-      {item.text}
-    </p>
-  }
-  <p>$</p>
-</section>
+export default function Array() {
+	@render {
+		<section>
+			<p>^</p>
+			@for (let item of $props.items) {
+				key = item.id
+				<p>
+					{item.text}
+				</p>
+			}
+			<p>$</p>
+		</section>
+	}
+}

@@ -1,10 +1,10 @@
 import type { SlotRender } from "@tera/view";
 
-declare namespace Object {
+declare namespace Watched {
 	/**
 	 * The component's name.
 	 */
-	const name: "Object";
+	const name: "Watched";
 	/**
 	 * Mounts or hydrates the component into the supplied parent node.
 	 * @param $parent -- The parent node.
@@ -16,4 +16,4 @@ declare namespace Object {
 	const render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => void;
 }
 
-export default Object;
+export default Watched;

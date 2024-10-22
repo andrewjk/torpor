@@ -31,6 +31,10 @@ export default function buildSpecialNode(
 			buildHeadNode(node, status, b);
 			break;
 		}
+		case ":fill": {
+			// HACK:
+			break;
+		}
 		default: {
 			throw new Error(`Invalid special node: ${node.tagName}`);
 		}

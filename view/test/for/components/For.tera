@@ -1,7 +1,11 @@
-<section>
-  @for (let i = 0; i < 5; i++) {
-    <p>
-      {i}
-    </p>
-  }
-</section>
+export default function For() {
+	@render {
+		<section>
+			@for (let i = 0; i < 5; i++) {
+				<p>
+					{i}
+				</p>
+			}
+		</section>
+	}
+}

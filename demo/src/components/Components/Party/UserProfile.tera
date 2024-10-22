@@ -1,13 +1,15 @@
-/**
- * @prop {string} name
- * @prop {number} age
- * @prop {string[]} favouriteColors
- * @prop {boolean} isAvailable
- */
-
-<div>
-  <p>My name is {$props.name}!</p>
-  <p>My age is {$props.age}!</p>
-  <p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
-  <p>I am {$props.isAvailable ? "available" : "not available"}</p>
-</div>
+export default function UserProfile($props: {
+	name: string,
+	age: number,
+	favoriteColors: string[],
+	isAvailable: boolean
+}) {
+	@render {
+		<div>
+			<p>My name is {$props.name}!</p>
+			<p>My age is {$props.age}!</p>
+			<p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
+			<p>I am {$props.isAvailable ? "available" : "not available"}</p>
+		</div>
+	}
+}

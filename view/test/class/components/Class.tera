@@ -1,3 +1,7 @@
-<div class="hello" class:red={$props.red} class:green={$props.green} class:blue={$props.blue}>
-    Hello!
-</div>
+export default function For() {
+	@render {
+		<div class="hello" class:red={$props.red} class:green={$props.green} class:blue={$props.blue}>
+			Hello!
+		</div>
+	}
+}

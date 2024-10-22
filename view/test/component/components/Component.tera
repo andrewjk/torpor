@@ -1,5 +1,7 @@
-<script>
-    import Header from './Header.tera';
-</script>
+import Header from './Header.tera';
 
-<Header name="Amy" />
+export default function Component() {
+	@render {
+		<Header name="Amy" />
+	}
+}

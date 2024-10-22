@@ -1,5 +1,4 @@
 import type Import from "../compile/types/Import";
-import type Documentation from "../compile/types/docs/Documentation";
 import type RootNode from "../compile/types/nodes/RootNode";
 import type Style from "../compile/types/styles/Style";
 
@@ -8,9 +7,9 @@ import type Style from "../compile/types/styles/Style";
  */
 export default interface ComponentTemplate {
 	name?: string;
-	docs?: Documentation;
 	imports?: Import[];
 	script?: string;
+	params?: string;
 	markup?: RootNode;
 	childComponents?: ComponentTemplate[];
 	style?: Style;

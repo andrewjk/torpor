@@ -1,35 +1,28 @@
 import type { ServerSlotRender } from "@tera/view";
-import List from './List.tera';
 
-const Let = {
-	/**
-	 * The component's name.
-	 */
-	name: "Let",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		$props ||= {};
+import List from './List.tera'
 
+export default function Let(
+	$props: any,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	
+	$props ??= {};
+
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	const t_props_1 = {};
+	t_props_1["items"] = $props.items;
+	const t_slots_1 = {};
+	t_slots_1["_"] = ($sprops: Record<PropertyKey, any>, $context: Record<PropertyKey, any>) => {
 		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		const t_props_1 = {};
-		t_props_1["items"] = $props.items;
-		const t_slots_1 = {};
-		t_slots_1["_"] = ($sprops: Record<PropertyKey, any>, $context: Record<PropertyKey, any>) => {
-			let $output = "";
-			$output += ` ${t_fmt($sprops.item.text)} `;
-			return $output;
-		}
-
-		$output += List.render(t_props_1, $context, t_slots_1)
+		$output += ` ${t_fmt($sprops.item.text)} `;
 		return $output;
 	}
+
+	$output += List(t_props_1, $context, t_slots_1)
+	return $output;
 }
 
-export default Let;

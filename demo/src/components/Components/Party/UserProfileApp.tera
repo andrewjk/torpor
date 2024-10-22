@@ -1,10 +1,12 @@
-<script>
-  import UserProfile from "./UserProfile.tera";
-</script>
+import UserProfile from "./UserProfile.tera";
 
-<UserProfile
-  name="John"
-  age={20}
-  favouriteColors={["green", "blue", "red"]}
-  isAvailable
-/>
+export default function UserProfileApp() {
+	@render {
+		<UserProfile
+			name="John"
+			age={20}
+			favouriteColors={["green", "blue", "red"]}
+			isAvailable
+		/>
+	}
+}

@@ -1,5 +1,5 @@
 type SlotRender = (
-	parent: Node,
+	parent: ParentNode,
 	anchor: Node | null,
 	$props?: Record<string, any>,
 	$context?: Record<string, any>,

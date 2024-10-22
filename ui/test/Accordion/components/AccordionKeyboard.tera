@@ -1,4 +1,4 @@
-<script>
+export default function AccordionKeyboard() {
 	import {
 		Accordion,
 		AccordionItem,
@@ -6,25 +6,27 @@
 		AccordionTrigger,
 		AccordionContent,
 	} from "../../../src/Accordion/index";
-</script>
 
-<Accordion value={$props.value} type="multiple">
-	<AccordionItem>
-		<AccordionHeader as="h4">
-			<AccordionTrigger>Header 1</AccordionTrigger>
-		</AccordionHeader>
-		<AccordionContent>Content 1</AccordionContent>
-	</AccordionItem>
-	<AccordionItem>
-		<AccordionHeader as="h4">
-			<AccordionTrigger>Header 2</AccordionTrigger>
-		</AccordionHeader>
-		<AccordionContent>Content 2</AccordionContent>
-	</AccordionItem>
-	<AccordionItem>
-		<AccordionHeader as="h4">
-			<AccordionTrigger>Header 3</AccordionTrigger>
-		</AccordionHeader>
-		<AccordionContent>Content 3</AccordionContent>
-	</AccordionItem>
-</Accordion>
+	@render {
+		<Accordion value={$props.value} type="multiple">
+			<AccordionItem>
+				<AccordionHeader as="h4">
+					<AccordionTrigger>Header 1</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>Content 1</AccordionContent>
+			</AccordionItem>
+			<AccordionItem>
+				<AccordionHeader as="h4">
+					<AccordionTrigger>Header 2</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>Content 2</AccordionContent>
+			</AccordionItem>
+			<AccordionItem>
+				<AccordionHeader as="h4">
+					<AccordionTrigger>Header 3</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>Content 3</AccordionContent>
+			</AccordionItem>
+		</Accordion>
+	}
+}

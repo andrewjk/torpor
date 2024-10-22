@@ -38,6 +38,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 			return transform(name, parsed.template, id, options);
 		} else {
 			console.log("\nERRORS\n======");
+			let errorText = "";
 			for (let error of parsed.errors) {
 				//const line = (input.slice(0, error.i).match(/\n/g) || "").length + 1;
 				let slice = code.slice(0, error.start);
@@ -50,8 +51,9 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 					}
 				}
 				console.log(`${line},${error.start - lastLineIndex - 1}: ${error.message}`);
+				errorText += `${line},${error.start - lastLineIndex - 1}: ${error.message}\n`;
 			}
-			throw new Error(`Parse failed for ${id}`);
+			throw new Error(`Parse failed for ${id}, ${errorText}`);
 		}
 	},
 });

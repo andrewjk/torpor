@@ -1,9 +1,11 @@
-<script>
-  let inputElement;
+export default function InputFocused() {
+	let inputElement;
 
-  $run(() => {
-    inputElement.focus();
-  });
-</script>
+	$run(() => {
+		inputElement.focus();
+	});
 
-<input bind:self={inputElement} />
+	@render {
+		<input bind:self={inputElement} />
+	}
+}

@@ -1,8 +1,10 @@
-<script>
-    let $state = $watch({ name: "Alice" });
-</script>
+export default function BindText() {
+	let $state = $watch({ name: "Alice" });
 
-<div>
-    <input bind:value={$state.name} />
-    <p>Hello, {$state.name}</p>
-</div>
+	@render {
+		<div>
+				<input bind:value={$state.name} />
+				<p>Hello, {$state.name}</p>
+		</div>
+	}
+}

@@ -1,9 +1,11 @@
-<script>
-    import List from './List.tera'
-</script>
+import List from './List.tera'
 
-<List items={$props.items}>
-    <:fill>
-        {$sprops.item.text}
-    </:fill>
-</List>
+export default function Let($props: any) {
+	@render {
+		<List items={$props.items}>
+			<:fill>
+				{$sprops.item.text}
+			</:fill>
+		</List>
+	}
+}

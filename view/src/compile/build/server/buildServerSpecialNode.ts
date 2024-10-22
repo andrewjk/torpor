@@ -27,6 +27,10 @@ export default function buildServerSpecialNode(
 			// TODO: For now this is just being done in hydrate
 			break;
 		}
+		case ":fill": {
+			// HACK:
+			break;
+		}
 		default: {
 			throw new Error(`Invalid special node: ${node.tagName}`);
 		}

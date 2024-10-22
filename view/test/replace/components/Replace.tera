@@ -1,9 +1,11 @@
-<script>
-    let counter = 0;
-</script>
+export default function Replace($props: { name: string}) {
+	let counter = 0;
 
-<div>
-    @replace ($props.name) {
-        <p>The replace count is {counter++}.</p>
-    }
-</div>
+	@render {
+		<div>
+			@replace ($props.name) {
+				<p>The replace count is {counter++}.</p>
+			}
+		</div>
+	}
+}

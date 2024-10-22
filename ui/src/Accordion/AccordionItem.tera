@@ -1,3 +1,5 @@
+import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from './AccordionTypes';
+
 /**
  * An item in an Accordion, which must consist of an AccordionTrigger and an AccordionContent.
  * 
@@ -17,10 +19,7 @@
  * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this AccordionItem
  * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
  */
-
-<script>
-	import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from './AccordionTypes';
-
+export default function AccordionItem($props: any) {
 	let $state: ItemState = $watch({
 		index: -1,
 		value: "",
@@ -63,12 +62,14 @@
 			$props.ontoggle($state.expanded);
 		}
 	})
-</script>
 
-<div
-	class='tera-accordion-item'
-	data-state={$state.dataState}
-	data-disabled={$state.dataDisabled}
->
-	<:slot />
-</div>
+	@render {
+		<div
+			class='tera-accordion-item'
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			<:slot />
+		</div>
+	}
+}

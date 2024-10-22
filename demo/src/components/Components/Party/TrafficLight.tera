@@ -1,28 +1,30 @@
-<script>
-  const TRAFFIC_LIGHTS = ["red", "orange", "green"];
-  let $state = $watch({
-    lightIndex: 0,
-    get light() {
-      return TRAFFIC_LIGHTS[this.lightIndex];
-    }
-  });
+export default function TrafficLight() {
+	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
+	let $state = $watch({
+		lightIndex: 0,
+		get light() {
+			return TRAFFIC_LIGHTS[this.lightIndex];
+		}
+	});
 
-  function nextLight() {
-    $state.lightIndex = ($state.lightIndex + 1) % TRAFFIC_LIGHTS.length;
-  }
-</script>
+	function nextLight() {
+		$state.lightIndex = ($state.lightIndex + 1) % TRAFFIC_LIGHTS.length;
+	}
 
-<div>
-  <button onclick={nextLight}>Next light</button>
-  <p>Light is: {$state.light}</p>
-  <p>
-    You must
-    @if ($state.light === "red") {
-      <span>STOP</span>
-    } else if ($state.light === "orange") {
-      <span>SLOW DOWN</span>
-    } else if ($state.light === "green") {
-      <span>GO</span>
-    }
-  </p>
-</div>
+	@render {
+		<div>
+			<button onclick={nextLight}>Next light</button>
+			<p>Light is: {$state.light}</p>
+			<p>
+				You must
+				@if ($state.light === "red") {
+					<span>STOP</span>
+				} else if ($state.light === "orange") {
+					<span>SLOW DOWN</span>
+				} else if ($state.light === "green") {
+					<span>GO</span>
+				}
+			</p>
+		</div>
+	}
+}

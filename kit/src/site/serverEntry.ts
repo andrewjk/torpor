@@ -210,7 +210,7 @@ async function loadView(
 	if (handler.layouts) {
 		let slotFunctions: ServerSlotRender[] = [];
 		slotFunctions[handler.layouts.length] = (_, context) =>
-			(clientEndPoint.component as ServerComponent).render($props, context);
+			(clientEndPoint.component as ServerComponent)($props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
@@ -219,7 +219,7 @@ async function loadView(
 					slots = { _: slotFunctions[i + 1] };
 				} else {
 					slotFunctions[i] = (_, context) =>
-						(layoutEndPoint.component as ServerComponent).render($props, context, {
+						(layoutEndPoint.component as ServerComponent)($props, context, {
 							_: slotFunctions[i + 1],
 						});
 				}
@@ -232,7 +232,7 @@ async function loadView(
 	// Put it all together
 	let html =
 		appHtml.substring(0, contentStart) +
-		component.render($props, undefined, slots) +
+		component($props, undefined, slots) +
 		appHtml.substring(contentEnd) +
 		(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
 		(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");

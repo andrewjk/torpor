@@ -1,7 +1,13 @@
-<div>
-    <Child name="Anna" />
-</div>
+export default function ParentChild() {
+	@render {
+		<div>
+			<Child name="Anna" />
+		</div>
+	}
+}
 
-<template name="Child">
-    <h2>Hello, {$props.name}</h2>
-</template>
+function Child($props: { name: string }) {
+	@render {
+		<h2>Hello, {$props.name}</h2>
+	}
+}

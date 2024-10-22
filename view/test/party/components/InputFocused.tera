@@ -1,10 +1,12 @@
-<script>
-  let inputElement;
+export default function InputFocused() {
+	let inputElement;
 
-  $mount(() => {
-    // HACK: This is easier to test for
-    inputElement.value = "hi";
-  });
-</script>
+	$mount(() => {
+		// HACK: This is easier to test for
+		inputElement.value = "hi";
+	});
 
-<input bind:self={inputElement} />
+	@render {
+		<input bind:self={inputElement} />
+	}
+}

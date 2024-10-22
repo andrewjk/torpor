@@ -1,4 +1,7 @@
-
-<h2>
-    <:slot />
-</h2>
+export default function BigTitle() {
+	@render {
+		<h2>
+			<:slot />
+		</h2>
+	}
+}

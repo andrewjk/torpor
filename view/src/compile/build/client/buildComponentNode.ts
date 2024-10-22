@@ -28,8 +28,9 @@ export default function buildComponentNode(
 	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
 	if (componentHasProps) {
 		// TODO: defaults etc props
-		status.imports.add("$watch");
-		b.append(`const ${propsName} = $watch({});`);
+		//status.imports.add("$watch");
+		//b.append(`const ${propsName} = $watch({});`);
+		b.append(`const ${propsName} = {};`);
 		for (let { name, value } of node.attributes) {
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute
@@ -124,5 +125,5 @@ export default function buildComponentNode(
 		}
 	}
 
-	b.append(`${componentName}.render(${renderParams});`);
+	b.append(`${componentName}(${renderParams});`);
 }

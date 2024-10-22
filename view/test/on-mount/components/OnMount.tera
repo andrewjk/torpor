@@ -1,2 +1,5 @@
-
-<input on:mount={(node) => node.value = "hi"} />
+export default function OnMount() {
+	@render {
+		<input on:mount={(node) => node.value = "hi"} />
+	}
+}

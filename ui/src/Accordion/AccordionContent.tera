@@ -1,13 +1,13 @@
+import getId from '../utils/getId';
+import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+
 /**
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
  *
  * @prop {string} [id] -- An ID for the AccordionContent's div container
  * @prop {boolean} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion
  */
-<script>
-	import getId from '../utils/getId';
-	import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
-
+export default function AccordionContent($props: any) {
 	$props.id ||= getId();
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
@@ -18,17 +18,19 @@
 
 	// Set the content ID so that it can be used with aria-controls in AccordionTrigger
 	$state.contentId = $props.id;
-</script>
 
-<div
-	id={$props.id}
-	class='tera-accordion-content'
-	role={$props.ariaRegion ? 'region' : undefined}
-	aria-labelledby={$state.headerId}
-	data-state={$state.dataState}
-	data-disabled={$state.dataDisabled}
->
-	@if ($state.expanded) {
-		<:slot />
+	@render {
+		<div
+			id={$props.id}
+			class='tera-accordion-content'
+			role={$props.ariaRegion ? 'region' : undefined}
+			aria-labelledby={$state.headerId}
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			@if ($state.expanded) {
+				<:slot />
+			}
+		</div>
 	}
-</div>
+}

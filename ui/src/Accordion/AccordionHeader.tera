@@ -1,3 +1,5 @@
+import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+
 /**
  * The header for an AccordionItem, which contains the AccordionTrigger.
  *
@@ -11,21 +13,21 @@
  *
  * @prop {'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'} as -- The type of HTML header to use
  */
-<script>
-	import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
-
+export default function ($props: any) {
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
 		throw new Error('AccordionHeader must be contained within an AccordionItem');
 	}
 	let $state = $context[AccordionItemContextName].state
-</script>
 
-@// TODO: $props.as
-<h4
-	class='tera-accordion-header'
-	data-state={$state.dataState}
-	data-disabled={$state.dataDisabled}
->
-	<:slot />
-</h4>
+	@render {
+		@// TODO: $props.as
+		<h4
+			class='tera-accordion-header'
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			<:slot />
+		</h4>
+	}
+}

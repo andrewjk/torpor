@@ -1,9 +1,13 @@
-<section>
-  <p>^</p>
-  @for (let item of $props.items) {
-    <p>
-      {item.text}
-    </p>
-  }
-  <p>$</p>
-</section>
+export default function ArrayUnkeyed() {
+	@render {
+		<section>
+			<p>^</p>
+			@for (let item of $props.items) {
+				<p>
+					{item.text}
+				</p>
+			}
+			<p>$</p>
+		</section>
+	}
+}

@@ -1,9 +1,11 @@
-<script>
-    let $state = $watch({
-        count: 0
-    })
-</script>
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	})
 
-<button onclick={() => $state.count++}>
-    Pressed {$state.count} {$state.count === 1 ? "time" : "times"}
-</button>
+	@render {
+		<button onclick={() => $state.count++}>
+			Pressed {$state.count} {$state.count === 1 ? "time" : "times"}
+		</button>
+	}
+}

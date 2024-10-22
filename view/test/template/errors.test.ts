@@ -4,8 +4,12 @@ import { trimParsed } from "../helpers";
 
 test("multiple top-level elements", () => {
 	const input = `
-<div/>
-<div/>
+export default function Test() {
+	@render {
+		<div/>
+		<div/>
+	}
+}
   `;
 	const output = trimParsed(parse("x", input));
 	const expected = {
@@ -13,7 +17,7 @@ test("multiple top-level elements", () => {
 		errors: [
 			{
 				message: "Multiple top-level elements: div",
-				start: 8,
+				start: 56,
 			},
 		],
 	};

@@ -1,35 +1,27 @@
 import type { ServerSlotRender } from "@tera/view";
 
-const List = {
-	/**
-	 * The component's name.
-	 */
-	name: "List",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		$props ||= {};
+export default function List(
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	
+	$props ??= {};
 
-		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		$output += `<ul> <![>`;
-		for (let item of $props.items) {
-			$output += `<!^> <li> <![>`;
-			const t_sprops_1 = {};
-			t_sprops_1["item"] = item;
-			if ($slots && $slots["_"]) {
-				$output += $slots["_"](t_sprops_1, $context);
-			}
-			$output += `<!]><!> </li> `;
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<ul> <![>`;
+	for (let item of $props.items) {
+		$output += `<!^> <li> <![>`;
+		const t_sprops_1 = {};
+		t_sprops_1["item"] = item;
+		if ($slots && $slots["_"]) {
+			$output += $slots["_"](t_sprops_1, $context);
 		}
-		$output += `<!]><!> </ul>`;
-		return $output;
+		$output += `<!]><!> </li> `;
 	}
+	$output += `<!]><!> </ul>`;
+	return $output;
 }
 
-export default List;

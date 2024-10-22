@@ -1,66 +1,66 @@
-<script>
-	import { $navigation } from "@tera/kit/state";
-	import PreloadingIndicator from "@/components/PreloadingIndicator.tera";
-</script>
+import { $page, $navigation } from "@tera/kit/state";
+import PreloadingIndicator from "@/components/PreloadingIndicator.tera";
 
-<div>
-@/*
-	@if ($navigation.inProgress) {
-		<PreloadingIndicator />
-	}
-*/
-	<Nav user={$props.data.user} />
+export default function Layout() {
+	@render {
+		<div>
+		@/*
+			@if ($navigation.inProgress) {
+				<PreloadingIndicator />
+			}
+		*/
+			<Nav user={$props.data.user} />
 
-	<main>
-		<:slot />
-	</main>
-</div>
-
-<template name="Nav">
-	<script>
-		import { $page } from "@tera/kit/state";
-	</script>
-
-	<nav class="navbar navbar-light">
-		<div class="container">
-			<a class="navbar-brand" href="/">conduit</a>
-			<ul class="nav navbar-nav pull-xs-right">
-				<li class="nav-item">
-					<a class="nav-link" class:active={$page.url.pathname === '/'} href="/">Home</a>
-				</li>
-
-				@if ($props.user) {
-					<li class="nav-item">
-						<a href="/editor" class="nav-link" class:active={$page.url.pathname === '/editor'}>
-							<i class="ion-compose" />&nbsp;New Post
-						</a>
-					</li>
-
-					<li class="nav-item">
-						<a href="/settings" class="nav-link" class:active={$page.url.pathname === '/settings'}>
-							<i class="ion-gear-a" />&nbsp;Settings
-						</a>
-					</li>
-
-					<li class="nav-item">
-						<a href="/profile/@{$props.user.username}" class="nav-link">
-							{$props.user.username}
-						</a>
-					</li>
-				} else {
-					<li class="nav-item">
-						<a href="/login" class="nav-link" class:active={$page.url.pathname === '/login'}>
-							Sign in
-						</a>
-					</li>
-
-					<li class="nav-item">
-						<a href="/register" class="nav-link" class:active={$page.url.pathname === '/register'}>
-							Sign up
-						</a>
-					</li>
-				}
-			</ul>
+			<main>
+				<:slot />
+			</main>
 		</div>
-	</nav>
-</template>
+	}
+}
+
+function Nav($props: any) {
+	@render {
+		<nav class="navbar navbar-light">
+			<div class="container">
+				<a class="navbar-brand" href="/">conduit</a>
+				<ul class="nav navbar-nav pull-xs-right">
+					<li class="nav-item">
+						<a class="nav-link" class:active={$page.url.pathname === '/'} href="/">Home</a>
+					</li>
+
+					@if ($props.user) {
+						<li class="nav-item">
+							<a href="/editor" class="nav-link" class:active={$page.url.pathname === '/editor'}>
+								<i class="ion-compose" />&nbsp;New Post
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a href="/settings" class="nav-link" class:active={$page.url.pathname === '/settings'}>
+								<i class="ion-gear-a" />&nbsp;Settings
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a href="/profile/@{$props.user.username}" class="nav-link">
+								{$props.user.username}
+							</a>
+						</li>
+					} else {
+						<li class="nav-item">
+							<a href="/login" class="nav-link" class:active={$page.url.pathname === '/login'}>
+								Sign in
+							</a>
+						</li>
+
+						<li class="nav-item">
+							<a href="/register" class="nav-link" class:active={$page.url.pathname === '/register'}>
+								Sign up
+							</a>
+						</li>
+					}
+				</ul>
+			</div>
+		</nav>
+	}
+}

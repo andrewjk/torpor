@@ -13,12 +13,7 @@ declare namespace UserProfile {
 	 * @param $context -- Values that have been passed into the component from its ancestors.
 	 * @param $slots -- Functions for rendering children into slot nodes within the component.
 	 */
-	const render: ($parent: ParentNode, $anchor: Node | null, $props?: {
-		name: string;
-		age: number;
-		favouriteColors: string[];
-		isAvailable: boolean;
-	}, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => void;
+	const render: ($parent: ParentNode, $anchor: Node | null, $props?: Record<PropertyKey, any>, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => void;
 }
 
 export default UserProfile;

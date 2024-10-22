@@ -1,7 +1,9 @@
-<script>
-    import Header from './Header.tera'
-</script>
+import Header from './Header.tera'
 
-<Header>
-    Basic stuff
-</Header>
+export default function Basic() {
+	@render {
+		<Header>
+			Basic stuff
+		</Header>
+	}
+}

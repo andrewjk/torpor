@@ -3,28 +3,32 @@ import parse from "../../src/compile/parse";
 import type ParseResult from "../../src/compile/types/ParseResult";
 import { trimParsed } from "../helpers";
 
-// TODO: Preserve space
-
 test("script with comments", () => {
-	const script = `
-const x = 5; //</script>
-const y = 10;
-/*
-</script>
-*/
-const z = 15;
-`;
 	const input = `
-<script>
-${script}
-</script>
+export default function Test() {
+	const x = 5; // @render {
+	const y = 10;
+	/*
+	@render {
+	*/
+	const z = 15;
+}
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
 		template: {
-			script: script.trim(),
+			script: `
+export default function Test(/* @params */) {
+	const x = 5; // @render {
+	const y = 10;
+	/*
+	@render {
+	*/
+	const z = 15;
+}
+`,
 		},
 	};
 	expect(output).toEqual(expected);

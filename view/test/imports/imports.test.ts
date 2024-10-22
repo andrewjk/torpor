@@ -5,10 +5,8 @@ import { trimParsed } from "../helpers";
 
 test("imports", () => {
 	const input = `
-  <script>
-    import * from 'somewhere';
-    import * from 'somewhere-else';
-  </script>
+import * from 'somewhere';
+import * from 'somewhere-else';
 `;
 	const output = trimParsed(parse("x", input));
 	const expected: ParseResult = {
@@ -31,7 +29,7 @@ test("imports", () => {
 					component: false,
 				},
 			],
-			script: "",
+			script: input,
 		},
 	};
 	expect(output).toEqual(expected);

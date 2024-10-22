@@ -1,11 +1,13 @@
-<script>
-  let $state = $watch({
-    pageTitle: ""
-  });
+export default function PageTitle() {
+	let $state = $watch({
+		pageTitle: ""
+	});
 
-  $run(() => {
-    $state.pageTitle = document.title;
-  });
-</script>
+	$run(() => {
+		$state.pageTitle = document.title;
+	});
 
-<p>Page title: {$state.pageTitle}</p>
+	@render {
+		<p>Page title: {$state.pageTitle}</p>
+	}
+}

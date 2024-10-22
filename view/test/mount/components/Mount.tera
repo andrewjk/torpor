@@ -1,9 +1,11 @@
-<script>
-  let inputElement;
+export default function Mount() {
+	let inputElement;
 
-  $mount(() => {
-    inputElement.value = "hi";
-  });
-</script>
+	$mount(() => {
+		inputElement.value = "hi";
+	});
 
-<input bind:self={inputElement} />
+	@render {
+		<input bind:self={inputElement} />
+	}
+}

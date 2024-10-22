@@ -1,4 +1,7 @@
-
-<h6>
-    <:slot />
-</h6>
+export default function SmallTitle() {
+	@render {
+		<h6>
+			<:slot />
+		</h6>
+	}
+}

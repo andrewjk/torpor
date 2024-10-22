@@ -4,7 +4,7 @@ import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Object.tera";
+import Component from "./components/Watched.tera";
 
 interface State {
 	text: string;
@@ -45,7 +45,7 @@ test("watch object -- hydrated", async () => {
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/watch-object/components/Object.tera";
+	const path = "./test/watch-object/components/Watched.tera";
 	hydrateComponent(container, path, Component, state);
 
 	check(container, state);

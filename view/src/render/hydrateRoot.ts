@@ -26,7 +26,7 @@ export default function hydrateRoot(
 	context.hydrationNode = html;
 
 	// Call the component's render function
-	component.render(html, null, props, slots);
+	component(html, null, props, slots);
 
 	context.hydrationNode = null;
 }

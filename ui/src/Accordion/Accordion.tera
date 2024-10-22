@@ -1,5 +1,8 @@
+import { AccordionContextName, type AccordionContext, type ItemState } from './AccordionTypes';
+
 /**
- * A vertically stacked set of interactive headings that enable users to reveal or hide associated sections of content.
+ * A vertically stacked set of interactive headings that enable users to reveal
+ * or hide associated sections of content.
  *
  * See [the WAI ARIA guidelines for Accordions](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/).
  *
@@ -21,10 +24,7 @@
  * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the Accordion
  * @prop {(value: string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
  */
-
-<script>
-	import { AccordionContextName, type AccordionContext, type ItemState } from './AccordionTypes';
-
+export default function ($props: any) {
 	$props.type ||= 'single';
 	$props.value ||= $props.type === 'single' ? '' : [];
 
@@ -199,8 +199,10 @@
 			}
 		}
 	}
-</script>
 
-<div class="tera-accordion">
-	<:slot />
-</div>
+	@render {
+		<div class="tera-accordion">
+			<:slot />
+		</div>
+	}
+}

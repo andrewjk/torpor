@@ -1,27 +1,20 @@
 import type { ServerSlotRender } from "@tera/view";
+
 import Header from './Header.tera';
 
-const Component = {
-	/**
-	 * The component's name.
-	 */
-	name: "Component",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		const t_props_1 = {};
-		t_props_1["name"] = "Amy";
+export default function Component(
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	const t_props_1 = {};
+	t_props_1["name"] = "Amy";
 
-		$output += Header.render(t_props_1, $context)
-		return $output;
-	}
+	$output += Header(t_props_1, $context)
+	return $output;
 }
 
-export default Component;

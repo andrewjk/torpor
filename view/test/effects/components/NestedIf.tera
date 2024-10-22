@@ -1,9 +1,13 @@
-<div>
-    @if ($props.condition) {
-        @if ($props.counter > 5) {
-            <p>It's big</p>
-        } else {
-            <p>It's small</p>
-        }
-    }
-</div>
+export default function NestedIf($props: { condition: boolean, counter: number }) {
+	@render {
+		<div>
+			@if ($props.condition) {
+				@if ($props.counter > 5) {
+					<p>It's big</p>
+				} else {
+					<p>It's small</p>
+				}
+			}
+		</div>
+	}
+}

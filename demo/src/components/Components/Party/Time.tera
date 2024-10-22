@@ -1,15 +1,17 @@
-<script>
-  let $state = $watch({
-    time: new Date().toLocaleTimeString()
-  });
+export default function Time() {
+	let $state = $watch({
+		time: new Date().toLocaleTimeString()
+	});
 
-  $run(() => {
-    const timer = setInterval(() => {
-      $state.time = new Date().toLocaleTimeString();
-    }, 1000);
+	$run(() => {
+		const timer = setInterval(() => {
+			$state.time = new Date().toLocaleTimeString();
+		}, 1000);
 
-    return () => clearInterval(timer);
-  });
-</script>
+		return () => clearInterval(timer);
+	});
 
-<p>Current time: {$state.time}</p>
+	@render {
+		<p>Current time: {$state.time}</p>
+	}
+}

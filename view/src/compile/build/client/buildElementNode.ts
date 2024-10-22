@@ -39,12 +39,12 @@ export default function buildElementNode(
 
 		// PERF: Does this have much of an impact??
 		if (root) {
-			status.imports.add("t_apply_props");
-			// TODO: I think we know what the props are at this stage, so we could be more direct?
-			b.append("");
-			b.append(
-				`t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
-			);
+			//status.imports.add("t_apply_props");
+			//// TODO: I think we know what the props are at this stage, so we could be more direct?
+			//b.append("");
+			//b.append(
+			//	`t_apply_props(${varName}, $props, [${status.props.map((p) => `'${p}'`).join(", ")}]);`,
+			//);
 		}
 
 		buildElementAttributes(node, varName, status, b);

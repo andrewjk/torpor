@@ -1,7 +1,11 @@
-<section>
-  @for (let key in $props.item) {
-    <p>
-      {$props.item[key]}
-    </p>
-  }
-</section>
+export default function ForIn() {
+	@render {
+		<section>
+			@for (let key in $props.item) {
+				<p>
+					{$props.item[key]}
+				</p>
+			}
+		</section>
+	}
+}

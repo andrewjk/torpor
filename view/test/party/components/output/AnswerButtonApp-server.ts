@@ -1,43 +1,36 @@
 import type { ServerSlotRender } from "@tera/view";
-import AnswerButton from './AnswerButton.tera';
 
-const AnswerButtonApp = {
-	/**
-	 * The component's name.
-	 */
-	name: "AnswerButtonApp",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		/* User script */
-		const $watch = (obj: Record<PropertyKey, any>) => obj;
-		let $state = $watch({
-			isHappy: true
-		});
+const $watch = (obj: Record<PropertyKey, any>) => obj;
+import AnswerButton from "./AnswerButton.tera";
 
-		function onAnswerNo() {
-			$state.isHappy = false;
-		}
+export default function AnswerButtonApp(
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	let $state = $watch({
+		isHappy: true
+	});
 
-		function onAnswerYes() {
-			$state.isHappy = true;
-		}
-		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		$output += `<div> <p>Are you happy?</p> `;
-		const t_props_1 = {};
-		t_props_1["onYes"] = onAnswerYes;
-		t_props_1["onNo"] = onAnswerNo;
-
-		$output += AnswerButton.render(t_props_1, $context)
-		$output += ` <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div>`;
-		return $output;
+	function onAnswerNo() {
+		$state.isHappy = false;
 	}
+
+	function onAnswerYes() {
+		$state.isHappy = true;
+	}
+
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<div> <p>Are you happy?</p> `;
+	const t_props_1 = {};
+	t_props_1["onYes"] = onAnswerYes;
+	t_props_1["onNo"] = onAnswerNo;
+
+	$output += AnswerButton(t_props_1, $context)
+	$output += ` <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div>`;
+	return $output;
 }
 
-export default AnswerButtonApp;

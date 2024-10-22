@@ -13,6 +13,7 @@ export default interface ParseStatus {
 	docs?: Documentation;
 	script?: string;
 	template?: ElementNode;
+	params?: string;
 	childTemplates?: ComponentTemplate[];
 	style?: Style;
 	styleHash?: string;

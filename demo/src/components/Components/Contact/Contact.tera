@@ -1,21 +1,23 @@
-﻿<script>
-	import Header from '../../Components/Shared/Header.vs';
-	import $watch from "../../watch/src/watch";
+﻿import Header from '../../Components/Shared/Header.vs';
+import $watch from "../../watch/src/watch";
 
+export default function Contact() {
 	const state = $watch({ message: "" })
-</script>
 
-<div>
-	<p class="prompt">
-		Enter your message: <textarea bind:value={state.message}></textarea>
-	</p>
-	<p>
-		<link href="/">Index page</link>
-	</p>
-</div>
-
-<style>
-	.prompt {
-		color: red;
+	@render {
+		<div>
+			<p class="prompt">
+				Enter your message: <textarea bind:value={state.message}></textarea>
+			</p>
+			<p>
+				<link href="/">Index page</link>
+			</p>
+		</div>
 	}
-</style>
+
+	@style {
+		.prompt {
+			color: red;
+		}
+	}
+}

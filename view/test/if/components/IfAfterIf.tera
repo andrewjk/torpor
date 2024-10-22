@@ -1,13 +1,17 @@
 
-<div>
-    @if ($props.counter > 10) {
-        <p>
-            It's true!
-        </p>
-    }
-    @if ($props.counter > 5) {
-        <p>
-            It's also true!
-        </p>
-    }
-</div>
+export default function IfAfterIf($props: { counter: number }) {
+	@render {
+		<div>
+			@if ($props.counter > 10) {
+				<p>
+					It's true!
+				</p>
+			}
+			@if ($props.counter > 5) {
+				<p>
+					It's also true!
+				</p>
+			}
+		</div>
+	}
+}

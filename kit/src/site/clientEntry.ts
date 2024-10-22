@@ -118,7 +118,7 @@ async function navigate(
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
-			clientEndPoint.component!.render(parent, anchor, $props, context);
+			clientEndPoint.component!(parent, anchor, $props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
@@ -127,7 +127,7 @@ async function navigate(
 					slots = { _: slotFunctions[i + 1] };
 				} else {
 					slotFunctions[i] = (parent, anchor, _, context) =>
-						layoutEndPoint.component!.render(parent, anchor, $props, context, {
+						layoutEndPoint.component!(parent, anchor, $props, context, {
 							_: slotFunctions[i + 1],
 						});
 				}

@@ -1,8 +1,8 @@
-<script>
-	import { $page } from "@tera/kit/state";
-	import ArticleList from "@/components/article/ArticleList.tera";
-	import Pagination from "@/components/Pagination.tera";
-	
+import { $page } from "@tera/kit/state";
+import ArticleList from "@/components/article/ArticleList.tera";
+import Pagination from "@/components/Pagination.tera";
+
+export default function Index() {
 	let $state = $watch({
 		page: +($page.url.searchParams.get("page") ?? "1"),
 		tag: $page.url.searchParams.get("tag"),
@@ -10,69 +10,71 @@
 		pageLinkBase: ""
 	})
 	$state.pageLinkBase = $state.tag ? `tag=${$state.tag}` : `tab=${$state.tab}`
-</script>
 
-<div class="home-page">
-	<:head>
-		<title>Conduit</title>
-		<link rel="stylesheet" href="mystyle.css"> 
-	</:head>
+	@render {
+		<div class="home-page">
+			<:head>
+				<title>Conduit</title>
+				<link rel="stylesheet" href="mystyle.css"> 
+			</:head>
 
-	@if (!$props.data.user) {
-		<div class="banner">
-			<div class="container">
-				<h1 class="logo-font">conduit</h1>
-				<p>A place to share your knowledge.</p>
-			</div>
-		</div>
-	}
-
-	<div class="container page">
-		<div class="row">
-			<div class="col-md-9">
-				<div class="feed-toggle">
-					<ul class="nav nav-pills outline-active">
-						<li class="nav-item">
-							<a href="/?tab=all" class="nav-link" class:active={$state.tab === "all" && !$state.tag}>
-								Global Feed
-							</a>
-						</li>
-
-						@if ($props.data.user) {
-							<li class="nav-item">
-								<a href="/?tab=feed" class="nav-link" class:active={$state.tab === "feed"}>Your Feed</a>
-							</li>
-						} else {
-							<li class="nav-item">
-								<a href="/login" class="nav-link">Sign in to see your Feed</a>
-							</li>
-						}
-
-						@if ($state.tag) {
-							<li class="nav-item">
-								<a href="/?tag={$state.tag}" class="nav-link active">
-									<i class="ion-pound" />
-									{$state.tag}
-								</a>
-							</li>
-						}
-					</ul>
+			@if (!$props.data.user) {
+				<div class="banner">
+					<div class="container">
+						<h1 class="logo-font">conduit</h1>
+						<p>A place to share your knowledge.</p>
+					</div>
 				</div>
+			}
 
-				<ArticleList articles={$props.data.articles} user={$props.data.user} />
-				<Pagination pageCount={$props.data.pageCount} page={$state.page} href={(p) => `/?${$props.pageLinkBase}&page=${p}`} />
-			</div>
+			<div class="container page">
+				<div class="row">
+					<div class="col-md-9">
+						<div class="feed-toggle">
+							<ul class="nav nav-pills outline-active">
+								<li class="nav-item">
+									<a href="/?tab=all" class="nav-link" class:active={$state.tab === "all" && !$state.tag}>
+										Global Feed
+									</a>
+								</li>
 
-			<div class="col-md-3">
-				<div class="sidebar">
-					<p>Popular Tags</p>
-					<div class="tag-list">
-						@for (let tag of $props.data.tags) {
-							<a href="/?tag={tag}" class="tag-default tag-pill">{tag}</a>
-						}
+								@if ($props.data.user) {
+									<li class="nav-item">
+										<a href="/?tab=feed" class="nav-link" class:active={$state.tab === "feed"}>Your Feed</a>
+									</li>
+								} else {
+									<li class="nav-item">
+										<a href="/login" class="nav-link">Sign in to see your Feed</a>
+									</li>
+								}
+
+								@if ($state.tag) {
+									<li class="nav-item">
+										<a href="/?tag={$state.tag}" class="nav-link active">
+											<i class="ion-pound" />
+											{$state.tag}
+										</a>
+									</li>
+								}
+							</ul>
+						</div>
+
+						<ArticleList articles={$props.data.articles} user={$props.data.user} />
+						<Pagination pageCount={$props.data.pageCount} page={$state.page} href={(p) => `/?${$props.pageLinkBase}&page=${p}`} />
+					</div>
+
+					<div class="col-md-3">
+						<div class="sidebar">
+							<p>Popular Tags</p>
+							<div class="tag-list">
+								@for (let tag of $props.data.tags) {
+									<a href="/?tag={tag}" class="tag-default tag-pill">{tag}</a>
+								}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</div>
+	}
+}

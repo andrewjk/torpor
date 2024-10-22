@@ -1,16 +1,20 @@
 
-<div>
-    @if ($props.counter > 10) {
-        <p>
-            It's over ten!
-        </p>
-    } else if ($props.counter > 5) {
-        <p>
-            It's over five!
-        </p>
-    } else {
-        <p>
-            It's not there yet
-        </p>
-    }
-</div>
+export default function IfElseIf($props: { counter: number }) {
+	@render {
+		<div>
+			@if ($props.counter > 10) {
+				<p>
+					It's over ten!
+				</p>
+			} else if ($props.counter > 5) {
+				<p>
+					It's over five!
+				</p>
+			} else {
+				<p>
+					It's not there yet
+				</p>
+			}
+		</div>
+	}
+}

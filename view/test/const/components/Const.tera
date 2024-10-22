@@ -1,7 +1,10 @@
-
-<div>
-    @const name = "Boris"
-    <p>
-        Hello, {name}!
-    </p>
-</div>
+export default function Const() {
+	@render {
+		<div>
+			@const name = "Boris"
+			<p>
+				Hello, {name}!
+			</p>
+		</div>
+	}
+}

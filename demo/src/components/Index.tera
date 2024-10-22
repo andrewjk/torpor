@@ -1,180 +1,183 @@
+import Nav from "./Nav.tera";
+
 /**
- * Components are declared in a file with docs, script, markup and styles
- * @prop {string} name - This is a strongly typed prop which can be accessed through $props
+ * Components are declared in a file with script, markup and styles
  */
+export default function Index($props: {
+	name: string
+}) {
+	// Use the $watch function to declare reactive state
+	const $state = $watch({
+		count: 0,
+		get isEven() {
+			return this.count % 2 === 0
+		},
+		tasks: []
+	})
 
-<script>
-    import Nav from "./Nav.tera";
-    
-    // Use the $watch function to declare reactive state
-    const $state = $watch({
-        count: 0,
-        get isEven() {
-            return this.count % 2 === 0
-        },
-        tasks: []
-    })
+	// Use the $run function to declare an effect that runs whenever its dependent state changes
+	$run(() => {
+		if ($state.count === 15) {
+			alert("Whoa there")
+		}
+	})
 
-    // Use the $run function to declare an effect that runs whenever its dependent state changes
-    $run(() => {
-        if ($state.count === 15) {
-            alert("Whoa there")
-        }
-    })
+	// This is an async function
+	let attempt = 0
+	$state.guesser = guessNumber(1000)
+	async function guessNumber(ms) {
+		attempt++
+		return new Promise((ok, err) => {
+		return setTimeout(
+			attempt % 3 === 0
+				? () => err("uh oh")
+				: () => ok(Math.floor(Math.random() * 10 + 1)),
+			ms)
+		})
+	}
 
-    // This is an async function
-    let attempt = 0
-    $state.guesser = guessNumber(1000)
-    async function guessNumber(ms) {
-      attempt++
-      return new Promise((ok, err) => {
-        return setTimeout(
-            attempt % 3 === 0
-                ? () => err("uh oh")
-                : () => ok(Math.floor(Math.random() * 10 + 1)),
-            ms)
-      })
-    }
+	// This is some demo data
+	const todo = ["Get started", "Make a component", "Relax"]
 
-    // This is some demo data
-    const todo = ["Get started", "Make a component", "Relax"]
-</script>
+	@render {
+		@// Make sure to keep this in sync with README
 
-@// Make sure to keep this in sync with README
+		<div style="margin: auto">
+			<h1>Demo</h1>
 
-<div style="margin: auto">
-    <h1>Demo</h1>
+			<Nav />
 
-    <Nav />
+			<h2>Basic reactivity</h2>
+			<p>Put reactive statements in braces, like {$state.count}.</p>
+			<div class="demo">
+				<p>
+					The count is {$state.count}.
+				</p>
+				<button onclick={() => $state.count += 1}>Increment</button>
+			</div>
 
-    <h2>Basic reactivity</h2>
-    <p>Put reactive statements in braces, like {$state.count}.</p>
-    <div class="demo">
-        <p>
-            The count is {$state.count}.
-        </p>
-        <button onclick={() => $state.count += 1}>Increment</button>
-    </div>
+			<h2>If statements</h2>
+			<p>Use the @if statement to show and hide branches, such as when $state.isEven changes.</p>
+			<div class="demo">
+				@if ($state.isEven) {
+					<p>The count is even.</p>
+				} else {
+					<p>The count is odd.</p>
+				}
+			</div>
 
-    <h2>If statements</h2>
-    <p>Use the @if statement to show and hide branches, such as when $state.isEven changes.</p>
-    <div class="demo">
-        @if ($state.isEven) {
-            <p>The count is even.</p>
-        } else {
-            <p>The count is odd.</p>
-        }
-    </div>
+			<h2>For loops</h2>
+			<p>For loops can be used to display and update a list when it changes.</p>
+			<div class="demo">
+				<button onclick={addTask}>Add a task</button>
+				<ul>
+					@for (let task of $state.tasks) {
+						@key = task.id
+						<TaskItem {task} />
+					}
+				</ul>
+				@function addTask() {
+					if ($state.tasks.length < 3) {
+						$state.tasks.push({
+							id: $state.tasks.length,
+							text: todo[$state.tasks.length ],
+							done: false
+						})
+					}
+				}
+				<p>{$state.tasks.length} tasks, {$state.tasks.filter((t) => t.done).length} done</p>
+			</div>
 
-    <h2>For loops</h2>
-    <p>For loops can be used to display and update a list when it changes.</p>
-    <div class="demo">
-        <button onclick={addTask}>Add a task</button>
-        <ul>
-            @for (let task of $state.tasks) {
-                @key = task.id
-                <TaskItem {task} />
-            }
-        </ul>
-        @function addTask() {
-            if ($state.tasks.length < 3) {
-                $state.tasks.push({
-                    id: $state.tasks.length,
-                    text: todo[$state.tasks.length ],
-                    done: false
-                })
-            }
-        }
-        <p>{$state.tasks.length} tasks, {$state.tasks.filter((t) => t.done).length} done</p>
-    </div>
+			<h2>Switch statements</h2>
+			<p>Switches can also be used (albeit with no break statements and no fallthrough).</p>
+			<div class="demo">
+				@switch ($state.count) {
+					case 0: {
+						<p>Nothing yet...</p>
+					}
+					case 1: {
+						<p>The count is one.</p>
+					}
+					default: {
+						<p>The count is more than one.</p>
+					}
+				}
+			</div>
 
-    <h2>Switch statements</h2>
-    <p>Switches can also be used (albeit with no break statements and no fallthrough).</p>
-    <div class="demo">
-        @switch ($state.count) {
-            case 0: {
-                <p>Nothing yet...</p>
-            }
-            case 1: {
-                <p>The count is one.</p>
-            }
-            default: {
-                <p>The count is more than one.</p>
-            }
-        }
-    </div>
+			<h2>Await statements</h2>
+			<p>There is a construct for await/then/catch.</p>
+			<div class="demo">
+				<p>Think of a number between 1 and 10...</p>
+				@await ($state.guesser) {
+					<p>Hmm...</p>
+				} then (number) {
+					<p>Is it {number}?</p>
+				} catch (ex) {
+					<p class="error">Something went wrong: {ex}!</p>
+				}
+				<button onclick={() => $state.guesser = guessNumber(500)}>
+					Guess again
+				</button>
+			</div>
 
-    <h2>Await statements</h2>
-    <p>There is a construct for await/then/catch.</p>
-    <div class="demo">
-        <p>Think of a number between 1 and 10...</p>
-        @await ($state.guesser) {
-            <p>Hmm...</p>
-        } then (number) {
-            <p>Is it {number}?</p>
-        } catch (ex) {
-            <p class="error">Something went wrong: {ex}!</p>
-        }
-        <button onclick={() => $state.guesser = guessNumber(500)}>
-            Guess again
-        </button>
-    </div>
+			<h2>Two way binding</h2>	
+			<p>Two way binding can be accomplished with bind:value (or bind:checked etc).</p>
+			<div class="demo">
+				<p>
+					Count: <input type="number" bind:value={$state.count} />
+				</p>
+			</div>
 
-    <h2>Two way binding</h2>    
-    <p>Two way binding can be accomplished with bind:value (or bind:checked etc).</p>
-    <div class="demo">
-        <p>
-            Count: <input type="number" bind:value={$state.count} />
-        </p>
-    </div>
+			<h2>Functions</h2>
+			<p>You can declare functions in markup with @function.</p>
+			<div class="demo">
+				<button onclick={resetCount}>Reset the count</button>
+				@function resetCount() {
+					$state.count = 0
+				}
+			</div>
+			
+			@// Const variables and console logging in markup
+			@const z = 15
+			@console.log(`const z is ${z}`)
 
-    <h2>Functions</h2>
-    <p>You can declare functions in markup with @function.</p>
-    <div class="demo">
-        <button onclick={resetCount}>Reset the count</button>
-        @function resetCount() {
-            $state.count = 0
-        }
-    </div>
-    
-    @// Const variables and console logging in markup
-    @const z = 15
-    @console.log(`const z is ${z}`)
+			@// Trigger the debugger in markup -- let's not do this now!
+			@// debugger
 
-    @// Trigger the debugger in markup -- let's not do this now!
-    @// debugger
+			@// TODO: Special tags
 
-    @// TODO: Special tags
+			<h2>Child components</h2>
+			<p>Components can be declared in separate files, or within a template tag.</p>
+		</div>
+	}
 
-    <h2>Child components</h2>
-    <p>Components can be declared in separate files, or within a template tag.</p>
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
 
-</div>
+		.error {
+			color: red;
+		}
+	}
+}
 
-<style>
-    .demo {
-        border: 1px dashed gray;    
-        border-radius: 5px;
-        padding: 20px;
-    }
+function TaskItem() {
+	@render {
+		<li class:done={$props.task.done}>
+			<input type="checkbox" bind:checked={$props.task.done} />
+			{$props.task.text}
+		</li>
+	}
 
-    .error {
-        color: red;
-    }
-</style>
-
-<template name="TaskItem">
-    <li class:done={$props.task.done}>
-        <input type="checkbox" bind:checked={$props.task.done} />
-        {$props.task.text}
-    </li>
-
-    <style>
-        li {
-            list-style-type: none;
-        }
-        .done {
-            text-decoration: line-through;
-        }
-    </style>
-</template>
+	@style {
+		li {
+			list-style-type: none;
+		}
+		.done {
+			text-decoration: line-through;
+		}
+	}
+}

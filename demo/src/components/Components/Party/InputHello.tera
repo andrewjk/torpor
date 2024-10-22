@@ -1,10 +1,12 @@
-<script>
-  let $state = $watch({
-    text: "Hello World"
-  });
-</script>
+export default function InputHello() {
+	let $state = $watch({
+		text: "Hello World"
+	});
 
-<div>
-  <p>{$state.text}</p>
-  <input bind:value={$state.text} />
-</div>
+	@render {
+		<div>
+			<p>{$state.text}</p>
+			<input bind:value={$state.text} />
+		</div>
+	}
+}

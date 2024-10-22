@@ -1,14 +1,16 @@
-<script>
-  let $state = $watch({
-    count: 0
-  });
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	});
 
-  function incrementCount() {
-    $state.count++;
-  }
-</script>
+	function incrementCount() {
+		$state.count++;
+	}
 
-<div>
-  <p>Counter: {$state.count}</p>
-  <button onclick={incrementCount}>+1</button>
-</div>
+	@render {
+		<div>
+			<p>Counter: {$state.count}</p>
+			<button onclick={incrementCount}>+1</button>
+		</div>
+	}
+}

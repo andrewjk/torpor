@@ -1,33 +1,25 @@
 import type { ServerSlotRender } from "@tera/view";
 
-const PageTitle = {
-	/**
-	 * The component's name.
-	 */
-	name: "PageTitle",
-	/**
-	 * Renders the component into a HTML string.
-	 * @param $props -- The values that have been passed into the component as properties.
-	 * @param $context -- Values that have been passed into the component from its ancestors.
-	 * @param $slots -- Functions for rendering children into slot nodes within the component.
-	 */
-	render: ($props?: any, $context?: Record<PropertyKey, any>, $slots?: Record<string, ServerSlotRender>) => {
-		/* User script */
-		const $watch = (obj: Record<PropertyKey, any>) => obj;
-		const $run = (fn: Function) => null;
-		let $state = $watch({
-			pageTitle: ""
-		});
+const $watch = (obj: Record<PropertyKey, any>) => obj;
+const $run = (fn: Function) => null;
+export default function PageTitle(
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
+	$slots?: Record<string, ServerSlotRender>
+) {
+	let $state = $watch({
+		pageTitle: ""
+	});
 
-		$run(() => {
-			$state.pageTitle = document.title;
-		});
-		let $output = "";
-		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
-		$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
-		return $output;
-	}
+	$run(() => {
+		$state.pageTitle = document.title;
+	});
+
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
+	return $output;
 }
 
-export default PageTitle;
