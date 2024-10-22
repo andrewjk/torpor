@@ -14,7 +14,7 @@ export default function Element(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

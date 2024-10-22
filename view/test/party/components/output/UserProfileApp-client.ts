@@ -15,6 +15,7 @@ export default function UserProfileApp(
 	$slots?: Record<string, SlotRender>
 ) {
 	
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

@@ -1,15 +1,16 @@
 import type { ServerSlotRender } from "@tera/view";
 
 const $watch = (obj: Record<PropertyKey, any>) => obj;
-export default function UserProifleContext(
+export default function UserProfileContext(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
+	$context = Object.assign({}, $context);
 	$context.user = $watch($context.user);
 
 	
-	$context = Object.assign({}, $context);
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

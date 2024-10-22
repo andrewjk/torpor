@@ -23,7 +23,7 @@ export default function ArrayIndexes(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

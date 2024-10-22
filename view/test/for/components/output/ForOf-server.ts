@@ -7,7 +7,7 @@ export default function ForOf(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

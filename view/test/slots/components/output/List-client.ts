@@ -23,7 +23,7 @@ export default function List(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

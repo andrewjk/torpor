@@ -14,6 +14,7 @@ export default function Name(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
 	let $state = $watch({
 		name: "John"
 	});

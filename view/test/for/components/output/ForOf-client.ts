@@ -23,7 +23,7 @@ export default function ForOf(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

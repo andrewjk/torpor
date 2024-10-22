@@ -15,7 +15,7 @@ export default function AnswerButton(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

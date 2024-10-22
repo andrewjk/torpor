@@ -21,6 +21,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -48,6 +49,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -75,6 +77,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -100,6 +103,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -127,6 +131,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -162,6 +167,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -189,6 +195,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -218,6 +225,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -245,6 +253,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,
@@ -270,6 +279,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	/* @render */
 }
 `,

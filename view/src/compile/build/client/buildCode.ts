@@ -102,6 +102,20 @@ function buildTemplate(
 			);
 
 			marker = i + "/* @params */".length;
+		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
+			b.append(script.substring(marker, i));
+
+			// Make sure we've got $props if we're going to be using it
+			if (template.props?.length) {
+				b.append(`$props ??= {};`);
+			}
+
+			// Redefine $context so that any newly added properties will only be passed to children
+			if (template.contextProps?.length) {
+				b.append(`$context = Object.assign({}, $context);`);
+			}
+
+			marker = i + "/* @start */".length;
 		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
 			b.append(script.substring(marker, i));
 
@@ -114,16 +128,6 @@ function buildTemplate(
 					fragmentStack: [],
 					forVarNames: [],
 				};
-				// Make sure we've got $props if we're going to be using it
-				if (template.props?.length) {
-					b.append(`$props ??= {};`);
-					b.append("");
-				}
-
-				// Redefine $context so that any newly added properties will only be passed to children
-				if (template.contextProps?.length) {
-					b.append(`$context = Object.assign({}, $context);`);
-				}
 
 				// Add the interface
 				b.append("/* User interface */");

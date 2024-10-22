@@ -9,6 +9,8 @@ export default function UserProfileContextApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
+	$context = Object.assign({}, $context);
 	const $user = $watch({
 		id: 1,
 		username: "unicorn42",
@@ -19,7 +21,6 @@ export default function UserProfileContextApp(
 	$context.user = $user;
 
 	
-	$context = Object.assign({}, $context);
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

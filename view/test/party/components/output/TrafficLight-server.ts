@@ -6,6 +6,7 @@ export default function TrafficLight(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
 		lightIndex: 0,

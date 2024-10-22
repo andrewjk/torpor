@@ -18,6 +18,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	const x = "\\"@render {";
 	const y = '\\'@render {';
 	const z = \`\\\`@render {\`;

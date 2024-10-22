@@ -18,11 +18,11 @@ export default function Replace(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
+	$props ??= {};
 	let counter = 0;
 
 	
-	$props ??= {};
-
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

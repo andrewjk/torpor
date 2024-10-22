@@ -21,7 +21,7 @@ export default function UserProfile(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

@@ -14,6 +14,7 @@ export default function BigTitle(
 	$slots?: Record<string, SlotRender>
 ) {
 	
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

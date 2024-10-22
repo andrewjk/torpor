@@ -8,14 +8,14 @@ export default function Component(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
+	$props ??= {};
 	let components = {
 		BigTitle,
 		SmallTitle
 	};
 
 	
-	$props ??= {};
-
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

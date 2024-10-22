@@ -6,6 +6,7 @@ export default function ColorSelect(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		selectedColorId: 2
 	});

@@ -9,17 +9,18 @@ import { t_fragment } from "@tera/view";
 import { t_next } from "@tera/view";
 import { t_root } from "@tera/view";
 
-export default function UserProifleContext(
+export default function UserProfileContext(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
+	$context = Object.assign({}, $context);
 	$context.user = $watch($context.user);
 
 	
-	$context = Object.assign({}, $context);
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

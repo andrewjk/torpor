@@ -6,6 +6,7 @@ export default function IsAvailable(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		isAvailable: false
 	});

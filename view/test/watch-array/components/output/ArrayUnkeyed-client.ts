@@ -23,7 +23,7 @@ export default function ArrayUnkeyed(
 ) {
 	
 	$props ??= {};
-
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

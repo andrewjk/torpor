@@ -6,6 +6,7 @@ export default function InputHello(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		text: "Hello World"
 	});

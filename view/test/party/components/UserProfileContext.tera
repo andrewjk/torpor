@@ -1,4 +1,4 @@
-export default function UserProifleContext() {
+export default function UserProfileContext() {
 	$context.user = $watch($context.user);
 
 	@render {

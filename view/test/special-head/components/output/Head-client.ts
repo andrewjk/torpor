@@ -12,6 +12,7 @@ export default function Head(
 	$slots?: Record<string, SlotRender>
 ) {
 	
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

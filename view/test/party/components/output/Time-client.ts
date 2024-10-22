@@ -14,6 +14,7 @@ export default function Time(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
 	let $state = $watch({
 		time: new Date().toLocaleTimeString()
 	});

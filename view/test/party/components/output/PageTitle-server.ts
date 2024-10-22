@@ -7,6 +7,7 @@ export default function PageTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		pageTitle: ""
 	});

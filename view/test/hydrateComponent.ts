@@ -52,7 +52,13 @@ export default function hydrateComponent(
 
 	const server = build(component.name, parsed.template!, { server: true });
 	const code = tsb(`
-${imports?.map((imp) => imp.importServer.code.replace("export default ", "")).join("\n") || ""}
+${
+	imports
+		?.map((imp) =>
+			imp.importServer.code.replace("export default ", "").replaceAll("const $", "//const $"),
+		)
+		.join("\n") || ""
+}
 ${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
 ${component.name};
 `);

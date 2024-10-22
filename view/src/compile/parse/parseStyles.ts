@@ -8,8 +8,8 @@ import consumeSpace from "./utils/consumeSpace";
 import consumeUntil from "./utils/consumeUntil";
 import isSpaceChar from "./utils/isSpaceChar";
 
-export default function parseStyleElement(source: string, status: ParseStatus): Style {
-	const style: Style = {
+export default function parseStyles(source: string, status: ParseStatus) {
+	status.style = {
 		global: false,
 		blocks: [],
 	};
@@ -18,6 +18,8 @@ export default function parseStyleElement(source: string, status: ParseStatus): 
 		name: "",
 		source,
 		i: 0,
+		marker: 0,
+		script: "",
 		errors: [],
 	};
 
@@ -26,14 +28,12 @@ export default function parseStyleElement(source: string, status: ParseStatus): 
 			consumeSpace(styleStatus);
 		} else {
 			const block = parseStyleBlock(styleStatus);
-			style.blocks.push(block);
+			status.style.blocks.push(block);
 		}
 	}
 
 	status.styleHash = hash(source);
 	status.errors = status.errors.concat(styleStatus.errors);
-
-	return style;
 }
 
 function parseStyleBlock(status: ParseStatus): StyleBlock {

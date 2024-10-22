@@ -21,6 +21,7 @@ export default function Test() {
 		template: {
 			script: `
 export default function Test(/* @params */) {
+	/* @start */
 	const x = 5; // @render {
 	const y = 10;
 	/*

@@ -8,6 +8,7 @@ export default function UserProfileApp(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	
+	
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

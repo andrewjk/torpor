@@ -5,11 +5,11 @@ export default function Replace(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
+	$props ??= {};
 	let counter = 0;
 
 	
-	$props ??= {};
-
 	/* User interface */
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";

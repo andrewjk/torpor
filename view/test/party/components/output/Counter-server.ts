@@ -6,6 +6,7 @@ export default function Counter(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		count: 0
 	});

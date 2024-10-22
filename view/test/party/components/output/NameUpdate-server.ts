@@ -6,6 +6,7 @@ export default function NameUpdate(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		name: "John"
 	});

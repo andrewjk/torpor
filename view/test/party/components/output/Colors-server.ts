@@ -5,6 +5,7 @@ export default function Colors(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	const colors = ["red", "green", "blue"];
 
 	

@@ -6,6 +6,7 @@ export default function DoubleCount(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	
 	let $state = $watch({
 		count: 10,
 		get doubleCount() {

@@ -16,6 +16,7 @@ export default function Increment(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
 	const $state = $watch({ counter: 0 })
 
 	function increment(e, num) {

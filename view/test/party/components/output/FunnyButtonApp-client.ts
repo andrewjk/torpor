@@ -16,6 +16,7 @@ export default function FunnyButtonApp(
 	$slots?: Record<string, SlotRender>
 ) {
 	
+	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 

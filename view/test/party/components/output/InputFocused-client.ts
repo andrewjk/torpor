@@ -12,6 +12,7 @@ export default function InputFocused(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
+	
 	let inputElement;
 
 	$mount(() => {

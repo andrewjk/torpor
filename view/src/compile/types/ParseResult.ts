@@ -4,5 +4,6 @@ import type CompileError from "./CompileError";
 export default interface ParseResult {
 	ok: boolean;
 	errors: CompileError[];
+	script: string;
 	template?: ComponentTemplate;
 }
