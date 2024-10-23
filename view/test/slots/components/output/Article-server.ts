@@ -5,8 +5,7 @@ export default function Article(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<section> <h2> <![>`;
@@ -22,7 +21,6 @@ export default function Article(
 		$output += $slots["footer"](undefined, $context);
 	}
 	$output += `<!]><!> </section>`;
-	
+
 	return $output;
 }
-

@@ -20,7 +20,7 @@ export default function TrafficLight(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
 		lightIndex: 0,
@@ -33,7 +33,6 @@ export default function TrafficLight(
 		$state.lightIndex = ($state.lightIndex + 1) % TRAFFIC_LIGHTS.length;
 	}
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -85,6 +84,5 @@ export default function TrafficLight(
 		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

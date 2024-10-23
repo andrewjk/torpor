@@ -14,8 +14,7 @@ export default function Named(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -37,9 +36,7 @@ export default function Named(
 		const t_text_2 = t_root(t_fragment_3);
 		t_add_fragment(t_fragment_3, $sparent, $sanchor);
 	}
-
 	Article(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

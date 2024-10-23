@@ -19,9 +19,8 @@ export default function UserProfile(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -44,6 +43,5 @@ export default function UserProfile(
 		t_text_4.textContent = `I am ${t_fmt($props.isAvailable ? "available" : "not available")}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

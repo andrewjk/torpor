@@ -14,7 +14,7 @@ export default function DoubleCount(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		count: 10,
 		get doubleCount() {
@@ -22,7 +22,6 @@ export default function DoubleCount(
 		}
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -33,6 +32,5 @@ export default function DoubleCount(
 		t_text_1.textContent = t_fmt($state.doubleCount);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

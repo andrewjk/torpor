@@ -5,9 +5,8 @@ export default function NestedIf(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -22,7 +21,6 @@ export default function NestedIf(
 		$output += `<!]><!> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

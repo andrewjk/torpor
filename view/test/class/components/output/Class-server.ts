@@ -5,13 +5,11 @@ export default function For(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div class="hello" class="${$props.red ? "red" : ""} ${$props.green ? "green" : ""} ${$props.blue ? "blue" : ""}"> Hello! </div>`;
-	
+
 	return $output;
 }
-

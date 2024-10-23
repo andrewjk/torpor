@@ -6,9 +6,8 @@ export default function ForIn(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<section> <![>`;
@@ -16,7 +15,6 @@ export default function ForIn(
 		$output += `<!^> <p> ${t_fmt($props.item[key])} </p> `;
 	}
 	$output += `<!]><!> </section>`;
-	
+
 	return $output;
 }
-

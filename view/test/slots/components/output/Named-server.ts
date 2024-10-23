@@ -7,8 +7,7 @@ export default function Named(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	const t_slots_1 = {};
@@ -24,7 +23,6 @@ export default function Named(
 	}
 
 	$output += Article(undefined, $context, t_slots_1)
-	
+
 	return $output;
 }
-

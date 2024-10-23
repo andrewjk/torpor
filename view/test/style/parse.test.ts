@@ -32,6 +32,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
 					style: {
 						global: false,
@@ -79,6 +82,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					style: {
 						global: false,
 						blocks: [
@@ -128,6 +134,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					style: {
 						global: false,
 						blocks: [
@@ -182,6 +191,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					style: {
 						global: false,
 						blocks: [
@@ -244,6 +256,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					style: {
 						global: false,
 						blocks: [

@@ -18,9 +18,8 @@ export default function Self(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -43,7 +42,6 @@ export default function Self(
 				$run(function setProp() {
 					t_props_1["level"] = $props.level + 1;
 				});
-
 				Self(t_fragment_1, t_comp_anchor_1, t_props_1, $context);
 				const t_text_2 = t_next(t_comp_anchor_1);
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
@@ -60,6 +58,5 @@ export default function Self(
 		t_text_1.textContent = ` Level ${t_fmt($props.level)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

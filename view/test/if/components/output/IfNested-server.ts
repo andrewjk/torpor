@@ -5,9 +5,8 @@ export default function IfNested(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -25,7 +24,6 @@ export default function IfNested(
 		$output += ` <p> The first is not true! </p> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

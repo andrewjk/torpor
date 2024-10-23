@@ -16,12 +16,11 @@ export default function InputHello(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		text: "Hello World"
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -37,6 +36,5 @@ export default function InputHello(
 	});
 	t_event(t_input_1, "input", (e) => $state.text = e.target.value);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

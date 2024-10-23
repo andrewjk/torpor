@@ -5,8 +5,7 @@ export default function Header(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h2> <![>`;
@@ -16,7 +15,6 @@ export default function Header(
 		$output += ` Default header... `;
 	}
 	$output += `<!]><!> </h2>`;
-	
+
 	return $output;
 }
-

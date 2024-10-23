@@ -6,9 +6,8 @@ export default function Self(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> Level ${t_fmt($props.level)} <![>`;
@@ -21,7 +20,6 @@ export default function Self(
 		$output += ` `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

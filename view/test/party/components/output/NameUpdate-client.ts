@@ -14,13 +14,12 @@ export default function NameUpdate(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		name: "John"
 	});
 	$state.name = "Jane"
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -31,6 +30,5 @@ export default function NameUpdate(
 		t_text_1.textContent = `Hello ${t_fmt($state.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

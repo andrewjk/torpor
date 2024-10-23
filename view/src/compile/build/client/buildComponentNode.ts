@@ -115,8 +115,6 @@ export default function buildComponentNode(
 		renderParams += `, ${slotsName}`;
 	}
 
-	b.append("");
-
 	let componentName = node.tagName;
 	if (componentName === ":component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");

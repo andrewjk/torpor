@@ -5,9 +5,8 @@ export default function IfAfterIf(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -19,7 +18,6 @@ export default function IfAfterIf(
 		$output += ` <p> It's also true! </p> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

@@ -5,8 +5,7 @@ export default function BigTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h2> <![>`;
@@ -14,7 +13,6 @@ export default function BigTitle(
 		$output += $slots["_"](undefined, $context);
 	}
 	$output += `<!]><!> </h2>`;
-	
+
 	return $output;
 }
-

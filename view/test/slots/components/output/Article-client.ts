@@ -13,8 +13,7 @@ export default function Article(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -34,6 +33,5 @@ export default function Article(
 		$slots["footer"](t_section_1, t_slot_anchor_3, undefined, $context)
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

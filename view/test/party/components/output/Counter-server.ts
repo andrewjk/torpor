@@ -7,7 +7,6 @@ export default function Counter(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let $state = $watch({
 		count: 0
 	});
@@ -16,11 +15,9 @@ export default function Counter(
 		$state.count++;
 	}
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> </div>`;
-	
+
 	return $output;
 }
-

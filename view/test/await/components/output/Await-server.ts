@@ -6,7 +6,6 @@ export default function Await(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	// Use the $watch function to declare reactive state
 	const $state = $watch({})
 
@@ -24,13 +23,11 @@ export default function Await(
 			})
 		}
 
-		
 		/* User interface */
 		let $output = "";
 		$output += `<div> <![>`;
 		$output += ` <p>Hmm...</p> `;
 		$output += `<!]><!> <button> Guess again </button> </div>`;
-		
+
 		return $output;
 	}
-

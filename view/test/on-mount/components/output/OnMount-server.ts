@@ -5,12 +5,10 @@ export default function OnMount(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<input/>`;
-	
+
 	return $output;
 }
-

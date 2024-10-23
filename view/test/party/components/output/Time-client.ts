@@ -14,7 +14,7 @@ export default function Time(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		time: new Date().toLocaleTimeString()
 	});
@@ -27,7 +27,6 @@ export default function Time(
 		return () => clearInterval(timer);
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -38,6 +37,5 @@ export default function Time(
 		t_text_1.textContent = `Current time: ${t_fmt($state.time)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

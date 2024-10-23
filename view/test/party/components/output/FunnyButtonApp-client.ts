@@ -15,8 +15,7 @@ export default function FunnyButtonApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -25,7 +24,6 @@ export default function FunnyButtonApp(
 	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
 	/* @component */
-
 	FunnyButton(t_div_1, t_comp_anchor_1, undefined, $context);
 	const t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1))) as HTMLElement;
 
@@ -36,9 +34,7 @@ export default function FunnyButtonApp(
 		const t_text_1 = t_root(t_fragment_2);
 		t_add_fragment(t_fragment_2, $sparent, $sanchor);
 	}
-
 	FunnyButton(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

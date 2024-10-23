@@ -8,7 +8,6 @@ export default function PageTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let $state = $watch({
 		pageTitle: ""
 	});
@@ -17,11 +16,9 @@ export default function PageTitle(
 		$state.pageTitle = document.title;
 	});
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
-	
+
 	return $output;
 }
-

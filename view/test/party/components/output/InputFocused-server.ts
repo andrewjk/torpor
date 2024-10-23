@@ -6,7 +6,6 @@ export default function InputFocused(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let inputElement;
 
 	$mount(() => {
@@ -14,11 +13,9 @@ export default function InputFocused(
 		inputElement.value = "hi";
 	});
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<input self="${inputElement || ""}"/>`;
-	
+
 	return $output;
 }
-

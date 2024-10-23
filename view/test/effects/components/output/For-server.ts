@@ -6,9 +6,8 @@ export default function For(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -16,7 +15,6 @@ export default function For(
 		$output += `<!^> <p>${t_fmt(item.text)}</p> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

@@ -12,7 +12,7 @@ export default function InputFocused(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let inputElement;
 
 	$mount(() => {
@@ -20,7 +20,6 @@ export default function InputFocused(
 		inputElement.value = "hi";
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -28,8 +27,6 @@ export default function InputFocused(
 	const t_input_1 = t_root(t_fragment_0) as HTMLInputElement;
 	inputElement = t_input_1;
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
 
 	t_flush();
 }
-

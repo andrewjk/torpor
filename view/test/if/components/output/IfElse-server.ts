@@ -5,9 +5,8 @@ export default function IfElse(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -18,7 +17,6 @@ export default function IfElse(
 		$output += ` <p> It's not true... </p> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

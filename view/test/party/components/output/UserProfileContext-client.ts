@@ -16,11 +16,10 @@ export default function UserProfileContext(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$context = Object.assign({}, $context);
+
 	$context.user = $watch($context.user);
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -37,6 +36,5 @@ export default function UserProfileContext(
 	});
 	t_event(t_button_1, "click", () => ($context.user.username = "Jane"));
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

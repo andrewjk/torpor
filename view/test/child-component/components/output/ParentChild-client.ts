@@ -15,8 +15,7 @@ export default function ParentChild(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -27,10 +26,9 @@ export default function ParentChild(
 	/* @component */
 	const t_props_1 = {};
 	t_props_1["name"] = "Anna";
-
 	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
+
 }
 
 function Child(
@@ -40,9 +38,8 @@ function Child(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -53,6 +50,5 @@ function Child(
 		t_text_1.textContent = `Hello, ${t_fmt($props.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

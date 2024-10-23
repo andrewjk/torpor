@@ -24,7 +24,7 @@ export default function ColorSelect(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		selectedColorId: 2
 	});
@@ -36,7 +36,6 @@ export default function ColorSelect(
 		{ id: 4, text: "gray", isDisabled: true },
 	];
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -92,6 +91,5 @@ export default function ColorSelect(
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

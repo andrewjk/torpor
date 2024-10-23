@@ -13,9 +13,8 @@ export default function AnswerButton(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -26,6 +25,5 @@ export default function AnswerButton(
 	t_event(t_button_1, "click", $props.onYes);
 	t_event(t_button_2, "click", $props.onNo);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

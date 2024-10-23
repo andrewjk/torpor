@@ -7,7 +7,6 @@ export default function ColorSelect(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let $state = $watch({
 		selectedColorId: 2
 	});
@@ -19,7 +18,6 @@ export default function ColorSelect(
 		{ id: 4, text: "gray", isDisabled: true },
 	];
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${$state.selectedColorId || ""}"> <![>`;
@@ -27,7 +25,6 @@ export default function ColorSelect(
 		$output += `<!^> <option ${color.id ? `value="${color.id}"` : ''} ${color.isDisabled ? `disabled="${color.isDisabled}"` : ''}> ${t_fmt(color.text)} </option> `;
 	}
 	$output += `<!]><!> </select> </div>`;
-	
+
 	return $output;
 }
-

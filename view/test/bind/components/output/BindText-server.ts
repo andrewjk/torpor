@@ -7,14 +7,11 @@ export default function BindText(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let $state = $watch({ name: "Alice" });
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <input value="${$state.name || ""}"/> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
-	
+
 	return $output;
 }
-

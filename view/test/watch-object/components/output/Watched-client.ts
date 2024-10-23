@@ -14,9 +14,8 @@ export default function Watched(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -27,6 +26,5 @@ export default function Watched(
 		t_text_1.textContent = ` ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.grandChild.grandChildText)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

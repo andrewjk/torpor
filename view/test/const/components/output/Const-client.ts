@@ -14,8 +14,7 @@ export default function Const(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -28,5 +27,5 @@ export default function Const(
 		t_text_1.textContent = ` Hello, ${t_fmt(name)}! `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
+
 }

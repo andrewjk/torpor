@@ -13,8 +13,7 @@ export default function Unused(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -23,9 +22,7 @@ export default function Unused(
 	const t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @component */
-
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

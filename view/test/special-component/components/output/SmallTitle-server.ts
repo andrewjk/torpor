@@ -5,8 +5,7 @@ export default function SmallTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h6> <![>`;
@@ -14,7 +13,6 @@ export default function SmallTitle(
 		$output += $slots["_"](undefined, $context);
 	}
 	$output += `<!]><!> </h6>`;
-	
+
 	return $output;
 }
-

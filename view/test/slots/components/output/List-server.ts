@@ -5,9 +5,8 @@ export default function List(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<ul> <![>`;
@@ -21,7 +20,6 @@ export default function List(
 		$output += `<!]><!> </li> `;
 	}
 	$output += `<!]><!> </ul>`;
-	
+
 	return $output;
 }
-

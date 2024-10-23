@@ -8,9 +8,8 @@ export default function Let(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	const t_props_1 = {};
@@ -23,7 +22,6 @@ export default function Let(
 	}
 
 	$output += List(t_props_1, $context, t_slots_1)
-	
+
 	return $output;
 }
-

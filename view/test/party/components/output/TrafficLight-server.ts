@@ -7,7 +7,6 @@ export default function TrafficLight(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
 		lightIndex: 0,
@@ -20,7 +19,6 @@ export default function TrafficLight(
 		$state.lightIndex = ($state.lightIndex + 1) % TRAFFIC_LIGHTS.length;
 	}
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
@@ -34,7 +32,6 @@ export default function TrafficLight(
 		$output += ` <span>GO</span> `;
 	}
 	$output += `<!]><!> </p> </div>`;
-	
+
 	return $output;
 }
-

@@ -6,7 +6,6 @@ export default function Bench(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let rowId = 1;
 	let $state = $watch({
 		data: [],
@@ -102,7 +101,6 @@ export default function Bench(
 		$context?: Record<PropertyKey, any>,
 		$slots?: Record<string, ServerSlotRender>
 	) {
-		
 		return Math.round(Math.random() * 1000) % max;
 	}
 
@@ -119,8 +117,5 @@ export default function Bench(
 		return data;
 	}
 
-	
-	
 	return $output;
 }
-

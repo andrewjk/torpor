@@ -12,9 +12,8 @@ export default function Element(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -28,6 +27,5 @@ export default function Element(
 		t_add_fragment(t_fragment_1, t_element_1, null);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

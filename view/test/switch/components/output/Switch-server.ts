@@ -11,9 +11,8 @@ export default function Switch(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -32,7 +31,6 @@ export default function Switch(
 		}
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

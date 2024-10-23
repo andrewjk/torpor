@@ -5,8 +5,7 @@ export default function FunnyButton(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<button style="
@@ -26,7 +25,6 @@ export default function FunnyButton(
 		$output += ` <span>No content found</span> `;
 	}
 	$output += `<!]><!> </button>`;
-	
+
 	return $output;
 }
-

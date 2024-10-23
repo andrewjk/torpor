@@ -6,18 +6,15 @@ export default function Mount(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let inputElement;
 
 	$mount(() => {
 		inputElement.value = "hi";
 	});
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<input self="${inputElement || ""}"/>`;
-	
+
 	return $output;
 }
-

@@ -6,13 +6,11 @@ export default function Header(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h2>Hi, ${t_fmt($props.name)}</h2>`;
-	
+
 	return $output;
 }
-

@@ -5,9 +5,8 @@ export default function If(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
@@ -18,7 +17,6 @@ export default function If(
 		$output += ` <p>It's small</p> `;
 	}
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

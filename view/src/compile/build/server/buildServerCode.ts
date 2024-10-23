@@ -92,6 +92,7 @@ function buildServerTemplate(
 				};
 
 				// Add the interface
+				b.append("");
 				b.append("/* User interface */");
 				b.append(`let $output = "";`);
 

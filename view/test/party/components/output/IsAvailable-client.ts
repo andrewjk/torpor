@@ -16,12 +16,11 @@ export default function IsAvailable(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		isAvailable: false
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -37,6 +36,5 @@ export default function IsAvailable(
 	});
 	t_event(t_input_1, "input", (e) => $state.isAvailable = e.target.checked);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

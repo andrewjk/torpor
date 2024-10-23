@@ -10,7 +10,6 @@ export default function UserProfileContextApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$context = Object.assign({}, $context);
 	const $user = $watch({
 		id: 1,
@@ -21,14 +20,12 @@ export default function UserProfileContextApp(
 	// TODO: I think we're supposed to $unwrap this and pass in an update function?
 	$context.user = $user;
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
 
 	$output += UserProfileContext(undefined, $context)
 	$output += ` </div>`;
-	
+
 	return $output;
 }
-

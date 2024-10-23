@@ -11,9 +11,8 @@ export default function For(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -29,6 +28,5 @@ export default function For(
 		t_div_1.classList.toggle("blue", $props.blue);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

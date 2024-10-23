@@ -16,12 +16,11 @@ export default function PickPill(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		picked: "red"
 	});
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -46,6 +45,5 @@ export default function PickPill(
 		if (e.target.checked) $state.picked = "red";
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

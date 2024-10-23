@@ -7,7 +7,10 @@ export default class Builder {
 	}
 
 	append(text: string) {
-		let i = text.startsWith("\n") ? 1 : 0;
+		text = text.trim();
+		let i = 0;
+		let newline = !!text.length && !text.endsWith("\n");
+
 		while (i < text.length) {
 			// Skip spaces
 			while (text[i] === " " || text[i] === "\t") {
@@ -46,7 +49,10 @@ export default class Builder {
 			}
 			i++;
 		}
-		this.#text += "\n";
+
+		if (!this.#text.endsWith("\n\n")) {
+			this.#text += "\n";
+		}
 	}
 
 	toString() {

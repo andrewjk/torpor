@@ -6,10 +6,8 @@ export default function Colors(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	const colors = ["red", "green", "blue"];
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<ul> <![>`;
@@ -17,7 +15,6 @@ export default function Colors(
 		$output += `<!^>  <li>${t_fmt(color)}</li> `;
 	}
 	$output += `<!]><!> </ul>`;
-	
+
 	return $output;
 }
-

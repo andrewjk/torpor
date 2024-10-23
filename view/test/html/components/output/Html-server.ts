@@ -5,13 +5,11 @@ export default function Html(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<p> <![>${$props.html}<!]><!> </p>`;
-	
+
 	return $output;
 }
-

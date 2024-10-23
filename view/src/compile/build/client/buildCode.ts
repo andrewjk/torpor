@@ -100,6 +100,8 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				b.append(`$context = Object.assign({}, $context);`);
 			}
 
+			b.append("");
+
 			marker = i + "/* @start */".length;
 		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
 			b.append(script.substring(marker, i));
@@ -115,6 +117,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				};
 
 				// Add the interface
+				b.append("");
 				b.append("/* User interface */");
 				buildFragmentText(current.markup, status, b);
 				b.append("");

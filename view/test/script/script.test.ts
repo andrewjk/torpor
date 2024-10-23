@@ -22,7 +22,7 @@ export default function Test(/* @params */) {
 	/* @end */
 }
 `,
-			components: [{}],
+			components: [{ start: 25, name: "Test", default: true }],
 		},
 	};
 	expect(output).toEqual(expected);

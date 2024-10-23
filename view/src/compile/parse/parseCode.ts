@@ -8,6 +8,7 @@ import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
+import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
 
 export default function parseCode(source: string): ParseResult {
@@ -59,6 +60,9 @@ export default function parseCode(source: string): ParseResult {
 					script: status.script,
 					components: status.components.map((c) => {
 						return {
+							start: c.start,
+							name: c.name,
+							default: c.default,
 							params: c.params,
 							markup: c.markup
 								? {
@@ -77,7 +81,13 @@ export default function parseCode(source: string): ParseResult {
 }
 
 function startComponent(status: ParseStatus) {
-	status.components.push({ start: status.i });
+	let def = /export\s+default\s+function\s+$/.test(status.source.substring(0, status.i));
+
+	status.components.push({
+		start: status.i,
+		name: consumeAlphaNumeric(status),
+		default: def,
+	});
 	const current = status.components.at(-1);
 	if (!current) return;
 

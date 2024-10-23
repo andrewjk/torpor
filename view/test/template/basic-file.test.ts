@@ -14,7 +14,13 @@ test("basic file", () => {
 		template: {
 			imports: [],
 			script: "export default function Test(/* @params */) {/* @start *//* @end */}",
-			components: [{}],
+			components: [
+				{
+					start: 24,
+					name: "Test",
+					default: true,
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);

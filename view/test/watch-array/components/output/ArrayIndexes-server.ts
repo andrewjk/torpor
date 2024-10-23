@@ -6,9 +6,8 @@ export default function ArrayIndexes(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<section> <p>^</p> <![>`;
@@ -16,7 +15,6 @@ export default function ArrayIndexes(
 		$output += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span> `;
 	}
 	$output += `<!]><!> <p>$</p> </section>`;
-	
+
 	return $output;
 }
-

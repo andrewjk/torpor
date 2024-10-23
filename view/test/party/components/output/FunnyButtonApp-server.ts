@@ -7,8 +7,7 @@ export default function FunnyButtonApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> `;
@@ -24,7 +23,6 @@ export default function FunnyButtonApp(
 
 	$output += FunnyButton(undefined, $context, t_slots_1)
 	$output += ` </div>`;
-	
+
 	return $output;
 }
-

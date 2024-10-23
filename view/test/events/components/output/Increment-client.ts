@@ -16,14 +16,13 @@ export default function Increment(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	const $state = $watch({ counter: 0 })
 
 	function increment(e, num) {
 		$state.counter += num || 1;
 	}
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -38,6 +37,5 @@ export default function Increment(
 		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

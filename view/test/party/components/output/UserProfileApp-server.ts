@@ -7,8 +7,7 @@ export default function UserProfileApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	const t_props_1 = {};
@@ -18,7 +17,6 @@ export default function UserProfileApp(
 	t_props_1["isAvailable"] = true;
 
 	$output += UserProfile(t_props_1, $context)
-	
+
 	return $output;
 }
-

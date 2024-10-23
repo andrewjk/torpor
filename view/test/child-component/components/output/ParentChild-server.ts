@@ -6,8 +6,7 @@ export default function ParentChild(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> `;
@@ -16,7 +15,7 @@ export default function ParentChild(
 
 	$output += Child(t_props_1, $context)
 	$output += ` </div>`;
-	
+
 	return $output;
 }
 
@@ -25,13 +24,11 @@ function Child(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
-	
+
 	return $output;
 }
-

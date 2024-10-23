@@ -17,14 +17,13 @@ export default function Component(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
+
 	let components = {
 		BigTitle,
 		SmallTitle
 	};
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -48,13 +47,11 @@ export default function Component(
 				const t_text_1 = t_root(t_fragment_3);
 				t_add_fragment(t_fragment_3, $sparent, $sanchor);
 			}
-
 			components[$props.self](t_fragment_1, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before);
 		});
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

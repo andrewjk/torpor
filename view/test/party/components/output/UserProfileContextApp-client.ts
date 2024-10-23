@@ -19,8 +19,8 @@ export default function UserProfileContextApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$context = Object.assign({}, $context);
+
 	const $user = $watch({
 		id: 1,
 		username: "unicorn42",
@@ -30,7 +30,6 @@ export default function UserProfileContextApp(
 	// TODO: I think we're supposed to $unwrap this and pass in an update function?
 	$context.user = $user;
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -40,12 +39,10 @@ export default function UserProfileContextApp(
 	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_div_1))))) as HTMLElement;
 
 	/* @component */
-
 	UserProfileContext(t_div_1, t_comp_anchor_1, undefined, $context);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Welcome back, ${t_fmt($user.username)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

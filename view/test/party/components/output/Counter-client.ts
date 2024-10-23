@@ -16,7 +16,7 @@ export default function Counter(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		count: 0
 	});
@@ -25,7 +25,6 @@ export default function Counter(
 		$state.count++;
 	}
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -38,6 +37,5 @@ export default function Counter(
 	});
 	t_event(t_button_1, "click", incrementCount);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

@@ -5,12 +5,10 @@ export default function Head(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div>  </div>`;
-	
+
 	return $output;
 }
-

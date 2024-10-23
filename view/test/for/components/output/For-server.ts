@@ -6,8 +6,7 @@ export default function For(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<section> <![>`;
@@ -15,7 +14,6 @@ export default function For(
 		$output += `<!^> <p> ${t_fmt(i)} </p> `;
 	}
 	$output += `<!]><!> </section>`;
-	
+
 	return $output;
 }
-

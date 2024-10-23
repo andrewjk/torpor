@@ -29,6 +29,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
 				},
 			],
@@ -63,6 +66,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
 				},
 			],
@@ -97,6 +103,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
 				},
 			],
@@ -129,6 +138,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("href", "http://example.com")], [], true)]),
 				},
 			],
@@ -163,6 +175,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([
 						el(
 							"a",
@@ -205,6 +220,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("input", [att("text"), att("required")], [], true)]),
 				},
 			],
@@ -239,6 +257,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
 				},
 			],
@@ -275,6 +296,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([
 						el(
 							"button",
@@ -313,6 +337,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("{href}")])]),
 				},
 			],
@@ -345,6 +372,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("a", [att("{href1}"), att("{href2}")])]),
 				},
 			],

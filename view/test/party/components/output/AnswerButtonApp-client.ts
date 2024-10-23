@@ -18,7 +18,7 @@ export default function AnswerButtonApp(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
+
 	let $state = $watch({
 		isHappy: true
 	});
@@ -31,7 +31,6 @@ export default function AnswerButtonApp(
 		$state.isHappy = true;
 	}
 
-	
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -47,13 +46,11 @@ export default function AnswerButtonApp(
 	$run(function setProp() {
 		t_props_1["onNo"] = onAnswerNo;
 	});
-
 	AnswerButton(t_div_1, t_comp_anchor_1, t_props_1, $context);
 	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1)));
 	$run(function setTextContent() {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

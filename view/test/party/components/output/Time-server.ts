@@ -8,7 +8,6 @@ export default function Time(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	let $state = $watch({
 		time: new Date().toLocaleTimeString()
 	});
@@ -21,11 +20,9 @@ export default function Time(
 		return () => clearInterval(timer);
 	});
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<p>Current time: ${t_fmt($state.time)}</p>`;
-	
+
 	return $output;
 }
-

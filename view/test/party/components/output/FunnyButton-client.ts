@@ -13,8 +13,7 @@ export default function FunnyButton(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -31,6 +30,5 @@ export default function FunnyButton(
 		t_next(t_text_1);
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

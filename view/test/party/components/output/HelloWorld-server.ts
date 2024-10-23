@@ -5,12 +5,10 @@ export default function HelloWorld(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<h1>Hello world</h1>`;
-	
+
 	return $output;
 }
-

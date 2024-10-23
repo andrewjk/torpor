@@ -34,6 +34,9 @@ export default function Test(/* @params */) {
 `,
 			components: [
 				{
+					start: 25,
+					name: "Test",
+					default: true,
 					markup: root([el("section", [], [el("p", [], [text("The content")])])]),
 				},
 			],

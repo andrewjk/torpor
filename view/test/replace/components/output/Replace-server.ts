@@ -6,18 +6,15 @@ export default function Replace(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
 	$props ??= {};
 	let counter = 0;
 
-	
 	/* User interface */
 	let $output = "";
 	$output += `<div> <![>`;
 	$props.name;
 	$output += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
 	$output += `<!]><!> </div>`;
-	
+
 	return $output;
 }
-

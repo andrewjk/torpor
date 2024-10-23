@@ -12,9 +12,8 @@ export default function For(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
-	
 	$props ??= {};
-	
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -30,6 +29,5 @@ export default function For(
 		t_attribute(t_div_1, "caption", `this attribute is for ${$props.description}`);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-	
-}
 
+}

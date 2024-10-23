@@ -7,13 +7,11 @@ export default function Unused(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 
 	$output += Header(undefined, $context)
-	
+
 	return $output;
 }
-

@@ -18,8 +18,9 @@ export default interface ParseStatus {
 }
 
 export interface ParseComponentStatus {
-	name?: string;
 	start?: number;
+	name?: string;
+	default?: boolean;
 	params?: string;
 	markup?: ElementNode;
 	style?: Style;

@@ -6,13 +6,12 @@ export default function Const(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	
-	
+
 	/* User interface */
 	let $output = "";
 	$output += `<div> `;
 	const name = "Boris";
 	$output += ` <p> Hello, ${t_fmt(name)}! </p> </div>`;
-	
+
 	return $output;
 }
