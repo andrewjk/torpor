@@ -16,6 +16,7 @@ export default function Array(
 		$output += `<!^>  <p> ${t_fmt(item.text)} </p> `;
 	}
 	$output += `<!]><!> <p>$</p> </section>`;
+	
 	return $output;
 }
 

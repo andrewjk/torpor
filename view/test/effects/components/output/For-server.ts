@@ -16,6 +16,7 @@ export default function For(
 		$output += `<!^> <p>${t_fmt(item.text)}</p> `;
 	}
 	$output += `<!]><!> </div>`;
+	
 	return $output;
 }
 

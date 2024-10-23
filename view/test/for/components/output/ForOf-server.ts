@@ -16,6 +16,7 @@ export default function ForOf(
 		$output += `<!^> <p> ${t_fmt(item)} </p> `;
 	}
 	$output += `<!]><!> </section>`;
+	
 	return $output;
 }
 

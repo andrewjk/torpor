@@ -1,5 +1,5 @@
 import type BuildOptions from "../types/BuildOptions";
-import type ComponentTemplate from "../types/ComponentTemplate";
+import type Template from "../types/Template";
 import Builder from "./utils/Builder";
 
 /**
@@ -12,7 +12,7 @@ import Builder from "./utils/Builder";
  */
 export default function buildType(
 	name: string,
-	template: ComponentTemplate,
+	template: Template,
 	options?: BuildOptions,
 ): string {
 	let b = new Builder();

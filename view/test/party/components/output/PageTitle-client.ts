@@ -34,5 +34,6 @@ export default function PageTitle(
 		t_text_1.textContent = `Page title: ${t_fmt($state.pageTitle)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

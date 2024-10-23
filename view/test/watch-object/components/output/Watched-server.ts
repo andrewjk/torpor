@@ -12,6 +12,7 @@ export default function Watched(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <p> ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.grandChild.grandChildText)} </p> </div>`;
+	
 	return $output;
 }
 

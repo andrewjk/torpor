@@ -29,5 +29,6 @@ export default function For(
 		t_div_1.classList.toggle("blue", $props.blue);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

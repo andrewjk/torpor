@@ -19,6 +19,7 @@ export default function InputFocused(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<input self="${inputElement || ""}"/>`;
+	
 	return $output;
 }
 

@@ -20,5 +20,6 @@ export default function Console(
 	/* @console */
 	console.log("@console is logging here");
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

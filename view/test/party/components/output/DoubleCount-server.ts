@@ -19,6 +19,7 @@ export default function DoubleCount(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div>${t_fmt($state.doubleCount)}</div>`;
+	
 	return $output;
 }
 

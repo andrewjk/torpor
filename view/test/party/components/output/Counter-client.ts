@@ -38,5 +38,6 @@ export default function Counter(
 	});
 	t_event(t_button_1, "click", incrementCount);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

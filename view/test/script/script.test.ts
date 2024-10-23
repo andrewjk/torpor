@@ -14,12 +14,15 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	const x = 5;
+	/* @end */
 }
 `,
+			components: [{}],
 		},
 	};
 	expect(output).toEqual(expected);

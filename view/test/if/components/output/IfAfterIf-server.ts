@@ -20,6 +20,7 @@ export default function IfAfterIf(
 		$output += ` <p> It's also true! </p> `;
 	}
 	$output += `<!]><!> </div>`;
+	
 	return $output;
 }
 

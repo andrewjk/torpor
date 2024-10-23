@@ -31,5 +31,6 @@ export default function FunnyButton(
 		t_next(t_text_1);
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

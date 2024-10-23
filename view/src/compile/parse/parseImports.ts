@@ -4,15 +4,15 @@ import type ParseStatus from "./ParseStatus";
 
 export default function parseImports(status: ParseStatus) {
 	let start = 0;
-	let braceLevel = 0;
+	let level = 0;
 	for (let i = 0; i < status.source.length + 1; i++) {
 		// HACK: Really need to properly parse imports
 		if (status.source[i] === "{") {
-			braceLevel += 1;
+			level += 1;
 		} else if (status.source[i] === "}") {
-			braceLevel -= 1;
+			level -= 1;
 		}
-		if ((status.source[i] === "\n" && braceLevel === 0) || status.source[i] === undefined) {
+		if ((status.source[i] === "\n" && level === 0) || status.source[i] === undefined) {
 			const line = status.source.substring(start, i).trim();
 			if (line.length) {
 				if (line.startsWith("//")) {
@@ -53,6 +53,7 @@ export default function parseImports(status: ParseStatus) {
 							}
 						}
 					}
+					status.i = i;
 				} else {
 					// Imports are done!
 					// TODO: Make sure there aren't any more with a regex

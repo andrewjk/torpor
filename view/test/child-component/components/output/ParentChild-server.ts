@@ -1,16 +1,23 @@
 import type { ServerSlotRender } from "@tera/view";
 
 export default function ParentChild(
-	$props: { name: string },
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	/* @start */
-	@render {
-		<div>
-		<Child name="Anna" />
-		</div>
-	}
+	
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<div> `;
+	const t_props_1 = {};
+	t_props_1["name"] = "Anna";
+
+	$output += Child(t_props_1, $context)
+	$output += ` </div>`;
+	
+	return $output;
 }
 
 function Child(
@@ -18,9 +25,14 @@ function Child(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	/* @start */
-	@render {
-		<h2>Hello, {$props.name}</h2>
-	}
+	
+	$props ??= {};
+	
+	/* User interface */
+	const t_fmt = (text: string) => (text != null ? text : "");
+	let $output = "";
+	$output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
+	
+	return $output;
 }
 

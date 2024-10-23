@@ -64,5 +64,6 @@ export default function Array(
 	);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

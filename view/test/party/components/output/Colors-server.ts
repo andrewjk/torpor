@@ -17,6 +17,7 @@ export default function Colors(
 		$output += `<!^>  <li>${t_fmt(color)}</li> `;
 	}
 	$output += `<!]><!> </ul>`;
+	
 	return $output;
 }
 

@@ -39,5 +39,6 @@ export default function FunnyButtonApp(
 
 	FunnyButton(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

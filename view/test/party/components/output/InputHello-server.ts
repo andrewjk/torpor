@@ -16,6 +16,7 @@ export default function InputHello(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <p>${t_fmt($state.text)}</p> <input value="${$state.text || ""}"/> </div>`;
+	
 	return $output;
 }
 

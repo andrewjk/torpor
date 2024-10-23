@@ -1,4 +1,3 @@
-import type ComponentTemplate from "../../types/ComponentTemplate";
 import type CompileError from "../types/CompileError";
 import type Import from "../types/Import";
 import type ElementNode from "../types/nodes/ElementNode";
@@ -7,17 +6,25 @@ import type Style from "../types/styles/Style";
 export default interface ParseStatus {
 	name: string;
 	source: string;
-	// The current index
 	i: number;
 	marker: number;
+	level: number;
+
+	imports: Import[];
 	script: string;
-	components: {
-	template?: ElementNode;
+
+	components: ParseComponentStatus[];
+	current: ParseComponentStatus;
+
+	errors: CompileError[];
+}
+
+interface ParseComponentStatus {
+	start?: number;
 	params?: string;
-	childTemplates?: ComponentTemplate[];
+	markup?: ElementNode;
 	style?: Style;
 	styleHash?: string;
-	imports?: Import[];
-	// Errors that have been encountered
-	errors: CompileError[];
+	props?: string[];
+	contextProps?: string[];
 }

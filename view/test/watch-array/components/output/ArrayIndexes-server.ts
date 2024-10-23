@@ -16,6 +16,7 @@ export default function ArrayIndexes(
 		$output += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span> `;
 	}
 	$output += `<!]><!> <p>$</p> </section>`;
+	
 	return $output;
 }
 

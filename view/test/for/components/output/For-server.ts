@@ -15,6 +15,7 @@ export default function For(
 		$output += `<!^> <p> ${t_fmt(i)} </p> `;
 	}
 	$output += `<!]><!> </section>`;
+	
 	return $output;
 }
 

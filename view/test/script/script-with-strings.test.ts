@@ -16,14 +16,17 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	const x = "\\"@render {";
 	const y = '\\'@render {';
 	const z = \`\\\`@render {\`;
+	/* @end */
 }
 `,
+			components: [{}],
 		},
 	};
 	expect(output).toEqual(expected);

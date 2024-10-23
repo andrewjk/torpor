@@ -12,6 +12,7 @@ export default function AnswerButton(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <button>YES</button> <button>NO</button> </div>`;
+	
 	return $output;
 }
 

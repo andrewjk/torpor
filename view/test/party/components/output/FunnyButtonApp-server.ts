@@ -25,6 +25,7 @@ export default function FunnyButtonApp(
 
 	$output += FunnyButton(undefined, $context, t_slots_1)
 	$output += ` </div>`;
+	
 	return $output;
 }
 

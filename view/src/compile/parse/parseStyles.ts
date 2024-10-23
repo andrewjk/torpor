@@ -9,7 +9,7 @@ import consumeUntil from "./utils/consumeUntil";
 import isSpaceChar from "./utils/isSpaceChar";
 
 export default function parseStyles(source: string, status: ParseStatus) {
-	status.style = {
+	status.current.style = {
 		global: false,
 		blocks: [],
 	};
@@ -19,7 +19,11 @@ export default function parseStyles(source: string, status: ParseStatus) {
 		source,
 		i: 0,
 		marker: 0,
+		level: 0,
+		imports: [],
 		script: "",
+		components: [],
+		current: {},
 		errors: [],
 	};
 
@@ -28,11 +32,11 @@ export default function parseStyles(source: string, status: ParseStatus) {
 			consumeSpace(styleStatus);
 		} else {
 			const block = parseStyleBlock(styleStatus);
-			status.style.blocks.push(block);
+			status.current.style.blocks.push(block);
 		}
 	}
 
-	status.styleHash = hash(source);
+	status.current.styleHash = hash(source);
 	status.errors = status.errors.concat(styleStatus.errors);
 }
 

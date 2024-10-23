@@ -12,6 +12,7 @@ export default function For(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div ${$props.thing ? `thing="${$props.thing}"` : ''} ${$props.dataThing ? `data-thing="${$props.dataThing}"` : ''} caption="this attribute is for ${$props.description}"> Hello! </div>`;
+	
 	return $output;
 }
 

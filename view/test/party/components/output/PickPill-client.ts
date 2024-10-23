@@ -46,5 +46,6 @@ export default function PickPill(
 		if (e.target.checked) $state.picked = "red";
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

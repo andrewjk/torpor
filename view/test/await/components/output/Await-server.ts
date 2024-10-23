@@ -31,6 +31,7 @@ export default function Await(
 		$output += `<div> <![>`;
 		$output += ` <p>Hmm...</p> `;
 		$output += `<!]><!> <button> Guess again </button> </div>`;
+		
 		return $output;
 	}
 

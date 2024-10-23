@@ -21,6 +21,7 @@ export default function PageTitle(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
+	
 	return $output;
 }
 

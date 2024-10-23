@@ -204,5 +204,6 @@ export default function Bench(
 	t_event(t_button_5, "click", clear);
 	t_event(t_button_6, "click", swapRows);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

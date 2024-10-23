@@ -20,30 +20,36 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
 
 	
+	/* @end */
 }
 `,
-			markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
-			style: {
-				global: false,
-				blocks: [
-					{
-						selector: "h1",
-						attributes: [
+			components: [
+				{
+					markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
+					style: {
+						global: false,
+						blocks: [
 							{
-								name: "color",
-								value: "blue",
+								selector: "h1",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+								],
+								children: [],
 							},
 						],
-						children: [],
 					},
-				],
-			},
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -62,27 +68,33 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	
+	/* @end */
 }
 `,
-			style: {
-				global: false,
-				blocks: [
-					{
-						selector: ".h1, p",
-						attributes: [
+			components: [
+				{
+					style: {
+						global: false,
+						blocks: [
 							{
-								name: "color",
-								value: "blue",
+								selector: ".h1, p",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+								],
+								children: [],
 							},
 						],
-						children: [],
 					},
-				],
-			},
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -104,31 +116,37 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	
+	/* @end */
 }
 `,
-			style: {
-				global: false,
-				blocks: [
-					{
-						selector: ".h1, p",
-						attributes: [
+			components: [
+				{
+					style: {
+						global: false,
+						blocks: [
 							{
-								name: "color",
-								value: "blue",
-							},
-							{
-								name: "background-color",
-								value: "green",
+								selector: ".h1, p",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+									{
+										name: "background-color",
+										value: "green",
+									},
+								],
+								children: [],
 							},
 						],
-						children: [],
 					},
-				],
-			},
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -151,33 +169,39 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	
+	/* @end */
 }
 `,
-			style: {
-				global: false,
-				blocks: [
-					{
-						selector: "@media screen and (min-width: 480px)",
-						attributes: [],
-						children: [
+			components: [
+				{
+					style: {
+						global: false,
+						blocks: [
 							{
-								selector: "button",
-								attributes: [
+								selector: "@media screen and (min-width: 480px)",
+								attributes: [],
+								children: [
 									{
-										name: "color",
-										value: "green",
+										selector: "button",
+										attributes: [
+											{
+												name: "color",
+												value: "green",
+											},
+										],
+										children: [],
 									},
 								],
-								children: [],
 							},
 						],
 					},
-				],
-			},
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -206,27 +230,33 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	
+	/* @end */
 }
 `,
-			style: {
-				global: false,
-				blocks: [
-					{
-						selector: "button",
-						attributes: [
+			components: [
+				{
+					style: {
+						global: false,
+						blocks: [
 							{
-								name: "color",
-								value: "green",
+								selector: "button",
+								attributes: [
+									{
+										name: "color",
+										value: "green",
+									},
+								],
+								children: [],
 							},
 						],
-						children: [],
 					},
-				],
-			},
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);

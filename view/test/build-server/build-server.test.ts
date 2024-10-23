@@ -1,6 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import fs from "fs";
+import tsb from "ts-blank-space";
 import { expect, test } from "vitest";
 import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
@@ -21,8 +22,11 @@ test("build for the server and render to HTML", () => {
 	expect(parsed.template).not.toBeUndefined();
 
 	const rendered = build("IfNested", parsed.template!, { server: true });
-	const code = rendered.code.replace("export default", "");
-	const html = eval(code).render(state);
+	const code = tsb(`
+${rendered.code.replace("export default ", "").replace("import ", "//import ")}
+IfNested;
+`);
+	const html = eval(code)(state);
 
 	const container = document.createElement("div");
 	container.innerHTML = html;

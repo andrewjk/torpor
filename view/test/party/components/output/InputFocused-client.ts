@@ -28,8 +28,7 @@ export default function InputFocused(
 	const t_input_1 = t_root(t_fragment_0) as HTMLInputElement;
 	inputElement = t_input_1;
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-
-	t_flush();
+	
 
 	t_flush();
 }

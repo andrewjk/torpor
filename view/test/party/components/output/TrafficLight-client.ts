@@ -85,5 +85,6 @@ export default function TrafficLight(
 		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

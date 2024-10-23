@@ -1,5 +1,5 @@
 import type BuildOptions from "../../../types/BuildOptions";
-import type ComponentTemplate from "../../../types/ComponentTemplate";
+import type Template from "../../../types/Template";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import buildFragmentText from "./buildFragmentText";
@@ -41,7 +41,7 @@ const importsMap: Record<string, string> = {
 
 export default function buildCode(
 	name: string,
-	template: ComponentTemplate,
+	template: Template,
 	options?: BuildOptions,
 ): string {
 	let b = new Builder();
@@ -50,13 +50,8 @@ export default function buildCode(
 	let imports = new Set<string>();
 	imports.add("SlotRender");
 
-	// Build the component and any child components
+	// Build the component
 	buildTemplate(name, template, imports, b);
-	//if (template.childComponents) {
-	//	for (let child of template.childComponents) {
-	//		buildTemplate(child.name || "ChildComponent", child, imports, b);
-	//	}
-	//}
 
 	// Add the gathered imports in alphabetical order
 	if (imports.size) {
@@ -67,18 +62,10 @@ export default function buildCode(
 		}
 	}
 
-	// Export the component
-	//b.append(`export default ${name};`);
-
 	return b.toString();
 }
 
-function buildTemplate(
-	name: string,
-	template: ComponentTemplate,
-	imports: Set<string>,
-	b: Builder,
-) {
+function buildTemplate(name: string, template: Template, imports: Set<string>, b: Builder) {
 	let script = template.script || "";
 
 	// Add default imports
@@ -86,6 +73,9 @@ function buildTemplate(
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
+
+	let currentIndex = 0;
+	let current = template.components[0];
 
 	let marker = 0;
 	for (let i = 0; i < script.length; i++) {
@@ -96,7 +86,7 @@ function buildTemplate(
 			b.append(
 				`$parent: ParentNode,
 				$anchor: Node | null,
-				${template.params || "$props?: Record<PropertyKey, any>"},
+				${current.params || "$props?: Record<PropertyKey, any>"},
 				$context?: Record<PropertyKey, any>,
 				$slots?: Record<string, SlotRender>`,
 			);
@@ -106,12 +96,12 @@ function buildTemplate(
 			b.append(script.substring(marker, i));
 
 			// Make sure we've got $props if we're going to be using it
-			if (template.props?.length) {
+			if (current.props?.length) {
 				b.append(`$props ??= {};`);
 			}
 
 			// Redefine $context so that any newly added properties will only be passed to children
-			if (template.contextProps?.length) {
+			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
 			}
 
@@ -119,11 +109,11 @@ function buildTemplate(
 		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
 			b.append(script.substring(marker, i));
 
-			if (template.markup) {
+			if (current.markup) {
 				const status: BuildStatus = {
 					imports,
-					props: template.props || [],
-					styleHash: template.styleHash || "",
+					props: current.props || [],
+					styleHash: current.styleHash || "",
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],
@@ -131,128 +121,30 @@ function buildTemplate(
 
 				// Add the interface
 				b.append("/* User interface */");
-				buildFragmentText(template.markup, status, b);
+				buildFragmentText(current.markup, status, b);
 				b.append("");
-				buildNode(template.markup, status, b, "$parent", "$anchor", true);
-
-				// Flush any $mount calls that were encountered -- move this to
-				// addFragment, because we also have to flush events and animations
-				if (imports.has("$mount")) {
-					status.imports.add("t_flush");
-					b.append("");
-					b.append("t_flush();");
-				}
+				buildNode(current.markup, status, b, "$parent", "$anchor", true);
 			}
 
 			marker = i + "/* @render */".length;
+		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
+			b.append(script.substring(marker, i));
+
+			currentIndex += 1;
+			current = template.components[currentIndex];
+
+			// TODO: Only if the component has $mount
+			// Flush any $mount calls that were encountered -- move this to
+			// addFragment, because we also have to flush events and animations
+			if (imports.has("$mount")) {
+				imports.add("t_flush");
+				b.append("");
+				b.append("t_flush();");
+			}
+
+			marker = i + "/* @end */".length;
 		}
-	}
-
-	//let position = script.indexOf("/* @render */");
-
-	// Flush any $mount calls that were encountered -- move this to
-	// addFragment, because we also have to flush events and animations
-	if (imports.has("$mount")) {
-		imports.add("t_flush");
-		b.append("");
-		b.append("t_flush();");
 	}
 
 	b.append(script.substring(marker));
-
-	return;
-
-	if (template.imports) {
-		// TODO: Should probably consolidate imports e.g. when we've split them up
-		for (let imp of template.imports) {
-			const alias = imp.alias ? ` as ${imp.alias}` : "";
-			const name = imp.nonDefault ? `{ ${imp.name}${alias} }` : imp.name;
-			imports.add(`import ${name} from '${imp.path}';`);
-		}
-	}
-
-	if (template.docs?.description) {
-		b.append(`
-		/**
-		 * ${template.docs.description}
-		 */`);
-	}
-
-	let propsInterface = "Record<PropertyKey, any>";
-	if (template.docs?.props) {
-		propsInterface = `{
-			${template.docs.props.map((p) => `${p.description ? `/** ${p.description} */` + "\n" : ""}${p.name}${p.optional ? "?" : ""}: ${p.type};`).join("\n")}
-		}`;
-	}
-
-	b.append(`
-	const ${name} = {
-		/**
-		 * The component's name.
-		 */
-		name: "${name}",
-		/**
-		 * Mounts or hydrates the component into the supplied parent node.
-		 * @param $parent -- The parent node.
-		 * @param $anchor -- The node to mount the component before.
-		 * @param $props -- The values that have been passed into the component as properties.
-		 * @param $context -- Values that have been passed into the component from its ancestors.
-		 * @param $slots -- Functions for rendering children into slot nodes within the component.
-		 */
-		render: ($parent: ParentNode, $anchor: Node | null, $props?: ${propsInterface}, $context?: Record<PropertyKey, any>, $slots?: Record<string, SlotRender>) => {`);
-
-	// Make sure we've got $props if we're going to be using it
-	if (template.props?.length) {
-		b.append(`$props ||= {};`);
-		b.append("");
-	}
-
-	// Redefine $context so that any newly added properties will only be passed to children
-	if (template.contextProps?.length) {
-		b.append(`$context = Object.assign({}, $context);`);
-		b.append("");
-	}
-
-	if (template.script) {
-		// Add default imports
-		if (/\$watch\b/.test(template.script)) imports.add("$watch");
-		if (/\$unwrap\b/.test(template.script)) imports.add("$unwrap");
-		if (/\$run\b/.test(template.script)) imports.add("$run");
-		if (/\$mount\b/.test(template.script)) imports.add("$mount");
-
-		// Add the script
-		b.append(`
-			/* User script */
-			${template.script}
-		`);
-	}
-
-	if (template.markup) {
-		const status: BuildStatus = {
-			imports,
-			props: template.props || [],
-			styleHash: template.styleHash || "",
-			varNames: {},
-			fragmentStack: [],
-			forVarNames: [],
-		};
-
-		// Add the interface
-		b.append("/* User interface */");
-		buildFragmentText(template.markup, status, b);
-		b.append("");
-		buildNode(template.markup, status, b, "$parent", "$anchor", true);
-
-		// Flush any $mount calls that were encountered -- move this to
-		// addFragment, because we also have to flush events and animations
-		if (imports.has("$mount")) {
-			status.imports.add("t_flush");
-			b.append("");
-			b.append("t_flush();");
-		}
-	}
-
-	b.append(`}
-		}
-	`);
 }

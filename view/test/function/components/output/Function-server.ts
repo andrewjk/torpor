@@ -20,6 +20,7 @@ export default function Function(
 	};
 
 	$output += ` <p> The count is ${t_fmt($state.counter)}. </p> </div>`;
+	
 	return $output;
 }
 

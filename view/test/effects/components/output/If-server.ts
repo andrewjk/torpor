@@ -19,6 +19,7 @@ export default function If(
 		$output += ` <p>It's small</p> `;
 	}
 	$output += `<!]><!> </div>`;
+	
 	return $output;
 }
 

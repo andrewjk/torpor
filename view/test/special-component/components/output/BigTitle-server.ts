@@ -15,6 +15,7 @@ export default function BigTitle(
 		$output += $slots["_"](undefined, $context);
 	}
 	$output += `<!]><!> </h2>`;
+	
 	return $output;
 }
 

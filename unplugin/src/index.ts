@@ -1,4 +1,4 @@
-import { type ComponentTemplate, build, parse } from "@tera/view/compile";
+import { type Template, build, parse } from "@tera/view/compile";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
@@ -58,17 +58,19 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 });
 
-function transform(name: string, template: ComponentTemplate, id: string, options?: Options) {
+function transform(name: string, template: Template, id: string, options?: Options) {
 	const built = build(name, template, options);
 	let transformed = built.code;
 
-	if (built.styles && built.styleHash) {
-		// Add a dynamic import for the component's CSS with a name from
-		// the hash and add the styles to a map. Then resolveId will
-		// pass the CSS id onto load, which will load the the actual CSS
-		// from the map
-		transformed = `import '${built.styleHash}.css';\n` + transformed;
-		styles.set(built.styleHash + ".css", built.styles);
+	if (built.styles && built.styleHashes) {
+		for (let i = 0; i < built.styles.length; i++) {
+			// Add a dynamic import for the component's CSS with a name from
+			// the hash and add the styles to a map. Then resolveId will
+			// pass the CSS id onto load, which will load the the actual CSS
+			// from the map
+			transformed = `import '${built.styleHashes[i]}.css';\n` + transformed;
+			styles.set(built.styleHashes[i] + ".css", built.styles[i]);
+		}
 	}
 
 	//printTransformed(transformed);

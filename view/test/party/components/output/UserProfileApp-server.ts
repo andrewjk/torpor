@@ -19,6 +19,7 @@ export default function UserProfileApp(
 	t_props_1["isAvailable"] = true;
 
 	$output += UserProfile(t_props_1, $context)
+	
 	return $output;
 }
 

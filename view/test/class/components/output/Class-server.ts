@@ -12,6 +12,7 @@ export default function For(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div class="hello" class="${$props.red ? "red" : ""} ${$props.green ? "green" : ""} ${$props.blue ? "blue" : ""}"> Hello! </div>`;
+	
 	return $output;
 }
 

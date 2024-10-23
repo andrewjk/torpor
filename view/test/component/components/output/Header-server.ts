@@ -12,6 +12,7 @@ export default function Header(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h2>Hi, ${t_fmt($props.name)}</h2>`;
+	
 	return $output;
 }
 

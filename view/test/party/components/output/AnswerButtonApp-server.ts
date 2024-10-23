@@ -32,6 +32,7 @@ export default function AnswerButtonApp(
 
 	$output += AnswerButton(t_props_1, $context)
 	$output += ` <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div>`;
+	
 	return $output;
 }
 

@@ -31,5 +31,6 @@ export default function NameUpdate(
 		t_text_1.textContent = `Hello ${t_fmt($state.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

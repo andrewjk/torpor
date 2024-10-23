@@ -23,6 +23,7 @@ export default function Article(
 		$output += $slots["footer"](undefined, $context);
 	}
 	$output += `<!]><!> </section>`;
+	
 	return $output;
 }
 

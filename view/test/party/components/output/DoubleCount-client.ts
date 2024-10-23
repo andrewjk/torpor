@@ -33,5 +33,6 @@ export default function DoubleCount(
 		t_text_1.textContent = t_fmt($state.doubleCount);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

@@ -1,5 +1,5 @@
 import type BuildOptions from "../types/BuildOptions";
-import type ComponentTemplate from "../types/ComponentTemplate";
+import type Template from "../types/Template";
 import buildCode from "./build/client/buildCode";
 import buildStyles from "./build/client/buildStyles";
 import buildServerCode from "./build/server/buildServerCode";
@@ -15,17 +15,21 @@ import type BuildResult from "./types/BuildResult";
  */
 export default function build(
 	name: string,
-	template: ComponentTemplate,
+	template: Template,
 	options?: BuildOptions,
 ): BuildResult {
 	let code = options?.server
 		? buildServerCode(name, template, options)
 		: buildCode(name, template, options);
-	let styles = template.style ? buildStyles(name, template) : undefined;
-	let styleHash = template.styleHash;
+	let styles = template.components
+		.map((c) => (c.style && c.styleHash ? buildStyles(c.style, c.styleHash) : undefined))
+		.filter((c) => c !== undefined);
+	let styleHashes = template.components
+		.map((c) => (c.style && c.styleHash ? c.styleHash : undefined))
+		.filter((c) => c !== undefined);
 	return {
 		code,
 		styles,
-		styleHash,
+		styleHashes,
 	};
 }

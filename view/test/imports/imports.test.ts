@@ -30,6 +30,7 @@ import * from 'somewhere-else';
 				},
 			],
 			script: input,
+			components: [],
 		},
 	};
 	expect(output).toEqual(expected);

@@ -27,6 +27,7 @@ export default function FunnyButton(
 		$output += ` <span>No content found</span> `;
 	}
 	$output += `<!]><!> </button>`;
+	
 	return $output;
 }
 

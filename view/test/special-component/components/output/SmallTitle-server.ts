@@ -15,6 +15,7 @@ export default function SmallTitle(
 		$output += $slots["_"](undefined, $context);
 	}
 	$output += `<!]><!> </h6>`;
+	
 	return $output;
 }
 

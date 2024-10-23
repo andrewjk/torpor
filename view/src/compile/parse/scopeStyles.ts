@@ -7,11 +7,13 @@ import type ParseStatus from "./ParseStatus";
 
 export default function scopeStyles(status: ParseStatus) {
 	let selectors: string[] = [];
-	if (status.style && status.styleHash && status.template) {
-		for (let block of status.style.blocks) {
-			collectStyleSelectors(block, selectors);
+	for (let component of status.components) {
+		if (component.style && component.styleHash && component.markup) {
+			for (let block of component.style.blocks) {
+				collectStyleSelectors(block, selectors);
+			}
+			scopeStylesOnNode(component.markup, selectors, component.styleHash);
 		}
-		scopeStylesOnNode(status.template, selectors, status.styleHash);
 	}
 }
 
@@ -22,9 +24,9 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[], styleHash: s
 			for (let a of node.attributes) {
 				if (a.name === "class" || a.name.startsWith("class:")) {
 					addClass = true;
-				} else if (a.name === "id") {
+				} else if (a.name === "id" && a.value) {
 					addClass = selectors.includes(`#${trimQuotes(a.value)}`);
-				} else if (a.name === "class") {
+				} else if (a.name === "class" && a.value) {
 					addClass = selectors.includes(`.${trimQuotes(a.value)}`);
 				}
 				if (addClass) break;
@@ -32,7 +34,7 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[], styleHash: s
 		}
 		if (addClass) {
 			let classAttribute = node.attributes.find((a) => a.name === "class");
-			if (classAttribute) {
+			if (classAttribute && classAttribute.value) {
 				classAttribute.value = `"${trimQuotes(classAttribute.value)} tera-${styleHash}"`;
 			} else {
 				node.attributes.push({

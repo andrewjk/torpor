@@ -1,3 +1,4 @@
+import TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
 import isSpaceNode from "../types/nodes/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
@@ -7,8 +8,9 @@ import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
+import addError from "./utils/addError";
+import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
-import isSpaceChar from "./utils/isSpaceChar";
 
 export default function parseCode(name: string, source: string): ParseResult {
 	const status: ParseStatus = {
@@ -16,25 +18,32 @@ export default function parseCode(name: string, source: string): ParseResult {
 		source,
 		i: 0,
 		marker: 0,
+		level: 0,
+		imports: [],
 		script: "",
+		components: [],
+		current: {},
 		errors: [],
 	};
 
 	// Get all imports, so that we can tell whether a tag is a component
 	parseImports(status);
 
-	// Get all usages of $props.name and $props["name"]
-	// Get all usages of $context.name and $context["name"]
-	const props = getPropsUsage(source);
-	const contextProps = getContextUsage(source);
-
 	for (; status.i < source.length; status.i++) {
 		if (consumeScriptComments(status)) {
 			// Keep going
+		} else if (status.source[status.i] === "{") {
+			status.level += 1;
+		} else if (status.source[status.i] === "}") {
+			status.level -= 1;
+			if (status.level === 0) {
+				endComponent(status);
+			}
 		} else if (accept("function", status)) {
 			// If the function name starts with a capital, parse it as a component
 			consumeSpace(status);
 			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
+				status.current.start = status.i;
 				parseComponentParams(status);
 			}
 		} else if (accept("@render", status, false)) {
@@ -44,18 +53,6 @@ export default function parseCode(name: string, source: string): ParseResult {
 		}
 	}
 	status.script += source.substring(status.marker, source.length);
-
-	// If the top-level element is <html> and there is whitespace after it,
-	// delete the whitespace, as that's what browsers seem to do
-	// It may be better instead to create whitespace if we don't find it when
-	// hydrating...
-	if (
-		status.template &&
-		status.template.tagName === "html" &&
-		isSpaceNode(status.template.children[0])
-	) {
-		status.template.children.splice(1, 1);
-	}
 
 	scopeStyles(status);
 
@@ -67,25 +64,30 @@ export default function parseCode(name: string, source: string): ParseResult {
 		template: ok
 			? {
 					imports: status.imports,
-					script: status.script || undefined,
-					params: status.params || undefined,
-					markup: status.template
-						? {
-								type: "root",
-								children: [status.template],
-							}
-						: undefined,
-					childComponents: status.childTemplates,
-					style: status.style,
-					styleHash: status.styleHash,
-					props: props.length ? props : undefined,
-					contextProps: contextProps.length ? contextProps : undefined,
+					script: status.script,
+					components: status.components.map((c) => {
+						return {
+							params: c.params,
+							markup: c.markup
+								? {
+										type: "root",
+										children: [c.markup],
+									}
+								: undefined,
+							style: c.style,
+							styleHash: c.styleHash,
+							props: c.props,
+							contextProps: c.contextProps,
+						} satisfies TemplateComponent;
+					}),
 				}
 			: undefined,
 	};
 }
 
 function parseComponentParams(status: ParseStatus) {
+	const componentName = consumeAlphaNumeric(status);
+
 	let start = -1;
 	let end = -1;
 	let level = 0;
@@ -109,7 +111,7 @@ function parseComponentParams(status: ParseStatus) {
 
 	status.script += status.source.substring(status.marker, start) + "/* @params */";
 
-	status.params = status.source.substring(start, end).trim() || undefined;
+	status.current.params = status.source.substring(start, end).trim() || undefined;
 
 	status.marker = end;
 	status.i = status.marker;
@@ -117,6 +119,8 @@ function parseComponentParams(status: ParseStatus) {
 	accept(")", status);
 	consumeSpace(status);
 	accept("{", status);
+	status.level += 1;
+
 	const space = consumeSpace(status);
 	status.script += status.source.substring(status.marker, status.i) + "/* @start */" + space;
 
@@ -125,6 +129,10 @@ function parseComponentParams(status: ParseStatus) {
 }
 
 function parseComponentRender(status: ParseStatus) {
+	if (status.current.markup) {
+		addError(status, `Multiple @render sections`, status.i);
+	}
+
 	status.script += status.source.substring(status.marker, status.i) + "/* @render */";
 
 	accept("@render", status);
@@ -133,11 +141,16 @@ function parseComponentRender(status: ParseStatus) {
 		parseMarkup(status, status.source);
 		accept("}", status);
 	}
+
 	status.marker = status.i;
 }
 
 function parseComponentStyle(status: ParseStatus) {
-	status.script += status.source.substring(status.marker, status.i); // + "/* @style */";
+	if (status.current.style) {
+		addError(status, `Multiple @style sections`, status.i);
+	}
+
+	status.script += status.source.substring(status.marker, status.i);
 
 	let start = -1;
 	let end = -1;
@@ -186,11 +199,42 @@ function parseComponentStyle(status: ParseStatus) {
 	status.i = start;
 	parseStyleElement(styleSource.trim(), status);
 
-	status.marker = end + 2;
-	status.i = status.marker;
+	status.i = end + 2;
+	status.marker = status.i;
 }
 
-function getPropsUsage(source: string): string[] {
+function endComponent(status: ParseStatus) {
+	status.script += status.source.substring(status.marker, status.i);
+	if (status.script.endsWith("\n")) {
+		status.script += "\t/* @end */\n";
+	} else {
+		status.script += "/* @end */";
+	}
+
+	// Get all usages of $props.name and $props["name"]
+	// Get all usages of $context.name and $context["name"]
+	const componentSource = status.source.substring(status.current.start || 0, status.i);
+	status.current.props = getPropsUsage(componentSource);
+	status.current.contextProps = getContextUsage(componentSource);
+
+	// If the top-level element is <html> and there is whitespace after it,
+	// delete the whitespace, as that's what browsers seem to do. It may be
+	// better instead to create whitespace if we don't find it when hydrating...
+	if (
+		status.current.markup &&
+		status.current.markup.tagName === "html" &&
+		isSpaceNode(status.current.markup.children[0])
+	) {
+		status.current.markup.children.splice(1, 1);
+	}
+
+	status.components.push(status.current);
+	status.current = {};
+
+	status.marker = status.i;
+}
+
+function getPropsUsage(source: string): string[] | undefined {
 	const propsMatches = source.matchAll(/\$props\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const props: string[] = [];
 	for (let match of propsMatches) {
@@ -199,10 +243,10 @@ function getPropsUsage(source: string): string[] {
 			props.push(name);
 		}
 	}
-	return props;
+	return props.length ? props : undefined;
 }
 
-function getContextUsage(source: string): string[] {
+function getContextUsage(source: string): string[] | undefined {
 	const contextsMatches = source.matchAll(/\$context\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const contexts: string[] = [];
 	for (let match of contextsMatches) {
@@ -211,7 +255,7 @@ function getContextUsage(source: string): string[] {
 			contexts.push(name);
 		}
 	}
-	return contexts;
+	return contexts.length ? contexts : undefined;
 }
 
 function consumeScriptComments(status: ParseStatus): boolean {

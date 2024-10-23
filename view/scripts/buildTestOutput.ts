@@ -11,7 +11,7 @@ async function run() {
 		absolute: true,
 		cwd: path.resolve("./test"),
 	});
-	await Promise.all(files.map((f) => buildOutputFiles(f)));
+	await Promise.all(files.sort().map((f) => buildOutputFiles(f)));
 	console.log("Done\n");
 }
 

@@ -13,5 +13,6 @@ export default function Const(
 	$output += `<div> `;
 	const name = "Boris";
 	$output += ` <p> Hello, ${t_fmt(name)}! </p> </div>`;
+	
 	return $output;
 }

@@ -16,6 +16,7 @@ export default function Name(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h1>Hello ${t_fmt($state.name)}</h1>`;
+	
 	return $output;
 }
 

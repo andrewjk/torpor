@@ -27,6 +27,7 @@ export default function ColorSelect(
 		$output += `<!^> <option ${color.id ? `value="${color.id}"` : ''} ${color.isDisabled ? `disabled="${color.isDisabled}"` : ''}> ${t_fmt(color.text)} </option> `;
 	}
 	$output += `<!]><!> </select> </div>`;
+	
 	return $output;
 }
 

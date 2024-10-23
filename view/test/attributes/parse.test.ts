@@ -19,13 +19,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
+			components: [
+				{
+					markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -47,13 +53,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
+			components: [
+				{
+					markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -75,13 +87,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
+			components: [
+				{
+					markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -101,13 +119,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("href", "http://example.com")], [], true)]),
+			components: [
+				{
+					markup: root([el("a", [att("href", "http://example.com")], [], true)]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -129,23 +153,29 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([
-				el(
-					"a",
-					[
-						att("href1", '"http://example.com"'),
-						att("href2", "'http://example.com'"),
-						att("href3", "http://example.com"),
-					],
-					[text("Link")],
-				),
-			]),
+			components: [
+				{
+					markup: root([
+						el(
+							"a",
+							[
+								att("href1", '"http://example.com"'),
+								att("href2", "'http://example.com'"),
+								att("href3", "http://example.com"),
+							],
+							[text("Link")],
+						),
+					]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -165,13 +195,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("input", [att("text"), att("required")], [], true)]),
+			components: [
+				{
+					markup: root([el("input", [att("text"), att("required")], [], true)]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -193,13 +229,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
+			components: [
+				{
+					markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -223,15 +265,25 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([
-				el("button", [att("onclick", "{() => {\n\t\t\tincrement();\n\t\t}}")], [text("Increment")]),
-			]),
+			components: [
+				{
+					markup: root([
+						el(
+							"button",
+							[att("onclick", "{() => {\n\t\t\tincrement();\n\t\t}}")],
+							[text("Increment")],
+						),
+					]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -251,13 +303,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("{href}")])]),
+			components: [
+				{
+					markup: root([el("a", [att("{href}")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);
@@ -277,13 +335,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("a", [att("{href1}"), att("{href2}")])]),
+			components: [
+				{
+					markup: root([el("a", [att("{href1}"), att("{href2}")])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);

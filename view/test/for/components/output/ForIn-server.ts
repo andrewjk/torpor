@@ -16,6 +16,7 @@ export default function ForIn(
 		$output += `<!^> <p> ${t_fmt($props.item[key])} </p> `;
 	}
 	$output += `<!]><!> </section>`;
+	
 	return $output;
 }
 

@@ -25,6 +25,7 @@ export default function Time(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<p>Current time: ${t_fmt($state.time)}</p>`;
+	
 	return $output;
 }
 

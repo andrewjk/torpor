@@ -23,13 +23,19 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([el("section", [], [el("p", [], [text("The  content")])])]),
+			components: [
+				{
+					markup: root([el("section", [], [el("p", [], [text("The  content")])])]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);

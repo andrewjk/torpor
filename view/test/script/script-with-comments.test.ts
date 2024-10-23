@@ -19,6 +19,7 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
@@ -28,8 +29,10 @@ export default function Test(/* @params */) {
 	@render {
 	*/
 	const z = 15;
+	/* @end */
 }
 `,
+			components: [{}],
 		},
 	};
 	expect(output).toEqual(expected);

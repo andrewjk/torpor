@@ -23,26 +23,32 @@ export default function Test() {
 		ok: true,
 		errors: [],
 		template: {
+			imports: [],
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
+	/* @end */
 }
 `,
-			markup: root([
-				el(
-					"section",
-					[],
-					[
-						control("@for group", "", [
-							control("@for", "for (let item of things)", [
-								control("@key", "key = item.id"),
-								el("p", [], [text("{item.name}")]),
-							]),
-						]),
-					],
-				),
-			]),
+			components: [
+				{
+					markup: root([
+						el(
+							"section",
+							[],
+							[
+								control("@for group", "", [
+									control("@for", "for (let item of things)", [
+										control("@key", "key = item.id"),
+										el("p", [], [text("{item.name}")]),
+									]),
+								]),
+							],
+						),
+					]),
+				},
+			],
 		},
 	};
 	expect(output).toEqual(expected);

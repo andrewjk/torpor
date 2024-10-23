@@ -34,6 +34,7 @@ export default function TrafficLight(
 		$output += ` <span>GO</span> `;
 	}
 	$output += `<!]><!> </p> </div>`;
+	
 	return $output;
 }
 

@@ -28,5 +28,6 @@ export default function Element(
 		t_add_fragment(t_fragment_1, t_element_1, null);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

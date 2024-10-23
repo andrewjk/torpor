@@ -17,6 +17,7 @@ export default function Header(
 		$output += ` Default header... `;
 	}
 	$output += `<!]><!> </h2>`;
+	
 	return $output;
 }
 

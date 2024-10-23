@@ -29,5 +29,6 @@ export default function Header(
 		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1);
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

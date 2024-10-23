@@ -12,6 +12,7 @@ export default function Html(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<p> <![>${$props.html}<!]><!> </p>`;
+	
 	return $output;
 }
 

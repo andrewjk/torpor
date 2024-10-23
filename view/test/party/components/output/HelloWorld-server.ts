@@ -11,6 +11,7 @@ export default function HelloWorld(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h1>Hello world</h1>`;
+	
 	return $output;
 }
 

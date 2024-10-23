@@ -12,6 +12,7 @@ export default function Element(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<${$props.tag}> Hello! </${$props.tag}>`;
+	
 	return $output;
 }
 

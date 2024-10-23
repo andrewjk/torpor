@@ -16,8 +16,8 @@ export default function parseMarkup(status: ParseStatus, source: string) {
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (accept("<", status, false)) {
 			// Parse the element
-			if (status.template === undefined) {
-				status.template = parseElement(status);
+			if (status.current.markup === undefined) {
+				status.current.markup = parseElement(status);
 			} else {
 				const start = status.i;
 				const element = parseElement(status);

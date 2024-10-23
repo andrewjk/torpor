@@ -95,10 +95,10 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	// If this is a component element, add a default <:fill> node
+	// HACK: For now, we just treat all tags starting with a capital as components
 	if (
-		element.tagName === status.name ||
-		status.imports?.some((i) => i.name === element.tagName) ||
-		status.childTemplates?.some((c) => c.name === element.tagName)
+		!element.tagName.startsWith(":") &&
+		element.tagName.substring(0, 1) === element.tagName.substring(0, 1).toLocaleUpperCase()
 	) {
 		element.type = "component";
 		slottifyChildNodes(element);

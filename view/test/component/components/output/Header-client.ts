@@ -26,5 +26,6 @@ export default function Header(
 		t_text_1.textContent = `Hi, ${t_fmt($props.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

@@ -87,11 +87,14 @@ export function att(name: string, value?: string): Attribute {
 }
 
 export function trimParsed(result: ParseResult): ParseResult {
-	if (result.template?.markup) {
-		trimElement(result.template.markup);
-	}
-	if (result.template?.styleHash) {
-		result.template.styleHash = undefined;
+	const component = result.template?.components[0];
+	if (component) {
+		if (component.markup) {
+			trimElement(component.markup);
+		}
+		if (component.styleHash) {
+			component.styleHash = undefined;
+		}
 	}
 	return result;
 }

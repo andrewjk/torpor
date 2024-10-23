@@ -32,6 +32,7 @@ export default function Component(
 
 	$output += components[$props.self](t_props_1, $context, t_slots_1)
 	$output += `<!]><!>`;
+	
 	return $output;
 }
 

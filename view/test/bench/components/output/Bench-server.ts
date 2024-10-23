@@ -128,6 +128,7 @@ export default function Bench(
 		$output += `<!^>  <tr class="${$state.selected === row.id ? "selected" : ""}"> <td class="col-md-1">${t_fmt(row.id)}</td> <td class="col-md-4"> <a> ${t_fmt(row.label)} </a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `;
 	}
 	$output += `<!]><!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div>`;
+	
 	return $output;
 }
 

@@ -1,5 +1,6 @@
 export default interface BuildResult {
 	code: string;
-	styles?: string;
-	styleHash?: string;
+	// TODO: interface
+	styles?: string[];
+	styleHashes?: string[];
 }

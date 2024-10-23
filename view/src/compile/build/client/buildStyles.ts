@@ -1,25 +1,14 @@
-import type ComponentTemplate from "../../../types/ComponentTemplate";
+import type Template from "../../../types/Template";
 import type Attribute from "../../types/nodes/Attribute";
+import Style from "../../types/styles/Style";
 import type StyleBlock from "../../types/styles/StyleBlock";
 import Builder from "../../utils/Builder";
 
-export default function buildStyles(name: string, template: ComponentTemplate): string {
+export default function buildStyles(style: Style, styleHash: string): string {
 	const b = new Builder();
 
-	if (template.style && template.styleHash) {
-		for (let block of template.style.blocks) {
-			buildStyleBlock(block, b, template.styleHash);
-		}
-
-		if (template.childComponents) {
-			for (let child of template.childComponents) {
-				if (child.style && child.styleHash) {
-					for (let block of child.style.blocks) {
-						buildStyleBlock(block, b, child.styleHash);
-					}
-				}
-			}
-		}
+	for (let block of style.blocks) {
+		buildStyleBlock(block, b, styleHash);
 	}
 
 	return b.toString();

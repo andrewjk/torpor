@@ -11,6 +11,7 @@ export default function Console(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div>  </div>`;
+	
 	return $output;
 }
 

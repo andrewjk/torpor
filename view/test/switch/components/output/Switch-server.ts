@@ -33,6 +33,7 @@ export default function Switch(
 		}
 	}
 	$output += `<!]><!> </div>`;
+	
 	return $output;
 }
 

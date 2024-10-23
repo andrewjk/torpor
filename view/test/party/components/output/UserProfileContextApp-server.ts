@@ -28,6 +28,7 @@ export default function UserProfileContextApp(
 
 	$output += UserProfileContext(undefined, $context)
 	$output += ` </div>`;
+	
 	return $output;
 }
 

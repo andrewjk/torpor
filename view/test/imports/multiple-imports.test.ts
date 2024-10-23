@@ -175,6 +175,7 @@ import {
 				},
 			],
 			script: input,
+			components: [],
 		},
 	};
 	expect(output).toEqual(expected);

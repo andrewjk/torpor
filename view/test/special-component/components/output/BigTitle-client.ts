@@ -25,5 +25,6 @@ export default function BigTitle(
 		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

@@ -64,5 +64,6 @@ export default function ArrayIndexes(
 	);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }
 

@@ -22,6 +22,7 @@ export default function List(
 		$output += `<!]><!> </li> `;
 	}
 	$output += `<!]><!> </ul>`;
+	
 	return $output;
 }
 

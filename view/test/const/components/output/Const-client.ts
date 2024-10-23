@@ -28,4 +28,5 @@ export default function Const(
 		t_text_1.textContent = ` Hello, ${t_fmt(name)}! `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	
 }

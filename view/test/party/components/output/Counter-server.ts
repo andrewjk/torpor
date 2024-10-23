@@ -20,6 +20,7 @@ export default function Counter(
 	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> </div>`;
+	
 	return $output;
 }
 

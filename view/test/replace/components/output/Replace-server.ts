@@ -17,6 +17,7 @@ export default function Replace(
 	$props.name;
 	$output += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
 	$output += `<!]><!> </div>`;
+	
 	return $output;
 }
 

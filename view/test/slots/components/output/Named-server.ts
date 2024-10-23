@@ -25,6 +25,7 @@ export default function Named(
 	}
 
 	$output += Article(undefined, $context, t_slots_1)
+	
 	return $output;
 }
 

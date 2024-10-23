@@ -9,7 +9,11 @@ test("empty file", () => {
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
-		template: {},
+		template: {
+			imports: [],
+			script: "",
+			components: [],
+		},
 	};
 	expect(output).toEqual(expected);
 });
