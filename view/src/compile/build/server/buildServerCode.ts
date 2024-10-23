@@ -4,11 +4,7 @@ import Builder from "../../utils/Builder";
 import BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
-export default function buildServerCode(
-	name: string,
-	template: Template,
-	options?: BuildOptions,
-): string {
+export default function buildServerCode(template: Template, options?: BuildOptions): string {
 	let b = new Builder();
 
 	// Gather imports as we go so they can be placed at the top

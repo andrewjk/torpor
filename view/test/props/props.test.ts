@@ -11,7 +11,7 @@ export default function Test() {
 	}
 }
 `;
-	const output = parse("x", input);
+	const output = parse(input);
 	const expected = ["name", "age", "address"];
 	expect(output.template?.components[0].props).toEqual(expected);
 });

@@ -24,7 +24,7 @@ export default function hydrateComponent(
 
 	const name = path.basename(componentPath, ".tera");
 	const source = fs.readFileSync(componentPath, "utf8");
-	const parsed = parse(name, source);
+	const parsed = parse(source);
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
@@ -33,27 +33,27 @@ export default function hydrateComponent(
 		const importName = imp[1];
 		const importPath = path.join(path.dirname(componentPath), imp[2]);
 		const importSource = fs.readFileSync(importPath, "utf8");
-		const importParsed = parse(importName, importSource);
+		const importParsed = parse(importSource);
 		expect(importParsed.ok).toBe(true);
 		expect(importParsed.template).not.toBeUndefined();
-		const importClient = build(importName, importParsed.template!);
+		const importClient = build(importParsed.template!);
 		if (debugPrint) {
 			console.log("=== import client");
 			console.log(importClient.code);
 			console.log("===");
 		}
-		const importServer = build(importName, importParsed.template!, { server: true });
+		const importServer = build(importParsed.template!, { server: true });
 		imports.push({ importPath, importClient, importServer });
 	}
 
-	const client = build(component.name, parsed.template!);
+	const client = build(parsed.template!);
 	if (debugPrint) {
 		console.log("=== client");
 		console.log(client.code);
 		console.log("===");
 	}
 
-	const server = build(component.name, parsed.template!, { server: true });
+	const server = build(parsed.template!, { server: true });
 	const code = tsb(`
 ${
 	imports

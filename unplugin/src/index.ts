@@ -32,10 +32,10 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 			?.replace(/\.tera$/, "")!;
 
 		// Try to parse the code
-		const parsed = parse(name, code);
+		const parsed = parse(code);
 		if (parsed.ok && parsed.template) {
 			// Transform for server or client
-			return transform(name, parsed.template, id, options);
+			return transform(parsed.template, id, options);
 		} else {
 			console.log("\nERRORS\n======");
 			let errorText = "";
@@ -58,8 +58,8 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 });
 
-function transform(name: string, template: Template, id: string, options?: Options) {
-	const built = build(name, template, options);
+function transform(template: Template, id: string, options?: Options) {
+	const built = build(template, options);
 	let transformed = built.code;
 
 	if (built.styles) {

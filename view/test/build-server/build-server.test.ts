@@ -17,11 +17,11 @@ test("build for the server and render to HTML", () => {
 	}
 	const source = fs.readFileSync(path).toString();
 
-	const parsed = parse("x", source);
+	const parsed = parse(source);
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
-	const rendered = build("IfNested", parsed.template!, { server: true });
+	const rendered = build(parsed.template!, { server: true });
 	const code = tsb(`
 ${rendered.code.replace("export default ", "").replace("import ", "//import ")}
 IfNested;

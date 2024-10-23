@@ -14,7 +14,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -48,7 +48,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -82,7 +82,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -114,7 +114,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -148,7 +148,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -190,7 +190,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -224,7 +224,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -260,7 +260,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -298,7 +298,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],
@@ -330,7 +330,7 @@ export default function Test() {
 }
 `;
 
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

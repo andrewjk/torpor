@@ -11,7 +11,7 @@ export default function Test() {
 	const z = \`\\\`@render {\`;
 }
 `;
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

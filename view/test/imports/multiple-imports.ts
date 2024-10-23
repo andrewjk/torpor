@@ -23,7 +23,7 @@ import {
 	export12
 } from "module-name";
 `;
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

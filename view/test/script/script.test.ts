@@ -9,7 +9,7 @@ export default function Test() {
 	const x = 5;
 }
 `;
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

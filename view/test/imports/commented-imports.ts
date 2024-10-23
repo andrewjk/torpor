@@ -8,7 +8,7 @@ test("commented imports", () => {
 //import * from 'somewhere';
 import * from 'somewhere-else';
 `;
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

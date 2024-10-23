@@ -5,7 +5,7 @@ import { trimParsed } from "../helpers";
 
 test("empty file", () => {
 	const input = "";
-	const output = trimParsed(parse("x", input));
+	const output = trimParsed(parse(input));
 	const expected: ParseResult = {
 		ok: true,
 		errors: [],

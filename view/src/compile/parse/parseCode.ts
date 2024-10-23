@@ -10,7 +10,7 @@ import accept from "./utils/accept";
 import addError from "./utils/addError";
 import consumeSpace from "./utils/consumeSpace";
 
-export default function parseCode(name: string, source: string): ParseResult {
+export default function parseCode(source: string): ParseResult {
 	const status: ParseStatus = {
 		source,
 		i: 0,

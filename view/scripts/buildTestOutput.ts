@@ -20,10 +20,10 @@ async function buildOutputFiles(file: string) {
 
 	const name = path.basename(file, ".tera");
 	const source = await fs.readFile(file, "utf8");
-	const parsed = parse(name, source);
+	const parsed = parse(source);
 	if (parsed.ok && parsed.template) {
-		let serverCode = build(name, parsed.template, { server: true }).code;
-		let clientCode = build(name, parsed.template).code;
+		let serverCode = build(parsed.template, { server: true }).code;
+		let clientCode = build(parsed.template).code;
 		let typesCode = buildType(name, parsed.template);
 		await fs.writeFile(file.replace(".tera", ".d.ts"), typesCode);
 

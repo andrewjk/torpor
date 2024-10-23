@@ -39,11 +39,7 @@ const importsMap: Record<string, string> = {
 	SlotRender: 'import type { SlotRender } from "${folder}";',
 };
 
-export default function buildCode(
-	name: string,
-	template: Template,
-	options?: BuildOptions,
-): string {
+export default function buildCode(template: Template, options?: BuildOptions): string {
 	let b = new Builder();
 
 	// Gather imports as we go so they can be placed at the top
@@ -51,7 +47,7 @@ export default function buildCode(
 	imports.add("SlotRender");
 
 	// Build the component
-	buildTemplate(name, template, imports, b);
+	buildTemplate(template, imports, b);
 
 	// Add the gathered imports in alphabetical order
 	if (imports.size) {
@@ -65,7 +61,7 @@ export default function buildCode(
 	return b.toString();
 }
 
-function buildTemplate(name: string, template: Template, imports: Set<string>, b: Builder) {
+function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 	let script = template.script || "";
 
 	// Add default imports
