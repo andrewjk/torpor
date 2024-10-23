@@ -4,6 +4,9 @@ import accept from "./utils/accept";
 import addError from "./utils/addError";
 
 export default function parseMarkup(status: ParseStatus, source: string) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
 	while (status.i < source.length) {
 		if (accept("<!--", status)) {
 			// It's a comment, swallow it
@@ -16,8 +19,8 @@ export default function parseMarkup(status: ParseStatus, source: string) {
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (accept("<", status, false)) {
 			// Parse the element
-			if (status.current.markup === undefined) {
-				status.current.markup = parseElement(status);
+			if (current.markup === undefined) {
+				current.markup = parseElement(status);
 			} else {
 				const start = status.i;
 				const element = parseElement(status);

@@ -129,10 +129,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// content. Anchors will be created for <:slot> nodes and fragments will
 			// be created for the <:fill> content
 			slottifyChildNodes(element);
-		} else if (element.tagName === ":self") {
-			element.tagName = status.name;
-			element.type = "component";
-			slottifyChildNodes(element);
 		} else if (element.tagName === ":component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
 			if (selfAttribute && selfAttribute.value) {

@@ -113,7 +113,7 @@ function buildTemplate(name: string, template: Template, imports: Set<string>, b
 				const status: BuildStatus = {
 					imports,
 					props: current.props || [],
-					styleHash: current.styleHash || "",
+					styleHash: current.style?.hash || "",
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],

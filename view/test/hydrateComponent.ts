@@ -6,6 +6,7 @@ import tsb from "ts-blank-space";
 import { expect } from "vitest";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
+import BuildResult from "../src/compile/types/BuildResult";
 import type Component from "../src/types/Component";
 
 const debugPrint = false;
@@ -27,21 +28,23 @@ export default function hydrateComponent(
 	expect(parsed.ok).toBe(true);
 	expect(parsed.template).not.toBeUndefined();
 
-	const imports = parsed.template!.imports?.map((imp) => {
-		let importPath = path.join(path.dirname(componentPath), imp.path);
-		let importSource = fs.readFileSync(importPath, "utf8");
-		let importParsed = parse(imp.name, importSource);
+	let imports: { importPath: string; importClient: BuildResult; importServer: BuildResult }[] = [];
+	for (let imp of source.matchAll(/^import\s+(.+?)\s+from\s+(?:'|")(.+\.tera)(?:'|");*$/gm)) {
+		const importName = imp[1];
+		const importPath = path.join(path.dirname(componentPath), imp[2]);
+		const importSource = fs.readFileSync(importPath, "utf8");
+		const importParsed = parse(importName, importSource);
 		expect(importParsed.ok).toBe(true);
 		expect(importParsed.template).not.toBeUndefined();
-		const importClient = build(imp.name, importParsed.template!);
+		const importClient = build(importName, importParsed.template!);
 		if (debugPrint) {
 			console.log("=== import client");
 			console.log(importClient.code);
 			console.log("===");
 		}
-		const importServer = build(imp.name, importParsed.template!, { server: true });
-		return { importPath, importClient, importServer };
-	});
+		const importServer = build(importName, importParsed.template!, { server: true });
+		imports.push({ importPath, importClient, importServer });
+	}
 
 	const client = build(component.name, parsed.template!);
 	if (debugPrint) {

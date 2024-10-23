@@ -1,12 +1,12 @@
-export default function AccordionList() {
-	import {
-		Accordion,
-		AccordionItem,
-		AccordionHeader,
-		AccordionTrigger,
-		AccordionContent,
-	} from "../../../src/Accordion/index";
+import {
+	Accordion,
+	AccordionItem,
+	AccordionHeader,
+	AccordionTrigger,
+	AccordionContent,
+} from "../../../src/Accordion/index";
 
+export default function AccordionList() {
 	@render {
 		<Accordion value={$props.value}>
 			@for (let item of $props.items) {

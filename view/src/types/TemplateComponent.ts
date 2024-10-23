@@ -5,7 +5,6 @@ export default interface TemplateComponent {
 	params?: string;
 	markup?: RootNode;
 	style?: Style;
-	styleHash?: string;
 	props?: string[];
 	contextProps?: string[];
 }

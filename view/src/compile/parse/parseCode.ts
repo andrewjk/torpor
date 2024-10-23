@@ -1,20 +1,17 @@
-import TemplateComponent from "../../types/TemplateComponent";
+import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
 import isSpaceNode from "../types/nodes/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
-import ParseStatus from "./ParseStatus";
-import parseImports from "./parseImports";
+import type ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
-import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
 
 export default function parseCode(name: string, source: string): ParseResult {
 	const status: ParseStatus = {
-		name,
 		source,
 		i: 0,
 		marker: 0,
@@ -22,14 +19,10 @@ export default function parseCode(name: string, source: string): ParseResult {
 		imports: [],
 		script: "",
 		components: [],
-		current: {},
 		errors: [],
 	};
 
-	// Get all imports, so that we can tell whether a tag is a component
-	parseImports(status);
-
-	for (; status.i < source.length; status.i++) {
+	for (status.i; status.i < source.length; status.i++) {
 		if (consumeScriptComments(status)) {
 			// Keep going
 		} else if (status.source[status.i] === "{") {
@@ -43,8 +36,7 @@ export default function parseCode(name: string, source: string): ParseResult {
 			// If the function name starts with a capital, parse it as a component
 			consumeSpace(status);
 			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
-				status.current.start = status.i;
-				parseComponentParams(status);
+				startComponent(status);
 			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
@@ -75,7 +67,6 @@ export default function parseCode(name: string, source: string): ParseResult {
 									}
 								: undefined,
 							style: c.style,
-							styleHash: c.styleHash,
 							props: c.props,
 							contextProps: c.contextProps,
 						} satisfies TemplateComponent;
@@ -85,8 +76,10 @@ export default function parseCode(name: string, source: string): ParseResult {
 	};
 }
 
-function parseComponentParams(status: ParseStatus) {
-	const componentName = consumeAlphaNumeric(status);
+function startComponent(status: ParseStatus) {
+	status.components.push({ start: status.i });
+	const current = status.components.at(-1);
+	if (!current) return;
 
 	let start = -1;
 	let end = -1;
@@ -111,7 +104,7 @@ function parseComponentParams(status: ParseStatus) {
 
 	status.script += status.source.substring(status.marker, start) + "/* @params */";
 
-	status.current.params = status.source.substring(start, end).trim() || undefined;
+	current.params = status.source.substring(start, end).trim() || undefined;
 
 	status.marker = end;
 	status.i = status.marker;
@@ -129,7 +122,10 @@ function parseComponentParams(status: ParseStatus) {
 }
 
 function parseComponentRender(status: ParseStatus) {
-	if (status.current.markup) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
+	if (current.markup) {
 		addError(status, `Multiple @render sections`, status.i);
 	}
 
@@ -146,7 +142,10 @@ function parseComponentRender(status: ParseStatus) {
 }
 
 function parseComponentStyle(status: ParseStatus) {
-	if (status.current.style) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
+	if (current.style) {
 		addError(status, `Multiple @style sections`, status.i);
 	}
 
@@ -204,6 +203,9 @@ function parseComponentStyle(status: ParseStatus) {
 }
 
 function endComponent(status: ParseStatus) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
 	status.script += status.source.substring(status.marker, status.i);
 	if (status.script.endsWith("\n")) {
 		status.script += "\t/* @end */\n";
@@ -213,23 +215,20 @@ function endComponent(status: ParseStatus) {
 
 	// Get all usages of $props.name and $props["name"]
 	// Get all usages of $context.name and $context["name"]
-	const componentSource = status.source.substring(status.current.start || 0, status.i);
-	status.current.props = getPropsUsage(componentSource);
-	status.current.contextProps = getContextUsage(componentSource);
+	const componentSource = status.source.substring(current.start || 0, status.i);
+	current.props = getPropsUsage(componentSource);
+	current.contextProps = getContextUsage(componentSource);
 
 	// If the top-level element is <html> and there is whitespace after it,
 	// delete the whitespace, as that's what browsers seem to do. It may be
 	// better instead to create whitespace if we don't find it when hydrating...
 	if (
-		status.current.markup &&
-		status.current.markup.tagName === "html" &&
-		isSpaceNode(status.current.markup.children[0])
+		current.markup &&
+		current.markup.tagName === "html" &&
+		isSpaceNode(current.markup.children[0])
 	) {
-		status.current.markup.children.splice(1, 1);
+		current.markup.children.splice(1, 1);
 	}
-
-	status.components.push(status.current);
-	status.current = {};
 
 	status.marker = status.i;
 }

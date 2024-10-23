@@ -22,14 +22,12 @@ export default function build(
 		? buildServerCode(name, template, options)
 		: buildCode(name, template, options);
 	let styles = template.components
-		.map((c) => (c.style && c.styleHash ? buildStyles(c.style, c.styleHash) : undefined))
-		.filter((c) => c !== undefined);
-	let styleHashes = template.components
-		.map((c) => (c.style && c.styleHash ? c.styleHash : undefined))
+		.map((c) =>
+			c.style ? { style: buildStyles(c.style, c.style.hash), hash: c.style.hash } : undefined,
+		)
 		.filter((c) => c !== undefined);
 	return {
 		code,
 		styles,
-		styleHashes,
 	};
 }

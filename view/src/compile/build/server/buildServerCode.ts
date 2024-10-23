@@ -81,7 +81,7 @@ function buildServerTemplate(
 			if (current.markup) {
 				const status: BuildServerStatus = {
 					output: "",
-					styleHash: current.styleHash || "",
+					styleHash: current.style?.hash || "",
 					varNames: {},
 					options,
 				};

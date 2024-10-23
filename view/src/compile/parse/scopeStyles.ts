@@ -8,11 +8,11 @@ import type ParseStatus from "./ParseStatus";
 export default function scopeStyles(status: ParseStatus) {
 	let selectors: string[] = [];
 	for (let component of status.components) {
-		if (component.style && component.styleHash && component.markup) {
+		if (component.style && component.markup) {
 			for (let block of component.style.blocks) {
 				collectStyleSelectors(block, selectors);
 			}
-			scopeStylesOnNode(component.markup, selectors, component.styleHash);
+			scopeStylesOnNode(component.markup, selectors, component.style.hash);
 		}
 	}
 }
