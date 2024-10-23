@@ -16,6 +16,11 @@
 			"types": "./dist/compile.d.ts",
 			"import": "./dist/compile.js",
 			"require": "./dist/compile.cjs"
+		},
+		"./ssr": {
+			"types": "./dist/ssr.d.ts",
+			"import": "./dist/ssr.js",
+			"require": "./dist/ssr.cjs"
 		}
 	},
 	"private": true,

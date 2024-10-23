@@ -1,4 +1,5 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
 export default function Self(
 	$props: { level: number },
@@ -9,7 +10,6 @@ export default function Self(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> Level ${t_fmt($props.level)} <![>`;
 	if ($props.level < 3) {

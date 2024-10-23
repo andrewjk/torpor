@@ -1,15 +1,24 @@
 import type BuildOptions from "../../../types/BuildOptions";
 import type Template from "../../../types/Template";
 import Builder from "../../utils/Builder";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+
+const importsMap: Record<string, string> = {
+	$watch: 'import { $watch } from "${folder}";',
+	$unwrap: 'import { $unwrap } from "${folder}";',
+	$run: 'import { $run } from "${folder}";',
+	$mount: 'import { $mount } from "${folder}";',
+	t_fmt: 'import { t_fmt } from "${folder}";',
+	ServerSlotRender: 'import type { ServerSlotRender } from "${folder}";',
+};
 
 export default function buildServerCode(template: Template, options?: BuildOptions): string {
 	let b = new Builder();
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
-	imports.add('import type { ServerSlotRender } from "${folder}";');
+	imports.add("ServerSlotRender");
 
 	// Build the component and any child components
 	buildServerTemplate(template, imports, b, options);
@@ -18,7 +27,8 @@ export default function buildServerCode(template: Template, options?: BuildOptio
 	if (imports.size) {
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
-			b.prepend(imp.replace("${folder}", options?.renderFolder || "@tera/view"));
+			imp = importsMap[imp] || imp;
+			b.prepend(imp.replace("${folder}", options?.renderFolder || "@tera/view/ssr"));
 		}
 	}
 
@@ -33,13 +43,11 @@ function buildServerTemplate(
 ) {
 	let script = template.script || "";
 
-	// TODO: Do these within the render method, or make serverWatch, serverUnwrap etc imports
-	// HACK: Stub reactivity functions to do nothing on the server
-	if (/\$watch\b/.test(script)) b.append("const $watch = (obj: Record<PropertyKey, any>) => obj;");
-	if (/\$unwrap\b/.test(script))
-		b.append("const $unwrap = (obj: Record<PropertyKey, any>) => obj;");
-	if (/\$run\b/.test(script)) b.append("const $run = (fn: Function) => null;");
-	if (/\$mount\b/.test(script)) b.append("const $mount = (fn: Function) => null;");
+	// Add default imports
+	if (/\$watch\b/.test(script)) imports.add("$watch");
+	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
+	if (/\$run\b/.test(script)) imports.add("$run");
+	if (/\$mount\b/.test(script)) imports.add("$mount");
 
 	let currentIndex = 0;
 	let current = template.components[0];
@@ -76,6 +84,7 @@ function buildServerTemplate(
 
 			if (current.markup) {
 				const status: BuildServerStatus = {
+					imports,
 					output: "",
 					styleHash: current.style?.hash || "",
 					varNames: {},
@@ -84,11 +93,6 @@ function buildServerTemplate(
 
 				// Add the interface
 				b.append("/* User interface */");
-
-				// HACK: Stub the format function to run on the server
-				// TODO: Add this to imports instead
-				b.append('const t_fmt = (text: string) => (text != null ? text : "");');
-
 				b.append(`let $output = "";`);
 
 				// Add the interface

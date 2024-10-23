@@ -1,4 +1,5 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
 export default function ArrayEntries(
 	$props?: Record<PropertyKey, any>,
@@ -9,7 +10,6 @@ export default function ArrayEntries(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<section> <p>^</p> <![>`;
 	for (let [i, item] of $props.items.entries()) {

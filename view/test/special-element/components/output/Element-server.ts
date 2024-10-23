@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 export default function Element(
 	$props?: Record<PropertyKey, any>,
@@ -9,7 +9,6 @@ export default function Element(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<${$props.tag}> Hello! </${$props.tag}>`;
 	

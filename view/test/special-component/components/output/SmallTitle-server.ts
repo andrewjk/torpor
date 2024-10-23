@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 export default function SmallTitle(
 	$props?: Record<PropertyKey, any>,
@@ -8,7 +8,6 @@ export default function SmallTitle(
 	
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h6> <![>`;
 	if ($slots && $slots["_"]) {

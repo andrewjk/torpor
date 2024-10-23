@@ -1,4 +1,5 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
 export default function ParentChild(
 	$props?: Record<PropertyKey, any>,
@@ -8,7 +9,6 @@ export default function ParentChild(
 	
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> `;
 	const t_props_1 = {};
@@ -29,7 +29,6 @@ function Child(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
 	

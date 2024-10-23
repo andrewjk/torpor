@@ -30,7 +30,6 @@ export default function hydrateComponent(
 
 	let imports: { importPath: string; importClient: BuildResult; importServer: BuildResult }[] = [];
 	for (let imp of source.matchAll(/^import\s+(.+?)\s+from\s+(?:'|")(.+\.tera)(?:'|");*$/gm)) {
-		const importName = imp[1];
 		const importPath = path.join(path.dirname(componentPath), imp[2]);
 		const importSource = fs.readFileSync(importPath, "utf8");
 		const importParsed = parse(importSource);
@@ -55,16 +54,27 @@ export default function hydrateComponent(
 
 	const server = build(parsed.template!, { server: true });
 	const code = tsb(`
+const $watch = (obj: Record<PropertyKey, any>) => obj;
+const $unwrap = (obj: Record<PropertyKey, any>) => obj;
+const $run = (fn: Function) => null;
+const $mount = (fn: Function) => null;
+const t_fmt = (text: string) => (text != null ? text : "");
 ${
 	imports
 		?.map((imp) =>
-			imp.importServer.code.replace("export default ", "").replaceAll("const $", "//const $"),
+			imp.importServer.code.replace("export default ", "").replace(/^import.+\n/gm, ""),
 		)
 		.join("\n") || ""
 }
 ${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
 ${component.name};
 `);
+
+	if (debugPrint) {
+		console.log("=== server");
+		console.log(server.code);
+		console.log("===");
+	}
 
 	const html = eval(code)(state).replaceAll(/\s+/g, " ");
 	if (debugPrint) {

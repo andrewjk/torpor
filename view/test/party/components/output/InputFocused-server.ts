@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $mount } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
-const $mount = (fn: Function) => null;
 export default function InputFocused(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -16,7 +16,6 @@ export default function InputFocused(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<input self="${inputElement || ""}"/>`;
 	

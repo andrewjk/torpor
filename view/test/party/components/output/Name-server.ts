@@ -1,6 +1,7 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function Name(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -13,7 +14,6 @@ export default function Name(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h1>Hello ${t_fmt($state.name)}</h1>`;
 	

@@ -1,4 +1,5 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
 export default function For(
 	$props?: Record<PropertyKey, any>,
@@ -8,7 +9,6 @@ export default function For(
 	
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<section> <![>`;
 	for (let i = 0; i < 5; i++) {

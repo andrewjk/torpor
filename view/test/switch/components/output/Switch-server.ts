@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 /**
  * A component with a switch statement in it.
@@ -15,7 +15,6 @@ export default function Switch(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <![>`;
 	switch ($props.value) {

@@ -1,4 +1,5 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
 export default function Replace(
 	$props: { name: string},
@@ -11,7 +12,6 @@ export default function Replace(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <![>`;
 	$props.name;

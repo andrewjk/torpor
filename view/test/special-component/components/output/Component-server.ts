@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 import BigTitle from "./BigTitle.tera";
 import SmallTitle from "./SmallTitle.tera";
@@ -17,7 +17,6 @@ export default function Component(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<![>`;
 	components[$props.self];

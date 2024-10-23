@@ -1,6 +1,7 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function UserProfileContext(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -12,7 +13,6 @@ export default function UserProfileContext(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> </div>`;
 	

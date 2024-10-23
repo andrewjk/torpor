@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 import FunnyButton from "./FunnyButton.tera";
 
@@ -10,7 +10,6 @@ export default function FunnyButtonApp(
 	
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> `;
 

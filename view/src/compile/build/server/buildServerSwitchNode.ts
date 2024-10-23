@@ -6,7 +6,7 @@ import {
 import type ControlNode from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../../utils/Builder";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerSwitchNode(

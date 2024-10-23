@@ -1,7 +1,8 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $unwrap } from "@tera/view/ssr";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
-const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 import UserProfileContext from "./UserProfileContext.tera";
 
 export default function UserProfileContextApp(
@@ -22,7 +23,6 @@ export default function UserProfileContextApp(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <h1>Welcome back, ${t_fmt($user.username)}</h1> `;
 

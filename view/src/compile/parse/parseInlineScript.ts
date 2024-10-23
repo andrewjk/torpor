@@ -1,4 +1,4 @@
-import ParseStatus from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 import accept from "./utils/accept";
 
 export default function parseInlineScript(status: ParseStatus): string {

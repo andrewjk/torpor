@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 export default function HelloWorld(
 	$props?: Record<PropertyKey, any>,
@@ -8,7 +8,6 @@ export default function HelloWorld(
 	
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<h1>Hello world</h1>`;
 	

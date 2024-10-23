@@ -1,6 +1,7 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function Increment(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -15,7 +16,6 @@ export default function Increment(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <button id="increment"> Increment </button> <button id="increment5"> Increment </button> <p> The count is ${t_fmt($state.counter)}. </p> </div>`;
 	

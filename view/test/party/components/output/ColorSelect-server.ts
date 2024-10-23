@@ -1,6 +1,7 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function ColorSelect(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -20,7 +21,6 @@ export default function ColorSelect(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${$state.selectedColorId || ""}"> <![>`;
 	for (let color of colors) {

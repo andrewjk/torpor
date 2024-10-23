@@ -1,7 +1,8 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $run } from "@tera/view/ssr";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
-const $run = (fn: Function) => null;
 export default function Time(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -22,7 +23,6 @@ export default function Time(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<p>Current time: ${t_fmt($state.time)}</p>`;
 	

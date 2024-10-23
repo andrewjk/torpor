@@ -1,7 +1,7 @@
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus, b: Builder) {
 	let content = node.content || "";
@@ -26,6 +26,7 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 	}
 
 	if (reactiveCount) {
+		status.imports.add("t_fmt");
 		content = content.replaceAll("{", "${t_fmt(").replaceAll("}", ")}");
 		status.output += content;
 	} else {

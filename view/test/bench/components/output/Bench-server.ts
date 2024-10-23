@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function Bench(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,

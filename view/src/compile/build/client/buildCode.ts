@@ -5,7 +5,6 @@ import type BuildStatus from "./BuildStatus";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
-// We were dynamically creating imports, which might still be useful for creating standalone components
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
 	$unwrap: 'import { $unwrap } from "${folder}";',

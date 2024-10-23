@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 export default function Await(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
@@ -26,7 +26,6 @@ export default function Await(
 
 		
 		/* User interface */
-		const t_fmt = (text: string) => (text != null ? text : "");
 		let $output = "";
 		$output += `<div> <![>`;
 		$output += ` <p>Hmm...</p> `;

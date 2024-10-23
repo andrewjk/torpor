@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view";
+import type { ServerSlotRender } from "@tera/view/ssr";
 
 export default function IfElseIf(
 	$props: { counter: number },
@@ -9,7 +9,6 @@ export default function IfElseIf(
 	$props ??= {};
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <![>`;
 	if ($props.counter > 10) {

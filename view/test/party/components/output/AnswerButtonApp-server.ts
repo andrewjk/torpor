@@ -1,6 +1,7 @@
-import type { ServerSlotRender } from "@tera/view";
+import { $watch } from "@tera/view/ssr";
+import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_fmt } from "@tera/view/ssr";
 
-const $watch = (obj: Record<PropertyKey, any>) => obj;
 import AnswerButton from "./AnswerButton.tera";
 
 export default function AnswerButtonApp(
@@ -23,7 +24,6 @@ export default function AnswerButtonApp(
 
 	
 	/* User interface */
-	const t_fmt = (text: string) => (text != null ? text : "");
 	let $output = "";
 	$output += `<div> <p>Are you happy?</p> `;
 	const t_props_1 = {};

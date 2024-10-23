@@ -10,7 +10,7 @@ import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerSlotNode(

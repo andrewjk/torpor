@@ -1,11 +1,10 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
-import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerElementNode(

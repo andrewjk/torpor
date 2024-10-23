@@ -4,7 +4,7 @@ import type RootNode from "../../types/nodes/RootNode";
 import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
-import BuildServerStatus from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerComponentNode from "./buildServerComponentNode";
 import buildServerControlNode from "./buildServerControlNode";
 import buildServerElementNode from "./buildServerElementNode";
