@@ -1,11 +1,9 @@
 import Nav from "./Nav.tera";
 
 /**
- * Components are declared in a file with script, markup and styles
+ * Components are functions that are declared in a `.tera` file
  */
-export default function Index($props: {
-	name: string
-}) {
+export default function Index($props: { name: string }) {
 	// Use the $watch function to declare reactive state
 	const $state = $watch({
 		count: 0,

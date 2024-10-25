@@ -15,7 +15,6 @@ export default function Index() {
 		<div class="home-page">
 			<:head>
 				<title>Conduit</title>
-				<link rel="stylesheet" href="mystyle.css"> 
 			</:head>
 
 			@if (!$props.data.user) {
