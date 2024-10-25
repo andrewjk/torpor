@@ -1,7 +1,0 @@
-﻿import LetterItem from './LetterItem.tera';
-
-export default function LetterItemDelegate() {
-	@render {
-		<LetterItem />
-	}
-}

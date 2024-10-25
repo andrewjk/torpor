@@ -1,0 +1,5 @@
+export default function HelloWorld() {
+	@render {
+		<p>Hello world</p>
+	}
+}

@@ -1,15 +1,14 @@
-import { route as demo } from "@/routes/demo/[slug]"
+//import { route as demo } from "@/routes/demo/[slug]"
 
 export default function Nav() {
+	function demo() {
+		return ""
+	}
 	@render {
 		<p>
-			<a href="/">Home</a>
+			<a href="/">Demo</a>
 			|
 			<a href="/party">Party</a>
-			|
-			<a href="/demo/thingo">Demo</a>
-			|
-			<a href={demo(5, { search: "hi" })}>Demo 5</a>
 		</p>
 	}
 }

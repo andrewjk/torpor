@@ -4,6 +4,6 @@ export default function Name() {
 	});
 
 	@render {
-		<h1>Hello {$state.name}</h1>
+		<p>Hello {$state.name}</p>
 	}
 }

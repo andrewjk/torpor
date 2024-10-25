@@ -5,6 +5,6 @@ export default function NameUpdate() {
 	$state.name = "Jane"
 
 	@render {
-		<h1>Hello {$state.name}</h1>
+		<p>Hello {$state.name}</p>
 	}
 }

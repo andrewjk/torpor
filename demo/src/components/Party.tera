@@ -1,146 +1,127 @@
 import Nav from "./Nav.tera";
 
-import Name from "./Components/Party/Name.tera";
-import NameUpdate from "./Components/Party/NameUpdate.tera";
-import DoubleCount from "./Components/Party/DoubleCount.tera";
-import HelloWorld from "./Components/Party/HelloWorld.tera";
-import CssStyle from "./Components/Party/CssStyle.tera";
-import Colors from "./Components/Party/Colors.tera";
-import Counter from "./Components/Party/Counter.tera";
-import InputFocused from "./Components/Party/InputFocused.tera";
-import TrafficLight from "./Components/Party/TrafficLight.tera";
-import PageTitle from "./Components/Party/PageTitle.tera";
-import Time from "./Components/Party/Time.tera";
-import UserProfileApp from "./Components/Party/UserProfileApp.tera";
-import AnswerButtonApp from "./Components/Party/AnswerButtonApp.tera";
-import FunnyButtonApp from "./Components/Party/FunnyButtonApp.tera";
-import UserProfileContextApp from "./Components/Party/UserProfileContextApp.tera";
-import InputHello from "./Components/Party/InputHello.tera";
-import IsAvailable from "./Components/Party/IsAvailable.tera";
-import PickPill from "./Components/Party/PickPill.tera";
-import ColorSelect from "./Components/Party/ColorSelect.tera";
+import Name from "./PartyComponents/Name.tera";
+import NameUpdate from "./PartyComponents/NameUpdate.tera";
+import DoubleCount from "./PartyComponents/DoubleCount.tera";
+import HelloWorld from "./PartyComponents/HelloWorld.tera";
+import CssStyle from "./PartyComponents/CssStyle.tera";
+import Colors from "./PartyComponents/Colors.tera";
+import Counter from "./PartyComponents/Counter.tera";
+import InputFocused from "./PartyComponents/InputFocused.tera";
+import TrafficLight from "./PartyComponents/TrafficLight.tera";
+import PageTitle from "./PartyComponents/PageTitle.tera";
+import Time from "./PartyComponents/Time.tera";
+import UserProfileApp from "./PartyComponents/UserProfileApp.tera";
+import AnswerButtonApp from "./PartyComponents/AnswerButtonApp.tera";
+import FunnyButtonApp from "./PartyComponents/FunnyButtonApp.tera";
+import UserProfileContextApp from "./PartyComponents/UserProfileContextApp.tera";
+import InputHello from "./PartyComponents/InputHello.tera";
+import IsAvailable from "./PartyComponents/IsAvailable.tera";
+import PickPill from "./PartyComponents/PickPill.tera";
+import ColorSelect from "./PartyComponents/ColorSelect.tera";
 
 export default function Party() {
 	@render {
-		<div style="margin: auto">
-			<h1>Demo</h1>
+		<div>
+			<h1>Party</h1>
 
 			<Nav />
 
 			<p>
-				Examples from <a href="https://component-party.dev">Component Party</a>
+				Examples from <a href="https://component-party.dev">Component Party</a>.
 			</p>
 
 			<h2>Declare state</h2>
-
 			<div class="demo">
 				<Name />
 			</div>
 
 			<h2>Update state</h2>
-
 			<div class="demo">
 				<NameUpdate />
 			</div>
 
 			<h2>Computed state</h2>
-
 			<div class="demo">
 				<DoubleCount />
 			</div>
 
 			<h2>Minimal template</h2>
-
 			<div class="demo">
 				<HelloWorld />
 			</div>
 
 			<h2>Styling</h2>
-
 			<div class="demo">
 				<CssStyle />
 			</div>
 
 			<h2>Loop</h2>
-
 			<div class="demo">
 				<Colors />
 			</div>
 
 			<h2>Event click</h2>
-
 			<div class="demo">
 				<Counter />
 			</div>
 
 			<h2>Dom ref</h2>
-
 			<div class="demo">
 				@// <InputFocused />
 			</div>
 
 			<h2>Conditional</h2>
-
 			<div class="demo">
 				<TrafficLight />
 			</div>
 
 			<h2>On mount</h2>
-
 			<div class="demo">
 				@// <PageTitle />
 			</div>
 
 			<h2>On unmount</h2>
-
 			<div class="demo">
 				@// <Time />
 			</div>
 
 			<h2>Props</h2>
-
 			<div class="demo">
 				<UserProfileApp />
 			</div>
 
 			<h2>Emit to parent</h2>
-
 			<div class="demo">
 				<AnswerButtonApp />
 			</div>
 
 			<h2>Slot fallback</h2>
-
 			<div class="demo">
 				<FunnyButtonApp />
 			</div>
 
 			<h2>Context</h2>
-
 			<div class="demo">
 				<UserProfileContextApp />
 			</div>
 
 			<h2>Input text</h2>
-
 			<div class="demo">
 				<InputHello />
 			</div>
 
 			<h2>Checkbox</h2>
-
 			<div class="demo">
 				<IsAvailable />
 			</div>
 
 			<h2>Radio</h2>
-
 			<div class="demo">
 				<PickPill />
 			</div>
 
 			<h2>Select</h2>
-
 			<div class="demo">
 				<ColorSelect />
 			</div>
@@ -149,9 +130,9 @@ export default function Party() {
 
 	@style {
 		.demo {
-				border: 1px dashed gray;		
-				border-radius: 5px;
-				padding: 20px;
+			border: 1px dashed gray;		
+			border-radius: 5px;
+			padding: 20px;
 		}
 	}
 }

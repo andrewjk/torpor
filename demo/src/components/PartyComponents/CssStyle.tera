@@ -1,0 +1,14 @@
+export default function CssStyle() {
+	@render {
+		<div>
+			<p class="title">I am red</p>
+			<button style="font-size: 1.5rem;">I am a button</button>
+		</div>
+	}
+
+	@style {
+		.title {
+			color: red;
+		}
+	}
+}

@@ -1,1 +1,0 @@
-﻿<button onclick={$props.onbubble}>Bubble an event</button>

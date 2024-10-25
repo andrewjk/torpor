@@ -1,9 +1,6 @@
-import component from "@/components/Index.tera";
+import component from "@/components/Demo.tera";
 import type { EndPoint } from "@tera/kit";
 
 export default {
-	load: () => {
-		console.log("data");
-	},
 	component,
 } satisfies EndPoint;

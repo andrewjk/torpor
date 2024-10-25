@@ -40,13 +40,13 @@ export default function Index($props: { name: string }) {
 	@render {
 		@// Make sure to keep this in sync with README
 
-		<div style="margin: auto">
+		<div>
 			<h1>Demo</h1>
 
 			<Nav />
 
 			<h2>Basic reactivity</h2>
-			<p>Put reactive statements in braces, like {$state.count}.</p>
+			<p>Put reactive statements in braces, like \{$state.count\}.</p>
 			<div class="demo">
 				<p>
 					The count is {$state.count}.
@@ -145,7 +145,10 @@ export default function Index($props: { name: string }) {
 			@// TODO: Special tags
 
 			<h2>Child components</h2>
-			<p>Components can be declared in separate files, or within a template tag.</p>
+			<p>
+				Child components can be declared in separate files and imported, or they can be
+				declared as a function in the current file (like TaskItem, below).
+			</p>
 		</div>
 	}
 
