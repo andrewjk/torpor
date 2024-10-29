@@ -9,6 +9,7 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 	// newlines from generated JS strings
 	content = content.replaceAll(/\s+/g, " ");
 
+	// TODO: Move all of this logic into parse, for text nodes and attribute values
 	let level = 0;
 	for (let i = 0; i < content.length; i++) {
 		const char = content[i];

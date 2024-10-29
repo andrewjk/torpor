@@ -16,6 +16,7 @@ export default function buildTextNode(
 	// newlines from generated JS strings
 	content = content.replaceAll(/\s+/g, " ");
 
+	// TODO: Move all of this logic into parse, for text nodes and attribute values
 	let textContent = "";
 	let reactiveCount = 0;
 	let level = 0;
