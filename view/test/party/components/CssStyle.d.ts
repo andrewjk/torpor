@@ -11,7 +11,7 @@ import type { SlotRender } from "@tera/view";
 declare function CssStyle(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { counter: number },
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;

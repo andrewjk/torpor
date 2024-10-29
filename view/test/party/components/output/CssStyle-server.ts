@@ -1,7 +1,7 @@
 import type { ServerSlotRender } from "@tera/view/ssr";
 
 export default function CssStyle(
-	$props: { counter: number },
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {

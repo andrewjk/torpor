@@ -6,7 +6,7 @@ import { t_root } from "@tera/view";
 export default function CssStyle(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { counter: number },
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
