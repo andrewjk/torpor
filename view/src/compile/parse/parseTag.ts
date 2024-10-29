@@ -10,12 +10,17 @@ import consumeUntil from "./utils/consumeUntil";
 export default function parseTag(status: ParseStatus): ElementNode {
 	accept("<", status);
 
+	let closeTag = accept("/", status);
+
 	consumeSpace(status);
 
 	let special = accept(":", status);
 	let tagName = consumeAlphaNumeric(status);
 	if (special) {
 		tagName = ":" + tagName;
+	}
+	if (closeTag) {
+		tagName = "/" + tagName;
 	}
 
 	consumeSpace(status);
@@ -25,14 +30,24 @@ export default function parseTag(status: ParseStatus): ElementNode {
 	let selfClosed = false;
 	if (accept("/>", status)) {
 		selfClosed = true;
+		// Actually, it is kind of convenient to self-close things, and more consistent with
+		// component tags...
+		//if (!voidTags.includes(tagName)) {
+		//	addError(status, `Self-closed non-void element: ${tagName}`, start);
+		//}
 	} else {
 		accept(">", status);
+	}
+
+	if (closeTag) {
+		selfClosed = true;
 	}
 
 	return {
 		type: special ? "special" : "element",
 		tagName,
 		selfClosed: selfClosed || undefined,
+		closed: selfClosed || undefined,
 		attributes,
 		children: [],
 	};
@@ -91,6 +106,4 @@ function parseAttributeValue(status: ParseStatus): string {
 		}
 		return value;
 	}
-
-	return "";
 }

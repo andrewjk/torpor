@@ -23,6 +23,7 @@ export interface ParseComponentStatus {
 	default?: boolean;
 	params?: string;
 	markup?: ElementNode;
+	stack?: ElementNode[];
 	style?: Style;
 	props?: string[];
 	contextProps?: string[];

@@ -22,7 +22,6 @@ export default function hydrateComponent(
 		componentPath = path.join("view", componentPath);
 	}
 
-	const name = path.basename(componentPath, ".tera");
 	const source = fs.readFileSync(componentPath, "utf8");
 	const parsed = parse(source);
 	expect(parsed.ok).toBe(true);

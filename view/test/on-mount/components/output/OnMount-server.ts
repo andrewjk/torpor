@@ -8,7 +8,7 @@ export default function OnMount(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input/>`;
+	$output += `<input>`;
 
 	return $output;
 }

@@ -22,11 +22,11 @@ export default function parseMarkup(status: ParseStatus, source: string) {
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (accept("<", status, false)) {
 			// Parse the element
+			const start = status.i;
+			const element = parseElement(status);
 			if (current.markup === undefined) {
-				current.markup = parseElement(status);
-			} else {
-				const start = status.i;
-				const element = parseElement(status);
+				current.markup = element;
+			} else if (!element.tagName.startsWith("/")) {
 				addError(status, `Multiple top-level elements: ${element.tagName}`, start);
 			}
 		} else {

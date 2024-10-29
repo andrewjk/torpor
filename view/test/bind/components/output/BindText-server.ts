@@ -11,7 +11,7 @@ export default function BindText(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <input value="${$state.name || ""}"/> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
+	$output += `<div> <input value="${$state.name || ""}"> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
 
 	return $output;
 }

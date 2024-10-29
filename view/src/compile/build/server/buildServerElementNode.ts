@@ -25,10 +25,10 @@ export default function buildServerElementNode(
 		}
 	}
 
-	// NOTE: Only void tags can be self-closed
-	const selfClosed = node.selfClosed && voidTags.includes(tagName);
-	status.output += `<${tagName}${attributes}${selfClosed ? "/" : ""}>`;
-	if (!selfClosed) {
+	// NOTE: Only void tags can be self-closed in HTML, although we allow it in
+	// templates and auto-expand it here
+	status.output += `<${tagName}${attributes}>`;
+	if (!voidTags.includes(tagName)) {
 		for (let child of node.children) {
 			buildServerNode(child, status, b);
 		}

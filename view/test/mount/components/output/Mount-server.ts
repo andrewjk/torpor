@@ -14,7 +14,7 @@ export default function Mount(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input self="${inputElement || ""}"/>`;
+	$output += `<input self="${inputElement || ""}">`;
 
 	return $output;
 }

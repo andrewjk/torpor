@@ -15,7 +15,7 @@ export default function InputFocused(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input self="${inputElement || ""}"/>`;
+	$output += `<input self="${inputElement || ""}">`;
 
 	return $output;
 }

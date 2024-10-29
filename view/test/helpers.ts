@@ -34,6 +34,7 @@ export function el(
 		attributes: attributes || [],
 		children: children || [],
 		selfClosed,
+		closed: true,
 	};
 }
 
@@ -92,9 +93,9 @@ export function trimParsed(result: ParseResult): ParseResult {
 		if (component.markup) {
 			trimElement(component.markup);
 		}
-		if (component.styleHash) {
-			component.styleHash = undefined;
-		}
+		//if (component.styleHash) {
+		//	component.styleHash = undefined;
+		//}
 	}
 	return result;
 }
