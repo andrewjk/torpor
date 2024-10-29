@@ -7,7 +7,7 @@ import FileSystemRouter from "./FileSystemRouter";
 
 export default function defineSite(options?: UserConfig) {
 	// Set the port
-	process.env.PORT = (options?.port || 5173).toString();
+	process.env.PORT = (options?.port || 7354).toString();
 
 	// Get Vinxi to create and serve the app
 	return createApp({
