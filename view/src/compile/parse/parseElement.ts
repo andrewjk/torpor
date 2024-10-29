@@ -52,8 +52,38 @@ export default function parseElement(status: ParseStatus): ElementNode {
 				// But only if the control statement is after a newline, so we don't
 				// mess with emails etc. This may need more finessing
 				let end = -1;
-				for (let j = status.i + 1; j < status.source.length; j++) {
-					if (status.source[j] === "<") {
+				for (let j = status.i; j < status.source.length; j++) {
+					if (status.source[j] === "{") {
+						// Skip reactive content
+						let level = 0;
+						for (let k = j; k < status.source.length; k++) {
+							const char = status.source[k];
+							const nextChar = status.source[k + 1];
+							if (char === "/" && nextChar === "/") {
+								// Skip one-line comments
+								k = status.source.indexOf("\n", k);
+							} else if (char === "/" && nextChar === "*") {
+								// Skip block comments
+								k = status.source.indexOf("*/", k) + 1;
+							} else if (char === '"' || char === "'" || char === "`") {
+								// Skip string contents
+								for (let l = k + 1; l < status.source.length; l++) {
+									if (status.source[l] === char && status.source[l - 1] !== "\\") {
+										k = l;
+										break;
+									}
+								}
+							} else if (char === "{") {
+								level += 1;
+							} else if (char === "}") {
+								level -= 1;
+								if (level === 0) {
+									j = k;
+									break;
+								}
+							}
+						}
+					} else if (status.source[j] === "<") {
 						end = j;
 					} else if (status.source[j] === "@") {
 						// Backtrack

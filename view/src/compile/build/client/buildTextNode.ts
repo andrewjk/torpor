@@ -14,30 +14,69 @@ export default function buildTextNode(
 
 	// Replace all spaces with a single space, both to save space and to remove
 	// newlines from generated JS strings
-	content = content.replace(/\s+/g, " ");
+	content = content.replaceAll(/\s+/g, " ");
 
-	// TODO: Should be fancier about this in parse -- e.g. ignore braces in
-	// quotes, unclosed, etc
-	let reactiveStarted = false;
+	let textContent = "";
 	let reactiveCount = 0;
+	let level = 0;
+	let maxLevel = 0;
 	for (let i = 0; i < content.length; i++) {
-		if (content[i] === "{") {
-			reactiveStarted = true;
-		} else if (content[i] === "}") {
-			if (reactiveStarted) {
+		const char = content[i];
+		const nextChar = content[i + 1];
+		if (char === "{") {
+			level++;
+			maxLevel = Math.max(level, maxLevel);
+			if (level === 1) {
 				reactiveCount += 1;
-				reactiveStarted = false;
+				textContent += "${t_fmt(";
+				continue;
+			}
+		} else if (char === "}") {
+			level--;
+			if (level === 0) {
+				textContent += ")";
+			}
+		} else if (char === "`" && level === 0) {
+			// Escape backticks outside of braces, as they will be within a backtick string
+			textContent += "\\";
+		} else if (level > 0) {
+			if (char === "/" && nextChar === "/") {
+				// Skip one-line comments
+				let start = i;
+				i = content.indexOf("\n", i);
+				textContent += content.substring(start, i + 1);
+				continue;
+			} else if (char === "/" && nextChar === "*") {
+				// Skip block comments
+				let start = i;
+				i = content.indexOf("*/", i) + 1;
+				textContent += content.substring(start, i + 1);
+				continue;
+			} else if (char === '"' || char === "'" || char === "`") {
+				// Skip string contents
+				let start = i;
+				for (let j = i + 1; j < content.length; j++) {
+					if (content[j] === char && content[j - 1] !== "\\") {
+						i = j;
+						textContent += content.substring(start, i + 1);
+						break;
+					}
+				}
+				continue;
 			}
 		}
+		textContent += content[i];
 	}
 
-	if (reactiveCount) {
-		status.imports.add("t_fmt");
+	// TODO: Only need to build if this is not 0
+	if (maxLevel) {
 		if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
-			content = `t_fmt(${content.substring(1, content.length - 1)})`;
+			textContent = textContent.substring(2, textContent.length - 1);
 		} else {
-			content = `\`${content.replaceAll("{", "${t_fmt(").replaceAll("}", ")}")}\``;
+			textContent = `\`${textContent}\``;
 		}
-		buildRun("setTextContent", `${node.varName}.textContent = ${content};`, status, b);
+
+		status.imports.add("t_fmt");
+		buildRun("setTextContent", `${node.varName}.textContent = ${textContent};`, status, b);
 	}
 }

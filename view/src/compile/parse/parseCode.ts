@@ -31,13 +31,13 @@ export default function parseCode(source: string): ParseResult {
 		} else if (status.source[status.i] === "}") {
 			status.level -= 1;
 			if (status.level === 0) {
-				endComponent(status);
+				parseComponentEnd(status);
 			}
 		} else if (accept("function", status)) {
 			// If the function name starts with a capital, parse it as a component
 			consumeSpace(status);
 			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
-				startComponent(status);
+				parseComponentStart(status);
 			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
@@ -80,7 +80,7 @@ export default function parseCode(source: string): ParseResult {
 	};
 }
 
-function startComponent(status: ParseStatus) {
+function parseComponentStart(status: ParseStatus) {
 	let def = /export\s+default\s+function\s+$/.test(status.source.substring(0, status.i));
 
 	status.components.push({
@@ -212,7 +212,7 @@ function parseComponentStyle(status: ParseStatus) {
 	status.marker = status.i;
 }
 
-function endComponent(status: ParseStatus) {
+function parseComponentEnd(status: ParseStatus) {
 	const current = status.components.at(-1);
 	if (!current) return;
 
