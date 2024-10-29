@@ -25,7 +25,10 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		// Get the children
 		while (status.i < status.source.length) {
 			addSpaceElement(element, status);
-			if (accept("</", status)) {
+			if (accept("}", status, false)) {
+				// That's the rendering done
+				break;
+			} else if (accept("</", status)) {
 				// It's a closing element, so we're done here
 				status.i = status.source.indexOf(">", status.i + 1) + 1;
 				break;
@@ -48,12 +51,16 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			} else {
 				// It's text content
 				const start = status.i;
-				// It ends at the next element, or at the next control statement
-				// But only if the control statement is after a newline, so we don't
-				// mess with emails etc. This may need more finessing
+				// It ends at the next element, or at the next control statement, or at the end of
+				// the render
+				// But only if the control statement is after a newline, so we don't mess with
+				// emails etc. This may need more finessing
 				let end = -1;
 				for (let j = status.i; j < status.source.length; j++) {
-					if (status.source[j] === "{") {
+					if (status.source[j] === "}") {
+						// That's the rendering done
+						end = j;
+					} else if (status.source[j] === "{") {
 						// Skip reactive content
 						let level = 0;
 						for (let k = j; k < status.source.length; k++) {
@@ -115,8 +122,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 							element.children.push(text);
 						}
 					}
-					// Rewind to the < so that it will get checked in the next loop, above
-					status.i = end; // - 1;
+					status.i = end;
 				} else {
 					status.i += 1;
 				}

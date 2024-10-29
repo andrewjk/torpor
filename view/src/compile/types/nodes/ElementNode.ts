@@ -6,6 +6,7 @@ import type TemplateNode from "./TemplateNode";
 export default interface ElementNode extends ParentNode {
 	type: "element" | "component" | "special";
 	tagName: string;
+	closed?: boolean;
 	selfClosed?: boolean;
 	attributes: Attribute[];
 	children: TemplateNode[];

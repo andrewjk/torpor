@@ -8,7 +8,10 @@ export default function parseMarkup(status: ParseStatus, source: string) {
 	if (!current) return;
 
 	while (status.i < source.length) {
-		if (accept("<!--", status)) {
+		if (accept("}", status, false)) {
+			// That's the rendering done
+			return;
+		} else if (accept("<!--", status)) {
 			// It's a comment, swallow it
 			status.i = status.source.indexOf("-->", status.i) + 3;
 		} else if (accept("@//", status)) {
@@ -26,9 +29,6 @@ export default function parseMarkup(status: ParseStatus, source: string) {
 				const element = parseElement(status);
 				addError(status, `Multiple top-level elements: ${element.tagName}`, start);
 			}
-		} else if (accept("}", status, false)) {
-			// That's us done
-			return;
 		} else {
 			status.i += 1;
 		}
