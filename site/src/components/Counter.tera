@@ -1,0 +1,16 @@
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}

@@ -1,0 +1,132 @@
+
+export default function State() {
+	@render {
+		<div>
+			<h1>State</h1>
+			<p>
+				Data that is stored within a component is called its `state`. State can be made
+				reactive by placing it in an object and wrapping it with the $watch function:
+			</p>
+			<pre><code>
+{`
+export default function Component() {
+	const $state = $watch({
+		count: 1
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trim()}
+			</code></pre>
+			<p>
+				The $watch function is automatically imported into component files if used (along
+				with a few other functions). By convention, reactive objects should start with a
+				`$` so that it is easy to see at a glance which statements are reactive in your
+				markup.
+			</p>
+			<p>
+				Dependent state can be created using object properties:
+			</p>
+			<pre><code>
+{`
+export default function Component() {
+	const $state = $watch({
+		count: 1,
+		get isEven() {
+            return this.count % 2 === 0
+		}
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.isEven ? "even" : "odd"}!
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trim()}
+			</code></pre>
+
+			<h2>The $run Function</h2>
+			<p>
+				Another function that is automatically imported into your components is `$run`.
+				Calling $run sets up a function that is run on component initialization and when
+				any reactive values accessed within it are changed:
+			</p>
+			<pre><code>
+{`
+export default function Component() {
+	const $state = $watch({
+		count: 1,
+	})
+
+	$run(() => {
+		if ($state.count > 5) {
+			document.getElementById("text").class = "large"	
+		}
+	})
+
+	@render {
+		<div>
+			<p id="text">
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trim()}
+			</code></pre>
+			<p>
+				Behind the scenes, $run is called in the @render block to set up reactive text,
+				attributes and statements.
+			</p>
+
+			<h2>The $mount Function</h2>
+			<p>
+				The $mount function is like the $run function, but it delays its first run until
+				after the @render block has been completed and all elements have been mounted.
+				It is automatically imported into your component if used.
+			</p>
+
+			<h2>The $unwrap Function</h2>
+			<p>
+				The $unwrap function returns the underlying object from a state object returned
+				from $watch.
+				It is automatically imported into your component if used.
+			</p>
+
+			<h2>Props</h2>
+			<p>
+				A component function can accept a $props component containing the properties that
+				were passed to the component:
+			</p>
+			<pre><code>
+{`
+export default function Component($props: { name: string }) {
+	@render {
+		<p>
+			Hello, {name}!
+		</p>
+	}
+}
+`.trim()}
+			</code></pre>
+		</div>
+	}
+}

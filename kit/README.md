@@ -16,12 +16,12 @@ npm create vite
 
 ## Folder structure
 
-- /lib
-- /site
-  - /api
+- /src
   - /assets
   - /components
+  - /lib
   - /routes
+    - /api
 
 ## Maybe
 

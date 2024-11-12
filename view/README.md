@@ -189,7 +189,8 @@ export default function Component($props: { name: string }) {
 
             <h2>Child components</h2>
             <p>
-                Components can be declared in separate files, or within a template tag (see TaskItem, below).
+                Child components can be declared in separate files and imported, or they can be
+                declared as a function in the current file (like TaskItem, below).
             </p>
         </div>
     }

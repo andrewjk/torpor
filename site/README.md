@@ -1,6 +1,6 @@
-# tera/docs
+# tera/site
 
-The documentation site for Tera.
+The home and documentation site for Tera.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 

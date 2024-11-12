@@ -1,0 +1,11 @@
+
+export default function Styles() {
+	@render {
+		<div>
+			<h1>Styles</h1>
+			<p>
+				TODO:
+			</p>
+		</div>
+	}
+}

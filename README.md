@@ -1,6 +1,6 @@
 # Tera
 
-Yet another JavaScript framework, designed for simplicity.
+Yet another JavaScript framework, designed for simplicity, completeness and fun.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 
@@ -18,7 +18,7 @@ Yet another JavaScript framework, designed for simplicity.
 ### Not yet
 
 - [tera/lsp](./lsp) -- Language server for IDEs
-- [tera/docs](./docs) -- Documentation, REPL, etc
+- [tera/site](./site) -- Homepage, documentation, REPL, etc
 - [tera/dev](./dev) -- Browser devtools
 - Performance
 

@@ -1,0 +1,120 @@
+import Counter from './Counter.tera';
+import viteLogo from '@/assets/vite.svg';
+
+/**
+ * The home component
+ */
+export default function Home() {
+	@render {
+		<div id="home-container">
+			@/*
+			// TODO: Need a Tera site and logo
+			<a href="https://www.typescriptlang.org/" target="_blank">
+				<img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
+			</a>
+			*/
+			<h1>Tera</h1>
+			<p>
+				Tera is a full-stack JavaScript framework that is designed for simplicity,
+				completeness and fun.
+			</p>
+			<div id="features-container">
+				<div class="features-card">
+					<h3>Simplicity</h3>
+					<p>
+						Define your UI with mostly-standard JavaScript, HTML and CSS
+					</p>
+					<p>
+						Make your UI state reactive with a single `$watch` function
+					</p>
+					<p>
+						Easily compose and refactor code and components as your project grows
+					</p>
+				</div>
+				<div class="features-card">
+					<h3>Completeness</h3>
+					<p>
+						Tera aims to include most of the things that you need to build high-quality
+						interfaces without having to reach for third party libraries, including:
+					</p>
+					<p><a href="docs/ui">An accessible, unstyled component library</a></p>
+					<p><a href="docs/kit">A site and app building framework</a></p>
+					<p>More to come...</p>
+				</div>
+				<div class="features-card">
+					<h3>Fun</h3>
+					<p>
+						Building on the web shouldn't be a chore!
+					</p>
+				</div>
+			</div>
+			
+			<h2>The Classic Counter</h2>
+			<p>
+				Below is an example `Counter` component, which maintains a `count` property in a
+				reactive `$state` object, and displays the value of the count with a button to
+				increment it:
+			</p>
+			<div id="demo-container">
+				<div class="demo-card">
+					<h3>Code</h3>
+					<pre><code>
+{`
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trim()}
+					</code></pre>
+				</div>
+				<div class="demo-card">
+					<h3>Component</h3>
+					<Counter />
+				</div>
+			</div>
+		</div>
+	}
+
+	@styles {
+		#home-container {
+			display: flex;
+			flex-direction: column;
+			place-items: center;
+		}
+
+		#features-container,
+		#demo-container {
+			display: flex;
+			gap: 0.5em;
+			min-width: 100%;
+		}
+
+		.features-card,
+		.demo-card {
+			flex-grow: 1;
+			background: #eee;
+			border-radius: 2em;
+			padding: 1em;
+		}
+
+		.features-card {
+			flex-basis: 0;
+			text-align: center;
+		}
+
+		.demo-card {
+		}
+	}
+}

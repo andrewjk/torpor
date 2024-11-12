@@ -1,0 +1,20 @@
+
+export default function GettingStarted() {
+	@render {
+		<div>
+			<:head>
+				<title>Getting Started</title>
+			</:head>
+
+			<h1>Getting Started</h1>
+			<p>
+				Use `npm` (or your preferred package manager) to add Tera to your project:
+			</p>
+			<pre><code>
+{`
+npm install tera
+`.trim()}
+			</code></pre>
+		</div>
+	}
+}

@@ -1,0 +1,95 @@
+
+export default function Comparisons() {
+	@render {
+		<div>
+			<:head>
+				<title>Comparisons</title>
+			</:head>
+
+			<h1>Comparisons</h1>
+			<p>
+				There are many JavaScript frameworks! Below is an overview of some of the major
+				ones and how Tera is similar and different.
+			</p>
+
+			<h2>React</h2>
+			<p>
+				React is a hugely popular framework that was launched and backed by Facebook. Its
+				components are written in JavaScript with an embedded XML-like syntax called JSX
+				for declaring the UI. It has been used in some of the biggest websites and has an
+				extensive ecosystem of helper libraries as well as a robust jobs market. Despite
+				being one of the older JavaScript frameworks, React is constantly evolving with
+				new (and sometimes controversial) features added frequently.
+			</p>
+			<p>
+				React uses a `Virtual DOM` to store a copy of the browser's UI and update it when
+				component state is changed. This means that state management can be as simple as
+				possible, stored in plain JavaScript variables that are synced automatically to the
+				UI, but this can also lead to performance issues if you're not careful.
+			</p>
+			<p>
+				Styling in React is achieved by importing a CSS file, using style objects within
+				JSX, or using one of the many third party libraries with a variety of approaches.
+			</p>
+			<p>
+				There are many backend frameworks built for use with React, but the most used are
+				probably Next.js (maintained by Vercel) and Remix (maintained by Shopify).
+			</p>
+			<h3>React's Strong Points</h3>
+			<p>
+				<ul>
+					<li>Used everywhere</li>
+					<li>Enormous library ecosystem</li>
+					<li>Conceptually simple state management</li>
+					<li>Many people like JSX</li>
+				</ul>
+			</p>
+			<h3>A React Counter</h3>
+
+			<table>
+				<tr>
+					<th></th>
+					<th>React</th>
+					<th>Tera</th>
+				</tr>
+				<tr>
+					<th>State</th>
+					<td>Virtual DOM</td>
+					<td>Proxy</td>
+				</tr>
+				<tr>
+					<th>UI Markup</th>
+					<td>JSX</td>
+					<td>HTML template</td>
+				</tr>
+				<tr>
+					<th>Styling</th>
+					<td>Import CSS</td>
+					<td>CSS template</td>
+				</tr>
+				<tr>
+					<th>Server</th>
+					<td>Third party</td>
+					<td>Built-in</td>
+				</tr>
+				<tr>
+					<th>Popularity</th>
+					<td>Huge</td>
+					<td>None</td>
+				</tr>
+			</table>
+
+			<h2>Vue</h2>
+
+			<h2>Svelte</h2>
+
+
+			<h2>Solid</h2>
+
+			<h2>Tera</h2>
+
+			<h2>ASP.NET, Django and Laravel</h2>
+
+		</div>
+	}
+}

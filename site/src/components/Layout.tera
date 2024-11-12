@@ -1,0 +1,26 @@
+import Sidebar from "./Sidebar.tera"
+
+export default function Layout() {
+    @render {
+        <div id="layout">
+            <div id="sidebar">
+                <Sidebar />
+            </div>
+            <div id="content">
+                <:slot />
+            </div>
+        </div>
+    }
+
+    @style {
+        #layout {   
+            display: grid;
+            grid-template-columns: 10em 1fr;
+            gap: 0.5em;
+        }
+
+        #sidebar {
+            margin: 0.2em;
+        }
+    }
+}

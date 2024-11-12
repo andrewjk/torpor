@@ -1,0 +1,11 @@
+
+export default function Overview() {
+	@render {
+		<div>
+			<h1>Overview</h1>
+			<p>
+				Tera is
+			</p>
+		</div>
+	}
+}

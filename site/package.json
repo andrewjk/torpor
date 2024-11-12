@@ -1,0 +1,21 @@
+{
+	"name": "@tera/site",
+	"version": "0.0.1",
+	"description": "The home and documentation site for Tera",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "terakit --dev",
+		"build": "tsc && terakit --build",
+		"preview": "vinxi serve"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@tera/kit": "workspace:^",
+		"@tera/unplugin": "workspace:^",
+		"@tera/view": "workspace:^",
+		"vinxi": "^0.4.3"
+	}
+}

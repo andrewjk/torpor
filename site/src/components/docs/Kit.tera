@@ -1,0 +1,11 @@
+
+export default function Kit() {
+	@render {
+		<div>
+			<h1>Kit</h1>
+			<p>
+				TODO:
+			</p>
+		</div>
+	}
+}

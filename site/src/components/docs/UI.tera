@@ -1,0 +1,11 @@
+
+export default function UI() {
+	@render {
+		<div>
+			<h1>UI</h1>
+			<p>
+				TODO:
+			</p>
+		</div>
+	}
+}
