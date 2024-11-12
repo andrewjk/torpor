@@ -1,6 +1,6 @@
 import articlesFavorite from "@/lib/api/controllers/articles/articlesFavorite";
 import articlesUnFavorite from "@/lib/api/controllers/articles/articlesUnFavorite";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	post: ({ params, appData }) => {

@@ -1,5 +1,5 @@
-import type { EndPoint } from "@tera/kit";
-import { redirect } from "@tera/kit/response";
+import type { EndPoint } from "@tera/build";
+import { redirect } from "@tera/build/response";
 
 export default {
 	load: async ({ cookies }) => {

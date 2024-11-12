@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
-import type { ServerEndPoint } from "@tera/kit";
-import { ok } from "@tera/kit/response";
+import type { ServerEndPoint } from "@tera/build";
+import { ok } from "@tera/build/response";
 
 export default {
 	load: async ({ appData, params }) => {

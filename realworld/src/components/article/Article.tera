@@ -1,4 +1,4 @@
-import { $page } from "@tera/kit/state";
+import { $page } from "@tera/build/state";
 import ArticleMeta from './ArticleMeta.tera';
 import CommentContainer from '../comment/CommentContainer.tera';
 

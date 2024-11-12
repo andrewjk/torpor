@@ -1,5 +1,5 @@
 //import { enhance } from '$app/forms';
-import { $page } from '@tera/kit/state';
+import { $page } from '@tera/build/state';
 
 export default function Layout() {
 	const $state = $watch({

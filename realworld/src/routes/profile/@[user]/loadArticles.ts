@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
 import { pageSize } from "@/lib/constants";
-import type { ServerParams } from "@tera/kit";
+import type { ServerParams } from "@tera/build";
 
 export default async function loadArticles(
 	{ url, params, appData }: ServerParams,

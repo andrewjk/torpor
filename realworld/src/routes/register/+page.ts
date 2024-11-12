@@ -1,5 +1,5 @@
 import component from "@/components/account/Register.tera";
-import type { EndPoint } from "@tera/kit";
+import type { EndPoint } from "@tera/build";
 
 export default {
 	component,

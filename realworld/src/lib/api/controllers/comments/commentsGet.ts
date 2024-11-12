@@ -1,4 +1,4 @@
-import { ok, serverError } from "@tera/kit/response";
+import { ok, serverError } from "@tera/build/response";
 import commentsGetPrisma from "../../db/comment/commentsGetPrisma";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import getErrorMessage from "../../utils/getErrorMessage";

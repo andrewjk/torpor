@@ -1,6 +1,6 @@
-# tera/kit
+# tera/build
 
-A framework for building libraries and/or sites with Tera.
+A framework for building sites and apps with Tera.
 
 Built with [Vinxi](https://github.com/nksaraf/vinxi).
 
@@ -25,7 +25,7 @@ npm create vite
 
 ## Maybe
 
-Ideally, sites built with tera/kit will be easy to get set up and running, with flexible overrides for complex uses.
+Ideally, sites built with tera/build will be easy to get set up and running, with flexible overrides for complex uses.
 
 - middleware setup for auth etc
 - file-based routing by default, with programmatic overrides

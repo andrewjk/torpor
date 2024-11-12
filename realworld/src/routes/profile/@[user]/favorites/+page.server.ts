@@ -1,5 +1,5 @@
-import type { ServerEndPoint } from "@tera/kit";
-import { ok } from "@tera/kit/response";
+import type { ServerEndPoint } from "@tera/build";
+import { ok } from "@tera/build/response";
 import loadArticles from "../loadArticles";
 
 export default {

@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
-import type { ServerEndPoint } from "@tera/kit";
-import { ok, redirect, unauthorized, unprocessable } from "@tera/kit/response";
+import type { ServerEndPoint } from "@tera/build";
+import { ok, redirect, unauthorized, unprocessable } from "@tera/build/response";
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 

@@ -1,12 +1,12 @@
 {
 	"name": "@tera/vite-starter",
 	"version": "0.0.1",
-	"description": "A Vite starter site built with tera/kit",
+	"description": "A Vite starter site built with tera/build",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../kit && pnpm build && cd ../realworld && terakit --dev",
-		"build": "tsc && terakit --build",
+		"dev": "cd ../build && pnpm build && cd ../realworld && tb --dev",
+		"build": "tsc && tb --build",
 		"preview": "vinxi serve",
 		"db:migratex": "tsm ./src/data/migrate.ts"
 	},
@@ -14,7 +14,6 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@tera/kit": "workspace:^",
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
 		"@types/bcryptjs": "^2.4.6",
@@ -31,6 +30,7 @@
 	"dependencies": {
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@prisma/client": "^5.21.1",
+		"@tera/build": "workspace:^",
 		"bcryptjs": "^2.4.3",
 		"dotenv": "^16.4.5",
 		"jose": "^5.9.4",

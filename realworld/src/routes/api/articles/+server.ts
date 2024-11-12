@@ -1,6 +1,6 @@
 import articlesCreate from "@/lib/api/controllers/articles/articlesCreate";
 import articlesList from "@/lib/api/controllers/articles/articlesList";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	get: ({ url, request }) => {

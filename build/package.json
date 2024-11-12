@@ -1,7 +1,7 @@
 {
-	"name": "@tera/kit",
+	"name": "@tera/build",
 	"version": "0.0.1",
-	"description": "A framework for building libraries and/or sites with Tera",
+	"description": "A framework for building sites and apps with Tera",
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
@@ -25,7 +25,7 @@
 	},
 	"private": true,
 	"bin": {
-		"terakit": "./dist/bin/index.js"
+		"tb": "./dist/bin/index.js"
 	},
 	"scripts": {
 		"build": "tsup",

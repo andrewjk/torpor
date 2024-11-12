@@ -1,4 +1,4 @@
-import type { ServerHook } from "@tera/kit";
+import type { ServerHook } from "@tera/build";
 
 export default {
 	handle: ({ appData, cookies }) => {

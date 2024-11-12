@@ -1,4 +1,4 @@
-import { ok } from "@tera/kit/response";
+import { ok } from "@tera/build/response";
 import prisma from "../../db/prisma";
 import tagView from "../../views/tagView";
 

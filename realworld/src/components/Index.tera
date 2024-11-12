@@ -1,4 +1,4 @@
-import { $page } from "@tera/kit/state";
+import { $page } from "@tera/build/state";
 import ArticleList from "@/components/article/ArticleList.tera";
 import Pagination from "@/components/Pagination.tera";
 

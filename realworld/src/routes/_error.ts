@@ -1,5 +1,5 @@
-import type { EndPoint } from "@tera/kit";
-import { $page } from "@tera/kit/state";
+import type { EndPoint } from "@tera/build";
+import { $page } from "@tera/build/state";
 import component from "./Error.tera";
 
 export default {

@@ -1,4 +1,4 @@
-import { created, serverError } from "@tera/kit/response";
+import { created, serverError } from "@tera/build/response";
 import userCreatePrisma from "../../db/user/userCreatePrisma";
 import createUserToken from "../../utils/createUserToken";
 import getErrorMessage from "../../utils/getErrorMessage";

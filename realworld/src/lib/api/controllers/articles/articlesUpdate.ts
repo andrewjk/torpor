@@ -1,5 +1,5 @@
 import { Article } from "@prisma/client";
-import { ok, serverError, unauthorized } from "@tera/kit/response";
+import { ok, serverError, unauthorized } from "@tera/build/response";
 import articleUpdatePrisma from "../../db/article/articleUpdatePrisma";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import getErrorMessage from "../../utils/getErrorMessage";

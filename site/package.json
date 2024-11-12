@@ -5,15 +5,15 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "terakit --dev",
-		"build": "tsc && terakit --build",
+		"dev": "tb --dev",
+		"build": "tsc && tb --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/kit": "workspace:^",
+		"@tera/build": "workspace:^",
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
 		"vinxi": "^0.4.3"

@@ -1,5 +1,5 @@
 import usersRegister from "@/lib/api/controllers/users/usersRegister";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	post: ({ request }) => {

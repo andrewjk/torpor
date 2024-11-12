@@ -1,5 +1,5 @@
 import usersLogin from "@/lib/api/controllers/users/usersLogin";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	post: ({ request }) => {

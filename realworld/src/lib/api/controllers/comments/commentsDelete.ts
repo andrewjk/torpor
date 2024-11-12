@@ -1,4 +1,4 @@
-import { ok, serverError, unauthorized } from "@tera/kit/response";
+import { ok, serverError, unauthorized } from "@tera/build/response";
 import commentDeletePrisma from "../../db/comment/commentDeletePrisma";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import getErrorMessage from "../../utils/getErrorMessage";

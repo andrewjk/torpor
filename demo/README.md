@@ -1,6 +1,6 @@
 # tera/demo
 
-A demo site built with [tera/kit](./kit).
+A demo site built with [tera/build](./build).
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 

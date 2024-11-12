@@ -1,6 +1,6 @@
 import commentsCreate from "@/lib/api/controllers/comments/commentsCreate";
 import commentsGet from "@/lib/api/controllers/comments/commentsGet";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	get: ({ params, request }) => {

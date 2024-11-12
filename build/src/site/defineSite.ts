@@ -25,7 +25,7 @@ export default function defineSite(options?: UserConfig) {
 			//	type: "http",
 			//	target: "server",
 			//	// TODO: change this when published
-			//	handler: "node_modules/@tera/kit/src/site/serverEntry.ts",
+			//	handler: "node_modules/@tera/build/src/site/serverEntry.ts",
 			//	routes: apiRoutes,
 			//	plugins: () => [config("custom", viteOptions())],
 			//},
@@ -34,7 +34,7 @@ export default function defineSite(options?: UserConfig) {
 				type: "http",
 				target: "server",
 				// TODO: change this when published
-				handler: "node_modules/@tera/kit/src/site/serverEntry.ts",
+				handler: "node_modules/@tera/build/src/site/serverEntry.ts",
 				routes,
 				plugins: () => [config("custom", viteOptions()), tera({ server: true })],
 			},
@@ -43,7 +43,7 @@ export default function defineSite(options?: UserConfig) {
 				type: "client",
 				target: "browser",
 				// TODO: change this when published
-				handler: "node_modules/@tera/kit/src/site/clientEntry.ts",
+				handler: "node_modules/@tera/build/src/site/clientEntry.ts",
 				base: "/_build",
 				routes,
 				plugins: () => [config("custom", viteOptions()), tera()],

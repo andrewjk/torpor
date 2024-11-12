@@ -1,4 +1,4 @@
-import { notFound, ok, serverError } from "@tera/kit/response";
+import { notFound, ok, serverError } from "@tera/build/response";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import createUserToken from "../../utils/createUserToken";
 import getErrorMessage from "../../utils/getErrorMessage";

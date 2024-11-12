@@ -19,7 +19,7 @@ if (fs.existsSync(jsConfigFile)) {
 	source = fs.readFileSync(jsConfigFile, "utf8");
 	source = source
 		.replace(
-			/import\s+\{\s+defineConfig\s+\}\s+from\s+["']@tera\/kit["']/,
+			/import\s+\{\s+defineConfig\s+\}\s+from\s+["']@tera\/build["']/,
 			"const defineConfig = (x) => x",
 		)
 		.replace("export default", "");

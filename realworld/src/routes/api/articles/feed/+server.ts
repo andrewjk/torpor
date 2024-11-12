@@ -1,5 +1,5 @@
 import articlesFeed from "@/lib/api/controllers/articles/articlesFeed";
-import type { ApiServerEndPoint } from "@tera/kit";
+import type { ApiServerEndPoint } from "@tera/build";
 
 export default {
 	get: ({ url, request }) => {

@@ -1,4 +1,4 @@
-import { $page, $navigation } from "@tera/kit/state";
+import { $page, $navigation } from "@tera/build/state";
 import PreloadingIndicator from "@/components/PreloadingIndicator.tera";
 
 export default function Layout() {

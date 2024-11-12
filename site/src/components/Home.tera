@@ -38,7 +38,7 @@ export default function Home() {
 						interfaces without having to reach for third party libraries, including:
 					</p>
 					<p><a href="docs/ui">An accessible, unstyled component library</a></p>
-					<p><a href="docs/kit">A site and app building framework</a></p>
+					<p><a href="docs/build">A site and app building framework</a></p>
 					<p>More to come...</p>
 				</div>
 				<div class="features-card">

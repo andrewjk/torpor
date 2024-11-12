@@ -13,7 +13,7 @@ Yet another JavaScript framework, designed for simplicity, completeness and fun.
 - Runtime reactivity via proxies that can be used in any JS/TS file
 - Scoped styles, two-way binding, child components and more -- see [tera/view](./view)
 - An accessible, unstyled component library -- see [tera/ui](./ui)
-- A rudimentary site and app building framework -- see [tera/kit](./kit)
+- A site and app building framework -- see [tera/build](./build)
 
 ### Not yet
 

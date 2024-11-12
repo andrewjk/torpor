@@ -1,4 +1,4 @@
-import { badRequest } from "@tera/kit/response";
+import { badRequest } from "@tera/build/response";
 import { ValidationError } from "../../utils/types";
 
 /**

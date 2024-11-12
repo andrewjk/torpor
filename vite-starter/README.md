@@ -1,6 +1,6 @@
 # tera/demo
 
-A Vite starter site built with [tera/kit](./kit).
+A Vite starter site built with [tera/build](./build).
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 

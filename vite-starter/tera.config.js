@@ -1,3 +1,3 @@
-import { defineConfig } from "@tera/kit";
+import { defineConfig } from "@tera/build";
 
 export default defineConfig();

@@ -1,4 +1,4 @@
-import { $page } from "@tera/kit/state";
+import { $page } from "@tera/build/state";
 
 export default function Error() {
 	@render {

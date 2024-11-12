@@ -1,19 +1,19 @@
 {
 	"name": "@tera/demo",
 	"version": "0.0.1",
-	"description": "A demo site built with tera/kit",
+	"description": "A demo site built with tera/build",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../kit && pnpm build && cd ../demo && terakit --dev",
-		"build": "tsc && terakit --build",
+		"dev": "cd ../build && pnpm build && cd ../demo && tb --dev",
+		"build": "tsc && tb --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/kit": "workspace:^",
+		"@tera/build": "workspace:^",
 		"@tera/ui": "workspace:^",
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
