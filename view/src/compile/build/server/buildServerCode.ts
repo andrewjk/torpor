@@ -88,6 +88,7 @@ function buildServerTemplate(
 					output: "",
 					styleHash: current.style?.hash || "",
 					varNames: {},
+					preserveWhitespace: false,
 					options,
 				};
 

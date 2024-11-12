@@ -11,6 +11,7 @@ export default interface BuildStatus {
 		path: string;
 	}[];
 	forVarNames: string[];
+	preserveWhitespace: boolean;
 	inHead?: boolean;
 	options?: BuildOptions;
 }

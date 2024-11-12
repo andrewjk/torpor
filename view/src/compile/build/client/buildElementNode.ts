@@ -50,9 +50,12 @@ export default function buildElementNode(
 		buildElementAttributes(node, varName, status, b);
 	}
 
+	const oldPreserveWhitespace = status.preserveWhitespace;
+	status.preserveWhitespace = ["code", "pre"].includes(node.tagName);
 	for (let child of node.children) {
 		buildNode(child, status, b, parentName, "null");
 	}
+	status.preserveWhitespace = oldPreserveWhitespace;
 }
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
@@ -186,7 +189,7 @@ function buildElementAttributes(
 				b.append(`${value} = ${varName};`);
 			} else if (name === "bind:group") {
 				buildBindGroupAttribute(node, varName, name, value, status, b);
-			} else if (name.indexOf("bind:") === 0) {
+			} else if (name.startsWith("bind:")) {
 				buildBindAttribute(node, varName, name, value, status, b);
 			} else if (name === "on:mount") {
 				// The on:mount event is faked by us by creating a $run. This also

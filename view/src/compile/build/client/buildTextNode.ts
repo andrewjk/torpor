@@ -12,9 +12,11 @@ export default function buildTextNode(
 ) {
 	let content = node.content || "";
 
-	// Replace all spaces with a single space, both to save space and to remove
-	// newlines from generated JS strings
-	content = content.replaceAll(/\s+/g, " ");
+	if (!status.preserveWhitespace) {
+		// Replace all spaces with a single space, both to save space and to remove
+		// newlines from generated JS strings
+		content = content.replaceAll(/\s+/g, " ");
+	}
 
 	// TODO: Move all of this logic into parse, for text nodes and attribute values
 	let textContent = "";

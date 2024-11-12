@@ -114,6 +114,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],
+					preserveWhitespace: false,
 				};
 
 				// Add the interface

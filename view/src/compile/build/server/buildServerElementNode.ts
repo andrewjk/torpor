@@ -29,9 +29,12 @@ export default function buildServerElementNode(
 	// templates and auto-expand it here
 	status.output += `<${tagName}${attributes}>`;
 	if (!voidTags.includes(tagName)) {
+		const oldPreserveWhitespace = status.preserveWhitespace;
+		status.preserveWhitespace = ["pre", "code"].includes(tagName);
 		for (let child of node.children) {
 			buildServerNode(child, status, b);
 		}
+		status.preserveWhitespace = oldPreserveWhitespace;
 		status.output += `</${tagName}>`;
 	}
 }
