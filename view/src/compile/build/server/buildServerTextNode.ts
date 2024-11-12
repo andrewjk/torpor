@@ -36,13 +36,13 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 				// Skip one-line comments
 				let start = i;
 				i = content.indexOf("\n", i);
-				status.output += content.substring(start, i + 1);
+				status.output += escapeHtml(content.substring(start, i + 1));
 				continue;
 			} else if (char === "/" && nextChar === "*") {
 				// Skip block comments
 				let start = i;
 				i = content.indexOf("*/", i) + 1;
-				status.output += content.substring(start, i + 1);
+				status.output += escapeHtml(content.substring(start, i + 1));
 				continue;
 			} else if (char === '"' || char === "'" || char === "`") {
 				// Skip string contents
@@ -50,7 +50,7 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 				for (let j = i + 1; j < content.length; j++) {
 					if (content[j] === char && content[j - 1] !== "\\") {
 						i = j;
-						status.output += content.substring(start, i + 1);
+						status.output += escapeHtml(content.substring(start, i + 1));
 						break;
 					}
 				}
@@ -59,4 +59,10 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 		}
 		status.output += char;
 	}
+}
+
+// Escape HTML in comments and strings on the server, so that we don't output unintended tags etc
+// This doesn't need to be done on the client, where we will be setting textContent
+function escapeHtml(text: string) {
+	return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }
