@@ -175,12 +175,25 @@ function parseComponentStyle(status: ParseStatus) {
 		} else if (char === "/" && nextChar === "*") {
 			// Skip block comments
 			status.i = status.source.indexOf("*/", status.i) + 1;
-		} else if (char === '"' || char === "'" || char === "`") {
+		} else if (char === '"' || char === "'") {
 			// Skip string contents
 			for (let j = status.i + 1; j < status.source.length; j++) {
 				if (status.source[j] === char && status.source[j - 1] !== "\\") {
 					status.i = j;
 					break;
+				}
+			}
+		} else if (char === "`") {
+			// Skip possibly interpolated string contents
+			let level2 = 0;
+			for (let j = status.i + 1; j < status.source.length; j++) {
+				if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
+					status.i = j;
+					break;
+				} else if (status.source[j] === "{" && (level2 > 0 || status.source[j - 1] === "$")) {
+					level2 += 1;
+				} else if (status.source[j] === "}" && level2 > 0) {
+					level2 -= 1;
 				}
 			}
 		} else if (char === "{") {
@@ -278,12 +291,26 @@ function consumeScriptComments(status: ParseStatus): boolean {
 		// Skip block comments
 		status.i = status.source.indexOf("*/", status.i) + 1;
 		return true;
-	} else if (char === '"' || char === "'" || char === "`") {
+	} else if (char === '"' || char === "'") {
 		// Skip string contents
 		for (let j = status.i + 1; j < status.source.length; j++) {
 			if (status.source[j] === char && status.source[j - 1] !== "\\") {
 				status.i = j;
 				break;
+			}
+		}
+		return true;
+	} else if (char === "`") {
+		// Skip possibly interpolated string contents
+		let level2 = 0;
+		for (let j = status.i + 1; j < status.source.length; j++) {
+			if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
+				status.i = j;
+				break;
+			} else if (status.source[j] === "{" && (level2 > 0 || status.source[j - 1] === "$")) {
+				level2 += 1;
+			} else if (status.source[j] === "}" && level2 > 0) {
+				level2 -= 1;
 			}
 		}
 		return true;

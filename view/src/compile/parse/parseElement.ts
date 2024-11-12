@@ -145,12 +145,25 @@ function parseText(status: ParseStatus, element: ElementNode) {
 				} else if (char === "/" && nextChar === "*") {
 					// Skip block comments
 					k = status.source.indexOf("*/", k) + 1;
-				} else if (char === '"' || char === "'" || char === "`") {
+				} else if (char === '"' || char === "'") {
 					// Skip string contents
 					for (let l = k + 1; l < status.source.length; l++) {
 						if (status.source[l] === char && status.source[l - 1] !== "\\") {
 							k = l;
 							break;
+						}
+					}
+				} else if (char === "`") {
+					// Skip possibly interpolated string contents
+					let level2 = 0;
+					for (let l = k + 1; l < status.source.length; l++) {
+						if (status.source[l] === char && status.source[l - 1] !== "\\" && level2 === 0) {
+							k = l;
+							break;
+						} else if (status.source[l] === "{" && (level2 > 0 || status.source[l - 1] === "$")) {
+							level2 += 1;
+						} else if (status.source[l] === "}" && level2 > 0) {
+							level2 -= 1;
 						}
 					}
 				} else if (char === "{") {

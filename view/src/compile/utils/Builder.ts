@@ -9,7 +9,7 @@ export default class Builder {
 	append(text: string) {
 		text = text.trim();
 		let i = 0;
-		let newline = !!text.length && !text.endsWith("\n");
+		//let newline = !!text.length && !text.endsWith("\n");
 
 		while (i < text.length) {
 			// Skip spaces
@@ -27,15 +27,30 @@ export default class Builder {
 					this.#space -= 1;
 				}
 
+				let gotText = false;
 				// Add indentation
 				this.#text += "\t".repeat(Math.max(0, this.#space));
-
 				// Add from text until the next newline or the end of text
 				const start = i;
 				while (i < text.length && text[i] !== "\n") {
+					// Just add backticked text as-is
+					if (text[i] === "`") {
+						i++;
+						let level = 0;
+						while (i < text.length && !(text[i] === "`" && text[i - 1] !== "\\" && level === 0)) {
+							// TODO: Need to do this in more places when skipping strings
+							if (text[i] === "{" && (level > 0 || text[i - 1] === "$")) {
+								level += 1;
+							} else if (text[i] === "}" && level > 0) {
+								level -= 1;
+							}
+							i++;
+						}
+					}
 					i++;
 				}
 				const line = text.substring(start, i + 1);
+
 				if (line.startsWith("*")) {
 					// JSDoc
 					this.#text += " ";
