@@ -1,5 +1,6 @@
+import Repl from "../repl/Repl.tera"
 
-export default function Binding() {	
+export default function Binding() {
 	@render {
 		<div>
 			<:head>
@@ -13,8 +14,7 @@ export default function Binding() {
 			<p>
 				Consider the following component:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	let $state = $watch({ name: "Andrew" })
 
@@ -29,17 +29,15 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 			<p>
 				The component contains an input and a welcome message which changes when the value
 				of $state.name is changed. $state.name has an initial value which is shown in the
 				input and welcome message but is not updated when the input's value is changed. To
-				update $state.name when the input value is changed, you can add `bind:` before the
-				input's `value` attribute:
+				update $state.name when the input value is changed, you can add <code>bind:</code>
+				before the input's <code>value</code> attribute:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	let $state = $watch({ name: "Andrew" })
 
@@ -55,24 +53,23 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 			<p>
 				Tera will create an onchange event for the input that sets $state.name.
 			</p>
 			
 			<h2>Input Types</h2>
 			<p>
-				Binding works with inputs and the `value`, `checked` and `group` attributes.
+				Binding works with inputs and the <code>value</code>, <code>checked</code>
+				and <code>group</code> attributes.
 			</p>
 
 			<h2>Element Binding</h2>
 			<p>
 				Another use for binding is for storing a DOM element in a variable, which is
-				done by adding a `bind:self` attribute:
+				done by adding a <code>bind:self</code> attribute:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	let para
 
@@ -81,24 +78,42 @@ export default function Component() {
 	})
 
 	@render {
-		<p bind:self={}>
+		<p bind:self={para}>
 			Welcome!
 		</p>
 	}
 
-	@styles {
+	@style {
 		large-text {
 			font-size: 10em;
 		}
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 			<p>
 				Note that the DOM element will not be available until after the component has been
 				mounted and all its elements added to the DOM, and so you should only access it
 				from within a $mount function.
 			</p>
+			
+			<h2>Playground</h2>
+			<Repl input={`
+export default function Component() {
+	let $state = $watch({ name: "Andrew" })
+
+	@render {
+		<div>
+			<p>
+				Your name: <input bind:value={$state.name}>
+			</p>
+			<p>
+				Welcome, {$state.name}!
+			</p>
+		</div>
+	}
+}
+`.trimStart()} />
+
 		</div>
 	}
 }

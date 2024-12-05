@@ -1,5 +1,5 @@
 import component from "@/components/docs/UI.tera";
-import { type EndPoint } from "../../../../../build/dist";
+import { type EndPoint } from "@tera/build";
 
 export default {
 	component,

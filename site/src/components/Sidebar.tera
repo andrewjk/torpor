@@ -1,11 +1,11 @@
 export default function Sidebar() {
     @render {
-        <div>
-            <ul>
+        <nav>
+            <ul class="plain">
                 <li><a href="/">Home</a></li>
             </ul>
             <h4>Docs</h4>
-            <ul>
+            <ul class="plain">
                 <li><a href="/docs/overview">Overview</a></li>
                 <li><a href="/docs/getting-started">Getting Started</a></li>
                 <li><a href="/docs/components">Components</a></li>
@@ -16,16 +16,20 @@ export default function Sidebar() {
                 <li><a href="/docs/special-tags">Special Tags</a></li>
                 <li><a href="/docs/comparisons">Comparisons</a></li>
             </ul>
-            <h4>Kit</h4>
             <h4>UI</h4>
-        </div>
-    }
-
-    @styles {
-        ul {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
+            <ul class="plain">
+                <li>TODO:</li>
+            </ul>
+            <h4>Build</h4>
+            <ul class="plain">
+                <li>TODO:</li>
+            </ul>
+            <h4>Playground</h4>
+            <ul class="plain">
+                <li><a href="/playground/play">Playground</a></li>
+                <li><a href="/playground/demo">Demo</a></li>
+                <li><a href="/playground/party">Component Party</a></li>
+            </ul>
+        </nav>
     }
 }

@@ -1,11 +1,48 @@
+import Repl from "../repl/Repl.tera"
 
 export default function Styles() {
 	@render {
 		<div>
 			<h1>Styles</h1>
 			<p>
-				TODO:
+				The CSS for styling a component's elements is declared with a <code>&commat;style</code>
+				block. There can only be one @style block per component:
 			</p>
+			<pre><code>{`
+export default function Component() {
+	@render {
+		<p class="extravagant">Hello!</p>
+	}
+
+	@style {
+		.extravagant {
+			font-size: x-large;
+			color: magenta;
+		}
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				The styles in the style block are scoped to the elements in the component so that
+				they don't affect elements in other components.
+			</p>
+
+			<h2>Playground</h2>
+			<Repl input={`
+export default function Component() {
+	@render {
+		<p class="extravagant">Hello!</p>
+	}
+
+	@style {
+		.extravagant {
+			font-size: x-large;
+			color: magenta;
+		}
+	}
+}
+`.trimStart()} />
+
 		</div>
 	}
 }

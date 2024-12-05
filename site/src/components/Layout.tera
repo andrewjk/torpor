@@ -15,12 +15,17 @@ export default function Layout() {
     @style {
         #layout {   
             display: grid;
-            grid-template-columns: 10em 1fr;
-            gap: 0.5em;
+            grid-template-columns: auto 1fr;
+            gap: 0.5rem;
+            height: 100vh;
         }
 
         #sidebar {
-            margin: 0.2em;
+            margin: 0.5rem;
+        }
+
+        #content {
+            overflow: auto;
         }
     }
 }

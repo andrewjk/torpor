@@ -1,8 +1,8 @@
 
-export default function Kit() {
+export default function Build() {
 	@render {
 		<div>
-			<h1>Kit</h1>
+			<h1>Build</h1>
 			<p>
 				TODO:
 			</p>

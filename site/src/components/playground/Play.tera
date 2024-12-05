@@ -1,0 +1,31 @@
+import Repl from "../repl/Repl.tera"
+
+export default function Playground() {
+	@render {
+		<div>
+			<:head>
+				<title>Playground</title>
+			</:head>
+
+			<h1>Playground</h1>
+			<Repl input={`
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trimStart()} />
+		</div>
+	}
+}

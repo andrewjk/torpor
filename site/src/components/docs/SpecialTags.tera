@@ -30,20 +30,18 @@ export default function SpecialTags() {
 
 			<h2>TODO: &lt;:window&gt;</h2>
 			<p>
-				Use the &lt;:window> tag to add events to the `window` object.
+				Use the &lt;:window> tag to add events to the <code>window</code> object.
 			</p>
 
 			<h2>TODO: &lt;:document&gt;</h2>
 			<p>
-				Use the &lt;:document> tag to add events to the `document` object.
+				Use the &lt;:document> tag to add events to the <code>document</code> object.
 			</p>
 
 			<h2>TODO: &lt;:body&gt;</h2>
 			<p>
-				Use the &lt;:body> tag to add events to the `body` object.
+				Use the &lt;:body> tag to add events to the <code>body</code> object.
 			</p>
 		</div>
 	}
-
-
 }

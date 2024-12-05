@@ -1,11 +1,114 @@
+import Demo from "./Demo.tera?raw"
+import Repl from "../repl/Repl.tera"
 
 export default function Overview() {
 	@render {
 		<div>
 			<h1>Overview</h1>
 			<p>
-				Tera is
+				Tera is a JavaScript framework, designed for simplicity, completeness and fun.
 			</p>
+			<p>
+				🚧 WARNING: VERY INCOMPLETE 🚧
+			</p>
+
+			<h2>Features</h2>
+			<ul>
+				<li>Compose your views with JS/TS, HTML and CSS</li>
+				<li>Components are functions with script, markup and styles</li>
+				<li>In-markup JS/TS logic with @if, @for, @switch and @await keywords</li>
+					<ul>
+						<li>And @replace, @const, @console, @debugger, @function and @html</li>
+					</ul>
+				<li>Runtime reactivity via proxies that can be used in any JS/TS file</li>
+				<li>Scoped styles, two-way binding, child components and more</li>
+				<li>An accessible, unstyled component library</li>
+				<li>A site and app building framework</li>
+			</ul>
+
+			<h2>A simple component</h2>
+			<pre><code>{`
+/**
+ * Components are functions that are declared in a \`.tera\` file
+ */
+export default function Component($props: { name: string }) {
+    // Use the $watch function to declare reactive state
+    const $state = $watch({
+        count: 0,
+        get isEven() {
+            return this.count % 2 === 0
+        },
+    })
+
+    // Put your HTML markup in a @render section
+    @render {
+        <div>
+            <h2>Hello, {$props.name}!</h2>
+
+            <button onclick={() => $state.count++}>
+                Increment
+            </button>
+
+            <p>
+                The count is {$state.count}.
+            </p>
+
+            @if ($state.isEven) {
+                <p>It is even.</p>
+            } else {
+                <p>It is odd.</p>
+            }
+        </div>
+    }
+
+    // Put your CSS styles in a @style section
+    @style {
+        h2 {
+			color: magenta;
+        }
+    }
+}
+`.trim()}</code></pre>
+
+
+			<h2>Playground</h2>
+			<Repl input={`
+export default function Component($props: { name: string }) {
+    const $state = $watch({
+        count: 0,
+        get isEven() {
+            return this.count % 2 === 0
+        },
+    })
+
+    @render {
+        <div>
+            <h2>Hello, {$props.name}!</h2>
+
+            <button onclick={() => $state.count++}>
+                Increment
+            </button>
+
+            <p>
+                The count is {$state.count}.
+            </p>
+
+            @if ($state.isEven) {
+                <p>It is even.</p>
+            } else {
+                <p>It is odd.</p>
+            }
+        </div>
+    }
+
+    @style {
+        h2 {
+			color: magenta;
+        }
+    }
+}
+`.trimStart()} />
+
 		</div>
 	}
 }

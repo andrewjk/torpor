@@ -8,13 +8,11 @@ export default function GettingStarted() {
 
 			<h1>Getting Started</h1>
 			<p>
-				Use `npm` (or your preferred package manager) to add Tera to your project:
+				Use <code>npm</code> (or your preferred package manager) to add Tera to your project:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 npm install tera
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 		</div>
 	}
 }

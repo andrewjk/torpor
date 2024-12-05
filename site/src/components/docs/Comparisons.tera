@@ -15,50 +15,236 @@ export default function Comparisons() {
 			<h2>React</h2>
 			<p>
 				React is a hugely popular framework that was launched and backed by Facebook. Its
-				components are written in JavaScript with an embedded XML-like syntax called JSX
-				for declaring the UI. It has been used in some of the biggest websites and has an
-				extensive ecosystem of helper libraries as well as a robust jobs market. Despite
-				being one of the older JavaScript frameworks, React is constantly evolving with
-				new (and sometimes controversial) features added frequently.
+				components are written in JavaScript with an embedded XML-like syntax called
+				<strong>JSX</strong> for declaring the UI. It has been used in some of the biggest
+				websites and has an extensive ecosystem of helper libraries as well as a robust
+				jobs market. Despite being one of the older JavaScript frameworks, React is
+				constantly evolving with new (and sometimes controversial) features added frequently.
 			</p>
 			<p>
-				React uses a `Virtual DOM` to store a copy of the browser's UI and update it when
-				component state is changed. This means that state management can be as simple as
-				possible, stored in plain JavaScript variables that are synced automatically to the
-				UI, but this can also lead to performance issues if you're not careful.
+				React uses a <strong>Virtual DOM</strong> to store a copy of the browser's UI and
+				update it when component state is changed. This means that state management can be
+				as simple as possible, stored in plain JavaScript variables that are synced
+				automatically to the UI, but this can also lead to performance issues if you're
+				not careful.
 			</p>
 			<p>
-				Styling in React is achieved by importing a CSS file, using style objects within
-				JSX, or using one of the many third party libraries with a variety of approaches.
+				Styling in React is achieved by <strong>importing a CSS file</strong>, using style
+				objects within JSX, or using one of the many third party libraries with a variety
+				of approaches.
 			</p>
 			<p>
 				There are many backend frameworks built for use with React, but the most used are
-				probably Next.js (maintained by Vercel) and Remix (maintained by Shopify).
+				probably <strong>Next.js</strong> (maintained by Vercel) and <strong>Remix</strong>
+				(maintained by Shopify).
 			</p>
-			<h3>React's Strong Points</h3>
 			<p>
-				<ul>
-					<li>Used everywhere</li>
-					<li>Enormous library ecosystem</li>
-					<li>Conceptually simple state management</li>
-					<li>Many people like JSX</li>
-				</ul>
+				<a href="https://en.wikipedia.org/wiki/React_(software)">
+					Read more about React at Wikipedia
+				</a>
 			</p>
-			<h3>A React Counter</h3>
 
-			<table>
+			<h3>A React Counter</h3>
+			<pre><code>{`
+import { useState } from "react";
+
+export default function Counter() {
+	const [count, setCount] = useState(0);
+
+	function incrementCount() {
+		setCount((count) => count + 1);
+	}
+
+	return (
+		<>
+			<p>Counter: {count}</p>
+			<button onClick={incrementCount}>+1</button>
+		</>
+	);
+}
+`.trim()}</code></pre>
+
+			<h2>Solid</h2>
+			<p>
+				Solid is one of the newest frameworks, but it has been enormously influential in
+				spreading the adoption of <strong>fine-grained reactivity</strong>, via a
+				mechanism they call signals.
+			</p>
+			<p>
+				Unlike a Virtual DOM, which re-runs all or part of the UI in response to changes,
+				<strong>signals</strong> watch for changes to state and update only the smallest
+				part of the UI that depends on that state.
+			</p>
+			<p>
+				Otherwise, the experience of writing a Solid component is similar to that of a React
+				component, with the logic in JavaScript, the markup in JSX and styles in imported
+				CSS.
+			</p>
+			<p>
+				Solid provides an official server framework called <strong>SolidStart</strong>.
+			</p>
+
+			<h3>A Solid Counter</h3>
+			<pre><code>{`
+import { createSignal } from "solid-js";
+
+export default function Counter() {
+	const [count, setCount] = createSignal(0);
+
+	function incrementCount() {
+		setCount(count() + 1);
+	}
+
+	return (
+		<>
+			<p>Counter: {count()}</p>
+			<button onClick={incrementCount}>+1</button>
+		</>
+	);
+}
+`.trim()}</code></pre>
+
+			<h2>Vue</h2>
+			<p>
+				Vue is another very popular framework. Its components are written in a single
+				file using a custom templating language, with separate sections for scripts,
+				markup and styles. Vue has an extensive ecosystem of helper libraries known for
+				their high quality and consistency.
+			</p>
+			<p>
+				Vue uses a <strong>Virtual DOM</strong> to manage component state changes with
+				some clever optimizations to avoid re-rendering where possible. There are some
+				ongoing efforts to go beyond this and remove the Virtual Dom altogether, replacing
+				it with a signals-based implementation, known as <strong>Vue Vapor</strong>.
+			</p>
+			<p>
+				Styling in Vue is achieved by writing <strong>plain CSS</strong> within the
+				&lt;style&gt; tag of a component.
+			</p>
+			<p>
+				Vue provides an official <strong>Vue Router</strong> for building Single Page
+				Applications, and for more complex requirements there is the <strong>Nuxt</strong>
+				framework.
+			</p>
+			<p>
+				<a href="https://en.wikipedia.org/wiki/Vue.js">
+					Read more about Vue at Wikipedia
+				</a>
+			</p>
+
+			<h3>A Vue 3 Counter</h3>
+			<pre><code>{`
+<script setup>
+	import { ref } from "vue";
+	const count = ref(0);
+
+	function incrementCount() {
+		count.value++;
+	}
+</script>
+
+<template>
+	<p>Counter: \{\{ count \}\}</p>
+	<button @click="incrementCount">+1</button>
+</template>
+`.trim()}</code></pre>
+
+			<h2>Svelte</h2>
+			<p>
+				Svelte is a newer framework that has gained a lot of fans due to its focus on
+				ease of use and simplicity. Like Vue, its components are written in a single
+				file using a custom templating language, with separate sections for scripts,
+				markup and styles.
+			</p>
+			<p>
+				Initially, Svelte used a <strong>compile-time</strong> tracking system to know when
+				to update the browser's UI, but the latest version (Svelte 5) has moved to a more
+				signals-like system that they call <strong>Runes</strong>.
+			</p>
+			<p>
+				Styling in Svelte is achieved by writing <strong>plain CSS</strong> within the
+				&lt;style&gt; tag of a component.
+			</p>
+			<p>
+				Svelte provides an official server framework called <strong>SvelteKit</strong>.
+			</p>
+			<p>
+				<a href="https://en.wikipedia.org/wiki/Svelte">
+					Read more about Svelte at Wikipedia
+				</a>
+			</p>
+
+			<h3>A Svelte 5 Counter</h3>
+			<pre><code>{`
+<script>
+	let count = $state(0);
+
+	function incrementCount() {
+		count++;
+	}
+</script>
+
+<p>Counter: {count}</p>
+<button onclick={incrementCount}>+1</button>
+`.trim()}</code></pre>
+
+			<h2>Tera</h2>
+			<p>
+				Tera components are written in JavaScript with embedded HTML and CSS for declaring
+				the UI. Tera aims to include everything you need to build high-quality components,
+				apps and sites without having to immediately reach for third-party libraries.
+			</p>
+			<p>
+				Tera state is stored in an object, which is wrapped in a JavaScript <strong>proxy</strong>,
+				which is monitored for changes to update the browser UI. This is conceptually
+				simpler than the approaches of Solid, Vue and Svelte, but may not be as efficient.
+			</p>
+			<p>
+				Tera provides a set of UI components, as well as an official server framework
+				called <strong>Tera Build</strong>.
+			</p>
+
+			<h3>A Tera Counter</h3>
+			<pre><code>{`
+export default function Counter() {
+	let $state = $watch({ count: 0 })
+
+	function incrementCount() {
+		$state.count++;
+	}
+
+	@render {
+		<div>
+			<p>Counter: {$state.count}</p>
+			<button onclick={incrementCount}>+1</button>
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>Comparison Table</h2>
+			<table class="full-width">
 				<tr>
 					<th></th>
 					<th>React</th>
+					<th>Vue</th>
+					<th>Svelte</th>
+					<th>Solid</th>
 					<th>Tera</th>
 				</tr>
 				<tr>
 					<th>State</th>
 					<td>Virtual DOM</td>
-					<td>Proxy</td>
+					<td>VDOM / Signals</td>
+					<td>Runes</td>
+					<td>Signals</td>
+					<td>State proxy</td>
 				</tr>
 				<tr>
 					<th>UI Markup</th>
+					<td>JSX</td>
+					<td>HTML template</td>
+					<td>HTML template</td>
 					<td>JSX</td>
 					<td>HTML template</td>
 				</tr>
@@ -66,30 +252,27 @@ export default function Comparisons() {
 					<th>Styling</th>
 					<td>Import CSS</td>
 					<td>CSS template</td>
+					<td>CSS template</td>
+					<td>Import CSS</td>
+					<td>CSS template</td>
 				</tr>
 				<tr>
-					<th>Server</th>
-					<td>Third party</td>
-					<td>Built-in</td>
+					<th>Server Framework</th>
+					<td>Next or Remix</td>
+					<td>Nuxt</td>
+					<td>SvelteKit</td>
+					<td>SolidStart</td>
+					<td>Tera Build</td>
 				</tr>
 				<tr>
 					<th>Popularity</th>
 					<td>Huge</td>
+					<td>Large</td>
+					<td>Medium</td>
+					<td>Small</td>
 					<td>None</td>
 				</tr>
 			</table>
-
-			<h2>Vue</h2>
-
-			<h2>Svelte</h2>
-
-
-			<h2>Solid</h2>
-
-			<h2>Tera</h2>
-
-			<h2>ASP.NET, Django and Laravel</h2>
-
 		</div>
 	}
 }

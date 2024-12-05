@@ -1,4 +1,157 @@
 :root {
+	--bg: #fff;
+	--text: #222;
+	--code: #f6f6f9;
+	--brand: #282a36;
+	--brad: 0.5rem;
+}
+
+html {
+	font-family: ui-sans-serif, sans-serif;
+}
+
+body {
+	color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: ui-serif, serif;
+	font-weight: 400;
+}
+
+h1 {
+	font-size: 5rem;
+}
+
+h2 {
+	font-size: 3.6rem;
+}
+
+h3 {
+	font-size: 2.8rem;
+}
+
+h4 {
+	font-size: 2rem;
+}
+
+h5 {
+	font-size: 1.4rem;
+}
+
+h6 {
+	font-size: 1rem;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-block-start: 2rem;
+	margin-block-end: 0.5rem;
+}
+
+p {
+	margin-block-start: 1rem;
+	margin-block-end: 1rem;
+}
+
+ul.plain,
+ol.plain {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+}
+
+pre,
+code {
+	background: var(--code);
+	border-radius: 0.5rem;
+	font-size: 1.3rem;
+	line-height: 1.5;
+}
+
+pre {
+	padding: 1rem;
+	text-align: left;
+	tab-size: 4;
+	white-space: nowrap;
+	white-space-collapse: preserve;
+
+	code {
+		padding: 0;
+	}
+}
+
+code {
+	padding: 0.5rem;
+}
+
+textarea.code {
+	border-radius: 0.5rem;
+	font-family: monospace;
+	font-size: 1.3rem;
+	line-height: 1.5;
+	padding: 0.5rem;
+	tab-size: 4;
+	white-space: nowrap;
+	white-space-collapse: preserve;
+}
+
+.hstack,
+.vstack {
+	display: flex;
+
+	div.grow {
+		flex-grow: 1;
+	}
+}
+
+.hstack {
+	flex-direction: row;
+}
+
+.vstack {
+	flex-direction: column;
+}
+
+.hstack.spaced,
+.vstack.spaced {
+	gap: 1rem;
+}
+
+.hstack.equal,
+.vstack.equal {
+	div {
+		flex: 1 1 0;
+	}
+}
+
+.full-width {
+	min-width: 100%;
+}
+
+table {
+	border-spacing: 0;
+	text-align: left;
+}
+
+th,
+td {
+	border-bottom: 1px solid lightgray;
+	padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+/*
+
+:root {
 	font-family: sans-serif;
 	line-height: 1.5;
 	font-weight: 400;
@@ -91,3 +244,4 @@ pre {
 		background-color: #f9f9f9;
 	}
 }
+*/

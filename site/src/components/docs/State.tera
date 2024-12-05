@@ -1,14 +1,16 @@
+import Repl from "../repl/Repl.tera"
 
 export default function State() {
 	@render {
 		<div>
 			<h1>State</h1>
 			<p>
-				Data that is stored within a component is called its `state`. State can be made
-				reactive by placing it in an object and wrapping it with the $watch function:
+				Data that is stored within a component is called its <code>state</code>. State can
+				be simple variables, or it can be placed in an object and wrapped with the
+				<code>$watch</code> function to make it reactive and update the UI when it is
+				changed:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1
@@ -25,19 +27,17 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 			<p>
 				The $watch function is automatically imported into component files if used (along
 				with a few other functions). By convention, reactive objects should start with a
-				`$` so that it is easy to see at a glance which statements are reactive in your
-				markup.
+				<code>$</code> so that it is easy to see at a glance which statements are reactive
+				in your markup.
 			</p>
 			<p>
 				Dependent state can be created using object properties:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1,
@@ -57,17 +57,15 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 
 			<h2>The $run Function</h2>
 			<p>
-				Another function that is automatically imported into your components is `$run`.
-				Calling $run sets up a function that is run on component initialization and when
-				any reactive values accessed within it are changed:
+				Another function that is automatically imported into your components is
+				<code>$run</code>. Calling $run sets up a function that is run on component
+				initialization and when any reactive values accessed within it are changed:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1,
@@ -75,7 +73,7 @@ export default function Component() {
 
 	$run(() => {
 		if ($state.count > 5) {
-			document.getElementById("text").class = "large"	
+			document.getElementById("text").style.fontSize = "x-large"	
 		}
 	})
 
@@ -90,8 +88,7 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
 			<p>
 				Behind the scenes, $run is called in the @render block to set up reactive text,
 				attributes and statements.
@@ -116,8 +113,7 @@ export default function Component() {
 				A component function can accept a $props component containing the properties that
 				were passed to the component:
 			</p>
-			<pre><code>
-{`
+			<pre><code>{`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
@@ -125,8 +121,34 @@ export default function Component($props: { name: string }) {
 		</p>
 	}
 }
-`.trim()}
-			</code></pre>
+`.trim()}</code></pre>
+			
+			<h2>Playground</h2>
+			<Repl input={`
+export default function Component() {
+	const $state = $watch({
+		count: 1,
+	})
+
+	$run(() => {
+		if ($state.count > 5) {
+			document.getElementById("text").style.fontSize = "x-large"	
+		}
+	})
+
+	@render {
+		<div>
+			<p id="text">
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+		</div>
+	}
+}
+`.trimStart()} />
+
 		</div>
 	}
 }
