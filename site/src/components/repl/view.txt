@@ -1,0 +1,713 @@
+// src/render/formatText.ts
+function formatText(text) {
+  return text != null ? text : "";
+}
+
+// src/render/context.ts
+var context = {
+  activeEffect: null,
+  activeRange: null,
+  mountEffects: [],
+  stashedEvents: [],
+  stashedAnimations: [],
+  hydrationNode: null
+  //hn: null,
+  //get hydrationNode() {
+  //	return this.hn;
+  //},
+  //set hydrationNode(value) {
+  //	console.log(`set hydration ${printNode(value)}`);
+  //	this.hn = value;
+  //},
+};
+var context_default = context;
+
+// src/render/$mount.ts
+function $mount(fn) {
+  context_default.mountEffects.push(fn);
+}
+
+// src/render/$run.ts
+function $run(fn) {
+  let effect = {
+    run: fn,
+    cleanup: null,
+    range: context_default.activeRange,
+    props: null
+  };
+  if (context_default.activeRange) {
+    (context_default.activeRange.effects ??= []).push(effect);
+  }
+  context_default.activeEffect = effect;
+  const cleanup = effect.run();
+  if (typeof cleanup === "function") {
+    effect.cleanup = cleanup;
+  }
+  context_default.activeEffect = null;
+}
+
+// src/watch/symbols.ts
+var proxyDataSymbol = Symbol("_proxy_data");
+
+// src/render/$unwrap.ts
+function $unwrap(object) {
+  return object[proxyDataSymbol].target || object;
+}
+
+// src/watch/trackEffect.ts
+function trackEffect(data, key) {
+  if (context_default.activeEffect) {
+    let propState = data.propData.get(key);
+    if (!propState) {
+      propState = { effects: [] };
+      data.propData.set(key, propState);
+    }
+    propState.effects ||= [];
+    propState.effects.push(context_default.activeEffect);
+    context_default.activeEffect.props ||= [];
+    context_default.activeEffect.props.push(propState);
+  }
+}
+
+// src/watch/triggerEffects.ts
+function triggerEffects(data, key) {
+  let effects = data.propData.get(key)?.effects;
+  if (effects) {
+    for (let effect of effects) {
+      if (effect.cleanup) {
+        effect.cleanup();
+      }
+      effect.run();
+    }
+  }
+}
+
+// src/watch/proxyGet.ts
+function proxyGet(target, key, receiver, data) {
+  if (key === proxyDataSymbol) {
+    return data;
+  }
+  if (!data.propData.has(key)) {
+    if (!data.shallow) {
+      let value = target[key];
+      if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) {
+        target[key] = $watch(value);
+      }
+    }
+    data.propData.set(key, null);
+  }
+  if (data.isArray) {
+    if (key === "pop" || key === "push" || key === "reverse" || key === "shift" || key === "sort" || key === "splice" || key === "unshift") {
+      const targetFunction = target[key];
+      return function(...args) {
+        targetFunction.apply(target, args);
+        triggerEffects(data, "length");
+      };
+    } else if (key === Symbol.iterator) {
+      trackEffect(data, "length");
+      context_default.activeEffect = null;
+    } else {
+      trackEffect(data, key);
+    }
+  } else {
+    trackEffect(data, key);
+  }
+  return Reflect.get(target, key, receiver);
+}
+
+// src/watch/transferEffects.ts
+function transferEffects(oldValue, newValue) {
+  const oldData = oldValue[proxyDataSymbol];
+  const newData = newValue[proxyDataSymbol];
+  moveChildEffects(oldValue, newValue, oldData, newData);
+}
+function moveChildEffects(oldValue, newValue, oldData, newData) {
+  for (let key of oldData.propData.keys()) {
+    let props = oldData.propData.get(key);
+    if (props) {
+      newData.propData.set(key, props);
+      let oldPropValue = oldValue[key];
+      let oldPropData = oldPropValue[proxyDataSymbol];
+      if (oldPropData) {
+        newValue[key] = $watch(newValue[key]);
+      }
+      let newPropValue = newValue[key];
+      if (props.effects) {
+        for (let effect of props.effects) {
+          if (effect.cleanup) {
+            effect.cleanup();
+          }
+          if (newPropValue) {
+            effect.run();
+          }
+        }
+      }
+      if (oldPropData) {
+        let newPropData = newPropValue[proxyDataSymbol];
+        moveChildEffects(oldPropValue, newPropValue, oldPropData, newPropData);
+      }
+    }
+  }
+}
+
+// src/watch/proxySet.ts
+function proxySet(target, key, value, receiver, data) {
+  const oldValue = target[key];
+  if (value !== oldValue) {
+    let newValue = value;
+    if (oldValue && oldValue[proxyDataSymbol]) {
+      newValue = $watch(value);
+      transferEffects(oldValue, newValue);
+    }
+    Reflect.set(target, key, newValue, receiver);
+    triggerEffects(data, key);
+    if (data.isArray && !isNaN(+String(key))) {
+      triggerEffects(data, "length");
+    }
+  }
+  return true;
+}
+
+// src/render/$watch.ts
+function $watch(object, options) {
+  if (object == null || object[proxyDataSymbol]) {
+    return object;
+  }
+  const data = {
+    target: object,
+    isArray: Array.isArray(object),
+    shallow: !!options?.shallow,
+    propData: /* @__PURE__ */ new Map()
+  };
+  const handler = {
+    get: function(target, prop, receiver) {
+      return proxyGet(target, prop, receiver, data);
+    },
+    set: function(target, prop, value, receiver) {
+      return proxySet(target, prop, value, receiver, data);
+    }
+  };
+  return new Proxy(object, handler);
+}
+
+// src/render/addAnimation.ts
+function addAnimation(el, entry, exit) {
+  context_default.stashedAnimations.push({
+    range: context_default.activeRange,
+    el,
+    in: entry,
+    out: exit
+  });
+}
+
+// src/render/addEvent.ts
+function addEvent(el, type, listener) {
+  context_default.stashedEvents.push({ range: context_default.activeRange, el, type, listener });
+}
+
+// src/motion/animate.ts
+async function animate(el, enter, keyframes, options) {
+  let animationOptions = Object.assign(
+    {
+      direction: enter ? "normal" : "reverse",
+      // TODO: Should probably have a global setting for this somewhere
+      // And respect browser reduce motion settings
+      duration: 1e3,
+      fill: "forwards"
+    },
+    options
+  );
+  const animation = el.animate(keyframes, animationOptions);
+  animation.timeline = document.timeline;
+  let activeRange = context_default.activeRange;
+  if (activeRange) {
+    activeRange.animations ??= /* @__PURE__ */ new Set();
+    activeRange.animations.add(animation);
+    await animation.finished;
+    activeRange.animations.delete(animation);
+  }
+}
+
+// src/render/addFragment.ts
+function addFragment(fragment, parent, before) {
+  const range = context_default.activeRange;
+  const hydrationNode = context_default.hydrationNode;
+  if (range) {
+    if (hydrationNode) {
+      range.endNode = hydrationNode;
+    } else {
+      range.startNode = fragment.firstChild;
+      range.endNode = fragment.lastChild;
+    }
+  }
+  let parentIsFragment = parent.nodeType === 11;
+  if (!hydrationNode) {
+    if (parentIsFragment) {
+      parent = before.parentNode;
+    }
+    parent.insertBefore(fragment, before);
+  }
+  if (!parentIsFragment) {
+    for (let event of context_default.stashedEvents) {
+      context_default.activeRange = event.range;
+      $run(() => {
+        event.el.addEventListener(event.type, event.listener);
+        return () => {
+          event.el.removeEventListener(event.type, event.listener);
+        };
+      });
+    }
+    context_default.stashedEvents.length = 0;
+    for (let animation of context_default.stashedAnimations) {
+      context_default.activeRange = animation.range;
+      $run(() => {
+        if (animation.in) {
+          animate(animation.el, true, animation.in.keyframes, animation.in.options);
+        }
+        if (animation.out) {
+          return () => {
+            animate(animation.el, false, animation.out.keyframes, animation.out.options);
+          };
+        }
+      });
+    }
+    context_default.stashedAnimations.length = 0;
+    context_default.activeRange = range;
+  }
+}
+
+// src/render/applyProps.ts
+function applyProps(el, props, propNamesUsed) {
+  if (props) {
+    for (let [name, value] of Object.entries(props)) {
+      if (!propNamesUsed.includes(name)) {
+        if (name.startsWith("on")) {
+          const eventName = name.substring(2);
+          el.addEventListener(eventName, value);
+        } else {
+          $run(function setAttribute2() {
+            el.setAttribute(name, value);
+          });
+        }
+      }
+    }
+  }
+}
+
+// src/render/flushMountEffects.ts
+function flushMountEffects() {
+  for (let fn of context_default.mountEffects) {
+    $run(fn);
+  }
+}
+
+// src/render/getFragment.ts
+function getFragment(array, index, html) {
+  if (array[index] === void 0) {
+    const template = document.createElement("template");
+    template.innerHTML = html;
+    array[index] = template.content;
+  }
+  let fragment = array[index].cloneNode(true);
+  return fragment;
+}
+
+// src/render/hydrate.ts
+function hydrate(parent, component, props, slots) {
+  context_default.hydrationNode = parent.firstChild;
+  component(parent, null, props, void 0, slots);
+  context_default.hydrationNode = null;
+}
+
+// src/render/mount.ts
+function mount(parent, component, props, slots) {
+  if (parent.childElementCount) {
+    throw new Error("The parent node must have no child elements");
+  }
+  while (parent.firstChild) {
+    parent.firstChild.remove();
+  }
+  component(parent, null, props, void 0, slots);
+}
+
+// src/render/newListItem.ts
+function newListItem(data, key) {
+  return {
+    startNode: null,
+    endNode: null,
+    children: null,
+    index: 0,
+    effects: null,
+    animations: null,
+    data,
+    key
+  };
+}
+
+// src/render/newRange.ts
+function newRange() {
+  return {
+    startNode: null,
+    endNode: null,
+    children: null,
+    index: 0,
+    effects: null,
+    animations: null
+  };
+}
+
+// src/render/hydrationMarkers.ts
+var HYDRATION_START = "[";
+var HYDRATION_END = "]";
+var HYDRATION_BRANCH = "^";
+
+// src/render/isComment.ts
+function isComment(node) {
+  return node.nodeType === 8;
+}
+
+// src/render/nodeNext.ts
+function nodeNext(node) {
+  let nextNode = node.nextSibling;
+  if (context_default.hydrationNode) {
+    if (nextNode && isComment(nextNode) && nextNode.data === HYDRATION_BRANCH) {
+      let comment = nextNode;
+      nextNode = nextNode.nextSibling;
+      comment.remove();
+    }
+    context_default.hydrationNode = nextNode;
+  }
+  return nextNode;
+}
+
+// src/render/nodeAnchor.ts
+function nodeAnchor(node) {
+  if (context_default.hydrationNode && isComment(node) && node.data === HYDRATION_START) {
+    let currentNode = nodeNext(node);
+    node.remove();
+    let level = 1;
+    while (currentNode) {
+      if (isComment(currentNode)) {
+        if (currentNode.data === HYDRATION_START) {
+          level += 1;
+        } else if (currentNode.data === HYDRATION_END) {
+          level -= 1;
+        }
+        if (level === 0) {
+          const endNode = currentNode.nextSibling;
+          currentNode.remove();
+          return endNode;
+        }
+      }
+      currentNode = currentNode.nextSibling;
+    }
+    if (!currentNode) {
+      throw new Error("End hydration comment not found");
+    }
+  }
+  return node;
+}
+
+// src/render/nodeChild.ts
+function nodeChild(parent) {
+  const child = parent.firstChild;
+  if (context_default.hydrationNode) {
+    context_default.hydrationNode = child;
+  }
+  return child;
+}
+
+// src/render/nodeRoot.ts
+function nodeRoot(parent) {
+  const hydrationNode = context_default.hydrationNode;
+  if (hydrationNode) {
+    const range = context_default.activeRange;
+    if (range && !range.startNode) {
+      range.startNode = hydrationNode;
+    }
+    return hydrationNode;
+  } else {
+    return parent.firstChild;
+  }
+}
+
+// src/render/popRange.ts
+function popRange(oldRange) {
+  context_default.activeRange = oldRange;
+}
+
+// src/render/pushRange.ts
+function pushRange(range, toParent = false) {
+  const activeRange = context_default.activeRange;
+  if (toParent && activeRange) {
+    (activeRange.children ??= []).push(range);
+  }
+  context_default.activeRange = range;
+  return activeRange;
+}
+
+// src/render/runControl.ts
+function runControl(range, anchor, create) {
+  range.index = -1;
+  const oldRange = pushRange(range, true);
+  $run(function runControl2() {
+    const oldBranchRange = pushRange(range);
+    create(anchor);
+    popRange(oldBranchRange);
+  });
+  if (context_default.hydrationNode) {
+    anchor = context_default.hydrationNode.nextSibling;
+  }
+  popRange(oldRange);
+}
+
+// src/render/clearRange.ts
+function clearRange(range) {
+  let animations = [];
+  clearEffects(range, animations);
+  if (animations.length) {
+    Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
+  } else {
+    clearNodes(range);
+  }
+}
+function clearEffects(range, animations) {
+  if (range.effects) {
+    const oldRange = context_default.activeRange;
+    context_default.activeRange = range;
+    for (let effect of range.effects) {
+      if (effect.cleanup) {
+        effect.cleanup();
+      }
+      if (effect.props) {
+        for (let prop of effect.props) {
+          if (prop.effects) {
+            let length = prop.effects.length;
+            let i = length;
+            while (i--) {
+              if (prop.effects[i] === effect) {
+                prop.effects[i] = prop.effects[length - 1];
+                prop.effects.pop();
+                length -= 1;
+              }
+            }
+          }
+        }
+      }
+    }
+    context_default.activeRange = oldRange;
+  }
+  if (range.animations) {
+    for (let animation of range.animations) {
+      animations.push(animation);
+    }
+  }
+  if (range.children) {
+    for (let child of range.children) {
+      clearEffects(child, animations);
+    }
+    range.children.length = 0;
+  }
+}
+function clearNodes(range) {
+  if (range.startNode) {
+    let currentNode = range.endNode || range.startNode;
+    while (currentNode !== range.startNode) {
+      let nextNode = currentNode.previousSibling;
+      currentNode.remove();
+      currentNode = nextNode;
+    }
+    currentNode.remove();
+    range.startNode = null;
+    range.endNode = null;
+  }
+}
+
+// src/render/runControlBranch.ts
+function runControlBranch(range, index, create) {
+  if (index >= 0 && range.index === index) {
+    return;
+  }
+  if (range.children?.length) {
+    clearRange(range.children[0]);
+    range.children.length = 0;
+  }
+  const oldRange = pushRange(newRange(), true);
+  create();
+  popRange(oldRange);
+  range.index = index;
+}
+
+// src/render/moveRange.ts
+function moveRange(parent, range, before) {
+  const endNode = range.endNode || range.startNode;
+  let currentNode = range.startNode;
+  while (currentNode) {
+    const nextNode = currentNode.nextSibling;
+    parent.insertBefore(currentNode, before);
+    if (currentNode === endNode) break;
+    currentNode = nextNode;
+  }
+}
+
+// src/render/runListItems.ts
+function runListItems(range, parent, anchor, oldItems, newItems, create) {
+  let oldStartIndex = 0;
+  let oldEndIndex = oldItems.length - 1;
+  let oldStartItem = oldItems[0];
+  let oldEndItem = oldItems[oldEndIndex];
+  let newStartIndex = 0;
+  let newEndIndex = newItems.length - 1;
+  let newStartItem = newItems[0];
+  let newEndItem = newItems[newEndIndex];
+  let oldKeyToIndex;
+  let newKeyToIndex;
+  while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
+    if (oldStartItem == null) {
+      oldStartItem = oldItems[++oldStartIndex];
+    } else if (oldEndItem == null) {
+      oldEndItem = oldItems[--oldEndIndex];
+    } else if (newStartItem == null) {
+      newStartItem = newItems[++newStartIndex];
+    } else if (newEndItem == null) {
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldStartItem.key === newStartItem.key) {
+      transferRangeMarkers(oldStartItem, newStartItem);
+      oldStartItem = oldItems[++oldStartIndex];
+      newStartItem = newItems[++newStartIndex];
+    } else if (oldEndItem.key === newEndItem.key) {
+      transferRangeMarkers(oldEndItem, newEndItem);
+      oldEndItem = oldItems[--oldEndIndex];
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldStartItem.key === newEndItem.key) {
+      moveRange(parent, oldStartItem, oldEndItem.endNode?.nextSibling);
+      transferRangeMarkers(oldStartItem, newEndItem);
+      oldStartItem = oldItems[++oldStartIndex];
+      newEndItem = newItems[--newEndIndex];
+    } else if (oldEndItem.key === newStartItem.key) {
+      moveRange(parent, oldEndItem, oldStartItem?.startNode);
+      transferRangeMarkers(oldEndItem, newStartItem);
+      oldEndItem = oldItems[--oldEndIndex];
+      newStartItem = newItems[++newStartIndex];
+    } else {
+      if (!oldKeyToIndex || !newKeyToIndex) {
+        oldKeyToIndex = /* @__PURE__ */ new Map();
+        for (let i = oldStartIndex; i < oldEndIndex; i++) {
+          oldKeyToIndex.set(oldItems[i].key, i);
+        }
+        newKeyToIndex = /* @__PURE__ */ new Map();
+        for (let i = newStartIndex; i < newEndIndex; i++) {
+          newKeyToIndex.set(newItems[i].key, i);
+        }
+      }
+      let oldIndex = oldKeyToIndex.get(newStartItem.key);
+      let newIndex = newKeyToIndex.get(oldStartItem.key);
+      if (oldIndex === void 0 && newIndex === void 0) {
+        newStartItem.data = $watch(newStartItem.data);
+        create(newStartItem, oldStartItem.startNode);
+        clearRange(oldStartItem);
+        context_default.activeRange.children.splice(oldStartIndex, 1);
+        oldStartItem = oldItems[++oldStartIndex];
+        newStartItem = newItems[++newStartIndex];
+      } else if (oldIndex === void 0) {
+        newStartItem.data = $watch(newStartItem.data);
+        create(newStartItem, oldStartItem.startNode);
+        newStartItem = newItems[++newStartIndex];
+      } else if (newIndex === void 0) {
+        clearRange(oldStartItem);
+        context_default.activeRange.children.splice(oldStartIndex, 1);
+        oldStartItem = oldItems[++oldStartIndex];
+      } else {
+        const oldData = oldItems[oldIndex];
+        moveRange(parent, oldData, oldStartItem.startNode);
+        transferRangeMarkers(oldData, newStartItem);
+        oldItems[oldIndex] = null;
+        newStartItem = newItems[++newStartIndex];
+      }
+    }
+  }
+  if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
+    if (oldStartIndex > oldEndIndex) {
+      let before = oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
+      for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
+        newStartItem.data = $watch(newStartItem.data);
+        create(newStartItem, before);
+        before = newStartItem.endNode?.nextSibling;
+      }
+    } else {
+      if (range.children) {
+        range.children.length = oldStartIndex;
+      }
+      for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
+        clearRange(oldStartItem);
+      }
+    }
+  }
+}
+function transferRangeMarkers(oldItem, newItem) {
+  newItem.startNode = oldItem.startNode;
+  newItem.endNode = oldItem.endNode;
+  for (let prop in oldItem.data) {
+    oldItem.data[prop] = newItem.data[prop];
+  }
+  newItem.data = oldItem.data;
+}
+
+// src/render/runList.ts
+function runList(range, parent, anchor, buildItems, create) {
+  const oldRange = pushRange(range, true);
+  let listItems = [];
+  $run(function runList2() {
+    const oldBranchRange = pushRange(range);
+    const newItems = buildItems();
+    runListItems(range, parent, anchor, listItems, newItems, create);
+    listItems = newItems;
+    popRange(oldBranchRange);
+  });
+  if (context_default.hydrationNode) {
+    anchor = context_default.hydrationNode.nextSibling;
+  }
+  popRange(oldRange);
+}
+
+// src/render/setAttribute.ts
+function setAttribute(el, name, value) {
+  if (value === false || value == null) {
+    el.removeAttribute(name);
+  } else {
+    el.setAttribute(name, value);
+  }
+}
+
+// src/render/setDynamicElement.ts
+function setDynamicElement(el, tag) {
+  if (context_default.hydrationNode) {
+    return el;
+  }
+  let newElement = document.createElement(tag);
+  el.replaceWith(newElement);
+  return newElement;
+}
+
+let t_add_fragment = addFragment;
+let t_anchor = nodeAnchor;
+let t_animate = addAnimation;
+let t_apply_props = applyProps;
+let t_attribute = setAttribute;
+let t_child = nodeChild;
+let t_dynamic = setDynamicElement;
+let t_event = addEvent;
+let t_flush = flushMountEffects;
+let t_fmt = formatText;
+let t_fragment = getFragment;
+let t_list_item = newListItem;
+let t_next = nodeNext;
+let t_pop_range = popRange;
+let t_push_range = pushRange;
+let t_range = newRange;
+let t_root = nodeRoot;
+let t_run_branch = runControlBranch;
+let t_run_control = runControl;
+let t_run_list = runList;
+
+//# sourceMappingURL=index.js.map
