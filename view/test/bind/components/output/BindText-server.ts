@@ -1,5 +1,6 @@
 import { $watch } from "@tera/view/ssr";
 import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_attr } from "@tera/view/ssr";
 import { t_fmt } from "@tera/view/ssr";
 
 export default function BindText(
@@ -11,7 +12,7 @@ export default function BindText(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <input value="${$state.name || ""}"> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
+	$output += `<div> <input value="${t_attr($state.name) || ""}"> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
 
 	return $output;
 }

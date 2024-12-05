@@ -1,5 +1,6 @@
 import { $watch } from "@tera/view/ssr";
 import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_attr } from "@tera/view/ssr";
 import { t_fmt } from "@tera/view/ssr";
 
 export default function InputHello(
@@ -13,7 +14,7 @@ export default function InputHello(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <p>${t_fmt($state.text)}</p> <input value="${$state.text || ""}"> </div>`;
+	$output += `<div> <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> </div>`;
 
 	return $output;
 }

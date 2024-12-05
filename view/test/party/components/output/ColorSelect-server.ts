@@ -1,5 +1,6 @@
 import { $watch } from "@tera/view/ssr";
 import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_attr } from "@tera/view/ssr";
 import { t_fmt } from "@tera/view/ssr";
 
 export default function ColorSelect(
@@ -20,9 +21,9 @@ export default function ColorSelect(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${$state.selectedColorId || ""}"> <![>`;
+	$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
 	for (let color of colors) {
-		$output += `<!^> <option ${color.id ? `value="${color.id}"` : ''} ${color.isDisabled ? `disabled="${color.isDisabled}"` : ''}> ${t_fmt(color.text)} </option> `;
+		$output += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;
 	}
 	$output += `<!]><!> </select> </div>`;
 

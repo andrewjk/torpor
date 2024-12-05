@@ -10,6 +10,7 @@ const importsMap: Record<string, string> = {
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
+	t_attr: 'import { t_attr } from "${folder}";',
 	ServerSlotRender: 'import type { ServerSlotRender } from "${folder}";',
 };
 

@@ -1,5 +1,6 @@
 import { $watch } from "@tera/view/ssr";
 import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_attr } from "@tera/view/ssr";
 import { t_fmt } from "@tera/view/ssr";
 
 export default function PickPill(
@@ -13,7 +14,7 @@ export default function PickPill(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <div>Picked: ${t_fmt($state.picked)}</div> <input id="blue-pill" group="${$state.picked || ""}" type="radio" value="blue"> <label for="blue-pill">Blue pill</label> <input id="red-pill" group="${$state.picked || ""}" type="radio" value="red"> <label for="red-pill">Red pill</label> </div>`;
+	$output += `<div> <div>Picked: ${t_fmt($state.picked)}</div> <input id="blue-pill" group="${t_attr($state.picked) || ""}" type="radio" value="blue"> <label for="blue-pill">Blue pill</label> <input id="red-pill" group="${t_attr($state.picked) || ""}" type="radio" value="red"> <label for="red-pill">Red pill</label> </div>`;
 
 	return $output;
 }

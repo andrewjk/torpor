@@ -12,7 +12,7 @@ export default function buildServerElementNode(
 	status: BuildServerStatus,
 	b: Builder,
 ) {
-	let attributes = buildElementAttributes(node, b);
+	let attributes = buildElementAttributes(node, status, b);
 	if (attributes.length) {
 		attributes = " " + attributes;
 	}
@@ -39,7 +39,7 @@ export default function buildServerElementNode(
 	}
 }
 
-function buildElementAttributes(node: ElementNode, b: Builder) {
+function buildElementAttributes(node: ElementNode, status: BuildServerStatus, b: Builder) {
 	let attributes: string[] = [];
 	let classIndex = -1;
 	for (let { name, value } of node.attributes) {
@@ -64,13 +64,14 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
 			name = name.substring(1, name.length - 1);
-			attributes.push(`${name}="\${${name}}"`);
+			status.imports.add("t_attr");
+			attributes.push(`${name}="\${t_attr(${name})}"`);
 		} else if (value != null && isFullyReactive(value)) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
 			if (name.startsWith("bind:")) {
-				let defaultValue = '""';
+				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
 				if (typeAttribute && typeAttribute.value) {
 					switch (trimQuotes(typeAttribute.value)) {
@@ -83,6 +84,11 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 							break;
 						}
 					}
+				}
+				if (!defaultValue) {
+					status.imports.add("t_attr");
+					value = `t_attr(${value})`;
+					defaultValue = '""';
 				}
 				let valueOrDefault = `${value} || ${defaultValue}`;
 				const propName = name.substring(5);
@@ -101,14 +107,19 @@ function buildElementAttributes(node: ElementNode, b: Builder) {
 			} else {
 				// Only set the attribute if the value is truthy
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
-				attributes.push(`\${${value} ? \`${name}="\${${value}}"\` : ''}`);
+				status.imports.add("t_attr");
+				attributes.push(`\${${value} ? \`${name}="\${t_attr(${value})}"\` : ''}`);
 			}
 		} else if (value != null && isReactive(value)) {
-			attributes.push(`${name}="${trimQuotes(value).replaceAll("{", "${")}"`);
+			// TODO: Match braces, don't replace braces inside code
+			status.imports.add("t_attr");
+			attributes.push(
+				`${name}="${trimQuotes(value).replaceAll("{", "${t_attr(").replaceAll("}", ")}")}"`,
+			);
 		} else if (value != null) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled
-			attributes.push(`${name}="${trimQuotes(value)}"`);
+			attributes.push(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`);
 		} else {
 			attributes.push(`${name}`);
 		}

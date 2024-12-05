@@ -18,7 +18,7 @@ test("build for the server and render to HTML", () => {
 	const source = fs.readFileSync(path).toString();
 
 	const parsed = parse(source);
-	expect(parsed.ok).toBe(true);
+	expect(parsed.errors).toEqual([]);
 	expect(parsed.template).not.toBeUndefined();
 
 	const rendered = build(parsed.template!, { server: true });

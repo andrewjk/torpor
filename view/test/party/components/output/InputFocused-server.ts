@@ -1,5 +1,6 @@
 import { $mount } from "@tera/view/ssr";
 import type { ServerSlotRender } from "@tera/view/ssr";
+import { t_attr } from "@tera/view/ssr";
 
 export default function InputFocused(
 	$props?: Record<PropertyKey, any>,
@@ -15,7 +16,7 @@ export default function InputFocused(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input self="${inputElement || ""}">`;
+	$output += `<input self="${t_attr(inputElement) || ""}">`;
 
 	return $output;
 }
