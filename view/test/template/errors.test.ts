@@ -18,6 +18,8 @@ export default function Test() {
 			{
 				message: "Multiple top-level elements: div",
 				start: 56,
+				line: 5,
+				column: 2,
 			},
 		],
 	};
@@ -39,6 +41,8 @@ export default function Test() {
 			{
 				message: "Unclosed non-void element: p",
 				start: 47,
+				line: 4,
+				column: 2,
 			},
 		],
 	};
@@ -63,6 +67,8 @@ export default function Test() {
 			{
 				message: "Unclosed non-void element: p",
 				start: 56,
+				line: 5,
+				column: 3,
 			},
 		],
 	};
@@ -108,6 +114,8 @@ export default function Test() {
 			{
 				message: "Closed void element: input",
 				start: 54,
+				line: 4,
+				column: 9,
 			},
 		],
 	};
@@ -131,6 +139,8 @@ export default function Test() {
 			{
 				message: "Closed void element: input",
 				start: 63,
+				line: 5,
+				column: 10,
 			},
 		],
 	};
@@ -154,10 +164,14 @@ export default function Test() {
 			{
 				message: "Multiple top-level elements: span",
 				start: 58,
+				line: 5,
+				column: 3,
 			},
 			{
 				message: "Non matching close tag: input",
 				start: 76,
+				line: 6,
+				column: 2,
 			},
 		],
 	};
@@ -184,6 +198,8 @@ export default function Test() {
 			{
 				message: "Non matching close tag: input (expected div)",
 				start: 87,
+				line: 7,
+				column: 3,
 			},
 		],
 	};
@@ -205,12 +221,16 @@ export default function Test() {
 		ok: false,
 		errors: [
 			{
-				message: "Non matching close tag: li (expected p)",
-				start: 80,
-			},
-			{
 				message: "Unclosed non-void element: p",
 				start: 56,
+				line: 5,
+				column: 3,
+			},
+			{
+				message: "Non matching close tag: li (expected p)",
+				start: 80,
+				line: 5,
+				column: 27,
 			},
 		],
 	};
@@ -238,10 +258,14 @@ export default function Test() {
 			{
 				message: "Unclosed non-void element: span",
 				start: 64,
+				line: 6,
+				column: 4,
 			},
 			{
 				message: "Non matching close tag: span (expected p)",
 				start: 106,
+				line: 9,
+				column: 3,
 			},
 		],
 	};

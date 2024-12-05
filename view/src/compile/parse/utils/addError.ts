@@ -9,5 +9,15 @@ import type ParseStatus from "../ParseStatus";
  * current parse position)
  */
 export default function addError(status: ParseStatus, message: string, start: number = status.i) {
-	status.errors.push({ message, start });
+	let slice = status.source.slice(0, start);
+	let line = 1;
+	let lastLineStart = 0;
+	for (let i = 0; i < slice.length; i++) {
+		if (status.source[i] === "\n") {
+			line += 1;
+			lastLineStart = i;
+		}
+	}
+	let column = start - lastLineStart - 1;
+	status.errors.push({ message, start, line, column });
 }

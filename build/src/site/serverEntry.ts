@@ -229,10 +229,18 @@ async function loadView(
 
 	event.node.res.setHeader("content-type", "text/html");
 
+	let componentCode = "";
+	try {
+		componentCode = component($props, undefined, slots);
+	} catch {
+		// TODO: Show a proper Error component
+		componentCode = '<span style="color: red">Script syntax error</span>';
+	}
+
 	// Put it all together
 	let html =
 		appHtml.substring(0, contentStart) +
-		component($props, undefined, slots) +
+		componentCode +
 		appHtml.substring(contentEnd) +
 		(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
 		(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");

@@ -50,6 +50,9 @@ export default function parseCode(source: string): ParseResult {
 	scopeStyles(status);
 
 	const ok = !status.errors.length;
+	if (!ok) {
+		status.errors = status.errors.sort((a, b) => a.start - b.start);
+	}
 
 	return {
 		ok,
@@ -162,7 +165,7 @@ function parseComponentStyle(status: ParseStatus) {
 	status.script += status.source.substring(status.marker, status.i);
 
 	let start = -1;
-	let end = -1;
+	let end = status.source.length;
 	let level = 0;
 	// HACK: strip the comments out of styles only
 	let styleSource = "";

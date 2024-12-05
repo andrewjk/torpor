@@ -141,7 +141,12 @@ async function navigate(
 		// TODO: Clear ranges, reuse layouts etc
 		parent.textContent = "";
 
-		mount(parent, component, $props, slots);
+		try {
+			mount(parent, component, $props, slots);
+		} catch {
+			// TODO: Show a proper Error component
+			parent.innerHTML = '<span style="color: red">Script syntax error</span>';
+		}
 	}
 
 	return true;

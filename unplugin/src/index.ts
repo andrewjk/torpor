@@ -25,35 +25,38 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		return /\.tera\?*/.test(id);
 	},
 	transform(code, id) {
-		// Get the component's name from the file id
-		let name = id
-			.split(/[\\\/]/)
-			.at(-1)
-			?.replace(/\.tera$/, "")!;
-
 		// Try to parse the code
-		const parsed = parse(code);
+		let parsed = parse(code);
 		if (parsed.ok && parsed.template) {
 			// Transform for server or client
 			return transform(parsed.template, id, options);
 		} else {
-			console.log("\nERRORS\n======");
-			let errorText = "";
-			for (let error of parsed.errors) {
-				//const line = (input.slice(0, error.i).match(/\n/g) || "").length + 1;
-				let slice = code.slice(0, error.start);
-				let line = 1;
-				let lastLineIndex = 0;
-				for (let i = 0; i < slice.length; i++) {
-					if (code[i] === "\n") {
-						line += 1;
-						lastLineIndex = i;
-					}
-				}
-				console.log(`${line},${error.start - lastLineIndex - 1}: ${error.message}`);
-				errorText += `${line},${error.start - lastLineIndex - 1}: ${error.message}\n`;
+			// Show an error component
+			let name = id
+				.split(/[\\\/]/)
+				.at(-1)
+				?.replace(/\.tera$/, "")!;
+			let errorMessages = parsed.errors.map((e) => `${e.line},${e.column}: ${e.message}`);
+			console.log(`\nERRORS\n======\n${errorMessages.join("\n")}`);
+			let errorCode = `
+export default function Error() {
+	@render {
+		<div style="background-color: #222; color: #f44"; font-size: 15px; line-height: 1.5;">
+			<p style="margin: 0; padding: 0;">
+				<strong>Error${parsed.errors.length === 1 ? "" : "s"} in ${name}:</strong>
+			</p>
+			<ul style="margin: 0; padding: 0 20px">
+				${errorMessages.map((e) => `<li>${e}</li>`).join("\n")}
+			</ul>
+		</div>
+	}
+}`;
+			let errorParsed = parse(errorCode);
+			if (errorParsed.ok && errorParsed.template) {
+				return transform(errorParsed.template, id, options);
 			}
-			throw new Error(`Parse failed for ${id}, ${errorText}`);
+			// This should never be reached, but just in case...
+			throw new Error(`Parse failed for ${id}, ${errorMessages.join("\n")}`);
 		}
 	},
 });
