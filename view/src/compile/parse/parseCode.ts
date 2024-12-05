@@ -39,6 +39,21 @@ export default function parseCode(source: string): ParseResult {
 			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
 				parseComponentStart(status);
 			}
+		} else if (accept("const", status)) {
+			// If it's a function and its name starts with a capital, parse it as a component
+			consumeSpace(status);
+			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
+				const start = status.i;
+				consumeAlphaNumeric(status);
+				consumeSpace(status);
+				if (accept("=", status)) {
+					consumeSpace(status);
+					if (accept("(", status, false)) {
+						status.i = start;
+						parseComponentStart(status);
+					}
+				}
+			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
 		} else if (accept("@style", status, false)) {
@@ -84,7 +99,9 @@ export default function parseCode(source: string): ParseResult {
 }
 
 function parseComponentStart(status: ParseStatus) {
-	let def = /export\s+default\s+function\s+$/.test(status.source.substring(0, status.i));
+	let source = status.source.substring(0, status.i);
+	let def = /export\s+default\s+(function|const)\s+$/.test(source);
+	let isConst = /const\s+$/.test(source);
 
 	status.components.push({
 		start: status.i,
@@ -124,6 +141,12 @@ function parseComponentStart(status: ParseStatus) {
 
 	accept(")", status);
 	consumeSpace(status);
+
+	if (isConst) {
+		accept("=>", status);
+		consumeSpace(status);
+	}
+
 	accept("{", status);
 	status.level += 1;
 
