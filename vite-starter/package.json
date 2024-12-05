@@ -16,6 +16,6 @@
 		"@tera/build": "workspace:^",
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
-		"vinxi": "^0.4.3"
+		"vinxi": "^0.5.1"
 	}
 }
