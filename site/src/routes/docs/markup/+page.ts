@@ -1,6 +1,6 @@
 import component from "@/components/docs/Markup.tera";
-import { type EndPoint } from "@tera/build";
+import { type PageEndPoint } from "@tera/build";
 
 export default {
 	component,
-} satisfies EndPoint;
+} satisfies PageEndPoint;

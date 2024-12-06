@@ -1,4 +1,4 @@
-import type ParamsType from "../types/ParamsType";
+type ParamsType = Record<PropertyKey, any>;
 
 export default function buildRoutePath<RP extends ParamsType, UP extends ParamsType>(
 	path: string,

@@ -1,6 +1,6 @@
 import profilesFollow from "@/lib/api/controllers/profiles/profilesFollow";
 import profilesUnFollow from "@/lib/api/controllers/profiles/profilesUnFollow";
-import type { ApiServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@tera/build";
 
 export default {
 	post: ({ params, request }) => {
@@ -9,4 +9,4 @@ export default {
 	del: ({ params, request }) => {
 		return profilesUnFollow(params, request);
 	},
-} satisfies ApiServerEndPoint;
+} satisfies ServerEndPoint;

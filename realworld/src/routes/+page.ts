@@ -1,7 +1,7 @@
 import component from "@/components/Index.tera";
-import type { EndPoint } from "@tera/build";
+import type { PageEndPoint } from "@tera/build";
 
 export default {
 	component,
 	head: [{ title: "Conduit" }],
-} satisfies EndPoint;
+} satisfies PageEndPoint;

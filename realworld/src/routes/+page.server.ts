@@ -1,6 +1,6 @@
 import * as api from "@/lib/api";
 import { pageSize } from "@/lib/constants";
-import { type ServerEndPoint } from "@tera/build";
+import { type PageServerEndPoint } from "@tera/build";
 import { ok } from "@tera/build/response";
 
 export default {
@@ -30,4 +30,4 @@ export default {
 			tags,
 		});
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;

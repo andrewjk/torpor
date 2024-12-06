@@ -5,17 +5,17 @@ import path from "path";
 import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
 import type { CookieSerializeOptions, EventHandlerRequest, H3Event } from "vinxi/http";
 import { getManifest } from "vinxi/manifest";
-import { ApiServerEndPoint } from "..";
+import { ServerEndPoint } from "..";
 import notFound from "../response/notFound";
 import ok from "../response/ok";
 import seeOther from "../response/seeOther";
 import serverError from "../response/serverError";
 import $page from "../state/$page";
-import type EndPoint from "../types/EndPoint";
+import type PageEndPoint from "../types/PageEndPoint";
+import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type RouteHandler from "../types/RouteHandler";
-import type ServerEndPoint from "../types/ServerEndPoint";
+import type ServerEvent from "../types/ServerEvent";
 import type ServerHook from "../types/ServerHook";
-import type ServerParams from "../types/ServerParams";
 import routeHandlers from "./routeHandlers";
 
 let printedRoutes = false;
@@ -79,7 +79,7 @@ async function loadData(
 ) {
 	const functionName = event.method.toLowerCase().replace("delete", "del");
 
-	const serverEndPoint: ApiServerEndPoint | undefined = (await handler.endPoint).default;
+	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
 		const serverParams = await buildServerParams(event, url, params);
 
@@ -103,7 +103,7 @@ async function loadServerData(
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
+	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint?.load) {
 		const serverParams = await buildServerParams(event, url, params);
 
@@ -132,13 +132,13 @@ async function loadView(
 	params: Record<string, string>,
 ) {
 	// There must be a client endpoint with a component
-	const clientEndPoint: EndPoint | undefined = (await handler.endPoint).default;
+	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint).default;
 	if (!clientEndPoint?.component) {
 		return notFound();
 	}
 
 	// There may be a server endpoint
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
+	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
 
 	// HACK: wrangle the view into app.html
 	// We could instead have an App.tera component with a slot, but you can run
@@ -175,8 +175,8 @@ async function loadView(
 	let data = {};
 	if (handler.layouts) {
 		for (let layout of handler.layouts) {
-			const layoutEndPoint: EndPoint | undefined = (await layout.endPoint)?.default;
-			const layoutServerEndPoint: ServerEndPoint | undefined = (await layout.serverEndPoint)
+			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint)?.default;
+			const layoutServerEndPoint: PageServerEndPoint | undefined = (await layout.serverEndPoint)
 				?.default;
 			const layoutData = await loadClientAndServerData(
 				url,
@@ -212,7 +212,7 @@ async function loadView(
 		slotFunctions[handler.layouts.length] = (_, context) =>
 			(clientEndPoint.component as ServerComponent)($props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
-			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
 					component = layoutEndPoint.component as ServerComponent;
@@ -258,7 +258,7 @@ async function runAction(
 	searchParams: URLSearchParams,
 ) {
 	const actionName = (Array.from(searchParams.keys())[0] || "default").replace(/^\//, "");
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.serverEndPoint).default;
+	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint).default;
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
@@ -283,10 +283,10 @@ async function runAction(
 async function loadClientAndServerData(
 	url: URL,
 	params: Record<string, string>,
-	serverParams: ServerParams,
+	serverParams: ServerEvent,
 	data: Record<string, any>,
-	clientEndPoint?: EndPoint,
-	serverEndPoint?: ServerEndPoint,
+	clientEndPoint?: PageEndPoint,
+	serverEndPoint?: PageServerEndPoint,
 ) {
 	let newData = {};
 	if (clientEndPoint?.load) {
@@ -317,7 +317,7 @@ async function buildServerParams(
 	event: H3Event<EventHandlerRequest>,
 	url: URL,
 	params: Record<string, string>,
-): Promise<ServerParams> {
+): Promise<ServerEvent> {
 	return {
 		url,
 		params,

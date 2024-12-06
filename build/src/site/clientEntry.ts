@@ -2,8 +2,8 @@ import { hydrate, mount } from "@tera/view";
 import type { Component, SlotRender } from "@tera/view";
 import "vinxi/client";
 import $page from "../state/$page";
-import type EndPoint from "../types/EndPoint";
-import ServerEndPoint from "../types/ServerEndPoint";
+import type PageEndPoint from "../types/PageEndPoint";
+import PageServerEndPoint from "../types/PageServerEndPoint";
 import routeHandlers from "./routeHandlers";
 
 // Intercept clicks on links
@@ -67,7 +67,7 @@ async function navigate(
 	const params = route.routeParams || {};
 
 	// There must be a client endpoint with a component
-	const clientEndPoint: EndPoint | undefined = (await handler.endPoint).default;
+	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint).default;
 	if (!clientEndPoint?.component) {
 		// TODO: 404
 		console.log("404");
@@ -75,7 +75,7 @@ async function navigate(
 	}
 
 	// There may be a server endpoint
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
+	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
 
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
@@ -86,8 +86,8 @@ async function navigate(
 			for (let key in params) {
 				layoutPath = layoutPath.replace(`[${key}]`, params[key]);
 			}
-			const layoutEndPoint: EndPoint | undefined = (await layout.endPoint)?.default;
-			const layoutServerEndPoint: ServerEndPoint | undefined = (await layout.serverEndPoint)
+			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint)?.default;
+			const layoutServerEndPoint: PageServerEndPoint | undefined = (await layout.serverEndPoint)
 				?.default;
 			const layoutData = await loadClientAndServerData(
 				data,
@@ -120,7 +120,7 @@ async function navigate(
 		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
 			clientEndPoint.component!(parent, anchor, $props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
-			const layoutEndPoint: EndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
 					component = layoutEndPoint.component as Component;
@@ -156,8 +156,8 @@ async function loadClientAndServerData(
 	data: Record<string, any>,
 	location: string,
 	params: Record<string, string>,
-	clientEndPoint?: EndPoint,
-	serverEndPoint?: ServerEndPoint,
+	clientEndPoint?: PageEndPoint,
+	serverEndPoint?: PageServerEndPoint,
 ) {
 	let newData = {};
 	if (clientEndPoint?.load) {

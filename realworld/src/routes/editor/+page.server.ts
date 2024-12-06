@@ -1,5 +1,5 @@
 import * as api from "@/lib/api.js";
-import type { ServerEndPoint } from "@tera/build";
+import type { PageServerEndPoint } from "@tera/build";
 import { redirect, seeOther, unauthorized, unprocessable } from "@tera/build/response";
 
 export default {
@@ -37,4 +37,4 @@ export default {
 			return seeOther(`/article/${result.article.slug}`);
 		},
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;

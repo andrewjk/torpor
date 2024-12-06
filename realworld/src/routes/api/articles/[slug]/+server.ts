@@ -1,7 +1,7 @@
 import articlesDelete from "@/lib/api/controllers/articles/articlesDelete";
 import articlesGet from "@/lib/api/controllers/articles/articlesGet";
 import articlesUpdate from "@/lib/api/controllers/articles/articlesUpdate";
-import type { ApiServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@tera/build";
 
 export default {
 	get: ({ params, request }) => {
@@ -13,4 +13,4 @@ export default {
 	del: ({ params, request }) => {
 		return articlesDelete(params, request);
 	},
-} satisfies ApiServerEndPoint;
+} satisfies ServerEndPoint;

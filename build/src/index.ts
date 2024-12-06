@@ -1,11 +1,11 @@
 import buildRoutePath from "./site/buildRoutePath";
 import defineConfig from "./site/defineConfig";
-import type ApiServerEndPoint from "./types/ApiServerEndPoint";
-import type EndPoint from "./types/EndPoint";
-import type PageParams from "./types/PageParams";
+import type PageEndPoint from "./types/PageEndPoint";
+import type PageEvent from "./types/PageEvent";
+import type PageServerEndPoint from "./types/PageServerEndPoint";
 import type ServerEndPoint from "./types/ServerEndPoint";
+import type ServerEvent from "./types/ServerEvent";
 import type ServerHook from "./types/ServerHook";
-import type ServerParams from "./types/ServerParams";
 import type UserConfig from "./types/UserConfig";
 
 // NOTE: Do not export anything that relies on vinxi/vite from here, or it will
@@ -15,10 +15,10 @@ export { defineConfig, buildRoutePath };
 
 export type {
 	UserConfig,
-	EndPoint,
+	PageEndPoint,
+	PageServerEndPoint,
 	ServerEndPoint,
-	ApiServerEndPoint,
 	ServerHook,
-	PageParams,
-	ServerParams,
+	PageEvent,
+	ServerEvent,
 };

@@ -1,9 +1,37 @@
-import ServerParams from "./ServerParams";
+import ServerEvent from "./ServerEvent";
 
+/**
+ * For +server.
+ */
 export default interface ServerEndPoint {
-	load?: ServerLoad;
-	actions?: Record<string, ServerAction>;
+	/**
+	 * Performs a GET.
+	 */
+	get?: ServerRequest;
+	/**
+	 * Perfroms a POST.
+	 */
+	post?: ServerRequest;
+	/**
+	 * Perfroms a PATCH.
+	 */
+	patch?: ServerRequest;
+	/**
+	 * Perfroms a PUT.
+	 */
+	put?: ServerRequest;
+	/**
+	 * Perfroms a DELETE.
+	 */
+	del?: ServerRequest;
+	/**
+	 * Perfroms an OPTIONS request.
+	 */
+	options?: ServerRequest;
+	/**
+	 * Perfroms a HEAD request.
+	 */
+	head?: ServerRequest;
 }
 
-type ServerLoad = (params: ServerParams) => Response | Promise<Response | undefined> | void;
-type ServerAction = (params: ServerParams) => Response | Promise<Response | undefined> | void;
+type ServerRequest = (event: ServerEvent) => Response | Promise<Response | undefined> | void;

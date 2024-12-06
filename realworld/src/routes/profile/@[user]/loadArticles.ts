@@ -1,9 +1,9 @@
 import * as api from "@/lib/api.js";
 import { pageSize } from "@/lib/constants";
-import type { ServerParams } from "@tera/build";
+import type { ServerEvent } from "@tera/build";
 
 export default async function loadArticles(
-	{ url, params, appData }: ServerParams,
+	{ url, params, appData }: ServerEvent,
 	type: "author" | "favorited",
 ) {
 	const user = appData.user;

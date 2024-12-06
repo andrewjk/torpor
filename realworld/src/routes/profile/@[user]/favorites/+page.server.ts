@@ -1,4 +1,4 @@
-import type { ServerEndPoint } from "@tera/build";
+import type { PageServerEndPoint } from "@tera/build";
 import { ok } from "@tera/build/response";
 import loadArticles from "../loadArticles";
 
@@ -7,4 +7,4 @@ export default {
 		const { articles, pageCount } = await loadArticles(event, "favorited");
 		return ok({ articles, pageCount });
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;

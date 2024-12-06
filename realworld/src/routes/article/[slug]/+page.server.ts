@@ -1,5 +1,5 @@
 import * as api from "@/lib/api.js";
-import type { ServerEndPoint } from "@tera/build";
+import type { PageServerEndPoint } from "@tera/build";
 import { ok, redirect, unauthorized, unprocessable } from "@tera/build/response";
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
@@ -89,4 +89,4 @@ export default {
 			return redirect(request.headers.get("referer") ?? `/article/${params.slug}`);
 		},
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;

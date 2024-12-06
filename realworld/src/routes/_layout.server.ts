@@ -1,4 +1,4 @@
-import type { ServerEndPoint } from "@tera/build";
+import type { PageServerEndPoint } from "@tera/build";
 import { ok } from "@tera/build/response";
 
 export default {
@@ -13,4 +13,4 @@ export default {
 			},
 		});
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;

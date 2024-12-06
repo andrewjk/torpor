@@ -1,8 +1,7 @@
 import { ServerResponse } from "node:http";
 import CookieHelper from "./CookieHelper";
 
-// TODO: ServerEvent?
-export default interface ServerParams {
+export default interface ServerEvent {
 	/**
 	 * The URL for the server function.
 	 */

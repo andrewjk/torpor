@@ -1,6 +1,6 @@
 import articlesCreate from "@/lib/api/controllers/articles/articlesCreate";
 import articlesList from "@/lib/api/controllers/articles/articlesList";
-import type { ApiServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@tera/build";
 
 export default {
 	get: ({ url, request }) => {
@@ -9,4 +9,4 @@ export default {
 	post: ({ appData, request }) => {
 		return articlesCreate(appData, request);
 	},
-} satisfies ApiServerEndPoint;
+} satisfies ServerEndPoint;

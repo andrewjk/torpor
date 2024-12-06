@@ -1,4 +1,4 @@
-import type { EndPoint } from "@tera/build";
+import type { PageEndPoint } from "@tera/build";
 import component from "./Editor.tera";
 
 export default {
@@ -11,4 +11,4 @@ export default {
 			tagList: [],
 		},
 	}),
-} satisfies EndPoint;
+} satisfies PageEndPoint;

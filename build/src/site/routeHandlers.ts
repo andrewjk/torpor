@@ -35,7 +35,6 @@ const routeHandlers: RouteHandlerCollection = {
 					loadHandler(handler);
 					handler.loaded = true;
 				}
-				if (path === "/profile/@[user]/_layout/~server") console.log(handler);
 				return {
 					handler,
 					routeParams: match.groups,
@@ -45,9 +44,9 @@ const routeHandlers: RouteHandlerCollection = {
 		}
 
 		console.log("not found");
-		for (let handler of (this as RouteHandlerCollection).handlers) {
-			console.log("  have", handler.path, handler.regex);
-		}
+		//for (let handler of (this as RouteHandlerCollection).handlers) {
+		//	console.log("  have", handler.path, handler.regex);
+		//}
 	},
 };
 
@@ -103,7 +102,7 @@ function findServer(path: string, fileRoutes: RouteModule[]): Promise<any> | und
 
 function findServerHook(path: string, fileRoutes: RouteModule[]): Promise<any> | undefined {
 	// TODO: Should this be a collection, like layouts?
-	let hookPath = "/_hooks.server";
+	let hookPath = "/_hook.server";
 	if (path.startsWith("/api/")) {
 		hookPath = "/api" + hookPath;
 	}

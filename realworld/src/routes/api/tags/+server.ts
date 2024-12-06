@@ -1,8 +1,8 @@
 import tagsGet from "@/lib/api/controllers/tags/tagsGet";
-import type { ApiServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@tera/build";
 
 export default {
 	get: () => {
 		return tagsGet();
 	},
-} satisfies ApiServerEndPoint;
+} satisfies ServerEndPoint;

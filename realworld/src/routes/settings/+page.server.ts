@@ -1,5 +1,5 @@
 import * as api from "@/lib/api.js";
-import type { ServerEndPoint } from "@tera/build";
+import type { PageServerEndPoint } from "@tera/build";
 import { redirect, unauthorized, unprocessable } from "@tera/build/response";
 
 export default {
@@ -44,4 +44,4 @@ export default {
 			appData.user = user;
 		},
 	},
-} satisfies ServerEndPoint;
+} satisfies PageServerEndPoint;
