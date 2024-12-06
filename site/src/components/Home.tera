@@ -58,7 +58,7 @@ export default function Home() {
 			<div class="hstack spaced full-width">
 				<div class="demo-card grow">
 					<h3>Code</h3>
-					<pre><code>{`
+					<pre style="padding: 1rem 0"><code>{`
 export default function Counter() {
 	let $state = $watch({
 		count: 0
