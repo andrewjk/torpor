@@ -1,6 +1,6 @@
 // src/render/formatText.ts
 function formatText(text) {
-  return text != null ? text : "";
+  return (text ?? "").toString();
 }
 
 // src/render/context.ts

@@ -39,9 +39,7 @@ ${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
 			.code
 			.replaceAll("export default function", "function")
 			.replaceAll("export function", "function")
-			.split("\n")
-			.filter((l) => !l.startsWith("import {"))
-			.join("\n")
+			.replace(/^import\s.+\n/gm, ""),
 	)
 }</script>
 </head>

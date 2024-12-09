@@ -31,7 +31,7 @@ async function run() {
 			/^import \{\s+formatText\s+\} from ".+?";/gms,
 			`// src/render/formatText.ts
 function formatText(text) {
-  return text != null ? text : "";
+  return (text ?? "").toString();
 }`,
 		);
 
