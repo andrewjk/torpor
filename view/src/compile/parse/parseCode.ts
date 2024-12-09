@@ -54,6 +54,19 @@ export default function parseCode(source: string): ParseResult {
 					}
 				}
 			}
+		} else if (accept("export", status)) {
+			// If it's an anonymous default export function, parse it as a component
+			const start = status.i;
+			if (
+				consumeSpace(status) &&
+				accept("default", status) &&
+				consumeSpace(status) &&
+				accept("(", status, false)
+			) {
+				parseComponentStart(status);
+			} else {
+				status.i = start;
+			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
 		} else if (accept("@style", status, false)) {
@@ -100,8 +113,9 @@ export default function parseCode(source: string): ParseResult {
 
 function parseComponentStart(status: ParseStatus) {
 	let source = status.source.substring(0, status.i);
-	let def = /export\s+default\s+(function|const)\s+$/.test(source);
+	let def = /export\s+default\s+(function\s+|const\s+)*$/.test(source);
 	let isConst = /const\s+$/.test(source);
+	let isAnon = /export default\s+$/.test(source);
 
 	status.components.push({
 		start: status.i,
@@ -142,7 +156,7 @@ function parseComponentStart(status: ParseStatus) {
 	accept(")", status);
 	consumeSpace(status);
 
-	if (isConst) {
+	if (isConst || isAnon) {
 		accept("=>", status);
 		consumeSpace(status);
 	}
