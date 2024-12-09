@@ -1,5 +1,5 @@
-import { $watch } from "@tera/view";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
 
 test("watching a null property", () => {
 	const input = {

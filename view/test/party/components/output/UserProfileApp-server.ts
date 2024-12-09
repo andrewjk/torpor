@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-import UserProfile from "./UserProfile.tera";
+import UserProfile from "./UserProfile-server";
 
 export default function UserProfileApp(
 	$props?: Record<PropertyKey, any>,

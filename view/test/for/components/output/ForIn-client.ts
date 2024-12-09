@@ -1,18 +1,18 @@
-import { $run } from "@tera/view";
-import type { ListItem } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_child } from "@tera/view";
-import { t_fmt } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_list_item } from "@tera/view";
-import { t_next } from "@tera/view";
-import { t_pop_range } from "@tera/view";
-import { t_push_range } from "@tera/view";
-import { t_range } from "@tera/view";
-import { t_root } from "@tera/view";
-import { t_run_list } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment from "../../../../src/render/getFragment";
+import t_list_item from "../../../../src/render/newListItem";
+import t_next from "../../../../src/render/nodeNext";
+import t_pop_range from "../../../../src/render/popRange";
+import t_push_range from "../../../../src/render/pushRange";
+import t_range from "../../../../src/render/newRange";
+import t_root from "../../../../src/render/nodeRoot";
+import t_run_list from "../../../../src/render/runList";
 
 export default function ForIn(
 	$parent: ParentNode,

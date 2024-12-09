@@ -1,37 +1,46 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Attributes.tera";
+
+const componentPath = "./test/attributes/components/Attributes";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 interface State {
 	thing: any;
 	dataThing: any;
 }
 
-test("attributes disappearing -- mounted", () => {
+test("attributes disappearing -- mounted", async () => {
 	let $state = $watch({
 		thing: "thing1",
 		dataThing: "thing2",
 	});
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, $state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
 	check(container, $state);
 });
 
-test("attributes disappearing -- hydrated", () => {
+test("attributes disappearing -- hydrated", async () => {
 	let $state = $watch({
 		thing: "thing1",
 		dataThing: "thing2",
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/attributes/components/Attributes.tera";
-	hydrateComponent(container, path, Component, $state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container, $state);
 });

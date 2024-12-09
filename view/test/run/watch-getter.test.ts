@@ -1,5 +1,5 @@
 import { $run, $watch } from "@tera/view";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 
 test("watching a getter effect", () => {
 	const person = $watch({

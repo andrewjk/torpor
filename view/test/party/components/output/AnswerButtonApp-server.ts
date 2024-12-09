@@ -1,8 +1,8 @@
 import { $watch } from "@tera/view/ssr";
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import { t_fmt } from "@tera/view/ssr";
 
-import AnswerButton from "./AnswerButton.tera";
+import AnswerButton from "./AnswerButton-server";
 
 export default function AnswerButtonApp(
 	$props?: Record<PropertyKey, any>,

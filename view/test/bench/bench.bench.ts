@@ -2,6 +2,7 @@ import { fireEvent } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { bench, expect } from "vitest";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 import Bench from "./components/Bench.tera";
 

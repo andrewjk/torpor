@@ -1,6 +1,6 @@
 import { $mount } from "@tera/view/ssr";
-import type { ServerSlotRender } from "@tera/view/ssr";
-import { t_attr } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import t_attr from "../../../../src/render/formatAttributeText";
 
 export default function Mount(
 	$props?: Record<PropertyKey, any>,

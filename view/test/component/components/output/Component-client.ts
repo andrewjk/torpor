@@ -1,10 +1,10 @@
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_root } from "@tera/view";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_fragment from "../../../../src/render/getFragment";
+import t_root from "../../../../src/render/nodeRoot";
 
-import Header from './Header.tera';
+import Header from "./Header-client";
 
 export default function Component(
 	$parent: ParentNode,

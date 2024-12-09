@@ -28,7 +28,7 @@
 		"build": "tsup && tsm ./scripts/copyToRepl.ts",
 		"build:watch": "tsup --watch",
 		"check": "tsc -p tsconfig-check.json --noEmit",
-		"test": "pnpm build && cd ../unplugin && pnpm build && cd ../view && vitest",
+		"test": "vitest",
 		"test:build": "tsm ./scripts/buildTestOutput.ts",
 		"bench": "tsm ./bench/bench.ts",
 		"format": "prettier --write ."

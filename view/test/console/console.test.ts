@@ -1,8 +1,14 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { afterAll, describe, expect, test, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
+import buildOutputFiles from "../buildOutputFiles";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Console.tera";
+
+const componentPath = "./test/console/components/Console";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 describe("console", () => {
 	const consoleMock = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -11,9 +17,10 @@ describe("console", () => {
 		consoleMock.mockReset();
 	});
 
-	test("console", () => {
+	test("console", async () => {
 		const container = document.createElement("div");
-		mountComponent(container, Component);
+		const component = await importComponent(componentPath, "client");
+		mountComponent(container, component);
 
 		//expect(consoleMock).toHaveBeenCalledOnce();
 		expect(consoleMock).toHaveBeenCalledWith("@console is logging here");

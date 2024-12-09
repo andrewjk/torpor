@@ -8,11 +8,11 @@ import type { SlotRender } from "@tera/view";
  * @param $context -- Values that have been passed into the component from its ancestors.
  * @param $slots -- Functions for rendering children into slot nodes within the component.
  */
-declare function For(
+declare function Attributes(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;
-export default For;
+export default Attributes;

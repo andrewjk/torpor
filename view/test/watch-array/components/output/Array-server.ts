@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import { t_fmt } from "@tera/view/ssr";
 
 export default function Array(

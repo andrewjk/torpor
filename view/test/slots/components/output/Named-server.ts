@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-import Article from './Article.tera'
+import Article from "./Article-server"
 
 export default function Named(
 	$props?: Record<PropertyKey, any>,

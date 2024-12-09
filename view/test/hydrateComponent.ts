@@ -1,92 +1,16 @@
-// Hydrate needs to come from the same source as component compilation
-import { hydrate } from "@tera/view";
-import fs from "fs";
-import path from "path";
-import tsb from "ts-blank-space";
-import { expect } from "vitest";
-import build from "../src/compile/build";
-import parse from "../src/compile/parse";
-import BuildResult from "../src/compile/types/BuildResult";
+import hydrate from "../src/render/hydrate";
 import type Component from "../src/types/Component";
-
-const debugPrint = false;
+import type ServerComponent from "../src/types/ServerComponent";
 
 export default function hydrateComponent(
 	container: HTMLElement,
-	componentPath: string,
-	component: Component,
+	clientComponent: Component,
+	serverComponent: ServerComponent,
 	state?: any,
 ) {
-	// HACK: we may be running this from the top level, or from within the view folder
-	if (!fs.existsSync(componentPath)) {
-		componentPath = path.join("view", componentPath);
-	}
-
-	const source = fs.readFileSync(componentPath, "utf8");
-	const parsed = parse(source);
-	expect(parsed.errors).toEqual([]);
-	expect(parsed.template).not.toBeUndefined();
-
-	// TODO: Should we extract imports in parse? I guess that depends on whether it's used outside
-	// of testing, e.g. in the REPL
-	let imports: { importPath: string; importServer: BuildResult }[] = [];
-	for (let imp of source.matchAll(/^import\s+(.+?)\s+from\s+(?:'|")(.+\.tera)(?:'|");*$/gm)) {
-		const importPath = path.join(path.dirname(componentPath), imp[2]);
-		const importSource = fs.readFileSync(importPath, "utf8");
-		const importParsed = parse(importSource);
-		expect(importParsed.errors).toEqual([]);
-		expect(importParsed.template).not.toBeUndefined();
-		if (debugPrint) {
-			const importClient = build(importParsed.template!);
-			console.log("=== import client");
-			console.log(importClient.code);
-			console.log("===");
-		}
-		const importServer = build(importParsed.template!, { server: true });
-		imports.push({ importPath, importServer });
-	}
-
-	const client = build(parsed.template!);
-	if (debugPrint) {
-		console.log("=== client");
-		console.log(client.code);
-		console.log("===");
-	}
-
-	const server = build(parsed.template!, { server: true });
-	const code = tsb(`
-const $watch = (obj: Record<PropertyKey, any>) => obj;
-const $unwrap = (obj: Record<PropertyKey, any>) => obj;
-const $run = (fn: Function) => null;
-const $mount = (fn: Function) => null;
-const t_fmt = (text: string?) => (text != null ? text : "");
-const t_attr = (text: string?) => (text ?? "").toString().replaceAll('"', "&quot;")
-${
-	imports
-		?.map((imp) =>
-			imp.importServer.code.replace("export default ", "").replace(/^import.+\n/gm, ""),
-		)
-		.join("\n") || ""
-}
-${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
-${component.name};
-`);
-
-	if (debugPrint) {
-		console.log("=== server");
-		console.log(server.code);
-		console.log("===");
-	}
-
-	const html = eval(code)(state).replaceAll(/\s+/g, " ");
-	if (debugPrint) {
-		console.log("=== server html");
-		console.log(html);
-		console.log("===");
-	}
-
+	const html = serverComponent(state);
 	container.innerHTML = html;
 	document.body.appendChild(container);
 
-	hydrate(container, component, state);
+	hydrate(container, clientComponent, state);
 }

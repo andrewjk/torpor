@@ -40,7 +40,7 @@ const $watch = (obj: Record<PropertyKey, any>) => obj;
 const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 const $run = (fn: Function) => null;
 const $mount = (fn: Function) => null;
-const t_fmt = (text: string?) => (text != null ? text : "");
+const t_fmt = (text: string?) => (text ?? "").toString();
 const t_attr = (text: string?) => (text ?? "").toString().replaceAll('"', "&quot;")
 ${
 	imports

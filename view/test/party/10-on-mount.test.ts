@@ -1,23 +1,32 @@
 import { queryByAttribute, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/PageTitle.tera";
 
-test("on mount -- mounted", () => {
+const componentPath = "./test/party/components/PageTitle";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
+
+test("on mount -- mounted", async () => {
 	document.title = "Document Title";
 
 	const container = document.createElement("div");
-	mountComponent(container, Component);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component);
 
 	check(container);
 });
 
-test("on mount -- hydrated", () => {
+test("on mount -- hydrated", async () => {
 	const container = document.createElement("div");
-	const path = "./test/party/components/PageTitle.tera";
-	hydrateComponent(container, path, Component);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent);
 
 	check(container);
 });

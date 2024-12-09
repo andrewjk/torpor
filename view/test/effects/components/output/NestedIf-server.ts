@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function NestedIf(
 	$props: { condition: boolean, counter: number },

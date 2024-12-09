@@ -1,22 +1,31 @@
-import { getByText, queryByText, waitFor, waitForElementToBeRemoved } from "@testing-library/dom";
+import { getByText, queryByText, waitFor } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Await.tera";
+
+const componentPath = "./test/await/components/Await";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 test("await -- mounted", async () => {
 	const container = document.createElement("div");
-	mountComponent(container, Component);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component);
 
 	await check(container);
 });
 
 test("await -- hydrated", async () => {
 	const container = document.createElement("div");
-	const path = "./test/await/components/Await.tera";
-	hydrateComponent(container, path, Component);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent);
 
 	await check(container);
 });

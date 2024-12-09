@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-import Header from './Header.tera'
+import Header from "./Header-server"
 
 export default function Basic(
 	$props?: Record<PropertyKey, any>,

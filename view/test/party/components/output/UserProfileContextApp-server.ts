@@ -1,9 +1,9 @@
 import { $unwrap } from "@tera/view/ssr";
 import { $watch } from "@tera/view/ssr";
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import { t_fmt } from "@tera/view/ssr";
 
-import UserProfileContext from "./UserProfileContext.tera";
+import UserProfileContext from "./UserProfileContext-server";
 
 export default function UserProfileContextApp(
 	$props?: Record<PropertyKey, any>,

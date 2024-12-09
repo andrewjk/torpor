@@ -1,12 +1,12 @@
-import { $run } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_fmt } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_root } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment from "../../../../src/render/getFragment";
+import t_root from "../../../../src/render/nodeRoot";
 
-import List from './List.tera'
+import List from "./List-client"
 
 export default function Let(
 	$parent: ParentNode,

@@ -1,4 +1,4 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 /**
  * A component with a switch statement in it.

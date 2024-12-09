@@ -1,30 +1,21 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 import type ArrayState from "./ArrayState";
-import Component from "./components/ArrayUnkeyed.tera";
 
-test("array calling all functions (unkeyed) -- mounted", () => {
-	const state = $watch({
-		items: [
-			{ id: 1, text: "a" },
-			{ id: 2, text: "b" },
-			{ id: 3, text: "c" },
-			{ id: 4, text: "d" },
-		],
-	});
+const componentPath = "./test/watch-array/components/ArrayUnkeyed";
 
-	const container = document.createElement("div");
-	mountComponent(container, Component, state);
-
-	check(container, state);
+beforeAll(() => {
+	buildOutputFiles(componentPath);
 });
 
-test("array calling all functions (unkeyed) -- hydrated", () => {
-	const state = $watch({
+test("array calling all functions (unkeyed) -- mounted", async () => {
+	const $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },
@@ -34,10 +25,28 @@ test("array calling all functions (unkeyed) -- hydrated", () => {
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/watch-array/components/ArrayUnkeyed.tera";
-	hydrateComponent(container, path, Component, state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
-	check(container, state);
+	check(container, $state);
+});
+
+test("array calling all functions (unkeyed) -- hydrated", async () => {
+	const $state = $watch({
+		items: [
+			{ id: 1, text: "a" },
+			{ id: 2, text: "b" },
+			{ id: 3, text: "c" },
+			{ id: 4, text: "d" },
+		],
+	});
+
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
+
+	check(container, $state);
 });
 
 function check(container: HTMLElement, state: ArrayState) {

@@ -1,30 +1,39 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import type ProxyData from "../../src/types/ProxyData";
 import { proxyDataSymbol } from "../../src/watch/symbols";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/If.tera";
+
+const componentPath = "./test/effects/components/If";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 test("if effect -- mounted", async () => {
-	const state = $watch({ counter: 0 });
+	const $state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
 test("if effect -- hydrated", async () => {
-	const state = $watch({ counter: 0 });
+	const $state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
-	const path = "./test/effects/components/If.tera";
-	hydrateComponent(container, path, Component, state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
 // HACK: Need to mock context properly

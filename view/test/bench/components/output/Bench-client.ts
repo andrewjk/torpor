@@ -1,5 +1,5 @@
-import { $watch } from "@tera/view";
-import type { SlotRender } from "@tera/view";
+import $watch from "../../../../src/render/$watch";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Bench(
 	$parent: ParentNode,

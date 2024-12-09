@@ -1,34 +1,43 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Html.tera";
+
+const componentPath = "./test/html/components/Html";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 interface State {
 	html: string;
 }
 
-test("html -- mounted", () => {
+test("html -- mounted", async () => {
 	let $state = $watch({
 		html: "<strong><em>I'm strong and emphasised</em></strong>",
 	});
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, $state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
 	check(container, $state);
 });
 
-test("html -- hydrated", () => {
+test("html -- hydrated", async () => {
 	let $state = $watch({
 		html: "<strong><em>I'm strong and emphasised</em></strong>",
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/html/components/Html.tera";
-	hydrateComponent(container, path, Component, $state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container, $state);
 });

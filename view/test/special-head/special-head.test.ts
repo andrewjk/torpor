@@ -1,34 +1,43 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/Head.tera";
+
+const componentPath = "./test/special-head/components/Head";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 interface State {
 	level: number;
 }
 
-test("special head -- mounted", () => {
+test("special head -- mounted", async () => {
 	let $state = $watch({
 		level: 1,
 	});
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, $state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
 	check(container, $state);
 });
 
-test("special head -- hydrated", () => {
+test("special head -- hydrated", async () => {
 	let $state = $watch({
 		level: 1,
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/special-head/components/Head.tera";
-	hydrateComponent(container, path, Component, $state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container, $state);
 });

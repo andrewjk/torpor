@@ -1,7 +1,7 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-import BigTitle from "./BigTitle.tera";
-import SmallTitle from "./SmallTitle.tera";
+import BigTitle from "./BigTitle-server";
+import SmallTitle from "./SmallTitle-server";
 
 export default function Component(
 	$props,

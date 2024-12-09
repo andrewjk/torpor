@@ -1,9 +1,9 @@
-import { $run } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_dynamic } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_root } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_dynamic from "../../../../src/render/setDynamicElement";
+import t_fragment from "../../../../src/render/getFragment";
+import t_root from "../../../../src/render/nodeRoot";
 
 export default function Element(
 	$parent: ParentNode,

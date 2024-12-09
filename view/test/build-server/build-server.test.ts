@@ -2,7 +2,7 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import fs from "fs";
 import tsb from "ts-blank-space";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
 

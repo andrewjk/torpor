@@ -1,19 +1,19 @@
-import { $run } from "@tera/view";
-import { $watch } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_child } from "@tera/view";
-import { t_event } from "@tera/view";
-import { t_fmt } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_next } from "@tera/view";
-import { t_pop_range } from "@tera/view";
-import { t_push_range } from "@tera/view";
-import { t_range } from "@tera/view";
-import { t_root } from "@tera/view";
-import { t_run_branch } from "@tera/view";
-import { t_run_control } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import $watch from "../../../../src/render/$watch";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
+import t_event from "../../../../src/render/addEvent";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
+import t_pop_range from "../../../../src/render/popRange";
+import t_push_range from "../../../../src/render/pushRange";
+import t_range from "../../../../src/render/newRange";
+import t_root from "../../../../src/render/nodeRoot";
+import t_run_branch from "../../../../src/render/runControlBranch";
+import t_run_control from "../../../../src/render/runControl";
 
 export default function Await(
 	$parent: ParentNode,

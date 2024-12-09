@@ -1,11 +1,11 @@
-import { $run } from "@tera/view";
-import { $watch } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_child } from "@tera/view";
-import { t_fmt } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_root } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import $watch from "../../../../src/render/$watch";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_child from "../../../../src/render/nodeChild";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment from "../../../../src/render/getFragment";
+import t_root from "../../../../src/render/nodeRoot";
 
 export default function DoubleCount(
 	$parent: ParentNode,

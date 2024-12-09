@@ -1,12 +1,19 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import type ProxyData from "../../src/types/ProxyData";
 import { proxyDataSymbol } from "../../src/watch/symbols";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/NestedIf.tera";
+
+const componentPath = "./test/effects/components/NestedIf";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 interface State {
 	condition: boolean;
@@ -14,28 +21,30 @@ interface State {
 }
 
 test("nested if effect -- mounted", async () => {
-	const state = $watch({
+	const $state = $watch({
 		condition: true,
 		counter: 0,
 	});
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
 test("nested if effect -- hydrated", async () => {
-	const state = $watch({
+	const $state = $watch({
 		condition: true,
 		counter: 0,
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/effects/components/NestedIf.tera";
-	hydrateComponent(container, path, Component, state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
 function check(container: HTMLElement, state: State) {

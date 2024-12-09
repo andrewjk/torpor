@@ -1,11 +1,11 @@
-import { $run } from "@tera/view";
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_root } from "@tera/view";
+import $run from "../../../../src/render/$run";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_fragment from "../../../../src/render/getFragment";
+import t_root from "../../../../src/render/nodeRoot";
 
-import UserProfile from "./UserProfile.tera";
+import UserProfile from "./UserProfile-client";
 
 export default function UserProfileApp(
 	$parent: ParentNode,

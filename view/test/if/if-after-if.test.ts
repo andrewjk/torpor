@@ -1,32 +1,41 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/IfAfterIf.tera";
+
+const componentPath = "./test/if/components/IfAfterIf";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
 
 interface State {
 	counter: number;
 }
 
-test("if after if -- mounted", () => {
-	const state = $watch({ counter: 8 });
+test("if after if -- mounted", async () => {
+	const $state = $watch({ counter: 8 });
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
-test("if after if -- hydrated", () => {
-	const state = $watch({ counter: 8 });
+test("if after if -- hydrated", async () => {
+	const $state = $watch({ counter: 8 });
 
 	const container = document.createElement("div");
-	const path = "./test/if/components/IfAfterIf.tera";
-	hydrateComponent(container, path, Component, state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
-	check(container, state);
+	check(container, $state);
 });
 
 function check(container: HTMLElement, state: State) {

@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import type ParseResult from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";

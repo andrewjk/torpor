@@ -1,5 +1,5 @@
 import { $run, $watch } from "@tera/view";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 
 test("setting the same value doesn't call effect again", () => {
 	const person = $watch({

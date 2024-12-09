@@ -1,6 +1,6 @@
-import type { ServerSlotRender } from "@tera/view/ssr";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-import FunnyButton from "./FunnyButton.tera";
+import FunnyButton from "./FunnyButton-server";
 
 export default function FunnyButtonApp(
 	$props?: Record<PropertyKey, any>,

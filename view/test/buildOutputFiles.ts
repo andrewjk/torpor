@@ -5,32 +5,25 @@ import { buildType } from "../src/compile";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 
-async function run() {
-	console.log("Building test output files");
+export default async function buildOutputFiles(componentPath: string) {
+	//console.log("Building test output files", componentPath);
 	const files = await fg("**/*.tera", {
 		absolute: true,
-		cwd: path.resolve("./test"),
+		cwd: path.resolve(path.dirname(componentPath)),
 	});
-	await Promise.all(files.sort().map((f) => buildOutputFiles(f)));
-	console.log("Done\n");
+	await Promise.all(files.sort().map((f) => buildFiles(f)));
+	//console.log("Done\n");
 }
 
-async function buildOutputFiles(file: string) {
+async function buildFiles(file: string) {
 	//console.log(`Building files for ${file.substring(path.resolve("./test").length)}`);
 
 	const name = path.basename(file, ".tera");
 	const source = await fs.readFile(file, "utf8");
 	const parsed = parse(source);
 	if (parsed.ok && parsed.template) {
-		let serverCode = build(parsed.template, { server: true }).code;
-		let clientCode = build(parsed.template).code;
-
-		// Replace imports from the built @tera/view to the source code, so that
-		// a) we don't have to build @tera/view before testing, and
-		// b) we have access to the same global context object in test and component code
-		for (let imp in importsMap) {
-			clientCode = clientCode.replace(imp, importsMap[imp]);
-		}
+		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
+		let clientCode = formatCode(build(parsed.template).code, "client");
 
 		let typesCode = buildType(name, parsed.template);
 		await fs.writeFile(file.replace(".tera", ".d.ts"), typesCode);
@@ -47,12 +40,23 @@ async function buildOutputFiles(file: string) {
 	}
 }
 
-run();
+function formatCode(code: string, suffix: string): string {
+	// Replace imports from the built @tera/view to the source code, so that
+	// a) we don't have to build @tera/view before testing, and
+	// b) we have access to the same global context object in test and component code
+	for (let imp in importsMap) {
+		code = code.replace(imp, importsMap[imp]);
+	}
+
+	// Replace component imports with JS imports
+	code = code.replaceAll(/import (.+?) from ['"](.+?).tera['"]/g, `import $1 from "$2-${suffix}"`);
+
+	return code;
+}
 
 // HACK: We could probably be smarter about this
 const importsMap: Record<string, string> = {
-	'import $watch from "../../src/render/$watch";':
-		'import $watch from "../../../../src/render/$watch";',
+	'import { $watch } from "@tera/view";': 'import $watch from "../../../../src/render/$watch";',
 	'import { $unwrap } from "@tera/view";': 'import $unwrap from "../../../../src/render/$unwrap";',
 	'import { $run } from "@tera/view";': 'import $run from "../../../../src/render/$run";',
 	'import { $mount } from "@tera/view";': 'import $mount from "../../../../src/render/$mount";',
@@ -102,4 +106,8 @@ const importsMap: Record<string, string> = {
 		'import type ListItem from "../../../../src/types/ListItem";',
 	'import type { SlotRender } from "@tera/view";':
 		'import type SlotRender from "../../../../src/types/SlotRender";',
+	'import { t_attr } from "@tera/view/ssr";':
+		'import t_attr from "../../../../src/render/formatAttributeText";',
+	'import type { ServerSlotRender } from "@tera/view/ssr";':
+		'import type ServerSlotRender from "../../../../src/types/ServerSlotRender";',
 };

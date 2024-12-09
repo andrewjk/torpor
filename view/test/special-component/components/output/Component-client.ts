@@ -1,14 +1,14 @@
-import type { SlotRender } from "@tera/view";
-import { t_add_fragment } from "@tera/view";
-import { t_anchor } from "@tera/view";
-import { t_fragment } from "@tera/view";
-import { t_range } from "@tera/view";
-import { t_root } from "@tera/view";
-import { t_run_branch } from "@tera/view";
-import { t_run_control } from "@tera/view";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_fragment from "../../../../src/render/getFragment";
+import t_range from "../../../../src/render/newRange";
+import t_root from "../../../../src/render/nodeRoot";
+import t_run_branch from "../../../../src/render/runControlBranch";
+import t_run_control from "../../../../src/render/runControl";
 
-import BigTitle from "./BigTitle.tera";
-import SmallTitle from "./SmallTitle.tera";
+import BigTitle from "./BigTitle-client";
+import SmallTitle from "./SmallTitle-client";
 
 export default function Component(
 	$parent: ParentNode,

@@ -1,13 +1,20 @@
-import { $watch } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { beforeAll, expect, test } from "vitest";
+import $watch from "../../src/render/$watch";
+import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
+import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Component from "./components/ForIn.tera";
 
-test("for in -- mounted", () => {
-	const state = $watch({
+const componentPath = "./test/for/components/ForIn";
+
+beforeAll(() => {
+	buildOutputFiles(componentPath);
+});
+
+test("for in -- mounted", async () => {
+	const $state = $watch({
 		item: {
 			first: "1",
 			second: "2",
@@ -16,13 +23,14 @@ test("for in -- mounted", () => {
 	});
 
 	const container = document.createElement("div");
-	mountComponent(container, Component, state);
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component, $state);
 
 	check(container);
 });
 
-test("for in -- hydrated", () => {
-	const state = $watch({
+test("for in -- hydrated", async () => {
+	const $state = $watch({
 		item: {
 			first: "1",
 			second: "2",
@@ -31,8 +39,9 @@ test("for in -- hydrated", () => {
 	});
 
 	const container = document.createElement("div");
-	const path = "./test/for/components/ForIn.tera";
-	hydrateComponent(container, path, Component, state);
+	const clientComponent = await importComponent(componentPath, "client");
+	const serverComponent = await importComponent(componentPath, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container);
 });
