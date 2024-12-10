@@ -6,7 +6,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
 import t_root from "../../../../src/render/nodeRoot";
-import t_run_branch from "../../../../src/render/runBranch";
+import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
 export default function IfNested(

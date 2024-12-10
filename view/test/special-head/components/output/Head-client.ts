@@ -15,7 +15,7 @@ export default function Head(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<div> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> </div>`);
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 
 	/* @head */

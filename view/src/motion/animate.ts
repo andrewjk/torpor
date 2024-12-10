@@ -34,7 +34,7 @@ export default async function animate(
 
 	// HACK: I'm not entirely sure why this is needed, but without it,
 	// animations never start
-	animation.timeline = document.timeline;
+	animation.timeline = el.ownerDocument.timeline;
 
 	// Add the animation to the active range, so that the range won't be cleared
 	// until the animation is completed

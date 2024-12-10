@@ -25,7 +25,7 @@ export default function Replace(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <!> </div>`);
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_replace_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
@@ -34,7 +34,7 @@ export default function Replace(
 	t_run_control(t_replace_range_1, t_replace_anchor_1, (t_before) => {
 		$props.name;
 		t_run_branch(t_replace_range_1, -1, () => {
-			const t_fragment_1 = t_fragment(t_fragments, 1, ` <p>#</p> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <p>#</p> `);
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_text_2 = t_next(t_next(t_root_1));

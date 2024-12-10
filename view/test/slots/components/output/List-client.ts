@@ -26,7 +26,7 @@ export default function List(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<ul> <!> </ul>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<ul> <!> </ul>`);
 	const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1))) as HTMLElement;
 
@@ -48,7 +48,7 @@ export default function List(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment(t_fragments, 1, ` <li> <!> </li> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <li> <!> </li> `);
 			const t_root_1 = t_root(t_fragment_1);
 			const t_slot_parent_1 = t_next(t_root_1) as HTMLElement;
 			const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;

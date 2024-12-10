@@ -23,7 +23,7 @@ export default function Self(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<div>#<!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div>#<!> </div>`);
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_div_1);
 	const t_if_anchor_1 = t_anchor(t_next(t_text_1)) as HTMLElement;
@@ -33,7 +33,7 @@ export default function Self(
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 		if ($props.level < 3) {
 			t_run_branch(t_if_range_1, 0, () => {
-				const t_fragment_1 = t_fragment(t_fragments, 1, ` <!> `);
+				const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <!> `);
 				const t_root_1 = t_root(t_fragment_1);
 				const t_comp_anchor_1 = t_anchor(t_next(t_root_1)) as HTMLElement;
 

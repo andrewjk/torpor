@@ -218,7 +218,7 @@ async function animate(el, enter, keyframes, options) {
     options
   );
   const animation = el.animate(keyframes, animationOptions);
-  animation.timeline = document.timeline;
+  animation.timeline = el.ownerDocument.timeline;
   let activeRange = context_default.activeRange;
   if (activeRange) {
     activeRange.animations ??= /* @__PURE__ */ new Set();
@@ -302,7 +302,7 @@ function flushMountEffects() {
 }
 
 // src/render/getFragment.ts
-function getFragment(array, index, html) {
+function getFragment(document, array, index, html) {
   if (array[index] === void 0) {
     const template = document.createElement("template");
     template.innerHTML = html;
@@ -684,7 +684,7 @@ function setDynamicElement(el, tag) {
   if (context_default.hydrationNode) {
     return el;
   }
-  let newElement = document.createElement(tag);
+  let newElement = el.ownerDocument.createElement(tag);
   el.replaceWith(newElement);
   return newElement;
 }

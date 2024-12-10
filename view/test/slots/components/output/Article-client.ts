@@ -17,7 +17,7 @@ export default function Article(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<section> <h2> <!> </h2> <!> <!> </section>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<section> <h2> <!> </h2> <!> <!> </section>`);
 	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_slot_parent_1 = t_next(t_child(t_section_1)) as HTMLElement;
 	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;

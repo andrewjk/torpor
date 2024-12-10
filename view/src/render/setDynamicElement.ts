@@ -9,7 +9,7 @@ export default function setDynamicElement(el: HTMLElement, tag: string) {
 	}
 
 	// Replace the old element with the new element
-	let newElement = document.createElement(tag);
+	let newElement = el.ownerDocument.createElement(tag);
 	el.replaceWith(newElement);
 
 	return newElement;

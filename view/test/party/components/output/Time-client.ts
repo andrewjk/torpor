@@ -30,7 +30,7 @@ export default function Time(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<p>#</p>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<p>#</p>`);
 	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(function setTextContent() {

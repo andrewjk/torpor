@@ -1,6 +1,7 @@
 import context from "./context";
 
 export default function getFragment(
+	document: Document,
 	array: DocumentFragment[],
 	index: number,
 	html: string,

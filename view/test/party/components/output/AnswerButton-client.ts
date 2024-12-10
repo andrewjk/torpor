@@ -18,7 +18,7 @@ export default function AnswerButton(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <button>YES</button> <button>NO</button> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <button>YES</button> <button>NO</button> </div>`);
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
 	const t_button_2 = t_next(t_next(t_button_1)) as HTMLElement;

@@ -24,7 +24,7 @@ export default function IsAvailable(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(t_fragments, 0, `<div> <div>#</div> <input id="is-available" type="checkbox"></input> <label for="is-available">Is available</label> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <div>#</div> <input id="is-available" type="checkbox"></input> <label for="is-available">Is available</label> </div>`);
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
 	const t_input_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLInputElement;
