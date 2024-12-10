@@ -30,8 +30,14 @@
 		"grammars": [
 			{
 				"language": "tera",
-				"scopeName": "text.tera.basic",
-				"path": "./syntaxes/tera.tmLanguage.json"
+				"scopeName": "source.tera",
+				"path": "./syntaxes/tera.tmLanguage.json",
+				"embeddedLanguages": {
+					"meta.embedded.block.javascript": "javascript",
+					"meta.embedded.block.typescript": "typescript",
+					"meta.embedded.block.html": "html",
+					"meta.embedded.block.css": "css"
+				}
 			}
 		]
 	},
