@@ -8,7 +8,7 @@
 		"dev": "cd ../build && pnpm build && cd ../realworld && tb --dev",
 		"build": "tsc && tb --build",
 		"preview": "vinxi serve",
-		"db:migratex": "tsm ./src/data/migrate.ts"
+		"db:migratex": "tsx ./src/data/migrate.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -23,7 +23,7 @@
 		"marked": "^15.0.3",
 		"prisma": "^6.0.1",
 		"sanitize-html": "^2.13.1",
-		"tsm": "^2.3.0",
+		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"vinxi": "^0.5.1"
 	},

@@ -25,12 +25,12 @@
 	},
 	"private": true,
 	"scripts": {
-		"build": "tsup && tsm ./scripts/copyToRepl.ts",
+		"build": "tsup && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsup --watch",
 		"check": "tsc -p tsconfig-check.json --noEmit",
 		"test": "vitest",
-		"test:build": "tsm ./scripts/buildTestOutput.ts",
-		"bench": "tsm ./bench/bench.ts",
+		"test:build": "tsx ./scripts/buildTestOutput.ts",
+		"bench": "tsx ./bench/bench.ts",
 		"format": "prettier --write ."
 	},
 	"keywords": [],
@@ -47,8 +47,8 @@
 		"jsdom": "^25.0.1",
 		"tinybench": "^3.0.7",
 		"ts-blank-space": "^0.4.4",
-		"tsm": "^2.3.0",
 		"tsup": "^8.3.5",
+		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"vitest": "^2.1.8"
 	}
