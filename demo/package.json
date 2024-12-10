@@ -18,5 +18,8 @@
 		"@tera/unplugin": "workspace:^",
 		"@tera/view": "workspace:^",
 		"vinxi": "^0.5.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5.7.2"
 	}
 }

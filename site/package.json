@@ -18,5 +18,8 @@
 		"@tera/view": "workspace:^",
 		"ts-blank-space": "^0.4.4",
 		"vinxi": "^0.5.1"
+	},
+	"peerDependencies": {
+		"typescript": "^5.7.2"
 	}
 }

@@ -17,10 +17,23 @@
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/jest-dom": "^6.6.3",
 		"@testing-library/user-event": "^14.5.2",
-		"@trivago/prettier-plugin-sort-imports": "^4.3.0",
+		"@trivago/prettier-plugin-sort-imports": "^5.2.0",
 		"@types/jsdom": "^21.1.7",
 		"jsdom": "^25.0.1",
 		"prettier": "^3.4.2",
 		"vitest": "^2.1.8"
-	}
+	},
+	"peerDependencies": {
+		"typescript": "^5.7.2"
+	},
+	"workspaces": [
+		"build",
+		"demo",
+		"realworld",
+		"site",
+		"ui",
+		"unplugin",
+		"view",
+		"vite-starter"
+	]
 }

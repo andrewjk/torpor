@@ -1,5 +1,9 @@
 packages:
-  - view
-  - unplugin
-  - ui
   - build
+  - demo
+  - realworld
+  - site
+  - ui
+  - unplugin
+  - view
+  - vite-starter

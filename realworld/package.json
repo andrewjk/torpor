@@ -1,5 +1,5 @@
 {
-	"name": "@tera/vite-starter",
+	"name": "@tera/realworld",
 	"version": "0.0.1",
 	"description": "A Vite starter site built with tera/build",
 	"type": "module",
@@ -35,7 +35,7 @@
 		"dotenv": "^16.4.7",
 		"jose": "^5.9.6",
 		"jsonwebtoken": "^9.0.2",
-		"kysely": "^0.27.4",
+		"kysely": "^0.27.5",
 		"winston": "^3.17.0"
 	}
 }
