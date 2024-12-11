@@ -3,22 +3,20 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { LanguageService as HTMLLanguageService, LanguageMode, Position } from "../languageModes";
+import { TeraDocumentRegions } from "../embeddedSupport";
+import { LanguageModelCache } from "../languageModelCache";
+import { LanguageMode, LanguageService, Position } from "../languageModes";
 
-export function getHTMLMode(htmlLanguageService: HTMLLanguageService): LanguageMode {
+export function getScriptMode(
+	documentRegions: LanguageModelCache<TeraDocumentRegions>,
+): LanguageMode {
 	return {
 		getId() {
-			return "html";
+			return "script";
 		},
-		doComplete(document: TextDocument, position: Position) {
-			return htmlLanguageService.doComplete(
-				document,
-				position,
-				htmlLanguageService.parseHTMLDocument(document),
-			);
-
-			// TODO: Add our things to the list, like components, special tags and special attributes
-		},
+		//doComplete(document: TextDocument, position: Position) {
+		//	/* TODO: JS completion?? */
+		//},
 		onDocumentRemoved(_document: TextDocument) {
 			/* nothing to do */
 		},

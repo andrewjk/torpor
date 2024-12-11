@@ -1,1 +1,1 @@
-{"root":["./src/embeddedsupport.ts","./src/languagemodelcache.ts","./src/languagemodes.ts","./src/server.ts","./src/modes/cssmode.ts","./src/modes/htmlmode.ts"],"version":"5.7.2"}
+{"root":["./src/embeddedsupport.ts","./src/languagemodelcache.ts","./src/languagemodes.ts","./src/server.ts","./src/modes/cssmode.ts","./src/modes/htmlmode.ts","./src/modes/scriptmode.ts"],"version":"5.7.2"}
