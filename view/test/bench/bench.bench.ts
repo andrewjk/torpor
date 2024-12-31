@@ -1,16 +1,18 @@
-import { fireEvent } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { bench, expect } from "vitest";
+import { beforeAll, bench } from "vitest";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import Bench from "./components/Bench.tera";
+
+const componentPath = "./test/bench/components/Bench";
 
 const user = userEvent.setup();
 
-const div = document.createElement("div");
-document.body.appendChild(div);
-render(div, Bench);
+beforeAll(async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(componentPath, "client");
+	mountComponent(container, component);
+});
 
 bench("bench", async () => {
 	const createButton = document.getElementById("create")!;
@@ -31,8 +33,3 @@ bench("bench", async () => {
 		console.log("ERROR");
 	}
 });
-
-const ev = new MouseEvent("click");
-function click(button: HTMLElement) {
-	fireEvent(button, ev);
-}
