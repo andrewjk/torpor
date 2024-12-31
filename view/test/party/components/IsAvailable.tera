@@ -7,7 +7,7 @@ export default function IsAvailable() {
 		<div>
 			<div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-			<input id="is-available" type="checkbox" bind:checked={$state.isAvailable} />
+			<input id="is-available" type="checkbox" :checked={$state.isAvailable} />
 			<label for="is-available">Is available</label>
 		</div>
 	}

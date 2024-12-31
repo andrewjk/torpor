@@ -45,9 +45,9 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus, b:
 	for (let { name, value } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
-		} else if (name.startsWith("on")) {
+		} else if (name.startsWith("on") || name.startsWith(":on")) {
 			// No events on the server
-		} else if (name.startsWith("transition") && value) {
+		} else if (name.startsWith(":transition") && value) {
 			// No animation on the server, but we do need to set the attributes
 			// from the first keyframe
 			// HACK: use a regex instead maybe?
@@ -70,7 +70,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus, b:
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
-			if (name.startsWith("bind:")) {
+			if (name === ":self" || name === ":value" || name === ":checked" || name === ":group") {
 				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
 				if (typeAttribute && typeAttribute.value) {
@@ -91,7 +91,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus, b:
 					defaultValue = '""';
 				}
 				let valueOrDefault = `${value} || ${defaultValue}`;
-				const propName = name.substring(5);
+				const propName = name.substring(1);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name.startsWith("class:")) {
 				const className = name.substring(6);

@@ -3,7 +3,7 @@ export default function BindText() {
 
 	@render {
 		<div>
-				<input bind:value={$state.name} />
+				<input :value={$state.name} />
 				<p>Hello, {$state.name}</p>
 		</div>
 	}

@@ -106,7 +106,7 @@ export default function Index($props: { name: string }) {
 					@for (let task of $state.tasks) {
 						@key = task.id
 						<li class:done={task.done}>
-							<input type="checkbox" bind:checked={task.done} />
+							<input type="checkbox" :checked={task.done} />
 							{task.text}
 						</li>
 					}
@@ -238,12 +238,12 @@ export default function Index($props: { name: string }) {
 	@render {
 		<div>
 			<h2>Two way binding</h2>	
-			<p>Two way binding can be accomplished with bind:value (or bind:checked etc).</p>
+			<p>Two way binding can be accomplished with :value (or :checked etc).</p>
 			<div class="demo">
 				<p>The count is {$state.count}.</p>
 				<button onclick={() => $state.count += 1}>Increment</button>
 				<p>
-					Count: <input type="number" bind:value={$state.count} />
+					Count: <input type="number" :value={$state.count} />
 				</p>
 			</div>
 		</div>
@@ -344,7 +344,7 @@ export default function Index($props: { name: string }) {
 function TaskItem($props) {
 	@render {
 		<li class:done={$props.task.done}>
-			<input type="checkbox" bind:checked={$props.task.done} />
+			<input type="checkbox" :checked={$props.task.done} />
 			{$props.task.text}
 		</li>
 	}

@@ -69,8 +69,8 @@ try {
 				<textarea
 					id="input"
 					class="code"
-					bind:value={$state.input}
-					on:mount={textAreaMount}
+					:value={$state.input}
+					:onmount={textAreaMount}
 					oninput={textAreaInput}
 					onkeydown={textAreaKeyDown}
 				/>

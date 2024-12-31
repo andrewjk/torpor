@@ -125,7 +125,7 @@ export default function InputFocused() {
   });
 
   @render {
-    <input bind:self={inputElement} />
+    <input :self={inputElement} />
   }
 }
 ```
@@ -358,7 +358,7 @@ export default function InputHello() {
   @render {
     <div>
       <p>{$state.text}</p>
-      <input bind:value={$state.text} />
+      <input :value={$state.text} />
     </div>
   }
 }
@@ -376,7 +376,7 @@ export default function IsAvailable() {
     <div>
       <div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-      <input id="is-available" type="checkbox" bind:checked={$state.isAvailable} />
+      <input id="is-available" type="checkbox" :checked={$state.isAvailable} />
       <label for="is-available">Is available</label>
     </div>
   }
@@ -395,10 +395,10 @@ export default function PickPill() {
     <div>
       <div>Picked: {$state.picked}</div>
 
-      <input id="blue-pill" bind:group={$state.picked} type="radio" value="blue" />
+      <input id="blue-pill" :group={$state.picked} type="radio" value="blue" />
       <label for="blue-pill">Blue pill</label>
 
-      <input id="red-pill" bind:group={$state.picked} type="radio" value="red" />
+      <input id="red-pill" :group={$state.picked} type="radio" value="red" />
       <label for="red-pill">Red pill</label>
     </div>
   }
@@ -424,7 +424,7 @@ export default function ColorSelect() {
     <div>
       <div>Selected: {colors[$state.selectedColorId - 1].text}</div>
 
-      <select bind:value={$state.selectedColorId}>
+      <select :value={$state.selectedColorId}>
         @for (let color of colors) {
           <option value={color.id} disabled={color.isDisabled}>
             {color.text}

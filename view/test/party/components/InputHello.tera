@@ -6,7 +6,7 @@ export default function InputHello() {
 	@render {
 		<div>
 			<p>{$state.text}</p>
-			<input bind:value={$state.text} />
+			<input :value={$state.text} />
 		</div>
 	}
 }

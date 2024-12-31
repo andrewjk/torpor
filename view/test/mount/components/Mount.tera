@@ -6,6 +6,6 @@ export default function Mount() {
 	});
 
 	@render {
-		<input bind:self={inputElement} />
+		<input :self={inputElement} />
 	}
 }

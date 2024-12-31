@@ -38,10 +38,10 @@ npm install tera
   - $mount to create an effect that runs after a component has been mounted
   - $unwrap to get the target object from the proxy
 - Automatic scoping of styles to component
-- Two-way binding with bind:value, bind:checked, etc
-- Element binding to a script variable with bind:self={...}
+- Two-way binding with :value, :checked, etc
+- Element binding to a script variable with :self={...}
 - Element in and out transitions using the Web Animations API
-- Run an effect when an element is added to the DOM with on:mount={(el) => ...}
+- Run an effect when an element is added to the DOM with :onmount={(el) => ...}
 - Special tags (mostly not yet implemented...)
   - <:component self={...}> inserts a dynamic component
   - <:element self={...}> inserts a dynamic element
@@ -162,10 +162,10 @@ export default function Component($props: { name: string }) {
             </div>
 
             <h2>Two way binding</h2>
-            <p>Two way binding can be accomplished with bind:value (or bind:checked etc).</p>
+            <p>Two way binding can be accomplished with :value (or :checked etc).</p>
             <div class="demo">
                 <p>
-                    Count: <input type="number" bind:value={$state.count} />
+                    Count: <input type="number" :value={$state.count} />
                 </p>
             </div>
 
@@ -211,7 +211,7 @@ export default function Component($props: { name: string }) {
 function TaskItem() {
     @render {
         <li class:done={$props.task.done}>
-            <input type="checkbox" bind:checked={$props.task.done} />
+            <input type="checkbox" :checked={$props.task.done} />
             {$props.task.text}
         </li>
     }

@@ -184,21 +184,21 @@ function buildElementAttributes(
 				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 			}
 
-			if (name === "bind:self") {
+			if (name === ":self") {
 				// Bind the DOM element to a user-defined variable
 				b.append(`${value} = ${varName};`);
-			} else if (name === "bind:group") {
+			} else if (name === ":group") {
 				buildBindGroupAttribute(node, varName, name, value, status, b);
-			} else if (name.startsWith("bind:")) {
+			} else if (name === ":value" || name === ":checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
-			} else if (name === "on:mount") {
-				// The on:mount event is faked by us by creating a $run. This also
+			} else if (name === ":onmount") {
+				// The :onmount event is faked by us by creating a $run. This also
 				// means that you can have unmount functionality by returning a
 				// cleanup function
 				buildRun("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
 				buildEventAttribute(node, varName, name, value, status, b);
-			} else if (name === "transition" || name.startsWith("transition:")) {
+			} else if (name.startsWith(":transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
 				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
@@ -211,7 +211,7 @@ function buildElementAttributes(
 				status.imports.add("t_attribute");
 				buildRun("setDataAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
 				// NOTE: dataset seems to be a tiny bit slower?
-				//const propName = name.substring(5);
+				//const propName = name.substring(name.indexOf("-"));
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
 			} else {
 				status.imports.add("t_attribute");
@@ -282,7 +282,7 @@ function buildBindAttribute(
 		eventName = "change";
 	}
 	let set = `${value} || ${defaultValue}`;
-	const propName = name.substring(5);
+	const propName = name.substring(1);
 	const setAttribute = `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
@@ -329,12 +329,12 @@ function buildTransitionAttribute(
 	let entryVarName = nextVarName("trans_in", status);
 	let exitVarName = nextVarName("trans_out", status);
 
-	if (name === "transition") {
+	if (name === ":transition") {
 		b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
 		b.append(`const ${exitVarName} = ${entryVarName};`);
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
-	} else if (name === "transition:in") {
-		let outAttribute = node.attributes.find((a) => a.name === "transition:out");
+	} else if (name === ":transition-in") {
+		let outAttribute = node.attributes.find((a) => a.name === ":transition-out");
 		if (outAttribute && outAttribute.value) {
 			let outValue = trimMatched(outAttribute.value, "{", "}");
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
@@ -344,10 +344,10 @@ function buildTransitionAttribute(
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
 			b.append(`t_animate(${varName}, ${entryVarName});`);
 		}
-	} else if (name === "transition:out") {
-		let inAttribute = node.attributes.find((a) => a.name === "transition:in");
+	} else if (name === ":transition-out") {
+		let inAttribute = node.attributes.find((a) => a.name === ":transition-in");
 		if (inAttribute) {
-			// This has already been handled with transition:in, above
+			// This has already been handled with :transition-in, above
 			return;
 		} else {
 			b.append(`const ${exitVarName} = ${getAnimationDetails(value, status)};`);

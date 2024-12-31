@@ -6,6 +6,6 @@ export default function InputFocused() {
 	});
 
 	@render {
-		<input bind:self={inputElement} />
+		<input :self={inputElement} />
 	}
 }
