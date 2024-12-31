@@ -210,7 +210,7 @@ export default function Component($props: { name: string }) {
 
 function TaskItem() {
     @render {
-        <li class:done={$props.task.done}>
+        <li :class={{ done: $props.task.done }}>
             <input type="checkbox" :checked={$props.task.done} />
             {$props.task.text}
         </li>

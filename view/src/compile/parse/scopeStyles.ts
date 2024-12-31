@@ -22,11 +22,12 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[], styleHash: s
 		let addClass = selectors.includes(node.tagName);
 		if (!addClass) {
 			for (let a of node.attributes) {
-				if (a.name === "class" || a.name.startsWith("class:")) {
+				if (a.name === "class" || a.name === ":class") {
 					addClass = true;
 				} else if (a.name === "id" && a.value) {
 					addClass = selectors.includes(`#${trimQuotes(a.value)}`);
 				} else if (a.name === "class" && a.value) {
+					// TODO: Never getting here?
 					addClass = selectors.includes(`.${trimQuotes(a.value)}`);
 				}
 				if (addClass) break;

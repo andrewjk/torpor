@@ -1,7 +1,8 @@
-// src/render/formatText.ts
-function formatText(text) {
-  return (text ?? "").toString();
-}
+import {
+  formatText,
+  getClasses,
+  getStyles
+} from "./chunk-KBZ2F5SP.js";
 
 // src/render/context.ts
 var context = {
@@ -695,6 +696,7 @@ let t_animate = addAnimation;
 let t_apply_props = applyProps;
 let t_attribute = setAttribute;
 let t_child = nodeChild;
+let t_class = getClasses;
 let t_dynamic = setDynamicElement;
 let t_event = addEvent;
 let t_flush = flushMountEffects;
@@ -709,5 +711,6 @@ let t_root = nodeRoot;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
+let t_style = getStyles;
 
 //# sourceMappingURL=index.js.map

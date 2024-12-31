@@ -7,23 +7,19 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/class/components/Class";
+const componentPath = "./test/style/components/Style";
 
 beforeAll(() => {
 	buildOutputFiles(componentPath);
 });
 
 interface State {
-	red: boolean;
-	green: boolean;
-	blue: boolean;
+	color: string;
 }
 
-test("class -- mounted", async () => {
+test("style -- mounted", async () => {
 	let $state = $watch({
-		red: true,
-		green: false,
-		blue: true,
+		color: "#aaa",
 	});
 
 	const container = document.createElement("div");
@@ -33,11 +29,9 @@ test("class -- mounted", async () => {
 	check(container, $state);
 });
 
-test("class -- hydrated", async () => {
+test("style -- hydrated", async () => {
 	let $state = $watch({
-		red: true,
-		green: false,
-		blue: true,
+		color: "#aaa",
 	});
 
 	const container = document.createElement("div");
@@ -50,20 +44,10 @@ test("class -- hydrated", async () => {
 
 function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "Hello!")).not.toBeNull();
-	expect(queryByText(container, "Hello!")).toHaveClass("hello red blue", { exact: true });
-
-	expect(queryByText(container, "Class object")).not.toBeNull();
-	expect(queryByText(container, "Class object")).toHaveClass("foo baz", { exact: true });
-
-	expect(queryByText(container, "Class array")).not.toBeNull();
-	expect(queryByText(container, "Class array")).toHaveClass("foo baz", { exact: true });
-
-	expect(queryByText(container, "Class nested")).not.toBeNull();
-	expect(queryByText(container, "Class nested")).toHaveClass("foo bar baz qux", { exact: true });
+	expect(queryByText(container, "Hello!")).toHaveStyle({ color: "#aaa" });
 
 	// Change state
-	state.green = true;
-	state.blue = false;
+	state.color = "#bbb";
 
-	expect(queryByText(container, "Hello!")).toHaveClass("hello red green", { exact: true });
+	expect(queryByText(container, "Hello!")).toHaveStyle({ color: "#bbb" });
 }

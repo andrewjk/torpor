@@ -81,6 +81,10 @@ const importsMap: Record<string, string> = {
 		'import t_apply_props from "../../../../src/render/applyProps";',
 	'import { t_attribute } from "@tera/view";':
 		'import t_attribute from "../../../../src/render/setAttribute";',
+	'import { t_class } from "@tera/view";':
+		'import t_class from "../../../../src/render/getClasses";',
+	'import { t_style } from "@tera/view";':
+		'import t_style from "../../../../src/render/getStyles";',
 	'import { t_dynamic } from "@tera/view";':
 		'import t_dynamic from "../../../../src/render/setDynamicElement";',
 	'import { t_fmt } from "@tera/view";': 'import t_fmt from "../../../../src/render/formatText";',
@@ -108,6 +112,10 @@ const importsMap: Record<string, string> = {
 		'import type SlotRender from "../../../../src/types/SlotRender";',
 	'import { t_attr } from "@tera/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
+	'import { t_class } from "@tera/view/ssr";':
+		'import t_class from "../../../../src/render/getClasses";',
+	'import { t_style } from "@tera/view/ssr";':
+		'import t_style from "../../../../src/render/getStyles";',
 	'import type { ServerSlotRender } from "@tera/view/ssr";':
 		'import type ServerSlotRender from "../../../../src/types/ServerSlotRender";',
 };

@@ -11,6 +11,8 @@ const importsMap: Record<string, string> = {
 	$mount: 'import { $mount } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_attr: 'import { t_attr } from "${folder}";',
+	t_class: 'import { t_class } from "${folder}";',
+	t_style: 'import { t_style } from "${folder}";',
 	ServerSlotRender: 'import type { ServerSlotRender } from "${folder}";',
 };
 

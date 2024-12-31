@@ -105,7 +105,7 @@ export default function Index($props: { name: string }) {
 				<ul>
 					@for (let task of $state.tasks) {
 						@key = task.id
-						<li class:done={task.done}>
+						<li :class={{ done: task.done }}>
 							<input type="checkbox" :checked={task.done} />
 							{task.text}
 						</li>
@@ -343,7 +343,7 @@ export default function Index($props: { name: string }) {
 
 function TaskItem($props) {
 	@render {
-		<li class:done={$props.task.done}>
+		<li :class={{ done: $props.task.done }}>
 			<input type="checkbox" :checked={$props.task.done} />
 			{$props.task.text}
 		</li>

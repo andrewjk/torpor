@@ -202,10 +202,12 @@ function buildElementAttributes(
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
 				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
-			} else if (name.startsWith("class:")) {
-				const propName = name.substring(6);
-				const setAttribute = `${varName}.classList.toggle("${propName}", ${value})`;
-				buildRun("setClassList", `${setAttribute};`, status, b);
+			} else if (name === ":class") {
+				status.imports.add("t_class");
+				buildRun("setClasses", `${varName}.className = t_class(${value});`, status, b);
+			} else if (name === ":style") {
+				status.imports.add("t_style");
+				buildRun("setStyles", `${varName}.style = t_style(${value});`, status, b);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");

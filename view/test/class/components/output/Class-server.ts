@@ -1,6 +1,7 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import t_class from "../../../../src/render/getClasses";
 
-export default function For(
+export default function Class(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
@@ -9,7 +10,7 @@ export default function For(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div class="hello" class="${$props.red ? "red" : ""} ${$props.green ? "green" : ""} ${$props.blue ? "blue" : ""}"> Hello! </div>`;
+	$output += `<div> <div class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue })}"> Hello! </div> <div class="${t_class({ foo: true, bar: false, baz: 5, qux: null })}"> Class object </div> <div class="${t_class([ "foo", false, true && "baz", undefined ])}"> Class array </div> <div class="${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ])}"> Class nested </div> </div>`;
 
 	return $output;
 }

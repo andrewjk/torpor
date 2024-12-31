@@ -8,7 +8,9 @@ import t_add_fragment from "./render/addFragment";
 import t_apply_props from "./render/applyProps";
 import t_flush from "./render/flushMountEffects";
 import t_fmt from "./render/formatText";
+import t_class from "./render/getClasses";
 import t_fragment from "./render/getFragment";
+import t_style from "./render/getStyles";
 import hydrate from "./render/hydrate";
 import mount from "./render/mount";
 import t_list_item from "./render/newListItem";
@@ -44,7 +46,9 @@ export {
 	t_apply_props,
 	t_flush,
 	t_fmt,
+	t_class,
 	t_fragment,
+	t_style,
 	t_range,
 	t_anchor,
 	t_child,
