@@ -1,3 +1,3 @@
-export default function formatAttributeText(text: any): string {
-	return (text ?? "").toString().replaceAll('"', "&quot;");
+export default function formatAttributeText(value: any): string {
+	return (value ?? "").toString().replaceAll('"', "&quot;");
 }

@@ -1,4 +1,4 @@
-import { $mount } from "@tera/view/ssr";
+import $mount from "../../../../src/render/$serverMount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 

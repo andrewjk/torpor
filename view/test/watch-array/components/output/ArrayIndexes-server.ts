@@ -1,5 +1,5 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
-import { t_fmt } from "@tera/view/ssr";
+import t_fmt from "../../../../src/render/formatText";
 
 export default function ArrayIndexes(
 	$props?: Record<PropertyKey, any>,

@@ -1,4 +1,4 @@
-import { $watch } from "@tera/view/ssr";
+import $watch from "../../../../src/render/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Await(

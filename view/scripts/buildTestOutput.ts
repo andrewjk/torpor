@@ -112,6 +112,13 @@ const importsMap: Record<string, string> = {
 		'import type ListItem from "../../../../src/types/ListItem";',
 	'import type { SlotRender } from "@tera/view";':
 		'import type SlotRender from "../../../../src/types/SlotRender";',
+	'import { $watch } from "@tera/view/ssr";': 'import $watch from "../../../../src/render/$watch";',
+	'import { $unwrap } from "@tera/view/ssr";':
+		'import $unwrap from "../../../../src/render/$unwrap";',
+	'import { $run } from "@tera/view/ssr";': 'import $run from "../../../../src/render/$run";',
+	'import { $mount } from "@tera/view/ssr";': 'import $mount from "../../../../src/render/$mount";',
+	'import { t_fmt } from "@tera/view/ssr";':
+		'import t_fmt from "../../../../src/render/formatText";',
 	'import { t_attr } from "@tera/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_class } from "@tera/view/ssr";':

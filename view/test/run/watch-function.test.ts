@@ -1,5 +1,6 @@
-import { $run, $watch } from "@tera/view";
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
+import $run from "../../src/render/$run";
+import $watch from "../../src/render/$watch";
 
 test("watching a function effect", () => {
 	const person = $watch({

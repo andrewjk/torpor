@@ -1,6 +1,6 @@
-import { $watch } from "@tera/view/ssr";
+import $watch from "../../../../src/render/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
-import { t_fmt } from "@tera/view/ssr";
+import t_fmt from "../../../../src/render/formatText";
 
 export default function Function(
 	$props?: Record<PropertyKey, any>,

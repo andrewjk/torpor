@@ -1,3 +1,3 @@
-export default function formatText(text: string): string {
-	return text ?? "";
+export default function formatText(value: any): string {
+	return value ?? "";
 }
