@@ -1,8 +1,41 @@
-import {
-  formatText,
-  getClasses,
-  getStyles
-} from "./chunk-KBZ2F5SP.js";
+// src/render/formatText.ts
+function formatText(value) {
+  return value ?? "";
+}
+
+// src/render/getClasses.ts
+function getClasses(value) {
+  let classes = [];
+  gatherNames("", value, classes);
+  return classes.join(" ");
+}
+function gatherNames(name, value, classes) {
+  if (value) {
+    if (Array.isArray(value)) {
+      for (let v of value) {
+        gatherNames(v, v, classes);
+      }
+    } else if (typeof value === "object") {
+      for (let [n, v] of Object.entries(value)) {
+        gatherNames(n, v, classes);
+      }
+    } else {
+      classes.push(name);
+    }
+  }
+}
+
+// src/render/getStyles.ts
+function getStyles(value) {
+  let styles = [];
+  for (let [n, v] of Object.entries(value)) {
+    styles.push(`${n}: ${v}`);
+  }
+  return styles.join("; ");
+}
+
+
+//# sourceMappingURL=chunk-GO2L324Q.js.map
 
 // src/render/context.ts
 var context = {

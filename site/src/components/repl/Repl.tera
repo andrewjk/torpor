@@ -49,8 +49,8 @@ ${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
 const target = document.getElementById("repl-target");
 try {
 	mount(target, ${parsed.template.components.find(c => c.default).name});
-} catch {
-	target.innerHTML = '<span style="color: red">Script syntax error</span>';
+} catch (error) {
+	target.innerHTML = '<span style="color: red"><p>Script syntax error</p><p>' + error + '</p></span>';
 }
 </script>
 </body>

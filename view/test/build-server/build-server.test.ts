@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import fs from "fs";
+import fs from "node:fs";
 import tsb from "ts-blank-space";
 import { beforeAll, expect, test } from "vitest";
 import build from "../../src/compile/build";

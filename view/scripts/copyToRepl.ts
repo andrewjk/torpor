@@ -1,17 +1,8 @@
-import fg from "fast-glob";
-import { existsSync, promises as fs } from "node:fs";
-import path from "node:path";
-import { buildType } from "../src/compile";
-import build from "../src/compile/build";
-import parse from "../src/compile/parse";
+import { promises as fs, readFileSync } from "node:fs";
 
 async function run() {
 	const indexFile = "./dist/index.js";
-	const destFile = "../site/src/components/repl/view.txt";
-
 	let source = await fs.readFile(indexFile, "utf8");
-	let match = source.match(/export \{(.+?)\};/);
-
 	source = source
 		.replace(/^export \{(.+)\};/gms, (_, capture) => {
 			return (
@@ -27,14 +18,14 @@ async function run() {
 				"\n"
 			);
 		})
-		.replace(
-			/^import \{\s+formatText\s+\} from ".+?";/gms,
-			`// src/render/formatText.ts
-function formatText(text) {
-  return (text ?? "").toString();
-}`,
-		);
+		// HACK: Why are these imported?
+		.replace(/^import \{.+} from ".\/chunk-(.+?).js";/gms, (_, capture) => {
+			const chunkFile = `./dist/chunk-${capture}.js`;
+			let chunkSource = readFileSync(chunkFile, "utf8");
+			return chunkSource.replace(/^export \{(.+)\};/gms, "");
+		});
 
+	const destFile = "../site/src/components/repl/view.txt";
 	await fs.writeFile(destFile, source);
 }
 
