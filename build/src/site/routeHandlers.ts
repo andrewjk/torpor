@@ -1,8 +1,8 @@
 import { getManifest } from "vinxi/manifest";
 import fileRoutes, { RouteModule } from "vinxi/routes";
-import RouteHandler from "../types/RouteHandler";
+import type RouteHandler from "../types/RouteHandler";
 import type RouteHandlerCollection from "../types/RouteHandlerCollection";
-import RouteLayoutHandler from "../types/RouteLayoutHandler";
+import type RouteLayoutHandler from "../types/RouteLayoutHandler";
 import lazyRoute from "./lazyRoute";
 
 const clientManifest = getManifest("client");

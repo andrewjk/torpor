@@ -1,5 +1,5 @@
 import type ElementNode from "../../types/nodes/ElementNode";
-import TextNode from "../../types/nodes/TextNode";
+import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
@@ -7,9 +7,10 @@ import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import BuildStatus from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
+import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 
@@ -195,7 +196,7 @@ function buildElementAttributes(
 				// The :onmount event is faked by us by creating a $run. This also
 				// means that you can have unmount functionality by returning a
 				// cleanup function
-				buildRun("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
+				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
 				buildEventAttribute(node, varName, name, value, status, b);
 			} else if (name.startsWith(":transition")) {

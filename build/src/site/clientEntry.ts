@@ -3,7 +3,7 @@ import type { Component, SlotRender } from "@tera/view";
 import "vinxi/client";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
-import PageServerEndPoint from "../types/PageServerEndPoint";
+import type PageServerEndPoint from "../types/PageServerEndPoint";
 import routeHandlers from "./routeHandlers";
 
 // Intercept clicks on links

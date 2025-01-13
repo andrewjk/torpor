@@ -1,8 +1,6 @@
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
-import BuildStatus from "./BuildStatus";
-import buildAddFragment from "./buildAddFragment";
-import buildFragment from "./buildFragment";
+import type BuildStatus from "./BuildStatus";
 import buildNode from "./buildNode";
 
 export default function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
