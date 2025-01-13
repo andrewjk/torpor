@@ -24,6 +24,10 @@ export default function Repl($props) {
 	$run(() => {
 		let input = $state.input
 		debounce(() => {
+			if (!input) {
+				return
+			}
+
 			let parsed = parse(input)
 			if (parsed.ok) {
 				$state.errors = []
@@ -121,9 +125,11 @@ try {
 	}
 
 	function textAreaMount(e) {
-		console.log("HI")
-		e.style.height = e.scrollHeight + "px";
-		e.style.overflowY = "hidden";
+		// HACK: Something is out of order somewhere
+		setTimeout(() => {
+			e.style.height = e.scrollHeight + "px";
+			e.style.overflowY = "hidden";
+		}, 1)
 	}
 
 	function textAreaInput(e) {

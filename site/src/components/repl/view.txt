@@ -61,23 +61,29 @@ function $mount(fn) {
   context_default.mountEffects.push(fn);
 }
 
-// src/render/$run.ts
-function $run(fn) {
-  let effect = {
-    run: fn,
-    cleanup: null,
-    range: context_default.activeRange,
-    props: null
-  };
-  if (context_default.activeRange) {
-    (context_default.activeRange.effects ??= []).push(effect);
-  }
+// src/watch/runEffect.ts
+function runEffect(effect) {
+  effect.active = true;
   context_default.activeEffect = effect;
   const cleanup = effect.run();
   if (typeof cleanup === "function") {
     effect.cleanup = cleanup;
   }
   context_default.activeEffect = null;
+}
+
+// src/render/$run.ts
+function $run(fn) {
+  let effect = {
+    run: fn,
+    cleanup: null,
+    props: null,
+    active: true
+  };
+  if (context_default.activeRange) {
+    (context_default.activeRange.effects ??= []).push(effect);
+  }
+  runEffect(effect);
 }
 
 // src/watch/symbols.ts
@@ -103,15 +109,38 @@ function trackEffect(data, key) {
   }
 }
 
+// src/watch/removeEffect.ts
+function removeEffect(effect) {
+  if (effect.cleanup) {
+    effect.cleanup();
+  }
+  if (effect.props) {
+    for (let prop of effect.props) {
+      if (prop.effects) {
+        let length = prop.effects.length;
+        let i = length;
+        while (i--) {
+          if (prop.effects[i] === effect) {
+            prop.effects[i] = prop.effects[length - 1];
+            prop.effects.pop();
+            length -= 1;
+          }
+        }
+      }
+    }
+  }
+  effect.active = false;
+}
+
 // src/watch/triggerEffects.ts
 function triggerEffects(data, key) {
   let effects = data.propData.get(key)?.effects;
   if (effects) {
-    for (let effect of effects) {
-      if (effect.cleanup) {
-        effect.cleanup();
+    for (let effect of effects.slice()) {
+      if (effect.active) {
+        removeEffect(effect);
+        runEffect(effect);
       }
-      effect.run();
     }
   }
 }
@@ -156,8 +185,7 @@ function transferEffects(oldValue, newValue) {
   moveChildEffects(oldValue, newValue, oldData, newData);
 }
 function moveChildEffects(oldValue, newValue, oldData, newData) {
-  for (let key of oldData.propData.keys()) {
-    let props = oldData.propData.get(key);
+  for (let [key, props] of oldData.propData.entries()) {
     if (props) {
       newData.propData.set(key, props);
       let oldPropValue = oldValue[key];
@@ -284,7 +312,7 @@ function addFragment(fragment, parent, before) {
   if (!parentIsFragment) {
     for (let event of context_default.stashedEvents) {
       context_default.activeRange = event.range;
-      $run(() => {
+      $run(function addFragmentEvent() {
         event.el.addEventListener(event.type, event.listener);
         return () => {
           event.el.removeEventListener(event.type, event.listener);
@@ -294,7 +322,7 @@ function addFragment(fragment, parent, before) {
     context_default.stashedEvents.length = 0;
     for (let animation of context_default.stashedAnimations) {
       context_default.activeRange = animation.range;
-      $run(() => {
+      $run(function addFragmentAnimation() {
         if (animation.in) {
           animate(animation.el, true, animation.in.keyframes, animation.in.options);
         }
@@ -510,24 +538,7 @@ function clearEffects(range, animations) {
     const oldRange = context_default.activeRange;
     context_default.activeRange = range;
     for (let effect of range.effects) {
-      if (effect.cleanup) {
-        effect.cleanup();
-      }
-      if (effect.props) {
-        for (let prop of effect.props) {
-          if (prop.effects) {
-            let length = prop.effects.length;
-            let i = length;
-            while (i--) {
-              if (prop.effects[i] === effect) {
-                prop.effects[i] = prop.effects[length - 1];
-                prop.effects.pop();
-                length -= 1;
-              }
-            }
-          }
-        }
-      }
+      removeEffect(effect);
     }
     context_default.activeRange = oldRange;
   }
@@ -546,6 +557,9 @@ function clearEffects(range, animations) {
 function clearNodes(range) {
   if (range.startNode) {
     let currentNode = range.endNode || range.startNode;
+    if (range.startNode.parentNode !== currentNode.parentNode) {
+      throw new Error("range nodes have different parents");
+    }
     while (currentNode !== range.startNode) {
       let nextNode = currentNode.previousSibling;
       currentNode.remove();
