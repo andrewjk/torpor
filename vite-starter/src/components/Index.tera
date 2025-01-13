@@ -1,4 +1,4 @@
-import viteLogo from '@/assets/vite.svg'
+import teraLogo from '@/assets/tera.svg'
 import Counter from "./Counter.tera";
 
 /**
@@ -7,13 +7,8 @@ import Counter from "./Counter.tera";
 export default function Index() {
 	@render {
 		<div>
-			<a href="https://vitejs.dev" target="_blank">
-				<img src={viteLogo} class="logo" alt="Vite logo" />
-			</a>
-			@/*
-			// TODO: Need a Tera site and logo
-			<a href="https://www.typescriptlang.org/" target="_blank">
-				<img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
+			<a href="https://www.terajs.dev/" target="_blank">
+				<img src="${teraLogo}" class="logo vanilla" alt="Tera logo" />
 			</a>
 			*/
 			<h1>Vite + Tera</h1>
@@ -21,7 +16,7 @@ export default function Index() {
 				<Counter />
 			</div>
 			<p class="read-the-docs">
-				Click on the Vite and Tera logos to learn more
+				Click on the Tera logo to learn more
 			</p>
 		</div>
 	}

@@ -1,5 +1,5 @@
 import Counter from './Counter.tera';
-import viteLogo from '@/assets/vite.svg';
+import teraLogo from '@/assets/tera.svg';
 
 /**
  * The home component
@@ -7,12 +7,9 @@ import viteLogo from '@/assets/vite.svg';
 export default function Home() {
 	@render {
 		<div id="home-container">
-			@/*
-			// TODO: Need a Tera site and logo
-			<a href="https://www.typescriptlang.org/" target="_blank">
-				<img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
+			<a href="https://www.terajs.dev/" target="_blank">
+				<img src={teraLogo} class="logo" alt="Tera logo" />
 			</a>
-			*/
 			<h1>Tera</h1>
 			<p>
 				Tera is a full-stack JavaScript framework that is designed for simplicity,
@@ -89,6 +86,9 @@ export default function Counter() {
 	}
 
 	@style {
+			width: 200px;
+		}
+
 		#home-container {
 			display: flex;
 			flex-direction: column;
@@ -97,7 +97,7 @@ export default function Counter() {
 
 		.features-card,
 		.demo-card {
-			background: var(--code);
+			background: var(--panel-back);
 			border-radius: 1rem;
 			padding: 1rem;
 		}
