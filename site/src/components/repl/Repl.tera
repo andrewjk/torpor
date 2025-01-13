@@ -67,7 +67,7 @@ try {
 	})
 
 	@render {
-		<div id="repl" class="hstack spaced full-width">
+		<div id="repl" class="hstack spaced full-width collapse">
 			<div id="input-container" class="grow">
 				<h3>Input</h3>
 				<textarea

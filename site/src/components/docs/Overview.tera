@@ -6,7 +6,7 @@ export default function Overview() {
 		<div>
 			<h1>Overview</h1>
 			<p>
-				Tera is a JavaScript framework, designed for simplicity, completeness and fun.
+				Tera is a JavaScript framework, designed for simplicity and completeness.
 			</p>
 			<p>
 				🚧 WARNING: VERY INCOMPLETE 🚧
@@ -14,16 +14,16 @@ export default function Overview() {
 
 			<h2>Features</h2>
 			<ul>
-				<li>Compose your views with JS/TS, HTML and CSS</li>
+				<li>Compose your views with JavaScript, HTML and CSS</li>
 				<li>Components are functions with script, markup and styles</li>
-				<li>In-markup JS/TS logic with @if, @for, @switch and @await keywords</li>
+				<li>In-markup JavaScript logic with @if, @for, @switch and @await keywords</li>
 					<ul>
 						<li>And @replace, @const, @console, @debugger, @function and @html</li>
 					</ul>
-				<li>Runtime reactivity via proxies that can be used in any JS/TS file</li>
+				<li>Runtime reactivity via proxies that can be used in any JavaScript file</li>
 				<li>Scoped styles, two-way binding, child components and more</li>
 				<li>An accessible, unstyled component library</li>
-				<li>A site and app building framework</li>
+				<li>A site and app framework</li>
 			</ul>
 
 			<h2>A simple component</h2>

@@ -21,11 +21,12 @@ export default function Layout() {
         }
 
         #sidebar {
-            margin: 0.5rem;
+            padding: 0.5rem;
         }
 
         #content {
             overflow: auto;
+            padding: 0.5rem;
         }
     }
 }

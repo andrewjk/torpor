@@ -16,7 +16,7 @@ export default function Binding() {
 			</p>
 			<pre><code>{`
 export default function Component() {
-	let $state = $watch({ name: "Andrew" })
+	let $state = $watch({ name: "Tera" })
 
 	@render {
 		<div>
@@ -39,7 +39,7 @@ export default function Component() {
 			</p>
 			<pre><code>{`
 export default function Component() {
-	let $state = $watch({ name: "Andrew" })
+	let $state = $watch({ name: "Tera" })
 
 	@render {
 		<div>
@@ -99,7 +99,7 @@ export default function Component() {
 			<h2>Playground</h2>
 			<Repl input={`
 export default function Component() {
-	let $state = $watch({ name: "Andrew" })
+	let $state = $watch({ name: "Tera" })
 
 	@render {
 		<div>

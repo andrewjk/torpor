@@ -14,13 +14,13 @@ npm install tera
 
 ## Features
 
-- Compose your views with JS/TS, HTML and CSS
+- Compose your views with JavaScript, HTML and CSS
 - Components are functions
   - In a file with the `.tera` extension
   - HTML markup in a `@render` section
   - CSS in a `@style` section
   - Child components in child component functions
-- In-markup JS/TS logic
+- In-markup JavaScript logic
   - @if statement
   - @for loop
   - @switch statement

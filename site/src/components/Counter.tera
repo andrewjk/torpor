@@ -11,6 +11,9 @@ export default function Counter() {
 			<button onclick={() => $state.count++}>
 				Increment
 			</button>
+			<button onclick={() => $state.count = 0}>
+				Reset
+			</button>
 		</div>
 	}
 }

@@ -58,7 +58,7 @@ export default function Component() {
 			<pre><code>{`
 export default function Component() {
 	const className = "extravagant"
-	const name = "Andrew"
+	const name = "Tera"
 
 	@render {
 		<p class={className}>

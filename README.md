@@ -1,19 +1,19 @@
 # Tera
 
-Yet another JavaScript framework, designed for simplicity, completeness and fun.
+Yet another JavaScript framework, designed for simplicity and completeness.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 
 ## Features
 
-- Compose your views with JS/TS, HTML and CSS
+- Compose your views with JavaScript, HTML and CSS
 - Components are functions with script, markup and styles
-- In-markup JS/TS logic with @if, @for, @switch and @await keywords
+- In-markup JavaScript logic with @if, @for, @switch and @await keywords
   - And @replace, @const, @console, @debugger, @function and @html
-- Runtime reactivity via proxies that can be used in any JS/TS file
+- Runtime reactivity via proxies that can be used in any JavaScript file
 - Scoped styles, two-way binding, child components and more -- see [tera/view](./view)
 - An accessible, unstyled component library -- see [tera/ui](./ui)
-- A site and app building framework -- see [tera/build](./build)
+- A site and app framework -- see [tera/build](./build)
 
 ### Not yet
 

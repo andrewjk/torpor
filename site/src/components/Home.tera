@@ -12,10 +12,10 @@ export default function Home() {
 			</a>
 			<h1>Tera</h1>
 			<p>
-				Tera is a full-stack JavaScript framework that is designed for simplicity,
-				completeness and fun.
+				Tera is a full-stack JavaScript framework that is designed for
+				simplicity and completeness.
 			</p>
-			<div class="hstack spaced equal full-width">
+			<div class="hstack spaced equal full-width collapse">
 				<div class="features-card">
 					<h3>Simplicity</h3>
 					<p>
@@ -34,15 +34,9 @@ export default function Home() {
 						Tera aims to include most of the things that you need to build high-quality
 						interfaces without having to reach for third party libraries, including:
 					</p>
-					<p><a href="docs/ui">An accessible, unstyled component library</a></p>
-					<p><a href="docs/build">A site and app building framework</a></p>
+					<p>An <a href="docs/ui">accessible, unstyled component library</a></p>
+					<p>A <a href="docs/build">site and app framework</a></p>
 					<p>More to come...</p>
-				</div>
-				<div class="features-card">
-					<h3>Fun</h3>
-					<p>
-						Building on the web shouldn't be a chore!
-					</p>
 				</div>
 			</div>
 			
@@ -52,7 +46,7 @@ export default function Home() {
 				<code>count</code> property in a reactive <code>$state</code> object, and displays
 				the value of the count with a button to increment it:
 			</p>
-			<div class="hstack spaced full-width">
+			<div class="hstack spaced full-width collapse">
 				<div class="demo-card grow">
 					<h3>Code</h3>
 					<pre style="padding: 1rem 0"><code>{`
@@ -68,6 +62,9 @@ export default function Counter() {
 			</p>
 			<button onclick={() => $state.count++}>
 				Increment
+			</button>
+			<button onclick={() => $state.count = 0}>
+				Reset
 			</button>
 		</div>
 	}
@@ -86,6 +83,8 @@ export default function Counter() {
 	}
 
 	@style {
+		.logo {
+			height: 200px;
 			width: 200px;
 		}
 
