@@ -52,21 +52,19 @@ function check(container: HTMLElement, state: State) {
 
 	// `condition`, `counter`
 	expect(proxyData(state).propData.size).toBe(2);
+	expect(proxyData(state).propData.get("condition")?.effects?.length).toBe(1);
+	expect(proxyData(state).propData.get("counter")?.effects?.length).toBe(1);
 	//expect(Object.keys(proxyData(state).propData).length).toBe(2);
-
-	// 2 if nodes with effects
-	//expect(context.rangeEffects.size).toBe(2);
 
 	state.condition = false;
 
 	expect(queryByText(container, "It's small")).toBeNull();
 
 	// `condition`
-	expect(proxyData(state).propData.size).toBe(1);
+	expect(proxyData(state).propData.size).toBe(2);
+	expect(proxyData(state).propData.get("condition")?.effects?.length).toBe(1);
+	expect(proxyData(state).propData.get("counter")?.effects?.length).toBe(0);
 	//expect(Object.keys(proxyData(state).propData).length).toBe(1);
-
-	// 1 if node with an effect
-	//expect(context.rangeEffects.size).toBe(1);
 }
 
 function proxyData(object: any): ProxyData {

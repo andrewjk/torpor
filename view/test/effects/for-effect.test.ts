@@ -47,7 +47,6 @@ test("for effect -- hydrated", async () => {
 	check(container, $state);
 });
 
-// HACK: Need to mock context properly
 function check(container: HTMLElement, state: any) {
 	// `items`
 	expect(proxyData(state).propData.size).toBe(1);
@@ -64,9 +63,6 @@ function check(container: HTMLElement, state: any) {
 	//expect(Object.keys(proxyData(state.items[0]).propData).length).toBe(1);
 	//expect(Object.keys(proxyData(state.items[1]).propData).length).toBe(1);
 	//expect(Object.keys(proxyData(state.items[2]).propData).length).toBe(1);
-
-	// 1 for node, 3 items with effects
-	//expect(context.rangeEffects.size).toBe(4);
 }
 
 function proxyData(object: any): ProxyData {
