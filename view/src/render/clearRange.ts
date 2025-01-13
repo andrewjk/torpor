@@ -1,4 +1,5 @@
 import type Range from "../types/Range";
+import removeEffect from "../watch/removeEffect";
 import context from "./context";
 
 export default function clearRange(range: Range) {
@@ -25,29 +26,7 @@ function clearEffects(range: Range, animations: Animation[]) {
 		context.activeRange = range;
 
 		for (let effect of range.effects) {
-			// Run any cleanup function
-			if (effect.cleanup) {
-				effect.cleanup();
-			}
-
-			// Delete the effect from any props that are subscribed to it
-			if (effect.props) {
-				for (let prop of effect.props) {
-					if (prop.effects) {
-						let length = prop.effects.length;
-						let i = length;
-						while (i--) {
-							if (prop.effects[i] === effect) {
-								prop.effects[i] = prop.effects[length - 1];
-								prop.effects.pop();
-								length -= 1;
-							}
-						}
-						// TODO: should ideally delete the prop if there
-						// are no more subscriptions??
-					}
-				}
-			}
+			removeEffect(effect);
 		}
 
 		context.activeRange = oldRange;
@@ -74,9 +53,9 @@ function clearNodes(range: Range) {
 	if (range.startNode) {
 		let currentNode = range.endNode || range.startNode;
 		// DEBUG:
-		//if (range.startNode.parentNode !== currentNode.parentNode) {
-		//	throw new Error("range nodes have different parents");
-		//}
+		if (range.startNode.parentNode !== currentNode.parentNode) {
+			throw new Error("range nodes have different parents");
+		}
 		while (currentNode !== range.startNode) {
 			let nextNode = currentNode.previousSibling;
 			currentNode.remove();

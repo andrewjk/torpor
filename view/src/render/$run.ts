@@ -1,5 +1,6 @@
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
+import runEffect from "../watch/runEffect";
 import context from "./context";
 
 // TODO: Take a pipeline of operators e.g. debounce
@@ -13,23 +14,14 @@ export default function $run(fn: () => Cleanup | void) {
 	let effect: Effect = {
 		run: fn,
 		cleanup: null,
-		range: context.activeRange,
 		props: null,
+		active: true,
 	};
 
 	if (context.activeRange) {
+		//console.log("the range is ", context.activeRange.id);
 		(context.activeRange.effects ??= []).push(effect);
 	}
 
-	context.activeEffect = effect;
-
-	// Run the effect to register its subscriptions and get its (optional)
-	// cleanup function
-	const cleanup = effect.run();
-
-	if (typeof cleanup === "function") {
-		effect.cleanup = cleanup;
-	}
-
-	context.activeEffect = null;
+	runEffect(effect);
 }

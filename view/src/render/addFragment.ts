@@ -48,7 +48,7 @@ export default function addFragment(
 
 		for (let event of context.stashedEvents) {
 			context.activeRange = event.range;
-			$run(() => {
+			$run(function addFragmentEvent() {
 				event.el.addEventListener(event.type, event.listener);
 				return () => {
 					event.el.removeEventListener(event.type, event.listener);
@@ -59,7 +59,7 @@ export default function addFragment(
 
 		for (let animation of context.stashedAnimations) {
 			context.activeRange = animation.range;
-			$run(() => {
+			$run(function addFragmentAnimation() {
 				if (animation.in) {
 					animate(animation.el, true, animation.in.keyframes, animation.in.options);
 				}

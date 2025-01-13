@@ -22,8 +22,7 @@ function moveChildEffects(
 ) {
 	// Recursively transfer and run effects for child properties
 	// TODO: Top down or bottom up?? Doing top down for now...
-	for (let key of oldData.propData.keys()) {
-		let props = oldData.propData.get(key);
+	for (let [key, props] of oldData.propData.entries()) {
 		if (props) {
 			// Transfer the prop data
 			newData.propData.set(key, props);
