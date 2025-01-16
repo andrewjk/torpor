@@ -1,4 +1,4 @@
-import type { ServerComponent, ServerSlotRender } from "@tera/view";
+import type { ServerComponent, ServerSlotRender } from "@torpor/view";
 import fs from "fs";
 import { IncomingMessage } from "node:http";
 import path from "path";
@@ -141,7 +141,7 @@ async function loadView(
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
 
 	// HACK: wrangle the view into app.html
-	// We could instead have an App.tera component with a slot, but you can run
+	// We could instead have an App.torp component with a slot, but you can run
 	// into hydration problems that way e.g. if there is a browser plugin that
 	// injects elements into <head> or <body>
 	const appHtml = loadAppHtml();

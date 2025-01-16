@@ -1,0 +1,75 @@
+import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from './AccordionTypes';
+
+/**
+ * An item in an Accordion, which must consist of an AccordionTrigger and an AccordionContent.
+ * 
+ * The structure of an AccordionItem is:
+ * 
+ * ```
+ * <AccordionItem>
+ * 	<AccordionHeader>
+ * 		<AccordionTrigger />
+ * 	</AccordionHeader>
+ * 	<AccordionContent />
+ * </AccordionItem>
+ * ```
+ *
+ * @prop {number} [index] -- The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically
+ * @prop {string} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index
+ * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this AccordionItem
+ * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
+ */
+export default function AccordionItem($props: any) {
+	let $state: ItemState = $watch({
+		index: -1,
+		value: "",
+		expanded: false,
+		disabled: $props.disabled,
+		parentDisabled: false,
+		get dataState() {
+			return this.expanded ? 'open' : 'closed';
+		},
+	})
+
+	// Get stuff out of the AccordionContext
+	const context = $context[AccordionContextName] as AccordionContext;
+	if (!context) {
+		throw new Error('AccordionItem must be contained within an Accordion');
+	}
+
+	// Put stuff into an AccordionItemContext
+	const itemContext: AccordionItemContext = {
+		toggleItem: context.toggleItem,
+		handleHeaderKey: context.handleHeaderKey,
+		state: $state,
+	};
+	$context[AccordionItemContextName] = itemContext;
+
+	// Register this item with the parent Accordion, which will handle toggling expanded for all items
+	context.registerItem($state);
+
+	// Remove the item from the parent Accordion when this item is destroyed
+	$run(() => {
+		return () => {
+			context.removeItem($state.index);
+		}
+	});
+
+	// Dispatch the toggle event when the value of expanded changes
+	// TODO: Should this be a setter instead?
+	$run(() => {
+		if ($props.ontoggle) {
+			$props.ontoggle($state.expanded);
+		}
+	})
+
+	@render {
+		<div
+			class='torp-accordion-item'
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			<:slot />
+		</div>
+	}
+}

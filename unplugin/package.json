@@ -1,10 +1,10 @@
 {
-	"name": "@tera/unplugin",
+	"name": "@torpor/unplugin",
 	"type": "module",
 	"version": "0.0.1",
-	"description": "Unplugin package to compile Tera components for Vite, Rollup, and other bundlers",
+	"description": "Unplugin package to compile Torpor components for Vite, Rollup, and other bundlers",
 	"keywords": [
-		"tera",
+		"torpor",
 		"unplugin"
 	],
 	"exports": {
@@ -108,7 +108,7 @@
 		}
 	},
 	"dependencies": {
-		"@tera/view": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"unplugin": "^2.0.0"
 	},
 	"devDependencies": {

@@ -1,6 +1,6 @@
 import articlesCreate from "@/lib/api/controllers/articles/articlesCreate";
 import articlesList from "@/lib/api/controllers/articles/articlesList";
-import type { ServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: ({ url, request }) => {

@@ -1,7 +1,7 @@
 import * as api from "@/lib/api";
 import { pageSize } from "@/lib/constants";
-import { type PageServerEndPoint } from "@tera/build";
-import { ok } from "@tera/build/response";
+import { type PageServerEndPoint } from "@torpor/build";
+import { ok } from "@torpor/build/response";
 
 export default {
 	load: async ({ url, appData }) => {

@@ -5,8 +5,8 @@ export async function setup() {
 }
 
 //export async function teardown() {
-//	// Delete all of the *.server.tera files that we created while hydrating
-//	const files = await fg("**/*.server.tera", {
+//	// Delete all of the *.server.torp files that we created while hydrating
+//	const files = await fg("**/*.server.torp", {
 //		absolute: true,
 //	});
 //	await Promise.all(files.map((f) => fs.unlink(f)));

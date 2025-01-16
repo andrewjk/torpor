@@ -22,16 +22,16 @@ async function run() {
 		for (const file of indexFiles) {
 			let jsfile = join(distFolder, component, file);
 			let code = await fs.readFile(jsfile, "utf8");
-			code = code.replace(/var (.+?) = "\.\.\/(.+?)-(.+?).tera"/g, 'import $1 from "./$2.tera"');
+			code = code.replace(/var (.+?) = "\.\.\/(.+?)-(.+?).torp"/g, 'import $1 from "./$2.torp"');
 			await fs.writeFile(jsfile, code);
 		}
 
-		// Move all *.tera files for the component into this folder
+		// Move all *.torp files for the component into this folder
 		const relatedFiles = (await fs.readdir(distFolder)).filter(
 			(f) => f.startsWith(component) && f !== component,
 		);
 		for (const file of relatedFiles) {
-			const newfile = file.substring(0, file.indexOf("-")) + ".tera";
+			const newfile = file.substring(0, file.indexOf("-")) + ".torp";
 			await fs.rename(join(distFolder, file), join(distFolder, component, newfile));
 		}
 

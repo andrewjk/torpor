@@ -1,4 +1,4 @@
-import { forbidden, notFound, ok, serverError } from "@tera/build/response";
+import { forbidden, notFound, ok, serverError } from "@torpor/build/response";
 import userGetEmailPrisma from "../../db/user/userGetEmailPrisma";
 import createUserToken from "../../utils/createUserToken";
 import getErrorMessage from "../../utils/getErrorMessage";

@@ -1,6 +1,6 @@
-# tera/ui
+# torpor/ui
 
-Accessible, unstyled components for use in your Tera front-end.
+Accessible, unstyled components for use in your Torpor front-end.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 

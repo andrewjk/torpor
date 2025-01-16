@@ -1,7 +1,7 @@
-import Accordion from "./Accordion.tera";
-import AccordionContent from "./AccordionContent.tera";
-import AccordionHeader from "./AccordionHeader.tera";
-import AccordionItem from "./AccordionItem.tera";
-import AccordionTrigger from "./AccordionTrigger.tera";
+import Accordion from "./Accordion.torp";
+import AccordionContent from "./AccordionContent.torp";
+import AccordionHeader from "./AccordionHeader.torp";
+import AccordionItem from "./AccordionItem.torp";
+import AccordionTrigger from "./AccordionTrigger.torp";
 
 export { Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionContent };

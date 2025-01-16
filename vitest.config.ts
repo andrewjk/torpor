@@ -1,8 +1,8 @@
 import { defineConfig } from "vitest/config";
-import tera from "./unplugin/dist/vite";
+import torpor from "./unplugin/dist/vite";
 
 export default defineConfig(({ mode }) => ({
-	plugins: [tera()],
+	plugins: [torpor()],
 	resolve: {
 		conditions: mode === "test" ? ["browser"] : [],
 	},

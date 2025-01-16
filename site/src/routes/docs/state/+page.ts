@@ -1,5 +1,5 @@
-import component from "@/components/docs/State.tera";
-import { type PageEndPoint } from "@tera/build";
+import component from "@/components/docs/State.torp";
+import { type PageEndPoint } from "@torpor/build";
 
 export default {
 	component,

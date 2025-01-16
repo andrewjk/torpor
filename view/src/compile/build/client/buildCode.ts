@@ -55,7 +55,7 @@ export default function buildCode(template: Template, options?: BuildOptions): s
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
 			imp = importsMap[imp] || imp;
-			b.prepend(imp.replace("${folder}", options?.renderFolder || "@tera/view"));
+			b.prepend(imp.replace("${folder}", options?.renderFolder || "@torpor/view"));
 		}
 	}
 

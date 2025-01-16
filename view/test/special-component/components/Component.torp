@@ -1,0 +1,15 @@
+import BigTitle from "./BigTitle.torp";
+import SmallTitle from "./SmallTitle.torp";
+
+export default function Component($props) {
+	let components = {
+		BigTitle,
+		SmallTitle
+	};
+
+	@render {
+		<:component self={components[$props.self]}>
+			Hello!
+		</:component>
+	}
+}

@@ -1,7 +1,7 @@
 {
-	"name": "@tera/build",
+	"name": "@torpor/build",
 	"version": "0.0.1",
-	"description": "A framework for building sites and apps with Tera",
+	"description": "A framework for building sites and apps with Torpor",
 	"type": "module",
 	"main": "dist/index.cjs",
 	"module": "dist/index.js",
@@ -35,8 +35,8 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/unplugin": "workspace:^",
-		"@tera/view": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"vinxi": "^0.5.1"
 	},
 	"devDependencies": {

@@ -28,7 +28,7 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 			} else if (globalStyleRegex.test(s)) {
 				return s.match(globalStyleRegex)![1];
 			} else {
-				return `${s}.tera-${styleHash}`;
+				return `${s}.torp-${styleHash}`;
 			}
 		});
 

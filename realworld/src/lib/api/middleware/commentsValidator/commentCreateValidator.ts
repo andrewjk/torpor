@@ -1,4 +1,4 @@
-import { badRequest } from "@tera/build/response";
+import { badRequest } from "@torpor/build/response";
 
 /**
  * Middleware that validates the properties of the request for the comment creation controller.

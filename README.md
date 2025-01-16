@@ -1,4 +1,4 @@
-# Tera
+# Torpor
 
 Yet another JavaScript framework, designed for simplicity and completeness.
 
@@ -11,24 +11,24 @@ Yet another JavaScript framework, designed for simplicity and completeness.
 - In-markup JavaScript logic with @if, @for, @switch and @await keywords
   - And @replace, @const, @console, @debugger, @function and @html
 - Runtime reactivity via proxies that can be used in any JavaScript file
-- Scoped styles, two-way binding, child components and more -- see [tera/view](./view)
-- An accessible, unstyled component library -- see [tera/ui](./ui)
-- A site and app framework -- see [tera/build](./build)
+- Scoped styles, two-way binding, child components and more -- see [torpor/view](./view)
+- An accessible, unstyled component library -- see [torpor/ui](./ui)
+- A site and app framework -- see [torpor/build](./build)
 
-### Not yet
+### Not Yet
 
-- [tera/lsp](./lsp) -- Language server for IDEs
-- [tera/site](./site) -- Homepage, documentation, REPL, etc
-- [tera/dev](./dev) -- Browser devtools
+- [torpor/lsp](./lsp) -- Language server for IDEs
+- [torpor/site](./site) -- Homepage, documentation, REPL, etc
+- [torpor/dev](./dev) -- Browser devtools
 - Performance
 
-## A simple component
+## A Simple Component
 
-See the [tera/view](./view) sub-repo for a more in-depth example.
+See the [torpor/view](./view) sub-repo for a more in-depth example.
 
 ```
 /**
- * Components are functions that are declared in a `.tera` file
+ * Components are functions that are declared in a `.torp` file
  */
 export default function Component($props: { name: string }) {
     // Use the $watch function to declare reactive state
@@ -74,17 +74,17 @@ export default function Component($props: { name: string }) {
 
 ## Installation
 
-Use `npm` (or your preferred package manager) to add Tera to your project:
+Use `npm` (or your preferred package manager) to add Torpor to your project:
 
 ```bash
-npm install tera
+npm install torpor
 ```
 
-Clone Tera to view its source and run a demo:
+Clone Torpor to view its source and run a demo:
 
 ```bash
-git clone https://github.com/andrewjk/tera.git
-cd tera/demo
+git clone https://github.com/andrewjk/torpor.git
+cd torpor/demo
 npm install
 npm run dev
 ```

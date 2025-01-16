@@ -111,7 +111,7 @@ export default () => {
 function td(source: string): TextDocument {
 	return {
 		uri: "",
-		languageId: "tera",
+		languageId: "torpor",
 		version: 1,
 		getText: (TextRange?) => source,
 		positionAt: (offset) => {

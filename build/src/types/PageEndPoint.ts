@@ -1,4 +1,4 @@
-import type { Component } from "@tera/view";
+import type { Component } from "@torpor/view";
 import type PageEvent from "./PageEvent";
 
 /**

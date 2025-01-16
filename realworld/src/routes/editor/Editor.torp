@@ -1,0 +1,100 @@
+//import { enhance } from '$app/forms';
+import FormErrors from '@/components/FormErrors.torp';
+
+export default function Editor() {
+	let article = $props.data.article;
+	let errors = $props.form?.errors;
+
+	@render {
+		<div class="editor-page">
+			<div class="container page">
+				<div class="row">
+					<div class="col-md-10 offset-md-1 col-xs-12">
+						<FormErrors {errors} />
+
+						<form use:enhance method="POST">
+							<fieldset class="form-group">
+								<input
+									name="title"
+									class="form-control form-control-lg"
+									placeholder="Article Title"
+									value={article.title}
+								/>
+							</fieldset>
+
+							<fieldset class="form-group">
+								<input
+									name="description"
+									class="form-control"
+									placeholder="What's this article about?"
+									value={article.description}
+								/>
+							</fieldset>
+
+							<fieldset class="form-group">
+								<textarea
+									name="body"
+									class="form-control"
+									rows="8"
+									placeholder="Write your article (in markdown)"
+									value={article.body}
+								/>
+							</fieldset>
+
+							<fieldset class="form-group">
+								<input
+									class="form-control"
+									placeholder="Enter tags"
+									onkeydown={(event) => {
+										if (event.key === 'Enter') {
+											event.preventDefault();
+											if (!article.tagList.includes(event.target.value)) {
+												article.tagList = [...article.tagList, event.target.value];
+											}
+
+											event.target.value = '';
+										}
+									}}
+								/>
+							</fieldset>
+
+							<div class="tag-list">
+								@for (let [i, tag] of article.tagList.entries()) {
+									@key = tag
+									<button
+										transition:scale|local={{ duration: 200 }}
+										animate:flip={{ duration: 200 }}
+										class="tag-default tag-pill"
+										onclick={(e) => {
+											e.preventDefault();
+											article.tagList = [
+												...article.tagList.slice(0, i),
+												...article.tagList.slice(i + 1)
+											];
+										}}
+										aria-label="Remove {tag} tag"
+									>
+										<i class="ion-close-round" />
+										{tag}
+									</button>
+								}
+							</div>
+
+							@for (let tag of article.tagList) {
+								<input hidden name="tag" value={tag} />
+							}
+
+							<button class="btn btn-lg pull-xs-right btn-primary">Publish Article</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+
+	@style {
+		.tag-pill {
+			border: none;
+		}
+	}
+}

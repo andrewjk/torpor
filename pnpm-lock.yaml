@@ -39,10 +39,10 @@ importers:
 
   build:
     dependencies:
-      '@tera/unplugin':
+      '@torpor/unplugin':
         specifier: workspace:^
         version: link:../unplugin
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
       vinxi:
@@ -61,16 +61,16 @@ importers:
 
   demo:
     dependencies:
-      '@tera/build':
+      '@torpor/build':
         specifier: workspace:^
         version: link:../build
-      '@tera/ui':
+      '@torpor/ui':
         specifier: workspace:^
         version: link:../ui
-      '@tera/unplugin':
+      '@torpor/unplugin':
         specifier: workspace:^
         version: link:../unplugin
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
       typescript:
@@ -109,9 +109,15 @@ importers:
       '@prisma/client':
         specifier: ^6.0.1
         version: 6.0.1(prisma@6.0.1)
-      '@tera/build':
+      '@torpor/build':
         specifier: workspace:^
         version: link:../build
+      '@torpor/unplugin':
+        specifier: workspace:^
+        version: link:../unplugin
+      '@torpor/view':
+        specifier: workspace:^
+        version: link:../view
       bcryptjs:
         specifier: ^2.4.3
         version: 2.4.3
@@ -131,12 +137,6 @@ importers:
         specifier: ^3.17.0
         version: 3.17.0
     devDependencies:
-      '@tera/unplugin':
-        specifier: workspace:^
-        version: link:../unplugin
-      '@tera/view':
-        specifier: workspace:^
-        version: link:../view
       '@types/bcryptjs':
         specifier: ^2.4.6
         version: 2.4.6
@@ -170,13 +170,13 @@ importers:
 
   site:
     dependencies:
-      '@tera/build':
+      '@torpor/build':
         specifier: workspace:^
         version: link:../build
-      '@tera/unplugin':
+      '@torpor/unplugin':
         specifier: workspace:^
         version: link:../unplugin
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
       ts-blank-space:
@@ -191,10 +191,10 @@ importers:
 
   ui:
     dependencies:
-      '@tera/unplugin':
+      '@torpor/unplugin':
         specifier: workspace:^
         version: link:../unplugin
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
     devDependencies:
@@ -240,7 +240,7 @@ importers:
 
   unplugin:
     dependencies:
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
       esbuild:
@@ -355,7 +355,7 @@ importers:
 
   view/benchx:
     dependencies:
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:..
     devDependencies:
@@ -386,13 +386,13 @@ importers:
 
   vite-starter:
     dependencies:
-      '@tera/build':
+      '@torpor/build':
         specifier: workspace:^
         version: link:../build
-      '@tera/unplugin':
+      '@torpor/unplugin':
         specifier: workspace:^
         version: link:../unplugin
-      '@tera/view':
+      '@torpor/view':
         specifier: workspace:^
         version: link:../view
       typescript:

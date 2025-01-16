@@ -1,4 +1,4 @@
-import { badRequest, unauthorized } from "@tera/build/response";
+import { badRequest, unauthorized } from "@torpor/build/response";
 import logger from "../../utils/logger";
 
 /**

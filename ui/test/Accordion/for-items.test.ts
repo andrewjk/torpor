@@ -1,9 +1,9 @@
-import { $watch, mount } from "@tera/view";
 import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
+import { $watch, mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import AccordionList from "./components/AccordionList.tera";
+import AccordionList from "./components/AccordionList.torp";
 
 describe("Accordion", () => {
 	it("Items in a for loop", async () => {

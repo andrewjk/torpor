@@ -1,6 +1,6 @@
-# tera/site
+# torpor/site
 
-The home and documentation site for Tera.
+The home and documentation site for Torpor.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 

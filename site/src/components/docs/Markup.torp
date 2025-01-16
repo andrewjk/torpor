@@ -1,0 +1,278 @@
+import Repl from "../repl/Repl.torp"
+
+export default function Markup() {
+	@render {
+		<div>
+			<:head>
+				<title>Markup | Torpor</title>
+			</:head>
+
+			<h1>Markup</h1>
+			<p>
+				The HTML that a component outputs is declared within a <code>&commat;render</code> block.
+				There can only be one @render block per component. Each @render block must contain
+				a single root element:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	@render {
+		<p>Hello!</p>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>Dynamic content</h2>
+			<p>
+				You can include dynamic content in text and attributes using braces:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	const className = "extravagant"
+	const name = "Torpor"
+
+	@render {
+		<p class={className}>
+			Hello, {name}!
+		</p>
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				Use this shortcut syntax to set the value of an attribute to a value of the same
+				name:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	const id = "main"
+
+	@render {
+		<p {id}>
+			Hello, {name}!
+		</p>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>If statements</h2>
+			<p>
+				Use an @if statement to show certain markup when a condition is met:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+			<button onclick={() => $state.counter--}>Decrement</button>
+			{$state.counter}
+			<button onclick={() => $state.counter++}>Increment</button>
+
+			@if ($state.counter < 0) {
+				<p>The count is negative.</p>
+			} else if ($state.counter > 0) {
+				<p>The count is positive.</p>
+			} else {
+				<p>The count is zero.</p>
+			}
+		</div>
+	}
+}
+`.trim()}</code></pre>
+			
+			<h2>For loops</h2>
+			<p>
+				Use a @for loop to show multiple elements:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({
+		stock: [
+			{ code: "W1", name: "Widgets", quantity: 5 }
+			{ code: "B2", name: "Boxes", quantity: 12 }
+			{ code: "D3", name: "Doodads", quantity: 3 }
+		]
+	})
+
+	@render {
+		<div>
+			<button onclick={() => $state.stock.sort((a, b) => a - b)}>
+				Sort by quantity
+			</button>
+
+			@for (let $item of $state.stock) {
+				@key $item.code
+				<p>{$item.name}: {$item.quantity}</p>
+			}
+		</div>
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				Note the use of the (optional) @key statement to store a unique value for each
+				loop item. If set, when the list is updated (e.g. when sorting), the @key value
+				will be used to recycle the DOM elements rather than destroying and recreating
+				each one.
+			</p>
+
+			<h2>Switch statements</h2>
+			<p>
+				Use a @switch statement to show one of many options:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+			{$state.counter}
+			<button onclick={() => $state.counter++}>Increment</button>
+
+			@switch ($state.counter) {
+				case 0: {
+					<p>It's zero.</p>
+				}
+				case 1: {
+					<p>It's one.</p>
+				}
+				case 2: {
+					<p>It's two.</p>
+				}
+				case 3: {
+					<p>It's three.</p>
+				}
+				case 4: {
+					<p>It's four.</p>
+				}
+				default: {
+					<p>It's bigger than four.</p>
+				}
+			}
+		</div>
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				Note that the switch statement differs from the JavaScript switch statement in that
+				each case statement must be surrounded by braces and no fallthroughs are allowed
+				(meaning that the <code>break</code> statement can be omitted).
+			</p>
+
+			<h2>Await statements</h2>
+			<p>
+				Use an @await statement to show the result of an asynchronous function:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>Replace statements</h2>
+			<p>
+				Use a @replace statement to re-render markup when a value is changed:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				This can be used to re-run component $mount statements and to re-play transition
+				animations.
+			</p>
+
+			<h2>&commat;const, @console and @debugger</h2>
+			<p>
+				The @const keyword can be used to declare a constant value within markup, the
+				&commat;console keyword can be used to log information within markup, and the
+				&commat;debugger keyword can be used to break code execution during markup rendering:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>Function declarations</h2>
+			<p>
+				Use the @function statement to declare a function within markup. This can be
+				useful for keeping logic close together, e.g. for moving a large onclick handler
+				out of an onclick attribute, but still keeping it next to the button it is called
+				from:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+			<h2>HTML rendering</h2>
+			<p>
+				Use a @html statement to render plain HTML within markup, e.g. from a database:
+			</p>
+			<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+			<p>
+				Note that when rendering HTML you should ensure that it is properly escaped to
+				prevent script injection and other attacks.
+			</p>
+
+			<h2>Playground</h2>
+			<Repl input={`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+			<button onclick={() => $state.counter--}>Decrement</button>
+			{$state.counter}
+			<button onclick={() => $state.counter++}>Increment</button>
+
+			@if ($state.counter < 0) {
+				<p>The count is negative.</p>
+			} else if ($state.counter > 0) {
+				<p>The count is positive.</p>
+			} else {
+				<p>The count is zero.</p>
+			}
+		</div>
+	}
+}
+`.trimStart()} />
+
+		</div>
+	}
+}

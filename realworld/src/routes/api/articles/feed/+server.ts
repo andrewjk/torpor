@@ -1,5 +1,5 @@
 import articlesFeed from "@/lib/api/controllers/articles/articlesFeed";
-import type { ServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: ({ url, request }) => {

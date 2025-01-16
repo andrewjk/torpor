@@ -5,13 +5,13 @@ import path from "path";
 import defineSite from "../site/defineSite";
 import type UserConfig from "../types/UserConfig";
 
-// Check for a tera.config.js/ts file in the working directory
+// Check for a torpor.config.js/ts file in the working directory
 // TODO: Make sure it's valid, try/catch, etc
 // TODO: There has GOT to be an easier way
 let options: UserConfig | undefined;
 const workingDir = process.cwd();
-const jsConfigFile = path.join(workingDir, "tera.config.js");
-const tsConfigFile = path.join(workingDir, "tera.config.ts");
+const jsConfigFile = path.join(workingDir, "torpor.config.js");
+const tsConfigFile = path.join(workingDir, "torpor.config.ts");
 let source: string | undefined;
 if (fs.existsSync(jsConfigFile)) {
 	//const configFile = path.relative(".", tsConfigFile);
@@ -19,7 +19,7 @@ if (fs.existsSync(jsConfigFile)) {
 	source = fs.readFileSync(jsConfigFile, "utf8");
 	source = source
 		.replace(
-			/import\s+\{\s+defineConfig\s+\}\s+from\s+["']@tera\/build["']/,
+			/import\s+\{\s+defineConfig\s+\}\s+from\s+["']@torpor\/build["']/,
 			"const defineConfig = (x) => x",
 		)
 		.replace("export default", "");

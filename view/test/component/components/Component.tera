@@ -1,7 +1,0 @@
-import Header from './Header.tera';
-
-export default function Component() {
-	@render {
-		<Header name="Amy" />
-	}
-}

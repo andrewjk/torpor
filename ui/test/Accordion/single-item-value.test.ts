@@ -1,8 +1,8 @@
-import { mount } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import AccordionSingle from "./components/AccordionSingle.tera";
+import AccordionSingle from "./components/AccordionSingle.torp";
 
 describe("Accordion", () => {
 	it("Single item default value", async () => {

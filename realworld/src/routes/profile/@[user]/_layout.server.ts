@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
-import type { PageServerEndPoint } from "@tera/build";
-import { ok } from "@tera/build/response";
+import type { PageServerEndPoint } from "@torpor/build";
+import { ok } from "@torpor/build/response";
 
 export default {
 	load: async ({ appData, params }) => {

@@ -15,23 +15,23 @@
 		"vscode": "^1.74.0"
 	},
 	"activationEvents": [
-		"onLanguage:tera"
+		"onLanguage:torpor"
 	],
 	"main": "./client/out/extension",
 	"contributes": {
 		"languages": [
 			{
-				"id": "tera",
+				"id": "torpor",
 				"extensions": [
-					".tera"
+					".torp"
 				]
 			}
 		],
 		"grammars": [
 			{
-				"language": "tera",
-				"scopeName": "source.tera",
-				"path": "./syntaxes/tera.tmLanguage.json",
+				"language": "torpor",
+				"scopeName": "source.torp",
+				"path": "./syntaxes/torpor.tmLanguage.json",
 				"embeddedLanguages": {
 					"meta.embedded.block.javascript": "javascript",
 					"meta.embedded.block.typescript": "typescript",

@@ -1,16 +1,16 @@
-# tera/demo
+# torpor/demo
 
-A Vite starter site built with [tera/build](./build).
+A Vite starter site built with [torpor/build](./build).
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 
 ## Running
 
-Clone Tera and use `npm` (or your preferred package manager) to run the site:
+Clone Torpor and use `npm` (or your preferred package manager) to run the site:
 
 ```bash
-git clone https://github.com/andrewjk/tera.git
-cd tera/vite-starter
+git clone https://github.com/andrewjk/torpor.git
+cd torpor/vite-starter
 npm install
 npm run dev
 ```

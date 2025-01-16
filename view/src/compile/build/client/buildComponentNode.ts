@@ -49,7 +49,7 @@ export default function buildComponentNode(
 				if (name === "class") {
 					// TODO: How to handle dynamic classes etc
 					// Probably just compile down to a string?
-					value = `"${trimQuotes(value)} tera-${status.styleHash}"`;
+					value = `"${trimQuotes(value)} torp-${status.styleHash}"`;
 				}
 				const setProp = `${propsName}["${name}"] = ${value};`;
 				if (fullyReactive || partlyReactive) {

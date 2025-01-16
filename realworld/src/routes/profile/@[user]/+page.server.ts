@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
-import type { PageServerEndPoint } from "@tera/build";
-import { ok, unauthorized, unprocessable } from "@tera/build/response";
+import type { PageServerEndPoint } from "@torpor/build";
+import { ok, unauthorized, unprocessable } from "@torpor/build/response";
 import loadArticles from "./loadArticles";
 
 export default {

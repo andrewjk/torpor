@@ -1,0 +1,15 @@
+
+export default function UI() {
+	@render {
+		<div>
+			<:head>
+				<title>UI | Torpor</title>
+			</:head>
+
+			<h1>UI</h1>
+			<p>
+				TODO:
+			</p>
+		</div>
+	}
+}

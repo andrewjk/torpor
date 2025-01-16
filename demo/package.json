@@ -1,7 +1,7 @@
 {
-	"name": "@tera/demo",
+	"name": "@torpor/demo",
 	"version": "0.0.1",
-	"description": "A demo site built with tera/build",
+	"description": "A demo site built with torpor/build",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -13,10 +13,10 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/build": "workspace:^",
-		"@tera/ui": "workspace:^",
-		"@tera/unplugin": "workspace:^",
-		"@tera/view": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/ui": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"vinxi": "^0.5.1"
 	},
 	"peerDependencies": {

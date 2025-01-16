@@ -17,7 +17,7 @@ export default function buildType(
 ): string {
 	let b = new Builder();
 
-	b.append(`import type { SlotRender } from "${options?.renderFolder || "@tera/view"}";`);
+	b.append(`import type { SlotRender } from "${options?.renderFolder || "@torpor/view"}";`);
 
 	for (let component of template.components) {
 		b.append("");

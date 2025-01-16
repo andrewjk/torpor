@@ -41,7 +41,7 @@ export default function buildServerComponentNode(
 				if (name === "class") {
 					// TODO: How to handle dynamic classes etc
 					// Probably just compile down to a string?
-					b.append(`"${trimQuotes(value)} tera-${status.styleHash}"`);
+					b.append(`"${trimQuotes(value)} torp-${status.styleHash}"`);
 				}
 				b.append(`${propsName}["${name}"] = ${value};`);
 			} else {

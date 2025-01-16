@@ -11,9 +11,9 @@ test("build for the server and render to HTML", () => {
 	// each test is run in hydration mode
 	const state = { counter: 8 };
 
-	let path = "./test/build-server/components/IfNested.tera";
+	let path = "./test/build-server/components/IfNested.torp";
 	if (!fs.existsSync(path)) {
-		path = "./view/test/build-server/components/IfNested.tera";
+		path = "./view/test/build-server/components/IfNested.torp";
 	}
 	const source = fs.readFileSync(path).toString();
 

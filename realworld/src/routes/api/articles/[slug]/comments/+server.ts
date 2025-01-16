@@ -1,6 +1,6 @@
 import commentsCreate from "@/lib/api/controllers/comments/commentsCreate";
 import commentsGet from "@/lib/api/controllers/comments/commentsGet";
-import type { ServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: ({ params, request }) => {

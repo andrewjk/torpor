@@ -8,7 +8,7 @@ export default defineConfig({
 	metafile: true,
 	sourcemap: true,
 	loader: {
-		".tera": "file",
+		".torp": "file",
 	},
 	onSuccess: "npm run build:fix",
 });

@@ -1,7 +1,7 @@
 {
-	"name": "@tera/vite-starter",
+	"name": "@torpor/vite-starter",
 	"version": "0.0.1",
-	"description": "A Vite starter site built with tera/build",
+	"description": "A Vite starter site built with torpor/build",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -13,9 +13,9 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/build": "workspace:^",
-		"@tera/unplugin": "workspace:^",
-		"@tera/view": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"vinxi": "^0.5.1"
 	},
 	"peerDependencies": {

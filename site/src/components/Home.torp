@@ -1,0 +1,120 @@
+import Counter from './Counter.torp';
+import teraLogo from '@/assets/torpor.svg';
+
+/**
+ * The home component
+ */
+export default function Home() {
+	@render {
+		<div id="home-container">
+			<:head>
+				<title>Torpor</title>
+			</:head>
+
+			<div class="hstack spaced">
+				<a href="https://www.torpor.dev/" target="_blank">
+					<img src={teraLogo} class="logo" alt="Torpor logo" />
+				</a>
+				<h1>Torpor</h1>
+			</div>
+			<p>
+				Torpor is a full-stack JavaScript framework that is designed for
+				simplicity and completeness.
+			</p>
+			<p>
+				🚧 WARNING: VERY INCOMPLETE 🚧
+			</p>
+
+			<div class="hstack spaced equal full-width collapse">
+				<div class="features-card">
+					<h3>Simplicity</h3>
+					<p>
+						Define your UI with mostly-standard JavaScript, HTML and CSS
+					</p>
+					<p>
+						Make your UI state reactive with a single <code>$watch</code> function
+					</p>
+					<p>
+						Easily compose and refactor code and components as your project grows
+					</p>
+				</div>
+				<div class="features-card">
+					<h3>Completeness</h3>
+					<p>
+						Torpor aims to include most of the things that you need to build high-quality
+						interfaces without having to reach for third party libraries, including:
+					</p>
+					<p>An <a href="docs/ui">accessible, unstyled component library</a></p>
+					<p>A <a href="docs/build">site and app framework</a></p>
+					<p>More to come...</p>
+				</div>
+			</div>
+			
+			<h2>The classic counter</h2>
+			<p>
+				Below is an example <code>Counter</code> component, which maintains a
+				<code>count</code> property in a reactive <code>$state</code> object, and displays
+				the value of the count with a button to increment it:
+			</p>
+			<div class="hstack spaced full-width collapse">
+				<div class="demo-card grow">
+					<h3>Code</h3>
+					<pre style="padding: 1rem 0"><code>{`
+export default function Counter() {
+	let $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<p>
+				The count is {$state.count}.
+			</p>
+			<button onclick={() => $state.count++}>
+				Increment
+			</button>
+			<button onclick={() => $state.count = 0}>
+				Reset
+			</button>
+		</div>
+	}
+}
+`.trim()}</code></pre>
+				</div>
+				<div class="demo-card grow">
+					<h3>Component</h3>
+					<Counter />
+				</div>
+			</div>
+			<p>
+				<a href="/playground/play">Edit this component in the playground</a>
+			</p>
+		</div>
+	}
+
+	@style {
+		.logo {
+			height: 75px;
+			width: 75px;
+		}
+
+		#home-container {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.features-card,
+		.demo-card {
+			background: var(--panel-back);
+			border-radius: 1rem;
+			padding: 1rem;
+		}
+
+		.features-card {
+			line-height: 1.5;
+		}
+
+		.demo-card {
+		}
+	}
+}

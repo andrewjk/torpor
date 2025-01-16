@@ -22,7 +22,7 @@ export default function buildHtml(source: string, state?: any, componentPath?: s
 	// of testing, e.g. in the REPL
 	let imports: { importPath: string; importServer: BuildResult }[] = [];
 	if (componentPath) {
-		for (let imp of source.matchAll(/^import\s+(.+?)\s+from\s+(?:'|")(.+\.tera)(?:'|");*$/gm)) {
+		for (let imp of source.matchAll(/^import\s+(.+?)\s+from\s+(?:'|")(.+\.torp)(?:'|");*$/gm)) {
 			const importPath = path.join(path.dirname(componentPath), imp[2]);
 			const importSource = fs.readFileSync(importPath, "utf8");
 			const importParsed = parse(importSource);

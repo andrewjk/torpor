@@ -1,6 +1,6 @@
-import type { PageEndPoint } from "@tera/build";
-import { $page } from "@tera/build/state";
-import component from "./Error.tera";
+import type { PageEndPoint } from "@torpor/build";
+import { $page } from "@torpor/build/state";
+import component from "./Error.torp";
 
 export default {
 	component,

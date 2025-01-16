@@ -36,11 +36,11 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[], styleHash: s
 		if (addClass) {
 			let classAttribute = node.attributes.find((a) => a.name === "class");
 			if (classAttribute && classAttribute.value) {
-				classAttribute.value = `"${trimQuotes(classAttribute.value)} tera-${styleHash}"`;
+				classAttribute.value = `"${trimQuotes(classAttribute.value)} torp-${styleHash}"`;
 			} else {
 				node.attributes.push({
 					name: "class",
-					value: `"tera-${styleHash}"`,
+					value: `"torp-${styleHash}"`,
 				});
 			}
 		}

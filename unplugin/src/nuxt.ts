@@ -8,7 +8,7 @@ export interface ModuleOptions extends Options {}
 
 export default defineNuxtModule<ModuleOptions>({
 	meta: {
-		name: "nuxt-unplugin-tera",
+		name: "nuxt-unplugin-torpor",
 		configKey: "unpluginStarter",
 	},
 	defaults: {

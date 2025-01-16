@@ -1,10 +1,10 @@
-import { $watch } from "@tera/view/ssr";
+import { $watch } from "@torpor/view/ssr";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Bench(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, ServerSlotRender>
+	$slots?: Record<string, ServerSlotRender>,
 ) {
 	let rowId = 1;
 	let $state = $watch({
@@ -39,7 +39,19 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const colours = [
+		"red",
+		"yellow",
+		"blue",
+		"green",
+		"pink",
+		"brown",
+		"purple",
+		"brown",
+		"white",
+		"black",
+		"orange",
+	];
 	const nouns = [
 		"table",
 		"chair",
@@ -99,7 +111,7 @@ export default function Bench(
 	function _random(
 		$props?: Record<PropertyKey, any>,
 		$context?: Record<PropertyKey, any>,
-		$slots?: Record<string, ServerSlotRender>
+		$slots?: Record<string, ServerSlotRender>,
 	) {
 		return Math.round(Math.random() * 1000) % max;
 	}

@@ -35,7 +35,7 @@ export default function Test(/* @params */) {
 					start: 25,
 					name: "Test",
 					default: true,
-					markup: root([el("h1", [{ name: "class", value: '"tera-1wvcb3a"' }], [text("Hi")])]),
+					markup: root([el("h1", [{ name: "class", value: '"torp-1wvcb3a"' }], [text("Hi")])]),
 					style: {
 						global: false,
 						blocks: [

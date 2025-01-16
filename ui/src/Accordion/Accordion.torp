@@ -1,0 +1,208 @@
+import { AccordionContextName, type AccordionContext, type ItemState } from './AccordionTypes';
+
+/**
+ * A vertically stacked set of interactive headings that enable users to reveal
+ * or hide associated sections of content.
+ *
+ * See [the WAI ARIA guidelines for Accordions](https://www.w3.org/WAI/ARIA/apg/patterns/accordion/).
+ *
+ * The structure of an Accordion is:
+ *
+ * ```
+ * <Accordion>
+ * 	<AccordionItem>
+ * 		<AccordionHeader>
+ * 			<AccordionTrigger />
+ * 		</AccordionHeader>
+ * 		<AccordionContent />
+ * 	</AccordionItem>
+ * </Accordion>
+ * ```
+ *
+ * @prop {'single' | 'multiple'} type -- Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time
+ * @prop {string | string[]} value -- The value of the expanded AccordionItem, or an array of values if the type is 'multiple'
+ * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the Accordion
+ * @prop {(value: string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
+ */
+export default function ($props: any) {
+	$props.type ||= 'single';
+	$props.value ||= $props.type === 'single' ? '' : [];
+
+	interface State {
+		value: string | string[];
+		itemStates: ItemState[];
+	}
+
+	let $state: State = $watch({
+		value: $props.value,
+		itemStates: []
+	})
+
+	// This is used to assign automatic indexes to items where needed
+	let nextIndex = 0;
+
+	// Set the context to pass down to items, with functions for each item to call
+	let context: AccordionContext = {
+		registerItem,
+		removeItem,
+		toggleItem,
+		handleHeaderKey
+	};
+	$context[AccordionContextName] = context;
+
+	$run(() => {
+		// HACK: This should probably be done with setters?
+		let newValue = $state.value;
+
+		// Get the value
+		switch ($props.type) {
+			case 'single': {
+				// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
+				newValue = newValue?.toString();
+				for (let item of $state.itemStates) {
+					item.expanded = item.value === newValue;
+				}
+				break;
+			}
+			case 'multiple': {
+				// Ensure the value passed in is an array
+				if (!Array.isArray(newValue)) {
+					newValue = [newValue];
+				}
+				for (let item of $state.itemStates) {
+					item.expanded = newValue.indexOf(item.value) !== -1;
+				}
+				break;
+			}
+		}
+
+		// Set the value
+		$state.value = newValue;
+	})
+
+	$run(() => {
+		$state.itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+	});
+
+	// Dispatch the change event when the value changes
+	// TODO: Should this be a setter instead?
+	$run(() => {
+		if ($props.onchange) {
+			$props.onchange($state.value);
+		}
+	})
+
+	function registerItem(itemState: ItemState) {
+		// If an index wasn't set for the item, set it automatically
+		if (itemState.index === -1) {
+			itemState.index = nextIndex++;
+		}
+
+		// If a value wasn't set for the item, set it to the index
+		if (!itemState.value) {
+			itemState.value = itemState.index.toString();
+		}
+
+		// If we have a value, set whether the item should be expanded
+		if ($state.value) {
+			switch ($props.type) {
+				case 'single': {
+					itemState.expanded = $state.value === itemState.value;
+					break;
+				}
+				case 'multiple': {
+					itemState.expanded = $state.value.includes(itemState.value);
+					break;
+				}
+			}
+		}
+
+		// Set whether the Accordion itself is disabled
+		$state.parentDisabled = $props.disabled
+
+		// Add the item's state to the array
+		$state.itemStates.splice(itemState.index, 0, itemState);
+	}
+
+	// TODO: I think this should be done by value
+	function removeItem(itemIndex: number) {
+		// Remove the item and re-index
+		let index = $state.itemStates.findIndex((item) => item.index === itemIndex);
+		if (index !== -1) {
+			$state.itemStates.splice(itemIndex, 1);
+		}
+		$state.itemStates.forEach((item, i) => (item.index = i));
+	}
+
+	function toggleItem(toggleValue: string) {
+		switch ($props.type) {
+			case 'single': {
+				for (let item of $state.itemStates) {
+					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
+					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
+					if (item.value === toggleValue) {
+						$state.value = item.expanded ? '' : item.value;
+						break;
+					}
+				}
+				break;
+			}
+			case 'multiple': {
+				let newValue = [];
+				for (let item of $state.itemStates) {
+					// The item is expanded if it has the supplied value (i.e. if it was clicked) or if it
+					// was already expanded
+					if (
+						(item.value === toggleValue && !item.expanded) ||
+						(item.value !== toggleValue && item.expanded)
+					) {
+						newValue.push(item.value);
+					}
+				}
+				$state.value = newValue.sort();
+				break;
+			}
+		}
+	}
+
+	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
+		switch (e.key) {
+			case 'Up':
+			case 'ArrowUp': {
+				if (headerIndex > 0) {
+					e.preventDefault();
+					$state.itemStates[headerIndex - 1].setFocused();
+				}
+				break;
+			}
+			case 'Down':
+			case 'ArrowDown': {
+				if (headerIndex < $state.itemStates.length - 1) {
+					e.preventDefault();
+					$state.itemStates[headerIndex + 1].setFocused();
+				}
+				break;
+			}
+			case 'Home': {
+				if (headerIndex > 0) {
+					e.preventDefault();
+					$state.itemStates[0].setFocused();
+				}
+				break;
+			}
+			case 'End': {
+				if (headerIndex < $state.itemStates.length - 1) {
+					e.preventDefault();
+					$state.itemStates[$state.itemStates.length - 1].setFocused();
+				}
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div class="torp-accordion">
+			<:slot />
+		</div>
+	}
+}

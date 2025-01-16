@@ -1,5 +1,5 @@
-import type { PageEndPoint } from "@tera/build";
-import { redirect } from "@tera/build/response";
+import type { PageEndPoint } from "@torpor/build";
+import { redirect } from "@torpor/build/response";
 
 export default {
 	load: async ({ cookies }) => {

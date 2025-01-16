@@ -4,9 +4,9 @@ Heavily documented sample code for https://code.visualstudio.com/api/language-ex
 
 ## Functionality
 
-This extension contributes a new language, `tera`. The new language is for illustration purpose and has basic syntax highlighting.
+This extension contributes a new language, `torpor`. The new language is for illustration purpose and has basic syntax highlighting.
 
-This Language Server works for `tera` file. tera is like HTML file but has file extension `.tera`. You can create a `test.tera` file to play with below functionalities:
+This Language Server works for `torpor` file. torpor is like HTML file but has file extension `.torp`. You can create a `test.torp` file to play with below functionalities:
 
 - Completions for HTML tags
 - Completions for CSS in `<style>` tag

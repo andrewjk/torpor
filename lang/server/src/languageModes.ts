@@ -13,7 +13,7 @@ import {
 } from 'vscode-html-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getCSSMode } from './modes/cssMode';
-import { getDocumentRegions, TeraDocumentRegions as TeraDocumentRegions } from './embeddedSupport';
+import { getDocumentRegions, TorporDocumentRegions as TorporDocumentRegions } from './embeddedSupport';
 import { getHTMLMode } from './modes/htmlMode';
 import { getLanguageModelCache, LanguageModelCache } from './languageModelCache';
 import { getScriptMode } from './modes/scriptMode';
@@ -47,7 +47,7 @@ export function getLanguageModes(): LanguageModes {
 	const htmlLanguageService = getHTMLLanguageService();
 	const cssLanguageService = getCSSLanguageService();
 
-	const documentRegions = getLanguageModelCache<TeraDocumentRegions>(10, 60, document =>
+	const documentRegions = getLanguageModelCache<TorporDocumentRegions>(10, 60, document =>
 		getDocumentRegions( document)
 	);
 

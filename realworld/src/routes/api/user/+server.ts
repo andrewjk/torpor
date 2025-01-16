@@ -1,6 +1,6 @@
 import userGet from "@/lib/api/controllers/user/userGet";
 import userUpdate from "@/lib/api/controllers/user/userUpdate";
-import type { ServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: ({ request }) => {

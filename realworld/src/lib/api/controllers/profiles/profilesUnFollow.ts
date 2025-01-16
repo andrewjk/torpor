@@ -1,4 +1,4 @@
-import { ok, serverError, unauthorized } from "@tera/build/response";
+import { ok, serverError, unauthorized } from "@torpor/build/response";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import userUnFollowProfilePrisma from "../../db/user/userUnFollowProfilePrisma";
 import getErrorMessage from "../../utils/getErrorMessage";

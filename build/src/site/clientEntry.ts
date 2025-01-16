@@ -1,5 +1,5 @@
-import { hydrate, mount } from "@tera/view";
-import type { Component, SlotRender } from "@tera/view";
+import { hydrate, mount } from "@torpor/view";
+import type { Component, SlotRender } from "@torpor/view";
 import "vinxi/client";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";

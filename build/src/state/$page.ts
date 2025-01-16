@@ -1,4 +1,4 @@
-import { $watch } from "@tera/view";
+import { $watch } from "@torpor/view";
 
 const $page = $watch(
 	{

@@ -1,0 +1,12 @@
+import UserProfile from "./UserProfile.torp";
+
+export default function UserProfileApp() {
+	@render {
+		<UserProfile
+			name="John"
+			age={20}
+			favouriteColors={["green", "blue", "red"]}
+			isAvailable
+		/>
+	}
+}

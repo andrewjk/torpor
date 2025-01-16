@@ -1,11 +1,11 @@
 {
-	"name": "@tera/site",
+	"name": "@torpor/site",
 	"version": "0.0.1",
-	"description": "The home and documentation site for Tera",
+	"description": "The home and documentation site for Torpor",
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "tb --dev",
+		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../build && pnpm build && cd ../site && tb --dev",
 		"build": "tsc && tb --build",
 		"preview": "vinxi serve"
 	},
@@ -13,9 +13,9 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@tera/build": "workspace:^",
-		"@tera/unplugin": "workspace:^",
-		"@tera/view": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"ts-blank-space": "^0.4.4",
 		"vinxi": "^0.5.1"
 	},

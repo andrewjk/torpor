@@ -4,13 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 import { LanguageService as CSSLanguageService } from "vscode-css-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { TeraDocumentRegions } from "../embeddedSupport";
+import { TorporDocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
 import { LanguageMode, Position } from "../languageModes";
 
 export function getCSSMode(
 	cssLanguageService: CSSLanguageService,
-	documentRegions: LanguageModelCache<TeraDocumentRegions>,
+	documentRegions: LanguageModelCache<TorporDocumentRegions>,
 ): LanguageMode {
 	return {
 		getId() {

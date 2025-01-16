@@ -1,5 +1,5 @@
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
-import { unprocessable } from "@tera/build/response";
+import { unprocessable } from "@torpor/build/response";
 import logger from "../../utils/logger";
 
 /**

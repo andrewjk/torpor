@@ -1,5 +1,5 @@
-# tera/dev
+# torpor/dev
 
-Browser devtools for Tera.
+Browser devtools for Torpor.
 
 🚧 WARNING: VERY INCOMPLETE 🚧

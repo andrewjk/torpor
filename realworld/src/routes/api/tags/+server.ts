@@ -1,5 +1,5 @@
 import tagsGet from "@/lib/api/controllers/tags/tagsGet";
-import type { ServerEndPoint } from "@tera/build";
+import type { ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: () => {

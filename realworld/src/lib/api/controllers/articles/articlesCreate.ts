@@ -1,5 +1,5 @@
 import { Tag } from "@prisma/client";
-import { created, serverError, unauthorized } from "@tera/build/response";
+import { created, serverError, unauthorized } from "@torpor/build/response";
 import articleCreatePrisma from "../../db/article/articleCreatePrisma";
 import tagsCreatePrisma from "../../db/tag/tagsCreatePrisma";
 import userGetPrisma from "../../db/user/userGetPrisma";

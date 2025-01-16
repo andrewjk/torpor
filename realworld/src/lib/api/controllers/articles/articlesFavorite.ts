@@ -1,4 +1,4 @@
-import { notFound, ok, serverError, unauthorized } from "@tera/build/response";
+import { notFound, ok, serverError, unauthorized } from "@torpor/build/response";
 import articleFavoritePrisma from "../../db/article/articleFavoritePrisma";
 import userGetPrisma from "../../db/user/userGetPrisma";
 import getErrorMessage from "../../utils/getErrorMessage";

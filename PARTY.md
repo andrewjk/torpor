@@ -1,4 +1,4 @@
-# Tera
+# Torpor
 
 Examples from [Component Party](https://component-party.dev).
 

@@ -1,0 +1,59 @@
+import getId from '../utils/getId';
+import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+
+/**
+ * A header button for an AccordionItem, which can be used to reveal or hide an associated AccordionContent.
+ */
+export default function AccordionTrigger() {
+	let button: HTMLButtonElement;
+
+	$props.id ||= getId();
+
+	// Get stuff out of the AccordionItemContext
+	const context = $context[AccordionItemContextName] as AccordionItemContext;
+	if (!context) {
+		throw new Error('AccordionTrigger must be contained within an AccordionItem');
+	}
+	let $state = $context[AccordionItemContextName].state;
+
+	// Set the header ID so that it can be used with aria-labelledby in AccordionContent
+	$state.headerId = $props.id;
+
+	// Let the item know how to set the button's focus
+	$state.setFocused = setFocused;
+
+	// This function is called by the parent Accordion to focus this item's button
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		// Pass the value to the toggleItem method in the parent Accordion which will handle toggling
+		// the value of expanded for all items (e.g. to close other items if necessary)
+		context.toggleItem($state.value);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		// Pass the key press up to the parent Accordion which will handle setting the focused button
+		context.handleHeaderKey($state.index, e);
+	}
+
+	@render {
+		<button
+			type="button"
+			id={$props.id}
+			class='torp-accordion-button'
+			disabled={$state.disabled || $state.parentDisabled}
+			aria-expanded={$state.expanded.toString()}
+			aria-disabled={$state.disabled}
+			aria-controls={$state.contentId}
+			data-state={$state.dataState}
+			data-disabled={$state.disabled}
+			:self={button}
+			onclick={handleClick}
+			onkeydown={handleKey}
+		>
+			<:slot />
+		</button>
+	}
+}

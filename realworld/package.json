@@ -1,7 +1,7 @@
 {
-	"name": "@tera/realworld",
+	"name": "@torpor/realworld",
 	"version": "0.0.1",
-	"description": "A Vite starter site built with tera/build",
+	"description": "A Vite starter site built with torpor/build",
 	"type": "module",
 	"private": true,
 	"scripts": {
@@ -14,8 +14,6 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@tera/unplugin": "workspace:^",
-		"@tera/view": "workspace:^",
 		"@types/bcryptjs": "^2.4.6",
 		"@types/jsonwebtoken": "^9.0.7",
 		"@types/sanitize-html": "^2.13.0",
@@ -30,7 +28,9 @@
 	"dependencies": {
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@prisma/client": "^6.0.1",
-		"@tera/build": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
 		"bcryptjs": "^2.4.3",
 		"dotenv": "^16.4.7",
 		"jose": "^5.9.6",

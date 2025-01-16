@@ -29,7 +29,7 @@ export function activate(context: ExtensionContext) {
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
 		// Register the server for plain text documents
-		documentSelector: [{ scheme: "file", language: "tera" }],
+		documentSelector: [{ scheme: "file", language: "torpor" }],
 	};
 
 	// Create the language client and start the client.

@@ -22,7 +22,7 @@ export default function parseImports(status: ParseStatus) {
 					// (see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
 					status.imports ||= [];
 					const importRegex = /import\s+(.+?)\s+from\s+([^;\n]+)/gms;
-					const componentRegex = /\.tera$/gm;
+					const componentRegex = /\.torp$/gm;
 					const importMatches = line.matchAll(importRegex);
 					for (let match of importMatches) {
 						const importName = match[1];

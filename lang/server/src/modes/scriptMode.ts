@@ -3,12 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { TeraDocumentRegions } from "../embeddedSupport";
+import { TorporDocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
 import { LanguageMode, LanguageService, Position } from "../languageModes";
 
 export function getScriptMode(
-	documentRegions: LanguageModelCache<TeraDocumentRegions>,
+	documentRegions: LanguageModelCache<TorporDocumentRegions>,
 ): LanguageMode {
 	return {
 		getId() {

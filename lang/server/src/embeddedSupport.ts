@@ -9,7 +9,7 @@ export interface LanguageRange extends Range {
 	attributeValue?: boolean;
 }
 
-export interface TeraDocumentRegions {
+export interface TorporDocumentRegions {
 	getEmbeddedDocument(languageId: string, ignoreAttributeValues?: boolean): TextDocument;
 	getLanguageRanges(range?: Range): LanguageRange[];
 	getLanguageAtPosition(position: Position): string | undefined;
@@ -26,11 +26,11 @@ interface EmbeddedRegion {
 	attributeValue?: boolean;
 }
 
-export function getDocumentRegions(document: TextDocument): TeraDocumentRegions {
+export function getDocumentRegions(document: TextDocument): TorporDocumentRegions {
 	const regions: EmbeddedRegion[] = [];
 	let documentText = document.getText();
 
-	// TODO: We've built a small parser here, but we could merge this with the main Tera parser
+	// TODO: We've built a small parser here, but we could merge this with the main Torpor parser
 	// TODO: Testing!
 	let start = 0;
 	for (let i = 0; i < documentText.length; i++) {

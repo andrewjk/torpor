@@ -1,7 +1,0 @@
-import ArticleList from "@/components/article/ArticleList.tera";
-
-export default function Profile() {
-	@render {
-		<ArticleList articles={$props.data.articles} user={$props.data.user} />
-	}
-}

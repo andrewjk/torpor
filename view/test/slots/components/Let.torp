@@ -1,0 +1,11 @@
+import List from './List.torp'
+
+export default function Let($props: any) {
+	@render {
+		<List items={$props.items}>
+			<:fill>
+				{$sprops.item.text}
+			</:fill>
+		</List>
+	}
+}

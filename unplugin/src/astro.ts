@@ -2,7 +2,7 @@ import unplugin from ".";
 import type { Options } from "./types";
 
 export default (options: Options) => ({
-	name: "unplugin-tera",
+	name: "unplugin-torpor",
 	hooks: {
 		"astro:config:setup": async (astro: any) => {
 			astro.config.vite.plugins ||= [];

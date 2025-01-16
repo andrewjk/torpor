@@ -1,4 +1,4 @@
-import { type Template, build, parse } from "@tera/view/compile";
+import { type Template, build, parse } from "@torpor/view/compile";
 import type { UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
@@ -7,7 +7,7 @@ import type { Options } from "./types";
 const styles = new Map<string, string>();
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => ({
-	name: "unplugin-tera",
+	name: "unplugin-torpor",
 	resolveId(id /*, importer, options*/) {
 		if (styles.has(id)) {
 			return id;
@@ -21,8 +21,8 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		return undefined;
 	},
 	transformInclude(id) {
-		// Check for *.tera files
-		return /\.tera\?*/.test(id);
+		// Check for *.torp files
+		return /\.torp\?*/.test(id);
 	},
 	transform(code, id) {
 		// Try to parse the code
@@ -35,7 +35,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 			let name = id
 				.split(/[\\\/]/)
 				.at(-1)
-				?.replace(/\.tera$/, "")!;
+				?.replace(/\.torp$/, "")!;
 			let errorMessages = parsed.errors.map((e) => `${e.line},${e.column}: ${e.message}`);
 			console.log(`\nERRORS\n======\n${errorMessages.join("\n")}`);
 			let errorCode = `

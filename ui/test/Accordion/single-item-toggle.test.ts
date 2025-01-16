@@ -1,9 +1,9 @@
-import { mount } from "@tera/view";
 import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
+import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import AccordionSingle from "./components/AccordionSingle.tera";
+import AccordionSingle from "./components/AccordionSingle.torp";
 
 describe("Accordion", () => {
 	it("Single item toggle", async () => {

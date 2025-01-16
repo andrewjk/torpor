@@ -1,22 +1,22 @@
-# tera/view
+# torpor/view
 
-Tera's view library, for writing and mounting components.
+Torpor's view library, for writing and mounting components.
 
 🚧 WARNING: VERY INCOMPLETE 🚧
 
 ## Installation
 
-Use `npm` (or your preferred package manager) to add Tera to your project:
+Use `npm` (or your preferred package manager) to add Torpor to your project:
 
 ```bash
-npm install tera
+npm install torpor
 ```
 
 ## Features
 
 - Compose your views with JavaScript, HTML and CSS
 - Components are functions
-  - In a file with the `.tera` extension
+  - In a file with the `.torp` extension
   - HTML markup in a `@render` section
   - CSS in a `@style` section
   - Child components in child component functions
@@ -59,7 +59,7 @@ npm install tera
 
 ```
 /**
- * Components are functions that are declared in a `.tera` file
+ * Components are functions that are declared in a `.torp` file
  */
 export default function Component($props: { name: string }) {
     // Use the $watch function to declare reactive state
@@ -231,8 +231,8 @@ function TaskItem() {
 ## Mounting
 
 ```
-import mount from "tera/view/mount";
-import Main from "./Main.tera";
+import mount from "torpor/view/mount";
+import Main from "./Main.torp";
 
 const root = document.getElementById("root");
 mount(root, Main);

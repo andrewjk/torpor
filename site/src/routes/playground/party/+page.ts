@@ -1,5 +1,5 @@
-import component from "@/components/playground/Party.tera";
-import { type PageEndPoint } from "@tera/build";
+import component from "@/components/playground/Party.torp";
+import { type PageEndPoint } from "@torpor/build";
 
 export default {
 	component,

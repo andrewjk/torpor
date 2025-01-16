@@ -1,9 +1,9 @@
-import { mount } from "@tera/view";
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
+import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import AccordionAccessibility from "./components/AccordionAccessibility.tera";
+import AccordionAccessibility from "./components/AccordionAccessibility.torp";
 
 describe("Accordion", () => {
 	it("Accessibility", async () => {

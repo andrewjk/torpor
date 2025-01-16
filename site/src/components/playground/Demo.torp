@@ -1,0 +1,364 @@
+import Repl from "../repl/Repl.torp"
+import DemoText from "./Demo.txt?raw"
+
+export default function Demo() {
+	@render {
+		<div>
+			<:head>
+				<title>Demo | Torpor</title>
+			</:head>
+
+			<h1>Demo</h1>
+
+			<h2>Basic reactivity</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	// Use the $watch function to declare reactive state
+	const $state = $watch({
+		count: 0,
+		get isEven() {
+			return this.count % 2 === 0
+		}
+	})
+
+	// Use the $run function to declare an effect that runs whenever its dependent state changes
+	$run(() => {
+		if ($state.count === 15) {
+			alert("Whoa there")
+		}
+	})
+
+	@render {
+		<div>
+			<h2>Basic reactivity</h2>
+			<p>Put reactive statements in braces, like {$state.count}.</p>
+			<div class="demo">
+				<p>
+					The count is {$state.count}.
+				</p>
+				<button onclick={() => $state.count += 1}>Increment</button>
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+`.trimStart()} />
+
+			<h2>If statements</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		count: 0,
+		get isEven() {
+			return this.count % 2 === 0
+		}
+	})
+
+	@render {
+		<div>
+			<h2>If statements</h2>
+			<p>Use the @if statement to show and hide branches, such as when $state.isEven changes.</p>
+			<div class="demo">
+				<p>The count is {$state.count}.</p>
+				<button onclick={() => $state.count += 1}>Increment</button>
+				@if ($state.isEven) {
+					<p>The count is even.</p>
+				} else {
+					<p>The count is odd.</p>
+				}
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+`.trimStart()} />
+
+			<h2>For loops</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		tasks: []
+	})
+
+	const todo = ["Get started", "Make a component", "Relax"]
+
+	@render {
+		<div>
+			<h2>For loops</h2>
+			<p>For loops can be used to display and update a list when it changes.</p>
+			<div class="demo">
+				<button onclick={addTask}>Add a task</button>
+				<ul>
+					@for (let task of $state.tasks) {
+						@key = task.id
+						<li :class={{ done: task.done }}>
+							<input type="checkbox" :checked={task.done} />
+							{task.text}
+						</li>
+					}
+				</ul>
+				@function addTask() {
+					if ($state.tasks.length < 3) {
+						$state.tasks.push({
+							id: $state.tasks.length,
+							text: todo[$state.tasks.length ],
+							done: false
+						})
+					}
+				}
+				<p>{$state.tasks.length} tasks, {$state.tasks.filter((t) => t.done).length} done</p>
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+		li { list-style-type: none; }
+		.done { text-decoration: line-through; }
+	}
+}
+`.trimStart()} />
+
+			<h2>Switch statements</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		count: 0,
+		get isEven() {
+			return this.count % 2 === 0
+		}
+	})
+
+	@render {
+		<div>
+			<h2>Switch statements</h2>
+			<p>Switches can also be used (albeit with no break statements and no fallthrough).</p>
+			<div class="demo">
+				<p>The count is {$state.count}.</p>
+				<button onclick={() => $state.count += 1}>Increment</button>
+				@switch ($state.count) {
+					case 0: {
+						<p>Nothing yet...</p>
+					}
+					case 1: {
+						<p>The count is one.</p>
+					}
+					default: {
+						<p>The count is more than one.</p>
+					}
+				}
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+`.trimStart()} />
+
+			<h2>Await statements</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({})
+
+	let attempt = 0
+	$state.guesser = guessNumber(1000)
+	async function guessNumber(ms) {
+		attempt++
+		return new Promise((ok, err) => {
+		return setTimeout(
+			attempt % 3 === 0
+				? () => err("uh oh")
+				: () => ok(Math.floor(Math.random() * 10 + 1)),
+			ms)
+		})
+	}
+
+	@render {
+		<div>
+			<h2>Await statements</h2>
+			<p>There is a construct for await/then/catch.</p>
+			<div class="demo">
+				<p>Think of a number between 1 and 10...</p>
+				@await ($state.guesser) {
+					<p>Hmm...</p>
+				} then (number) {
+					<p>Is it {number}?</p>
+				} catch (ex) {
+					<p class="error">Something went wrong: {ex}!</p>
+				}
+				<button onclick={() => $state.guesser = guessNumber(500)}>
+					Guess again
+				</button>
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+		.error { color: red; }
+	}
+}
+`.trimStart()} />
+
+			<h2>Two way binding</h2>	
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<h2>Two way binding</h2>	
+			<p>Two way binding can be accomplished with :value (or :checked etc).</p>
+			<div class="demo">
+				<p>The count is {$state.count}.</p>
+				<button onclick={() => $state.count += 1}>Increment</button>
+				<p>
+					Count: <input type="number" :value={$state.count} />
+				</p>
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+`.trimStart()} />
+
+			<h2>Functions</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		count: 0
+	})
+
+	@render {
+		<div>
+			<h2>Functions</h2>
+			<p>You can declare functions in markup with @function.</p>
+			<div class="demo">
+				<p>The count is {$state.count}.</p>
+				<button onclick={incrementCount}>Increment</button>
+				<button onclick={resetCount}>Reset the count</button>
+				@function incrementCount() {
+					$state.count += 1
+				}
+				@function resetCount() {
+					$state.count = 0
+				}
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+`.trimStart()} />
+
+			<h2>Child components</h2>
+			<Repl input={`
+export default function Index($props: { name: string }) {
+	const $state = $watch({
+		tasks: []
+	})
+
+	const todo = ["Get started", "Make a component", "Relax"]
+
+	@render {
+		<div>
+			<h2>Child components</h2>
+			<p>
+				Child components can be declared in separate files and imported, or they can be
+				declared as a function in the current file (like TaskItem, below).
+			</p>
+			<div class="demo">
+				<button onclick={addTask}>Add a task</button>
+				<ul>
+					@for (let task of $state.tasks) {
+						@key = task.id
+						<TaskItem {task} />
+					}
+				</ul>
+				@function addTask() {
+					if ($state.tasks.length < 3) {
+						$state.tasks.push({
+							id: $state.tasks.length,
+							text: todo[$state.tasks.length ],
+							done: false
+						})
+					}
+				}
+				<p>{$state.tasks.length} tasks, {$state.tasks.filter((t) => t.done).length} done</p>
+			</div>
+		</div>
+	}
+
+	@style {
+		.demo {
+			border: 1px dashed gray;	
+			border-radius: 5px;
+			padding: 20px;
+		}
+	}
+}
+
+function TaskItem($props) {
+	@render {
+		<li :class={{ done: $props.task.done }}>
+			<input type="checkbox" :checked={$props.task.done} />
+			{$props.task.text}
+		</li>
+	}
+
+	@style {
+		li {
+			list-style-type: none;
+		}
+		.done {
+			text-decoration: line-through;
+		}
+	}
+}
+`.trimStart()} />
+		</div>
+	}
+}
