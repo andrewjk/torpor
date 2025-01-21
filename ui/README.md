@@ -2,7 +2,7 @@
 
 Accessible, unstyled components for use in your Torpor front-end.
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Features
 

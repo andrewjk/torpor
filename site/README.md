@@ -2,7 +2,7 @@
 
 The home and documentation site for Torpor.
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## To do
 

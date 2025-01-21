@@ -55,7 +55,7 @@ export default function Component() {
 
 			<h2>If statements</h2>
 			<p>
-				Use an @if statement to show certain markup when a condition is met:
+				Use an <code>&commat;if</code> statement to show certain markup when a condition is met:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -81,7 +81,7 @@ export default function Component() {
 			
 			<h2>For loops</h2>
 			<p>
-				Use a @for loop to show multiple elements:
+				Use a <code>&commat;for</code> loop to show multiple elements:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -116,7 +116,7 @@ export default function Component() {
 
 			<h2>Switch statements</h2>
 			<p>
-				Use a @switch statement to show one of many options:
+				Use a <code>&commat;switch</code> statement to show one of many options:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -159,7 +159,7 @@ export default function Component() {
 
 			<h2>Await statements</h2>
 			<p>
-				Use an @await statement to show the result of an asynchronous function:
+				Use an <code>&commat;await</code> statement to show the result of an asynchronous function:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -175,7 +175,7 @@ export default function Component() {
 
 			<h2>Replace statements</h2>
 			<p>
-				Use a @replace statement to re-render markup when a value is changed:
+				Use a <code>&commat;replace</code> statement to re-render markup when a value is changed:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -195,9 +195,9 @@ export default function Component() {
 
 			<h2>&commat;const, @console and @debugger</h2>
 			<p>
-				The @const keyword can be used to declare a constant value within markup, the
-				&commat;console keyword can be used to log information within markup, and the
-				&commat;debugger keyword can be used to break code execution during markup rendering:
+				The <code>&commat;const</code> keyword can be used to declare a constant value within markup, the
+				<code>&commat;console</code> keyword can be used to log information within markup, and the
+				<code>&commat;debugger</code> keyword can be used to break code execution during markup rendering:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -213,7 +213,7 @@ export default function Component() {
 
 			<h2>Function declarations</h2>
 			<p>
-				Use the @function statement to declare a function within markup. This can be
+				Use the <code>&commat;function</code> statement to declare a function within markup. This can be
 				useful for keeping logic close together, e.g. for moving a large onclick handler
 				out of an onclick attribute, but still keeping it next to the button it is called
 				from:
@@ -232,7 +232,7 @@ export default function Component() {
 
 			<h2>HTML rendering</h2>
 			<p>
-				Use a @html statement to render plain HTML within markup, e.g. from a database:
+				Use a <code>&commat;html</code> statement to render plain HTML within markup, e.g. from a database:
 			</p>
 			<pre><code>{`
 export default function Component() {

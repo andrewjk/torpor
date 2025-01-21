@@ -2,9 +2,9 @@
 
 A framework for building sites and apps with Torpor.
 
-Built with [Vinxi](https://github.com/nksaraf/vinxi).
+Built on top of [Vinxi](https://github.com/nksaraf/vinxi).
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Installation
 

@@ -100,21 +100,21 @@ export default function Component() {
 
 			<h2>The $mount function</h2>
 			<p>
-				The $mount function is like the $run function, but it delays its first run until
+				The <code>$mount</code> function is like the $run function, but it delays its first run until
 				after the @render block has been completed and all elements have been mounted.
 				It is automatically imported into your component if used.
 			</p>
 
 			<h2>The $unwrap function</h2>
 			<p>
-				The $unwrap function returns the underlying object from a state object returned
+				The <code>$unwrap</code> function returns the underlying object from a state object returned
 				from $watch.
 				It is automatically imported into your component if used.
 			</p>
 
 			<h2>Props</h2>
 			<p>
-				A component function can accept a $props component containing the properties that
+				A component function can accept a <code>$props</code> component containing the properties that
 				were passed to the component:
 			</p>
 			<pre><code>{`

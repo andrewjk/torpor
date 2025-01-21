@@ -21,8 +21,8 @@ export default function Home() {
 				Torpor is a full-stack JavaScript framework that is designed for
 				simplicity and completeness.
 			</p>
-			<p>
-				🚧 WARNING: VERY INCOMPLETE 🚧
+			<p class="warning">
+				🚧 WARNING: WORK IN PROGRESS 🚧
 			</p>
 
 			<div class="hstack spaced equal full-width collapse">
@@ -44,13 +44,13 @@ export default function Home() {
 						Torpor aims to include most of the things that you need to build high-quality
 						interfaces without having to reach for third party libraries, including:
 					</p>
-					<p>An <a href="docs/ui">accessible, unstyled component library</a></p>
-					<p>A <a href="docs/build">site and app framework</a></p>
+					<p>An <a href="ui/overview">accessible, unstyled component library</a></p>
+					<p>A <a href="build/overview">site and app framework</a></p>
 					<p>More to come...</p>
 				</div>
 			</div>
 			
-			<h2>The classic counter</h2>
+			<h2>A counter</h2>
 			<p>
 				Below is an example <code>Counter</code> component, which maintains a
 				<code>count</code> property in a reactive <code>$state</code> object, and displays

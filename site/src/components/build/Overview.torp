@@ -1,0 +1,22 @@
+
+export default function Build() {
+	@render {
+		<div>
+			<:head>
+				<title>Build | Torpor</title>
+			</:head>
+
+			<h1>Build</h1>
+			<p>
+				Build is Torpor's site and app building framework. It is built on top of 
+				<a href="https://github.com/nksaraf/vinxi">Vinxi</a>.
+			</p>
+			<p>
+				This documentation is built in Build.
+			</p>
+			<p>
+				TODO:
+			</p>
+		</div>
+	}
+}

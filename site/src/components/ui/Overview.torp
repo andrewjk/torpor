@@ -8,6 +8,9 @@ export default function UI() {
 
 			<h1>UI</h1>
 			<p>
+				Torpor comes with an accessible, unstyled component library.
+			</p>
+			<p>
 				TODO:
 			</p>
 		</div>

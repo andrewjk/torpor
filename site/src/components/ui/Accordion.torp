@@ -1,0 +1,54 @@
+import { Accordion, AccordionItem, AccordionTrigger, AccordionHeader, AccordionContent } from "@torpor/ui/Accordion"
+
+export default function Component() {
+	@render {
+		<div>
+			<:head>
+				<title>Accordion | Torpor</title>
+			</:head>
+
+			<h1>Accordion</h1>
+			<p>
+				A vertically stacked set of interactive headings that enable users to reveal
+				or hide associated sections of content.
+			</p>
+			<p>
+				See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/accordion/">the WAI ARIA guidelines for Accordions</a>.
+			</p>
+			<h2>Structure</h2>
+			<pre><code>{`
+<Accordion>
+	<AccordionItem>
+		<AccordionHeader>
+			<AccordionTrigger />
+		</AccordionHeader>
+		<AccordionContent />
+	</AccordionItem>
+</Accordion>
+`.trim()}</code></pre>
+			<h2>Demo</h2>
+			<div>
+				<Accordion>
+					<AccordionItem>
+						<AccordionHeader>
+							<AccordionTrigger>Header 1</AccordionTrigger>
+						</AccordionHeader>
+						<AccordionContent>Content 1</AccordionContent>
+					</AccordionItem>
+					<AccordionItem>
+						<AccordionHeader>
+							<AccordionTrigger>Header 2</AccordionTrigger>
+						</AccordionHeader>
+						<AccordionContent>Content 2</AccordionContent>
+					</AccordionItem>
+					<AccordionItem>
+						<AccordionHeader>
+							<AccordionTrigger>Header 3</AccordionTrigger>
+						</AccordionHeader>
+						<AccordionContent>Content 3</AccordionContent>
+					</AccordionItem>
+				</Accordion>
+			</div>
+		</div>
+	}
+}

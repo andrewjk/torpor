@@ -2,14 +2,14 @@
 
 Yet another JavaScript framework, designed for simplicity and completeness.
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Features
 
 - Compose your views with JavaScript, HTML and CSS
 - Components are functions with script, markup and styles
-- In-markup JavaScript logic with @if, @for, @switch and @await keywords
-  - And @replace, @const, @console, @debugger, @function and @html
+- In-markup JavaScript logic with `@if`, `@for`, `@switch` and `@await` keywords
+  - And `@replace`, `@const`, `@console`, `@debugger`, `@function` and `@html`
 - Runtime reactivity via proxies that can be used in any JavaScript file
 - Scoped styles, two-way binding, child components and more -- see [torpor/view](./view)
 - An accessible, unstyled component library -- see [torpor/ui](./ui)
@@ -17,8 +17,7 @@ Yet another JavaScript framework, designed for simplicity and completeness.
 
 ### Not Yet
 
-- [torpor/lsp](./lsp) -- Language server for IDEs
-- [torpor/site](./site) -- Homepage, documentation, REPL, etc
+- [torpor/lang](./lang) -- Language server for IDEs
 - [torpor/dev](./dev) -- Browser devtools
 - Performance
 

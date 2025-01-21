@@ -1,35 +1,36 @@
 export default function Sidebar() {
-    @render {
-        <nav>
-            <ul class="plain">
-                <li><a href="/">Home</a></li>
-            </ul>
-            <h4>Docs</h4>
-            <ul class="plain">
-                <li><a href="/docs/overview">Overview</a></li>
-                <li><a href="/docs/getting-started">Getting Started</a></li>
-                <li><a href="/docs/components">Components</a></li>
-                <li><a href="/docs/markup">Markup</a></li>
-                <li><a href="/docs/state">State</a></li>
-                <li><a href="/docs/binding">Binding</a></li>
-                <li><a href="/docs/styles">Styles</a></li>
-                <li><a href="/docs/special-tags">Special Tags</a></li>
-                <li><a href="/docs/comparisons">Comparisons</a></li>
-            </ul>
-            <h4>UI</h4>
-            <ul class="plain">
-                <li>TODO:</li>
-            </ul>
-            <h4>Build</h4>
-            <ul class="plain">
-                <li>TODO:</li>
-            </ul>
-            <h4>Playground</h4>
-            <ul class="plain">
-                <li><a href="/playground/play">Playground</a></li>
-                <li><a href="/playground/demo">Demo</a></li>
-                <li><a href="/playground/party">Component Party</a></li>
-            </ul>
-        </nav>
-    }
+	@render {
+		<nav>
+			<ul class="plain">
+				<li><a href="/">Home</a></li>
+			</ul>
+			<h4>Docs</h4>
+			<ul class="plain">
+				<li><a href="/docs/overview">Overview</a></li>
+				<li><a href="/docs/getting-started">Getting Started</a></li>
+				<li><a href="/docs/components">Components</a></li>
+				<li><a href="/docs/markup">Markup</a></li>
+				<li><a href="/docs/state">State</a></li>
+				<li><a href="/docs/binding">Binding</a></li>
+				<li><a href="/docs/styles">Styles</a></li>
+				<li><a href="/docs/special-tags">Special Tags</a></li>
+				<li><a href="/docs/comparisons">Comparisons</a></li>
+			</ul>
+			<h4>UI</h4>
+			<ul class="plain">
+				<li><a href="/ui/overview">Overview</a></li>
+				<li><a href="/ui/accordion">Accordion</a></li>
+			</ul>
+			<h4>Build</h4>
+			<ul class="plain">
+				<li><a href="/build/overview">Overview</a></li>
+			</ul>
+			<h4>Playground</h4>
+			<ul class="plain">
+				<li><a href="/playground/play">Playground</a></li>
+				<li><a href="/playground/demo">Demo</a></li>
+				<li><a href="/playground/party">Component Party</a></li>
+			</ul>
+		</nav>
+	}
 }

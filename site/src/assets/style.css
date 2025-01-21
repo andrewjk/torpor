@@ -177,6 +177,13 @@ td {
 	padding: 0.5rem 0.5rem 0.5rem 0;
 }
 
+.warning {
+	border: 1px solid red;
+	border-radius: var(--brad);
+	background-color: rgba(255, 0, 0, 0.1);
+	padding: 0.5rem 1rem;
+}
+
 /*
 
 :root {

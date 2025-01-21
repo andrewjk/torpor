@@ -2,7 +2,7 @@
 
 A demo site built with [torpor/build](./build).
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Running
 

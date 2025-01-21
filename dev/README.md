@@ -2,4 +2,4 @@
 
 Browser devtools for Torpor.
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧

@@ -2,7 +2,7 @@
 
 Torpor's view library, for writing and mounting components.
 
-🚧 WARNING: VERY INCOMPLETE 🚧
+🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Installation
 
