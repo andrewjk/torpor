@@ -3,7 +3,9 @@
 	"version": "0.0.1",
 	"description": "A starter template for building an app or site with Torpor Build",
 	"type": "module",
-	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsc && tb --build",

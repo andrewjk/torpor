@@ -1,5 +1,6 @@
 packages:
   - build
+  - build-starter
   - ui
   - unplugin
   - view

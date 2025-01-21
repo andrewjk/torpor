@@ -23,7 +23,9 @@
 			"require": "./dist/state.cjs"
 		}
 	},
-	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"bin": {
 		"tb": "./dist/bin/index.js"
 	},

@@ -3,7 +3,9 @@
 	"version": "0.0.1",
 	"description": "The home and documentation site for Torpor",
 	"type": "module",
-	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../build && pnpm build && cd ../site && tb --dev",
 		"build": "tsc && tb --build",

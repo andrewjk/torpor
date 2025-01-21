@@ -18,7 +18,9 @@
 			"require": "./dist/motion.cjs"
 		}
 	},
-	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"build": "tsup",
 		"build:fix": "esno scripts/postbuild.ts",

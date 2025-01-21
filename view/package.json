@@ -23,7 +23,9 @@
 			"require": "./dist/ssr.cjs"
 		}
 	},
-	"private": true,
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"build": "tsup && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsup --watch",
