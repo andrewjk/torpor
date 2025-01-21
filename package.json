@@ -28,12 +28,8 @@
 	},
 	"workspaces": [
 		"build",
-		"demo",
-		"realworld",
-		"site",
 		"ui",
 		"unplugin",
-		"view",
-		"vite-starter"
+		"view"
 	]
 }

@@ -1,9 +1,5 @@
 packages:
   - build
-  - demo
-  - realworld
-  - site
   - ui
   - unplugin
   - view
-  - vite-starter
