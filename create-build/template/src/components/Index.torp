@@ -7,11 +7,10 @@ import Counter from "./Counter.torp";
 export default function Index() {
 	@render {
 		<div>
-			<a href="https://www.torpor.dev/" target="_blank">
-				<img src="${torporLogo}" class="logo vanilla" alt="Torpor logo" />
+			<a href="https://torpor.dev/" target="_blank">
+				<img src={torporLogo} class="logo vanilla" alt="Torpor logo" />
 			</a>
-			*/
-			<h1>Vite + Torpor</h1>
+			<h1>Torpor Build</h1>
 			<div class="card">
 				<Counter />
 			</div>

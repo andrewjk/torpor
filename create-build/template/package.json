@@ -1,7 +1,7 @@
 {
-	"name": "@torpor/build-starter",
+	"name": "",
 	"version": "0.0.1",
-	"description": "A starter template for building an app or site with Torpor Build",
+	"description": "",
 	"type": "module",
 	"publishConfig": {
 		"access": "public"
@@ -15,9 +15,9 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/build": "workspace:^",
-		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^",
+		"@torpor/build": "^0.0.1",
+		"@torpor/unplugin": "^0.0.1",
+		"@torpor/view": "^0.0.1",
 		"vinxi": "^0.5.1"
 	},
 	"peerDependencies": {

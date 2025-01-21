@@ -1,0 +1,15 @@
+{
+	"name": "@torpor/create-build",
+	"version": "0.0.1",
+	"description": "A starter template for building an app or site with Torpor Build",
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"create-build": "./index.js"
+	},
+	"license": "ISC",
+	"dependencies": {
+		"cross-spawn": "^7.0.3"
+	}
+}

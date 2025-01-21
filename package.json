@@ -29,7 +29,7 @@
 	},
 	"workspaces": [
 		"build",
-		"build-starter",
+		"create-build",
 		"ui",
 		"unplugin",
 		"view"
