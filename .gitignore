@@ -2,7 +2,8 @@
 node_modules/
 coverage/
 dist/
-benchx/
 temp/
 *.db
 .env*
+
+view-bench/
