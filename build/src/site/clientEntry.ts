@@ -143,9 +143,9 @@ async function navigate(
 
 		try {
 			mount(parent, component, $props, slots);
-		} catch {
+		} catch (error) {
 			// TODO: Show a proper Error component
-			parent.innerHTML = '<span style="color: red">Script syntax error</span>';
+			parent.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
 		}
 	}
 

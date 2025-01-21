@@ -232,9 +232,9 @@ async function loadView(
 	let componentCode = "";
 	try {
 		componentCode = component($props, undefined, slots);
-	} catch {
+	} catch (error) {
 		// TODO: Show a proper Error component
-		componentCode = '<span style="color: red">Script syntax error</span>';
+		componentCode = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
 	}
 
 	// Put it all together
