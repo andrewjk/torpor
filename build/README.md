@@ -8,10 +8,13 @@ Built on top of [Vinxi](https://github.com/nksaraf/vinxi).
 
 ## Installation
 
-Use `npm` (or your preferred package manager) to create a Vite project:
+Use `npm` (or your preferred package manager) to create a starter project:
 
 ```bash
-npm create vite
+npm init @torpor/build my-project
+cd my-project
+npm install
+npm run dev
 ```
 
 ## Folder structure
