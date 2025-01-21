@@ -2,7 +2,6 @@
 
 // From https://www.petermekhaeil.com/how-to-build-an-npx-starter-template/
 
-const spawn = require("cross-spawn");
 const fs = require("fs");
 const path = require("path");
 
@@ -41,7 +40,14 @@ fs.writeFileSync(
 // the dependencies. We are using a third-party library
 // called `cross-spawn` for cross-platform support.
 // (Node has issues spawning child processes in Windows).
-spawn.sync("npm", ["install"], { stdio: "inherit" });
+//spawn.sync("npm", ["install"], { stdio: "inherit" });
 
-console.log("Success! Your new project is ready.");
-console.log(`Created ${projectName} at ${projectDir}`);
+let message = message;
+console.log("=".repeat(message.length));
+console.log(message);
+console.log("=".repeat(message.length));
+console.log();
+console.log(`Next steps:`);
+console.log(`cd ${projectName}`);
+console.log(`npm install`);
+console.log(`npm run dev`);

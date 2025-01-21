@@ -1,16 +1,16 @@
-# torpor/demo
+# torpor/create-build
 
-A Vite starter site built with [torpor/build](./build).
+A starter template for building an app with [Torpor Build](./build).
 
 🚧 WARNING: WORK IN PROGRESS 🚧
 
 ## Running
 
-Clone Torpor and use `npm` (or your preferred package manager) to run the site:
+Use `npm` (or your preferred package manager) to create the template:
 
 ```bash
-git clone https://github.com/andrewjk/torpor.git
-cd torpor/vite-starter
+npm init @torpor/build my-project
+cd my-project
 npm install
 npm run dev
 ```
