@@ -8,7 +8,7 @@
 	},
 	"scripts": {
 		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../build && pnpm build && cd ../site && tb --dev",
-		"build": "tsc && tb --build",
+		"build": "tb --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
