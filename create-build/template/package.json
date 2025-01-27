@@ -15,9 +15,11 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@torpor/view": "^0.0.1"
+	},
+	"devDependencies": {
 		"@torpor/build": "^0.0.1",
 		"@torpor/unplugin": "^0.0.1",
-		"@torpor/view": "^0.0.1",
 		"vinxi": "^0.5.1"
 	},
 	"peerDependencies": {

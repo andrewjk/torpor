@@ -13,7 +13,20 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"dependencies": {
+		"@libsql/kysely-libsql": "^0.4.1",
+		"@prisma/client": "^6.0.1",
+		"@torpor/view": "workspace:^",
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.4.7",
+		"jose": "^5.9.6",
+		"jsonwebtoken": "^9.0.2",
+		"kysely": "^0.27.5",
+		"winston": "^3.17.0"
+	},
 	"devDependencies": {
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
 		"@types/bcryptjs": "^2.4.6",
 		"@types/jsonwebtoken": "^9.0.7",
 		"@types/sanitize-html": "^2.13.0",
@@ -24,18 +37,5 @@
 		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"vinxi": "^0.5.1"
-	},
-	"dependencies": {
-		"@libsql/kysely-libsql": "^0.4.1",
-		"@prisma/client": "^6.0.1",
-		"@torpor/build": "workspace:^",
-		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^",
-		"bcryptjs": "^2.4.3",
-		"dotenv": "^16.4.7",
-		"jose": "^5.9.6",
-		"jsonwebtoken": "^9.0.2",
-		"kysely": "^0.27.5",
-		"winston": "^3.17.0"
 	}
 }

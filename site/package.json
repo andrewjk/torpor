@@ -8,21 +8,20 @@
 	},
 	"scripts": {
 		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../build && pnpm build && cd ../site && tb --dev",
-		"build": "tb --build",
+		"build": "tb --config torpor.config.js --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
-		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"ts-blank-space": "^0.4.4",
-		"vinxi": "^0.5.1"
+		"sucrase": "^3.35.0"
 	},
-	"peerDependencies": {
-		"typescript": "^5.7.2"
+	"devDependencies": {
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"vinxi": "^0.5.1"
 	}
 }

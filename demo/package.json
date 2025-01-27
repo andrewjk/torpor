@@ -13,13 +13,12 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
-		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^",
-		"vinxi": "^0.5.1"
+		"@torpor/view": "workspace:^"
 	},
-	"peerDependencies": {
-		"typescript": "^5.7.2"
+	"devDependencies": {
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"vinxi": "^0.5.1"
 	}
 }

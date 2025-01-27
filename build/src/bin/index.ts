@@ -2,7 +2,7 @@
 //import { existsSync, promises as fs } from "node:fs";
 import fs from "node:fs";
 import path from "path";
-import defineSite from "../site/defineSite";
+import defineConfig from "../site/defineConfig";
 import type UserConfig from "../types/UserConfig";
 
 // Check for a torpor.config.js/ts file in the working directory
@@ -31,7 +31,7 @@ if (source) {
 	options = eval(source);
 }
 
-const app = defineSite(options);
+const app = defineConfig(options);
 
 // This already gets done in vinxi.createApp so we can't do it twice
 //if (process.argv.includes("--dev")) {
