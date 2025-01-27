@@ -1,4 +1,4 @@
-import tsb from "ts-blank-space";
+import { transform } from "sucrase";
 import { build, parse } from "@torpor/view/compile";
 import script from "./view.txt?raw"
 
@@ -38,13 +38,14 @@ export default function Repl($props) {
 ${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
 <script>${script}</script>
 <script>${
-	tsb(
+	transform(
 		component
 			.code
 			.replaceAll("export default function", "function")
 			.replaceAll("export function", "function")
 			.replace(/^import\s.+\n/gm, ""),
-	)
+		{ transforms: ["typescript"] }
+	).code
 }</script>
 </head>
 <body>

@@ -206,6 +206,9 @@ importers:
       jsdom:
         specifier: ^25.0.1
         version: 25.0.1
+      sucrase:
+        specifier: ^3.35.0
+        version: 3.35.0
       tinybench:
         specifier: ^3.0.7
         version: 3.0.7

@@ -1,12 +1,12 @@
 import fs from "fs";
 import path from "path";
-import tsb from "ts-blank-space";
+import { transform } from "sucrase";
 import { expect } from "vitest";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 import BuildResult from "../src/compile/types/BuildResult";
 
-const debugPrint = false;
+const debugPrint = true;
 
 export default function buildHtml(source: string, state?: any, componentPath?: string) {
 	// HACK: we may be running this from the top level, or from within the view folder
@@ -35,13 +35,13 @@ export default function buildHtml(source: string, state?: any, componentPath?: s
 
 	const template = parsed.template!;
 	const server = build(template, { server: true });
-	const code = tsb(`
+	let code = `
 const $watch = (obj: Record<PropertyKey, any>) => obj;
 const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 const $run = (fn: Function) => null;
 const $mount = (fn: Function) => null;
-const t_fmt = (text: string?) => (text ?? "").toString();
-const t_attr = (text: string?) => (text ?? "").toString().replaceAll('"', "&quot;")
+const t_fmt = (value: any) => (value ?? "").toString();
+const t_attr = (value: any) => (value ?? "").toString().replaceAll('"', "&quot;")
 ${
 	imports
 		?.map((imp) =>
@@ -51,7 +51,9 @@ ${
 }
 ${server.code.replace("export default ", "").replace(/^import.+\n/gm, "")}
 ${template.components.find((t) => t.default)!.name};
-`);
+`;
+	// Strip TypeScript
+	code = transform(code, { transforms: ["typescript"] }).code;
 
 	if (debugPrint) {
 		console.log("=== server");
