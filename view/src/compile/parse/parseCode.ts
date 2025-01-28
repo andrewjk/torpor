@@ -36,13 +36,13 @@ export default function parseCode(source: string): ParseResult {
 		} else if (accept("function", status)) {
 			// If the function name starts with a capital, parse it as a component
 			consumeSpace(status);
-			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
+			if (/[A-Z]/.test(source[status.i])) {
 				parseComponentStart(status);
 			}
 		} else if (accept("const", status)) {
 			// If it's a function and its name starts with a capital, parse it as a component
 			consumeSpace(status);
-			if (source[status.i] === source[status.i].toLocaleUpperCase()) {
+			if (/[A-Z]/.test(source[status.i])) {
 				const start = status.i;
 				consumeAlphaNumeric(status);
 				consumeSpace(status);
