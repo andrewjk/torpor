@@ -207,7 +207,7 @@ function buildElementAttributes(
 				buildRun("setClasses", `${varName}.className = t_class(${value});`, status, b);
 			} else if (name === ":style") {
 				status.imports.add("t_style");
-				buildRun("setStyles", `${varName}.style = t_style(${value});`, status, b);
+				buildRun("setStyles", `${varName}.setAttribute("style", t_style(${value}));`, status, b);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");

@@ -22,7 +22,7 @@ export default function Style(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	$run(function setStyles() {
-		t_div_1.style = t_style({ color: $props.color });
+		t_div_1.setAttribute("style", t_style({ color: $props.color }));
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
 
