@@ -3,14 +3,17 @@ import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import UserProfile from "./UserProfile-server";
 
 export default function UserProfileApp(
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
 
 	/* User interface */
 	let $output = "";
-	const t_props_1 = {};
+	const t_props_1: any = {};
 	t_props_1["name"] = "John";
 	t_props_1["age"] = 20;
 	t_props_1["favouriteColors"] = ["green", "blue", "red"];

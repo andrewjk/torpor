@@ -12,8 +12,10 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function UserProfileContext(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 	$context = Object.assign({}, $context);
@@ -23,7 +25,8 @@ export default function UserProfileContext(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> </div>`);
+	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_next(t_next(t_child(t_div_1)))));
 	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))));

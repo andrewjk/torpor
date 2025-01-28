@@ -80,22 +80,19 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 			b.append(script.substring(marker, i));
 
 			// TODO: Support other params, like the user setting $context
-			b.append(
-				`$parent: ParentNode,
-				$anchor: Node | null,
-				${current.params || "$props?: Record<PropertyKey, any>"},
-				$context?: Record<PropertyKey, any>,
-				$slots?: Record<string, SlotRender>`,
-			);
+			let params = [
+				"$parent: ParentNode",
+				"$anchor: Node | null",
+				current.params ??
+					`${current.props?.length ? "$props" : "// @ts-ignore\n$props?"}: Record<PropertyKey, any>`,
+				`${current.contextProps?.length ? "" : "// @ts-ignore\n"}$context?: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "" : "// @ts-ignore\n"}$slots?: Record<string, SlotRender>`,
+			];
+			b.append(params.join(",\n"));
 
 			marker = i + "/* @params */".length;
 		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
 			b.append(script.substring(marker, i));
-
-			// Make sure we've got $props if we're going to be using it
-			if (current.props?.length) {
-				b.append(`$props ??= {};`);
-			}
 
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
@@ -112,6 +109,8 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				const status: BuildStatus = {
 					imports,
 					props: current.props || [],
+					contextProps: current.contextProps || [],
+					slotProps: current.slotProps || [],
 					styleHash: current.style?.hash || "",
 					varNames: {},
 					fragmentStack: [],

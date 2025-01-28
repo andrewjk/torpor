@@ -61,20 +61,17 @@ function buildServerTemplate(
 			b.append(script.substring(marker, i));
 
 			// TODO: Support other params, like the user setting $context
-			b.append(
-				`${current.params || "$props?: Record<PropertyKey, any>"},
-				$context?: Record<PropertyKey, any>,
-				$slots?: Record<string, ServerSlotRender>`,
-			);
+			let params = [
+				current.params ??
+					`${current.props?.length ? "$props" : "// @ts-ignore\n$props?"}: Record<PropertyKey, any>`,
+				`${current.contextProps?.length ? "" : "// @ts-ignore\n"}$context?: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "" : "// @ts-ignore\n"}$slots?: Record<string, ServerSlotRender>`,
+			];
+			b.append(params.join(",\n"));
 
 			marker = i + "/* @params */".length;
 		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
 			b.append(script.substring(marker, i));
-
-			// Make sure we've got $props if we're going to be using it
-			if (current.props?.length) {
-				b.append(`$props ??= {};`);
-			}
 
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {

@@ -10,8 +10,11 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function PageTitle(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
@@ -26,7 +29,8 @@ export default function PageTitle(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<p>#</p>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p>`);
+	// @ts-ignore
 	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(function setTextContent() {

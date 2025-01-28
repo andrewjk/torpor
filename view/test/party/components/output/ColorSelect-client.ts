@@ -20,8 +20,11 @@ import t_run_list from "../../../../src/render/runList";
 export default function ColorSelect(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
@@ -39,7 +42,8 @@ export default function ColorSelect(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <div>#</div> <select> <!> </select> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div>#</div> <select> <!> </select> </div>`);
+	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
 	const t_select_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLElement;
@@ -63,10 +67,12 @@ export default function ColorSelect(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <option>#</option> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
+			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
 			const t_option_1 = t_next(t_root_1) as HTMLElement;
 			const t_text_2 = t_child(t_option_1);
+			// @ts-ignore
 			const t_text_3 = t_next(t_option_1);
 			$run(function setAttribute() {
 				t_attribute(t_option_1, "value", t_item.data.color.id);

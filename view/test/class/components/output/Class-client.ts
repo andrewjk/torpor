@@ -10,16 +10,18 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Class(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <div> Hello! </div> <div> Class object </div> <div> Class array </div> <div> Class nested </div> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div> Hello! </div> <div> Class object </div> <div> Class array </div> <div> Class nested </div> </div>`);
+	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_div_2 = t_next(t_child(t_div_1)) as HTMLDivElement;
 	const t_div_3 = t_next(t_next(t_div_2)) as HTMLDivElement;

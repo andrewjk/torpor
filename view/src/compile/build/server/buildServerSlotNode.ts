@@ -37,7 +37,7 @@ export default function buildServerSlotNode(
 	const slotHasProps = slotAttributes.length;
 	if (slotHasProps) {
 		// TODO: defaults etc props
-		b.append(`const ${propsName} = {};`);
+		b.append(`const ${propsName}: any = {};`);
 		for (let { name, value } of slotAttributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute

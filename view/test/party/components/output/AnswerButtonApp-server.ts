@@ -5,8 +5,11 @@ import t_fmt from "../../../../src/render/formatText";
 import AnswerButton from "./AnswerButton-server";
 
 export default function AnswerButtonApp(
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	let $state = $watch({
@@ -24,7 +27,7 @@ export default function AnswerButtonApp(
 	/* User interface */
 	let $output = "";
 	$output += `<div> <p>Are you happy?</p> `;
-	const t_props_1 = {};
+	const t_props_1: any = {};
 	t_props_1["onYes"] = onAnswerYes;
 	t_props_1["onNo"] = onAnswerNo;
 

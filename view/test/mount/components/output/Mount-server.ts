@@ -3,8 +3,11 @@ import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 
 export default function Mount(
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	let inputElement;

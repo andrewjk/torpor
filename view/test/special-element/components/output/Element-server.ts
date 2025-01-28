@@ -1,11 +1,12 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Element(
-	$props?: Record<PropertyKey, any>,
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	let $output = "";

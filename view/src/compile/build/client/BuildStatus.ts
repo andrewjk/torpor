@@ -4,6 +4,8 @@ import { type Fragment } from "../../types/nodes/Fragment";
 export type BuildStatus = {
 	imports: Set<string>;
 	props: string[];
+	contextProps: string[];
+	slotProps: string[];
 	styleHash: string;
 	varNames: Record<string, number>;
 	fragmentStack: {

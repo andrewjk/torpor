@@ -6,7 +6,7 @@ import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 import { type BuildResult } from "../src/compile/types/BuildResult";
 
-const debugPrint = true;
+const debugPrint = false;
 
 export default function buildHtml(source: string, state?: any, componentPath?: string) {
 	// HACK: we may be running this from the top level, or from within the view folder

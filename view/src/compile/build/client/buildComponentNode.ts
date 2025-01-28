@@ -28,7 +28,7 @@ export default function buildComponentNode(
 		// TODO: defaults etc props
 		//status.imports.add("$watch");
 		//b.append(`const ${propsName} = $watch({});`);
-		b.append(`const ${propsName} = {};`);
+		b.append(`const ${propsName}: any = {};`);
 		for (let { name, value } of node.attributes) {
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute
@@ -78,14 +78,18 @@ export default function buildComponentNode(
 	const componentHasSlots = node.children.length;
 	const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
 	if (componentHasSlots) {
-		b.append(`const ${slotsName} = {};`);
+		b.append(`const ${slotsName}: Record<string, SlotRender> = {};`);
 		for (let slot of node.children) {
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
-				b.append(
-					`${slotsName}["${slotName}"] = ($sparent: ParentNode, $sanchor: Node | null, $sprops: Record<PropertyKey, any>, $context: Record<PropertyKey, any>) => {`,
-				);
+				const slotParams = [
+					"$sparent: ParentNode",
+					"$sanchor: Node | null",
+					"//@ts-ignore\n$sprops?: Record<PropertyKey, any>",
+					"//@ts-ignore\n$context?: Record<PropertyKey, any>",
+				];
+				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
 
 				buildFragment(slot, status, b, "$sparent", "$sanchor");
 

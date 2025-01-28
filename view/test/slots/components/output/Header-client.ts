@@ -9,7 +9,9 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Header(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ) {
@@ -17,13 +19,15 @@ export default function Header(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<h2> <!> </h2>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h2> <!> </h2>`);
+	// @ts-ignore
 	const t_h2_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_h2_1))) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, $context)
+		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, undefined)
 	} else {
-		const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` Default header... `);
+		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Default header... `);
+		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_1);
 		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1);
 	}

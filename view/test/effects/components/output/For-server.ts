@@ -3,10 +3,11 @@ import t_fmt from "../../../../src/render/formatText";
 
 export default function For(
 	$props: { items: { text: string }[] },
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	let $output = "";

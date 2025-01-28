@@ -6,8 +6,10 @@ import t_fmt from "../../../../src/render/formatText";
 import UserProfileContext from "./UserProfileContext-server";
 
 export default function UserProfileContextApp(
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$context = Object.assign({}, $context);

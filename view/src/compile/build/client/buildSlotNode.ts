@@ -53,9 +53,13 @@ export default function buildSlotNode(node: ElementNode, status: BuildStatus, b:
 	const slotAnchorName = node.varName!;
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
-	b.append(
-		`$slots["${slotName}"](${slotParentName}, ${slotAnchorName}, ${slotHasProps ? propsName : "undefined"}, $context)`,
-	);
+	let params = [
+		slotParentName,
+		slotAnchorName,
+		slotHasProps ? propsName : "undefined",
+		status.contextProps.length ? "$context" : "undefined",
+	];
+	b.append(`$slots["${slotName}"](${params.join(", ")})`);
 
 	// TODO: Maybe not if there's only a single space node?
 	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");

@@ -2,8 +2,11 @@ import $watch from "../../../../src/render/$serverWatch";
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Await(
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	// Use the $watch function to declare reactive state

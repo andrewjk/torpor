@@ -18,8 +18,11 @@ import t_run_control from "../../../../src/render/runControl";
 export default function Await(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
@@ -43,7 +46,8 @@ export default function Await(
 		/* User interface */
 		const t_fragments: DocumentFragment[] = [];
 
-		const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <!> <button> Guess again </button> </div>`);
+		const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <!> <button> Guess again </button> </div>`);
+		// @ts-ignore
 		const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 		const t_await_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
@@ -54,8 +58,10 @@ export default function Await(
 		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
 			t_await_token_1++;
 			t_run_branch(t_await_range_1, 0, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <p>Hmm...</p> `);
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
+				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
+				// @ts-ignore
 				const t_text_1 = t_next(t_next(t_root_1));
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
 				t_next(t_text_1);
@@ -66,8 +72,10 @@ export default function Await(
 					if (token === t_await_token_1) {
 						let t_old_range_1 = t_push_range(t_await_range_1);
 						t_run_branch(t_await_range_1, 1, () => {
-							const t_fragment_2 = t_fragment($parent.ownerDocument, t_fragments, 2, ` <p>Is it a number?</p> `);
+							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Is it a number?</p> `);
+							// @ts-ignore
 							const t_root_2 = t_root(t_fragment_2);
+							// @ts-ignore
 							const t_text_2 = t_next(t_next(t_root_2));
 							t_add_fragment(t_fragment_2, t_div_1, t_before);
 							t_next(t_text_2);
@@ -79,9 +87,11 @@ export default function Await(
 					if (token === t_await_token_1) {
 						let t_old_range_1 = t_push_range(t_await_range_1);
 						t_run_branch(t_await_range_1, 2, () => {
-							const t_fragment_3 = t_fragment($parent.ownerDocument, t_fragments, 3, ` <p class="error">#</p> `);
+							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p class="error">#</p> `);
+							// @ts-ignore
 							const t_root_3 = t_root(t_fragment_3);
 							const t_text_3 = t_child(t_next(t_root_3));
+							// @ts-ignore
 							const t_text_4 = t_next(t_next(t_root_3));
 							$run(function setTextContent() {
 								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;

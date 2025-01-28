@@ -16,8 +16,11 @@ import t_run_control from "../../../../src/render/runControl";
 export default function TrafficLight(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
@@ -36,7 +39,8 @@ export default function TrafficLight(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <button>Next light</button> <p>#</p> <p> You must <!> </p> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <button>Next light</button> <p>#</p> <p> You must <!> </p> </div>`);
+	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
 	const t_text_1 = t_child(t_next(t_next(t_button_1)));
@@ -48,8 +52,10 @@ export default function TrafficLight(
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 		if ($state.light === "red") {
 			t_run_branch(t_if_range_1, 0, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <span>STOP</span> `);
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
+				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
+				// @ts-ignore
 				const t_text_2 = t_next(t_next(t_root_1));
 				t_add_fragment(t_fragment_1, t_if_parent_1, t_before);
 				t_next(t_text_2);
@@ -57,8 +63,10 @@ export default function TrafficLight(
 		}
 		else if ($state.light === "orange") {
 			t_run_branch(t_if_range_1, 1, () => {
-				const t_fragment_2 = t_fragment($parent.ownerDocument, t_fragments, 2, ` <span>SLOW DOWN</span> `);
+				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
+				// @ts-ignore
 				const t_root_2 = t_root(t_fragment_2);
+				// @ts-ignore
 				const t_text_3 = t_next(t_next(t_root_2));
 				t_add_fragment(t_fragment_2, t_if_parent_1, t_before);
 				t_next(t_text_3);
@@ -66,8 +74,10 @@ export default function TrafficLight(
 		}
 		else if ($state.light === "green") {
 			t_run_branch(t_if_range_1, 2, () => {
-				const t_fragment_3 = t_fragment($parent.ownerDocument, t_fragments, 3, ` <span>GO</span> `);
+				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
+				// @ts-ignore
 				const t_root_3 = t_root(t_fragment_3);
+				// @ts-ignore
 				const t_text_4 = t_next(t_next(t_root_3));
 				t_add_fragment(t_fragment_3, t_if_parent_1, t_before);
 				t_next(t_text_4);

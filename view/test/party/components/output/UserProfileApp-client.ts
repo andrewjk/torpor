@@ -10,20 +10,24 @@ import UserProfile from "./UserProfile-client";
 export default function UserProfileApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<!>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0);
 	const t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = {};
+	const t_props_1: any = {};
 	t_props_1["name"] = "John";
 	$run(function setProp() {
 		t_props_1["age"] = 20;

@@ -8,10 +8,11 @@ export default function UserProfile(
 		favoriteColors: string[],
 		isAvailable: boolean
 	},
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	let $output = "";

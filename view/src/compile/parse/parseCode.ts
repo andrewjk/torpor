@@ -104,6 +104,7 @@ export default function parseCode(source: string): ParseResult {
 							style: c.style,
 							props: c.props,
 							contextProps: c.contextProps,
+							slotProps: c.slotProps,
 						} satisfies TemplateComponent;
 					}),
 				}

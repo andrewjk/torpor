@@ -17,8 +17,11 @@ import t_run_list from "../../../../src/render/runList";
 export default function Colors(
 	$parent: ParentNode,
 	$anchor: Node | null,
+	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
 
@@ -27,7 +30,8 @@ export default function Colors(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<ul> <!> </ul>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<ul> <!> </ul>`);
+	// @ts-ignore
 	const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_for_anchor_1 = t_anchor(t_next(t_child(t_ul_1))) as HTMLElement;
 
@@ -50,9 +54,11 @@ export default function Colors(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <li>#</li> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>#</li> `);
+			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
+			// @ts-ignore
 			const t_text_2 = t_next(t_next(t_root_1));
 			$run(function setTextContent() {
 				t_text_1.textContent = t_fmt(t_item.data.color);

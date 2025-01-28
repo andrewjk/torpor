@@ -3,10 +3,11 @@ import t_fmt from "../../../../src/render/formatText";
 
 export default function Replace(
 	$props: { name: string},
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	$props ??= {};
 	let counter = 0;
 
 	/* User interface */

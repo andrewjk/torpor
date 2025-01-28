@@ -74,7 +74,7 @@ export default function buildFragment(
 			status.imports.add("t_fragment");
 			const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
 			b.append(
-				`const ${fragmentName} = t_fragment($parent.ownerDocument, t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
+				`const ${fragmentName} = t_fragment($parent.ownerDocument!, t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
 			);
 			let fragmentPath = { parent: null, type: "fragment", children: [] };
 			let varPaths = new Map<string, string>();
@@ -120,6 +120,10 @@ function maybeAddRootNodeDeclaration(
 		status.imports.add("t_root");
 		const rootName = `t_root_${fragment.number}`;
 		const rootPath = `t_root(${fragmentName})`;
+		// HACK: We don't know whether this variable will be used by other child
+		// nodes, so we have to create it regardless and ignore the error if
+		// it's not used -- maybe we could be smarter about this
+		b.append("// @ts-ignore");
 		b.append(`const ${rootName} = ${rootPath};`);
 		varPaths.set(rootPath, rootName);
 		//b.append(`console.log("${rootName}", ${rootName}, ${rootName}.textContent);`);
@@ -380,6 +384,10 @@ function declareElementFragmentVars(
 				if (node.tagName === ":element") {
 					b.append(`let ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				} else {
+					// HACK: Not great
+					if (topLevel && lastChild) {
+						b.append("// @ts-ignore");
+					}
 					b.append(`const ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				}
 				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
@@ -487,6 +495,10 @@ function declareTextFragmentVars(
 			if (status.options?.useCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
+				// HACK: Not great
+				if (topLevel && lastChild) {
+					b.append("// @ts-ignore");
+				}
 				b.append(`const ${node.varName} = ${varPath};`);
 				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 			}

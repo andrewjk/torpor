@@ -9,16 +9,18 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Header(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<h2>#</h2>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h2>#</h2>`);
+	// @ts-ignore
 	const t_h2_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_text_1 = t_child(t_h2_1);
 	$run(function setTextContent() {

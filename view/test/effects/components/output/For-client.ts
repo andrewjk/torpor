@@ -18,15 +18,17 @@ export default function For(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { items: { text: string }[] },
+	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument, t_fragments, 0, `<div> <!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <!> </div>`);
+	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_for_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
@@ -48,9 +50,11 @@ export default function For(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument, t_fragments, 1, ` <p>#</p> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
+			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
+			// @ts-ignore
 			const t_text_2 = t_next(t_next(t_root_1));
 			$run(function setTextContent() {
 				t_text_1.textContent = t_fmt(t_item.data.item.text);

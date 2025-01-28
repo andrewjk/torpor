@@ -85,6 +85,11 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// content. Anchors will be created for <:slot> nodes and fragments will
 			// be created for the <:fill> content
 			slottifyChildNodes(element);
+
+			// Add it to the component's slots collection
+			const current = status.components[status.components.length - 1];
+			current.slotProps ??= [];
+			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
 		} else if (element.tagName === ":component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
 			if (selfAttribute && selfAttribute.value) {

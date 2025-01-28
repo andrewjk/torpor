@@ -24,7 +24,7 @@ export default function buildServerComponentNode(
 	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
 	if (componentHasProps) {
 		// TODO: defaults etc props
-		b.append(`const ${propsName} = {};`);
+		b.append(`const ${propsName}: any = {};`);
 		for (let { name, value } of node.attributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute
@@ -68,14 +68,16 @@ export default function buildServerComponentNode(
 	const componentHasSlots = node.children.length;
 	const slotsName = componentHasSlots ? nextVarName("slots", status) : "undefined";
 	if (componentHasSlots) {
-		b.append(`const ${slotsName} = {};`);
+		b.append(`const ${slotsName}: Record<string, ServerSlotRender> = {};`);
 		for (let slot of node.children) {
 			if (isSpecialNode(slot)) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
-				b.append(
-					`${slotsName}["${slotName}"] = ($sprops: Record<PropertyKey, any>, $context: Record<PropertyKey, any>) => {`,
-				);
+				const slotParams = [
+					"// @ts-ignore\n$sprops?: Record<PropertyKey, any>",
+					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
+				];
+				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
 				b.append(`let $output = "";`);
 
 				for (let child of slot.children) {
