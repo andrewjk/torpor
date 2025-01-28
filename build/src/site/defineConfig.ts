@@ -35,7 +35,7 @@ export default function defineConfig(options?: UserConfig) {
 				type: "http",
 				target: "server",
 				// TODO: change this when published
-				handler: "node_modules/@torpor/build/src/site/serverEntry.ts",
+				handler: "./node_modules/@torpor/build/src/site/serverEntry.ts",
 				routes,
 				plugins: () => [config("custom", viteOptions()), torpor({ server: true })],
 			},
@@ -44,7 +44,7 @@ export default function defineConfig(options?: UserConfig) {
 				type: "client",
 				target: "browser",
 				// TODO: change this when published
-				handler: "node_modules/@torpor/build/src/site/clientEntry.ts",
+				handler: "./node_modules/@torpor/build/src/site/clientEntry.ts",
 				base: "/_build",
 				routes,
 				plugins: () => [config("custom", viteOptions()), torpor()],

@@ -3,9 +3,6 @@
 	"version": "0.0.1",
 	"description": "",
 	"type": "module",
-	"publishConfig": {
-		"access": "public"
-	},
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsc && tb --build",
