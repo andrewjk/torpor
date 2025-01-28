@@ -1,8 +1,8 @@
-import type ProxyPropData from "./ProxyPropData";
+import { type ProxyPropData } from "./ProxyPropData";
 
-export default interface ProxyData {
+export type ProxyData = {
 	target: Record<PropertyKey, any>;
 	isArray: boolean;
 	shallow: boolean;
 	propData: Map<PropertyKey, ProxyPropData | null>;
-}
+};

@@ -1,5 +1,5 @@
-import type BuildOptions from "../types/BuildOptions";
-import type Template from "../types/Template";
+import { type BuildOptions } from "../types/BuildOptions";
+import { type Template } from "../types/Template";
 import Builder from "./utils/Builder";
 
 /**
@@ -10,14 +10,10 @@ import Builder from "./utils/Builder";
  *
  * @returns The d.ts file content
  */
-export default function buildType(
-	name: string,
-	template: Template,
-	options?: BuildOptions,
-): string {
+export default function buildType(template: Template, options?: BuildOptions): string {
 	let b = new Builder();
 
-	b.append(`import type { SlotRender } from "${options?.renderFolder || "@torpor/view"}";`);
+	b.append(`import { type SlotRender } from "${options?.renderFolder || "@torpor/view"}";`);
 
 	for (let component of template.components) {
 		b.append("");

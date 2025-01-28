@@ -1,5 +1,5 @@
-import type ElementNode from "../../types/nodes/ElementNode";
-import type TextNode from "../../types/nodes/TextNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
+import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
@@ -7,7 +7,7 @@ import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";
@@ -19,7 +19,6 @@ export default function buildElementNode(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	anchorName: string,
 	root = false,
 ) {
 	if (status.inHead) {
@@ -189,7 +188,7 @@ function buildElementAttributes(
 				// Bind the DOM element to a user-defined variable
 				b.append(`${value} = ${varName};`);
 			} else if (name === ":group") {
-				buildBindGroupAttribute(node, varName, name, value, status, b);
+				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === ":value" || name === ":checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
 			} else if (name === ":onmount") {
@@ -198,7 +197,7 @@ function buildElementAttributes(
 				// cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
-				buildEventAttribute(node, varName, name, value, status, b);
+				buildEventAttribute(varName, name, value, status, b);
 			} else if (name.startsWith(":transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
@@ -227,7 +226,6 @@ function buildElementAttributes(
 function buildBindGroupAttribute(
 	node: ElementNode,
 	varName: string,
-	name: string,
 	value: string,
 	status: BuildStatus,
 	b: Builder,
@@ -294,7 +292,6 @@ function buildBindAttribute(
 }
 
 function buildEventAttribute(
-	node: ElementNode,
 	varName: string,
 	name: string,
 	value: string,
@@ -333,18 +330,18 @@ function buildTransitionAttribute(
 	let exitVarName = nextVarName("trans_out", status);
 
 	if (name === ":transition") {
-		b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
+		b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
 		b.append(`const ${exitVarName} = ${entryVarName};`);
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 	} else if (name === ":transition-in") {
 		let outAttribute = node.attributes.find((a) => a.name === ":transition-out");
 		if (outAttribute && outAttribute.value) {
 			let outValue = trimMatched(outAttribute.value, "{", "}");
-			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
-			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue, status)};`);
+			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
+			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue)};`);
 			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 		} else {
-			b.append(`const ${entryVarName} = ${getAnimationDetails(value, status)};`);
+			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
 			b.append(`t_animate(${varName}, ${entryVarName});`);
 		}
 	} else if (name === ":transition-out") {
@@ -353,7 +350,7 @@ function buildTransitionAttribute(
 			// This has already been handled with :transition-in, above
 			return;
 		} else {
-			b.append(`const ${exitVarName} = ${getAnimationDetails(value, status)};`);
+			b.append(`const ${exitVarName} = ${getAnimationDetails(value)};`);
 			b.append(`t_animate(${varName}, null, ${entryVarName});`);
 		}
 	} else {
@@ -361,7 +358,7 @@ function buildTransitionAttribute(
 	}
 }
 
-function getAnimationDetails(value: string, status: BuildStatus) {
+function getAnimationDetails(value: string) {
 	// HACK: Split by commas, but not when in brackets
 	let parts: string[] = [];
 	let start = 0;

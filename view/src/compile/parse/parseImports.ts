@@ -1,6 +1,6 @@
 import trimQuotes from "../utils/trimQuotes";
 import trimStartAndEnd from "../utils/trimStartAndEnd";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 
 export default function parseImports(status: ParseStatus) {
 	let start = 0;

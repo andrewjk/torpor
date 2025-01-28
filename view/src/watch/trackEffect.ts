@@ -1,5 +1,5 @@
 import context from "../render/context";
-import type ProxyData from "../types/ProxyData";
+import { type ProxyData } from "../types/ProxyData";
 
 export default function trackEffect(data: ProxyData, key: PropertyKey) {
 	// If there's an active effect, register this target/prop with it, so that

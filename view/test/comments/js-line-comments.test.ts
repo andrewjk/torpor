@@ -1,6 +1,6 @@
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import type ParseResult from "../../src/compile/types/ParseResult";
+import { type ParseResult } from "../../src/compile/types/ParseResult";
 import { el, root, text, trimParsed } from "../helpers";
 
 test("js line comments", () => {

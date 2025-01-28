@@ -1,10 +1,10 @@
-import type ControlNode from "../../types/nodes/ControlNode";
-import type ElementNode from "../../types/nodes/ElementNode";
-import type RootNode from "../../types/nodes/RootNode";
-import type TemplateNode from "../../types/nodes/TemplateNode";
-import type TextNode from "../../types/nodes/TextNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
+import { type RootNode } from "../../types/nodes/RootNode";
+import { type TemplateNode } from "../../types/nodes/TemplateNode";
+import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildComponentNode from "./buildComponentNode";
 import buildControlNode from "./buildControlNode";
 import buildElementNode from "./buildElementNode";
@@ -33,23 +33,23 @@ export default function buildNode(
 			break;
 		}
 		case "control": {
-			buildControlNode(node as ControlNode, status, b, parentName, anchorName);
+			buildControlNode(node as ControlNode, status, b);
 			break;
 		}
 		case "component": {
-			buildComponentNode(node as ElementNode, status, b, parentName, anchorName, root);
+			buildComponentNode(node as ElementNode, status, b, root);
 			break;
 		}
 		case "element": {
-			buildElementNode(node as ElementNode, status, b, parentName, anchorName, root);
+			buildElementNode(node as ElementNode, status, b, parentName, root);
 			break;
 		}
 		case "text": {
-			buildTextNode(node as TextNode, status, b, parentName, anchorName);
+			buildTextNode(node as TextNode, status, b);
 			break;
 		}
 		case "special": {
-			buildSpecialNode(node as ElementNode, status, b, parentName, anchorName, root);
+			buildSpecialNode(node as ElementNode, status, b, parentName, root);
 			break;
 		}
 		default: {

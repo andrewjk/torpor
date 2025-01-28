@@ -1,5 +1,5 @@
 import $watch from "../../../../src/render/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Await(
 	$props?: Record<PropertyKey, any>,

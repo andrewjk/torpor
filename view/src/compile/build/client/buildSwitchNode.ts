@@ -1,19 +1,13 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildSwitchNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	const switchParentName = node.parentName!;
 	const switchAnchorName = node.varName!;
 	const switchRangeName = nextVarName("switch_range", status);

@@ -1,6 +1,6 @@
-import RouteLayoutHandler from "./RouteLayoutHandler";
+import { type RouteLayoutHandler } from "./RouteLayoutHandler";
 
-export default interface RouteHandler {
+export type RouteHandler = {
 	path: string;
 	regex: RegExp;
 	endPoint: Promise<any>;
@@ -9,4 +9,4 @@ export default interface RouteHandler {
 	layouts?: RouteLayoutHandler[];
 	serverEndPoint?: Promise<any>;
 	serverHook?: Promise<any>;
-}
+};

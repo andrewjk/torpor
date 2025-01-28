@@ -1,5 +1,5 @@
 import { $watch } from "@torpor/view/ssr";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Bench(
 	$props?: Record<PropertyKey, any>,

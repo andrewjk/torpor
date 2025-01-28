@@ -1,4 +1,4 @@
-import type { PageEndPoint } from "@torpor/build";
+import { type PageEndPoint } from "@torpor/build";
 import { redirect } from "@torpor/build/response";
 
 export default {

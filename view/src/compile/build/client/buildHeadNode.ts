@@ -1,6 +1,6 @@
-import type ElementNode from "../../types/nodes/ElementNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildNode from "./buildNode";
 
 export default function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {

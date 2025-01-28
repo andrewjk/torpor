@@ -1,15 +1,9 @@
-import type TextNode from "../../types/nodes/TextNode";
+import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildRun from "./buildRun";
 
-export default function buildTextNode(
-	node: TextNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildTextNode(node: TextNode, status: BuildStatus, b: Builder) {
 	let content = node.content || "";
 
 	if (!status.preserveWhitespace) {

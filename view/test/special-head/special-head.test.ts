@@ -1,4 +1,3 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
@@ -42,7 +41,7 @@ test("special head -- hydrated", async () => {
 	check(container, $state);
 });
 
-function check(container: HTMLElement, $state: State) {
+function check(container: HTMLElement, _: State) {
 	//console.log(container.textContent);
 	//expect(queryByText(container, "Title: Hello")).not.toBeNull();
 	expect(container.ownerDocument.title).toBe("Hello");

@@ -1,4 +1,4 @@
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 
 test("watching an undefined property", () => {

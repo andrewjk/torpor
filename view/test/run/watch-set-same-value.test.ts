@@ -9,7 +9,7 @@ test("setting the same value doesn't call effect again", () => {
 	});
 	let fullName = "";
 	let counter = 0;
-	const effect = $run(() => {
+	$run(() => {
 		fullName = `${person.firstName} ${person.lastName}`;
 		counter++;
 	});

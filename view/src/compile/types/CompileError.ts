@@ -1,6 +1,6 @@
-export default interface CompileError {
+export type CompileError = {
 	message: string;
 	start: number;
 	line: number;
 	column: number;
-}
+};

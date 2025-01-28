@@ -1,9 +1,9 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function IfNested(
 	$props: { counter: number },
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, ServerSlotRender>
+	$slots?: Record<string, ServerSlotRender>,
 ) {
 	$props ??= {};
 
@@ -14,13 +14,11 @@ export default function IfNested(
 		$output += ` <![>`;
 		if ($props.counter > 10) {
 			$output += ` <p> It's both true! </p> `;
-		}
-		else {
+		} else {
 			$output += ` <p> The second is not true! </p> `;
 		}
 		$output += `<!]><!> `;
-	}
-	else {
+	} else {
 		$output += ` <p> The first is not true! </p> `;
 	}
 	$output += `<!]><!> </div>`;

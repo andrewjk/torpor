@@ -1,7 +1,7 @@
-import type BuildOptions from "../../../types/BuildOptions";
-import type Fragment from "../../types/nodes/Fragment";
+import { type BuildOptions } from "../../../types/BuildOptions";
+import { type Fragment } from "../../types/nodes/Fragment";
 
-export default interface BuildStatus {
+export type BuildStatus = {
 	imports: Set<string>;
 	props: string[];
 	styleHash: string;
@@ -14,4 +14,4 @@ export default interface BuildStatus {
 	preserveWhitespace: boolean;
 	inHead?: boolean;
 	options?: BuildOptions;
-}
+};

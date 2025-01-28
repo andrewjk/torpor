@@ -3,14 +3,14 @@ import {
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
 } from "../../types/comments";
-import type ElementNode from "../../types/nodes/ElementNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerSlotNode(

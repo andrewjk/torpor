@@ -1,4 +1,3 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
@@ -6,7 +5,7 @@ import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import type ArrayState from "./ArrayState";
+import { type ArrayState } from "./ArrayState";
 
 const componentPath = "./test/watch-array/components/ArrayEntries";
 

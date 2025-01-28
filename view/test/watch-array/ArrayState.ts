@@ -1,6 +1,6 @@
-export default interface ArrayState {
+export type ArrayState = {
 	items: {
 		id: number;
 		text: string;
 	}[];
-}
+};

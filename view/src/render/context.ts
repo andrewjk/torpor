@@ -1,7 +1,7 @@
-import type Animation from "../types/Animation";
-import type Cleanup from "../types/Cleanup";
-import type Effect from "../types/Effect";
-import type Range from "../types/Range";
+import { type Animation } from "../types/Animation";
+import { type Cleanup } from "../types/Cleanup";
+import { type Effect } from "../types/Effect";
+import { type Range } from "../types/Range";
 
 /**
  * The global context for setting up effects and updating subscriptions.

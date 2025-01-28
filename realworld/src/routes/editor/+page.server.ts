@@ -1,5 +1,5 @@
 import * as api from "@/lib/api.js";
-import type { PageServerEndPoint } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
 import { redirect, seeOther, unauthorized, unprocessable } from "@torpor/build/response";
 
 export default {

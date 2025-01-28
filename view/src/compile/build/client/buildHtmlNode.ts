@@ -1,16 +1,10 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 
-export default function buildHtmlNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	const htmlAnchorName = node.varName!;
 	const htmlParentName = node.parentName || htmlAnchorName + ".parentNode";
 	const htmlRangeName = nextVarName("html_range", status);

@@ -1,4 +1,4 @@
-import { queryByAttribute, queryByText } from "@testing-library/dom";
+import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
 import buildOutputFiles from "../buildOutputFiles";

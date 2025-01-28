@@ -18,14 +18,13 @@ async function run() {
 async function buildOutputFiles(file: string) {
 	//console.log(`Building files for ${file.substring(path.resolve("./test").length)}`);
 
-	const name = path.basename(file, ".torp");
 	const source = await fs.readFile(file, "utf8");
 	const parsed = parse(source);
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
 		let clientCode = formatCode(build(parsed.template).code, "client");
 
-		let typesCode = buildType(name, parsed.template);
+		let typesCode = buildType(parsed.template);
 		await fs.writeFile(file.replace(".torp", ".d.ts"), typesCode);
 
 		let outputFile = file.replace("/components/", "/components/output/");
@@ -111,10 +110,10 @@ const importsMap: Record<string, string> = {
 	'import { t_txt } from "@torpor/view";': 'import t_txt from "../../../../src/render/createText";',
 	'import { t_cmt } from "@torpor/view";':
 		'import t_cmt from "../../../../src/render/createComment";',
-	'import type { ListItem } from "@torpor/view";':
-		'import type ListItem from "../../../../src/types/ListItem";',
-	'import type { SlotRender } from "@torpor/view";':
-		'import type SlotRender from "../../../../src/types/SlotRender";',
+	'import { type ListItem } from "@torpor/view";':
+		'import { type ListItem } from "../../../../src/types/ListItem";',
+	'import { type SlotRender } from "@torpor/view";':
+		'import { type SlotRender } from "../../../../src/types/SlotRender";',
 	'import { $watch } from "@torpor/view/ssr";':
 		'import $watch from "../../../../src/render/$watch";',
 	'import { $unwrap } from "@torpor/view/ssr";':
@@ -130,6 +129,6 @@ const importsMap: Record<string, string> = {
 		'import t_class from "../../../../src/render/getClasses";',
 	'import { t_style } from "@torpor/view/ssr";':
 		'import t_style from "../../../../src/render/getStyles";',
-	'import type { ServerSlotRender } from "@torpor/view/ssr";':
-		'import type ServerSlotRender from "../../../../src/types/ServerSlotRender";',
+	'import { type ServerSlotRender } from "@torpor/view/ssr";':
+		'import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";',
 };

@@ -19,11 +19,13 @@ async function run() {
 			);
 		})
 		// HACK: Why are these imported?
-		.replace(/^import \{.+} from ".\/chunk-(.+?).js";/gms, (_, capture) => {
+		.replaceAll(/^import \{.+} from ".\/chunk-(.+?).js";/gms, (_, capture) => {
 			const chunkFile = `./dist/chunk-${capture}.js`;
 			let chunkSource = readFileSync(chunkFile, "utf8");
 			return chunkSource.replace(/^export \{(.+)\};/gms, "");
-		});
+		})
+		.replaceAll(/^import ".\/chunk-(.+?).js";/gms, "")
+		.replaceAll(/\/\/# sourceMappingURL=(.+?).js.map/g, "");
 
 	const destFile = "../site/src/components/repl/view.txt";
 	await fs.writeFile(destFile, source);

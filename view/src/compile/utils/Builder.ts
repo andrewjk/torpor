@@ -27,7 +27,6 @@ export default class Builder {
 					this.#space -= 1;
 				}
 
-				let gotText = false;
 				// Add indentation
 				this.#text += "\t".repeat(Math.max(0, this.#space));
 				// Add from text until the next newline or the end of text

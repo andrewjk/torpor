@@ -1,8 +1,8 @@
-import type ControlNode from "../types/nodes/ControlNode";
-import type ElementNode from "../types/nodes/ElementNode";
-import type TextNode from "../types/nodes/TextNode";
+import { type ControlNode } from "../types/nodes/ControlNode";
+import { type ElementNode } from "../types/nodes/ElementNode";
+import { type TextNode } from "../types/nodes/TextNode";
 import isTextNode from "../types/nodes/isTextNode";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 import consumeSpace from "./utils/consumeSpace";
 
 export default function addSpaceElement(parent: ElementNode | ControlNode, status: ParseStatus) {

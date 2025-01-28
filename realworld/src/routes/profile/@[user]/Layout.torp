@@ -50,8 +50,8 @@ export default function Layout() {
 									<button
 										:class={{
 											"btn btn-sm action-btn": true,
-											btn-secondary: $props.data.profile.following,
-											btn-outline-secondar: !$props.data.profile.following
+											"btn-secondary": $props.data.profile.following,
+											"btn-outline-secondary": !$props.data.profile.following
 										}}
 									>
 										<i class="ion-plus-round" />

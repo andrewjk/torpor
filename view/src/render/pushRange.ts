@@ -1,4 +1,4 @@
-import type Range from "../types/Range";
+import { type Range } from "../types/Range";
 import context from "./context";
 
 export default function pushRange(range: Range, toParent = false): Range | null {

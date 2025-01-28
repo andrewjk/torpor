@@ -1,5 +1,5 @@
 import Builder from "../../utils/Builder";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 
 export default function buildRun(
 	functionName: string,

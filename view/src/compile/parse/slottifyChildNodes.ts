@@ -1,5 +1,5 @@
-import type ElementNode from "../types/nodes/ElementNode";
-import type TemplateNode from "../types/nodes/TemplateNode";
+import { type ElementNode } from "../types/nodes/ElementNode";
+import { type TemplateNode } from "../types/nodes/TemplateNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 
 /**

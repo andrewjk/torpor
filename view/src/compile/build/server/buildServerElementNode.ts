@@ -1,10 +1,10 @@
-import type ElementNode from "../../types/nodes/ElementNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerElementNode(
@@ -12,7 +12,7 @@ export default function buildServerElementNode(
 	status: BuildServerStatus,
 	b: Builder,
 ) {
-	let attributes = buildElementAttributes(node, status, b);
+	let attributes = buildElementAttributes(node, status);
 	if (attributes.length) {
 		attributes = " " + attributes;
 	}
@@ -39,7 +39,7 @@ export default function buildServerElementNode(
 	}
 }
 
-function buildElementAttributes(node: ElementNode, status: BuildServerStatus, b: Builder) {
+function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 	let attributes: string[] = [];
 	for (let { name, value } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {

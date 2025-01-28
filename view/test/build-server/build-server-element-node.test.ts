@@ -1,4 +1,4 @@
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import buildHtml from "../buildHtml";
 
 test("build server element node", () => {

@@ -1,10 +1,10 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { transform } from "sucrase";
 import { expect } from "vitest";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
-import BuildResult from "../src/compile/types/BuildResult";
+import { type BuildResult } from "../src/compile/types/BuildResult";
 
 const debugPrint = true;
 

@@ -8,7 +8,7 @@ test("watching a simple effect", () => {
 		lastName: "Smith",
 	});
 	let fullName = "";
-	const effect = $run(() => {
+	$run(() => {
 		fullName = `${person.firstName} ${person.lastName}`;
 	});
 	expect(fullName).toBe("Andrew Smith");

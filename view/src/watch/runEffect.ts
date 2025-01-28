@@ -1,5 +1,5 @@
 import context from "../render/context";
-import Effect from "../types/Effect";
+import { type Effect } from "../types/Effect";
 
 export default function runEffect(effect: Effect) {
 	// Reactivate it in case it's been deactivated

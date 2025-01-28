@@ -11,7 +11,7 @@ test("watching a function effect", () => {
 		},
 	});
 	let greeting = "";
-	const effect = $run(() => {
+	$run(() => {
 		greeting = `Hi, ${person.fullName()}!`;
 	});
 	expect(greeting).toBe("Hi, Andrew Smith!");

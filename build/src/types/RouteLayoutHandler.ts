@@ -1,5 +1,5 @@
-export default interface RouteLayoutHandler {
+export type RouteLayoutHandler = {
 	path: string;
 	endPoint: Promise<any>;
 	serverEndPoint?: Promise<any>;
-}
+};

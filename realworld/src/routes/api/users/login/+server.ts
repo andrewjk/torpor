@@ -1,5 +1,5 @@
 import usersLogin from "@/lib/api/controllers/users/usersLogin";
-import type { ServerEndPoint } from "@torpor/build";
+import { type ServerEndPoint } from "@torpor/build";
 
 export default {
 	post: ({ request }) => {

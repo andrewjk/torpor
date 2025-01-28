@@ -1,21 +1,15 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
 // TODO: Are there too many branches for ifs etc?
 
-export default function buildIfNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	const ifAnchorName = node.varName!;
 	const ifParentName = node.parentName || ifAnchorName + ".parentNode";
 	const ifRangeName = nextVarName("if_range", status);

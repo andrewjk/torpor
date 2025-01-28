@@ -1,5 +1,3 @@
-import context from "./context";
-
 export default function getFragment(
 	document: Document,
 	array: DocumentFragment[],

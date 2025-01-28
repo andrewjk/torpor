@@ -1,9 +1,9 @@
-import type TemplateNode from "../types/nodes/TemplateNode";
+import { type TemplateNode } from "../types/nodes/TemplateNode";
 import isElementNode from "../types/nodes/isElementNode";
 import isParentNode from "../types/nodes/isParentNode";
-import type StyleBlock from "../types/styles/StyleBlock";
+import { type StyleBlock } from "../types/styles/StyleBlock";
 import trimQuotes from "../utils/trimQuotes";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 
 export default function scopeStyles(status: ParseStatus) {
 	let selectors: string[] = [];

@@ -1,4 +1,4 @@
-import type SlotRender from "../../../../src/types/SlotRender";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
 import t_root from "../../../../src/render/nodeRoot";

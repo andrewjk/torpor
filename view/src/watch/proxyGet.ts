@@ -1,6 +1,6 @@
 import $watch from "../render/$watch";
 import context from "../render/context";
-import type ProxyData from "../types/ProxyData";
+import { type ProxyData } from "../types/ProxyData";
 import { proxyDataSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
 import triggerEffects from "./triggerEffects";

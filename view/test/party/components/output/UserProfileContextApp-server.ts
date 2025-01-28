@@ -1,6 +1,6 @@
 import $unwrap from "../../../../src/render/$serverUnwrap";
 import $watch from "../../../../src/render/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 import UserProfileContext from "./UserProfileContext-server";

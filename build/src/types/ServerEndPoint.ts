@@ -1,9 +1,9 @@
-import ServerEvent from "./ServerEvent";
+import { type ServerEvent } from "./ServerEvent";
 
 /**
  * For +server.
  */
-export default interface ServerEndPoint {
+export type ServerEndPoint = { [key: string]: ServerRequest } & {
 	/**
 	 * Performs a GET.
 	 */
@@ -32,6 +32,6 @@ export default interface ServerEndPoint {
 	 * Perfroms a HEAD request.
 	 */
 	head?: ServerRequest;
-}
+};
 
 type ServerRequest = (event: ServerEvent) => Response | Promise<Response | undefined> | void;

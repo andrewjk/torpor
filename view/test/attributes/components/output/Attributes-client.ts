@@ -1,5 +1,5 @@
 import $run from "../../../../src/render/$run";
-import type SlotRender from "../../../../src/types/SlotRender";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_attribute from "../../../../src/render/setAttribute";
 import t_fragment from "../../../../src/render/getFragment";

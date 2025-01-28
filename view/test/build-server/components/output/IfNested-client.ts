@@ -1,20 +1,20 @@
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
+import t_fragment from "../../../../src/render/getFragment";
+import t_range from "../../../../src/render/newRange";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
-import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_range from "../../../../src/render/newRange";
 import t_root from "../../../../src/render/nodeRoot";
-import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import t_run_branch from "../../../../src/render/runControlBranch";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 
 export default function IfNested(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { counter: number },
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ) {
 	$props ??= {};
 
@@ -45,8 +45,7 @@ export default function IfNested(
 							t_add_fragment(t_fragment_2, t_fragment_1, t_before);
 							t_next(t_text_1);
 						});
-					}
-					else {
+					} else {
 						t_run_branch(t_if_range_2, 1, () => {
 							const t_fragment_3 = t_fragment(t_fragments, 3, ` <p> The second is not true! </p> `);
 							const t_root_3 = t_root(t_fragment_3);
@@ -61,8 +60,7 @@ export default function IfNested(
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
 				t_next(t_text_3);
 			});
-		}
-		else {
+		} else {
 			t_run_branch(t_if_range_1, 1, () => {
 				const t_fragment_4 = t_fragment(t_fragments, 4, ` <p> The first is not true! </p> `);
 				const t_root_4 = t_root(t_fragment_4);
@@ -74,5 +72,4 @@ export default function IfNested(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor);
-
 }

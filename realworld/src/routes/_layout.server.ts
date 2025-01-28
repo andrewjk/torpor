@@ -1,4 +1,4 @@
-import type { PageServerEndPoint } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
 import { ok } from "@torpor/build/response";
 
 export default {

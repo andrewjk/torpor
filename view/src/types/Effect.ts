@@ -1,10 +1,10 @@
-import type Cleanup from "./Cleanup";
-import type ProxyPropData from "./ProxyPropData";
+import { type Cleanup } from "./Cleanup";
+import { type ProxyPropData } from "./ProxyPropData";
 
 /**
  * An effect that is run and re-run when the properties it depends on change.
  */
-export default interface Effect {
+export type Effect = {
 	run: () => Cleanup | void;
 	cleanup: Cleanup | null;
 
@@ -15,4 +15,4 @@ export default interface Effect {
 	props: ProxyPropData[] | null;
 
 	active: boolean;
-}
+};

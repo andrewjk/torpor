@@ -1,4 +1,4 @@
-export default interface Animation {
+export interface Animation {
 	keyframes: Keyframe[] | PropertyIndexedKeyframes;
 	options?: number | KeyframeAnimationOptions;
 }

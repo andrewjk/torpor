@@ -1,4 +1,3 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";

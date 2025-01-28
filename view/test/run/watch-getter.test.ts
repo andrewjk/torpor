@@ -11,7 +11,7 @@ test("watching a getter effect", () => {
 		},
 	});
 	let greeting = "";
-	const effect = $run(() => {
+	$run(() => {
 		greeting = `Hi, ${person.fullName}!`;
 	});
 	expect(greeting).toBe("Hi, Andrew Smith!");

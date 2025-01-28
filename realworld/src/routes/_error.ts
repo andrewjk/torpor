@@ -1,4 +1,4 @@
-import type { PageEndPoint } from "@torpor/build";
+import { type PageEndPoint } from "@torpor/build";
 import { $page } from "@torpor/build/state";
 import component from "./Error.torp";
 

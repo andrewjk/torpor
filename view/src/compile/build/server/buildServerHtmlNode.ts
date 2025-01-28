@@ -3,17 +3,11 @@ import {
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
 } from "../../types/comments";
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
-import Builder from "../../utils/Builder";
-import type BuildServerStatus from "./BuildServerStatus";
-import buildServerNode from "./buildServerNode";
+import { type BuildServerStatus } from "./BuildServerStatus";
 
-export default function buildServerHtmlNode(
-	node: ControlNode,
-	status: BuildServerStatus,
-	b: Builder,
-) {
+export default function buildServerHtmlNode(node: ControlNode, status: BuildServerStatus) {
 	// Surround the entire control statement with bracketed comments, so that we
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;

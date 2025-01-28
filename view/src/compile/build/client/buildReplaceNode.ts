@@ -1,18 +1,12 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildReplaceNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	const replaceAnchorName = node.varName!;
 	const replaceParentName = node.parentName || replaceAnchorName + ".parentNode";
 	const replaceRangeName = nextVarName("replace_range", status);

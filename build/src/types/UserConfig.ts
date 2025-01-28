@@ -1,3 +1,3 @@
-export default interface UserConfig {
+export type UserConfig = {
 	port?: number;
-}
+};

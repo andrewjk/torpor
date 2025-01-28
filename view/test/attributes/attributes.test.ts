@@ -48,7 +48,7 @@ test("attributes -- hydrated", async () => {
 	check(container, $state);
 });
 
-function check(container: HTMLElement, state: State) {
+function check(container: HTMLElement, _: State) {
 	expect(queryByText(container, "Hello!")).not.toBeNull();
 	expect(queryByText(container, "Hello!")).toHaveAttribute("thing", "thing1");
 	expect(queryByText(container, "Hello!")).toHaveAttribute("data-thing", "thing2");

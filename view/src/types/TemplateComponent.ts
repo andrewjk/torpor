@@ -1,7 +1,7 @@
-import type RootNode from "../compile/types/nodes/RootNode";
-import type Style from "../compile/types/styles/Style";
+import { type RootNode } from "../compile/types/nodes/RootNode";
+import { type Style } from "../compile/types/styles/Style";
 
-export default interface TemplateComponent {
+export type TemplateComponent = {
 	start?: number;
 	name?: string;
 	default?: boolean;
@@ -10,4 +10,4 @@ export default interface TemplateComponent {
 	style?: Style;
 	props?: string[];
 	contextProps?: string[];
-}
+};

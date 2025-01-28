@@ -1,3 +1,3 @@
-export default interface WatchOptions {
+export type WatchOptions = {
 	shallow?: boolean;
-}
+};

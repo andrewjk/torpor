@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
 import { pageSize } from "@/lib/constants";
-import type { ServerEvent } from "@torpor/build";
+import { type ServerEvent } from "@torpor/build";
 
 export default async function loadArticles(
 	{ url, params, appData }: ServerEvent,

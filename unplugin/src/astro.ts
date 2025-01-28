@@ -1,5 +1,5 @@
 import unplugin from ".";
-import type { Options } from "./types";
+import { type Options } from "./types";
 
 export default (options: Options) => ({
 	name: "unplugin-torpor",

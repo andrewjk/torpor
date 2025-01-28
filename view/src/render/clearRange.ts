@@ -1,4 +1,4 @@
-import type Range from "../types/Range";
+import { type Range } from "../types/Range";
 import removeEffect from "../watch/removeEffect";
 import context from "./context";
 

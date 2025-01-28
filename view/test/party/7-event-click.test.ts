@@ -1,4 +1,4 @@
-import { queryByAttribute, queryByText } from "@testing-library/dom";
+import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { beforeAll, expect, test } from "vitest";

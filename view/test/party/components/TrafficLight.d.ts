@@ -1,4 +1,4 @@
-import type { SlotRender } from "@torpor/view";
+import { type SlotRender } from "@torpor/view";
 
 /**
  * Mounts or hydrates the component into the supplied parent node.

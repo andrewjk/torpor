@@ -1,4 +1,4 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Article(
 	$props?: Record<PropertyKey, any>,

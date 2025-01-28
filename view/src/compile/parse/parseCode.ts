@@ -1,8 +1,8 @@
-import type TemplateComponent from "../../types/TemplateComponent";
-import type ParseResult from "../types/ParseResult";
+import { type TemplateComponent } from "../../types/TemplateComponent";
+import { type ParseResult } from "../types/ParseResult";
 import isSpaceNode from "../types/nodes/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";

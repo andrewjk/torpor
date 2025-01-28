@@ -1,9 +1,9 @@
-import type CompileError from "../types/CompileError";
-import type Import from "../types/Import";
-import type ElementNode from "../types/nodes/ElementNode";
-import type Style from "../types/styles/Style";
+import { type CompileError } from "../types/CompileError";
+import { type Import } from "../types/Import";
+import { type ElementNode } from "../types/nodes/ElementNode";
+import { type Style } from "../types/styles/Style";
 
-export default interface ParseStatus {
+export type ParseStatus = {
 	source: string;
 	i: number;
 	marker: number;
@@ -15,7 +15,7 @@ export default interface ParseStatus {
 	components: ParseComponentStatus[];
 
 	errors: CompileError[];
-}
+};
 
 export interface ParseComponentStatus {
 	start?: number;

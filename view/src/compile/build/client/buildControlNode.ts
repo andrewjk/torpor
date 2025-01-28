@@ -1,6 +1,6 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
 import buildHtmlNode from "./buildHtmlNode";
@@ -9,16 +9,10 @@ import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
 
-export default function buildControlNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildControlNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	switch (node.operation) {
 		case "@if group": {
-			buildIfNode(node, status, b, parentName, anchorName);
+			buildIfNode(node, status, b);
 			break;
 		}
 		case "@if":
@@ -28,7 +22,8 @@ export default function buildControlNode(
 			break;
 		}
 		case "@switch group": {
-			buildSwitchNode(node, status, b, parentName, anchorName);
+			buildSwitchNode(node, status, b);
+			break;
 		}
 		case "@case":
 		case "@default": {
@@ -36,7 +31,7 @@ export default function buildControlNode(
 			break;
 		}
 		case "@for group": {
-			buildForNode(node, status, b, parentName, anchorName);
+			buildForNode(node, status, b);
 			break;
 		}
 		case "@for":
@@ -45,7 +40,7 @@ export default function buildControlNode(
 			break;
 		}
 		case "@await group": {
-			buildAwaitNode(node, status, b, parentName, anchorName);
+			buildAwaitNode(node, status, b);
 			break;
 		}
 		case "@await":
@@ -55,7 +50,7 @@ export default function buildControlNode(
 			break;
 		}
 		case "@replace group": {
-			buildReplaceNode(node, status, b, parentName, anchorName);
+			buildReplaceNode(node, status, b);
 			break;
 		}
 		case "@replace": {
@@ -63,7 +58,7 @@ export default function buildControlNode(
 			break;
 		}
 		case "@html group": {
-			buildHtmlNode(node, status, b, parentName, anchorName);
+			buildHtmlNode(node, status, b);
 			break;
 		}
 		case "@html": {

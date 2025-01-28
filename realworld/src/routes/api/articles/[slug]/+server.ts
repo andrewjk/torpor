@@ -1,7 +1,7 @@
 import articlesDelete from "@/lib/api/controllers/articles/articlesDelete";
 import articlesGet from "@/lib/api/controllers/articles/articlesGet";
 import articlesUpdate from "@/lib/api/controllers/articles/articlesUpdate";
-import type { ServerEndPoint } from "@torpor/build";
+import { type ServerEndPoint } from "@torpor/build";
 
 export default {
 	get: ({ params, request }) => {

@@ -1,4 +1,4 @@
-export default interface Attribute {
+export type Attribute = {
 	name: string;
 	value?: string;
-}
+};

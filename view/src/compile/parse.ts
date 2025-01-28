@@ -1,5 +1,5 @@
 import parseCode from "./parse/parseCode";
-import type ParseResult from "./types/ParseResult";
+import { type ParseResult } from "./types/ParseResult";
 
 /**
  * Parses source code into a component template

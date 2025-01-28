@@ -1,7 +1,7 @@
 import $run from "../../../../src/render/$run";
 import $unwrap from "../../../../src/render/$unwrap";
 import $watch from "../../../../src/render/$watch";
-import type SlotRender from "../../../../src/types/SlotRender";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";

@@ -1,4 +1,4 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 import Header from "./Header-server";
 

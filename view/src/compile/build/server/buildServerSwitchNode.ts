@@ -3,10 +3,10 @@ import {
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
 } from "../../types/comments";
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../../utils/Builder";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerSwitchNode(
@@ -25,7 +25,7 @@ export default function buildServerSwitchNode(
 
 	// Build the switch statement
 	b.append(`${node.statement} {`);
-	for (let [i, branch] of node.children.filter((c) => isControlNode(c)).entries()) {
+	for (let branch of node.children.filter((c) => isControlNode(c))) {
 		if (isControlNode(branch)) {
 			buildServerSwitchBranch(branch, status, b);
 		}

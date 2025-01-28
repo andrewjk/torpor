@@ -1,20 +1,14 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildAwaitNode(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder) {
 	const awaitParentName = node.parentName!;
 	const awaitAnchorName = node.varName!;
 	const awaitRangeName = nextVarName("await_range", status);

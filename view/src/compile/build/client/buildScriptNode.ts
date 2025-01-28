@@ -1,4 +1,4 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 
 export default function buildScriptNode(node: ControlNode, b: Builder) {

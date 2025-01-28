@@ -15,7 +15,7 @@ test("watching a defined property effect", () => {
 	});
 
 	let greeting = "";
-	const effect = $run(() => {
+	$run(() => {
 		// @ts-ignore TODO
 		greeting = `Hi, ${person.fullName}!`;
 	});

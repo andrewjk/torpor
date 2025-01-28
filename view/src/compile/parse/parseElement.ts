@@ -1,11 +1,11 @@
-import type ControlNode from "../types/nodes/ControlNode";
-import type ElementNode from "../types/nodes/ElementNode";
-import type TextNode from "../types/nodes/TextNode";
+import { type ControlNode } from "../types/nodes/ControlNode";
+import { type ElementNode } from "../types/nodes/ElementNode";
+import { type TextNode } from "../types/nodes/TextNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 import isTextNode from "../types/nodes/isTextNode";
 import trimMatched from "../utils/trimMatched";
 import voidTags from "../utils/voidTags";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 import { type ParseComponentStatus } from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";

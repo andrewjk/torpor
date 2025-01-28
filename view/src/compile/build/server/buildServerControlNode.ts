@@ -1,6 +1,6 @@
-import type ControlNode from "../../types/nodes/ControlNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerHtmlNode from "./buildServerHtmlNode";
@@ -27,6 +27,7 @@ export default function buildServerControlNode(
 		}
 		case "@switch group": {
 			buildServerSwitchNode(node, status, b);
+			break;
 		}
 		case "@case":
 		case "@default": {
@@ -61,7 +62,7 @@ export default function buildServerControlNode(
 			break;
 		}
 		case "@html group": {
-			buildServerHtmlNode(node, status, b);
+			buildServerHtmlNode(node, status);
 			break;
 		}
 		case "@html": {

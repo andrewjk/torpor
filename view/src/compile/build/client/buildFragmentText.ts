@@ -1,13 +1,13 @@
 import { ANCHOR_COMMENT } from "../../types/comments";
-import type ControlNode from "../../types/nodes/ControlNode";
-import type ElementNode from "../../types/nodes/ElementNode";
-import type Fragment from "../../types/nodes/Fragment";
-import type RootNode from "../../types/nodes/RootNode";
-import type TemplateNode from "../../types/nodes/TemplateNode";
-import type TextNode from "../../types/nodes/TextNode";
+import { type ControlNode } from "../../types/nodes/ControlNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
+import { type Fragment } from "../../types/nodes/Fragment";
+import { type RootNode } from "../../types/nodes/RootNode";
+import { type TemplateNode } from "../../types/nodes/TemplateNode";
+import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import isReactive from "../utils/isReactive";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 
 /**
  * Builds the HTML template text for all of the fragments in a component

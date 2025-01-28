@@ -12,7 +12,7 @@ export default async function importComponent(componentPath: string, suffix: str
 	const destPath = path.join(path.dirname(componentPath), "temp");
 	const destFile = path.join(destPath, `${path.basename(componentPath)}-${suffix}-${hash}.ts`);
 	if (!fs.existsSync(destFile)) {
-		console.log(`${sourceFile} has changed, copying new version`);
+		//console.log(`${sourceFile} has changed, copying new version`);
 
 		if (!fs.existsSync(destPath)) {
 			fs.mkdirSync(destPath);

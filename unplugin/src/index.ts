@@ -1,8 +1,8 @@
 import { type Template, build, parse } from "@torpor/view/compile";
-import type { UnpluginFactory } from "unplugin";
+import { type UnpluginFactory } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
-import type { Options } from "./types";
+import { type Options } from "./types";
 
 const styles = new Map<string, string>();
 
@@ -84,6 +84,7 @@ function transform(template: Template, id: string, options?: Options) {
 	});
 }
 
+/*
 function printTransformed(transformed: string) {
 	console.log(
 		transformed
@@ -92,6 +93,7 @@ function printTransformed(transformed: string) {
 			.join("\n"),
 	);
 }
+*/
 
 export const unplugin = /* #__PURE__ */ createUnplugin(unpluginFactory);
 

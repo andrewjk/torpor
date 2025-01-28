@@ -1,10 +1,10 @@
-import type ControlNode from "../types/nodes/ControlNode";
-import type ElementNode from "../types/nodes/ElementNode";
-import type OperationType from "../types/nodes/OperationType";
+import { type ControlNode } from "../types/nodes/ControlNode";
+import { type ElementNode } from "../types/nodes/ElementNode";
+import { type OperationType } from "../types/nodes/OperationType";
 import isControlNode from "../types/nodes/isControlNode";
 import trimMatched from "../utils/trimMatched";
 import trimStart from "../utils/trimStart";
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import parseInlineScript from "./parseInlineScript";

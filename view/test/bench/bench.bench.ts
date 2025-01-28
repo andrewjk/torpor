@@ -16,7 +16,7 @@ beforeAll(async () => {
 
 bench("bench", async () => {
 	const createButton = document.getElementById("create")!;
-	const createLotsButton = document.getElementById("createlots")!;
+	//const createLotsButton = document.getElementById("createlots")!;
 	const appendButton = document.getElementById("append")!;
 	const updateButton = document.getElementById("update")!;
 	const swapButton = document.getElementById("swaprows")!;

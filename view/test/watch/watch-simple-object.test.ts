@@ -1,4 +1,4 @@
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 
@@ -7,5 +7,6 @@ test("watching a simple object", () => {
 		name: "Andrew",
 	};
 	const output = $watch(input);
+	// @ts-ignore
 	expect(output[proxyDataSymbol]).not.toBeNull();
 });

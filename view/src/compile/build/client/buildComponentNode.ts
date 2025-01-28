@@ -1,4 +1,4 @@
-import type ElementNode from "../../types/nodes/ElementNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
@@ -6,7 +6,7 @@ import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -16,8 +16,6 @@ export default function buildComponentNode(
 	node: ElementNode,
 	status: BuildStatus,
 	b: Builder,
-	parentName: string,
-	anchorName: string,
 	root = false,
 ) {
 	b.append("");

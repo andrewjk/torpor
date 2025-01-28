@@ -1,5 +1,5 @@
 import * as api from "@/lib/api.js";
-import type { PageServerEndPoint } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
 import { ok, redirect, unauthorized, unprocessable } from "@torpor/build/response";
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";

@@ -1,6 +1,5 @@
 // Adapted from https://github.com/snabbdom/snabbdom
 // With changes from https://github.com/luwes/js-diff-benchmark
-
 /*
  * The MIT License (MIT)
  *
@@ -25,8 +24,8 @@
  * SOFTWARE.
  */
 import $watch from "../render/$watch";
-import type ListItem from "../types/ListItem";
-import type Range from "../types/Range";
+import { type ListItem } from "../types/ListItem";
+import { type Range } from "../types/Range";
 import clearRange from "./clearRange";
 import context from "./context";
 import moveRange from "./moveRange";

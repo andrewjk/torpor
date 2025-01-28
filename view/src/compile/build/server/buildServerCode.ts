@@ -1,7 +1,7 @@
-import type BuildOptions from "../../../types/BuildOptions";
-import type Template from "../../../types/Template";
+import { type BuildOptions } from "../../../types/BuildOptions";
+import { type Template } from "../../../types/Template";
 import Builder from "../../utils/Builder";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 const importsMap: Record<string, string> = {
@@ -13,7 +13,7 @@ const importsMap: Record<string, string> = {
 	t_attr: 'import { t_attr } from "${folder}";',
 	t_class: 'import { t_class } from "${folder}";',
 	t_style: 'import { t_style } from "${folder}";',
-	ServerSlotRender: 'import type { ServerSlotRender } from "${folder}";',
+	ServerSlotRender: 'import { type ServerSlotRender } from "${folder}";',
 };
 
 export default function buildServerCode(template: Template, options?: BuildOptions): string {

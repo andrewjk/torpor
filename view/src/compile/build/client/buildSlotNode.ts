@@ -1,23 +1,17 @@
-import type ElementNode from "../../types/nodes/ElementNode";
+import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
-import type BuildStatus from "./BuildStatus";
+import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 
-export default function buildSlotNode(
-	node: ElementNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	anchorName: string,
-) {
+export default function buildSlotNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	// If there's a slot, build that, otherwise build the default nodes
 	let slotName = node.attributes.find((a) => a.name === "name")?.value;
 	slotName = slotName ? trimQuotes(slotName) : "_";

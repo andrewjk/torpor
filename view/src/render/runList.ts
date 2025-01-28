@@ -1,6 +1,6 @@
 import $run from "../render/$run";
-import type ListItem from "../types/ListItem";
-import type Range from "../types/Range";
+import { type ListItem } from "../types/ListItem";
+import { type Range } from "../types/Range";
 import context from "./context";
 import popRange from "./popRange";
 import pushRange from "./pushRange";

@@ -1,7 +1,7 @@
 import { LibsqlDialect } from "@libsql/kysely-libsql";
-import { promises as fs } from "fs";
 import { FileMigrationProvider, Kysely, Migrator } from "kysely";
-import * as path from "path";
+import { promises as fs } from "node:fs";
+import * as path from "node:path";
 import { Database } from "./types";
 
 async function migrateToLatest() {

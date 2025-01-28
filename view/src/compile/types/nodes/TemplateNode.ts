@@ -1,6 +1,6 @@
-import type NodeType from "./NodeType";
+import { type NodeType } from "./NodeType";
 
-export default interface TemplateNode {
+export type TemplateNode = {
 	type: NodeType;
 
 	// This gets set when building
@@ -12,4 +12,4 @@ export default interface TemplateNode {
 	// Nodes with anchors need to be hydrated immediately (while we have the
 	// correct anchor node) rather than at the end of the fragment
 	handled?: boolean;
-}
+};

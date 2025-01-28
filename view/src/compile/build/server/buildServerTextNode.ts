@@ -1,8 +1,7 @@
-import type TextNode from "../../types/nodes/TextNode";
-import Builder from "../../utils/Builder";
-import type BuildServerStatus from "./BuildServerStatus";
+import { type TextNode } from "../../types/nodes/TextNode";
+import { type BuildServerStatus } from "./BuildServerStatus";
 
-export default function buildServerTextNode(node: TextNode, status: BuildServerStatus, b: Builder) {
+export default function buildServerTextNode(node: TextNode, status: BuildServerStatus) {
 	let content = node.content || "";
 
 	if (!status.preserveWhitespace) {

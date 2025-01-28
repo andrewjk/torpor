@@ -1,9 +1,9 @@
-import type Attribute from "./Attribute";
-import type Fragment from "./Fragment";
-import type ParentNode from "./ParentNode";
-import type TemplateNode from "./TemplateNode";
+import { type Attribute } from "./Attribute";
+import { type Fragment } from "./Fragment";
+import { type ParentNode } from "./ParentNode";
+import { type TemplateNode } from "./TemplateNode";
 
-export default interface ElementNode extends ParentNode {
+export type ElementNode = ParentNode & {
 	type: "element" | "component" | "special";
 	tagName: string;
 	closed?: boolean;
@@ -14,4 +14,4 @@ export default interface ElementNode extends ParentNode {
 	// This gets set when building
 	fragment?: Fragment;
 	parentName?: string;
-}
+};

@@ -1,4 +1,4 @@
-import type ParseStatus from "./ParseStatus";
+import { type ParseStatus } from "./ParseStatus";
 import parseElement from "./parseElement";
 import accept from "./utils/accept";
 import addError from "./utils/addError";

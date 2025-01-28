@@ -1,14 +1,13 @@
 import $watch from "../../../../src/render/$watch";
-import type SlotRender from "../../../../src/types/SlotRender";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 
 export default function Bench(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ) {
-
 	let rowId = 1;
 	let $state = $watch({
 		data: [],
@@ -42,7 +41,19 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const colours = [
+		"red",
+		"yellow",
+		"blue",
+		"green",
+		"pink",
+		"brown",
+		"purple",
+		"brown",
+		"white",
+		"black",
+		"orange",
+	];
 	const nouns = [
 		"table",
 		"chair",
@@ -104,9 +115,8 @@ export default function Bench(
 		$anchor: Node | null,
 		$props?: Record<PropertyKey, any>,
 		$context?: Record<PropertyKey, any>,
-		$slots?: Record<string, SlotRender>
+		$slots?: Record<string, SlotRender>,
 	) {
-
 		return Math.round(Math.random() * 1000) % max;
 	}
 
@@ -122,5 +132,4 @@ export default function Bench(
 		}
 		return data;
 	}
-
 }

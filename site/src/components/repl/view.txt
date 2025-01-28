@@ -35,7 +35,7 @@ function getStyles(value) {
 }
 
 
-//# sourceMappingURL=chunk-GO2L324Q.js.map
+
 
 // src/render/context.ts
 var context = {
@@ -760,4 +760,3 @@ let t_run_control = runControl;
 let t_run_list = runList;
 let t_style = getStyles;
 
-//# sourceMappingURL=index.js.map

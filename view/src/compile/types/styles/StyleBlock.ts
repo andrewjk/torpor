@@ -1,7 +1,7 @@
-import Attribute from "./Attribute";
+import { type Attribute } from "./Attribute";
 
-export default interface StyleBlock {
+export type StyleBlock = {
 	selector: string;
 	attributes: Attribute[];
 	children: StyleBlock[];
-}
+};

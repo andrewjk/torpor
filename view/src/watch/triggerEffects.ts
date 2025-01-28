@@ -1,4 +1,4 @@
-import type ProxyData from "../types/ProxyData";
+import { type ProxyData } from "../types/ProxyData";
 import removeEffect from "./removeEffect";
 import runEffect from "./runEffect";
 
