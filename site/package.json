@@ -9,19 +9,18 @@
 	"scripts": {
 		"dev": "cd ../view && pnpm build && cd ../unplugin && pnpm build && cd ../build && pnpm build && cd ../site && tb --dev",
 		"build": "tb --config torpor.config.js --build",
+		"check": "tsc -p tsconfig.json --noEmit",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/ui": "workspace:^",
-		"@torpor/view": "workspace:^",
-		"sucrase": "^3.35.0"
-	},
-	"devDependencies": {
 		"@torpor/build": "workspace:^",
+		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
+		"sucrase": "^3.35.0",
 		"vinxi": "^0.5.1"
 	}
 }

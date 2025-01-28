@@ -4,9 +4,17 @@
 		"lib": ["es2022", "DOM"],
 		"module": "esnext",
 		"moduleResolution": "bundler",
+		"esModuleInterop": true,
+		// Strict
 		"strict": true,
 		"strictNullChecks": true,
-		"esModuleInterop": true
-	},
-	"exclude": ["dist"]
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		// TODO: Node type erasing, with next version of TS
+		//"erasableSyntaxOnly": true,
+		"allowImportingTsExtensions": true,
+		"rewriteRelativeImportExtensions": true,
+		"verbatimModuleSyntax": true
+	}
 }

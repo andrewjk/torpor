@@ -24,6 +24,7 @@
 	"scripts": {
 		"build": "tsup",
 		"build:fix": "esno scripts/postbuild.ts",
+		"check": "tsc -p tsconfig.json --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest"
 	},

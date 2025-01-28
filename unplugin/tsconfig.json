@@ -1,4 +1,7 @@
 {
-	"extends": "../tsconfig",
-	"exclude": ["dist"]
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"skipLibCheck": true
+	},
+	"include": ["src"]
 }

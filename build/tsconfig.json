@@ -1,4 +1,7 @@
 {
-	"extends": "../tsconfig",
-	"include": ["tsup.config.ts"]
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"skipLibCheck": true
+	},
+	"include": ["src"]
 }

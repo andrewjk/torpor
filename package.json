@@ -7,6 +7,7 @@
 	"private": true,
 	"scripts": {
 		"build": "pnpm -r run build",
+		"check": "pnpm -r run check",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"format": "prettier --write ."
@@ -22,10 +23,8 @@
 		"@types/jsdom": "^21.1.7",
 		"jsdom": "^26.0.0",
 		"prettier": "^3.4.2",
+		"typescript": "^5.7.2",
 		"vitest": "^3.0.4"
-	},
-	"peerDependencies": {
-		"typescript": "^5.7.2"
 	},
 	"workspaces": [
 		"build",

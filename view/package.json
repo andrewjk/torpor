@@ -29,7 +29,7 @@
 	"scripts": {
 		"build": "tsup && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsup --watch",
-		"check": "tsc -p tsconfig-check.json --noEmit",
+		"check": "tsc -p tsconfig.json --noEmit",
 		"test": "vitest",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
 		"bench": "tsx ./bench/bench.ts",
