@@ -1,3 +1,4 @@
+
 // src/render/formatText.ts
 function formatText(value) {
   return value ?? "";

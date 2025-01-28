@@ -1,7 +1,9 @@
 {
 	"extends": "../tsconfig.json",
 	"compilerOptions": {
-		"skipLibCheck": true
+		// TODO: We should be using the tsconfig from the site
+		"skipLibCheck": true,
+		"verbatimModuleSyntax": false
 	},
 	"include": ["src"]
 }
