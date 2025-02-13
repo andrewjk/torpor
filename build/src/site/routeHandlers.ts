@@ -102,7 +102,7 @@ function findServer(path: string, fileRoutes: RouteModule[]): Promise<any> | und
 
 function findServerHook(path: string, fileRoutes: RouteModule[]): Promise<any> | undefined {
 	// TODO: Should this be a collection, like layouts?
-	let hookPath = "/_hook.server";
+	let hookPath = "/_hook/~server";
 	if (path.startsWith("/api/")) {
 		hookPath = "/api" + hookPath;
 	}
