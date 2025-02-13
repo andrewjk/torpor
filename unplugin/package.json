@@ -113,27 +113,27 @@
 	},
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"unplugin": "^2.1.2"
+		"unplugin": "^2.2.0"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^4.1.0",
-		"@nuxt/kit": "^3.15.3",
-		"@nuxt/schema": "^3.15.3",
-		"@trivago/prettier-plugin-sort-imports": "^5.2.1",
-		"@types/node": "^22.10.10",
-		"bumpp": "^10.0.1",
+		"@antfu/eslint-config": "^4.2.0",
+		"@nuxt/kit": "^3.15.4",
+		"@nuxt/schema": "^3.15.4",
+		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
+		"@types/node": "^22.13.2",
+		"bumpp": "^10.0.3",
 		"chalk": "^5.4.1",
-		"eslint": "^9.19.0",
+		"eslint": "^9.20.1",
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
 		"nodemon": "^3.1.9",
-		"prettier": "^3.4.2",
+		"prettier": "^3.5.0",
 		"rimraf": "^6.0.1",
-		"rollup": "^4.32.0",
+		"rollup": "^4.34.6",
 		"tsup": "^8.3.6",
 		"typescript": "^5.7.3",
-		"vite": "^6.0.11",
-		"vitest": "^3.0.4",
+		"vite": "^6.1.0",
+		"vitest": "^3.0.5",
 		"webpack": "^5.97.1"
 	}
 }
