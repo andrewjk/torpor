@@ -16,11 +16,13 @@ const routeHandlers: RouteHandlerCollection = {
 			return {
 				...route,
 				regex: pathToRegExp(route.path),
+				order: /\[([^\/]+?)\]/.test(route.path) ? 1 : 0,
 				// TODO: Implement the rest of the lazyRoute stuff from vinxi/react or vinxi/solid
 				endPoint: lazyRoute(route.$handler, clientManifest, serverManifest),
 				loaded: false,
 			};
-		}),
+		})
+		.sort((a, b) => a.order - b.order),
 	match(path, urlParams) {
 		console.log("matching", path);
 
