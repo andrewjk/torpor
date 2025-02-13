@@ -35,6 +35,7 @@ export default function Function(
 	/* @function */
 	function increment() {
 		$state.counter += 1;
+		let x = "";
 	};
 
 	$run(function setTextContent() {

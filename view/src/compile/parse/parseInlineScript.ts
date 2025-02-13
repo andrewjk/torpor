@@ -16,7 +16,7 @@ export default function parseInlineScript(status: ParseStatus): string {
 		} else if (accept('"', status) || accept("'", status)) {
 			// Skip string contents
 			const char = status.source[status.i - 1];
-			for (let j = status.i + 1; j < status.source.length; j++) {
+			for (let j = status.i; j < status.source.length; j++) {
 				if (status.source[j] === char && status.source[j - 1] !== "\\") {
 					status.i = j + 1;
 					break;
@@ -26,7 +26,7 @@ export default function parseInlineScript(status: ParseStatus): string {
 			// Skip possibly interpolated string contents
 			const char = status.source[status.i - 1];
 			let level2 = 0;
-			for (let j = status.i + 1; j < status.source.length; j++) {
+			for (let j = status.i; j < status.source.length; j++) {
 				if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
 					status.i = j + 1;
 					break;

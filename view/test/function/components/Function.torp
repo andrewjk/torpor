@@ -6,6 +6,7 @@ export default function Function() {
 			<button id=increment onclick={increment}>Increment</button>
 			@function increment() {
 					$state.counter += 1;
+					let x = "";
 			}
 			<p>
 					The count is {$state.counter}.
