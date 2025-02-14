@@ -14,13 +14,13 @@ export default function printNode(node: Node | null | undefined) {
 		} else if (node.nodeType === 3) {
 			// Text
 			let txt = node as Text;
-			let p = `'${txt.textContent}'`;
+			let p = "txt";
 			if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(txt)}]`;
 			paths.push(p);
 		} else if (node.nodeType === 8) {
 			// Comment
 			let com = node as Comment;
-			let p = `<!${com.data}>`;
+			let p = "cmt";
 			if (node.parentNode) p += `[${Array.from(node.parentNode.childNodes).indexOf(com)}]`;
 			paths.push(p);
 		} else if (node.nodeType === 9) {

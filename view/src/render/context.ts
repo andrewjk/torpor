@@ -43,7 +43,7 @@ interface Context {
 
 	/** The node that is actively being hydrated. */
 	hydrationNode: ChildNode | null;
-	//hn: Node | null;
+	//hn: ChildNode | null;
 }
 
 const context: Context = {
