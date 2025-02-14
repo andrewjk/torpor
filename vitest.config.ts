@@ -1,5 +1,5 @@
 import { defineConfig } from "vitest/config";
-import torpor from "./unplugin/dist/vite";
+import torpor from "./packages/unplugin/dist/vite";
 
 export default defineConfig(({ mode }) => ({
 	plugins: [torpor()],

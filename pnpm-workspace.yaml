@@ -1,6 +1,4 @@
 packages:
-  - build
-  - create-build
-  - ui
-  - unplugin
-  - view
+  - "packages/*"
+  - "site"
+  - "examples/*"

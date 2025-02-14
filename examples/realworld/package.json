@@ -1,0 +1,43 @@
+{
+	"name": "@torpor/realworld",
+	"version": "0.0.1",
+	"description": "A Vite starter site built with torpor/build",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "cd ../../packages/build && pnpm build && cd ../../examples/realworld && tb --dev",
+		"build": "tsc && tb --build",
+		"check": "tsc -p tsconfig.json --noEmit",
+		"preview": "vinxi serve",
+		"db:generate": "prisma generate",
+		"db:migratex": "tsx ./src/data/migrate.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@libsql/kysely-libsql": "^0.4.1",
+		"@prisma/client": "^6.3.1",
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^",
+		"bcryptjs": "^2.4.3",
+		"dotenv": "^16.4.7",
+		"jose": "^5.9.6",
+		"jsonwebtoken": "^9.0.2",
+		"kysely": "^0.27.5",
+		"vinxi": "^0.5.1",
+		"winston": "^3.17.0"
+	},
+	"devDependencies": {
+		"@types/bcryptjs": "^2.4.6",
+		"@types/jsonwebtoken": "^9.0.8",
+		"@types/sanitize-html": "^2.13.0",
+		"dotenv-cli": "^8.0.0",
+		"marked": "^15.0.6",
+		"prisma": "^6.3.1",
+		"sanitize-html": "^2.14.0",
+		"tsx": "^4.19.2",
+		"typescript": "^5.7.3"
+	}
+}

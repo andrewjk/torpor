@@ -11,19 +11,19 @@ Yet another JavaScript framework, designed for simplicity and completeness.
 - In-markup JavaScript logic with `@if`, `@for`, `@switch` and `@await` keywords
   - And `@replace`, `@const`, `@console`, `@debugger`, `@function` and `@html`
 - Runtime reactivity via proxies that can be used in any JavaScript file
-- Scoped styles, two-way binding, child components and more -- see [torpor/view](./view)
-- An accessible, unstyled component library -- see [torpor/ui](./ui)
-- A site and app framework -- see [torpor/build](./build)
+- Scoped styles, two-way binding, child components and more -- see [torpor/view](./packages/view)
+- An accessible, unstyled component library -- see [torpor/ui](./packages/ui)
+- A site and app framework -- see [torpor/build](./packages/build)
 
 ### Not Yet
 
-- [torpor/lang](./lang) -- Language server for IDEs
-- [torpor/dev](./dev) -- Browser devtools
+- [torpor/language-tools](./language-tools) -- Language server for IDEs
+- [torpor/dev-tools](./dev-tools) -- Browser development tools
 - Performance
 
 ## A Simple Component
 
-See the [torpor/view](./view) sub-repo for a more in-depth example.
+See the [torpor/view](./packages/view) sub-repo for a more in-depth example.
 
 ```
 /**
@@ -83,7 +83,7 @@ Clone Torpor to view its source and run a demo:
 
 ```bash
 git clone https://github.com/andrewjk/torpor.git
-cd torpor/demo
+cd torpor/examples/demo
 npm install
 npm run dev
 ```
