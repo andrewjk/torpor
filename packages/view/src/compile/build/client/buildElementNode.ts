@@ -13,6 +13,7 @@ import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildElementNode(
 	node: ElementNode,
@@ -230,6 +231,8 @@ function buildBindGroupAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
+	value = replaceForVarNames(value, status);
+
 	// Automatically add an event to bind the value
 	// TODO: Only tested this with radio buttons
 	let eventName = "change";
@@ -253,6 +256,8 @@ function buildBindAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
+	value = replaceForVarNames(value, status);
+
 	// Automatically add an event to bind the value
 	// TODO: Need to check the element to find out what type of event to add
 	let eventName = "input";
@@ -298,14 +303,7 @@ function buildEventAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
-	// HACK: If a value from a for loop is used in the function body,
-	// get it from the loop data to trigger an update when it is changed
-	for (let varName of status.forVarNames) {
-		value = value.replaceAll(
-			new RegExp(`([\\s\\(\\[])${varName}([\\s\\.\\(\\)\\[\\];])`, "g"),
-			`$1t_item.data.${varName}$2`,
-		);
-	}
+	value = replaceForVarNames(value, status);
 
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
@@ -321,6 +319,8 @@ function buildTransitionAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
+	value = replaceForVarNames(value, status);
+
 	status.imports.add("t_animate");
 
 	// Add an in and out transition, after the fragment has been added
