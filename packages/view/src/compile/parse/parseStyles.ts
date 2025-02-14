@@ -70,6 +70,8 @@ function parseStyleBlock(status: ParseStatus): StyleBlock | undefined {
 				} else {
 					break;
 				}
+			} else {
+				return block;
 			}
 			consumeSpace(status);
 		}
