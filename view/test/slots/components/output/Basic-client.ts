@@ -2,6 +2,7 @@ import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 import Header from "./Header-client"
@@ -39,6 +40,7 @@ export default function Basic(
 		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_2);
 		t_add_fragment(t_fragment_2, $sparent, $sanchor);
+		t_next(t_text_1);
 	}
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);

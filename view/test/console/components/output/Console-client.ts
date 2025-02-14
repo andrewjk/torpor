@@ -1,6 +1,7 @@
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Console(
@@ -23,5 +24,6 @@ export default function Console(
 	/* @console */
 	console.log("@console is logging here");
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

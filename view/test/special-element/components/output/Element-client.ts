@@ -3,6 +3,7 @@ import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_dynamic from "../../../../src/render/setDynamicElement";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Element(
@@ -27,7 +28,9 @@ export default function Element(
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Hello! `);
 		let t_element_2 = t_root(t_fragment_1) as HTMLElement;
 		t_add_fragment(t_fragment_1, t_element_1, null);
+		t_next(t_element_2);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_element_1);
 
 }

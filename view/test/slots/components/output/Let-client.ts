@@ -4,6 +4,7 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 import List from "./List-client"
@@ -47,6 +48,7 @@ export default function Let(
 			t_text_1.textContent = ` ${t_fmt($sprops.item.text)} `;
 		});
 		t_add_fragment(t_fragment_2, $sparent, $sanchor);
+		t_next(t_text_1);
 	}
 	List(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);

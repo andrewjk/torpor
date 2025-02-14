@@ -40,5 +40,6 @@ export default function IsAvailable(
 	});
 	t_event(t_input_1, "input", (e) => $state.isAvailable = e.target.checked);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

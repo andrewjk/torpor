@@ -41,5 +41,6 @@ export default function Increment(
 		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

@@ -39,5 +39,6 @@ export default function UserProfileContext(
 	});
 	t_event(t_button_1, "click", () => ($context.user.username = "Jane"));
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

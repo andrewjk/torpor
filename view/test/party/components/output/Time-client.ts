@@ -5,6 +5,7 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Time(
@@ -41,5 +42,6 @@ export default function Time(
 		t_text_1.textContent = `Current time: ${t_fmt($state.time)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_p_1);
 
 }

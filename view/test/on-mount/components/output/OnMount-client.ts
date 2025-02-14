@@ -3,6 +3,7 @@ import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_flush from "../../../../src/render/flushMountEffects";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function OnMount(
@@ -26,6 +27,7 @@ export default function OnMount(
 		return ((node) => node.value = "hi")(t_input_1);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_input_1);
 
 	t_flush();
 }

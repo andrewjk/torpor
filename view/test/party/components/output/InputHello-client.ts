@@ -40,5 +40,6 @@ export default function InputHello(
 	});
 	t_event(t_input_1, "input", (e) => $state.text = e.target.value);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

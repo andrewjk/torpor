@@ -62,5 +62,6 @@ export default function Self(
 		t_text_1.textContent = ` Level ${t_fmt($props.level)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

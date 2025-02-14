@@ -56,6 +56,7 @@ export default function Named(
 		// @ts-ignore
 		const t_text_2 = t_root(t_fragment_3);
 		t_add_fragment(t_fragment_3, $sparent, $sanchor);
+		t_next(t_text_2);
 	}
 	Article(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 	t_add_fragment(t_fragment_0, $parent, $anchor);

@@ -2,6 +2,7 @@ import $run from "../../../../src/render/$run";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import t_style from "../../../../src/render/getStyles";
 
@@ -25,5 +26,6 @@ export default function Style(
 		t_div_1.setAttribute("style", t_style({ color: $props.color }));
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

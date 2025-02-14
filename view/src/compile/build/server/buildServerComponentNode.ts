@@ -1,3 +1,4 @@
+import { ANCHOR_COMMENT } from "../../types/comments";
 import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
@@ -110,4 +111,9 @@ export default function buildServerComponentNode(
 	}
 	b.append("");
 	b.append(`$output += ${componentName}(${renderParams})`);
+
+	// If we're using a @replace to update a :component, we need another anchor comment
+	if (node.tagName === ":component") {
+		status.output += ANCHOR_COMMENT;
+	}
 }

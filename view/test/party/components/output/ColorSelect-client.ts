@@ -97,5 +97,6 @@ export default function ColorSelect(
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

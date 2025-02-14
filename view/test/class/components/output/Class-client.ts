@@ -40,5 +40,6 @@ export default function Class(
 		t_div_5.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ]);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

@@ -27,5 +27,6 @@ export default function AnswerButton(
 	t_event(t_button_1, "click", $props.onYes);
 	t_event(t_button_2, "click", $props.onNo);
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

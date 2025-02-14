@@ -30,7 +30,9 @@ export default function Header(
 		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_1);
 		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1);
+		t_next(t_text_1);
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_h2_1);
 
 }

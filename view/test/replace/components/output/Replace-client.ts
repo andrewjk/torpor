@@ -51,5 +51,6 @@ export default function Replace(
 	});
 
 	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_next(t_div_1);
 
 }

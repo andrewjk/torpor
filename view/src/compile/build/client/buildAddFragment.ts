@@ -17,7 +17,7 @@ export default function buildAddFragment(
 		status.imports.add("t_add_fragment");
 		b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
 		// TODO: Don't need to do this if the last thing we hydrated was the end node
-		if (fragment.endVarName && node.children.length > 1) {
+		if (fragment.endVarName) {
 			status.imports.add("t_next");
 			b.append(`t_next(${fragment.endVarName});`);
 		}

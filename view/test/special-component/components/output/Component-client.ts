@@ -2,6 +2,7 @@ import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
@@ -56,6 +57,7 @@ export default function Component(
 				// @ts-ignore
 				const t_text_1 = t_root(t_fragment_3);
 				t_add_fragment(t_fragment_3, $sparent, $sanchor);
+				t_next(t_text_1);
 			}
 			components[$props.self](t_fragment_1, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before);
