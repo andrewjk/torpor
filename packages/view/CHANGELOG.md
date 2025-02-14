@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.0.4
+
+### Patch Changes
+
+- 76dd6ea: Fix: return on invalid style
+- 8f0a0a1: Fix: replace @for vars in more places
+
 ## 0.0.3
 
 ### Patch Changes
