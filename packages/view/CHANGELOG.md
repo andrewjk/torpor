@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.5
+
+### Patch Changes
+
+- 44cf656: Fix: replace @for vars in even more places
+
 ## 0.0.4
 
 ### Patch Changes
