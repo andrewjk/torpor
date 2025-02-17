@@ -1,5 +1,5 @@
 import { ok } from "@torpor/build/response";
-import { ValidationError } from "../../utils/types";
+import { ValidationError } from "../../utils/ValidationError";
 
 /**
  * Middleware to validate request properties for articles listing controller.
@@ -9,7 +9,7 @@ import { ValidationError } from "../../utils/types";
  * @returns
  */
 export default async function articlesListValidator(request: Request) {
-	const { tag, author, favorited, limit, offset } = req.query;
+	const { tag, author, favorited, limit, offset } = request.query;
 	const errors: ValidationError = {};
 	errors.query = [];
 

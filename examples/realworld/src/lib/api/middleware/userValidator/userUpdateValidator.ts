@@ -1,5 +1,5 @@
 import { badRequest } from "@torpor/build/response";
-import { ValidationError } from "../../utils/types";
+import { ValidationError } from "../../utils/ValidationError";
 
 /**
  * This function is a middleware that validates the user information in the request in order to log the user.
@@ -14,12 +14,12 @@ export default async function userUpdateValidator(request: Request) {
 	const errors: ValidationError = {};
 	errors.body = [];
 
-	if (!req.body) {
+	if (!request.body) {
 		errors.body.push("can't be empty");
 		return badRequest({ errors });
 	}
 
-	const { user } = req.body;
+	const { user } = request.body;
 	if (!user) {
 		errors.body.push("user property must exist");
 		return badRequest({ errors });

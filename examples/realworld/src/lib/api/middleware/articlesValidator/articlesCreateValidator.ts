@@ -1,5 +1,5 @@
 import { badRequest } from "@torpor/build/response";
-import { ValidationError } from "../../utils/types";
+import { ValidationError } from "../../utils/ValidationError";
 
 /**
  * Middleware to validate input for article creation controller.
@@ -12,12 +12,12 @@ export default async function articlesCreateValidator(request: Request) {
 	const errors: ValidationError = {};
 	errors.body = [];
 
-	if (!req.body) {
+	if (!request.body) {
 		errors.body.push("can't be empty");
 		return badRequest({ errors });
 	}
 
-	if (!req.body.article && typeof req.body.article != "object") {
+	if (!request.body.article && typeof req.body.article != "object") {
 		errors.body.push("article must be an object inside body");
 		return badRequest({ errors });
 	}

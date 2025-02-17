@@ -1,5 +1,5 @@
 import { ok } from "@torpor/build/response";
-import { ValidationError } from "../../utils/types";
+import { ValidationError } from "../../utils/ValidationError";
 
 /**
  * Middleware to validate request for article feed controller.
@@ -9,7 +9,7 @@ import { ValidationError } from "../../utils/types";
  * @returns
  */
 export default async function articlesFeedValidator(request: Request) {
-	const { limit, offset } = req.query;
+	const { limit, offset } = request.query;
 	const errors: ValidationError = {};
 	errors.query = [];
 

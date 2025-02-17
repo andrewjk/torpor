@@ -6,8 +6,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "cd ../../packages/build && pnpm build && cd ../../examples/demo && tb --dev",
-		"build": "tsc && tb --build",
-		"check": "tsc -p tsconfig.json --noEmit",
+		"build": "tsc --noEmit && tb --build",
+		"check": "tsc --noEmit",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],

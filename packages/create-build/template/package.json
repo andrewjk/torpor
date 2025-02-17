@@ -5,7 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tb --dev",
-		"build": "tsc && tb --build",
+		"build": "tsc --noEmit && tb --build",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],

@@ -6,8 +6,8 @@
 	"private": true,
 	"scripts": {
 		"dev": "cd ../packages/view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && pnpm build && cd ../build && pnpm build && cd ../../site && tb --dev",
-		"build": "tb --config torpor.config.js --build",
-		"check": "tsc -p tsconfig.json --noEmit",
+		"build": "tsc --noEmit && tb --build",
+		"check": "tsc --noEmit",
 		"preview": "vinxi serve"
 	},
 	"keywords": [],

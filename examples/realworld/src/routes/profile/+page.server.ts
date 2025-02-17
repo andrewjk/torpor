@@ -1,4 +1,4 @@
-import { type PageEndPoint } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
 import { redirect } from "@torpor/build/response";
 
 export default {
@@ -9,4 +9,4 @@ export default {
 		const user = jwt ? JSON.parse(atob(jwt)) : null;
 		return redirect(user ? `/profile/@${user.username}` : "/login");
 	},
-} satisfies PageEndPoint;
+} satisfies PageServerEndPoint;

@@ -16,7 +16,6 @@ export default async function commentsDelete(
 	params: Record<string, string>,
 	appData: Record<string, any>,
 ) {
-	const slug = params.slug;
 	const id = parseInt(params.id);
 	const username = appData.user?.username;
 
@@ -26,7 +25,7 @@ export default async function commentsDelete(
 		if (!currentUser) return unauthorized();
 
 		// Remove comment from database
-		const comment = await commentDeletePrisma(slug, id, currentUser);
+		const comment = await commentDeletePrisma(id, currentUser);
 		if (!comment) return serverError();
 
 		// Create comment view

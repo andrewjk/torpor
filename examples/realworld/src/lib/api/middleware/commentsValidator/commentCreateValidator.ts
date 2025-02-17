@@ -8,7 +8,7 @@ import { badRequest } from "@torpor/build/response";
  * @returns
  */
 export default function commentCreateValidator(request: Request) {
-	const comment = req.body.comment;
+	const comment = request.body.comment;
 	if (!comment) return badRequest({ errors: { body: ["the body must contain a comment object"] } });
 	if (typeof comment != "object")
 		return badRequest({ errors: { body: ["the comment  must be an object"] } });

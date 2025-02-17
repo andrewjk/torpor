@@ -1,7 +1,7 @@
 import pages from "@/data/docs.js";
 
 const routes = pages.map((p) => {
-	return {};
+	return p;
 });
 
 export default routes;
