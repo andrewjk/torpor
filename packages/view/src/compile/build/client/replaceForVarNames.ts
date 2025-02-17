@@ -8,7 +8,7 @@ export default function replaceForVarNames(value: string, status: BuildStatus) {
 	// get it from the loop data to trigger an update when it is changed
 	for (let varName of status.forVarNames) {
 		value = value.replaceAll(
-			new RegExp(`([\\s\\(\\[\\{])${varName}([\\s\\.\\(\\)\\[\\]\\};])`, "g"),
+			new RegExp(`(^|\\s|\\(|\\[|\\{)${varName}($|\\s|\\.|\\(|\\)|\\[|\\]|\\}|;)`, "g"),
 			`$1t_item.data.${varName}$2`,
 		);
 	}

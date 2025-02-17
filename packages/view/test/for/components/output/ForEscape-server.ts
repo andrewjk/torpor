@@ -16,7 +16,7 @@ export default function ForEscape(
 	let $output = "";
 	$output += `<section> <![>`;
 	for (let i = 0; i < 5; i++) {
-		$output += `<!^> <p>${t_fmt(i)}</p> <div data-testid="input1-${t_attr(i)}" ${i ? `name="${t_attr(i)}"` : ''}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${things[i] ? `name="${t_attr(things[i])}"` : ''}></div> `;
+		$output += `<!^> <p>${t_fmt(i)}</p> <div data-testid="input1-${t_attr(i)}" ${i ? `name="${t_attr(i)}"` : ''}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${things[i] ? `name="${t_attr(things[i])}"` : ''}></div> <input value="${t_attr(i) || ""}" name="${t_attr(i)}"> `;
 	}
 	$output += `<!]><!> </section>`;
 

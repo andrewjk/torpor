@@ -5,6 +5,7 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_attribute from "../../../../src/render/setAttribute";
 import t_child from "../../../../src/render/nodeChild";
+import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_list_item from "../../../../src/render/newListItem";
@@ -54,15 +55,16 @@ export default function ForEscape(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input></input> `);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_div_1 = t_next(t_next(t_next(t_root_1))) as HTMLDivElement;
 			const t_div_2 = t_next(t_next(t_div_1)) as HTMLDivElement;
 			const t_div_3 = t_next(t_next(t_div_2)) as HTMLDivElement;
+			const t_input_1 = t_next(t_next(t_div_3)) as HTMLInputElement;
 			// @ts-ignore
-			const t_text_2 = t_next(t_div_3);
+			const t_text_2 = t_next(t_input_1);
 			$run(function setTextContent() {
 				t_text_1.textContent = t_fmt(t_item.data.i);
 			});
@@ -83,6 +85,13 @@ export default function ForEscape(
 			});
 			$run(function setAttribute() {
 				t_attribute(t_div_3, "name", things[t_item.data.i]);
+			});
+			$run(function setBinding() {
+				t_input_1.value = t_item.data.i || "";
+			});
+			t_event(t_input_1, "input", (e) => t_item.data.i = e.target.value);
+			$run(function setAttribute() {
+				t_attribute(t_input_1, "name", `${t_item.data.i}`);
 			});
 			t_add_fragment(t_fragment_1, t_section_1, t_before);
 			t_next(t_text_2);

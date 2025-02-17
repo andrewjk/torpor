@@ -1,5 +1,6 @@
-import { queryByTestId } from "@testing-library/dom";
+import { queryByTestId, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { beforeAll, expect, test } from "vitest";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
@@ -17,7 +18,7 @@ test("for escape -- mounted", async () => {
 	const component = await importComponent(componentPath, "client");
 	mountComponent(container, component);
 
-	check(container);
+	await check(container);
 });
 
 test("for escape -- hydrated", async () => {
@@ -26,10 +27,10 @@ test("for escape -- hydrated", async () => {
 	const serverComponent = await importComponent(componentPath, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	check(container);
+	await check(container);
 });
 
-function check(container: HTMLElement) {
+async function check(container: HTMLElement) {
 	expect(queryByTestId(container, "input1-2")).not.toBeNull();
 	expect(queryByTestId(container, "input1-2")).toHaveAttribute("name", "2");
 
@@ -38,4 +39,12 @@ function check(container: HTMLElement) {
 
 	expect(queryByTestId(container, "input3-2")).not.toBeNull();
 	expect(queryByTestId(container, "input3-2")).toHaveAttribute("name", "c");
+
+	const user = userEvent.setup();
+	const input = container.getElementsByTagName("input")[0];
+
+	await user.clear(input);
+	await user.type(input, "Hello");
+
+	expect(queryByText(container, "Hello")).not.toBeNull();
 }
