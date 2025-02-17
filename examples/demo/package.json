@@ -18,6 +18,6 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"vinxi": "^0.5.1"
+		"vinxi": "^0.5.3"
 	}
 }

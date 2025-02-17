@@ -19,6 +19,6 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"sucrase": "^3.35.0",
-		"vinxi": "^0.5.1"
+		"vinxi": "^0.5.3"
 	}
 }
