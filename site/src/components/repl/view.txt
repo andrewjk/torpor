@@ -473,8 +473,11 @@ function nodeAnchor(node) {
 
 // src/render/nodeChild.ts
 function nodeChild(parent) {
-  const child = parent.firstChild;
+  let child = parent.firstChild;
   if (context_default.hydrationNode) {
+    if (!child) {
+      child = parent.appendChild(parent.ownerDocument.createTextNode(""));
+    }
     context_default.hydrationNode = child;
   }
   return child;

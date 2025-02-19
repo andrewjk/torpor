@@ -8,6 +8,7 @@
 	"scripts": {
 		"build": "pnpm -r run build",
 		"check": "pnpm -r run check",
+		"release": "pnpm -r run build && pnpm -r changesets publish",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"format": "prettier --write ."
