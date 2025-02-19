@@ -9,7 +9,7 @@
 		"build": "pnpm -r run build",
 		"check": "pnpm -r run check",
 		"version": "pnpm changeset version",
-		"release": "pnpm -r run build && pnpm -r changeset publish",
+		"release": "pnpm -r run build && pnpm changeset publish",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"format": "prettier --write ."
