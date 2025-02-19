@@ -38,12 +38,12 @@ const routeHandlers: RouteHandlerCollection = {
 			return a.path.length - b.path.length;
 		}),
 	match(path, urlParams) {
-		console.log("matching", path);
-
 		// TODO: Lots of testing etc
 		for (let handler of (this as RouteHandlerCollection).handlers) {
 			let match = path.match(handler.regex);
 			if (match) {
+				console.log(`matching ${path}, found ${handler.path}`);
+
 				// Lazy load server endpoints and layouts
 				// Partly because it makes sense to do it here, but also because
 				// it doesn't work if we try to do it upfront for some reason
@@ -59,10 +59,7 @@ const routeHandlers: RouteHandlerCollection = {
 			}
 		}
 
-		console.log("not found");
-		//for (let handler of (this as RouteHandlerCollection).handlers) {
-		//	console.log("  have", handler.path, handler.regex);
-		//}
+		console.log(`matching ${path}, not found`);
 	},
 };
 

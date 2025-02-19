@@ -43,7 +43,7 @@ async function navigate(
 	urlParams: URLSearchParams,
 	firstTime = false,
 ): Promise<boolean> {
-	console.log("navigating client to", path, "with", urlParams.toString());
+	console.log("navigating client to", path, urlParams.size ? `with ${urlParams}` : "");
 
 	const parent = document.getElementById("app");
 	if (!parent) {
@@ -146,6 +146,7 @@ async function navigate(
 		} catch (error) {
 			// TODO: Show a proper Error component
 			parent.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+			console.log(error);
 		}
 	}
 

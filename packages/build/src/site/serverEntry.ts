@@ -26,17 +26,17 @@ export default eventHandler(async (event) => {
 
 	const searchParams = url.searchParams;
 
-	console.log("handling server", event.method, "for", path, "with", searchParams);
+	console.log(
+		"handling server",
+		event.method,
+		"for",
+		path,
+		searchParams.size ? `with ${searchParams}` : "",
+	);
 
 	if (!printedRoutes) {
 		printedRoutes = true;
-		console.log(
-			"routes:\n  " +
-				routeHandlers.handlers
-					.map((h) => h.path)
-					.sort()
-					.join("\n  "),
-		);
+		console.log("routes:\n  " + routeHandlers.handlers.map((h) => h.path).join("\n  "));
 	}
 
 	const route = routeHandlers.match(path, searchParams);
@@ -235,6 +235,7 @@ async function loadView(
 	} catch (error) {
 		// TODO: Show a proper Error component
 		componentCode = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+		console.log(error);
 	}
 
 	// Put it all together
