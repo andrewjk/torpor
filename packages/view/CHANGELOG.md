@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.7
+
+### Patch Changes
+
+- b90d729: Dumb: forgot to build
+
 ## 0.0.6
 
 ### Patch Changes
