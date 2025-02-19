@@ -1,3 +1,4 @@
-export type UserConfig = {
+type UserConfig = {
 	port?: number;
 };
+export default UserConfig;

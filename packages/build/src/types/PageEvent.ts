@@ -1,4 +1,4 @@
-export type PageEvent = {
+type PageEvent = {
 	/**
 	 * The URL for the server function.
 	 */
@@ -12,3 +12,4 @@ export type PageEvent = {
 	 */
 	data: Record<string, any>;
 };
+export default PageEvent;

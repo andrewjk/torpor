@@ -1,37 +1,36 @@
-import { type ServerEvent } from "./ServerEvent";
+import type ServerRequest from "./ServerRequest";
 
 /**
  * For +server.
  */
-export type ServerEndPoint = { [key: string]: ServerRequest } & {
+type ServerEndPoint = { [key: string]: ServerRequest } & {
 	/**
 	 * Performs a GET.
 	 */
 	get?: ServerRequest;
 	/**
-	 * Perfroms a POST.
+	 * Performs a POST.
 	 */
 	post?: ServerRequest;
 	/**
-	 * Perfroms a PATCH.
+	 * Performs a PATCH.
 	 */
 	patch?: ServerRequest;
 	/**
-	 * Perfroms a PUT.
+	 * Performs a PUT.
 	 */
 	put?: ServerRequest;
 	/**
-	 * Perfroms a DELETE.
+	 * Performs a DELETE.
 	 */
 	del?: ServerRequest;
 	/**
-	 * Perfroms an OPTIONS request.
+	 * Performs an OPTIONS request.
 	 */
 	options?: ServerRequest;
 	/**
-	 * Perfroms a HEAD request.
+	 * Performs a HEAD request.
 	 */
 	head?: ServerRequest;
 };
-
-type ServerRequest = (event: ServerEvent) => Response | Promise<Response | undefined> | void;
+export default ServerEndPoint;

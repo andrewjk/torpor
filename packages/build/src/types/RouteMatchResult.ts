@@ -1,7 +1,8 @@
-import { type RouteHandler } from "./RouteHandler";
+import type RouteHandler from "./RouteHandler";
 
-export type RouteMatchResult = {
+type RouteMatchResult = {
 	handler: RouteHandler;
 	routeParams?: Record<string, string>;
 	urlParams?: Record<string, string>;
 };
+export default RouteMatchResult;

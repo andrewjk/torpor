@@ -1,7 +1,7 @@
 import { ServerResponse } from "node:http";
-import { type CookieHelper } from "./CookieHelper";
+import CookieHelper from "./CookieHelper";
 
-export type ServerEvent = {
+type ServerEvent = {
 	/**
 	 * The URL for the server function.
 	 */
@@ -25,3 +25,4 @@ export type ServerEvent = {
 	 */
 	cookies: CookieHelper;
 };
+export default ServerEvent;

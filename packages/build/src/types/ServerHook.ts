@@ -1,13 +1,14 @@
-import { type ServerEvent } from "./ServerEvent";
+import type ServerEvent from "./ServerEvent";
 
 /**
  * For _hook.server.
  */
-export type ServerHook = {
+type ServerHook = {
 	/**
 	 * Called on each server request.
 	 */
 	handle?: ServerLoad;
 };
+export default ServerHook;
 
 type ServerLoad = (event: ServerEvent) => Promise<void> | void;

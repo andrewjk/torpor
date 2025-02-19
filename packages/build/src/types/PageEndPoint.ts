@@ -1,10 +1,10 @@
 import { type Component } from "@torpor/view";
-import { type PageEvent } from "./PageEvent";
+import type PageEvent from "./PageEvent";
 
 /**
  * For +page.
  */
-export type PageEndPoint = {
+type PageEndPoint = {
 	/**
 	 * Builds the route path for the page in a type-safe manner.
 	 * TODO: Not sure this is actually the best way to do it...
@@ -24,6 +24,7 @@ export type PageEndPoint = {
 	 */
 	head?: HeadElement[] | ((event: PageEvent) => HeadElement[]);
 };
+export default PageEndPoint;
 
 type HeadElement = TitleElement | MetaElement;
 

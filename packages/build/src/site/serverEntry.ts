@@ -10,12 +10,12 @@ import ok from "../response/ok";
 import seeOther from "../response/seeOther";
 import serverError from "../response/serverError";
 import $page from "../state/$page";
-import { type PageEndPoint } from "../types/PageEndPoint";
-import { type PageServerEndPoint } from "../types/PageServerEndPoint";
-import { type RouteHandler } from "../types/RouteHandler";
-import { type ServerEndPoint } from "../types/ServerEndPoint";
-import { type ServerEvent } from "../types/ServerEvent";
-import { type ServerHook } from "../types/ServerHook";
+import type PageEndPoint from "../types/PageEndPoint";
+import type PageServerEndPoint from "../types/PageServerEndPoint";
+import type RouteHandler from "../types/RouteHandler";
+import type ServerEndPoint from "../types/ServerEndPoint";
+import type ServerEvent from "../types/ServerEvent";
+import type ServerHook from "../types/ServerHook";
 import routeHandlers from "./routeHandlers";
 
 let printedRoutes = false;

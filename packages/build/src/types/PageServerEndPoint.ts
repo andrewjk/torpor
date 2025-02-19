@@ -1,18 +1,17 @@
-import { type ServerEvent } from "./ServerEvent";
+import type PageServerAction from "./PageServerAction";
+import type PageServerLoad from "./PageServerLoad";
 
 /**
  * For +page.server.
  */
-export type PageServerEndPoint = {
+type PageServerEndPoint = {
 	/**
 	 * Loads data from the server for a page.
 	 */
-	load?: ServerLoad;
+	load?: PageServerLoad;
 	/**
 	 * A map of actions that can be performed on the server for a page, generally from a form submit.
 	 */
-	actions?: Record<string, ServerAction>;
+	actions?: Record<string, PageServerAction>;
 };
-
-type ServerLoad = (event: ServerEvent) => Response | Promise<Response | undefined> | void;
-type ServerAction = (event: ServerEvent) => Response | Promise<Response | undefined> | void;
+export default PageServerEndPoint;

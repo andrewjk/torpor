@@ -2,7 +2,7 @@ import torpor from "@torpor/unplugin/vite";
 import path from "node:path";
 import { type AppOptions, type RouterSchemaInput, createApp } from "vinxi";
 import { config } from "vinxi/plugins/config";
-import { type UserConfig } from "../types/UserConfig";
+import type UserConfig from "../types/UserConfig";
 import FileSystemRouter from "./FileSystemRouter";
 
 export default function defineConfig(options?: UserConfig) {
