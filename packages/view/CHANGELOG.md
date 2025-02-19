@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.6
+
+### Patch Changes
+
+- 808da4c: Fix: hydrating a node with empty text
+
 ## 0.0.5
 
 ### Patch Changes
