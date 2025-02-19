@@ -16,13 +16,27 @@ const routeHandlers: RouteHandlerCollection = {
 			return {
 				...route,
 				regex: pathToRegExp(route.path),
-				order: /\[([^\/]+?)\]/.test(route.path) ? 1 : 0,
 				// TODO: Implement the rest of the lazyRoute stuff from vinxi/react or vinxi/solid
 				endPoint: lazyRoute(route.$handler, clientManifest, serverManifest),
 				loaded: false,
 			};
 		})
-		.sort((a, b) => a.order - b.order),
+		.sort((a, b) => {
+			// Sort [param]s after paths
+			// There might be a quicker/easier way to do this
+			for (let i = 0; i < Math.min(a.path.length, b.path.length); i++) {
+				if (a.path[i] === "[" && b.path[i] !== "[") {
+					return 1;
+				} else if (b.path[i] === "[" && a.path[i] !== "[") {
+					return -1;
+				} else if (a.path[i] === b.path[i]) {
+					// Keep going...
+				} else {
+					return a.path[i].localeCompare(b.path[i]);
+				}
+			}
+			return a.path.length - b.path.length;
+		}),
 	match(path, urlParams) {
 		console.log("matching", path);
 
