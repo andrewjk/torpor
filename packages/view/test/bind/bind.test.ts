@@ -33,15 +33,25 @@ async function check(container: HTMLElement) {
 	const user = userEvent.setup();
 
 	const input = container.getElementsByTagName("input")[0];
+	const select = container.getElementsByTagName("select")[0];
 	const para = container.getElementsByTagName("p")[0];
+	const para2 = container.getElementsByTagName("p")[1];
 
 	expect(input).toHaveValue("Alice");
 	expect(para).toHaveTextContent("Hello, Alice");
 
+	expect(select).toHaveValue("1");
+	expect(select.childNodes[1]).toHaveAttribute("selected", true);
+	expect(para2).toHaveTextContent("You have selected, 1");
+
 	// Update the input value
 	await user.clear(input);
 	await user.type(input, "Bob");
+	await user.selectOptions(select, "2");
 
 	expect(input).toHaveValue("Bob");
 	expect(para).toHaveTextContent("Hello, Bob");
+
+	expect(select).toHaveValue("2");
+	expect(para2).toHaveTextContent("You have selected, 2");
 }

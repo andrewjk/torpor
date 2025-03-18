@@ -11,11 +11,11 @@ export default function BindText(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-	let $state = $watch({ name: "Alice" });
+	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <input value="${t_attr($state.name) || ""}"> <p>Hello, ${t_fmt($state.name)}</p> </div>`;
+	$output += `<div> <input value="${t_attr($state.name) || ""}"> <select value="${t_attr($state.selected) || ""}"> <option value="0">First</option> <option value="1">Second</option> <option value="2">Third</option> </select> <p>Hello, ${t_fmt($state.name)}</p> <p>You have selected, ${t_fmt($state.selected)}</p> </div>`;
 
 	return $output;
 }
