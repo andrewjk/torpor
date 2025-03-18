@@ -42,7 +42,7 @@ fs.writeFileSync(
 // (Node has issues spawning child processes in Windows).
 //spawn.sync("npm", ["install"], { stdio: "inherit" });
 
-let message = message;
+let message = `Created '${projectName}' in '${projectDir}'`;
 console.log("=".repeat(message.length));
 console.log(message);
 console.log("=".repeat(message.length));
