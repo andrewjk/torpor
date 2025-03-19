@@ -1,5 +1,6 @@
 export default class ServerEvent {
 	request: Request;
+	response?: Response;
 	// TODO: Should we cast types??
 	params?: { [key: string]: string };
 

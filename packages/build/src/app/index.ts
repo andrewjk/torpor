@@ -6,9 +6,24 @@ import ServerEvent from "./ServerEvent";
 // Create a dummy App
 const app = new App();
 app.get("/", home);
+app.use(middle, middle2);
 
 function home(ev: ServerEvent) {
+	console.log("method");
 	return new Response("hey");
+}
+
+async function middle(ev: ServerEvent, next: () => void | Promise<void>) {
+	console.log("beginning");
+	await next();
+	console.log("end");
+}
+
+async function middle2(ev: ServerEvent, next: () => void | Promise<void>) {
+	console.log("beginning2");
+	await next();
+	ev.response = new Response("hey there!!!!");
+	console.log("end2");
 }
 
 // Read args

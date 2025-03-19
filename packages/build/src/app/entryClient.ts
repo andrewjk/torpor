@@ -1,10 +1,11 @@
 import { hydrate, mount } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
-import "vinxi/client";
+//import "vinxi/client";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
-import routeHandlers from "./routeHandlers";
+
+//import routeHandlers from "./routeHandlers";
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -52,12 +53,31 @@ async function navigate(
 		return false;
 	}
 
-	const route = routeHandlers.match(path, urlParams);
-	if (!route) {
-		// TODO: 404
-		console.log("404");
-		return false;
-	}
+	//const route = routeHandlers.match(path, urlParams);
+	//if (!route) {
+	//	// TODO: 404
+	//	console.log("404");
+	//	return false;
+	//}
+
+	const route = {
+		handler: {
+			path,
+			// From routeHandlers.handlers.map
+			regex: pathToRegExp(path),
+			// From lazyRoute, sort of
+			endPoint: import("./counter.ts"),
+			loaded: false,
+
+			// From routeHandlers.match:
+			//layouts?: RouteLayoutHandler[];
+			//serverEndPoint?: Promise<any>;
+			//serverHook?: Promise<any>;
+		},
+		// From routeHandlers.match
+		routeParams: {},
+		urlParams: undefined,
+	};
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
@@ -135,6 +155,7 @@ async function navigate(
 		}
 	}
 
+	//console.log("HEY", firstTime, parent, String(component), $props, slots);
 	if (firstTime) {
 		hydrate(parent, component, $props, slots);
 	} else {
@@ -189,4 +210,14 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 		params,
 		data,
 	};
+}
+
+function pathToRegExp(path: string): RegExp {
+	const pattern = path
+		.split("/")
+		.map((p) => {
+			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
+		})
+		.join("\\/");
+	return new RegExp(`^${pattern}$`);
 }

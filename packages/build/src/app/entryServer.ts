@@ -1,10 +1,11 @@
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
+import { Request } from "express";
 import fs from "node:fs";
-import { IncomingMessage } from "node:http";
+//import { IncomingMessage } from "node:http";
 import path from "node:path";
-import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
-import { type CookieSerializeOptions, type EventHandlerRequest, H3Event } from "vinxi/http";
-import { getManifest } from "vinxi/manifest";
+//import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
+//import { type CookieSerializeOptions, type EventHandlerRequest, H3Event } from "vinxi/http";
+//import { getManifest } from "vinxi/manifest";
 import notFound from "../response/notFound";
 import ok from "../response/ok";
 import seeOther from "../response/seeOther";
@@ -16,33 +17,55 @@ import type RouteHandler from "../types/RouteHandler";
 import type ServerEndPoint from "../types/ServerEndPoint";
 import type ServerEvent from "../types/ServerEvent";
 import type ServerHook from "../types/ServerHook";
-import routeHandlers from "./routeHandlers";
 
-let printedRoutes = false;
+//import routeHandlers from "./routeHandlers";
 
-export default eventHandler(async (event) => {
-	const url = new URL(`http://${process.env.HOST ?? "localhost"}${event.node.req.url}`);
+//let printedRoutes = false;
+
+type ExpressRequest = Request<{}, any, any, /*QueryString.ParsedQs*/ any, Record<string, any>>;
+
+export async function render(req: ExpressRequest) {
+	const url = new URL(`http://${process.env.HOST ?? "localhost"}${req.originalUrl}`);
 	const path = url.pathname;
 
 	const searchParams = url.searchParams;
 
 	console.log(
 		"handling server",
-		event.method,
+		req.method,
 		"for",
 		path,
 		searchParams.size ? `with ${searchParams}` : "",
 	);
 
-	if (!printedRoutes) {
-		printedRoutes = true;
-		console.log("routes:\n  " + routeHandlers.handlers.map((h) => h.path).join("\n  "));
-	}
+	// TODO:
+	//if (!printedRoutes) {
+	//	printedRoutes = true;
+	//	console.log("routes:\n  " + routeHandlers.handlers.map((h) => h.path).join("\n  "));
+	//}
+	//
+	//const route = routeHandlers.match(path, searchParams);
+	//if (!route) {
+	//	return notFound();
+	//}
+	const route = {
+		handler: {
+			path,
+			// From routeHandlers.handlers.map
+			regex: pathToRegExp(path),
+			// From lazyRoute, sort of
+			endPoint: import("./counter.ts"),
+			loaded: false,
 
-	const route = routeHandlers.match(path, searchParams);
-	if (!route) {
-		return notFound();
-	}
+			// From routeHandlers.match:
+			//layouts?: RouteLayoutHandler[];
+			//serverEndPoint?: Promise<any>;
+			//serverHook?: Promise<any>;
+		},
+		// From routeHandlers.match
+		routeParams: {},
+		urlParams: undefined,
+	};
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
@@ -55,33 +78,33 @@ export default eventHandler(async (event) => {
 
 	// HACK: Support any +server location??
 	if (path.startsWith("/api/")) {
-		return await loadData(event, url, handler, params);
+		return await loadData(req, url, handler, params);
 	} else if (path.endsWith("~server")) {
 		// HACK: Is this the best way to signal that we want server data??
 		// And can we maybe combine this with the above method, or are they too different?
-		if (event.method === "GET") {
-			return await loadServerData(event, url, handler, params);
+		if (req.method === "GET") {
+			return await loadServerData(req, url, handler, params);
 		}
 	} else {
-		if (event.method === "GET") {
-			return await loadView(event, url, handler, params);
-		} else if (event.method === "POST") {
-			return await runAction(event, url, handler, params, searchParams);
+		if (req.method === "GET") {
+			return await loadView(req, url, handler, params);
+		} else if (req.method === "POST") {
+			return await runAction(req, url, handler, params, searchParams);
 		}
 	}
-});
+}
 
 async function loadData(
-	event: H3Event<EventHandlerRequest>,
+	req: ExpressRequest,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
-	const functionName = event.method.toLowerCase().replace("delete", "del");
+	const functionName = req.method.toLowerCase().replace("delete", "del");
 
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
-		const serverParams = await buildServerParams(event, url, params);
+		const serverParams = await buildServerParams(req, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -98,14 +121,14 @@ async function loadData(
 }
 
 async function loadServerData(
-	event: H3Event<EventHandlerRequest>,
+	req: ExpressRequest,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint?.load) {
-		const serverParams = await buildServerParams(event, url, params);
+		const serverParams = await buildServerParams(req, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -126,7 +149,7 @@ async function loadServerData(
 }
 
 async function loadView(
-	event: H3Event<EventHandlerRequest>,
+	req: ExpressRequest,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -144,24 +167,26 @@ async function loadView(
 	// We could instead have an App.torp component with a slot, but you can run
 	// into hydration problems that way e.g. if there is a browser plugin that
 	// injects elements into <head> or <body>
-	const appHtml = loadAppHtml();
-	let contentStart = regexIndexOf(appHtml, /\<div\s+id=("app"|'app'|app)\s+/);
-	contentStart = appHtml.indexOf(">", contentStart) + 1;
-	let contentEnd = appHtml.indexOf("</div>", contentStart);
-	if (contentStart === -1 || contentEnd === -1) {
-		return serverError;
-	}
+	//const appHtml = loadAppHtml();
+	//let contentStart = regexIndexOf(appHtml, /\<div\s+id=("app"|'app'|app)\s+/);
+	//contentStart = appHtml.indexOf(">", contentStart) + 1;
+	//let contentEnd = appHtml.indexOf("</div>", contentStart);
+	//if (contentStart === -1 || contentEnd === -1) {
+	//	return serverError;
+	//}
 
 	// Build client scripts
+	/*
 	const clientManifest = getManifest("client");
 	const clientHandler = clientManifest.inputs[clientManifest.handler];
 	const clientScript = clientHandler.output.path;
 	const hasClientScript = !!clientScript;
 	const manifestJson = JSON.stringify(clientManifest.json());
 	const hasManifestJson = manifestJson !== "{}";
+	*/
 
 	// Maybe hit the server hook
-	const serverParams = await buildServerParams(event, url, params);
+	const serverParams = await buildServerParams(req, url, params);
 	if (handler.serverHook) {
 		const serverHook: ServerHook | undefined = (await handler.serverHook).default;
 		if (serverHook?.handle) {
@@ -227,7 +252,7 @@ async function loadView(
 		}
 	}
 
-	event.node.res.setHeader("content-type", "text/html");
+	//event.node.res.setHeader("content-type", "text/html");
 
 	let componentCode = "";
 	try {
@@ -239,20 +264,20 @@ async function loadView(
 	}
 
 	// Put it all together
-	let html =
-		appHtml.substring(0, contentStart) +
-		componentCode +
-		appHtml.substring(contentEnd) +
-		(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
-		(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");
-
+	//let html =
+	//	appHtml.substring(0, contentStart) +
+	//	componentCode +
+	//	appHtml.substring(contentEnd) +
+	//	(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
+	//	(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");
+	let html = componentCode;
 	//console.log(html);
 
 	return html;
 }
 
 async function runAction(
-	event: H3Event<EventHandlerRequest>,
+	req: ExpressRequest,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -264,7 +289,7 @@ async function runAction(
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
-			const serverParams = await buildServerParams(event, url, params);
+			const serverParams = await buildServerParams(req, url, params);
 
 			if (handler.serverHook) {
 				const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -315,7 +340,7 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 }
 
 async function buildServerParams(
-	event: H3Event<EventHandlerRequest>,
+	req: ExpressRequest,
 	url: URL,
 	params: Record<string, string>,
 ): Promise<ServerEvent> {
@@ -323,18 +348,22 @@ async function buildServerParams(
 		url,
 		params,
 		appData: {},
+		// TODO:
+		/*
 		request: await incomingMessageToRequest(event.node.req, url),
 		response: event.node.res,
 		cookies: {
-			get: (name: string) => getCookie(event, name),
+			get: (name: string) => req.getCookie(event, name),
 			set: (name: string, value: string, options?: CookieSerializeOptions) =>
 				setCookie(event, name, value, options),
 			delete: (name: string, options?: CookieSerializeOptions) =>
 				deleteCookie(event, name, options),
 		},
+		*/
 	};
 }
 
+/*
 // From https://stackoverflow.com/a/78849544
 async function incomingMessageToRequest(req: IncomingMessage, url: URL): Promise<Request> {
 	const headers = new Headers();
@@ -368,6 +397,7 @@ function getRequestBody(req: IncomingMessage): Promise<Buffer> {
 		});
 	});
 }
+*/
 
 let loadedAppHtml = "";
 function loadAppHtml() {
@@ -382,4 +412,14 @@ function loadAppHtml() {
 function regexIndexOf(string: string, regex: RegExp, position?: number) {
 	var indexOf = string.substring(position || 0).search(regex);
 	return indexOf >= 0 ? indexOf + (position || 0) : indexOf;
+}
+
+function pathToRegExp(path: string): RegExp {
+	const pattern = path
+		.split("/")
+		.map((p) => {
+			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
+		})
+		.join("\\/");
+	return new RegExp(`^${pattern}$`);
 }
