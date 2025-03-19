@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import App from "./App";
-import { createFetchHandler } from "./NodeFetchHandler";
 import ServerEvent from "./ServerEvent";
+import { createFetchHandler } from "./adapters/node/createFetchHandler";
 
 // Create a dummy App
 const app = new App();

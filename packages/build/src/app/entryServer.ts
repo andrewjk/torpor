@@ -1,8 +1,5 @@
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
-import { Request } from "express";
-import fs from "node:fs";
 //import { IncomingMessage } from "node:http";
-import path from "node:path";
 //import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
 //import { type CookieSerializeOptions, type EventHandlerRequest, H3Event } from "vinxi/http";
 //import { getManifest } from "vinxi/manifest";
@@ -22,17 +19,16 @@ import type ServerHook from "../types/ServerHook";
 
 //let printedRoutes = false;
 
-type ExpressRequest = Request<{}, any, any, /*QueryString.ParsedQs*/ any, Record<string, any>>;
-
-export async function render(req: ExpressRequest) {
-	const url = new URL(`http://${process.env.HOST ?? "localhost"}${req.originalUrl}`);
+export async function render(ev: ServerEvent) {
+	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
+	const url = new URL(ev.request.url);
 	const path = url.pathname;
 
 	const searchParams = url.searchParams;
 
 	console.log(
 		"handling server",
-		req.method,
+		ev.request.method,
 		"for",
 		path,
 		searchParams.size ? `with ${searchParams}` : "",
@@ -78,33 +74,33 @@ export async function render(req: ExpressRequest) {
 
 	// HACK: Support any +server location??
 	if (path.startsWith("/api/")) {
-		return await loadData(req, url, handler, params);
+		return await loadData(ev, url, handler, params);
 	} else if (path.endsWith("~server")) {
 		// HACK: Is this the best way to signal that we want server data??
 		// And can we maybe combine this with the above method, or are they too different?
-		if (req.method === "GET") {
-			return await loadServerData(req, url, handler, params);
+		if (ev.request.method === "GET") {
+			return await loadServerData(ev, url, handler, params);
 		}
 	} else {
-		if (req.method === "GET") {
-			return await loadView(req, url, handler, params);
-		} else if (req.method === "POST") {
-			return await runAction(req, url, handler, params, searchParams);
+		if (ev.request.method === "GET") {
+			return await loadView(ev, url, handler, params);
+		} else if (ev.request.method === "POST") {
+			return await runAction(ev, url, handler, params, searchParams);
 		}
 	}
 }
 
 async function loadData(
-	req: ExpressRequest,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
-	const functionName = req.method.toLowerCase().replace("delete", "del");
+	const functionName = ev.request.method.toLowerCase().replace("delete", "del");
 
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
-		const serverParams = await buildServerParams(req, url, params);
+		const serverParams = await buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -121,14 +117,14 @@ async function loadData(
 }
 
 async function loadServerData(
-	req: ExpressRequest,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint).default;
 	if (serverEndPoint?.load) {
-		const serverParams = await buildServerParams(req, url, params);
+		const serverParams = await buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -149,7 +145,7 @@ async function loadServerData(
 }
 
 async function loadView(
-	req: ExpressRequest,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -186,7 +182,7 @@ async function loadView(
 	*/
 
 	// Maybe hit the server hook
-	const serverParams = await buildServerParams(req, url, params);
+	const serverParams = await buildServerParams(ev, url, params);
 	if (handler.serverHook) {
 		const serverHook: ServerHook | undefined = (await handler.serverHook).default;
 		if (serverHook?.handle) {
@@ -277,7 +273,7 @@ async function loadView(
 }
 
 async function runAction(
-	req: ExpressRequest,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -289,7 +285,7 @@ async function runAction(
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
-			const serverParams = await buildServerParams(req, url, params);
+			const serverParams = await buildServerParams(ev, url, params);
 
 			if (handler.serverHook) {
 				const serverHook: ServerHook | undefined = (await handler.serverHook).default;
@@ -339,8 +335,9 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 	};
 }
 
+// TODO: Don't need this?
 async function buildServerParams(
-	req: ExpressRequest,
+	ev: ServerEvent,
 	url: URL,
 	params: Record<string, string>,
 ): Promise<ServerEvent> {
@@ -348,6 +345,7 @@ async function buildServerParams(
 		url,
 		params,
 		appData: {},
+		request: ev.request,
 		// TODO:
 		/*
 		request: await incomingMessageToRequest(event.node.req, url),
@@ -361,57 +359,6 @@ async function buildServerParams(
 		},
 		*/
 	};
-}
-
-/*
-// From https://stackoverflow.com/a/78849544
-async function incomingMessageToRequest(req: IncomingMessage, url: URL): Promise<Request> {
-	const headers = new Headers();
-	for (const [key, value] of Object.entries(req.headers)) {
-		if (Array.isArray(value)) {
-			value.forEach((v) => headers.append(key, v));
-		} else if (value !== undefined) {
-			headers.set(key, value);
-		}
-	}
-	// Convert body to Buffer if applicable
-	const body = req.method !== "GET" && req.method !== "HEAD" ? await getRequestBody(req) : null;
-	return new Request(url, {
-		method: req.method,
-		headers: headers,
-		body: body,
-	});
-}
-
-function getRequestBody(req: IncomingMessage): Promise<Buffer> {
-	return new Promise<Buffer>((resolve, reject) => {
-		const chunks: Buffer[] = [];
-		req.on("data", (chunk: Buffer) => {
-			chunks.push(chunk);
-		});
-		req.on("end", () => {
-			resolve(Buffer.concat(chunks));
-		});
-		req.on("error", (err) => {
-			reject(err);
-		});
-	});
-}
-*/
-
-let loadedAppHtml = "";
-function loadAppHtml() {
-	if (!loadedAppHtml) {
-		let file = path.resolve("src/app.html");
-		loadedAppHtml = fs.readFileSync(file).toString();
-	}
-	return loadedAppHtml;
-}
-
-// From https://stackoverflow.com/a/274094
-function regexIndexOf(string: string, regex: RegExp, position?: number) {
-	var indexOf = string.substring(position || 0).search(regex);
-	return indexOf >= 0 ? indexOf + (position || 0) : indexOf;
 }
 
 function pathToRegExp(path: string): RegExp {

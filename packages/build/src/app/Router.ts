@@ -26,7 +26,7 @@ export default class Router {
 	}
 
 	match(method: HttpMethod, path: string) {
-		console.log("matching", path);
+		//console.log("matching", path);
 		for (let handler of this.methods.get(method)!) {
 			let match = path.match(handler.regex);
 			if (match) {
@@ -37,7 +37,7 @@ export default class Router {
 				};
 			}
 		}
-		console.log("not found");
+		//console.log("not found");
 	}
 }
 

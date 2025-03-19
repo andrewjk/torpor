@@ -4,6 +4,11 @@ import Router from "./Router";
 import ServerEvent from "./ServerEvent";
 import ServerFunction from "./ServerFunction";
 
+const NOOP = () => {};
+
+// TODO: Merge this with Router, it's basically the same thing
+// Although I guess you might have multiple Routers??
+
 export default class App {
 	#router: Router;
 	#middleware: MiddlewareFunction[];
@@ -13,42 +18,67 @@ export default class App {
 		this.#middleware = [];
 	}
 
-	// Standard fetch method should work in any runtime (including Node with some shims)
+	/**
+	 * The standard Fetch API method that should work in any runtime (including
+	 * Node with polyfills).
+	 * @returns
+	 */
 	fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
 		const request = new Request(input, init);
 		const method = request.method as HttpMethod;
 		const url = new URL(request.url);
-		const path = url.pathname.replaceAll(/\/+/g, "/");
-		const handler = this.#router.match(method, path);
-		if (handler) {
-			let ev = new ServerEvent(request, handler.params);
-			console.log("GOT", this.#middleware.length, "MIDS");
-			if (this.#middleware.length) {
-				// TODO: Get middleware for the route only
-				await this.#middleware[0](ev, buildNext(this.#middleware, 0));
-				function buildNext(
-					middleware: MiddlewareFunction[],
-					i: number,
-				): () => void | Promise<void> {
-					if (i < middleware.length - 1) {
-						i++;
-						let next = middleware[i];
-						return async () => next(ev, buildNext(middleware, i));
-					} else {
-						return async () => {
-							ev.response = await handler!.fn(ev);
-						};
-					}
+		const handler = this.#router.match(method, url.pathname);
+
+		let ev = new ServerEvent(request, handler?.params);
+		//console.log("GOT", this.#middleware.length, "MIDS");
+		if (this.#middleware.length) {
+			// TODO: Get middleware that applies to this route only
+			await this.#middleware[0](ev, buildNext(this.#middleware, 0));
+			function buildNext(middleware: MiddlewareFunction[], i: number): () => void | Promise<void> {
+				if (ev.response) {
+					return NOOP;
 				}
-				// TODO: Should I be returning 200 if there's no response? Because it's not an error??
-				return ev.response ?? new Response(null, { status: 200 });
-			} else {
-				return handler.fn(ev);
+
+				if (i < middleware.length - 1) {
+					i++;
+					let next = middleware[i];
+					return async () => next(ev, buildNext(middleware, i));
+				} else {
+					return handler
+						? async () => {
+								ev.response = await handler.fn(ev);
+							}
+						: NOOP;
+				}
 			}
+
+			// TODO: Should I be returning 200 if there's no response? Because it's not an error??
+			return ev.response ?? new Response(null, { status: 200 });
+		} else if (handler) {
+			return await handler.fn(ev);
 		}
+		//}
 		return new Response(null, { status: 400 });
 	};
 
+	/**
+	 * Adds a method/route pattern combination.
+	 * @param method The HTTP method, such as GET, PUT or POST.
+	 * @param route The route pattern.
+	 * @param fn The function to call when the pattern is matched.
+	 * @returns
+	 */
+	add(method: HttpMethod, route: string, fn: ServerFunction): App {
+		this.#router.add(method, route, fn);
+		return this;
+	}
+
+	/**
+	 * Adds a route pattern that will be matched on a GET method.
+	 * @param route The route pattern.
+	 * @param fn The function to call when the pattern is matched.
+	 * @returns
+	 */
 	get(route: string, fn: ServerFunction) {
 		return this.add("GET", route, fn);
 	}
@@ -77,19 +107,10 @@ export default class App {
 		return this.add("TRACE", route, fn);
 	}
 
-	add(method: HttpMethod, route: string, fn: ServerFunction): App {
-		this.#router.add(method, route, fn);
-		return this;
-	}
-
 	// TODO:
 	//use(route: string, ...fn: MiddlewareFunction[])
 	use(...fn: MiddlewareFunction[]): App {
 		this.#middleware = this.#middleware.concat(fn);
 		return this;
 	}
-
-	//match(method: HttpMethod, path: string) {
-	//	return this.#router.match(method, path);
-	//}
 }
