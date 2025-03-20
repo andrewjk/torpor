@@ -1,108 +1,161 @@
-import torpor from "@torpor/unplugin/vite";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { createServer as createViteServer } from "vite";
-import App from "./App";
-import createMiddlewareHandler from "./adapters/node/createMiddlewareHandler";
-import createNodeServer from "./adapters/node/createNodeServer";
+import ServerEvent from "./ServerEvent";
+import pathToRegex from "./pathToRegex";
+import type HttpMethod from "./types/HttpMethod";
+import type MiddlewareFunction from "./types/MiddlewareFunction";
+import type ServerFunction from "./types/ServerFunction";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const NOOP = () => {};
 
-async function createServer() {
-	const app = new App();
+/**
+ * A Fetch API Request/Response server.
+ */
+export default class Server {
+	methods = new Map<HttpMethod, RouteHandler[]>();
+	middleware: MiddlewareFunction[] = [];
 
-	const options = { server: true };
+	constructor() {
+		// Create all method handlers up front so we don't have to worry about
+		// checking if they exist. Using a non-standard method will just error
+		this.methods.set("GET", []);
+		this.methods.set("HEAD", []);
+		this.methods.set("PATCH", []);
+		this.methods.set("POST", []);
+		this.methods.set("PUT", []);
+		this.methods.set("DELETE", []);
+		this.methods.set("OPTIONS", []);
+		this.methods.set("CONNECT", []);
+		this.methods.set("TRACE", []);
 
-	// Create the Vite server in middleware mode and configure the app type as
-	// 'custom', disabling Vite's own HTML serving logic so the parent server
-	// can take control
-	const vite = await createViteServer({
-		server: { middlewareMode: true },
-		appType: "custom",
-		plugins: [torpor(options)],
-	});
+		this.middleware = [];
+	}
 
-	// Use vite's connect instance as middleware
-	app.use(createMiddlewareHandler(vite.middlewares));
+	/**
+	 * The standard Fetch API method that should work in any runtime (including
+	 * Node with polyfills).
+	 * @returns
+	 */
+	fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+		const request = new Request(input, init);
+		const method = request.method as HttpMethod;
+		const url = new URL(request.url);
+		const match = this.match(method, url.pathname);
+		let ev = new ServerEvent(request, match?.params);
 
-	app.use(
-		//"*",
-		async (ev, next) => {
-			// we should only get here once!
-			//console.log("HERE WE GO", ev.request.url);
-			//const url = req.originalUrl;
-
-			try {
-				const templateFile = path.resolve(__dirname, "index.html");
-				const clientScript = "/src/app/entryClient.ts";
-				const serverScript = "/src/app/entryServer.ts";
-
-				// Read index.html
-				let template = fs.readFileSync(templateFile, "utf-8");
-
-				// Apply Vite HTML transforms. This injects the Vite HMR client, and
-				// also applies HTML transforms from Vite plugins
-				template = await vite.transformIndexHtml(ev.request.url, template);
-
-				// Load the server entry. ssrLoadModule automatically transforms ESM
-				// source code to be usable in Node.js. No bundling is required, and
-				// it provides efficient invalidation similar to HMR
-				const { render } = await vite.ssrLoadModule(serverScript);
-
-				// Render the app HTML via entryServer's exported `render` function
-				const appHtml = await render(ev);
-
-				// Inject the app-rendered HTML and client scripts into the template
-				// TODO: Manifest?
-				let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
-				contentStart = template.indexOf(">", contentStart) + 1;
-				let contentEnd = template.indexOf("</div>", contentStart);
-				if (contentStart === -1 || contentEnd === -1) {
-					throw new Error(`Couldn't find <div id="app"></div>`);
+		if (this.middleware.length) {
+			// TODO: Get middleware that applies to this route only?
+			await this.middleware[0](ev, buildNext(this.middleware, 0));
+			function buildNext(middleware: MiddlewareFunction[], i: number): () => void | Promise<void> {
+				if (ev.response) {
+					return NOOP;
 				}
-				const html =
-					template.substring(0, contentStart) +
-					appHtml +
-					template.substring(contentEnd) +
-					`<script type="module" src="${clientScript}"></script>`;
 
-				// HACK: turn off SSR after this so that we can hydrate
-				// Instead we need different routers like Vinxi has?
-				// Or somehow indicate to the router that we are server/client?
-				// Headers maybe???
-				options.server = false;
-
-				// Send the rendered HTML back
-				//res.status(200).set({ "Content-Type": "text/html" }).end(html);
-				ev.response = new Response(html, {
-					status: 200,
-					headers: {
-						"Content-Type": "text/html",
-					},
-				});
-			} catch (e: any) {
-				// If an error is caught, let Vite fix the stack trace so it maps
-				// back to your actual source code
-				vite.ssrFixStacktrace(e);
-				next(e);
+				if (i < middleware.length - 1) {
+					let next = middleware[i + 1];
+					return async () => next(ev, buildNext(middleware, i + 1));
+				} else {
+					return match
+						? async () => {
+								ev.response = await match.fn(ev);
+							}
+						: NOOP;
+				}
 			}
-		},
-	);
 
-	// Create the server and start listening
-	const port = 3000;
-	const host = "127.0.0.1";
-	const server = createNodeServer(app.fetch);
-	server.listen(port, host, () => {
-		console.log(`Listening on ${host}:${port}`);
-	});
+			// TODO: Should I be returning 200 if there's no response? Because it's not an error??
+			return ev.response ?? new Response(null, { status: 200 });
+		} else if (match) {
+			return await match.fn(ev);
+		}
+		//}
+		return new Response(null, { status: 400 });
+	};
+
+	/**
+	 * Adds a method/route pattern combination.
+	 * @param method The HTTP method, such as GET, PUT or POST.
+	 * @param route The route pattern.
+	 * @param fn The function to call when the pattern is matched.
+	 * @returns
+	 */
+	add(method: HttpMethod, route: string, fn: ServerFunction): Server {
+		this.methods.get(method)!.push(new RouteHandler(route, fn));
+		return this;
+	}
+
+	match(method: HttpMethod, path: string) {
+		for (let handler of this.methods.get(method)!) {
+			let match = path.match(handler.regex);
+			if (match) {
+				return {
+					fn: handler.fn,
+					params: match.groups,
+				};
+			}
+		}
+	}
+
+	/**
+	 * Adds a route pattern that will be matched on a GET method.
+	 * @param route The route pattern.
+	 * @param fn The function to call when the pattern is matched.
+	 * @returns
+	 */
+	get(route: string, fn: ServerFunction) {
+		return this.add("GET", route, fn);
+	}
+	head(route: string, fn: ServerFunction) {
+		return this.add("HEAD", route, fn);
+	}
+	patch(route: string, fn: ServerFunction) {
+		return this.add("PATCH", route, fn);
+	}
+	post(route: string, fn: ServerFunction) {
+		return this.add("POST", route, fn);
+	}
+	put(route: string, fn: ServerFunction) {
+		return this.add("PUT", route, fn);
+	}
+	delete(route: string, fn: ServerFunction) {
+		return this.add("DELETE", route, fn);
+	}
+	options(route: string, fn: ServerFunction) {
+		return this.add("OPTIONS", route, fn);
+	}
+	connect(route: string, fn: ServerFunction) {
+		return this.add("CONNECT", route, fn);
+	}
+	trace(route: string, fn: ServerFunction) {
+		return this.add("TRACE", route, fn);
+	}
+
+	// TODO:
+	//use(route: string, ...fn: MiddlewareFunction[])
+	use(...fn: MiddlewareFunction[]): Server {
+		this.middleware = this.middleware.concat(fn);
+		return this;
+	}
 }
 
-createServer();
+class RouteHandler {
+	route: string;
+	regex: RegExp;
+	fn: ServerFunction;
 
-// From https://stackoverflow.com/a/274094
-function regexIndexOf(string: string, regex: RegExp, position?: number) {
-	var indexOf = string.substring(position || 0).search(regex);
-	return indexOf >= 0 ? indexOf + (position || 0) : indexOf;
+	constructor(route: string, fn: ServerFunction) {
+		this.route = route;
+		this.regex = pathToRegex(route);
+		this.fn = fn;
+	}
 }
+
+//class MiddlewareHandler {
+//	route: string;
+//	regex: RegExp;
+//	fn: MiddlewareFunction;
+//
+//	constructor(route: string, fn: MiddlewareFunction) {
+//		this.route = route;
+//		this.regex = pathToRegex(route);
+//		this.fn = fn;
+//	}
+//}

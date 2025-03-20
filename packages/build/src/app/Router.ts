@@ -1,6 +1,9 @@
-import HttpMethod from "./HttpMethod";
-import MiddlewareFunction from "./MiddlewareFunction";
-import ServerFunction from "./ServerFunction";
+import pathToRegex from "./pathToRegex";
+import HttpMethod from "./types/HttpMethod";
+import MiddlewareFunction from "./types/MiddlewareFunction";
+import ServerFunction from "./types/ServerFunction";
+
+// This is not actually used anywhere, for now at least
 
 export default class Router {
 	methods = new Map<HttpMethod, RouteHandler[]>();
@@ -26,7 +29,6 @@ export default class Router {
 	}
 
 	match(method: HttpMethod, path: string) {
-		//console.log("matching", path);
 		for (let handler of this.methods.get(method)!) {
 			let match = path.match(handler.regex);
 			if (match) {
@@ -37,7 +39,6 @@ export default class Router {
 				};
 			}
 		}
-		//console.log("not found");
 	}
 }
 
@@ -48,7 +49,7 @@ class RouteHandler {
 
 	constructor(route: string, fn: ServerFunction) {
 		this.route = route;
-		this.regex = pathToRegExp(route);
+		this.regex = pathToRegex(route);
 		this.fn = fn;
 	}
 }
@@ -60,17 +61,7 @@ class MiddlewareHandler {
 
 	constructor(route: string, fn: MiddlewareFunction) {
 		this.route = route;
-		this.regex = pathToRegExp(route);
+		this.regex = pathToRegex(route);
 		this.fn = fn;
 	}
-}
-
-function pathToRegExp(path: string): RegExp {
-	const pattern = path
-		.split("/")
-		.map((p) => {
-			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
-		})
-		.join("\\/");
-	return new RegExp(`^${pattern}$`);
 }

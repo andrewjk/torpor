@@ -8,4 +8,5 @@ type HttpMethod =
 	| "OPTIONS"
 	| "CONNECT"
 	| "TRACE";
+
 export default HttpMethod;

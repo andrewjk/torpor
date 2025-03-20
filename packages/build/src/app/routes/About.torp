@@ -1,0 +1,13 @@
+export default function Counter() {
+	@render {
+		<div>
+			<h1>About</h1>
+			<p>
+				This is the about page...
+			</p>
+			<p>
+				<a href="/">Home</a>
+			</p>
+		</div>
+	}
+}

@@ -1,10 +1,10 @@
 import { createServer } from "node:http";
-import App from "./App";
+import Server from "./Server";
 import ServerEvent from "./ServerEvent";
 import { createFetchHandler } from "./adapters/node/createFetchHandler";
 
 // Create a dummy App
-const app = new App();
+const app = new Server();
 app.get("/", home);
 app.use(middle, middle2);
 

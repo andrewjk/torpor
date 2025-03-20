@@ -6,71 +6,47 @@ import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
 import notFound from "../response/notFound";
 import ok from "../response/ok";
 import seeOther from "../response/seeOther";
-import serverError from "../response/serverError";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
-import type RouteHandler from "../types/RouteHandler";
 import type ServerEndPoint from "../types/ServerEndPoint";
 import type ServerEvent from "../types/ServerEvent";
 import type ServerHook from "../types/ServerHook";
+import App from "./App";
+import EndPointHandler from "./types/EndPointHandler";
 
-//import routeHandlers from "./routeHandlers";
+const app = new App();
 
-//let printedRoutes = false;
+let printedRoutes = false;
 
-export async function render(ev: ServerEvent) {
+export async function renderLocation(ev: ServerEvent) {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
 	const path = url.pathname;
+	const query = url.searchParams;
 
-	const searchParams = url.searchParams;
+	console.log("handling server", ev.request.method, "for", path, query.size ? `with ${query}` : "");
 
-	console.log(
-		"handling server",
-		ev.request.method,
-		"for",
-		path,
-		searchParams.size ? `with ${searchParams}` : "",
-	);
+	if (!printedRoutes) {
+		printedRoutes = true;
+		console.log("routes:\n  " + app.routes.map((r) => r.route).join("\n  "));
+	}
 
-	// TODO:
-	//if (!printedRoutes) {
-	//	printedRoutes = true;
-	//	console.log("routes:\n  " + routeHandlers.handlers.map((h) => h.path).join("\n  "));
-	//}
-	//
-	//const route = routeHandlers.match(path, searchParams);
-	//if (!route) {
-	//	return notFound();
-	//}
-	const route = {
-		handler: {
-			path,
-			// From routeHandlers.handlers.map
-			regex: pathToRegExp(path),
-			// From lazyRoute, sort of
-			endPoint: import("./counter.ts"),
-			loaded: false,
-
-			// From routeHandlers.match:
-			//layouts?: RouteLayoutHandler[];
-			//serverEndPoint?: Promise<any>;
-			//serverHook?: Promise<any>;
-		},
-		// From routeHandlers.match
-		routeParams: {},
-		urlParams: undefined,
-	};
+	const route = app.match(path, query);
+	if (!route) {
+		return notFound();
+	}
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
 	$page.url = url;
 
 	const handler = route.handler;
-	const params = route.routeParams || {};
+	const params = route.params || {};
 
 	// TODO: Hit the server hook out here
+
+	// We could maybe set data loading up as middleware on a route??????
 
 	// HACK: Support any +server location??
 	if (path.startsWith("/api/")) {
@@ -85,7 +61,7 @@ export async function render(ev: ServerEvent) {
 		if (ev.request.method === "GET") {
 			return await loadView(ev, url, handler, params);
 		} else if (ev.request.method === "POST") {
-			return await runAction(ev, url, handler, params, searchParams);
+			return await runAction(ev, url, handler, params, query);
 		}
 	}
 }
@@ -93,7 +69,7 @@ export async function render(ev: ServerEvent) {
 async function loadData(
 	ev: ServerEvent,
 	url: URL,
-	handler: RouteHandler,
+	handler: EndPointHandler,
 	params: Record<string, string>,
 ) {
 	const functionName = ev.request.method.toLowerCase().replace("delete", "del");
@@ -119,7 +95,7 @@ async function loadData(
 async function loadServerData(
 	ev: ServerEvent,
 	url: URL,
-	handler: RouteHandler,
+	handler: EndPointHandler,
 	params: Record<string, string>,
 ) {
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint).default;
@@ -147,7 +123,7 @@ async function loadServerData(
 async function loadView(
 	ev: ServerEvent,
 	url: URL,
-	handler: RouteHandler,
+	handler: EndPointHandler,
 	params: Record<string, string>,
 ) {
 	// There must be a client endpoint with a component
@@ -158,18 +134,6 @@ async function loadView(
 
 	// There may be a server endpoint
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
-
-	// HACK: wrangle the view into app.html
-	// We could instead have an App.torp component with a slot, but you can run
-	// into hydration problems that way e.g. if there is a browser plugin that
-	// injects elements into <head> or <body>
-	//const appHtml = loadAppHtml();
-	//let contentStart = regexIndexOf(appHtml, /\<div\s+id=("app"|'app'|app)\s+/);
-	//contentStart = appHtml.indexOf(">", contentStart) + 1;
-	//let contentEnd = appHtml.indexOf("</div>", contentStart);
-	//if (contentStart === -1 || contentEnd === -1) {
-	//	return serverError;
-	//}
 
 	// Build client scripts
 	/*
@@ -248,26 +212,14 @@ async function loadView(
 		}
 	}
 
-	//event.node.res.setHeader("content-type", "text/html");
-
-	let componentCode = "";
+	let html;
 	try {
-		componentCode = component($props, undefined, slots);
+		html = component($props, undefined, slots);
 	} catch (error) {
 		// TODO: Show a proper Error component
-		componentCode = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
 		console.log(error);
 	}
-
-	// Put it all together
-	//let html =
-	//	appHtml.substring(0, contentStart) +
-	//	componentCode +
-	//	appHtml.substring(contentEnd) +
-	//	(hasClientScript ? `<script type="module" src="${clientScript}"></script>` : "") +
-	//	(hasManifestJson ? `<script>window.manifest = ${manifestJson}</script>` : "");
-	let html = componentCode;
-	//console.log(html);
 
 	return html;
 }
@@ -275,11 +227,11 @@ async function loadView(
 async function runAction(
 	ev: ServerEvent,
 	url: URL,
-	handler: RouteHandler,
+	handler: EndPointHandler,
 	params: Record<string, string>,
-	searchParams: URLSearchParams,
+	query: URLSearchParams,
 ) {
-	const actionName = (Array.from(searchParams.keys())[0] || "default").replace(/^\//, "");
+	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint).default;
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
@@ -359,14 +311,4 @@ async function buildServerParams(
 		},
 		*/
 	};
-}
-
-function pathToRegExp(path: string): RegExp {
-	const pattern = path
-		.split("/")
-		.map((p) => {
-			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
-		})
-		.join("\\/");
-	return new RegExp(`^${pattern}$`);
 }

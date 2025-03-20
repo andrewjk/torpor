@@ -34,7 +34,7 @@
 		"build:watch": "tsup --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest",
-		"serve": "tsx ./src/app/server.ts"
+		"serve": "tsx ./src/app/serve.ts"
 	},
 	"keywords": [],
 	"author": "",

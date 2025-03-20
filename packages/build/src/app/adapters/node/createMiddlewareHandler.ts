@@ -1,21 +1,11 @@
 import { IncomingMessage, ServerResponse } from "node:http";
-import MiddlewareFunction from "../../MiddlewareFunction.js";
+import MiddlewareFunction from "../../types/MiddlewareFunction.js";
 import flattenHeaders from "./flattenHeaders.js";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse.js";
 import readableToBuffer from "./readableToBuffer.js";
 import requestToNodeMessage from "./requestToNodeMessage.js";
 
 // From https://github.com/vikejs/vike-node/blob/main/packages/vike-node/src/runtime/adapters/connectToWeb.ts
-
-const statusCodesWithoutBody = [
-	100, // Continue
-	101, // Switching Protocols
-	102, // Processing (WebDAV)
-	103, // Early Hints
-	204, // No Content
-	205, // Reset Content
-	304, // Not Modified
-];
 
 /**
  * Converts a Connect-style middleware to a web-compatible request handler.
@@ -34,7 +24,7 @@ export default function createMiddlewareHandler(
 			onReadable(async ({ readable, headers, status }) => {
 				const responseBody = statusCodesWithoutBody.includes(status)
 					? null
-					: // HACK: chunked readers don't get read correctly somewhere
+					: // HACK: chunked bodies don't get read correctly somewhere
 						//(Readable.toWeb(readable) as ReadableStream);
 						await readableToBuffer(readable);
 				ev.response = new Response(responseBody, {
@@ -48,7 +38,7 @@ export default function createMiddlewareHandler(
 				if (error) {
 					reject(error instanceof Error ? error : new Error(String(error)));
 				} else {
-					// TODO: Can we nest the next functions less? This is weird
+					// TODO: Can we nest the next functions less? This is a bit weird
 					await next();
 					resolve();
 				}
@@ -66,6 +56,16 @@ export default function createMiddlewareHandler(
 		});
 	};
 }
+
+const statusCodesWithoutBody = [
+	100, // Continue
+	101, // Switching Protocols
+	102, // Processing (WebDAV)
+	103, // Early Hints
+	204, // No Content
+	205, // Reset Content
+	304, // Not Modified
+];
 
 type NextFunction = (err?: unknown) => void;
 type ConnectMiddleware<

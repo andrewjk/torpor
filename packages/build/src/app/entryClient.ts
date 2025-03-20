@@ -3,8 +3,11 @@ import { type Component, type SlotRender } from "@torpor/view";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
+import App from "./App.ts";
 
 //import routeHandlers from "./routeHandlers";
+
+const app = new App();
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -38,12 +41,8 @@ async function navigateToLocation(location: Location, firstTime = false) {
 	return await navigate(location.pathname, new URLSearchParams(location.search), firstTime);
 }
 
-async function navigate(
-	path: string,
-	urlParams: URLSearchParams,
-	firstTime = false,
-): Promise<boolean> {
-	console.log("navigating client to", path, urlParams.size ? `with ${urlParams}` : "");
+async function navigate(path: string, query: URLSearchParams, firstTime = false): Promise<boolean> {
+	console.log("navigating client to", path, query.size ? `with ${query}` : "");
 
 	const parent = document.getElementById("app");
 	if (!parent) {
@@ -52,38 +51,19 @@ async function navigate(
 		return false;
 	}
 
-	//const route = routeHandlers.match(path, urlParams);
-	//if (!route) {
-	//	// TODO: 404
-	//	console.log("404");
-	//	return false;
-	//}
-
-	const route = {
-		handler: {
-			path,
-			// From routeHandlers.handlers.map
-			regex: pathToRegExp(path),
-			// From lazyRoute, sort of
-			endPoint: import("./counter.ts"),
-			loaded: false,
-
-			// From routeHandlers.match:
-			//layouts?: RouteLayoutHandler[];
-			//serverEndPoint?: Promise<any>;
-			//serverHook?: Promise<any>;
-		},
-		// From routeHandlers.match
-		routeParams: {},
-		urlParams: undefined,
-	};
+	const route = app.match(path, query);
+	if (!route) {
+		// TODO: 404
+		console.log("404");
+		return false;
+	}
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
 	//$page.url = new URL(document.location.href);
 
 	const handler = route.handler;
-	const params = route.routeParams || {};
+	const params = route.params || {};
 
 	// There must be a client endpoint with a component
 	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint).default;
@@ -211,7 +191,7 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 	};
 }
 
-function pathToRegExp(path: string): RegExp {
+function pathToRegex(path: string): RegExp {
 	const pattern = path
 		.split("/")
 		.map((p) => {
