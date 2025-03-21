@@ -1,8 +1,8 @@
+import pathToRegex from "../app/pathToRegex";
+import type HttpMethod from "../types/HttpMethod";
+import type MiddlewareFunction from "../types/MiddlewareFunction";
 import ServerEvent from "./ServerEvent";
-import pathToRegex from "./pathToRegex";
-import type HttpMethod from "./types/HttpMethod";
-import type MiddlewareFunction from "./types/MiddlewareFunction";
-import type ServerFunction from "./types/ServerFunction";
+import type ServerFunction from "./ServerFunction";
 
 const NOOP = () => {};
 
@@ -73,12 +73,12 @@ export default class Server {
 	/**
 	 * Adds a method/route pattern combination.
 	 * @param method The HTTP method, such as GET, PUT or POST.
-	 * @param route The route pattern.
+	 * @param path The route path pattern.
 	 * @param fn The function to call when the pattern is matched.
 	 * @returns
 	 */
-	add(method: HttpMethod, route: string, fn: ServerFunction): Server {
-		this.methods.get(method)!.push(new RouteHandler(route, fn));
+	add(method: HttpMethod, path: string, fn: ServerFunction): Server {
+		this.methods.get(method)!.push(new RouteHandler(path, fn));
 		return this;
 	}
 
@@ -96,40 +96,40 @@ export default class Server {
 
 	/**
 	 * Adds a route pattern that will be matched on a GET method.
-	 * @param route The route pattern.
+	 * @param path The route pattern.
 	 * @param fn The function to call when the pattern is matched.
 	 * @returns
 	 */
-	get(route: string, fn: ServerFunction) {
-		return this.add("GET", route, fn);
+	get(path: string, fn: ServerFunction) {
+		return this.add("GET", path, fn);
 	}
-	head(route: string, fn: ServerFunction) {
-		return this.add("HEAD", route, fn);
+	head(path: string, fn: ServerFunction) {
+		return this.add("HEAD", path, fn);
 	}
-	patch(route: string, fn: ServerFunction) {
-		return this.add("PATCH", route, fn);
+	patch(path: string, fn: ServerFunction) {
+		return this.add("PATCH", path, fn);
 	}
-	post(route: string, fn: ServerFunction) {
-		return this.add("POST", route, fn);
+	post(path: string, fn: ServerFunction) {
+		return this.add("POST", path, fn);
 	}
-	put(route: string, fn: ServerFunction) {
-		return this.add("PUT", route, fn);
+	put(path: string, fn: ServerFunction) {
+		return this.add("PUT", path, fn);
 	}
-	delete(route: string, fn: ServerFunction) {
-		return this.add("DELETE", route, fn);
+	delete(path: string, fn: ServerFunction) {
+		return this.add("DELETE", path, fn);
 	}
-	options(route: string, fn: ServerFunction) {
-		return this.add("OPTIONS", route, fn);
+	options(path: string, fn: ServerFunction) {
+		return this.add("OPTIONS", path, fn);
 	}
-	connect(route: string, fn: ServerFunction) {
-		return this.add("CONNECT", route, fn);
+	connect(path: string, fn: ServerFunction) {
+		return this.add("CONNECT", path, fn);
 	}
-	trace(route: string, fn: ServerFunction) {
-		return this.add("TRACE", route, fn);
+	trace(path: string, fn: ServerFunction) {
+		return this.add("TRACE", path, fn);
 	}
 
 	// TODO:
-	//use(route: string, ...fn: MiddlewareFunction[])
+	//use(path: string, ...fn: MiddlewareFunction[])
 	use(...fn: MiddlewareFunction[]): Server {
 		this.middleware = this.middleware.concat(fn);
 		return this;
@@ -137,25 +137,25 @@ export default class Server {
 }
 
 class RouteHandler {
-	route: string;
+	path: string;
 	regex: RegExp;
 	fn: ServerFunction;
 
-	constructor(route: string, fn: ServerFunction) {
-		this.route = route;
-		this.regex = pathToRegex(route);
+	constructor(path: string, fn: ServerFunction) {
+		this.path = path;
+		this.regex = pathToRegex(path);
 		this.fn = fn;
 	}
 }
 
 //class MiddlewareHandler {
-//	route: string;
+//	path: string;
 //	regex: RegExp;
 //	fn: MiddlewareFunction;
 //
-//	constructor(route: string, fn: MiddlewareFunction) {
-//		this.route = route;
-//		this.regex = pathToRegex(route);
+//	constructor(path: string, fn: MiddlewareFunction) {
+//		this.path = path;
+//		this.regex = pathToRegex(path);
 //		this.fn = fn;
 //	}
 //}

@@ -14,4 +14,5 @@ type PageServerEndPoint = {
 	 */
 	actions?: Record<string, PageServerAction>;
 };
+
 export default PageServerEndPoint;

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import Server from "../src/app/Server";
+import Server from "../src/server/Server";
 
 test("app router methods", () => {
 	let app = new Server();

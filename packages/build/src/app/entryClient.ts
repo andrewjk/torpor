@@ -1,13 +1,14 @@
+// @ts-ignore TODO: Create export with types?
+import manifest from "@torpor/build/manifest";
 import { hydrate, mount } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
-import App from "./App.ts";
+import Router from "./Router.ts";
 
-//import routeHandlers from "./routeHandlers";
-
-const app = new App();
+const router = new Router();
+router.addPages(manifest.routes);
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -51,7 +52,7 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 		return false;
 	}
 
-	const route = app.match(path, query);
+	const route = router.match(path, query);
 	if (!route) {
 		// TODO: 404
 		console.log("404");
@@ -66,7 +67,7 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 	const params = route.params || {};
 
 	// There must be a client endpoint with a component
-	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint).default;
+	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
 	if (!clientEndPoint?.component) {
 		// TODO: 404
 		console.log("404");
@@ -74,7 +75,8 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 	}
 
 	// There may be a server endpoint
-	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
+	const serverEndPoint: PageServerEndPoint | undefined =
+		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
@@ -85,9 +87,9 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 			for (let key in params) {
 				layoutPath = layoutPath.replace(`[${key}]`, params[key]);
 			}
-			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint)?.default;
-			const layoutServerEndPoint: PageServerEndPoint | undefined = (await layout.serverEndPoint)
-				?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+			const layoutServerEndPoint: PageServerEndPoint | undefined =
+				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
 			const layoutData = await loadClientAndServerData(
 				data,
 				document.location.origin + layoutPath,
@@ -119,7 +121,8 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
 			clientEndPoint.component!(parent, anchor, $props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
-			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
+				?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
 					component = layoutEndPoint.component as Component;
@@ -189,14 +192,4 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 		params,
 		data,
 	};
-}
-
-function pathToRegex(path: string): RegExp {
-	const pattern = path
-		.split("/")
-		.map((p) => {
-			return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
-		})
-		.join("\\/");
-	return new RegExp(`^${pattern}$`);
 }

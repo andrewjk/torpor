@@ -1,67 +1,134 @@
+import LayoutHandler from "../types/LayoutHandler";
+import RouteHandler from "../types/RouteHandler";
 import pathToRegex from "./pathToRegex";
-import HttpMethod from "./types/HttpMethod";
-import MiddlewareFunction from "./types/MiddlewareFunction";
-import ServerFunction from "./types/ServerFunction";
-
-// This is not actually used anywhere, for now at least
 
 export default class Router {
-	methods = new Map<HttpMethod, RouteHandler[]>();
-	middleware: MiddlewareHandler[] = [];
+	routes: Route[] = [];
+	//pages = new Map<string, PageEndPoint>();
 
-	constructor() {
-		// Create all method handlers up front so we don't have to worry about
-		// checking if they exist. Using a non-standard method will just error
-		this.methods.set("GET", []);
-		this.methods.set("HEAD", []);
-		this.methods.set("PATCH", []);
-		this.methods.set("POST", []);
-		this.methods.set("PUT", []);
-		this.methods.set("DELETE", []);
-		this.methods.set("OPTIONS", []);
-		this.methods.set("CONNECT", []);
-		this.methods.set("TRACE", []);
-	}
+	constructor() {}
 
-	add(method: HttpMethod, route: string, fn: ServerFunction): Router {
-		this.methods.get(method)!.push(new RouteHandler(route, fn));
+	//add(path: string, file: string) {
+	//	// TODO: Call the specific addX method based on the file path
+	//	this.addPage(route, file);
+	//}
+
+	addPages(routes: { path: string; endPoint: () => Promise<any> }[]) {
+		for (let r of routes) {
+			this.routes.push(
+				new Route(r.path, {
+					path: r.path,
+					endPoint: r.endPoint,
+				}),
+			);
+		}
 		return this;
 	}
 
-	match(method: HttpMethod, path: string) {
-		for (let handler of this.methods.get(method)!) {
-			let match = path.match(handler.regex);
+	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
+	addPage(path: string, endPoint: () => Promise<any>) {
+		//this.server.get(route, (ev) => this.loadPage(ev, file));
+		this.routes.push(
+			new Route(path, {
+				path,
+				endPoint,
+			}),
+		);
+		return this;
+	}
+
+	/*
+	loadPage(ev: ServerEvent, file: string): Response {
+		let page = this.pages.get(file);
+		if (!page) {
+			page = {};
+			this.pages.set(file, page);
+		}
+	}
+	*/
+
+	match(path: string, query: URLSearchParams) {
+		for (let route of this.routes) {
+			let match = path.match(route.regex);
 			if (match) {
-				console.log("found", handler);
+				console.log(`Matched '${path}'`);
+
+				// Lazy load server endpoints and layouts
+				if (!route.handler.loaded) {
+					// TODO:
+					this.loadHandler(route.handler, route.path);
+				}
+
 				return {
-					fn: handler.fn,
+					handler: route.handler,
 					params: match.groups,
+					query,
 				};
 			}
 		}
+		console.log(`Not found for '${path}'`);
+	}
+
+	loadHandler(handler: RouteHandler, path: string) {
+		////handler.endPoint = import(handler.path);
+		handler.layouts = this.findLayouts(path);
+		handler.serverEndPoint = this.findServer(path);
+		handler.serverHook = this.findServerHook(path);
+	}
+
+	findLayouts(path: string): LayoutHandler[] | undefined {
+		let layouts: LayoutHandler[] = [];
+		let parts = path
+			// Strip the trailing`~/server` (so we don't look for `~/server/_layout`
+			// which will never exist)
+			.replace(/\/~server$/, "")
+			// The path will always start with / so splitting e.g. `/first/second`
+			// will result in ['', 'first', 'second'] and checks for `/_layout`,
+			// `/first/_layout` and `/second/_layout`
+			.split("/");
+		let basePath = "";
+		for (let i = 0; i < parts.length; i++) {
+			if (i > 0) {
+				basePath += "/" + parts[i];
+			}
+			const layoutPath = basePath + "/_layout";
+			const layoutRoute = this.routes.find((r) => r.path === layoutPath);
+			if (layoutRoute) {
+				layouts.push({
+					path: layoutPath,
+					endPoint: layoutRoute.handler.endPoint,
+					serverEndPoint: this.findServer(layoutPath),
+				});
+			}
+		}
+		return layouts.length ? layouts : undefined;
+	}
+
+	findServer(path: string): (() => Promise<any>) | undefined {
+		const serverPath = path.replace(/\/$/, "") + "/~server";
+		const serverRoute = this.routes.find((r) => r.path === serverPath);
+		return serverRoute && serverRoute.handler.endPoint;
+	}
+
+	findServerHook(path: string): (() => Promise<any>) | undefined {
+		// TODO: Should this be a collection, like layouts?
+		let hookPath = "/_hook/~server";
+		if (path.startsWith("/api/")) {
+			hookPath = "/api" + hookPath;
+		}
+		const hookRoute = this.routes.find((r) => r.path === hookPath);
+		return hookRoute && hookRoute.handler.endPoint;
 	}
 }
 
-class RouteHandler {
-	route: string;
+class Route {
+	path: string;
 	regex: RegExp;
-	fn: ServerFunction;
+	handler: RouteHandler;
 
-	constructor(route: string, fn: ServerFunction) {
-		this.route = route;
-		this.regex = pathToRegex(route);
-		this.fn = fn;
-	}
-}
-
-class MiddlewareHandler {
-	route: string;
-	regex: RegExp;
-	fn: MiddlewareFunction;
-
-	constructor(route: string, fn: MiddlewareFunction) {
-		this.route = route;
-		this.regex = pathToRegex(route);
-		this.fn = fn;
+	constructor(path: string, handler: RouteHandler) {
+		this.path = path;
+		this.regex = pathToRegex(path);
+		this.handler = handler;
 	}
 }

@@ -1,9 +1,9 @@
 import { IncomingMessage, ServerResponse } from "node:http";
-import MiddlewareFunction from "../../types/MiddlewareFunction.js";
-import flattenHeaders from "./flattenHeaders.js";
-import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse.js";
-import readableToBuffer from "./readableToBuffer.js";
-import requestToNodeMessage from "./requestToNodeMessage.js";
+import MiddlewareFunction from "../../types/MiddlewareFunction";
+import flattenHeaders from "./flattenHeaders";
+import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
+import readableToBuffer from "./readableToBuffer";
+import requestToNodeMessage from "./requestToNodeMessage";
 
 // From https://github.com/vikejs/vike-node/blob/main/packages/vike-node/src/runtime/adapters/connectToWeb.ts
 

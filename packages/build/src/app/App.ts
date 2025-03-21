@@ -1,10 +1,15 @@
-import AppBase from "./AppBase";
+// The user sets this up
+// It will then be passed into entryServer and entryClient in a Vite plugin
+// In those files, it will build a Router
+export default class App {
+	root: string;
+	routes: { path: string; file: string }[] = [];
 
-// TODO: Have to pass this into entryClient and entryServer somehow
-export default class App extends AppBase {
 	constructor() {
-		super();
-		this.addPage("/", import("./routes/counter.ts"));
-		this.addPage("/about", import("./routes/about.ts"));
+		this.root = process.cwd();
+	}
+
+	addRoute(path: string, file: string) {
+		this.routes.push({ path, file });
 	}
 }

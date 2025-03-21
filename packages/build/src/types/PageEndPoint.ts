@@ -1,5 +1,5 @@
 import { type Component } from "@torpor/view";
-import type PageEvent from "./PageEvent";
+import type PageLoadEvent from "./PageLoadEvent";
 
 /**
  * For +page.
@@ -13,7 +13,7 @@ type PageEndPoint = {
 	/**
 	 * Loads data for the page.
 	 */
-	load?: (event: PageEvent) => any;
+	load?: (event: PageLoadEvent) => any;
 	/**
 	 * The component that is displayed for the page.
 	 */
@@ -22,8 +22,9 @@ type PageEndPoint = {
 	/**
 	 * The head element data for the page, which may include a <title> and <meta> elements.
 	 */
-	head?: HeadElement[] | ((event: PageEvent) => HeadElement[]);
+	head?: HeadElement[] | ((event: PageLoadEvent) => HeadElement[]);
 };
+
 export default PageEndPoint;
 
 type HeadElement = TitleElement | MetaElement;

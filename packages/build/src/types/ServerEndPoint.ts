@@ -33,4 +33,5 @@ type ServerEndPoint = { [key: string]: ServerRequest } & {
 	 */
 	head?: ServerRequest;
 };
+
 export default ServerEndPoint;

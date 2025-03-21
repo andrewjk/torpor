@@ -1,4 +1,5 @@
-import type ServerEvent from "./ServerEvent";
+import type ServerLoadEvent from "./ServerLoadEvent";
 
-type PageServerAction = (event: ServerEvent) => Response | Promise<Response | undefined> | void;
+type PageServerAction = (event: ServerLoadEvent) => Response | Promise<Response | undefined> | void;
+
 export default PageServerAction;

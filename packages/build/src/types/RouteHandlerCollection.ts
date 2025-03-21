@@ -5,4 +5,5 @@ type RouteHandlerCollection = {
 	handlers: RouteHandler[];
 	match(path: string, urlParams?: URLSearchParams): RouteMatchResult | undefined;
 };
+
 export default RouteHandlerCollection;

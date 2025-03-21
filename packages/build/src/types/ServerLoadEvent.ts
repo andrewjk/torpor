@@ -1,7 +1,6 @@
-import { ServerResponse } from "node:http";
 import CookieHelper from "./CookieHelper";
 
-type ServerEvent = {
+type ServerLoadEvent = {
 	/**
 	 * The URL for the server function.
 	 */
@@ -17,12 +16,15 @@ type ServerEvent = {
 	 * and pages. It flows down in that order.
 	 */
 	appData: Record<string, any>;
-	// TODO: Would be nicer if these were Request/Response?
+	/**
+	 * The server request.
+	 */
 	request: Request;
-	response: ServerResponse;
+	//response: ServerResponse;
 	/**
 	 * A helper for getting and setting cookie data.
 	 */
 	cookies: CookieHelper;
 };
-export default ServerEvent;
+
+export default ServerLoadEvent;

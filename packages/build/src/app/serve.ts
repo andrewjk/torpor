@@ -4,18 +4,25 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
 import { type ViteDevServer } from "vite";
+import createMiddlewareHandler from "../adapters/node/createMiddlewareHandler.ts";
+import createNodeServer from "../adapters/node/createNodeServer.ts";
 import { serverError } from "../response.ts";
-import Server from "./Server.ts";
-import type ServerEvent from "./ServerEvent";
-import createMiddlewareHandler from "./adapters/node/createMiddlewareHandler.ts";
-import createNodeServer from "./adapters/node/createNodeServer.ts";
+import Server from "../server/Server.ts";
+import ServerEvent from "../server/ServerEvent.ts";
+import App from "./App.ts";
+import manifest from "./manifest.ts";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// const PROD = process.env.NODE_ENV === "production";
 
 runServer();
 
 async function runServer() {
 	const options = { server: true };
+
+	// This should get done outside the library
+	const app = new App();
+	app.addRoute("/", "./src/app/routes/counter.ts");
+	app.addRoute("/about", "./src/app/routes/about.ts");
 
 	const server = new Server();
 
@@ -25,8 +32,32 @@ async function runServer() {
 	const vite = await createViteServer({
 		server: { middlewareMode: true },
 		appType: "custom",
-		plugins: [torpor(options)],
+		plugins: [manifest(app), torpor(options)],
 	});
+
+	// Read index.html
+	const clientScript = "/src/app/entryClient.ts";
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	const templateFile = path.resolve(__dirname, "index.html");
+	let template = fs.readFileSync(templateFile, "utf-8");
+
+	// Apply Vite HTML transforms. This injects the Vite HMR client, and also
+	// applies HTML transforms from Vite plugins. Note that we only support a
+	// universal transform, not individual transforms for each route
+	template = await vite.transformIndexHtml("", template);
+
+	// Prepare index.html up so that we can just splice components into it
+	let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
+	contentStart = template.indexOf(">", contentStart) + 1;
+	let contentEnd = template.indexOf("</div>", contentStart);
+	if (contentStart === -1 || contentEnd === -1) {
+		throw new Error(`Couldn't find <div id="app"></div>`);
+	}
+	template =
+		template.substring(0, contentStart) +
+		"%COMPONENT_HTML%" +
+		template.substring(contentEnd) +
+		`<script type="module" src="${clientScript}"></script>`;
 
 	// Use vite's connect instance as middleware
 	server.use(createMiddlewareHandler(vite.middlewares));
@@ -34,7 +65,7 @@ async function runServer() {
 	// Any request goes through loadEndPoint
 	server.get("*", async (ev) => {
 		try {
-			const response = await loadEndPoint(ev, vite);
+			const response = await loadEndPoint(ev, vite, template);
 
 			// HACK: turn off SSR after this so that we can hydrate
 			// Instead we need different routers like Vinxi has?
@@ -65,18 +96,10 @@ async function runServer() {
 }
 
 // TODO: Cache the HTML, pass the HTML in to entryServer.ts
+// Figure out some way to only pass it in when necessary
 
-async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer) {
-	const templateFile = path.resolve(__dirname, "index.html");
-	const clientScript = "/src/app/entryClient.ts";
+async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer, template: string) {
 	const serverScript = "/src/app/entryServer.ts";
-
-	// Read index.html
-	let template = fs.readFileSync(templateFile, "utf-8");
-
-	// Apply Vite HTML transforms. This injects the Vite HMR client, and
-	// also applies HTML transforms from Vite plugins
-	template = await vite.transformIndexHtml(ev.request.url, template);
 
 	// Load the server entry. ssrLoadModule automatically transforms ESM
 	// source code to be usable in Node.js. No bundling is required, and
@@ -86,19 +109,8 @@ async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer) {
 	// Render the app HTML via entryServer's exported `render` function
 	const appHtml = await renderLocation(ev);
 
-	// Inject the app-rendered HTML and client scripts into the template
-	// TODO: Manifest?
-	let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
-	contentStart = template.indexOf(">", contentStart) + 1;
-	let contentEnd = template.indexOf("</div>", contentStart);
-	if (contentStart === -1 || contentEnd === -1) {
-		throw new Error(`Couldn't find <div id="app"></div>`);
-	}
-	const html =
-		template.substring(0, contentStart) +
-		appHtml +
-		template.substring(contentEnd) +
-		`<script type="module" src="${clientScript}"></script>`;
+	// Inject the app-rendered HTML into the template
+	const html = template.replace("%COMPONENT_HTML%", appHtml);
 
 	// Send the rendered HTML back
 	return new Response(html, {

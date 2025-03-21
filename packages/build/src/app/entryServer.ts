@@ -1,4 +1,7 @@
+// @ts-ignore TODO: Create export with types?
+import manifest from "@torpor/build/manifest";
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
+import { ServerEvent } from "../index.ts";
 //import { IncomingMessage } from "node:http";
 //import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
 //import { type CookieSerializeOptions, type EventHandlerRequest, H3Event } from "vinxi/http";
@@ -9,15 +12,16 @@ import seeOther from "../response/seeOther";
 import $page from "../state/$page";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
+import RouteHandler from "../types/RouteHandler";
 import type ServerEndPoint from "../types/ServerEndPoint";
-import type ServerEvent from "../types/ServerEvent";
 import type ServerHook from "../types/ServerHook";
-import App from "./App";
-import EndPointHandler from "./types/EndPointHandler";
-
-const app = new App();
+import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
+import Router from "./Router.ts";
 
 let printedRoutes = false;
+
+const router = new Router();
+router.addPages(manifest.routes);
 
 export async function renderLocation(ev: ServerEvent) {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
@@ -29,10 +33,10 @@ export async function renderLocation(ev: ServerEvent) {
 
 	if (!printedRoutes) {
 		printedRoutes = true;
-		console.log("routes:\n  " + app.routes.map((r) => r.route).join("\n  "));
+		console.log("routes:\n  " + router.routes.map((r) => r.path).join("\n  "));
 	}
 
-	const route = app.match(path, query);
+	const route = router.match(path, query);
 	if (!route) {
 		return notFound();
 	}
@@ -67,19 +71,19 @@ export async function renderLocation(ev: ServerEvent) {
 }
 
 async function loadData(
-	ev: ServerEvent,
+	ev: ServerLoadEvent,
 	url: URL,
-	handler: EndPointHandler,
+	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
 	const functionName = ev.request.method.toLowerCase().replace("delete", "del");
 
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint).default;
+	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
 		const serverParams = await buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
-			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 			if (serverHook?.handle) {
 				await serverHook.handle(serverParams);
 			}
@@ -93,17 +97,17 @@ async function loadData(
 }
 
 async function loadServerData(
-	ev: ServerEvent,
+	ev: ServerLoadEvent,
 	url: URL,
-	handler: EndPointHandler,
+	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
-	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint).default;
+	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint()).default;
 	if (serverEndPoint?.load) {
 		const serverParams = await buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
-			const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 			if (serverHook?.handle) {
 				await serverHook.handle(serverParams);
 			}
@@ -121,19 +125,20 @@ async function loadServerData(
 }
 
 async function loadView(
-	ev: ServerEvent,
+	ev: ServerLoadEvent,
 	url: URL,
-	handler: EndPointHandler,
+	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
 	// There must be a client endpoint with a component
-	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint).default;
+	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
 	if (!clientEndPoint?.component) {
 		return notFound();
 	}
 
 	// There may be a server endpoint
-	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint)?.default;
+	const serverEndPoint: PageServerEndPoint | undefined =
+		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
 	// Build client scripts
 	/*
@@ -148,7 +153,7 @@ async function loadView(
 	// Maybe hit the server hook
 	const serverParams = await buildServerParams(ev, url, params);
 	if (handler.serverHook) {
-		const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+		const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 		if (serverHook?.handle) {
 			await serverHook.handle(serverParams);
 		}
@@ -160,9 +165,9 @@ async function loadView(
 	let data = {};
 	if (handler.layouts) {
 		for (let layout of handler.layouts) {
-			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint)?.default;
-			const layoutServerEndPoint: PageServerEndPoint | undefined = (await layout.serverEndPoint)
-				?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+			const layoutServerEndPoint: PageServerEndPoint | undefined =
+				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
 			const layoutData = await loadClientAndServerData(
 				url,
 				params,
@@ -197,7 +202,8 @@ async function loadView(
 		slotFunctions[handler.layouts.length] = (_, context) =>
 			(clientEndPoint.component as ServerComponent)($props, context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
-			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint)?.default;
+			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
+				?.default;
 			if (layoutEndPoint?.component) {
 				if (i === 0) {
 					component = layoutEndPoint.component as ServerComponent;
@@ -225,14 +231,15 @@ async function loadView(
 }
 
 async function runAction(
-	ev: ServerEvent,
+	ev: ServerLoadEvent,
 	url: URL,
-	handler: EndPointHandler,
+	handler: RouteHandler,
 	params: Record<string, string>,
 	query: URLSearchParams,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
-	const serverEndPoint: PageServerEndPoint | undefined = (await handler.serverEndPoint).default;
+	const serverEndPoint: PageServerEndPoint | undefined =
+		handler.serverEndPoint && (await handler.serverEndPoint()).default;
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
@@ -240,7 +247,7 @@ async function runAction(
 			const serverParams = await buildServerParams(ev, url, params);
 
 			if (handler.serverHook) {
-				const serverHook: ServerHook | undefined = (await handler.serverHook).default;
+				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 				if (serverHook?.handle) {
 					await serverHook.handle(serverParams);
 				}
@@ -257,7 +264,7 @@ async function runAction(
 async function loadClientAndServerData(
 	url: URL,
 	params: Record<string, string>,
-	serverParams: ServerEvent,
+	serverParams: ServerLoadEvent,
 	data: Record<string, any>,
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
@@ -292,23 +299,20 @@ async function buildServerParams(
 	ev: ServerEvent,
 	url: URL,
 	params: Record<string, string>,
-): Promise<ServerEvent> {
+): Promise<ServerLoadEvent> {
 	return {
 		url,
 		params,
 		appData: {},
 		request: ev.request,
-		// TODO:
-		/*
-		request: await incomingMessageToRequest(event.node.req, url),
-		response: event.node.res,
-		cookies: {
-			get: (name: string) => req.getCookie(event, name),
-			set: (name: string, value: string, options?: CookieSerializeOptions) =>
-				setCookie(event, name, value, options),
-			delete: (name: string, options?: CookieSerializeOptions) =>
-				deleteCookie(event, name, options),
-		},
-		*/
+		//request: await incomingMessageToRequest(event.node.req, url),
+		//response: event.node.res,
+		//cookies: {
+		//	get: (name: string) => req.getCookie(event, name),
+		//	set: (name: string, value: string, options?: CookieSerializeOptions) =>
+		//		setCookie(event, name, value, options),
+		//	delete: (name: string, options?: CookieSerializeOptions) =>
+		//		deleteCookie(event, name, options),
+		//},
 	};
 }

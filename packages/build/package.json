@@ -41,8 +41,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^",
-		"vinxi": "^0.5.3"
+		"@torpor/view": "workspace:^"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
