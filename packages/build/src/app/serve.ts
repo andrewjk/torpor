@@ -1,5 +1,5 @@
 import torpor from "@torpor/unplugin/vite";
-import fs from "node:fs";
+import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
@@ -13,16 +13,20 @@ import App from "./App.ts";
 import manifest from "./manifest.ts";
 
 // const PROD = process.env.NODE_ENV === "production";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 runServer();
 
 async function runServer() {
 	const options = { server: true };
 
-	// This should get done outside the library
 	const app = new App();
-	app.addRoute("/", "./src/app/routes/counter.ts");
-	app.addRoute("/about", "./src/app/routes/about.ts");
+
+	// This should get done outside the library
+	//app.addRoute("/", "./src/app/routes/counter.ts");
+	//app.addRoute("/about", "./src/app/routes/about.ts");
+
+	app.addRouteFolder("routes");
 
 	const server = new Server();
 
@@ -37,9 +41,8 @@ async function runServer() {
 
 	// Read index.html
 	const clientScript = "/src/app/entryClient.ts";
-	const __dirname = path.dirname(fileURLToPath(import.meta.url));
 	const templateFile = path.resolve(__dirname, "index.html");
-	let template = fs.readFileSync(templateFile, "utf-8");
+	let template = await fs.readFile(templateFile, "utf-8");
 
 	// Apply Vite HTML transforms. This injects the Vite HMR client, and also
 	// applies HTML transforms from Vite plugins. Note that we only support a

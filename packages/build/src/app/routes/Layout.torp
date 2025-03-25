@@ -1,0 +1,10 @@
+import { $page, $navigation } from "@torpor/build/state";
+
+export default function Layout() {
+	@render {
+		<main>
+			<h1>Hello</h1>
+			<:slot />
+		</main>
+	}
+}

@@ -305,7 +305,6 @@ async function buildServerParams(
 		params,
 		appData: {},
 		request: ev.request,
-		//request: await incomingMessageToRequest(event.node.req, url),
 		//response: event.node.res,
 		//cookies: {
 		//	get: (name: string) => req.getCookie(event, name),
