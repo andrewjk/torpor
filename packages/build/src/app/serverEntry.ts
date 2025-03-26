@@ -1,40 +1,30 @@
-// @ts-ignore TODO: Create export with types?
 import manifest from "@torpor/build/manifest";
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
-import { ServerEvent } from "../index.ts";
-//import { IncomingMessage } from "node:http";
-//import { deleteCookie, eventHandler, getCookie, setCookie } from "vinxi/http";
-//import { type CookieSerializeOptions, type EventHandlerRequest, H3Event } from "vinxi/http";
-//import { getManifest } from "vinxi/manifest";
-import notFound from "../response/notFound";
-import ok from "../response/ok";
-import seeOther from "../response/seeOther";
-import $page from "../state/$page";
-import type PageEndPoint from "../types/PageEndPoint";
-import type PageServerEndPoint from "../types/PageServerEndPoint";
-import RouteHandler from "../types/RouteHandler";
-import type ServerEndPoint from "../types/ServerEndPoint";
-import type ServerHook from "../types/ServerHook";
+import notFound from "../response/notFound.ts";
+import ok from "../response/ok.ts";
+import seeOther from "../response/seeOther.ts";
+import ServerEvent from "../server/ServerEvent.ts";
+import $page from "../state/$page.ts";
+import type PageEndPoint from "../types/PageEndPoint.ts";
+import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
+import RouteHandler from "../types/RouteHandler.ts";
+import type ServerEndPoint from "../types/ServerEndPoint.ts";
+import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 import Router from "./Router.ts";
-
-let printedRoutes = false;
 
 const router = new Router();
 router.addPages(manifest.routes);
 
-export async function renderLocation(ev: ServerEvent) {
+console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
+
+export async function render(ev: ServerEvent, template: string) {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
 	const path = url.pathname;
 	const query = url.searchParams;
 
-	console.log("handling server", ev.request.method, "for", path, query.size ? `with ${query}` : "");
-
-	if (!printedRoutes) {
-		printedRoutes = true;
-		console.log("routes:\n  " + router.routes.map((r) => r.path).join("\n  "));
-	}
+	console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const route = router.match(path, query);
 	if (!route) {
@@ -63,7 +53,7 @@ export async function renderLocation(ev: ServerEvent) {
 		}
 	} else {
 		if (ev.request.method === "GET") {
-			return await loadView(ev, url, handler, params);
+			return await loadView(ev, url, handler, params, template);
 		} else if (ev.request.method === "POST") {
 			return await runAction(ev, url, handler, params, query);
 		}
@@ -71,7 +61,7 @@ export async function renderLocation(ev: ServerEvent) {
 }
 
 async function loadData(
-	ev: ServerLoadEvent,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -80,7 +70,7 @@ async function loadData(
 
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
-		const serverParams = await buildServerParams(ev, url, params);
+		const serverParams = buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
@@ -90,6 +80,7 @@ async function loadData(
 		}
 
 		const result = await serverEndPoint[functionName](serverParams);
+
 		// If there was no response returned from load (such as errors or a
 		// redirect), send an ok response
 		return result || ok();
@@ -97,14 +88,14 @@ async function loadData(
 }
 
 async function loadServerData(
-	ev: ServerLoadEvent,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
 ) {
 	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint()).default;
 	if (serverEndPoint?.load) {
-		const serverParams = await buildServerParams(ev, url, params);
+		const serverParams = buildServerParams(ev, url, params);
 
 		if (handler.serverHook) {
 			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
@@ -114,6 +105,7 @@ async function loadServerData(
 		}
 
 		const result = await serverEndPoint.load(serverParams);
+
 		// If there was no response returned from load (such as errors or a
 		// redirect), send an ok response
 		return result || ok();
@@ -125,10 +117,11 @@ async function loadServerData(
 }
 
 async function loadView(
-	ev: ServerLoadEvent,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
+	template: string,
 ) {
 	// There must be a client endpoint with a component
 	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
@@ -151,7 +144,7 @@ async function loadView(
 	*/
 
 	// Maybe hit the server hook
-	const serverParams = await buildServerParams(ev, url, params);
+	const serverParams = buildServerParams(ev, url, params);
 	if (handler.serverHook) {
 		const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 		if (serverHook?.handle) {
@@ -221,17 +214,23 @@ async function loadView(
 	let html;
 	try {
 		html = component($props, undefined, slots);
+		html = template.replace("%COMPONENT_HTML%", html);
 	} catch (error) {
 		// TODO: Show a proper Error component
 		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
 		console.log(error);
 	}
 
-	return html;
+	return new Response(html, {
+		status: 200,
+		headers: {
+			"content-type": "text/html",
+		},
+	});
 }
 
 async function runAction(
-	ev: ServerLoadEvent,
+	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -244,7 +243,7 @@ async function runAction(
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
-			const serverParams = await buildServerParams(ev, url, params);
+			const serverParams = buildServerParams(ev, url, params);
 
 			if (handler.serverHook) {
 				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
@@ -254,6 +253,7 @@ async function runAction(
 			}
 
 			const result = await action(serverParams);
+
 			// If there was no response returned from the action (such as errors
 			// or a redirect), reload the page by redirecting
 			return result || seeOther(url.pathname);
@@ -294,24 +294,17 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 	};
 }
 
-// TODO: Don't need this?
-async function buildServerParams(
+function buildServerParams(
 	ev: ServerEvent,
 	url: URL,
 	params: Record<string, string>,
-): Promise<ServerLoadEvent> {
+): ServerLoadEvent {
 	return {
 		url,
 		params,
 		appData: {},
 		request: ev.request,
-		//response: event.node.res,
-		//cookies: {
-		//	get: (name: string) => req.getCookie(event, name),
-		//	set: (name: string, value: string, options?: CookieSerializeOptions) =>
-		//		setCookie(event, name, value, options),
-		//	delete: (name: string, options?: CookieSerializeOptions) =>
-		//		deleteCookie(event, name, options),
-		//},
+		cookies: ev.cookies,
+		headers: ev.headers,
 	};
 }

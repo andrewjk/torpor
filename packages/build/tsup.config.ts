@@ -7,4 +7,7 @@ export default defineConfig({
 	clean: true,
 	metafile: true,
 	sourcemap: true,
+	// Put this in here to stop issues with bundling Vite from bin/index.ts
+	// I'm not sure if this will cause further issues down the line?
+	external: ["vite"],
 });

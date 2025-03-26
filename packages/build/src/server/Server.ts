@@ -4,7 +4,7 @@ import type MiddlewareFunction from "../types/MiddlewareFunction";
 import ServerEvent from "./ServerEvent";
 import type ServerFunction from "./ServerFunction";
 
-const NOOP = () => {};
+const noop = () => {};
 
 /**
  * A Fetch API Request/Response server.
@@ -40,13 +40,13 @@ export default class Server {
 		const url = new URL(request.url);
 		const match = this.match(method, url.pathname);
 		let ev = new ServerEvent(request, match?.params);
-
+		//console.log(input, this.middleware.length);
 		if (this.middleware.length) {
 			// TODO: Get middleware that applies to this route only?
 			await this.middleware[0](ev, buildNext(this.middleware, 0));
 			function buildNext(middleware: MiddlewareFunction[], i: number): () => void | Promise<void> {
 				if (ev.response) {
-					return NOOP;
+					return noop;
 				}
 
 				if (i < middleware.length - 1) {
@@ -57,17 +57,23 @@ export default class Server {
 						? async () => {
 								ev.response = await match.fn(ev);
 							}
-						: NOOP;
+						: noop;
 				}
 			}
 
+			// TODO: Add headers to the response
+
 			// TODO: Should I be returning 200 if there's no response? Because it's not an error??
-			return ev.response ?? new Response(null, { status: 200 });
+			ev.response ??= new Response(null, { status: 200 });
+			ev.addHeaders();
+
+			//console.log(ev.response);
+			return ev.response;
 		} else if (match) {
 			return await match.fn(ev);
 		}
-		//}
-		return new Response(null, { status: 400 });
+
+		return new Response(null, { status: 404 });
 	};
 
 	/**
@@ -92,6 +98,7 @@ export default class Server {
 				};
 			}
 		}
+		console.log(`${method} not found: ${path}`);
 	}
 
 	/**

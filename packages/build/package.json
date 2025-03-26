@@ -39,7 +39,7 @@
 		"test": "vitest",
 		"serve": "tsx ./src/app/serve.ts",
 		"build:client": "vite build --outDir dist/client",
-		"build:server": "vite build --outDir dist/server --ssr src/app/entryServer.ts"
+		"build:server": "vite build --outDir dist/server --ssr src/app/serverEntry.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -47,6 +47,8 @@
 	"dependencies": {
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
+		"cookie": "^1.0.2",
+		"dotenv": "^16.4.7",
 		"vite": "^6.2.3",
 		"vite-tsconfig-paths": "^5.1.4"
 	},

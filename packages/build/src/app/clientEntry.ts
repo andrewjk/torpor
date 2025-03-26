@@ -1,10 +1,9 @@
-// @ts-ignore TODO: Create export with types?
 import manifest from "@torpor/build/manifest";
 import { hydrate, mount } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
-import $page from "../state/$page";
-import type PageEndPoint from "../types/PageEndPoint";
-import type PageServerEndPoint from "../types/PageServerEndPoint";
+import $page from "../state/$page.ts";
+import type PageEndPoint from "../types/PageEndPoint.ts";
+import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import Router from "./Router.ts";
 
 const router = new Router();
@@ -43,7 +42,7 @@ async function navigateToLocation(location: Location, firstTime = false) {
 }
 
 async function navigate(path: string, query: URLSearchParams, firstTime = false): Promise<boolean> {
-	console.log("navigating client to", path, query.size ? `with ${query}` : "");
+	console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const parent = document.getElementById("app");
 	if (!parent) {

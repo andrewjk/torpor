@@ -1,29 +1,36 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { Plugin } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+//import { fileURLToPath } from "node:url";
 
 // The user sets this up
-// It will then be passed into entryServer and entryClient in a Vite plugin
+// It will then be passed into serverEntry and clientEntry in a Vite plugin
 // In those files, it will build a Router
+// TODO: Rename this to Site
+
+//const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default class App {
 	root: string;
 	routes: { path: string; file: string }[] = [];
+	// Is default plugins a bad idea?
+	// HACK: Set loose because otherwise it uses a list of allowed extensions
+	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
 
 	constructor() {
 		this.root = process.cwd();
 	}
 
 	async addRouteFolder(folder: string) {
-		const routeFolder = path.join(__dirname, folder);
+		// TODO: Use this.root
+		const routeFolder = path.join(this.root, folder);
 		const routeFiles = await fs.readdir(routeFolder, { recursive: true });
 
-		// // TODO: Need to handle `_` files
-		// .filter((route) => !route.path.startsWith("_"))
-
 		for (let file of routeFiles) {
-			if (file.endsWith(".ts") || file.endsWith(".js")) {
+			// The file must start with `+` or `_` and end with `.js` or `.ts`
+			if (/^(\+|_).+(\.js|\.ts)$/.test(path.basename(file))) {
 				let routePath = file
 					.replace(/^\//, "")
 					.replace(/(\.ts|\.js)$/, "")
@@ -38,10 +45,12 @@ export default class App {
 				this.routes.push({ path: routePath, file });
 			}
 		}
+		this.sortRoutes();
 	}
 
 	addRoute(path: string, file: string) {
 		this.routes.push({ path, file });
+		this.sortRoutes();
 	}
 
 	sortRoutes() {

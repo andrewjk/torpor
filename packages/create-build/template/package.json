@@ -1,12 +1,12 @@
 {
-	"name": "",
+	"name": "@torpor/create-build",
 	"version": "0.0.1",
 	"description": "",
 	"type": "module",
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsc --noEmit && tb --build",
-		"preview": "vinxi serve"
+		"check": "tsc --noEmit"
 	},
 	"keywords": [],
 	"author": "",
@@ -14,7 +14,6 @@
 	"dependencies": {
 		"@torpor/build": "^0.0.1",
 		"@torpor/unplugin": "^0.0.1",
-		"@torpor/view": "^0.0.1",
-		"vinxi": "^0.5.1"
+		"@torpor/view": "^0.0.1"
 	}
 }

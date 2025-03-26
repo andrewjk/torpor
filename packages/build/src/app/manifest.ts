@@ -2,16 +2,15 @@ import path from "node:path";
 import { Plugin } from "vite";
 import App from "./App";
 
-// TODO:
 const moduleId = "@torpor/build/manifest";
 
 /**
- * A Vite plugin that provides information about the app to both entryClient and
- * entryServer
+ * A Vite plugin that provides information about the app to both clientEntry and
+ * serverEntry
  */
 export default function manifest(app: App): Plugin {
 	return {
-		name: moduleId,
+		name: "torpor-manifest",
 		resolveId: {
 			order: "pre",
 			handler(id) {

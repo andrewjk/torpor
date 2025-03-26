@@ -1,4 +1,5 @@
-import CookieHelper from "./CookieHelper";
+import CookieHelper from "../server/CookieHelper";
+import HeaderHelper from "../server/HeaderHelper";
 
 type ServerLoadEvent = {
 	/**
@@ -25,6 +26,10 @@ type ServerLoadEvent = {
 	 * A helper for getting and setting cookie data.
 	 */
 	cookies: CookieHelper;
+	/**
+	 * A helper for getting and setting headers.
+	 */
+	headers: HeaderHelper;
 };
 
 export default ServerLoadEvent;

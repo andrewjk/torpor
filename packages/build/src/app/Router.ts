@@ -51,8 +51,6 @@ export default class Router {
 		for (let route of this.routes) {
 			let match = path.match(route.regex);
 			if (match) {
-				console.log(`Matched '${path}'`);
-
 				// Lazy load server endpoints and layouts
 				if (!route.handler.loaded) {
 					// TODO:
@@ -66,7 +64,8 @@ export default class Router {
 				};
 			}
 		}
-		console.log(`Not found for '${path}'`);
+
+		console.log(`not found: '${path}'`);
 	}
 
 	loadHandler(handler: RouteHandler, path: string) {

@@ -9,7 +9,7 @@ export default function Build() {
 			<h1>Build</h1>
 			<p>
 				Build is Torpor's site and app building framework. It is built on top of 
-				<a href="https://github.com/nksaraf/vinxi">Vinxi</a>.
+				<a href="https://vite.dev">Vite</a>.
 			</p>
 			<p>
 				This documentation is built in Build.

@@ -1,7 +1,8 @@
 import torpor from "@torpor/unplugin/vite";
+import { configDotenv } from "dotenv";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-//import { fileURLToPath } from "node:url";
+import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
 import { type ViteDevServer } from "vite";
 import createMiddlewareHandler from "../adapters/node/createMiddlewareHandler.ts";
@@ -9,41 +10,36 @@ import createNodeServer from "../adapters/node/createNodeServer.ts";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
 import ServerEvent from "../server/ServerEvent.ts";
+import regexIndexOf from "../utils/regexIndexOf.ts";
 import App from "./App.ts";
 import manifest from "./manifest.ts";
 
-const ENV_PROD = process.env.NODE_ENV === "production";
-//const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-runServer(new App());
-
-async function runServer(app: App) {
+export default async function runDev(app: App) {
 	const options = { server: true };
-	console.log(app);
-	// This should get done outside the library
-	//app.addRoute("/", "./src/app/routes/counter.ts");
-	//app.addRoute("/about", "./src/app/routes/about.ts");
-
-	app.addRouteFolder("routes");
 
 	const server = new Server();
 
+	process.env.DEBUG = "vite-tsconfig-paths";
 	// Create the Vite server in middleware mode and configure the app type as
 	// "custom", disabling Vite's own HTML serving logic so the parent server
 	// can take control
 	const vite = await createViteServer({
 		server: { middlewareMode: true },
 		appType: "custom",
-		plugins: [manifest(app), torpor(options)],
+		plugins: [manifest(app), torpor(options), ...app.plugins],
+		//resolve: {
+		//	alias: {
+		//		"@": path.resolve(app.root, "/src/"),
+		//	},
+		//},
 	});
 
 	// Read site.html
 	// It's called site.html because @torpor/build builds the site (html, routes
 	// etc) while the user builds the app (components etc)
-	const templateFile = path.resolve(
-		app.root,
-		ENV_PROD ? "dist/client/site.html" : "src/app/site.html",
-	);
+	const templateFile = path.resolve(app.root, "src/site.html");
 	let template = await fs.readFile(templateFile, "utf-8");
 
 	// Apply Vite HTML transforms. This injects the Vite HMR client, and also
@@ -51,8 +47,9 @@ async function runServer(app: App) {
 	// universal transform, not individual transforms for each route
 	template = await vite.transformIndexHtml("", template);
 
-	// Prepare site.html up so that we can just splice components into it
-	const clientScript = "/src/app/clientEntry.ts";
+	// Prepare site.html so that we can just splice components into it
+	//const clientScript = "/src/app/clientEntry.ts";
+	const clientScript = path.resolve(__dirname, "../../src/app/clientEntry.ts");
 	let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
 	contentStart = template.indexOf(">", contentStart) + 1;
 	let contentEnd = template.indexOf("</div>", contentStart);
@@ -71,7 +68,7 @@ async function runServer(app: App) {
 	// Any request goes through loadEndPoint
 	server.get("*", async (ev) => {
 		try {
-			const response = await loadEndPoint(ev, vite, app, template);
+			const response = await loadEndPoint(ev, vite, template);
 
 			// HACK: turn off SSR after this so that we can hydrate
 			// Instead we need different routers like Vinxi has?
@@ -88,30 +85,33 @@ async function runServer(app: App) {
 		}
 	});
 
+	// Load environment variables from a `.env` file, with defaults if not set
+	configDotenv();
+
+	process.env.PROTOCOL ??= "http:";
+	process.env.HOST ??= "localhost";
+	process.env.PORT ??= "7059";
+
 	// Create the Node server and start listening
-	const port = 3000;
-	const host = "127.0.0.1";
+	console.log(`\nConnecting to ${process.env.HOST}:${process.env.PORT}`);
 	const node = createNodeServer(server.fetch);
-	node.listen(port, host, () => {
-		console.log(`Listening on ${host}:${port}`);
+	node.listen(parseInt(process.env.PORT), process.env.HOST, () => {
+		console.log(`Listening on ${process.env.HOST}:${process.env.PORT}\n`);
 	});
 }
 
-async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer, app: App, template: string) {
+async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer, template: string) {
 	// Load the server entry. ssrLoadModule automatically transforms ESM
 	// source code to be usable in Node.js. No bundling is required, and
 	// it provides efficient invalidation similar to HMR
-	const serverScript = path.resolve(
-		app.root,
-		ENV_PROD ? "dist/server/serverEntry.js" : "/src/app/serverEntry.ts",
-	);
-	const { render } = ENV_PROD
-		? (import(serverScript) as any)
-		: await vite.ssrLoadModule(serverScript);
+	const serverScript = path.resolve(__dirname, "../../src/app/serverEntry.ts");
+	//const serverScript = path.resolve("../../src/app/serverEntry.ts");
+	const { render } = await vite.ssrLoadModule(serverScript);
+	//const { render } = await import(serverScript);
 
 	// Render the app HTML via serverEntry's exported `render` function
-	const appHtml = await render(ev);
-
+	return await render(ev, template);
+	/*
 	// Inject the app-rendered HTML into the template
 	const html = template.replace("%COMPONENT_HTML%", appHtml);
 
@@ -122,10 +122,5 @@ async function loadEndPoint(ev: ServerEvent, vite: ViteDevServer, app: App, temp
 			"Content-Type": "text/html",
 		},
 	});
-}
-
-// From https://stackoverflow.com/a/274094
-function regexIndexOf(string: string, regex: RegExp, position?: number) {
-	var indexOf = string.substring(position || 0).search(regex);
-	return indexOf >= 0 ? indexOf + (position || 0) : indexOf;
+	*/
 }

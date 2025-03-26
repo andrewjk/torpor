@@ -24,7 +24,7 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "site.config.ts"],
 	// TODO: Fix these files
 	"exclude": ["src/lib/api/middleware/**/*"]
 }
