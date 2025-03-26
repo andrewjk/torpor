@@ -21,6 +21,9 @@
 			"types": "./dist/state.d.ts",
 			"import": "./dist/state.js",
 			"require": "./dist/state.cjs"
+		},
+		"./manifest": {
+			"types": "./src/types/manifest.d.ts"
 		}
 	},
 	"publishConfig": {
@@ -34,24 +37,26 @@
 		"build:watch": "tsup --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest",
-		"serve": "tsx ./src/app/serve.ts"
+		"serve": "tsx ./src/app/serve.ts",
+		"build:client": "vite build --outDir dist/client",
+		"build:server": "vite build --outDir dist/server --ssr src/app/entryServer.ts"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^"
+		"@torpor/view": "workspace:^",
+		"vite": "^6.2.3",
+		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/express": "^5.0.0",
+		"@types/express": "^5.0.1",
 		"express": "^4.21.2",
-		"lilconfig": "^3.1.3",
-		"tsup": "^8.3.6",
-		"tsx": "^4.19.2",
-		"typescript": "^5.7.3",
-		"vite": "^6.1.0",
-		"vitest": "^3.0.7"
+		"tsup": "^8.4.0",
+		"tsx": "^4.19.3",
+		"typescript": "^5.8.2",
+		"vitest": "^3.0.9"
 	}
 }

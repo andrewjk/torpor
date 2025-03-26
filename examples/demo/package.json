@@ -7,8 +7,7 @@
 	"scripts": {
 		"dev": "cd ../../packages/build && pnpm build && cd ../../examples/demo && tb --dev",
 		"build": "tsc --noEmit && tb --build",
-		"check": "tsc --noEmit",
-		"preview": "vinxi serve"
+		"check": "tsc --noEmit"
 	},
 	"keywords": [],
 	"author": "",
@@ -17,7 +16,6 @@
 		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^",
-		"vinxi": "^0.5.3"
+		"@torpor/view": "workspace:^"
 	}
 }
