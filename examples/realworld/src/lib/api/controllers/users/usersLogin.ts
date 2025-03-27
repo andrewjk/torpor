@@ -18,7 +18,6 @@ export default async function userLogin(request: Request) {
 		if (!user) return notFound();
 
 		// Compare the user password given with the one stored
-		console.log(password, user.password);
 		if (!compareWithHash(password, user.password)) return forbidden();
 
 		// Create the user token for future authentication

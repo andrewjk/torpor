@@ -1,6 +1,7 @@
 //const base = 'https://api.realworld.io/api';
 //const base = "http://localhost:3000/api";
 const base = "http://localhost:7059/api";
+//const base = `${process.env.PROTOCOL}//${process.env.HOST}:${process.env.PORT}/api`;
 
 interface SendOptions {
 	method: "GET" | "POST" | "PUT" | "DELETE";
@@ -12,7 +13,7 @@ interface SendOptions {
 // TODO: Make this all type-safe
 
 async function send({ method, path, data, token }: SendOptions) {
-	console.log("getting api data from", path);
+	console.log(`getting api data from '${path}'`);
 
 	interface RequestOptions {
 		method: string;

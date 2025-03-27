@@ -14,7 +14,9 @@ const DUMMY_BASE_URL = "http://localhost";
 export default function requestToNodeMessage(request: Request): IncomingMessage {
 	const parsedUrl = new URL(request.url, DUMMY_BASE_URL);
 	const pathAndQuery = (parsedUrl.pathname || "") + (parsedUrl.search || "");
-	const body = request.body ? Readable.fromWeb(request.body as any) : Readable.from([]);
+	// HACK: Using Readable.fromWeb locks request.body so that the request cannot be used again
+	// As we're only using this for Vite middlewares, it's safe to discard the body for now?
+	const body = /*request.body ? Readable.fromWeb(request.body as any) :*/ Readable.from([]);
 
 	return Object.assign(body, {
 		url: pathAndQuery,

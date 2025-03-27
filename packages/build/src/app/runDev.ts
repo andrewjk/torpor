@@ -21,7 +21,6 @@ export default async function runDev(app: App) {
 
 	const server = new Server();
 
-	process.env.DEBUG = "vite-tsconfig-paths";
 	// Create the Vite server in middleware mode and configure the app type as
 	// "custom", disabling Vite's own HTML serving logic so the parent server
 	// can take control
@@ -29,11 +28,6 @@ export default async function runDev(app: App) {
 		server: { middlewareMode: true },
 		appType: "custom",
 		plugins: [manifest(app), torpor(options), ...app.plugins],
-		//resolve: {
-		//	alias: {
-		//		"@": path.resolve(app.root, "/src/"),
-		//	},
-		//},
 	});
 
 	// Read site.html
@@ -48,7 +42,6 @@ export default async function runDev(app: App) {
 	template = await vite.transformIndexHtml("", template);
 
 	// Prepare site.html so that we can just splice components into it
-	//const clientScript = "/src/app/clientEntry.ts";
 	const clientScript = path.resolve(__dirname, "../../src/app/clientEntry.ts");
 	let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
 	contentStart = template.indexOf(">", contentStart) + 1;
@@ -62,11 +55,13 @@ export default async function runDev(app: App) {
 		template.substring(contentEnd) +
 		`<script type="module" src="${clientScript}"></script>`;
 
-	// Use vite's connect instance as middleware
+	// Use vite's Connect instance as middleware. We need to wrap it with
+	// createMiddlewareHandler that converts Connect middleware to
+	// Request/Response web handlers
 	server.use(createMiddlewareHandler(vite.middlewares));
 
-	// Any request goes through loadEndPoint
-	server.get("*", async (ev) => {
+	// Every request (GET, POST, etc) goes through loadEndPoint
+	server.add("*", async (ev) => {
 		try {
 			const response = await loadEndPoint(ev, vite, template);
 

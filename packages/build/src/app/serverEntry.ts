@@ -85,6 +85,8 @@ async function loadData(
 		// redirect), send an ok response
 		return result || ok();
 	}
+
+	return notFound();
 }
 
 async function loadServerData(
@@ -114,6 +116,9 @@ async function loadServerData(
 	// It's ok if there's no load method -- we can't tell whether there will be
 	// when loading routes
 	//return ok();
+
+	// Trying this out
+	return notFound();
 }
 
 async function loadView(
@@ -132,16 +137,6 @@ async function loadView(
 	// There may be a server endpoint
 	const serverEndPoint: PageServerEndPoint | undefined =
 		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
-
-	// Build client scripts
-	/*
-	const clientManifest = getManifest("client");
-	const clientHandler = clientManifest.inputs[clientManifest.handler];
-	const clientScript = clientHandler.output.path;
-	const hasClientScript = !!clientScript;
-	const manifestJson = JSON.stringify(clientManifest.json());
-	const hasManifestJson = manifestJson !== "{}";
-	*/
 
 	// Maybe hit the server hook
 	const serverParams = buildServerParams(ev, url, params);
@@ -252,13 +247,15 @@ async function runAction(
 				}
 			}
 
-			const result = await action(serverParams);
+			const result = await action(serverParams); // <--
 
 			// If there was no response returned from the action (such as errors
 			// or a redirect), reload the page by redirecting
 			return result || seeOther(url.pathname);
 		}
 	}
+
+	return notFound();
 }
 
 async function loadClientAndServerData(
