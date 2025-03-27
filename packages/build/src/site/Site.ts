@@ -25,7 +25,6 @@ export default class Site {
 	}
 
 	async addRouteFolder(folder: string) {
-		// TODO: Use this.root
 		const routeFolder = path.join(this.root, folder);
 		const routeFiles = await fs.readdir(routeFolder, { recursive: true });
 
@@ -35,11 +34,11 @@ export default class Site {
 				let routePath = file
 					.replace(/^\//, "")
 					.replace(/(\.ts|\.js)$/, "")
-					.replace(/_hook.server$/, "_hook/~server")
-					.replace(/_layout.server$/, "_layout/~server")
-					.replace(/\+page.server$/, "~server")
+					.replace(/_hook.server$/, "_hook~server")
+					.replace(/_layout.server$/, "_layout~server")
+					.replace(/\+page.server$/, "_page~server")
+					.replace(/\+server$/, "~server")
 					.replace(/\+page$/, "")
-					.replace(/\+server$/, "")
 					.replace(/\/$/, "");
 				routePath = routePath.length > 0 ? `/${routePath}` : "/";
 				file = path.relative(this.root, path.resolve(routeFolder, file));
@@ -49,7 +48,8 @@ export default class Site {
 		this.sortRoutes();
 	}
 
-	addRoute(path: string, file: string) {
+	addRouteFile(path: string, file: string) {
+		// TODO: Indicate what type of route it is?
 		this.routes.push({ path, file });
 		this.sortRoutes();
 	}

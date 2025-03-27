@@ -40,19 +40,19 @@ export async function load(ev: ServerEvent, template: string) {
 	const params = route.params || {};
 
 	// TODO: Hit the server hook out here
-
 	// We could maybe set data loading up as middleware on a route??????
 
-	// HACK: Support any +server location??
-	if (path.startsWith("/api/")) {
-		return await loadData(ev, url, handler, params);
+	if (path.endsWith("/~server")) {
+		// It's a /+server.ts endpoint
+		const functionName = ev.request.method.toLowerCase().replace("delete", "del");
+		return await loadData(ev, url, handler, functionName, params);
 	} else if (path.endsWith("~server")) {
-		// HACK: Is this the best way to signal that we want server data??
-		// And can we maybe combine this with the above method, or are they too different?
+		// It's a /+page.server.ts or /_layout.server.ts endpoint
 		if (ev.request.method === "GET") {
-			return await loadServerData(ev, url, handler, params);
+			return await loadData(ev, url, handler, "load", params);
 		}
 	} else {
+		// It's a /+page.ts or /_layout.ts endpoint
 		if (ev.request.method === "GET") {
 			return await loadView(ev, url, handler, params, template);
 		} else if (ev.request.method === "POST") {
@@ -65,10 +65,9 @@ async function loadData(
 	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
+	functionName: string,
 	params: Record<string, string>,
 ) {
-	const functionName = ev.request.method.toLowerCase().replace("delete", "del");
-
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
 	if (serverEndPoint && serverEndPoint[functionName]) {
 		const serverParams = buildServerParams(ev, url, params);
@@ -87,38 +86,6 @@ async function loadData(
 		return result || ok();
 	}
 
-	return notFound();
-}
-
-async function loadServerData(
-	ev: ServerEvent,
-	url: URL,
-	handler: RouteHandler,
-	params: Record<string, string>,
-) {
-	const serverEndPoint: PageServerEndPoint | undefined = (await handler.endPoint()).default;
-	if (serverEndPoint?.load) {
-		const serverParams = buildServerParams(ev, url, params);
-
-		if (handler.serverHook) {
-			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-			if (serverHook?.handle) {
-				await serverHook.handle(serverParams);
-			}
-		}
-
-		const result = await serverEndPoint.load(serverParams);
-
-		// If there was no response returned from load (such as errors or a
-		// redirect), send an ok response
-		return result || ok();
-	}
-
-	// It's ok if there's no load method -- we can't tell whether there will be
-	// when loading routes
-	//return ok();
-
-	// Trying this out
 	return notFound();
 }
 

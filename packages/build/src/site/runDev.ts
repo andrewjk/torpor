@@ -17,8 +17,6 @@ import manifest from "./manifest.ts";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default async function runDev(site: Site) {
-	const options = { server: true };
-
 	const server = new Server();
 
 	// Create the Vite server in middleware mode and configure the app type as
@@ -30,7 +28,7 @@ export default async function runDev(site: Site) {
 		plugins: [
 			manifest(site),
 			// @ts-ignore not sure...
-			torpor(options),
+			torpor(),
 			...site.plugins,
 		],
 	});
@@ -68,15 +66,7 @@ export default async function runDev(site: Site) {
 	// Every request (GET, POST, etc) goes through loadEndPoint
 	server.add("*", async (ev) => {
 		try {
-			const response = await loadEndPoint(ev, vite, template);
-
-			// HACK: turn off SSR after this so that we can hydrate
-			// Instead we need different routers like Vinxi has?
-			// Or somehow indicate to the router that we are server/client?
-			// Headers maybe???
-			options.server = false;
-
-			return response;
+			return await loadEndPoint(ev, vite, template);
 		} catch (e: any) {
 			// If an error is caught, let Vite fix the stack trace so it maps
 			// back to your actual source code
