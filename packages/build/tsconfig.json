@@ -5,5 +5,5 @@
 		"skipLibCheck": true,
 		"verbatimModuleSyntax": false
 	},
-	"include": ["src", "src/app"]
+	"include": ["src", "src/site/app"]
 }

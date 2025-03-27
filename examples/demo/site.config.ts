@@ -1,7 +1,7 @@
-import { App } from "@torpor/build";
+import { Site } from "@torpor/build";
 
-const app = new App();
+const site = new Site();
 
-app.addRouteFolder("./src/routes");
+site.addRouteFolder("./src/routes");
 
-export default app;
+export default site;

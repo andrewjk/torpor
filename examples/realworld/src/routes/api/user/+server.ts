@@ -6,7 +6,7 @@ export default {
 	get: ({ request }) => {
 		return userGet(request);
 	},
-	post: ({ appData, request }) => {
+	put: ({ appData, request }) => {
 		return userUpdate(appData, request);
 	},
 } satisfies ServerEndPoint;

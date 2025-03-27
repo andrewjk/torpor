@@ -3,20 +3,21 @@ import path from "node:path";
 import { Plugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-//import { fileURLToPath } from "node:url";
-
 // The user sets this up
-// It will then be passed into serverEntry and clientEntry in a Vite plugin
-// In those files, it will build a Router
-// TODO: Rename this to Site
+// It is passed into serverEntry and clientEntry through a Vite plugin (defined in manifest.ts)
+// In those files, it is used to build a Router
 
-//const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-export default class App {
+/**
+ * The Site class contains the information necessary to setup a @torpor/build
+ * site, including routes, plugins, and options.
+ */
+export default class Site {
 	root: string;
 	routes: { path: string; file: string }[] = [];
 	// Is default plugins a bad idea?
 	// HACK: Set loose because otherwise it uses a list of allowed extensions
+	// TODO: Should probably just do this ourselves and let the user pass in
+	// tsconfigPaths themselves if they want to do something funky
 	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
 
 	constructor() {
