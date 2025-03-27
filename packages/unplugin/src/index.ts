@@ -24,7 +24,13 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		// Check for *.torp files
 		return /\.torp\?*/.test(id);
 	},
-	transform(code, id) {
+	// @ts-ignore
+	transform(code, id, viteOptions) {
+		// Vite can override user server options
+		if (options && viteOptions && viteOptions.ssr !== undefined) {
+			options.server = viteOptions.ssr;
+		}
+
 		// Try to parse the code
 		let parsed = parse(code);
 		if (parsed.ok && parsed.template) {
