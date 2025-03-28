@@ -28,7 +28,7 @@
 		"typescript": "^5.8.2",
 		"vitest": "^3.0.9"
 	},
-	"packageManager": "pnpm@10.3.0",
+	"packageManager": "pnpm@10.7.0",
 	"workspaces": [
 		"packages/build",
 		"packages/create-build",
