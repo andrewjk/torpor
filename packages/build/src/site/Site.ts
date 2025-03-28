@@ -34,10 +34,10 @@ export default class Site {
 				let routePath = file
 					.replace(/^\//, "")
 					.replace(/(\.ts|\.js)$/, "")
-					.replace(/_hook.server$/, "_hook~server")
-					.replace(/_layout.server$/, "_layout~server")
-					.replace(/\+page.server$/, "_page~server")
-					.replace(/\+server$/, "~server")
+					.replace(/_hook.server$/, "_hook/~server")
+					.replace(/_layout.server$/, "_layout/~server")
+					.replace(/\+page.server$/, "~server")
+					.replace(/\+server$/, "")
 					.replace(/\+page$/, "")
 					.replace(/\/$/, "");
 				routePath = routePath.length > 0 ? `/${routePath}` : "/";

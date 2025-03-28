@@ -1,9 +1,9 @@
 import * as api from "@/lib/api.js";
 import { pageSize } from "@/lib/constants";
-import { type ServerEvent } from "@torpor/build";
+import { type ServerLoadEvent } from "@torpor/build";
 
 export default async function loadArticles(
-	{ url, params, appData }: ServerEvent,
+	{ url, params, appData }: ServerLoadEvent,
 	type: "author" | "favorited",
 ) {
 	const user = appData.user;

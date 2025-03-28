@@ -50,7 +50,7 @@ export default class Server {
 				}
 			}
 		} else if (match) {
-			await match.fn(ev);
+			ev.response = await match.fn(ev);
 		} else {
 			return new Response(null, { status: 404 });
 		}

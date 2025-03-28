@@ -104,14 +104,14 @@ export default class Router {
 	}
 
 	findServer(path: string): (() => Promise<any>) | undefined {
-		const serverPath = path + "~server";
+		const serverPath = path.replace(/\/$/, "") + "/~server";
 		const serverRoute = this.routes.find((r) => r.path === serverPath);
 		return serverRoute && serverRoute.handler.endPoint;
 	}
 
 	findServerHook(path: string): (() => Promise<any>) | undefined {
 		// TODO: Should this be a collection, like layouts?
-		let serverHookPath = "/_hook~server";
+		let serverHookPath = "/_hook/~server";
 		// HACK: Generalise this
 		if (path.startsWith("/api/")) {
 			serverHookPath = "/api" + serverHookPath;

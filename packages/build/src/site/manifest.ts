@@ -8,7 +8,7 @@ const moduleId = "@torpor/build/manifest";
  * A Vite plugin that provides information about the app to both clientEntry and
  * serverEntry.
  */
-export default function manifest(app: Site): Plugin {
+export default function manifest(app: Site, server = false): Plugin {
 	return {
 		name: "torpor-manifest",
 		resolveId: {
@@ -24,7 +24,13 @@ export default function manifest(app: Site): Plugin {
 				return `
 export default {
   routes: [
-    ${app.routes.map((r) => `{ path: "${r.path}", file: "${r.file}", endPoint: () => import(/* @vite-ignore */ "${path.join(app.root, r.file)}") }`).join(",\n    ")}
+    ${app.routes
+			.filter((r) => server || !/server\.(ts|js)$/.test(r.file))
+			.map(
+				(r) =>
+					`{ path: "${r.path}", file: "${r.file}", endPoint: () => import(/* @vite-ignore */ "${path.join(app.root, r.file)}") }`,
+			)
+			.join(",\n    ")}
   ],
 };
 `;

@@ -6,7 +6,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "cd ../../packages/build && pnpm build && cd ../../examples/realworld && tb --dev",
-		"build": "tsc --noEmit && tb --build",
+		"build": "cd ../../packages/build && pnpm build && cd ../../examples/realworld && tsc --noEmit && tb --build",
 		"check": "tsc --noEmit",
 		"db:generate": "prisma generate",
 		"db:migratex": "tsx ./src/data/migrate.ts"

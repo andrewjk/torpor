@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { transformWithEsbuild } from "vite";
 import Site from "../site/Site";
+import runBuild from "../site/runBuild";
 import runDev from "../site/runDev";
 
 run();
@@ -17,7 +18,7 @@ async function run() {
 		// If it's JS, we can just import it straight up
 		configFile = jsConfigFile;
 	} else if (fs.existsSync(tsConfigFile)) {
-		// If it's TS, we need to conver it to JS
+		// If it's TS, we need to convert it to JS
 		// TODO: Put the generated file somewhere better (dist?)
 		configFile = path.join(workingDir, "site.config.out.js");
 		let source = (
@@ -38,7 +39,6 @@ async function run() {
 	if (process.argv.includes("--dev")) {
 		await runDev(site);
 	} else if (process.argv.includes("--build")) {
-		// TODO:
-		//await app.build();
+		await runBuild(site);
 	}
 }

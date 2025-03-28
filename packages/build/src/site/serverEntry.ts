@@ -42,7 +42,7 @@ export async function load(ev: ServerEvent, template: string) {
 	// TODO: Hit the server hook out here
 	// We could maybe set data loading up as middleware on a route??????
 
-	if (path.endsWith("/~server")) {
+	if (path.startsWith("/api/")) {
 		// It's a /+server.ts endpoint
 		const functionName = ev.request.method.toLowerCase().replace("delete", "del");
 		return await loadData(ev, url, handler, functionName, params);

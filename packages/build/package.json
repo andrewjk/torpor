@@ -36,9 +36,7 @@
 		"build": "tsup",
 		"build:watch": "tsup --watch",
 		"check": "tsc --noEmit",
-		"test": "vitest",
-		"build:client": "vite build --outDir dist/client",
-		"build:server": "vite build --outDir dist/server --ssr src/site/serverEntry.ts"
+		"test": "vitest"
 	},
 	"keywords": [],
 	"author": "",
