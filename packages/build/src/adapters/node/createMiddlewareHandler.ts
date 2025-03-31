@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
-import MiddlewareFunction from "../../types/MiddlewareFunction";
+import type MiddlewareFunction from "../../types/MiddlewareFunction";
 import flattenHeaders from "./flattenHeaders";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
 import requestToNodeMessage from "./requestToNodeMessage";

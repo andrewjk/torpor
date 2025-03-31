@@ -1,5 +1,6 @@
-import LayoutHandler from "../types/LayoutHandler";
-import RouteHandler from "../types/RouteHandler";
+import type LayoutHandler from "../types/LayoutHandler";
+import type ManifestRoute from "../types/ManifestRoute";
+import type RouteHandler from "../types/RouteHandler";
 import pathToRegex from "./pathToRegex";
 
 export default class Router {
@@ -13,11 +14,12 @@ export default class Router {
 	//	this.addPage(route, file);
 	//}
 
-	addPages(routes: { path: string; endPoint: () => Promise<any> }[]) {
+	addPages(routes: ManifestRoute[]) {
 		for (let r of routes) {
 			this.routes.push(
 				new Route(r.path, {
 					path: r.path,
+					type: r.type,
 					endPoint: r.endPoint,
 				}),
 			);
@@ -26,11 +28,12 @@ export default class Router {
 	}
 
 	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
-	addPage(path: string, endPoint: () => Promise<any>) {
+	addPage(path: string, type: number, endPoint: () => Promise<any>) {
 		//this.server.get(route, (ev) => this.loadPage(ev, file));
 		this.routes.push(
 			new Route(path, {
 				path,
+				type,
 				endPoint,
 			}),
 		);

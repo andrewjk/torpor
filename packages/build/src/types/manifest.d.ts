@@ -1,5 +1,7 @@
+import type ManifestRoute from "./ManifestRoute";
+
 declare const manifest: {
-	routes: { path: string; file: string; endPoint: () => Promise<any> }[];
+	routes: ManifestRoute[];
 };
 
 export default manifest;

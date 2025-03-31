@@ -28,7 +28,7 @@ export default {
 			.filter((r) => server || !/server\.(ts|js)$/.test(r.file))
 			.map(
 				(r) =>
-					`{ path: "${r.path}", file: "${r.file}", endPoint: () => import(/* @vite-ignore */ "${path.join(app.root, r.file)}") }`,
+					`{ path: "${r.path}", file: "${r.file}", type: ${r.type}, endPoint: () => import(/* @vite-ignore */ "${path.join(app.root, r.file)}") }`,
 			)
 			.join(",\n    ")}
   ],

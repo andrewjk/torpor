@@ -1,6 +1,6 @@
 import ServerFunction from "../server/ServerFunction";
-import HttpMethod from "../types/HttpMethod";
-import MiddlewareFunction from "../types/MiddlewareFunction";
+import type HttpMethod from "../types/HttpMethod";
+import type MiddlewareFunction from "../types/MiddlewareFunction";
 import pathToRegex from "./pathToRegex";
 
 // This is not actually used anywhere, for now at least

@@ -8,6 +8,15 @@ import $page from "../state/$page.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import RouteHandler from "../types/RouteHandler.ts";
+import {
+	HOOK_ROUTE,
+	HOOK_SERVER_ROUTE,
+	LAYOUT_ROUTE,
+	LAYOUT_SERVER_ROUTE,
+	PAGE_ROUTE,
+	PAGE_SERVER_ROUTE,
+	SERVER_ROUTE,
+} from "../types/RouteType";
 import type ServerEndPoint from "../types/ServerEndPoint.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
@@ -31,6 +40,7 @@ export async function load(ev: ServerEvent, template: string) {
 	if (!route) {
 		return notFound();
 	}
+	console.log(route);
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
@@ -42,23 +52,37 @@ export async function load(ev: ServerEvent, template: string) {
 	// TODO: Hit the server hook out here
 	// We could maybe set data loading up as middleware on a route??????
 
-	if (path.startsWith("/api/")) {
-		// It's a /+server.ts endpoint
-		const functionName = ev.request.method.toLowerCase().replace("delete", "del");
-		return await loadData(ev, url, handler, functionName, params);
-	} else if (path.endsWith("~server")) {
-		// It's a /+page.server.ts or /_layout.server.ts endpoint
-		if (ev.request.method === "GET") {
-			return await loadData(ev, url, handler, "load", params);
+	switch (handler.type) {
+		case PAGE_ROUTE:
+		case LAYOUT_ROUTE: {
+			// It's a /+page.ts or /_layout.ts endpoint
+			if (ev.request.method === "GET") {
+				return await loadView(ev, url, handler, params, template);
+			} else if (ev.request.method === "POST") {
+				return await runAction(ev, url, handler, params, query);
+			}
+			break;
 		}
-	} else {
-		// It's a /+page.ts or /_layout.ts endpoint
-		if (ev.request.method === "GET") {
-			return await loadView(ev, url, handler, params, template);
-		} else if (ev.request.method === "POST") {
-			return await runAction(ev, url, handler, params, query);
+		case PAGE_SERVER_ROUTE:
+		case LAYOUT_SERVER_ROUTE: {
+			// It's a /+page.server.ts or /_layout.server.ts endpoint
+			if (ev.request.method === "GET") {
+				return await loadData(ev, url, handler, "load", params);
+			}
+			break;
+		}
+		case SERVER_ROUTE: {
+			// It's a /+server.ts endpoint
+			const functionName = ev.request.method.toLowerCase().replace("delete", "del");
+			return await loadData(ev, url, handler, functionName, params);
+		}
+		case HOOK_ROUTE:
+		case HOOK_SERVER_ROUTE: {
+			break;
 		}
 	}
+
+	return notFound();
 }
 
 async function loadData(
