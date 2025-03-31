@@ -1,8 +1,8 @@
 import { IncomingMessage, ServerResponse } from "node:http";
-import { Readable } from "node:stream";
 import type MiddlewareFunction from "../../types/MiddlewareFunction";
 import flattenHeaders from "./flattenHeaders";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
+import readableToBuffer from "./readableToBuffer";
 import requestToNodeMessage from "./requestToNodeMessage";
 
 // From https://github.com/vikejs/vike-node/blob/main/packages/vike-node/src/runtime/adapters/connectToWeb.ts
@@ -24,11 +24,10 @@ export default function createMiddlewareHandler(
 			onReadable(async ({ readable, headers, status }) => {
 				const responseBody = statusCodesWithoutBody.includes(status)
 					? null
-					: (Readable.toWeb(readable) as ReadableStream);
-				// HACK: I had an issue where chunked bodies were not being
-				// read correctly somewhere so I used the below but now it
-				// appears to be working?
-				//await readableToBuffer(readable);
+					: //(Readable.toWeb(readable) as ReadableStream);
+						// HACK: Chunked bodies are not being
+						// read correctly somewhere...
+						await readableToBuffer(readable);
 				ev.response = new Response(responseBody, {
 					status,
 					headers: flattenHeaders(headers),

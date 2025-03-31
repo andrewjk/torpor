@@ -7,6 +7,7 @@ import { build, defineConfig } from "vite";
 import createNodeServer from "../adapters/node/createNodeServer.ts";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
+import contentType from "../server/contentType.ts";
 import Site from "./Site.ts";
 import manifest from "./manifest.ts";
 import prepareTemplate from "./prepareTemplate.ts";
@@ -19,6 +20,8 @@ export default async function runBuild(site: Site) {
 	if (existsSync(distFolder)) {
 		await fs.rm(distFolder, { recursive: true });
 	}
+	const clientFolder = path.join(distFolder, "client");
+	const serverFolder = path.join(distFolder, "server");
 
 	// TODO: From a setting
 	let siteHtml = path.resolve(site.root, "src/site.html");
@@ -37,7 +40,7 @@ export default async function runBuild(site: Site) {
 				...site.plugins,
 			],
 			build: {
-				outDir: path.join(distFolder, "client"),
+				outDir: clientFolder,
 				rollupOptions: {
 					input: [
 						siteHtml,
@@ -63,7 +66,7 @@ export default async function runBuild(site: Site) {
 				...site.plugins,
 			],
 			build: {
-				outDir: path.join(distFolder, "server"),
+				outDir: serverFolder,
 				rollupOptions: {
 					input: [serverScriptFile, ...site.routes.map((r) => path.resolve(site.root, r.file))],
 				},
@@ -72,19 +75,20 @@ export default async function runBuild(site: Site) {
 		}),
 	);
 
-	// Move the site.html and clientEntry.js files into /client
+	// Move the site.html file into /client
 	// HACK: Should do this in Rollup if possible?
-	siteHtml = path.join(distFolder, "/client/site.html");
-	await fs.rename(path.join(distFolder, "/client/src/site.html"), siteHtml);
-	await fs.rm(path.join(distFolder, "/client/src"), { recursive: true });
-	clientScriptFile = path.join(distFolder, "/client/clientEntry.js");
-	let fileToRename = (await fs.readdir(path.join(distFolder, "/client/assets"))).find((f) =>
-		f.includes("clientEntry-"),
+	siteHtml = path.join(clientFolder, "site.html");
+	await fs.rename(path.join(clientFolder, "src", "site.html"), siteHtml);
+	await fs.rm(path.join(clientFolder, "src"), { recursive: true });
+
+	// Find the client script file in /assets
+	let clientScriptName = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
+		f.startsWith("clientEntry-"),
 	);
-	if (!fileToRename) {
+	if (!clientScriptName) {
 		throw new Error("clientEntry.js not found");
 	}
-	await fs.rename(path.join(distFolder, "/client/assets", fileToRename), clientScriptFile);
+	clientScriptFile = `/assets/${clientScriptName}`;
 
 	const server = new Server();
 
@@ -104,11 +108,31 @@ export default async function runBuild(site: Site) {
 
 	//server.use(createMiddlewareHandler(vite.middlewares));
 
+	// Serve dist/client/assets statically
+	server.add("/assets/*", async (ev) => {
+		try {
+			const url = new URL(ev.request.url);
+			const file = path.join(site.root, "dist", "client", url.pathname);
+			if (existsSync(file)) {
+				// TODO: Stream the data?
+				return new Response(await fs.readFile(file), {
+					status: 200,
+					headers: {
+						"Content-Type": contentType(path.extname(file)),
+					},
+				});
+			}
+			//}
+		} catch (e: any) {
+			return serverError(e);
+		}
+	});
+
 	// Every request (GET, POST, etc) goes through loadEndPoint
+	const serverScript = path.resolve(serverFolder, "serverEntry.js");
 	server.add("*", async (ev) => {
 		try {
 			// Load the server entry
-			const serverScript = path.resolve(distFolder, "server/serverEntry.js");
 			const { load } = await import(serverScript);
 
 			// Render the app HTML (or fetch server data etc) via serverEntry's

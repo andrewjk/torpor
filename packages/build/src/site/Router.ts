@@ -56,7 +56,6 @@ export default class Router {
 			if (match) {
 				// Lazy load server endpoints and layouts
 				if (!route.handler.loaded) {
-					// TODO:
 					this.loadHandler(route.handler, route.path);
 				}
 

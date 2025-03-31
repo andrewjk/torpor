@@ -63,8 +63,7 @@ export default class Server {
 	};
 
 	/**
-	 * Adds a method/route pattern combination.
-	 * @param method The HTTP method, such as GET, PUT or POST.
+	 * Adds a server function at a route path.
 	 * @param path The route path pattern.
 	 * @param fn The function to call when the pattern is matched.
 	 * @returns

@@ -176,7 +176,7 @@ async function loadClientAndServerData(
 		const serverResponse = await fetch(serverUrl);
 		if (
 			serverResponse?.ok &&
-			serverResponse.headers.get("content-type")?.includes("application/json")
+			serverResponse.headers.get("Content-Type")?.includes("application/json")
 		) {
 			const serverData = await serverResponse.json();
 			Object.assign(newData, serverData);

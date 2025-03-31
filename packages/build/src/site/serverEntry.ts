@@ -40,7 +40,6 @@ export async function load(ev: ServerEvent, template: string) {
 	if (!route) {
 		return notFound();
 	}
-	console.log(route);
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
@@ -211,7 +210,7 @@ async function loadView(
 	return new Response(html, {
 		status: 200,
 		headers: {
-			"content-type": "text/html",
+			"Content-Type": "text/html",
 		},
 	});
 }
