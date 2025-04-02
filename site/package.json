@@ -18,5 +18,8 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"sucrase": "^3.35.0"
+	},
+	"devDependencies": {
+		"typescript": "^5.8.2"
 	}
 }
