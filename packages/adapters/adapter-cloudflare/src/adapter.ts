@@ -1,12 +1,8 @@
+import { type Adapter, Site } from "@torpor/build";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { build, defineConfig } from "vite";
-import Site from "../../site/Site";
-import prepareTemplate from "../../site/prepareTemplate";
-import type Adapter from "../../types/Adapter";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import prepareTemplate from "./prepareTemplate";
 
 export default {
 	postbuild,
@@ -25,8 +21,15 @@ async function postbuild(site: Site) {
 	const tempFolder = path.join(distFolder, "temp");
 	const cloudflareFolder = path.join(distFolder, "cloudflare");
 
+	// TODO: Is this going to be the correct path after installing from npm?
+	const buildSrcFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/");
+	const adapterSrcFolder = path.resolve(
+		site.root,
+		"./node_modules/@torpor/adapter-cloudflare/src/",
+	);
+
 	// Compile _worker.ts
-	let workerFile = path.resolve(__dirname, "../../../src/adapters/cloudflare/_worker.ts");
+	let workerFile = path.join(adapterSrcFolder, "_worker.ts");
 	let workerSource = await fs.readFile(workerFile, "utf-8");
 
 	// Find the client script file in /assets
@@ -43,7 +46,7 @@ async function postbuild(site: Site) {
 	let template = await fs.readFile(siteHtml, "utf-8");
 	template = prepareTemplate(template, clientScript);
 
-	const serverClass = path.resolve(__dirname, "../../../src/server/Server.ts");
+	const serverClass = path.join(buildSrcFolder, "server", "Server.ts");
 	const serverScript = path.join(serverFolder, "serverEntry.js");
 
 	// Splice file names into _worker.ts
@@ -91,8 +94,9 @@ async function postbuild(site: Site) {
 	// Build a wrangler.toml file for running with `wrangler dev`
 	const wranglerConfig = `
 name = "torpor-miniflare"
-main = "cloudflare/_worker.js"
+main = "./cloudflare/_worker.js"
 compatibility_date = "2025-01-01"
+
 [assets]
 directory = "./cloudflare"
 binding = "ASSETS"

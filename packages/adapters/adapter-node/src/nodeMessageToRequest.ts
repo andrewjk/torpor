@@ -1,7 +1,7 @@
 import { type IncomingMessage } from "node:http";
 import { Http2ServerRequest } from "node:http2";
 import { Readable } from "node:stream";
-import flattenHeaders from "./flattenHeaders";
+import flattenHeaders from "../../../build/src/server/connect/flattenHeaders";
 
 // From https://stackoverflow.com/a/78849544
 // and https://gist.github.com/marvinhagemeister/cc236ec97235ce0305ae9d48a24a607d

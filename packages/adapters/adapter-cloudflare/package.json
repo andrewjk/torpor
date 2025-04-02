@@ -1,0 +1,32 @@
+{
+	"name": "@torpor/adapter-cloudflare",
+	"version": "0.0.1",
+	"description": "A @torpor/build adapter for deploying to Cloudflare Pages",
+	"type": "module",
+	"main": "dist/index.cjs",
+	"module": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"build": "tsup",
+		"build:watch": "tsup --watch",
+		"check": "tsc --noEmit",
+		"test": "vitest"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@torpor/build": "workspace:^",
+		"vite": "^6.2.4"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
+		"tsup": "^8.4.0",
+		"tsx": "^4.19.3",
+		"typescript": "^5.8.2",
+		"vitest": "^3.1.1"
+	}
+}

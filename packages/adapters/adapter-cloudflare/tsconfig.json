@@ -1,7 +1,7 @@
 {
-	"extends": "../../tsconfig.json",
+	"extends": "../../../tsconfig.json",
 	"compilerOptions": {
-		// TODO: We should be using the tsconfig from the site
+		// HACK:
 		"skipLibCheck": true,
 		"verbatimModuleSyntax": false
 	},

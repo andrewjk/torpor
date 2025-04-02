@@ -1,5 +1,4 @@
-import Server from "../../server/Server";
-import type Adapter from "../../types/Adapter";
+import { type Adapter, Server } from "@torpor/build";
 import createNodeServer from "./createNodeServer";
 
 export default {

@@ -14,6 +14,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@torpor/adapter-cloudflare": "workspace:^",
 		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",

@@ -1,10 +1,9 @@
+import { cloudflare } from "@torpor/adapter-cloudflare";
 import { Site } from "@torpor/build";
-import cloudflare from "@torpor/build/adapters/cloudflare";
 
 const site = new Site();
+site.adapter = cloudflare;
 
 await site.addRouteFolder("./src/routes");
-
-site.adapter = cloudflare;
 
 export default site;

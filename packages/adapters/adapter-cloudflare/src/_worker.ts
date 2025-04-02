@@ -3,7 +3,8 @@ import Server from "%SERVER_CLASS%";
 // @ts-ignore
 import { load } from "%SERVER_SCRIPT%";
 
-// This file has the above imports replaced and is then compiled to create a Cloudflare Pages Worker
+// This file has the above imports replaced and is then compiled to create a
+// Cloudflare Pages worker file
 
 const template = `%HTML_TEMPLATE%`;
 

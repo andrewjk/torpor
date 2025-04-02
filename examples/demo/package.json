@@ -13,6 +13,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"@torpor/adapter-node": "workspace:^",
 		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",

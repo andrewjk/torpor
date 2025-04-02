@@ -2,7 +2,6 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Plugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import node from "../adapters/node";
 import Adapter from "../types/Adapter";
 import {
 	HOOK_ROUTE,
@@ -13,6 +12,7 @@ import {
 	PAGE_SERVER_ROUTE,
 	SERVER_ROUTE,
 } from "../types/RouteType";
+import defaultAdapter from "./defaultAdapter";
 
 // 1. The user sets this up
 // 2. It is passed into serverEntry and clientEntry through a Vite plugin
@@ -32,7 +32,7 @@ export default class Site {
 	// tsconfigPaths themselves if they want to do something funky
 	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
 	// Is default adapter a bad idea?
-	adapter: Adapter = node;
+	adapter: Adapter = defaultAdapter;
 
 	constructor() {
 		this.root = process.cwd();

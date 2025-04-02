@@ -16,6 +16,7 @@
 	"dependencies": {
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@prisma/client": "^6.5.0",
+		"@torpor/adapter-node": "workspace:^",
 		"@torpor/build": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",

@@ -1,4 +1,6 @@
+import Server from "./server/Server";
 import Site from "./site/Site";
+import type Adapter from "./types/Adapter";
 import type PageEndPoint from "./types/PageEndPoint";
 import type PageLoadEvent from "./types/PageLoadEvent";
 import type PageServerAction from "./types/PageServerAction";
@@ -9,9 +11,10 @@ import type ServerHook from "./types/ServerHook";
 import type ServerLoadEvent from "./types/ServerLoadEvent";
 import type ServerRequest from "./types/ServerRequest";
 
-export { Site };
+export { Server, Site };
 
 export type {
+	Adapter,
 	PageEndPoint,
 	PageServerEndPoint,
 	PageServerLoad,
