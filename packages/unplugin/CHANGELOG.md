@@ -1,5 +1,11 @@
 # @torpor/unplugin
 
+## 0.1.0
+
+### Minor Changes
+
+- Overwrite user options with Vite options
+
 ## 0.0.6
 
 ### Patch Changes

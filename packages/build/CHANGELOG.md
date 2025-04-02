@@ -1,5 +1,18 @@
 # @torpor/build
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @torpor/unplugin@0.1.0
+
+## 0.1.0
+
+### Minor Changes
+
+- Chore: replace Vinxi with Vite plugins
+
 ## 0.0.6
 
 ### Patch Changes
