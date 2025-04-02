@@ -47,7 +47,6 @@ async function postbuild(site: Site) {
 	const serverScript = path.join(serverFolder, "serverEntry.js");
 
 	// Splice file names into _worker.ts
-	//let workerSource = await fs.readFile(workerFile, "utf-8");
 	workerSource = workerSource
 		.replace("%SERVER_CLASS%", serverClass)
 		.replace("%SERVER_SCRIPT%", serverScript)
@@ -79,31 +78,23 @@ async function postbuild(site: Site) {
 			},
 		}),
 	);
-	//workerFile = path.join(distFolder, "cloudflare", "_worker.js");
 
-	// Move all the Cloudflare files out into the base folder (because the config
-	// file doesn't get recognised when deployed)
-	for (let file of await fs.readdir(cloudflareFolder)) {
-		await fs.rename(path.join(cloudflareFolder, file), path.join(distFolder, file));
+	// Copy the client assets into the Cloudflare folder
+	await fs.mkdir(path.join(cloudflareFolder, "assets"));
+	for (let file of await fs.readdir(path.join(clientFolder, "assets"))) {
+		await fs.copyFile(
+			path.join(clientFolder, "assets", file),
+			path.join(cloudflareFolder, "assets", file),
+		);
 	}
-	await fs.rm(cloudflareFolder, { recursive: true });
 
-	// Build a wrangler.json file for running with `wrangler dev`
-	//const wranglerConfig = JSON.stringify({
-	//	name: "torpor-miniflare",
-	//	main: "cloudflare/_worker.js",
-	//	compatibility_date: "2025-01-01",
-	//	assets: {
-	//		directory: "./client",
-	//		binding: "ASSETS",
-	//	},
-	//}, null, 2).replaceAll("  ", "\t");
+	// Build a wrangler.toml file for running with `wrangler dev`
 	const wranglerConfig = `
 name = "torpor-miniflare"
-main = "_worker.js"
+main = "cloudflare/_worker.js"
 compatibility_date = "2025-01-01"
 [assets]
-directory = "./client"
+directory = "./cloudflare"
 binding = "ASSETS"
 	`;
 	const wranglerFile = path.join(distFolder, "wrangler.toml");

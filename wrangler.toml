@@ -1,7 +1,0 @@
-name = "torpor-site"
-pages_build_output_dir = "./site/dist"
-compatibility_date = "2025-01-01"
-
-[assets]
-directory = "./client"
-binding = "ASSETS"
