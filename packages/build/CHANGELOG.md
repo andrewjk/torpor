@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.2
+
+### Patch Changes
+
+- d31d14d: Feat: allow running from code
+
 ## 0.1.1
 
 ### Patch Changes
