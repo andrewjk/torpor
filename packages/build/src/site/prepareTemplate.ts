@@ -1,4 +1,4 @@
-export default function prepareTemplate(template: string, clientScriptFile: string) {
+export default function prepareTemplate(template: string, clientScript: string) {
 	let contentStart = regexIndexOf(template, /\<div\s+id=("app"|'app'|app)\s+/);
 	contentStart = template.indexOf(">", contentStart) + 1;
 	let contentEnd = template.indexOf("</div>", contentStart);
@@ -9,7 +9,7 @@ export default function prepareTemplate(template: string, clientScriptFile: stri
 		template.substring(0, contentStart) +
 		"%COMPONENT_HTML%" +
 		template.substring(contentEnd) +
-		`<script type="module" src="${clientScriptFile}"></script>`
+		`<script type="module" src="${clientScript}"></script>`
 	);
 }
 

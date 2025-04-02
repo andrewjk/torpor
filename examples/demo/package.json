@@ -5,7 +5,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../../packages/build && pnpm build && cd ../../examples/demo && tb --dev",
+		"dev": "tb --dev",
 		"build": "tsc --noEmit && tb --build",
 		"check": "tsc --noEmit"
 	},

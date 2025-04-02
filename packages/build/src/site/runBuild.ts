@@ -8,6 +8,11 @@ import manifest from "./manifest.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// TODO: Don't cache index.html in dev?
+// TODO: Multiple hook.server locations
+// TODO: Don't reload layouts during client routing
+// TODO: Call the correct +page and +server routes when in the same folder
+
 export default async function runBuild(site: Site) {
 	// Delete the dist folder if it exists
 	const distFolder = path.resolve(site.root, "dist");
@@ -25,8 +30,8 @@ export default async function runBuild(site: Site) {
 	// TODO: From a setting
 	let siteHtml = path.resolve(site.root, "src/site.html");
 
-	let clientScriptFile = path.resolve(__dirname, "../../src/site/clientEntry.ts");
-	let serverScriptFile = path.resolve(__dirname, "../../src/site/serverEntry.ts");
+	let clientScript = path.resolve(__dirname, "../../src/site/clientEntry.ts");
+	let serverScript = path.resolve(__dirname, "../../src/site/serverEntry.ts");
 
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name
@@ -43,7 +48,7 @@ export default async function runBuild(site: Site) {
 				rollupOptions: {
 					input: [
 						siteHtml,
-						clientScriptFile,
+						clientScript,
 						...site.routes
 							.filter((r) => !/server\.(ts|js)$/.test(r.file))
 							.map((r) => path.resolve(site.root, r.file)),
@@ -67,9 +72,9 @@ export default async function runBuild(site: Site) {
 			build: {
 				outDir: serverFolder,
 				rollupOptions: {
-					input: [serverScriptFile, ...site.routes.map((r) => path.resolve(site.root, r.file))],
+					input: [serverScript, ...site.routes.map((r) => path.resolve(site.root, r.file))],
 				},
-				ssr: serverScriptFile,
+				ssr: serverScript,
 			},
 		}),
 	);
