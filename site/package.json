@@ -5,9 +5,9 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "cd ../packages/view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && pnpm build && cd ../build && pnpm build && cd ../../site && tb --dev",
+		"dev": "tb --dev",
 		"build": "tsc --noEmit && tb --build",
-		"buildcf": "tsx buildcf.ts",
+		"build:cf": "tsx buildcf.ts",
 		"check": "tsc --noEmit"
 	},
 	"keywords": [],
@@ -21,6 +21,7 @@
 		"sucrase": "^3.35.0"
 	},
 	"devDependencies": {
+		"tsx": "^4.19.3",
 		"typescript": "^5.8.2"
 	}
 }
