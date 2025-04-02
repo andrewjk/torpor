@@ -82,17 +82,25 @@ async function postbuild(site: Site) {
 	workerFile = path.join(distFolder, "cloudflare", "_worker.js");
 
 	// Build a wrangler.json file for running with `wrangler dev`
-	const wranglerConfig = {
-		name: "torpor-miniflare",
-		main: "cloudflare/_worker.js",
-		compatibility_date: "2025-01-01",
-		assets: {
-			directory: "./client",
-			binding: "ASSETS",
-		},
-	};
-	const wranglerFile = path.join(distFolder, "wrangler.json");
-	await fs.writeFile(wranglerFile, JSON.stringify(wranglerConfig, null, 2).replaceAll("  ", "\t"));
+	//const wranglerConfig = JSON.stringify({
+	//	name: "torpor-miniflare",
+	//	main: "cloudflare/_worker.js",
+	//	compatibility_date: "2025-01-01",
+	//	assets: {
+	//		directory: "./client",
+	//		binding: "ASSETS",
+	//	},
+	//}, null, 2).replaceAll("  ", "\t");
+	const wranglerConfig = `
+name = "torpor-miniflare"
+main = "cloudflare/_worker.js"
+compatibility_date = "2025-01-01"
+[assets]
+directory = "./client"
+binding = "ASSETS"
+	`;
+	const wranglerFile = path.join(distFolder, "wrangler.toml");
+	await fs.writeFile(wranglerFile, wranglerConfig);
 
 	await fs.rm(tempFolder, { recursive: true });
 }
