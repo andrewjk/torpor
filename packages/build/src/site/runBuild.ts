@@ -1,12 +1,9 @@
 import torpor from "@torpor/unplugin/vite";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { build, defineConfig } from "vite";
 import Site from "./Site.ts";
 import manifest from "./manifest.ts";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // TODO: Don't cache index.html in dev?
 // TODO: Multiple hook.server locations
@@ -30,8 +27,10 @@ export default async function runBuild(site: Site) {
 	// TODO: From a setting
 	let siteHtml = path.resolve(site.root, "src/site.html");
 
-	let clientScript = path.resolve(__dirname, "../../src/site/clientEntry.ts");
-	let serverScript = path.resolve(__dirname, "../../src/site/serverEntry.ts");
+	// TODO: Is this going to be the correct path after installing from npm?
+	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
+	let clientScript = path.join(siteFolder, "clientEntry.ts");
+	let serverScript = path.join(siteFolder, "serverEntry.ts");
 
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name

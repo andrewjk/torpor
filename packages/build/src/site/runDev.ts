@@ -2,7 +2,6 @@ import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
 import createMiddlewareHandler from "../adapters/node/createMiddlewareHandler.ts";
 import { serverError } from "../response.ts";
@@ -10,8 +9,6 @@ import Server from "../server/Server.ts";
 import Site from "./Site.ts";
 import manifest from "./manifest.ts";
 import prepareTemplate from "./prepareTemplate.ts";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default async function runDev(site: Site) {
 	const server = new Server();
@@ -42,8 +39,9 @@ export default async function runDev(site: Site) {
 	template = await vite.transformIndexHtml("", template);
 
 	// TODO: Is this going to be the correct path after installing from npm?
-	const clientScript = path.resolve(__dirname, "../../src/site/clientEntry.ts");
-	const serverScript = path.resolve(__dirname, "../../src/site/serverEntry.ts");
+	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
+	let clientScript = path.join(siteFolder, "clientEntry.ts");
+	let serverScript = path.join(siteFolder, "serverEntry.ts");
 
 	// Prepare site.html so that we can just splice components into it
 	template = prepareTemplate(template, clientScript);

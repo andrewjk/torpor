@@ -5,6 +5,7 @@ export default defineConfig({
 		"src/index.ts",
 		"src/state.ts",
 		"src/response.ts",
+		"src/run.ts",
 		"src/bin/index.ts",
 		"src/adapters/node/index.ts",
 		"src/adapters/cloudflare/index.ts",

@@ -7,6 +7,7 @@
 	"scripts": {
 		"dev": "cd ../packages/view && pnpm build && cd ../unplugin && pnpm build && cd ../ui && pnpm build && cd ../build && pnpm build && cd ../../site && tb --dev",
 		"build": "tsc --noEmit && tb --build",
+		"buildcf": "tsx buildcf.ts",
 		"check": "tsc --noEmit"
 	},
 	"keywords": [],

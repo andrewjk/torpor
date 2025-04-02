@@ -22,6 +22,11 @@
 			"import": "./dist/state.js",
 			"require": "./dist/state.cjs"
 		},
+		"./run": {
+			"types": "./dist/run.d.ts",
+			"import": "./dist/run.js",
+			"require": "./dist/run.cjs"
+		},
 		"./manifest": {
 			"types": "./src/types/manifest.d.ts"
 		},
