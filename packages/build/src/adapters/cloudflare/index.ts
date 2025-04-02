@@ -79,7 +79,14 @@ async function postbuild(site: Site) {
 			},
 		}),
 	);
-	workerFile = path.join(distFolder, "cloudflare", "_worker.js");
+	//workerFile = path.join(distFolder, "cloudflare", "_worker.js");
+
+	// Move all the Cloudflare files out into the base folder (because the config
+	// file doesn't get recognised when deployed)
+	for (let file of await fs.readdir(cloudflareFolder)) {
+		await fs.rename(path.join(cloudflareFolder, file), path.join(distFolder, file));
+	}
+	await fs.rm(cloudflareFolder, { recursive: true });
 
 	// Build a wrangler.json file for running with `wrangler dev`
 	//const wranglerConfig = JSON.stringify({
@@ -93,7 +100,7 @@ async function postbuild(site: Site) {
 	//}, null, 2).replaceAll("  ", "\t");
 	const wranglerConfig = `
 name = "torpor-miniflare"
-main = "cloudflare/_worker.js"
+main = "_worker.js"
 compatibility_date = "2025-01-01"
 [assets]
 directory = "./client"
