@@ -1,16 +1,10 @@
 import torpor from "@torpor/unplugin/vite";
-import { configDotenv } from "dotenv";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { build, defineConfig } from "vite";
-import createNodeServer from "../adapters/node/createNodeServer.ts";
-import { serverError } from "../response.ts";
-import Server from "../server/Server.ts";
-import contentType from "../server/contentType.ts";
 import Site from "./Site.ts";
 import manifest from "./manifest.ts";
-import prepareTemplate from "./prepareTemplate.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -22,6 +16,11 @@ export default async function runBuild(site: Site) {
 	}
 	const clientFolder = path.join(distFolder, "client");
 	const serverFolder = path.join(distFolder, "server");
+
+	// HOOK: Prebuild
+	if (site.adapter.prebuild) {
+		await site.adapter.prebuild(site);
+	}
 
 	// TODO: From a setting
 	let siteHtml = path.resolve(site.root, "src/site.html");
@@ -81,81 +80,8 @@ export default async function runBuild(site: Site) {
 	await fs.rename(path.join(clientFolder, "src", "site.html"), siteHtml);
 	await fs.rm(path.join(clientFolder, "src"), { recursive: true });
 
-	// Find the client script file in /assets
-	let clientScriptName = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
-		f.startsWith("clientEntry-"),
-	);
-	if (!clientScriptName) {
-		throw new Error("clientEntry.js not found");
+	// HOOK: Postbuild
+	if (site.adapter.postbuild) {
+		await site.adapter.postbuild(site);
 	}
-	clientScriptFile = `/assets/${clientScriptName}`;
-
-	const server = new Server();
-
-	//const vite = await createViteServer({
-	//	...
-	//});
-
-	// Read site.html
-	// It's called site.html because @torpor/build builds the site (html, routes
-	// etc) while the user builds the app (components etc)
-	let template = await fs.readFile(siteHtml, "utf-8");
-
-	//template = await vite.transformIndexHtml("", template);
-
-	// Prepare site.html so that we can just splice components into it
-	template = prepareTemplate(template, clientScriptFile);
-
-	//server.use(createMiddlewareHandler(vite.middlewares));
-
-	// Serve dist/client/assets statically
-	server.add("/assets/*", async (ev) => {
-		try {
-			const url = new URL(ev.request.url);
-			const file = path.join(site.root, "dist", "client", url.pathname);
-			if (existsSync(file)) {
-				// TODO: Stream the data?
-				return new Response(await fs.readFile(file), {
-					status: 200,
-					headers: {
-						"Content-Type": contentType(path.extname(file)),
-					},
-				});
-			}
-			//}
-		} catch (e: any) {
-			return serverError(e);
-		}
-	});
-
-	// Every request (GET, POST, etc) goes through loadEndPoint
-	const serverScript = path.resolve(serverFolder, "serverEntry.js");
-	server.add("*", async (ev) => {
-		try {
-			// Load the server entry
-			const { load } = await import(serverScript);
-
-			// Render the app HTML (or fetch server data etc) via serverEntry's
-			// exported `load` function
-			return await load(ev, template);
-		} catch (e: any) {
-			//vite.ssrFixStacktrace(e);
-			return serverError(e);
-		}
-	});
-
-	// Load environment variables from a `.env` file, with defaults if not set
-	configDotenv();
-
-	process.env.PROTOCOL ??= "http:";
-	process.env.HOST ??= "localhost";
-	process.env.PORT ??= "7059";
-
-	// Create the server and start listening
-	console.log(`\nConnecting to ${process.env.HOST}:${process.env.PORT}`);
-	// TODO: Not node!
-	const buildServer = createNodeServer(server.fetch);
-	buildServer.listen(parseInt(process.env.PORT), process.env.HOST, () => {
-		console.log(`Listening on ${process.env.HOST}:${process.env.PORT}\n`);
-	});
 }

@@ -5,7 +5,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createServer as createViteServer } from "vite";
 import createMiddlewareHandler from "../adapters/node/createMiddlewareHandler.ts";
-import createNodeServer from "../adapters/node/createNodeServer.ts";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
 import Site from "./Site.ts";
@@ -43,11 +42,11 @@ export default async function runDev(site: Site) {
 	template = await vite.transformIndexHtml("", template);
 
 	// TODO: Is this going to be the correct path after installing from npm?
-	const clientScriptFile = path.resolve(__dirname, "../../src/site/clientEntry.ts");
-	const serverScriptFile = path.resolve(__dirname, "../../src/site/serverEntry.ts");
+	const clientScript = path.resolve(__dirname, "../../src/site/clientEntry.ts");
+	const serverScript = path.resolve(__dirname, "../../src/site/serverEntry.ts");
 
 	// Prepare site.html so that we can just splice components into it
-	template = prepareTemplate(template, clientScriptFile);
+	template = prepareTemplate(template, clientScript);
 
 	// Use vite's Connect instance as middleware. We need to wrap it with
 	// createMiddlewareHandler that converts Connect middleware to
@@ -60,7 +59,7 @@ export default async function runDev(site: Site) {
 			// Load the server entry. ssrLoadModule automatically transforms ESM
 			// source code to be usable in Node.js. No bundling is required, and
 			// it provides efficient invalidation similar to HMR
-			const { load } = await vite.ssrLoadModule(serverScriptFile);
+			const { load } = await vite.ssrLoadModule(serverScript);
 
 			// Render the app HTML (or fetch server data etc) via serverEntry's
 			// exported `load` function
@@ -80,10 +79,6 @@ export default async function runDev(site: Site) {
 	process.env.HOST ??= "localhost";
 	process.env.PORT ??= "7059";
 
-	// Create the Node server and start listening
-	console.log(`\nConnecting to ${process.env.HOST}:${process.env.PORT}`);
-	const devServer = createNodeServer(server.fetch);
-	devServer.listen(parseInt(process.env.PORT), process.env.HOST, () => {
-		console.log(`Listening on ${process.env.HOST}:${process.env.PORT}\n`);
-	});
+	// Serve the site
+	site.adapter.serve(server, site);
 }

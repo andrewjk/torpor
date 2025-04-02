@@ -1,7 +1,14 @@
 import { defineConfig } from "tsup";
 
 export default defineConfig({
-	entry: ["src/index.ts", "src/state.ts", "src/response.ts", "src/bin/index.ts"],
+	entry: [
+		"src/index.ts",
+		"src/state.ts",
+		"src/response.ts",
+		"src/bin/index.ts",
+		"src/adapters/node/index.ts",
+		"src/adapters/cloudflare/index.ts",
+	],
 	format: ["esm", "cjs"],
 	dts: true,
 	clean: true,

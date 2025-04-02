@@ -2,6 +2,8 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { Plugin } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
+import node from "../adapters/node";
+import Adapter from "../types/Adapter";
 import {
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,
@@ -29,6 +31,8 @@ export default class Site {
 	// TODO: Should probably just do this ourselves and let the user pass in
 	// tsconfigPaths themselves if they want to do something funky
 	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
+	// Is default adapter a bad idea?
+	adapter: Adapter = node;
 
 	constructor() {
 		this.root = process.cwd();
@@ -84,6 +88,10 @@ export default class Site {
 		}
 		return -1;
 	}
+
+	// TODO: You could make your site in a single file, like e.g. Hono...
+	//addPage(path: string, endPoint: PageEndPoint, serverEndPoint?: PageServerEndPoint) {}
+	//addEndPoint(path: string, endPoint: ServerEndPoint) {}
 
 	#sortRoutes() {
 		this.routes = this.routes.sort((a, b) => {
