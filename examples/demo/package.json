@@ -17,5 +17,8 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^"
+	},
+	"devDependencies": {
+		"typescript": "^5.8.2"
 	}
 }
