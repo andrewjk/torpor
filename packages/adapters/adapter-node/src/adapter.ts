@@ -8,10 +8,11 @@ export default {
 		process.env.PORT ??= "7059";
 
 		// Create the Node server and start listening
-		console.log(`\nConnecting to ${process.env.HOST}:${process.env.PORT}`);
+		const url = `${process.env.PROTOCOL}//${process.env.HOST}:${process.env.PORT}`;
+		console.log(`\nConnecting to ${url}`);
 		const devServer = createNodeServer(server.fetch);
 		devServer.listen(parseInt(process.env.PORT), process.env.HOST, () => {
-			console.log(`Listening on ${process.env.HOST}:${process.env.PORT}\n`);
+			console.log(`Listening on ${url}\n`);
 		});
 	},
 } satisfies Adapter;

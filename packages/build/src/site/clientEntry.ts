@@ -43,7 +43,7 @@ async function navigateToLocation(location: Location, firstTime = false) {
 }
 
 async function navigate(path: string, query: URLSearchParams, firstTime = false): Promise<boolean> {
-	console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
+	//console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const parent = document.getElementById("app");
 	if (!parent) {

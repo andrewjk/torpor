@@ -26,7 +26,7 @@ import Router from "./Router.ts";
 const router = new Router();
 router.addPages(manifest.routes);
 
-console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
+//console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
 export async function load(ev: ServerEvent, template: string) {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
@@ -34,7 +34,7 @@ export async function load(ev: ServerEvent, template: string) {
 	const path = url.pathname;
 	const query = url.searchParams;
 
-	console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
+	//console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const route = router.match(path, query);
 	if (!route) {
