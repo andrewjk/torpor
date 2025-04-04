@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 0.1.2
+
+### Patch Changes
+
+- a472f9b: Fix: update dependencies
+
 ## 0.1.1
 
 ### Patch Changes

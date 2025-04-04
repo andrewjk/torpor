@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.4
+
+### Patch Changes
+
+- 20ddf6c: Fix: better/less console.logging
+
 ## 0.1.3
 
 ### Patch Changes

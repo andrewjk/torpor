@@ -13,7 +13,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/adapter-node": "^0.0.1",
-		"@torpor/build": "^0.1.3",
+		"@torpor/build": "^0.1.4",
 		"@torpor/unplugin": "^0.1.0",
 		"@torpor/view": "^0.0.7"
 	},
