@@ -20,16 +20,18 @@ export default function manifest(site: Site, server = false): Plugin {
 				}
 			},
 		},
-		load(id) {
+		// @ts-ignore
+		load(id, viteOptions) {
 			if (id === moduleId) {
+				let serverRequest = server && !!viteOptions?.ssr;
 				return `
-${!server ? "const load = { default: { load: true } };" : ""}
+${!serverRequest ? "const load = { default: { load: true } };" : ""}
 export default {
   routes: [
     ${site.routes
 			.map((r) => {
-				if (server || !/server\.(ts|js)$/.test(r.file)) {
-					return `{ path: "${r.path}", file: "${r.file}", type: ${r.type}, endPoint: ${server || !/server\.(ts|js)$/.test(r.file) ? `() => import(/* @vite-ignore */ "${path.join(site.root, r.file)}")` : "undefined"} }`;
+				if (serverRequest || !/server\.(ts|js)$/.test(r.file)) {
+					return `{ path: "${r.path}", file: "${r.file}", type: ${r.type}, endPoint: ${serverRequest || !/server\.(ts|js)$/.test(r.file) ? `() => import(/* @vite-ignore */ "${path.join(site.root, r.file)}")` : "undefined"} }`;
 				} else {
 					// On the client, for a server route, we need to check
 					// whether there's a load function and set a dummy endPoint
