@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.8
+
+### Patch Changes
+
+- a8ead36: Fix: always pass $context down
+
 ## 0.0.7
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @torpor/build
 
+## 0.1.5
+
+### Patch Changes
+
+- 5c9d90f: Fix: double check server rendering from Vite options
+- Updated dependencies [a8ead36]
+  - @torpor/view@0.0.8
+  - @torpor/unplugin@0.1.1
+
 ## 0.1.4
 
 ### Patch Changes
