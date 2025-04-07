@@ -17,6 +17,9 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"dependencies": {
+		"@changesets/cli": "^2.28.1"
+	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/jest-dom": "^6.6.3",
@@ -25,18 +28,17 @@
 		"@types/jsdom": "^21.1.7",
 		"jsdom": "^26.0.0",
 		"prettier": "^3.5.3",
-		"typescript": "^5.8.2",
+		"typescript": "^5.8.3",
 		"vitest": "^3.1.1"
 	},
-	"packageManager": "pnpm@10.7.0",
 	"workspaces": [
+		"packages/adapters/adapter-cloudflare",
+		"packages/adapters/adapter-node",
 		"packages/build",
 		"packages/create-build",
 		"packages/ui",
 		"packages/unplugin",
 		"packages/view"
 	],
-	"dependencies": {
-		"@changesets/cli": "^2.28.1"
-	}
+	"packageManager": "pnpm@10.7.0"
 }

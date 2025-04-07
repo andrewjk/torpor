@@ -61,14 +61,14 @@
 		"@torpor/view": "workspace:^",
 		"cookie": "^1.0.2",
 		"dotenv": "^16.4.7",
-		"vite": "^6.2.4",
+		"vite": "^6.2.5",
 		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"tsup": "^8.4.0",
 		"tsx": "^4.19.3",
-		"typescript": "^5.8.2",
+		"typescript": "^5.8.3",
 		"vitest": "^3.1.1"
 	}
 }
