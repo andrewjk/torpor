@@ -24,7 +24,7 @@ export default function BigTitle(
 	const t_h2_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_h2_1))) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, undefined)
+		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, $context)
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
 	t_next(t_h2_1);

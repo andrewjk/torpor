@@ -25,15 +25,15 @@ export default function Article(
 	const t_slot_parent_1 = t_next(t_child(t_section_1)) as HTMLElement;
 	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
 	if ($slots && $slots["header"]) {
-		$slots["header"](t_slot_parent_1, t_slot_anchor_1, undefined, undefined)
+		$slots["header"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
 	}
 	const t_slot_anchor_2 = t_anchor(t_next(t_next(t_slot_parent_1))) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_section_1, t_slot_anchor_2, undefined, undefined)
+		$slots["_"](t_section_1, t_slot_anchor_2, undefined, $context)
 	}
 	const t_slot_anchor_3 = t_anchor(t_next(t_next(t_slot_anchor_2))) as HTMLElement;
 	if ($slots && $slots["footer"]) {
-		$slots["footer"](t_section_1, t_slot_anchor_3, undefined, undefined)
+		$slots["footer"](t_section_1, t_slot_anchor_3, undefined, $context)
 	}
 	t_add_fragment(t_fragment_0, $parent, $anchor);
 	t_next(t_section_1);

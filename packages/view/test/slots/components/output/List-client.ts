@@ -60,7 +60,7 @@ export default function List(
 				t_sprops_1["item"] = t_item.data.item;
 			});
 			if ($slots && $slots["_"]) {
-				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_sprops_1, undefined)
+				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_sprops_1, $context)
 			}
 			// @ts-ignore
 			const t_text_1 = t_next(t_slot_parent_1);

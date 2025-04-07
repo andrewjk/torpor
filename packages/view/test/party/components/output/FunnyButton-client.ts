@@ -24,7 +24,7 @@ export default function FunnyButton(
 	const t_button_1 = t_root(t_fragment_0) as HTMLElement;
 	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_button_1))) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_button_1, t_slot_anchor_1, undefined, undefined)
+		$slots["_"](t_button_1, t_slot_anchor_1, undefined, $context)
 	} else {
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>No content found</span> `);
 		// @ts-ignore
