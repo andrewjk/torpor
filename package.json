@@ -6,10 +6,11 @@
 	"main": "index.js",
 	"private": true,
 	"scripts": {
-		"build": "pnpm -r run build",
-		"check": "pnpm -r run check",
-		"version": "pnpm changeset version",
-		"release": "pnpm -r run build && pnpm changeset publish",
+		"build": "pnpm -r build",
+		"check": "pnpm -r check",
+		"cs:add": "pnpm changeset add",
+		"cs:version": "pnpm changeset version",
+		"cs:publish": "pnpm -r build && pnpm changeset publish",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"format": "prettier --write ."
