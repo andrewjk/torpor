@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.10
+
+### Patch Changes
+
+- 3cf6de6: Fix: use namespace when creating svg fragments
+
 ## 0.0.9
 
 ### Patch Changes
