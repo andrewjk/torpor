@@ -1,5 +1,13 @@
 # @torpor/unplugin
 
+## 0.1.2
+
+### Patch Changes
+
+- 47c5277: Chore: update dependencies
+- Updated dependencies [47c5277]
+  - @torpor/view@0.0.9
+
 ## 0.1.1
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 0.1.3
+
+### Patch Changes
+
+- 47c5277: Chore: update dependencies
+
 ## 0.1.2
 
 ### Patch Changes

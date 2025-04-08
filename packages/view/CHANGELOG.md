@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.9
+
+### Patch Changes
+
+- 47c5277: Chore: update dependencies
+
 ## 0.0.8
 
 ### Patch Changes
