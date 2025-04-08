@@ -74,7 +74,7 @@ export default function buildFragment(
 			status.imports.add("t_fragment");
 			const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
 			b.append(
-				`const ${fragmentName} = t_fragment($parent.ownerDocument!, t_fragments, ${fragment.number}, \`${fragmentText}\`);`,
+				`const ${fragmentName} = t_fragment($parent.ownerDocument!, t_fragments, ${fragment.number}, \`${fragmentText}\`${fragment.ns ? ", true" : ""});`,
 			);
 			let fragmentPath = { parent: null, type: "fragment", children: [] };
 			let varPaths = new Map<string, string>();

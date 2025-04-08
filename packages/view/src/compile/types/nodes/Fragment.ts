@@ -1,6 +1,7 @@
 export type Fragment = {
 	number: number;
 	text: string;
+	ns: boolean;
 	events: {
 		varName: string;
 		eventName: string;

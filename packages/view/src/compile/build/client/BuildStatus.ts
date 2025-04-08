@@ -13,6 +13,7 @@ export type BuildStatus = {
 		path: string;
 	}[];
 	forVarNames: string[];
+	ns: boolean;
 	preserveWhitespace: boolean;
 	inHead?: boolean;
 	options?: BuildOptions;

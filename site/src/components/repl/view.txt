@@ -365,11 +365,19 @@ function flushMountEffects() {
 }
 
 // src/render/getFragment.ts
-function getFragment(document, array, index, html) {
+function getFragment(document, array, index, html, ns) {
   if (array[index] === void 0) {
-    const template = document.createElement("template");
-    template.innerHTML = html;
-    array[index] = template.content;
+    if (ns) {
+      const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
+      template.innerHTML = html;
+      const fragment2 = new DocumentFragment();
+      fragment2.append(...template.childNodes);
+      array[index] = fragment2;
+    } else {
+      const template = document.createElement("template");
+      template.innerHTML = html;
+      array[index] = template.content;
+    }
   }
   let fragment = array[index].cloneNode(true);
   return fragment;

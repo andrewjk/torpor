@@ -120,6 +120,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],
+					ns: false,
 					preserveWhitespace: false,
 				};
 
