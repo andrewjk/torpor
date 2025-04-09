@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.1.8
+
+### Patch Changes
+
+- fe7444e: Refactor: rearrange build exports
+- Updated dependencies [8852c89]
+  - @torpor/unplugin@0.1.4
+
 ## 0.1.7
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @torpor/unplugin
 
+## 0.1.4
+
+### Patch Changes
+
+- 8852c89: Chore: fix peers
+
 ## 0.1.3
 
 ### Patch Changes
