@@ -1,7 +1,7 @@
 import pathToRegex from "../site/pathToRegex";
-import type MiddlewareFunction from "../types/MiddlewareFunction";
 import ServerEvent from "./ServerEvent";
-import type ServerFunction from "./ServerFunction";
+import type MiddlewareFunction from "./types/MiddlewareFunction";
+import type ServerFunction from "./types/ServerFunction";
 
 const noop = () => {};
 
@@ -70,6 +70,7 @@ export default class Server {
 	 */
 	add(path: string, fn: ServerFunction): Server {
 		this.routes.push(new RouteHandler(path, fn));
+		this.#sortRoutes();
 		return this;
 	}
 
@@ -91,6 +92,25 @@ export default class Server {
 	use(...fn: MiddlewareFunction[]): Server {
 		this.middleware = this.middleware.concat(fn);
 		return this;
+	}
+
+	#sortRoutes() {
+		this.routes = this.routes.sort((a, b) => {
+			// Sort [param]s after paths
+			// There might be a quicker/easier way to do this
+			for (let i = 0; i < Math.min(a.path.length, b.path.length); i++) {
+				if (a.path[i] === "[" && b.path[i] !== "[") {
+					return 1;
+				} else if (b.path[i] === "[" && a.path[i] !== "[") {
+					return -1;
+				} else if (a.path[i] === b.path[i]) {
+					// Keep going...
+				} else {
+					return a.path[i].localeCompare(b.path[i]);
+				}
+			}
+			return a.path.length - b.path.length;
+		});
 	}
 }
 

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from "node:http";
-import type MiddlewareFunction from "../../types/MiddlewareFunction";
+import type MiddlewareFunction from "../types/MiddlewareFunction";
 import flattenHeaders from "./flattenHeaders";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
 import readableToBuffer from "./readableToBuffer";
@@ -13,7 +13,7 @@ import requestToNodeMessage from "./requestToNodeMessage";
  * @param handler - The Connect-style middleware function to be converted.
  * @returns A function that handles web requests and returns a Response or undefined.
  */
-export default function createMiddlewareHandler(
+export default function connectMiddleware(
 	handler: ConnectMiddleware | ConnectMiddlewareBoolean,
 ): MiddlewareFunction {
 	return async (ev, next) => {

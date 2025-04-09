@@ -1,4 +1,4 @@
-import ServerEvent from "../server/ServerEvent";
+import ServerEvent from "../ServerEvent";
 
 type MiddlewareFunction = (
 	ev: ServerEvent,

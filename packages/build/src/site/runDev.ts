@@ -5,7 +5,7 @@ import path from "node:path";
 import { createServer as createViteServer } from "vite";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
-import createMiddlewareHandler from "../server/connect/createMiddlewareHandler.ts";
+import connectMiddleware from "../server/connect/connectMiddleware.ts";
 import Site from "./Site.ts";
 import manifest from "./manifest.ts";
 import prepareTemplate from "./prepareTemplate.ts";
@@ -49,7 +49,7 @@ export default async function runDev(site: Site) {
 	// Use vite's Connect instance as middleware. We need to wrap it with
 	// createMiddlewareHandler that converts Connect middleware to
 	// Request/Response web handlers
-	server.use(createMiddlewareHandler(vite.middlewares));
+	server.use(connectMiddleware(vite.middlewares));
 
 	// Every request (GET, POST, etc) goes through loadEndPoint
 	server.add("*", async (ev) => {

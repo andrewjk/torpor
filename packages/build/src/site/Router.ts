@@ -3,9 +3,11 @@ import type ManifestRoute from "../types/ManifestRoute";
 import type RouteHandler from "../types/RouteHandler";
 import pathToRegex from "./pathToRegex";
 
+/**
+ * A router that handles file routes with layouts, hooks, etc.
+ */
 export default class Router {
 	routes: Route[] = [];
-	//pages = new Map<string, PageEndPoint>();
 
 	constructor() {}
 
@@ -24,12 +26,12 @@ export default class Router {
 				}),
 			);
 		}
+		this.#sortRoutes();
 		return this;
 	}
 
 	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
 	addPage(path: string, type: number, endPoint: () => Promise<any>) {
-		//this.server.get(route, (ev) => this.loadPage(ev, file));
 		this.routes.push(
 			new Route(path, {
 				path,
@@ -37,6 +39,7 @@ export default class Router {
 				endPoint,
 			}),
 		);
+		this.#sortRoutes();
 		return this;
 	}
 
@@ -56,7 +59,7 @@ export default class Router {
 			if (match) {
 				// Lazy load server endpoints and layouts
 				if (!route.handler.loaded) {
-					this.loadHandler(route.handler, route.path);
+					this.#loadHandler(route.handler, route.path);
 				}
 
 				return {
@@ -70,14 +73,13 @@ export default class Router {
 		console.log(`not found: '${path}'`);
 	}
 
-	loadHandler(handler: RouteHandler, path: string) {
-		////handler.endPoint = import(handler.path);
-		handler.layouts = this.findLayouts(path);
-		handler.serverEndPoint = this.findServer(path);
-		handler.serverHook = this.findServerHook(path);
+	#loadHandler(handler: RouteHandler, path: string) {
+		handler.layouts = this.#findLayouts(path);
+		handler.serverEndPoint = this.#findServer(path);
+		handler.serverHook = this.#findServerHook(path);
 	}
 
-	findLayouts(path: string): LayoutHandler[] | undefined {
+	#findLayouts(path: string): LayoutHandler[] | undefined {
 		let layouts: LayoutHandler[] = [];
 		let parts = path
 			// Strip the trailing`~/server` (so we don't look for `~/server/_layout`
@@ -98,20 +100,20 @@ export default class Router {
 				layouts.push({
 					path: layoutPath,
 					endPoint: layoutRoute.handler.endPoint,
-					serverEndPoint: this.findServer(layoutPath),
+					serverEndPoint: this.#findServer(layoutPath),
 				});
 			}
 		}
 		return layouts.length ? layouts : undefined;
 	}
 
-	findServer(path: string): (() => Promise<any>) | undefined {
+	#findServer(path: string): (() => Promise<any>) | undefined {
 		const serverPath = path.replace(/\/$/, "") + "/~server";
 		const serverRoute = this.routes.find((r) => r.path === serverPath);
 		return serverRoute && serverRoute.handler.endPoint;
 	}
 
-	findServerHook(path: string): (() => Promise<any>) | undefined {
+	#findServerHook(path: string): (() => Promise<any>) | undefined {
 		// TODO: Should this be a collection, like layouts?
 		let serverHookPath = "/_hook/~server";
 		// HACK: Generalise this
@@ -120,6 +122,27 @@ export default class Router {
 		}
 		const serverHookRoute = this.routes.find((r) => r.path === serverHookPath);
 		return serverHookRoute && serverHookRoute.handler.endPoint;
+	}
+
+	// HACK: We're doing this here as well as in Site, so that you can use the
+	// Router externally without Site
+	#sortRoutes() {
+		this.routes = this.routes.sort((a, b) => {
+			// Sort [param]s after paths
+			// There might be a quicker/easier way to do this
+			for (let i = 0; i < Math.min(a.path.length, b.path.length); i++) {
+				if (a.path[i] === "[" && b.path[i] !== "[") {
+					return 1;
+				} else if (b.path[i] === "[" && a.path[i] !== "[") {
+					return -1;
+				} else if (a.path[i] === b.path[i]) {
+					// Keep going...
+				} else {
+					return a.path[i].localeCompare(b.path[i]);
+				}
+			}
+			return a.path.length - b.path.length;
+		});
 	}
 }
 

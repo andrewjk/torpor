@@ -1,4 +1,4 @@
-import Server from "./server/Server";
+import Router from "./site/Router";
 import Site from "./site/Site";
 import type Adapter from "./types/Adapter";
 import type PageEndPoint from "./types/PageEndPoint";
@@ -11,7 +11,7 @@ import type ServerHook from "./types/ServerHook";
 import type ServerLoadEvent from "./types/ServerLoadEvent";
 import type ServerRequest from "./types/ServerRequest";
 
-export { Server, Site };
+export { Site, Router };
 
 export type {
 	Adapter,

@@ -27,18 +27,13 @@
 			"import": "./dist/run.js",
 			"require": "./dist/run.cjs"
 		},
+		"./server": {
+			"types": "./dist/server.d.ts",
+			"import": "./dist/server.js",
+			"require": "./dist/server.cjs"
+		},
 		"./manifest": {
 			"types": "./src/types/manifest.d.ts"
-		},
-		"./adapters/node": {
-			"types": "./dist/adapters/node/index.d.ts",
-			"import": "./dist/adapters/node/index.js",
-			"require": "./dist/adapters/node/index.cjs"
-		},
-		"./adapters/cloudflare": {
-			"types": "./dist/adapters/cloudflare/index.d.ts",
-			"import": "./dist/adapters/cloudflare/index.js",
-			"require": "./dist/adapters/cloudflare/index.cjs"
 		}
 	},
 	"publishConfig": {

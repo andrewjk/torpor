@@ -1,7 +1,7 @@
-import ServerFunction from "../server/ServerFunction";
-import type HttpMethod from "../types/HttpMethod";
-import type MiddlewareFunction from "../types/MiddlewareFunction";
-import pathToRegex from "./pathToRegex";
+import pathToRegex from "../site/pathToRegex";
+import type HttpMethod from "./types/HttpMethod";
+import type MiddlewareFunction from "./types/MiddlewareFunction";
+import type ServerFunction from "./types/ServerFunction";
 
 // This is not actually used anywhere, for now at least
 
