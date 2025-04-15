@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.9
+
+### Patch Changes
+
+- ff685cb: Fix: use the existing fragment name
+
 ## 0.1.8
 
 ### Patch Changes

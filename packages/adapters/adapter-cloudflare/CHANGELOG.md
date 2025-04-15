@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.6
+
+### Patch Changes
+
+- 095c6c5: Feat: `adapter` object for adapter functionality
+- Updated dependencies [ff685cb]
+  - @torpor/build@0.1.9
+
 ## 0.0.5
 
 ### Patch Changes
