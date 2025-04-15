@@ -82,6 +82,20 @@ async function postbuild(site: Site) {
 		}),
 	);
 
+	// HACK: Disabling preload doesn't work so we have to brute-force it???
+	for (let file of await fs.readdir(cloudflareFolder)) {
+		if (file.startsWith("_worker")) {
+			let b = await fs.readFile(path.join(cloudflareFolder, file), "utf-8");
+			if (b.includes("const __vitePreload")) {
+				b = b.replaceAll(
+					"const __vitePreload = function preload(baseModule, deps, importerUrl) {",
+					"const __vitePreload = function preload(baseModule, deps, importerUrl) { return baseModule();",
+				);
+				await fs.writeFile(path.join(cloudflareFolder, file), b);
+			}
+		}
+	}
+
 	// Copy the client assets into the Cloudflare folder
 	await fs.mkdir(path.join(cloudflareFolder, "assets"));
 	for (let file of await fs.readdir(path.join(clientFolder, "assets"))) {
