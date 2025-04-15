@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.8
+
+### Patch Changes
+
+- 5df2010: Fix: force disabling Vite preload
+
 ## 0.0.7
 
 ### Patch Changes
