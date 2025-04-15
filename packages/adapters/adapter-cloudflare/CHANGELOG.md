@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.9
+
+### Patch Changes
+
+- 858538b: Fix: move adapter to globalThis, pass it to server loads
+- Updated dependencies [858538b]
+  - @torpor/build@0.1.11
+
 ## 0.0.8
 
 ### Patch Changes

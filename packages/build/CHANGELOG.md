@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.11
+
+### Patch Changes
+
+- 858538b: Fix: move adapter to globalThis, pass it to server loads
+
 ## 0.1.10
 
 ### Patch Changes
