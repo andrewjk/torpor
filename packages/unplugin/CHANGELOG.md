@@ -1,5 +1,12 @@
 # @torpor/unplugin
 
+## 0.1.5
+
+### Patch Changes
+
+- Updated dependencies [78e78b9]
+  - @torpor/view@0.0.11
+
 ## 0.1.4
 
 ### Patch Changes

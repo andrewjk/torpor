@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.11
+
+### Patch Changes
+
+- 78e78b9: Fix: use the existing fragment name
+
 ## 0.0.10
 
 ### Patch Changes
