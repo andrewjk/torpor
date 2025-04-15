@@ -24,12 +24,11 @@ server.add("*", async (ev: any) => {
 	}
 });
 
-// Put adapter-specific functionality in the `adapter` global object
-let adapter: Record<PropertyKey, any> = {};
-
 export default {
 	async fetch(request: Request, env: any) {
-		adapter.env = env;
+		// Put adapter-specific functionality in the `adapter` property of globalThis
+		// @ts-ignore
+		globalThis.adapter = { env };
 
 		const url = new URL(request.url);
 

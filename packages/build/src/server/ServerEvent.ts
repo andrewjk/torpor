@@ -5,16 +5,22 @@ export default class ServerEvent {
 	request: Request;
 	response?: Response;
 	// TODO: Should we cast types??
-	params?: { [key: string]: string };
+	params?: Record<string, string>;
+
+	adapter: any;
 
 	cookies: CookieHelper;
 	headers: HeaderHelper;
 
-	constructor(request: Request, params?: { [key: string]: string }) {
+	constructor(request: Request, params?: Record<string, string>) {
 		this.request = request;
 		this.params = params;
 		this.cookies = new CookieHelper(request);
 		this.headers = new HeaderHelper(request);
+
+		// Adapters may have added the `adapter` property to globalThis
+		// @ts-ignore
+		this.adapter = globalThis.adapter;
 	}
 
 	addHeaders() {

@@ -30,6 +30,10 @@ type ServerLoadEvent = {
 	 * A helper for getting and setting headers.
 	 */
 	headers: HeaderHelper;
+	/**
+	 * An optional adapter object, containing adapter-specific functionality.
+	 */
+	adapter: Record<PropertyKey, any>;
 };
 
 export default ServerLoadEvent;

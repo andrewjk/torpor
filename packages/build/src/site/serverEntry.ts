@@ -294,5 +294,6 @@ function buildServerParams(
 		request: ev.request,
 		cookies: ev.cookies,
 		headers: ev.headers,
+		adapter: ev.adapter,
 	};
 }
