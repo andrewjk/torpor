@@ -11,8 +11,8 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
-		// TODO: Node type erasing, with next version of TS
-		//"erasableSyntaxOnly": true,
+		// Node type erasing
+		"erasableSyntaxOnly": true,
 		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
 		"verbatimModuleSyntax": true
