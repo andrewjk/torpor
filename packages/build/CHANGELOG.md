@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.12
+
+### Patch Changes
+
+- 8de094b: Fix: ignore trailing slashes when matching routes
+
 ## 0.1.11
 
 ### Patch Changes
