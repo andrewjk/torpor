@@ -19,7 +19,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@changesets/cli": "^2.29.1"
+		"@changesets/cli": "^2.29.2"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.0",
@@ -30,7 +30,7 @@
 		"jsdom": "^26.1.0",
 		"prettier": "^3.5.3",
 		"typescript": "^5.8.3",
-		"vitest": "^3.1.1"
+		"vitest": "^3.1.2"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",
