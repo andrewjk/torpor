@@ -18,7 +18,7 @@ export default class CookieHelper {
 		return parse(header ?? "")[name];
 	}
 
-	set(name: string, value: string, options?: SerializeOptions) {
+	set(name: string, value: string, options?: SerializeOptions): void {
 		// Set a cookie header with some default values for security
 		options ??= {};
 		options.httpOnly ??= true;
@@ -27,7 +27,7 @@ export default class CookieHelper {
 		this.cookies.set(name, serialize(name, value, options));
 	}
 
-	delete(name: string, options?: SerializeOptions) {
+	delete(name: string, options?: SerializeOptions): void {
 		// Set a cookie header with an immediate expiry date
 		options ??= {};
 		options.expires = new Date(0);

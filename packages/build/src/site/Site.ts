@@ -38,7 +38,7 @@ export default class Site {
 		this.root = process.cwd();
 	}
 
-	async addRouteFolder(folder: string) {
+	async addRouteFolder(folder: string): Promise<void> {
 		const routeFolder = path.join(this.root, folder);
 		const routeFiles = await fs.readdir(routeFolder, { recursive: true });
 
@@ -63,7 +63,7 @@ export default class Site {
 		this.#sortRoutes();
 	}
 
-	addRouteFile(path: string, file: string) {
+	addRouteFile(path: string, file: string): void {
 		let type = this.#routeType(file);
 		this.routes.push({ path, file, type });
 		this.#sortRoutes();

@@ -1,5 +1,5 @@
 import { type Template, build, parse } from "@torpor/view/compile";
-import { type UnpluginFactory } from "unplugin";
+import { type UnpluginFactory, type UnpluginInstance } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
 import { type Options } from "./types";
@@ -102,6 +102,7 @@ function printTransformed(transformed: string) {
 }
 */
 
-export const unplugin = /* #__PURE__ */ createUnplugin(unpluginFactory);
+export const unplugin: UnpluginInstance<Options | undefined, boolean> =
+	/* #__PURE__ */ createUnplugin(unpluginFactory);
 
 export default unplugin;

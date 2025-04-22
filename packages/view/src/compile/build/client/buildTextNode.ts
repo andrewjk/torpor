@@ -3,7 +3,7 @@ import Builder from "../../utils/Builder";
 import { type BuildStatus } from "./BuildStatus";
 import buildRun from "./buildRun";
 
-export default function buildTextNode(node: TextNode, status: BuildStatus, b: Builder) {
+export default function buildTextNode(node: TextNode, status: BuildStatus, b: Builder): void {
 	let content = node.content || "";
 
 	if (!status.preserveWhitespace) {

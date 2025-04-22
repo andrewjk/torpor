@@ -3,7 +3,7 @@ import parseElement from "./parseElement";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
 
-export default function parseMarkup(status: ParseStatus, source: string) {
+export default function parseMarkup(status: ParseStatus, source: string): void {
 	const current = status.components.at(-1);
 	if (!current) return;
 

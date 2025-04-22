@@ -34,7 +34,10 @@ const controlOperations = [
 
 const standaloneOperations = ["@key", "@html", "@const", "@console", "@debugger", "@function"];
 
-export default function parseControl(status: ParseStatus, parentNode: ElementNode | ControlNode) {
+export default function parseControl(
+	status: ParseStatus,
+	parentNode: ElementNode | ControlNode,
+): void {
 	const node = parseControlOpen(status);
 	if (!node) {
 		return;

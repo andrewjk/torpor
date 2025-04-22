@@ -14,7 +14,7 @@ export default function buildServerComponentNode(
 	node: ElementNode,
 	status: BuildServerStatus,
 	b: Builder,
-) {
+): void {
 	if (status.output) {
 		b.append(`$output += \`${status.output}\`;`);
 		status.output = "";

@@ -7,7 +7,7 @@ import isAlphaNumericChar from "./isAlphaNumericChar";
  *
  * @returns True if the supplied string contains only alpha-numeric characters
  */
-export default function isAlphaNumeric(text: string) {
+export default function isAlphaNumeric(text: string): boolean {
 	for (let i = 0; i < text.length; i++) {
 		if (!isAlphaNumericChar(text, i)) {
 			return false;

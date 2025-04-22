@@ -1,7 +1,7 @@
 import context from "../render/context";
 import { type ProxyData } from "../types/ProxyData";
 
-export default function trackEffect(data: ProxyData, key: PropertyKey) {
+export default function trackEffect(data: ProxyData, key: PropertyKey): void {
 	// If there's an active effect, register this target/prop with it, so that
 	// it will be called when this prop is set
 	if (context.activeEffect) {

@@ -9,7 +9,7 @@ import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
 
-export default function buildControlNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildControlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	switch (node.operation) {
 		case "@if group": {
 			buildIfNode(node, status, b);

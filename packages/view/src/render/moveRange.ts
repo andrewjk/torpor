@@ -1,6 +1,6 @@
 import { type Range } from "../types/Range";
 
-export default function moveRange(parent: Node, range: Range, before: ChildNode | null) {
+export default function moveRange(parent: Node, range: Range, before: ChildNode | null): void {
 	const endNode = range.endNode || range.startNode;
 	let currentNode = range.startNode;
 	while (currentNode) {

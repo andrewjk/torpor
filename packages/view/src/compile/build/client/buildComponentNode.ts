@@ -17,7 +17,7 @@ export default function buildComponentNode(
 	status: BuildStatus,
 	b: Builder,
 	root = false,
-) {
+): void {
 	b.append("");
 	b.append("/* @component */");
 

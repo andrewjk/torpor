@@ -6,7 +6,7 @@
  *
  * @returns True if the supplied character is alpha-numeric
  */
-export default function isAlphaNumericChar(text: string, index: number) {
+export default function isAlphaNumericChar(text: string, index: number): boolean {
 	let code = text.charCodeAt(index);
 	return (
 		// 0-9

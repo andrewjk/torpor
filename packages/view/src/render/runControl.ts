@@ -12,7 +12,7 @@ export default function runControl(
 	range: Range,
 	anchor: Node | null,
 	create: (anchor: Node | null) => void,
-) {
+): void {
 	// Store the index in the range so that it can be accessed by the statement's
 	// branches
 	range.index = -1;

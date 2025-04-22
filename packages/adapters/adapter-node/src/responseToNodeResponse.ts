@@ -6,7 +6,7 @@ import { INTERNAL_BODY } from "./constants";
 export default async function responseToNodeResponse(
 	res: Response,
 	outgoing: ServerResponse | Http2ServerResponse,
-) {
+): Promise<void> {
 	outgoing.statusCode = res.status;
 	outgoing.statusMessage = res.statusText;
 

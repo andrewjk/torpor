@@ -15,11 +15,11 @@ export default class HeaderHelper {
 		return this.request.headers.get(name) ?? undefined;
 	}
 
-	set(name: string, value: string) {
+	set(name: string, value: string): void {
 		this.headers.set(name, value);
 	}
 
-	delete(name: string) {
+	delete(name: string): void {
 		this.headers.delete(name);
 	}
 }

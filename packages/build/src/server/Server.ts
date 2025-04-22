@@ -74,7 +74,7 @@ export default class Server {
 		return this;
 	}
 
-	match(path: string) {
+	match(path: string): Match | undefined {
 		for (let handler of this.routes) {
 			let match = path.match(handler.regex);
 			if (match) {
@@ -137,3 +137,8 @@ class RouteHandler {
 //		this.fn = fn;
 //	}
 //}
+
+type Match = {
+	fn: ServerFunction;
+	params?: Record<string, string>;
+};

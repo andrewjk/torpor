@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2022",
-		"lib": ["es2022", "DOM"],
+		"lib": ["es2022", "DOM", "DOM.Iterable"],
 		"module": "esnext",
 		"moduleResolution": "bundler",
 		"esModuleInterop": true,
@@ -15,6 +15,10 @@
 		"erasableSyntaxOnly": true,
 		"allowImportingTsExtensions": true,
 		"rewriteRelativeImportExtensions": true,
-		"verbatimModuleSyntax": true
+		"verbatimModuleSyntax": true,
+		// Isolated declarations
+		"isolatedDeclarations": true,
+		"declaration": true,
+		"declarationMap": true
 	}
 }

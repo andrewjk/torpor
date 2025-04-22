@@ -43,7 +43,7 @@
 		"tb": "./dist/bin/index.js"
 	},
 	"scripts": {
-		"build": "tsup",
+		"build": "tsc --noEmit && tsup",
 		"build:watch": "tsup --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest"

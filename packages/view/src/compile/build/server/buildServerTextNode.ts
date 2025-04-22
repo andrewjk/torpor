@@ -1,7 +1,7 @@
 import { type TextNode } from "../../types/nodes/TextNode";
 import { type BuildServerStatus } from "./BuildServerStatus";
 
-export default function buildServerTextNode(node: TextNode, status: BuildServerStatus) {
+export default function buildServerTextNode(node: TextNode, status: BuildServerStatus): void {
 	let content = node.content || "";
 
 	if (!status.preserveWhitespace) {

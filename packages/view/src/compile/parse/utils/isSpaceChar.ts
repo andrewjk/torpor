@@ -6,7 +6,7 @@
  *
  * @returns True if the supplied character is a space
  */
-export default function isSpaceChar(text: string, index: number) {
+export default function isSpaceChar(text: string, index: number): boolean {
 	let code = text.charCodeAt(index);
 	return code === 32 || (code >= 9 && code <= 13);
 }

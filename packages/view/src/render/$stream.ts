@@ -1,1 +1,1 @@
-export default function $stream() {}
+export default function $stream(): void {}

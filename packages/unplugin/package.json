@@ -73,10 +73,10 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsup",
+		"build": "tsc --noEmit && tsup",
 		"build:watch": "tsup --watch src",
 		"build:fix": "esno scripts/postbuild.ts",
-		"check": "tsc -p tsconfig.json --noEmit",
+		"check": "tsc --noEmit",
 		"lint": "eslint .",
 		"play": "npm -C playground run dev",
 		"prepublishOnly": "npm run build",

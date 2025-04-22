@@ -2,7 +2,7 @@ import { type Adapter } from "@torpor/build";
 import { Server } from "@torpor/build/server";
 import createNodeServer from "./createNodeServer";
 
-export default {
+const adapter: Adapter = {
 	serve: (server: Server) => {
 		process.env.PROTOCOL ??= "http:";
 		process.env.HOST ??= "localhost";
@@ -16,4 +16,6 @@ export default {
 			console.log(`Listening on ${url}\n`);
 		});
 	},
-} satisfies Adapter;
+};
+
+export default adapter;

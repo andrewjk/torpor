@@ -5,7 +5,10 @@ import isTextNode from "../types/nodes/isTextNode";
 import { type ParseStatus } from "./ParseStatus";
 import consumeSpace from "./utils/consumeSpace";
 
-export default function addSpaceElement(parent: ElementNode | ControlNode, status: ParseStatus) {
+export default function addSpaceElement(
+	parent: ElementNode | ControlNode,
+	status: ParseStatus,
+): void {
 	const content = consumeSpace(status);
 	if (content) {
 		const previousNode = parent.children[parent.children.length - 1];

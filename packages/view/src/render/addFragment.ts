@@ -6,7 +6,7 @@ export default function addFragment(
 	fragment: DocumentFragment,
 	parent: ParentNode,
 	before: Node | null,
-) {
+): void {
 	//console.log(`adding fragment '${fragment.textContent}' to ${printNode(parent)}`);
 	//console.log("before", printNode(before));
 

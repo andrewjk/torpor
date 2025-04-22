@@ -6,7 +6,7 @@
  *
  * @returns The text without the char on the start
  */
-export default function trimStart(text: string, char: string) {
+export default function trimStart(text: string, char: string): string {
 	let start = 0;
 	while (text[start] === char) {
 		start += 1;

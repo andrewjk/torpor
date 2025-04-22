@@ -1,7 +1,7 @@
 import context from "../render/context";
 import { type Effect } from "../types/Effect";
 
-export default function runEffect(effect: Effect) {
+export default function runEffect(effect: Effect): void {
 	// Reactivate it in case it's been deactivated
 	effect.active = true;
 

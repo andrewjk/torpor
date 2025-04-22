@@ -19,7 +19,7 @@ export default function hydrateRoot(
 	component: Component,
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
-) {
+): void {
 	let html = document.documentElement;
 
 	// With server side rendering, we start hydrating at the <html> element

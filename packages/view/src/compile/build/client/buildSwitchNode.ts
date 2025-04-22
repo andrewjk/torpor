@@ -7,7 +7,7 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const switchParentName = node.parentName!;
 	const switchAnchorName = node.varName!;
 	const switchRangeName = nextVarName("switch_range", status);

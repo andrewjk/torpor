@@ -10,6 +10,6 @@ import trimStart from "./trimStart";
  *
  * @returns The text without the char at the start or the end
  */
-export default function trimStartAndEnd(text: string, startChar: string, endChar: string) {
+export default function trimStartAndEnd(text: string, startChar: string, endChar: string): string {
 	return trimEnd(trimStart(text, startChar), endChar);
 }

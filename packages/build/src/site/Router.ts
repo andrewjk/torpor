@@ -16,7 +16,7 @@ export default class Router {
 	//	this.addPage(route, file);
 	//}
 
-	addPages(routes: ManifestRoute[]) {
+	addPages(routes: ManifestRoute[]): this {
 		for (let r of routes) {
 			this.routes.push(
 				new Route(r.path, {
@@ -31,7 +31,7 @@ export default class Router {
 	}
 
 	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
-	addPage(path: string, type: number, endPoint: () => Promise<any>) {
+	addPage(path: string, type: number, endPoint: () => Promise<any>): this {
 		this.routes.push(
 			new Route(path, {
 				path,
@@ -53,7 +53,7 @@ export default class Router {
 	}
 	*/
 
-	match(path: string, query: URLSearchParams) {
+	match(path: string, query: URLSearchParams): Match | undefined {
 		for (let route of this.routes) {
 			let match = path.match(route.regex);
 			if (match) {
@@ -157,3 +157,9 @@ class Route {
 		this.handler = handler;
 	}
 }
+
+type Match = {
+	handler: RouteHandler;
+	params?: Record<string, string>;
+	query: URLSearchParams;
+};

@@ -10,7 +10,7 @@ import Site from "./Site.ts";
 import manifest from "./manifest.ts";
 import prepareTemplate from "./prepareTemplate.ts";
 
-export default async function runDev(site: Site) {
+export default async function runDev(site: Site): Promise<void> {
 	const server = new Server();
 
 	// Create the Vite server in middleware mode and configure the app type as

@@ -1,6 +1,6 @@
 //import "../scripts/buildTestOutput";
 
-export async function setup() {
+export async function setup(): Promise<void> {
 	// Build the output files in the above import
 }
 

@@ -5,7 +5,7 @@
  *
  * @returns True if the supplied string is fully or partially reactive
  */
-export default function isReactive(text: string) {
+export default function isReactive(text: string): boolean {
 	// TODO: Need to be more fancy (check that braces match, ignore comments and strings etc)
 	return text.includes("{") && text.includes("}");
 }

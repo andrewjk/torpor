@@ -4,7 +4,7 @@ import newRange from "./newRange";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
 
-export default function runControlBranch(range: Range, index: number, create: () => void) {
+export default function runControlBranch(range: Range, index: number, create: () => void): void {
 	// Only run the branch if it's not the current branch
 	if (index >= 0 && range.index === index) {
 		return;

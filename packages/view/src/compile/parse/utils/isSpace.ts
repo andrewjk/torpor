@@ -7,7 +7,7 @@ import isSpaceChar from "./isSpaceChar";
  *
  * @returns True if the supplied string contains only space characters
  */
-export default function isSpace(text: string) {
+export default function isSpace(text: string): boolean {
 	for (let i = 0; i < text.length; i++) {
 		if (!isSpaceChar(text, i)) {
 			return false;

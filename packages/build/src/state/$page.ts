@@ -1,6 +1,11 @@
 import { $watch } from "@torpor/view";
 
-const $page = $watch(
+type Page = {
+	status: number;
+	url: URL;
+};
+
+const $page: Page = $watch(
 	{
 		status: 404,
 		url: new URL("http://localhost"),

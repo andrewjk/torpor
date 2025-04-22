@@ -1,3 +1,3 @@
-const proxyDataSymbol = Symbol("_proxy_data");
+const proxyDataSymbol: unique symbol = Symbol("_proxy_data");
 
 export { proxyDataSymbol };

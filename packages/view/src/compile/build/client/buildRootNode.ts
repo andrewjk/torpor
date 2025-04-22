@@ -11,7 +11,7 @@ export default function buildRootNode(
 	b: Builder,
 	parentName: string,
 	anchorName: string,
-) {
+): void {
 	buildFragment(node, status, b, parentName, anchorName);
 
 	status.fragmentStack.push({

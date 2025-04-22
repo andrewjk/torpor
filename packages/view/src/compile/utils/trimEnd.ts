@@ -6,7 +6,7 @@
  *
  * @returns The text without the char on the end
  */
-export default function trimEnd(text: string, char: string) {
+export default function trimEnd(text: string, char: string): string {
 	let end = text.length;
 	while (text[end - 1] === char) {
 		end -= 1;

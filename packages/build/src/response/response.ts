@@ -5,7 +5,7 @@
  * header set to "application/json". Otherwise, if the body is a string, the
  * content-type header will be set to "text/plain".
  */
-export default function response(status: number, body?: object | string) {
+export default function response(status: number, body?: object | string): Response {
 	let headers: Record<string, string> | undefined = undefined;
 	if (body) {
 		if (typeof body === "object") {

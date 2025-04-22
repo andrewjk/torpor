@@ -2,7 +2,7 @@ import { type Range } from "../types/Range";
 import removeEffect from "../watch/removeEffect";
 import context from "./context";
 
-export default function clearRange(range: Range) {
+export default function clearRange(range: Range): void {
 	//console.log(`clearing range ${printNode(range.startNode)} to ${printNode(range.endNode)}`);
 
 	// Clear effects and collect animations that take place within this range and its children

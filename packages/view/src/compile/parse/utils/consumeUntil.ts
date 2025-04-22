@@ -10,7 +10,7 @@ import { type ParseStatus } from "../ParseStatus";
  * @returns The string of characters from the current parse position to the
  * found character
  */
-export default function consumeUntil(chars: string, status: ParseStatus) {
+export default function consumeUntil(chars: string, status: ParseStatus): string {
 	const start = status.i;
 	for (status.i; status.i < status.source.length; status.i++) {
 		if (chars.includes(status.source[status.i])) {

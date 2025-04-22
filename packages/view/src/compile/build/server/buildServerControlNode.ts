@@ -13,7 +13,7 @@ export default function buildServerControlNode(
 	node: ControlNode,
 	status: BuildServerStatus,
 	b: Builder,
-) {
+): void {
 	switch (node.operation) {
 		case "@if group": {
 			buildServerIfNode(node, status, b);

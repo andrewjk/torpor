@@ -2,11 +2,11 @@ export default class Builder {
 	#text = "";
 	#space = 0;
 
-	prepend(text: string) {
+	prepend(text: string): void {
 		this.#text = text + "\n" + this.#text;
 	}
 
-	append(text: string) {
+	append(text: string): void {
 		text = text.trim();
 		let i = 0;
 		//let newline = !!text.length && !text.endsWith("\n");
@@ -69,7 +69,7 @@ export default class Builder {
 		}
 	}
 
-	toString() {
+	toString(): string {
 		return this.#text;
 	}
 }

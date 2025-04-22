@@ -10,7 +10,7 @@ export default function proxyGet(
 	key: PropertyKey,
 	receiver: any,
 	data: ProxyData,
-) {
+): any {
 	if (key === proxyDataSymbol) {
 		return data;
 	}

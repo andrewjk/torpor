@@ -13,7 +13,7 @@ export default function hydrate(
 	component: Component,
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
-) {
+): void {
 	// When mounting, the parent must have no child elements, so  we can just set
 	// the hydration node to the first child node
 	context.hydrationNode = parent.firstChild;

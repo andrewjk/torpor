@@ -13,7 +13,7 @@ const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
 const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;
 const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 
-export default function buildForNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildForNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const forParentName = node.parentName!;
 	const forAnchorName = node.varName!;
 

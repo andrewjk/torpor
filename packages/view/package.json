@@ -27,9 +27,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsup && tsx ./scripts/copyToRepl.ts",
+		"build": "tsc --noEmit && tsup && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsup --watch",
-		"check": "tsc -p tsconfig.json --noEmit",
+		"check": "tsc --noEmit",
 		"test": "vitest",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
 		"bench": "tsx ./bench/bench.ts",

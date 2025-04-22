@@ -3,7 +3,7 @@ import Builder from "../../utils/Builder";
 import { type BuildStatus } from "./BuildStatus";
 import buildNode from "./buildNode";
 
-export default function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
+export default function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder): void {
 	b.append("");
 	b.append("/* @head */");
 

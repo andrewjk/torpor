@@ -10,7 +10,7 @@ import isReactive from "./isReactive";
  *
  * @returns True if the supplied attribute is reactive
  */
-export default function isReactiveAttribute(name: string, value: string) {
+export default function isReactiveAttribute(name: string, value: string): boolean {
 	// TODO: Better checking of whether an attribute is reactive
 	return isFullyReactive(name) || isReactive(value) || name.startsWith("on");
 }

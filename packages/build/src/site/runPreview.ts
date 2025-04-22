@@ -8,7 +8,7 @@ import Site from "./Site";
 import prepareTemplate from "./prepareTemplate.ts";
 import runBuild from "./runBuild";
 
-export default async function runPreview(site: Site) {
+export default async function runPreview(site: Site): Promise<void> {
 	// Build the site
 	await runBuild(site);
 

@@ -28,7 +28,7 @@ router.addPages(manifest.routes);
 
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
-export async function load(ev: ServerEvent, template: string) {
+export async function load(ev: ServerEvent, template: string): Promise<Response> {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
 	const path = url.pathname;

@@ -4,14 +4,16 @@ import path from "node:path";
 import { build, defineConfig } from "vite";
 import prepareTemplate from "./prepareTemplate";
 
-export default {
+const adapter: Adapter = {
 	postbuild,
 	serve: (/* server: Server, site: Site*/) => {
 		console.log("TODO");
 	},
-} satisfies Adapter;
+};
 
-async function postbuild(site: Site) {
+export default adapter;
+
+async function postbuild(site: Site): Promise<void> {
 	// Build _worker.js as per
 	// https://developers.cloudflare.com/pages/functions/advanced-mode/
 

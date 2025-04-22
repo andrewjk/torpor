@@ -1,7 +1,7 @@
-import { defineConfig } from "vitest/config";
+import { type UserConfigFnObject, defineConfig } from "vitest/config";
 import torpor from "../unplugin/dist/vite";
 
-export default defineConfig(({ mode }) => ({
+const config: UserConfigFnObject = defineConfig(({ mode }) => ({
 	plugins: [torpor()],
 	resolve: {
 		conditions: mode === "test" ? ["browser"] : [],
@@ -11,3 +11,5 @@ export default defineConfig(({ mode }) => ({
 		globalSetup: "./test/globalSetup.ts",
 	},
 }));
+
+export default config;

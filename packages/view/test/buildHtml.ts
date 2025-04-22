@@ -8,7 +8,7 @@ import { type BuildResult } from "../src/compile/types/BuildResult";
 
 const debugPrint = false;
 
-export default function buildHtml(source: string, state?: any, componentPath?: string) {
+export default function buildHtml(source: string, state?: any, componentPath?: string): string {
 	// HACK: we may be running this from the top level, or from within the view folder
 	if (componentPath && !fs.existsSync(componentPath)) {
 		componentPath = path.join("view", componentPath);

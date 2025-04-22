@@ -3,7 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 
-export default async function importComponent(componentPath: string, suffix: string) {
+export default async function importComponent(componentPath: string, suffix: string): Promise<any> {
 	// Create a file with a hashed suffix to import dynamically in Vite(st)
 	const sourceFile =
 		path.join(path.dirname(componentPath), "output", path.basename(componentPath)) +
@@ -32,7 +32,7 @@ export default async function importComponent(componentPath: string, suffix: str
 			.replaceAll(/import (.+?) from ['"]\.\/(.+?)['"]/g, 'import $1 from "../output/$2"');
 		fs.writeFileSync(destFile, source);
 	}
-	return (await import(destFile)).default as any;
+	return (await import(destFile)).default;
 }
 
 // From https://stackoverflow.com/a/18658613

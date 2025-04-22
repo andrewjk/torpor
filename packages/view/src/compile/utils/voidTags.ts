@@ -1,5 +1,5 @@
 // From https://developer.mozilla.org/en-US/docs/Glossary/Void_element
-const voidTags = [
+const voidTags: string[] = [
 	"area",
 	"base",
 	"br",

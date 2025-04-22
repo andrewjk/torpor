@@ -11,7 +11,7 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 
-export default function buildSlotNode(node: ElementNode, status: BuildStatus, b: Builder) {
+export default function buildSlotNode(node: ElementNode, status: BuildStatus, b: Builder): void {
 	// If there's a slot, build that, otherwise build the default nodes
 	let slotName = node.attributes.find((a) => a.name === "name")?.value;
 	slotName = slotName ? trimQuotes(slotName) : "_";

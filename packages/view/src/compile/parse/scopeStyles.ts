@@ -5,7 +5,7 @@ import { type StyleBlock } from "../types/styles/StyleBlock";
 import trimQuotes from "../utils/trimQuotes";
 import { type ParseStatus } from "./ParseStatus";
 
-export default function scopeStyles(status: ParseStatus) {
+export default function scopeStyles(status: ParseStatus): void {
 	let selectors: string[] = [];
 	for (let component of status.components) {
 		if (component.style && component.markup) {

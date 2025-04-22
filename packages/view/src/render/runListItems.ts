@@ -45,7 +45,7 @@ export default function runListItems(
 	oldItems: ListItem[],
 	newItems: ListItem[],
 	create: (data: ListItem, before: Node | null) => void,
-) {
+): void {
 	let oldStartIndex = 0;
 	let oldEndIndex = oldItems.length - 1;
 	let oldStartItem = oldItems[0];

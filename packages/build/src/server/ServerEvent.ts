@@ -23,7 +23,7 @@ export default class ServerEvent {
 		this.adapter = globalThis.adapter;
 	}
 
-	addHeaders() {
+	addHeaders(): void {
 		if (!this.response) {
 			throw new Error("Response not created yet");
 		}

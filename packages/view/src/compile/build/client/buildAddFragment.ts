@@ -10,7 +10,7 @@ export default function buildAddFragment(
 	b: Builder,
 	parentName: string,
 	anchorName: string,
-) {
+): void {
 	if (node.fragment) {
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;

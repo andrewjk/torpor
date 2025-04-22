@@ -21,7 +21,7 @@ export default function buildElementNode(
 	b: Builder,
 	parentName: string,
 	root = false,
-) {
+): void {
 	if (status.inHead) {
 		if (node.tagName === "title") {
 			buildTitleNode(node, status, b);

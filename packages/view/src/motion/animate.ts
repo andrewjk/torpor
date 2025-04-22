@@ -12,7 +12,7 @@ export default async function animate(
 	enter: boolean,
 	keyframes: Keyframe[] | PropertyIndexedKeyframes | null,
 	options?: number | KeyframeAnimationOptions,
-) {
+): Promise<void> {
 	// This is quite simplistic
 	// We might need to
 	// - store the animation

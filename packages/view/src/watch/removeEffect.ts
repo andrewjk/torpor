@@ -1,6 +1,6 @@
 import { type Effect } from "../types/Effect";
 
-export default function removeEffect(effect: Effect) {
+export default function removeEffect(effect: Effect): void {
 	//let effectName = String(effect.run).split("{")[0].trim();
 	//console.log(`removing effect '${effectName}'`);
 

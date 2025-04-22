@@ -21,7 +21,7 @@ export function createFetchHandler(handler: (req: Request) => Response | Promise
 	return async (
 		incoming: IncomingMessage | Http2ServerRequest,
 		outgoing: ServerResponse | Http2ServerResponse,
-	) => {
+	): Promise<void> => {
 		const req = await nodeMessageToRequest(incoming);
 		const res = await handler(req);
 		return await responseToNodeResponse(res, outgoing);

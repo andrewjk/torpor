@@ -22,9 +22,9 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsup",
+		"build": "tsc --noEmit && tsup",
 		"build:fix": "esno scripts/postbuild.ts",
-		"check": "tsc -p tsconfig.json --noEmit",
+		"check": "tsc --noEmit",
 		"test": "vitest run",
 		"test:watch": "vitest"
 	},

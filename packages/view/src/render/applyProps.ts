@@ -4,7 +4,7 @@ export default function applyProps(
 	el: Element,
 	props: Record<string, any> | undefined,
 	propNamesUsed: string[],
-) {
+): void {
 	if (props) {
 		for (let [name, value] of Object.entries(props)) {
 			if (!propNamesUsed.includes(name)) {

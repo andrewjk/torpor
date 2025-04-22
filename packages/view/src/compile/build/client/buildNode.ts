@@ -19,7 +19,7 @@ export default function buildNode(
 	parentName: string,
 	anchorName: string,
 	root = false,
-) {
+): void {
 	// Nodes with anchors will have been handled when their containing fragment
 	// was built so we want to skip them here
 	if (node.handled) {

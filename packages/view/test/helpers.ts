@@ -116,7 +116,7 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 	}
 }
 
-export function trimCode(code: string) {
+export function trimCode(code: string): string {
 	//return code.split('\n').filter(l => !l.trim().startsWith("import"))
 	return code.replace(/\/\*\*.+\*\/\n/gms, "");
 }

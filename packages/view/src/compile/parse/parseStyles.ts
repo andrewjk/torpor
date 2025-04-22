@@ -8,7 +8,7 @@ import consumeUntil from "./utils/consumeUntil";
 import expect from "./utils/expect";
 import isSpaceChar from "./utils/isSpaceChar";
 
-export default function parseStyles(source: string, status: ParseStatus) {
+export default function parseStyles(source: string, status: ParseStatus): void {
 	const current = status.components.at(-1);
 	if (!current) return;
 

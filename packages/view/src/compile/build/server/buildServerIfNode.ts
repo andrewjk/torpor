@@ -13,7 +13,7 @@ export default function buildServerIfNode(
 	node: ControlNode,
 	status: BuildServerStatus,
 	b: Builder,
-) {
+): void {
 	// Surround the entire control statement with bracketed comments, so that we
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;

@@ -16,7 +16,7 @@ export default function buildFragmentText(
 	node: RootNode | ControlNode,
 	status: BuildStatus,
 	b: Builder,
-) {
+): void {
 	const fragments: Fragment[] = [];
 	buildNodeFragmentText(node, status, fragments);
 

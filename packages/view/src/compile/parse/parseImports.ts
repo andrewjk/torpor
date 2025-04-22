@@ -2,7 +2,7 @@ import trimQuotes from "../utils/trimQuotes";
 import trimStartAndEnd from "../utils/trimStartAndEnd";
 import { type ParseStatus } from "./ParseStatus";
 
-export default function parseImports(status: ParseStatus) {
+export default function parseImports(status: ParseStatus): void {
 	let start = 0;
 	let level = 0;
 	for (let i = 0; i < status.source.length + 1; i++) {

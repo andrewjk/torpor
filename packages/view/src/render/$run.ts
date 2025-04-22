@@ -10,7 +10,7 @@ import context from "./context";
  *
  * @param fn The function to run, which may return a cleanup function
  */
-export default function $run(fn: () => Cleanup | void) {
+export default function $run(fn: () => Cleanup | void): void {
 	let effect: Effect = {
 		run: fn,
 		cleanup: null,

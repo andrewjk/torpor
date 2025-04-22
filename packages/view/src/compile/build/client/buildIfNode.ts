@@ -9,7 +9,7 @@ import buildNode from "./buildNode";
 
 // TODO: Are there too many branches for ifs etc?
 
-export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const ifAnchorName = node.varName!;
 	const ifParentName = node.parentName || ifAnchorName + ".parentNode";
 	const ifRangeName = nextVarName("if_range", status);

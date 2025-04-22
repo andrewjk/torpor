@@ -1,4 +1,4 @@
-export default function createText(content: string) {
+export default function createText(content: string): Text {
 	return document.createTextNode(isReactiveText(content) ? " " : content);
 }
 

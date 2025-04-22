@@ -8,7 +8,11 @@ import { type ParseStatus } from "../ParseStatus";
  * @param start (Optional) The start position of the error (defaults to the
  * current parse position)
  */
-export default function addError(status: ParseStatus, message: string, start: number = status.i) {
+export default function addError(
+	status: ParseStatus,
+	message: string,
+	start: number = status.i,
+): void {
 	let line = 1;
 	let lastLineStart = 0;
 	for (let i = 0; i < start; i++) {

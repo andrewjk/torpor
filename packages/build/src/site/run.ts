@@ -6,7 +6,10 @@ import runBuild from "./runBuild";
 import runDev from "./runDev";
 import runPreview from "./runPreview";
 
-export default async function run(folder: string, mode: "dev" | "build" | "preview") {
+export default async function run(
+	folder: string,
+	mode: "dev" | "build" | "preview",
+): Promise<void> {
 	// Look for and load a site.config.js/ts file in the working directory
 	let configFile = "";
 	let deleteConfigFile = false;

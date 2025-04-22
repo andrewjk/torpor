@@ -11,7 +11,7 @@ export default function buildServerElementNode(
 	node: ElementNode,
 	status: BuildServerStatus,
 	b: Builder,
-) {
+): void {
 	let attributes = buildElementAttributes(node, status);
 	if (attributes.length) {
 		attributes = " " + attributes;

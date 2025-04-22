@@ -6,7 +6,7 @@ import type ServerFunction from "./types/ServerFunction";
 // This is not actually used anywhere, for now at least
 
 export default class Router {
-	methods = new Map<HttpMethod, RouteHandler[]>();
+	methods: Map<HttpMethod, RouteHandler[]> = new Map<HttpMethod, RouteHandler[]>();
 	middleware: MiddlewareHandler[] = [];
 
 	constructor() {
@@ -28,7 +28,7 @@ export default class Router {
 		return this;
 	}
 
-	match(method: HttpMethod, path: string) {
+	match(method: HttpMethod, path: string): Match | undefined {
 		for (let handler of this.methods.get(method)!) {
 			let match = path.match(handler.regex);
 			if (match) {
@@ -65,3 +65,8 @@ class MiddlewareHandler {
 		this.fn = fn;
 	}
 }
+
+type Match = {
+	fn: ServerFunction;
+	params?: Record<string, string>;
+};

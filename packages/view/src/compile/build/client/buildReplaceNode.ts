@@ -6,7 +6,7 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const replaceAnchorName = node.varName!;
 	const replaceParentName = node.parentName || replaceAnchorName + ".parentNode";
 	const replaceRangeName = nextVarName("replace_range", status);

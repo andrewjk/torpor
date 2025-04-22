@@ -2,7 +2,7 @@ export default function createElement(
 	tagName: string,
 	attributes: Record<string, string>,
 	children: Node[],
-) {
+): HTMLElement {
 	let el = document.createElement(tagName);
 	// Set any attributes that aren't reactive
 	// Reactive attributes will be set in $run effects

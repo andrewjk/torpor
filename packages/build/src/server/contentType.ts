@@ -1,6 +1,6 @@
 // From https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/MIME_types/Common_types
 
-export default function contentType(extension: string) {
+export default function contentType(extension: string): string {
 	return types[extension] || "application/octet-stream";
 }
 

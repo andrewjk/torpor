@@ -16,7 +16,7 @@ export default function runList(
 	anchor: Node | null,
 	buildItems: () => ListItem[],
 	create: (item: ListItem, anchor: Node | null) => void,
-) {
+): void {
 	const oldRange = pushRange(range, true);
 
 	let listItems: ListItem[] = [];

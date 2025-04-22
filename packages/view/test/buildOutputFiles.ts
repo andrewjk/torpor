@@ -5,7 +5,7 @@ import { buildType } from "../src/compile";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 
-export default async function buildOutputFiles(componentPath: string) {
+export default async function buildOutputFiles(componentPath: string): Promise<void> {
 	//console.log("Building test output files", componentPath);
 	const files = await fg("**/*.torp", {
 		absolute: true,

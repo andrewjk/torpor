@@ -7,7 +7,7 @@ export default function buildMount(
 	functionBody: string,
 	status: BuildStatus,
 	b: Builder,
-) {
+): void {
 	functionBody = replaceForVarNames(functionBody, status);
 
 	status.imports.add("$mount");

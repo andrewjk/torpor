@@ -8,7 +8,7 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 
-export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder) {
+export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const awaitParentName = node.parentName!;
 	const awaitAnchorName = node.varName!;
 	const awaitRangeName = nextVarName("await_range", status);

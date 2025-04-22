@@ -1,4 +1,8 @@
-import { createRspackPlugin } from "unplugin";
+import { type RspackPluginInstance, createRspackPlugin } from "unplugin";
 import { unpluginFactory } from ".";
+import type { Options } from "./types";
 
-export default createRspackPlugin(unpluginFactory);
+const plugin: (options?: Options | undefined) => RspackPluginInstance =
+	createRspackPlugin(unpluginFactory);
+
+export default plugin;

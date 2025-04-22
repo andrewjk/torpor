@@ -10,7 +10,7 @@ import manifest from "./manifest.ts";
 // TODO: Don't reload layouts during client routing
 // TODO: Call the correct +page and +server routes when in the same folder
 
-export default async function runBuild(site: Site) {
+export default async function runBuild(site: Site): Promise<void> {
 	// Delete the dist folder if it exists
 	const distFolder = path.resolve(site.root, "dist");
 	if (existsSync(distFolder)) {

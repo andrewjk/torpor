@@ -2,7 +2,7 @@ import { type ProxyData } from "../types/ProxyData";
 import removeEffect from "./removeEffect";
 import runEffect from "./runEffect";
 
-export default function triggerEffects(data: ProxyData, key: PropertyKey) {
+export default function triggerEffects(data: ProxyData, key: PropertyKey): void {
 	// Get the effects for the supplied property
 	let effects = data.propData.get(key)?.effects;
 	if (effects) {

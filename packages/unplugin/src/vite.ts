@@ -1,4 +1,9 @@
 import { createVitePlugin } from "unplugin";
+import type { Plugin } from "vite";
 import { unpluginFactory } from ".";
+import type { Options } from "./types";
 
-export default createVitePlugin(unpluginFactory);
+const plugin: (options?: Options | undefined) => Plugin<any> | Plugin<any>[] =
+	createVitePlugin(unpluginFactory);
+
+export default plugin;

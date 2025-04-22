@@ -12,7 +12,11 @@ import buildServerRootNode from "./buildServerRootNode";
 import buildServerSpecialNode from "./buildServerSpecialNode";
 import buildServerTextNode from "./buildServerTextNode";
 
-export default function buildServerNode(node: TemplateNode, status: BuildServerStatus, b: Builder) {
+export default function buildServerNode(
+	node: TemplateNode,
+	status: BuildServerStatus,
+	b: Builder,
+): void {
 	switch (node.type) {
 		case "root": {
 			buildServerRootNode(node as RootNode, status, b);

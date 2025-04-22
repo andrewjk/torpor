@@ -8,7 +8,7 @@ import { proxyDataSymbol } from "./symbols";
 export default function transferEffects(
 	oldValue: Record<PropertyKey, any>,
 	newValue: Record<PropertyKey, any>,
-) {
+): void {
 	const oldData = oldValue[proxyDataSymbol] as ProxyData;
 	const newData = newValue[proxyDataSymbol] as ProxyData;
 	moveChildEffects(oldValue, newValue, oldData, newData);

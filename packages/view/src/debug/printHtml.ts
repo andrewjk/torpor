@@ -1,4 +1,4 @@
-export default function printHtml(html: string) {
+export default function printHtml(html: string): string {
 	let lines = html
 		.replaceAll("<", "\n<")
 		.replaceAll(">", ">\n")

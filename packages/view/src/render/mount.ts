@@ -13,7 +13,7 @@ export default function mount(
 	component: Component,
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
-) {
+): void {
 	// The parent node must have no child elements, so that we can hydrate
 	// without worrying about where to start
 	if (parent.childElementCount) {
