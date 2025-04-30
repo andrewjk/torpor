@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { type UserConfigFnObject, defineConfig } from "vitest/config";
 import torpor from "./packages/unplugin/dist/vite";
 
 export default defineConfig(({ mode }) => ({
@@ -10,4 +10,4 @@ export default defineConfig(({ mode }) => ({
 		environment: "jsdom",
 		setupFiles: "./vitest.setup.ts",
 	},
-}));
+})) satisfies UserConfigFnObject as UserConfigFnObject;

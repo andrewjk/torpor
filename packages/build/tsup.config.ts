@@ -1,4 +1,9 @@
-import { defineConfig } from "tsup";
+import { type Options, defineConfig } from "tsup";
+
+type Config =
+	| Options
+	| Options[]
+	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
 
 export default defineConfig({
 	entry: [
@@ -17,4 +22,4 @@ export default defineConfig({
 	// Put this in here to stop issues with bundling Vite from bin/index.ts
 	// I'm not sure if this will cause further issues down the line?
 	external: ["vite"],
-});
+}) satisfies Config as Config;

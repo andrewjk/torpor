@@ -1,4 +1,9 @@
-import { defineConfig } from "tsup";
+import { type Options, defineConfig } from "tsup";
+
+type Config =
+	| Options
+	| Options[]
+	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
 
 export default defineConfig({
 	entry: ["src/Accordion/index.ts", "src/motion.ts"],
@@ -11,4 +16,4 @@ export default defineConfig({
 		".torp": "file",
 	},
 	onSuccess: "npm run build:fix",
-});
+}) satisfies Config as Config;

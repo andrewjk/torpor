@@ -1,4 +1,9 @@
-import { defineConfig } from "tsup";
+import { type Options, defineConfig } from "tsup";
+
+type Config =
+	| Options
+	| Options[]
+	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
 
 export default defineConfig({
 	entry: ["src/*.ts"],
@@ -8,4 +13,4 @@ export default defineConfig({
 	clean: true,
 	splitting: true,
 	onSuccess: "npm run build:fix",
-});
+}) satisfies Config as Config;

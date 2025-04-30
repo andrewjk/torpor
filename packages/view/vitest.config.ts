@@ -1,7 +1,7 @@
 import { type UserConfigFnObject, defineConfig } from "vitest/config";
 import torpor from "../unplugin/dist/vite";
 
-const config: UserConfigFnObject = defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => ({
 	plugins: [torpor()],
 	resolve: {
 		conditions: mode === "test" ? ["browser"] : [],
@@ -10,6 +10,4 @@ const config: UserConfigFnObject = defineConfig(({ mode }) => ({
 		environment: "jsdom",
 		globalSetup: "./test/globalSetup.ts",
 	},
-}));
-
-export default config;
+})) satisfies UserConfigFnObject as UserConfigFnObject;

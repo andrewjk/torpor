@@ -1,3 +1,3 @@
-import { defineConfig } from "vitest/config";
+import { type UserConfigFnObject, defineConfig } from "vitest/config";
 
-export default defineConfig(() => ({}));
+export default defineConfig(() => ({})) satisfies UserConfigFnObject as UserConfigFnObject;

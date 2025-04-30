@@ -4,14 +4,12 @@ import path from "node:path";
 import { build, defineConfig } from "vite";
 import prepareTemplate from "./prepareTemplate";
 
-const adapter: Adapter = {
+export default {
 	postbuild,
 	serve: (/* server: Server, site: Site*/) => {
 		console.log("TODO");
 	},
-};
-
-export default adapter;
+} satisfies Adapter as Adapter;
 
 async function postbuild(site: Site): Promise<void> {
 	// Build _worker.js as per
