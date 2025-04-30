@@ -36,12 +36,7 @@ export default async function runBuild(site: Site): Promise<void> {
 	// EXCLUDING anything with `server.js` in the name
 	await build(
 		defineConfig({
-			plugins: [
-				manifest(site),
-				// @ts-ignore
-				torpor(),
-				...site.plugins,
-			],
+			plugins: [manifest(site), torpor(), ...site.plugins],
 			build: {
 				outDir: clientFolder,
 				rollupOptions: {
@@ -62,12 +57,7 @@ export default async function runBuild(site: Site): Promise<void> {
 	// files
 	await build(
 		defineConfig({
-			plugins: [
-				manifest(site, true),
-				// @ts-ignore
-				torpor(),
-				...site.plugins,
-			],
+			plugins: [manifest(site, true), torpor(), ...site.plugins],
 			build: {
 				outDir: serverFolder,
 				rollupOptions: {

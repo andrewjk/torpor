@@ -19,12 +19,7 @@ export default async function runDev(site: Site): Promise<void> {
 	const vite = await createViteServer({
 		server: { middlewareMode: true },
 		appType: "custom",
-		plugins: [
-			manifest(site, true),
-			// @ts-ignore not sure...
-			torpor(),
-			...site.plugins,
-		],
+		plugins: [manifest(site, true), torpor(), ...site.plugins],
 	});
 
 	// Read site.html
@@ -46,7 +41,7 @@ export default async function runDev(site: Site): Promise<void> {
 	// Prepare site.html so that we can just splice components into it
 	template = prepareTemplate(template, clientScript);
 
-	// Use vite's Connect instance as middleware. We need to wrap it with
+	// Use Vite's Connect instance as middleware. We need to wrap it with
 	// createMiddlewareHandler that converts Connect middleware to
 	// Request/Response web handlers
 	server.use(connectMiddleware(vite.middlewares));
