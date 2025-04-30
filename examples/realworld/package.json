@@ -15,7 +15,7 @@
 	"license": "ISC",
 	"dependencies": {
 		"@libsql/kysely-libsql": "^0.4.1",
-		"@prisma/client": "^6.6.0",
+		"@prisma/client": "^6.7.0",
 		"@torpor/adapter-node": "workspace:^",
 		"@torpor/build": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
@@ -24,17 +24,17 @@
 		"dotenv": "^16.5.0",
 		"jose": "^6.0.10",
 		"jsonwebtoken": "^9.0.2",
-		"kysely": "^0.28.1",
+		"kysely": "^0.28.2",
 		"winston": "^3.17.0"
 	},
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.9",
 		"@types/sanitize-html": "^2.15.0",
 		"dotenv-cli": "^8.0.0",
-		"marked": "^15.0.9",
-		"prisma": "^6.6.0",
+		"marked": "^15.0.11",
+		"prisma": "^6.7.0",
 		"sanitize-html": "^2.16.0",
-		"tsx": "^4.19.3",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3"
 	}
 }

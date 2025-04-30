@@ -22,7 +22,7 @@
 		"sucrase": "^3.35.0"
 	},
 	"devDependencies": {
-		"tsx": "^4.19.3",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3"
 	}
 }

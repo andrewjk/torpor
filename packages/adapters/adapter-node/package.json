@@ -25,12 +25,12 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/build": "workspace:^",
-		"vite": "^6.3.2"
+		"vite": "^6.3.3"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"tsup": "^8.4.0",
-		"tsx": "^4.19.3",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",
 		"vitest": "^3.1.2"
 	}

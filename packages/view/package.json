@@ -44,13 +44,13 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/jsdom": "^21.1.7",
-		"@types/node": "^22.14.1",
+		"@types/node": "^22.15.3",
 		"fast-glob": "^3.3.3",
 		"jsdom": "^26.1.0",
 		"sucrase": "^3.35.0",
 		"tinybench": "^4.0.1",
 		"tsup": "^8.4.0",
-		"tsx": "^4.19.3",
+		"tsx": "^4.19.4",
 		"typescript": "^5.8.3",
 		"vitest": "^3.1.2"
 	}
