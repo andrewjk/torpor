@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.12
+
+### Patch Changes
+
+- 018728f: Fix: build for server (not browser)
+
 ## 0.0.11
 
 ### Patch Changes
