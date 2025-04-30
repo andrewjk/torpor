@@ -1,5 +1,11 @@
 # @torpor/adapter-node
 
+## 0.0.10
+
+### Patch Changes
+
+- 3ed8a23: Chore: specify exports in packages
+
 ## 0.0.9
 
 ### Patch Changes
