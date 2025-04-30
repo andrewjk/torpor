@@ -22,12 +22,11 @@ export default async function run(
 		// If it's TS, we need to convert it to JS
 		// TODO: Put the generated file somewhere better (dist?)
 		configFile = path.join(folder, "site.config.temp.js");
-		let source = (
-			await transformWithEsbuild(fs.readFileSync(tsConfigFile, "utf-8"), tsConfigFile, {
-				loader: "ts",
-			})
-		).code;
-		fs.writeFileSync(configFile, source);
+		let source = fs.readFileSync(tsConfigFile, "utf-8");
+		let transformed = await transformWithEsbuild(source, tsConfigFile, {
+			loader: "ts",
+		});
+		fs.writeFileSync(configFile, transformed.code);
 		deleteConfigFile = true;
 	} else {
 		throw new Error("site.config file not found");
