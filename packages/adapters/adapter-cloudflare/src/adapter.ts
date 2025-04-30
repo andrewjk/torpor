@@ -75,26 +75,11 @@ async function postbuild(site: Site): Promise<void> {
 				// HACK: We don't need to minify as the worker isn't downloaded?
 				// And it makes debugging easier
 				minify: false,
-				// HACK: Disable preload so that the _worker.js file doesn't end
-				// up with document and window references that are not available
-				modulePreload: false,
+				// HACK: Build for SSR so we don't get document and window references
+				ssr: true,
 			},
 		}),
 	);
-
-	// HACK: Disabling preload doesn't work so we have to brute-force it???
-	for (let file of await fs.readdir(cloudflareFolder)) {
-		if (file.startsWith("_worker")) {
-			let b = await fs.readFile(path.join(cloudflareFolder, file), "utf-8");
-			if (b.includes("const __vitePreload")) {
-				b = b.replaceAll(
-					"const __vitePreload = function preload(baseModule, deps, importerUrl) {",
-					"const __vitePreload = function preload(baseModule, deps, importerUrl) { return baseModule();",
-				);
-				await fs.writeFile(path.join(cloudflareFolder, file), b);
-			}
-		}
-	}
 
 	// Copy the client assets into the Cloudflare folder
 	await fs.mkdir(path.join(cloudflareFolder, "assets"));
