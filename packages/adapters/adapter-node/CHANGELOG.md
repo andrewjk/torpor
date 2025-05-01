@@ -1,5 +1,13 @@
 # @torpor/adapter-node
 
+## 0.0.11
+
+### Patch Changes
+
+- 7162232: Fix: set globalThis.adapter in all adapters
+- Updated dependencies [02eac8e]
+  - @torpor/build@0.1.13
+
 ## 0.0.10
 
 ### Patch Changes

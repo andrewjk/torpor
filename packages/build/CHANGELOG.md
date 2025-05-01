@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.13
+
+### Patch Changes
+
+- 02eac8e: Feat: allow passing extra inputs to build
+
 ## 0.1.12
 
 ### Patch Changes
