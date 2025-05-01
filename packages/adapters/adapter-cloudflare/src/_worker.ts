@@ -26,7 +26,8 @@ server.add("*", async (ev: any) => {
 
 export default {
 	async fetch(request: Request, env: any): Promise<any> {
-		// Put adapter-specific functionality in the `adapter` property of globalThis
+		// Put adapter-specific functionality in the `adapter` property of
+		// globalThis for now
 		// @ts-ignore
 		globalThis.adapter = { env };
 

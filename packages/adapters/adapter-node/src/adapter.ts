@@ -8,6 +8,11 @@ export default {
 		process.env.HOST ??= "localhost";
 		process.env.PORT ??= "7059";
 
+		// Put adapter-specific functionality in the `adapter` property of
+		// globalThis for now
+		// @ts-ignore
+		globalThis.adapter = { env: process.env };
+
 		// Create the Node server and start listening
 		const url = `${process.env.PROTOCOL}//${process.env.HOST}:${process.env.PORT}`;
 		console.log(`\nConnecting to ${url}`);
