@@ -46,6 +46,7 @@ export default async function runBuild(site: Site): Promise<void> {
 						...site.routes
 							.filter((r) => !/server\.(ts|js)$/.test(r.file))
 							.map((r) => path.resolve(site.root, r.file)),
+						...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
 					],
 				},
 				ssrManifest: true,
@@ -61,7 +62,11 @@ export default async function runBuild(site: Site): Promise<void> {
 			build: {
 				outDir: serverFolder,
 				rollupOptions: {
-					input: [serverScript, ...site.routes.map((r) => path.resolve(site.root, r.file))],
+					input: [
+						serverScript,
+						...site.routes.map((r) => path.resolve(site.root, r.file)),
+						...site.inputs,
+					],
 				},
 				ssr: serverScript,
 			},

@@ -33,6 +33,12 @@ export default class Site {
 	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
 	// Is default adapter a bad idea?
 	adapter: Adapter = defaultAdapter;
+	/**
+	 * Extra inputs, as absolute file paths, that will be compiled with the
+	 * output. What you do with them after that is up to you. File paths ending
+	 * with server.ts/js will only be compiled with the server output
+	 */
+	inputs: string[] = [];
 
 	constructor() {
 		this.root = process.cwd();
