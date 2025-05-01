@@ -64,7 +64,7 @@ async function postbuild(site: Site): Promise<void> {
 			build: {
 				outDir: cloudflareFolder,
 				rollupOptions: {
-					input: [workerFile],
+					input: [workerFile, ...site.inputs],
 					output: {
 						entryFileNames: `[name].js`,
 						chunkFileNames: `[name].js`,
