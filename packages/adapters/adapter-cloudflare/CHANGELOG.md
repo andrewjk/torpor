@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.14
+
+### Patch Changes
+
+- 2272579: Feat: allow passing extra inputs to build
+
 ## 0.0.13
 
 ### Patch Changes
