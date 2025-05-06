@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.1.14
+
+### Patch Changes
+
+- e395c9e: Feat: rudimentary test infrastructure
+- Updated dependencies [5676a0b]
+  - @torpor/unplugin@0.1.6
+
 ## 0.1.13
 
 ### Patch Changes
