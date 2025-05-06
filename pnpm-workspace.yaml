@@ -1,5 +1,7 @@
 packages:
-  - "packages/*"
-  - "packages/adapters/*"
-  - "site"
-  - "examples/*"
+  - packages/*
+  - packages/adapters/*
+  - site
+  - examples/*
+onlyBuiltDependencies:
+  - esbuild
