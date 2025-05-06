@@ -12,6 +12,7 @@ export default defineConfig({
 		"src/run.ts",
 		"src/server.ts",
 		"src/state.ts",
+		"src/test.ts",
 		"src/bin/index.ts",
 	],
 	format: ["esm", "cjs"],

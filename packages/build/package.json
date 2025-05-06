@@ -32,6 +32,11 @@
 			"import": "./dist/server.js",
 			"require": "./dist/server.cjs"
 		},
+		"./test": {
+			"types": "./dist/test.d.ts",
+			"import": "./dist/test.js",
+			"require": "./dist/test.cjs"
+		},
 		"./manifest": {
 			"types": "./src/types/manifest.d.ts"
 		}
