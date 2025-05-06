@@ -1,5 +1,12 @@
 # @torpor/build
 
+## 0.1.15
+
+### Patch Changes
+
+- Updated dependencies [e4060e6]
+  - @torpor/unplugin@0.1.7
+
 ## 0.1.14
 
 ### Patch Changes

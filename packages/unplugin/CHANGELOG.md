@@ -1,5 +1,11 @@
 # @torpor/unplugin
 
+## 0.1.7
+
+### Patch Changes
+
+- e4060e6: Fix: delegate SSR option to Vite or testing
+
 ## 0.1.6
 
 ### Patch Changes
