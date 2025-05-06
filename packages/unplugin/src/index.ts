@@ -29,7 +29,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		// Vite can override user server options
 		if (viteOptions && viteOptions.ssr !== undefined) {
 			options ??= {};
-			options.server = viteOptions.ssr;
+			options.server ||= viteOptions.ssr;
 		}
 
 		// Try to parse the code
