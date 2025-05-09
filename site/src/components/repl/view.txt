@@ -5,9 +5,12 @@ function formatText(value) {
 }
 
 // src/render/getClasses.ts
-function getClasses(value) {
+function getClasses(value, styleHash) {
   let classes = [];
   gatherNames("", value, classes);
+  if (styleHash) {
+    classes.push(styleHash);
+  }
   return classes.join(" ");
 }
 function gatherNames(name, value, classes) {
