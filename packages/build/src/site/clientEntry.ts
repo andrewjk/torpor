@@ -17,11 +17,7 @@ window.addEventListener("click", async (e) => {
 		const href = (e.target as HTMLLinkElement).href;
 		const url = new URL(href);
 
-		// Update $page before building the components
-		// TODO: Find somewhere better to put this
-		$page.url = url;
-
-		if (await navigate(url.pathname, url.searchParams)) {
+		if (await navigate(url)) {
 			window.history.pushState(null, "", url);
 		} else {
 			window.location.href = href;
@@ -39,10 +35,10 @@ window.addEventListener("popstate", async () => {
 navigateToLocation(document.location, true);
 
 async function navigateToLocation(location: Location, firstTime = false) {
-	return await navigate(location.pathname, new URLSearchParams(location.search), firstTime);
+	return await navigate(new URL(location.toString()), firstTime);
 }
 
-async function navigate(path: string, query: URLSearchParams, firstTime = false): Promise<boolean> {
+async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	//console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const parent = document.getElementById("app");
@@ -51,6 +47,9 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 		console.log("500");
 		return false;
 	}
+
+	const path = url.pathname;
+	const query = url.searchParams;
 
 	const route = router.match(path, query);
 	if (!route) {
@@ -61,7 +60,7 @@ async function navigate(path: string, query: URLSearchParams, firstTime = false)
 
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
-	//$page.url = new URL(document.location.href);
+	$page.url = url;
 
 	const handler = route.handler;
 	const params = route.params || {};
