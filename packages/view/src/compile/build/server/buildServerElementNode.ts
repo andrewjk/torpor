@@ -94,6 +94,9 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name === ":class") {
 				status.imports.add("t_class");
+				if (node.scopeStyles) {
+					value += `, "torp-${status.styleHash}"`;
+				}
 				attributes.push(`class="\${t_class(${value})}"`);
 			} else if (name === ":style") {
 				status.imports.add("t_style");
@@ -110,6 +113,11 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			attributes.push(
 				`${name}="${trimQuotes(value).replaceAll("{", "${t_attr(").replaceAll("}", ")}")}"`,
 			);
+		} else if (name === "class" && node.scopeStyles) {
+			value = value
+				? `"${trimQuotes(value)} torp-${status.styleHash}"`
+				: `"torp-${status.styleHash}"`;
+			attributes.push(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`);
 		} else if (value != null) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled

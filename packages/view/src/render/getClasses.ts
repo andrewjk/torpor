@@ -1,6 +1,9 @@
-export default function getClasses(value: unknown): string {
+export default function getClasses(value: unknown, styleHash?: string): string {
 	let classes: string[] = [];
 	gatherNames("", value, classes);
+	if (styleHash) {
+		classes.push(styleHash);
+	}
 	return classes.join(" ");
 }
 

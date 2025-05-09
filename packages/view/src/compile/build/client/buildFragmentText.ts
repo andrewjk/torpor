@@ -6,6 +6,7 @@ import { type RootNode } from "../../types/nodes/RootNode";
 import { type TemplateNode } from "../../types/nodes/TemplateNode";
 import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import trimQuotes from "../../utils/trimQuotes";
 import isReactive from "../utils/isReactive";
 import { type BuildStatus } from "./BuildStatus";
 
@@ -155,6 +156,11 @@ function buildElementFragmentText(
 				if (a.name.startsWith("data-")) {
 					return `${a.name}=""`;
 				}
+			} else if (a.name === "class" && node.scopeStyles) {
+				let value = a.value
+					? `"${trimQuotes(a.value)} torp-${status.styleHash}"`
+					: `"torp-${status.styleHash}"`;
+				return `${a.name}=${value}`;
 			} else {
 				return `${a.name}${a.value != null ? `=${a.value}` : ""}`;
 			}

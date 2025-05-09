@@ -21,24 +21,28 @@ export default function Class(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div> Hello! </div> <div> Class object </div> <div> Class array </div> <div> Class nested </div> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div class="yo torp-1ljxz83"> From string </div> <a> From state </a> <div> From state with scope </div> <div> Class object </div> <div> Class array </div> <div> Class nested </div> </div>`);
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_div_2 = t_next(t_child(t_div_1)) as HTMLDivElement;
+	const t_a_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLElement;
+	const t_div_2 = t_next(t_next(t_a_1)) as HTMLDivElement;
 	const t_div_3 = t_next(t_next(t_div_2)) as HTMLDivElement;
 	const t_div_4 = t_next(t_next(t_div_3)) as HTMLDivElement;
 	const t_div_5 = t_next(t_next(t_div_4)) as HTMLDivElement;
 	$run(function setClasses() {
-		t_div_2.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue });
+		t_a_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
 	});
 	$run(function setClasses() {
-		t_div_3.className = t_class({ foo: true, bar: false, baz: 5, qux: null });
+		t_div_2.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
 	});
 	$run(function setClasses() {
-		t_div_4.className = t_class([ "foo", false, true && "baz", undefined ]);
+		t_div_3.className = t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ljxz83");
 	});
 	$run(function setClasses() {
-		t_div_5.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ]);
+		t_div_4.className = t_class([ "foo", false, true && "baz", undefined ], "torp-1ljxz83");
+	});
+	$run(function setClasses() {
+		t_div_5.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-1ljxz83");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor);
 	t_next(t_div_1);

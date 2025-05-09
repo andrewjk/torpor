@@ -12,43 +12,35 @@ export default function scopeStyles(status: ParseStatus): void {
 			for (let block of component.style.blocks) {
 				collectStyleSelectors(block, selectors);
 			}
-			scopeStylesOnNode(component.markup, selectors, component.style.hash);
+			scopeStylesOnNode(component.markup, selectors);
 		}
 	}
 }
 
-function scopeStylesOnNode(node: TemplateNode, selectors: string[], styleHash: string) {
+function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 	if (isElementNode(node)) {
-		let addClass = selectors.includes(node.tagName);
-		if (!addClass) {
+		let scopeStyles = selectors.includes(node.tagName);
+		if (!scopeStyles) {
 			for (let a of node.attributes) {
 				if (a.name === "class" || a.name === ":class") {
-					addClass = true;
+					scopeStyles = true;
 				} else if (a.name === "id" && a.value) {
-					addClass = selectors.includes(`#${trimQuotes(a.value)}`);
+					scopeStyles = selectors.includes(`#${trimQuotes(a.value)}`);
 				} else if (a.name === "class" && a.value) {
 					// TODO: Never getting here?
-					addClass = selectors.includes(`.${trimQuotes(a.value)}`);
+					scopeStyles = selectors.includes(`.${trimQuotes(a.value)}`);
 				}
-				if (addClass) break;
+				if (scopeStyles) {
+					break;
+				}
 			}
 		}
-		if (addClass) {
-			let classAttribute = node.attributes.find((a) => a.name === "class");
-			if (classAttribute && classAttribute.value) {
-				classAttribute.value = `"${trimQuotes(classAttribute.value)} torp-${styleHash}"`;
-			} else {
-				node.attributes.push({
-					name: "class",
-					value: `"torp-${styleHash}"`,
-				});
-			}
-		}
+		node.scopeStyles = scopeStyles;
 	}
 
 	if (isParentNode(node)) {
 		for (let child of node.children) {
-			scopeStylesOnNode(child, selectors, styleHash);
+			scopeStylesOnNode(child, selectors);
 		}
 	}
 }

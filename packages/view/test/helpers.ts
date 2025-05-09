@@ -28,12 +28,16 @@ export function el(
 	children?: TemplateNode[],
 	selfClosed?: boolean,
 ): ElementNode {
+	let scopeStyles = !!attributes?.find((a) => a.name === "class" && a.value?.startsWith(`"torp-`));
 	return {
 		type: "element",
 		tagName,
-		attributes: attributes || [],
+		attributes: (attributes || []).filter(
+			(a) => !(a.name === "class" && a.value?.startsWith(`"torp-`)),
+		),
 		children: children || [],
 		selfClosed,
+		scopeStyles: scopeStyles || undefined,
 		closed: true,
 	};
 }

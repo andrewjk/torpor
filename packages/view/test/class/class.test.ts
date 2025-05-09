@@ -49,21 +49,44 @@ test("class -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: State) {
-	expect(queryByText(container, "Hello!")).not.toBeNull();
-	expect(queryByText(container, "Hello!")).toHaveClass("hello red blue", { exact: true });
+	expect(queryByText(container, "From string")).not.toBeNull();
+	expect(queryByText(container, "From string")).toHaveClass("yo torp-1ljxz83", {
+		exact: true,
+	});
+
+	expect(queryByText(container, "From state")).not.toBeNull();
+	expect(queryByText(container, "From state")).toHaveClass("hello red blue torp-1ljxz83", {
+		exact: true,
+	});
+
+	expect(queryByText(container, "From state with scope")).not.toBeNull();
+	expect(queryByText(container, "From state with scope")).toHaveClass(
+		"hello red blue torp-1ljxz83",
+		{
+			exact: true,
+		},
+	);
 
 	expect(queryByText(container, "Class object")).not.toBeNull();
-	expect(queryByText(container, "Class object")).toHaveClass("foo baz", { exact: true });
+	expect(queryByText(container, "Class object")).toHaveClass("foo baz torp-1ljxz83", {
+		exact: true,
+	});
 
 	expect(queryByText(container, "Class array")).not.toBeNull();
-	expect(queryByText(container, "Class array")).toHaveClass("foo baz", { exact: true });
+	expect(queryByText(container, "Class array")).toHaveClass("foo baz torp-1ljxz83", {
+		exact: true,
+	});
 
 	expect(queryByText(container, "Class nested")).not.toBeNull();
-	expect(queryByText(container, "Class nested")).toHaveClass("foo bar baz qux", { exact: true });
+	expect(queryByText(container, "Class nested")).toHaveClass("foo bar baz qux torp-1ljxz83", {
+		exact: true,
+	});
 
 	// Change state
 	state.green = true;
 	state.blue = false;
 
-	expect(queryByText(container, "Hello!")).toHaveClass("hello red green", { exact: true });
+	expect(queryByText(container, "From state")).toHaveClass("hello red green torp-1ljxz83", {
+		exact: true,
+	});
 }

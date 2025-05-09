@@ -202,9 +202,15 @@ function buildElementAttributes(
 			} else if (name.startsWith(":transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
+				if (node.scopeStyles) {
+					value += `+ "torp-${status.styleHash}"`;
+				}
 				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
 			} else if (name === ":class") {
 				status.imports.add("t_class");
+				if (node.scopeStyles) {
+					value += `, "torp-${status.styleHash}"`;
+				}
 				buildRun("setClasses", `${varName}.className = t_class(${value});`, status, b);
 			} else if (name === ":style") {
 				status.imports.add("t_style");

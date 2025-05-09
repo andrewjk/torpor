@@ -1,8 +1,16 @@
 export default function Class() {
 	@render {
 		<div>
+			<div class="yo">
+				From string
+			</div>
+
+			<a :class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
+				From state
+			</a>
+
 			<div :class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
-				Hello!
+				From state with scope
 			</div>
 
 			<div :class={{ foo: true, bar: false, baz: 5, qux: null }}>
@@ -17,5 +25,11 @@ export default function Class() {
 				Class nested
 			</div>
 		</div>		
+	}
+
+	@style {
+		div {
+			color: blue;
+		}
 	}
 }
