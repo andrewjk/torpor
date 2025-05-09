@@ -1,7 +1,7 @@
 import manifest from "@torpor/build/manifest";
+import { $page } from "@torpor/build/state";
 import { hydrate, mount } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
-import $page from "../state/$page.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import Router from "./Router.ts";

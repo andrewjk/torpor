@@ -1,10 +1,10 @@
 import manifest from "@torpor/build/manifest";
+import { $page } from "@torpor/build/state";
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
-import $page from "../state/$page.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import RouteHandler from "../types/RouteHandler.ts";
