@@ -1,7 +1,7 @@
 import fg from "fast-glob";
-import { existsSync, promises as fs } from "node:fs";
+import crypto from "node:crypto";
+import { existsSync, promises as fs, unlinkSync } from "node:fs";
 import path from "node:path";
-import { buildType } from "../src/compile";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
 
@@ -15,7 +15,7 @@ export default async function buildOutputFiles(componentPath: string): Promise<v
 	//console.log("Done\n");
 }
 
-async function buildFiles(file: string) {
+export async function buildFiles(file: string): Promise<void> {
 	//console.log(`Building files for ${file.substring(path.resolve("./test").length)}`);
 
 	const source = await fs.readFile(file, "utf8");
@@ -23,20 +23,55 @@ async function buildFiles(file: string) {
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
 		let clientCode = formatCode(build(parsed.template).code, "client");
+		await maybeWriteFile(file, clientCode, "client");
+		await maybeWriteFile(file, serverCode, "server");
+	} else {
+		// Just log the message and continue with output/testing
+		console.log("PARSE FAILED for " + file);
+		console.log(parsed.errors.map((e) => e.message).join("\n"));
+	}
+}
 
-		let typesCode = buildType(parsed.template);
-		await fs.writeFile(file.replace(".torp", ".d.ts"), typesCode);
+async function maybeWriteFile(file: string, code: string, suffix: string) {
+	//const hash = await hashFileContents(code);
+	const hash = hashFileCode(code);
 
-		let outputFile = file.replace("/components/", "/components/output/");
+	// If the hashed file doesn't exist, update it and the output file
+	let outputFile = file
+		.replace("/components/", "/components/temp/")
+		.replace(".torp", `-${suffix}-${hash}.ts`);
+	if (!existsSync(outputFile)) {
+		console.log(`Building files for ${file}`);
+
+		let outputFolder = path.dirname(outputFile);
+		if (!existsSync(outputFolder)) {
+			await fs.mkdir(outputFolder);
+		}
+
+		// Delete old files
+		const glob = `${path.basename(file, ".torp")}-${suffix}-*.ts`;
+		const oldFiles = await fg(glob, {
+			absolute: true,
+			cwd: path.resolve(outputFolder),
+		});
+		oldFiles.forEach((f) => unlinkSync(f));
+
+		// Create the new hash file
+		await fs.writeFile(outputFile, code);
+
+		// Create the new output file
+		outputFile = file
+			.replace("/components/", "/components/output/")
+			.replace(".torp", `-${suffix}.ts`);
 		if (!existsSync(path.dirname(outputFile))) {
 			await fs.mkdir(path.dirname(outputFile));
 		}
-		await fs.writeFile(outputFile.replace(".torp", "-server.ts"), serverCode);
-		await fs.writeFile(outputFile.replace(".torp", "-client.ts"), clientCode);
-	} else {
-		// Just log the message and continue with output/testing
-		console.log("Parse failed for " + file);
+		await fs.writeFile(outputFile, code);
 	}
+}
+
+function hashFileCode(code: string) {
+	return crypto.createHash("sha1").update(code).digest("hex");
 }
 
 function formatCode(code: string, suffix: string): string {

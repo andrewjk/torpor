@@ -1,47 +1,19 @@
-import fg from "fast-glob";
-import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { buildFiles } from "./buildOutputFiles";
 
 export default async function importComponent(componentPath: string, suffix: string): Promise<any> {
-	// Create a file with a hashed suffix to import dynamically in Vite(st)
-	const sourceFile =
-		path.join(path.dirname(componentPath), "output", path.basename(componentPath)) +
-		`-${suffix}.ts`;
-	const hash = await hashFileContents(sourceFile);
-	const destPath = path.join(path.dirname(componentPath), "temp");
-	const destFile = path.join(destPath, `${path.basename(componentPath)}-${suffix}-${hash}.ts`);
-	if (!fs.existsSync(destFile)) {
-		//console.log(`${sourceFile} has changed, copying new version`);
+	if (!componentPath.endsWith(".torp")) componentPath += ".torp";
+	await buildFiles(componentPath);
 
-		if (!fs.existsSync(destPath)) {
-			fs.mkdirSync(destPath);
-		}
-
-		// Delete old files
-		(
-			await fg(`${path.basename(componentPath)}-${suffix}-*.ts`, {
-				absolute: true,
-				cwd: path.resolve(destPath),
-			})
-		).forEach((f) => fs.unlinkSync(f));
-
-		//fs.copyFileSync(sourceFile, destFile);
-		const source = fs
-			.readFileSync(sourceFile, "utf8")
-			.replaceAll(/import (.+?) from ['"]\.\/(.+?)['"]/g, 'import $1 from "../output/$2"');
-		fs.writeFileSync(destFile, source);
+	const destFolder = path.join(path.dirname(componentPath), "temp");
+	let destFile = fs
+		.readdirSync(destFolder)
+		.find((f) => f.startsWith(`${path.basename(componentPath, ".torp")}-${suffix}-`));
+	if (!destFile) {
+		throw new Error("Component file not found");
 	}
-	return (await import(destFile)).default;
-}
+	destFile = path.join(destFolder, destFile);
 
-// From https://stackoverflow.com/a/18658613
-function hashFileContents(path: string): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const hash = crypto.createHash("sha1");
-		const stream = fs.createReadStream(path);
-		stream.on("error", (err) => reject(err));
-		stream.on("data", (chunk) => hash.update(chunk));
-		stream.on("end", () => resolve(hash.digest("hex")));
-	});
+	return (await import(destFile)).default;
 }
