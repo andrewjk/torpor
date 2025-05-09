@@ -1,5 +1,14 @@
 # @torpor/build
 
+## 0.1.16
+
+### Patch Changes
+
+- 9332635: Fix: set $page props in the correct object
+- Updated dependencies [ff5f459]
+  - @torpor/view@0.0.12
+  - @torpor/unplugin@0.1.8
+
 ## 0.1.15
 
 ### Patch Changes

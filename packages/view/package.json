@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/view",
-	"version": "0.0.11",
+	"version": "0.0.12",
 	"description": "Torpor's view library, for writing and mounting components",
 	"type": "module",
 	"main": "dist/index.cjs",

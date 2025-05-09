@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.12
+
+### Patch Changes
+
+- ff5f459: Fix: scope more styles
+
 ## 0.0.11
 
 ### Patch Changes
