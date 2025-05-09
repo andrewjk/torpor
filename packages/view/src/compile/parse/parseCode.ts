@@ -217,17 +217,21 @@ function parseComponentStyle(status: ParseStatus) {
 			// Skip block comments
 			status.i = status.source.indexOf("*/", status.i) + 1;
 		} else if (char === '"' || char === "'") {
+			styleSource += char;
 			// Skip string contents
 			for (let j = status.i + 1; j < status.source.length; j++) {
+				styleSource += status.source[j];
 				if (status.source[j] === char && status.source[j - 1] !== "\\") {
 					status.i = j;
 					break;
 				}
 			}
 		} else if (char === "`") {
+			styleSource += char;
 			// Skip possibly interpolated string contents
 			let level2 = 0;
 			for (let j = status.i + 1; j < status.source.length; j++) {
+				styleSource += status.source[j];
 				if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
 					status.i = j;
 					break;
