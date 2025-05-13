@@ -23,10 +23,23 @@ import type ServerEndPoint from "../types/ServerEndPoint.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 
-export default async function runTest(site: Site, route: string): Promise<Response> {
+/**
+ * Runs a site route in test mode
+ * @param site The site configuration, with routing configured
+ * @param route The route path e.g. `/home`
+ * @param ev An optional ServerEvent, which you can use to set test cookies and headers
+ * @returns An HTTP response containing the requested data, HTML, or error status
+ */
+export default async function runTest(
+	site: Site,
+	route: string,
+	ev?: ServerEvent,
+): Promise<Response> {
 	if (!route.startsWith("/")) route += "/";
-	const req = new Request(`http://localhost${route}`);
-	const ev = new ServerEvent(req);
+	if (!ev) {
+		const req = new Request(`http://localhost${route}`);
+		ev = new ServerEvent(req);
+	}
 
 	// Build the router from the Site object created by the user
 	const router = new Router();
