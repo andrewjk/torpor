@@ -1,5 +1,16 @@
 # @torpor/build
 
+## 0.1.17
+
+### Patch Changes
+
+- 7373f27: Fix: parse the cookie value retrieved from the map
+- 679a448: Fix: set $page props on every navigation
+- e5b761b: Feat: allow passing ServerEvent to runTest
+- Updated dependencies [ed4a6db]
+  - @torpor/view@0.0.13
+  - @torpor/unplugin@0.1.9
+
 ## 0.1.16
 
 ### Patch Changes

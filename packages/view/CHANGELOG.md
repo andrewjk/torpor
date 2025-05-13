@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.0.13
+
+### Patch Changes
+
+- ed4a6db: Fix: include quoted content in styles
+
 ## 0.0.12
 
 ### Patch Changes
