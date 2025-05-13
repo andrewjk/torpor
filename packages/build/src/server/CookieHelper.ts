@@ -9,11 +9,11 @@ export default class CookieHelper {
 	}
 
 	get(name: string): string | undefined {
-		// If it's been set, return the updated value
+		// If it's been set, return the value from the map
 		if (this.cookies.has(name)) {
-			return this.cookies.get(name);
+			return parse(this.cookies.get(name)!)[name];
 		}
-		// Otherwise, return the cookie value from the `Cookie` header
+		// Otherwise, return the value from the `cookie` header
 		const header = this.request.headers.get("cookie");
 		return parse(header ?? "")[name];
 	}
