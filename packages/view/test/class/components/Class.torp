@@ -1,7 +1,11 @@
 export default function Class() {
 	@render {
 		<div>
-			<div class="yo">
+			<div id="divid">
+				From id
+			</div>
+
+			<div class="divclass">
 				From string
 			</div>
 

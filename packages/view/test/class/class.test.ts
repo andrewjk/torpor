@@ -49,8 +49,13 @@ test("class -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: State) {
+	expect(queryByText(container, "From id")).not.toBeNull();
+	expect(queryByText(container, "From id")).toHaveClass("torp-1ljxz83", {
+		exact: true,
+	});
+
 	expect(queryByText(container, "From string")).not.toBeNull();
-	expect(queryByText(container, "From string")).toHaveClass("yo torp-1ljxz83", {
+	expect(queryByText(container, "From string")).toHaveClass("divclass torp-1ljxz83", {
 		exact: true,
 	});
 

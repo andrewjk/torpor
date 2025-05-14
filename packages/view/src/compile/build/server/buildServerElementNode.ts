@@ -40,6 +40,7 @@ export default function buildServerElementNode(
 }
 
 function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
+	let needsClass = node.scopeStyles;
 	let attributes: string[] = [];
 	for (let { name, value } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
@@ -96,6 +97,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				status.imports.add("t_class");
 				if (node.scopeStyles) {
 					value += `, "torp-${status.styleHash}"`;
+					needsClass = false;
 				}
 				attributes.push(`class="\${t_class(${value})}"`);
 			} else if (name === ":style") {
@@ -118,6 +120,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				? `"${trimQuotes(value)} torp-${status.styleHash}"`
 				: `"torp-${status.styleHash}"`;
 			attributes.push(`${name}="${trimQuotes(value).replaceAll('"', "&quot;")}"`);
+			needsClass = false;
 		} else if (value != null) {
 			// Just set the attribute
 			// TODO: Probably check if it's a boolean attribute e.g. disabled
@@ -125,6 +128,9 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 		} else {
 			attributes.push(`${name}`);
 		}
+	}
+	if (needsClass) {
+		attributes.push(`class="torp-${status.styleHash}"`);
 	}
 	return attributes.join(" ");
 }

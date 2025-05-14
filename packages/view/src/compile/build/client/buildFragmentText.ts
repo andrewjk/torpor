@@ -146,6 +146,7 @@ function buildElementFragmentText(
 	fragments: Fragment[],
 	currentFragment: Fragment,
 ) {
+	let needsClass = node.scopeStyles;
 	currentFragment.text += `<${node.tagName}`;
 	let attributesText = node.attributes
 		.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
@@ -157,6 +158,7 @@ function buildElementFragmentText(
 					return `${a.name}=""`;
 				}
 			} else if (a.name === "class" && node.scopeStyles) {
+				needsClass = false;
 				let value = a.value
 					? `"${trimQuotes(a.value)} torp-${status.styleHash}"`
 					: `"torp-${status.styleHash}"`;
@@ -169,6 +171,9 @@ function buildElementFragmentText(
 		.join(" ");
 	if (attributesText) {
 		currentFragment.text += " " + attributesText;
+	}
+	if (needsClass) {
+		currentFragment.text += ` class="torp-${status.styleHash}"`;
 	}
 	currentFragment.text += ">";
 	for (let child of node.children) {
