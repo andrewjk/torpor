@@ -73,6 +73,11 @@ function buildServerTemplate(
 		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
 			b.append(script.substring(marker, i));
 
+			// Make sure we've got $props if we're going to be using it
+			if (current.props?.length) {
+				b.append(`$props ??= {};`);
+			}
+
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
