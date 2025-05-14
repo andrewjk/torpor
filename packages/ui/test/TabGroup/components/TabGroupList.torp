@@ -1,0 +1,26 @@
+import {
+	TabGroup,
+	TabList,
+	TabHeader,
+	TabTrigger,
+	TabContent,
+} from "../../../src/TabGroup/index";
+
+export default function TabGroupList() {
+	@render {
+		<TabGroup value={$props.value}>
+			<TabList>
+			@for (let item of $props.items) {
+				@key = item.id
+				<TabHeader as="h4">
+					<TabTrigger>{item.header}</TabTrigger>
+				</TabHeader>
+			}
+			</TabList>
+			@for (let item of $props.items) {
+				@key = item.id
+				<TabContent>{item.text}</TabContent>
+			}
+		</TabGroup>
+	}
+}

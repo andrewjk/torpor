@@ -1,0 +1,28 @@
+import {
+	TabGroup,
+	TabList,
+	TabHeader,
+	TabTrigger,
+	TabContent,
+} from "../../../src/TabGroup/index";
+
+export default function TabGroupAccessibility() {
+	@render {
+		<TabGroup value={$props.value}>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader as="h4">
+					<TabTrigger>Header 1</TabTrigger>
+				</TabHeader>
+				<TabHeader as="h4">
+					<TabTrigger>Header 2</TabTrigger>
+				</TabHeader>
+				<TabHeader as="h4">
+					<TabTrigger>Header 3</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>Body 1</TabContent>
+			<TabContent>Body 2</TabContent>
+			<TabContent>Body 3</TabContent>
+		</TabGroup>
+	}
+}

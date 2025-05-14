@@ -1,0 +1,226 @@
+import { TabGroupContextName, type TabGroupContext, type ItemState } from './TabGroupTypes';
+
+/**
+ * A list of interactive headings coupled with layered sections of content that
+ * enable users to reveal a single section of content at a time.
+ *
+ * See [the WAI ARIA guidelines for Tabs](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+ *
+ * The structure of a TabGroup is:
+ *
+ * ```
+ * <TabGroup>
+ * 	<TabList>
+ * 		<TabHeader>
+ * 			<TabTrigger />
+ * 		</TabHeader>
+ * 	</TabList>
+ * 	<TabContent />
+ * </TabGroup>
+ * ```
+ *
+ * @prop {'horizontal' | 'vertical'} orientation -- The orientation of the tab buttons, which affects keyboard navigation
+ * @prop {'automatic' | 'manual'} activation -- How tabs are activated; if automatic they are shown on focus, if manual they must be clicked
+ * @prop {string | string[]} value -- The value of the active TabContent
+ * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the TabGroup
+ * @prop {(value: string | string[]) => void} [onchange] -- Raised when the active item has changed
+ */
+export default function TabGroup($props: any) {
+	$props.orientation ||= 'horizontal';
+	$props.activation ||= 'automatic';
+	$props.value ||= '';
+
+	interface State {
+		value: string;
+		itemStates: ItemState[];
+	}
+
+	let $state: State = $watch({
+		value: $props.value,
+		itemStates: []
+	})
+
+	// This is used to assign automatic indexes to items where needed
+	let nextHeaderIndex = 0;
+	let nextItemIndex = 0;
+
+	// Set the context to pass down to headers and content, with functions for each item to call
+	let context: TabGroupContext = {
+		registerHeader,
+		registerItem,
+		removeItem,
+		triggerItem,
+		handleHeaderKey,
+		orientation: $props.orientation,
+		activation: $props.activation,
+	};
+	$context[TabGroupContextName] = context;
+
+	$run(() => {
+		// HACK: This should probably be done with setters?
+		let newValue = $state.value;
+
+		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
+		newValue = newValue?.toString();
+		for (let item of $state.itemStates) {
+			item.active = item.value === newValue;
+		}
+
+		// Set the value
+		$state.value = newValue;
+	});
+
+	$run(() => {
+		$state.itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+	});
+
+	// Dispatch the change event when the value changes
+	// TODO: Should this be a setter instead?
+	$run(() => {
+		if ($props.onchange) {
+			$props.onchange($state.value);
+		}
+	})
+
+	// TODO:
+	//$mount(() => {
+	//	if ($state.value === "" && $state.itemStates.length) {
+	//		$state.value = $state.itemStates[0].value;
+	//	}
+	//})
+
+	function registerHeader(index: number | undefined, value: string | undefined, setFocused: () => void): ItemState {
+		// If an index wasn't set for the header, set it automatically
+		if (!index) {
+			index = nextHeaderIndex++;
+		}
+
+		// Get or add the ItemState at this index
+		const itemState = getItemState(index, value);
+
+		itemState.setFocused = setFocused;
+
+		return itemState;
+	}
+
+	function registerItem(index: number | undefined, value: string | undefined): ItemState {
+		// If an index wasn't set for the item, set it automatically
+		if (!index) {
+			index = nextItemIndex++;
+		}
+
+		// Get or add the ItemState at this index
+		const itemState = getItemState(index, value);
+
+		return itemState;
+	}
+
+	function getItemState(index: number, value: string | undefined): ItemState {
+		// If we already have an item at this index, just return it
+		if ($state.itemStates.length > index) {
+			return $state.itemStates[index];
+		}
+
+		// If a value wasn't set for the item, set it to the index
+		if (!value) {
+			value = index.toString();
+		}
+
+		// Add the item's state to the array
+		const newItemState: ItemState = $watch({
+			index,
+			value,
+			active: value === $state.value,
+			headerId: '',
+			contentId: '',
+			disabled: false,
+			parentDisabled: false,
+			setFocused: () => {},
+			orientation: $props.orientation,
+			activation: $props.activation
+		});
+		$state.itemStates.splice(index, 0, newItemState);
+
+		return newItemState;
+	}
+
+	// TODO: I think this should be done by value
+	function removeItem(itemIndex: number) {
+		// Remove the item and re-index
+		let index = $state.itemStates.findIndex((item) => item.index === itemIndex);
+		if (index !== -1) {
+			$state.itemStates.splice(itemIndex, 1);
+		}
+		$state.itemStates.forEach((item, i) => (item.index = i));
+	}
+
+	function triggerItem(toggleValue: string) {
+		for (let item of $state.itemStates) {
+			// The item is active if it has the supplied value
+			if (item.value === toggleValue) {
+				$state.value = item.value;
+				break;
+			}
+		}
+	}
+
+	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
+		switch (e.key) {
+			case 'Left':
+			case 'ArrowLeft': {
+				if ($props.orientation === 'horizontal' && headerIndex > 0) {
+					e.preventDefault();
+					$state.itemStates[headerIndex - 1].setFocused();
+				}
+				break;
+			}
+			case 'Up':
+			case 'ArrowUp': {
+				if ($props.orientation === 'vertical' && headerIndex > 0) {
+					e.preventDefault();
+					$state.itemStates[headerIndex - 1].setFocused();
+				}
+				break;
+			}
+			case 'Right':
+			case 'ArrowRight': {
+				if ($props.orientation === 'horizontal' && headerIndex < $state.itemStates.length - 1) {
+					e.preventDefault();
+					$state.itemStates[headerIndex + 1].setFocused();
+				}
+				break;
+			}
+			case 'Down':
+			case 'ArrowDown': {
+				if ($props.orientation === 'vertical' && headerIndex < $state.itemStates.length - 1) {
+					e.preventDefault();
+					$state.itemStates[headerIndex + 1].setFocused();
+				}
+				break;
+			}
+			case 'Home': {
+				if (headerIndex > 0) {
+					e.preventDefault();
+					$state.itemStates[0].setFocused();
+				}
+				break;
+			}
+			case 'End': {
+				if (headerIndex < $state.itemStates.length - 1) {
+					e.preventDefault();
+					$state.itemStates[$state.itemStates.length - 1].setFocused();
+				}
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			class="torp-tab-group"
+			data-orientation={$props.orientation}
+		>
+			<:slot />
+		</div>
+	}
+}

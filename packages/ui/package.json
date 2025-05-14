@@ -12,6 +12,11 @@
 			"import": "./dist/Accordion/index.js",
 			"require": "./dist/Accordion/index.cjs"
 		},
+		"./TabGroup": {
+			"types": "./dist/TabGroup/index.d.ts",
+			"import": "./dist/TabGroup/index.js",
+			"require": "./dist/TabGroup/index.cjs"
+		},
 		"./motion": {
 			"types": "./dist/motion.d.ts",
 			"import": "./dist/motion.js",

@@ -1,0 +1,28 @@
+import {
+	TabGroup,
+	TabList,
+	TabHeader,
+	TabTrigger,
+	TabContent,
+} from "../../../src/TabGroup/index";
+
+export default function TabGroupTrigger() {
+	@render {
+		<TabGroup value={$props.value}>
+			<TabList>
+				<TabHeader as="h4">
+					<TabTrigger>Header 1</TabTrigger>
+				</TabHeader>
+				<TabHeader as="h4">
+					<TabTrigger>Header 2</TabTrigger>
+				</TabHeader>
+				<TabHeader as="h4">
+					<TabTrigger>Header 3</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>Content 1</TabContent>
+			<TabContent>Content 2</TabContent>
+			<TabContent>Content 3</TabContent>
+		</TabGroup>
+	}
+}

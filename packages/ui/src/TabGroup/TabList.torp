@@ -1,0 +1,49 @@
+import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from './TabGroupTypes';
+
+/**
+ * A component that holds the TabHeaders of a TabGroup.
+ * 
+ * The structure of a TabList is:
+ * 
+ * ```
+ * <TabList>
+ * 	<TabHeader>
+ * 		<TabTrigger />
+ * 	</TabHeader>
+ * </TabList>
+ * ```
+ *
+ * @prop {string} ariaLabel -- An ARIA label for describing the tab list to screen readers
+ */
+export default function TabList($props: any) {
+	// Get stuff out of the TabGroupContext
+	const context = $context[TabGroupContextName] as TabGroupContext;
+	if (!context) {
+		throw new Error('TabList must be contained within an TabGroup');
+	}
+	// TODO: const { orientation } = context;
+	const orientation = context.orientation;
+
+	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
+		// TODO: Should this be the first button?
+		const el = e.currentTarget.childNodes[0];
+		if (el instanceof HTMLElement) {
+			el.focus();
+			e.preventDefault();
+		}
+	}
+
+	@render {
+		<div
+			class='torp-tab-list'
+			role="tablist"
+			aria-label={$props.ariaLabel}
+			aria-orientation={orientation}
+			data-orientation={orientation}
+			tabindex="0"
+			onfocus={handleFocus}
+		>
+			<:slot />
+		</div>
+	}
+}

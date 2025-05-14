@@ -1,0 +1,36 @@
+import getId from '../utils/getId';
+import { TabGroupContextName, type TabGroupContext } from './TabGroupTypes';
+
+/**
+ * Content for a TabGroup, which can be revealed or hidden by an associated TabTrigger.
+ *
+ * @prop {string} [id] -- An ID for the TabContent's div container
+ */
+export default function TabContent($props: any) {
+	$props.id ||= getId();
+
+	const context = $context[TabGroupContextName] as TabGroupContext;
+	if (!context) {
+		throw new Error('TabContent must be contained within a TabGroup');
+	}
+	let $state = $context[TabGroupContextName].registerItem($props.index, $props.value);
+
+	// Set the content ID so that it can be used with aria-controls in TabTrigger
+	$state.contentId = $props.id;
+
+	@render {
+		<div
+			id={$props.id}
+			class='torp-tab-content'
+			role="tabpanel"
+			aria-labelledby={$state.headerId}
+			data-orientation={$props.orientation}
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			@if ($state.active) {
+				<:slot />
+			}
+		</div>
+	}
+}

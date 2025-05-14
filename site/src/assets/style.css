@@ -253,9 +253,9 @@ button:hover {
 }
 button:focus,
 button:focus-visible {
-	outline: 4px auto -webkit-focus-ring-color;
+	outline: 2px auto Highlight;
+	outline: 2px auto -webkit-focus-ring-color;
 }
-
 pre {
 	border: 1px dashed gray;
 	border-radius: 5px;

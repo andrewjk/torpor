@@ -1,13 +1,18 @@
 import chalk from "chalk";
 import { existsSync, promises as fs, lstatSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // HACK: There is almost certainly a way to do this with standard TS/TSUP/etc
 // but I can't figure it out
 
 async function run() {
-	const distFolder = resolve(dirname(fileURLToPath(import.meta.url)), "../dist");
+	const scriptsFolder = dirname(fileURLToPath(import.meta.url));
+	const sourceFolder = resolve(scriptsFolder, "../src");
+	const distFolder = resolve(scriptsFolder, "../dist");
+
+	// Read the dist files first, not for every component
+	const distFiles = (await fs.readdir(distFolder)).filter((f) => f.endsWith(".torp"));
 
 	// Loop through component folders e.g. Accordion
 	const componentFolders = (await fs.readdir(distFolder)).filter((f) =>
@@ -27,10 +32,11 @@ async function run() {
 		}
 
 		// Move all *.torp files for the component into this folder
-		const relatedFiles = (await fs.readdir(distFolder)).filter(
-			(f) => f.startsWith(component) && f !== component,
-		);
-		for (const file of relatedFiles) {
+		let relatedFiles = (await fs.readdir(join(sourceFolder, component)))
+			.filter((f) => f.endsWith(".torp") && f !== component)
+			.map((f) => basename(f, ".torp"))
+			.map((f) => distFiles.find((df) => df.startsWith(`${f}-`) && df.endsWith(".torp"))!);
+		for (let file of relatedFiles) {
 			const newfile = file.substring(0, file.indexOf("-")) + ".torp";
 			await fs.rename(join(distFolder, file), join(distFolder, component, newfile));
 		}

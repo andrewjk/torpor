@@ -1,0 +1,50 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+
+export default function Component() {
+	@render {
+		<div>
+			<:head>
+				<title>Tab Group | Torpor</title>
+			</:head>
+
+			<h1>Tab Group</h1>
+			<p>
+				A list of interactive headings coupled with layered sections of content that
+				enable users to reveal a single section of content at a time.
+			</p>
+			<p>
+				See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/tabs/">the WAI ARIA guidelines for Tabs</a>.
+			</p>
+			<h2>Structure</h2>
+			<pre><code>{`
+<TabGroup>
+	<TabList>
+		<TabHeader>
+			<TabTrigger />
+		</TabHeader>
+	</TabList>
+	<TabContent />
+</TabGroup>
+`.trim()}</code></pre>
+			<h2>Demo</h2>
+			<div>
+				<TabGroup>
+					<TabList>
+						<TabHeader>
+							<TabTrigger>Header 1</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger>Header 2</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger>Header 3</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>Content 1</TabContent>
+					<TabContent>Content 2</TabContent>
+					<TabContent>Content 3</TabContent>
+				</TabGroup>
+			</div>
+		</div>
+	}
+}
