@@ -41,5 +41,5 @@
 		"packages/unplugin",
 		"packages/view"
 	],
-	"packageManager": "pnpm@10.7.0"
+	"packageManager": "pnpm@10.11.0"
 }

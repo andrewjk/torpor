@@ -113,7 +113,7 @@
 	},
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"unplugin": "^2.3.3"
+		"unplugin": "^2.3.4"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^4.13.0",
