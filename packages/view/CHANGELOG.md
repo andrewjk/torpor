@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.0.14
+
+### Patch Changes
+
+- fb896c6: Fix: make sure we've got $props on the server
+- 85bccf6: Fix: apply scope to elements without a class
+
 ## 0.0.13
 
 ### Patch Changes

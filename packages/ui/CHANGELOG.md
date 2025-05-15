@@ -1,5 +1,15 @@
 # @torpor/ui
 
+## 0.0.17
+
+### Patch Changes
+
+- 819a7d8: Feat: UI TabGroup component
+- Updated dependencies [fb896c6]
+- Updated dependencies [85bccf6]
+  - @torpor/view@0.0.14
+  - @torpor/unplugin@0.1.10
+
 ## 0.0.16
 
 ### Patch Changes
