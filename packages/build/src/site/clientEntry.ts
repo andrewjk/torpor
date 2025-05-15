@@ -1,4 +1,5 @@
 import manifest from "@torpor/build/manifest";
+// @ts-ignore This errors in the Cloudflare build?
 import { $page } from "@torpor/build/state";
 import { hydrate, mount } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
