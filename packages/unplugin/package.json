@@ -120,7 +120,7 @@
 		"@nuxt/kit": "^3.17.3",
 		"@nuxt/schema": "^3.17.3",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/node": "^22.15.17",
+		"@types/node": "^22.15.18",
 		"bumpp": "^10.1.0",
 		"chalk": "^5.4.1",
 		"eslint": "^9.26.0",
