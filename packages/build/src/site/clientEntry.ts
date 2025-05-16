@@ -40,8 +40,6 @@ async function navigateToLocation(location: Location, firstTime = false) {
 }
 
 async function navigate(url: URL, firstTime = false): Promise<boolean> {
-	//console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
-
 	const parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
@@ -51,6 +49,8 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 
 	const path = url.pathname;
 	const query = url.searchParams;
+
+	console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const route = router.match(path, query);
 	if (!route) {
@@ -138,12 +138,14 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	}
 
 	if (firstTime) {
+		console.log("hydrating with node", parent, parent?.firstChild);
 		hydrate(parent, component, $props, slots);
 	} else {
 		// TODO: Clear ranges, reuse layouts etc
 		parent.textContent = "";
 
 		try {
+			console.log("mounting");
 			mount(parent, component, $props, slots);
 		} catch (error) {
 			// TODO: Show a proper Error component
