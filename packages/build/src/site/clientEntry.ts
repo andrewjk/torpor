@@ -138,7 +138,7 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	}
 
 	if (firstTime) {
-		console.log("hydrating with node", parent, parent?.firstChild);
+		console.log("hydrating");
 		hydrate(parent, component, $props, slots);
 	} else {
 		// TODO: Clear ranges, reuse layouts etc
