@@ -1,10 +1,10 @@
-import getId from '../utils/getId';
-import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+import getId from "../utils/getId";
+import { AccordionItemContextName, type AccordionItemContext } from "./AccordionTypes";
 
 /**
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
  *
- * @prop {string} [id] -- An ID for the AccordionContent's div container
+ * @prop {string} [id] -- An ID for the AccordionContent'sdiv container
  * @prop {boolean} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion
  */
 export default function AccordionContent($props: any) {
@@ -12,7 +12,7 @@ export default function AccordionContent($props: any) {
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
-		throw new Error('AccordionContent must be contained within an AccordionItem');
+		throw new Error("AccordionContent must be contained within an AccordionItem");
 	}
 	let $state = $context[AccordionItemContextName].state
 
@@ -22,8 +22,8 @@ export default function AccordionContent($props: any) {
 	@render {
 		<div
 			id={$props.id}
-			class='torp-accordion-content'
-			role={$props.ariaRegion ? 'region' : undefined}
+			class={`torp-accordion-content ${$props.class ?? ""}`.trim()}
+			role={$props.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}

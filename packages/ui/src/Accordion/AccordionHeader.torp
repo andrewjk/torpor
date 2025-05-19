@@ -1,4 +1,4 @@
-import { AccordionItemContextName, type AccordionItemContext } from './AccordionTypes';
+import { AccordionItemContextName, type AccordionItemContext } from "./AccordionTypes";
 
 /**
  * The header for an AccordionItem, which contains the AccordionTrigger.
@@ -11,19 +11,20 @@ import { AccordionItemContextName, type AccordionItemContext } from './Accordion
  * </AccordionHeader>
  * ```
  *
- * @prop {'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'} as -- The type of HTML header to use
+ * @prop {"h1" | "h2" | "h3" | "h4" | "h5" | "h6"} as -- The type of HTML header to use
  */
 export default function AccordionHeader($props: any) {
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
-		throw new Error('AccordionHeader must be contained within an AccordionItem');
+		throw new Error("AccordionHeader must be contained within an AccordionItem");
 	}
 	let $state = $context[AccordionItemContextName].state
 
 	@render {
 		@// TODO: $props.as
 		<h4
-			class='torp-accordion-header'
+			id={$props.id}
+			class={`torp-accordion-header ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}
 		>

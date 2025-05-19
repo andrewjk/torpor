@@ -1,4 +1,4 @@
-import { AccordionContextName, type AccordionContext, type ItemState } from './AccordionTypes';
+import { AccordionContextName, type AccordionContext, type ItemState } from "./AccordionTypes";
 
 /**
  * A vertically stacked set of interactive headings that enable users to reveal
@@ -19,14 +19,14 @@ import { AccordionContextName, type AccordionContext, type ItemState } from './A
  * </Accordion>
  * ```
  *
- * @prop {'single' | 'multiple'} type -- Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time
- * @prop {string | string[]} value -- The value of the expanded AccordionItem, or an array of values if the type is 'multiple'
+ * @prop {"single" | "multiple"} type -- Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time
+ * @prop {string | string[]} value -- The value of the expanded AccordionItem, or an array of values if the type is "multiple"
  * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the Accordion
  * @prop {(value: string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
  */
 export default function Accordion($props: any) {
-	$props.type ||= 'single';
-	$props.value ||= $props.type === 'single' ? '' : [];
+	$props.type ||= "single";
+	$props.value ||= $props.type === "single" ? "" : [];
 
 	interface State {
 		value: string | string[];
@@ -56,7 +56,7 @@ export default function Accordion($props: any) {
 
 		// Get the value
 		switch ($props.type) {
-			case 'single': {
+			case "single": {
 				// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
 				newValue = newValue?.toString();
 				for (let item of $state.itemStates) {
@@ -64,7 +64,7 @@ export default function Accordion($props: any) {
 				}
 				break;
 			}
-			case 'multiple': {
+			case "multiple": {
 				// Ensure the value passed in is an array
 				if (!Array.isArray(newValue)) {
 					newValue = [newValue];
@@ -106,11 +106,11 @@ export default function Accordion($props: any) {
 		// If we have a value, set whether the item should be expanded
 		if ($state.value) {
 			switch ($props.type) {
-				case 'single': {
+				case "single": {
 					itemState.expanded = $state.value === itemState.value;
 					break;
 				}
-				case 'multiple': {
+				case "multiple": {
 					itemState.expanded = $state.value.includes(itemState.value);
 					break;
 				}
@@ -120,7 +120,7 @@ export default function Accordion($props: any) {
 		// Set whether the Accordion itself is disabled
 		$state.parentDisabled = $props.disabled
 
-		// Add the item's state to the array
+		// Add the item'sstate to the array
 		$state.itemStates.splice(itemState.index, 0, itemState);
 	}
 
@@ -136,18 +136,18 @@ export default function Accordion($props: any) {
 
 	function toggleItem(toggleValue: string) {
 		switch ($props.type) {
-			case 'single': {
+			case "single": {
 				for (let item of $state.itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
 					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
 					if (item.value === toggleValue) {
-						$state.value = item.expanded ? '' : item.value;
+						$state.value = item.expanded ? "" : item.value;
 						break;
 					}
 				}
 				break;
 			}
-			case 'multiple': {
+			case "multiple": {
 				let newValue = [];
 				for (let item of $state.itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) or if it
@@ -167,30 +167,30 @@ export default function Accordion($props: any) {
 
 	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case 'Up':
-			case 'ArrowUp': {
+			case "Up":
+			case "ArrowUp": {
 				if (headerIndex > 0) {
 					e.preventDefault();
 					$state.itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
-			case 'Down':
-			case 'ArrowDown': {
+			case "Down":
+			case "ArrowDown": {
 				if (headerIndex < $state.itemStates.length - 1) {
 					e.preventDefault();
 					$state.itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
-			case 'Home': {
+			case "Home": {
 				if (headerIndex > 0) {
 					e.preventDefault();
 					$state.itemStates[0].setFocused();
 				}
 				break;
 			}
-			case 'End': {
+			case "End": {
 				if (headerIndex < $state.itemStates.length - 1) {
 					e.preventDefault();
 					$state.itemStates[$state.itemStates.length - 1].setFocused();
@@ -201,7 +201,10 @@ export default function Accordion($props: any) {
 	}
 
 	@render {
-		<div class="torp-accordion">
+		<div
+			id={$props.id}
+			class={`torp-accordion ${$props.class ?? ""}`.trim()}
+		>
 			<:slot />
 		</div>
 	}

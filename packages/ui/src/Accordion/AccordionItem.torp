@@ -1,4 +1,4 @@
-import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from './AccordionTypes';
+import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from "./AccordionTypes";
 
 /**
  * An item in an Accordion, which must consist of an AccordionTrigger and an AccordionContent.
@@ -15,7 +15,7 @@ import { AccordionContextName, AccordionItemContextName, type AccordionContext, 
  * ```
  *
  * @prop {number} [index] -- The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically
- * @prop {string} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index
+ * @prop {string} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item'sinitial index
  * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this AccordionItem
  * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
  */
@@ -27,14 +27,14 @@ export default function AccordionItem($props: any) {
 		disabled: $props.disabled,
 		parentDisabled: false,
 		get dataState() {
-			return this.expanded ? 'open' : 'closed';
+			return this.expanded ? "open" : "closed";
 		},
 	})
 
 	// Get stuff out of the AccordionContext
 	const context = $context[AccordionContextName] as AccordionContext;
 	if (!context) {
-		throw new Error('AccordionItem must be contained within an Accordion');
+		throw new Error("AccordionItem must be contained within an Accordion");
 	}
 
 	// Put stuff into an AccordionItemContext
@@ -65,7 +65,8 @@ export default function AccordionItem($props: any) {
 
 	@render {
 		<div
-			class='torp-accordion-item'
+			id={$props.id}
+			class={`torp-accordion-item ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}
 		>
