@@ -120,7 +120,7 @@ export default function Accordion($props: any) {
 		// Set whether the Accordion itself is disabled
 		$state.parentDisabled = $props.disabled
 
-		// Add the item'sstate to the array
+		// Add the item's state to the array
 		$state.itemStates.splice(itemState.index, 0, itemState);
 	}
 

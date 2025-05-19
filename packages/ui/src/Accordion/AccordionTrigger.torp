@@ -19,10 +19,10 @@ export default function AccordionTrigger() {
 	// Set the header ID so that it can be used with aria-labelledby in AccordionContent
 	$state.headerId = $props.id;
 
-	// Let the item know how to set the button'sfocus
+	// Let the item know how to set the button's focus
 	$state.setFocused = setFocused;
 
-	// This function is called by the parent Accordion to focus this item'sbutton
+	// This function is called by the parent Accordion to focus this item's button
 	function setFocused() {
 		button.focus();
 	}
