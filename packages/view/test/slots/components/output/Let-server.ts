@@ -1,7 +1,7 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
-import List from "./List-server"
+import List from "../output/./List-server"
 
 export default function Let(
 	$props: any,
@@ -10,6 +10,7 @@ export default function Let(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 
 	/* User interface */
 	let $output = "";

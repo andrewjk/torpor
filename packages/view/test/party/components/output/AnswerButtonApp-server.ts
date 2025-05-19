@@ -2,7 +2,7 @@ import $watch from "../../../../src/render/$serverWatch";
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
-import AnswerButton from "./AnswerButton-server";
+import AnswerButton from "../output/./AnswerButton-server";
 
 export default function AnswerButtonApp(
 	// @ts-ignore

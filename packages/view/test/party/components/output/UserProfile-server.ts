@@ -13,6 +13,7 @@ export default function UserProfile(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 
 	/* User interface */
 	let $output = "";

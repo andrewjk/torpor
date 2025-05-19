@@ -1,6 +1,6 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
-import FunnyButton from "./FunnyButton-server";
+import FunnyButton from "../output/./FunnyButton-server";
 
 export default function FunnyButtonApp(
 	// @ts-ignore

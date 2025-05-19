@@ -6,6 +6,7 @@ export default function List(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 
 	/* User interface */
 	let $output = "";

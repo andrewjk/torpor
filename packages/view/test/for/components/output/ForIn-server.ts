@@ -8,6 +8,7 @@ export default function ForIn(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 
 	/* User interface */
 	let $output = "";

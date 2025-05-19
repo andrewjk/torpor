@@ -7,6 +7,7 @@ export default function NestedIf(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 
 	/* User interface */
 	let $output = "";

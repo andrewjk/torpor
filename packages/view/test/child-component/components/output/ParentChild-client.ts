@@ -1,4 +1,5 @@
 import $run from "../../../../src/render/$run";
+import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -28,7 +29,7 @@ export default function ParentChild(
 	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
 
 	/* @component */
-	const t_props_1: any = {};
+	const t_props_1: any = $watch({});
 	t_props_1["name"] = "Anna";
 	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
 	t_add_fragment(t_fragment_0, $parent, $anchor);

@@ -5,7 +5,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-import Article from "./Article-client"
+import Article from "../output/./Article-client"
 
 export default function Named(
 	$parent: ParentNode,

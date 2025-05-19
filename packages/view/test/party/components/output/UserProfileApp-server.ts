@@ -1,6 +1,6 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
-import UserProfile from "./UserProfile-server";
+import UserProfile from "../output/./UserProfile-server";
 
 export default function UserProfileApp(
 	// @ts-ignore

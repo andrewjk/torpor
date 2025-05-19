@@ -1,6 +1,6 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
-import Header from "./Header-server"
+import Header from "../output/./Header-server"
 
 export default function Unused(
 	// @ts-ignore

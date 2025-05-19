@@ -1,7 +1,7 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
-import BigTitle from "./BigTitle-server";
-import SmallTitle from "./SmallTitle-server";
+import BigTitle from "../output/./BigTitle-server";
+import SmallTitle from "../output/./SmallTitle-server";
 
 export default function Component(
 	$props,
@@ -10,6 +10,7 @@ export default function Component(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 	let components = {
 		BigTitle,
 		SmallTitle

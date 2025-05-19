@@ -9,7 +9,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-import AnswerButton from "./AnswerButton-client";
+import AnswerButton from "../output/./AnswerButton-client";
 
 export default function AnswerButtonApp(
 	$parent: ParentNode,
@@ -43,7 +43,7 @@ export default function AnswerButtonApp(
 	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_div_1))))) as HTMLElement;
 
 	/* @component */
-	const t_props_1: any = {};
+	const t_props_1: any = $watch({});
 	$run(function setProp() {
 		t_props_1["onYes"] = onAnswerYes;
 	});

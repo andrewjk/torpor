@@ -6,7 +6,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-import FunnyButton from "./FunnyButton-client";
+import FunnyButton from "../output/./FunnyButton-client";
 
 export default function FunnyButtonApp(
 	$parent: ParentNode,

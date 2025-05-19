@@ -1,6 +1,6 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
-import Article from "./Article-server"
+import Article from "../output/./Article-server"
 
 export default function Named(
 	// @ts-ignore

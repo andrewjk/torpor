@@ -1,10 +1,11 @@
+import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_root from "../../../../src/render/nodeRoot";
 
-import Header from "./Header-client";
+import Header from "../output/./Header-client";
 
 export default function Component(
 	$parent: ParentNode,
@@ -26,7 +27,7 @@ export default function Component(
 	const t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @component */
-	const t_props_1: any = {};
+	const t_props_1: any = $watch({});
 	t_props_1["name"] = "Amy";
 	Header(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 	t_add_fragment(t_fragment_0, $parent, $anchor);

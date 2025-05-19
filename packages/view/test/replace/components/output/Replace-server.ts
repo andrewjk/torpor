@@ -8,6 +8,7 @@ export default function Replace(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	$props ??= {};
 	let counter = 0;
 
 	/* User interface */

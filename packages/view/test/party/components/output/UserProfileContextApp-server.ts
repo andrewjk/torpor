@@ -3,7 +3,7 @@ import $watch from "../../../../src/render/$serverWatch";
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
-import UserProfileContext from "./UserProfileContext-server";
+import UserProfileContext from "../output/./UserProfileContext-server";
 
 export default function UserProfileContextApp(
 	// @ts-ignore

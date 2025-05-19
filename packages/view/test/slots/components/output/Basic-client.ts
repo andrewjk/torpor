@@ -5,7 +5,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-import Header from "./Header-client"
+import Header from "../output/./Header-client"
 
 export default function Basic(
 	$parent: ParentNode,

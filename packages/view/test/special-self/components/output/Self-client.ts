@@ -1,4 +1,5 @@
 import $run from "../../../../src/render/$run";
+import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -42,7 +43,7 @@ export default function Self(
 				const t_comp_anchor_1 = t_anchor(t_next(t_root_1)) as HTMLElement;
 
 				/* @component */
-				const t_props_1: any = {};
+				const t_props_1: any = $watch({});
 				$run(function setProp() {
 					t_props_1["level"] = $props.level + 1;
 				});

@@ -1,3 +1,4 @@
+import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -8,8 +9,8 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
-import BigTitle from "./BigTitle-client";
-import SmallTitle from "./SmallTitle-client";
+import BigTitle from "../output/./BigTitle-client";
+import SmallTitle from "../output/./SmallTitle-client";
 
 export default function Component(
 	$parent: ParentNode,
@@ -44,7 +45,7 @@ export default function Component(
 			const t_comp_anchor_1 = t_anchor(t_root_1) as HTMLElement;
 
 			/* @component */
-			const t_props_1: any = {};
+			const t_props_1: any = $watch({});
 			const t_slots_1: Record<string, SlotRender> = {};
 			t_slots_1["_"] = (
 				$sparent: ParentNode,

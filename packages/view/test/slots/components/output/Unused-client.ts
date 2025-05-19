@@ -4,7 +4,7 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_root from "../../../../src/render/nodeRoot";
 
-import Header from "./Header-client"
+import Header from "../output/./Header-client"
 
 export default function Unused(
 	$parent: ParentNode,

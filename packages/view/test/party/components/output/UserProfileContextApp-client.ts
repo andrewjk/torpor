@@ -10,7 +10,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-import UserProfileContext from "./UserProfileContext-client";
+import UserProfileContext from "../output/./UserProfileContext-client";
 
 export default function UserProfileContextApp(
 	$parent: ParentNode,
