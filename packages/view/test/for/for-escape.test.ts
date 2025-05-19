@@ -40,11 +40,10 @@ async function check(container: HTMLElement) {
 	expect(queryByTestId(container, "input3-2")).not.toBeNull();
 	expect(queryByTestId(container, "input3-2")).toHaveAttribute("name", "c");
 
-	const user = userEvent.setup();
 	const input = container.getElementsByTagName("input")[0];
 
-	await user.clear(input);
-	await user.type(input, "Hello");
+	await userEvent.clear(input);
+	await userEvent.type(input, "Hello");
 
 	expect(queryByText(container, "Hello")).not.toBeNull();
 }

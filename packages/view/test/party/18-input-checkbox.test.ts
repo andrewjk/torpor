@@ -31,12 +31,11 @@ test("input checkbox -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
-	const user = userEvent.setup();
 	const input = container.getElementsByTagName("input")[0];
 
 	expect(queryByText(container, "Not available")).not.toBeNull();
 
-	await user.click(input);
+	await userEvent.click(input);
 
 	expect(queryByText(container, "Available")).not.toBeNull();
 }

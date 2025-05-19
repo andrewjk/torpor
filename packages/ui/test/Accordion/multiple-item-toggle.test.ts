@@ -7,8 +7,6 @@ import AccordionMultiple from "./components/AccordionMultiple.torp";
 
 describe("Accordion", () => {
 	it("Multiple item toggle", async () => {
-		const user = userEvent.setup();
-
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, AccordionMultiple);
@@ -18,16 +16,16 @@ describe("Accordion", () => {
 		expect(queryByText(container, "Content 3")).not.toBeInTheDocument();
 
 		// Clicking header 1 should reveal body 1
-		await user.click(getByText(container, "Header 1"));
+		await userEvent.click(getByText(container, "Header 1"));
 		expect(queryByText(container, "Content 1")).toBeInTheDocument();
 
 		// Clicking header 2 should reveal body 1 and body 2
-		await user.click(getByText(container, "Header 2"));
+		await userEvent.click(getByText(container, "Header 2"));
 		expect(queryByText(container, "Content 1")).toBeInTheDocument();
 		expect(queryByText(container, "Content 2")).toBeInTheDocument();
 
 		// Clicking header 2 again should hide body 2
-		await user.click(getByText(container, "Header 2"));
+		await userEvent.click(getByText(container, "Header 2"));
 		expect(queryByText(container, "Content 1")).toBeInTheDocument();
 		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
 	});

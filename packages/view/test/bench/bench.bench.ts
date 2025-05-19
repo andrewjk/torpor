@@ -6,8 +6,6 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/bench/components/Bench";
 
-const user = userEvent.setup();
-
 beforeAll(async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -24,11 +22,11 @@ bench("bench", async () => {
 
 	try {
 		// Press a bunch of buttons
-		await user.click(createButton);
-		await user.click(appendButton);
-		await user.click(updateButton);
-		await user.click(swapButton);
-		await user.click(clearButton);
+		await userEvent.click(createButton);
+		await userEvent.click(appendButton);
+		await userEvent.click(updateButton);
+		await userEvent.click(swapButton);
+		await userEvent.click(clearButton);
 	} catch {
 		console.log("ERROR");
 	}

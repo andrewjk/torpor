@@ -31,19 +31,18 @@ test("emit to parent -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
-	const user = userEvent.setup();
 	const yesButton = container.getElementsByTagName("button")[0];
 	const noButton = container.getElementsByTagName("button")[1];
 
 	expect(queryByText(container, "😀")).not.toBeNull();
 	expect(queryByText(container, "😥")).toBeNull();
 
-	await user.click(noButton);
+	await userEvent.click(noButton);
 
 	expect(queryByText(container, "😀")).toBeNull();
 	expect(queryByText(container, "😥")).not.toBeNull();
 
-	await user.click(yesButton);
+	await userEvent.click(yesButton);
 
 	expect(queryByText(container, "😀")).not.toBeNull();
 	expect(queryByText(container, "😥")).toBeNull();

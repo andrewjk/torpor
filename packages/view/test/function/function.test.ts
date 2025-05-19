@@ -36,13 +36,12 @@ async function check(container: HTMLElement) {
 	vi.useFakeTimers({
 		shouldAdvanceTime: true,
 	});
-	const user = userEvent.setup();
 
 	expect(queryByText(container, "The count is 0.")).not.toBeNull();
 
 	const increment = Array.from(container.children).find((e) => e.id === "increment");
 	expect(increment).not.toBeNull();
-	await user.click(increment!);
+	await userEvent.click(increment!);
 
 	expect(queryByText(container, "The count is 1.")).not.toBeNull();
 }

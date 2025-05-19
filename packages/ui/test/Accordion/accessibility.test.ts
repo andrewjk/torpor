@@ -1,14 +1,11 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import AccordionAccessibility from "./components/AccordionAccessibility.torp";
 
 describe("Accordion", () => {
 	it("Accessibility", async () => {
-		const user = userEvent.setup();
-
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, AccordionAccessibility, { value: ["1", "3"] });

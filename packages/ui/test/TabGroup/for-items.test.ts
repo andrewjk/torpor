@@ -7,8 +7,6 @@ import TabGroupList from "./components/TabGroupList.torp";
 
 describe("TabGroup", () => {
 	it("Items in a for loop", async () => {
-		const user = userEvent.setup();
-
 		let $state = $watch({
 			value: "1",
 			items: [
@@ -35,7 +33,7 @@ describe("TabGroup", () => {
 		expect(queryByText(container, "Content 3")).not.toBeInTheDocument();
 
 		// Clicking header 1 should reveal body 1
-		await user.click(getByText(container, "Item 1"));
+		await userEvent.click(getByText(container, "Item 1"));
 		expect(queryByText(container, "Content 1")).toBeInTheDocument();
 
 		$state.items.push({ id: 3, header: "Item 4", text: "Content 4" });
@@ -47,7 +45,7 @@ describe("TabGroup", () => {
 		expect(queryByText(container, "Content 4")).not.toBeInTheDocument();
 
 		// Clicking header 4 should reveal body 4
-		await user.click(getByText(container, "Item 4"));
+		await userEvent.click(getByText(container, "Item 4"));
 		expect(queryByText(container, "Content 1")).not.toBeInTheDocument();
 		expect(queryByText(container, "Content 4")).toBeInTheDocument();
 	});

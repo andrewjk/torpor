@@ -31,19 +31,18 @@ test("input radio -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
-	const user = userEvent.setup();
 	const blueRadio = container.getElementsByTagName("input")[0];
 	const redRadio = container.getElementsByTagName("input")[1];
 
 	expect(queryByText(container, "Picked: red")).not.toBeNull();
 	expect(queryByText(container, "Picked: blue")).toBeNull();
 
-	await user.click(blueRadio);
+	await userEvent.click(blueRadio);
 
 	expect(queryByText(container, "Picked: red")).toBeNull();
 	expect(queryByText(container, "Picked: blue")).not.toBeNull();
 
-	await user.click(redRadio);
+	await userEvent.click(redRadio);
 
 	expect(queryByText(container, "Picked: red")).not.toBeNull();
 	expect(queryByText(container, "Picked: blue")).toBeNull();

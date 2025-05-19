@@ -31,13 +31,12 @@ test("context -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
-	const user = userEvent.setup();
 	const button = container.getElementsByTagName("button")[0];
 
 	expect(queryByText(container, "Welcome back, unicorn42")).not.toBeNull();
 	expect(queryByText(container, "Username: unicorn42")).not.toBeNull();
 
-	await user.click(button);
+	await userEvent.click(button);
 
 	expect(queryByText(container, "Welcome back, Jane")).not.toBeNull();
 	expect(queryByText(container, "Username: Jane")).not.toBeNull();

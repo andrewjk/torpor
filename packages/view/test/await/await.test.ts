@@ -31,7 +31,14 @@ test("await -- hydrated", async () => {
 });
 
 async function check(container: HTMLElement) {
-	const user = userEvent.setup();
+	expect(queryByText(container, "Hmm...")).not.toBeNull();
+	expect(queryByText(container, "Is it a number?")).toBeNull();
+
+	await waitFor(() => expect(queryByText(container, "Hmm...")).toBeNull());
+
+	expect(queryByText(container, "Is it a number?")).not.toBeNull();
+
+	await userEvent.click(getByText(container, "Guess again"));
 
 	expect(queryByText(container, "Hmm...")).not.toBeNull();
 	expect(queryByText(container, "Is it a number?")).toBeNull();
@@ -40,16 +47,7 @@ async function check(container: HTMLElement) {
 
 	expect(queryByText(container, "Is it a number?")).not.toBeNull();
 
-	await user.click(getByText(container, "Guess again"));
-
-	expect(queryByText(container, "Hmm...")).not.toBeNull();
-	expect(queryByText(container, "Is it a number?")).toBeNull();
-
-	await waitFor(() => expect(queryByText(container, "Hmm...")).toBeNull());
-
-	expect(queryByText(container, "Is it a number?")).not.toBeNull();
-
-	await user.click(getByText(container, "Guess again"));
+	await userEvent.click(getByText(container, "Guess again"));
 
 	expect(queryByText(container, "Hmm...")).not.toBeNull();
 	expect(queryByText(container, "Is it a number?")).toBeNull();
