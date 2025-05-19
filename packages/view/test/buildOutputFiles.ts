@@ -83,7 +83,12 @@ function formatCode(code: string, suffix: string): string {
 	}
 
 	// Replace component imports with JS imports
-	code = code.replaceAll(/import (.+?) from ['"](.+?).torp['"]/g, `import $1 from "$2-${suffix}"`);
+	// HACK: Reference from `../output/` as it will work in both the hashed files
+	// (in `/temp`) and non-hashed files (in `/output`)
+	code = code.replaceAll(
+		/import (.+?) from ['"](.+?).torp['"]/g,
+		`import $1 from "../output/$2-${suffix}"`,
+	);
 
 	return code;
 }
