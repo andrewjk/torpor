@@ -25,10 +25,13 @@ export default function buildComponentNode(
 	const componentHasProps = node.attributes.length || root;
 	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
 	if (componentHasProps) {
-		// TODO: defaults etc props
-		//status.imports.add("$watch");
-		//b.append(`const ${propsName} = $watch({});`);
-		b.append(`const ${propsName}: any = {};`);
+		// NOTE: The $props object is wrapped in a proxy so that components can
+		// be updated if they refer to a $props.property in e.g. an element's
+		// attribute
+		// TODO: default props etc
+		status.imports.add("$watch");
+		b.append(`const ${propsName}: any = $watch({});`);
+
 		for (let { name, value } of node.attributes) {
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute

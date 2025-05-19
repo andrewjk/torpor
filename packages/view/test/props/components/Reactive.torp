@@ -1,0 +1,18 @@
+export default function Reactive($props: any) {
+	let $state = $watch({ text: "before" })
+
+	@render {
+		<div>
+			<button onclick={() => $state.text = "after"}>Update text</button>
+			<Child text={$state.text} />
+		</div>
+	}
+}
+
+function Child($props: any) {
+	@render {
+		<p>
+			{$props.text}
+		</p>
+	}
+}
