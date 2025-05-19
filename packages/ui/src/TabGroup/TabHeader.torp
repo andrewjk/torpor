@@ -1,9 +1,9 @@
-import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from './TabGroupTypes';
+import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from "./TabGroupTypes";
 
 /**
  * The header for a tab item, which contains the TabTrigger.
  *
- * The structure of an TabHeader is:
+ * The structure of a TabHeader is:
  * 
  * ```
  * <TabHeader>
@@ -11,12 +11,12 @@ import { TabGroupContextName, TabItemContextName, type TabGroupContext, type Tab
  * </TabHeader>
  * ```
  *
- * @prop {'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'} as -- The type of HTML header to use
+ * @prop {"h1" | "h2" | "h3" | "h4" | "h5" | "h6"} as -- The type of HTML header to use
  */
 export default function TabHeader($props: any) {
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {
-		throw new Error('TabHeader must be contained within a TabGroup');
+		throw new Error("TabHeader must be contained within a TabGroup");
 	}
 	let $state = $context[TabGroupContextName].registerHeader($props.index, $props.value);
 
@@ -37,10 +37,12 @@ export default function TabHeader($props: any) {
 	@render {
 		@// TODO: $props.as
 		<h4
-			:class={{
-				'torp-tab-header': true,
-				horizontal: $state.orientation === "horizontal",
-				vertical: $state.orientation === "vertical" }}
+			id={$props.id}
+			:class={[
+				"torp-tab-header",
+				$props.class,
+				$state.orientation
+			]}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}
 		>

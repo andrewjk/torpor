@@ -1,4 +1,4 @@
-import { TabGroupContextName, type TabGroupContext, type ItemState } from './TabGroupTypes';
+import { TabGroupContextName, type TabGroupContext, type ItemState } from "./TabGroupTypes";
 
 /**
  * A list of interactive headings coupled with layered sections of content that
@@ -19,16 +19,16 @@ import { TabGroupContextName, type TabGroupContext, type ItemState } from './Tab
  * </TabGroup>
  * ```
  *
- * @prop {'horizontal' | 'vertical'} orientation -- The orientation of the tab buttons, which affects keyboard navigation
- * @prop {'automatic' | 'manual'} activation -- How tabs are activated; if automatic they are shown on focus, if manual they must be clicked
+ * @prop {"horizontal" | "vertical"} orientation -- The orientation of the tab buttons, which affects keyboard navigation
+ * @prop {"automatic" | "manual"} activation -- How tabs are activated; if automatic they are shown on focus, if manual they must be clicked
  * @prop {string | string[]} value -- The value of the active TabContent
  * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the TabGroup
  * @prop {(value: string | string[]) => void} [onchange] -- Raised when the active item has changed
  */
 export default function TabGroup($props: any) {
-	$props.orientation ||= 'horizontal';
-	$props.activation ||= 'automatic';
-	$props.value ||= '';
+	$props.orientation ||= "horizontal";
+	$props.activation ||= "automatic";
+	$props.value ||= "";
 
 	interface State {
 		value: string;
@@ -131,8 +131,8 @@ export default function TabGroup($props: any) {
 			index,
 			value,
 			active: value === $state.value,
-			headerId: '',
-			contentId: '',
+			headerId: "",
+			contentId: "",
 			disabled: false,
 			parentDisabled: false,
 			setFocused: () => {},
@@ -166,46 +166,46 @@ export default function TabGroup($props: any) {
 
 	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case 'Left':
-			case 'ArrowLeft': {
-				if ($props.orientation === 'horizontal' && headerIndex > 0) {
+			case "Left":
+			case "ArrowLeft": {
+				if ($props.orientation === "horizontal" && headerIndex > 0) {
 					e.preventDefault();
 					$state.itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
-			case 'Up':
-			case 'ArrowUp': {
-				if ($props.orientation === 'vertical' && headerIndex > 0) {
+			case "Up":
+			case "ArrowUp": {
+				if ($props.orientation === "vertical" && headerIndex > 0) {
 					e.preventDefault();
 					$state.itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
-			case 'Right':
-			case 'ArrowRight': {
-				if ($props.orientation === 'horizontal' && headerIndex < $state.itemStates.length - 1) {
+			case "Right":
+			case "ArrowRight": {
+				if ($props.orientation === "horizontal" && headerIndex < $state.itemStates.length - 1) {
 					e.preventDefault();
 					$state.itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
-			case 'Down':
-			case 'ArrowDown': {
-				if ($props.orientation === 'vertical' && headerIndex < $state.itemStates.length - 1) {
+			case "Down":
+			case "ArrowDown": {
+				if ($props.orientation === "vertical" && headerIndex < $state.itemStates.length - 1) {
 					e.preventDefault();
 					$state.itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
-			case 'Home': {
+			case "Home": {
 				if (headerIndex > 0) {
 					e.preventDefault();
 					$state.itemStates[0].setFocused();
 				}
 				break;
 			}
-			case 'End': {
+			case "End": {
 				if (headerIndex < $state.itemStates.length - 1) {
 					e.preventDefault();
 					$state.itemStates[$state.itemStates.length - 1].setFocused();
@@ -217,7 +217,8 @@ export default function TabGroup($props: any) {
 
 	@render {
 		<div
-			class="torp-tab-group"
+			id={$props.id}
+			class={`torp-tab-group ${$props.class ?? ""}`.trim()}
 			data-orientation={$props.orientation}
 		>
 			<:slot />

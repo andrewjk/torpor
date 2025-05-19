@@ -1,5 +1,5 @@
-import getId from '../utils/getId';
-import { TabGroupContextName, type TabGroupContext } from './TabGroupTypes';
+import getId from "../utils/getId";
+import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
 
 /**
  * Content for a TabGroup, which can be revealed or hidden by an associated TabTrigger.
@@ -11,7 +11,7 @@ export default function TabContent($props: any) {
 
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {
-		throw new Error('TabContent must be contained within a TabGroup');
+		throw new Error("TabContent must be contained within a TabGroup");
 	}
 	let $state = $context[TabGroupContextName].registerItem($props.index, $props.value);
 
@@ -21,7 +21,7 @@ export default function TabContent($props: any) {
 	@render {
 		<div
 			id={$props.id}
-			class='torp-tab-content'
+			class={`torp-tab-content ${$props.class ?? ""}`.trim()}
 			role="tabpanel"
 			aria-labelledby={$state.headerId}
 			data-orientation={$props.orientation}
