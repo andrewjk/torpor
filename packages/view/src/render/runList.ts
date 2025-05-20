@@ -23,12 +23,18 @@ export default function runList(
 
 	// Run the list in an effect
 	$run(function runList() {
-		// Push and pop the control statement on subsequent runs, so that new item
-		// ranges will be added to its children
+		// Push and pop the control statement on subsequent runs, so that new
+		// item ranges will be added to its children
 		const oldBranchRange = pushRange(range);
 
 		// Build the array of items with keys and data
 		const newItems = buildItems();
+
+		// Do NOT re-run the list for properties accessed while updating its
+		// items. E.g. we want to re-run the list for `@for (item of $items)`
+		// (in buildItems, above) but not for `<span>{item.id}</span>` (in
+		// runListItems, below)
+		context.activeEffect = null;
 
 		// Run the function that updates the list's items
 		runListItems(range, parent, anchor, listItems, newItems, create);

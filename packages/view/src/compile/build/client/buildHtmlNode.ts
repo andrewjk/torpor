@@ -36,6 +36,7 @@ function buildHtmlBranch(
 ) {
 	status.imports.add("t_run_branch");
 
+	b.append(`${node.statement};`);
 	b.append(`t_run_branch(${rangeName}, -1, () => {`);
 
 	const templateName = nextVarName("template", status);

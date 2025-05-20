@@ -593,7 +593,10 @@ function runControlBranch(range, index, create) {
     range.children.length = 0;
   }
   const oldRange = pushRange(newRange(), true);
+  const oldEffect = context_default.activeEffect;
+  context_default.activeEffect = null;
   create();
+  context_default.activeEffect = oldEffect;
   popRange(oldRange);
   range.index = index;
 }
@@ -720,6 +723,7 @@ function runList(range, parent, anchor, buildItems, create) {
   $run(function runList2() {
     const oldBranchRange = pushRange(range);
     const newItems = buildItems();
+    context_default.activeEffect = null;
     runListItems(range, parent, anchor, listItems, newItems, create);
     listItems = newItems;
     popRange(oldBranchRange);
