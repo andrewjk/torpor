@@ -49,7 +49,7 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 				.at(-1)
 				?.replace(/\.torp$/, "")!;
 			let errorMessages = parsed.errors.map((e) => `${e.line},${e.column}: ${e.message}`);
-			console.log(`\nERRORS\n======\n${errorMessages.join("\n")}`);
+			console.log(`\nERRORS: ${id}\n======\n${errorMessages.join("\n")}`);
 			let errorCode = `
 export default function Error() {
 	@render {
