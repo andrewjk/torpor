@@ -100,8 +100,6 @@ const importsMap: Record<string, string> = {
 		'import $unwrap from "../../../../src/render/$unwrap";',
 	'import { $run } from "@torpor/view";': 'import $run from "../../../../src/render/$run";',
 	'import { $mount } from "@torpor/view";': 'import $mount from "../../../../src/render/$mount";',
-	'import { t_flush } from "@torpor/view";':
-		'import t_flush from "../../../../src/render/flushMountEffects";',
 	'import { t_range } from "@torpor/view";':
 		'import t_range from "../../../../src/render/newRange";',
 	'import { t_push_range } from "@torpor/view";':

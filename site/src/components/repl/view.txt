@@ -314,6 +314,10 @@ function addFragment(fragment, parent, before) {
     parent.insertBefore(fragment, before);
   }
   if (!parentIsFragment) {
+    for (let effect of context_default.mountEffects) {
+      $run(effect);
+    }
+    context_default.mountEffects.length = 0;
     for (let event of context_default.stashedEvents) {
       context_default.activeRange = event.range;
       $run(function addFragmentEvent() {
@@ -357,13 +361,6 @@ function applyProps(el, props, propNamesUsed) {
         }
       }
     }
-  }
-}
-
-// src/render/flushMountEffects.ts
-function flushMountEffects() {
-  for (let fn of context_default.mountEffects) {
-    $run(fn);
   }
 }
 
@@ -761,7 +758,6 @@ let t_child = nodeChild;
 let t_class = getClasses;
 let t_dynamic = setDynamicElement;
 let t_event = addEvent;
-let t_flush = flushMountEffects;
 let t_fmt = formatText;
 let t_fragment = getFragment;
 let t_list_item = newListItem;

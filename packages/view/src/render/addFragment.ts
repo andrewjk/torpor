@@ -40,11 +40,16 @@ export default function addFragment(
 		parent.insertBefore(fragment, before);
 	}
 
-	// If we're adding this fragment to the DOM, we can now add our stashed
-	// events and play our stashed animations
+	// If we're adding this fragment to the DOM, we can now run any $mount
+	// functions, add our stashed events and play our stashed animations
 	if (!parentIsFragment) {
 		// Set the active range for each event and animation so it will get
 		// attached to the right one and set it back afterwards
+
+		for (let effect of context.mountEffects) {
+			$run(effect);
+		}
+		context.mountEffects.length = 0;
 
 		for (let event of context.stashedEvents) {
 			context.activeRange = event.range;

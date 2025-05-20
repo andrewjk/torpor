@@ -10,7 +10,6 @@ const importsMap: Record<string, string> = {
 	$unwrap: 'import { $unwrap } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
-	t_flush: 'import { t_flush } from "${folder}";',
 	t_range: 'import { t_range } from "${folder}";',
 	t_push_range: 'import { t_push_range } from "${folder}";',
 	t_pop_range: 'import { t_pop_range } from "${folder}";',
@@ -138,15 +137,6 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 
 			currentIndex += 1;
 			current = template.components[currentIndex];
-
-			// TODO: Only if the component has $mount
-			// Flush any $mount calls that were encountered -- move this to
-			// addFragment, because we also have to flush events and animations
-			if (imports.has("$mount")) {
-				imports.add("t_flush");
-				b.append("");
-				b.append("t_flush();");
-			}
 
 			marker = i + "/* @end */".length;
 		}

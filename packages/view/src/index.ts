@@ -6,7 +6,6 @@ import t_animate from "./render/addAnimation";
 import t_event from "./render/addEvent";
 import t_add_fragment from "./render/addFragment";
 import t_apply_props from "./render/applyProps";
-import t_flush from "./render/flushMountEffects";
 import t_fmt from "./render/formatText";
 import t_class from "./render/getClasses";
 import t_fragment from "./render/getFragment";
@@ -44,7 +43,6 @@ export {
 	t_event,
 	t_add_fragment,
 	t_apply_props,
-	t_flush,
 	t_fmt,
 	t_class,
 	t_fragment,
