@@ -6,6 +6,12 @@ import ExampleInfo from "./dialog/ExampleInfo.torp";
 import ExampleConfirm from "./dialog/ExampleConfirm.torp";
 import ExamplePrompt from "./dialog/ExamplePrompt.torp";
 
+import ExampleBasicCode from "./dialog/ExampleBasic.torp?raw";
+import ExampleFunctionCode from "./dialog/ExampleFunction.torp?raw";
+import ExampleInfoCode from "./dialog/ExampleInfo.torp?raw";
+import ExampleConfirmCode from "./dialog/ExampleConfirm.torp?raw";
+import ExamplePromptCode from "./dialog/ExamplePrompt.torp?raw";
+
 export default function Component() {
 	@render {
 		<div>
@@ -31,160 +37,160 @@ export default function Component() {
 </Dialog>
 `.trim()}</code></pre>
 			<h2>Demo</h2>
-				<TabGroup>
-					<TabList ariaLabel="Example tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Basic
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Function
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Info
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Confirm
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Prompt
-							</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleBasic />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" onclick={copyCode}>
-										Copy to clipboard
-									</button>
-									<p>// TODO:</p>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleFunction />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" onclick={copyCode}>
-										Copy to clipboard
-									</button>
-									<p>// TODO:</p>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleInfo />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" onclick={copyCode}>
-										Copy to clipboard
-									</button>
-									<p>// TODO:</p>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleConfirm />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" onclick={copyCode}>
-										Copy to clipboard
-									</button>
-									<p>// TODO:</p>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExamplePrompt />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" onclick={copyCode}>
-										Copy to clipboard
-									</button>
-									<p>// TODO:</p>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-				</TabGroup>
+			<TabGroup>
+				<TabList ariaLabel="Example tabs">
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Basic
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Function
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Info
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Confirm
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Prompt
+						</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBasic />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" onclick={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBasicCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleFunction />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" onclick={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleFunctionCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleInfo />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" onclick={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleInfoCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleConfirm />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" onclick={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleConfirmCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExamplePrompt />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" onclick={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExamplePromptCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+			</TabGroup>
 		</div>
 	}
 }

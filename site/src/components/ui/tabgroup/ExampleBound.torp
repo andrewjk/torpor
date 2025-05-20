@@ -1,0 +1,59 @@
+
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from '@torpor/ui/TabGroup';
+import buildItems from '../../../utils/buildItems';
+
+export default function ExampleBound($props: any) {
+	let itemCount = 5;
+	let items = buildItems(itemCount);
+
+	let $state = $watch({ value: '0' });
+
+	@render {
+		<div>
+			<p>Selected value: <input type="number" :value={$state.value} /></p>
+
+			<TabGroup :value={$state.value}>
+				<TabList class="extabbound-list" ariaLabel="Basic tab example">
+					@for (let [index, item] of items.entries()) {
+						@key = index
+						<TabHeader>
+							<TabTrigger class="extabbound-trigger">
+								Item {index + 1}
+							</TabTrigger>
+						</TabHeader>
+					}
+				</TabList>
+				@for (let [index, item] of items.entries()) {
+					@key = index
+					<TabContent class="extabbound-content">
+						<p>{item}</p>
+					</TabContent>
+				}
+			</TabGroup>
+		</div>
+	}
+
+	@style {
+		:global(.extabbound-trigger) {
+			all: unset;
+			cursor: default;
+			border-bottom: 2px solid gainsboro;
+			padding: 5px 10px;
+		}
+
+		:global(.extabbound-trigger[data-state='active']) {
+			border-bottom: 2px solid black;
+		}
+
+		:global(.extabbound-content) {
+			display: none;
+		}
+
+		:global(.extabbound-content[data-state='active']) {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 200px;
+		}
+	}
+}

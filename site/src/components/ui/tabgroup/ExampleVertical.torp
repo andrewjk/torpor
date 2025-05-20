@@ -1,0 +1,60 @@
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from '@torpor/ui/TabGroup';
+import buildItems from '../../../utils/buildItems';
+
+export default function ExampleVertical(props: any) {
+	let itemCount = 5;
+	let items = buildItems(itemCount);
+
+	@render {
+		<TabGroup class="extabvert" orientation="vertical">
+			<TabList class="extabvert-list" ariaLabel="Vertical tab example">
+				@for (let [index, item] of items.entries()) {
+					<TabHeader>
+						<TabTrigger class="extabvert-trigger">
+							Item {index + 1}
+						</TabTrigger>
+					</TabHeader>
+				}
+			</TabList>
+			@for (let [index, item] of items.entries()) {
+				<TabContent class="extabvert-content">
+					<p>{item}</p>
+				</TabContent>
+			}
+		</TabGroup>
+	}
+
+	@style {
+		:global(.extabvert) {
+			display: grid;
+			grid-template-columns: auto 1fr;
+		}
+
+		:global(.extabvert-list) {
+			display: flex;
+			flex-direction: column;
+		}
+
+		:global(.extabvert-trigger) {
+			all: unset;
+			cursor: default;
+			border-right: 2px solid gainsboro;
+			padding: 5px 10px;
+		}
+
+		:global(.extabvert-trigger[data-state='active']) {
+			border-right: 2px solid black;
+		}
+
+		:global(.extabvert-content) {
+			display: none;
+		}
+
+		:global(.extabvert-content[data-state='active']) {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 200px;
+		}
+	}
+}

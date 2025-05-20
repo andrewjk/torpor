@@ -1,4 +1,10 @@
-import { Accordion, AccordionItem, AccordionTrigger, AccordionHeader, AccordionContent } from "@torpor/ui/Accordion"
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../utils/copyCode";
+import ExampleBasic from "./accordion/ExampleBasic.torp";
+import ExampleBound from "./accordion/ExampleBound.torp";
+
+import ExampleBasicCode from "./accordion/ExampleBasic.torp?raw";
+import ExampleBoundCode from "./accordion/ExampleBound.torp?raw";
 
 export default function Component() {
 	@render {
@@ -27,28 +33,70 @@ export default function Component() {
 </Accordion>
 `.trim()}</code></pre>
 			<h2>Demo</h2>
-			<div>
-				<Accordion>
-					<AccordionItem>
-						<AccordionHeader>
-							<AccordionTrigger>Header 1</AccordionTrigger>
-						</AccordionHeader>
-						<AccordionContent>Content 1</AccordionContent>
-					</AccordionItem>
-					<AccordionItem>
-						<AccordionHeader>
-							<AccordionTrigger>Header 2</AccordionTrigger>
-						</AccordionHeader>
-						<AccordionContent>Content 2</AccordionContent>
-					</AccordionItem>
-					<AccordionItem>
-						<AccordionHeader>
-							<AccordionTrigger>Header 3</AccordionTrigger>
-						</AccordionHeader>
-						<AccordionContent>Content 3</AccordionContent>
-					</AccordionItem>
-				</Accordion>
-			</div>
+			<TabGroup>
+				<TabList ariaLabel="Example tabs">
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Basic
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Bound
+						</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBasic />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBasicCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBound />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBoundCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+			</TabGroup>
 		</div>
 	}
 }

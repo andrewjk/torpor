@@ -1,4 +1,12 @@
 import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../utils/copyCode";
+import ExampleBasic from "./tabgroup/ExampleBasic.torp";
+import ExampleBound from "./tabgroup/ExampleBound.torp";
+import ExampleVertical from "./tabgroup/ExampleVertical.torp";
+
+import ExampleBasicCode from "./tabgroup/ExampleBasic.torp?raw";
+import ExampleBoundCode from "./tabgroup/ExampleBound.torp?raw";
+import ExampleVerticalCode from "./tabgroup/ExampleVertical.torp?raw";
 
 export default function Component() {
 	@render {
@@ -27,24 +35,100 @@ export default function Component() {
 </TabGroup>
 `.trim()}</code></pre>
 			<h2>Demo</h2>
-			<div>
-				<TabGroup>
-					<TabList>
-						<TabHeader>
-							<TabTrigger>Header 1</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger>Header 2</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger>Header 3</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>Content 1</TabContent>
-					<TabContent>Content 2</TabContent>
-					<TabContent>Content 3</TabContent>
-				</TabGroup>
-			</div>
+			<TabGroup>
+				<TabList ariaLabel="Example tabs">
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Basic
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Bound
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Vertical
+						</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBasic />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBasicCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBound />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBoundCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleVertical />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleVerticalCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+			</TabGroup>
 		</div>
 	}
 }

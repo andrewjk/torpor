@@ -1,0 +1,64 @@
+import { Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionContent } from "@torpor/ui/Accordion";
+
+export default function ExampleBasic($props: any) {
+	@render {
+		<Accordion class="exaccbasic">
+			<AccordionItem class="exaccbasic-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbasic-trigger">Item 1</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbasic-content" @/* transition:slide */>The first item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="exaccbasic-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbasic-trigger">Item 2</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbasic-content" @/* transition:slide */>Another item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="exaccbasic-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbasic-trigger">Item 3</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbasic-content" @/* transition:slide */>The last item</div>
+				</AccordionContent>
+			</AccordionItem>
+		</Accordion>
+	}
+
+	@style {
+		:global(.exaccbasic) {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			width: 200px;
+		}
+
+		:global(.exaccbasic-trigger) {
+			all: unset;
+			cursor: default;
+			padding: 5px;
+			width: 100%;
+		}
+
+		:global(.exaccbasic-trigger:focus-visible) {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+
+		:global(.exaccbasic-content) {
+			padding: 5px;
+			width: 100%;
+		}
+
+		:global(.exaccbasic-item + .exaccbasic-item) {
+			border-top: 1px solid gainsboro;
+		}
+
+		:global(.exaccbasic-trigger[data-state="open"]) {
+			border-bottom: 2px solid black;
+		}
+	}
+}

@@ -37,192 +37,190 @@ export default function Component() {
 </Popover>
 `.trim()}</code></pre>
 			<h2>Demo</h2>
-			<div>
-				<TabGroup>
-					<TabList ariaLabel="Example tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Static
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Anchored
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Contextual
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Function
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Mount
-							</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">
-								Variable
-							</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleStatic />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleStaticCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleAnchored />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleAnchoredCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleContextual />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleContextualCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleFunction />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleFunctionCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleMount />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleMountCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-					<TabContent>
-						<TabGroup>
-							<TabList ariaLabel="Preview and code tabs">
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Preview</TabTrigger>
-								</TabHeader>
-								<TabHeader>
-									<TabTrigger class="example-tab-header">Code</TabTrigger>
-								</TabHeader>
-							</TabList>
-							<TabContent>
-								<p class="example-preview">
-									<ExampleVariable />
-								</p>
-							</TabContent>
-							<TabContent>
-								<div class="example-code">
-									<button type="button" class="example-copy-button" on:click={copyCode}>
-										Copy to clipboard
-									</button>
-									<pre><code>{ExampleVariableCode.trim()}</code></pre>
-								</div>
-							</TabContent>
-						</TabGroup>
-					</TabContent>
-				</TabGroup>
-			</div>
+			<TabGroup>
+				<TabList ariaLabel="Example tabs">
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Static
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Anchored
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Contextual
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Function
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Mount
+						</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Variable
+						</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleStatic />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleStaticCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleAnchored />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleAnchoredCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleContextual />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleContextualCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleFunction />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleFunctionCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleMount />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleMountCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleVariable />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleVariableCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+			</TabGroup>
 		</div>
 	}
 }
