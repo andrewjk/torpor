@@ -1,0 +1,53 @@
+
+import { Popover, PopoverTrigger, PopoverContentAnchored } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
+
+export default function ExampleAnchored($props: any) {
+	function handleOption(color: string) {
+		alert(`You prefer ${color}?!`);
+	}
+
+	@render {
+		<div>
+			<p>
+				The button below shows a popover Dialog using the Popover, PopoverTrigger and
+				PopoverContentAnchored components.
+			</p>
+
+			<Popover>
+				<PopoverTrigger>Show a popover</PopoverTrigger>
+				<PopoverContentAnchored class="expopanc-content">
+					<Dialog>
+						<DialogHeader>
+							<h4>Header</h4>
+						</DialogHeader>
+						<DialogBody>
+							<p>Which color do you prefer?</p>
+						</DialogBody>
+						<DialogFooter class="expopanc-footer">
+							<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
+						</DialogFooter>
+					</Dialog>
+				</PopoverContentAnchored>
+			</Popover>
+		</div>
+	}
+
+	@style {
+		:global(.expopanc-content) {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			padding: 10px;
+			width: 340px;
+			z-index: 200;
+		}
+
+		:global(.expopanc-footer) {
+			display: flex;
+			gap: 10px;
+			justify-content: right;
+		}
+	}
+}

@@ -6,7 +6,13 @@ type Config =
 	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
 
 export default defineConfig({
-	entry: ["src/Accordion/index.ts", "src/TabGroup/index.ts", "src/motion.ts"],
+	entry: [
+		"src/Accordion/index.ts",
+		"src/Dialog/index.ts",
+		"src/Popover/index.ts",
+		"src/TabGroup/index.ts",
+		"src/motion.ts",
+	],
 	format: ["esm", "cjs"],
 	dts: { entry: ["src/motion.ts"] },
 	clean: true,

@@ -1,0 +1,66 @@
+import { Popover, PopoverTriggerContextual, PopoverContentContextual } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
+
+export default function ExampleContextual($props: any) {
+	function handleOption(color: string) {
+		alert(`You prefer ${color}?!`);
+	}
+
+	@render {
+		<div>
+			<p>Right-click on the panel below to trigger a context menu.</p>
+
+			<Popover>
+				<PopoverTriggerContextual class="expopcon-element">Show a contextual</PopoverTriggerContextual>
+				<PopoverContentContextual class="expopcon-content">
+					<Dialog>
+						<DialogHeader>
+							<h4>Header</h4>
+						</DialogHeader>
+						<DialogBody>
+							<p>Which color do you prefer?</p>
+						</DialogBody>
+						<DialogFooter class="expopcon-footer">
+							<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
+						</DialogFooter>
+					</Dialog>
+				</PopoverContentContextual>
+			</Popover>
+		</div>
+	}
+
+	@style {
+		:global(.expopcon-overlay) {
+			background-color: rgba(0, 0, 0, 0.6);
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			z-index: 100;
+		}
+
+		:global(.expopcon-element) {
+			border: 1px dashed #222;
+			border-radius: 4px;
+			cursor: default;
+			padding: 20px;
+		}
+
+		:global(.expopcon-content) {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			padding: 10px;
+			width: 340px;
+			z-index: 200;
+		}
+
+		:global(.expopcon-footer) {
+			display: flex;
+			gap: 10px;
+			justify-content: right;
+		}
+	}
+}

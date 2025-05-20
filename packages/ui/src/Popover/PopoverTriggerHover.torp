@@ -1,0 +1,30 @@
+
+import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
+import hoverTrigger from "../mount/hoverTrigger";
+
+/**
+ * The div that causes a Popover to appear or disappear when hovered.
+ */
+export default function PopoverTriggerHover($props: any) {
+	// Get stuff out of the PopoverContext
+	const context = $context[PopoverContextName] as PopoverContext;
+	if (!context) {
+		throw new Error("PopoverTriggerHover must be contained within a Popover");
+	}
+	let $state = context.state;
+
+	function handleHover() {
+		$state.visible = !$state.visible
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-popover-trigger-hover ${$props.class ?? ""}`.trim()}
+			:onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
+			:self={context.anchorElement}
+		>
+			<:slot />
+		</div>
+	}
+}

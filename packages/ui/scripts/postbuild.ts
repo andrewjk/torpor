@@ -52,16 +52,22 @@ async function run() {
 	}
 
 	// Move all utils/*.ts files into the dest folder
-	if (!existsSync(join(distFolder, "utils"))) {
-		await fs.mkdir(join(distFolder, "utils"));
+	moveUtils(distFolder, "utils");
+	moveUtils(distFolder, "mount");
+}
+
+async function moveUtils(distFolder: string, folderName: string) {
+	// Move all utils/*.ts files into the dest folder
+	if (!existsSync(join(distFolder, folderName))) {
+		await fs.mkdir(join(distFolder, folderName));
 	}
 
-	const utilsFolder = resolve(distFolder, "..", "src", "utils");
+	const utilsFolder = resolve(distFolder, "..", "src", folderName);
 	const utilsFiles = (await fs.readdir(utilsFolder)).filter(
 		(f) => f.endsWith(".ts") && f !== "index.ts",
 	);
 	for (const file of utilsFiles) {
-		await fs.copyFile(join(utilsFolder, file), join(distFolder, "utils", file));
+		await fs.copyFile(join(utilsFolder, file), join(distFolder, folderName, file));
 	}
 }
 

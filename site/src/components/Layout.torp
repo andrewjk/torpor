@@ -63,6 +63,7 @@ export default function Layout() {
 			position: relative;
 			left: 10px;
 			top: 10px;
+			margin-bottom: 10px;
 		}
 	}
 }

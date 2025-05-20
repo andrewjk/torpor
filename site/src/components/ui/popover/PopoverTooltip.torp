@@ -1,0 +1,29 @@
+import { Popover, PopoverContentAnchored } from "@torpor/ui/Popover";
+
+interface Props {
+	anchor: HTMLElement;
+	text: string;
+}
+
+export default function PopoverTooltip($props: Props) {
+	@render {
+		<Popover anchor={$props.anchor} visible>
+			<PopoverContentAnchored class="popover-tooltip-content" side="top">
+				{$props.text}
+			</PopoverContentAnchored>
+		</Popover>
+	}
+
+	@style {
+		:global(.popover-tooltip-content) {
+			background: #333;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			color: white;
+
+			padding: 10px;
+
+			z-index: 200;
+		}
+	}
+}

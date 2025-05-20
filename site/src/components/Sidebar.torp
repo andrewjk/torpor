@@ -21,6 +21,7 @@ export default function Sidebar() {
 				<li><a href="/ui/overview">Overview</a></li>
 				<li><a href="/ui/accordion">Accordion</a></li>
 				<li><a href="/ui/dialog">Dialog</a></li>
+				<li><a href="/ui/popover">Popover</a></li>
 				<li><a href="/ui/tab-group">TabGroup</a></li>
 			</ul>
 			<h4>Build</h4>

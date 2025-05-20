@@ -1,0 +1,28 @@
+import { Popover, PopoverContentAnchored } from "@torpor/ui/Popover";
+
+interface Props {
+	anchor: HTMLElement;
+}
+
+export default function PopoverContext($props: Props) {
+	@render {
+		<Popover anchor={$props.anchor} visible>
+			<PopoverContentAnchored class="popover-context-content" side="top">
+				I'm the context
+			</PopoverContentAnchored>
+		</Popover>
+	}
+
+	@style {
+		:global(.popover-context-content) {
+			background: #333;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			color: white;
+
+			padding: 10px;
+
+			z-index: 200;
+		}
+	}
+}

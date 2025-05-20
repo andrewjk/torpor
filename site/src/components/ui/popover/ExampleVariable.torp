@@ -1,0 +1,37 @@
+import { Popover, PopoverContentAnchored } from "@torpor/ui/Popover";
+
+export default function ExampleVariable($props: any) {
+	let $state = $watch({
+		showPopover: false,
+	})
+	let button: HTMLButtonElement;
+
+	@render {
+		<div>
+			<p>The button below shows an inline popover component, using a variable.</p>
+
+			<button type="button" :self={button} onclick={() => ($state.showPopover = !$state.showPopover)}>
+				Show a popover
+			</button>
+
+			@if ($state.showPopover) {
+				<Popover anchor={button} visible>
+					<PopoverContentAnchored class="expopvar-content" side="top">
+						You showed the popover!
+					</PopoverContentAnchored>
+				</Popover>
+			}
+		</div>
+	}
+
+	@style {
+		:global(.expopvar-content) {
+			background: #333;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			color: white;
+			padding: 10px;
+			z-index: 200;
+		}
+	}
+}

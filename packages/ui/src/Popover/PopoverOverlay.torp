@@ -1,0 +1,32 @@
+import { disableScroll } from "../mount/disableScroll";
+import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
+
+/**
+ * The background overlay for a Popover. Adding an overlay automatically sets the Popover to modal.
+ */
+export default function PopoverOverlay($props: any) {
+	// Get stuff out of the PopoverContext
+	const context = $context[PopoverContextName] as PopoverContext;
+	if (!context) {
+		throw new Error("PopoverOverlay must be contained within a Popover");
+	}
+	let $state = context.state;
+
+	// Any Popover with an overlay is modal
+	context.modal = true;
+
+	@render {
+		<div style="display: content;">
+			@if ($state.visible) {
+				<div
+					id={$props.id}
+					class={`torp-popover-overlay ${$props.class ?? ""}`.trim()}
+					tabindex="-1"
+					:onmount={(el) => disableScroll(el)}
+				>
+					<:slot />
+				</div>
+			}
+		</div>
+	}
+}

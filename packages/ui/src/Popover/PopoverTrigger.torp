@@ -1,0 +1,29 @@
+import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
+
+/**
+ * The button that causes a Popover to appear or disappear.
+ */
+export default function PopoverTrigger($props: any) {
+	// Get stuff out of the PopoverContext
+	const context = $context[PopoverContextName] as PopoverContext;
+	if (!context) {
+		throw new Error("PopoverTrigger must be contained within a Popover");
+	}
+	let $state = context.state;
+
+	function handleClick() {
+		$state.visible = !$state.visible;
+	}
+
+	@render {
+		<button
+			type="button"
+			id={$props.id}
+			class={`torp-popover-trigger ${$props.class ?? ""}`.trim()}
+			onclick={handleClick}
+			:self={context.anchorElement}
+		>
+			<:slot />
+		</button>
+	}
+}

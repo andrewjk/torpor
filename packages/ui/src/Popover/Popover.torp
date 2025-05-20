@@ -1,0 +1,112 @@
+import { PopoverContextName, type Point, type PopoverContext, type PopoverState } from "./PopoverTypes";
+
+/**
+ * A popover that can be used to show rich content or obtain information from a user.
+ *
+ * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
+ *
+ * The structure of a Popover is:
+ *
+ * ```
+ * <Popover>
+ * 	<PopoverOverlay /> (optional, if modal)
+ * 		<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
+ * 	<PopoverContentStatic/PopoverContentAnchored/PopoverContentContextual />
+ * </Popover>
+ * ```
+ * @prop {boolean} modal -- Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers 
+ * @prop {boolean} visible -- Whether the popover is visible 
+ * @prop {HTMLElement | undefined} anchor -- The element to anchor this popover to, as an alternative to supplying a PopoverTrigger 
+ * @prop {Point | undefined} position -- The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual 
+ * @prop {((value: any) => void) | undefined} [callback] -- A function to be called when the user selects a response
+ */
+export default function Popover($props: any) {
+	let $state: PopoverState = $watch({
+		visible: false,
+		position: { x: 0, y: 0 }
+	})
+
+	// Copy props into state whenever they change
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+		$state.position = $props.position ?? { x: 0, y: 0 };
+	})
+
+	let first = true;
+	$run(() => {
+		let visible = $state.visible;
+
+		if (first) {
+			first = false;
+			return;
+		}
+
+		dispatchEvents(visible);
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: PopoverContext = {
+		handleButton,
+		handleClickOutside,
+		state: $state,
+		modal: $props.modal,
+		anchorElement: $unwrap($props.anchor),
+	};
+	$context[PopoverContextName] = context;
+
+	// TODO:
+	function dispatchEvents() {
+		/** Raised when the popover is opened or closed */
+		//dispatch("toggle", $state.visible);
+	
+		//if ($state.visible) {
+		//	/** Raised when the popover has opened */
+		//	dispatch("open");
+		//} else {
+		//	/** Raised when the popover has closed */
+		//	dispatch("close", result);
+		//}
+	}
+
+	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+		// Get the button's result
+		switch (type) {
+			case "confirm": {
+				result = value || true;
+				break;
+			}
+			case "cancel": {
+				result = value || false;
+				break;
+			}
+			default: {
+				result = value;
+				break;
+			}
+		}
+
+		// Hide the popover
+		$state.visible = false;
+
+		// Call the callback
+		if ($props.callback) {
+			$props.callback(result);
+		}
+	}
+
+	function handleClickOutside(e: MouseEvent) {
+		e.preventDefault();
+		$state.visible = false;
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-popover ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}
