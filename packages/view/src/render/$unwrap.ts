@@ -6,5 +6,5 @@ import { proxyDataSymbol } from "../watch/symbols";
  * @param object The proxy object
  */
 export default function $unwrap<T extends Record<PropertyKey, any>>(object: T): T {
-	return object[proxyDataSymbol].target || object;
+	return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
 }

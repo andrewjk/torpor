@@ -95,7 +95,7 @@ var proxyDataSymbol = Symbol("_proxy_data");
 
 // src/render/$unwrap.ts
 function $unwrap(object) {
-  return object[proxyDataSymbol].target || object;
+  return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
 }
 
 // src/watch/trackEffect.ts
