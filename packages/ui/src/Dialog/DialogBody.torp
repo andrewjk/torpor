@@ -1,0 +1,34 @@
+import getId from "../utils/getId";
+import { DialogContextName, type DialogContext } from "./DialogTypes";
+
+/**
+ * The body information for a Dialog. Content in the body will be announced by
+ * screen readers when the Dialog is opened, unless ariaAnnounce is false.
+ * 
+ * @prop {boolean} ariaAnnounce -- Whether the body content will be announced by screen readers when the Dialog is opened
+ */
+export default function DialogBody($props: any) {
+	$props.id ??= getId();
+	$props.ariaAnnounce ??= true;
+
+	// Get stuff out of the DialogContext
+	const context = $context[DialogContextName] as DialogContext;
+	if (!context) {
+		throw new Error("DialogBody must be contained within a Dialog");
+	}
+	let $state = context.state;
+
+	// Set the body id for using in the Dialog's ARIA attributes
+	if ($props.ariaAnnounce) {
+		$state.bodyId = $props.id;
+	}
+
+	@render {
+		<div
+			id={$props.id} 
+			class={`torp-dialog-body ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}

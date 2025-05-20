@@ -12,6 +12,11 @@
 			"import": "./dist/Accordion/index.js",
 			"require": "./dist/Accordion/index.cjs"
 		},
+		"./Dialog": {
+			"types": "./dist/Dialog/index.d.ts",
+			"import": "./dist/Dialog/index.js",
+			"require": "./dist/Dialog/index.cjs"
+		},
 		"./TabGroup": {
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js",

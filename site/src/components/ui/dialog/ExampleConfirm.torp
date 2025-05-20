@@ -1,0 +1,25 @@
+import { showPopoverPrompt } from "@torpor/ui/Popover";
+import ConfirmDialog from "./ConfirmDialog.torp";
+
+export default function ExampleConfirm($props: any) {
+	async function show() {
+		const result = await showPopoverPrompt(ConfirmDialog, { text: "Press OK to continue..." });
+		if (result) {
+			alert("OK, we'll continue.");
+		} else {
+			alert("I guess we'll cancel then.");
+		}
+	}
+
+	@render {
+		<div>
+			<p>
+				The button below shows a modal dialog with OK and Cancel buttons
+				using the showPopoverPrompt function.
+			</p>
+			<p>
+				<button type="button" onclick={show}>Show a confirm modal</button>
+			</p>
+		</div>
+	}
+}

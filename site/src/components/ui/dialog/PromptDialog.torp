@@ -1,0 +1,77 @@
+import { Popover, PopoverOverlay, PopoverContentStatic } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
+
+export default function PromptDialog($props: any) {
+	$props.confirmText ||= "OK";
+	$props.cancelText ||= "Cancel";
+
+	let $state = $watch({
+		value: ""
+	});
+
+	@render {
+		<Popover visible callback={$props.callback}>
+			<PopoverOverlay class="prompt-dialog-overlay" />
+			<PopoverContentStatic class="prompt-dialog-content">
+				<Dialog>
+					@if ($props.header) {
+						<DialogHeader>
+							<h4>{$props.header}</h4>
+						</DialogHeader>
+					}
+					@if ($props.text) {
+						<DialogBody>
+							<p>{$props.text}</p>
+							<p>
+								<input class="prompt-dialog-input" type="text" :value={$state.value} />
+							</p>
+						</DialogBody>
+					}
+					<DialogFooter class="prompt-dialog-footer">
+						<DialogButton type="confirm" value={$state.value} disabled={!$state.value}>
+							{$props.confirmText}
+						</DialogButton>
+						<DialogButton type="cancel">
+							{$props.cancelText}
+						</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContentStatic>
+		</Popover>
+	}
+
+	@style {
+		:global(.prompt-dialog-overlay) {
+			background-color: rgba(0, 0, 0, 0.6);
+			position: fixed;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			z-index: 100;
+		}
+
+		:global(.prompt-dialog-content) {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			padding: 10px;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 340px;
+			z-index: 200;
+		}
+
+		.prompt-dialog-input {
+			width: 100%;
+		}
+
+		:global(.prompt-dialog-footer) {
+			display: flex;
+			gap: 10px;
+			justify-content: right;
+		}
+	}
+}

@@ -29,5 +29,40 @@ export default function Layout() {
 			overflow: auto;
 			padding: 0.5rem;
 		}
+
+		:global(.example-tab-header) {
+			all: unset;
+			background: transparent;
+			border-bottom: 1px solid gainsboro;
+			cursor: default;
+			padding: 5px;
+		}
+
+		:global(.example-tab-header[data-state='active']) {
+			border-bottom: 2px solid black;
+		}
+
+		:global(.example-preview) {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			background: #f6f6f6;
+			border-radius: 4px;
+			height: 340px;
+		}
+
+		:global(.example-code) {
+			background: #f2f2f2;
+			border-radius: 4px;
+			height: 340px;
+			overflow: auto;
+		}
+
+		:global(.example-copy-button) {
+			position: relative;
+			left: 10px;
+			top: 10px;
+		}
 	}
 }

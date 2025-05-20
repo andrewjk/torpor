@@ -1,0 +1,13 @@
+/**
+ * The footer for a Dialog, which may contain one or more DialogButtons.
+ */
+export default function DialogFooter($props: any) {
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-dialog-footer ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}

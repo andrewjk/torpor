@@ -1,0 +1,22 @@
+import { showPopoverPrompt } from "../../../src/Popover";
+import CustomDialog from "./CustomDialog.torp";
+
+export default function DialogFunction($props: any) {
+	let $state = $watch({ color: "" });
+
+	async function show() {
+		// @ts-ignore
+		$state.color = await showPopoverPrompt(CustomDialog, null, $parent);
+	}
+
+	@render {
+		<div>
+			<button type="button" onclick={show}>Show the modal</button>
+
+			@if ($state.color) {
+				<p>Your favorite color is {$state.color}?!</p>
+			}
+		</div>
+	}
+}
+

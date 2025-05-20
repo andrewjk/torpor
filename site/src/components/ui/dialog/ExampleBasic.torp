@@ -1,0 +1,74 @@
+import { Popover, PopoverOverlay, PopoverContentStatic } from '@torpor/ui/Popover';
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
+
+export default function ExampleBasic($props: any) {
+	let $state = $watch({
+		showPopover: false
+	});
+
+	function handleOption(color: string) {
+		alert(`You prefer ${color}?!`);
+	}
+
+	@render {
+		<div>
+			<p>The button below shows a basic modal dialog.</p>
+			<p>
+				<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+					Show a modal
+				</button>
+			</p>
+
+			<Popover class="modal" visible={$state.showPopover}>
+				<PopoverOverlay class="exdlgbas-overlay" />
+				<PopoverContentStatic class="exdlgbas-content">
+					<Dialog>
+						<DialogHeader>
+							<h4>Header</h4>
+						</DialogHeader>
+						<DialogBody>
+							<p>Which color do you prefer?</p>
+						</DialogBody>
+						<DialogFooter class="exdlgbas-footer">
+							<DialogButton onclick={() => handleOption('blue')}>Blue</DialogButton>
+							<DialogButton onclick={() => handleOption('red')}>Red</DialogButton>
+						</DialogFooter>
+					</Dialog>
+				</PopoverContentStatic>
+			</Popover>	
+		</div>
+	}
+
+	@style {
+		:global(.exdlgbas-overlay) {
+			background-color: rgba(0, 0, 0, 0.6);
+
+			position: static;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+
+			z-index: 100;
+		}
+
+		:global(.exdlgbas-content) {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			padding: 10px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			width: 340px;
+			z-index: 200;
+		}
+
+		:global(.exdlgbas-footer) {
+			display: flex;
+			gap: 10px;
+			justify-content: right;
+		}
+	}
+}

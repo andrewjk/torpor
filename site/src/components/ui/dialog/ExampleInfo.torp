@@ -1,0 +1,20 @@
+import { showPopoverPrompt } from "@torpor/ui/Popover";
+import InfoDialog from "./InfoDialog.torp";
+
+export default function ExampleInfo($props: any) {
+	async function show() {
+		await showPopoverPrompt(InfoDialog, { text: "Press OK to continue..." });
+	}
+
+	@render {
+		<div>
+			<p>
+				The button below shows a modal dialog with an OK button using
+				the showPopoverPrompt function.
+			</p>
+			<p>
+				<button type="button" onclick={show}>Show an info modal</button>
+			</p>
+		</div>
+	}
+}

@@ -1,0 +1,24 @@
+
+import { showPopoverPrompt } from "@torpor/ui/Popover";
+import CustomDialog from "./CustomDialog.torp";
+
+export default function ExampleFunction($props: any) {
+	async function show() {
+		const result = await showPopoverPrompt(CustomDialog);
+		if (result) {
+			alert(`You prefer ${result}?!`);
+		}
+	}
+
+	@render {
+		<div>
+			<p>
+				The button below shows a custom modal dialog component using the
+				showPopoverPrompt function.
+			</p>
+			<p>
+				<button type="button" onclick={show}>Show a modal</button>
+			</p>
+		</div>
+	}
+}

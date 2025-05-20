@@ -1,0 +1,48 @@
+import { DialogContextName, type DialogContext } from "./DialogTypes";
+
+/**
+ * A button that is placed in a DialogFooter and signals a response by a user.
+ * 
+ * @prop {any | undefined} value -- The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover
+ * @prop {"confirm" | "cancel" | undefined} type -- "confirm" if the button should respond to the Enter key or "cancel" if the button should respond to the Escape key
+ * @prop {boolean} disabled -- Whether this button is disabled
+ */
+export default function DialogButton($props: any) {
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the DialogContext
+	const context = $context[DialogContextName] as DialogContext;
+	if (!context) {
+		throw new Error("DialogButton must be contained within a Dialog");
+	}
+	const handleButton = context.handleButton;
+
+	$mount(() => {
+		// Store the confirm or cancel button in the DialogContext
+		if ($props.type === "confirm") {
+			context.confirmButton = button;
+		} else if ($props.type === "cancel") {
+			context.cancelButton = button;
+		}
+	});
+
+	function handleClick(e) {
+		if ($props.onclick) {
+			$props.onclick(e)
+		}
+		handleButton($props.type, $props.value);
+	}
+
+	@render {
+		<button
+			type="button"
+			id={$props.id}
+			class={`torp-dialog-button ${$props.class ?? ""}`.trim()}
+			disabled={$props.disabled}
+			onclick={handleClick}
+			:self={button}
+		>
+			<:slot />
+		</button>
+	}
+}

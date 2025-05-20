@@ -1,0 +1,157 @@
+import getId from "../utils/getId";
+import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import { trapFocus, type TrapFocusOptions } from "../mount/trapFocus";
+import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
+import { DialogContextName, type DialogContext, type DialogState } from "./DialogTypes";
+
+/**
+ * Content for a window displayed in a Popover.
+ * 
+ * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
+ * 
+ * The structure of a Dialog is:
+ * 
+ * ```
+ * <Dialog>
+ *     <DialogHeader /> (optional)
+ *     <DialogBody /> (optional)
+ *     <DialogFooter> (optional)
+ *         <DialogButton /> (optional)
+ *     </DialogFooter>
+ * </Dialog>
+ * ```
+ * 
+ * @prop {string | undefined} ariaLabel -- An ARIA label for describing the popover to screen readers 
+ * @prop {boolean} alert -- Whether the dialog should alert the user via the screen reader
+ */
+export default function Dialog($props: any) {
+	$props.id ??= getId();
+	$props.dialog ??= false;
+
+	let div: HTMLDivElement;
+
+	let trapFocusOptions: TrapFocusOptions = {
+		focusableElements: []
+	};
+
+	// Get stuff out of the PopoverContext
+	const popoverContext = $context[PopoverContextName] as PopoverContext;
+	if (!popoverContext) {
+		throw new Error("Dialog must be contained within a Contextual, Prompt or Popover");
+	}
+	//const { handleButton, modal, visible } = popoverContext;
+	const handleButton = popoverContext.handleButton;
+	const modal = popoverContext.modal;
+	const visible = popoverContext.state.visible;
+
+	popoverContext.handleClickOutside = handleClickOutside;
+	// Set the focusFirstElement method in the PopoverContext so that it can be
+	// called after everything has been shown
+	popoverContext.focusFirstElement = focusFirstElement;
+
+	// Set the IDs for using in the Dialog's ARIA attributes
+	let $state :DialogState = $watch({
+		dialogId: $props.id,
+		headerId: "",
+		bodyId: "",
+		visible
+	})
+
+	// Set the context to pass down to items
+	let context: DialogContext = {
+		handleButton,
+		state: $state
+	};
+	$context[DialogContextName] = context;
+
+	let closeOnClick = false;
+
+	$mount(() => {
+		if ($state.visible) {
+			// HACK: Because this Dialog could be shown with a click, we need to
+			// wait for another mousedown before we close on click. Otherwise
+			// the click immediately bubbles to the document. I guess we could
+			// require the user to preventDefault after calling showPrompt etc,
+			// but that seems very error-prone?
+			closeOnClick = false;
+			addDocumentEvent("mousedown", handleDocumentMouseDown);
+			addDocumentEvent("click", handleDocumentClick);
+		} else {
+			removeDocumentEvent("mousedown", handleDocumentMouseDown);
+			removeDocumentEvent("click", handleDocumentClick);
+			// Focus the anchor element per WAI guidelines
+			if (context.anchorElement?.focus) {
+				context.anchorElement.focus();
+			}
+		}
+	});
+
+	function focusFirstElement() {
+		if (trapFocusOptions.focusableElements.length) {
+			trapFocusOptions.focusableElements[0].focus();
+		}
+	}
+
+	function handleDocumentMouseDown() {
+		closeOnClick = true;
+	}
+
+	function handleDocumentClick(e: MouseEvent) {
+		if (
+			closeOnClick &&
+			div &&
+			!div.contains(e.target as HTMLElement) &&
+			(!context.anchorElement || !context.anchorElement.contains(e.target as HTMLElement))
+		) {
+			handleClickOutside(e);
+		}
+	}
+
+	function handleClickOutside(e: MouseEvent) {
+		// Don't allow the user to click outside -- they must press a button or
+		// the Esc key
+		e.preventDefault();
+		if (!modal) {
+			popoverContext.state.visible = false;
+			context.state.visible = false;
+		}
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Esc":
+			case "Escape": {
+				if (context.cancelButton) {
+					context.cancelButton.click();
+					e.preventDefault();
+				}
+				break;
+			}
+			case "Enter": {
+				if (context.confirmButton) {
+					context.confirmButton.click();
+					e.preventDefault();
+				}
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-dialog ${$props.class ?? ""}`.trim()}
+			tabindex="0"
+			role={$props.alert ? "alertdialog" : "dialog"}
+			aria-modal={modal}
+			aria-label={$props.ariaLabel}
+			aria-labelledby={!$props.ariaLabel && $state.headerId ? $state.headerId : undefined}
+			aria-describedby={$state.bodyId ? $state.bodyId : undefined}
+			onkeydown={handleKey}
+			:onmount={(el) => trapFocus(el, trapFocusOptions)}
+			:self={div}
+		>
+			<:slot />
+		</div>
+	}
+}
