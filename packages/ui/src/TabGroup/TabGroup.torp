@@ -32,13 +32,13 @@ export default function TabGroup($props: any) {
 
 	interface State {
 		value: string;
-		itemStates: ItemState[];
 	}
 
 	let $state: State = $watch({
-		value: $props.value,
-		itemStates: []
-	})
+		value: $props.value
+	});
+
+	let itemStates: ItemState[] = [];
 
 	// This is used to assign automatic indexes to items where needed
 	let nextHeaderIndex = 0;
@@ -62,7 +62,7 @@ export default function TabGroup($props: any) {
 
 		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
 		newValue = newValue?.toString();
-		for (let item of $state.itemStates) {
+		for (let item of itemStates) {
 			item.active = item.value === newValue;
 		}
 
@@ -71,7 +71,7 @@ export default function TabGroup($props: any) {
 	});
 
 	$run(() => {
-		$state.itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+		itemStates.forEach((s) => s.parentDisabled = $props.disabled);
 	});
 
 	// Dispatch the change event when the value changes
@@ -84,8 +84,8 @@ export default function TabGroup($props: any) {
 
 	// TODO:
 	//$mount(() => {
-	//	if ($state.value === "" && $state.itemStates.length) {
-	//		$state.value = $state.itemStates[0].value;
+	//	if ($state.value === "" && itemStates.length) {
+	//		$state.value = itemStates[0].value;
 	//	}
 	//})
 
@@ -117,8 +117,8 @@ export default function TabGroup($props: any) {
 
 	function getItemState(index: number, value: string | undefined): ItemState {
 		// If we already have an item at this index, just return it
-		if ($state.itemStates.length > index) {
-			return $state.itemStates[index];
+		if (itemStates.length > index) {
+			return itemStates[index];
 		}
 
 		// If a value wasn't set for the item, set it to the index
@@ -142,7 +142,7 @@ export default function TabGroup($props: any) {
 			orientation: $props.orientation,
 			activation: $props.activation
 		});
-		$state.itemStates.splice(index, 0, newItemState);
+		itemStates.splice(index, 0, newItemState);
 
 		return newItemState;
 	}
@@ -150,15 +150,15 @@ export default function TabGroup($props: any) {
 	// TODO: I think this should be done by value
 	function removeItem(itemIndex: number) {
 		// Remove the item and re-index
-		let index = $state.itemStates.findIndex((item) => item.index === itemIndex);
+		let index = itemStates.findIndex((item) => item.index === itemIndex);
 		if (index !== -1) {
-			$state.itemStates.splice(itemIndex, 1);
+			itemStates.splice(itemIndex, 1);
 		}
-		$state.itemStates.forEach((item, i) => (item.index = i));
+		itemStates.forEach((item, i) => (item.index = i));
 	}
 
 	function triggerItem(toggleValue: string) {
-		for (let item of $state.itemStates) {
+		for (let item of itemStates) {
 			// The item is active if it has the supplied value
 			if (item.value === toggleValue) {
 				$state.value = item.value;
@@ -173,7 +173,7 @@ export default function TabGroup($props: any) {
 			case "ArrowLeft": {
 				if ($props.orientation === "horizontal" && headerIndex > 0) {
 					e.preventDefault();
-					$state.itemStates[headerIndex - 1].setFocused();
+					itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
@@ -181,37 +181,37 @@ export default function TabGroup($props: any) {
 			case "ArrowUp": {
 				if ($props.orientation === "vertical" && headerIndex > 0) {
 					e.preventDefault();
-					$state.itemStates[headerIndex - 1].setFocused();
+					itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
 			case "Right":
 			case "ArrowRight": {
-				if ($props.orientation === "horizontal" && headerIndex < $state.itemStates.length - 1) {
+				if ($props.orientation === "horizontal" && headerIndex < itemStates.length - 1) {
 					e.preventDefault();
-					$state.itemStates[headerIndex + 1].setFocused();
+					itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
 			case "Down":
 			case "ArrowDown": {
-				if ($props.orientation === "vertical" && headerIndex < $state.itemStates.length - 1) {
+				if ($props.orientation === "vertical" && headerIndex < itemStates.length - 1) {
 					e.preventDefault();
-					$state.itemStates[headerIndex + 1].setFocused();
+					itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
 			case "Home": {
 				if (headerIndex > 0) {
 					e.preventDefault();
-					$state.itemStates[0].setFocused();
+					itemStates[0].setFocused();
 				}
 				break;
 			}
 			case "End": {
-				if (headerIndex < $state.itemStates.length - 1) {
+				if (headerIndex < itemStates.length - 1) {
 					e.preventDefault();
-					$state.itemStates[$state.itemStates.length - 1].setFocused();
+					itemStates[itemStates.length - 1].setFocused();
 				}
 				break;
 			}

@@ -30,13 +30,13 @@ export default function Accordion($props: any) {
 
 	interface State {
 		value: string | string[];
-		itemStates: ItemState[];
 	}
 
 	let $state: State = $watch({
-		value: $props.value,
-		itemStates: []
-	})
+		value: $props.value
+	});
+
+	let itemStates: ItemState[] = [];
 
 	// This is used to assign automatic indexes to items where needed
 	let nextIndex = 0;
@@ -59,7 +59,7 @@ export default function Accordion($props: any) {
 			case "single": {
 				// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
 				newValue = newValue?.toString();
-				for (let item of $state.itemStates) {
+				for (let item of itemStates) {
 					item.expanded = item.value === newValue;
 				}
 				break;
@@ -69,7 +69,7 @@ export default function Accordion($props: any) {
 				if (!Array.isArray(newValue)) {
 					newValue = [newValue];
 				}
-				for (let item of $state.itemStates) {
+				for (let item of itemStates) {
 					item.expanded = newValue.indexOf(item.value) !== -1;
 				}
 				break;
@@ -81,7 +81,7 @@ export default function Accordion($props: any) {
 	})
 
 	$run(() => {
-		$state.itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+		itemStates.forEach((s) => s.parentDisabled = $props.disabled);
 	});
 
 	// Dispatch the change event when the value changes
@@ -121,23 +121,23 @@ export default function Accordion($props: any) {
 		$state.parentDisabled = $props.disabled
 
 		// Add the item's state to the array
-		$state.itemStates.splice(itemState.index, 0, itemState);
+		itemStates.splice(itemState.index, 0, itemState);
 	}
 
 	// TODO: I think this should be done by value
 	function removeItem(itemIndex: number) {
 		// Remove the item and re-index
-		let index = $state.itemStates.findIndex((item) => item.index === itemIndex);
+		let index = itemStates.findIndex((item) => item.index === itemIndex);
 		if (index !== -1) {
-			$state.itemStates.splice(itemIndex, 1);
+			itemStates.splice(itemIndex, 1);
 		}
-		$state.itemStates.forEach((item, i) => (item.index = i));
+		itemStates.forEach((item, i) => (item.index = i));
 	}
 
 	function toggleItem(toggleValue: string) {
 		switch ($props.type) {
 			case "single": {
-				for (let item of $state.itemStates) {
+				for (let item of itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
 					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
 					if (item.value === toggleValue) {
@@ -149,7 +149,7 @@ export default function Accordion($props: any) {
 			}
 			case "multiple": {
 				let newValue = [];
-				for (let item of $state.itemStates) {
+				for (let item of itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) or if it
 					// was already expanded
 					if (
@@ -171,29 +171,29 @@ export default function Accordion($props: any) {
 			case "ArrowUp": {
 				if (headerIndex > 0) {
 					e.preventDefault();
-					$state.itemStates[headerIndex - 1].setFocused();
+					itemStates[headerIndex - 1].setFocused();
 				}
 				break;
 			}
 			case "Down":
 			case "ArrowDown": {
-				if (headerIndex < $state.itemStates.length - 1) {
+				if (headerIndex < itemStates.length - 1) {
 					e.preventDefault();
-					$state.itemStates[headerIndex + 1].setFocused();
+					itemStates[headerIndex + 1].setFocused();
 				}
 				break;
 			}
 			case "Home": {
 				if (headerIndex > 0) {
 					e.preventDefault();
-					$state.itemStates[0].setFocused();
+					itemStates[0].setFocused();
 				}
 				break;
 			}
 			case "End": {
-				if (headerIndex < $state.itemStates.length - 1) {
+				if (headerIndex < itemStates.length - 1) {
 					e.preventDefault();
-					$state.itemStates[$state.itemStates.length - 1].setFocused();
+					itemStates[itemStates.length - 1].setFocused();
 				}
 				break;
 			}
