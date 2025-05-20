@@ -135,6 +135,9 @@ export default function TabGroup($props: any) {
 			contentId: "",
 			disabled: false,
 			parentDisabled: false,
+			get dataState() {
+				return this.active ? "active" : "inactive";
+			},
 			setFocused: () => {},
 			orientation: $props.orientation,
 			activation: $props.activation

@@ -27,6 +27,7 @@ export interface ItemState {
 	expanded: boolean;
 	disabled: boolean;
 	parentDisabled: boolean;
+	dataState: "open" | "closed";
 	/** Called in the Accordion when a header needs to be focused */
 	setFocused: () => void;
 }

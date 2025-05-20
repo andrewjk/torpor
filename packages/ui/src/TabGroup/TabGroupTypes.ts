@@ -33,6 +33,7 @@ export interface ItemState {
 	contentId: string;
 	disabled: boolean;
 	parentDisabled: boolean;
+	dataState: "active" | "inactive";
 	/** Called in the TabGroup when a header needs to be focused */
 	setFocused: () => void;
 }
