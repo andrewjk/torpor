@@ -35,23 +35,31 @@ export default function parseCode(source: string): ParseResult {
 			}
 		} else if (accept("function", status)) {
 			// If the function name starts with a capital, parse it as a component
-			consumeSpace(status);
-			if (/[A-Z]/.test(source[status.i])) {
-				parseComponentStart(status);
+			if (consumeSpace(status)) {
+				if (/[A-Z]/.test(source[status.i])) {
+					parseComponentStart(status);
+				} else {
+					// Unconsume the last space
+					status.i--;
+				}
 			}
 		} else if (accept("const", status)) {
 			// If it's a function and its name starts with a capital, parse it as a component
-			consumeSpace(status);
-			if (/[A-Z]/.test(source[status.i])) {
-				const start = status.i;
-				consumeAlphaNumeric(status);
-				consumeSpace(status);
-				if (accept("=", status)) {
+			if (consumeSpace(status)) {
+				if (/[A-Z]/.test(source[status.i])) {
+					const start = status.i;
+					consumeAlphaNumeric(status);
 					consumeSpace(status);
-					if (accept("(", status, false)) {
-						status.i = start;
-						parseComponentStart(status);
+					if (accept("=", status)) {
+						consumeSpace(status);
+						if (accept("(", status, false)) {
+							status.i = start;
+							parseComponentStart(status);
+						}
 					}
+				} else {
+					// Unconsume the last space
+					status.i--;
 				}
 			}
 		} else if (accept("export", status)) {
