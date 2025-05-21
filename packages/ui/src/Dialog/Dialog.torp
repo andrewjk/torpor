@@ -39,9 +39,7 @@ export default function Dialog($props: any) {
 	if (!popoverContext) {
 		throw new Error("Dialog must be contained within a Contextual, Prompt or Popover");
 	}
-	//const { handleButton, modal, visible } = popoverContext;
-	const handleButton = popoverContext.handleButton;
-	const modal = popoverContext.modal;
+	const { handleButton, modal } = popoverContext;
 	const visible = popoverContext.state.visible;
 
 	popoverContext.handleClickOutside = handleClickOutside;
@@ -50,7 +48,7 @@ export default function Dialog($props: any) {
 	popoverContext.focusFirstElement = focusFirstElement;
 
 	// Set the IDs for using in the Dialog's ARIA attributes
-	let $state :DialogState = $watch({
+	let $state: DialogState = $watch({
 		dialogId: $props.id,
 		headerId: "",
 		bodyId: "",
@@ -60,7 +58,8 @@ export default function Dialog($props: any) {
 	// Set the context to pass down to items
 	let context: DialogContext = {
 		handleButton,
-		state: $state
+		state: $state,
+		anchorElement: popoverContext.anchorElement
 	};
 	$context[DialogContextName] = context;
 

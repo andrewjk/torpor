@@ -10,7 +10,7 @@ import { PopoverContextName, type Point, type PopoverContext, type PopoverState 
  * ```
  * <Popover>
  * 	<PopoverOverlay /> (optional, if modal)
- * 		<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
+ * 	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
  * 	<PopoverContentStatic/PopoverContentAnchored/PopoverContentContextual />
  * </Popover>
  * ```

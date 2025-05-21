@@ -2,7 +2,6 @@ export const PopoverContextName = "Popover";
 
 /** The shared context for popover components (Contextual, Prompt and Popover) */
 export interface PopoverContext {
-	//setVisible: (value: boolean, result?: any) => void;
 	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
 	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
 	// There may be a more elegant way to accomplish this too

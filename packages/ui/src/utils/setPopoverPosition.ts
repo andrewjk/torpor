@@ -71,8 +71,6 @@ export default function setPopoverPosition(
 			throw new Error(`Invalid MenuPopout side: ${side}`);
 		}
 	}
-
-	console.log("calculating position...", calculatedSide);
 }
 
 function setVerticalAlignment(
