@@ -1,0 +1,178 @@
+import {
+	NavMenuContextName,
+	type NavMenuContext,
+	type ItemState,
+	NavMenuPopoutContextName,
+	type NavMenuPopoutContext
+} from "./NavMenuTypes";
+
+/**
+ * A list of links for navigating a website.
+ *
+ * See [the WAI ARIA guidelines for Menus](https://www.w3.org/WAI/ARIA/apg/patterns/menu/).
+ *
+ * The structure of a NavMenu is:
+ *
+ * ```
+ * <NavMenu>
+ *	 <NavMenuLink />
+ *	 <NavMenuSeparator /> (optional)
+ *	 <NavMenuPopout /> (optional)
+ *	 ...
+ * </NavMenu>
+ * ```
+ *
+ * @prop {string | undefined} ariaLabel -- An ARIA label for describing the menu to screen readers 
+ * @prop {"horizontal" | "vertical"} orientation -- The orientation of the menu, which affects keyboard navigation
+ */
+export default function NavMenu($props: any) {
+	$props.orientation ||= "horizontal";
+
+	// A collection containing the state and some functions for each item
+	let itemStates: ItemState[] = [];
+	let focusIndex = -1;
+
+	// Check whether this is a menu in a popout
+	const popoutContext = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
+	const inPopout = !!popoutContext;
+	let popoutState = popoutContext?.state;
+
+	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
+	if (popoutContext) {
+		popoutContext.focusFirstElement = focusFirstElement;
+	}
+
+	// Set the context to pass down to items
+	let context: NavMenuContext = {
+		handleItemFocus,
+		handleItemKey,
+		registerItem
+	};
+	$context[NavMenuContextName] = context;
+
+	// If the NavMenu is not in a popout, focus its first item. Otherwise the popout will call focusFirstElement, below
+	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
+		if (!popoutContext && itemStates.length) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function focusFirstElement() {
+		if (itemStates.length) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function registerItem(setFocused: () => void) {
+		// Add the item's state to the array and return its index
+		const newItemState: ItemState = {
+			setFocused
+		};
+		itemStates.push(newItemState);
+		itemStates = itemStates;
+		return { index: itemStates.length - 1 };
+	}
+
+	function handleItemFocus(index: number) {
+		focusIndex = index;
+	}
+
+	function handleItemKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Esc":
+			case "Escape": {
+				if (inPopout) {
+					e.preventDefault();
+					//setPopoutVisible(false);
+					popoutState.visible = false;
+				}
+				break;
+			}
+			case "Right":
+			case "ArrowRight": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("previous");
+				}
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("previous");
+				} else {
+					// TODO: This should be based on what side the menu shows on
+					// And on the orientation
+					if (inPopout) {
+						e.preventDefault();
+						popoutState.visible = false;
+					}
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusItem("start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusItem("end");
+				break;
+			}
+		}
+	}
+
+	function focusItem(target: "start" | "previous" | "next" | "end") {
+		switch (target) {
+			case "start": {
+				focusIndex = 0;
+				break;
+			}
+			case "previous": {
+				focusIndex = Math.max(0, focusIndex - 1);
+				break;
+			}
+			case "next": {
+				focusIndex = Math.min(itemStates.length - 1, focusIndex + 1);
+				break;
+			}
+			case "end": {
+				focusIndex = itemStates.length - 1;
+				break;
+			}
+		}
+		itemStates[focusIndex]?.setFocused();
+	}
+
+	@render {
+		<nav
+			id={$props.id}
+			class={`torp-nav-menu ${$props.class ?? ""}`.trim()}
+			tabindex="0"
+			role="menubar"
+			aria-label={$props.ariaLabel}
+			aria-orientation={$props.orientation}
+			onfocus={handleFocus}
+		>
+			<:slot />
+		</nav>
+	}
+}

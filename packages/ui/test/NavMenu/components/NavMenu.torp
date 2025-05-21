@@ -1,0 +1,28 @@
+import {
+	NavMenu,
+	NavMenuLink,
+	NavMenuPopout,
+	NavMenuPopoutButton,
+	NavMenuPopoutContent,
+	NavMenuSeparator
+} from "../../../src/NavMenu";
+
+export default function NavMenu($props: any) {
+	@render {
+		<NavMenu ariaLabel="Site navigation">
+			<NavMenuLink href="/">Home</NavMenuLink>
+			<NavMenuLink href="/page1">Page 1</NavMenuLink>
+			<NavMenuSeparator />
+			<NavMenuPopout>
+				<NavMenuPopoutButton>Subpages</NavMenuPopoutButton>
+				<NavMenuPopoutContent>
+					<NavMenu ariaLabel="Sub site navigation" orientation="vertical">
+						<NavMenuLink href="/sub/page1">Subpage 1</NavMenuLink>
+						<NavMenuLink href="/sub/page2">Subpage 2</NavMenuLink>
+						<NavMenuLink href="/sub/page3">Subpage 3</NavMenuLink>
+					</NavMenu>
+				</NavMenuPopoutContent>
+			</NavMenuPopout>
+		</NavMenu>
+	}
+}

@@ -1,0 +1,35 @@
+import {
+	NavMenu,
+	NavMenuLink,
+	NavMenuPopout,
+	NavMenuPopoutButton,
+	NavMenuPopoutContent,
+	NavMenuGroup,
+	NavMenuGroupHeader,
+	NavMenuSeparator
+} from "../../../src/NavMenu";
+
+export default function NavMenuAccessibility($props: any) {
+	@render {
+		<NavMenu ariaLabel="Site navigation">
+			<NavMenuLink href="/">Home</NavMenuLink>
+			<NavMenuLink href="/page1">Page</NavMenuLink>
+			<NavMenuLink href="/disabled" disabled>Disabled</NavMenuLink>
+			<NavMenuSeparator>/</NavMenuSeparator>
+			<NavMenuPopout>
+				<NavMenuPopoutButton>Subpages</NavMenuPopoutButton>
+				<NavMenuPopoutContent>
+					<NavMenu ariaLabel="Sub site navigation" orientation="vertical">
+						<NavMenuLink href="/sub/page1">Subpage 1</NavMenuLink>
+						<NavMenuLink href="/sub/page2">Subpage 2</NavMenuLink>
+						<NavMenuLink href="/sub/page3">Subpage 3</NavMenuLink>
+					</NavMenu>
+				</NavMenuPopoutContent>
+			</NavMenuPopout>
+			<NavMenuGroup>
+				<NavMenuGroupHeader as="h4">Group header</NavMenuGroupHeader>
+				<NavMenuLink href="/grouped-page">Grouped page</NavMenuLink>
+			</NavMenuGroup>
+		</NavMenu>
+	}
+}

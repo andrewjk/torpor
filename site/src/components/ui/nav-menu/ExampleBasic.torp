@@ -1,0 +1,79 @@
+import {
+	NavMenu,
+	NavMenuLink,
+	NavMenuPopout,
+	NavMenuPopoutButton,
+	NavMenuPopoutContent,
+	NavMenuSeparator
+} from '@torpor/ui/NavMenu';
+
+export default function ExampleBasic($props: any) {
+	@render {
+		<NavMenu class="exnavbasic" ariaLabel="Site navigation">
+			<NavMenuLink class="exnavbasic-link" href="/" newWindow>Home</NavMenuLink>
+			<NavMenuLink class="exnavbasic-link" href="https://google.com" newWindow>Google</NavMenuLink>
+			<NavMenuSeparator class="exnavbasic-separator" />
+			<NavMenuPopout>
+				<NavMenuPopoutButton class="exnavbasic-link">Search ▼</NavMenuPopoutButton>
+				<NavMenuPopoutContent class="exnavbasic-link-content">
+					<NavMenu class="exnavbasic-sub-menu" orientation="vertical">
+						<NavMenuLink class="exnavbasic-link" href="https://www.google.com/" newWindow>
+							Google
+						</NavMenuLink>
+						<NavMenuLink class="exnavbasic-link" href="https://www.bing.com/" newWindow>
+							Bing
+						</NavMenuLink>
+						<NavMenuLink class="exnavbasic-link" href="https://duckduckgo.com/" newWindow>
+							DuckDuckGo
+						</NavMenuLink>
+					</NavMenu>
+				</NavMenuPopoutContent>
+			</NavMenuPopout>
+		</NavMenu>
+	}
+
+	@style {
+		:global(.exnavbasic) {
+			display: flex;
+			flex-direction: row;
+		}
+
+		:global(.exnavbasic-link) {
+			all: unset;
+			cursor: default;
+			display: flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		:global(.exnavbasic-link:hover),
+		:global(.exnavbasic-link:focus),
+		:global(.exnavbasic-link:active) {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		:global(.exnavbasic-link-content) {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			min-width: 100px;
+			padding: 5px;
+			position: absolute;
+			z-index: 200;
+		}
+
+		:global(.exnavbasic-sub-menu) {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		:global(.exnavbasic-separator) {
+			border-right: 1px solid gainsboro;
+		}
+	}
+}

@@ -1,0 +1,43 @@
+import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
+
+/**
+ * An element of any type that can be placed in a NavMenu.
+ *
+ * @prop {boolean} disabled -- Whether this button is disabled 
+ * @prop {HTMLElement} element -- An element that can be focused via keyboard navigation
+ */
+export default function NavMenuElement($props: any) {
+	/** Set when the item is disabled */
+	let dataDisabled = $props.disabled || undefined;
+
+	// Get stuff out of the NavMenuContext
+	const menuContext = $context[NavMenuContextName] as NavMenuContext;
+	if (!menuContext) {
+		throw new Error("NavMenuElement must be contained within a NavMenu");
+	}
+	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
+
+	// Register this item with the parent NavMenu and store the index
+	const { index } = registerItem(setFocused);
+
+	function setFocused() {
+		element.focus();
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-nav-menu-div ${$props.class ?? ""}`.trim()}
+			type="div"
+			role="menuitem"
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-disabled={dataDisabled}
+			onkeydown
+			onkeydown={handleItemKey}
+			onclick
+			onfocus={() => handleItemFocus(index)}
+		>
+			<:slot />
+		</div>
+	}
+}

@@ -1,0 +1,30 @@
+import { NavMenuGroupContextName, type NavMenuGroupContext } from "./NavMenuTypes";
+
+/**
+ * A container for a logical group of navigation menu items.
+ *
+ * @prop {string | undefined} ariaLabel -- An ARIA label for describing the group to screen readers 
+ */
+export default function NavMenuGroup($props: any) {
+	let $state = $watch({
+		headerId: ""
+	});
+
+	// Set the context to pass down to items
+	let context: NavMenuGroupContext = {
+		state: $state,
+	};
+	$context[NavMenuGroupContextName] = context;
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-nav-menu-group ${$props.class ?? ""}`.trim()}
+			role="group"
+			aria-label={$props.ariaLabel}
+			aria-labelledby={$state.headerId}
+		>
+			<:slot />
+		</div>
+	}
+}

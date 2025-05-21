@@ -1,0 +1,120 @@
+
+import {
+	NavMenuContextName,
+	NavMenuPopoutContextName,
+	type NavMenuContext,
+	type NavMenuPopoutContext,
+} from "./NavMenuTypes";
+
+/**
+ * A button that is placed in a NavMenu and signals a response by a user.
+ *
+ * @prop {number} hoverDelay -- The delay before showing the popout, in milliseconds
+ * @prop {boolean} disabled -- Whether this button is disabled
+ */
+export default function NavMenuPopoutButton($props: any) {
+	$props.hoverDelay ??= 500;
+
+	/** Set when the item is disabled */
+	let dataDisabled = $props.disabled || undefined;
+
+	let button: HTMLButtonElement;
+	let interval: NodeJS.Timeout | undefined;
+
+	// Get stuff out of the NavMenuContext
+	const menuContext = $context[NavMenuContextName] as NavMenuContext;
+	if (!menuContext) {
+		throw new Error("NavMenuPopoutButton must be contained within a NavMenu");
+	}
+	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
+
+	// Get stuff out of the NavMenuPopoutContext
+	const popoutContext = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
+	if (!popoutContext) {
+		throw new Error("NavMenuPopoutButton must be contained within a NavMenuPopout");
+	}
+	let $state = popoutContext.state;
+
+	// Register this item with the parent NavMenu and store the index
+	const { index } = registerItem(setFocused);
+
+	// TODO: $mount should be run AFTER the button has been set
+	//$mount(() => {
+	//	// Set the anchor element to the button when it exists
+	//	popoutContext.anchorElement = button;
+	//});
+
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		$state.visible = true;
+	}
+
+	function handlePopoutKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Right":
+			case "ArrowRight":
+				// TODO: This should be based on what side the menu shows on
+				e.preventDefault();
+				$state.visible = true;
+				break;
+			default:
+				handleItemKey(e);
+		}
+	}
+
+	function handleMouseEnter() {
+		if ($props.disabled) return;
+
+		// Handle the hover after a delay
+		if (!interval) {
+			interval = setTimeout(() => $state.visible = true, $props.hoverDelay);
+		}
+	}
+
+	function handleMouseLeave() {
+		if ($props.disabled) return;
+
+		// Prevent short hovers or touches from firing the event
+		if (interval) {
+			clearTimeout(interval);
+			interval = undefined;
+		}
+	}
+
+	function handleMouseMove() {
+		if ($props.disabled) return;
+
+		// Reset the interval on mouse move
+		if (interval) {
+			clearTimeout(interval);
+			interval = setTimeout(() => $state.visible = true, $props.hoverDelay);
+		}
+	}
+
+	@render {
+		<button
+			id={$props.id}
+			class={`torp-nav-menu-popout-button ${$props.class ?? ""}`.trim()}
+			type="button"
+			disabled={$props.disabled}
+			role="menuitem"
+			aria-haspopup="true"
+			aria-expanded={$state.visible.toString()}
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-disabled={dataDisabled}
+			onkeydown={handlePopoutKey}
+			onclick={handleClick}
+			onfocus={() => handleItemFocus(index)}
+			onmouseenter={handleMouseEnter}
+			onmouseleave={handleMouseLeave}
+			onmousemove={handleMouseMove}
+			:self={button}
+			:onmount={(el) => popoutContext.anchorElement = el }
+		>
+			<:slot />
+		</button>
+	}
+}

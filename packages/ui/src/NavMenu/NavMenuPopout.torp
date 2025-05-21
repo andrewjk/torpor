@@ -1,0 +1,64 @@
+import { NavMenuPopoutContextName, type NavMenuPopoutContext } from "./NavMenuTypes";
+
+/**
+ * A popout that is attached to a menu button and can be used to show a submenu.
+ *
+ * The structure of a NavMenuPopout is:
+ *
+ * ```
+ * <NavMenuPopout>
+ *     <NavMenuPopoutButton />
+ * 	<NavMenuPopoutContent />
+ * </NavMenuPopout>
+ * ```
+ *
+ * @prop {boolean} visible -- Whether the popout is visible
+ */
+export default function NavMenuPopout($props: any) {
+	$props.visible ??= false;
+
+	let $state = $watch({
+		visible: $props.visible
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: NavMenuPopoutContext = {
+		state: $state,
+	};
+	$context[NavMenuPopoutContextName] = context;
+
+	// Copy props into state whenever they change
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+	});
+
+	// TODO:
+	//context.visible.subscribe((value) => {
+	//	/** Raised when the popout is opened or closed */
+	//	dispatch("toggle", visible);
+	//
+	//	if (value) {
+	//		/** Raised when the popout has opened */
+	//		dispatch("open");
+	//	} else {
+	//		/** Raised when the popout has closed */
+	//		dispatch("close", result);
+	//	}
+	//});
+
+	function handleMouseLeave() {
+		$state.visible = false;
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-nav-menu-popout ${$props.class ?? ""}`.trim()}
+			onmouseleave={handleMouseLeave}
+		>
+			<:slot />
+		</div>
+	}
+}

@@ -17,6 +17,11 @@
 			"import": "./dist/Dialog/index.js",
 			"require": "./dist/Dialog/index.cjs"
 		},
+		"./NavMenu": {
+			"types": "./dist/NavMenu/index.d.ts",
+			"import": "./dist/NavMenu/index.js",
+			"require": "./dist/NavMenu/index.cjs"
+		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js",

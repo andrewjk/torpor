@@ -1,0 +1,67 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../utils/copyCode";
+import ExampleBasic from "./nav-menu/ExampleBasic.torp";
+
+import ExampleBasicCode from "./nav-menu/ExampleBasic.torp?raw";
+
+export default function Component() {
+	@render {
+		<div>
+			<:head>
+				<title>Nav Menu | Torpor</title>
+			</:head>
+
+			<h1>Nav Menu</h1>
+			<p>
+				A list of links for navigating a website.
+			</p>
+			<p>
+				See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/menu/">the WAI ARIA guidelines for Menus</a>.
+			</p>
+			<h2>Structure</h2>
+			<pre><code>{`
+<NavMenu>
+	<NavMenuLink />
+	<NavMenuSeparator /> (optional)
+	<NavMenuPopout /> (optional)
+	...
+</NavMenu>
+`.trim()}</code></pre>
+			<h2>Demo</h2>
+			<TabGroup>
+				<TabList ariaLabel="Example tabs">
+					<TabHeader>
+						<TabTrigger class="example-tab-header">
+							Basic
+						</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>
+					<TabGroup>
+						<TabList ariaLabel="Preview and code tabs">
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Preview</TabTrigger>
+							</TabHeader>
+							<TabHeader>
+								<TabTrigger class="example-tab-header">Code</TabTrigger>
+							</TabHeader>
+						</TabList>
+						<TabContent>
+							<p class="example-preview">
+								<ExampleBasic />
+							</p>
+						</TabContent>
+						<TabContent>
+							<div class="example-code">
+								<button type="button" class="example-copy-button" on:click={copyCode}>
+									Copy to clipboard
+								</button>
+								<pre><code>{ExampleBasicCode.trim()}</code></pre>
+							</div>
+						</TabContent>
+					</TabGroup>
+				</TabContent>
+			</TabGroup>
+		</div>
+	}
+}
