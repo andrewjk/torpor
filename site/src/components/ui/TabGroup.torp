@@ -1,12 +1,12 @@
 import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
 import copyCode from "../../utils/copyCode";
-import ExampleBasic from "./tabgroup/ExampleBasic.torp";
-import ExampleBound from "./tabgroup/ExampleBound.torp";
-import ExampleVertical from "./tabgroup/ExampleVertical.torp";
+import ExampleBasic from "./tab-group/ExampleBasic.torp";
+import ExampleBound from "./tab-group/ExampleBound.torp";
+import ExampleVertical from "./tab-group/ExampleVertical.torp";
 
-import ExampleBasicCode from "./tabgroup/ExampleBasic.torp?raw";
-import ExampleBoundCode from "./tabgroup/ExampleBound.torp?raw";
-import ExampleVerticalCode from "./tabgroup/ExampleVertical.torp?raw";
+import ExampleBasicCode from "./tab-group/ExampleBasic.torp?raw";
+import ExampleBoundCode from "./tab-group/ExampleBound.torp?raw";
+import ExampleVerticalCode from "./tab-group/ExampleVertical.torp?raw";
 
 export default function Component() {
 	@render {
