@@ -35,7 +35,13 @@ async function run() {
 		let relatedFiles = (await fs.readdir(join(sourceFolder, component)))
 			.filter((f) => f.endsWith(".torp") && f !== component)
 			.map((f) => basename(f, ".torp"))
-			.map((f) => distFiles.find((df) => df.startsWith(`${f}-`) && df.endsWith(".torp"))!);
+			.map((f) => {
+				const output = distFiles.find((df) => df.startsWith(`${f}-`) && df.endsWith(".torp"));
+				if (!output) {
+					console.log("FILE NOT FOUND:", f, distFiles);
+				}
+				return output!;
+			});
 		for (let file of relatedFiles) {
 			const newfile = file.substring(0, file.indexOf("-")) + ".torp";
 			await fs.rename(join(distFolder, file), join(distFolder, component, newfile));
