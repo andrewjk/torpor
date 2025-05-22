@@ -35,7 +35,7 @@ export default function Counter(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_button_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLElement;
+	const t_button_1 = t_next(t_child(t_div_1), 3) as HTMLElement;
 	$run(function setTextContent() {
 		t_text_1.textContent = `Counter: ${t_fmt($state.count)}`;
 	});

@@ -28,9 +28,9 @@ export default function UserProfileContext(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> </div>`);
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_text_1 = t_child(t_next(t_next(t_next(t_child(t_div_1)))));
-	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))));
-	const t_button_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))))) as HTMLElement;
+	const t_text_1 = t_child(t_next(t_child(t_div_1), 3));
+	const t_text_2 = t_child(t_next(t_child(t_div_1), 5));
+	const t_button_1 = t_next(t_child(t_div_1), 7) as HTMLElement;
 	$run(function setTextContent() {
 		t_text_1.textContent = `Username: ${t_fmt($context.user.username)}`;
 	});

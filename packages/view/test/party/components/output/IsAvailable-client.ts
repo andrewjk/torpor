@@ -31,7 +31,7 @@ export default function IsAvailable(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_input_1 = t_next(t_next(t_next(t_child(t_div_1)))) as HTMLInputElement;
+	const t_input_1 = t_next(t_child(t_div_1), 3) as HTMLInputElement;
 	$run(function setTextContent() {
 		t_text_1.textContent = t_fmt($state.isAvailable ? "Available" : "Not available");
 	});

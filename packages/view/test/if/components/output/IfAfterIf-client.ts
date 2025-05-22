@@ -38,7 +38,7 @@ export default function IfAfterIf(
 				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
 				// @ts-ignore
-				const t_text_1 = t_next(t_next(t_root_1));
+				const t_text_1 = t_next(t_root_1, 2);
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
 				t_next(t_text_1);
 			});
@@ -49,7 +49,7 @@ export default function IfAfterIf(
 		}
 	});
 
-	const t_if_anchor_2 = t_anchor(t_next(t_next(t_if_anchor_1))) as HTMLElement;
+	const t_if_anchor_2 = t_anchor(t_next(t_if_anchor_1, 2)) as HTMLElement;
 
 	/* @if */
 	const t_if_range_2 = t_range();
@@ -60,7 +60,7 @@ export default function IfAfterIf(
 				// @ts-ignore
 				const t_root_2 = t_root(t_fragment_2);
 				// @ts-ignore
-				const t_text_2 = t_next(t_next(t_root_2));
+				const t_text_2 = t_next(t_root_2, 2);
 				t_add_fragment(t_fragment_2, t_div_1, t_before);
 				t_next(t_text_2);
 			});

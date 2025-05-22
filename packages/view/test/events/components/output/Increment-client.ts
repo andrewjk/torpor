@@ -33,8 +33,8 @@ export default function Increment(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
-	const t_button_2 = t_next(t_next(t_button_1)) as HTMLElement;
-	const t_text_1 = t_child(t_next(t_next(t_button_2)));
+	const t_button_2 = t_next(t_button_1, 2) as HTMLElement;
+	const t_text_1 = t_child(t_next(t_button_2, 2));
 	t_event(t_button_1, "click", increment);
 	t_event(t_button_2, "click", (e) => increment(e, 5));
 	$run(function setTextContent() {

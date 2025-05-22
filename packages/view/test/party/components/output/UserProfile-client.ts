@@ -31,9 +31,9 @@ export default function UserProfile(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_text_2 = t_child(t_next(t_next(t_next(t_child(t_div_1)))));
-	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))));
-	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))))));
+	const t_text_2 = t_child(t_next(t_child(t_div_1), 3));
+	const t_text_3 = t_child(t_next(t_child(t_div_1), 5));
+	const t_text_4 = t_child(t_next(t_child(t_div_1), 7));
 	$run(function setTextContent() {
 		t_text_1.textContent = `My name is ${t_fmt($props.name)}!`;
 	});

@@ -59,10 +59,10 @@ export default function ForEscape(
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
-			const t_div_1 = t_next(t_next(t_next(t_root_1))) as HTMLDivElement;
-			const t_div_2 = t_next(t_next(t_div_1)) as HTMLDivElement;
-			const t_div_3 = t_next(t_next(t_div_2)) as HTMLDivElement;
-			const t_input_1 = t_next(t_next(t_div_3)) as HTMLInputElement;
+			const t_div_1 = t_next(t_root_1, 3) as HTMLDivElement;
+			const t_div_2 = t_next(t_div_1, 2) as HTMLDivElement;
+			const t_div_3 = t_next(t_div_2, 2) as HTMLDivElement;
+			const t_input_1 = t_next(t_div_3, 2) as HTMLInputElement;
 			// @ts-ignore
 			const t_text_2 = t_next(t_input_1);
 			$run(function setTextContent() {

@@ -696,10 +696,36 @@ function getFragmentVarPath(
 	if (name !== "?") {
 		// Add the path, so that we can shorten subsequent paths e.g.
 		// const div = t_next(t_child(root));
-		// const p = t_next(t_next(t_next(t_child(root)))) => t_next(t_next(div))
+		// const p = t_next(t_next(t_next(t_child(root))))
+		// => const p = t_next(t_next(div))
 		varPaths.set(varPath, name);
 		// Add the name, so that we are always using the last declared name
 		varPaths.set(name, name);
+	}
+
+	// Shorten `t_next(t_next(x))` to `t_next(x, 2)`
+	while (varPath.includes("t_next(t_next(")) {
+		const match = varPath.match(/(t_next\(){2,}/)![0];
+		const count = match.length / "t_next(".length;
+		const pos = varPath.indexOf("t_next(t_next(");
+		const head = varPath.substring(0, pos);
+		let level = 0;
+		let end = 0;
+		for (let i = pos + match.length; i < varPath.length; i++) {
+			if (varPath[i] === "(") {
+				level++;
+			} else if (varPath[i] === ")") {
+				if (level === 0) {
+					end = i;
+					break;
+				} else {
+					level--;
+				}
+			}
+		}
+		const tail = varPath.substring(end + count);
+		const param = varPath.substring(pos + match.length, end);
+		varPath = `${head}t_next(${param}, ${count})${tail}`;
 	}
 
 	return varPath;
@@ -721,7 +747,17 @@ function getFragmentVarPathPart(
 	for (let [i, child] of path.children.entries()) {
 		if (i > 0) {
 			status.imports.add("t_next");
+			//if (varPath.startsWith("t_next")) {
+			//	const match = varPath.match(/t_next\(.+?, (\d+)\)/);
+			//	if (match) {
+			//		const count = parseInt(match[1]) + 1;
+			//		varPath = varPath.replace(/t_next\((.+), \d+\)/, `t_next($1, ${count})`);
+			//	} else {
+			//		varPath = varPath.replace(/t_next\((.+)\)/, `t_next($1, 2)`);
+			//	}
+			//} else {
 			varPath = `t_next(${varPath})`;
+			//}
 		}
 
 		if (i === path.children.length - 1 && child.children.length) {

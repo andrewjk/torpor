@@ -32,7 +32,7 @@ export default function Text(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_text_2 = t_child(t_next(t_next(t_next(t_child(t_div_1)))));
+	const t_text_2 = t_child(t_next(t_child(t_div_1), 3));
 	$run(function setTextContent() {
 		t_text_1.textContent = ` ${t_fmt($props.value)} `;
 	});

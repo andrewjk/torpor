@@ -40,7 +40,7 @@ export default function BindComponent(
 		$state.name = t_props_1["name"];
 	});
 	BindText(t_div_1, t_comp_anchor_1, t_props_1, $context);
-	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1)));
+	const t_text_1 = t_child(t_next(t_comp_anchor_1, 2));
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 	});

@@ -29,7 +29,7 @@ export default function Reactive(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1))) as HTMLElement;
+	const t_comp_anchor_1 = t_anchor(t_next(t_button_1, 2)) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});

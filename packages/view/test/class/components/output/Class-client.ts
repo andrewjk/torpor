@@ -25,11 +25,11 @@ export default function Class(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div class="torp-1ljxz83"> <div id="divid" class="torp-1ljxz83"> From id </div> <div class="divclass torp-1ljxz83"> From string </div> <a class="torp-1ljxz83"> From state </a> <div class="torp-1ljxz83"> From state with scope </div> <div class="torp-1ljxz83"> Class object </div> <div class="torp-1ljxz83"> Class array </div> <div class="torp-1ljxz83"> Class nested </div> </div>`);
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_a_1 = t_next(t_next(t_next(t_next(t_next(t_child(t_div_1)))))) as HTMLElement;
-	const t_div_2 = t_next(t_next(t_a_1)) as HTMLDivElement;
-	const t_div_3 = t_next(t_next(t_div_2)) as HTMLDivElement;
-	const t_div_4 = t_next(t_next(t_div_3)) as HTMLDivElement;
-	const t_div_5 = t_next(t_next(t_div_4)) as HTMLDivElement;
+	const t_a_1 = t_next(t_child(t_div_1), 5) as HTMLElement;
+	const t_div_2 = t_next(t_a_1, 2) as HTMLDivElement;
+	const t_div_3 = t_next(t_div_2, 2) as HTMLDivElement;
+	const t_div_4 = t_next(t_div_3, 2) as HTMLDivElement;
+	const t_div_5 = t_next(t_div_4, 2) as HTMLDivElement;
 	$run(function setClasses() {
 		t_a_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
 	});

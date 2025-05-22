@@ -27,11 +27,11 @@ export default function Article(
 	if ($slots && $slots["header"]) {
 		$slots["header"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
 	}
-	const t_slot_anchor_2 = t_anchor(t_next(t_next(t_slot_parent_1))) as HTMLElement;
+	const t_slot_anchor_2 = t_anchor(t_next(t_slot_parent_1, 2)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_section_1, t_slot_anchor_2, undefined, $context)
 	}
-	const t_slot_anchor_3 = t_anchor(t_next(t_next(t_slot_anchor_2))) as HTMLElement;
+	const t_slot_anchor_3 = t_anchor(t_next(t_slot_anchor_2, 2)) as HTMLElement;
 	if ($slots && $slots["footer"]) {
 		$slots["footer"](t_section_1, t_slot_anchor_3, undefined, $context)
 	}

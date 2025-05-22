@@ -57,7 +57,7 @@ export default function ForIn(
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
 			// @ts-ignore
-			const t_text_2 = t_next(t_next(t_root_1));
+			const t_text_2 = t_next(t_root_1, 2);
 			$run(function setTextContent() {
 				t_text_1.textContent = ` ${t_fmt($props.item[t_item.data.key])} `;
 			});

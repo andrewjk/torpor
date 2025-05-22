@@ -39,7 +39,7 @@ export default function UserProfileContextApp(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_div_1))))) as HTMLElement;
+	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1), 3)) as HTMLElement;
 
 	/* @component */
 	UserProfileContext(t_div_1, t_comp_anchor_1, undefined, $context);

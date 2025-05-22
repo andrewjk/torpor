@@ -38,7 +38,7 @@ export default function IfElseIf(
 				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
 				// @ts-ignore
-				const t_text_1 = t_next(t_next(t_root_1));
+				const t_text_1 = t_next(t_root_1, 2);
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
 				t_next(t_text_1);
 			});
@@ -49,7 +49,7 @@ export default function IfElseIf(
 				// @ts-ignore
 				const t_root_2 = t_root(t_fragment_2);
 				// @ts-ignore
-				const t_text_2 = t_next(t_next(t_root_2));
+				const t_text_2 = t_next(t_root_2, 2);
 				t_add_fragment(t_fragment_2, t_div_1, t_before);
 				t_next(t_text_2);
 			});
@@ -60,7 +60,7 @@ export default function IfElseIf(
 				// @ts-ignore
 				const t_root_3 = t_root(t_fragment_3);
 				// @ts-ignore
-				const t_text_3 = t_next(t_next(t_root_3));
+				const t_text_3 = t_next(t_root_3, 2);
 				t_add_fragment(t_fragment_3, t_div_1, t_before);
 				t_next(t_text_3);
 			});

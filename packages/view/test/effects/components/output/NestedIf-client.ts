@@ -48,7 +48,7 @@ export default function NestedIf(
 							// @ts-ignore
 							const t_root_2 = t_root(t_fragment_2);
 							// @ts-ignore
-							const t_text_1 = t_next(t_next(t_root_2));
+							const t_text_1 = t_next(t_root_2, 2);
 							t_add_fragment(t_fragment_2, t_fragment_1, t_before);
 							t_next(t_text_1);
 						});
@@ -59,7 +59,7 @@ export default function NestedIf(
 							// @ts-ignore
 							const t_root_3 = t_root(t_fragment_3);
 							// @ts-ignore
-							const t_text_2 = t_next(t_next(t_root_3));
+							const t_text_2 = t_next(t_root_3, 2);
 							t_add_fragment(t_fragment_3, t_fragment_1, t_before);
 							t_next(t_text_2);
 						});

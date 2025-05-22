@@ -32,7 +32,7 @@ export default function Array(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section> <p>^</p> <!> <p>$</p> </section>`);
 	// @ts-ignore
 	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
-	const t_for_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_section_1))))) as HTMLElement;
+	const t_for_anchor_1 = t_anchor(t_next(t_child(t_section_1), 3)) as HTMLElement;
 
 	/* @for */
 	let t_for_range_1 = t_range();
@@ -58,7 +58,7 @@ export default function Array(
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_next(t_root_1));
 			// @ts-ignore
-			const t_text_2 = t_next(t_next(t_root_1));
+			const t_text_2 = t_next(t_root_1, 2);
 			$run(function setTextContent() {
 				t_text_1.textContent = ` ${t_fmt(t_item.data.item.text)} `;
 			});

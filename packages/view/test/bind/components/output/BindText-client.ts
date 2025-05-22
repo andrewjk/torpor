@@ -29,9 +29,9 @@ export default function BindText(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_input_1 = t_next(t_child(t_div_1)) as HTMLInputElement;
-	const t_select_1 = t_next(t_next(t_input_1)) as HTMLElement;
-	const t_text_1 = t_child(t_next(t_next(t_select_1)));
-	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_select_1)))));
+	const t_select_1 = t_next(t_input_1, 2) as HTMLElement;
+	const t_text_1 = t_child(t_next(t_select_1, 2));
+	const t_text_2 = t_child(t_next(t_select_1, 4));
 	$run(function setBinding() {
 		t_input_1.value = $state.name || "";
 	});

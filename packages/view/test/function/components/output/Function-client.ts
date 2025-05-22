@@ -29,7 +29,7 @@ export default function Function(
 	// @ts-ignore
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
-	const t_text_1 = t_child(t_next(t_next(t_button_1)));
+	const t_text_1 = t_child(t_next(t_button_1, 2));
 	t_event(t_button_1, "click", increment);
 
 	/* @function */

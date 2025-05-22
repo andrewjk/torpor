@@ -62,7 +62,7 @@ export default function Await(
 				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
 				// @ts-ignore
-				const t_text_1 = t_next(t_next(t_root_1));
+				const t_text_1 = t_next(t_root_1, 2);
 				t_add_fragment(t_fragment_1, t_div_1, t_before);
 				t_next(t_text_1);
 			});
@@ -76,7 +76,7 @@ export default function Await(
 							// @ts-ignore
 							const t_root_2 = t_root(t_fragment_2);
 							// @ts-ignore
-							const t_text_2 = t_next(t_next(t_root_2));
+							const t_text_2 = t_next(t_root_2, 2);
 							t_add_fragment(t_fragment_2, t_div_1, t_before);
 							t_next(t_text_2);
 						});
@@ -92,7 +92,7 @@ export default function Await(
 							const t_root_3 = t_root(t_fragment_3);
 							const t_text_3 = t_child(t_next(t_root_3));
 							// @ts-ignore
-							const t_text_4 = t_next(t_next(t_root_3));
+							const t_text_4 = t_next(t_root_3, 2);
 							$run(function setTextContent() {
 								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
 							});
@@ -105,7 +105,7 @@ export default function Await(
 			})(t_await_token_1);
 		});
 
-		const t_button_1 = t_next(t_next(t_await_anchor_1)) as HTMLElement;
+		const t_button_1 = t_next(t_await_anchor_1, 2) as HTMLElement;
 		t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));
 		t_add_fragment(t_fragment_0, $parent, $anchor);
 		t_next(t_div_1);

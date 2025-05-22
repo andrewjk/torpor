@@ -29,7 +29,7 @@ export default function FunnyButtonApp(
 
 	/* @component */
 	FunnyButton(t_div_1, t_comp_anchor_1, undefined, $context);
-	const t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1))) as HTMLElement;
+	const t_comp_anchor_2 = t_anchor(t_next(t_comp_anchor_1, 2)) as HTMLElement;
 
 	/* @component */
 	const t_slots_1: Record<string, SlotRender> = {};
