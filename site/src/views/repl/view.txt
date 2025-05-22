@@ -438,8 +438,16 @@ function isComment(node) {
 }
 
 // src/render/nodeNext.ts
-function nodeNext(node) {
-  let nextNode = node.nextSibling;
+function nodeNext(node, count) {
+  let nextNode = checkHydrationNode(node.nextSibling);
+  if (count) {
+    for (let i = 1; i < count; i++) {
+      nextNode = checkHydrationNode(nextNode.nextSibling);
+    }
+  }
+  return nextNode;
+}
+function checkHydrationNode(nextNode) {
   if (context_default.hydrationNode) {
     if (nextNode && isComment(nextNode) && nextNode.data === HYDRATION_BRANCH) {
       let comment = nextNode;

@@ -1,4 +1,4 @@
-import component from "@/components/docs/Comparisons.torp";
+import component from "@/views/docs/Comparisons.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {

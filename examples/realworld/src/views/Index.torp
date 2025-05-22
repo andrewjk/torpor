@@ -1,6 +1,6 @@
 import { $page } from "@torpor/build/state";
-import ArticleList from "@/components/article/ArticleList.torp";
-import Pagination from "@/components/Pagination.torp";
+import ArticleList from "@/views/article/ArticleList.torp";
+import Pagination from "@/views/Pagination.torp";
 
 export default function Index() {
 	let $state = $watch({

@@ -1,4 +1,4 @@
-import ArticleList from "@/components/article/ArticleList.torp";
+import ArticleList from "@/views/article/ArticleList.torp";
 
 export default function Profile() {
 	@render {

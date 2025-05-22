@@ -1,5 +1,5 @@
 import { $page, $navigation } from "@torpor/build/state";
-import PreloadingIndicator from "@/components/PreloadingIndicator.torp";
+import PreloadingIndicator from "@/views/PreloadingIndicator.torp";
 
 export default function Layout() {
 	@render {

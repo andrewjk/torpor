@@ -27,7 +27,7 @@ async function run() {
 		.replaceAll(/^import ".\/chunk-(.+?).js";/gms, "")
 		.replaceAll(/\/\/# sourceMappingURL=(.+?).js.map/g, "");
 
-	const destFile = "../../site/src/components/repl/view.txt";
+	const destFile = "../../site/src/views/repl/view.txt";
 	await fs.writeFile(destFile, source);
 }
 

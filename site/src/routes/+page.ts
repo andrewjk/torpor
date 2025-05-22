@@ -1,4 +1,4 @@
-import component from "@/components/Home.torp";
+import component from "@/views/Home.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {
