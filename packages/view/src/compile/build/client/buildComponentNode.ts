@@ -39,6 +39,16 @@ export default function buildComponentNode(
 				// It's a shortcut attribute
 				name = name.substring(1, name.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${name};`, status, b);
+			} else if (name.startsWith("&") && value != null && isFullyReactive(value)) {
+				// It's a bound property
+				// Add two $runs -- one to update the props, and one to update the value
+				// The component author will need to make sure $props.x is updated
+				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
+				// e.g. Component($props: { text: Bindable<string> })
+				name = name.substring(1);
+				value = value.substring(1, value.length - 1);
+				buildRun("setProp", `${propsName}["${name}"] = ${value};`, status, b);
+				buildRun("setBinding", `${value} = ${propsName}["${name}"];`, status, b);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);
