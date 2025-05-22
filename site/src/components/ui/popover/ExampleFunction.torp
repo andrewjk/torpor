@@ -16,7 +16,7 @@ export default function ExampleFunction($props: any) {
 			</p>
 
 			<p>
-				<button type="button" onclick={show} :self={button}>Show a popover</button>
+				<button type="button" onclick={show} &ref={button}>Show a popover</button>
 			</p>
 		</div>
 	}

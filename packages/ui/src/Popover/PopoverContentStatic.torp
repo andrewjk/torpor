@@ -68,7 +68,7 @@ export default function PopoverContentStatic($props: any) {
 				<div
 					id={$props.id}
 					class={`torp-popover-content-static ${$props.class ?? ""}`.trim()}
-					:self={div}
+					&ref={div}
 				>
 					<:slot />
 				</div>

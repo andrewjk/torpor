@@ -35,7 +35,7 @@ export default function Component() {
 				of $state.name is changed. $state.name has an initial value which is shown in the
 				input and welcome message but is not updated when the input's value is changed. To
 				update $state.name when the input value is changed, you can use the special
-				<code>:value</code> attribute:
+				<code>&value</code> attribute:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -45,7 +45,7 @@ export default function Component() {
 		<div>
 			<p>
 				@// Here:
-				Your name: <input :value={$state.name}>
+				Your name: <input &value={$state.name}>
 			</p>
 			<p>
 				Welcome, {$state.name}!
@@ -60,14 +60,14 @@ export default function Component() {
 			
 			<h2>Input types</h2>
 			<p>
-				Binding works with inputs and the <code>:value</code>, <code>:checked</code>
-				and <code>:group</code> attributes.
+				Binding works with inputs and the <code>&value</code>, <code>&checked</code>
+				and <code>&group</code> attributes.
 			</p>
 
 			<h2>Element binding</h2>
 			<p>
 				Another use for binding is for storing a DOM element in a variable, which is
-				done by adding a <code>:self</code> attribute:
+				done by adding a <code>&ref</code> attribute:
 			</p>
 			<pre><code>{`
 export default function Component() {
@@ -78,7 +78,7 @@ export default function Component() {
 	})
 
 	@render {
-		<p :self={para}>
+		<p &ref={para}>
 			Welcome!
 		</p>
 	}
@@ -104,7 +104,7 @@ export default function Component() {
 	@render {
 		<div>
 			<p>
-				Your name: <input :value={$state.name}>
+				Your name: <input &value={$state.name}>
 			</p>
 			<p>
 				Welcome, {$state.name}!

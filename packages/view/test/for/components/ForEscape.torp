@@ -7,7 +7,7 @@ export default function ForEscape() {
 				<div data-testid="input1-{i}" name={i} />
 				<div data-testid="input2-{i}" name="{i}" />
 				<div data-testid="input3-{i}" name={things[i]} />
-				<input :value={i} name="{i}" />
+				<input &value={i} name="{i}" />
 			}
 		</section>
 	}

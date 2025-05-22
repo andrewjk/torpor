@@ -55,7 +55,7 @@ export default function TabTrigger() {
 			data-state={$state.dataState}
 			data-disabled={$state.disabled}
 			data-orientation={$state.orientation}
-			:self={button}
+			&ref={button}
 			onclick={handleClick}
 			onkeydown={handleKey}
 		>

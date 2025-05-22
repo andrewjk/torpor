@@ -14,7 +14,7 @@ export default function ColorSelect() {
 		<div>
 			<div>Selected: {colors[$state.selectedColorId - 1].text}</div>
 
-			<select :value={$state.selectedColorId}>
+			<select &value={$state.selectedColorId}>
 				@for (let color of colors) {
 					<option value={color.id} disabled={color.isDisabled}>
 						{color.text}

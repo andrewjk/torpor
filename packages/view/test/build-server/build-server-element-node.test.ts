@@ -35,7 +35,7 @@ export default function Component() {
 		<p>
 			<input value='some "text"'>
 			<input value={value}>
-			<input :value={value}>
+			<input &value={value}>
 			<input {value}>
 			<input value={value + " extra"}>
 			<input value="{value} extra">

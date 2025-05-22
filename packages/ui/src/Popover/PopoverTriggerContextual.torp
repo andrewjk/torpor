@@ -29,7 +29,7 @@ export default function PopoverTriggerContextual($props: any) {
 			id={$props.id}
 			class={`torp-popover-trigger-contextual ${$props.class ?? ""}`.trim()}
 			oncontextmenu={handleContextual}
-			:self={context.anchorElement}
+			&ref={context.anchorElement}
 		>
 			<:slot />
 		</div>

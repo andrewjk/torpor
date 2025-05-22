@@ -70,7 +70,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
 
-			if (name === ":self" || name === ":value" || name === ":checked" || name === ":group") {
+			if (name === "&ref" || name === "&value" || name === "&checked" || name === "&group") {
 				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
 				if (typeAttribute && typeAttribute.value) {

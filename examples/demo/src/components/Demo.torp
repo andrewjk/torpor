@@ -119,10 +119,10 @@ export default function Index($props: { name: string }) {
 			</div>
 
 			<h2>Two way binding</h2>	
-			<p>Two way binding can be accomplished with :value (or :checked etc).</p>
+			<p>Two way binding can be accomplished with &value (or &checked etc).</p>
 			<div class="demo">
 				<p>
-					Count: <input type="number" :value={$state.count} />
+					Count: <input type="number" &value={$state.count} />
 				</p>
 			</div>
 
@@ -168,7 +168,7 @@ export default function Index($props: { name: string }) {
 function TaskItem() {
 	@render {
 		<li :class={{ done: $props.task.done }}>
-			<input type="checkbox" :checked={$props.task.done} />
+			<input type="checkbox" &checked={$props.task.done} />
 			{$props.task.text}
 		</li>
 	}

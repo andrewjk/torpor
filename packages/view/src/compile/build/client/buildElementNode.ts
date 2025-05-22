@@ -185,17 +185,17 @@ function buildElementAttributes(
 				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 			}
 
-			if (name === ":self") {
+			if (name === "&ref") {
 				// Bind the DOM element to a user-defined variable
 				b.append(`${value} = ${varName};`);
-			} else if (name === ":group") {
+			} else if (name === "&group") {
 				buildBindGroupAttribute(node, varName, value, status, b);
-			} else if (name === ":value" || name === ":checked") {
+			} else if (name === "&value" || name === "&checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
 			} else if (name === ":onmount") {
-				// The :onmount event is faked by us by creating a $run. This also
-				// means that you can have unmount functionality by returning a
-				// cleanup function
+				// The :onmount event is faked by us by creating a $mount. This
+				// also means that you can have unmount functionality by
+				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
 				buildEventAttribute(varName, name, value, status, b);

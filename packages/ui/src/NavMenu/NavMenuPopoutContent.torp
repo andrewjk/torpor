@@ -68,7 +68,7 @@ export default function NavMenuPopoutContent($props: any) {
 				<div
 					id={$props.id}
 					class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
-					:self={div}
+					&ref={div}
 					:onmount={(el) => setPopoverPosition(context.anchorElement, el, $props.side, $props.alignment)}
 				>
 					<:slot />

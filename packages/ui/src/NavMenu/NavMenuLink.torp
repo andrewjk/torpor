@@ -44,7 +44,7 @@ export default function NavMenuLink($props: any) {
 			onkeydown={handleItemKey}
 			onclick
 			onfocus={() => handleItemFocus(index)}
-			:self={link}
+			&ref={link}
 		>
 			<:slot />
 		</a>

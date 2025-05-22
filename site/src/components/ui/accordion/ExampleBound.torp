@@ -11,9 +11,9 @@ export default function ExampleBound($props: any) {
 
 	@render {
 		<div>
-			<p>Value: <input type="number" :value={$state.value} /></p>
+			<p>Value: <input type="number" &value={$state.value} /></p>
 
-			<Accordion class="exaccbound" :value={$state.value}>
+			<Accordion class="exaccbound" &value={$state.value}>
 				<AccordionItem class="exaccbound-item">
 					<AccordionHeader as="h4">
 						<AccordionTrigger class="exaccbound-trigger">Item 1</AccordionTrigger>

@@ -23,7 +23,7 @@ export default function PromptDialog($props: any) {
 						<DialogBody>
 							<p>{$props.text}</p>
 							<p>
-								<input class="prompt-dialog-input" type="text" :value={$state.value} />
+								<input class="prompt-dialog-input" type="text" &value={$state.value} />
 							</p>
 						</DialogBody>
 					}

@@ -49,7 +49,7 @@ export default function AccordionTrigger() {
 			aria-controls={$state.contentId}
 			data-state={$state.dataState}
 			data-disabled={$state.disabled}
-			:self={button}
+			&ref={button}
 			onclick={handleClick}
 			onkeydown={handleKey}
 		>

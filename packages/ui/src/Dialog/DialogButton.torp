@@ -40,7 +40,7 @@ export default function DialogButton($props: any) {
 			class={`torp-dialog-button ${$props.class ?? ""}`.trim()}
 			disabled={$props.disabled}
 			onclick={handleClick}
-			:self={button}
+			&ref={button}
 		>
 			<:slot />
 		</button>

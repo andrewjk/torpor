@@ -88,7 +88,7 @@ export default function PopoverContentContextual($props: any) {
 				<div
 					id={$props.id}
 					class={`torp-popover-content-contextual ${$props.class ?? ""}`.trim()}
-					:self={div}
+					&ref={div}
 					:onmount={(el) => setContextPosition(context.anchorElement, el, $state.position)}
 				>
 					<:slot />

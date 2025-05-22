@@ -21,7 +21,7 @@ export default function PopoverTrigger($props: any) {
 			id={$props.id}
 			class={`torp-popover-trigger ${$props.class ?? ""}`.trim()}
 			onclick={handleClick}
-			:self={context.anchorElement}
+			&ref={context.anchorElement}
 		>
 			<:slot />
 		</button>

@@ -111,7 +111,7 @@ export default function NavMenuPopoutButton($props: any) {
 			onmouseenter={handleMouseEnter}
 			onmouseleave={handleMouseLeave}
 			onmousemove={handleMouseMove}
-			:self={button}
+			&ref={button}
 			:onmount={(el) => popoutContext.anchorElement = el }
 		>
 			<:slot />

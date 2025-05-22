@@ -10,7 +10,7 @@ export default function ExampleVariable($props: any) {
 		<div>
 			<p>The button below shows an inline popover component, using a variable.</p>
 
-			<button type="button" :self={button} onclick={() => ($state.showPopover = !$state.showPopover)}>
+			<button type="button" &ref={button} onclick={() => ($state.showPopover = !$state.showPopover)}>
 				Show a popover
 			</button>
 

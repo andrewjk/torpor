@@ -22,7 +22,7 @@ export default function PopoverTriggerHover($props: any) {
 			id={$props.id}
 			class={`torp-popover-trigger-hover ${$props.class ?? ""}`.trim()}
 			:onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
-			:self={context.anchorElement}
+			&ref={context.anchorElement}
 		>
 			<:slot />
 		</div>

@@ -38,7 +38,7 @@ export default function NavMenuButton($props: any) {
 			onkeydown={handleItemKey}
 			onclick
 			onfocus={() => handleItemFocus(index)}
-			:self={button}
+			&ref={button}
 		>
 			<:slot />
 		</button>

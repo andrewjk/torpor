@@ -3,8 +3,8 @@ export default function BindText() {
 
 	@render {
 		<div>
-			<input :value={$state.name} />
-			<select :value={$state.selected}>
+			<input &value={$state.name} />
+			<select &value={$state.selected}>
 				<option value=0>First</option>
 				<option value=1>Second</option>
 				<option value=2>Third</option>

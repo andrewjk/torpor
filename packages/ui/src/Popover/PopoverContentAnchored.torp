@@ -96,7 +96,7 @@ export default function PopoverContentAnchored($props: any) {
 				<div
 					id={$props.id}
 					class={`torp-popover-content-anchored ${$props.class ?? ""}`.trim()}
-					:self={div}
+					&ref={div}
 					:onmount={(el) => setPopoverPosition(context.anchorElement, el, $props.side, $props.alignment)}
 				>
 					<:slot />
