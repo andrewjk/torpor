@@ -19,7 +19,7 @@ export default function InputFocused(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input self="${t_attr(inputElement) || ""}">`;
+	$output += `<input ref="${t_attr(inputElement) || ""}">`;
 
 	return $output;
 }

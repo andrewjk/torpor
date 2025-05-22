@@ -58,7 +58,7 @@ function BindText(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
+	$props ??= $watch({});
 
 	//let $state = $watch({
 		//	text: $props.name

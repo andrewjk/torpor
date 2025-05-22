@@ -21,7 +21,7 @@ export default function Component(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
+	$props ??= $watch({});
 
 	let components = {
 		BigTitle,

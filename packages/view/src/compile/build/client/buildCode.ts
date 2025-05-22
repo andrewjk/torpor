@@ -95,7 +95,8 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 
 			// Make sure we've got $props if we're going to be using it
 			if (current.props?.length) {
-				b.append(`$props ??= {};`);
+				imports.add("$watch");
+				b.append(`$props ??= $watch({});`);
 			}
 
 			// Redefine $context so that any newly added properties will only be passed to children

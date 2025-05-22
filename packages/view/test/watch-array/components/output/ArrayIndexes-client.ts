@@ -1,4 +1,5 @@
 import $run from "../../../../src/render/$run";
+import $watch from "../../../../src/render/$watch";
 import { type ListItem } from "../../../../src/types/ListItem";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -23,7 +24,7 @@ export default function ArrayIndexes(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
+	$props ??= $watch({});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

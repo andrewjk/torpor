@@ -46,7 +46,7 @@ function Child(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ) {
-	$props ??= {};
+	$props ??= $watch({});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
