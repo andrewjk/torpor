@@ -26,24 +26,6 @@ export default function Popover($props: any) {
 		position: { x: 0, y: 0 }
 	})
 
-	// Copy props into state whenever they change
-	$run(() => {
-		$state.visible = $props.visible ?? false;
-		$state.position = $props.position ?? { x: 0, y: 0 };
-	})
-
-	let first = true;
-	$run(() => {
-		let visible = $state.visible;
-
-		if (first) {
-			first = false;
-			return;
-		}
-
-		dispatchEvents(visible);
-	});
-
 	let result: any;
 
 	// Set the context to pass down to items
@@ -56,19 +38,30 @@ export default function Popover($props: any) {
 	};
 	$context[PopoverContextName] = context;
 
-	// TODO:
-	function dispatchEvents() {
-		/** Raised when the popover is opened or closed */
-		//dispatch("toggle", $state.visible);
-	
-		//if ($state.visible) {
-		//	/** Raised when the popover has opened */
-		//	dispatch("open");
-		//} else {
-		//	/** Raised when the popover has closed */
-		//	dispatch("close", result);
-		//}
-	}
+	// Copy props into state whenever they change
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+		$state.position = $props.position ?? { x: 0, y: 0 };
+	})
+
+	// Dispatch the toggle event when the popout is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
 
 	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
 		// Get the button's result

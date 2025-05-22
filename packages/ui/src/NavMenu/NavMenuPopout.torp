@@ -34,19 +34,24 @@ export default function NavMenuPopout($props: any) {
 		$state.visible = $props.visible ?? false;
 	});
 
-	// TODO:
-	//context.visible.subscribe((value) => {
-	//	/** Raised when the popout is opened or closed */
-	//	dispatch("toggle", visible);
-	//
-	//	if (value) {
-	//		/** Raised when the popout has opened */
-	//		dispatch("open");
-	//	} else {
-	//		/** Raised when the popout has closed */
-	//		dispatch("close", result);
-	//	}
-	//});
+	// Dispatch the toggle event when the popout is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $props.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
 
 	function handleMouseLeave() {
 		$state.visible = false;

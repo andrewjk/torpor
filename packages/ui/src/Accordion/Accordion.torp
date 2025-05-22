@@ -77,12 +77,16 @@ export default function Accordion($props: any) {
 	});
 
 	// Dispatch the change event when the value changes
-	// TODO: Should this be a setter instead?
+	let firstChange = true;
 	$run(() => {
-		if ($props.onchange) {
-			$props.onchange($props.value);
+		const ev = $props.onchange;
+		const value = $props.value;
+		if (firstChange) {
+			firstChange = false;
+		} else if (ev) {
+			ev(value);
 		}
-	})
+	});
 
 	function registerItem(itemState: ItemState) {
 		// If an index wasn't set for the item, set it automatically

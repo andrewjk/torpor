@@ -56,12 +56,16 @@ export default function AccordionItem($props: any) {
 	});
 
 	// Dispatch the toggle event when the value of expanded changes
-	// TODO: Should this be a setter instead?
+	let firstToggle = true;
 	$run(() => {
-		if ($props.ontoggle) {
-			$props.ontoggle($state.expanded);
+		const ev = $props.ontoggle;
+		const expanded = $state.expanded;
+		if (firstToggle) {
+			firstToggle = false;
+		} else if (ev) {
+			ev(expanded);
 		}
-	})
+	});
 
 	@render {
 		<div
