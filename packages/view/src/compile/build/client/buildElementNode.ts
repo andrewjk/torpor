@@ -139,8 +139,11 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	for (let { name, value } of node.attributes) {
 		if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
+			// It could be e.g. {width} or it could be {$state.width}, but
+			// in either case we set the value of the width property
 			name = name.substring(1, name.length - 1);
-			buildRun("setAttribute", `t_head_el.setAttribute("${name}", ${name});`, status, b);
+			const propName = name.split(".").at(-1);
+			buildRun("setAttribute", `t_head_el.setAttribute("${propName}", ${name});`, status, b);
 		} else if (value != null && isReactive(value)) {
 			// It's a reactive attribute
 			if (isFullyReactive(value)) {
@@ -175,8 +178,11 @@ function buildElementAttributes(
 			// Ignore this special attribute
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
+			// It could be e.g. {width} or it could be {$state.width}, but
+			// in either case we set the value of the width property
 			name = name.substring(1, name.length - 1);
-			buildRun("setAttribute", `${varName}.setAttribute("${name}", ${name});`, status, b);
+			const propName = name.split(".").at(-1);
+			buildRun("setAttribute", `${varName}.setAttribute("${propName}", ${name});`, status, b);
 		} else if (value != null && isReactive(value)) {
 			// It's a reactive attribute
 			if (isFullyReactive(value)) {

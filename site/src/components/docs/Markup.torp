@@ -52,6 +52,10 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
+			<p>
+				You can also use e.g. <code>{`<p {$state.id}>Hello</p>`}</code> to get the
+				property value from the property of an object.
+			</p>
 
 			<h2>If statements</h2>
 			<p>

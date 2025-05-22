@@ -27,8 +27,11 @@ export default function buildSlotNode(node: ElementNode, status: BuildStatus, b:
 		for (let { name, value } of slotAttributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute
+				// It could be e.g. {width} or it could be {$state.width}, but
+				// in either case we set the value of the width property
 				name = name.substring(1, name.length - 1);
-				buildRun("setProp", `${propsName}["${name}"] = ${name};`, status, b);
+				const propName = name.split(".").at(-1);
+				buildRun("setProp", `${propsName}["${propName}"] = ${name};`, status, b);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);

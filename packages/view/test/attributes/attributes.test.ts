@@ -24,6 +24,7 @@ test("attributes -- mounted", async () => {
 		thing: "thing1",
 		dataThing: "thing2",
 		description: "a person",
+		attr: "val",
 	});
 
 	const container = document.createElement("div");
@@ -38,6 +39,7 @@ test("attributes -- hydrated", async () => {
 		thing: "thing1",
 		dataThing: "thing2",
 		description: "a person",
+		attr: "val",
 	});
 
 	const container = document.createElement("div");
@@ -56,4 +58,5 @@ function check(container: HTMLElement, _: State) {
 		"caption",
 		"this attribute is for a person",
 	);
+	expect(queryByText(container, "Hello!")).toHaveAttribute("attr", "val");
 }

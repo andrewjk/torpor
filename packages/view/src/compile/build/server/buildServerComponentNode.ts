@@ -29,8 +29,11 @@ export default function buildServerComponentNode(
 		for (let { name, value } of node.attributes) {
 			if (name.startsWith("{") && name.endsWith("}")) {
 				// It's a shortcut attribute
+				// It could be e.g. {width} or it could be {$state.width}, but
+				// in either case we set the value of the width property
 				name = name.substring(1, name.length - 1);
-				b.append(`${propsName}["${name}"] = ${name};`);
+				const propName = name.split(".").at(-1);
+				b.append(`${propsName}["${propName}"] = ${name};`);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);

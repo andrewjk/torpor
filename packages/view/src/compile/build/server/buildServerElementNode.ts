@@ -63,9 +63,12 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			);
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
+			// It could be e.g. {width} or it could be {$state.width}, but
+			// in either case we set the value of the width property
 			name = name.substring(1, name.length - 1);
+			const propName = name.split(".").at(-1);
 			status.imports.add("t_attr");
-			attributes.push(`${name}="\${t_attr(${name})}"`);
+			attributes.push(`${propName}="\${t_attr(${name})}"`);
 		} else if (value != null && isFullyReactive(value)) {
 			// It's a reactive attribute
 			value = value.substring(1, value.length - 1);
