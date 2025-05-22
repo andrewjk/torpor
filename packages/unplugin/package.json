@@ -116,7 +116,7 @@
 		"unplugin": "^2.3.4"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^4.13.1",
+		"@antfu/eslint-config": "^4.13.2",
 		"@nuxt/kit": "^3.17.4",
 		"@nuxt/schema": "^3.17.4",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",

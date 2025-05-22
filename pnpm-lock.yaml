@@ -292,8 +292,8 @@ importers:
         version: 2.3.4
     devDependencies:
       '@antfu/eslint-config':
-        specifier: ^4.13.1
-        version: 4.13.1(@vue/compiler-sfc@3.5.6)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(happy-dom@17.4.7)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.29.3)(terser@5.39.2)(tsx@4.19.4)(yaml@2.8.0))
+        specifier: ^4.13.2
+        version: 4.13.2(@vue/compiler-sfc@3.5.6)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(happy-dom@17.4.7)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.29.3)(terser@5.39.2)(tsx@4.19.4)(yaml@2.8.0))
       '@nuxt/kit':
         specifier: ^3.17.4
         version: 3.17.4(magicast@0.3.5)
@@ -430,8 +430,8 @@ packages:
   '@adobe/css-tools@4.4.3':
     resolution: {integrity: sha512-VQKMkwriZbaOgVCby1UDY/LDk5fIjhQicCvVPFqfe+69fWaPWydbWJ3wRt59/YzIwda1I81loas3oCoHxnqvdA==}
 
-  '@antfu/eslint-config@4.13.1':
-    resolution: {integrity: sha512-Ldv0gzQEDH/M+6NfhVBK/9NTDwsYJuHHJBPaFQN9X6LGd927sfEWzMHQdEbrA7f8Rr6abbinReifK7OjDipJ/g==}
+  '@antfu/eslint-config@4.13.2':
+    resolution: {integrity: sha512-F+IVIQUCfw6eW4H06c9a9USJ3UOnoBx4I0qsTL3kO6GcyJB6mwk+nawFf95DfHKT3fJKv58YPPz0XCmsY/w0XA==}
     hasBin: true
     peerDependencies:
       '@eslint-react/eslint-plugin': ^1.38.4
@@ -1988,8 +1988,8 @@ packages:
     peerDependencies:
       eslint: ^9.5.0
 
-  eslint-flat-config-utils@2.0.1:
-    resolution: {integrity: sha512-brf0eAgQ6JlKj3bKfOTuuI7VcCZvi8ZCD1MMTVoEvS/d38j8cByZViLFALH/36+eqB17ukmfmKq3bWzGvizejA==}
+  eslint-flat-config-utils@2.1.0:
+    resolution: {integrity: sha512-6fjOJ9tS0k28ketkUcQ+kKptB4dBZY2VijMZ9rGn8Cwnn1SH0cZBoPXT8AHBFHxmHcLFQK9zbELDinZ2Mr1rng==}
 
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
@@ -3786,8 +3786,8 @@ packages:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
 
-  watchpack@2.4.3:
-    resolution: {integrity: sha512-adBYQLivcg1jbdKEJeqScJJFvgm4qY9+3tXw+jdG6lkVeqRJEtiQmSWjmth8GKmDZuX7sYM4YFxQsf0AzMfGGw==}
+  watchpack@2.4.4:
+    resolution: {integrity: sha512-c5EGNOiyxxV5qmTtAB7rbiXxi1ooX1pQKMLX/MIabJjRA0SJBQOjKF+KSVfHkr9U1cADPon0mRiVe/riyaiDUA==}
     engines: {node: '>=10.13.0'}
 
   web-streams-polyfill@3.3.3:
@@ -3910,7 +3910,7 @@ snapshots:
 
   '@adobe/css-tools@4.4.3': {}
 
-  '@antfu/eslint-config@4.13.1(@vue/compiler-sfc@3.5.6)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(happy-dom@17.4.7)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.29.3)(terser@5.39.2)(tsx@4.19.4)(yaml@2.8.0))':
+  '@antfu/eslint-config@4.13.2(@vue/compiler-sfc@3.5.6)(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.4(@types/debug@4.1.12)(@types/node@22.15.21)(happy-dom@17.4.7)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.29.3)(terser@5.39.2)(tsx@4.19.4)(yaml@2.8.0))':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 0.10.1
@@ -3924,7 +3924,7 @@ snapshots:
       cac: 6.7.14
       eslint: 9.27.0(jiti@2.4.2)
       eslint-config-flat-gitignore: 2.1.0(eslint@9.27.0(jiti@2.4.2))
-      eslint-flat-config-utils: 2.0.1
+      eslint-flat-config-utils: 2.1.0
       eslint-merge-processors: 2.0.0(eslint@9.27.0(jiti@2.4.2))
       eslint-plugin-antfu: 3.1.1(eslint@9.27.0(jiti@2.4.2))
       eslint-plugin-command: 3.2.0(eslint@9.27.0(jiti@2.4.2))
@@ -5555,7 +5555,7 @@ snapshots:
       '@eslint/compat': 1.2.9(eslint@9.27.0(jiti@2.4.2))
       eslint: 9.27.0(jiti@2.4.2)
 
-  eslint-flat-config-utils@2.0.1:
+  eslint-flat-config-utils@2.1.0:
     dependencies:
       pathe: 2.0.3
 
@@ -7619,7 +7619,7 @@ snapshots:
     dependencies:
       xml-name-validator: 5.0.0
 
-  watchpack@2.4.3:
+  watchpack@2.4.4:
     dependencies:
       glob-to-regexp: 0.4.1
       graceful-fs: 4.2.11
@@ -7658,7 +7658,7 @@ snapshots:
       schema-utils: 4.3.2
       tapable: 2.2.2
       terser-webpack-plugin: 5.3.14(webpack@5.99.9)
-      watchpack: 2.4.3
+      watchpack: 2.4.4
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'
