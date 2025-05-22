@@ -30,23 +30,6 @@ export default function TabGroup($props: any) {
 	$props.activation ||= "automatic";
 	$props.value ||= "";
 
-	interface State {
-		value: string;
-	}
-
-	let $state: State = $watch({
-		value: $props.value
-	});
-
-	// Update state with props, and props with state, so that props can be bound
-	// TODO: I think we should be able to just use $props and get rid of $state?
-	$run(() => {
-		$state.value = $props.value
-	})
-	$run(() => {
-		$props.value = $state.value
-	})
-
 	let itemStates: ItemState[] = [];
 
 	// This is used to assign automatic indexes to items where needed
@@ -64,10 +47,9 @@ export default function TabGroup($props: any) {
 		activation: $props.activation,
 	};
 	$context[TabGroupContextName] = context;
-
 	$run(() => {
 		// HACK: This should probably be done with setters?
-		let newValue = $state.value;
+		let newValue = $props.value;
 
 		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
 		newValue = newValue?.toString();
@@ -76,7 +58,7 @@ export default function TabGroup($props: any) {
 		}
 
 		// Set the value
-		$state.value = newValue;
+		$props.value = newValue;
 	});
 
 	$run(() => {
@@ -87,14 +69,14 @@ export default function TabGroup($props: any) {
 	// TODO: Should this be a setter instead?
 	$run(() => {
 		if ($props.onchange) {
-			$props.onchange($state.value);
+			$props.onchange($props.value);
 		}
 	})
 
 	// TODO:
 	//$mount(() => {
-	//	if ($state.value === "" && itemStates.length) {
-	//		$state.value = itemStates[0].value;
+	//	if ($props.value === "" && itemStates.length) {
+	//		$props.value = itemStates[0].value;
 	//	}
 	//})
 
@@ -139,7 +121,7 @@ export default function TabGroup($props: any) {
 		const newItemState: ItemState = $watch({
 			index,
 			value,
-			active: value === $state.value,
+			active: value === $props.value,
 			headerId: "",
 			contentId: "",
 			disabled: false,
@@ -170,7 +152,7 @@ export default function TabGroup($props: any) {
 		for (let item of itemStates) {
 			// The item is active if it has the supplied value
 			if (item.value === toggleValue) {
-				$state.value = item.value;
+				$props.value = item.value;
 				break;
 			}
 		}
