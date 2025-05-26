@@ -1,5 +1,5 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
-import buildItems from "../../../utils/buildItems";
+import buildItems from "../../../lib/buildItems";
 
 export default function ExampleBasic($props: any) {
 	let itemCount = 5;

@@ -1,5 +1,5 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
-import copyCode from "../../utils/copyCode";
+import copyCode from "../../lib/copyCode";
 import ExampleStatic from "./popover/ExampleStatic.torp";
 import ExampleAnchored from "./popover/ExampleAnchored.torp";
 import ExampleContextual from "./popover/ExampleContextual.torp";

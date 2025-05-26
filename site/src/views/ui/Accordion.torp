@@ -1,5 +1,5 @@
 import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
-import copyCode from "../../utils/copyCode";
+import copyCode from "../../lib/copyCode";
 import ExampleBasic from "./accordion/ExampleBasic.torp";
 import ExampleBound from "./accordion/ExampleBound.torp";
 
