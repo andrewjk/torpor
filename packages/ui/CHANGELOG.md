@@ -1,5 +1,33 @@
 # @torpor/ui
 
+## 0.1.0
+
+### Minor Changes
+
+- 995513a: Break: specify binding with `&` rather than `:`
+
+### Patch Changes
+
+- cda6804: Fix: move itemStates out of $state
+- 80c5461: Feat: id and class props for the Accordion
+- cbd07ca: Feat: bind component props with `&name`
+- d4a7ecc: Feat: UI Popover component
+- b6bf066: Fix: set data-state (open/closed/active/inactive)
+- baec4c7: Feat: UI NavMenu component
+- 8545f43: Feat: UI Dialog component
+- 7cdeaa5: Feat: id and class props for the TabGroup
+- Updated dependencies [28a993b]
+- Updated dependencies [98602ec]
+- Updated dependencies [a49d307]
+- Updated dependencies [995513a]
+- Updated dependencies [c9a9cf8]
+- Updated dependencies [cbd07ca]
+- Updated dependencies [f53b184]
+- Updated dependencies [215db17]
+- Updated dependencies [95e866b]
+  - @torpor/unplugin@0.1.11
+  - @torpor/view@0.1.0
+
 ## 0.0.17
 
 ### Patch Changes

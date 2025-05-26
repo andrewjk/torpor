@@ -1,5 +1,20 @@
 # @torpor/unplugin
 
+## 0.1.11
+
+### Patch Changes
+
+- 28a993b: Fix: show the file path that has errors in console
+- Updated dependencies [98602ec]
+- Updated dependencies [a49d307]
+- Updated dependencies [995513a]
+- Updated dependencies [c9a9cf8]
+- Updated dependencies [cbd07ca]
+- Updated dependencies [f53b184]
+- Updated dependencies [215db17]
+- Updated dependencies [95e866b]
+  - @torpor/view@0.1.0
+
 ## 0.1.10
 
 ### Patch Changes

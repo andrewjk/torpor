@@ -1,5 +1,21 @@
 # @torpor/view
 
+## 0.1.0
+
+### Minor Changes
+
+- 995513a: Break: specify binding with `&` rather than `:`
+
+### Patch Changes
+
+- 98602ec: Fix: don't re-run the entire loop/control statement
+- a49d307: Fix: allow const destructuring in components
+- c9a9cf8: Fix: flush :onmounts when adding a fragment
+- cbd07ca: Feat: bind component props with `&name`
+- f53b184: Feat: watch $props
+- 215db17: Fix: allow $unwrapping a null object
+- 95e866b: Feat: shortcut syntax for object properties
+
 ## 0.0.14
 
 ### Patch Changes
