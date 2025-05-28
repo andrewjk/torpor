@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.24
+
+### Patch Changes
+
+- 22f62d4: Fix: Site.viteConfig settings
+- Updated dependencies [22f62d4]
+  - @torpor/build@0.1.23
+
 ## 0.0.23
 
 ### Patch Changes
