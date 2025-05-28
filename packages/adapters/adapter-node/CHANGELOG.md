@@ -1,5 +1,12 @@
 # @torpor/adapter-node
 
+## 0.0.20
+
+### Patch Changes
+
+- Updated dependencies [4e0ec90]
+  - @torpor/build@0.1.22
+
 ## 0.0.19
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.22
+
+### Patch Changes
+
+- 4e0ec90: Feat: allow more Site.viteConfig settings
+
 ## 0.1.21
 
 ### Patch Changes
