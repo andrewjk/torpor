@@ -59,27 +59,23 @@ async function postbuild(site: Site): Promise<void> {
 	await fs.mkdir(tempFolder);
 	await fs.writeFile(workerFile, workerSource);
 
-	await build(
-		defineConfig({
-			build: {
-				outDir: cloudflareFolder,
-				rollupOptions: {
-					input: [workerFile, ...site.inputs],
-					output: {
-						entryFileNames: `[name].js`,
-						chunkFileNames: `[name].js`,
-						assetFileNames: `[name].[ext]`,
-					},
-					preserveEntrySignatures: "strict",
-				},
-				// HACK: We don't need to minify as the worker isn't downloaded?
-				// And it makes debugging easier
-				minify: false,
-				// HACK: Build for SSR so we don't get document and window references
-				ssr: true,
-			},
-		}),
-	);
+	const cloudflareConfig = structuredClone(site.viteConfig ?? {});
+	cloudflareConfig.build ??= {};
+	cloudflareConfig.build.outDir = cloudflareFolder;
+	cloudflareConfig.build.rollupOptions ??= {};
+	cloudflareConfig.build.rollupOptions.input = [workerFile, ...site.inputs];
+	cloudflareConfig.build.rollupOptions.output = {
+		entryFileNames: `[name].js`,
+		chunkFileNames: `[name].js`,
+		assetFileNames: `[name].[ext]`,
+	};
+	cloudflareConfig.build.rollupOptions.preserveEntrySignatures = "strict";
+	// HACK: We don't need to minify as the worker isn't downloaded?
+	// And it makes debugging easier
+	cloudflareConfig.build.minify = false;
+	// HACK: Build for SSR so we don't get document and window references
+	cloudflareConfig.build.ssr = true;
+	await build(defineConfig(cloudflareConfig));
 
 	// Copy the client assets into the Cloudflare folder
 	await fs.mkdir(path.join(cloudflareFolder, "assets"));

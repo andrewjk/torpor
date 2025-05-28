@@ -40,8 +40,10 @@ export default class Site {
 	 */
 	inputs: string[] = [];
 	/**
-	 * Vite config options. `plugins` and `build.rollupOptions.input` will be
-	 * overridden, so you should set `Site.plugins` and `Site.inputs` instead.
+	 * Vite config options to merge with the standard Torpor build options.
+	 * `plugins` and `build.rollupOptions.input` will be overridden, so you
+	 * should set `Site.plugins` and `Site.inputs` instead. Other options may be
+	 * overridden or incompatible, so experimentation may be required
 	 */
 	viteConfig?: UserConfig;
 

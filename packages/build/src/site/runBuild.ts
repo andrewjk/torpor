@@ -16,8 +16,8 @@ export default async function runBuild(site: Site): Promise<void> {
 	if (existsSync(distFolder)) {
 		await fs.rm(distFolder, { recursive: true });
 	}
-	let clientFolder = path.join(distFolder, "client");
-	let serverFolder = path.join(distFolder, "server");
+	const clientFolder = path.join(distFolder, "client");
+	const serverFolder = path.join(distFolder, "server");
 
 	// HOOK: Prebuild
 	if (site.adapter.prebuild) {
@@ -34,11 +34,10 @@ export default async function runBuild(site: Site): Promise<void> {
 
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name
-	const clientConfig = site.viteConfig ?? {};
+	const clientConfig = structuredClone(site.viteConfig ?? {});
 	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
 	clientConfig.build ??= {};
-	clientConfig.build.outDir ??= clientFolder;
-	clientFolder = clientConfig.build.outDir;
+	clientConfig.build.outDir = clientFolder;
 	clientConfig.build.rollupOptions ??= {};
 	clientConfig.build.rollupOptions.input = [
 		siteHtml,
@@ -53,12 +52,10 @@ export default async function runBuild(site: Site): Promise<void> {
 
 	// Build the server assets, including the server entry script and the route
 	// files
-	const serverConfig = site.viteConfig ?? {};
-	serverConfig.plugins ??= [];
-	serverConfig.plugins.push(manifest(site, true), torpor(), ...site.plugins);
+	const serverConfig = structuredClone(site.viteConfig ?? {});
+	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
 	serverConfig.build ??= {};
-	serverConfig.build.outDir ??= serverFolder;
-	serverFolder = serverConfig.build.outDir;
+	serverConfig.build.outDir = serverFolder;
 	serverConfig.build.rollupOptions ??= {};
 	serverConfig.build.rollupOptions.input = [
 		serverScript,
