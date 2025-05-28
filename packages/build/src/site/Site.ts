@@ -1,8 +1,8 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { Plugin } from "vite";
+import { type Plugin, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import Adapter from "../types/Adapter";
+import type Adapter from "../types/Adapter";
 import {
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,
@@ -39,6 +39,10 @@ export default class Site {
 	 * with server.ts/js will only be compiled with the server output
 	 */
 	inputs: string[] = [];
+	/**
+	 * Vite config options. `plugins` and `build` will be overridden.
+	 */
+	viteConfig?: UserConfig;
 
 	constructor() {
 		this.root = process.cwd();

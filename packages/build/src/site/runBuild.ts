@@ -34,44 +34,40 @@ export default async function runBuild(site: Site): Promise<void> {
 
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name
-	await build(
-		defineConfig({
-			plugins: [manifest(site), torpor(), ...site.plugins],
-			build: {
-				outDir: clientFolder,
-				rollupOptions: {
-					input: [
-						siteHtml,
-						clientScript,
-						...site.routes
-							.filter((r) => !/server\.(ts|js)$/.test(r.file))
-							.map((r) => path.resolve(site.root, r.file)),
-						...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
-					],
-				},
-				ssrManifest: true,
-			},
-		}),
-	);
+	const clientConfig = site.viteConfig ?? {};
+	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
+	clientConfig.build = {
+		outDir: clientFolder,
+		rollupOptions: {
+			input: [
+				siteHtml,
+				clientScript,
+				...site.routes
+					.filter((r) => !/server\.(ts|js)$/.test(r.file))
+					.map((r) => path.resolve(site.root, r.file)),
+				...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
+			],
+		},
+		ssrManifest: true,
+	};
+	await build(defineConfig(clientConfig));
 
 	// Build the server assets, including the server entry script and the route
 	// files
-	await build(
-		defineConfig({
-			plugins: [manifest(site, true), torpor(), ...site.plugins],
-			build: {
-				outDir: serverFolder,
-				rollupOptions: {
-					input: [
-						serverScript,
-						...site.routes.map((r) => path.resolve(site.root, r.file)),
-						...site.inputs,
-					],
-				},
-				ssr: serverScript,
-			},
-		}),
-	);
+	const serverConfig = site.viteConfig ?? {};
+	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
+	serverConfig.build = {
+		outDir: serverFolder,
+		rollupOptions: {
+			input: [
+				serverScript,
+				...site.routes.map((r) => path.resolve(site.root, r.file)),
+				...site.inputs,
+			],
+		},
+		ssr: serverScript,
+	};
+	await build(defineConfig(serverConfig));
 
 	// Move the site.html file into /client
 	// HACK: Should do this in Rollup if possible?
