@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.21
+
+### Patch Changes
+
+- 4296742: Feat: add Site.viteConfig to set Vite options in build
+
 ## 0.1.20
 
 ### Patch Changes
