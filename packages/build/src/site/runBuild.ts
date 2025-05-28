@@ -16,8 +16,8 @@ export default async function runBuild(site: Site): Promise<void> {
 	if (existsSync(distFolder)) {
 		await fs.rm(distFolder, { recursive: true });
 	}
-	const clientFolder = path.join(distFolder, "client");
-	const serverFolder = path.join(distFolder, "server");
+	let clientFolder = path.join(distFolder, "client");
+	let serverFolder = path.join(distFolder, "server");
 
 	// HOOK: Prebuild
 	if (site.adapter.prebuild) {
@@ -36,37 +36,36 @@ export default async function runBuild(site: Site): Promise<void> {
 	// EXCLUDING anything with `server.js` in the name
 	const clientConfig = site.viteConfig ?? {};
 	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
-	clientConfig.build = {
-		outDir: clientFolder,
-		rollupOptions: {
-			input: [
-				siteHtml,
-				clientScript,
-				...site.routes
-					.filter((r) => !/server\.(ts|js)$/.test(r.file))
-					.map((r) => path.resolve(site.root, r.file)),
-				...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
-			],
-		},
-		ssrManifest: true,
-	};
+	clientConfig.build ??= {};
+	clientConfig.build.outDir ??= clientFolder;
+	clientFolder = clientConfig.build.outDir;
+	clientConfig.build.rollupOptions ??= {};
+	clientConfig.build.rollupOptions.input = [
+		siteHtml,
+		clientScript,
+		...site.routes
+			.filter((r) => !/server\.(ts|js)$/.test(r.file))
+			.map((r) => path.resolve(site.root, r.file)),
+		...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
+	];
+	clientConfig.build.ssrManifest = true;
 	await build(defineConfig(clientConfig));
 
 	// Build the server assets, including the server entry script and the route
 	// files
 	const serverConfig = site.viteConfig ?? {};
-	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
-	serverConfig.build = {
-		outDir: serverFolder,
-		rollupOptions: {
-			input: [
-				serverScript,
-				...site.routes.map((r) => path.resolve(site.root, r.file)),
-				...site.inputs,
-			],
-		},
-		ssr: serverScript,
-	};
+	serverConfig.plugins ??= [];
+	serverConfig.plugins.push(manifest(site, true), torpor(), ...site.plugins);
+	serverConfig.build ??= {};
+	serverConfig.build.outDir ??= serverFolder;
+	serverFolder = serverConfig.build.outDir;
+	serverConfig.build.rollupOptions ??= {};
+	serverConfig.build.rollupOptions.input = [
+		serverScript,
+		...site.routes.map((r) => path.resolve(site.root, r.file)),
+		...site.inputs,
+	];
+	serverConfig.build.ssr = serverScript;
 	await build(defineConfig(serverConfig));
 
 	// Move the site.html file into /client

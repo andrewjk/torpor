@@ -40,7 +40,8 @@ export default class Site {
 	 */
 	inputs: string[] = [];
 	/**
-	 * Vite config options. `plugins` and `build` will be overridden.
+	 * Vite config options. `plugins` and `build.rollupOptions.input` will be
+	 * overridden, so you should set `Site.plugins` and `Site.inputs` instead.
 	 */
 	viteConfig?: UserConfig;
 
