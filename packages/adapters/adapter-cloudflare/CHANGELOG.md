@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.25
+
+### Patch Changes
+
+- c37269f: Fix: move from Cloudflare Pages to Workers
+
 ## 0.0.24
 
 ### Patch Changes
