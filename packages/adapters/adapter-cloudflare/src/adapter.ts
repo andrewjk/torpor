@@ -7,7 +7,7 @@ import prepareTemplate from "./prepareTemplate";
 export default {
 	postbuild,
 	serve: (/* server: Server, site: Site*/) => {
-		console.log("TODO");
+		console.log("TODO: Cloudflare dev server");
 	},
 } satisfies Adapter as Adapter;
 
@@ -98,6 +98,16 @@ binding = "ASSETS"
 	`;
 	const wranglerFile = path.join(distFolder, "wrangler.toml");
 	await fs.writeFile(wranglerFile, wranglerConfig);
+
+	// Build a .assetsignore file
+	const assetsIgnore = `
+**/node_modules
+**/.DS_Store
+**/.git
+_worker.js
+`;
+	const assetsIgnoreFile = path.join(cloudflareFolder, ".assetsignore");
+	await fs.writeFile(assetsIgnoreFile, assetsIgnore);
 
 	await fs.rm(tempFolder, { recursive: true });
 }
