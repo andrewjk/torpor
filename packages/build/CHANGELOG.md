@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.24
+
+### Patch Changes
+
+- 6092a91: Fix: don't swallow error responses when loading data
+
 ## 0.1.23
 
 ### Patch Changes

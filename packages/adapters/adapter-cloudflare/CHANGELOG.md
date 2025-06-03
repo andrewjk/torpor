@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.26
+
+### Patch Changes
+
+- d6b06ab: Fix: move from Cloudflare Pages to Workers
+- Updated dependencies [6092a91]
+  - @torpor/build@0.1.24
+
 ## 0.0.25
 
 ### Patch Changes
