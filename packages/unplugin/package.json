@@ -113,17 +113,17 @@
 	},
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"unplugin": "^2.3.4"
+		"unplugin": "^2.3.5"
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^4.13.2",
 		"@nuxt/kit": "^3.17.4",
 		"@nuxt/schema": "^3.17.4",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/node": "^22.15.21",
+		"@types/node": "^22.15.29",
 		"bumpp": "^10.1.1",
 		"chalk": "^5.4.1",
-		"eslint": "^9.27.0",
+		"eslint": "^9.28.0",
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
 		"nodemon": "^3.1.10",
@@ -133,7 +133,7 @@
 		"tsup": "^8.5.0",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5",
-		"vitest": "^3.1.4",
+		"vitest": "^3.2.0",
 		"webpack": "^5.99.9"
 	}
 }

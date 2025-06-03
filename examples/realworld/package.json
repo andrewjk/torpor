@@ -14,7 +14,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@libsql/client": "^0.15.7",
+		"@libsql/client": "^0.15.8",
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@prisma/client": "^6.8.2",
 		"@torpor/adapter-node": "workspace:^",
