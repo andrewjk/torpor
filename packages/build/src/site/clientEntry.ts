@@ -90,24 +90,28 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
 			const layoutServerEndPoint: PageServerEndPoint | undefined =
 				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-			const layoutData = await loadClientAndServerData(
+			const layoutResponse = await loadClientAndServerData(
 				data,
 				document.location.origin + layoutPath,
 				params,
 				layoutEndPoint,
 				layoutServerEndPoint,
 			);
-			Object.assign(data, layoutData);
+			if (layoutResponse?.ok === false) {
+				return layoutResponse;
+			}
 		}
 	}
-	let endPointData = await loadClientAndServerData(
+	let endPointResponse = await loadClientAndServerData(
 		data,
 		document.location.origin + path,
 		params,
 		clientEndPoint,
 		serverEndPoint,
 	);
-	Object.assign(data, endPointData);
+	if (endPointResponse?.ok === false) {
+		return endPointResponse;
+	}
 	let $props: Record<string, any> = { data };
 
 	// If there are layouts, work our way upwards, pushing each component into
@@ -164,27 +168,33 @@ async function loadClientAndServerData(
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
 ) {
-	let newData = {};
 	if (clientEndPoint?.load) {
 		const clientUrl = new URL(document.location.href);
 		const clientParams = buildClientParams(clientUrl, params, data);
-		const clientData = await clientEndPoint.load(clientParams);
-		if (clientData) {
-			Object.assign(newData, clientData);
+		const clientResponse = await clientEndPoint.load(clientParams);
+		if (clientResponse) {
+			if (clientResponse.ok) {
+				if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
+					Object.assign(data, await clientResponse.json());
+				}
+			} else {
+				return clientResponse;
+			}
 		}
 	}
 	if (serverEndPoint?.load) {
 		const serverUrl = location.replace(/\/$/, "") + "/~server";
 		const serverResponse = await fetch(serverUrl);
-		if (
-			serverResponse?.ok &&
-			serverResponse.headers.get("Content-Type")?.includes("application/json")
-		) {
-			const serverData = await serverResponse.json();
-			Object.assign(newData, serverData);
+		if (serverResponse) {
+			if (serverResponse.ok) {
+				if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
+					Object.assign(data, await serverResponse.json());
+				}
+			} else {
+				return serverResponse;
+			}
 		}
 	}
-	return newData;
 }
 
 function buildClientParams(url: URL, params: Record<string, string>, data: Record<string, any>) {
