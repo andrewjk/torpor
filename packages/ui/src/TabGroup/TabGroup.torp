@@ -47,6 +47,7 @@ export default function TabGroup($props: any) {
 		activation: $props.activation,
 	};
 	$context[TabGroupContextName] = context;
+
 	$run(() => {
 		// HACK: This should probably be done with setters?
 		let newValue = $props.value;
@@ -77,12 +78,12 @@ export default function TabGroup($props: any) {
 		}
 	});
 
-	// TODO:
-	//$mount(() => {
-	//	if ($props.value === "" && itemStates.length) {
-	//		$props.value = itemStates[0].value;
-	//	}
-	//})
+	// On mount, if no value was set, show the first tab content
+	$mount(() => {
+		if ($props.value === "" && itemStates.length) {
+			$props.value = itemStates[0].value;
+		}
+	});
 
 	function registerHeader(index: number | undefined, value: string | undefined, setFocused: () => void): ItemState {
 		// If an index wasn't set for the header, set it automatically
@@ -125,6 +126,8 @@ export default function TabGroup($props: any) {
 		const newItemState: ItemState = $watch({
 			index,
 			value,
+			// TODO: this would be better than using $mount, but it doesn't work with nested tabs
+			// active: value === $props.value || ($props.value === "" && index === 0),
 			active: value === $props.value,
 			headerId: "",
 			contentId: "",
