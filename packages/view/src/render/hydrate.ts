@@ -1,5 +1,6 @@
 import { type Component } from "../types/Component";
 import { type SlotRender } from "../types/SlotRender";
+import $run from "./$run";
 import context from "./context";
 
 /**
@@ -22,4 +23,10 @@ export default function hydrate(
 	component(parent, null, props, undefined, slots);
 
 	context.hydrationNode = null;
+
+	// Now that we've hydrated, we can run $mount effects
+	for (let effect of context.mountEffects) {
+		$run(effect);
+	}
+	context.mountEffects.length = 0;
 }

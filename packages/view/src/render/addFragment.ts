@@ -41,16 +41,19 @@ export default function addFragment(
 	}
 
 	// If we're adding this fragment to the DOM, we can now run any $mount
-	// functions, add our stashed events and play our stashed animations
+	// effects, add our stashed events and play our stashed animations
 	if (!parentIsFragment) {
-		// Set the active range for each event and animation so it will get
-		// attached to the right one and set it back afterwards
-
-		for (let effect of context.mountEffects) {
-			$run(effect);
+		// Only run $mount effects if not hydrating (if hydrating, they will get
+		// run at the end when everything is hooked up)
+		if (!context.hydrationNode) {
+			for (let effect of context.mountEffects) {
+				$run(effect);
+			}
+			context.mountEffects.length = 0;
 		}
-		context.mountEffects.length = 0;
 
+		// Set the active range for each event so it will get attached to the
+		// right one and set it back afterwards
 		for (let event of context.stashedEvents) {
 			context.activeRange = event.range;
 			$run(function addFragmentEvent() {
@@ -62,6 +65,8 @@ export default function addFragment(
 		}
 		context.stashedEvents.length = 0;
 
+		// Set the active range for each animation so it will get attached to
+		// the right one and set it back afterwards
 		for (let animation of context.stashedAnimations) {
 			context.activeRange = animation.range;
 			$run(function addFragmentAnimation() {

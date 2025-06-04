@@ -314,10 +314,12 @@ function addFragment(fragment, parent, before) {
     parent.insertBefore(fragment, before);
   }
   if (!parentIsFragment) {
-    for (let effect of context_default.mountEffects) {
-      $run(effect);
+    if (!context_default.hydrationNode) {
+      for (let effect of context_default.mountEffects) {
+        $run(effect);
+      }
+      context_default.mountEffects.length = 0;
     }
-    context_default.mountEffects.length = 0;
     for (let event of context_default.stashedEvents) {
       context_default.activeRange = event.range;
       $run(function addFragmentEvent() {
@@ -388,6 +390,10 @@ function hydrate(parent, component, props, slots) {
   context_default.hydrationNode = parent.firstChild;
   component(parent, null, props, void 0, slots);
   context_default.hydrationNode = null;
+  for (let effect of context_default.mountEffects) {
+    $run(effect);
+  }
+  context_default.mountEffects.length = 0;
 }
 
 // src/render/mount.ts
