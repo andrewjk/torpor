@@ -1,0 +1,93 @@
+
+export default function Offscreen($props: any) {
+	$props.visible ||= true;
+	$props.position ||= "left";
+
+	let offscreen: HTMLElement | undefined;
+
+	// From https://stackoverflow.com/a/46707458
+	function measure(el, fn) {
+		let oldVisibility = el.style.visibility;
+		let oldPosition = el.style.position;
+
+		let oldParent = el.parentNode;
+		let oldBefore = el.nextNode;
+
+		el.style.visibility = "hidden";
+		el.style.position = "absolute";
+
+		document.body.appendChild(el);
+		let result = fn(el);
+		el.parentNode.removeChild(el);
+
+		oldParent.appendChild(el, oldBefore);
+		el.style.visibility = oldVisibility;
+		el.style.position = oldPosition;
+
+		return result;
+	}
+
+	function transitionArgs() {
+		if (offscreen) {
+			switch ($props.position) {
+				case "left": {
+					offscreen.style.left = 0;
+					const width = measure(offscreen, (el) => el.offsetWidth);
+					return [
+						{ transform: `translateX(-${width}px)` },
+						{ transform: "translateX(0px)" }
+					];
+				}
+				case "top": {
+					offscreen.style.top = 0;
+					const height = measure(offscreen, (el) => el.offsetHeight);
+					return [
+						{ transform: `translateY(-${height}px)` },
+						{ transform: "translateY(0px)" }
+					];
+				}
+				case "right": {
+					offscreen.style.right = 0;
+					const width = measure(offscreen, (el) => el.offsetWidth);
+					return [
+						{ transform: `translateX(${width}px)` },
+						{ transform: "translateX(0px)" }
+					];
+				}
+				case "bottom": {
+					offscreen.style.bottom = 0;
+					const height = measure(offscreen, (el) => el.offsetHeight);
+					return [
+						{ transform: `translateY(${height}px)` },
+						{ transform: "translateY(0px)" }
+					];
+				}
+			}
+		}
+	}
+
+	function close() {
+		$props.visible = false;
+		if ($props.onclose) {
+			$props.onclose()
+		}
+	}
+
+	@render {
+		<div style="display: contents">			
+			@if ($props.visible) {
+				<div onclick={close} >
+					<div
+						id={$props.id}
+						class={`torp-offscreen ${$props.class ?? ""}`.trim()}
+						style="position: fixed;"
+						:transition={transitionArgs()}
+						&ref={offscreen}
+					>
+						<:slot />
+					</div>
+				</div>
+			}
+		</div>
+	}
+}

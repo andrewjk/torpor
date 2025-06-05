@@ -22,6 +22,11 @@
 			"import": "./dist/NavMenu/index.js",
 			"require": "./dist/NavMenu/index.cjs"
 		},
+		"./Offscreen": {
+			"types": "./dist/Offscreen/index.d.ts",
+			"import": "./dist/Offscreen/index.js",
+			"require": "./dist/Offscreen/index.cjs"
+		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js",
