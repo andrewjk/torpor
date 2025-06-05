@@ -11,7 +11,7 @@ export default function NavMenuGroupHeader($props: any) {
 
 	const context = $context[NavMenuGroupContextName] as NavMenuGroupContext;
 	if (!context) {
-		throw new Error("NavMenuGroupHeader must be contained within an NavMenuGroup");
+		throw new Error("NavMenuGroupHeader must be contained within a NavMenuGroup");
 	}
 	let $state = context.state;
 

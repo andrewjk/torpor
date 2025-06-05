@@ -37,7 +37,7 @@ export default function Dialog($props: any) {
 	// Get stuff out of the PopoverContext
 	const popoverContext = $context[PopoverContextName] as PopoverContext;
 	if (!popoverContext) {
-		throw new Error("Dialog must be contained within a Contextual, Prompt or Popover");
+		throw new Error("Dialog must be contained within a Popover");
 	}
 	const { handleButton, modal } = popoverContext;
 	const visible = popoverContext.state.visible;
