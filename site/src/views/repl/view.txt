@@ -276,15 +276,18 @@ async function animate(el, enter, keyframes, options) {
   let animationOptions = Object.assign(
     {
       direction: enter ? "normal" : "reverse",
-      // TODO: Should probably have a global setting for this somewhere
+      // TODO: Should probably have a global setting for these somewhere
       // And respect browser reduce motion settings
-      duration: 1e3,
+      duration: 300,
+      easing: "ease-in-out",
       fill: "forwards"
     },
     options
   );
   const animation = el.animate(keyframes, animationOptions);
-  animation.timeline = el.ownerDocument.timeline;
+  setTimeout(() => {
+    animation.timeline = el.ownerDocument.timeline;
+  }, 1);
   let activeRange = context_default.activeRange;
   if (activeRange) {
     activeRange.animations ??= /* @__PURE__ */ new Set();

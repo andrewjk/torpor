@@ -18,13 +18,13 @@ export default async function animate(
 	// - store the animation
 	// - reverse it if it's running and the range appears/disappears
 	// - transfer the animation to the new element
-
 	let animationOptions = Object.assign(
 		{
 			direction: enter ? "normal" : "reverse",
-			// TODO: Should probably have a global setting for this somewhere
+			// TODO: Should probably have a global setting for these somewhere
 			// And respect browser reduce motion settings
-			duration: 1000,
+			duration: 300,
+			easing: "ease-in-out",
 			fill: "forwards",
 		},
 		options,
@@ -32,9 +32,13 @@ export default async function animate(
 
 	const animation = el.animate(keyframes, animationOptions);
 
-	// HACK: I'm not entirely sure why this is needed, but without it,
-	// animations never start
-	animation.timeline = el.ownerDocument.timeline;
+	// HACK: I'm not entirely sure why we need to sent the animation's timeline,
+	// but without it, animations never start
+	// HACK: We also need to make sure the element has been added to the DOM
+	// with a timeout
+	setTimeout(() => {
+		animation.timeline = el.ownerDocument.timeline;
+	}, 1);
 
 	// Add the animation to the active range, so that the range won't be cleared
 	// until the animation is completed
