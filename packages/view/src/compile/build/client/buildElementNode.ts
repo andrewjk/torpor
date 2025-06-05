@@ -173,9 +173,23 @@ function buildElementAttributes(
 	// TODO: Flatten this out
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
+	// Do &ref first, just in case any other attributes depend on it being set
+	// e.g. if you have a `style` attribute that depends on the element's size
+	const refAttribute = node.attributes.find((a) => a.name === "&ref");
+	if (refAttribute) {
+		let value = refAttribute.value;
+		if (value != null && isFullyReactive(value)) {
+			// Bind the DOM element to a user-defined variable
+			value = value.substring(1, value.length - 1);
+			b.append(`${value} = ${varName};`);
+		}
+	}
+
 	for (let { name, value } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
+		} else if (name === "&ref") {
+			// Ignore this one, it should have been done already, above
 		} else if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
 			// It could be e.g. {width} or it could be {$state.width}, but
@@ -191,10 +205,7 @@ function buildElementAttributes(
 				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 			}
 
-			if (name === "&ref") {
-				// Bind the DOM element to a user-defined variable
-				b.append(`${value} = ${varName};`);
-			} else if (name === "&group") {
+			if (name === "&group") {
 				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === "&value" || name === "&checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
