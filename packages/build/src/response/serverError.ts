@@ -8,5 +8,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/500
  */
 export default function serverError(body?: object | string): Response {
-	return response(500, body);
+	return response(500, body ?? "Server error");
 }

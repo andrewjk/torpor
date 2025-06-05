@@ -10,5 +10,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403
  */
 export default function forbidden(body?: object | string): Response {
-	return response(403, body);
+	return response(403, body ?? "Forbidden");
 }

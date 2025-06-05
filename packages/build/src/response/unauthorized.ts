@@ -10,5 +10,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/401
  */
 export default function unauthorized(body?: object | string): Response {
-	return response(401, body);
+	return response(401, body ?? "Unauthorized");
 }

@@ -10,5 +10,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/405
  */
 export default function methodNotAllowed(body?: object | string): Response {
-	return response(405, body);
+	return response(405, body ?? "Method not allowed");
 }

@@ -13,5 +13,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404
  */
 export default function notFound(body?: object | string): Response {
-	return response(404, body);
+	return response(404, body ?? "Not found");
 }

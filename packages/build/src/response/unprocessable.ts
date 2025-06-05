@@ -8,5 +8,5 @@ import response from "./response";
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422
  */
 export default function unprocessable(body?: object | string): Response {
-	return response(422, body);
+	return response(422, body ?? "Unprocessable");
 }
