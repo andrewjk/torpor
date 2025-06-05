@@ -67,7 +67,7 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 
 	const route = router.match(path, query);
 	if (!route) {
-		return handleResponse(path, notFound());
+		return handleResponse(notFound());
 	}
 
 	// Update $page before building the components
