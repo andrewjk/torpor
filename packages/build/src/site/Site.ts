@@ -4,6 +4,7 @@ import { type Plugin, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import type Adapter from "../types/Adapter";
 import {
+	ERROR_ROUTE,
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,
 	LAYOUT_ROUTE,
@@ -98,6 +99,8 @@ export default class Site {
 			return HOOK_ROUTE;
 		} else if (routePath.endsWith("_hook.server")) {
 			return HOOK_SERVER_ROUTE;
+		} else if (routePath.endsWith("_error")) {
+			return ERROR_ROUTE;
 		}
 		return -1;
 	}

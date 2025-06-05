@@ -5,3 +5,4 @@ export const LAYOUT_ROUTE = 4;
 export const LAYOUT_SERVER_ROUTE = 5;
 export const HOOK_ROUTE = 6;
 export const HOOK_SERVER_ROUTE = 7;
+export const ERROR_ROUTE = 8;

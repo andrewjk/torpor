@@ -10,6 +10,7 @@ import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import RouteHandler from "../types/RouteHandler.ts";
 import {
+	ERROR_ROUTE,
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,
 	LAYOUT_ROUTE,
@@ -29,6 +30,33 @@ router.addPages(manifest.routes);
 
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
+async function handleResponse(response: Response): Promise<Response> {
+	$page.status = response.status;
+
+	// Success codes and redirect codes are acceptable
+	if (response.status >= 200 && response.status <= 399) {
+		return response;
+	}
+
+	// It's an error, so redirect to the error page
+	// We're just pushing the status and message in the URL, but maybe there's a
+	// more sophisticated way to do this?
+	// TODO: Should be returning loadView rather than redirecting
+	// TODO: Should be returning the NEAREST error page to this path, including layouts
+	let params = new URLSearchParams();
+	params.append("status", $page.status.toString());
+	let message = await response.text();
+	if (response.headers.get("Content-Type")?.includes("application/json")) {
+		const data = JSON.parse(message);
+		message = data.message ?? message;
+	}
+	if (message) {
+		$page.error.message = message;
+		params.append("message", message);
+	}
+	return seeOther(`/_error?${params.toString()}`);
+}
+
 export async function load(ev: ServerEvent, template: string): Promise<Response> {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
@@ -39,12 +67,17 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 
 	const route = router.match(path, query);
 	if (!route) {
-		return notFound();
+		return handleResponse(path, notFound());
 	}
 
 	// Update $page before building the components
-	// TODO: Find somewhere better to put this
 	$page.url = url;
+	if (path.endsWith("/_error")) {
+		$page.status = parseInt(query.get("status") ?? "404");
+		$page.error.message = query.get("message") ?? "";
+	} else {
+		$page.status = 200;
+	}
 
 	const handler = route.handler;
 	const params = route.params || {};
@@ -57,9 +90,9 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 		case LAYOUT_ROUTE: {
 			// It's a /+page.ts or /_layout.ts endpoint
 			if (ev.request.method === "GET") {
-				return await loadView(ev, url, handler, params, template);
+				return handleResponse(await loadView(ev, url, handler, params, template));
 			} else if (ev.request.method === "POST") {
-				return await runAction(ev, url, handler, params, query);
+				return handleResponse(await runAction(ev, url, handler, params, query));
 			}
 			break;
 		}
@@ -79,6 +112,9 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 		case HOOK_ROUTE:
 		case HOOK_SERVER_ROUTE: {
 			break;
+		}
+		case ERROR_ROUTE: {
+			return await loadView(ev, url, handler, params, template);
 		}
 	}
 
@@ -141,7 +177,8 @@ async function loadView(
 
 	// Pass the data into $props
 	// TODO: Promise.all
-	// NOTE: We're loading data from top to bottom, overriding as we go, and I'm not sure if this is the best way to go
+	// NOTE: We're loading data from top to bottom, overriding as we go, and I'm
+	// not sure if this is the best way to go
 	let data = {};
 	if (handler.layouts) {
 		for (let layout of handler.layouts) {

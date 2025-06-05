@@ -60,8 +60,15 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	}
 
 	// Update $page before building the components
-	// TODO: Find somewhere better to put this
 	$page.url = url;
+	if (path.endsWith("/_error")) {
+		$page.status = parseInt(query.get("status") ?? "404");
+		$page.error.message = query.get("message") ?? "";
+		// Make it look a bit classier by removing the query
+		window.history.replaceState({}, "", url.toString().split("?")[0]);
+	} else {
+		$page.status = 200;
+	}
 
 	const handler = route.handler;
 	const params = route.params || {};
@@ -98,7 +105,7 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 				layoutServerEndPoint,
 			);
 			if (layoutResponse?.ok === false) {
-				return layoutResponse;
+				return false;
 			}
 		}
 	}
@@ -110,7 +117,7 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 		serverEndPoint,
 	);
 	if (endPointResponse?.ok === false) {
-		return endPointResponse;
+		return false;
 	}
 	let $props: Record<string, any> = { data };
 
@@ -167,7 +174,7 @@ async function loadClientAndServerData(
 	params: Record<string, string>,
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
-) {
+): Promise<Response | void> {
 	if (clientEndPoint?.load) {
 		const clientUrl = new URL(document.location.href);
 		const clientParams = buildClientParams(clientUrl, params, data);
