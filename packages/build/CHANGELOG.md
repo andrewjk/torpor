@@ -1,5 +1,17 @@
 # @torpor/build
 
+## 0.1.25
+
+### Patch Changes
+
+- 3fe0d0e: Feat: set default error messages in responses
+- f26603f: Feat: basic error handling
+- Updated dependencies [f9fd76d]
+- Updated dependencies [1ddc240]
+- Updated dependencies [7b9dc31]
+  - @torpor/view@0.1.1
+  - @torpor/unplugin@0.1.12
+
 ## 0.1.24
 
 ### Patch Changes

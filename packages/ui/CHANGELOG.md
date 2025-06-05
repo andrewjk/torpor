@@ -1,5 +1,18 @@
 # @torpor/ui
 
+## 0.1.1
+
+### Patch Changes
+
+- 4e6a5aa: Break: rename PopoverContentStatic to PopoverContent
+- 2d7fae6: Fix: show the first tab content if no value set
+- a3a40f6: Fix: Popover issues
+- Updated dependencies [f9fd76d]
+- Updated dependencies [1ddc240]
+- Updated dependencies [7b9dc31]
+  - @torpor/view@0.1.1
+  - @torpor/unplugin@0.1.12
+
 ## 0.1.0
 
 ### Minor Changes

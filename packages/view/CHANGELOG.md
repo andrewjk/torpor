@@ -1,5 +1,13 @@
 # @torpor/view
 
+## 0.1.1
+
+### Patch Changes
+
+- f9fd76d: Fix: make sure an animated element has been added
+- 1ddc240: Fix: delay $mount effects until after hydrating
+- 7b9dc31: Fix: bind refs first, so they can be used in attributes
+
 ## 0.1.0
 
 ### Minor Changes

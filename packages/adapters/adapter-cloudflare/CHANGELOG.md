@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.0.27
+
+### Patch Changes
+
+- Updated dependencies [3fe0d0e]
+- Updated dependencies [f26603f]
+  - @torpor/build@0.1.25
+
 ## 0.0.26
 
 ### Patch Changes
