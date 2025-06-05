@@ -5,13 +5,13 @@ import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
  * The content that is displayed for a Popover when it is open, such as a Dialog
  * in the middle of the screen or a div that slides in from the side.
  */
-export default function PopoverContentStatic($props: any) {
+export default function PopoverContent($props: any) {
 	let div: HTMLDivElement;
 
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
 	if (!context) {
-		throw new Error("PopoverContentStatic must be contained within a Popover");
+		throw new Error("PopoverContent must be contained within a Popover");
 	}
 	let $state = context.state;
 
@@ -63,11 +63,11 @@ export default function PopoverContentStatic($props: any) {
 	}
 
 	@render {
-		<div style="display: content;">
+		<div style="display: contents">
 			@if ($state.visible) {
 				<div
 					id={$props.id}
-					class={`torp-popover-content-static ${$props.class ?? ""}`.trim()}
+					class={`torp-popover-content ${$props.class ?? ""}`.trim()}
 					&ref={div}
 				>
 					<:slot />

@@ -1,4 +1,4 @@
-import { Popover, PopoverContentStatic } from "../../../src/Popover/index";
+import { Popover, PopoverContent } from "../../../src/Popover/index";
 import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function DialogVariable($props: any) {
@@ -18,7 +18,7 @@ export default function DialogVariable($props: any) {
 			}
 
 			<Popover visible={$state.showPopover}>
-				<PopoverContentStatic>
+				<PopoverContent>
 					<Dialog>
 						<DialogBody>
 							<p>Which color do you prefer?</p>
@@ -28,7 +28,7 @@ export default function DialogVariable($props: any) {
 							<DialogButton value="red" onclick={() => ($state.color = "red")}>Red</DialogButton>
 						</DialogFooter>
 					</Dialog>
-				</PopoverContentStatic>
+				</PopoverContent>
 			</Popover>
 		</div>
 	}

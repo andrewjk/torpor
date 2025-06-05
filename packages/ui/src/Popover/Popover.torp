@@ -11,7 +11,7 @@ import { PopoverContextName, type Point, type PopoverContext, type PopoverState 
  * <Popover>
  * 	<PopoverOverlay /> (optional, if modal)
  * 	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
- * 	<PopoverContentStatic/PopoverContentAnchored/PopoverContentContextual />
+ * 	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
  * </Popover>
  * ```
  * @prop {boolean} modal -- Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers 

@@ -1,4 +1,4 @@
-import { Popover, PopoverContentStatic } from '../../../src/Popover/index';
+import { Popover, PopoverContent } from '../../../src/Popover/index';
 import {
 	Dialog,
 	DialogHeader,
@@ -16,7 +16,7 @@ export default function DialogAccessibility($props: any) {
 
 	@render {
 		<Popover visible modal={$props.modal}>
-			<PopoverContentStatic>
+			<PopoverContent>
 				<Dialog alert={$props.alert}>
 					<DialogHeader>Color preference</DialogHeader>
 					<DialogBody ariaAnnounce={$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
@@ -25,7 +25,7 @@ export default function DialogAccessibility($props: any) {
 						<DialogButton value="red" onclick={() => (color = 'red')}>Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentStatic>
+			</PopoverContent>
 		</Popover>
 	}
 }

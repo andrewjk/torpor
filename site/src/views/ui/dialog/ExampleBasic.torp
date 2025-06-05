@@ -1,4 +1,4 @@
-import { Popover, PopoverOverlay, PopoverContentStatic } from '@torpor/ui/Popover';
+import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
 
 export default function ExampleBasic($props: any) {
@@ -21,7 +21,7 @@ export default function ExampleBasic($props: any) {
 
 			<Popover class="modal" visible={$state.showPopover}>
 				<PopoverOverlay class="exdlgbas-overlay" />
-				<PopoverContentStatic class="exdlgbas-content">
+				<PopoverContent class="exdlgbas-content">
 					<Dialog>
 						<DialogHeader>
 							<h4>Header</h4>
@@ -34,7 +34,7 @@ export default function ExampleBasic($props: any) {
 							<DialogButton onclick={() => handleOption('red')}>Red</DialogButton>
 						</DialogFooter>
 					</Dialog>
-				</PopoverContentStatic>
+				</PopoverContent>
 			</Popover>	
 		</div>
 	}
@@ -42,13 +42,11 @@ export default function ExampleBasic($props: any) {
 	@style {
 		:global(.exdlgbas-overlay) {
 			background-color: rgba(0, 0, 0, 0.6);
-
-			position: static;
+			position: fixed;
 			top: 0;
 			left: 0;
 			height: 100vh;
 			width: 100vw;
-
 			z-index: 100;
 		}
 

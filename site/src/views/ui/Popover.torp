@@ -1,13 +1,13 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
 import copyCode from "../../lib/copyCode";
-import ExampleStatic from "./popover/ExampleStatic.torp";
+import ExampleDialog from "./popover/ExampleDialog.torp";
 import ExampleAnchored from "./popover/ExampleAnchored.torp";
 import ExampleContextual from "./popover/ExampleContextual.torp";
 import ExampleFunction from "./popover/ExampleFunction.torp";
 import ExampleMount from "./popover/ExampleMount.torp";
 import ExampleVariable from "./popover/ExampleVariable.torp";
 
-import ExampleStaticCode from "./popover/ExampleStatic.torp?raw";
+import ExampleDialogCode from "./popover/ExampleDialog.torp?raw";
 import ExampleAnchoredCode from "./popover/ExampleAnchored.torp?raw";
 import ExampleContextualCode from "./popover/ExampleContextual.torp?raw";
 import ExampleFunctionCode from "./popover/ExampleFunction.torp?raw";
@@ -33,7 +33,7 @@ export default function Component() {
 <Popover>
 	<PopoverOverlay /> (optional, if modal)
 	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
-	<PopoverContentStatic/PopoverContentAnchored/PopoverContentContextual />
+	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
 </Popover>
 `.trim()}</code></pre>
 			<h2>Demo</h2>
@@ -41,7 +41,7 @@ export default function Component() {
 				<TabList ariaLabel="Example tabs">
 					<TabHeader>
 						<TabTrigger class="example-tab-header">
-							Static
+							Dialog
 						</TabTrigger>
 					</TabHeader>
 					<TabHeader>
@@ -82,7 +82,7 @@ export default function Component() {
 						</TabList>
 						<TabContent>
 							<p class="example-preview">
-								<ExampleStatic />
+								<ExampleDialog />
 							</p>
 						</TabContent>
 						<TabContent>
@@ -90,7 +90,7 @@ export default function Component() {
 								<button type="button" class="example-copy-button" on:click={copyCode}>
 									Copy to clipboard
 								</button>
-								<pre><code>{ExampleStaticCode.trim()}</code></pre>
+								<pre><code>{ExampleDialogCode.trim()}</code></pre>
 							</div>
 						</TabContent>
 					</TabGroup>

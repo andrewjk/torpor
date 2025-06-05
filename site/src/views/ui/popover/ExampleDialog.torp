@@ -1,7 +1,7 @@
-import { Popover, PopoverOverlay, PopoverTrigger, PopoverContentStatic } from "@torpor/ui/Popover";
+import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
-export default function ExampleStatic($props: any) {
+export default function ExampleDialog($props: any) {
 	function handleOption(color: string) {
 		alert(`You prefer ${color}?!`);
 	}
@@ -10,13 +10,13 @@ export default function ExampleStatic($props: any) {
 		<div>
 			<p>
 				The button below shows a popover Dialog using the Popover, PopoverTrigger
-				and PopoverContentStatic components.
+				and PopoverContent components.
 			</p>
 
 			<Popover>
 				<PopoverOverlay class="expopsta-overlay" />
 				<PopoverTrigger>Show a popover</PopoverTrigger>
-				<PopoverContentStatic class="expopsta-content">
+				<PopoverContent class="expopsta-content">
 					<Dialog>
 						<DialogHeader>
 							<h4>Header</h4>
@@ -29,7 +29,7 @@ export default function ExampleStatic($props: any) {
 							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 						</DialogFooter>
 					</Dialog>
-				</PopoverContentStatic>
+				</PopoverContent>
 			</Popover>
 		</div>
 	}

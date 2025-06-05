@@ -1,4 +1,4 @@
-import { Popover, PopoverOverlay, PopoverContentStatic } from "@torpor/ui/Popover";
+import { Popover, PopoverOverlay, PopoverContent } from "@torpor/ui/Popover";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function InfoDialog($props: any) {
@@ -7,7 +7,7 @@ export default function InfoDialog($props: any) {
 	@render {
 		<Popover visible callback={$props.callback}>
 			<PopoverOverlay class="info-dialog-overlay" />
-			<PopoverContentStatic class="info-dialog-content">
+			<PopoverContent class="info-dialog-content">
 				<Dialog>
 					@if ($props.header) {
 						<DialogHeader>
@@ -25,7 +25,7 @@ export default function InfoDialog($props: any) {
 						</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentStatic>
+			</PopoverContent>
 		</Popover>
 	}
 

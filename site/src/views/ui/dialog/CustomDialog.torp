@@ -1,11 +1,11 @@
-import { Popover, PopoverOverlay, PopoverContentStatic } from '@torpor/ui/Popover';
+import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
 
 export default function CustomDialog($props: any) {
 	@render {
 		<Popover visible callback={$props.callback}>
 			<PopoverOverlay class="custom-dialog-overlay" />
-			<PopoverContentStatic class="custom-dialog-content">
+			<PopoverContent class="custom-dialog-content">
 				<Dialog>
 					<DialogHeader>
 						<h4>Header</h4>
@@ -18,7 +18,7 @@ export default function CustomDialog($props: any) {
 						<DialogButton value="red">Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentStatic>
+			</PopoverContent>
 		</Popover>
 	}
 

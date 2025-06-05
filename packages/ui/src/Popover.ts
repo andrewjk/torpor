@@ -1,7 +1,7 @@
 import Popover from "./Popover/Popover.torp";
+import PopoverContent from "./Popover/PopoverContent.torp";
 import PopoverContentAnchored from "./Popover/PopoverContentAnchored.torp";
 import PopoverContentContextual from "./Popover/PopoverContentContextual.torp";
-import PopoverContentStatic from "./Popover/PopoverContentStatic.torp";
 import PopoverOverlay from "./Popover/PopoverOverlay.torp";
 import PopoverTrigger from "./Popover/PopoverTrigger.torp";
 import PopoverTriggerContextual from "./Popover/PopoverTriggerContextual.torp";
@@ -20,7 +20,7 @@ export {
 	PopoverTriggerContextual,
 	PopoverContentAnchored,
 	PopoverContentContextual,
-	PopoverContentStatic,
+	PopoverContent,
 	showPopover,
 	showPopoverPrompt,
 	clickPopover,

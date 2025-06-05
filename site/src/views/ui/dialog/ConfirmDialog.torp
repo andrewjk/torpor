@@ -1,4 +1,4 @@
-import { Popover, PopoverOverlay, PopoverContentStatic } from '@torpor/ui/Popover';
+import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
 
 export default function ConfirmDialog($props: any) {
@@ -8,7 +8,7 @@ export default function ConfirmDialog($props: any) {
 	@render {
 		<Popover visible callback={$props.callback}>
 			<PopoverOverlay class="confirm-dialog-overlay" />
-			<PopoverContentStatic class="confirm-dialog-content">
+			<PopoverContent class="confirm-dialog-content">
 				<Dialog>
 					@if ($props.header) {
 						<DialogHeader>
@@ -29,7 +29,7 @@ export default function ConfirmDialog($props: any) {
 						</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentStatic>
+			</PopoverContent>
 		</Popover>
 	}
 

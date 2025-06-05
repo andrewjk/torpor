@@ -1,10 +1,10 @@
-import { Popover, PopoverContentStatic } from "../../../src/Popover/index";
+import { Popover, PopoverContent } from "../../../src/Popover/index";
 import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function CustomDialog($props: any) {
 	@render {
 		<Popover visible callback={$props.callback}>
-			<PopoverContentStatic>
+			<PopoverContent>
 				<Dialog>
 					<DialogBody>
 						<p>Which color do you prefer?</p>
@@ -14,7 +14,7 @@ export default function CustomDialog($props: any) {
 						<DialogButton value="red">Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentStatic>
+			</PopoverContent>
 		</Popover>
 	}
 }
