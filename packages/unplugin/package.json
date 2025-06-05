@@ -116,9 +116,9 @@
 		"unplugin": "^2.3.5"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^4.13.2",
-		"@nuxt/kit": "^3.17.4",
-		"@nuxt/schema": "^3.17.4",
+		"@antfu/eslint-config": "^4.13.3",
+		"@nuxt/kit": "^3.17.5",
+		"@nuxt/schema": "^3.17.5",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/node": "^22.15.29",
 		"bumpp": "^10.1.1",
@@ -133,7 +133,7 @@
 		"tsup": "^8.5.0",
 		"typescript": "^5.8.3",
 		"vite": "^6.3.5",
-		"vitest": "^3.2.0",
+		"vitest": "^3.2.1",
 		"webpack": "^5.99.9"
 	}
 }
