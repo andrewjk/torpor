@@ -1,0 +1,38 @@
+import { Popover, PopoverTriggerHover, PopoverContentContextual } from "@torpor/ui/Popover";
+
+export default function ExampleHover($props: any) {
+	function handleOption(color: string) {
+		alert(`You prefer ${color}?!`);
+	}
+
+	@render {
+		<div>
+			<p>Hover over the panel below to trigger a tooltip.</p>
+
+			<Popover>
+				<PopoverTriggerHover class="expophov-target">Hover me</PopoverTriggerHover>
+				<PopoverContentContextual class="expophov-content">
+					I'm a tooltip...
+				</PopoverContentContextual>
+			</Popover>
+		</div>
+	}
+
+	@style {
+		:global(.expophov-target) {
+			border: 1px dashed #222;
+			border-radius: 4px;
+			cursor: default;
+			padding: 20px;
+		}
+
+		:global(.expophov-content) {
+			background: #333;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			color: white;
+			padding: 10px;
+			z-index: 200;
+		}
+	}
+}

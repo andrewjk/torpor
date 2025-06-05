@@ -46,10 +46,11 @@ export default function Layout() {
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: center;
+			//justify-content: center;
 			background: #f6f6f6;
 			border-radius: 4px;
 			height: 340px;
+			padding: 20px;
 		}
 
 		:global(.example-code) {

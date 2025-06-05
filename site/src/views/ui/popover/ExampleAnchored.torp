@@ -10,8 +10,8 @@ export default function ExampleAnchored($props: any) {
 	@render {
 		<div>
 			<p>
-				The button below shows a popover Dialog using the Popover, PopoverTrigger and
-				PopoverContentAnchored components.
+				The button below shows a popover Dialog below itself using the Popover,
+				PopoverTrigger and PopoverContentAnchored components.
 			</p>
 
 			<Popover>

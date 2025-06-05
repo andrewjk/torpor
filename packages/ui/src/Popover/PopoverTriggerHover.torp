@@ -13,7 +13,15 @@ export default function PopoverTriggerHover($props: any) {
 	}
 	let $state = context.state;
 
-	function handleHover() {
+	function handleHover(node, e) {
+		if ($state.position) {
+			// Get the position relative to the element, so we can reposition on scroll
+			const rect = node.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			$state.position = { x, y };
+			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
+		}
 		$state.visible = !$state.visible
 	}
 

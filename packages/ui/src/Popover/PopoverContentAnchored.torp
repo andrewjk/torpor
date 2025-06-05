@@ -91,7 +91,7 @@ export default function PopoverContentAnchored($props: any) {
 	}
 
 	@render {
-		<div style="display: content;">
+		<div style="display: contents">
 			@if ($state.visible) {
 				<div
 					id={$props.id}

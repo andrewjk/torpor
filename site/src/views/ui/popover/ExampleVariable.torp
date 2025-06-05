@@ -16,7 +16,7 @@ export default function ExampleVariable($props: any) {
 
 			@if ($state.showPopover) {
 				<Popover anchor={button} visible>
-					<PopoverContentAnchored class="expopvar-content" side="top">
+					<PopoverContentAnchored class="expopvar-content" side="bottom">
 						You showed the popover!
 					</PopoverContentAnchored>
 				</Popover>

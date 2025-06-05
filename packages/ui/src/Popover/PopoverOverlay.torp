@@ -16,7 +16,7 @@ export default function PopoverOverlay($props: any) {
 	context.modal = true;
 
 	@render {
-		<div style="display: content;">
+		<div style="display: contents">
 			@if ($state.visible) {
 				<div
 					id={$props.id}
