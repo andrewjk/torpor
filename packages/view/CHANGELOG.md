@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.1.2
+
+### Patch Changes
+
+- 0e69292: Fix: null check
+- b69fde1: Fix: replace for var names in control statements
+
 ## 0.1.1
 
 ### Patch Changes

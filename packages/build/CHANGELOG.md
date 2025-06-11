@@ -1,5 +1,15 @@
 # @torpor/build
 
+## 0.1.26
+
+### Patch Changes
+
+- 348cd75: Feat: allow creating the Site router with files
+- Updated dependencies [0e69292]
+- Updated dependencies [b69fde1]
+  - @torpor/view@0.1.2
+  - @torpor/unplugin@0.1.13
+
 ## 0.1.25
 
 ### Patch Changes
