@@ -5,6 +5,7 @@ import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const replaceAnchorName = node.varName!;
@@ -38,7 +39,7 @@ function buildReplaceBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${node.statement};`);
+	b.append(`${replaceForVarNames(node.statement, status)};`);
 	b.append(`t_run_branch(${rangeName}, -1, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");

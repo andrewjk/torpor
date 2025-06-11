@@ -6,6 +6,7 @@ import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: Are there too many branches for ifs etc?
 
@@ -55,7 +56,7 @@ function buildIfBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${node.statement} {`);
+	b.append(`${replaceForVarNames(node.statement, status)} {`);
 	b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
