@@ -193,7 +193,7 @@ function moveChildEffects(oldValue, newValue, oldData, newData) {
     if (props) {
       newData.propData.set(key, props);
       let oldPropValue = oldValue[key];
-      let oldPropData = oldPropValue[proxyDataSymbol];
+      let oldPropData = oldPropValue != null ? oldPropValue[proxyDataSymbol] : void 0;
       if (oldPropData) {
         newValue[key] = $watch(newValue[key]);
       }
