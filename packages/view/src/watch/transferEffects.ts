@@ -28,7 +28,7 @@ function moveChildEffects(
 			newData.propData.set(key, props);
 
 			let oldPropValue = oldValue[key];
-			let oldPropData = oldPropValue[proxyDataSymbol];
+			let oldPropData = oldPropValue != null ? oldPropValue[proxyDataSymbol] : undefined;
 
 			// If the old value was a proxy, make the new value one too
 			// TODO: Make sure we aren't accidentally creating proxies for
