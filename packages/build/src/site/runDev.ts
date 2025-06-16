@@ -16,11 +16,11 @@ export default async function runDev(site: Site): Promise<void> {
 	// Create the Vite server in middleware mode and configure the app type as
 	// "custom", disabling Vite's own HTML serving logic so the parent server
 	// can take control
-	const vite = await createViteServer({
-		server: { middlewareMode: true },
-		appType: "custom",
-		plugins: [manifest(site, true), torpor(), ...site.plugins],
-	});
+	const config = structuredClone(site.viteConfig ?? {});
+	config.server = { middlewareMode: true };
+	config.appType = "custom";
+	config.plugins = [manifest(site, true), torpor(), ...site.plugins];
+	const vite = await createViteServer(config);
 
 	// Read site.html
 	// It's called site.html because @torpor/build builds the site (html, routes
