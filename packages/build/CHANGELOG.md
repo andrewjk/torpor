@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.27
+
+### Patch Changes
+
+- bed55d5: Feat: allow passing Vite options in dev
+
 ## 0.1.26
 
 ### Patch Changes

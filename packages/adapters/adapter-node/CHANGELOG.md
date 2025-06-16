@@ -1,5 +1,12 @@
 # @torpor/adapter-node
 
+## 0.0.25
+
+### Patch Changes
+
+- Updated dependencies [bed55d5]
+  - @torpor/build@0.1.27
+
 ## 0.0.24
 
 ### Patch Changes
