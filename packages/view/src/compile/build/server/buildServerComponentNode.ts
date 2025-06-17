@@ -34,6 +34,17 @@ export default function buildServerComponentNode(
 				name = name.substring(1, name.length - 1);
 				const propName = name.split(".").at(-1);
 				b.append(`${propsName}["${propName}"] = ${name};`);
+			} else if (name === ":class" && value != null && isFullyReactive(value)) {
+				status.imports.add("t_class");
+				value = value.substring(1, value.length - 1);
+				if (node.scopeStyles) {
+					value += `, "torp-${status.styleHash}"`;
+				}
+				b.append(`${propsName}["class"] = t_class(${value});`);
+			} else if (name === ":style" && value != null && isFullyReactive(value)) {
+				status.imports.add("t_style");
+				value = value.substring(1, value.length - 1);
+				b.append(`${propsName}["style"] = t_style(${value});`);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);

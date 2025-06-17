@@ -28,12 +28,22 @@ export default function Class() {
 			<div :class={[ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ]}>
 				Class nested
 			</div>
-		</div>		
+
+			<Child :class={{ "child-class": true }} />
+		</div>
 	}
 
 	@style {
 		div {
 			color: blue;
 		}
+	}
+}
+
+function Child() {
+	@render {
+		<div class={$props.class}>
+			Child class
+		</div>
 	}
 }

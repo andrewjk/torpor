@@ -52,6 +52,17 @@ export default function buildComponentNode(
 				value = value.substring(1, value.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${value};`, status, b);
 				buildRun("setBinding", `${value} = ${propsName}["${name}"];`, status, b);
+			} else if (name === ":class" && value != null && isFullyReactive(value)) {
+				status.imports.add("t_class");
+				value = value.substring(1, value.length - 1);
+				if (node.scopeStyles) {
+					value += `, "torp-${status.styleHash}"`;
+				}
+				buildRun("setClasses", `${propsName}["class"] = t_class(${value});`, status, b);
+			} else if (name === ":style" && value != null && isFullyReactive(value)) {
+				status.imports.add("t_style");
+				value = value.substring(1, value.length - 1);
+				buildRun("setStyles", `${propsName}["style"] = t_style(${value});`, status, b);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
 				let partlyReactive = isReactive(value);
