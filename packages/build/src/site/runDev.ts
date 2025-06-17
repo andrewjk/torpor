@@ -1,3 +1,4 @@
+import estorpor from "@torpor/unplugin/esbuild";
 import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
 import { promises as fs } from "node:fs";
@@ -20,6 +21,17 @@ export default async function runDev(site: Site): Promise<void> {
 	config.server = { middlewareMode: true };
 	config.appType = "custom";
 	config.plugins = [manifest(site, true), torpor(), ...site.plugins];
+
+	// HACK: To be able to import `.torp` files from barrel files in
+	// node_modules, we need to add their libraries to `ssr.noExternal` in
+	// site.config.ts, and let esbuild know how to compile them here
+	config.optimizeDeps ??= {};
+	config.optimizeDeps.extensions ??= [];
+	config.optimizeDeps.extensions.push(".torp");
+	config.optimizeDeps.esbuildOptions ??= {};
+	config.optimizeDeps.esbuildOptions.plugins ??= [];
+	config.optimizeDeps.esbuildOptions.plugins.push(estorpor());
+
 	const vite = await createViteServer(config);
 
 	// Read site.html
