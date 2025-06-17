@@ -1,4 +1,5 @@
 import { type TemplateNode } from "../types/nodes/TemplateNode";
+import isComponentNode from "../types/nodes/isComponentNode";
 import isElementNode from "../types/nodes/isElementNode";
 import isParentNode from "../types/nodes/isParentNode";
 import { type StyleBlock } from "../types/styles/StyleBlock";
@@ -18,7 +19,7 @@ export default function scopeStyles(status: ParseStatus): void {
 }
 
 function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
-	if (isElementNode(node)) {
+	if (isElementNode(node) || isComponentNode(node)) {
 		let scopeStyles = selectors.includes(node.tagName);
 		if (!scopeStyles) {
 			for (let a of node.attributes) {
