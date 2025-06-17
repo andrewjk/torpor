@@ -18,20 +18,24 @@ const globalStyleRegex = /\:global\((.+)\)/;
 function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 	// TODO: This should probably be done while parsing
 	// And handle attribute selectors
-	const selectors = block.selector
-		.split(/([\s*,>+~])/)
-		.filter((s) => !!s.trim())
-		.map((s) => {
-			if (s.length === 1 && "*,>+~".includes(s)) {
-				return s;
-			} else if (globalStyleRegex.test(s)) {
-				return s.match(globalStyleRegex)![1];
-			} else {
-				return `${s}.torp-${styleHash}`;
-			}
-		});
-
-	b.append(`${selectors.join(" ")} {`);
+	if (block.selector.startsWith("@")) {
+		// Just output media queries and properties as-is
+		b.append(`${block.selector} {`);
+	} else {
+		const selectors = block.selector
+			.split(/([\s*,>+~])/)
+			.filter((s) => !!s.trim())
+			.map((s) => {
+				if (s.length === 1 && "*,>+~".includes(s)) {
+					return s;
+				} else if (globalStyleRegex.test(s)) {
+					return s.match(globalStyleRegex)![1];
+				} else {
+					return `${s}.torp-${styleHash}`;
+				}
+			});
+		b.append(`${selectors.join(" ")} {`);
+	}
 	for (let attribute of block.attributes) {
 		buildStyleAttribute(attribute, b);
 	}
