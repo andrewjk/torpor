@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.4
+
+### Patch Changes
+
+- daba2ad: Fix: passing `:class` and `:style` to components
+
 ## 0.1.3
 
 ### Patch Changes

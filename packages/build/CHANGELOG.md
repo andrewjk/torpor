@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.1.30
+
+### Patch Changes
+
+- Updated dependencies [daba2ad]
+  - @torpor/view@0.1.4
+  - @torpor/unplugin@0.1.15
+
 ## 0.1.29
 
 ### Patch Changes
