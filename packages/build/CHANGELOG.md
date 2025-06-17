@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.1.28
+
+### Patch Changes
+
+- fa85b57: Fix: force `.torp` file compilation in dev
+
 ## 0.1.27
 
 ### Patch Changes

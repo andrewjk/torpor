@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/build",
-	"version": "0.1.27",
+	"version": "0.1.28",
 	"description": "A framework for building sites and apps with Torpor",
 	"type": "module",
 	"main": "dist/index.cjs",
