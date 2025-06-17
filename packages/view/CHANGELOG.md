@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.3
+
+### Patch Changes
+
+- de51225: Fix: passing `:class` and `:style` to components
+
 ## 0.1.2
 
 ### Patch Changes

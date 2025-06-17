@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [de51225]
+  - @torpor/view@0.1.3
+  - @torpor/unplugin@0.1.14
+
 ## 0.1.2
 
 ### Patch Changes
