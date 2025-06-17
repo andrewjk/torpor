@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.5
+
+### Patch Changes
+
+- f390b78: Fix: don't scope media queries and CSS properties
+
 ## 0.1.4
 
 ### Patch Changes

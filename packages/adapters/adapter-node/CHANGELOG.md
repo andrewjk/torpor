@@ -1,5 +1,11 @@
 # @torpor/adapter-node
 
+## 0.0.29
+
+### Patch Changes
+
+- @torpor/build@0.1.31
+
 ## 0.0.28
 
 ### Patch Changes
