@@ -36,7 +36,7 @@ export default function Class(
 	/* @component */
 	const t_props_1: any = $watch({});
 	$run(function setClasses() {
-		t_props_1["class"] = t_class({ "child-class": true });
+		t_props_1["class"] = t_class({ "child-class": true }, "torp-1ljxz83");
 	});
 	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
 	$run(function setClasses() {

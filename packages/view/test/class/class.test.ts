@@ -97,7 +97,7 @@ function check(container: HTMLElement, state: State) {
 
 	// Components
 	expect(queryByText(container, "Child class")).not.toBeNull();
-	expect(queryByText(container, "Child class")).toHaveClass("child-class", {
+	expect(queryByText(container, "Child class")).toHaveClass("child-class torp-1ljxz83", {
 		exact: true,
 	});
 }
