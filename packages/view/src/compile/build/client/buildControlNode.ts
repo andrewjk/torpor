@@ -71,7 +71,8 @@ export default function buildControlNode(node: ControlNode, status: BuildStatus,
 			buildScriptNode(node, b);
 			break;
 		}
-		case "@function": {
+		case "@function":
+		case "@async function": {
 			b.append("");
 			buildScriptNode(node, b);
 			b.append("");

@@ -20,4 +20,5 @@ export type OperationType =
 	| "@const"
 	| "@console"
 	| "@debugger"
-	| "@function";
+	| "@function"
+	| "@async function";

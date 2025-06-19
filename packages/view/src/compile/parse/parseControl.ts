@@ -30,9 +30,18 @@ const controlOperations = [
 	"@console",
 	"@debugger",
 	"@function",
+	"@async function",
 ];
 
-const standaloneOperations = ["@key", "@html", "@const", "@console", "@debugger", "@function"];
+const standaloneOperations = [
+	"@key",
+	"@html",
+	"@const",
+	"@console",
+	"@debugger",
+	"@function",
+	"@async function",
+];
 
 export default function parseControl(
 	status: ParseStatus,
@@ -91,7 +100,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 	for (status.i; status.i < status.source.length; status.i++) {
 		const char = status.source[status.i];
 		if (
-			isSpaceChar(status.source, status.i) ||
+			(isSpaceChar(status.source, status.i) && operation !== "@async") ||
 			(accept(":", status) && operation === "default") ||
 			(accept(".", status) && operation === "@console") ||
 			(accept("(", status, false) && operation === "@html")
@@ -111,7 +120,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 		statement = parseControlStatement(start, operation, status);
 
 		// Special processing for functions -- read until the closing brace
-		if (operation === "@function") {
+		if (operation === "@function" || operation === "@async function") {
 			statement += ` {${parseInlineScript(status)}}`;
 			accept("}", status);
 		}

@@ -77,7 +77,8 @@ export default function buildServerControlNode(
 			buildServerScriptNode(node, b);
 			break;
 		}
-		case "@function": {
+		case "@function":
+		case "@async function": {
 			if (status.output) {
 				b.append(`$output += \`${status.output}\`;`);
 				status.output = "";
