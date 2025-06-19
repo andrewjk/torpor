@@ -35,7 +35,7 @@ export default function NavMenuLink($props: any) {
 			id={$props.id}
 			class={`torp-nav-menu-link ${$props.class ?? ""}`.trim()}
 			href={$props.href}
-			disabled={$props.disabled}
+			{$props.disabled}
 			target={$props.newWindow ? "_blank" : undefined}
 			role="menuitem"
 			aria-disabled={$props.disabled ? "true" : undefined}

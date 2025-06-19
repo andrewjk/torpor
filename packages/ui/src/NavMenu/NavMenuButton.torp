@@ -30,9 +30,9 @@ export default function NavMenuButton($props: any) {
 			id={$props.id}
 			class={`torp-nav-menu-button ${$props.class ?? ""}`.trim()}
 			type="button"
-			{disabled}
+			{$props.disabled}
 			role="menuitem"
-			aria-disabled={disabled ? "true" : undefined}
+			aria-disabled={$props.disabled ? "true" : undefined}
 			data-disabled={dataDisabled}
 			onkeydown
 			onkeydown={handleItemKey}

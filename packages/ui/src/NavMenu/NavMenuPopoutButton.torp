@@ -99,7 +99,7 @@ export default function NavMenuPopoutButton($props: any) {
 			id={$props.id}
 			class={`torp-nav-menu-popout-button ${$props.class ?? ""}`.trim()}
 			type="button"
-			disabled={$props.disabled}
+			{$props.disabled}
 			role="menuitem"
 			aria-haspopup="true"
 			aria-expanded={$state.visible.toString()}
