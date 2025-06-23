@@ -1,6 +1,6 @@
 import fg from "fast-glob";
 import crypto from "node:crypto";
-import { exists, existsSync, promises as fs, unlinkSync } from "node:fs";
+import { existsSync, promises as fs, unlinkSync } from "node:fs";
 import path from "node:path";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
