@@ -27,7 +27,7 @@ export default function Style(
 	$run(function setStyles() {
 		t_div_1.setAttribute("style", t_style({ color: $props.color }));
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

@@ -29,10 +29,10 @@ export default function Header(
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Default header... `);
 		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_1);
-		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1);
+		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1, t_text_1);
 		t_next(t_text_1);
 	}
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h2_1);
 	t_next(t_h2_1);
 
 }

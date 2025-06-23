@@ -55,7 +55,7 @@ export default function AnswerButtonApp(
 	$run(function setTextContent() {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

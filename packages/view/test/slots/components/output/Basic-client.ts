@@ -39,7 +39,7 @@ export default function Basic(
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Basic stuff `);
 		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_2);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor);
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
 		t_next(t_text_1);
 	}
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);

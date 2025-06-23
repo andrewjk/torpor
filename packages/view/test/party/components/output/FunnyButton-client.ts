@@ -31,10 +31,10 @@ export default function FunnyButton(
 		const t_root_1 = t_root(t_fragment_1);
 		// @ts-ignore
 		const t_text_1 = t_next(t_root_1, 2);
-		t_add_fragment(t_fragment_1, t_button_1, t_slot_anchor_1);
+		t_add_fragment(t_fragment_1, t_button_1, t_slot_anchor_1, t_text_1);
 		t_next(t_text_1);
 	}
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1);
 	t_next(t_button_1);
 
 }

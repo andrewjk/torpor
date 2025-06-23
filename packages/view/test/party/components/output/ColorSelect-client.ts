@@ -83,7 +83,7 @@ export default function ColorSelect(
 			$run(function setTextContent() {
 				t_text_2.textContent = ` ${t_fmt(t_item.data.color.text)} `;
 			});
-			t_add_fragment(t_fragment_1, t_select_1, t_before);
+			t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
 			t_next(t_text_3);
 			t_pop_range(t_old_range_1);
 		}
@@ -96,7 +96,7 @@ export default function ColorSelect(
 		t_select_1.value = $state.selectedColorId || "";
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

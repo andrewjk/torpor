@@ -38,7 +38,7 @@ export default function UserProfileContext(
 		t_text_2.textContent = `Email: ${t_fmt($context.user.email)}`;
 	});
 	t_event(t_button_1, "click", () => ($context.user.username = "Jane"));
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

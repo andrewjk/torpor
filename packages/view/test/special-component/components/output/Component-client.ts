@@ -58,7 +58,7 @@ export default function Component(
 				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` Hello! `);
 				// @ts-ignore
 				const t_text_1 = t_root(t_fragment_3);
-				t_add_fragment(t_fragment_3, $sparent, $sanchor);
+				t_add_fragment(t_fragment_3, $sparent, $sanchor, t_text_1);
 				t_next(t_text_1);
 			}
 			components[$props.self](t_fragment_1, t_comp_anchor_1, t_props_1, $context, t_slots_1);

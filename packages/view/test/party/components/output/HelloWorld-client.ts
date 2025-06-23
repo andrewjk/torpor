@@ -21,7 +21,7 @@ export default function HelloWorld(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h1>Hello world</h1>`);
 	// @ts-ignore
 	const t_h1_1 = t_root(t_fragment_0) as HTMLElement;
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h1_1);
 	t_next(t_h1_1);
 
 }

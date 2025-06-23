@@ -6,6 +6,9 @@ export default function IfElse($props: { counter: number }) {
 				<p>
 					It's true!
 				</p>
+				<p>
+					That's right
+				</p>
 			} else {
 				<p>
 					It's not true...

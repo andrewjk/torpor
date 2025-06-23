@@ -38,7 +38,7 @@ export default function Reactive(
 	});
 	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
 	t_event(t_button_1, "click", () => $state.text = "after");
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }
@@ -64,7 +64,7 @@ function Child(
 	$run(function setTextContent() {
 		t_text_1.textContent = ` ${t_fmt($props.text)} `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
 	t_next(t_p_1);
 
 }

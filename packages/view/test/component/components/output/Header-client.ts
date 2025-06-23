@@ -29,7 +29,7 @@ export default function Header(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hi, ${t_fmt($props.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h2_1);
 	t_next(t_h2_1);
 
 }

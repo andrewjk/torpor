@@ -39,7 +39,7 @@ export default function If(
 				const t_root_1 = t_root(t_fragment_1);
 				// @ts-ignore
 				const t_text_1 = t_next(t_root_1, 2);
-				t_add_fragment(t_fragment_1, t_div_1, t_before);
+				t_add_fragment(t_fragment_1, t_div_1, t_before, t_text_1);
 				t_next(t_text_1);
 			});
 		}
@@ -50,13 +50,13 @@ export default function If(
 				const t_root_2 = t_root(t_fragment_2);
 				// @ts-ignore
 				const t_text_2 = t_next(t_root_2, 2);
-				t_add_fragment(t_fragment_2, t_div_1, t_before);
+				t_add_fragment(t_fragment_2, t_div_1, t_before, t_text_2);
 				t_next(t_text_2);
 			});
 		}
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

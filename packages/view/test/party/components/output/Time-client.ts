@@ -41,7 +41,7 @@ export default function Time(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Current time: ${t_fmt($state.time)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
 	t_next(t_p_1);
 
 }

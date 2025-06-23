@@ -46,7 +46,7 @@ export default function UserProfileContextApp(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Welcome back, ${t_fmt($user.username)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

@@ -41,7 +41,7 @@ export default function Named(
 		const t_root_2 = t_root(t_fragment_2);
 		// @ts-ignore
 		const t_text_1 = t_next(t_root_2, 2);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor);
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
 		t_next(t_text_1);
 	}
 	t_slots_1["header"] = (
@@ -55,7 +55,7 @@ export default function Named(
 		const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` The article's header `);
 		// @ts-ignore
 		const t_text_2 = t_root(t_fragment_3);
-		t_add_fragment(t_fragment_3, $sparent, $sanchor);
+		t_add_fragment(t_fragment_3, $sparent, $sanchor, t_text_2);
 		t_next(t_text_2);
 	}
 	Article(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);

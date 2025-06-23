@@ -50,7 +50,7 @@ export default function Self(
 				Self(t_fragment_1, t_comp_anchor_1, t_props_1, $context);
 				// @ts-ignore
 				const t_text_2 = t_next(t_comp_anchor_1);
-				t_add_fragment(t_fragment_1, t_div_1, t_before);
+				t_add_fragment(t_fragment_1, t_div_1, t_before, t_text_2);
 				t_next(t_text_2);
 			});
 		}
@@ -63,7 +63,7 @@ export default function Self(
 	$run(function setTextContent() {
 		t_text_1.textContent = ` Level ${t_fmt($props.level)} `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

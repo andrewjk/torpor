@@ -23,7 +23,7 @@ export default function Console(
 	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	/* @console */
 	console.log("@console is logging here");
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

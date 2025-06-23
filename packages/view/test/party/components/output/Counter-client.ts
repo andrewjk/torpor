@@ -40,7 +40,7 @@ export default function Counter(
 		t_text_1.textContent = `Counter: ${t_fmt($state.count)}`;
 	});
 	t_event(t_button_1, "click", incrementCount);
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

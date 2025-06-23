@@ -13,7 +13,7 @@ export default function IfElse(
 	let $output = "";
 	$output += `<div> <![>`;
 	if ($props.counter > 7) {
-		$output += ` <p> It's true! </p> `;
+		$output += ` <p> It's true! </p> <p> That's right </p> `;
 	}
 	else {
 		$output += ` <p> It's not true... </p> `;

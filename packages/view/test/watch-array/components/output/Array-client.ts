@@ -62,13 +62,13 @@ export default function Array(
 			$run(function setTextContent() {
 				t_text_1.textContent = ` ${t_fmt(t_item.data.item.text)} `;
 			});
-			t_add_fragment(t_fragment_1, t_section_1, t_before);
+			t_add_fragment(t_fragment_1, t_section_1, t_before, t_text_2);
 			t_next(t_text_2);
 			t_pop_range(t_old_range_1);
 		}
 	);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
 	t_next(t_section_1);
 
 }

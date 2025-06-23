@@ -64,13 +64,13 @@ export default function List(
 			}
 			// @ts-ignore
 			const t_text_1 = t_next(t_slot_parent_1);
-			t_add_fragment(t_fragment_1, t_ul_1, t_before);
+			t_add_fragment(t_fragment_1, t_ul_1, t_before, t_text_1);
 			t_next(t_text_1);
 			t_pop_range(t_old_range_1);
 		}
 	);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_ul_1);
 	t_next(t_ul_1);
 
 }

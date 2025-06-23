@@ -32,7 +32,7 @@ export default function ParentChild(
 	const t_props_1: any = $watch({});
 	t_props_1["name"] = "Anna";
 	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }
@@ -58,7 +58,7 @@ function Child(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hello, ${t_fmt($props.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h2_1);
 	t_next(t_h2_1);
 
 }

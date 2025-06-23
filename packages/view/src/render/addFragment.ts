@@ -6,9 +6,10 @@ export default function addFragment(
 	fragment: DocumentFragment,
 	parent: ParentNode,
 	before: Node | null,
+	endNode?: ChildNode,
 ): void {
-	//console.log(`adding fragment '${fragment.textContent}' to ${printNode(parent)}`);
-	//console.log("before", printNode(before));
+	//console.log(`adding fragment '${fragment.textContent}' to `, parent);
+	//console.log("before", before);
 
 	const range = context.activeRange;
 	const hydrationNode = context.hydrationNode;
@@ -16,7 +17,7 @@ export default function addFragment(
 	// Set the active range's end node to the last node in the fragment
 	if (range) {
 		if (hydrationNode) {
-			range.endNode = hydrationNode;
+			range.endNode = endNode ?? hydrationNode;
 		} else {
 			range.startNode = fragment.firstChild;
 			range.endNode = fragment.lastChild;
@@ -45,7 +46,7 @@ export default function addFragment(
 	if (!parentIsFragment) {
 		// Only run $mount effects if not hydrating (if hydrating, they will get
 		// run at the end when everything is hooked up)
-		if (!context.hydrationNode) {
+		if (!hydrationNode) {
 			for (let effect of context.mountEffects) {
 				$run(effect);
 			}

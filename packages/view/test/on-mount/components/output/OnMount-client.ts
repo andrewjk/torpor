@@ -25,7 +25,7 @@ export default function OnMount(
 	$mount(function elMount() {
 		return ((node) => node.value = "hi")(t_input_1);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_input_1);
 	t_next(t_input_1);
 
 }

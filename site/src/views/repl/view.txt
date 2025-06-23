@@ -298,12 +298,12 @@ async function animate(el, enter, keyframes, options) {
 }
 
 // src/render/addFragment.ts
-function addFragment(fragment, parent, before) {
+function addFragment(fragment, parent, before, endNode) {
   const range = context_default.activeRange;
   const hydrationNode = context_default.hydrationNode;
   if (range) {
     if (hydrationNode) {
-      range.endNode = hydrationNode;
+      range.endNode = endNode ?? hydrationNode;
     } else {
       range.startNode = fragment.firstChild;
       range.endNode = fragment.lastChild;
@@ -317,7 +317,7 @@ function addFragment(fragment, parent, before) {
     parent.insertBefore(fragment, before);
   }
   if (!parentIsFragment) {
-    if (!context_default.hydrationNode) {
+    if (!hydrationNode) {
       for (let effect of context_default.mountEffects) {
         $run(effect);
       }

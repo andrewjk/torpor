@@ -44,7 +44,7 @@ export default function BindComponent(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }
@@ -81,7 +81,7 @@ function BindText(
 				t_input_1.value = $props.name || "";
 			});
 			t_event(t_input_1, "input", (e) => $props.name = e.target.value);
-			t_add_fragment(t_fragment_0, $parent, $anchor);
+			t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 			t_next(t_div_1);
 
 		}

@@ -29,10 +29,10 @@ export default function Element(
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Hello! `);
 		let t_element_2 = t_root(t_fragment_1) as HTMLElement;
-		t_add_fragment(t_fragment_1, t_element_1, null);
+		t_add_fragment(t_fragment_1, t_element_1, null, t_element_2);
 		t_next(t_element_2);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
 	t_next(t_element_1);
 
 }

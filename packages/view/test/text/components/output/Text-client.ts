@@ -39,7 +39,7 @@ export default function Text(
 	$run(function setTextContent() {
 		t_text_2.textContent = t_fmt($props.empty);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

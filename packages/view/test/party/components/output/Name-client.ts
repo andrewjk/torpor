@@ -33,7 +33,7 @@ export default function Name(
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hello ${t_fmt($state.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h1_1);
 	t_next(t_h1_1);
 
 }

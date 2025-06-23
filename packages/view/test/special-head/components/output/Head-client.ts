@@ -30,7 +30,7 @@ export default function Head(
 		return () => document.title = t_old_title;
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

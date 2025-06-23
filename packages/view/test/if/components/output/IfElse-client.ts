@@ -34,12 +34,12 @@ export default function IfElse(
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 		if ($props.counter > 7) {
 			t_run_branch(t_if_range_1, 0, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's true! </p> `);
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's true! </p> <p> That's right </p> `);
 				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1);
 				// @ts-ignore
-				const t_text_1 = t_next(t_root_1, 2);
-				t_add_fragment(t_fragment_1, t_div_1, t_before);
+				const t_text_1 = t_next(t_root_1, 4);
+				t_add_fragment(t_fragment_1, t_div_1, t_before, t_text_1);
 				t_next(t_text_1);
 			});
 		}
@@ -50,13 +50,13 @@ export default function IfElse(
 				const t_root_2 = t_root(t_fragment_2);
 				// @ts-ignore
 				const t_text_2 = t_next(t_root_2, 2);
-				t_add_fragment(t_fragment_2, t_div_1, t_before);
+				t_add_fragment(t_fragment_2, t_div_1, t_before, t_text_2);
 				t_next(t_text_2);
 			});
 		}
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

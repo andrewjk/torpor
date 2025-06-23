@@ -41,7 +41,7 @@ export default function Function(
 	$run(function setTextContent() {
 		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

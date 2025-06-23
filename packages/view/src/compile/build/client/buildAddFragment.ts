@@ -15,7 +15,11 @@ export default function buildAddFragment(
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;
 		status.imports.add("t_add_fragment");
-		b.append(`t_add_fragment(${fragmentName}, ${parentName}, ${anchorName});`);
+		let params = [fragmentName, parentName, anchorName];
+		if (fragment.endVarName) {
+			params.push(fragment.endVarName);
+		}
+		b.append(`t_add_fragment(${params.join(", ")});`);
 		// TODO: Don't need to do this if the last thing we hydrated was the end node
 		if (fragment.endVarName) {
 			status.imports.add("t_next");

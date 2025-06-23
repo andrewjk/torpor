@@ -47,12 +47,12 @@ export default function Replace(
 			$run(function setTextContent() {
 				t_text_1.textContent = `The replace count is ${t_fmt(counter++)}.`;
 			});
-			t_add_fragment(t_fragment_1, t_div_1, t_before);
+			t_add_fragment(t_fragment_1, t_div_1, t_before, t_text_2);
 			t_next(t_text_2);
 		});
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

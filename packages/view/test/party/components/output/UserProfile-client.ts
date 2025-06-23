@@ -46,7 +46,7 @@ export default function UserProfile(
 	$run(function setTextContent() {
 		t_text_4.textContent = `I am ${t_fmt($props.isAvailable ? "available" : "not available")}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }

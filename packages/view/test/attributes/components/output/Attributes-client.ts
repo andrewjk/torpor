@@ -36,7 +36,7 @@ export default function Attributes(
 	$run(function setAttribute() {
 		t_div_1.setAttribute("attr", $props.attr);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
 	t_next(t_div_1);
 
 }
