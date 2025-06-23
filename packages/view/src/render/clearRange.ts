@@ -3,7 +3,7 @@ import removeEffect from "../watch/removeEffect";
 import context from "./context";
 
 export default function clearRange(range: Range): void {
-	//console.log(`clearing range ${printNode(range.startNode)} to ${printNode(range.endNode)}`);
+	//console.log("clearing range", range.startNode, "to", range.endNode);
 
 	// Clear effects and collect animations that take place within this range and its children
 	let animations: Animation[] = [];

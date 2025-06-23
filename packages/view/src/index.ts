@@ -6,6 +6,7 @@ import t_animate from "./render/addAnimation";
 import t_event from "./render/addEvent";
 import t_add_fragment from "./render/addFragment";
 import t_apply_props from "./render/applyProps";
+import clearLayoutSlot from "./render/clearLayoutSlot";
 import t_fmt from "./render/formatText";
 import t_class from "./render/getClasses";
 import t_fragment from "./render/getFragment";
@@ -22,6 +23,7 @@ import t_pop_range from "./render/popRange";
 import t_push_range from "./render/pushRange";
 import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
+import runLayoutSlot from "./render/runLayoutSlot";
 import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
@@ -32,7 +34,7 @@ import { type ServerSlotRender } from "./types/ServerSlotRender";
 import { type SlotRender } from "./types/SlotRender";
 
 // Mount and hydrate
-export { mount, hydrate };
+export { mount, hydrate, runLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
 export { $watch, $unwrap, $run, $mount };

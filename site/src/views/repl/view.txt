@@ -369,6 +369,59 @@ function applyProps(el, props, propNamesUsed) {
   }
 }
 
+// src/render/clearRange.ts
+function clearRange(range) {
+  let animations = [];
+  clearEffects(range, animations);
+  if (animations.length) {
+    Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
+  } else {
+    clearNodes(range);
+  }
+}
+function clearEffects(range, animations) {
+  if (range.effects) {
+    const oldRange = context_default.activeRange;
+    context_default.activeRange = range;
+    for (let effect of range.effects) {
+      removeEffect(effect);
+    }
+    context_default.activeRange = oldRange;
+  }
+  if (range.animations) {
+    for (let animation of range.animations) {
+      animations.push(animation);
+    }
+  }
+  if (range.children) {
+    for (let child of range.children) {
+      clearEffects(child, animations);
+    }
+    range.children.length = 0;
+  }
+}
+function clearNodes(range) {
+  if (range.startNode) {
+    let currentNode = range.endNode || range.startNode;
+    if (range.startNode.parentNode !== currentNode.parentNode) {
+      throw new Error("range nodes have different parents");
+    }
+    while (currentNode !== range.startNode) {
+      let nextNode = currentNode.previousSibling;
+      currentNode.remove();
+      currentNode = nextNode;
+    }
+    currentNode.remove();
+    range.startNode = null;
+    range.endNode = null;
+  }
+}
+
+// src/render/clearLayoutSlot.ts
+function clearLayoutSlot(range) {
+  clearRange(range);
+}
+
 // src/render/getFragment.ts
 function getFragment(document, array, index, html, ns) {
   if (array[index] === void 0) {
@@ -552,54 +605,6 @@ function runControl(range, anchor, create) {
   popRange(oldRange);
 }
 
-// src/render/clearRange.ts
-function clearRange(range) {
-  let animations = [];
-  clearEffects(range, animations);
-  if (animations.length) {
-    Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
-  } else {
-    clearNodes(range);
-  }
-}
-function clearEffects(range, animations) {
-  if (range.effects) {
-    const oldRange = context_default.activeRange;
-    context_default.activeRange = range;
-    for (let effect of range.effects) {
-      removeEffect(effect);
-    }
-    context_default.activeRange = oldRange;
-  }
-  if (range.animations) {
-    for (let animation of range.animations) {
-      animations.push(animation);
-    }
-  }
-  if (range.children) {
-    for (let child of range.children) {
-      clearEffects(child, animations);
-    }
-    range.children.length = 0;
-  }
-}
-function clearNodes(range) {
-  if (range.startNode) {
-    let currentNode = range.endNode || range.startNode;
-    if (range.startNode.parentNode !== currentNode.parentNode) {
-      throw new Error("range nodes have different parents");
-    }
-    while (currentNode !== range.startNode) {
-      let nextNode = currentNode.previousSibling;
-      currentNode.remove();
-      currentNode = nextNode;
-    }
-    currentNode.remove();
-    range.startNode = null;
-    range.endNode = null;
-  }
-}
-
 // src/render/runControlBranch.ts
 function runControlBranch(range, index, create) {
   if (index >= 0 && range.index === index) {
@@ -616,6 +621,17 @@ function runControlBranch(range, index, create) {
   context_default.activeEffect = oldEffect;
   popRange(oldRange);
   range.index = index;
+}
+
+// src/render/runLayoutSlot.ts
+function runLayoutSlot(component, slot, parent, anchor, $props, $context) {
+  const range = newRange();
+  const oldRange = pushRange(range, true);
+  component(parent, anchor, $props, $context, {
+    _: slot
+  });
+  popRange(oldRange);
+  return range;
 }
 
 // src/render/moveRange.ts

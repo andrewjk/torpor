@@ -220,8 +220,8 @@ async function loadView(
 	let slots: Record<string, ServerSlotRender> | undefined = undefined;
 	if (handler.layouts) {
 		let slotFunctions: ServerSlotRender[] = [];
-		slotFunctions[handler.layouts.length] = (_, context) =>
-			(clientEndPoint.component as ServerComponent)($props, context);
+		slotFunctions[handler.layouts.length] = (_, $context) =>
+			(clientEndPoint.component as ServerComponent)($props, $context);
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 				?.default;
@@ -230,8 +230,8 @@ async function loadView(
 					component = layoutEndPoint.component as ServerComponent;
 					slots = { _: slotFunctions[i + 1] };
 				} else {
-					slotFunctions[i] = (_, context) =>
-						(layoutEndPoint.component as ServerComponent)($props, context, {
+					slotFunctions[i] = (_, $context) =>
+						(layoutEndPoint.component as ServerComponent)($props, $context, {
 							_: slotFunctions[i + 1],
 						});
 				}
@@ -300,7 +300,7 @@ async function loadClientAndServerData(
 	serverEndPoint?: PageServerEndPoint,
 ) {
 	if (clientEndPoint?.load) {
-		const clientParams = buildClientParams(url, data, params);
+		const clientParams = buildClientParams(url, params, data);
 		const clientResponse = await clientEndPoint.load(clientParams);
 		if (clientResponse) {
 			if (clientResponse.ok) {

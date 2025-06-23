@@ -1,8 +1,9 @@
 import manifest from "@torpor/build/manifest";
 // @ts-ignore This errors in the Cloudflare build?
 import { $page } from "@torpor/build/state";
-import { hydrate, mount } from "@torpor/view";
+import { clearLayoutSlot, hydrate, runLayoutSlot } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
+import { mount } from "@torpor/view";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import Router from "./Router.ts";
@@ -10,6 +11,18 @@ import Router from "./Router.ts";
 // Build the router from the Site object created by the user
 const router = new Router();
 router.addPages(manifest.routes);
+
+// Store the current layout stack, so that we can re-use parts of it as necessary
+interface LayoutPath {
+	path: string;
+	/** Whether to re-use this layout */
+	reuse: boolean;
+	/** Data loaded from endpoints that should be re-used */
+	data: any;
+	/** The range of the UI in this layout's slot */
+	slotRange: any;
+}
+let layoutStack: LayoutPath[] = [];
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
@@ -26,6 +39,8 @@ window.addEventListener("click", async (e) => {
 	}
 });
 
+// TODO: Intercept more events on links so that we can preload
+
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
 window.addEventListener("popstate", async () => {
@@ -40,7 +55,7 @@ async function navigateToLocation(location: Location, firstTime = false) {
 }
 
 async function navigate(url: URL, firstTime = false): Promise<boolean> {
-	const parent = document.getElementById("app");
+	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
 		console.log("500");
@@ -85,27 +100,39 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	const serverEndPoint: PageServerEndPoint | undefined =
 		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
+	let newStack: LayoutPath[] = [];
+
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
 	let data = {};
 	if (handler.layouts) {
-		for (let layout of handler.layouts) {
+		for (let [i, layout] of handler.layouts.entries()) {
 			let layoutPath = layout.path;
-			for (let key in params) {
-				layoutPath = layoutPath.replace(`[${key}]`, params[key]);
-			}
-			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-			const layoutServerEndPoint: PageServerEndPoint | undefined =
-				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-			const layoutResponse = await loadClientAndServerData(
-				data,
-				document.location.origin + layoutPath,
-				params,
-				layoutEndPoint,
-				layoutServerEndPoint,
-			);
-			if (layoutResponse?.ok === false) {
-				return false;
+			if (layoutStack.at(i)?.path === layoutPath) {
+				// We've already loaded this layout, we can just re-use its data
+				layoutStack[i].reuse = true;
+				newStack[i] = layoutStack[i];
+				Object.assign(data, layoutStack[i].data);
+			} else {
+				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRange: null };
+				for (let key in params) {
+					layoutPath = layoutPath.replace(`[${key}]`, params[key]);
+				}
+				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+				const layoutServerEndPoint: PageServerEndPoint | undefined =
+					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+				const layoutResponse = await loadClientAndServerData(
+					stackLayout.data,
+					document.location.origin + layoutPath,
+					params,
+					layoutEndPoint,
+					layoutServerEndPoint,
+				);
+				if (layoutResponse?.ok === false) {
+					return false;
+				}
+				Object.assign(data, stackLayout.data);
+				newStack.push(stackLayout);
 			}
 		}
 	}
@@ -121,42 +148,69 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	}
 	let $props: Record<string, any> = { data };
 
+	layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRange: null });
+	layoutStack = newStack;
+
 	// If there are layouts, work our way upwards, pushing each component into
 	// the default slot of its parent
-	// TODO: Also handle layout server data
 	// TODO: There's probably a nicer way to do this with reducers or something
 	let component = clientEndPoint.component as Component;
 	let slots: Record<string, SlotRender> | undefined = undefined;
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
-		slotFunctions[handler.layouts.length] = (parent, anchor, _, context) =>
-			clientEndPoint.component!(parent, anchor, $props, context);
+		// The last slot function will render the client component
+		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor, _, $context) {
+			if (clientEndPoint.component) {
+				let i = layoutStack.length - 1;
+				layoutStack[i].slotRange = runLayoutSlot(
+					clientEndPoint.component,
+					slotFunctions[i + 1],
+					parent,
+					anchor,
+					$props,
+					$context,
+				);
+			}
+		};
+
+		// Each earlier slot function will render a layout
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 				?.default;
 			if (layoutEndPoint?.component) {
-				if (i === 0) {
+				if (layoutStack[i].reuse) {
+					// Set the parent to add the new content to (from the old
+					// content), clear the range under this point, and set the
+					// component to the slot function within this layout
+					parent = layoutStack[i].slotRange.startNode.parentNode as HTMLElement;
+					clearLayoutSlot(layoutStack[i].slotRange);
+					component = slotFunctions[i + 1];
+					break;
+				} else if (i === 0) {
 					component = layoutEndPoint.component as Component;
 					slots = { _: slotFunctions[i + 1] };
 				} else {
-					slotFunctions[i] = (parent, anchor, _, context) =>
-						layoutEndPoint.component!(parent, anchor, $props, context, {
-							_: slotFunctions[i + 1],
-						});
+					slotFunctions[i] = function layoutComponent(parent, anchor, _, $context) {
+						if (layoutEndPoint.component) {
+							layoutStack[i].slotRange = runLayoutSlot(
+								layoutEndPoint.component,
+								slotFunctions[i + 1],
+								parent,
+								anchor,
+								$props,
+								$context,
+							);
+						}
+					};
 				}
 			}
 		}
 	}
 
 	if (firstTime) {
-		console.log("hydrating");
 		hydrate(parent, component, $props, slots);
 	} else {
-		// TODO: Clear ranges, reuse layouts etc
-		parent.textContent = "";
-
 		try {
-			console.log("mounting");
 			mount(parent, component, $props, slots);
 		} catch (error) {
 			// TODO: Show a proper Error component
