@@ -1,5 +1,6 @@
 import { type TemplateComponent } from "../../types/TemplateComponent";
 import { type ParseResult } from "../types/ParseResult";
+import isElementNode from "../types/nodes/isElementNode";
 import isSpaceNode from "../types/nodes/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
 import { type ParseStatus } from "./ParseStatus";
@@ -103,12 +104,7 @@ export default function parseCode(source: string): ParseResult {
 							name: c.name,
 							default: c.default,
 							params: c.params,
-							markup: c.markup
-								? {
-										type: "root",
-										children: [c.markup],
-									}
-								: undefined,
+							markup: c.markup,
 							style: c.style,
 							props: c.props,
 							contextProps: c.contextProps,
@@ -300,8 +296,9 @@ function parseComponentEnd(status: ParseStatus) {
 	// better instead to create whitespace if we don't find it when hydrating...
 	if (
 		current.markup &&
-		current.markup.tagName === "html" &&
-		isSpaceNode(current.markup.children[0])
+		isElementNode(current.markup.children[0]) &&
+		current.markup.children[0].tagName === "html" &&
+		isSpaceNode(current.markup.children[0].children[0])
 	) {
 		current.markup.children.splice(1, 1);
 	}

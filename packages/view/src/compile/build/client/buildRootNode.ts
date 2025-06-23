@@ -18,7 +18,11 @@ export default function buildRootNode(
 		fragment: node.fragment,
 		path: "0:ch/",
 	});
-	buildNode(node.children[0], status, b, parentName, anchorName, true);
+
+	for (let child of node.children) {
+		buildNode(child, status, b, parentName, anchorName, true);
+	}
+
 	status.fragmentStack.pop();
 
 	buildAddFragment(node, status, b, parentName, anchorName);

@@ -1,7 +1,6 @@
 import { type ParseStatus } from "./ParseStatus";
 import parseElement from "./parseElement";
 import accept from "./utils/accept";
-import addError from "./utils/addError";
 
 export default function parseMarkup(status: ParseStatus, source: string): void {
 	const current = status.components.at(-1);
@@ -22,13 +21,9 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (accept("<", status, false)) {
 			// Parse the element
-			const start = status.i;
 			const element = parseElement(status);
-			if (current.markup === undefined) {
-				current.markup = element;
-			} else if (!element.tagName.startsWith("/")) {
-				addError(status, `Multiple top-level elements: ${element.tagName}`, start);
-			}
+			current.markup ??= { type: "root", children: [] };
+			current.markup.children.push(element);
 		} else {
 			status.i += 1;
 		}

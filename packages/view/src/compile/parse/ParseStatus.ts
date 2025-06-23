@@ -1,6 +1,7 @@
 import { type CompileError } from "../types/CompileError";
 import { type Import } from "../types/Import";
 import { type ElementNode } from "../types/nodes/ElementNode";
+import { type RootNode } from "../types/nodes/RootNode";
 import { type Style } from "../types/styles/Style";
 
 export type ParseStatus = {
@@ -25,7 +26,7 @@ export interface ParseComponentStatus {
 	default?: boolean;
 	/** Params declared by the user in the component's function */
 	params?: string;
-	markup?: ElementNode;
+	markup?: RootNode;
 	stack?: ElementNode[];
 	style?: Style;
 	/** $props that are used in the component's function */
