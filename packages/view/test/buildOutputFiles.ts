@@ -1,6 +1,6 @@
 import fg from "fast-glob";
 import crypto from "node:crypto";
-import { existsSync, promises as fs, unlinkSync } from "node:fs";
+import { exists, existsSync, promises as fs, unlinkSync } from "node:fs";
 import path from "node:path";
 import build from "../src/compile/build";
 import parse from "../src/compile/parse";
@@ -54,7 +54,11 @@ async function maybeWriteFile(file: string, code: string, suffix: string) {
 			absolute: true,
 			cwd: path.resolve(outputFolder),
 		});
-		oldFiles.forEach((f) => unlinkSync(f));
+		oldFiles.forEach((f) => {
+			if (existsSync(f)) {
+				unlinkSync(f);
+			}
+		});
 
 		// Create the new hash file
 		await fs.writeFile(outputFile, code);
