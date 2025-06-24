@@ -63,17 +63,15 @@ export default function NavMenuPopoutContent($props: any) {
 	}
 
 	@render {
-		<div style="display: contents">			
-			@if ($state.visible) {
-				<div
-					id={$props.id}
-					class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
-					&ref={div}
-					:onmount={(el) => setPopoverPosition(context.anchorElement, el, $props.side, $props.alignment)}
-				>
-					<:slot />
-				</div>
-			}
-		</div>
+		@if ($state.visible) {
+			<div
+				id={$props.id}
+				class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
+				&ref={div}
+				:onmount={(el) => setPopoverPosition(context.anchorElement, el, $props.side, $props.alignment)}
+			>
+				<:slot />
+			</div>
+		}
 	}
 }

@@ -16,17 +16,15 @@ export default function PopoverOverlay($props: any) {
 	context.modal = true;
 
 	@render {
-		<div style="display: contents">
-			@if ($state.visible) {
-				<div
-					id={$props.id}
-					class={`torp-popover-overlay ${$props.class ?? ""}`.trim()}
-					tabindex="-1"
-					:onmount={(el) => disableScroll(el)}
-				>
-					<:slot />
-				</div>
-			}
-		</div>
+		@if ($state.visible) {
+			<div
+				id={$props.id}
+				class={`torp-popover-overlay ${$props.class ?? ""}`.trim()}
+				tabindex="-1"
+				:onmount={(el) => disableScroll(el)}
+			>
+				<:slot />
+			</div>
+		}
 	}
 }

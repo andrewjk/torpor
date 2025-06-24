@@ -63,16 +63,14 @@ export default function PopoverContent($props: any) {
 	}
 
 	@render {
-		<div style="display: contents">
-			@if ($state.visible) {
-				<div
-					id={$props.id}
-					class={`torp-popover-content ${$props.class ?? ""}`.trim()}
-					&ref={div}
-				>
-					<:slot />
-				</div>
-			}
-		</div>
+		@if ($state.visible) {
+			<div
+				id={$props.id}
+				class={`torp-popover-content ${$props.class ?? ""}`.trim()}
+				&ref={div}
+			>
+				<:slot />
+			</div>
+		}
 	}
 }
