@@ -26,10 +26,11 @@ export default function BindComponent(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <!> <p>#</p> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <!> <p>#</p> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
+	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_comp_parent_1))) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
@@ -39,13 +40,16 @@ export default function BindComponent(
 	$run(function setBinding() {
 		$state.name = t_props_1["name"];
 	});
-	BindText(t_div_1, t_comp_anchor_1, t_props_1, $context);
-	const t_text_1 = t_child(t_next(t_comp_anchor_1, 2));
+	BindText(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
+
+	const t_text_1 = t_child(t_next(t_next(t_anchor(t_comp_anchor_1, true), true)));
+	// @ts-ignore
+	const t_text_2 = t_next(t_comp_parent_1, true);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+	t_next(t_text_2);
 
 }
 
@@ -73,15 +77,17 @@ function BindText(
 			/* User interface */
 			const t_fragments: DocumentFragment[] = [];
 
-			const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <input></input> </div>`);
+			const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <input></input> </div> `);
 			// @ts-ignore
-			const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-			const t_input_1 = t_next(t_child(t_div_1)) as HTMLInputElement;
+			const t_root_0 = t_root(t_fragment_0, true);
+			const t_input_1 = t_next(t_child(t_next(t_root_0))) as HTMLInputElement;
+			// @ts-ignore
+			const t_text_1 = t_next(t_next(t_root_0), true);
 			$run(function setBinding() {
 				t_input_1.value = $props.name || "";
 			});
 			t_event(t_input_1, "input", (e) => $props.name = e.target.value);
-			t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-			t_next(t_div_1);
+			t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
+			t_next(t_text_1);
 
 		}

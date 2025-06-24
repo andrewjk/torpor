@@ -12,11 +12,11 @@ export default function For(
 
 	/* User interface */
 	let $output = "";
-	$output += `<section> <![>`;
+	$output += ` <section> <![>`;
 	for (let i = 0; i < 5; i++) {
 		$output += `<!^> <p> ${t_fmt(i)} </p> `;
 	}
-	$output += `<!]><!> </section>`;
+	$output += `<!]><!> </section> `;
 
 	return $output;
 }

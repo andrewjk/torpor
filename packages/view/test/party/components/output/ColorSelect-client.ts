@@ -42,11 +42,11 @@ export default function ColorSelect(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div>#</div> <select> <!> </select> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <div>#</div> <select> <!> </select> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_select_1 = t_next(t_child(t_div_1), 3) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_text_1 = t_child(t_next(t_child(t_next(t_root_0))));
+	const t_select_1 = t_next(t_next(t_next(t_child(t_next(t_root_0))), true)) as HTMLElement;
 	const t_for_anchor_1 = t_anchor(t_next(t_child(t_select_1))) as HTMLElement;
 
 	/* @for */
@@ -69,11 +69,11 @@ export default function ColorSelect(
 			let t_old_range_1 = t_push_range(t_item, true);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
 			// @ts-ignore
-			const t_root_1 = t_root(t_fragment_1);
+			const t_root_1 = t_root(t_fragment_1, true);
 			const t_option_1 = t_next(t_root_1) as HTMLElement;
 			const t_text_2 = t_child(t_option_1);
 			// @ts-ignore
-			const t_text_3 = t_next(t_option_1);
+			const t_text_3 = t_next(t_option_1, true);
 			$run(function setAttribute() {
 				t_attribute(t_option_1, "value", t_item.data.color.id);
 			});
@@ -89,6 +89,8 @@ export default function ColorSelect(
 		}
 	);
 
+	// @ts-ignore
+	const t_text_4 = t_next(t_next(t_root_0), true);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
 	});
@@ -96,7 +98,7 @@ export default function ColorSelect(
 		t_select_1.value = $state.selectedColorId || "";
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
+	t_next(t_text_4);
 
 }

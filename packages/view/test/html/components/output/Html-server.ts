@@ -11,7 +11,7 @@ export default function Html(
 
 	/* User interface */
 	let $output = "";
-	$output += `<p> <![>${$props.html}<!]><!> </p>`;
+	$output += ` <p> <![>${$props.html}<!]><!> </p> `;
 
 	return $output;
 }

@@ -10,11 +10,11 @@ export default function BigTitle(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h2> <![>`;
+	$output += ` <h2> <![>`;
 	if ($slots && $slots["_"]) {
 		$output += $slots["_"](undefined, $context);
 	}
-	$output += `<!]><!> </h2>`;
+	$output += `<!]><!> </h2> `;
 
 	return $output;
 }

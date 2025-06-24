@@ -25,12 +25,14 @@ export default function UserProfileContext(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_text_1 = t_child(t_next(t_child(t_div_1), 3));
-	const t_text_2 = t_child(t_next(t_child(t_div_1), 5));
-	const t_button_1 = t_next(t_child(t_div_1), 7) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_text_1 = t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)));
+	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)), true)));
+	const t_button_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)), true)), true)) as HTMLElement;
+	// @ts-ignore
+	const t_text_3 = t_next(t_next(t_root_0), true);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Username: ${t_fmt($context.user.username)}`;
 	});
@@ -38,7 +40,7 @@ export default function UserProfileContext(
 		t_text_2.textContent = `Email: ${t_fmt($context.user.email)}`;
 	});
 	t_event(t_button_1, "click", () => ($context.user.username = "Jane"));
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
+	t_next(t_text_3);
 
 }

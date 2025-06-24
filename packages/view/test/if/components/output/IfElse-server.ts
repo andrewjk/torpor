@@ -11,14 +11,14 @@ export default function IfElse(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <![>`;
+	$output += ` <![>`;
 	if ($props.counter > 7) {
-		$output += ` <p> It's true! </p> <p> That's right </p> `;
+		$output += `<!^> <p> It's true! </p> <p> That's right </p> `;
 	}
 	else {
-		$output += ` <p> It's not true... </p> `;
+		$output += `<!^> <p> It's not true... </p> `;
 	}
-	$output += `<!]><!> </div>`;
+	$output += `<!]><!> `;
 
 	return $output;
 }

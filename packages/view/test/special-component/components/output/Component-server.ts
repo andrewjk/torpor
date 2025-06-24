@@ -18,7 +18,7 @@ export default function Component(
 
 	/* User interface */
 	let $output = "";
-	$output += `<![>`;
+	$output += ` <![>`;
 	components[$props.self];
 	const t_props_1: any = {};
 	t_props_1["self"] = components[$props.self];
@@ -36,7 +36,7 @@ export default function Component(
 
 	$output += components[$props.self](t_props_1, $context, t_slots_1)
 	$output += `<!>`;
-	$output += `<!]><!>`;
+	$output += `<!]><!> `;
 
 	return $output;
 }

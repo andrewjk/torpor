@@ -25,21 +25,25 @@ export default function Reactive(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <button>Update text</button> <!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <button>Update text</button> <!> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_button_1, 2)) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_button_1 = t_next(t_child(t_next(t_root_0))) as HTMLElement;
+	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
+	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1, true))) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
 	$run(function setProp() {
 		t_props_1["text"] = $state.text;
 	});
-	Child(t_div_1, t_comp_anchor_1, t_props_1, $context);
+	Child(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
+
+	// @ts-ignore
+	const t_text_1 = t_next(t_comp_parent_1, true);
 	t_event(t_button_1, "click", () => $state.text = "after");
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
+	t_next(t_text_1);
 
 }
 
@@ -57,14 +61,16 @@ function Child(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> `);
 	// @ts-ignore
-	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
-	const t_text_1 = t_child(t_p_1);
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_text_1 = t_child(t_next(t_root_0));
+	// @ts-ignore
+	const t_text_2 = t_next(t_next(t_root_0), true);
 	$run(function setTextContent() {
 		t_text_1.textContent = ` ${t_fmt($props.text)} `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
-	t_next(t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+	t_next(t_text_2);
 
 }

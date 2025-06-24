@@ -17,7 +17,7 @@ export default function InputHello(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> </div>`;
+	$output += ` <div> <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> </div> `;
 
 	return $output;
 }

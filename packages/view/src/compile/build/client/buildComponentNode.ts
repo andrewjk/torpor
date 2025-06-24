@@ -153,4 +153,5 @@ export default function buildComponentNode(
 	}
 
 	b.append(`${componentName}(${renderParams});`);
+	b.append("");
 }

@@ -10,13 +10,13 @@ export default function Header(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h2> <![>`;
+	$output += ` <h2> <![>`;
 	if ($slots && $slots["_"]) {
 		$output += $slots["_"](undefined, $context);
 	} else {
 		$output += ` Default header... `;
 	}
-	$output += `<!]><!> </h2>`;
+	$output += `<!]><!> </h2> `;
 
 	return $output;
 }

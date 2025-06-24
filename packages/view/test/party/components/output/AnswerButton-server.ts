@@ -11,7 +11,7 @@ export default function AnswerButton(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <button>YES</button> <button>NO</button> </div>`;
+	$output += ` <div> <button>YES</button> <button>NO</button> </div> `;
 
 	return $output;
 }

@@ -8,5 +8,7 @@ export default function buildServerRootNode(
 	status: BuildServerStatus,
 	b: Builder,
 ): void {
-	buildServerNode(node.children[0], status, b);
+	for (let child of node.children) {
+		buildServerNode(child, status, b);
+	}
 }

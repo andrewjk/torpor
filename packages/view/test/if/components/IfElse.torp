@@ -1,19 +1,17 @@
 
 export default function IfElse($props: { counter: number }) {
 	@render {
-		<div>
-			@if ($props.counter > 7) {
-				<p>
-					It's true!
-				</p>
-				<p>
-					That's right
-				</p>
-			} else {
-				<p>
-					It's not true...
-				</p>
-			}
-		</div>
+		@if ($props.counter > 7) {
+			<p>
+				It's true!
+			</p>
+			<p>
+				That's right
+			</p>
+		} else {
+			<p>
+				It's not true...
+			</p>
+		}
 	}
 }

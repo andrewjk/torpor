@@ -17,22 +17,22 @@ export default function Switch(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <![>`;
+	$output += ` <div> <![>`;
 	switch ($props.value) {
 		case 1: {
-			$output += ` <p> A small value. </p> `;
+			$output += `<!^> <p> A small value. </p> `;
 			break;
 		}
 		case 100: {
-			$output += ` <p> A large value. </p> `;
+			$output += `<!^> <p> A large value. </p> `;
 			break;
 		}
 		default: {
-			$output += ` <p> Another value. </p> `;
+			$output += `<!^> <p> Another value. </p> `;
 			break;
 		}
 	}
-	$output += `<!]><!> </div>`;
+	$output += `<!]><!> </div> `;
 
 	return $output;
 }

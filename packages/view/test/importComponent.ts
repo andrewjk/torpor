@@ -10,6 +10,10 @@ export default async function importComponent(componentPath: string, suffix: str
 	let destFile = fs
 		.readdirSync(destFolder)
 		.find((f) => f.startsWith(`${path.basename(componentPath, ".torp")}-${suffix}-`));
+	//const destFolder = path.join(path.dirname(componentPath), "output");
+	//let destFile = fs
+	//	.readdirSync(destFolder)
+	//	.find((f) => f.startsWith(`${path.basename(componentPath, ".torp")}-${suffix}`));
 	if (!destFile) {
 		throw new Error("Component file not found");
 	}

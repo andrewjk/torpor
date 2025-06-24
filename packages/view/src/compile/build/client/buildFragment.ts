@@ -119,14 +119,19 @@ function maybeAddRootNodeDeclaration(
 	} else {
 		status.imports.add("t_root");
 		const rootName = `t_root_${fragment.number}`;
-		const rootPath = `t_root(${fragmentName})`;
+		const params = [fragmentName];
+		if (firstNode.type === "text") {
+			params.push("true");
+		}
+		const rootPath = `t_root(${params.join(", ")})`;
 		// HACK: We don't know whether this variable will be used by other child
 		// nodes, so we have to create it regardless and ignore the error if
 		// it's not used -- maybe we could be smarter about this
 		b.append("// @ts-ignore");
 		b.append(`const ${rootName} = ${rootPath};`);
-		varPaths.set(rootPath, rootName);
-		//b.append(`console.log("${rootName}", ${rootName}, ${rootName}.textContent);`);
+		// HACK: pretend we don't have the text param, so that subsequent t_root
+		// uses will be shortened, even if we don't know they are text nodes
+		varPaths.set(`t_root(${fragmentName})`, rootName);
 
 		printDebug(rootName, status, b);
 	}
@@ -656,7 +661,13 @@ function declareParentAndAnchorFragmentVars(
 		path.children.push(anchorPath);
 
 		node.varName = nextVarName(`${name}_anchor`, status);
-		const anchorVarPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
+		const anchorVarPath = getFragmentVarPath(
+			fragment,
+			status,
+			`t_anchor(${node.varName}, true)`,
+			anchorPath,
+			varPaths,
+		);
 		if (status.options?.useCreateElement) {
 			b.append(`let ${node.varName};`);
 		} else {
@@ -710,8 +721,9 @@ function getFragmentVarPath(
 		varPaths.set(name, name);
 	}
 
-	// Shorten `t_next(t_next(x))` to `t_next(x, 2)`
+	// Shorten `t_next(t_next(x))` to `t_skip(x, 2)`
 	while (varPath.includes("t_next(t_next(")) {
+		status.imports.add("t_skip");
 		const match = varPath.match(/(t_next\(){2,}/)![0];
 		const count = match.length / "t_next(".length;
 		const pos = varPath.indexOf("t_next(t_next(");
@@ -732,8 +744,11 @@ function getFragmentVarPath(
 		}
 		const tail = varPath.substring(end + count);
 		const param = varPath.substring(pos + match.length, end);
-		varPath = `${head}t_next(${param}, ${count})${tail}`;
+		varPath = `${head}t_skip(${param}, ${count})${tail}`;
 	}
+
+	// Set t_next_text back to t_next
+	varPath = varPath.replaceAll("t_next_text", "t_next");
 
 	return varPath;
 }
@@ -753,18 +768,14 @@ function getFragmentVarPathPart(
 	}
 	for (let [i, child] of path.children.entries()) {
 		if (i > 0) {
-			status.imports.add("t_next");
-			//if (varPath.startsWith("t_next")) {
-			//	const match = varPath.match(/t_next\(.+?, (\d+)\)/);
-			//	if (match) {
-			//		const count = parseInt(match[1]) + 1;
-			//		varPath = varPath.replace(/t_next\((.+), \d+\)/, `t_next($1, ${count})`);
-			//	} else {
-			//		varPath = varPath.replace(/t_next\((.+)\)/, `t_next($1, 2)`);
-			//	}
-			//} else {
-			varPath = `t_next(${varPath})`;
-			//}
+			if (child.type === "text" || child.type === "space") {
+				// HACK: Using t_next_text just stops t_next(node, true) from
+				// being converted into t_skip
+				varPath = `t_next_text(${varPath}, true)`;
+			} else {
+				status.imports.add("t_next");
+				varPath = `t_next(${varPath})`;
+			}
 		}
 
 		if (i === path.children.length - 1 && child.children.length) {

@@ -1,6 +1,7 @@
 import { type ControlNode } from "../types/nodes/ControlNode";
 import { type ElementNode } from "../types/nodes/ElementNode";
 import { type OperationType } from "../types/nodes/OperationType";
+import { type RootNode } from "../types/nodes/RootNode";
 import isControlNode from "../types/nodes/isControlNode";
 import trimMatched from "../utils/trimMatched";
 import trimStart from "../utils/trimStart";
@@ -45,7 +46,7 @@ const standaloneOperations = [
 
 export default function parseControl(
 	status: ParseStatus,
-	parentNode: ElementNode | ControlNode,
+	parentNode: RootNode | ElementNode | ControlNode,
 ): void {
 	const node = parseControlOpen(status);
 	if (!node) {
@@ -197,7 +198,7 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
  * @param node The control node
  * @param parentNode The parent node
  */
-function wrangleControlNode(node: ControlNode, parentNode: ElementNode | ControlNode) {
+function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNode | ControlNode) {
 	// Group
 	// * if/else into an if group
 	// * for into a for group
@@ -283,7 +284,10 @@ function wrangleControlNode(node: ControlNode, parentNode: ElementNode | Control
  * @param status The parse status
  * @param parentNode The parent node
  */
-function parseControlBranches(status: ParseStatus, parentNode: ElementNode | ControlNode) {
+function parseControlBranches(
+	status: ParseStatus,
+	parentNode: RootNode | ElementNode | ControlNode,
+) {
 	// Look ahead and see if we have another control statement
 	// NOTE: We could be more strict here (e.g. we could check that an else is
 	// after an if), but for now we are just leaving it to the JS parser

@@ -12,7 +12,7 @@ export default function Header(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h2>Hi, ${t_fmt($props.name)}</h2>`;
+	$output += ` <h2>Hi, ${t_fmt($props.name)}</h2> `;
 
 	return $output;
 }

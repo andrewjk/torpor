@@ -1,5 +1,6 @@
 import {
 	ANCHOR_COMMENT,
+	HYDRATION_BREAK_COMMENT,
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
 } from "../../types/comments";
@@ -39,6 +40,9 @@ export default function buildServerIfNode(
 
 function buildServerIfBranch(node: ControlNode, status: BuildServerStatus, b: Builder) {
 	b.append(`${node.statement} {`);
+
+	// Separate spaces across boundaries with a careted comment
+	status.output += HYDRATION_BREAK_COMMENT;
 
 	for (let child of node.children) {
 		buildServerNode(child, status, b);

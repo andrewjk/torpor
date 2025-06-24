@@ -10,7 +10,7 @@ export default function List(
 
 	/* User interface */
 	let $output = "";
-	$output += `<ul> <![>`;
+	$output += ` <ul> <![>`;
 	for (let item of $props.items) {
 		$output += `<!^> <li> <![>`;
 		const t_sprops_1: any = {};
@@ -20,7 +20,7 @@ export default function List(
 		}
 		$output += `<!]><!> </li> `;
 	}
-	$output += `<!]><!> </ul>`;
+	$output += `<!]><!> </ul> `;
 
 	return $output;
 }

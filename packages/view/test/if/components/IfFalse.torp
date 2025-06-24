@@ -1,0 +1,10 @@
+
+export default function IfFalse($props: { counter: number }) {
+	@render {
+		@if ($props.counter > 7) {
+			<p>
+				It's true!
+			</p>
+		}
+	}
+}

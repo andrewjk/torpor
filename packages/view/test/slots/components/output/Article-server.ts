@@ -10,7 +10,7 @@ export default function Article(
 
 	/* User interface */
 	let $output = "";
-	$output += `<section> <h2> <![>`;
+	$output += ` <section> <h2> <![>`;
 	if ($slots && $slots["header"]) {
 		$output += $slots["header"](undefined, $context);
 	}
@@ -22,7 +22,7 @@ export default function Article(
 	if ($slots && $slots["footer"]) {
 		$output += $slots["footer"](undefined, $context);
 	}
-	$output += `<!]><!> </section>`;
+	$output += `<!]><!> </section> `;
 
 	return $output;
 }

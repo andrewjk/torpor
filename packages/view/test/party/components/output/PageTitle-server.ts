@@ -21,7 +21,7 @@ export default function PageTitle(
 
 	/* User interface */
 	let $output = "";
-	$output += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
+	$output += ` <p>Page title: ${t_fmt($state.pageTitle)}</p> `;
 
 	return $output;
 }

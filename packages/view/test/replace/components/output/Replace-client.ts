@@ -28,10 +28,11 @@ export default function Replace(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <!> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_replace_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_replace_parent_1 = t_next(t_root_0) as HTMLElement;
+	const t_replace_anchor_1 = t_anchor(t_next(t_child(t_replace_parent_1))) as HTMLElement;
 
 	/* @replace */
 	const t_replace_range_1 = t_range();
@@ -40,19 +41,21 @@ export default function Replace(
 		t_run_branch(t_replace_range_1, -1, () => {
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
 			// @ts-ignore
-			const t_root_1 = t_root(t_fragment_1);
+			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
 			// @ts-ignore
-			const t_text_2 = t_next(t_root_1, 2);
+			const t_text_2 = t_next(t_next(t_root_1), true);
 			$run(function setTextContent() {
 				t_text_1.textContent = `The replace count is ${t_fmt(counter++)}.`;
 			});
-			t_add_fragment(t_fragment_1, t_div_1, t_before, t_text_2);
+			t_add_fragment(t_fragment_1, t_replace_parent_1, t_before, t_text_2);
 			t_next(t_text_2);
 		});
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	// @ts-ignore
+	const t_text_3 = t_next(t_replace_parent_1, true);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
+	t_next(t_text_3);
 
 }

@@ -126,8 +126,6 @@ export default function buildServerComponentNode(
 	b.append("");
 	b.append(`$output += ${componentName}(${renderParams})`);
 
-	// If we're using a @replace to update a :component, we need another anchor comment
-	if (node.tagName === ":component") {
-		status.output += ANCHOR_COMMENT;
-	}
+	// Add the anchor node
+	status.output += ANCHOR_COMMENT;
 }

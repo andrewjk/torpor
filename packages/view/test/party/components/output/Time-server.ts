@@ -25,7 +25,7 @@ export default function Time(
 
 	/* User interface */
 	let $output = "";
-	$output += `<p>Current time: ${t_fmt($state.time)}</p>`;
+	$output += ` <p>Current time: ${t_fmt($state.time)}</p> `;
 
 	return $output;
 }

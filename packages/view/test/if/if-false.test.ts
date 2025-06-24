@@ -7,7 +7,7 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/if/components/IfElse";
+const componentPath = "./test/if/components/IfFalse";
 
 beforeAll(() => {
 	buildOutputFiles(componentPath);
@@ -40,15 +40,12 @@ test("if false -- hydrated", async () => {
 
 function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's true!")).toBeNull();
-	expect(queryByText(container, "It's not true...")).not.toBeNull();
 
 	state.counter = 10;
 
 	expect(queryByText(container, "It's true!")).not.toBeNull();
-	expect(queryByText(container, "It's not true...")).toBeNull();
 
 	state.counter = 3;
 
 	expect(queryByText(container, "It's true!")).toBeNull();
-	expect(queryByText(container, "It's not true...")).not.toBeNull();
 }

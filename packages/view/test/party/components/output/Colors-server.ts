@@ -13,11 +13,11 @@ export default function Colors(
 
 	/* User interface */
 	let $output = "";
-	$output += `<ul> <![>`;
+	$output += ` <ul> <![>`;
 	for (let color of colors) {
 		$output += `<!^>  <li>${t_fmt(color)}</li> `;
 	}
-	$output += `<!]><!> </ul>`;
+	$output += `<!]><!> </ul> `;
 
 	return $output;
 }

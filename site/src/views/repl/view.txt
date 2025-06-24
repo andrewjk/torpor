@@ -492,58 +492,71 @@ function newRange() {
 // src/render/hydrationMarkers.ts
 var HYDRATION_START = "[";
 var HYDRATION_END = "]";
-var HYDRATION_BRANCH = "^";
+var HYDRATION_BREAK = "^";
 
 // src/render/isComment.ts
 function isComment(node) {
-  return node.nodeType === 8;
+  return node?.nodeType === 8;
+}
+
+// src/render/isText.ts
+function isText(node) {
+  return node?.nodeType === 3;
+}
+
+// src/render/nodeCheckHydrationBreak.ts
+function nodeCheckHydrationBreak(node) {
+  if (context_default.hydrationNode) {
+    if (node && isComment(node) && node.data === HYDRATION_BREAK) {
+      let comment = node;
+      node = node.nextSibling;
+      comment.remove();
+    }
+    context_default.hydrationNode = node;
+  }
+  return node;
 }
 
 // src/render/nodeNext.ts
-function nodeNext(node, count) {
-  let nextNode = checkHydrationNode(node.nextSibling);
-  if (count) {
-    for (let i = 1; i < count; i++) {
-      nextNode = checkHydrationNode(nextNode.nextSibling);
-    }
+function nodeNext(node, text = false) {
+  if (context_default.hydrationNode && text && isText(node)) {
+    return node;
   }
-  return nextNode;
-}
-function checkHydrationNode(nextNode) {
-  if (context_default.hydrationNode) {
-    if (nextNode && isComment(nextNode) && nextNode.data === HYDRATION_BRANCH) {
-      let comment = nextNode;
-      nextNode = nextNode.nextSibling;
-      comment.remove();
-    }
-    context_default.hydrationNode = nextNode;
-  }
+  let nextNode = nodeCheckHydrationBreak(node.nextSibling);
   return nextNode;
 }
 
 // src/render/nodeAnchor.ts
-function nodeAnchor(node) {
-  if (context_default.hydrationNode && isComment(node) && node.data === HYDRATION_START) {
-    let currentNode = nodeNext(node);
-    node.remove();
-    let level = 1;
-    while (currentNode) {
-      if (isComment(currentNode)) {
-        if (currentNode.data === HYDRATION_START) {
-          level += 1;
-        } else if (currentNode.data === HYDRATION_END) {
-          level -= 1;
-        }
-        if (level === 0) {
-          const endNode = currentNode.nextSibling;
-          currentNode.remove();
-          return endNode;
-        }
-      }
-      currentNode = currentNode.nextSibling;
+function nodeAnchor(node, subsequent = false) {
+  if (context_default.hydrationNode) {
+    if (subsequent) {
+      return context_default.hydrationNode;
     }
-    if (!currentNode) {
-      throw new Error("End hydration comment not found");
+    if (isComment(node) && node.data === HYDRATION_START) {
+      let currentNode = nodeNext(node);
+      node.remove();
+      let level = 1;
+      while (currentNode) {
+        if (isComment(currentNode)) {
+          if (currentNode.data === HYDRATION_START) {
+            level += 1;
+          } else if (currentNode.data === HYDRATION_END) {
+            level -= 1;
+            if (level === 0) {
+              const endNode = currentNode.nextSibling;
+              currentNode.remove();
+              if (context_default.hydrationNode === currentNode) {
+                context_default.hydrationNode = endNode;
+              }
+              return endNode;
+            }
+          }
+        }
+        currentNode = currentNode.nextSibling;
+      }
+      if (!currentNode) {
+        throw new Error("End hydration comment not found");
+      }
     }
   }
   return node;
@@ -551,28 +564,41 @@ function nodeAnchor(node) {
 
 // src/render/nodeChild.ts
 function nodeChild(parent) {
-  let child = parent.firstChild;
+  let childNode = parent.firstChild;
   if (context_default.hydrationNode) {
-    if (!child) {
-      child = parent.appendChild(parent.ownerDocument.createTextNode(""));
+    if (!childNode) {
+      childNode = parent.appendChild(parent.ownerDocument.createTextNode(""));
     }
-    context_default.hydrationNode = child;
+    context_default.hydrationNode = childNode;
   }
-  return child;
+  return childNode;
 }
 
 // src/render/nodeRoot.ts
-function nodeRoot(parent) {
-  const hydrationNode = context_default.hydrationNode;
-  if (hydrationNode) {
+function nodeRoot(parent, text = false) {
+  if (context_default.hydrationNode) {
+    let rootNode = context_default.hydrationNode;
+    if (text && !isText(rootNode) && isText(rootNode.previousSibling)) {
+      rootNode = rootNode.previousSibling;
+      context_default.hydrationNode = rootNode;
+    }
     const range = context_default.activeRange;
     if (range && !range.startNode) {
-      range.startNode = hydrationNode;
+      range.startNode = rootNode;
     }
-    return hydrationNode;
+    return rootNode;
   } else {
     return parent.firstChild;
   }
+}
+
+// src/render/nodeSkip.ts
+function nodeSkip(node, count) {
+  let nextNode = node;
+  for (let i = 0; i < count; i++) {
+    nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
+  }
+  return nextNode;
 }
 
 // src/render/popRange.ts
@@ -806,5 +832,6 @@ let t_root = nodeRoot;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
+let t_skip = nodeSkip;
 let t_style = getStyles;
 

@@ -11,18 +11,18 @@ export default function NestedIf(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <![>`;
+	$output += ` <div> <![>`;
 	if ($props.condition) {
-		$output += ` <![>`;
+		$output += `<!^> <![>`;
 		if ($props.counter > 5) {
-			$output += ` <p>It's big</p> `;
+			$output += `<!^> <p>It's big</p> `;
 		}
 		else {
-			$output += ` <p>It's small</p> `;
+			$output += `<!^> <p>It's small</p> `;
 		}
 		$output += `<!]><!> `;
 	}
-	$output += `<!]><!> </div>`;
+	$output += `<!]><!> </div> `;
 
 	return $output;
 }

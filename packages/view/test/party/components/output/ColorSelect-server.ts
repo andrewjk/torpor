@@ -24,11 +24,11 @@ export default function ColorSelect(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
+	$output += ` <div> <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
 	for (let color of colors) {
 		$output += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;
 	}
-	$output += `<!]><!> </select> </div>`;
+	$output += `<!]><!> </select> </div> `;
 
 	return $output;
 }

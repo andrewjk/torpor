@@ -25,13 +25,15 @@ export default function BindText(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <input></input> <select> <option value=0>First</option> <option value=1>Second</option> <option value=2>Third</option> </select> <p>#</p> <p>#</p> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <input></input> <select> <option value=0>First</option> <option value=1>Second</option> <option value=2>Third</option> </select> <p>#</p> <p>#</p> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_input_1 = t_next(t_child(t_div_1)) as HTMLInputElement;
-	const t_select_1 = t_next(t_input_1, 2) as HTMLElement;
-	const t_text_1 = t_child(t_next(t_select_1, 2));
-	const t_text_2 = t_child(t_next(t_select_1, 4));
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_input_1 = t_next(t_child(t_next(t_root_0))) as HTMLInputElement;
+	const t_select_1 = t_next(t_next(t_input_1, true)) as HTMLElement;
+	const t_text_1 = t_child(t_next(t_next(t_select_1, true)));
+	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_select_1, true)), true)));
+	// @ts-ignore
+	const t_text_3 = t_next(t_next(t_root_0), true);
 	$run(function setBinding() {
 		t_input_1.value = $state.name || "";
 	});
@@ -46,7 +48,7 @@ export default function BindText(
 	$run(function setTextContent() {
 		t_text_2.textContent = `You have selected, ${t_fmt($state.selected)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
+	t_next(t_text_3);
 
 }

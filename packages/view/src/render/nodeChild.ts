@@ -1,18 +1,23 @@
 import context from "./context";
 
 /**
- * Gets the first child of a node
+ * Gets the first child of a node.
+ *
+ * Sets the hydration node.
+ *
+ * @param parent The parent node.
  */
-export default function nodeChild(parent: Node): Node {
-	let child = parent.firstChild;
+export default function nodeChild(parent: Node): ChildNode {
+	let childNode = parent.firstChild;
 	if (context.hydrationNode) {
 		// The child may be null when hydrating the sole text child of an
 		// element with no text
-		if (!child) {
-			child = parent.appendChild(parent.ownerDocument!.createTextNode(""));
+		if (!childNode) {
+			childNode = parent.appendChild(parent.ownerDocument!.createTextNode(""));
 		}
-		context.hydrationNode = child;
+		context.hydrationNode = childNode;
 	}
+
 	// NOTE: We know this is not null as it is being called from generated code
-	return child!;
+	return childNode!;
 }

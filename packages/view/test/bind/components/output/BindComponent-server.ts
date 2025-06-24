@@ -16,12 +16,12 @@ export default function BindComponent(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> `;
+	$output += ` <div> `;
 	const t_props_1: any = {};
 	t_props_1["&name"] = $state.name;
 
 	$output += BindText(t_props_1, $context)
-	$output += ` <p>Hello, ${t_fmt($state.name)}</p> </div>`;
+	$output += `<!> <p>Hello, ${t_fmt($state.name)}</p> </div> `;
 
 	return $output;
 }
@@ -46,7 +46,7 @@ function BindText(
 
 			/* User interface */
 			let $output = "";
-			$output += `<div> <input value="${t_attr($props.name) || ""}"> </div>`;
+			$output += ` <div> <input value="${t_attr($props.name) || ""}"> </div> `;
 
 			return $output;
 		}

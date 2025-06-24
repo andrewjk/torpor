@@ -26,13 +26,13 @@ export default function AnswerButtonApp(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <p>Are you happy?</p> `;
+	$output += ` <div> <p>Are you happy?</p> `;
 	const t_props_1: any = {};
 	t_props_1["onYes"] = onAnswerYes;
 	t_props_1["onNo"] = onAnswerNo;
 
 	$output += AnswerButton(t_props_1, $context)
-	$output += ` <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div>`;
+	$output += `<!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> </div> `;
 
 	return $output;
 }

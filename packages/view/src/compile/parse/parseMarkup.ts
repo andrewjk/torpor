@@ -1,6 +1,10 @@
-import { type ParseStatus } from "./ParseStatus";
+import type { TextNode } from "../types/nodes/TextNode";
+import type { ParseStatus } from "./ParseStatus";
+import parseControl from "./parseControl";
 import parseElement from "./parseElement";
 import accept from "./utils/accept";
+import consumeSpace from "./utils/consumeSpace";
+import isSpaceChar from "./utils/isSpaceChar";
 
 export default function parseMarkup(status: ParseStatus, source: string): void {
 	const current = status.components.at(-1);
@@ -19,11 +23,19 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 		} else if (accept("@/*", status)) {
 			// Swallow block comments
 			status.i = status.source.indexOf("*/", status.i) + 2;
+		} else if (isSpaceChar(status.source, status.i)) {
+			current.markup ??= { type: "root", children: [] };
+			const text: TextNode = { type: "text", content: consumeSpace(status) };
+			current.markup.children.push(text);
 		} else if (accept("<", status, false)) {
 			// Parse the element
-			const element = parseElement(status);
 			current.markup ??= { type: "root", children: [] };
+			const element = parseElement(status);
 			current.markup.children.push(element);
+		} else if (accept("@", status, false)) {
+			// Parse the control
+			current.markup ??= { type: "root", children: [] };
+			parseControl(status, current.markup);
 		} else {
 			status.i += 1;
 		}

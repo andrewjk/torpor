@@ -12,11 +12,11 @@ export default function ForOf(
 
 	/* User interface */
 	let $output = "";
-	$output += `<section> <![>`;
+	$output += ` <section> <![>`;
 	for (let item of $props.items) {
 		$output += `<!^> <p> ${t_fmt(item)} </p> `;
 	}
-	$output += `<!]><!> </section>`;
+	$output += `<!]><!> </section> `;
 
 	return $output;
 }

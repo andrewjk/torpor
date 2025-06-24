@@ -11,7 +11,7 @@ export default function HelloWorld(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h1>Hello world</h1>`;
+	$output += ` <h1>Hello world</h1> `;
 
 	return $output;
 }

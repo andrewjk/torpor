@@ -39,13 +39,13 @@ export default function TrafficLight(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <button>Next light</button> <p>#</p> <p> You must <!> </p> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <button>Next light</button> <p>#</p> <p> You must <!> </p> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_button_1 = t_next(t_child(t_div_1)) as HTMLElement;
-	const t_text_1 = t_child(t_next(t_button_1, 2));
-	const t_if_parent_1 = t_next(t_button_1, 4) as HTMLElement;
-	const t_if_anchor_1 = t_anchor(t_next(t_child(t_next(t_button_1, 4)))) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_button_1 = t_next(t_child(t_next(t_root_0))) as HTMLElement;
+	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
+	const t_if_parent_1 = t_next(t_next(t_next(t_next(t_button_1, true)), true)) as HTMLElement;
+	const t_if_anchor_1 = t_anchor(t_next(t_child(t_next(t_next(t_next(t_next(t_button_1, true)), true))))) as HTMLElement;
 
 	/* @if */
 	const t_if_range_1 = t_range();
@@ -54,9 +54,9 @@ export default function TrafficLight(
 			t_run_branch(t_if_range_1, 0, () => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
 				// @ts-ignore
-				const t_root_1 = t_root(t_fragment_1);
+				const t_root_1 = t_root(t_fragment_1, true);
 				// @ts-ignore
-				const t_text_2 = t_next(t_root_1, 2);
+				const t_text_2 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
 				t_next(t_text_2);
 			});
@@ -65,9 +65,9 @@ export default function TrafficLight(
 			t_run_branch(t_if_range_1, 1, () => {
 				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
 				// @ts-ignore
-				const t_root_2 = t_root(t_fragment_2);
+				const t_root_2 = t_root(t_fragment_2, true);
 				// @ts-ignore
-				const t_text_3 = t_next(t_root_2, 2);
+				const t_text_3 = t_next(t_next(t_root_2), true);
 				t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
 				t_next(t_text_3);
 			});
@@ -76,9 +76,9 @@ export default function TrafficLight(
 			t_run_branch(t_if_range_1, 2, () => {
 				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
 				// @ts-ignore
-				const t_root_3 = t_root(t_fragment_3);
+				const t_root_3 = t_root(t_fragment_3, true);
 				// @ts-ignore
-				const t_text_4 = t_next(t_root_3, 2);
+				const t_text_4 = t_next(t_next(t_root_3), true);
 				t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
 				t_next(t_text_4);
 			});
@@ -89,11 +89,13 @@ export default function TrafficLight(
 		}
 	});
 
+	// @ts-ignore
+	const t_text_5 = t_next(t_next(t_root_0), true);
 	t_event(t_button_1, "click", nextLight);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
+	t_next(t_text_5);
 
 }

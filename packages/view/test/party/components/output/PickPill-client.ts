@@ -27,12 +27,14 @@ export default function PickPill(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <div>#</div> <input id="blue-pill" type="radio" value="blue"></input> <label for="blue-pill">Blue pill</label> <input id="red-pill" type="radio" value="red"></input> <label for="red-pill">Red pill</label> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <div>#</div> <input id="blue-pill" type="radio" value="blue"></input> <label for="blue-pill">Blue pill</label> <input id="red-pill" type="radio" value="red"></input> <label for="red-pill">Red pill</label> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_text_1 = t_child(t_next(t_child(t_div_1)));
-	const t_input_1 = t_next(t_child(t_div_1), 3) as HTMLInputElement;
-	const t_input_2 = t_next(t_input_1, 4) as HTMLInputElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_text_1 = t_child(t_next(t_child(t_next(t_root_0))));
+	const t_input_1 = t_next(t_next(t_next(t_child(t_next(t_root_0))), true)) as HTMLInputElement;
+	const t_input_2 = t_next(t_next(t_next(t_next(t_input_1, true)), true)) as HTMLInputElement;
+	// @ts-ignore
+	const t_text_2 = t_next(t_next(t_root_0), true);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Picked: ${t_fmt($state.picked)}`;
 	});
@@ -48,7 +50,7 @@ export default function PickPill(
 	t_event(t_input_2, "change", (e) => {
 		if (e.target.checked) $state.picked = "red";
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+	t_next(t_text_2);
 
 }

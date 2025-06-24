@@ -12,7 +12,7 @@ export default function Style(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div style="${t_style({ color: $props.color })}"> Hello! </div>`;
+	$output += ` <div style="${t_style({ color: $props.color })}"> Hello! </div> `;
 
 	return $output;
 }

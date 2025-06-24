@@ -4,6 +4,7 @@ import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
+import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
 import UserProfile from "../output/./UserProfile-client";
@@ -22,10 +23,10 @@ export default function UserProfileApp(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
 	// @ts-ignore
-	const t_root_0 = t_root(t_fragment_0);
-	const t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
@@ -38,6 +39,10 @@ export default function UserProfileApp(
 	});
 	t_props_1["isAvailable"] = true;
 	UserProfile(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+
+	// @ts-ignore
+	const t_text_1 = t_next(t_anchor(t_comp_anchor_1, true), true);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
+	t_next(t_text_1);
 
 }

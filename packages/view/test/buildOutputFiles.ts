@@ -143,6 +143,7 @@ const importsMap: Record<string, string> = {
 	'import { t_child } from "@torpor/view";':
 		'import t_child from "../../../../src/render/nodeChild";',
 	'import { t_next } from "@torpor/view";': 'import t_next from "../../../../src/render/nodeNext";',
+	'import { t_skip } from "@torpor/view";': 'import t_skip from "../../../../src/render/nodeSkip";',
 	'import { t_frg } from "@torpor/view";':
 		'import t_frg from "../../../../src/render/createFragment";',
 	'import { t_elm } from "@torpor/view";':
@@ -170,6 +171,8 @@ const importsMap: Record<string, string> = {
 		'import t_class from "../../../../src/render/getClasses";',
 	'import { t_style } from "@torpor/view/ssr";':
 		'import t_style from "../../../../src/render/getStyles";',
+	'import { t_print } from "@torpor/view";':
+		'import t_print from "../../../../src/debug/printNode";',
 	'import { type ServerSlotRender } from "@torpor/view/ssr";':
 		'import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";',
 };

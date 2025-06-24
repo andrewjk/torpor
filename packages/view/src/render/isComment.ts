@@ -1,3 +1,3 @@
-export default function isComment(node: Node): node is Comment {
-	return node.nodeType === 8;
+export default function isComment(node: Node | null | undefined): node is Comment {
+	return node?.nodeType === 8;
 }

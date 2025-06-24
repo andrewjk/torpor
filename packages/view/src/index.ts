@@ -1,4 +1,3 @@
-import t_print from "./debug/printNode";
 import $mount from "./render/$mount";
 import $run from "./render/$run";
 import $unwrap from "./render/$unwrap";
@@ -20,6 +19,7 @@ import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
 import t_next from "./render/nodeNext";
 import t_root from "./render/nodeRoot";
+import t_skip from "./render/nodeSkip";
 import t_pop_range from "./render/popRange";
 import t_push_range from "./render/pushRange";
 import t_run_control from "./render/runControl";
@@ -55,6 +55,7 @@ export {
 	t_child,
 	t_next,
 	t_root,
+	t_skip,
 	t_pop_range,
 	t_push_range,
 	t_run_control,
@@ -63,8 +64,6 @@ export {
 	t_run_list,
 	t_attribute,
 	t_dynamic,
-	// For debugging
-	t_print,
 };
 
 export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem };

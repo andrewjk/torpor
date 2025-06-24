@@ -68,5 +68,5 @@ ${template.components.find((t) => t.default)!.name};
 		console.log("===");
 	}
 
-	return html;
+	return html.trim();
 }

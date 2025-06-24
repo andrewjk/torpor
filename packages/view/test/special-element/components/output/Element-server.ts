@@ -11,7 +11,7 @@ export default function Element(
 
 	/* User interface */
 	let $output = "";
-	$output += `<${$props.tag}> Hello! </${$props.tag}>`;
+	$output += ` <${$props.tag}> Hello! </${$props.tag}> `;
 
 	return $output;
 }

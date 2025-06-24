@@ -21,9 +21,12 @@ export default function Attributes(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div data-thing="" {$props.attr}> Hello! </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div data-thing="" {$props.attr}> Hello! </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
+	// @ts-ignore
+	const t_text_1 = t_next(t_div_1, true);
 	$run(function setAttribute() {
 		t_attribute(t_div_1, "thing", $props.thing);
 	});
@@ -36,7 +39,7 @@ export default function Attributes(
 	$run(function setAttribute() {
 		t_div_1.setAttribute("attr", $props.attr);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
+	t_next(t_text_1);
 
 }

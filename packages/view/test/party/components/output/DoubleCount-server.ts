@@ -19,7 +19,7 @@ export default function DoubleCount(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div>${t_fmt($state.doubleCount)}</div>`;
+	$output += ` <div>${t_fmt($state.doubleCount)}</div> `;
 
 	return $output;
 }

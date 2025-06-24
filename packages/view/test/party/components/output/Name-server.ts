@@ -16,7 +16,7 @@ export default function Name(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h1>Hello ${t_fmt($state.name)}</h1>`;
+	$output += ` <h1>Hello ${t_fmt($state.name)}</h1> `;
 
 	return $output;
 }

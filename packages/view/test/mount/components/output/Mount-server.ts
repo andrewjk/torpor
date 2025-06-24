@@ -18,7 +18,7 @@ export default function Mount(
 
 	/* User interface */
 	let $output = "";
-	$output += `<input ref="${t_attr(inputElement) || ""}">`;
+	$output += ` <input ref="${t_attr(inputElement) || ""}"> `;
 
 	return $output;
 }

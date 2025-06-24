@@ -12,11 +12,11 @@ export default function ForIn(
 
 	/* User interface */
 	let $output = "";
-	$output += `<section> <![>`;
+	$output += ` <section> <![>`;
 	for (let key in $props.item) {
 		$output += `<!^> <p> ${t_fmt($props.item[key])} </p> `;
 	}
-	$output += `<!]><!> </section>`;
+	$output += `<!]><!> </section> `;
 
 	return $output;
 }

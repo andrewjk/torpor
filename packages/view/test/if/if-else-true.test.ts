@@ -17,7 +17,7 @@ interface State {
 	counter: number;
 }
 
-test("if true -- mounted", async () => {
+test("if else true -- mounted", async () => {
 	const $state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");
@@ -27,7 +27,7 @@ test("if true -- mounted", async () => {
 	check(container, $state);
 });
 
-test("if true -- hydrated", async () => {
+test("if else true -- hydrated", async () => {
 	const $state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");

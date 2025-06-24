@@ -12,11 +12,11 @@ export default function ArrayEntries(
 
 	/* User interface */
 	let $output = "";
-	$output += `<section> <p>^</p> <![>`;
+	$output += ` <section> <p>^</p> <![>`;
 	for (let [i, item] of $props.items.entries()) {
 		$output += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt(item.text)} </span> `;
 	}
-	$output += `<!]><!> <p>$</p> </section>`;
+	$output += `<!]><!> <p>$</p> </section> `;
 
 	return $output;
 }

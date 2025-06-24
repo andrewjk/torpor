@@ -22,14 +22,17 @@ export default function FunnyButtonApp(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div> <!> <!> </div>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <!> <!> </div> `);
 	// @ts-ignore
-	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_div_1))) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
+	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_comp_parent_1))) as HTMLElement;
 
 	/* @component */
-	FunnyButton(t_div_1, t_comp_anchor_1, undefined, $context);
-	const t_comp_anchor_2 = t_anchor(t_next(t_comp_anchor_1, 2)) as HTMLElement;
+	FunnyButton(t_comp_parent_1, t_comp_anchor_1, undefined, $context);
+
+	const t_comp_parent_2 = t_comp_parent_1 as HTMLElement;
+	const t_comp_anchor_2 = t_anchor(t_next(t_next(t_anchor(t_comp_anchor_1, true), true))) as HTMLElement;
 
 	/* @component */
 	const t_slots_1: Record<string, SlotRender> = {};
@@ -47,8 +50,11 @@ export default function FunnyButtonApp(
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
 		t_next(t_text_1);
 	}
-	FunnyButton(t_div_1, t_comp_anchor_2, undefined, $context, t_slots_1);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
-	t_next(t_div_1);
+	FunnyButton(t_comp_parent_2, t_comp_anchor_2, undefined, $context, t_slots_1);
+
+	// @ts-ignore
+	const t_text_2 = t_next(t_comp_parent_2, true);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+	t_next(t_text_2);
 
 }

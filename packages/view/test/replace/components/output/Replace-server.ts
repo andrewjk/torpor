@@ -13,10 +13,10 @@ export default function Replace(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> <![>`;
+	$output += ` <div> <![>`;
 	$props.name;
 	$output += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
-	$output += `<!]><!> </div>`;
+	$output += `<!]><!> </div> `;
 
 	return $output;
 }

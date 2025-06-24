@@ -13,10 +13,12 @@ export default function Component(
 
 	/* User interface */
 	let $output = "";
+	$output += ` `;
 	const t_props_1: any = {};
 	t_props_1["name"] = "Amy";
 
 	$output += Header(t_props_1, $context)
+	$output += `<!> `;
 
 	return $output;
 }

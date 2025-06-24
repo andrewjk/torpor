@@ -10,7 +10,7 @@ export default function FunnyButton(
 
 	/* User interface */
 	let $output = "";
-	$output += `<button style="
+	$output += ` <button style="
 				background: rgba(0, 0, 0, 0.4);
 				color: #fff;
 				padding: 10px 20px;
@@ -26,7 +26,7 @@ export default function FunnyButton(
 	} else {
 		$output += ` <span>No content found</span> `;
 	}
-	$output += `<!]><!> </button>`;
+	$output += `<!]><!> </button> `;
 
 	return $output;
 }

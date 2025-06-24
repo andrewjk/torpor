@@ -12,12 +12,12 @@ export default function ParentChild(
 
 	/* User interface */
 	let $output = "";
-	$output += `<div> `;
+	$output += ` <div> `;
 	const t_props_1: any = {};
 	t_props_1["name"] = "Anna";
 
 	$output += Child(t_props_1, $context)
-	$output += ` </div>`;
+	$output += `<!> </div> `;
 
 	return $output;
 }
@@ -33,7 +33,7 @@ function Child(
 
 	/* User interface */
 	let $output = "";
-	$output += `<h2>Hello, ${t_fmt($props.name)}</h2>`;
+	$output += ` <h2>Hello, ${t_fmt($props.name)}</h2> `;
 
 	return $output;
 }
