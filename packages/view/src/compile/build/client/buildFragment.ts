@@ -127,6 +127,8 @@ function maybeAddRootNodeDeclaration(
 		b.append(`const ${rootName} = ${rootPath};`);
 		varPaths.set(rootPath, rootName);
 		//b.append(`console.log("${rootName}", ${rootName}, ${rootName}.textContent);`);
+
+		printDebug(rootName, status, b);
 	}
 }
 
@@ -389,8 +391,9 @@ function declareElementFragmentVars(
 						b.append("// @ts-ignore");
 					}
 					b.append(`const ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
+
+					printDebug(node.varName, status, b);
 				}
-				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
 			}
 		}
 	}
@@ -500,7 +503,8 @@ function declareTextFragmentVars(
 					b.append("// @ts-ignore");
 				}
 				b.append(`const ${node.varName} = ${varPath};`);
-				//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
+
+				printDebug(node.varName, status, b);
 			}
 		}
 	} else {
@@ -636,6 +640,8 @@ function declareParentAndAnchorFragmentVars(
 					b.append(`let ${node.parentName} as HTMLElement;`);
 				} else {
 					b.append(`const ${node.parentName} = ${parentVarPath} as HTMLElement;`);
+
+					printDebug(node.parentName, status, b);
 				}
 				varPaths.set(parentVarPath, node.parentName);
 			} else {
@@ -656,7 +662,8 @@ function declareParentAndAnchorFragmentVars(
 		} else {
 			status.imports.add("t_anchor");
 			b.append(`const ${node.varName} = t_anchor(${anchorVarPath}) as HTMLElement;`);
-			//b.append(`console.log("${node.varName}", ${node.varName}, ${node.varName}.textContent);`);
+
+			printDebug(node.varName, status, b);
 		}
 	} else {
 		status.imports.add("t_cmt");
@@ -765,6 +772,14 @@ function getFragmentVarPathPart(
 		}
 	}
 	return varPath;
+}
+
+const debug = false;
+function printDebug(varName: string, status: BuildStatus, b: Builder) {
+	if (debug) {
+		status.imports.add("t_print");
+		b.append(`console.log("${varName}:", t_print(${varName}));`);
+	}
 }
 
 /*

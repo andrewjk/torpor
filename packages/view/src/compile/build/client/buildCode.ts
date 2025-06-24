@@ -35,6 +35,7 @@ const importsMap: Record<string, string> = {
 	t_elm: 'import { t_elm } from "${folder}";',
 	t_txt: 'import { t_txt } from "${folder}";',
 	t_cmt: 'import { t_cmt } from "${folder}";',
+	t_print: 'import { t_print } from "${folder}";',
 	ListItem: 'import { type ListItem } from "${folder}";',
 	SlotRender: 'import { type SlotRender } from "${folder}";',
 };

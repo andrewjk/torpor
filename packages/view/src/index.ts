@@ -1,3 +1,4 @@
+import t_print from "./debug/printNode";
 import $mount from "./render/$mount";
 import $run from "./render/$run";
 import $unwrap from "./render/$unwrap";
@@ -62,6 +63,8 @@ export {
 	t_run_list,
 	t_attribute,
 	t_dynamic,
+	// For debugging
+	t_print,
 };
 
 export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem };
