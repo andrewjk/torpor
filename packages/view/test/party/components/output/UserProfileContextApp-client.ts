@@ -8,7 +8,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 import UserProfileContext from "../output/./UserProfileContext-client";
@@ -45,8 +44,6 @@ export default function UserProfileContextApp(
 
 	/* @component */
 	UserProfileContext(t_comp_parent_1, t_comp_anchor_1, undefined, $context);
-
-	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_2 = t_next(t_comp_parent_1, true);

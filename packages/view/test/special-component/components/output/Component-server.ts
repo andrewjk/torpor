@@ -20,6 +20,7 @@ export default function Component(
 	let $output = "";
 	$output += ` <![>`;
 	components[$props.self];
+	$output += `<![>`;
 	const t_props_1: any = {};
 	t_props_1["self"] = components[$props.self];
 	const t_slots_1: Record<string, ServerSlotRender> = {};
@@ -35,7 +36,7 @@ export default function Component(
 	}
 
 	$output += components[$props.self](t_props_1, $context, t_slots_1)
-	$output += `<!>`;
+	$output += `<!]><!>`;
 	$output += `<!]><!> `;
 
 	return $output;

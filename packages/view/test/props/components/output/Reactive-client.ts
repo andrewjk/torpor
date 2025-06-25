@@ -8,7 +8,6 @@ import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Reactive(
@@ -39,8 +38,6 @@ export default function Reactive(
 		t_props_1["text"] = $state.text;
 	});
 	Child(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
-
-	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_1 = t_next(t_comp_parent_1, true);

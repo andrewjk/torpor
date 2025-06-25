@@ -679,19 +679,6 @@ function declareParentAndAnchorFragmentVars(
 	// rather than at the end of the fragment
 	buildNode(node, status, b, parentName, anchorName);
 	node.handled = true;
-
-	// Before hydrating, the anchor node actually gets set to the first node
-	// After hydrating, we need to reset the anchor node to the end node
-	if (declare && node.varName) {
-		status.imports.add("t_reanchor");
-		b.append(`${node.varName} = t_reanchor(${node.varName}) as HTMLElement;`);
-		b.append("");
-
-		printDebug(node.varName, status, b);
-	}
-
-	// TODO: Due to the above, I think we only need to set the hydration node at
-	// the end of a fragment, not in every next() call??
 }
 
 function getFragmentVarPath(

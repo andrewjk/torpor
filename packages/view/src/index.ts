@@ -18,7 +18,6 @@ import t_range from "./render/newRange";
 import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
 import t_next from "./render/nodeNext";
-import t_reanchor from "./render/nodeReanchor";
 import t_root from "./render/nodeRoot";
 import t_skip from "./render/nodeSkip";
 import t_pop_range from "./render/popRange";
@@ -53,7 +52,6 @@ export {
 	t_style,
 	t_range,
 	t_anchor,
-	t_reanchor,
 	t_child,
 	t_next,
 	t_root,

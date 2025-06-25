@@ -11,7 +11,6 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
 import t_range from "../../../../src/render/newRange";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -106,8 +105,6 @@ export default function Await(
 				});
 			})(t_await_token_1);
 		});
-
-		t_await_anchor_1 = t_reanchor(t_await_anchor_1) as HTMLElement;
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;
 		// @ts-ignore

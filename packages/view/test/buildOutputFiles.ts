@@ -140,8 +140,6 @@ const importsMap: Record<string, string> = {
 	'import { t_root } from "@torpor/view";': 'import t_root from "../../../../src/render/nodeRoot";',
 	'import { t_anchor } from "@torpor/view";':
 		'import t_anchor from "../../../../src/render/nodeAnchor";',
-	'import { t_reanchor } from "@torpor/view";':
-		'import t_reanchor from "../../../../src/render/nodeReanchor";',
 	'import { t_child } from "@torpor/view";':
 		'import t_child from "../../../../src/render/nodeChild";',
 	'import { t_next } from "@torpor/view";': 'import t_next from "../../../../src/render/nodeNext";',

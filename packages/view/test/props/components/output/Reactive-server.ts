@@ -13,12 +13,12 @@ export default function Reactive(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <button>Update text</button> `;
+	$output += ` <div> <button>Update text</button> <![>`;
 	const t_props_1: any = {};
 	t_props_1["text"] = $state.text;
 
 	$output += Child(t_props_1, $context)
-	$output += `<!> </div> `;
+	$output += `<!]><!> </div> `;
 
 	return $output;
 }

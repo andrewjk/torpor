@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 import FunnyButton from "../output/./FunnyButton-client";
@@ -32,8 +31,6 @@ export default function FunnyButtonApp(
 	/* @component */
 	FunnyButton(t_comp_parent_1, t_comp_anchor_1, undefined, $context);
 
-	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
-
 	const t_comp_parent_2 = t_comp_parent_1 as HTMLElement;
 	let t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1, true))) as HTMLElement;
 
@@ -54,8 +51,6 @@ export default function FunnyButtonApp(
 		t_next(t_text_1);
 	}
 	FunnyButton(t_comp_parent_2, t_comp_anchor_2, undefined, $context, t_slots_1);
-
-	t_comp_anchor_2 = t_reanchor(t_comp_anchor_2) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_2 = t_next(t_comp_parent_2, true);

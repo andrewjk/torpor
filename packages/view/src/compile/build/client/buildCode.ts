@@ -29,7 +29,6 @@ const importsMap: Record<string, string> = {
 	t_animate: 'import { t_animate } from "${folder}";',
 	t_root: 'import { t_root } from "${folder}";',
 	t_anchor: 'import { t_anchor } from "${folder}";',
-	t_reanchor: 'import { t_reanchor } from "${folder}";',
 	t_child: 'import { t_child } from "${folder}";',
 	t_next: 'import { t_next } from "${folder}";',
 	t_skip: 'import { t_skip } from "${folder}";',

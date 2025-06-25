@@ -13,7 +13,7 @@ export default function UserProfileApp(
 
 	/* User interface */
 	let $output = "";
-	$output += ` `;
+	$output += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["name"] = "John";
 	t_props_1["age"] = 20;
@@ -21,7 +21,7 @@ export default function UserProfileApp(
 	t_props_1["isAvailable"] = true;
 
 	$output += UserProfile(t_props_1, $context)
-	$output += `<!> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

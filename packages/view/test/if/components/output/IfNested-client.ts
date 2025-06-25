@@ -5,7 +5,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -66,8 +65,6 @@ export default function IfNested(
 					}
 				});
 
-				t_if_anchor_2 = t_reanchor(t_if_anchor_2) as HTMLElement;
-
 				// @ts-ignore
 				const t_text_3 = t_next(t_if_anchor_2, true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_3);
@@ -86,8 +83,6 @@ export default function IfNested(
 			});
 		}
 	});
-
-	t_if_anchor_1 = t_reanchor(t_if_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_5 = t_next(t_if_anchor_1, true);

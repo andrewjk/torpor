@@ -13,7 +13,7 @@ export default function Basic(
 
 	/* User interface */
 	let $output = "";
-	$output += ` `;
+	$output += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -27,7 +27,7 @@ export default function Basic(
 	}
 
 	$output += Header(undefined, $context, t_slots_1)
-	$output += `<!> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

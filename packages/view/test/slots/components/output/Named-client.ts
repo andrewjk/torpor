@@ -3,7 +3,6 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 import Article from "../output/./Article-client"
@@ -60,8 +59,6 @@ export default function Named(
 		t_next(t_text_2);
 	}
 	Article(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
-
-	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_3 = t_next(t_comp_anchor_1, true);

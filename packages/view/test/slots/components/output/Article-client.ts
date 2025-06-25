@@ -4,7 +4,6 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Article(
@@ -28,22 +27,16 @@ export default function Article(
 	if ($slots && $slots["header"]) {
 		$slots["header"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
 	}
-	t_slot_anchor_1 = t_reanchor(t_slot_anchor_1) as HTMLElement;
-
 	const t_slot_parent_2 = t_next(t_root_0) as HTMLElement;
 	let t_slot_anchor_2 = t_anchor(t_next(t_next(t_slot_parent_1, true))) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_slot_parent_2, t_slot_anchor_2, undefined, $context)
 	}
-	t_slot_anchor_2 = t_reanchor(t_slot_anchor_2) as HTMLElement;
-
 	const t_slot_parent_3 = t_slot_parent_2 as HTMLElement;
 	let t_slot_anchor_3 = t_anchor(t_next(t_next(t_slot_anchor_2, true))) as HTMLElement;
 	if ($slots && $slots["footer"]) {
 		$slots["footer"](t_slot_parent_3, t_slot_anchor_3, undefined, $context)
 	}
-	t_slot_anchor_3 = t_reanchor(t_slot_anchor_3) as HTMLElement;
-
 	// @ts-ignore
 	const t_text_1 = t_next(t_slot_parent_3, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);

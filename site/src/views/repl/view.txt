@@ -571,11 +571,6 @@ function nodeChild(parent) {
   return childNode;
 }
 
-// src/render/nodeReanchor.ts
-function nodeReanchor(node) {
-  return context_default.hydrationNode ?? node;
-}
-
 // src/render/nodeRoot.ts
 function nodeRoot(parent, text = false) {
   if (context_default.hydrationNode) {
@@ -830,7 +825,6 @@ let t_next = nodeNext;
 let t_pop_range = popRange;
 let t_push_range = pushRange;
 let t_range = newRange;
-let t_reanchor = nodeReanchor;
 let t_root = nodeRoot;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;

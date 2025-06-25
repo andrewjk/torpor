@@ -13,7 +13,7 @@ export default function Named(
 
 	/* User interface */
 	let $output = "";
-	$output += ` `;
+	$output += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -37,7 +37,7 @@ export default function Named(
 	}
 
 	$output += Article(undefined, $context, t_slots_1)
-	$output += `<!> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

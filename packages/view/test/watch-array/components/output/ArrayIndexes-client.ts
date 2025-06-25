@@ -12,7 +12,6 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
 import t_range from "../../../../src/render/newRange";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
 
@@ -69,8 +68,6 @@ export default function ArrayIndexes(
 			t_pop_range(t_old_range_1);
 		}
 	);
-
-	t_for_anchor_1 = t_reanchor(t_for_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_3 = t_next(t_for_parent_1, true);

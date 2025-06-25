@@ -13,10 +13,10 @@ export default function FunnyButtonApp(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> `;
+	$output += ` <div> <![>`;
 
 	$output += FunnyButton(undefined, $context)
-	$output += `<!> `;
+	$output += `<!]><!> <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -30,7 +30,7 @@ export default function FunnyButtonApp(
 	}
 
 	$output += FunnyButton(undefined, $context, t_slots_1)
-	$output += `<!> </div> `;
+	$output += `<!]><!> </div> `;
 
 	return $output;
 }

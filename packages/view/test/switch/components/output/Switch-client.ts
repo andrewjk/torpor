@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
-import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -79,8 +78,6 @@ export default function Switch(
 			}
 		}
 	});
-
-	t_switch_anchor_1 = t_reanchor(t_switch_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_4 = t_next(t_switch_parent_1, true);
