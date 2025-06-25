@@ -160,7 +160,6 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 		}
 	}
 	b.append(`
-			return () => alert("YO");
 		});`);
 }
 
