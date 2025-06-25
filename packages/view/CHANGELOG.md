@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.9
+
+### Patch Changes
+
+- df6c62b: Fix: remove alert!
+
 ## 0.1.8
 
 ### Patch Changes
