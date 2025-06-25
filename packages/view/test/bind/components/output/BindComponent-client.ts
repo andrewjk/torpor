@@ -8,6 +8,7 @@ import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function BindComponent(
@@ -30,7 +31,7 @@ export default function BindComponent(
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_child(t_comp_parent_1))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_next(t_child(t_comp_parent_1))) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
@@ -42,7 +43,9 @@ export default function BindComponent(
 	});
 	BindText(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
 
-	const t_text_1 = t_child(t_next(t_next(t_anchor(t_comp_anchor_1, true), true)));
+	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
+
+	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
 	// @ts-ignore
 	const t_text_2 = t_next(t_comp_parent_1, true);
 	$run(function setTextContent() {

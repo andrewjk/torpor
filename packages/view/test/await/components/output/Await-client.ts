@@ -11,6 +11,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
 import t_range from "../../../../src/render/newRange";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -50,7 +51,7 @@ export default function Await(
 		// @ts-ignore
 		const t_root_0 = t_root(t_fragment_0, true);
 		const t_await_parent_1 = t_next(t_root_0) as HTMLElement;
-		const t_await_anchor_1 = t_anchor(t_next(t_child(t_await_parent_1))) as HTMLElement;
+		let t_await_anchor_1 = t_anchor(t_next(t_child(t_await_parent_1))) as HTMLElement;
 
 		/* @await */
 		const t_await_range_1 = t_range();
@@ -106,7 +107,9 @@ export default function Await(
 			})(t_await_token_1);
 		});
 
-		const t_button_1 = t_next(t_next(t_anchor(t_await_anchor_1, true), true)) as HTMLElement;
+		t_await_anchor_1 = t_reanchor(t_await_anchor_1) as HTMLElement;
+
+		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;
 		// @ts-ignore
 		const t_text_5 = t_next(t_await_parent_1, true);
 		t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));

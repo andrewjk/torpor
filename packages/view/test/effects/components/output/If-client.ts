@@ -6,6 +6,7 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -28,7 +29,7 @@ export default function If(
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_if_parent_1 = t_next(t_root_0) as HTMLElement;
-	const t_if_anchor_1 = t_anchor(t_next(t_child(t_if_parent_1))) as HTMLElement;
+	let t_if_anchor_1 = t_anchor(t_next(t_child(t_if_parent_1))) as HTMLElement;
 
 	/* @if */
 	const t_if_range_1 = t_range();
@@ -56,6 +57,8 @@ export default function If(
 			});
 		}
 	});
+
+	t_if_anchor_1 = t_reanchor(t_if_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_3 = t_next(t_if_parent_1, true);

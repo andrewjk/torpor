@@ -5,6 +5,7 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_range from "../../../../src/render/newRange";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -34,7 +35,7 @@ export default function Component(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_replace_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	let t_replace_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @replace */
 	const t_replace_range_1 = t_range();
@@ -44,7 +45,7 @@ export default function Component(
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<!>`);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1);
-			const t_comp_anchor_1 = t_anchor(t_root_1) as HTMLElement;
+			let t_comp_anchor_1 = t_anchor(t_root_1) as HTMLElement;
 
 			/* @component */
 			const t_props_1: any = $watch({});
@@ -65,12 +66,16 @@ export default function Component(
 			}
 			components[$props.self](t_fragment_1, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
+			t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
+
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before);
 		});
 	});
 
+	t_replace_anchor_1 = t_reanchor(t_replace_anchor_1) as HTMLElement;
+
 	// @ts-ignore
-	const t_text_2 = t_next(t_anchor(t_replace_anchor_1, true), true);
+	const t_text_2 = t_next(t_replace_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 

@@ -13,6 +13,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
 import t_range from "../../../../src/render/newRange";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
 
@@ -36,7 +37,7 @@ export default function ForEscape(
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	const t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
 
 	/* @for */
 	let t_for_range_1 = t_range();
@@ -99,6 +100,8 @@ export default function ForEscape(
 			t_pop_range(t_old_range_1);
 		}
 	);
+
+	t_for_anchor_1 = t_reanchor(t_for_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_3 = t_next(t_for_parent_1, true);

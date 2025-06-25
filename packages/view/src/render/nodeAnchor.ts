@@ -15,20 +15,10 @@ import nodeNext from "./nodeNext";
  * the matched comments.
  *
  * @param node The potential anchor node.
- * @param subsequent Whether this is the second time the anchor is being retrieved.
  * @returns The anchor node.
  */
-export default function nodeAnchor(node: ChildNode, subsequent = false): ChildNode {
+export default function nodeAnchor(node: ChildNode): ChildNode {
 	if (context.hydrationNode) {
-		// The first time we get a node anchor during hydration, the hydration
-		// node gets set to the first node in the statement, and then we work
-		// through the nodes until we get to the anchor node itself. So, the
-		// second time we get the anchor node, the hydration node should have
-		// been set to it. I'm not sure this is going to always be the case...
-		if (subsequent) {
-			return context.hydrationNode;
-		}
-
 		if (isComment(node) && node.data === HYDRATION_START) {
 			// Skip and remove the start node, setting the hydration node in
 			// nodeNext

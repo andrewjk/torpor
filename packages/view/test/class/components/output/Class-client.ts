@@ -7,6 +7,7 @@ import t_child from "../../../../src/render/nodeChild";
 import t_class from "../../../../src/render/getClasses";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Class(
@@ -32,7 +33,7 @@ export default function Class(
 	const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
 	const t_div_4 = t_next(t_next(t_div_3, true)) as HTMLDivElement;
 	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
-	const t_comp_anchor_1 = t_anchor(t_next(t_next(t_div_4, true))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_div_4, true))) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
@@ -40,6 +41,8 @@ export default function Class(
 		t_props_1["class"] = t_class({ "child-class": true }, "torp-1ljxz83");
 	});
 	Child(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
+
+	t_comp_anchor_1 = t_reanchor(t_comp_anchor_1) as HTMLElement;
 
 	// @ts-ignore
 	const t_text_1 = t_next(t_comp_parent_1, true);

@@ -4,6 +4,7 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
+import t_reanchor from "../../../../src/render/nodeReanchor";
 import t_root from "../../../../src/render/nodeRoot";
 
 export default function Header(
@@ -23,7 +24,7 @@ export default function Header(
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_slot_parent_1 = t_next(t_root_0) as HTMLElement;
-	const t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
+	let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
 	} else {
@@ -33,6 +34,8 @@ export default function Header(
 		t_add_fragment(t_fragment_1, t_slot_parent_1, t_slot_anchor_1, t_text_1);
 		t_next(t_text_1);
 	}
+	t_slot_anchor_1 = t_reanchor(t_slot_anchor_1) as HTMLElement;
+
 	// @ts-ignore
 	const t_text_2 = t_next(t_slot_parent_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
