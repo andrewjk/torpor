@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.8
+
+### Patch Changes
+
+- 1be84b1: Fix: component hydration nodes
+
 ## 0.1.7
 
 ### Patch Changes
