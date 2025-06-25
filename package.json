@@ -19,7 +19,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@changesets/cli": "^2.29.4"
+		"@changesets/cli": "^2.29.5"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.0",
@@ -28,9 +28,9 @@
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/jsdom": "^21.1.7",
 		"jsdom": "^26.1.0",
-		"prettier": "^3.5.3",
+		"prettier": "^3.6.0",
 		"typescript": "^5.8.3",
-		"vitest": "^3.2.3"
+		"vitest": "^3.2.4"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",
@@ -41,5 +41,5 @@
 		"packages/unplugin",
 		"packages/view"
 	],
-	"packageManager": "pnpm@10.11.1"
+	"packageManager": "pnpm@10.12.3"
 }
