@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.7
+
+### Patch Changes
+
+- 14f7694: Fix: reset anchor nodes after hydration
+
 ## 0.1.6
 
 ### Patch Changes
