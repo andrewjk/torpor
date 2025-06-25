@@ -1,5 +1,15 @@
 # @torpor/view
 
+## 0.1.6
+
+### Patch Changes
+
+- 1866f30: Fix: set range end nodes correctly when hydrating
+- a31647f: Feat: `@async function` in @render
+- 951a86f: Feat: re-use layout data and UI
+- 6d6fb89: Feat: top-level control statements in @render
+- 9c13f0f: Feat: allow multiple top-level elements in @render
+
 ## 0.1.5
 
 ### Patch Changes

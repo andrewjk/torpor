@@ -1,5 +1,18 @@
 # @torpor/build
 
+## 0.1.32
+
+### Patch Changes
+
+- 951a86f: Feat: re-use layout data and UI
+- 182d436: Feat: prefetching link data
+- Updated dependencies [1866f30]
+- Updated dependencies [a31647f]
+- Updated dependencies [951a86f]
+- Updated dependencies [6d6fb89]
+- Updated dependencies [9c13f0f]
+  - @torpor/view@0.1.6
+
 ## 0.1.31
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # @torpor/ui
 
+## 0.1.6
+
+### Patch Changes
+
+- 586f073: Fix: set disabled properly
+- a14a74f: Refactor: remove <div style="display: contents">
+- Updated dependencies [1866f30]
+- Updated dependencies [a31647f]
+- Updated dependencies [951a86f]
+- Updated dependencies [6d6fb89]
+- Updated dependencies [9c13f0f]
+  - @torpor/view@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes
