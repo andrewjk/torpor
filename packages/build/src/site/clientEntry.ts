@@ -6,6 +6,7 @@ import { type Component, type SlotRender } from "@torpor/view";
 import { mount } from "@torpor/view";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
+import type RouteHandler from "../types/RouteHandler.ts";
 import Router from "./Router.ts";
 
 // Build the router from the Site object created by the user
@@ -24,6 +25,9 @@ interface LayoutPath {
 }
 let layoutStack: LayoutPath[] = [];
 
+// TODO: Probably expire after 30 seconds or something?
+let prefetchedData: Record<string, any> = {};
+
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
 	if (e.target && (e.target as HTMLElement).tagName === "A") {
@@ -39,7 +43,38 @@ window.addEventListener("click", async (e) => {
 	}
 });
 
-// TODO: Intercept more events on links so that we can preload
+// Intercept mouseover/focus/touchstart on links for prefetching
+// TODO: settings e.g. <a href="" data-tb-prefetch="eager"/"visible"/"hover"/"touch">
+window.addEventListener("mouseover", maybePrefetch);
+window.addEventListener("focus", maybePrefetch);
+window.addEventListener("touchstart", maybePrefetch);
+
+async function maybePrefetch(e: Event) {
+	if (e.target && (e.target as HTMLElement).tagName === "A") {
+		const href = (e.target as HTMLLinkElement).href;
+		const url = new URL(href);
+
+		const path = url.pathname;
+		const query = url.searchParams;
+		const route = router.match(path, query);
+		if (route) {
+			const handler = route.handler;
+			const params = route.params || {};
+
+			// There should be a client endpoint
+			const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
+
+			// There may be a server endpoint
+			const serverEndPoint: PageServerEndPoint | undefined =
+				handler.serverEndPoint && (await handler.serverEndPoint())?.default;
+
+			// Just dummy this up
+			let newStack: LayoutPath[] = [];
+
+			await loadData(handler, params, path, newStack, clientEndPoint, serverEndPoint, true);
+		}
+	}
+}
 
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
@@ -100,56 +135,22 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	const serverEndPoint: PageServerEndPoint | undefined =
 		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
-	let newStack: LayoutPath[] = [];
+	let newLayoutStack: LayoutPath[] = [];
 
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
-	let data = {};
-	if (handler.layouts) {
-		for (let [i, layout] of handler.layouts.entries()) {
-			let layoutPath = layout.path;
-			if (layoutStack.at(i)?.path === layoutPath) {
-				// We've already loaded this layout, we can just re-use its data
-				layoutStack[i].reuse = true;
-				newStack[i] = layoutStack[i];
-				Object.assign(data, layoutStack[i].data);
-			} else {
-				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRange: null };
-				for (let key in params) {
-					layoutPath = layoutPath.replace(`[${key}]`, params[key]);
-				}
-				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-				const layoutServerEndPoint: PageServerEndPoint | undefined =
-					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-				const layoutResponse = await loadClientAndServerData(
-					stackLayout.data,
-					document.location.origin + layoutPath,
-					params,
-					layoutEndPoint,
-					layoutServerEndPoint,
-				);
-				if (layoutResponse?.ok === false) {
-					return false;
-				}
-				Object.assign(data, stackLayout.data);
-				newStack.push(stackLayout);
-			}
-		}
-	}
-	let endPointResponse = await loadClientAndServerData(
-		data,
-		document.location.origin + path,
+	const data = await loadData(
+		handler,
 		params,
+		path,
+		newLayoutStack,
 		clientEndPoint,
 		serverEndPoint,
 	);
-	if (endPointResponse?.ok === false) {
-		return false;
-	}
-	let $props: Record<string, any> = { data };
+	const $props: Record<string, any> = { data };
 
 	layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRange: null });
-	layoutStack = newStack;
+	layoutStack = newLayoutStack;
 
 	// If there are layouts, work our way upwards, pushing each component into
 	// the default slot of its parent
@@ -219,7 +220,66 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 		}
 	}
 
+	// Reset prefetched data on each navigation
+	prefetchedData = {};
+
 	return true;
+}
+
+async function loadData(
+	handler: RouteHandler,
+	params: Record<string, string>,
+	path: string,
+	newLayoutStack: LayoutPath[],
+	clientEndPoint: PageEndPoint | undefined,
+	serverEndPoint: PageServerEndPoint | undefined,
+	prefetch = false,
+) {
+	let data = {};
+	if (handler.layouts) {
+		for (let [i, layout] of handler.layouts.entries()) {
+			let layoutPath = layout.path;
+			if (layoutStack.at(i)?.path === layoutPath) {
+				// We've already loaded this layout, we can just re-use its data and UI
+				if (!prefetch) {
+					layoutStack[i].reuse = true;
+				}
+				newLayoutStack[i] = layoutStack[i];
+				Object.assign(data, layoutStack[i].data);
+			} else {
+				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRange: null };
+				for (let key in params) {
+					layoutPath = layoutPath.replace(`[${key}]`, params[key]);
+				}
+				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+				const layoutServerEndPoint: PageServerEndPoint | undefined =
+					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+				const layoutResponse = await loadClientAndServerData(
+					stackLayout.data,
+					document.location.origin + layoutPath,
+					params,
+					layoutEndPoint,
+					layoutServerEndPoint,
+				);
+				if (layoutResponse?.ok === false) {
+					return false;
+				}
+				Object.assign(data, stackLayout.data);
+				newLayoutStack.push(stackLayout);
+			}
+		}
+	}
+	let endPointResponse = await loadClientAndServerData(
+		data,
+		document.location.origin + path,
+		params,
+		clientEndPoint,
+		serverEndPoint,
+	);
+	if (endPointResponse?.ok === false) {
+		return false;
+	}
+	return data;
 }
 
 async function loadClientAndServerData(
@@ -230,29 +290,46 @@ async function loadClientAndServerData(
 	serverEndPoint?: PageServerEndPoint,
 ): Promise<Response | void> {
 	if (clientEndPoint?.load) {
-		const clientUrl = new URL(document.location.href);
-		const clientParams = buildClientParams(clientUrl, params, data);
-		const clientResponse = await clientEndPoint.load(clientParams);
-		if (clientResponse) {
-			if (clientResponse.ok) {
-				if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
-					Object.assign(data, await clientResponse.json());
+		if (prefetchedData[location]) {
+			//console.log("CLIENT DATA ALREADY LOADED", location);
+			Object.assign(data, prefetchedData[location]);
+		} else {
+			//console.log("CLIENT DATA LOADING", location);
+			const clientUrl = new URL(document.location.href);
+			const clientParams = buildClientParams(clientUrl, params, data);
+			const clientResponse = await clientEndPoint.load(clientParams);
+			if (clientResponse) {
+				if (clientResponse.ok) {
+					if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
+						const clientData = await clientResponse.json();
+						Object.assign(data, clientData);
+						prefetchedData[location] = clientData;
+					}
+				} else {
+					return clientResponse;
 				}
-			} else {
-				return clientResponse;
 			}
 		}
 	}
 	if (serverEndPoint?.load) {
 		const serverUrl = location.replace(/\/$/, "") + "/~server";
-		const serverResponse = await fetch(serverUrl);
-		if (serverResponse) {
-			if (serverResponse.ok) {
-				if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
-					Object.assign(data, await serverResponse.json());
+
+		if (prefetchedData[serverUrl]) {
+			//console.log("SERVER DATA ALREADY LOADED", serverUrl);
+			Object.assign(data, prefetchedData[serverUrl]);
+		} else {
+			//console.log("SERVER DATA LOADING", serverUrl);
+			const serverResponse = await fetch(serverUrl);
+			if (serverResponse) {
+				if (serverResponse.ok) {
+					if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
+						const serverData = await serverResponse.json();
+						Object.assign(data, serverData);
+						prefetchedData[serverUrl] = serverData;
+					}
+				} else {
+					return serverResponse;
 				}
-			} else {
-				return serverResponse;
 			}
 		}
 	}
