@@ -649,7 +649,7 @@ function runControlBranch(range, index, create) {
 // src/render/runLayoutSlot.ts
 function runLayoutSlot(component, slot, parent, anchor, $props, $context) {
   const range = newRange();
-  const oldRange = pushRange(range, true);
+  const oldRange = pushRange(range);
   component(parent, anchor, $props, $context, {
     _: slot
   });

@@ -193,7 +193,7 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 				} else {
 					slotFunctions[i] = function layoutComponent(parent, anchor, _, $context) {
 						if (layoutEndPoint.component) {
-							layoutStack[i].slotRange = runLayoutSlot(
+							layoutStack[i - 1].slotRange = runLayoutSlot(
 								layoutEndPoint.component,
 								slotFunctions[i + 1],
 								parent,
@@ -291,10 +291,8 @@ async function loadClientAndServerData(
 ): Promise<Response | void> {
 	if (clientEndPoint?.load) {
 		if (prefetchedData[location]) {
-			//console.log("CLIENT DATA ALREADY LOADED", location);
 			Object.assign(data, prefetchedData[location]);
 		} else {
-			//console.log("CLIENT DATA LOADING", location);
 			const clientUrl = new URL(document.location.href);
 			const clientParams = buildClientParams(clientUrl, params, data);
 			const clientResponse = await clientEndPoint.load(clientParams);
@@ -315,10 +313,8 @@ async function loadClientAndServerData(
 		const serverUrl = location.replace(/\/$/, "") + "/~server";
 
 		if (prefetchedData[serverUrl]) {
-			//console.log("SERVER DATA ALREADY LOADED", serverUrl);
 			Object.assign(data, prefetchedData[serverUrl]);
 		} else {
-			//console.log("SERVER DATA LOADING", serverUrl);
 			const serverResponse = await fetch(serverUrl);
 			if (serverResponse) {
 				if (serverResponse.ok) {

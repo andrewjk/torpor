@@ -14,7 +14,7 @@ export default function runLayoutSlot(
 	$context?: Record<PropertyKey, any>,
 ): Range {
 	const range = newRange();
-	const oldRange = pushRange(range, true);
+	const oldRange = pushRange(range);
 
 	component(parent, anchor, $props, $context, {
 		_: slot,
