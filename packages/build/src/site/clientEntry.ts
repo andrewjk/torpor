@@ -1,7 +1,7 @@
 import manifest from "@torpor/build/manifest";
 // @ts-ignore This errors in the Cloudflare build?
 import { $page } from "@torpor/build/state";
-import { clearLayoutSlot, hydrate, runLayoutSlot } from "@torpor/view";
+import { clearLayoutSlot, fillLayoutSlot, hydrate } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
 import { mount } from "@torpor/view";
 import type PageEndPoint from "../types/PageEndPoint.ts";
@@ -161,17 +161,15 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
 		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor, _, $context) {
-			if (clientEndPoint.component) {
-				let i = layoutStack.length - 1;
-				layoutStack[i].slotRange = runLayoutSlot(
-					clientEndPoint.component,
-					slotFunctions[i + 1],
-					parent,
-					anchor,
-					$props,
-					$context,
-				);
-			}
+			let i = layoutStack.length - 1;
+			layoutStack[i].slotRange = fillLayoutSlot(
+				clientEndPoint.component!,
+				slotFunctions[i + 1],
+				parent,
+				anchor,
+				$props,
+				$context,
+			);
 		};
 
 		// Each earlier slot function will render a layout
@@ -192,16 +190,14 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 					slots = { _: slotFunctions[i + 1] };
 				} else {
 					slotFunctions[i] = function layoutComponent(parent, anchor, _, $context) {
-						if (layoutEndPoint.component) {
-							layoutStack[i - 1].slotRange = runLayoutSlot(
-								layoutEndPoint.component,
-								slotFunctions[i + 1],
-								parent,
-								anchor,
-								$props,
-								$context,
-							);
-						}
+						layoutStack[i - 1].slotRange = fillLayoutSlot(
+							layoutEndPoint.component!,
+							slotFunctions[i + 1],
+							parent,
+							anchor,
+							$props,
+							$context,
+						);
 					};
 				}
 			}
@@ -239,6 +235,9 @@ async function loadData(
 	if (handler.layouts) {
 		for (let [i, layout] of handler.layouts.entries()) {
 			let layoutPath = layout.path;
+			for (let key in params) {
+				layoutPath = layoutPath.replace(`[${key}]`, params[key]);
+			}
 			if (layoutStack.at(i)?.path === layoutPath) {
 				// We've already loaded this layout, we can just re-use its data and UI
 				if (!prefetch) {
@@ -248,9 +247,6 @@ async function loadData(
 				Object.assign(data, layoutStack[i].data);
 			} else {
 				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRange: null };
-				for (let key in params) {
-					layoutPath = layoutPath.replace(`[${key}]`, params[key]);
-				}
 				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
 				const layoutServerEndPoint: PageServerEndPoint | undefined =
 					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
