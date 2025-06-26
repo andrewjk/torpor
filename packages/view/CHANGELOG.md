@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.11
+
+### Patch Changes
+
+- 741a289: !Refactor: rename runLayoutSlot to fillLayoutSlot
+
 ## 0.1.10
 
 ### Patch Changes

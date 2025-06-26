@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.1.34
+
+### Patch Changes
+
+- 1221923: Fix: updating layouts in [parameter] routes
+- Updated dependencies [741a289]
+  - @torpor/view@0.1.11
+
 ## 0.1.33
 
 ### Patch Changes
