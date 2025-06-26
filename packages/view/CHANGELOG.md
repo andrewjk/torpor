@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.1.10
+
+### Patch Changes
+
+- 74bf42d: Fix: store (and clear) the right layout slot ranges
+
 ## 0.1.9
 
 ### Patch Changes
