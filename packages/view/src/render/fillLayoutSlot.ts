@@ -5,7 +5,7 @@ import newRange from "./newRange";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
 
-export default function runLayoutSlot(
+export default function fillLayoutSlot(
 	component: Component,
 	slot: SlotRender,
 	parent: ParentNode,

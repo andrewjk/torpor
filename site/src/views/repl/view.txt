@@ -422,6 +422,44 @@ function clearLayoutSlot(range) {
   clearRange(range);
 }
 
+// src/render/newRange.ts
+function newRange() {
+  return {
+    startNode: null,
+    endNode: null,
+    children: null,
+    index: 0,
+    effects: null,
+    animations: null
+  };
+}
+
+// src/render/popRange.ts
+function popRange(oldRange) {
+  context_default.activeRange = oldRange;
+}
+
+// src/render/pushRange.ts
+function pushRange(range, toParent = false) {
+  const activeRange = context_default.activeRange;
+  if (toParent && activeRange) {
+    (activeRange.children ??= []).push(range);
+  }
+  context_default.activeRange = range;
+  return activeRange;
+}
+
+// src/render/fillLayoutSlot.ts
+function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
+  const range = newRange();
+  const oldRange = pushRange(range);
+  component(parent, anchor, $props, $context, {
+    _: slot
+  });
+  popRange(oldRange);
+  return range;
+}
+
 // src/render/getFragment.ts
 function getFragment(document, array, index, html, ns) {
   if (array[index] === void 0) {
@@ -474,18 +512,6 @@ function newListItem(data, key) {
     animations: null,
     data,
     key
-  };
-}
-
-// src/render/newRange.ts
-function newRange() {
-  return {
-    startNode: null,
-    endNode: null,
-    children: null,
-    index: 0,
-    effects: null,
-    animations: null
   };
 }
 
@@ -598,21 +624,6 @@ function nodeSkip(node, count) {
   return nextNode;
 }
 
-// src/render/popRange.ts
-function popRange(oldRange) {
-  context_default.activeRange = oldRange;
-}
-
-// src/render/pushRange.ts
-function pushRange(range, toParent = false) {
-  const activeRange = context_default.activeRange;
-  if (toParent && activeRange) {
-    (activeRange.children ??= []).push(range);
-  }
-  context_default.activeRange = range;
-  return activeRange;
-}
-
 // src/render/runControl.ts
 function runControl(range, anchor, create) {
   range.index = -1;
@@ -644,17 +655,6 @@ function runControlBranch(range, index, create) {
   context_default.activeEffect = oldEffect;
   popRange(oldRange);
   range.index = index;
-}
-
-// src/render/runLayoutSlot.ts
-function runLayoutSlot(component, slot, parent, anchor, $props, $context) {
-  const range = newRange();
-  const oldRange = pushRange(range);
-  component(parent, anchor, $props, $context, {
-    _: slot
-  });
-  popRange(oldRange);
-  return range;
 }
 
 // src/render/moveRange.ts
