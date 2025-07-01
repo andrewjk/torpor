@@ -31,8 +31,15 @@ let prefetchedData: Record<string, any> = {};
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
 	if (e.target && (e.target as HTMLElement).tagName === "A") {
+		const link = e.target as HTMLAnchorElement;
+
+		if (ignoreAnchorMouseEvent(link, e)) {
+			return;
+		}
+
 		e.preventDefault();
-		const href = (e.target as HTMLLinkElement).href;
+
+		const href = link.href;
 		const url = new URL(href);
 
 		if (await navigate(url)) {
@@ -46,12 +53,17 @@ window.addEventListener("click", async (e) => {
 // Intercept mouseover/focus/touchstart on links for prefetching
 // TODO: settings e.g. <a href="" data-tb-prefetch="eager"/"visible"/"hover"/"touch">
 window.addEventListener("mouseover", maybePrefetch);
-window.addEventListener("focus", maybePrefetch);
 window.addEventListener("touchstart", maybePrefetch);
 
-async function maybePrefetch(e: Event) {
+async function maybePrefetch(e: MouseEvent | TouchEvent) {
 	if (e.target && (e.target as HTMLElement).tagName === "A") {
-		const href = (e.target as HTMLLinkElement).href;
+		const link = e.target as HTMLAnchorElement;
+
+		if (ignoreAnchorMouseEvent(link, e)) {
+			return;
+		}
+
+		const href = link.href;
 		const url = new URL(href);
 
 		const path = url.pathname;
@@ -74,6 +86,19 @@ async function maybePrefetch(e: Event) {
 			await loadData(handler, params, path, newStack, clientEndPoint, serverEndPoint, true);
 		}
 	}
+}
+
+function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: MouseEvent | TouchEvent) {
+	// Ignore the event if a modifier key is pressed, or target is not
+	// "_self", or if rel="external"
+	return (
+		e.altKey ||
+		e.ctrlKey ||
+		e.metaKey ||
+		e.shiftKey ||
+		(link.target && link.target !== "_self") ||
+		link.rel === "external"
+	);
 }
 
 // Listen for changes to the URL that occur when the user navigates using the
