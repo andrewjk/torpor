@@ -7,27 +7,25 @@ export default function ExampleContextual($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>Right-click on the panel below to trigger a context menu.</p>
+		<p>Right-click on the panel below to trigger a context menu.</p>
 
-			<Popover>
-				<PopoverTriggerContextual class="expopcon-element">Show a contextual</PopoverTriggerContextual>
-				<PopoverContentContextual class="expopcon-content">
-					<Dialog>
-						<DialogHeader>
-							<h4>Header</h4>
-						</DialogHeader>
-						<DialogBody>
-							<p>Which color do you prefer?</p>
-						</DialogBody>
-						<DialogFooter class="expopcon-footer">
-							<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
-							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
-						</DialogFooter>
-					</Dialog>
-				</PopoverContentContextual>
-			</Popover>
-		</div>
+		<Popover>
+			<PopoverTriggerContextual class="expopcon-element">Show a contextual</PopoverTriggerContextual>
+			<PopoverContentContextual class="expopcon-content">
+				<Dialog>
+					<DialogHeader>
+						<h4>Header</h4>
+					</DialogHeader>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter class="expopcon-footer">
+						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContentContextual>
+		</Popover>
 	}
 
 	@style {

@@ -11,14 +11,14 @@ export default function If(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <![>`;
+	$output += ` <![>`;
 	if ($props.counter > 5) {
 		$output += `<!^> <p>It's big</p> `;
 	}
 	else {
 		$output += `<!^> <p>It's small</p> `;
 	}
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

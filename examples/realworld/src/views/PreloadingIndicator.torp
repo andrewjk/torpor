@@ -16,17 +16,15 @@ export default function PreloadingIndicator() {
 	});
 
 	@render {
-		<div>
-			@if ($state.visible) {
-				<div class="progress-container">
-					<div class="progress" style="width: {$state.p * 100}%" />
-				</div>
-			}
+		@if ($state.visible) {
+			<div class="progress-container">
+				<div class="progress" style="width: {$state.p * 100}%" />
+			</div>
+		}
 
-			@if ($state.p >= 0.4) {
-				<div class="fade" />
-			}
-		</div>
+		@if ($state.p >= 0.4) {
+			<div class="fade" />
+		}
 	}
 
 	@style {

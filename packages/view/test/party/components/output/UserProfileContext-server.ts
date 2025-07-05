@@ -14,7 +14,7 @@ export default function UserProfileContext(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> </div> `;
+	$output += ` <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> `;
 
 	return $output;
 }

@@ -2,18 +2,17 @@ import Repl from "../repl/Repl.torp"
 
 export default function Party() {
 	@render {
-		<div>
-			<:head>
-				<title>Component Party | Torpor</title>
-			</:head>
+		<:head>
+			<title>Component Party | Torpor</title>
+		</:head>
 
-			<h1>Component Party</h1>
-			<p>
-				Examples from <a href="https://component-party.dev">Component Party</a>.
-			</p>
+		<h1>Component Party</h1>
+		<p>
+			Examples from <a href="https://component-party.dev">Component Party</a>.
+		</p>
 
-			<h2>Declare state</h2>
-			<Repl input={`
+		<h2>Declare state</h2>
+		<Repl input={`
 export default function Name() {
 	let $state = $watch({
 		name: "John"
@@ -25,8 +24,8 @@ export default function Name() {
 }
 `.trimStart()} />
 
-			<h2>Update state</h2>
-			<Repl input={`
+		<h2>Update state</h2>
+		<Repl input={`
 export default function NameUpdate() {
 	let $state = $watch({
 		name: "John"
@@ -39,8 +38,8 @@ export default function NameUpdate() {
 }
 `.trimStart()} />
 
-			<h2>Computed state</h2>
-			<Repl input={`
+		<h2>Computed state</h2>
+		<Repl input={`
 export default function DoubleCount() {
 	let $state = $watch({
 		count: 10,
@@ -55,8 +54,8 @@ export default function DoubleCount() {
 }
 `.trimStart()} />
 
-			<h2>Minimal template</h2>
-			<Repl input={`
+		<h2>Minimal template</h2>
+		<Repl input={`
 export default function HelloWorld() {
 	@render {
 		<p>Hello world</p>
@@ -64,14 +63,12 @@ export default function HelloWorld() {
 }
 `.trimStart()} />
 
-			<h2>Styling</h2>
-			<Repl input={`
+		<h2>Styling</h2>
+		<Repl input={`
 export default function CssStyle() {
 	@render {
-		<div>
-			<h1 class="title">I am red</h1>
-			<button style="font-size: 10rem;">I am a button</button>
-		</div>
+		<h1 class="title">I am red</h1>
+		<button style="font-size: 10rem;">I am a button</button>
 	}
 
 	@style {
@@ -82,8 +79,8 @@ export default function CssStyle() {
 }
 `.trimStart()} />
 
-			<h2>Loop</h2>
-			<Repl input={`
+		<h2>Loop</h2>
+		<Repl input={`
 export default function Colors() {
 	const colors = ["red", "green", "blue"];
 
@@ -98,8 +95,8 @@ export default function Colors() {
 }
 `.trimStart()} />
 
-			<h2>Event click</h2>
-			<Repl input={`
+		<h2>Event click</h2>
+		<Repl input={`
 export default function Counter() {
 	let $state = $watch({
 		count: 0
@@ -110,16 +107,14 @@ export default function Counter() {
 	}
 
 	@render {
-		<div>
-			<p>Counter: {$state.count}</p>
-			<button onclick={incrementCount}>+1</button>
-		</div>
+		<p>Counter: {$state.count}</p>
+		<button onclick={incrementCount}>+1</button>
 	}
 }
 `.trimStart()} />
 
-			<h2>Dom ref</h2>
-			<Repl input={`
+		<h2>Dom ref</h2>
+		<Repl input={`
 export default function InputFocused() {
 	let inputElement;
 
@@ -133,8 +128,8 @@ export default function InputFocused() {
 }
 `.trimStart()} />
 
-			<h2>Conditional</h2>
-			<Repl input={`
+		<h2>Conditional</h2>
+		<Repl input={`
 export default function TrafficLight() {
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
@@ -149,36 +144,34 @@ export default function TrafficLight() {
 	}
 
 	@render {
-		<div>
-			<button onclick={nextLight}>Next light</button>
-			<p>Light is: {$state.light}</p>
-			<p>
-				You must
-				@if ($state.light === "red") {
-					<span>STOP</span>
-				} else if ($state.light === "orange") {
-					<span>SLOW DOWN</span>
-				} else if ($state.light === "green") {
-					<span>GO</span>
-				}
-			</p>
-		</div>
+		<button onclick={nextLight}>Next light</button>
+		<p>Light is: {$state.light}</p>
+		<p>
+			You must
+			@if ($state.light === "red") {
+				<span>STOP</span>
+			} else if ($state.light === "orange") {
+				<span>SLOW DOWN</span>
+			} else if ($state.light === "green") {
+				<span>GO</span>
+			}
+		</p>
 	}
 }
 `.trimStart()} />
 
-			<h2>On mount</h2>
-			<Repl input={`
+		<h2>On mount</h2>
+		<Repl input={`
 `.trimStart()} />
-				@// <PageTitle />
+			@// <PageTitle />
 
-			<h2>On unmount</h2>
-			<Repl input={`
+		<h2>On unmount</h2>
+		<Repl input={`
 `.trimStart()} />
-				@// <Time />
+			@// <Time />
 
-			<h2>Props</h2>
-			<Repl input={`
+		<h2>Props</h2>
+		<Repl input={`
 export default function UserProfileApp() {
 	@render {
 		<UserProfile
@@ -197,18 +190,16 @@ function UserProfile($props: {
 	isAvailable: boolean
 }) {
 	@render {
-		<div>
-			<p>My name is {$props.name}!</p>
-			<p>My age is {$props.age}!</p>
-			<p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
-			<p>I am {$props.isAvailable ? "available" : "not available"}</p>
-		</div>
+		<p>My name is {$props.name}!</p>
+		<p>My age is {$props.age}!</p>
+		<p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
+		<p>I am {$props.isAvailable ? "available" : "not available"}</p>
 	}
 }
 `.trimStart()} />
 
-			<h2>Emit to parent</h2>
-			<Repl input={`
+		<h2>Emit to parent</h2>
+		<Repl input={`
 export default function AnswerButtonApp() {
 	let $state = $watch({
 		isHappy: true
@@ -223,33 +214,26 @@ export default function AnswerButtonApp() {
 	}
 
 	@render {
-		<div>
-			<p>Are you happy?</p>
-			<AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
-			<p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
-		</div>
+		<p>Are you happy?</p>
+		<AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
+		<p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
 	}
 }
 
 function AnswerButton($props: any) {
 	@render {
-		<div>
-			<button onclick={$props.onYes}>YES</button>
-
-			<button onclick={$props.onNo}>NO</button>
-		</div>
+		<button onclick={$props.onYes}>YES</button>
+		<button onclick={$props.onNo}>NO</button>
 	}
 }
 `.trimStart()} />
 
-			<h2>Slot fallback</h2>
-			<Repl input={`
+		<h2>Slot fallback</h2>
+		<Repl input={`
 export default function FunnyButtonApp() {
 	@render {
-		<div>
-			<FunnyButton />
-			<FunnyButton>Click me!</FunnyButton>
-		</div>
+		<FunnyButton />
+		<FunnyButton>Click me!</FunnyButton>
 	}
 }
 
@@ -276,8 +260,8 @@ function FunnyButton() {
 }
 `.trimStart()} />
 
-			<h2>Context</h2>
-			<Repl input={`
+		<h2>Context</h2>
+		<Repl input={`
 export default function UserProfileContextApp() {
 	const $user = $watch({
 		id: 1,
@@ -289,10 +273,8 @@ export default function UserProfileContextApp() {
 	$context.user = $user;
 
 	@render {
-		<div>
-			<p>Welcome back, {$user.username}</p>
-			<UserProfileContext />
-		</div>
+		<p>Welcome back, {$user.username}</p>
+		<UserProfileContext />
 	}
 }
 
@@ -300,75 +282,67 @@ function UserProfileContext() {
 	$context.user = $watch($context.user);
 
 	@render {
-		<div>
-			<h2>My Profile</h2>
-			<p>Username: {$context.user.username}</p>
-			<p>Email: {$context.user.email}</p>
-			<button onclick={() => ($context.user.username = "Jane")}>
-				Update username to Jane
-			</button>
-		</div>
+		<h2>My Profile</h2>
+		<p>Username: {$context.user.username}</p>
+		<p>Email: {$context.user.email}</p>
+		<button onclick={() => ($context.user.username = "Jane")}>
+			Update username to Jane
+		</button>
 	}
 }
 `.trimStart()} />
 
-			<h2>Input text</h2>
-			<Repl input={`
+		<h2>Input text</h2>
+		<Repl input={`
 export default function InputHello() {
 	let $state = $watch({
 		text: "Hello World"
 	});
 
 	@render {
-		<div>
-			<p>{$state.text}</p>
-			<input &value={$state.text} />
-		</div>
+		<p>{$state.text}</p>
+		<input &value={$state.text} />
 	}
 }
 `.trimStart()} />
 
-			<h2>Checkbox</h2>
-			<Repl input={`
+		<h2>Checkbox</h2>
+		<Repl input={`
 export default function IsAvailable() {
 	let $state = $watch({
 		isAvailable: false
 	});
 
 	@render {
-		<div>
-			<div>{$state.isAvailable ? "Available" : "Not available"}</div>
+		<div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-			<input id="is-available" type="checkbox" &checked={$state.isAvailable} />
-			<label for="is-available">Is available</label>
-		</div>
+		<input id="is-available" type="checkbox" &checked={$state.isAvailable} />
+		<label for="is-available">Is available</label>
 	}
 }
 `.trimStart()} />
 
-			<h2>Radio</h2>
-			<Repl input={`
+		<h2>Radio</h2>
+		<Repl input={`
 export default function PickPill() {
 	let $state = $watch({
 		picked: "red"
 	});
 
 	@render {
-		<div>
-			<div>Picked: {$state.picked}</div>
+		<div>Picked: {$state.picked}</div>
 
-			<input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
-			<label for="blue-pill">Blue pill</label>
+		<input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
+		<label for="blue-pill">Blue pill</label>
 
-			<input id="red-pill" &group={$state.picked} type="radio" value="red" />
-			<label for="red-pill">Red pill</label>
-		</div>
+		<input id="red-pill" &group={$state.picked} type="radio" value="red" />
+		<label for="red-pill">Red pill</label>
 	}
 }
 `.trimStart()} />
 
-			<h2>Select</h2>
-			<Repl input={`
+		<h2>Select</h2>
+		<Repl input={`
 export default function ColorSelect() {
 	let $state = $watch({
 		selectedColorId: 2
@@ -382,21 +356,17 @@ export default function ColorSelect() {
 	];
 
 	@render {
-		<div>
-			<div>Selected: {colors[$state.selectedColorId - 1].text}</div>
+		<div>Selected: {colors[$state.selectedColorId - 1].text}</div>
 
-			<select &value={$state.selectedColorId}>
-				@for (let color of colors) {
-					<option value={color.id} disabled={color.isDisabled}>
-						{color.text}
-					</option>
-				}
-			</select>
-		</div>
+		<select &value={$state.selectedColorId}>
+			@for (let color of colors) {
+				<option value={color.id} disabled={color.isDisabled}>
+					{color.text}
+				</option>
+			}
+		</select>
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

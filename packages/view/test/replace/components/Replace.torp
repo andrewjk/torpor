@@ -2,10 +2,8 @@ export default function Replace($props: { name: string}) {
 	let counter = 0;
 
 	@render {
-		<div>
-			@replace ($props.name) {
-				<p>The replace count is {counter++}.</p>
-			}
-		</div>
+		@replace ($props.name) {
+			<p>The replace count is {counter++}.</p>
+		}
 	}
 }

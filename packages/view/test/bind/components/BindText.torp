@@ -2,15 +2,13 @@ export default function BindText() {
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	@render {
-		<div>
-			<input &value={$state.name} />
-			<select &value={$state.selected}>
-				<option value=0>First</option>
-				<option value=1>Second</option>
-				<option value=2>Third</option>
-			</select>
-			<p>Hello, {$state.name}</p>
-			<p>You have selected, {$state.selected}</p>
-		</div>
+		<input &value={$state.name} />
+		<select &value={$state.selected}>
+			<option value=0>First</option>
+			<option value=1>Second</option>
+			<option value=2>Third</option>
+		</select>
+		<p>Hello, {$state.name}</p>
+		<p>You have selected, {$state.selected}</p>
 	}
 }

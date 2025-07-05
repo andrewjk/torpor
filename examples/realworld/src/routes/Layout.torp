@@ -3,18 +3,17 @@ import PreloadingIndicator from "@/views/PreloadingIndicator.torp";
 
 export default function Layout() {
 	@render {
-		<div>
 		@/*
-			@if ($navigation.inProgress) {
-				<PreloadingIndicator />
-			}
+		@if ($navigation.inProgress) {
+			<PreloadingIndicator />
+		}
 		*/
-			<Nav user={$props.data.user} />
 
-			<main>
-				<:slot />
-			</main>
-		</div>
+		<Nav user={$props.data.user} />
+
+		<main>
+			<:slot />
+		</main>
 	}
 }
 

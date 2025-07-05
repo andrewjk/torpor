@@ -11,16 +11,14 @@ export default function ColorSelect() {
 	];
 
 	@render {
-		<div>
-			<div>Selected: {colors[$state.selectedColorId - 1].text}</div>
+		<div>Selected: {colors[$state.selectedColorId - 1].text}</div>
 
-			<select &value={$state.selectedColorId}>
-				@for (let color of colors) {
-					<option value={color.id} disabled={color.isDisabled}>
-						{color.text}
-					</option>
-				}
-			</select>
-		</div>
+		<select &value={$state.selectedColorId}>
+			@for (let color of colors) {
+				<option value={color.id} disabled={color.isDisabled}>
+					{color.text}
+				</option>
+			}
+		</select>
 	}
 }

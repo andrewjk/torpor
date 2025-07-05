@@ -27,13 +27,13 @@ export default function InputHello(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <p>#</p> <input></input> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <input></input> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_child(t_next(t_root_0))));
-	const t_input_1 = t_next(t_next(t_next(t_child(t_next(t_root_0))), true)) as HTMLInputElement;
+	const t_text_1 = t_child(t_next(t_root_0));
+	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
 	// @ts-ignore
-	const t_text_2 = t_next(t_next(t_root_0), true);
+	const t_text_2 = t_next(t_input_1, true);
 	$run(function setTextContent() {
 		t_text_1.textContent = t_fmt($state.text);
 	});

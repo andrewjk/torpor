@@ -1,11 +1,9 @@
 export default function Watched($props: any) {
 	@render {
-		<div>
-			<p>
-				{$props.text}
-				{$props.child.childText}
-				{$props.child.grandChild.grandChildText}
-			</p>
-		</div>
+		<p>
+			{$props.text}
+			{$props.child.childText}
+			{$props.child.grandChild.grandChildText}
+		</p>
 	}
 }

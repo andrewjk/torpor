@@ -24,7 +24,7 @@ export default function TrafficLight(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
+	$output += ` <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 	if ($state.light === "red") {
 		$output += `<!^> <span>STOP</span> `;
 	}
@@ -34,7 +34,7 @@ export default function TrafficLight(
 	else if ($state.light === "green") {
 		$output += `<!^> <span>GO</span> `;
 	}
-	$output += `<!]><!> </p> </div> `;
+	$output += `<!]><!> </p> `;
 
 	return $output;
 }

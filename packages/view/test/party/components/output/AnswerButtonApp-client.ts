@@ -37,11 +37,10 @@ export default function AnswerButtonApp(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <p>Are you happy?</p> <!> <p style="font-size: 50px;">#</p> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>Are you happy?</p> <!> <p style="font-size: 50px;">#</p> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_comp_parent_1)), true))) as HTMLElement;
+	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
 
 	/* @component */
 	const t_props_1: any = $watch({});
@@ -51,11 +50,11 @@ export default function AnswerButtonApp(
 	$run(function setProp() {
 		t_props_1["onNo"] = onAnswerNo;
 	});
-	AnswerButton(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
+	AnswerButton(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
 	// @ts-ignore
-	const t_text_2 = t_next(t_comp_parent_1, true);
+	const t_text_2 = t_next(t_next(t_next(t_comp_anchor_1, true)), true);
 	$run(function setTextContent() {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");
 	});

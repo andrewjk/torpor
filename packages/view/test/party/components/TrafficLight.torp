@@ -12,19 +12,17 @@ export default function TrafficLight() {
 	}
 
 	@render {
-		<div>
-			<button onclick={nextLight}>Next light</button>
-			<p>Light is: {$state.light}</p>
-			<p>
-				You must
-				@if ($state.light === "red") {
-					<span>STOP</span>
-				} else if ($state.light === "orange") {
-					<span>SLOW DOWN</span>
-				} else if ($state.light === "green") {
-					<span>GO</span>
-				}
-			</p>
-		</div>
+		<button onclick={nextLight}>Next light</button>
+		<p>Light is: {$state.light}</p>
+		<p>
+			You must
+			@if ($state.light === "red") {
+				<span>STOP</span>
+			} else if ($state.light === "orange") {
+				<span>SLOW DOWN</span>
+			} else if ($state.light === "green") {
+				<span>GO</span>
+			}
+		</p>
 	}
 }

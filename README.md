@@ -40,23 +40,21 @@ export default function Component($props: { name: string }) {
 
     // Put your HTML markup in a @render section
     @render {
-        <div class="demo">
-            <h2>Hello, {$props.name}!</h2>
+        <h2>Hello, {$props.name}!</h2>
 
-            <button onclick={() => $state.count++}>
-                Increment
-            </button>
+        <button onclick={() => $state.count++}>
+            Increment
+        </button>
 
-            <p>
-                The count is {$state.count}.
-            </p>
+        <p>
+            The count is {$state.count}.
+        </p>
 
-            @if ($state.isEven) {
-                <p>It is even.</p>
-            } else {
-                <p>It is odd.</p>
-            }
-        </div>
+        @if ($state.isEven) {
+            <p>It is even.</p>
+        } else {
+            <p>It is odd.</p>
+        }
     }
 
     // Put your CSS styles in a @style section

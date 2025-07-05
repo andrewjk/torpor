@@ -12,9 +12,7 @@ export default function UserProfileContextApp() {
 	$context.user = $user;
 
 	@render {
-		<div>
-			<h1>Welcome back, {$user.username}</h1>
-			<UserProfileContext />
-		</div>
+		<h1>Welcome back, {$user.username}</h1>
+		<UserProfileContext />
 	}
 }

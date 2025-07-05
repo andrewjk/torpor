@@ -2,74 +2,69 @@ import Repl from "../repl/Repl.torp"
 
 export default function Binding() {
 	@render {
-		<div>
-			<:head>
-				<title>Binding | Torpor</title>
-			</:head>
+		<:head>
+			<title>Binding | Torpor</title>
+		</:head>
 
-			<h1>Binding</h1>
-			<p>
-				Torpor supports two-way binding for updating the application's state from user input.
-			</p>
-			<p>
-				Consider the following component:
-			</p>
-			<pre><code>{`
+		<h1>Binding</h1>
+		<p>
+			Torpor supports two-way binding for updating the application's state from user input.
+		</p>
+		<p>
+			Consider the following component:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	let $state = $watch({ name: "Torpor" })
 
 	@render {
-		<div>
-			<p>
-				Your name: <input value={$state.name}>
-			</p>
-			<p>
-				Welcome, {$state.name}!
-			</p>
-		</div>
+		<p>
+			Your name: <input value={$state.name}>
+		</p>
+		<p>
+			Welcome, {$state.name}!
+		</p>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				The component contains an input and a welcome message which changes when the value
-				of $state.name is changed. $state.name has an initial value which is shown in the
-				input and welcome message but is not updated when the input's value is changed. To
-				update $state.name when the input value is changed, you can use the special
-				<code>&value</code> attribute:
-			</p>
-			<pre><code>{`
+		<p>
+			The component contains an input and a welcome message which changes when the value
+			of $state.name is changed. $state.name has an initial value which is shown in the
+			input and welcome message but is not updated when the input's value is changed. To
+			update $state.name when the input value is changed, you can use the special
+			<code>&value</code> attribute:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	let $state = $watch({ name: "Torpor" })
 
 	@render {
-		<div>
-			<p>
-				@// Here:
-				Your name: <input &value={$state.name}>
-			</p>
-			<p>
-				Welcome, {$state.name}!
-			</p>
-		</div>
+		<p>
+			@// Here:
+			Your name: <input &value={$state.name}>
+		</p>
+		<p>
+			Welcome, {$state.name}!
+		</p>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				Torpor will create an onchange event for the input that sets $state.name.
-			</p>
-			
-			<h2>Input types</h2>
-			<p>
-				Binding works with inputs and the <code>&value</code>, <code>&checked</code>
-				and <code>&group</code> attributes.
-			</p>
+		<p>
+			Torpor will create an onchange event for the input that sets $state.name.
+		</p>
+		
+		<h2>Input types</h2>
+		<p>
+			Binding works with inputs and the <code>&value</code>, <code>&checked</code>
+			and <code>&group</code> attributes.
+		</p>
 
-			<h2>Element binding</h2>
-			<p>
-				Another use for binding is for storing a DOM element in a variable, which is
-				done by adding a <code>&ref</code> attribute:
-			</p>
-			<pre><code>{`
+		<h2>Element binding</h2>
+		<p>
+			Another use for binding is for storing a DOM element in a variable, which is
+			done by adding a <code>&ref</code> attribute:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	let para
 
@@ -90,30 +85,26 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				Note that the DOM element will not be available until after the component has been
-				mounted and all its elements added to the DOM, and so you should only access it
-				from within a $mount function.
-			</p>
-			
-			<h2>Playground</h2>
-			<Repl input={`
+		<p>
+			Note that the DOM element will not be available until after the component has been
+			mounted and all its elements added to the DOM, and so you should only access it
+			from within a $mount function.
+		</p>
+		
+		<h2>Playground</h2>
+		<Repl input={`
 export default function Component() {
 	let $state = $watch({ name: "Torpor" })
 
 	@render {
-		<div>
-			<p>
-				Your name: <input &value={$state.name}>
-			</p>
-			<p>
-				Welcome, {$state.name}!
-			</p>
-		</div>
+		<p>
+			Your name: <input &value={$state.name}>
+		</p>
+		<p>
+			Welcome, {$state.name}!
+		</p>
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

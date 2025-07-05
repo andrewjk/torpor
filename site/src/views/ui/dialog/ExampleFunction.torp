@@ -11,14 +11,12 @@ export default function ExampleFunction($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				The button below shows a custom modal dialog component using the
-				showPopoverPrompt function.
-			</p>
-			<p>
-				<button type="button" onclick={show}>Show a modal</button>
-			</p>
-		</div>
+		<p>
+			The button below shows a custom modal dialog component using the
+			showPopoverPrompt function.
+		</p>
+		<p>
+			<button type="button" onclick={show}>Show a modal</button>
+		</p>
 	}
 }

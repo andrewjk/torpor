@@ -4,14 +4,12 @@ export default function PickPill() {
 	});
 
 	@render {
-		<div>
-			<div>Picked: {$state.picked}</div>
+		<div>Picked: {$state.picked}</div>
 
-			<input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
-			<label for="blue-pill">Blue pill</label>
+		<input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
+		<label for="blue-pill">Blue pill</label>
 
-			<input id="red-pill" &group={$state.picked} type="radio" value="red" />
-			<label for="red-pill">Red pill</label>
-		</div>
+		<input id="red-pill" &group={$state.picked} type="radio" value="red" />
+		<label for="red-pill">Red pill</label>
 	}
 }

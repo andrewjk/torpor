@@ -14,14 +14,14 @@ export default function Function(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <button id="increment">Increment</button> `;
+	$output += ` <button id="increment">Increment</button> `;
 
 	function increment() {
 		$state.counter += 1;
 		let x = "";
 	};
 
-	$output += ` <p> The count is ${t_fmt($state.counter)}. </p> </div> `;
+	$output += ` <p> The count is ${t_fmt($state.counter)}. </p> `;
 
 	return $output;
 }

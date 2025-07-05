@@ -20,7 +20,7 @@ export default function Counter(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> </div> `;
+	$output += ` <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> `;
 
 	return $output;
 }

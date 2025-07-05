@@ -17,17 +17,15 @@ export default function Await() {
 		}
 
 	@render {
-		<div>
-				@await ($state.guesser) {
-						<p>Hmm...</p>
-				} then (number) {
-						<p>Is it a number?</p>
-				} catch (ex) {
-						<p class="error">Something went wrong: {ex}!</p>
-				}
-				<button onclick={() => $state.guesser = guessNumber(100)}>
-						Guess again
-				</button>
-		</div>
+		@await ($state.guesser) {
+				<p>Hmm...</p>
+		} then (number) {
+				<p>Is it a number?</p>
+		} catch (ex) {
+				<p class="error">Something went wrong: {ex}!</p>
+		}
+		<button onclick={() => $state.guesser = guessNumber(100)}>
+				Guess again
+		</button>
 	}
 }

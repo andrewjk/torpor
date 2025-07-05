@@ -39,10 +39,10 @@ export default function TrafficLight(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <button>Next light</button> <p>#</p> <p> You must <!> </p> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button>Next light</button> <p>#</p> <p> You must <!> </p> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_child(t_next(t_root_0))) as HTMLElement;
+	const t_button_1 = t_next(t_root_0) as HTMLElement;
 	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
 	const t_if_parent_1 = t_next(t_next(t_next(t_next(t_button_1, true)), true)) as HTMLElement;
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_next(t_next(t_next(t_next(t_button_1, true)), true))))) as HTMLElement;
@@ -90,7 +90,7 @@ export default function TrafficLight(
 	});
 
 	// @ts-ignore
-	const t_text_5 = t_next(t_next(t_root_0), true);
+	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_button_1, true)), true)), true);
 	t_event(t_button_1, "click", nextLight);
 	$run(function setTextContent() {
 		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;

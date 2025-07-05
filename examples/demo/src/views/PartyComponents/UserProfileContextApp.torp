@@ -11,9 +11,7 @@ export default function UserProfileContextApp() {
 	$context.user = $user;
 
 	@render {
-		<div>
-			<p>Welcome back, {$user.username}</p>
-			<UserProfileContext />
-		</div>
+		<p>Welcome back, {$user.username}</p>
+		<UserProfileContext />
 	}
 }

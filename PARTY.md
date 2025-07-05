@@ -62,10 +62,8 @@ export default function HelloWorld() {
 ```
 export default function CssStyle() {
   @render {
-    <div>
-      <h1 class="title">I am red</h1>
-      <button style="font-size: 10rem;">I am a button</button>
-    </div>
+    <h1 class="title">I am red</h1>
+    <button style="font-size: 10rem;">I am a button</button>
   }
 
   @style {
@@ -106,10 +104,8 @@ export default function Counter() {
   }
 
   @render {
-    <div>
-      <p>Counter: {$state.count}</p>
-      <button onclick={incrementCount}>+1</button>
-    </div>
+    <p>Counter: {$state.count}</p>
+    <button onclick={incrementCount}>+1</button>
   }
 }
 ```
@@ -147,20 +143,18 @@ export default function TrafficLight() {
   }
 
   @render {
-    <div>
-      <button onclick={nextLight}>Next light</button>
-      <p>Light is: {$state.light}</p>
-      <p>
-        You must
-        @if ($state.light === "red") {
-          <span>STOP</span>
-        } else if ($state.light === "orange") {
-          <span>SLOW DOWN</span>
-        } else if ($state.light === "green") {
-          <span>GO</span>
-        }
-      </p>
-    </div>
+    <button onclick={nextLight}>Next light</button>
+    <p>Light is: {$state.light}</p>
+    <p>
+      You must
+      @if ($state.light === "red") {
+        <span>STOP</span>
+      } else if ($state.light === "orange") {
+        <span>SLOW DOWN</span>
+      } else if ($state.light === "green") {
+        <span>GO</span>
+      }
+    </p>
   }
 }
 ```
@@ -226,12 +220,10 @@ function UserProfile($props = {
   isAvailable: false,
 }) {
   @render {
-    <div>
-      <p>My name is {$props.name}!</p>
-      <p>My age is {$props.age}!</p>
-      <p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
-      <p>I am {$props.isAvailable ? "available" : "not available"}</p>
-    </div>
+    <p>My name is {$props.name}!</p>
+    <p>My age is {$props.age}!</p>
+    <p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
+    <p>I am {$props.isAvailable ? "available" : "not available"}</p>
   }
 }
 ```
@@ -253,11 +245,9 @@ export default function App() {
   }
 
   @render {
-    <div>
-      <p>Are you happy?</p>
-      <AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
-      <p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
-    </div>
+    <p>Are you happy?</p>
+    <AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
+    <p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
   }
 }
 
@@ -266,11 +256,8 @@ function AnswerButton($props = {
   onNo: () => null
 }) {
   @render {
-    <div>
-      <button onclick={$props.onYes}>YES</button>
-
-      <button onclick={$props.onNo}>NO</button>
-    </div>
+    <button onclick={$props.onYes}>YES</button>
+    <button onclick={$props.onNo}>NO</button>
   }
 }
 ```
@@ -280,10 +267,8 @@ function AnswerButton($props = {
 ```
 export default function App() {
   @render {
-    <div>
-      <FunnyButton />
-      <FunnyButton>Click me!</FunnyButton>
-    </div>
+    <FunnyButton />
+    <FunnyButton>Click me!</FunnyButton>
   }
 }
 
@@ -324,10 +309,8 @@ export default function Context() {
   $context.user = $user;
 
   @render {
-    <div>
-      <h1>Welcome back, {$user.username}</h1>
-      <UserProfileContext />
-    </div>
+    <h1>Welcome back, {$user.username}</h1>
+    <UserProfileContext />
   }
 }
 
@@ -335,14 +318,12 @@ function UserProfileContext() {
   $context.user = $watch($context.user);
 
   @render {
-    <div>
-      <h2>My Profile</h2>
-      <p>Username: {$context.user.username}</p>
-      <p>Email: {$context.user.email}</p>
-      <button onclick={() => ($context.user.username = "Jane")}>
-        Update username to Jane
-      </button>
-    </div>
+    <h2>My Profile</h2>
+    <p>Username: {$context.user.username}</p>
+    <p>Email: {$context.user.email}</p>
+    <button onclick={() => ($context.user.username = "Jane")}>
+      Update username to Jane
+    </button>
   }
 }
 ```
@@ -356,10 +337,8 @@ export default function InputHello() {
   });
 
   @render {
-    <div>
-      <p>{$state.text}</p>
-      <input &value={$state.text} />
-    </div>
+    <p>{$state.text}</p>
+    <input &value={$state.text} />
   }
 }
 ```
@@ -373,12 +352,10 @@ export default function IsAvailable() {
   });
 
   @render {
-    <div>
-      <div>{$state.isAvailable ? "Available" : "Not available"}</div>
+    <div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-      <input id="is-available" type="checkbox" &checked={$state.isAvailable} />
-      <label for="is-available">Is available</label>
-    </div>
+    <input id="is-available" type="checkbox" &checked={$state.isAvailable} />
+    <label for="is-available">Is available</label>
   }
 }
 ```
@@ -392,15 +369,13 @@ export default function PickPill() {
   });
 
   @render {
-    <div>
-      <div>Picked: {$state.picked}</div>
+    <div>Picked: {$state.picked}</div>
 
-      <input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
-      <label for="blue-pill">Blue pill</label>
+    <input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
+    <label for="blue-pill">Blue pill</label>
 
-      <input id="red-pill" &group={$state.picked} type="radio" value="red" />
-      <label for="red-pill">Red pill</label>
-    </div>
+    <input id="red-pill" &group={$state.picked} type="radio" value="red" />
+    <label for="red-pill">Red pill</label>
   }
 }
 ```
@@ -421,17 +396,15 @@ export default function ColorSelect() {
   ];
 
   @render {
-    <div>
-      <div>Selected: {colors[$state.selectedColorId - 1].text}</div>
+    <div>Selected: {colors[$state.selectedColorId - 1].text}</div>
 
-      <select &value={$state.selectedColorId}>
-        @for (let color of colors) {
-          <option value={color.id} disabled={color.isDisabled}>
-            {color.text}
-          </option>
-        }
-      </select>
-    </div>
+    <select &value={$state.selectedColorId}>
+      @for (let color of colors) {
+        <option value={color.id} disabled={color.isDisabled}>
+          {color.text}
+        </option>
+      }
+    </select>
   }
 }
 ```

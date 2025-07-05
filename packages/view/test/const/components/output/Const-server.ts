@@ -12,9 +12,9 @@ export default function Const(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> `;
+	$output += ` `;
 	const name = "Boris";
-	$output += ` <p> Hello, ${t_fmt(name)}! </p> </div> `;
+	$output += ` <p> Hello, ${t_fmt(name)}! </p> `;
 
 	return $output;
 }

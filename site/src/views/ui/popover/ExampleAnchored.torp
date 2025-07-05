@@ -8,30 +8,28 @@ export default function ExampleAnchored($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				The button below shows a popover Dialog below itself using the Popover,
-				PopoverTrigger and PopoverContentAnchored components.
-			</p>
+		<p>
+			The button below shows a popover Dialog below itself using the Popover,
+			PopoverTrigger and PopoverContentAnchored components.
+		</p>
 
-			<Popover>
-				<PopoverTrigger>Show a popover</PopoverTrigger>
-				<PopoverContentAnchored class="expopanc-content">
-					<Dialog>
-						<DialogHeader>
-							<h4>Header</h4>
-						</DialogHeader>
-						<DialogBody>
-							<p>Which color do you prefer?</p>
-						</DialogBody>
-						<DialogFooter class="expopanc-footer">
-							<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
-							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
-						</DialogFooter>
-					</Dialog>
-				</PopoverContentAnchored>
-			</Popover>
-		</div>
+		<Popover>
+			<PopoverTrigger>Show a popover</PopoverTrigger>
+			<PopoverContentAnchored class="expopanc-content">
+				<Dialog>
+					<DialogHeader>
+						<h4>Header</h4>
+					</DialogHeader>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter class="expopanc-footer">
+						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContentAnchored>
+		</Popover>
 	}
 
 	@style {

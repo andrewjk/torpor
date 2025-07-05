@@ -5,9 +5,7 @@ export default function CommentContainer() {
 	@render {
 		<div class="col-xs-12 col-md-8 offset-md-2">
 			@if ($props.user) {
-				<div>
-					<CommentInput user={$props.user} />
-				</div>
+				<CommentInput user={$props.user} />
 			} else {
 				<p>
 					<a href="/login">Sign in</a>

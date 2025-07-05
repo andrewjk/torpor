@@ -1,51 +1,49 @@
 
 export default function SpecialTags() {
 	@render {
-		<div>
-			<:head>
-				<title>Special Tags | Torpor</title>
-			</:head>
+		<:head>
+			<title>Special Tags | Torpor</title>
+		</:head>
 
-			<h1>Special Tags</h1>
-			<p>
-				There are some special tags that you can place within your markup. These tags are
-				not rendered, but instead provide functionality.
-			</p>
+		<h1>Special Tags</h1>
+		<p>
+			There are some special tags that you can place within your markup. These tags are
+			not rendered, but instead provide functionality.
+		</p>
 
-			<h2>&lt;:component&gt;</h2>
-			<p>
-				&lt;:component self=&lbrace;...&rbrace;> inserts a dynamic component.
-			</p>
+		<h2>&lt;:component&gt;</h2>
+		<p>
+			&lt;:component self=&lbrace;...&rbrace;> inserts a dynamic component.
+		</p>
 
-			<h2>&lt;:element&gt;</h2>
-			<p>
-				&lt;:element self=&lbrace;...&rbrace;> inserts a dynamic element.
-			</p>
+		<h2>&lt;:element&gt;</h2>
+		<p>
+			&lt;:element self=&lbrace;...&rbrace;> inserts a dynamic element.
+		</p>
 
-			<h2>TODO: &lt;:trim&gt;</h2>
-			<p>
-				&lt;:trim> trims whitespace around the tag.
-			</p>
+		<h2>TODO: &lt;:trim&gt;</h2>
+		<p>
+			&lt;:trim> trims whitespace around the tag.
+		</p>
 
-			<h2>&lt;:head&gt;</h2>
-			<p>
-				Use the &lt;:head> tag to add content to the &lt;head> tag.
-			</p>
+		<h2>&lt;:head&gt;</h2>
+		<p>
+			Use the &lt;:head> tag to add content to the &lt;head> tag.
+		</p>
 
-			<h2>TODO: &lt;:window&gt;</h2>
-			<p>
-				Use the &lt;:window> tag to add events to the <code>window</code> object.
-			</p>
+		<h2>TODO: &lt;:window&gt;</h2>
+		<p>
+			Use the &lt;:window> tag to add events to the <code>window</code> object.
+		</p>
 
-			<h2>TODO: &lt;:document&gt;</h2>
-			<p>
-				Use the &lt;:document> tag to add events to the <code>document</code> object.
-			</p>
+		<h2>TODO: &lt;:document&gt;</h2>
+		<p>
+			Use the &lt;:document> tag to add events to the <code>document</code> object.
+		</p>
 
-			<h2>TODO: &lt;:body&gt;</h2>
-			<p>
-				Use the &lt;:body> tag to add events to the <code>body</code> object.
-			</p>
-		</div>
+		<h2>TODO: &lt;:body&gt;</h2>
+		<p>
+			Use the &lt;:body> tag to add events to the <code>body</code> object.
+		</p>
 	}
 }

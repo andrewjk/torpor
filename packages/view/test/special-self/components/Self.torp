@@ -1,11 +1,9 @@
 
 export default function Self($props: { level: number }) {
 	@render {
-		<div>
-			Level {$props.level}
-			@if ($props.level < 3) {
-				<Self level={$props.level + 1} />
-			}
-		</div>
+		<p>Level {$props.level}</p>
+		@if ($props.level < 3) {
+			<Self level={$props.level + 1} />
+		}
 	}
 }

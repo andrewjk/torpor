@@ -7,31 +7,29 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				The button below shows a popover Dialog using the Popover, PopoverTrigger
-				and PopoverContent components.
-			</p>
+		<p>
+			The button below shows a popover Dialog using the Popover, PopoverTrigger
+			and PopoverContent components.
+		</p>
 
-			<Popover>
-				<PopoverOverlay class="expopsta-overlay" />
-				<PopoverTrigger>Show a popover</PopoverTrigger>
-				<PopoverContent class="expopsta-content">
-					<Dialog>
-						<DialogHeader>
-							<h4>Header</h4>
-						</DialogHeader>
-						<DialogBody>
-							<p>Which color do you prefer?</p>
-						</DialogBody>
-						<DialogFooter class="expopsta-footer">
-							<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
-							<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
-						</DialogFooter>
-					</Dialog>
-				</PopoverContent>
-			</Popover>
-		</div>
+		<Popover>
+			<PopoverOverlay class="expopsta-overlay" />
+			<PopoverTrigger>Show a popover</PopoverTrigger>
+			<PopoverContent class="expopsta-content">
+				<Dialog>
+					<DialogHeader>
+						<h4>Header</h4>
+					</DialogHeader>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter class="expopsta-footer">
+						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContent>
+		</Popover>
 	}
 
 	@style {

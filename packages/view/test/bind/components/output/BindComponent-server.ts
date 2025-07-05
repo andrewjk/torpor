@@ -1,4 +1,3 @@
-import $run from "../../../../src/render/$serverRun";
 import $watch from "../../../../src/render/$serverWatch";
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
@@ -16,12 +15,12 @@ export default function BindComponent(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <![>`;
+	$output += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["&name"] = $state.name;
 
 	$output += BindText(t_props_1, $context)
-	$output += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p> </div> `;
+	$output += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p> `;
 
 	return $output;
 }
@@ -34,19 +33,10 @@ function BindText(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-	//let $state = $watch({
-		//	text: $props.name
-		//})
 
-		// $run(() => t_name_changed($props.name))
+	/* User interface */
+	let $output = "";
+	$output += ` <input value="${t_attr($props.name) || ""}"> `;
 
-		//$run(() => {
-			//	$props.name = $state.text
-			//});
-
-			/* User interface */
-			let $output = "";
-			$output += ` <div> <input value="${t_attr($props.name) || ""}"> </div> `;
-
-			return $output;
-		}
+	return $output;
+}

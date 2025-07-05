@@ -2,13 +2,11 @@ export default function UserProfileContext() {
 	$context.user = $watch($context.user);
 
 	@render {
-		<div>
-			<h2>My Profile</h2>
-			<p>Username: {$context.user.username}</p>
-			<p>Email: {$context.user.email}</p>
-			<button onclick={() => ($context.user.username = "Jane")}>
-				Update username to Jane
-			</button>
-		</div>
+		<h2>My Profile</h2>
+		<p>Username: {$context.user.username}</p>
+		<p>Email: {$context.user.email}</p>
+		<button onclick={() => ($context.user.username = "Jane")}>
+			Update username to Jane
+		</button>
 	}
 }

@@ -4,11 +4,9 @@ export default function IsAvailable() {
 	});
 
 	@render {
-		<div>
-			<div>{$state.isAvailable ? "Available" : "Not available"}</div>
+		<div>{$state.isAvailable ? "Available" : "Not available"}</div>
 
-			<input id="is-available" type="checkbox" &checked={$state.isAvailable} />
-			<label for="is-available">Is available</label>
-		</div>
+		<input id="is-available" type="checkbox" &checked={$state.isAvailable} />
+		<label for="is-available">Is available</label>
 	}
 }

@@ -28,9 +28,9 @@ export default function Await(
 
 		/* User interface */
 		let $output = "";
-		$output += ` <div> <![>`;
+		$output += ` <![>`;
 		$output += ` <p>Hmm...</p> `;
-		$output += `<!]><!> <button> Guess again </button> </div> `;
+		$output += `<!]><!> <button> Guess again </button> `;
 
 		return $output;
 	}

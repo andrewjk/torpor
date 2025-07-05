@@ -6,17 +6,15 @@ import Counter from "./Counter.torp";
  */
 export default function Index() {
 	@render {
-		<div>
-			<a href="https://torpor.dev/" target="_blank">
-				<img src={torporLogo} class="logo vanilla" alt="Torpor logo" />
-			</a>
-			<h1>Torpor Build</h1>
-			<div class="card">
-				<Counter />
-			</div>
-			<p class="read-the-docs">
-				Click on the Torpor logo to learn more
-			</p>
+		<a href="https://torpor.dev/" target="_blank">
+			<img src={torporLogo} class="logo vanilla" alt="Torpor logo" />
+		</a>
+		<h1>Torpor Build</h1>
+		<div class="card">
+			<Counter />
 		</div>
+		<p class="read-the-docs">
+			Click on the Torpor logo to learn more
+		</p>
 	}
 }

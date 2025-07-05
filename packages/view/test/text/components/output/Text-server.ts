@@ -18,7 +18,7 @@ export default function Text(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <p> ${t_fmt($props.value)} </p> <p>${t_fmt($props.empty)}</p> </div> `;
+	$output += ` <p> ${t_fmt($props.value)} </p>  <p>${t_fmt($props.empty)}</p> `;
 
 	return $output;
 }

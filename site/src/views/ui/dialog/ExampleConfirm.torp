@@ -12,14 +12,12 @@ export default function ExampleConfirm($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				The button below shows a modal dialog with OK and Cancel buttons
-				using the showPopoverPrompt function.
-			</p>
-			<p>
-				<button type="button" onclick={show}>Show a confirm modal</button>
-			</p>
-		</div>
+		<p>
+			The button below shows a modal dialog with OK and Cancel buttons
+			using the showPopoverPrompt function.
+		</p>
+		<p>
+			<button type="button" onclick={show}>Show a confirm modal</button>
+		</p>
 	}
 }

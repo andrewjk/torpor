@@ -29,17 +29,16 @@ export default function For(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <!> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @for */
 	let t_for_range_1 = t_range();
 	t_run_list(
 		t_for_range_1,
-		t_for_parent_1,
+		t_fragment_0,
 		t_for_anchor_1,
 		function createNewItems() {
 			let t_new_items: ListItem[] = [];
@@ -62,14 +61,14 @@ export default function For(
 			$run(function setTextContent() {
 				t_text_1.textContent = t_fmt(t_item.data.item.text);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);
+			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);
 			t_next(t_text_2);
 			t_pop_range(t_old_range_1);
 		}
 	);
 
 	// @ts-ignore
-	const t_text_3 = t_next(t_for_parent_1, true);
+	const t_text_3 = t_next(t_for_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 

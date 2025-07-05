@@ -3,44 +3,43 @@ import Repl from "../repl/Repl.torp"
 
 export default function Overview() {
 	@render {
-		<div>
-			<:head>
-				<title>Overview | Torpor</title>
-			</:head>
+		<:head>
+			<title>Overview | Torpor</title>
+		</:head>
 
-			<h1>Overview</h1>
-			<p>
-				Torpor is a JavaScript framework, designed for simplicity and completeness.
-			</p>
-			<p class="warning">
-				🚧 WARNING: WORK IN PROGRESS 🚧
-			</p>
+		<h1>Overview</h1>
+		<p>
+			Torpor is a JavaScript framework, designed for simplicity and completeness.
+		</p>
+		<p class="warning">
+			🚧 WARNING: WORK IN PROGRESS 🚧
+		</p>
 
-			<h2>Features</h2>
-			<ul>
-				<li>Compose your views with JavaScript, HTML and CSS</li>
-				<li>Components are functions with script, markup and styles</li>
-				<li>
-					In-markup JavaScript logic with <code>&commat;if</code>, <code>&commat;for</code>,
-					<code>&commat;switch</code> and <code>&commat;await</code> keywords
-				</li>
-					<ul>
-						<li>
-							And <code>&commat;replace</code>, <code>&commat;const</code>, <code>&commat;console</code>,
-							<code>&commat;debugger</code>, <code>&commat;function</code> and <code>&commat;html</code>
-						</li>
-					</ul>
-				<li>Runtime reactivity via proxies that can be used in any JavaScript file</li>
-				<li>Scoped styles, two-way binding, child components and more</li>
-				<li>An accessible, unstyled component library</li>
-				<li>A site and app framework</li>
-			</ul>
+		<h2>Features</h2>
+		<ul>
+			<li>Compose your views with JavaScript, HTML and CSS</li>
+			<li>Components are functions with script, markup and styles</li>
+			<li>
+				In-markup JavaScript logic with <code>&commat;if</code>, <code>&commat;for</code>,
+				<code>&commat;switch</code> and <code>&commat;await</code> keywords
+			</li>
+				<ul>
+					<li>
+						And <code>&commat;replace</code>, <code>&commat;const</code>, <code>&commat;console</code>,
+						<code>&commat;debugger</code>, <code>&commat;function</code> and <code>&commat;html</code>
+					</li>
+				</ul>
+			<li>Runtime reactivity via proxies that can be used in any JavaScript file</li>
+			<li>Scoped styles, two-way binding, child components and more</li>
+			<li>An accessible, unstyled component library</li>
+			<li>A site and app framework</li>
+		</ul>
 
-			<h2>A simple component</h2>
-			<pre><code>{`
+		<h2>A simple component</h2>
+		<pre><code>{`
 /**
- * Components are functions that are declared in a \`.torp\` file
- */
+* Components are functions that are declared in a \`.torp\` file
+*/
 export default function Component($props: { name: string }) {
 	// Use the $watch function to declare reactive state
 	const $state = $watch({
@@ -52,23 +51,21 @@ export default function Component($props: { name: string }) {
 
 	// Put your HTML markup in a @render section
 	@render {
-		<div>
-			<h2>Hello, {$props.name}!</h2>
+		<h2>Hello, {$props.name}!</h2>
 
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 
-			<p>
-				The count is {$state.count}.
-			</p>
+		<p>
+			The count is {$state.count}.
+		</p>
 
-			@if ($state.isEven) {
-				<p>It is even.</p>
-			} else {
-				<p>It is odd.</p>
-			}
-		</div>
+		@if ($state.isEven) {
+			<p>It is even.</p>
+		} else {
+			<p>It is odd.</p>
+		}
 	}
 
 	// Put your CSS styles in a @style section
@@ -81,8 +78,8 @@ export default function Component($props: { name: string }) {
 `.trim()}</code></pre>
 
 
-			<h2>Playground</h2>
-			<Repl input={`
+		<h2>Playground</h2>
+		<Repl input={`
 export default function App() {
 	@render {
 		<Component name="Torpor" />
@@ -98,23 +95,21 @@ function Component($props: { name: string }) {
 	})
 
 	@render {
-		<div>
-			<h2>Hello, {$props.name}!</h2>
+		<h2>Hello, {$props.name}!</h2>
 
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 
-			<p>
-				The count is {$state.count}.
-			</p>
+		<p>
+			The count is {$state.count}.
+		</p>
 
-			@if ($state.isEven) {
-				<p>It is even.</p>
-			} else {
-				<p>It is odd.</p>
-			}
-		</div>
+		@if ($state.isEven) {
+			<p>It is even.</p>
+		} else {
+			<p>It is odd.</p>
+		}
 	}
 
 	@style {
@@ -124,7 +119,5 @@ function Component($props: { name: string }) {
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

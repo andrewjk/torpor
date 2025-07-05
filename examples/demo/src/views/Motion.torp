@@ -6,26 +6,24 @@ export default function Motion() {
 	})
 
 	@render {
-		<div>
-			<p>
-				<button onclick={() => $state.show = !$state.show} style="min-width: 100px; padding: 10px;">
-					{$state.show ? "Hide" : "Show"}
-				</button>
-			</p>
+		<p>
+			<button onclick={() => $state.show = !$state.show} style="min-width: 100px; padding: 10px;">
+				{$state.show ? "Hide" : "Show"}
+			</button>
+		</p>
 
-			<p>
-				@if ($state.show) {
-					<div :transition={[{color: "pink"}, {color: "red"}]}>Hello</div>
-				}
-			</p>
+		<p>
+			@if ($state.show) {
+				<div :transition={[{color: "pink"}, {color: "red"}]}>Hello</div>
+			}
+		</p>
 
-			<p>
-				@if ($state.show) {
-					<div>No transition here</div>
-					<div :transition={fade, { duration: 2000 }}>Hello 2</div>
-					<div>No transition here</div>
-				}
-			</p>
-		</div>
+		<p>
+			@if ($state.show) {
+				<div>No transition here</div>
+				<div :transition={fade, { duration: 2000 }}>Hello 2</div>
+				<div>No transition here</div>
+			}
+		</p>
 	}
 }

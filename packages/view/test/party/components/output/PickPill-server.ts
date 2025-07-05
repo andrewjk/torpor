@@ -17,7 +17,7 @@ export default function PickPill(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <div>Picked: ${t_fmt($state.picked)}</div> <input id="blue-pill" group="${t_attr($state.picked) || ""}" type="radio" value="blue"> <label for="blue-pill">Blue pill</label> <input id="red-pill" group="${t_attr($state.picked) || ""}" type="radio" value="red"> <label for="red-pill">Red pill</label> </div> `;
+	$output += ` <div>Picked: ${t_fmt($state.picked)}</div> <input id="blue-pill" group="${t_attr($state.picked) || ""}" type="radio" value="blue"> <label for="blue-pill">Blue pill</label> <input id="red-pill" group="${t_attr($state.picked) || ""}" type="radio" value="red"> <label for="red-pill">Red pill</label> `;
 
 	return $output;
 }

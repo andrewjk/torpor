@@ -2,9 +2,7 @@ import FunnyButton from "./FunnyButton.torp";
 
 export default function FunnyButtonApp() {
 	@render {
-		<div>
-			<FunnyButton />
-			<FunnyButton>Click me!</FunnyButton>
-		</div>
+		<FunnyButton />
+		<FunnyButton>Click me!</FunnyButton>
 	}
 }

@@ -1,8 +1,6 @@
 export default function ParentChild() {
 	@render {
-		<div>
-			<Child name="Anna" />
-		</div>
+		<Child name="Anna" />
 	}
 }
 

@@ -17,7 +17,7 @@ export default function Switch(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <![>`;
+	$output += ` <![>`;
 	switch ($props.value) {
 		case 1: {
 			$output += `<!^> <p> A small value. </p> `;
@@ -32,7 +32,7 @@ export default function Switch(
 			break;
 		}
 	}
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

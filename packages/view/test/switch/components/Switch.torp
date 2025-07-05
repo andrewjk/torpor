@@ -6,24 +6,22 @@
 	value: number
 }) {
 	@render {
-		<div>
-			@switch ($props.value) {
-				case 1: {
-					<p>
-						A small value.
-					</p>
-				}
-				case 100: {
-					<p>
-						A large value.
-					</p>
-				}
-				default: {
-					<p>
-						Another value.
-					</p>
-				}
+		@switch ($props.value) {
+			case 1: {
+				<p>
+					A small value.
+				</p>
 			}
-		</div>
+			case 100: {
+				<p>
+					A large value.
+				</p>
+			}
+			default: {
+				<p>
+					Another value.
+				</p>
+			}
+		}
 	}
 }

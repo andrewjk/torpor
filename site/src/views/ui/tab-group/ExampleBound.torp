@@ -9,28 +9,26 @@ export default function ExampleBound($props: any) {
 	let $state = $watch({ value: '0' });
 
 	@render {
-		<div>
-			<p>Selected value: <input type="number" &value={$state.value} /></p>
+		<p>Selected value: <input type="number" &value={$state.value} /></p>
 
-			<TabGroup &value={$state.value}>
-				<TabList class="extabbound-list" ariaLabel="Basic tab example">
-					@for (let [index, item] of items.entries()) {
-						@key = index
-						<TabHeader>
-							<TabTrigger class="extabbound-trigger">
-								Item {index + 1}
-							</TabTrigger>
-						</TabHeader>
-					}
-				</TabList>
+		<TabGroup &value={$state.value}>
+			<TabList class="extabbound-list" ariaLabel="Basic tab example">
 				@for (let [index, item] of items.entries()) {
 					@key = index
-					<TabContent class="extabbound-content">
-						<p>{item}</p>
-					</TabContent>
+					<TabHeader>
+						<TabTrigger class="extabbound-trigger">
+							Item {index + 1}
+						</TabTrigger>
+					</TabHeader>
 				}
-			</TabGroup>
-		</div>
+			</TabList>
+			@for (let [index, item] of items.entries()) {
+				@key = index
+				<TabContent class="extabbound-content">
+					<p>{item}</p>
+				</TabContent>
+			}
+		</TabGroup>
 	}
 
 	@style {

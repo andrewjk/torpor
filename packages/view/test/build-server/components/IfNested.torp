@@ -1,21 +1,19 @@
 export default function IfNested($props: { counter: number }) {
 	@render {
-		<div>
-			@if ($props.counter > 5) {
-				@if ($props.counter > 10) {
-					<p>
-						It's both true!
-					</p>
-				} else {
-					<p>
-						The second is not true!
-					</p>
-				}
+		@if ($props.counter > 5) {
+			@if ($props.counter > 10) {
+				<p>
+					It's both true!
+				</p>
 			} else {
 				<p>
-					The first is not true!
+					The second is not true!
 				</p>
 			}
-		</div>
+		} else {
+			<p>
+				The first is not true!
+			</p>
+		}
 	}
 }

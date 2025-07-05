@@ -13,7 +13,7 @@ export default function FunnyButtonApp(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <![>`;
+	$output += ` <![>`;
 
 	$output += FunnyButton(undefined, $context)
 	$output += `<!]><!> <![>`;
@@ -30,7 +30,7 @@ export default function FunnyButtonApp(
 	}
 
 	$output += FunnyButton(undefined, $context, t_slots_1)
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

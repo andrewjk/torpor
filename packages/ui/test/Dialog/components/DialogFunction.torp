@@ -10,13 +10,11 @@ export default function DialogFunction($props: any) {
 	}
 
 	@render {
-		<div>
-			<button type="button" onclick={show}>Show the modal</button>
+		<button type="button" onclick={show}>Show the modal</button>
 
-			@if ($state.color) {
-				<p>Your favorite color is {$state.color}?!</p>
-			}
-		</div>
+		@if ($state.color) {
+			<p>Your favorite color is {$state.color}?!</p>
+		}
 	}
 }
 

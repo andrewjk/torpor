@@ -7,21 +7,19 @@ export default function ExampleVariable($props: any) {
 	let button: HTMLButtonElement;
 
 	@render {
-		<div>
-			<p>The button below shows an inline popover component, using a variable.</p>
+		<p>The button below shows an inline popover component, using a variable.</p>
 
-			<button type="button" &ref={button} onclick={() => ($state.showPopover = !$state.showPopover)}>
-				Show a popover
-			</button>
+		<button type="button" &ref={button} onclick={() => ($state.showPopover = !$state.showPopover)}>
+			Show a popover
+		</button>
 
-			@if ($state.showPopover) {
-				<Popover anchor={button} visible>
-					<PopoverContentAnchored class="expopvar-content" side="bottom">
-						You showed the popover!
-					</PopoverContentAnchored>
-				</Popover>
-			}
-		</div>
+		@if ($state.showPopover) {
+			<Popover anchor={button} visible>
+				<PopoverContentAnchored class="expopvar-content" side="bottom">
+					You showed the popover!
+				</PopoverContentAnchored>
+			</Popover>
+		}
 	}
 
 	@style {

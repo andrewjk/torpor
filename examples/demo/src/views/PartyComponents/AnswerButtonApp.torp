@@ -14,10 +14,8 @@ export default function AnswerButtonApp() {
 	}
 
 	@render {
-		<div>
-			<p>Are you happy?</p>
-			<AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
-			<p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
-		</div>
+		<p>Are you happy?</p>
+		<AnswerButton onYes={onAnswerYes} onNo={onAnswerNo} />
+		<p style="font-size: 50px;">{$state.isHappy ? "😀" : "😥"}</p>
 	}
 }

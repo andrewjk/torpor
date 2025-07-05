@@ -11,32 +11,30 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>The button below shows a basic modal dialog.</p>
-			<p>
-				<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
-					Show a modal
-				</button>
-			</p>
+		<p>The button below shows a basic modal dialog.</p>
+		<p>
+			<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+				Show a modal
+			</button>
+		</p>
 
-			<Popover class="modal" visible={$state.showPopover}>
-				<PopoverOverlay class="exdlgbas-overlay" />
-				<PopoverContent class="exdlgbas-content">
-					<Dialog>
-						<DialogHeader>
-							<h4>Header</h4>
-						</DialogHeader>
-						<DialogBody>
-							<p>Which color do you prefer?</p>
-						</DialogBody>
-						<DialogFooter class="exdlgbas-footer">
-							<DialogButton onclick={() => handleOption('blue')}>Blue</DialogButton>
-							<DialogButton onclick={() => handleOption('red')}>Red</DialogButton>
-						</DialogFooter>
-					</Dialog>
-				</PopoverContent>
-			</Popover>	
-		</div>
+		<Popover class="modal" visible={$state.showPopover}>
+			<PopoverOverlay class="exdlgbas-overlay" />
+			<PopoverContent class="exdlgbas-content">
+				<Dialog>
+					<DialogHeader>
+						<h4>Header</h4>
+					</DialogHeader>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter class="exdlgbas-footer">
+						<DialogButton onclick={() => handleOption('blue')}>Blue</DialogButton>
+						<DialogButton onclick={() => handleOption('red')}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContent>
+		</Popover>
 	}
 
 	@style {

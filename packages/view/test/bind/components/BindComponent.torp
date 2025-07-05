@@ -2,28 +2,13 @@ export default function BindComponent() {
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	@render {
-		<div>
-			@// t_name_changed = (value) => $state.name = value;
-			<BindText &name={$state.name} />
-			<p>Hello, {$state.name}</p>
-		</div>
+		<BindText &name={$state.name} />
+		<p>Hello, {$state.name}</p>
 	}
 }
 
 function BindText($props: any) {
-	//let $state = $watch({
-	//	text: $props.name
-	//})
-
-	// $run(() => t_name_changed($props.name))
-
-	//$run(() => {
-	//	$props.name = $state.text
-	//});
-
 	@render {
-		<div>
-			<input &value={$props.name} />
-		</div>
+		<input &value={$props.name} />
 	}
 }

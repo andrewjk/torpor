@@ -3,22 +3,20 @@ import { Offscreen } from "@torpor/ui/Offscreen";
 
 export default function ExampleDialog($props: any) {
 	@render {
-		<div>
-			<p>
-				The button below shows a popover Offscreen using the Popover, PopoverTrigger
-				and PopoverContent components.
-			</p>
+		<p>
+			The button below shows a popover Offscreen using the Popover, PopoverTrigger
+			and PopoverContent components.
+		</p>
 
-			<Popover>
-				<PopoverOverlay class="expopoff-overlay" />
-				<PopoverTrigger>Show a popover</PopoverTrigger>
-				<PopoverContent>
-					<Offscreen class="expopoff-content">
-						<p>Here I am</p>
-					</Offscreen>
-				</PopoverContent>
-			</Popover>
-		</div>
+		<Popover>
+			<PopoverOverlay class="expopoff-overlay" />
+			<PopoverTrigger>Show a popover</PopoverTrigger>
+			<PopoverContent>
+				<Offscreen class="expopoff-content">
+					<p>Here I am</p>
+				</Offscreen>
+			</PopoverContent>
+		</Popover>
 	}
 
 	@style {

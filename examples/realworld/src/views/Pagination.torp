@@ -7,16 +7,14 @@ export default function Pagination($props: {
 	href: (p: number) => string
 }) {
 	@render {
-		<div>
-			@if ($props.pageCount > 1) {
-				<nav>
-					<ul class="pagination">
-						@for (let i = 1; i < $props.pageCount; i++) {
-							<li :class={{ "page-item": true, active: i == $props.page }}><a class="page-link" href={$props.href(i)}>{i}</a></li>
-						}
-					</ul>
-				</nav>
-			}
-		</div>
+		@if ($props.pageCount > 1) {
+			<nav>
+				<ul class="pagination">
+					@for (let i = 1; i < $props.pageCount; i++) {
+						<li :class={{ "page-item": true, active: i == $props.page }}><a class="page-link" href={$props.href(i)}>{i}</a></li>
+					}
+				</ul>
+			</nav>
+		}
 	}
 }

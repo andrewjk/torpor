@@ -1,18 +1,16 @@
 
 export default function GettingStarted() {
 	@render {
-		<div>
-			<:head>
-				<title>Getting Started | Torpor</title>
-			</:head>
+		<:head>
+			<title>Getting Started | Torpor</title>
+		</:head>
 
-			<h1>Getting Started</h1>
-			<p>
-				Use <code>npm</code> (or your preferred package manager) to add Torpor to your project:
-			</p>
-			<pre><code>{`
+		<h1>Getting Started</h1>
+		<p>
+			Use <code>npm</code> (or your preferred package manager) to add Torpor to your project:
+		</p>
+		<pre><code>{`
 npm install torpor
 `.trim()}</code></pre>
-		</div>
 	}
 }

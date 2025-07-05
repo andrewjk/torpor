@@ -12,7 +12,7 @@ export default function Self(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> Level ${t_fmt($props.level)} <![>`;
+	$output += ` <p>Level ${t_fmt($props.level)}</p> <![>`;
 	if ($props.level < 3) {
 		$output += `<!^> <![>`;
 		const t_props_1: any = {};
@@ -21,7 +21,7 @@ export default function Self(
 		$output += Self(t_props_1, $context)
 		$output += `<!]><!> `;
 	}
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

@@ -2,18 +2,18 @@ import Repl from "../repl/Repl.torp"
 
 export default function Markup() {
 	@render {
-		<div>
-			<:head>
-				<title>Markup | Torpor</title>
-			</:head>
+		<:head>
+			<title>Markup | Torpor</title>
+		</:head>
 
-			<h1>Markup</h1>
-			<p>
-				The HTML that a component outputs is declared within a <code>&commat;render</code> block.
-				There can only be one @render block per component. Each @render block must contain
-				a single root element:
-			</p>
-			<pre><code>{`
+		<h1>Markup</h1>
+		<p>
+			The HTML that a component outputs is declared within a <code>&commat;render</code>
+			block. There can only be one @render block per component. Each @render block may
+			contain multiple root elements, but each root element must be either a tag or control
+			statement:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	@render {
 		<p>Hello!</p>
@@ -21,11 +21,11 @@ export default function Component() {
 }
 `.trim()}</code></pre>
 
-			<h2>Dynamic content</h2>
-			<p>
-				You can include dynamic content in text and attributes using braces:
-			</p>
-			<pre><code>{`
+		<h2>Dynamic content</h2>
+		<p>
+			You can include dynamic content in text and attributes using braces:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const className = "extravagant"
 	const name = "Torpor"
@@ -37,11 +37,11 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				Use this shortcut syntax to set the value of an attribute to a value of the same
-				name:
-			</p>
-			<pre><code>{`
+		<p>
+			Use this shortcut syntax to set the value of an attribute to a value of the same
+			name:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const id = "main"
 
@@ -52,42 +52,40 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				You can also use e.g. <code>{`<p {$state.id}>Hello</p>`}</code> to get the
-				property value from the property of an object.
-			</p>
+		<p>
+			You can also use e.g. <code>{`<p {$state.id}>Hello</p>`}</code> to get the
+			property value from the property of an object.
+		</p>
 
-			<h2>If statements</h2>
-			<p>
-				Use an <code>&commat;if</code> statement to show certain markup when a condition is met:
-			</p>
-			<pre><code>{`
+		<h2>If statements</h2>
+		<p>
+			Use an <code>&commat;if</code> statement to show certain markup when a condition is met:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
 	@render {
-		<div>
-			<button onclick={() => $state.counter--}>Decrement</button>
-			{$state.counter}
-			<button onclick={() => $state.counter++}>Increment</button>
+		<button onclick={() => $state.counter--}>Decrement</button>
+		{$state.counter}
+		<button onclick={() => $state.counter++}>Increment</button>
 
-			@if ($state.counter < 0) {
-				<p>The count is negative.</p>
-			} else if ($state.counter > 0) {
-				<p>The count is positive.</p>
-			} else {
-				<p>The count is zero.</p>
-			}
-		</div>
+		@if ($state.counter < 0) {
+			<p>The count is negative.</p>
+		} else if ($state.counter > 0) {
+			<p>The count is positive.</p>
+		} else {
+			<p>The count is zero.</p>
+		}
 	}
 }
 `.trim()}</code></pre>
-			
-			<h2>For loops</h2>
-			<p>
-				Use a <code>&commat;for</code> loop to show multiple elements:
-			</p>
-			<pre><code>{`
+		
+		<h2>For loops</h2>
+		<p>
+			Use a <code>&commat;for</code> loop to show multiple elements:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	let $state = $watch({
 		stock: [
@@ -98,185 +96,177 @@ export default function Component() {
 	})
 
 	@render {
-		<div>
-			<button onclick={() => $state.stock.sort((a, b) => a - b)}>
-				Sort by quantity
-			</button>
+		<button onclick={() => $state.stock.sort((a, b) => a - b)}>
+			Sort by quantity
+		</button>
 
-			@for (let $item of $state.stock) {
-				@key $item.code
-				<p>{$item.name}: {$item.quantity}</p>
+		@for (let $item of $state.stock) {
+			@key $item.code
+			<p>{$item.name}: {$item.quantity}</p>
+		}
+	}
+}
+`.trim()}</code></pre>
+		<p>
+			Note the use of the (optional) @key statement to store a unique value for each
+			loop item. If set, when the list is updated (e.g. when sorting), the @key value
+			will be used to recycle the DOM elements rather than destroying and recreating
+			each one.
+		</p>
+
+		<h2>Switch statements</h2>
+		<p>
+			Use a <code>&commat;switch</code> statement to show one of many options:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<p>{$state.counter}</p>
+		<button onclick={() => $state.counter++}>Increment</button>
+
+		@switch ($state.counter) {
+			case 0: {
+				<p>It's zero.</p>
 			}
-		</div>
-	}
-}
-`.trim()}</code></pre>
-			<p>
-				Note the use of the (optional) @key statement to store a unique value for each
-				loop item. If set, when the list is updated (e.g. when sorting), the @key value
-				will be used to recycle the DOM elements rather than destroying and recreating
-				each one.
-			</p>
-
-			<h2>Switch statements</h2>
-			<p>
-				Use a <code>&commat;switch</code> statement to show one of many options:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-			{$state.counter}
-			<button onclick={() => $state.counter++}>Increment</button>
-
-			@switch ($state.counter) {
-				case 0: {
-					<p>It's zero.</p>
-				}
-				case 1: {
-					<p>It's one.</p>
-				}
-				case 2: {
-					<p>It's two.</p>
-				}
-				case 3: {
-					<p>It's three.</p>
-				}
-				case 4: {
-					<p>It's four.</p>
-				}
-				default: {
-					<p>It's bigger than four.</p>
-				}
+			case 1: {
+				<p>It's one.</p>
 			}
-		</div>
-	}
-}
-`.trim()}</code></pre>
-			<p>
-				Note that the switch statement differs from the JavaScript switch statement in that
-				each case statement must be surrounded by braces and no fallthroughs are allowed
-				(meaning that the <code>break</code> statement can be omitted).
-			</p>
-
-			<h2>Await statements</h2>
-			<p>
-				Use an <code>&commat;await</code> statement to show the result of an asynchronous function:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-
-		</div>
-	}
-}
-`.trim()}</code></pre>
-
-			<h2>Replace statements</h2>
-			<p>
-				Use a <code>&commat;replace</code> statement to re-render markup when a value is changed:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-
-		</div>
-	}
-}
-`.trim()}</code></pre>
-			<p>
-				This can be used to re-run component $mount statements and to re-play transition
-				animations.
-			</p>
-
-			<h2>&commat;const, @console and @debugger</h2>
-			<p>
-				The <code>&commat;const</code> keyword can be used to declare a constant value within markup, the
-				<code>&commat;console</code> keyword can be used to log information within markup, and the
-				<code>&commat;debugger</code> keyword can be used to break code execution during markup rendering:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-
-		</div>
-	}
-}
-`.trim()}</code></pre>
-
-			<h2>Function declarations</h2>
-			<p>
-				Use the <code>&commat;function</code> statement to declare a function within markup. This can be
-				useful for keeping logic close together, e.g. for moving a large onclick handler
-				out of an onclick attribute, but still keeping it next to the button it is called
-				from:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-
-		</div>
-	}
-}
-`.trim()}</code></pre>
-
-			<h2>HTML rendering</h2>
-			<p>
-				Use a <code>&commat;html</code> statement to render plain HTML within markup, e.g. from a database:
-			</p>
-			<pre><code>{`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-
-		</div>
-	}
-}
-`.trim()}</code></pre>
-			<p>
-				Note that when rendering HTML you should ensure that it is properly escaped to
-				prevent script injection and other attacks.
-			</p>
-
-			<h2>Playground</h2>
-			<Repl input={`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
-	@render {
-		<div>
-			<button onclick={() => $state.counter--}>Decrement</button>
-			{$state.counter}
-			<button onclick={() => $state.counter++}>Increment</button>
-
-			@if ($state.counter < 0) {
-				<p>The count is negative.</p>
-			} else if ($state.counter > 0) {
-				<p>The count is positive.</p>
-			} else {
-				<p>The count is zero.</p>
+			case 2: {
+				<p>It's two.</p>
 			}
+			case 3: {
+				<p>It's three.</p>
+			}
+			case 4: {
+				<p>It's four.</p>
+			}
+			default: {
+				<p>It's bigger than four.</p>
+			}
+		}
+	}
+}
+`.trim()}</code></pre>
+		<p>
+			Note that the switch statement differs from the JavaScript switch statement in that
+			each case statement must be surrounded by braces and no fallthroughs are allowed
+			(meaning that the <code>break</code> statement can be omitted).
+		</p>
+
+		<h2>Await statements</h2>
+		<p>
+			Use an <code>&commat;await</code> statement to show the result of an asynchronous function:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
 		</div>
+	}
+}
+`.trim()}</code></pre>
+
+		<h2>Replace statements</h2>
+		<p>
+			Use a <code>&commat;replace</code> statement to re-render markup when a value is changed:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+		<p>
+			This can be used to re-run component $mount statements and to re-play transition
+			animations.
+		</p>
+
+		<h2>&commat;const, @console and @debugger</h2>
+		<p>
+			The <code>&commat;const</code> keyword can be used to declare a constant value within markup, the
+			<code>&commat;console</code> keyword can be used to log information within markup, and the
+			<code>&commat;debugger</code> keyword can be used to break code execution during markup rendering:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+		<h2>Function declarations</h2>
+		<p>
+			Use the <code>&commat;function</code> statement to declare a function within markup. This can be
+			useful for keeping logic close together, e.g. for moving a large onclick handler
+			out of an onclick attribute, but still keeping it next to the button it is called
+			from:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+
+		<h2>HTML rendering</h2>
+		<p>
+			Use a <code>&commat;html</code> statement to render plain HTML within markup, e.g. from a database:
+		</p>
+		<pre><code>{`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<div>
+
+		</div>
+	}
+}
+`.trim()}</code></pre>
+		<p>
+			Note that when rendering HTML you should ensure that it is properly escaped to
+			prevent script injection and other attacks.
+		</p>
+
+		<h2>Playground</h2>
+		<Repl input={`
+export default function Component() {
+	let $state = $watch({ counter: 0 })
+
+	@render {
+		<button onclick={() => $state.counter--}>Decrement</button>
+		{$state.counter}
+		<button onclick={() => $state.counter++}>Increment</button>
+
+		@if ($state.counter < 0) {
+			<p>The count is negative.</p>
+		} else if ($state.counter > 0) {
+			<p>The count is positive.</p>
+		} else {
+			<p>The count is zero.</p>
+		}
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

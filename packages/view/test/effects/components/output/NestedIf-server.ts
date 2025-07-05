@@ -11,7 +11,7 @@ export default function NestedIf(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <![>`;
+	$output += ` <![>`;
 	if ($props.condition) {
 		$output += `<!^> <![>`;
 		if ($props.counter > 5) {
@@ -22,7 +22,7 @@ export default function NestedIf(
 		}
 		$output += `<!]><!> `;
 	}
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

@@ -2,60 +2,60 @@ import Repl from "../repl/Repl.torp"
 
 export default function Components() {
 	@render {
-		<div>
-			<:head>
-				<title>Components | Torpor</title>
-			</:head>
+		<:head>
+			<title>Components | Torpor</title>
+		</:head>
 
-			<h1>Components</h1>
-			<p>
-				Each component is a JavaScript function located in a file with the <code>.torp</code>
-				extension. The function is responsible for storing the component's state, building
-				and updating the component's HTML, and scoping CSS styles.
-			</p>
+		<h1>Components</h1>
+		<p>
+			Each component is a JavaScript function located in a file with the <code>.torp</code>
+			extension. The function is responsible for storing the component's state, building
+			and updating the component's HTML, and scoping CSS styles.
+		</p>
 
-			<h2>The function</h2>
-			<p>
-				The component function should look something like this:
-			</p>
-			<pre><code>{`
+		<h2>The function</h2>
+		<p>
+			The component function should look something like this:
+		</p>
+		<pre><code>{`
 export default function Component() {
-	// ...
+// ...
 }
 `.trim()}</code></pre>
-			<p>
-				The function's name must start with an uppercase letter to be considered a
-				component.
-			</p>
-			<p>
-				The component should be exported if it is to be used outside the file. You can use
-				any combination of <code>export default</code>, <code>export</code> and unexported
-				functions for components in a Torpor file. For example, a child component that is
-				used only in the current file can be declared like this:
-			</p>
-			<pre><code>{`
+		<p>
+			The function's name must start with an uppercase letter to be considered a
+			component.
+		</p>
+		<p>
+			The component should be exported if it is to be used outside the file. You can use
+			any combination of <code>export default</code>, <code>export</code> and unexported
+			functions for components in a Torpor file. For example, a child component that is
+			used only in the current file can be declared like this:
+		</p>
+		<pre><code>{`
 function ChildComponent() {
-	// ...
+// ...
 }
 `.trim()}</code></pre>
 
-			<h2>Markup</h2>
-			<p>
-				The HTML that a component outputs is declared within a <code>&commat;render</code>
-				block. There can only be one @render block per component. Each @render block must
-				contain a single root element:
-			</p>
-			<pre><code>{`
+		<h2>Markup</h2>
+		<p>
+			The HTML that a component outputs is declared within a <code>&commat;render</code>
+			block. There can only be one @render block per component. Each @render block may
+			contain multiple root elements, but each root element must be either a tag or control
+			statement:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	@render {
 		<p>Hello!</p>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				You can include dynamic content in text and attributes using braces:
-			</p>
-			<pre><code>{`
+		<p>
+			You can include dynamic content in text and attributes using braces:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const className = "extravagant"
 	const name = "Torpor"
@@ -67,47 +67,45 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				See the <a href="/docs/markup">Markup</a> section for more on what you can do in
-				the @render block.
-			</p>
+		<p>
+			See the <a href="/docs/markup">Markup</a> section for more on what you can do in
+			the @render block.
+		</p>
 
-			<h2>State</h2>
-			<p>
-				Data that is stored within a component is called its <code>state</code>. State can
-				be simple variables, as above, or it can be placed in an object and wrapped with
-				the <code>$watch</code> function to make it reactive and update the UI when it is
-				changed:
-			</p>
-			<pre><code>{`
+		<h2>State</h2>
+		<p>
+			Data that is stored within a component is called its <code>state</code>. State can
+			be simple variables, as above, or it can be placed in an object and wrapped with
+			the <code>$watch</code> function to make it reactive and update the UI when it is
+			changed:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1
 	})
 
 	@render {
-		<div>
-			<p>
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p>
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				The $watch function is automatically imported into component files if used (along
-				with a few other functions). By convention, reactive objects should start with a
-				<code>$</code> so that it is easy to see at a glance which statements are reactive
-				in your markup.
-			</p>
-			<p>
-				A component function can accept a <code>$props</code> component containing the
-				properties that were passed to the component:
-			</p>
-			<pre><code>{`
+		<p>
+			The $watch function is automatically imported into component files if used (along
+			with a few other functions). By convention, reactive objects should start with a
+			<code>$</code> so that it is easy to see at a glance which statements are reactive
+			in your markup.
+		</p>
+		<p>
+			A component function can accept a <code>$props</code> component containing the
+			properties that were passed to the component:
+		</p>
+		<pre><code>{`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
@@ -116,17 +114,17 @@ export default function Component($props: { name: string }) {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				See the <a href="/docs/state">State</a> section for more on how to manage component
-				state.
-			</p>
+		<p>
+			See the <a href="/docs/state">State</a> section for more on how to manage component
+			state.
+		</p>
 
-			<h2>Styles</h2>
-			<p>
-				The CSS for styling a component's elements is declared with a <code>&commat;style</code>
-				block. There can only be one @style block per component:
-			</p>
-			<pre><code>{`
+		<h2>Styles</h2>
+		<p>
+			The CSS for styling a component's elements is declared with a <code>&commat;style</code>
+			block. There can only be one @style block per component:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	@render {
 		<p class="extravagant">Hello!</p>
@@ -140,31 +138,29 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				The styles in the style block are scoped to the elements in the component so that
-				they don't affect elements in other components.
-			</p>
-			<p>
-				See the <a href="/docs/styles">Styles</a> section for more on what you can do in
-				the @style block.
-			</p>
+		<p>
+			The styles in the style block are scoped to the elements in the component so that
+			they don't affect elements in other components.
+		</p>
+		<p>
+			See the <a href="/docs/styles">Styles</a> section for more on what you can do in
+			the @style block.
+		</p>
 
-			<h2>Playground</h2>
-			<Repl input={`
+		<h2>Playground</h2>
+		<Repl input={`
 export default function Component() {
 	const $state = $watch({
 		count: 1
 	})
 
 	@render {
-		<div>
-			<p class="extravagant">
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p class="extravagant">
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 
 	@style {
@@ -175,7 +171,5 @@ export default function Component() {
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

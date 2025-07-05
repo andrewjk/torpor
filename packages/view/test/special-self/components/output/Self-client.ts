@@ -26,12 +26,11 @@ export default function Self(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#<!> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <!> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
-	const t_if_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_if_anchor_1 = t_anchor(t_next(t_text_1)) as HTMLElement;
+	let t_if_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
 
 	/* @if */
 	const t_if_range_1 = t_range();
@@ -52,7 +51,7 @@ export default function Self(
 
 				// @ts-ignore
 				const t_text_2 = t_next(t_comp_anchor_1, true);
-				t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
+				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);
 				t_next(t_text_2);
 			});
 		}
@@ -63,9 +62,9 @@ export default function Self(
 	});
 
 	// @ts-ignore
-	const t_text_3 = t_next(t_if_parent_1, true);
+	const t_text_3 = t_next(t_if_anchor_1, true);
 	$run(function setTextContent() {
-		t_text_1.textContent = ` Level ${t_fmt($props.level)} `;
+		t_text_1.textContent = `Level ${t_fmt($props.level)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);

@@ -46,11 +46,10 @@ export default function Await(
 		/* User interface */
 		const t_fragments: DocumentFragment[] = [];
 
-		const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <!> <button> Guess again </button> </div> `);
+		const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> <button> Guess again </button> `);
 		// @ts-ignore
 		const t_root_0 = t_root(t_fragment_0, true);
-		const t_await_parent_1 = t_next(t_root_0) as HTMLElement;
-		let t_await_anchor_1 = t_anchor(t_next(t_child(t_await_parent_1))) as HTMLElement;
+		let t_await_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 		/* @await */
 		const t_await_range_1 = t_range();
@@ -64,7 +63,7 @@ export default function Await(
 				const t_root_1 = t_root(t_fragment_1, true);
 				// @ts-ignore
 				const t_text_1 = t_next(t_next(t_root_1), true);
-				t_add_fragment(t_fragment_1, t_await_parent_1, t_before, t_text_1);
+				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
 			});
 			((token) => {
@@ -78,7 +77,7 @@ export default function Await(
 							const t_root_2 = t_root(t_fragment_2, true);
 							// @ts-ignore
 							const t_text_2 = t_next(t_next(t_root_2), true);
-							t_add_fragment(t_fragment_2, t_await_parent_1, t_before, t_text_2);
+							t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 							t_next(t_text_2);
 						});
 						t_pop_range(t_old_range_1);
@@ -97,7 +96,7 @@ export default function Await(
 							$run(function setTextContent() {
 								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
 							});
-							t_add_fragment(t_fragment_3, t_await_parent_1, t_before, t_text_4);
+							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);
 							t_next(t_text_4);
 						});
 						t_pop_range(t_old_range_1);
@@ -108,7 +107,7 @@ export default function Await(
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;
 		// @ts-ignore
-		const t_text_5 = t_next(t_await_parent_1, true);
+		const t_text_5 = t_next(t_button_1, true);
 		t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));
 		t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
 		t_next(t_text_5);

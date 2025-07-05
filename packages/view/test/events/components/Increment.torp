@@ -6,16 +6,14 @@ export default function Increment() {
 	}
 
 	@render {
-		<div>
-			<button id="increment" onclick={increment}>
-				Increment
-			</button>
-			<button id="increment5" onclick={(e) => increment(e, 5)}>
-				Increment
-			</button>
-			<p>
-				The count is {$state.counter}.
-			</p>
-		</div>
+		<button id="increment" onclick={increment}>
+			Increment
+		</button>
+		<button id="increment5" onclick={(e) => increment(e, 5)}>
+			Increment
+		</button>
+		<p>
+			The count is {$state.counter}.
+		</p>
 	}
 }

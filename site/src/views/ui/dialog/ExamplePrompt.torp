@@ -10,14 +10,12 @@ export default function ExamplePrompt($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				The button below shows a modal dialog with an input box using
-				the showPopoverPrompt function.
-			</p>
-			<p>
-				<button type="button" onclick={show}>Show a prompt modal</button>
-			</p>
-		</div>
+		<p>
+			The button below shows a modal dialog with an input box using
+			the showPopoverPrompt function.
+		</p>
+		<p>
+			<button type="button" onclick={show}>Show a prompt modal</button>
+		</p>
 	}
 }

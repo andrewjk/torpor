@@ -10,36 +10,34 @@ export default function ExampleBound($props: any) {
 	let $state = $watch({ value: "0" });
 
 	@render {
-		<div>
-			<p>Value: <input type="number" &value={$state.value} /></p>
+		<p>Value: <input type="number" &value={$state.value} /></p>
 
-			<Accordion class="exaccbound" &value={$state.value}>
-				<AccordionItem class="exaccbound-item">
-					<AccordionHeader as="h4">
-						<AccordionTrigger class="exaccbound-trigger">Item 1</AccordionTrigger>
-					</AccordionHeader>
-					<AccordionContent>
-						<div class="exaccbound-content" @/* transition:slide */>The first item</div>
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem class="exaccbound-item">
-					<AccordionHeader as="h4">
-						<AccordionTrigger class="exaccbound-trigger">Item 2</AccordionTrigger>
-					</AccordionHeader>
-					<AccordionContent>
-						<div class="exaccbound-content" @/* transition:slide */>Another item</div>
-					</AccordionContent>
-				</AccordionItem>
-				<AccordionItem class="exaccbound-item">
-					<AccordionHeader as="h4">
-						<AccordionTrigger class="exaccbound-trigger">Item 3</AccordionTrigger>
-					</AccordionHeader>
-					<AccordionContent>
-						<div class="exaccbound-content" @/* transition:slide */>The last item</div>
-					</AccordionContent>
-				</AccordionItem>
-			</Accordion>
-		</div>
+		<Accordion class="exaccbound" &value={$state.value}>
+			<AccordionItem class="exaccbound-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbound-trigger">Item 1</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbound-content" @/* transition:slide */>The first item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="exaccbound-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbound-trigger">Item 2</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbound-content" @/* transition:slide */>Another item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="exaccbound-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="exaccbound-trigger">Item 3</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="exaccbound-content" @/* transition:slide */>The last item</div>
+				</AccordionContent>
+			</AccordionItem>
+		</Accordion>
 	}
 
 	@style {

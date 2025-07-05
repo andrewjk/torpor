@@ -25,11 +25,10 @@ export default function Reactive(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <button>Update text</button> <!> </div> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button>Update text</button> <!> `);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_child(t_next(t_root_0))) as HTMLElement;
-	const t_comp_parent_1 = t_next(t_root_0) as HTMLElement;
+	const t_button_1 = t_next(t_root_0) as HTMLElement;
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1, true))) as HTMLElement;
 
 	/* @component */
@@ -37,10 +36,10 @@ export default function Reactive(
 	$run(function setProp() {
 		t_props_1["text"] = $state.text;
 	});
-	Child(t_comp_parent_1, t_comp_anchor_1, t_props_1, $context);
+	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	// @ts-ignore
-	const t_text_1 = t_next(t_comp_parent_1, true);
+	const t_text_1 = t_next(t_comp_anchor_1, true);
 	t_event(t_button_1, "click", () => $state.text = "after");
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);

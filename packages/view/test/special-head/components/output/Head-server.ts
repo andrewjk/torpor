@@ -11,7 +11,7 @@ export default function Head(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div>  </div> `;
+	$output += `  `;
 
 	return $output;
 }

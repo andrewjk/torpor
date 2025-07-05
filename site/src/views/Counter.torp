@@ -4,16 +4,14 @@ export default function Counter() {
 	})
 
 	@render {
-		<div>
-			<p>
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-			<button onclick={() => $state.count = 0}>
-				Reset
-			</button>
-		</div>
+		<p>
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
+		<button onclick={() => $state.count = 0}>
+			Reset
+		</button>
 	}
 }

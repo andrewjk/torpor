@@ -6,12 +6,10 @@
 	empty: string;
 }) {
 	@render {
-		<div>
-			<p>
-				{$props.value}
-			</p>
-			@// Make sure the #text element to be set is not null if the value is empty
-			<p>{$props.empty}</p>
-		</div>
+		<p>
+			{$props.value}
+		</p>
+		@// Make sure the #text element to be set is not null if the value is empty
+		<p>{$props.empty}</p>
 	}
 }

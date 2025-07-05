@@ -24,10 +24,10 @@ export default function UserProfileContextApp(
 
 	/* User interface */
 	let $output = "";
-	$output += ` <div> <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
+	$output += ` <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
 
 	$output += UserProfileContext(undefined, $context)
-	$output += `<!]><!> </div> `;
+	$output += `<!]><!> `;
 
 	return $output;
 }

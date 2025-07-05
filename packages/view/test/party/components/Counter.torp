@@ -8,9 +8,7 @@ export default function Counter() {
 	}
 
 	@render {
-		<div>
-			<p>Counter: {$state.count}</p>
-			<button onclick={incrementCount}>+1</button>
-		</div>
+		<p>Counter: {$state.count}</p>
+		<button onclick={incrementCount}>+1</button>
 	}
 }

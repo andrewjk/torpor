@@ -8,28 +8,26 @@ export default function DialogVariable($props: any) {
 	});
 
 	@render {
-		<div>
-			<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
-				Show the modal
-			</button>
+		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+			Show the modal
+		</button>
 
-			@if ($state.color) {
-				<p>Your favorite color is {$state.color}?!</p>
-			}
+		@if ($state.color) {
+			<p>Your favorite color is {$state.color}?!</p>
+		}
 
-			<Popover visible={$state.showPopover}>
-				<PopoverContent>
-					<Dialog>
-						<DialogBody>
-							<p>Which color do you prefer?</p>
-						</DialogBody>
-						<DialogFooter>
-							<DialogButton value="blue" onclick={() => ($state.color = "blue")}>Blue</DialogButton>
-							<DialogButton value="red" onclick={() => ($state.color = "red")}>Red</DialogButton>
-						</DialogFooter>
-					</Dialog>
-				</PopoverContent>
-			</Popover>
-		</div>
+		<Popover visible={$state.showPopover}>
+			<PopoverContent>
+				<Dialog>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter>
+						<DialogButton value="blue" onclick={() => ($state.color = "blue")}>Blue</DialogButton>
+						<DialogButton value="red" onclick={() => ($state.color = "red")}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContent>
+		</Popover>
 	}
 }

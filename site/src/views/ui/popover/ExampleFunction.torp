@@ -9,15 +9,13 @@ export default function ExampleFunction($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>
-				You can show a popover in code using the showPopover function, which takes as its parameters a
-				component to show in the popover along with a DOM element to use as an anchor.
-			</p>
+		<p>
+			You can show a popover in code using the showPopover function, which takes as its parameters a
+			component to show in the popover along with a DOM element to use as an anchor.
+		</p>
 
-			<p>
-				<button type="button" onclick={show} &ref={button}>Show a popover</button>
-			</p>
-		</div>
+		<p>
+			<button type="button" onclick={show} &ref={button}>Show a popover</button>
+		</p>
 	}
 }

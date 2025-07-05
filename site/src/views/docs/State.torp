@@ -2,74 +2,69 @@ import Repl from "../repl/Repl.torp"
 
 export default function State() {
 	@render {
-		<div>
-			<:head>
-				<title>State | Torpor</title>
-			</:head>
+		<:head>
+			<title>State | Torpor</title>
+		</:head>
 
-			<h1>State</h1>
-			<p>
-				Data that is stored within a component is called its <code>state</code>. State can
-				be simple variables, or it can be placed in an object and wrapped with the
-				<code>$watch</code> function to make it reactive and update the UI when it is
-				changed:
-			</p>
-			<pre><code>{`
+		<h1>State</h1>
+		<p>
+			Data that is stored within a component is called its <code>state</code>. State can
+			be simple variables, or it can be placed in an object and wrapped with the
+			<code>$watch</code> function to make it reactive and update the UI when it is
+			changed:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1
 	})
 
 	@render {
-		<div>
-			<p>
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p>
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				The $watch function is automatically imported into component files if used (along
-				with a few other functions). By convention, reactive objects should start with a
-				<code>$</code> so that it is easy to see at a glance which statements are reactive
-				in your markup.
-			</p>
-			<p>
-				Dependent state can be created using object properties:
-			</p>
-			<pre><code>{`
+		<p>
+			The $watch function is automatically imported into component files if used (along
+			with a few other functions). By convention, reactive objects should start with a
+			<code>$</code> so that it is easy to see at a glance which statements are reactive
+			in your markup.
+		</p>
+		<p>
+			Dependent state can be created using object properties:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1,
 		get isEven() {
-            return this.count % 2 === 0
+			return this.count % 2 === 0
 		}
 	})
 
 	@render {
-		<div>
-			<p>
-				The count is {$state.isEven ? "even" : "odd"}!
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p>
+			The count is {$state.isEven ? "even" : "odd"}!
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 }
 `.trim()}</code></pre>
 
-			<h2>The $run function</h2>
-			<p>
-				Another function that is automatically imported into your components is
-				<code>$run</code>. Calling $run sets up a function that is run on component
-				initialization and when any reactive values accessed within it are changed:
-			</p>
-			<pre><code>{`
+		<h2>The $run function</h2>
+		<p>
+			Another function that is automatically imported into your components is
+			<code>$run</code>. Calling $run sets up a function that is run on component
+			initialization and when any reactive values accessed within it are changed:
+		</p>
+		<pre><code>{`
 export default function Component() {
 	const $state = $watch({
 		count: 1,
@@ -82,42 +77,40 @@ export default function Component() {
 	})
 
 	@render {
-		<div>
-			<p id="text">
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p id="text">
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 }
 `.trim()}</code></pre>
-			<p>
-				Behind the scenes, $run is called in the @render block to set up reactive text,
-				attributes and statements.
-			</p>
+		<p>
+			Behind the scenes, $run is called in the @render block to set up reactive text,
+			attributes and statements.
+		</p>
 
-			<h2>The $mount function</h2>
-			<p>
-				The <code>$mount</code> function is like the $run function, but it delays its first run until
-				after the @render block has been completed and all elements have been mounted.
-				It is automatically imported into your component if used.
-			</p>
+		<h2>The $mount function</h2>
+		<p>
+			The <code>$mount</code> function is like the $run function, but it delays its first run until
+			after the @render block has been completed and all elements have been mounted.
+			It is automatically imported into your component if used.
+		</p>
 
-			<h2>The $unwrap function</h2>
-			<p>
-				The <code>$unwrap</code> function returns the underlying object from a state object returned
-				from $watch.
-				It is automatically imported into your component if used.
-			</p>
+		<h2>The $unwrap function</h2>
+		<p>
+			The <code>$unwrap</code> function returns the underlying object from a state object returned
+			from $watch.
+			It is automatically imported into your component if used.
+		</p>
 
-			<h2>Props</h2>
-			<p>
-				A component function can accept a <code>$props</code> component containing the properties that
-				were passed to the component:
-			</p>
-			<pre><code>{`
+		<h2>Props</h2>
+		<p>
+			A component function can accept a <code>$props</code> component containing the properties that
+			were passed to the component:
+		</p>
+		<pre><code>{`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
@@ -126,9 +119,9 @@ export default function Component($props: { name: string }) {
 	}
 }
 `.trim()}</code></pre>
-			
-			<h2>Playground</h2>
-			<Repl input={`
+		
+		<h2>Playground</h2>
+		<Repl input={`
 export default function Component() {
 	const $state = $watch({
 		count: 1,
@@ -141,18 +134,14 @@ export default function Component() {
 	})
 
 	@render {
-		<div>
-			<p id="text">
-				The count is {$state.count}.
-			</p>
-			<button onclick={() => $state.count++}>
-				Increment
-			</button>
-		</div>
+		<p id="text">
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
 	}
 }
 `.trimStart()} />
-
-		</div>
 	}
 }

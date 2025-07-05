@@ -6,22 +6,20 @@ export default function ExampleBasic($props: any) {
 	});
 
 	@render {
-		<div>
+		<p>
+			The button below shows a popover Dialog using the Offscreen, OffscreenTrigger and
+			OffscreenContent components.
+		</p>
+
+		<button onclick={() => $state.visible = !$state.visible}>
+			Show
+		</button>
+
+		<Offscreen &visible={$state.visible}>
 			<p>
-				The button below shows a popover Dialog using the Offscreen, OffscreenTrigger and
-				OffscreenContent components.
+				Hello!
 			</p>
-
-			<button onclick={() => $state.visible = !$state.visible}>
-				Show
-			</button>
-
-			<Offscreen &visible={$state.visible}>
-				<p>
-					Hello!
-				</p>
-			</Offscreen>
-		</div>
+		</Offscreen>
 	}
 
 	@style {

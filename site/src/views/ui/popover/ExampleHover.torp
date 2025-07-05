@@ -6,16 +6,14 @@ export default function ExampleHover($props: any) {
 	}
 
 	@render {
-		<div>
-			<p>Hover over the panel below to trigger a tooltip.</p>
+		<p>Hover over the panel below to trigger a tooltip.</p>
 
-			<Popover>
-				<PopoverTriggerHover class="expophov-target">Hover me</PopoverTriggerHover>
-				<PopoverContentContextual class="expophov-content">
-					I'm a tooltip...
-				</PopoverContentContextual>
-			</Popover>
-		</div>
+		<Popover>
+			<PopoverTriggerHover class="expophov-target">Hover me</PopoverTriggerHover>
+			<PopoverContentContextual class="expophov-content">
+				I'm a tooltip...
+			</PopoverContentContextual>
+		</Popover>
 	}
 
 	@style {
