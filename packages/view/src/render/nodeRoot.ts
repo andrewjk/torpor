@@ -1,4 +1,6 @@
 import context from "./context";
+import { HYDRATION_START } from "./hydrationMarkers";
+import isCommentNode from "./isCommentNode";
 import isTextNode from "./isTextNode";
 
 /**
@@ -18,6 +20,13 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 		// is caused by text nodes being merged in HTML
 		if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
 			rootNode = rootNode.previousSibling;
+			context.hydrationNode = rootNode;
+		}
+
+		// HACK: If the root node is a hydration start comment node, get the
+		// next one instead
+		if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
+			rootNode = rootNode.nextSibling!;
 			context.hydrationNode = rootNode;
 		}
 
