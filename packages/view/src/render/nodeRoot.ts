@@ -1,5 +1,5 @@
 import context from "./context";
-import isText from "./isText";
+import isTextNode from "./isTextNode";
 
 /**
  * Gets the first child in a fragment.
@@ -16,7 +16,7 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 		// If the root node we need is a text node, and the hydration node is
 		// not a text node but the previous node is, use the previous node. This
 		// is caused by text nodes being merged in HTML
-		if (text && !isText(rootNode) && isText(rootNode.previousSibling)) {
+		if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
 			rootNode = rootNode.previousSibling;
 			context.hydrationNode = rootNode;
 		}
