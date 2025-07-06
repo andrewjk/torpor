@@ -1,6 +1,6 @@
-export default function printNode(node: Node | null | undefined): string {
+export default function printNode(node: Node | null | undefined, colored = true): string {
 	if (!node) {
-		return `\x1b[41m[null]\x1b[0m`;
+		return colored ? "\x1b[41m[null]\x1b[0m" : "[null]";
 	}
 
 	let parent = node;
@@ -12,25 +12,25 @@ export default function printNode(node: Node | null | undefined): string {
 	}
 
 	let status = { p: "" };
-	printChildNode(parent!, node!, status);
+	printChildNode(parent!, node!, status, colored);
 
 	return status.p;
 }
 
-function printChildNode(node: Node, target: Node, status: { p: string }) {
+function printChildNode(node: Node, target: Node, status: { p: string }, colored: boolean) {
 	if (node.nodeType === 1) {
 		// Element
 		let el = node as Element;
 		let p = `<${el.tagName.toLowerCase()}>`;
 		if (node === target) {
-			p = `\x1b[44m${p}\x1b[0m`;
+			p = colored ? `\x1b[44m${p}\x1b[0m` : `~~{${p}}~~`;
 		}
 		status.p += p;
 	} else if (node.nodeType === 3) {
 		// Text
 		let p = "…";
 		if (node === target) {
-			p = `\x1b[44m${p}\x1b[0m`;
+			p = colored ? `\x1b[44m${p}\x1b[0m` : `~~{${p}}~~`;
 		}
 		status.p += p;
 	} else if (node.nodeType === 8) {
@@ -38,7 +38,7 @@ function printChildNode(node: Node, target: Node, status: { p: string }) {
 		let com = node as Comment;
 		let p = `<!${com.data}>`;
 		if (node === target) {
-			p = `\x1b[44m${p}\x1b[0m`;
+			p = colored ? `\x1b[44m${p}\x1b[0m` : `~~{${p}}~~`;
 		}
 		status.p += p;
 	} else if (node.nodeType === 9) {
@@ -49,7 +49,7 @@ function printChildNode(node: Node, target: Node, status: { p: string }) {
 	}
 
 	for (let child of node.childNodes) {
-		printChildNode(child, target, status);
+		printChildNode(child, target, status, colored);
 	}
 
 	if (node.nodeType === 1) {
