@@ -1,6 +1,6 @@
 import context from "./context";
 import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
-import isComment from "./isComment";
+import isCommentNode from "./isCommentNode";
 import nodeNext from "./nodeNext";
 
 /**
@@ -19,7 +19,7 @@ import nodeNext from "./nodeNext";
  */
 export default function nodeAnchor(node: ChildNode): ChildNode {
 	if (context.hydrationNode) {
-		if (isComment(node) && node.data === HYDRATION_START) {
+		if (isCommentNode(node) && node.data === HYDRATION_START) {
 			// Skip and remove the start node, setting the hydration node in
 			// nodeNext
 			let currentNode = nodeNext(node);
@@ -28,7 +28,7 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 			// Go through siblings until we get to the end
 			let level = 1;
 			while (currentNode) {
-				if (isComment(currentNode)) {
+				if (isCommentNode(currentNode)) {
 					if (currentNode.data === HYDRATION_START) {
 						level += 1;
 					} else if (currentNode.data === HYDRATION_END) {

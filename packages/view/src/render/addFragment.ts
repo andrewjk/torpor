@@ -1,6 +1,7 @@
 import animate from "../motion/animate";
 import $run from "./$run";
 import context from "./context";
+import isFragmentNode from "./isFragmentNode";
 
 export default function addFragment(
 	fragment: DocumentFragment,
@@ -24,7 +25,7 @@ export default function addFragment(
 		}
 	}
 
-	let parentIsFragment = parent.nodeType === 11;
+	let parentIsFragment = isFragmentNode(parent);
 
 	if (!hydrationNode) {
 		// HACK: We need to be able to add fragments to new fragments as well as

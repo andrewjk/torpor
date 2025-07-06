@@ -1,6 +1,6 @@
 import context from "./context";
 import { HYDRATION_BREAK } from "./hydrationMarkers";
-import isComment from "./isComment";
+import isCommentNode from "./isCommentNode";
 
 // TODO: It would be good to remove this, if possible
 
@@ -14,7 +14,7 @@ import isComment from "./isComment";
  */
 export default function nodeCheckHydrationBreak(node: ChildNode | null): ChildNode | null {
 	if (context.hydrationNode) {
-		if (node && isComment(node) && node.data === HYDRATION_BREAK) {
+		if (node && isCommentNode(node) && node.data === HYDRATION_BREAK) {
 			let comment = node;
 			node = node.nextSibling;
 			comment.remove();
