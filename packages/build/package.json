@@ -60,15 +60,15 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"cookie": "^1.0.2",
-		"dotenv": "^17.0.1",
-		"vite": "^7.0.2",
+		"dotenv": "^17.2.1",
+		"vite": "^7.1.1",
 		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"tsup": "^8.5.0",
 		"tsx": "^4.20.3",
-		"typescript": "^5.8.3",
+		"typescript": "^5.9.2",
 		"vitest": "^3.2.4"
 	}
 }

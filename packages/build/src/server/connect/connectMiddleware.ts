@@ -1,5 +1,6 @@
 import { IncomingMessage, ServerResponse } from "node:http";
 import type MiddlewareFunction from "../types/MiddlewareFunction";
+import bufferToArrayBuffer from "./bufferToArrayBuffer";
 import flattenHeaders from "./flattenHeaders";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
 import readableToBuffer from "./readableToBuffer";
@@ -27,7 +28,7 @@ export default function connectMiddleware(
 					: //(Readable.toWeb(readable) as ReadableStream);
 						// HACK: Chunked bodies are not being
 						// read correctly somewhere...
-						await readableToBuffer(readable);
+						bufferToArrayBuffer(await readableToBuffer(readable));
 				ev.response = new Response(responseBody, {
 					status,
 					headers: flattenHeaders(headers),
