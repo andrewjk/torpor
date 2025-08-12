@@ -297,6 +297,11 @@ async function animate(el, enter, keyframes, options) {
   }
 }
 
+// src/render/isFragmentNode.ts
+function isFragmentNode(node) {
+  return node?.nodeType === 11;
+}
+
 // src/render/addFragment.ts
 function addFragment(fragment, parent, before, endNode) {
   const range = context_default.activeRange;
@@ -309,7 +314,7 @@ function addFragment(fragment, parent, before, endNode) {
       range.endNode = fragment.lastChild;
     }
   }
-  let parentIsFragment = parent.nodeType === 11;
+  let parentIsFragment = isFragmentNode(parent);
   if (!hydrationNode) {
     if (parentIsFragment) {
       parent = before.parentNode;
@@ -520,20 +525,20 @@ var HYDRATION_START = "[";
 var HYDRATION_END = "]";
 var HYDRATION_BREAK = "^";
 
-// src/render/isComment.ts
-function isComment(node) {
+// src/render/isCommentNode.ts
+function isCommentNode(node) {
   return node?.nodeType === 8;
 }
 
-// src/render/isText.ts
-function isText(node) {
+// src/render/isTextNode.ts
+function isTextNode(node) {
   return node?.nodeType === 3;
 }
 
 // src/render/nodeCheckHydrationBreak.ts
 function nodeCheckHydrationBreak(node) {
   if (context_default.hydrationNode) {
-    if (node && isComment(node) && node.data === HYDRATION_BREAK) {
+    if (node && isCommentNode(node) && node.data === HYDRATION_BREAK) {
       let comment = node;
       node = node.nextSibling;
       comment.remove();
@@ -545,7 +550,7 @@ function nodeCheckHydrationBreak(node) {
 
 // src/render/nodeNext.ts
 function nodeNext(node, text = false) {
-  if (context_default.hydrationNode && text && isText(node)) {
+  if (context_default.hydrationNode && text && isTextNode(node)) {
     return node;
   }
   let nextNode = nodeCheckHydrationBreak(node.nextSibling);
@@ -555,12 +560,12 @@ function nodeNext(node, text = false) {
 // src/render/nodeAnchor.ts
 function nodeAnchor(node) {
   if (context_default.hydrationNode) {
-    if (isComment(node) && node.data === HYDRATION_START) {
+    if (isCommentNode(node) && node.data === HYDRATION_START) {
       let currentNode = nodeNext(node);
       node.remove();
       let level = 1;
       while (currentNode) {
-        if (isComment(currentNode)) {
+        if (isCommentNode(currentNode)) {
           if (currentNode.data === HYDRATION_START) {
             level += 1;
           } else if (currentNode.data === HYDRATION_END) {
@@ -601,8 +606,12 @@ function nodeChild(parent) {
 function nodeRoot(parent, text = false) {
   if (context_default.hydrationNode) {
     let rootNode = context_default.hydrationNode;
-    if (text && !isText(rootNode) && isText(rootNode.previousSibling)) {
+    if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
       rootNode = rootNode.previousSibling;
+      context_default.hydrationNode = rootNode;
+    }
+    if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
+      rootNode = rootNode.nextSibling;
       context_default.hydrationNode = rootNode;
     }
     const range = context_default.activeRange;
@@ -661,6 +670,9 @@ function runControlBranch(range, index, create) {
 function moveRange(parent, range, before) {
   const endNode = range.endNode || range.startNode;
   let currentNode = range.startNode;
+  if (isFragmentNode(parent)) {
+    parent = before.parentNode;
+  }
   while (currentNode) {
     const nextNode = currentNode.nextSibling;
     parent.insertBefore(currentNode, before);
