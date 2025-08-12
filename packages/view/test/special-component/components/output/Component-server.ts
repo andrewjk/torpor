@@ -17,10 +17,11 @@ export default function Component(
 	};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	components[$props.self];
-	$output += `<![>`;
+	t_body += `<![>`;
 	const t_props_1: any = {};
 	t_props_1["self"] = components[$props.self];
 	const t_slots_1: Record<string, ServerSlotRender> = {};
@@ -30,14 +31,16 @@ export default function Component(
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
-		let $output = "";
-		$output += ` Hello! `;
-		return $output;
+		let t_body = "";
+		t_body += ` Hello! `;
+		return t_body;
 	}
 
-	$output += components[$props.self](t_props_1, $context, t_slots_1)
-	$output += `<!]><!>`;
-	$output += `<!]><!> `;
+	const t_comp_1 = components[$props.self](t_props_1, $context, t_slots_1);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!>`;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

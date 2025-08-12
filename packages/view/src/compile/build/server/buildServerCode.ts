@@ -1,6 +1,7 @@
 import { type BuildOptions } from "../../../types/BuildOptions";
 import { type Template } from "../../../types/Template";
 import Builder from "../../utils/Builder";
+import buildStyles from "../client/buildStyles";
 import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
@@ -100,13 +101,21 @@ function buildServerTemplate(
 				// Add the interface
 				b.append("");
 				b.append("/* User interface */");
-				b.append(`let $output = "";`);
+				b.append(`let t_body = "";`);
+				if (current.style) {
+					// Replace multiple spaces with a single space
+					const styles = buildStyles(current.style, current.style.hash)
+						.replaceAll('"', '\\"')
+						.replaceAll(/\s+/g, " ");
+					b.append(`let t_head = "<style id='${current.style.hash}'>${styles}</style>";\n`);
+				} else {
+					b.append(`let t_head = "";`);
+				}
 
-				// Add the interface
 				buildServerNode(current.markup, status, b);
 
 				if (status.output) {
-					b.append(`$output += \`${status.output}\`;`);
+					b.append(`t_body += \`${status.output}\`;`);
 					status.output = "";
 				}
 			}
@@ -114,7 +123,7 @@ function buildServerTemplate(
 			marker = i + "/* @render */".length;
 		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
 			b.append(script.substring(marker, i));
-			b.append("return $output;");
+			b.append(`return { body: t_body, head: t_head };`);
 
 			currentIndex += 1;
 			current = template.components[currentIndex];

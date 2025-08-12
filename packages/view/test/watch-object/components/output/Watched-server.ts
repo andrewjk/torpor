@@ -11,8 +11,9 @@ export default function Watched(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p> ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.grandChild.grandChildText)} </p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p> ${t_fmt($props.text)} ${t_fmt($props.child.childText)} ${t_fmt($props.child.grandChild.grandChildText)} </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

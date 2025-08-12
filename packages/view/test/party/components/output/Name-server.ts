@@ -15,8 +15,9 @@ export default function Name(
 	});
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h1>Hello ${t_fmt($state.name)}</h1> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h1>Hello ${t_fmt($state.name)}</h1> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

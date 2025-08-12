@@ -11,8 +11,9 @@ export default function Attributes(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div ${$props.thing ? `thing="${t_attr($props.thing)}"` : ''} ${$props.dataThing ? `data-thing="${t_attr($props.dataThing)}"` : ''} caption="this attribute is for ${t_attr($props.description)}" attr="${t_attr($props.attr)}"> Hello! </div> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <div ${$props.thing ? `thing="${t_attr($props.thing)}"` : ''} ${$props.dataThing ? `data-thing="${t_attr($props.dataThing)}"` : ''} caption="this attribute is for ${t_attr($props.description)}" attr="${t_attr($props.attr)}"> Hello! </div> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

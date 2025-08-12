@@ -11,12 +11,13 @@ export default function ForOf(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <![>`;
 	for (let item of $props.items) {
-		$output += `<!^> <p> ${t_fmt(item)} </p> `;
+		t_body += `<!^> <p> ${t_fmt(item)} </p> `;
 	}
-	$output += `<!]><!> </section> `;
+	t_body += `<!]><!> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

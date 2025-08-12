@@ -1,7 +1,7 @@
 import $watch from "../../../../src/render/$serverWatch";
-import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
-import t_class from "../../../../src/render/getClasses";
 import t_fmt from "../../../../src/render/formatText";
+import t_class from "../../../../src/render/getClasses";
+import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function Bench(
 	// @ts-ignore
@@ -9,7 +9,7 @@ export default function Bench(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	$slots?: Record<string, ServerSlotRender>,
 ) {
 	let rowId = 1;
 	let $state = $watch({
@@ -44,7 +44,19 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const colours = [
+		"red",
+		"yellow",
+		"blue",
+		"green",
+		"pink",
+		"brown",
+		"purple",
+		"brown",
+		"white",
+		"black",
+		"orange",
+	];
 	const nouns = [
 		"table",
 		"chair",
@@ -119,12 +131,12 @@ export default function Bench(
 	}
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <![>`;
+	let t_body = "";
+	t_body += ` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <![>`;
 	for (let row of $state.data) {
-		$output += `<!^>  <tr class="${t_class({ danger: $state.selected === row.id })}"> <td class="col-md-1">${t_fmt(row.id)}</td> <td class="col-md-4"> <a> ${t_fmt(row.label)} </a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `;
+		t_body += `<!^>  <tr class="${t_class({ danger: $state.selected === row.id })}"> <td class="col-md-1">${t_fmt(row.id)}</td> <td class="col-md-4"> <a> ${t_fmt(row.label)} </a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `;
 	}
-	$output += `<!]><!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `;
+	t_body += `<!]><!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `;
 
-	return $output;
+	return t_body;
 }

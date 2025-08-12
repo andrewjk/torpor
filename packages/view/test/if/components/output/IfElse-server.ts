@@ -10,15 +10,16 @@ export default function IfElse(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	if ($props.counter > 7) {
-		$output += `<!^> <p> It's true! </p> <p> That's right </p> `;
+		t_body += `<!^> <p> It's true! </p> <p> That's right </p> `;
 	}
 	else {
-		$output += `<!^> <p> It's not true... </p> `;
+		t_body += `<!^> <p> It's not true... </p> `;
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -10,15 +10,16 @@ export default function Shape(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img"> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img"> <![>`;
 	if ($props.name === "rect") {
-		$output += `<!^> <rect width="100" height="100" fill="red"></rect> `;
+		t_body += `<!^> <rect width="100" height="100" fill="red"></rect> `;
 	}
 	else {
-		$output += `<!^> <circle r="45" cx="50" cy="50" fill="red"></circle> `;
+		t_body += `<!^> <circle r="45" cx="50" cy="50" fill="red"></circle> `;
 	}
-	$output += `<!]><!> </svg> `;
+	t_body += `<!]><!> </svg> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

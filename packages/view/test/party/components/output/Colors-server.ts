@@ -12,12 +12,13 @@ export default function Colors(
 	const colors = ["red", "green", "blue"];
 
 	/* User interface */
-	let $output = "";
-	$output += ` <ul> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <ul> <![>`;
 	for (let color of colors) {
-		$output += `<!^>  <li>${t_fmt(color)}</li> `;
+		t_body += `<!^>  <li>${t_fmt(color)}</li> `;
 	}
-	$output += `<!]><!> </ul> `;
+	t_body += `<!]><!> </ul> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

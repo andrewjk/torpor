@@ -27,10 +27,11 @@ export default function Await(
 		}
 
 		/* User interface */
-		let $output = "";
-		$output += ` <![>`;
-		$output += ` <p>Hmm...</p> `;
-		$output += `<!]><!> <button> Guess again </button> `;
+		let t_body = "";
+		let t_head = "";
+		t_body += ` <![>`;
+		t_body += ` <p>Hmm...</p> `;
+		t_body += `<!]><!> <button> Guess again </button> `;
 
-		return $output;
+		return { body: t_body, head: t_head };
 	}

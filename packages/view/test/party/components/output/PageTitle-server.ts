@@ -20,8 +20,9 @@ export default function PageTitle(
 	});
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p>Page title: ${t_fmt($state.pageTitle)}</p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p>Page title: ${t_fmt($state.pageTitle)}</p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

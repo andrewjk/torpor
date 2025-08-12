@@ -11,12 +11,13 @@ export default function ArrayEntries(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <p>^</p> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <p>^</p> <![>`;
 	for (let [i, item] of $props.items.entries()) {
-		$output += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt(item.text)} </span> `;
+		t_body += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt(item.text)} </span> `;
 	}
-	$output += `<!]><!> <p>$</p> </section> `;
+	t_body += `<!]><!> <p>$</p> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

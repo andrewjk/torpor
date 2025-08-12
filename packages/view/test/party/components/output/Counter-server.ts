@@ -19,8 +19,9 @@ export default function Counter(
 	}
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

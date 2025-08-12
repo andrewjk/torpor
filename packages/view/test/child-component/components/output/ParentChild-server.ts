@@ -11,15 +11,18 @@ export default function ParentChild(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["name"] = "Anna";
 
-	$output += Child(t_props_1, $context)
-	$output += `<!]><!> `;
+	const t_comp_1 = Child(t_props_1, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }
 
 function Child(
@@ -32,8 +35,9 @@ function Child(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h2>Hello, ${t_fmt($props.name)}</h2> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h2>Hello, ${t_fmt($props.name)}</h2> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

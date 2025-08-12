@@ -9,12 +9,13 @@ export default function SmallTitle(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h6> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h6> <![>`;
 	if ($slots && $slots["_"]) {
-		$output += $slots["_"](undefined, $context);
+		t_body += $slots["_"](undefined, $context);
 	}
-	$output += `<!]><!> </h6> `;
+	t_body += `<!]><!> </h6> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

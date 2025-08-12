@@ -10,19 +10,20 @@ export default function NestedIf(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	if ($props.condition) {
-		$output += `<!^> <![>`;
+		t_body += `<!^> <![>`;
 		if ($props.counter > 5) {
-			$output += `<!^> <p>It's big</p> `;
+			t_body += `<!^> <p>It's big</p> `;
 		}
 		else {
-			$output += `<!^> <p>It's small</p> `;
+			t_body += `<!^> <p>It's small</p> `;
 		}
-		$output += `<!]><!> `;
+		t_body += `<!]><!> `;
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

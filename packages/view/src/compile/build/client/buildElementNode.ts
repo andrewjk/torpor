@@ -134,8 +134,8 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	// TODO: dedupe e.g. <meta name="x"> or on special key
 	b.append(`
 		$run(function runHead() {
-			const t_head_el = document.createElement("${node.tagName}");
-			document.getElementsByTagName("head")[0].appendChild(t_head_el);`);
+			const t_headel = document.createElement("${node.tagName}");
+			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
 	for (let { name, value } of node.attributes) {
 		if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
@@ -143,7 +143,7 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			// in either case we set the value of the width property
 			name = name.substring(1, name.length - 1);
 			const propName = name.split(".").at(-1);
-			buildRun("setAttribute", `t_head_el.setAttribute("${propName}", ${name});`, status, b);
+			buildRun("setAttribute", `t_headel.setAttribute("${propName}", ${name});`, status, b);
 		} else if (value != null && isReactive(value)) {
 			// It's a reactive attribute
 			if (isFullyReactive(value)) {
@@ -153,10 +153,10 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			}
 
 			status.imports.add("t_attribute");
-			buildRun("setAttribute", `t_attribute(t_head_el, "${name}", ${value});`, status, b);
+			buildRun("setAttribute", `t_attribute(t_headel, "${name}", ${value});`, status, b);
 		} else if (value != null) {
 			status.imports.add("t_attribute");
-			b.append(`t_attribute(t_head_el, "${name}", ${value});`);
+			b.append(`t_attribute(t_headel, "${name}", ${value});`);
 		}
 	}
 	b.append(`

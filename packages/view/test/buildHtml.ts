@@ -61,7 +61,7 @@ ${template.components.find((t) => t.default)!.name};
 		console.log("===");
 	}
 
-	const html = eval(code)(state).replaceAll(/\s+/g, " ");
+	const html = eval(code)(state).body.replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");
 		console.log(html);

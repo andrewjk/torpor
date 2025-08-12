@@ -11,8 +11,9 @@ export default function Header(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h2>Hi, ${t_fmt($props.name)}</h2> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h2>Hi, ${t_fmt($props.name)}</h2> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

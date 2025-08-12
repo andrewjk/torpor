@@ -8,9 +8,8 @@ export default function hydrateComponent(
 	serverComponent: ServerComponent,
 	state?: any,
 ): void {
-	const html = serverComponent(state);
-	//console.log("HTML", html);
-	container.innerHTML = html;
+	const { body } = serverComponent(state);
+	container.innerHTML = body;
 	container.ownerDocument.body.appendChild(container);
 
 	hydrate(container, clientComponent, state);

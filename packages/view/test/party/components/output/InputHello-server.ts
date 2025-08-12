@@ -16,8 +16,9 @@ export default function InputHello(
 	});
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -16,23 +16,24 @@ export default function Switch(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	switch ($props.value) {
 		case 1: {
-			$output += `<!^> <p> A small value. </p> `;
+			t_body += `<!^> <p> A small value. </p> `;
 			break;
 		}
 		case 100: {
-			$output += `<!^> <p> A large value. </p> `;
+			t_body += `<!^> <p> A large value. </p> `;
 			break;
 		}
 		default: {
-			$output += `<!^> <p> Another value. </p> `;
+			t_body += `<!^> <p> Another value. </p> `;
 			break;
 		}
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

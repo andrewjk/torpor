@@ -10,16 +10,17 @@ export default function IfAfterIf(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	if ($props.counter > 10) {
-		$output += `<!^> <p> It's true! </p> `;
+		t_body += `<!^> <p> It's true! </p> `;
 	}
-	$output += `<!]><!> <![>`;
+	t_body += `<!]><!> <![>`;
 	if ($props.counter > 5) {
-		$output += `<!^> <p> It's also true! </p> `;
+		t_body += `<!^> <p> It's also true! </p> `;
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

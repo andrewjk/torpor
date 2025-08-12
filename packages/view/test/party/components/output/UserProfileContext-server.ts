@@ -13,8 +13,9 @@ export default function UserProfileContext(
 	$context.user = $watch($context.user);
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h2>My Profile</h2> <p>Username: ${t_fmt($context.user.username)}</p> <p>Email: ${t_fmt($context.user.email)}</p> <button> Update username to Jane </button> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

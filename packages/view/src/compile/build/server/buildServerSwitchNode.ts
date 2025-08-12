@@ -20,7 +20,7 @@ export default function buildServerSwitchNode(
 	status.output += HYDRATION_START_COMMENT;
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 
@@ -51,7 +51,7 @@ function buildServerSwitchBranch(node: ControlNode, status: BuildServerStatus, b
 	}
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 

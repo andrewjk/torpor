@@ -12,11 +12,14 @@ export default function FunnyButtonApp(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 
-	$output += FunnyButton(undefined, $context)
-	$output += `<!]><!> <![>`;
+	const t_comp_1 = FunnyButton(undefined, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -24,13 +27,15 @@ export default function FunnyButtonApp(
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
-		let $output = "";
-		$output += `Click me!`;
-		return $output;
+		let t_body = "";
+		t_body += `Click me!`;
+		return t_body;
 	}
 
-	$output += FunnyButton(undefined, $context, t_slots_1)
-	$output += `<!]><!> `;
+	const t_comp_2 = FunnyButton(undefined, $context, t_slots_1);
+	t_body += t_comp_2.body;
+	t_head += t_comp_2.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

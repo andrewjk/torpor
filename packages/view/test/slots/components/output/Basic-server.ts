@@ -12,8 +12,9 @@ export default function Basic(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -21,13 +22,15 @@ export default function Basic(
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
-		let $output = "";
-		$output += ` Basic stuff `;
-		return $output;
+		let t_body = "";
+		t_body += ` Basic stuff `;
+		return t_body;
 	}
 
-	$output += Header(undefined, $context, t_slots_1)
-	$output += `<!]><!> `;
+	const t_comp_1 = Header(undefined, $context, t_slots_1);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

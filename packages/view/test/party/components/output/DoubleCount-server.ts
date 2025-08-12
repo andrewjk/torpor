@@ -18,8 +18,9 @@ export default function DoubleCount(
 	});
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div>${t_fmt($state.doubleCount)}</div> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <div>${t_fmt($state.doubleCount)}</div> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

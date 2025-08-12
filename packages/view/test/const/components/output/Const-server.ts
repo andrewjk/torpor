@@ -11,10 +11,11 @@ export default function Const(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` `;
 	const name = "Boris";
-	$output += ` <p> Hello, ${t_fmt(name)}! </p> `;
+	t_body += ` <p> Hello, ${t_fmt(name)}! </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

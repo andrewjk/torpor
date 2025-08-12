@@ -11,12 +11,13 @@ export default function For(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <![>`;
 	for (let i = 0; i < 5; i++) {
-		$output += `<!^> <p> ${t_fmt(i)} </p> `;
+		t_body += `<!^> <p> ${t_fmt(i)} </p> `;
 	}
-	$output += `<!]><!> </section> `;
+	t_body += `<!]><!> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -14,15 +14,18 @@ export default function BindComponent(
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["&name"] = $state.name;
 
-	$output += BindText(t_props_1, $context)
-	$output += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p> `;
+	const t_comp_1 = BindText(t_props_1, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }
 
 function BindText(
@@ -35,8 +38,9 @@ function BindText(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <input value="${t_attr($props.name) || ""}"> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <input value="${t_attr($props.name) || ""}"> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

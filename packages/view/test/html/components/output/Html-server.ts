@@ -10,8 +10,9 @@ export default function Html(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p> <![>${$props.html}<!]><!> </p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p> <![>${$props.html}<!]><!> </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

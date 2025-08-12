@@ -12,11 +12,14 @@ export default function Unused(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 
-	$output += Header(undefined, $context)
-	$output += `<!]><!> `;
+	const t_comp_1 = Header(undefined, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

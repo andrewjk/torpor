@@ -10,8 +10,9 @@ export default function OnMount(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <input> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <input> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

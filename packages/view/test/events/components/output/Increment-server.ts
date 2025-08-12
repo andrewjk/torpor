@@ -17,8 +17,9 @@ export default function Increment(
 	}
 
 	/* User interface */
-	let $output = "";
-	$output += ` <button id="increment"> Increment </button> <button id="increment5"> Increment </button> <p> The count is ${t_fmt($state.counter)}. </p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <button id="increment"> Increment </button> <button id="increment5"> Increment </button> <p> The count is ${t_fmt($state.counter)}. </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

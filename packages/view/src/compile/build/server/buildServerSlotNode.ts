@@ -23,7 +23,7 @@ export default function buildServerSlotNode(
 	status.output += HYDRATION_START_COMMENT;
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 
@@ -62,9 +62,13 @@ export default function buildServerSlotNode(
 	}
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
-	b.append(
-		`$output += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
-	);
+	b.append(`t_body += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`);
+	////const slotResult = nextVarName("comp", status);
+	////b.append(
+	////	`const ${slotResult} = $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
+	////);
+	////b.append(`t_body += ${slotResult}.body;`);
+	////b.append(`t_head += ${slotResult}.head;`);
 
 	// TODO: Not if there's only a single space node -- maybe check in parse
 	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");
@@ -76,7 +80,7 @@ export default function buildServerSlotNode(
 		}
 
 		if (status.output) {
-			b.append(`$output += \`${status.output}\`;`);
+			b.append(`t_body += \`${status.output}\`;`);
 			status.output = "";
 		}
 	}

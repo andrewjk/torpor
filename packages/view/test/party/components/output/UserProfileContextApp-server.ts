@@ -23,11 +23,14 @@ export default function UserProfileContextApp(
 	$context.user = $user;
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
 
-	$output += UserProfileContext(undefined, $context)
-	$output += `<!]><!> `;
+	const t_comp_1 = UserProfileContext(undefined, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

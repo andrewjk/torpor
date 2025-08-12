@@ -111,8 +111,5 @@ export default function Counter() {
 		.features-card {
 			line-height: 1.5;
 		}
-
-		.demo-card {
-		}
 	}
 }

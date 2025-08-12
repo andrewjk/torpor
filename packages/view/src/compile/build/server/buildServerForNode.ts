@@ -20,7 +20,7 @@ export default function buildServerForNode(
 	status.output += HYDRATION_START_COMMENT;
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 
@@ -49,7 +49,7 @@ function buildServerForBranch(node: ControlNode, status: BuildServerStatus, b: B
 	}
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 

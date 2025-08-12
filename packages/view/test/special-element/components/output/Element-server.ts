@@ -10,8 +10,9 @@ export default function Element(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <${$props.tag}> Hello! </${$props.tag}> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <${$props.tag}> Hello! </${$props.tag}> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -11,8 +11,9 @@ export default function Style(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div style="${t_style({ color: $props.color })}"> Hello! </div> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <div style="${t_style({ color: $props.color })}"> Hello! </div> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -11,12 +11,13 @@ export default function ArrayUnkeyed(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <p>^</p> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <p>^</p> <![>`;
 	for (let item of $props.items) {
-		$output += `<!^> <p> ${t_fmt(item.text)} </p> `;
+		t_body += `<!^> <p> ${t_fmt(item.text)} </p> `;
 	}
-	$output += `<!]><!> <p>$</p> </section> `;
+	t_body += `<!]><!> <p>$</p> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

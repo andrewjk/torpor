@@ -51,7 +51,7 @@ export default async function runTest(
 		})),
 	);
 
-	return await load(router, ev, "%COMPONENT_HTML%");
+	return await load(router, ev, "%COMPONENT_BODY%");
 }
 
 // HACK: This is a copy of serverEntry
@@ -231,8 +231,8 @@ async function loadView(
 
 	let html;
 	try {
-		html = component($props, undefined, slots);
-		html = template.replace("%COMPONENT_HTML%", html);
+		let { body, head } = component($props, undefined, slots);
+		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD", head);
 	} catch (error) {
 		// TODO: Show a proper Error component
 		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";

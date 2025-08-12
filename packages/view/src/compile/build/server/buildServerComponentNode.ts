@@ -24,7 +24,7 @@ export default function buildServerComponentNode(
 	status.output += HYDRATION_START_COMMENT;
 
 	if (status.output) {
-		b.append(`$output += \`${status.output}\`;`);
+		b.append(`t_body += \`${status.output}\`;`);
 		status.output = "";
 	}
 
@@ -101,18 +101,18 @@ export default function buildServerComponentNode(
 					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
 				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
-				b.append(`let $output = "";`);
+				b.append(`let t_body = "";`);
 
 				for (let child of slot.children) {
 					buildServerNode(child, status, b);
 				}
 
 				if (status.output) {
-					b.append(`$output += \`${status.output}\`;`);
+					b.append(`t_body += \`${status.output}\`;`);
 					status.output = "";
 				}
 
-				b.append("return $output;");
+				b.append("return t_body;");
 				b.append(`}`);
 			}
 		}
@@ -132,7 +132,10 @@ export default function buildServerComponentNode(
 		renderParams += `, ${slotsName}`;
 	}
 	b.append("");
-	b.append(`$output += ${componentName}(${renderParams})`);
+	const componentResult = nextVarName("comp", status);
+	b.append(`const ${componentResult} = ${componentName}(${renderParams});`);
+	b.append(`t_body += ${componentResult}.body;`);
+	b.append(`t_head += ${componentResult}.head;`);
 
 	// End the control statement
 	status.output += HYDRATION_END_COMMENT;

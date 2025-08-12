@@ -29,7 +29,7 @@ IfNested;
 	// Strip TypeScript
 	code = transform(code, { transforms: ["typescript"] }).code;
 
-	const html = eval(code)(state);
+	const html = eval(code)(state).body;
 
 	const container = document.createElement("div");
 	container.innerHTML = html;

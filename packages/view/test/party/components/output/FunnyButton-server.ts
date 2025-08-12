@@ -9,8 +9,9 @@ export default function FunnyButton(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <button style="
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <button style="
 				background: rgba(0, 0, 0, 0.4);
 				color: #fff;
 				padding: 10px 20px;
@@ -22,11 +23,11 @@ export default function FunnyButton(
 				outline: 0;
 			"> <![>`;
 	if ($slots && $slots["_"]) {
-		$output += $slots["_"](undefined, $context);
+		t_body += $slots["_"](undefined, $context);
 	} else {
-		$output += ` <span>No content found</span> `;
+		t_body += ` <span>No content found</span> `;
 	}
-	$output += `<!]><!> </button> `;
+	t_body += `<!]><!> </button> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

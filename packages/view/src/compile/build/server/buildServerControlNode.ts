@@ -71,7 +71,7 @@ export default function buildServerControlNode(
 		}
 		case "@const": {
 			if (status.output) {
-				b.append(`$output += \`${status.output}\`;`);
+				b.append(`t_body += \`${status.output}\`;`);
 				status.output = "";
 			}
 			buildServerScriptNode(node, b);
@@ -80,7 +80,7 @@ export default function buildServerControlNode(
 		case "@function":
 		case "@async function": {
 			if (status.output) {
-				b.append(`$output += \`${status.output}\`;`);
+				b.append(`t_body += \`${status.output}\`;`);
 				status.output = "";
 			}
 			b.append("");

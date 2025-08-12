@@ -11,12 +11,13 @@ export default function For(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	for (let item of $props.items) {
-		$output += `<!^> <p>${t_fmt(item.text)}</p> `;
+		t_body += `<!^> <p>${t_fmt(item.text)}</p> `;
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

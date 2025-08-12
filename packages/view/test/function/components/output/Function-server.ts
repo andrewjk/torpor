@@ -13,15 +13,16 @@ export default function Function(
 	let $state = $watch({ counter: 0 })
 
 	/* User interface */
-	let $output = "";
-	$output += ` <button id="increment">Increment</button> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <button id="increment">Increment</button> `;
 
 	function increment() {
 		$state.counter += 1;
 		let x = "";
 	};
 
-	$output += ` <p> The count is ${t_fmt($state.counter)}. </p> `;
+	t_body += ` <p> The count is ${t_fmt($state.counter)}. </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

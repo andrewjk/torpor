@@ -9,20 +9,21 @@ export default function Article(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <h2> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <h2> <![>`;
 	if ($slots && $slots["header"]) {
-		$output += $slots["header"](undefined, $context);
+		t_body += $slots["header"](undefined, $context);
 	}
-	$output += `<!]><!> </h2> <![>`;
+	t_body += `<!]><!> </h2> <![>`;
 	if ($slots && $slots["_"]) {
-		$output += $slots["_"](undefined, $context);
+		t_body += $slots["_"](undefined, $context);
 	}
-	$output += `<!]><!> <![>`;
+	t_body += `<!]><!> <![>`;
 	if ($slots && $slots["footer"]) {
-		$output += $slots["footer"](undefined, $context);
+		t_body += $slots["footer"](undefined, $context);
 	}
-	$output += `<!]><!> </section> `;
+	t_body += `<!]><!> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

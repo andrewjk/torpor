@@ -13,12 +13,13 @@ export default function ForEscape(
 	let things = ["a", "b", "c", "d", "e"]
 
 	/* User interface */
-	let $output = "";
-	$output += ` <section> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <section> <![>`;
 	for (let i = 0; i < 5; i++) {
-		$output += `<!^> <p>${t_fmt(i)}</p> <div data-testid="input1-${t_attr(i)}" ${i ? `name="${t_attr(i)}"` : ''}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${things[i] ? `name="${t_attr(things[i])}"` : ''}></div> <input value="${t_attr(i) || ""}" name="${t_attr(i)}"> `;
+		t_body += `<!^> <p>${t_fmt(i)}</p> <div data-testid="input1-${t_attr(i)}" ${i ? `name="${t_attr(i)}"` : ''}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${things[i] ? `name="${t_attr(things[i])}"` : ''}></div> <input value="${t_attr(i) || ""}" name="${t_attr(i)}"> `;
 	}
-	$output += `<!]><!> </section> `;
+	t_body += `<!]><!> </section> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

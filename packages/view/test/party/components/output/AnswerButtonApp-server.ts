@@ -25,14 +25,17 @@ export default function AnswerButtonApp(
 	}
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p>Are you happy?</p> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p>Are you happy?</p> <![>`;
 	const t_props_1: any = {};
 	t_props_1["onYes"] = onAnswerYes;
 	t_props_1["onNo"] = onAnswerNo;
 
-	$output += AnswerButton(t_props_1, $context)
-	$output += `<!]><!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> `;
+	const t_comp_1 = AnswerButton(t_props_1, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

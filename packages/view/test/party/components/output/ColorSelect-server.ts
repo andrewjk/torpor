@@ -23,12 +23,13 @@ export default function ColorSelect(
 	];
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
 	for (let color of colors) {
-		$output += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;
+		t_body += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;
 	}
-	$output += `<!]><!> </select> `;
+	t_body += `<!]><!> </select> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

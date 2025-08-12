@@ -9,14 +9,15 @@ export default function Header(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <h2> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <h2> <![>`;
 	if ($slots && $slots["_"]) {
-		$output += $slots["_"](undefined, $context);
+		t_body += $slots["_"](undefined, $context);
 	} else {
-		$output += ` Default header... `;
+		t_body += ` Default header... `;
 	}
-	$output += `<!]><!> </h2> `;
+	t_body += `<!]><!> </h2> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

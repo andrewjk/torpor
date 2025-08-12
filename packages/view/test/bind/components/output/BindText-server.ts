@@ -14,8 +14,9 @@ export default function BindText(
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
-	let $output = "";
-	$output += ` <input value="${t_attr($state.name) || ""}"> <select value="${t_attr($state.selected) || ""}"> <option value="0">First</option> <option value="1">Second</option> <option value="2">Third</option> </select> <p>Hello, ${t_fmt($state.name)}</p> <p>You have selected, ${t_fmt($state.selected)}</p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <input value="${t_attr($state.name) || ""}"> <select value="${t_attr($state.selected) || ""}"> <option value="0">First</option> <option value="1">Second</option> <option value="2">Third</option> </select> <p>Hello, ${t_fmt($state.name)}</p> <p>You have selected, ${t_fmt($state.selected)}</p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

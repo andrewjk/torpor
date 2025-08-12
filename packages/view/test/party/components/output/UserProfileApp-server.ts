@@ -12,16 +12,19 @@ export default function UserProfileApp(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["name"] = "John";
 	t_props_1["age"] = 20;
 	t_props_1["favouriteColors"] = ["green", "blue", "red"];
 	t_props_1["isAvailable"] = true;
 
-	$output += UserProfile(t_props_1, $context)
-	$output += `<!]><!> `;
+	const t_comp_1 = UserProfile(t_props_1, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

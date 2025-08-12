@@ -24,8 +24,9 @@ export default function Time(
 	});
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p>Current time: ${t_fmt($state.time)}</p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p>Current time: ${t_fmt($state.time)}</p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

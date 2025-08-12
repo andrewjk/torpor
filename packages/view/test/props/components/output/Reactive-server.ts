@@ -12,15 +12,18 @@ export default function Reactive(
 	let $state = $watch({ text: "before" })
 
 	/* User interface */
-	let $output = "";
-	$output += ` <button>Update text</button> <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <button>Update text</button> <![>`;
 	const t_props_1: any = {};
 	t_props_1["text"] = $state.text;
 
-	$output += Child(t_props_1, $context)
-	$output += `<!]><!> `;
+	const t_comp_1 = Child(t_props_1, $context);
+	t_body += t_comp_1.body;
+	t_head += t_comp_1.head;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }
 
 function Child(
@@ -33,8 +36,9 @@ function Child(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <p> ${t_fmt($props.text)} </p> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <p> ${t_fmt($props.text)} </p> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

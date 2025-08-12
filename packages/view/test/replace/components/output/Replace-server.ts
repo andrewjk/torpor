@@ -12,11 +12,12 @@ export default function Replace(
 	let counter = 0;
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	$props.name;
-	$output += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
-	$output += `<!]><!> `;
+	t_body += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

@@ -10,22 +10,23 @@ export default function IfNested(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <![>`;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <![>`;
 	if ($props.counter > 5) {
-		$output += `<!^> <![>`;
+		t_body += `<!^> <![>`;
 		if ($props.counter > 10) {
-			$output += `<!^> <p> It's both true! </p> `;
+			t_body += `<!^> <p> It's both true! </p> `;
 		}
 		else {
-			$output += `<!^> <p> The second is not true! </p> `;
+			t_body += `<!^> <p> The second is not true! </p> `;
 		}
-		$output += `<!]><!> `;
+		t_body += `<!]><!> `;
 	}
 	else {
-		$output += `<!^> <p> The first is not true! </p> `;
+		t_body += `<!^> <p> The first is not true! </p> `;
 	}
-	$output += `<!]><!> `;
+	t_body += `<!]><!> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

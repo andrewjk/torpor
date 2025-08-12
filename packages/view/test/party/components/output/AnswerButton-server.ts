@@ -10,8 +10,9 @@ export default function AnswerButton(
 	$props ??= {};
 
 	/* User interface */
-	let $output = "";
-	$output += ` <button>YES</button> <button>NO</button> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <button>YES</button> <button>NO</button> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }

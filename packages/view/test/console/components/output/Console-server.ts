@@ -10,8 +10,9 @@ export default function Console(
 ) {
 
 	/* User interface */
-	let $output = "";
-	$output += ` <div>  </div> `;
+	let t_body = "";
+	let t_head = "";
+	t_body += ` <div>  </div> `;
 
-	return $output;
+	return { body: t_body, head: t_head };
 }
