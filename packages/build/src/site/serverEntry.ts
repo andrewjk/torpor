@@ -289,11 +289,15 @@ async function runAction(
 				}
 			}
 
-			const result = await action(serverParams); // <--
+			const result = await action(serverParams);
 
-			// If there was no response returned from the action (such as errors
-			// or a redirect), reload the page by redirecting
-			return result || seeOther(url.pathname);
+			// Return the response if it was not ok (i.e. errors or a redirect)
+			// Otherwise, reload the page by redirecting
+			if (result && !result.ok) {
+				return result;
+			} else {
+				return seeOther(url.pathname);
+			}
 		}
 	}
 
