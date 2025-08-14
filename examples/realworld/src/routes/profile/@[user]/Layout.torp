@@ -48,7 +48,7 @@ export default function Layout() {
 								>
 									<input hidden type="checkbox" name="following" checked={$props.data.profile.following} />
 									<button
-										:class={{
+										class={{
 											"btn btn-sm action-btn": true,
 											"btn-secondary": $props.data.profile.following,
 											"btn-outline-secondary": !$props.data.profile.following
@@ -75,7 +75,7 @@ export default function Layout() {
 								<li class="nav-item">
 									<a
 										href="/profile/@{$props.data.profile.username}"
-										:class={{
+										class={{
 											"nav-link": true,
 											active: !$state.isFavorites
 										}}
@@ -87,7 +87,7 @@ export default function Layout() {
 								<li class="nav-item">
 									<a
 										href="/profile/@{$props.data.profile.username}/favorites"
-										:class={{
+										class={{
 											"nav-link": true,
 											active: $state.isFavorites
 										}}

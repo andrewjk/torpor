@@ -96,14 +96,17 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				let valueOrDefault = `${value} || ${defaultValue}`;
 				const propName = name.substring(1);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
-			} else if (name === ":class") {
+			} else if (name === "class" || name === ":class") {
+				// NOTE: :class is obsolete, but let's keep it for a version or two
 				status.imports.add("t_class");
+				let params = [value];
 				if (node.scopeStyles) {
-					value += `, "torp-${status.styleHash}"`;
+					params.push(`"torp-${status.styleHash}"`);
 					needsClass = false;
 				}
-				attributes.push(`class="\${t_class(${value})}"`);
-			} else if (name === ":style") {
+				attributes.push(`class="\${t_class(${params.join(", ")})}"`);
+			} else if (name === "style" || name === ":style") {
+				// NOTE: :style is obsolete, but let's keep it for a version or two
 				status.imports.add("t_style");
 				attributes.push(`style="\${t_style(${value})}"`);
 			} else {

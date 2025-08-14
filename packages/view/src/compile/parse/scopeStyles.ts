@@ -24,6 +24,7 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 		if (!scopeStyles) {
 			for (let a of node.attributes) {
 				if (a.name === "class" || a.name === ":class") {
+					// NOTE: :class is obsolete, but let's keep it for a version or two
 					scopeStyles = true;
 				} else if (a.name === "id" && a.value) {
 					scopeStyles = selectors.includes(`#${trimQuotes(a.value)}`);

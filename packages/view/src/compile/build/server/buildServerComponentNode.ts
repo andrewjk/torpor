@@ -42,16 +42,23 @@ export default function buildServerComponentNode(
 				name = name.substring(1, name.length - 1);
 				const propName = name.split(".").at(-1);
 				b.append(`${propsName}["${propName}"] = ${name};`);
-			} else if (name === ":class" && value != null && isFullyReactive(value)) {
+			} else if ((name === "class" || name === ":class") && value != null) {
+				// NOTE: :class is obsolete, but let's keep it for a version or two
 				status.imports.add("t_class");
-				value = value.substring(1, value.length - 1);
-				if (node.scopeStyles) {
-					value += `, "torp-${status.styleHash}"`;
+				if (isFullyReactive(value)) {
+					value = value.substring(1, value.length - 1);
 				}
-				b.append(`${propsName}["class"] = t_class(${value});`);
-			} else if (name === ":style" && value != null && isFullyReactive(value)) {
+				const params = [value];
+				if (node.scopeStyles) {
+					params.push(`"torp-${status.styleHash}"`);
+				}
+				b.append(`${propsName}["class"] = t_class(${params.join(", ")});`);
+			} else if ((name === "style" || name === ":style") && value != null) {
+				// NOTE: :style is obsolete, but let's keep it for a version or two
 				status.imports.add("t_style");
-				value = value.substring(1, value.length - 1);
+				if (isFullyReactive(value)) {
+					value = value.substring(1, value.length - 1);
+				}
 				b.append(`${propsName}["style"] = t_style(${value});`);
 			} else if (value != null) {
 				let fullyReactive = isFullyReactive(value);
@@ -60,11 +67,6 @@ export default function buildServerComponentNode(
 					value = value.substring(1, value.length - 1);
 				} else if (partlyReactive) {
 					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
-				}
-				if (name === "class") {
-					// TODO: How to handle dynamic classes etc
-					// Probably just compile down to a string?
-					b.append(`"${trimQuotes(value)} torp-${status.styleHash}"`);
 				}
 				b.append(`${propsName}["${name}"] = ${value};`);
 			} else {

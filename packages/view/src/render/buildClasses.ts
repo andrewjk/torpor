@@ -1,10 +1,17 @@
-export default function getClasses(value: unknown, styleHash?: string): string {
-	let classes: string[] = [];
-	gatherNames("", value, classes);
-	if (styleHash) {
-		classes.push(styleHash);
+export default function buildClasses(value: unknown, styleHash?: string): string {
+	if (typeof value === "string") {
+		if (styleHash) {
+			value += " " + styleHash;
+		}
+		return value;
+	} else {
+		let classes: string[] = [];
+		gatherNames("", value, classes);
+		if (styleHash) {
+			classes.push(styleHash);
+		}
+		return classes.join(" ");
 	}
-	return classes.join(" ");
 }
 
 function gatherNames(name: unknown, value: unknown, classes: string[]) {

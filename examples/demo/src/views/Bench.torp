@@ -152,7 +152,7 @@ export default function Index() {
                 <tbody>
                     @for (let row of $state.data) {
                         @key = row.id
-                        <tr :class={{ danger: $state.selected === row.id }}>
+                        <tr class={{ danger: $state.selected === row.id }}>
                             <td class="col-md-1">{row.id}</td>
                             <td class="col-md-4">
                                 <a onclick={() => $state.selected = row.id}>

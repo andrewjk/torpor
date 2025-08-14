@@ -5,7 +5,7 @@ import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
-import t_style from "../../../../src/render/getStyles";
+import t_style from "../../../../src/render/buildStyles";
 
 export default function Style(
 	$parent: ParentNode,

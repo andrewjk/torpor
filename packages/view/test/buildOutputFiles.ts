@@ -125,9 +125,9 @@ const importsMap: Record<string, string> = {
 	'import { t_attribute } from "@torpor/view";':
 		'import t_attribute from "../../../../src/render/setAttribute";',
 	'import { t_class } from "@torpor/view";':
-		'import t_class from "../../../../src/render/getClasses";',
+		'import t_class from "../../../../src/render/buildClasses";',
 	'import { t_style } from "@torpor/view";':
-		'import t_style from "../../../../src/render/getStyles";',
+		'import t_style from "../../../../src/render/buildStyles";',
 	'import { t_dynamic } from "@torpor/view";':
 		'import t_dynamic from "../../../../src/render/setDynamicElement";',
 	'import { t_fmt } from "@torpor/view";': 'import t_fmt from "../../../../src/render/formatText";',
@@ -168,9 +168,9 @@ const importsMap: Record<string, string> = {
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_class } from "@torpor/view/ssr";':
-		'import t_class from "../../../../src/render/getClasses";',
+		'import t_class from "../../../../src/render/buildClasses";',
 	'import { t_style } from "@torpor/view/ssr";':
-		'import t_style from "../../../../src/render/getStyles";',
+		'import t_style from "../../../../src/render/buildStyles";',
 	'import { t_print } from "@torpor/view";':
 		'import t_print from "../../../../src/debug/printNode";',
 	'import { type ServerSlotRender } from "@torpor/view/ssr";':

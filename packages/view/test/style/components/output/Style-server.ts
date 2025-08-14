@@ -1,5 +1,5 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
-import t_style from "../../../../src/render/getStyles";
+import t_style from "../../../../src/render/buildStyles";
 
 export default function Style(
 	$props: Record<PropertyKey, any>,

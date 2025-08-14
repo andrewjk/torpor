@@ -1,6 +1,5 @@
 import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
-import t_attr from "../../../../src/render/formatAttributeText";
-import t_class from "../../../../src/render/getClasses";
+import t_class from "../../../../src/render/buildClasses";
 
 export default function Class(
 	$props: Record<PropertyKey, any>,
@@ -38,7 +37,7 @@ function Child(
 	/* User interface */
 	let t_body = "";
 	let t_head = "";
-	t_body += ` <div ${$props.class ? `class="${t_attr($props.class)}"` : ''}> Child class </div> `;
+	t_body += ` <div class="${t_class($props.class)}"> Child class </div> `;
 
 	return { body: t_body, head: t_head };
 }

@@ -3,7 +3,7 @@ import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
-import t_class from "../../../../src/render/getClasses";
+import t_class from "../../../../src/render/buildClasses";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
@@ -81,8 +81,8 @@ function Child(
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
 	// @ts-ignore
 	const t_text_1 = t_next(t_div_1, true);
-	$run(function setClassName() {
-		t_div_1.className = $props.class;
+	$run(function setClasses() {
+		t_div_1.className = t_class($props.class);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);

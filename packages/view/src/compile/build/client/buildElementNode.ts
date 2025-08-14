@@ -217,17 +217,14 @@ function buildElementAttributes(
 				buildEventAttribute(varName, name, value, status, b);
 			} else if (name.startsWith(":transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
-			} else if (name === "class") {
-				if (node.scopeStyles) {
-					value += `+ "torp-${status.styleHash}"`;
-				}
-				buildRun("setClassName", `${varName}.className = ${value};`, status, b);
-			} else if (name === ":class") {
+			} else if (name === "class" || name === ":class") {
+				// NOTE: :class is obsolete, but let's keep it for a version or two
 				status.imports.add("t_class");
+				const params = [value];
 				if (node.scopeStyles) {
-					value += `, "torp-${status.styleHash}"`;
+					params.push(`"torp-${status.styleHash}"`);
 				}
-				buildRun("setClasses", `${varName}.className = t_class(${value});`, status, b);
+				buildRun("setClasses", `${varName}.className = t_class(${params.join(", ")});`, status, b);
 			} else if (name === ":style") {
 				status.imports.add("t_style");
 				buildRun("setStyles", `${varName}.setAttribute("style", t_style(${value}));`, status, b);

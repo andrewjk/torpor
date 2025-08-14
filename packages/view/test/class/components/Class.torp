@@ -8,27 +8,27 @@ export default function Class() {
 			From string
 		</div>
 
-		<a :class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
+		<a class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
 			From state
 		</a>
 
-		<div :class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
+		<div class={{ hello: true, red: $props.red, green: $props.green, blue: $props.blue }}>
 			From state with scope
 		</div>
 
-		<div :class={{ foo: true, bar: false, baz: 5, qux: null }}>
+		<div class={{ foo: true, bar: false, baz: 5, qux: null }}>
 			Class object
 		</div>
 
-		<div :class={[ "foo", false, true && "baz", undefined ]}>
+		<div class={[ "foo", false, true && "baz", undefined ]}>
 			Class array
 		</div>
 
-		<div :class={[ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ]}>
+		<div class={[ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ]}>
 			Class nested
 		</div>
 
-		<Child :class={{ "child-class": true }} />
+		<Child class={{ "child-class": true }} />
 	}
 
 	@style {

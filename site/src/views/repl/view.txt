@@ -4,8 +4,8 @@ function formatText(value) {
   return value ?? "";
 }
 
-// src/render/getClasses.ts
-function getClasses(value, styleHash) {
+// src/render/buildClasses.ts
+function buildClasses(value, styleHash) {
   let classes = [];
   gatherNames("", value, classes);
   if (styleHash) {
@@ -29,8 +29,8 @@ function gatherNames(name, value, classes) {
   }
 }
 
-// src/render/getStyles.ts
-function getStyles(value) {
+// src/render/buildStyles.ts
+function buildStyles(value) {
   let styles = [];
   for (let [n, v] of Object.entries(value)) {
     styles.push(`${n}: ${v}`);
@@ -827,7 +827,7 @@ let t_animate = addAnimation;
 let t_apply_props = applyProps;
 let t_attribute = setAttribute;
 let t_child = nodeChild;
-let t_class = getClasses;
+let t_class = buildClasses;
 let t_dynamic = setDynamicElement;
 let t_event = addEvent;
 let t_fmt = formatText;
@@ -842,5 +842,5 @@ let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
 let t_skip = nodeSkip;
-let t_style = getStyles;
+let t_style = buildStyles;
 

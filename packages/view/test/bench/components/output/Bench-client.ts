@@ -1,21 +1,21 @@
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
-import { type ListItem } from "../../../../src/types/ListItem";
-import { type SlotRender } from "../../../../src/types/SlotRender";
-import t_add_fragment from "../../../../src/render/addFragment";
-import t_anchor from "../../../../src/render/nodeAnchor";
-import t_child from "../../../../src/render/nodeChild";
-import t_class from "../../../../src/render/getClasses";
 import t_event from "../../../../src/render/addEvent";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_class from "../../../../src/render/buildClasses";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_list_item from "../../../../src/render/newListItem";
+import t_range from "../../../../src/render/newRange";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
 import t_next from "../../../../src/render/nodeNext";
+import t_root from "../../../../src/render/nodeRoot";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
-import t_range from "../../../../src/render/newRange";
-import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
+import { type ListItem } from "../../../../src/types/ListItem";
+import { type SlotRender } from "../../../../src/types/SlotRender";
 
 export default function Bench(
 	$parent: ParentNode,
@@ -25,9 +25,8 @@ export default function Bench(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ) {
-
 	let rowId = 1;
 	let $state = $watch({
 		data: [],
@@ -61,7 +60,19 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const colours = [
+		"red",
+		"yellow",
+		"blue",
+		"green",
+		"pink",
+		"brown",
+		"purple",
+		"brown",
+		"white",
+		"black",
+		"orange",
+	];
 	const nouns = [
 		"table",
 		"chair",
@@ -138,17 +149,204 @@ export default function Bench(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `);
+	const t_fragment_0 = t_fragment(
+		$parent.ownerDocument!,
+		t_fragments,
+		0,
+		` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `,
+	);
 	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))))) as HTMLElement;
-	const t_button_2 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)))) as HTMLElement;
-	const t_button_3 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)))) as HTMLElement;
-	const t_button_4 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)))) as HTMLElement;
-	const t_button_5 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)), true)))) as HTMLElement;
-	const t_button_6 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)), true)), true)))) as HTMLElement;
-	const t_for_parent_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)))) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true))))))) as HTMLElement;
+	const t_button_1 = t_next(
+		t_child(
+			t_next(
+				t_child(
+					t_next(
+						t_child(
+							t_next(
+								t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true),
+							),
+						),
+					),
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_button_2 = t_next(
+		t_child(
+			t_next(
+				t_next(
+					t_next(
+						t_child(
+							t_next(
+								t_child(
+									t_next(
+										t_next(
+											t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
+											true,
+										),
+									),
+								),
+							),
+						),
+					),
+					true,
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_button_3 = t_next(
+		t_child(
+			t_next(
+				t_next(
+					t_next(
+						t_next(
+							t_next(
+								t_child(
+									t_next(
+										t_child(
+											t_next(
+												t_next(
+													t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
+													true,
+												),
+											),
+										),
+									),
+								),
+							),
+							true,
+						),
+					),
+					true,
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_button_4 = t_next(
+		t_child(
+			t_next(
+				t_next(
+					t_next(
+						t_next(
+							t_next(
+								t_next(
+									t_next(
+										t_child(
+											t_next(
+												t_child(
+													t_next(
+														t_next(
+															t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
+															true,
+														),
+													),
+												),
+											),
+										),
+									),
+									true,
+								),
+							),
+							true,
+						),
+					),
+					true,
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_button_5 = t_next(
+		t_child(
+			t_next(
+				t_next(
+					t_next(
+						t_next(
+							t_next(
+								t_next(
+									t_next(
+										t_next(
+											t_next(
+												t_child(
+													t_next(
+														t_child(
+															t_next(
+																t_next(
+																	t_next(
+																		t_child(t_next(t_child(t_next(t_child(t_next(t_root_0)))))),
+																	),
+																	true,
+																),
+															),
+														),
+													),
+												),
+											),
+											true,
+										),
+									),
+									true,
+								),
+							),
+							true,
+						),
+					),
+					true,
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_button_6 = t_next(
+		t_child(
+			t_next(
+				t_next(
+					t_next(
+						t_next(
+							t_next(
+								t_next(
+									t_next(
+										t_next(
+											t_next(
+												t_next(
+													t_next(
+														t_child(
+															t_next(
+																t_child(
+																	t_next(
+																		t_next(
+																			t_next(
+																				t_child(t_next(t_child(t_next(t_child(t_next(t_root_0)))))),
+																			),
+																			true,
+																		),
+																	),
+																),
+															),
+														),
+													),
+													true,
+												),
+											),
+											true,
+										),
+									),
+									true,
+								),
+							),
+							true,
+						),
+					),
+					true,
+				),
+			),
+		),
+	) as HTMLElement;
+	const t_for_parent_1 = t_next(
+		t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true))),
+	) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(
+		t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)))))),
+	) as HTMLElement;
 
 	/* @for */
 	let t_for_range_1 = t_range();
@@ -169,14 +367,21 @@ export default function Bench(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `);
+			const t_fragment_1 = t_fragment(
+				$parent.ownerDocument!,
+				t_fragments,
+				1,
+				` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `,
+			);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_tr_1 = t_next(t_root_1) as HTMLElement;
 			const t_text_1 = t_child(t_next(t_child(t_tr_1)));
 			const t_a_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_tr_1)), true)))) as HTMLElement;
 			const t_text_2 = t_child(t_a_1);
-			const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true)))) as HTMLElement;
+			const t_a_2 = t_next(
+				t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true))),
+			) as HTMLElement;
 			// @ts-ignore
 			const t_text_3 = t_next(t_tr_1, true);
 			$run(function setClasses() {
@@ -185,7 +390,7 @@ export default function Bench(
 			$run(function setTextContent() {
 				t_text_1.textContent = t_fmt(t_item.data.row.id);
 			});
-			t_event(t_a_1, "click", () => $state.selected = t_item.data.row.id);
+			t_event(t_a_1, "click", () => ($state.selected = t_item.data.row.id));
 			$run(function setTextContent() {
 				t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;
 			});
@@ -193,7 +398,7 @@ export default function Bench(
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_3);
 			t_next(t_text_3);
 			t_pop_range(t_old_range_1);
-		}
+		},
 	);
 
 	// @ts-ignore
@@ -206,5 +411,4 @@ export default function Bench(
 	t_event(t_button_6, "click", swapRows);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
-
 }
