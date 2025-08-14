@@ -13,7 +13,9 @@ type PageEndPoint = {
 	/**
 	 * Loads data for the page.
 	 */
-	load?: (event: PageLoadEvent) => Response | Promise<Response | undefined> | Promise<void> | void;
+	load?: (
+		event: PageLoadEvent,
+	) => Response | undefined | void | Promise<Response | undefined | void>;
 	/**
 	 * The component that is displayed for the page.
 	 */

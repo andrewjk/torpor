@@ -2,6 +2,6 @@ import type ServerLoadEvent from "./ServerLoadEvent";
 
 type PageServerLoad = (
 	event: ServerLoadEvent,
-) => Response | Promise<Response | undefined> | Promise<void> | void;
+) => Response | undefined | void | Promise<Response | undefined | void>;
 
 export default PageServerLoad;

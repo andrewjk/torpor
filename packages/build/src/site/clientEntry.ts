@@ -309,7 +309,7 @@ async function loadClientAndServerData(
 	params: Record<string, string>,
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
-): Promise<Response | void> {
+): Promise<Response | undefined | void> {
 	if (clientEndPoint?.load) {
 		if (prefetchedData[location]) {
 			Object.assign(data, prefetchedData[location]);

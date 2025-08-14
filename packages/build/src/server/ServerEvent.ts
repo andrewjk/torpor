@@ -3,7 +3,7 @@ import HeaderHelper from "./HeaderHelper";
 
 export default class ServerEvent {
 	request: Request;
-	response?: Response;
+	response: Response | undefined | void;
 	// TODO: Should we cast types??
 	params?: Record<string, string>;
 
