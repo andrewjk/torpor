@@ -1,5 +1,17 @@
 # @torpor/view
 
+## 0.2.0
+
+### Minor Changes
+
+- b716d5c: Feat: inline styles during SSR
+
+### Patch Changes
+
+- c38f914: Fix: moving a range that was in a fragment
+- 995d950: Fix: merge :class and class (making :class obsolete)
+- 014bda0: Fix: skip hydration start when getting the root
+
 ## 0.1.11
 
 ### Patch Changes

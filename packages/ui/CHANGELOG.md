@@ -1,5 +1,17 @@
 # @torpor/ui
 
+## 0.1.7
+
+### Patch Changes
+
+- 995d950: Fix: merge :class and class (making :class obsolete)
+- Updated dependencies [c38f914]
+- Updated dependencies [995d950]
+- Updated dependencies [b716d5c]
+- Updated dependencies [014bda0]
+  - @torpor/view@0.2.0
+  - @torpor/unplugin@0.1.17
+
 ## 0.1.6
 
 ### Patch Changes

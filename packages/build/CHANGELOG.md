@@ -1,5 +1,22 @@
 # @torpor/build
 
+## 0.2.0
+
+### Minor Changes
+
+- b716d5c: Feat: inline styles during SSR
+
+### Patch Changes
+
+- a4f2573: Fix: reload the page on successful form submit
+- 67e6ca6: Fix: don't intercept external links
+- Updated dependencies [c38f914]
+- Updated dependencies [995d950]
+- Updated dependencies [b716d5c]
+- Updated dependencies [014bda0]
+  - @torpor/view@0.2.0
+  - @torpor/unplugin@0.1.17
+
 ## 0.1.34
 
 ### Patch Changes
