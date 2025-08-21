@@ -399,9 +399,6 @@ importers:
       '@torpor/adapter-cloudflare':
         specifier: workspace:^
         version: link:../packages/adapters/adapter-cloudflare
-      '@torpor/adapter-node':
-        specifier: workspace:^
-        version: link:../packages/adapters/adapter-node
       '@torpor/build':
         specifier: workspace:^
         version: link:../packages/build

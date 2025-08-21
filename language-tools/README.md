@@ -1,27 +1,40 @@
-# LSP Example for Embedded Language using Language Service
+# Torpor
 
-Heavily documented sample code for https://code.visualstudio.com/api/language-extensions/embedded-languages#language-services
+This is the Visual Studio Code language server for [Torpor](https://torpor.dev) ([Github](https://github.com/andrewjk/torpor)).
 
-## Functionality
+Torpor is yet another JavaScript framework, designed for simplicity and completeness.
 
-This extension contributes a new language, `torpor`. The new language is for illustration purpose and has basic syntax highlighting.
+The language server provides syntax highlighting for `.torp` files, which contain components, and look something like this:
 
-This Language Server works for `torpor` file. torpor is like HTML file but has file extension `.torp`. You can create a `test.torp` file to play with below functionalities:
+```
+/**
+ * A simple counter component.
+ */
+export default function Counter() {
+    // Use the $watch function to declare reactive state
+    const $state = $watch({
+        count: 0,
+    })
 
-- Completions for HTML tags
-- Completions for CSS in `<style>` tag
-- Diagnostics for CSS
+    // HTML markup goes in a @render section
+    @render {
+        <button onclick={() => $state.count++}>
+            Increment
+        </button>
 
-## Running the Sample
+        <p class="demo">
+            The count is {$state.count}.
+        </p>
+    }
 
-- Run `npm install` in this folder. This installs all necessary npm modules in both the client and server folder
-- Open VS Code on this folder.
-- Press Ctrl+Shift+B to compile the client and server.
-- Switch to the Debug viewlet.
-- Select `Launch Client` from the drop down.
-- Run the launch config.
-- If you want to debug the server as well use the launch configuration `Attach to Server`
-- In the [Extension Development Host] instance of VSCode, open a HTML document
-  - Type `<d|` to try HTML completion
-  - Type `<style>.foo { c| }</style>` to try CSS completion
-  - Have `<style>.foo { }</style>` to see CSS Diagnostics
+    // CSS styles go in a @style section
+    @style {
+        .demo {
+            border: 1px dashed gray;
+            border-radius: 5px;
+            padding: 20px;
+        }
+    }
+}
+
+```

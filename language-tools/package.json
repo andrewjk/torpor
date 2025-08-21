@@ -1,14 +1,15 @@
 {
-	"name": "lsp-embedded-language-service-sample",
-	"description": "A language server example using language services to support embedded languages",
-	"author": "Microsoft Corporation",
-	"license": "MIT",
-	"version": "1.0.0",
+	"name": "torpor",
+	"description": "The Torpor language server.",
+	"author": "",
+	"icon": "logo.png",
+	"license": "ISC",
+	"version": "0.0.1",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-extension-samples"
+		"url": "https://github.com/andrewjk/torpor"
 	},
-	"publisher": "vscode-samples",
+	"publisher": "torpor",
 	"categories": [],
 	"keywords": [],
 	"engines": {
@@ -42,18 +43,19 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "cd client && pnpm install && cd .. && npm run compile",
+		"vscode:prepublish": "cd client && npm install && cd .. && npm run compile",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-		"postinstall": "cd client && pnpm install && cd ../server && pnpm install && cd .."
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+		"publish": "vsce publish"
 	},
 	"devDependencies": {
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^24.0.10",
-		"@typescript-eslint/eslint-plugin": "^8.35.1",
-		"@typescript-eslint/parser": "^8.35.1",
-		"eslint": "^9.30.1",
-		"typescript": "^5.8.3"
+		"@types/node": "^22.10.1",
+		"@typescript-eslint/eslint-plugin": "^8.18.0",
+		"@typescript-eslint/parser": "^8.18.0",
+		"eslint": "^9.16.0",
+		"typescript": "^5.7.2"
 	}
 }
