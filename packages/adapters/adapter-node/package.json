@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/adapter-node",
-	"version": "0.0.29",
+	"version": "0.0.30",
 	"description": "A @torpor/build adapter for running on Node",
 	"type": "module",
 	"main": "dist/index.cjs",

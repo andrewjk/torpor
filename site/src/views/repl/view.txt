@@ -1,17 +1,19 @@
 
-// src/render/formatText.ts
-function formatText(value) {
-  return value ?? "";
-}
-
 // src/render/buildClasses.ts
 function buildClasses(value, styleHash) {
-  let classes = [];
-  gatherNames("", value, classes);
-  if (styleHash) {
-    classes.push(styleHash);
+  if (typeof value === "string") {
+    if (styleHash) {
+      value += " " + styleHash;
+    }
+    return value;
+  } else {
+    let classes = [];
+    gatherNames("", value, classes);
+    if (styleHash) {
+      classes.push(styleHash);
+    }
+    return classes.join(" ");
   }
-  return classes.join(" ");
 }
 function gatherNames(name, value, classes) {
   if (value) {
@@ -31,11 +33,28 @@ function gatherNames(name, value, classes) {
 
 // src/render/buildStyles.ts
 function buildStyles(value) {
-  let styles = [];
-  for (let [n, v] of Object.entries(value)) {
-    styles.push(`${n}: ${v}`);
+  if (typeof value === "string") {
+    return value;
+  } else {
+    let styles = [];
+    if (value) {
+      if (Array.isArray(value)) {
+        for (let v of value) {
+          styles.push(v);
+        }
+      } else if (typeof value === "object") {
+        for (let [n, v] of Object.entries(value)) {
+          styles.push(`${n}: ${v}`);
+        }
+      }
+    }
+    return styles.join("; ");
   }
-  return styles.join("; ");
+}
+
+// src/render/formatText.ts
+function formatText(value) {
+  return value ?? "";
 }
 
 

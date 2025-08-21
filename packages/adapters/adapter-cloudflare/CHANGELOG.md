@@ -1,5 +1,18 @@
 # @torpor/adapter-cloudflare
 
+## 0.1.0
+
+### Minor Changes
+
+- b716d5c: Feat: inline styles during SSR
+
+### Patch Changes
+
+- Updated dependencies [a4f2573]
+- Updated dependencies [67e6ca6]
+- Updated dependencies [b716d5c]
+  - @torpor/build@0.2.0
+
 ## 0.0.33
 
 ### Patch Changes
