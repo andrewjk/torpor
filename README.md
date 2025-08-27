@@ -17,9 +17,12 @@ Yet another JavaScript framework, designed for simplicity and completeness.
 
 ### Not Yet
 
-- [torpor/language-tools](./language-tools) -- Language server for IDEs
 - [torpor/dev-tools](./dev-tools) -- Browser development tools
 - Performance
+
+## Language Tools
+
+You can install the Torpor language server for VS Code by searching in the extensions sidebar or from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Torpor.torpor). The language server currently only provides syntax highlighting for `.torp` files.
 
 ## A Simple Component
 
