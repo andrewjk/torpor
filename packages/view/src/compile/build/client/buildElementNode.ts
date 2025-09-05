@@ -4,8 +4,6 @@ import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
-import isFullyReactive from "../utils/isFullyReactive";
-import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
@@ -136,7 +134,7 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 		$run(function runHead() {
 			const t_headel = document.createElement("${node.tagName}");
 			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
-	for (let { name, value } of node.attributes) {
+	for (let { name, value, reactive } of node.attributes) {
 		if (name.startsWith("{") && name.endsWith("}")) {
 			// It's a shortcut attribute
 			// It could be e.g. {width} or it could be {$state.width}, but
@@ -144,14 +142,7 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			name = name.substring(1, name.length - 1);
 			const propName = name.split(".").at(-1);
 			buildRun("setAttribute", `t_headel.setAttribute("${propName}", ${name});`, status, b);
-		} else if (value != null && isReactive(value)) {
-			// It's a reactive attribute
-			if (isFullyReactive(value)) {
-				value = value.substring(1, value.length - 1);
-			} else {
-				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
-			}
-
+		} else if (value != null && reactive) {
 			status.imports.add("t_attribute");
 			buildRun("setAttribute", `t_attribute(t_headel, "${name}", ${value});`, status, b);
 		} else if (value != null) {
@@ -176,34 +167,19 @@ function buildElementAttributes(
 	// e.g. if you have a `style` attribute that depends on the element's size
 	const refAttribute = node.attributes.find((a) => a.name === "&ref");
 	if (refAttribute) {
-		let value = refAttribute.value;
-		if (value != null && isFullyReactive(value)) {
+		let { value, fullyReactive } = refAttribute;
+		if (value != null && fullyReactive) {
 			// Bind the DOM element to a user-defined variable
-			value = value.substring(1, value.length - 1);
 			b.append(`${value} = ${varName};`);
 		}
 	}
 
-	for (let { name, value } of node.attributes) {
+	for (let { name, value, reactive } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// Ignore this one, it should have been done already, above
-		} else if (name.startsWith("{") && name.endsWith("}")) {
-			// It's a shortcut attribute
-			// It could be e.g. {width} or it could be {$state.width}, but
-			// in either case we set the value of the width property
-			name = name.substring(1, name.length - 1);
-			const propName = name.split(".").at(-1);
-			buildRun("setAttribute", `${varName}.setAttribute("${propName}", ${name});`, status, b);
-		} else if (value != null && isReactive(value)) {
-			// It's a reactive attribute
-			if (isFullyReactive(value)) {
-				value = value.substring(1, value.length - 1);
-			} else {
-				value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
-			}
-
+		} else if (value != null && reactive) {
 			if (name === "&group") {
 				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === "&value" || name === "&checked") {

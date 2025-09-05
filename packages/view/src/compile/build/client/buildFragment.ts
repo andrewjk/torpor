@@ -11,7 +11,6 @@ import isTextNode from "../../types/nodes/isTextNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import isReactive from "../utils/isReactive";
-import isReactiveAttribute from "../utils/isReactiveAttribute";
 import nextVarName from "../utils/nextVarName";
 import { type BuildStatus } from "./BuildStatus";
 import buildNode from "./buildNode";
@@ -412,7 +411,7 @@ function declareElementFragmentVars(
 		let attributes = node.attributes
 			.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
 			.map((a) => {
-				if (a.value && isReactive(a.value)) {
+				if (a.value && a.reactive) {
 					// Adding a placeholder for reactive attributes seems to speed things
 					// up, especially in the case of data attributes
 					return `"${a.name}": "#"`;
@@ -461,9 +460,7 @@ function declareElementFragmentVars(
 }
 
 function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
-	const hasReactiveAttribute = node.attributes.some(
-		(a) => a.value && isReactiveAttribute(a.name, a.value),
-	);
+	const hasReactiveAttribute = node.attributes.some((a) => a.value && a.reactive);
 	const isDynamicElement =
 		node.tagName === ":element" && node.attributes.find((a) => a.name === "self");
 	return hasReactiveAttribute || isDynamicElement || (topLevel && lastChild);

@@ -3,8 +3,6 @@ import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
-import isFullyReactive from "../utils/isFullyReactive";
-import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import { type BuildStatus } from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
@@ -32,7 +30,7 @@ export default function buildComponentNode(
 		status.imports.add("$watch");
 		b.append(`const ${propsName}: any = $watch({});`);
 
-		for (let { name, value } of node.attributes) {
+		for (let { name, value, reactive, fullyReactive } of node.attributes) {
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute
 			} else if (name.startsWith("{") && name.endsWith("}")) {
@@ -42,22 +40,18 @@ export default function buildComponentNode(
 				name = name.substring(1, name.length - 1);
 				const propName = name.split(".").at(-1);
 				buildRun("setProp", `${propsName}["${propName}"] = ${name};`, status, b);
-			} else if (name.startsWith("&") && value != null && isFullyReactive(value)) {
+			} else if (name.startsWith("&") && value != null && fullyReactive) {
 				// It's a bound property
 				// Add two $runs -- one to update the props, and one to update the value
 				// The component author will need to make sure $props.x is updated
 				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
 				// e.g. Component($props: { text: Bindable<string> })
 				name = name.substring(1);
-				value = value.substring(1, value.length - 1);
 				buildRun("setProp", `${propsName}["${name}"] = ${value};`, status, b);
 				buildRun("setBinding", `${value} = ${propsName}["${name}"];`, status, b);
 			} else if ((name === "class" || name === ":class") && value != null) {
 				// NOTE: :class is obsolete, but let's keep it for a version or two
 				status.imports.add("t_class");
-				if (isFullyReactive(value)) {
-					value = value.substring(1, value.length - 1);
-				}
 				const params = [value];
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
@@ -66,20 +60,10 @@ export default function buildComponentNode(
 			} else if ((name === "style" || name === ":style") && value != null) {
 				// NOTE: :style is obsolete, but let's keep it for a version or two
 				status.imports.add("t_style");
-				if (isFullyReactive(value)) {
-					value = value.substring(1, value.length - 1);
-				}
 				buildRun("setStyles", `${propsName}["style"] = t_style(${value});`, status, b);
 			} else if (value != null) {
-				let fullyReactive = isFullyReactive(value);
-				let partlyReactive = isReactive(value);
-				if (fullyReactive) {
-					value = value.substring(1, value.length - 1);
-				} else if (partlyReactive) {
-					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
-				}
 				const setProp = `${propsName}["${name}"] = ${value};`;
-				if (fullyReactive || partlyReactive) {
+				if (reactive) {
 					buildRun("setProp", setProp, status, b);
 				} else {
 					b.append(setProp);

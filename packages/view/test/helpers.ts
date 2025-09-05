@@ -1,3 +1,5 @@
+import isFullyReactive from "../src/compile/build/utils/isFullyReactive";
+import isReactive from "../src/compile/build/utils/isReactive";
 import { type ParseResult } from "../src/compile/types/ParseResult";
 import { type Attribute } from "../src/compile/types/nodes/Attribute";
 import { type ControlNode } from "../src/compile/types/nodes/ControlNode";
@@ -6,6 +8,7 @@ import { type OperationType } from "../src/compile/types/nodes/OperationType";
 import { type RootNode } from "../src/compile/types/nodes/RootNode";
 import { type TemplateNode } from "../src/compile/types/nodes/TemplateNode";
 import { type TextNode } from "../src/compile/types/nodes/TextNode";
+import trimQuotes from "../src/compile/utils/trimQuotes";
 
 export function cmp(
 	name: string,
@@ -85,9 +88,27 @@ export function text(content: string): TextNode {
 }
 
 export function att(name: string, value?: string): Attribute {
+	let reactive = false;
+	let fullyReactive = false;
+
+	if (value) {
+		reactive = isReactive(value);
+		fullyReactive = isFullyReactive(value);
+		if (fullyReactive) {
+			value = value.substring(1, value.length - 1);
+		} else if (reactive) {
+			value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
+		}
+	} else if (name.startsWith("{") && name.endsWith("}")) {
+		value = name.substring(1, name.length - 1);
+		name = value;
+		reactive = fullyReactive = true;
+	}
 	return {
 		name,
 		value,
+		reactive,
+		fullyReactive,
 	};
 }
 

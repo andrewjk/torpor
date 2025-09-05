@@ -2,8 +2,6 @@ import { type ElementNode } from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
-import isFullyReactive from "../utils/isFullyReactive";
-import isReactive from "../utils/isReactive";
 import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
@@ -21,7 +19,7 @@ export default function buildServerElementNode(
 	if (tagName === ":element") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
 		if (selfAttribute) {
-			tagName = `$${selfAttribute.value}`;
+			tagName = `$\{${selfAttribute.value}}`;
 		}
 	}
 
@@ -42,7 +40,7 @@ export default function buildServerElementNode(
 function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 	let needsClass = node.scopeStyles;
 	let attributes: string[] = [];
-	for (let { name, value } of node.attributes) {
+	for (let { name, value, reactive, fullyReactive } of node.attributes) {
 		if (name === "self" && node.tagName === ":element") {
 			// Ignore this special attribute
 		} else if (name.startsWith("on") || name.startsWith(":on")) {
@@ -61,18 +59,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			attributes.push(
 				`style="\${Object.entries(${value}).map(([k, v]) => \`$\{k}: $\{v}\`).join("; ")}"`,
 			);
-		} else if (name.startsWith("{") && name.endsWith("}")) {
-			// It's a shortcut attribute
-			// It could be e.g. {width} or it could be {$state.width}, but
-			// in either case we set the value of the width property
-			name = name.substring(1, name.length - 1);
-			const propName = name.split(".").at(-1);
-			status.imports.add("t_attr");
-			attributes.push(`${propName}="\${t_attr(${name})}"`);
-		} else if (value != null && isFullyReactive(value)) {
-			// It's a reactive attribute
-			value = value.substring(1, value.length - 1);
-
+		} else if (value != null && fullyReactive) {
 			if (name === "&ref" || name === "&value" || name === "&checked" || name === "&group") {
 				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
@@ -115,11 +102,11 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				status.imports.add("t_attr");
 				attributes.push(`\${${value} ? \`${name}="\${t_attr(${value})}"\` : ''}`);
 			}
-		} else if (value != null && isReactive(value)) {
+		} else if (value != null && reactive) {
 			// TODO: Match braces, don't replace braces inside code
 			status.imports.add("t_attr");
 			attributes.push(
-				`${name}="${trimQuotes(value).replaceAll("{", "${t_attr(").replaceAll("}", ")}")}"`,
+				`${name}="${trimQuotes(value).replaceAll("${", "${t_attr(").replaceAll("}", ")}")}"`,
 			);
 		} else if (name === "class" && node.scopeStyles) {
 			value = value

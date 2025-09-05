@@ -1,5 +1,8 @@
+import isFullyReactive from "../build/utils/isFullyReactive";
+import isReactive from "../build/utils/isReactive";
 import { type Attribute } from "../types/nodes/Attribute";
 import { type ElementNode } from "../types/nodes/ElementNode";
+import trimQuotes from "../utils/trimQuotes";
 import { type ParseStatus } from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import accept from "./utils/accept";
@@ -77,12 +80,28 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 function parseAttribute(status: ParseStatus): Attribute {
 	let name = consumeUntil("= \t\r\n/>", status);
 	let value: string | undefined = undefined;
+	let reactive = false;
+	let fullyReactive = false;
 	consumeSpace(status);
 	if (accept("=", status)) {
 		consumeSpace(status);
 		value = parseAttributeValue(status);
+		reactive = isReactive(value);
+		fullyReactive = isFullyReactive(value);
+		if (fullyReactive) {
+			value = value.substring(1, value.length - 1);
+		} else if (reactive) {
+			value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
+		}
+	} else if (name.startsWith("{") && name.endsWith("}")) {
+		// It's a shortcut attribute
+		// It could be e.g. {width} or it could be {$state.width}, but
+		// in either case we set the value of the width property
+		value = name.substring(1, name.length - 1);
+		name = value.split(".").at(-1)!;
+		reactive = fullyReactive = true;
 	}
-	return { name, value };
+	return { name, value, reactive, fullyReactive };
 }
 
 function parseAttributeValue(status: ParseStatus): string {

@@ -7,8 +7,6 @@ import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
-import isFullyReactive from "../utils/isFullyReactive";
-import isReactive from "../utils/isReactive";
 import nextVarName from "../utils/nextVarName";
 import { type BuildServerStatus } from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -39,21 +37,7 @@ export default function buildServerSlotNode(
 		// TODO: defaults etc props
 		b.append(`const ${propsName}: any = {};`);
 		for (let { name, value } of slotAttributes) {
-			if (name.startsWith("{") && name.endsWith("}")) {
-				// It's a shortcut attribute
-				// It could be e.g. {width} or it could be {$state.width}, but
-				// in either case we set the value of the width property
-				name = name.substring(1, name.length - 1);
-				const propName = name.split(".").at(-1);
-				b.append(`${propsName}["${propName}"] = ${name};`);
-			} else if (value != null) {
-				let fullyReactive = isFullyReactive(value);
-				let partlyReactive = isReactive(value);
-				if (fullyReactive) {
-					value = value.substring(1, value.length - 1);
-				} else if (partlyReactive) {
-					value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
-				}
+			if (value != null) {
 				b.append(`${propsName}["${name}"] = ${value};`);
 			} else {
 				b.append(`${propsName}["${name}"] = true;`);
