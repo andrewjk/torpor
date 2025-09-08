@@ -13,9 +13,9 @@ export default function ExampleDialog($props: any) {
 		</p>
 
 		<Popover>
-			<PopoverOverlay class="expopsta-overlay" />
+			<PopoverOverlay class="example-popover-overlay" />
 			<PopoverTrigger>Show a popover</PopoverTrigger>
-			<PopoverContent class="expopsta-content">
+			<PopoverContent class="example-popover-content">
 				<Dialog>
 					<DialogHeader>
 						<h4>Header</h4>
@@ -23,7 +23,7 @@ export default function ExampleDialog($props: any) {
 					<DialogBody>
 						<p>Which color do you prefer?</p>
 					</DialogBody>
-					<DialogFooter class="expopsta-footer">
+					<DialogFooter class="example-popover-footer">
 						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
 						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 					</DialogFooter>
@@ -33,7 +33,7 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@style {
-		:global(.expopsta-overlay) {
+		:global(.example-popover-overlay) {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -43,7 +43,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.expopsta-content) {
+		:global(.example-popover-content) {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -56,7 +56,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 200;
 		}
 
-		:global(.expopsta-footer) {
+		:global(.example-popover-footer) {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

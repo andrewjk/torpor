@@ -12,11 +12,11 @@ export default function ExampleBound($props: any) {
 		<p>Selected value: <input type="number" &value={$state.value} /></p>
 
 		<TabGroup &value={$state.value}>
-			<TabList class="extabbound-list" ariaLabel="Basic tab example">
+			<TabList class="example-tab-list" ariaLabel="Basic tab example">
 				@for (let [index, item] of items.entries()) {
 					@key = index
 					<TabHeader>
-						<TabTrigger class="extabbound-trigger">
+						<TabTrigger class="example-tab-trigger">
 							Item {index + 1}
 						</TabTrigger>
 					</TabHeader>
@@ -24,7 +24,7 @@ export default function ExampleBound($props: any) {
 			</TabList>
 			@for (let [index, item] of items.entries()) {
 				@key = index
-				<TabContent class="extabbound-content">
+				<TabContent class="example-tab-content">
 					<p>{item}</p>
 				</TabContent>
 			}
@@ -32,22 +32,22 @@ export default function ExampleBound($props: any) {
 	}
 
 	@style {
-		:global(.extabbound-trigger) {
+		:global(.example-tab-trigger) {
 			all: unset;
 			cursor: default;
 			border-bottom: 2px solid gainsboro;
 			padding: 5px 10px;
 		}
 
-		:global(.extabbound-trigger[data-state='active']) {
+		:global(.example-tab-trigger[data-state='active']) {
 			border-bottom: 2px solid black;
 		}
 
-		:global(.extabbound-content) {
+		:global(.example-tab-content) {
 			display: none;
 		}
 
-		:global(.extabbound-content[data-state='active']) {
+		:global(.example-tab-content[data-state='active']) {
 			display: flex;
 			align-items: center;
 			justify-content: center;

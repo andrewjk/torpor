@@ -9,21 +9,21 @@ import {
 
 export default function ExampleBasic($props: any) {
 	@render {
-		<NavMenu class="exnavbasic" ariaLabel="Site navigation">
-			<NavMenuLink class="exnavbasic-link" href="/" newWindow>Home</NavMenuLink>
-			<NavMenuLink class="exnavbasic-link" href="https://google.com" newWindow>Google</NavMenuLink>
-			<NavMenuSeparator class="exnavbasic-separator" />
+		<NavMenu class="example-navmenu" ariaLabel="Site navigation">
+			<NavMenuLink class="example-navmenu-link" href="/" newWindow>Home</NavMenuLink>
+			<NavMenuLink class="example-navmenu-link" href="https://google.com" newWindow>Google</NavMenuLink>
+			<NavMenuSeparator class="example-navmenu-separator" />
 			<NavMenuPopout>
-				<NavMenuPopoutButton class="exnavbasic-link">Search ▼</NavMenuPopoutButton>
-				<NavMenuPopoutContent class="exnavbasic-link-content">
-					<NavMenu class="exnavbasic-sub-menu" orientation="vertical">
-						<NavMenuLink class="exnavbasic-link" href="https://www.google.com/" newWindow>
+				<NavMenuPopoutButton class="example-navmenu-link">Search ▼</NavMenuPopoutButton>
+				<NavMenuPopoutContent class="example-navmenu-link-content">
+					<NavMenu class="example-navmenu-sub-menu" orientation="vertical">
+						<NavMenuLink class="example-navmenu-link" href="https://www.google.com/" newWindow>
 							Google
 						</NavMenuLink>
-						<NavMenuLink class="exnavbasic-link" href="https://www.bing.com/" newWindow>
+						<NavMenuLink class="example-navmenu-link" href="https://www.bing.com/" newWindow>
 							Bing
 						</NavMenuLink>
-						<NavMenuLink class="exnavbasic-link" href="https://duckduckgo.com/" newWindow>
+						<NavMenuLink class="example-navmenu-link" href="https://duckduckgo.com/" newWindow>
 							DuckDuckGo
 						</NavMenuLink>
 					</NavMenu>
@@ -33,12 +33,12 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.exnavbasic) {
+		:global(.example-navmenu) {
 			display: flex;
 			flex-direction: row;
 		}
 
-		:global(.exnavbasic-link) {
+		:global(.example-navmenu-link) {
 			all: unset;
 			cursor: default;
 			display: flex;
@@ -48,15 +48,15 @@ export default function ExampleBasic($props: any) {
 			padding: 5px 10px;
 		}
 
-		:global(.exnavbasic-link:hover),
-		:global(.exnavbasic-link:focus),
-		:global(.exnavbasic-link:active) {
+		:global(.example-navmenu-link:hover),
+		:global(.example-navmenu-link:focus),
+		:global(.example-navmenu-link:active) {
 			background-color: dodgerblue;
 			border-radius: 4px;
 			color: white;
 		}
 
-		:global(.exnavbasic-link-content) {
+		:global(.example-navmenu-link-content) {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -66,13 +66,13 @@ export default function ExampleBasic($props: any) {
 			z-index: 200;
 		}
 
-		:global(.exnavbasic-sub-menu) {
+		:global(.example-navmenu-sub-menu) {
 			display: flex;
 			flex-direction: column;
 			gap: 5px;
 		}
 
-		:global(.exnavbasic-separator) {
+		:global(.example-navmenu-separator) {
 			border-right: 1px solid gainsboro;
 		}
 	}

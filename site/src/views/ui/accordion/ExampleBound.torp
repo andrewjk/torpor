@@ -12,62 +12,62 @@ export default function ExampleBound($props: any) {
 	@render {
 		<p>Value: <input type="number" &value={$state.value} /></p>
 
-		<Accordion class="exaccbound" &value={$state.value}>
-			<AccordionItem class="exaccbound-item">
+		<Accordion class="example-dialog" &value={$state.value}>
+			<AccordionItem class="example-dialog-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="exaccbound-trigger">Item 1</AccordionTrigger>
+					<AccordionTrigger class="example-dialog-trigger">Item 1</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="exaccbound-content" @/* transition:slide */>The first item</div>
+					<div class="example-dialog-content" @/* transition:slide */>The first item</div>
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem class="exaccbound-item">
+			<AccordionItem class="example-dialog-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="exaccbound-trigger">Item 2</AccordionTrigger>
+					<AccordionTrigger class="example-dialog-trigger">Item 2</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="exaccbound-content" @/* transition:slide */>Another item</div>
+					<div class="example-dialog-content" @/* transition:slide */>Another item</div>
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem class="exaccbound-item">
+			<AccordionItem class="example-dialog-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="exaccbound-trigger">Item 3</AccordionTrigger>
+					<AccordionTrigger class="example-dialog-trigger">Item 3</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="exaccbound-content" @/* transition:slide */>The last item</div>
+					<div class="example-dialog-content" @/* transition:slide */>The last item</div>
 				</AccordionContent>
 			</AccordionItem>
 		</Accordion>
 	}
 
 	@style {
-		:global(.exaccbound) {
+		:global(.example-dialog) {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			width: 200px;
 		}
 
-		:global(.exaccbound-trigger) {
+		:global(.example-dialog-trigger) {
 			all: unset;
 			cursor: default;
 			padding: 5px;
 			width: 100%;
 		}
 
-		:global(.exaccbound-trigger:focus-visible) {
+		:global(.example-dialog-trigger:focus-visible) {
 			box-shadow: black 0px 0px 0px 2px;
 		}
 
-		:global(.exaccbound-content) {
+		:global(.example-dialog-content) {
 			padding: 5px;
 			width: 100%;
 		}
 
-		:global(.exaccbound-item + .exaccbound-item) {
+		:global(.example-dialog-item + .example-dialog-item) {
 			border-top: 1px solid gainsboro;
 		}
 
-		:global(.exaccbound-trigger[data-state="open"]) {
+		:global(.example-dialog-trigger[data-state="open"]) {
 			border-bottom: 2px solid black;
 		}
 	}

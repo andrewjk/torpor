@@ -7,11 +7,11 @@ export default function ExampleBasic($props: any) {
 
 	@render {
 		<TabGroup>
-			<TabList class="extabbasic-list" ariaLabel="Basic tab example">
+			<TabList class="example-tab-list" ariaLabel="Basic tab example">
 				@for (let [index, item] of items.entries()) {
 					@key = index
 					<TabHeader>
-						<TabTrigger class="extabbasic-trigger">
+						<TabTrigger class="example-tab-trigger">
 							Item {index + 1}
 						</TabTrigger>
 					</TabHeader>
@@ -19,7 +19,7 @@ export default function ExampleBasic($props: any) {
 			</TabList>
 			@for (let [index, item] of items.entries()) {
 				@key = index
-				<TabContent class="extabbasic-content">
+				<TabContent class="example-tab-content">
 					<p>{item}</p>
 				</TabContent>
 			}
@@ -27,22 +27,22 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.extabbasic-trigger) {
+		:global(.example-tab-trigger) {
 			all: unset;
 			cursor: default;
 			border-bottom: 2px solid gainsboro;
 			padding: 5px 10px;
 		}
 
-		:global(.extabbasic-trigger[data-state="active"]) {
+		:global(.example-tab-trigger[data-state="active"]) {
 			border-bottom: 2px solid black;
 		}
 
-		:global(.extabbasic-content) {
+		:global(.example-tab-content) {
 			display: none;
 		}
 
-		:global(.extabbasic-content[data-state="active"]) {
+		:global(.example-tab-content[data-state="active"]) {
 			display: flex;
 			align-items: center;
 			justify-content: center;

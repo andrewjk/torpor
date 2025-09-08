@@ -9,22 +9,22 @@ export default function ExampleHover($props: any) {
 		<p>Hover over the panel below to trigger a tooltip.</p>
 
 		<Popover>
-			<PopoverTriggerHover class="expophov-target">Hover me</PopoverTriggerHover>
-			<PopoverContentContextual class="expophov-content">
+			<PopoverTriggerHover class="example-popover-target">Hover me</PopoverTriggerHover>
+			<PopoverContentContextual class="example-popover-content">
 				I'm a tooltip...
 			</PopoverContentContextual>
 		</Popover>
 	}
 
 	@style {
-		:global(.expophov-target) {
+		:global(.example-popover-target) {
 			border: 1px dashed #222;
 			border-radius: 4px;
 			cursor: default;
 			padding: 20px;
 		}
 
-		:global(.expophov-content) {
+		:global(.example-popover-content) {
 			background: #333;
 			border: 1px solid gainsboro;
 			border-radius: 4px;

@@ -14,7 +14,7 @@ export default function ExampleVariable($props: any) {
 			Show
 		</button>
 
-		<Drawer &visible={$state.visible} class="example-content">
+		<Drawer &visible={$state.visible} class="example-drawer-content">
 			<p>
 				Hello!
 			</p>
@@ -22,7 +22,7 @@ export default function ExampleVariable($props: any) {
 	}
 
 	@style {
-		:global(.example-content) {
+		:global(.example-drawer-content) {
 			background: white;
 			padding: 10px;
 			top: 0;

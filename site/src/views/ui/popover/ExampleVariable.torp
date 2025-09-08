@@ -15,7 +15,7 @@ export default function ExampleVariable($props: any) {
 
 		@if ($state.showPopover) {
 			<Popover anchor={button} visible>
-				<PopoverContentAnchored class="expopvar-content" side="bottom">
+				<PopoverContentAnchored class="example-popover-content" side="bottom">
 					You showed the popover!
 				</PopoverContentAnchored>
 			</Popover>
@@ -23,7 +23,7 @@ export default function ExampleVariable($props: any) {
 	}
 
 	@style {
-		:global(.expopvar-content) {
+		:global(.example-popover-content) {
 			background: #333;
 			border: 1px solid gainsboro;
 			border-radius: 4px;

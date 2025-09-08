@@ -10,8 +10,8 @@ export default function ExampleContextual($props: any) {
 		<p>Right-click on the panel below to trigger a context menu.</p>
 
 		<Popover>
-			<PopoverTriggerContextual class="expopcon-element">Show a contextual</PopoverTriggerContextual>
-			<PopoverContentContextual class="expopcon-content">
+			<PopoverTriggerContextual class="example-popover-element">Show a contextual</PopoverTriggerContextual>
+			<PopoverContentContextual class="example-popover-content">
 				<Dialog>
 					<DialogHeader>
 						<h4>Header</h4>
@@ -19,7 +19,7 @@ export default function ExampleContextual($props: any) {
 					<DialogBody>
 						<p>Which color do you prefer?</p>
 					</DialogBody>
-					<DialogFooter class="expopcon-footer">
+					<DialogFooter class="example-popover-footer">
 						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
 						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 					</DialogFooter>
@@ -29,7 +29,7 @@ export default function ExampleContextual($props: any) {
 	}
 
 	@style {
-		:global(.expopcon-overlay) {
+		:global(.example-popover-overlay) {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: absolute;
 			top: 0;
@@ -39,14 +39,14 @@ export default function ExampleContextual($props: any) {
 			z-index: 100;
 		}
 
-		:global(.expopcon-element) {
+		:global(.example-popover-element) {
 			border: 1px dashed #222;
 			border-radius: 4px;
 			cursor: default;
 			padding: 20px;
 		}
 
-		:global(.expopcon-content) {
+		:global(.example-popover-content) {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -55,7 +55,7 @@ export default function ExampleContextual($props: any) {
 			z-index: 200;
 		}
 
-		:global(.expopcon-footer) {
+		:global(.example-popover-footer) {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

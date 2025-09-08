@@ -9,10 +9,10 @@ export default function ExampleDialog($props: any) {
 		</p>
 
 		<Popover>
-			<PopoverOverlay class="example-overlay" />
+			<PopoverOverlay class="example-drawer-overlay" />
 			<PopoverTrigger>Show a popover</PopoverTrigger>
 			<PopoverContent>
-				<Drawer class="example-content">
+				<Drawer class="example-drawer-content">
 					<p>Here I am</p>
 				</Drawer>
 			</PopoverContent>
@@ -20,7 +20,7 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@style {
-		:global(.example-overlay) {
+		:global(.example-drawer-overlay) {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -30,7 +30,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.example-content) {
+		:global(.example-drawer-content) {
 			background: white;
 			padding: 10px;
 			top: 0;

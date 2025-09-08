@@ -6,18 +6,18 @@ export default function ExampleVertical(props: any) {
 	let items = buildItems(itemCount);
 
 	@render {
-		<TabGroup class="extabvert" orientation="vertical">
-			<TabList class="extabvert-list" ariaLabel="Vertical tab example">
+		<TabGroup class="example-tab" orientation="vertical">
+			<TabList class="example-tab-list" ariaLabel="Vertical tab example">
 				@for (let [index, item] of items.entries()) {
 					<TabHeader>
-						<TabTrigger class="extabvert-trigger">
+						<TabTrigger class="example-tab-trigger">
 							Item {index + 1}
 						</TabTrigger>
 					</TabHeader>
 				}
 			</TabList>
 			@for (let [index, item] of items.entries()) {
-				<TabContent class="extabvert-content">
+				<TabContent class="example-tab-content">
 					<p>{item}</p>
 				</TabContent>
 			}
@@ -25,32 +25,32 @@ export default function ExampleVertical(props: any) {
 	}
 
 	@style {
-		:global(.extabvert) {
+		:global(.example-tab) {
 			display: grid;
 			grid-template-columns: auto 1fr;
 		}
 
-		:global(.extabvert-list) {
+		:global(.example-tab-list) {
 			display: flex;
 			flex-direction: column;
 		}
 
-		:global(.extabvert-trigger) {
+		:global(.example-tab-trigger) {
 			all: unset;
 			cursor: default;
 			border-right: 2px solid gainsboro;
 			padding: 5px 10px;
 		}
 
-		:global(.extabvert-trigger[data-state='active']) {
+		:global(.example-tab-trigger[data-state='active']) {
 			border-right: 2px solid black;
 		}
 
-		:global(.extabvert-content) {
+		:global(.example-tab-content) {
 			display: none;
 		}
 
-		:global(.extabvert-content[data-state='active']) {
+		:global(.example-tab-content[data-state='active']) {
 			display: flex;
 			align-items: center;
 			justify-content: center;
