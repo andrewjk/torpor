@@ -22,8 +22,8 @@
 		"sucrase": "^3.35.0"
 	},
 	"devDependencies": {
-		"tsx": "^4.20.3",
+		"tsx": "^4.20.5",
 		"typescript": "^5.9.2",
-		"wrangler": "^4.28.1"
+		"wrangler": "^4.34.0"
 	}
 }
