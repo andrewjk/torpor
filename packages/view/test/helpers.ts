@@ -1,5 +1,3 @@
-import isFullyReactive from "../src/compile/build/utils/isFullyReactive";
-import isReactive from "../src/compile/build/utils/isReactive";
 import { type ParseResult } from "../src/compile/types/ParseResult";
 import { type Attribute } from "../src/compile/types/nodes/Attribute";
 import { type ControlNode } from "../src/compile/types/nodes/ControlNode";
@@ -8,6 +6,8 @@ import { type OperationType } from "../src/compile/types/nodes/OperationType";
 import { type RootNode } from "../src/compile/types/nodes/RootNode";
 import { type TemplateNode } from "../src/compile/types/nodes/TemplateNode";
 import { type TextNode } from "../src/compile/types/nodes/TextNode";
+import isFullyReactive from "../src/compile/utils/isFullyReactive";
+import isReactive from "../src/compile/utils/isReactive";
 import trimQuotes from "../src/compile/utils/trimQuotes";
 
 export function cmp(

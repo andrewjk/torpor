@@ -1,7 +1,7 @@
-import isFullyReactive from "../build/utils/isFullyReactive";
-import isReactive from "../build/utils/isReactive";
 import { type Attribute } from "../types/nodes/Attribute";
 import { type ElementNode } from "../types/nodes/ElementNode";
+import isFullyReactive from "../utils/isFullyReactive";
+import isReactive from "../utils/isReactive";
 import trimQuotes from "../utils/trimQuotes";
 import { type ParseStatus } from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";

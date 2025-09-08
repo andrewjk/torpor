@@ -6,8 +6,8 @@ import { type RootNode } from "../../types/nodes/RootNode";
 import { type TemplateNode } from "../../types/nodes/TemplateNode";
 import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import isReactive from "../../utils/isReactive";
 import trimQuotes from "../../utils/trimQuotes";
-import isReactive from "../utils/isReactive";
 import { type BuildStatus } from "./BuildStatus";
 
 /**
