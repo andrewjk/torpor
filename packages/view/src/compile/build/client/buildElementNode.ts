@@ -135,14 +135,7 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			const t_headel = document.createElement("${node.tagName}");
 			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
 	for (let { name, value, reactive } of node.attributes) {
-		if (name.startsWith("{") && name.endsWith("}")) {
-			// It's a shortcut attribute
-			// It could be e.g. {width} or it could be {$state.width}, but
-			// in either case we set the value of the width property
-			name = name.substring(1, name.length - 1);
-			const propName = name.split(".").at(-1);
-			buildRun("setAttribute", `t_headel.setAttribute("${propName}", ${name});`, status, b);
-		} else if (value != null && reactive) {
+		if (value != null && reactive) {
 			status.imports.add("t_attribute");
 			buildRun("setAttribute", `t_attribute(t_headel, "${name}", ${value});`, status, b);
 		} else if (value != null) {

@@ -33,13 +33,6 @@ export default function buildComponentNode(
 		for (let { name, value, reactive, fullyReactive } of node.attributes) {
 			if (name === "self" && node.tagName === ":component") {
 				// Ignore this special attribute
-			} else if (name.startsWith("{") && name.endsWith("}")) {
-				// It's a shortcut attribute
-				// It could be e.g. {width} or it could be {$state.width}, but
-				// in either case we set the value of the width property
-				name = name.substring(1, name.length - 1);
-				const propName = name.split(".").at(-1);
-				buildRun("setProp", `${propsName}["${propName}"] = ${name};`, status, b);
 			} else if (name.startsWith("&") && value != null && fullyReactive) {
 				// It's a bound property
 				// Add two $runs -- one to update the props, and one to update the value
