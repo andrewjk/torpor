@@ -3,7 +3,6 @@ import { type ElementNode } from "../types/nodes/ElementNode";
 import { type TextNode } from "../types/nodes/TextNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 import isTextNode from "../types/nodes/isTextNode";
-import trimMatched from "../utils/trimMatched";
 import voidTags from "../utils/voidTags";
 import { type ParseStatus } from "./ParseStatus";
 import { type ParseComponentStatus } from "./ParseStatus";
@@ -92,11 +91,11 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
 		} else if (element.tagName === ":component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
-			if (selfAttribute && selfAttribute.value) {
+			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 				element.type = "component";
 				slottifyChildNodes(element);
 
-				const selfValue = trimMatched(selfAttribute.value, "{", "}");
+				const selfValue = selfAttribute.value;
 				const replace: ControlNode = {
 					type: "control",
 					operation: "@replace",

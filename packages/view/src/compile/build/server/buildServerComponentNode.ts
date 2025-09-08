@@ -6,7 +6,6 @@ import {
 import { type ElementNode } from "../../types/nodes/ElementNode";
 import isSpecialNode from "../../types/nodes/isSpecialNode";
 import Builder from "../../utils/Builder";
-import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import { type BuildServerStatus } from "./BuildServerStatus";
@@ -101,8 +100,8 @@ export default function buildServerComponentNode(
 	let componentName = node.tagName;
 	if (componentName === ":component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
-		if (selfAttribute && selfAttribute.value) {
-			componentName = trimMatched(selfAttribute.value, "{", "}");
+		if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
+			componentName = selfAttribute.value;
 		}
 	}
 

@@ -2,7 +2,6 @@ import { type ElementNode } from "../../types/nodes/ElementNode";
 import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
-import trimMatched from "../../utils/trimMatched";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import { type BuildStatus } from "./BuildStatus";
@@ -59,10 +58,10 @@ export default function buildElementNode(
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	let selfAttribute = node.attributes.find((a) => a.name === "self");
-	if (selfAttribute && selfAttribute.value) {
+	if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 		status.imports.add("$run");
 		status.imports.add("t_dynamic");
-		let selfValue = trimMatched(selfAttribute.value, "{", "}");
+		let selfValue = selfAttribute.value;
 		b.append(`$run(function setDynamic() {`);
 		b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
 
@@ -323,8 +322,8 @@ function buildTransitionAttribute(
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 	} else if (name === ":transition-in") {
 		let outAttribute = node.attributes.find((a) => a.name === ":transition-out");
-		if (outAttribute && outAttribute.value) {
-			let outValue = trimMatched(outAttribute.value, "{", "}");
+		if (outAttribute && outAttribute.value && outAttribute.fullyReactive) {
+			let outValue = outAttribute.value;
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
 			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue)};`);
 			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
