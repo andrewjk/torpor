@@ -28,11 +28,11 @@ export default function Component() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <Dialog>
-<DialogHeader /> (optional)
-<DialogBody /> (optional)
-<DialogFooter> (optional)
-	<DialogButton /> (optional)
-</DialogFooter>
+	<DialogHeader /> (optional)
+	<DialogBody /> (optional)
+	<DialogFooter> (optional)
+		<DialogButton /> (optional)
+	</DialogFooter>
 </Dialog>
 `.trim()}</code></pre>
 		<h2>Demo</h2>

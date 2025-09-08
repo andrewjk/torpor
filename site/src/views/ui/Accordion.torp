@@ -23,12 +23,12 @@ export default function Component() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <Accordion>
-<AccordionItem>
-	<AccordionHeader>
-		<AccordionTrigger />
-	</AccordionHeader>
-	<AccordionContent />
-</AccordionItem>
+	<AccordionItem>
+		<AccordionHeader>
+			<AccordionTrigger />
+		</AccordionHeader>
+		<AccordionContent />
+	</AccordionItem>
 </Accordion>
 `.trim()}</code></pre>
 		<h2>Demo</h2>

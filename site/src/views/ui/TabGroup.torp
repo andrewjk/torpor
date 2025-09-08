@@ -25,12 +25,12 @@ export default function Component() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <TabGroup>
-<TabList>
-	<TabHeader>
-		<TabTrigger />
-	</TabHeader>
-</TabList>
-<TabContent />
+	<TabList>
+		<TabHeader>
+			<TabTrigger />
+		</TabHeader>
+	</TabList>
+	<TabContent />
 </TabGroup>
 `.trim()}</code></pre>
 		<h2>Demo</h2>

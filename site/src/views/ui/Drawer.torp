@@ -14,7 +14,7 @@ export default function Component() {
 
 		<h1>Drawer</h1>
 		<p>
-			A container that can be hidden drawer and slid out when needed.
+			A container that can be hidden offscreen and slid out when needed.
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`

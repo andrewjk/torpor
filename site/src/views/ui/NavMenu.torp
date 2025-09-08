@@ -20,10 +20,10 @@ export default function Component() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <NavMenu>
-<NavMenuLink />
-<NavMenuSeparator /> (optional)
-<NavMenuPopout /> (optional)
-...
+	<NavMenuLink />
+	<NavMenuSeparator /> (optional)
+	<NavMenuPopout /> (optional)
+	...
 </NavMenu>
 `.trim()}</code></pre>
 		<h2>Demo</h2>

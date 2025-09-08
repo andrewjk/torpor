@@ -34,9 +34,9 @@ export default function Component() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <Popover>
-<PopoverOverlay /> (optional, if modal)
-<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
-<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
+	<PopoverOverlay /> (optional, if modal)
+	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
+	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
 </Popover>
 `.trim()}</code></pre>
 		<h2>Demo</h2>
