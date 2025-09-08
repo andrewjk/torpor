@@ -3,6 +3,8 @@ import { type ElementNode } from "../types/nodes/ElementNode";
 import { type TextNode } from "../types/nodes/TextNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 import isTextNode from "../types/nodes/isTextNode";
+import endOfString from "../utils/endOfString";
+import endOfTemplateString from "../utils/endOfTemplateString";
 import voidTags from "../utils/voidTags";
 import { type ParseStatus } from "./ParseStatus";
 import { type ParseComponentStatus } from "./ParseStatus";
@@ -148,25 +150,10 @@ function parseText(status: ParseStatus, element: ElementNode) {
 					k = status.source.indexOf("*/", k) + 1;
 				} else if (char === '"' || char === "'") {
 					// Skip string contents
-					for (let l = k + 1; l < status.source.length; l++) {
-						if (status.source[l] === char && status.source[l - 1] !== "\\") {
-							k = l;
-							break;
-						}
-					}
+					k = endOfString(char, status.source, k);
 				} else if (char === "`") {
-					// Skip possibly interpolated string contents
-					let level2 = 0;
-					for (let l = k + 1; l < status.source.length; l++) {
-						if (status.source[l] === char && status.source[l - 1] !== "\\" && level2 === 0) {
-							k = l;
-							break;
-						} else if (status.source[l] === "{" && (level2 > 0 || status.source[l - 1] === "$")) {
-							level2 += 1;
-						} else if (status.source[l] === "}" && level2 > 0) {
-							level2 -= 1;
-						}
-					}
+					// Skip template string contents
+					k = endOfTemplateString(status.source, k);
 				} else if (char === "{") {
 					level += 1;
 				} else if (char === "}") {

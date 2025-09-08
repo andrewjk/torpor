@@ -2,6 +2,8 @@ import { type TemplateComponent } from "../../types/TemplateComponent";
 import { type ParseResult } from "../types/ParseResult";
 import isElementNode from "../types/nodes/isElementNode";
 import isSpaceNode from "../types/nodes/isSpaceNode";
+import endOfString from "../utils/endOfString";
+import endOfTemplateString from "../utils/endOfTemplateString";
 import trimQuotes from "../utils/trimQuotes";
 import { type ParseStatus } from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
@@ -221,30 +223,15 @@ function parseComponentStyle(status: ParseStatus) {
 			// Skip block comments
 			status.i = status.source.indexOf("*/", status.i) + 1;
 		} else if (char === '"' || char === "'") {
-			styleSource += char;
 			// Skip string contents
-			for (let j = status.i + 1; j < status.source.length; j++) {
-				styleSource += status.source[j];
-				if (status.source[j] === char && status.source[j - 1] !== "\\") {
-					status.i = j;
-					break;
-				}
-			}
+			let start = status.i;
+			status.i = endOfString(char, status.source, start);
+			styleSource += status.source.substring(start, status.i + 1);
 		} else if (char === "`") {
-			styleSource += char;
-			// Skip possibly interpolated string contents
-			let level2 = 0;
-			for (let j = status.i + 1; j < status.source.length; j++) {
-				styleSource += status.source[j];
-				if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
-					status.i = j;
-					break;
-				} else if (status.source[j] === "{" && (level2 > 0 || status.source[j - 1] === "$")) {
-					level2 += 1;
-				} else if (status.source[j] === "}" && level2 > 0) {
-					level2 -= 1;
-				}
-			}
+			// Skip interpolated string contents
+			let start = status.i;
+			status.i = endOfTemplateString(status.source, start);
+			styleSource += status.source.substring(start, status.i + 1);
 		} else if (char === "{") {
 			level += 1;
 			if (start === -1) {
@@ -343,26 +330,11 @@ function consumeScriptComments(status: ParseStatus): boolean {
 		return true;
 	} else if (char === '"' || char === "'") {
 		// Skip string contents
-		for (let j = status.i + 1; j < status.source.length; j++) {
-			if (status.source[j] === char && status.source[j - 1] !== "\\") {
-				status.i = j;
-				break;
-			}
-		}
+		status.i = endOfString(char, status.source, status.i);
 		return true;
 	} else if (char === "`") {
-		// Skip possibly interpolated string contents
-		let level2 = 0;
-		for (let j = status.i + 1; j < status.source.length; j++) {
-			if (status.source[j] === char && status.source[j - 1] !== "\\" && level2 === 0) {
-				status.i = j;
-				break;
-			} else if (status.source[j] === "{" && (level2 > 0 || status.source[j - 1] === "$")) {
-				level2 += 1;
-			} else if (status.source[j] === "}" && level2 > 0) {
-				level2 -= 1;
-			}
-		}
+		// Skip interpolated string contents
+		status.i = endOfTemplateString(status.source, status.i);
 		return true;
 	}
 	return false;

@@ -1,5 +1,7 @@
 import { type TextNode } from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import endOfString from "../../utils/endOfString";
+import endOfTemplateString from "../../utils/endOfTemplateString";
 import { type BuildStatus } from "./BuildStatus";
 import buildRun from "./buildRun";
 
@@ -52,30 +54,14 @@ export default function buildTextNode(node: TextNode, status: BuildStatus, b: Bu
 			} else if (char === '"' || char === "'") {
 				// Skip string contents
 				let start = i;
-				for (let j = i + 1; j < content.length; j++) {
-					if (content[j] === char && content[j - 1] !== "\\") {
-						i = j;
-						textContent += content.substring(start, i + 1);
-						break;
-					}
-				}
+				i = endOfString(char, content, i);
+				textContent += content.substring(start, i + 1);
 				continue;
 			} else if (char === "`") {
-				// Skip possibly interpolated string contents
-				// TODO: Recursively skip strings inside the interpolated JS
+				// Skip interpolated string contents
 				let start = i;
-				let level2 = 0;
-				for (let j = i + 1; j < content.length; j++) {
-					if (content[j] === char && content[j - 1] !== "\\" && level2 === 0) {
-						i = j;
-						textContent += content.substring(start, i + 1);
-						break;
-					} else if (content[j] === "{" && (level2 > 0 || content[j - 1] === "$")) {
-						level2 += 1;
-					} else if (content[j] === "}" && level2 > 0) {
-						level2 -= 1;
-					}
-				}
+				i = endOfTemplateString(content, i);
+				textContent += content.substring(start, i + 1);
 				continue;
 			}
 		}

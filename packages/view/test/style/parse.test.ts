@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
 import { type ParseResult } from "../../src/compile/types/ParseResult";
-import { el, root, text, trimParsed } from "../helpers";
+import { att, el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
 	const input = `
@@ -35,7 +35,7 @@ export default function Test(/* @params */) {
 					start: 25,
 					name: "Test",
 					default: true,
-					markup: root([el("h1", [{ name: "class", value: '"torp-1wvcb3a"' }], [text("Hi")])]),
+					markup: root([el("h1", [att("class", '"torp-1wvcb3a"')], [text("Hi")])]),
 					style: {
 						global: false,
 						blocks: [
@@ -223,7 +223,7 @@ export default function Test(/* @params */) {
 	expect(output).toEqual(expected);
 });
 
-test("comments in style", () => {
+test("style with comments", () => {
 	const input = `
 export default function Test() {
 	@style {
@@ -274,6 +274,57 @@ export default function Test(/* @params */) {
 							},
 						],
 						hash: "z7n1b7",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+});
+
+test("style with quotes", () => {
+	const input = `
+export default function Test() {
+	@style {
+		p {
+			color: "blue";
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: "p",
+								attributes: [
+									{
+										name: "color",
+										value: '"blue"',
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "7qpvk6",
 					},
 				},
 			],

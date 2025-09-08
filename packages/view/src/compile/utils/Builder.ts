@@ -1,3 +1,5 @@
+import endOfTemplateString from "./endOfTemplateString";
+
 export default class Builder {
 	#text = "";
 	#space = 0;
@@ -34,17 +36,7 @@ export default class Builder {
 				while (i < text.length && text[i] !== "\n") {
 					// Just add backticked text as-is
 					if (text[i] === "`") {
-						i++;
-						let level = 0;
-						while (i < text.length && !(text[i] === "`" && text[i - 1] !== "\\" && level === 0)) {
-							// TODO: Need to do this in more places when skipping strings
-							if (text[i] === "{" && (level > 0 || text[i - 1] === "$")) {
-								level += 1;
-							} else if (text[i] === "}" && level > 0) {
-								level -= 1;
-							}
-							i++;
-						}
+						i = endOfTemplateString(text, i);
 					}
 					i++;
 				}
