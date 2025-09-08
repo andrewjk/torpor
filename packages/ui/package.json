@@ -22,10 +22,10 @@
 			"import": "./dist/NavMenu/index.js",
 			"require": "./dist/NavMenu/index.cjs"
 		},
-		"./Offscreen": {
-			"types": "./dist/Offscreen/index.d.ts",
-			"import": "./dist/Offscreen/index.js",
-			"require": "./dist/Offscreen/index.cjs"
+		"./Drawer": {
+			"types": "./dist/Drawer/index.d.ts",
+			"import": "./dist/Drawer/index.js",
+			"require": "./dist/Drawer/index.cjs"
 		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",

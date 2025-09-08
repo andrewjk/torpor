@@ -1,0 +1,33 @@
+import { Drawer } from "@torpor/ui/Drawer";
+
+export default function ExampleVariable($props: any) {
+	let $state = $watch({
+		visible: false
+	});
+
+	@render {
+		<p>
+			The button below shows a popover Dialog using a variable.
+		</p>
+
+		<button onclick={() => $state.visible = !$state.visible}>
+			Show
+		</button>
+
+		<Drawer &visible={$state.visible} class="example-content">
+			<p>
+				Hello!
+			</p>
+		</Drawer>
+	}
+
+	@style {
+		:global(.example-content) {
+			background: white;
+			padding: 10px;
+			top: 0;
+			height: 100vh;
+			z-index: 200;
+		}
+	}
+}

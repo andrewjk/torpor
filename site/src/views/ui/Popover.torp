@@ -1,7 +1,7 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
 import copyCode from "../../lib/copyCode";
 import ExampleDialog from "./popover/ExampleDialog.torp";
-import ExampleOffscreen from "./popover/ExampleOffscreen.torp";
+import ExampleDrawer from "./popover/ExampleDrawer.torp";
 import ExampleAnchored from "./popover/ExampleAnchored.torp";
 import ExampleContextual from "./popover/ExampleContextual.torp";
 import ExampleHover from "./popover/ExampleHover.torp";
@@ -10,7 +10,7 @@ import ExampleMount from "./popover/ExampleMount.torp";
 import ExampleVariable from "./popover/ExampleVariable.torp";
 
 import ExampleDialogCode from "./popover/ExampleDialog.torp?raw";
-import ExampleOffscreenCode from "./popover/ExampleOffscreen.torp?raw";
+import ExampleDrawerCode from "./popover/ExampleDrawer.torp?raw";
 import ExampleAnchoredCode from "./popover/ExampleAnchored.torp?raw";
 import ExampleContextualCode from "./popover/ExampleContextual.torp?raw";
 import ExampleHoverCode from "./popover/ExampleHover.torp?raw";
@@ -49,7 +49,7 @@ export default function Component() {
 				</TabHeader>
 				<TabHeader>
 					<TabTrigger class="example-tab-header">
-						Offscreen
+						Drawer
 					</TabTrigger>
 				</TabHeader>
 				<TabHeader>
@@ -120,7 +120,7 @@ export default function Component() {
 					</TabList>
 					<TabContent>
 						<p class="example-preview">
-							<ExampleOffscreen />
+							<ExampleDrawer />
 						</p>
 					</TabContent>
 					<TabContent>
@@ -128,7 +128,7 @@ export default function Component() {
 							<button type="button" class="example-copy-button" on:click={copyCode}>
 								Copy to clipboard
 							</button>
-							<pre><code>{ExampleOffscreenCode.trim()}</code></pre>
+							<pre><code>{ExampleDrawerCode.trim()}</code></pre>
 						</div>
 					</TabContent>
 				</TabGroup>

@@ -1,0 +1,89 @@
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import copyCode from "../../lib/copyCode";
+import ExampleVariable from "./drawer/ExampleVariable.torp";
+import ExamplePopover from "./drawer/ExamplePopover.torp";
+
+import ExampleVariableCode from "./drawer/ExampleVariable.torp?raw";
+import ExamplePopoverCode from "./drawer/ExamplePopover.torp?raw";
+
+export default function Component() {
+	@render {
+		<:head>
+			<title>Drawer | Torpor</title>
+		</:head>
+
+		<h1>Drawer</h1>
+		<p>
+			A container that can be hidden drawer and slid out when needed.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Drawer />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Variable
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Popover
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleVariable />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" on:click={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleVariableCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExamplePopover />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" on:click={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExamplePopoverCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

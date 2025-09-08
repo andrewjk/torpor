@@ -1,6 +1,6 @@
 
-export default function Offscreen($props: any) {
-	$props.visible ||= true;
+export default function Drawer($props: any) {
+	$props.visible ??= true;
 	$props.position ||= "left";
 
 	let offscreen: HTMLElement | undefined;
@@ -66,25 +66,16 @@ export default function Offscreen($props: any) {
 		}
 	}
 
-	function close() {
-		$props.visible = false;
-		if ($props.onclose) {
-			$props.onclose()
-		}
-	}
-
 	@render {
 		@if ($props.visible) {
-			<div onclick={close} >
-				<div
-					id={$props.id}
-					class={`torp-offscreen ${$props.class ?? ""}`.trim()}
-					style="position: fixed;"
-					:transition={transitionArgs()}
-					&ref={offscreen}
-				>
-					<:slot />
-				</div>
+			<div
+				id={$props.id}
+				class={`torp-offscreen ${$props.class ?? ""}`.trim()}
+				style="position: fixed;"
+				:transition={transitionArgs()}
+				&ref={offscreen}
+			>
+				<:slot />
 			</div>
 		}
 	}

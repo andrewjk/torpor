@@ -1,26 +1,26 @@
 import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
-import { Offscreen } from "@torpor/ui/Offscreen";
+import { Drawer } from "@torpor/ui/Drawer";
 
 export default function ExampleDialog($props: any) {
 	@render {
 		<p>
-			The button below shows a popover Offscreen using the Popover, PopoverTrigger
+			The button below shows a popover Drawer using the Popover, PopoverTrigger
 			and PopoverContent components.
 		</p>
 
 		<Popover>
-			<PopoverOverlay class="expopoff-overlay" />
+			<PopoverOverlay class="example-overlay" />
 			<PopoverTrigger>Show a popover</PopoverTrigger>
 			<PopoverContent>
-				<Offscreen class="expopoff-content">
+				<Drawer class="example-content">
 					<p>Here I am</p>
-				</Offscreen>
+				</Drawer>
 			</PopoverContent>
 		</Popover>
 	}
 
 	@style {
-		:global(.expopoff-overlay) {
+		:global(.example-overlay) {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -30,7 +30,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.expopoff-content) {
+		:global(.example-content) {
 			background: white;
 			padding: 10px;
 			top: 0;
