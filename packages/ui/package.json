@@ -22,6 +22,11 @@
 			"import": "./dist/Dialog/index.js",
 			"require": "./dist/Dialog/index.cjs"
 		},
+		"./Disclosure": {
+			"types": "./dist/Disclosure/index.d.ts",
+			"import": "./dist/Disclosure/index.js",
+			"require": "./dist/Disclosure/index.cjs"
+		},
 		"./Drawer": {
 			"types": "./dist/Drawer/index.d.ts",
 			"import": "./dist/Drawer/index.js",

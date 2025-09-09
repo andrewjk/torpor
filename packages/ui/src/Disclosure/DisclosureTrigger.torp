@@ -1,0 +1,36 @@
+import getId from "../utils/getId";
+import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+
+/**
+ * A header button for a Disclosure, which can be used to reveal or hide an associated DisclosureContent.
+ */
+export default function DisclosureTrigger() {
+	$props.id ||= getId();
+
+	// Get stuff out of the DisclosureContext
+	const context = $context[DisclosureContextName] as DisclosureContext;
+	if (!context) {
+		throw new Error("DisclosureTrigger must be contained within a Disclosure");
+	}
+	let $state = $context[DisclosureContextName].state;
+
+	// Set the header ID so that it can be used with aria-labelledby in DisclosureContent
+	$state.headerId = $props.id;
+
+	@render {
+		<button
+			type="button"
+			id={$props.id}
+			class={`torp-disclosure-trigger ${$props.class ?? ""}`.trim()}
+			disabled={$state.disabled || $state.parentDisabled}
+			aria-expanded={$state.expanded.toString()}
+			aria-disabled={$state.disabled}
+			aria-controls={$state.contentId}
+			data-state={$state.dataState}
+			data-disabled={$state.disabled}
+			onclick={() => $state.expanded = !$state.expanded}
+		>
+			<:slot />
+		</button>
+	}
+}

@@ -1,0 +1,56 @@
+import {
+	Disclosure,
+	DisclosureHeader,
+	DisclosureTrigger,
+	DisclosureContent
+} from "@torpor/ui/Disclosure";
+
+export default function ExampleBound($props: any) {
+	let $state = $watch({ expanded: false });
+
+	@render {
+		<p>Expanded:
+			<select &value={$state.expanded}>
+				<option value="false">No</option>
+				<option value="true">Yes</option>
+			</select>
+		</p>
+
+		<Disclosure class="example-disclosure" &expanded={$state.expanded}>
+			<DisclosureHeader as="h4">
+				<DisclosureTrigger class="example-disclosure-trigger">Click me</DisclosureTrigger>
+			</DisclosureHeader>
+			<DisclosureContent>
+				<div class="example-disclosure-content" @/* transition:slide */>Here I am</div>
+			</DisclosureContent>
+		</Disclosure>
+	}
+
+	@style {
+		.example-disclosure {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			width: 200px;
+		}
+
+		.example-disclosure-trigger {
+			all: unset;
+			cursor: default;
+			padding: 5px;
+			width: 100%;
+		}
+
+		.example-disclosure-trigger:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+
+		.example-disclosure-trigger[data-state="open"] {
+			border-bottom: 2px solid black;
+		}
+
+		.example-disclosure-content {
+			padding: 5px;
+			width: 100%;
+		}
+	}
+}

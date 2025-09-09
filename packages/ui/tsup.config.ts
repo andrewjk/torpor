@@ -10,6 +10,7 @@ export default defineConfig({
 		"src/Accordion/index.ts",
 		"src/Breadcrumb/index.ts",
 		"src/Dialog/index.ts",
+		"src/Disclosure/index.ts",
 		"src/Drawer/index.ts",
 		"src/NavMenu/index.ts",
 		"src/Popover/index.ts",

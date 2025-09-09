@@ -1,0 +1,69 @@
+import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+
+/**
+ * An interactive header that enables users to reveal or hide an associated section of content.
+ *
+ * See [the WAI ARIA guidelines for Disclosures](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/).
+ *
+ * The structure of a Disclosure is:
+ *
+ * ```
+ * <Disclosure>
+ *     <DisclosureHeader>
+ *         <DisclosureTrigger />
+ *     </DisclosureHeader>
+ *     <DisclosureContent />
+ * </Disclosure>
+ * ```
+ *
+ * @prop {boolean} [expanded] -- Whether the Disclosure is expanded and its content visible
+ * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this Disclosure
+ * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
+ */
+export default function Disclosure($props: any) {
+	$props.expanded ??= false;
+	$props.disabled ??= false;
+
+	let $state: DisclosureState = $watch({
+		expanded: $props.expanded && $props.expanded !== "false",
+		disabled: $props.disabled,
+		get dataState() {
+			return this.expanded ? "open" : "closed";
+		},
+	});
+
+	// Update $state with $props
+	$run(() => {
+		$state.expanded = $props.expanded && $props.expanded !== "false";
+		$state.disabled = $props.disabled;
+	});
+
+	// Put stuff into a DisclosureContext
+	const itemContext: DisclosureContext = {
+		state: $state,
+	};
+	$context[DisclosureContextName] = itemContext;
+
+	// Dispatch the toggle event when the value of expanded changes
+	let firstToggle = true;
+	$run(() => {
+		const ev = $props.ontoggle;
+		const expanded = $state.expanded;
+		if (firstToggle) {
+			firstToggle = false;
+		} else if (ev) {
+			ev(expanded);
+		}
+	});
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-disclosure-item ${$props.class ?? ""}`.trim()}
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			<:slot />
+		</div>
+	}
+}

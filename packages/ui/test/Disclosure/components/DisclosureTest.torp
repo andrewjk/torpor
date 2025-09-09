@@ -1,0 +1,17 @@
+import {
+	Disclosure,
+	DisclosureHeader,
+	DisclosureTrigger,
+	DisclosureContent
+} from '../../../src/Disclosure/index';
+
+export default function DisclosureAccessibility($props: { expanded: boolean }) {
+	@render {
+		<Disclosure {$props.expanded}>
+			<DisclosureHeader as="h4">
+				<DisclosureTrigger>Disclosure header</DisclosureTrigger>
+			</DisclosureHeader>
+			<DisclosureContent>Disclosure content</DisclosureContent>
+		</Disclosure>
+	}
+}

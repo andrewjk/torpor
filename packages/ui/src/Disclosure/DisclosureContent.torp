@@ -1,0 +1,36 @@
+import getId from "../utils/getId";
+import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+
+/**
+ * Content for a Disclosure, which can be revealed or hidden by an associated DisclosureTrigger.
+ *
+ * @prop {string} [id] -- An ID for the DisclosureContent's div container
+ * @prop {boolean} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Disclosure
+ */
+export default function DisclosureContent($props: any) {
+	$props.id ||= getId();
+
+	const context = $context[DisclosureContextName] as DisclosureContext;
+	if (!context) {
+		throw new Error("DisclosureContent must be contained within a Disclosure");
+	}
+	let $state = $context[DisclosureContextName].state
+
+	// Set the content ID so that it can be used with aria-controls in DisclosureTrigger
+	$state.contentId = $props.id;
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-disclosure-content ${$props.class ?? ""}`.trim()}
+			role={$props.ariaRegion ? "region" : undefined}
+			aria-labelledby={$state.headerId}
+			data-state={$state.dataState}
+			data-disabled={$state.dataDisabled}
+		>
+			@if ($state.expanded) {
+				<:slot />
+			}
+		</div>
+	}
+}
