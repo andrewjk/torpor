@@ -1,0 +1,38 @@
+import { Popover, PopoverContent } from '../../../src/Popover/index';
+import {
+	Dialog,
+	DialogBody,
+	DialogFooter,
+	DialogButton
+} from '../../../src/Dialog/index';
+
+export default function PromptVariable() {
+	let $state = $watch({
+		color: '',
+		showPopover: false
+	});
+
+	@render {
+		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+			Show the prompt
+		</button>
+
+		@if ($state.color) {
+			<p>Your favorite color is {$state.color}?!</p>
+		}
+
+		<Popover &visible={$state.showPopover}>
+			<PopoverContent>
+				<Dialog>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter>
+						<DialogButton value="blue" onclick={() => ($state.color = 'blue')}>Blue</DialogButton>
+						<DialogButton value="red" onclick={() => ($state.color = 'red')}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</PopoverContent>
+		</Popover>
+	}
+}
