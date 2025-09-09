@@ -1,0 +1,33 @@
+
+/**
+ *
+ * A list of links to the parent pages of the current page in hierarchical order.
+ *
+ * See [the WAI ARIA guidelines for Breadcrumbs](https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/).
+ *
+ * The structure of a Breadcrumb is:
+ *
+ * ```
+ * <Breadcrumb>
+ *     <BreadcrumbItem />
+ *     <BreadcrumbSeparator /> (optional)
+ *     <BreadcrumbItem />
+ * 	...
+ * </Breadcrumb>
+ * ```
+ *
+ * You can separate BreadcrumbItems using BreadcrumbSeparators or by using CSS.
+ *
+ * @prop {string | undefined} ariaLabel -- An ARIA label for describing the popover to screen readers 
+ */
+export default function Breadcrumb($props: any) {
+	@render {
+		<nav
+			id={$props.id}
+			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
+			aria-label={$props.ariaLabel}
+		>
+			<:slot />
+		</nav>
+	}
+}

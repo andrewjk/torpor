@@ -1,0 +1,97 @@
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import copyCode from "../../lib/copyCode";
+import ExampleCSS from "./breadcrumb/ExampleCSS.torp";
+import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
+
+import ExampleCSSCode from "./breadcrumb/ExampleCSS.torp?raw";
+import ExampleSeparatorsCode from "./breadcrumb/ExampleSeparators.torp?raw";
+
+export default function Component() {
+	@render {
+		<:head>
+			<title>Breadcrumb | Torpor</title>
+		</:head>
+
+		<h1>Breadcrumb</h1>
+		<p>
+			A list of links to the parent pages of the current page in hierarchical order.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/">the WAI ARIA guidelines for Breadcrumbs</a>.
+ 		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Breadcrumb>
+    <BreadcrumbItem />
+    <BreadcrumbSeparator /> (optional)
+    <BreadcrumbItem />
+	...
+</Breadcrumb>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						CSS
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Separators
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleCSS />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" on:click={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleCSSCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleSeparators />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" on:click={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleSeparatorsCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

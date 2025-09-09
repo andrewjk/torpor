@@ -1,0 +1,16 @@
+
+/**
+ * A separator between links in a Breadcrumb component. It is hidden from
+ * screen readers.
+ */
+export default function BreadcrumbSeparator($props: any) {
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-breadcrumb-separator ${$props.class ?? ""}`.trim()}
+			aria-hidden="true"
+		>
+			<:slot />
+		</div>
+	}
+}

@@ -1,0 +1,38 @@
+import { Breadcrumb, BreadcrumbItem } from "@torpor/ui/Breadcrumb";
+
+export default function ExampleCSS($props: any) {
+	@render {
+		<p>
+			Below is an example Breadcrumb using CSS to style the separators.
+		</p>
+
+		<Breadcrumb class="example-breadcrumb" ariaLabel="Breadcrumb">
+			<BreadcrumbItem class="example-breadcrumb-item">
+				<a href="/">Torpor</a>
+			</BreadcrumbItem>
+			<BreadcrumbItem class="example-breadcrumb-item">
+				<a href="/ui/overview">UI</a>
+			</BreadcrumbItem>
+			<BreadcrumbItem class="example-breadcrumb-item" current>
+				Breadcrumb
+			</BreadcrumbItem>
+		</Breadcrumb>
+	}
+
+	@style {
+		.example-breadcrumb {
+			display: flex;
+		}
+
+		.example-breadcrumb-item + .example-breadcrumb-item::before {
+			display: inline-block;
+			content: '»';
+			margin: 0 4px;
+		}
+
+		.example-breadcrumb-item[data-current='current'] {
+			color: currentcolor;
+			text-decoration: none;
+		}
+	}
+}

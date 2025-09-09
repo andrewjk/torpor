@@ -8,9 +8,10 @@ type Config =
 export default defineConfig({
 	entry: [
 		"src/Accordion/index.ts",
+		"src/Breadcrumb/index.ts",
 		"src/Dialog/index.ts",
-		"src/NavMenu/index.ts",
 		"src/Drawer/index.ts",
+		"src/NavMenu/index.ts",
 		"src/Popover/index.ts",
 		"src/TabGroup/index.ts",
 		"src/motion.ts",

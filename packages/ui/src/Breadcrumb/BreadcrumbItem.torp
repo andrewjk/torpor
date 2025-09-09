@@ -1,0 +1,19 @@
+
+/**
+ * An item in a breadcrumb, containing a link to one of the parent pages of the
+ * current page (or the current page).
+ *
+ * @prop {boolean | undefined} current -- Whether this is the current page
+ */
+export default function BreadcrumbItem($props: any) {
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
+			aria-current={$props.current ? "page" : undefined}
+			data-current={$props.current ? "current" : undefined}
+		>
+			<:slot />
+		</div>
+	}
+}

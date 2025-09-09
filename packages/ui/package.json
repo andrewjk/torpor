@@ -12,20 +12,25 @@
 			"import": "./dist/Accordion/index.js",
 			"require": "./dist/Accordion/index.cjs"
 		},
+		"./Breadcrumb": {
+			"types": "./dist/Breadcrumb/index.d.ts",
+			"import": "./dist/Breadcrumb/index.js",
+			"require": "./dist/Breadcrumb/index.cjs"
+		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
 			"import": "./dist/Dialog/index.js",
 			"require": "./dist/Dialog/index.cjs"
 		},
-		"./NavMenu": {
-			"types": "./dist/NavMenu/index.d.ts",
-			"import": "./dist/NavMenu/index.js",
-			"require": "./dist/NavMenu/index.cjs"
-		},
 		"./Drawer": {
 			"types": "./dist/Drawer/index.d.ts",
 			"import": "./dist/Drawer/index.js",
 			"require": "./dist/Drawer/index.cjs"
+		},
+		"./NavMenu": {
+			"types": "./dist/NavMenu/index.d.ts",
+			"import": "./dist/NavMenu/index.js",
+			"require": "./dist/NavMenu/index.cjs"
 		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
