@@ -1,4 +1,4 @@
-import { type Attribute } from "../../types/nodes/Attribute";
+import { type Attribute } from "../../types/styles/Attribute";
 import { type Style } from "../../types/styles/Style";
 import { type StyleBlock } from "../../types/styles/StyleBlock";
 import Builder from "../../utils/Builder";
@@ -13,8 +13,6 @@ export default function buildStyles(style: Style, styleHash: string): string {
 	return b.toString();
 }
 
-const globalStyleRegex = /\:global\((.+)\)/;
-
 function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 	// TODO: This should probably be done while parsing
 	// And handle attribute selectors
@@ -22,18 +20,29 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 		// Just output media queries and properties as-is
 		b.append(`${block.selector} {`);
 	} else {
-		const selectors = block.selector
-			.split(/([\s*,>+~])/)
-			.filter((s) => !!s.trim())
-			.map((s) => {
-				if (s.length === 1 && "*,>+~".includes(s)) {
-					return s;
-				} else if (globalStyleRegex.test(s)) {
-					return s.match(globalStyleRegex)![1];
-				} else {
-					return `${s}.torp-${styleHash}`;
-				}
-			});
+		block.selector = block.selector.replaceAll(/\s+/g, " ");
+		let selectors: string[] = [];
+		let global = false;
+		let start = 0;
+		for (let i = 0; i <= block.selector.length; i++) {
+			if (block.selector.substring(i).startsWith(":global(")) {
+				i += ":global".length;
+				start = i + 1;
+				global = true;
+			} else if (global && block.selector[i] === ")") {
+				addSelector(selectors, block.selector, styleHash, start, i, global);
+				start = i + 1;
+				global = false;
+			} else if ("*,>+~".includes(block.selector[i])) {
+				selectors.push(block.selector[i]);
+				start = i + 1;
+			} else if (i === block.selector.length) {
+				addSelector(selectors, block.selector, styleHash, start, i, global);
+			} else if (block.selector[i] === " ") {
+				addSelector(selectors, block.selector, styleHash, start, i, global);
+				start = i + 1;
+			}
+		}
 		b.append(`${selectors.join(" ")} {`);
 	}
 	for (let attribute of block.attributes) {
@@ -43,6 +52,23 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 		buildStyleBlock(child, b, styleHash);
 	}
 	b.append(`}`);
+}
+
+function addSelector(
+	selectors: string[],
+	selector: string,
+	styleHash: string,
+	start: number,
+	end: number,
+	global: boolean,
+) {
+	if (end > start) {
+		let s = selector.substring(start, end);
+		if (!global) {
+			s += `.torp-${styleHash}`;
+		}
+		selectors.push(s);
+	}
 }
 
 function buildStyleAttribute(attribute: Attribute, b: Builder) {

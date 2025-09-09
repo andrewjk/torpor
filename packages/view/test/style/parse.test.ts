@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import buildStyles from "../../src/compile/build/client/buildStyles";
 import parse from "../../src/compile/parse";
 import { type ParseResult } from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
@@ -162,6 +163,183 @@ export default function Test(/* @params */) {
 		},
 	};
 	expect(output).toEqual(expected);
+});
+
+test("style with combinators", () => {
+	const input = `
+export default function Test() {
+	@style {
+		.h1.blah p > .child + .next {
+			color: blue;
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: ".h1.blah p > .child + .next",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "1hfc9nc",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "1hfc9nc");
+	const expectedStyle = `
+.h1.blah.torp-1hfc9nc p.torp-1hfc9nc > .child.torp-1hfc9nc + .next.torp-1hfc9nc {
+	color: blue;
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
+});
+
+test("global style with combinators", () => {
+	const input = `
+export default function Test() {
+	@style {
+		:global(.h1.blah p > .child + .next) {
+			color: blue;
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: ":global(.h1.blah p > .child + .next)",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "wbexfk",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "wbexfk");
+	const expectedStyle = `
+.h1.blah p > .child + .next {
+	color: blue;
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
+});
+
+test("some global styles", () => {
+	const input = `
+export default function Test() {
+	@style {
+		:global(.h1.blah) p > .child + :global(.next) {
+			color: blue;
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: ":global(.h1.blah) p > .child + :global(.next)",
+								attributes: [
+									{
+										name: "color",
+										value: "blue",
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "1cfcedi",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "1cfcedi");
+	const expectedStyle = `
+.h1.blah p.torp-1cfcedi > .child.torp-1cfcedi + .next {
+	color: blue;
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
 });
 
 test("media query", () => {
