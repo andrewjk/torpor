@@ -49,7 +49,6 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			// No animation on the server, but we do need to set the attributes
 			// from the first keyframe
 			// HACK: use a regex instead maybe?
-			value = value.substring(1, value.length - 1).trim();
 			value = value.split(",")[0].trim();
 			if (value.startsWith("[")) {
 				value = value.substring(1);
