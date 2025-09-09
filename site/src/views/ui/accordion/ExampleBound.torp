@@ -12,62 +12,62 @@ export default function ExampleBound($props: any) {
 	@render {
 		<p>Value: <input type="number" &value={$state.value} /></p>
 
-		<Accordion class="example-dialog" &value={$state.value}>
-			<AccordionItem class="example-dialog-item">
+		<Accordion class="example-accordion" &value={$state.value}>
+			<AccordionItem class="example-accordion-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="example-dialog-trigger">Item 1</AccordionTrigger>
+					<AccordionTrigger class="example-accordion-trigger">Item 1</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-dialog-content" @/* transition:slide */>The first item</div>
+					<div class="example-accordion-content" @/* transition:slide */>The first item</div>
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem class="example-dialog-item">
+			<AccordionItem class="example-accordion-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="example-dialog-trigger">Item 2</AccordionTrigger>
+					<AccordionTrigger class="example-accordion-trigger">Item 2</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-dialog-content" @/* transition:slide */>Another item</div>
+					<div class="example-accordion-content" @/* transition:slide */>Another item</div>
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem class="example-dialog-item">
+			<AccordionItem class="example-accordion-item">
 				<AccordionHeader as="h4">
-					<AccordionTrigger class="example-dialog-trigger">Item 3</AccordionTrigger>
+					<AccordionTrigger class="example-accordion-trigger">Item 3</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-dialog-content" @/* transition:slide */>The last item</div>
+					<div class="example-accordion-content" @/* transition:slide */>The last item</div>
 				</AccordionContent>
 			</AccordionItem>
 		</Accordion>
 	}
 
 	@style {
-		.example-dialog {
+		.example-accordion {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			width: 200px;
 		}
 
-		.example-dialog-trigger {
+		.example-accordion-trigger {
 			all: unset;
 			cursor: default;
 			padding: 5px;
 			width: 100%;
 		}
 
-		.example-dialog-trigger:focus-visible {
+		.example-accordion-trigger:focus-visible {
 			box-shadow: black 0px 0px 0px 2px;
 		}
 
-		.example-dialog-content {
+		.example-accordion-content {
 			padding: 5px;
 			width: 100%;
 		}
 
-		.example-dialog-item + .example-dialog-item {
+		.example-accordion-item + .example-accordion-item {
 			border-top: 1px solid gainsboro;
 		}
 
-		.example-dialog-trigger[data-state="open"] {
+		.example-accordion-trigger[data-state="open"] {
 			border-bottom: 2px solid black;
 		}
 	}
