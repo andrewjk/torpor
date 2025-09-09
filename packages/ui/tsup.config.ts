@@ -13,6 +13,7 @@ export default defineConfig({
 		"src/Disclosure/index.ts",
 		"src/Drawer/index.ts",
 		"src/NavMenu/index.ts",
+		"src/Notification/index.ts",
 		"src/Popover/index.ts",
 		"src/TabGroup/index.ts",
 		"src/motion.ts",

@@ -1,0 +1,14 @@
+import {
+	Notification,
+	NotificationContent,
+	NotificationClose
+} from '../../../src/Notification/index';
+
+export default function NotificationAccessibility() {
+	@render {
+		<Notification visible>
+			<NotificationContent>Here's a notification</NotificationContent>
+			<NotificationClose>Close me</NotificationClose>
+		</Notification>
+	}
+}

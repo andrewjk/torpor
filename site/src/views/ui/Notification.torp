@@ -1,0 +1,131 @@
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import copyCode from "../../lib/copyCode";
+import ExampleBasic from "./notification/ExampleBasic.torp";
+import ExampleFunction from "./notification/ExampleFunction.torp";
+import ExampleQueue from "./notification/ExampleQueue.torp";
+
+import ExampleBasicCode from "./notification/ExampleBasic.torp?raw";
+import ExampleFunctionCode from "./notification/ExampleFunction.torp?raw";
+import ExampleQueueCode from "./notification/ExampleQueue.torp?raw";
+
+export default function Component() {
+	@render {
+		<:head>
+			<title>Notification | Torpor</title>
+		</:head>
+
+		<h1>Notification</h1>
+		<p>
+			An element that displays a brief, important message in a way that
+			attracts the user's attention without interrupting the user's task.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/alert/">the WAI ARIA guidelines for Alerts</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Notification>
+	<NotificationHeader /> (optional)
+	<NotificationBody /> (optional)
+	<NotificationFooter> (optional)
+		<NotificationButton /> (optional)
+	</NotificationFooter>
+</Notification>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Function
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Queue
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleBasic />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleFunction />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleFunctionCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleQueue />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleQueueCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

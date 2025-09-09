@@ -1,0 +1,38 @@
+import { NotificationContainer, showNotification } from '@torpor/ui/Notification';
+import CustomNotification from './CustomNotification.torp';
+
+export default function ExampleFunction() {
+	let nextNumber = 1;
+
+	function show() {
+		showNotification(CustomNotification, { text: `Here's notification ${nextNumber++}` });
+	}
+
+	@render {
+		<p>
+			The button below shows a custom notification component using the
+			showNotification function.
+		</p>
+		<p>
+			<button type="button" onclick={show}>Show a notification</button>
+		</p>
+
+		<NotificationContainer class="example-notification" />
+	}
+
+	@style {
+		.example-notification {
+			pointer-events: none;
+
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			gap: 5px;
+
+			position: fixed;
+			top: 5px;
+			left: 0;
+			right: 0;
+		}
+	}
+}

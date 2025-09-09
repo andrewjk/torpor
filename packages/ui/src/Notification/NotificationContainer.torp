@@ -1,0 +1,14 @@
+/**
+ * The container for one or more Notifications, which can be used to position
+ * the notifications inside the viewport.
+ */
+export default function NotificationContainer() {
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-notification-container ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}

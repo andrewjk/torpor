@@ -1,0 +1,119 @@
+import {
+	NotificationContainer,
+	Notification,
+	NotificationContent,
+	NotificationClose
+} from '@torpor/ui/Notification';
+
+export default function ExampleQueue() {
+	let nextId = 0;
+	let $state = $watch({
+		notifications: [],
+		position: 'top'
+	});
+
+	function addNotification() {
+		$state.notifications.push({ id: nextId++, text: `Here's notification ${nextId}` });
+	}
+
+	function removeNotification(id: number) {
+		const index = $state.notifications.findIndex((n) => n.id === id);
+		if (index !== -1) {
+			$state.notifications.splice(index, 1);
+		}
+	}
+
+	@render {
+		<p>
+			The button below shows notifications inside a NotificationContainer
+			which has been styled to display notifications one after another.
+		</p>
+		<p>
+			<button type="button" onclick={addNotification}>Show a notification</button>
+		</p>
+		<p>
+			Position:
+			<select &value={$state.position}>
+				<option>top</option>
+				<option>top-left</option>
+				<option>top-right</option>
+				<option>bottom</option>
+				<option>bottom-left</option>
+				<option>bottom-right</option>
+			</select>
+		</p>
+
+		<NotificationContainer class={['example-notification-container', $state.position].join(' ')}>
+			@for (let note of $state.notifications) {
+				@key = note.id;
+				<Notification class="example-notification" onclose={() => removeNotification(note.id)}>
+					<NotificationContent>{note.text}</NotificationContent>
+					<NotificationClose>X</NotificationClose>
+				</Notification>
+			}
+		</NotificationContainer>
+	}
+
+	@style {
+		.example-notification-container {
+			pointer-events: none;
+
+			display: flex;
+			align-items: center;
+			flex-direction: column;
+			gap: 5px;
+
+			position: fixed;
+		}
+
+		.example-notification-container.top {
+			top: 5px;
+			left: 0;
+			right: 0;
+		}
+
+		.example-notification-container.top-left {
+			top: 5px;
+			left: 5px;
+		}
+
+		.example-notification-container.top-right {
+			top: 5px;
+			right: 5px;
+		}
+
+		.example-notification-container.bottom {
+			flex-direction: column-reverse;
+			bottom: 5px;
+			left: 0;
+			right: 0;
+		}
+
+		.example-notification-container.bottom-left {
+			flex-direction: column-reverse;
+			bottom: 5px;
+			left: 5px;
+		}
+
+		.example-notification-container.bottom-right {
+			flex-direction: column-reverse;
+			bottom: 5px;
+			right: 5px;
+		}
+
+		.example-notification {
+			pointer-events: all;
+
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+
+			display: grid;
+			grid-template-columns: auto min-content;
+			gap: 15px;
+
+			width: 340px;
+			padding: 10px;
+		}
+	}
+}

@@ -1,0 +1,38 @@
+import { Notification, NotificationContent, NotificationClose } from '@torpor/ui/Notification';
+
+export default function ExampleBasic() {
+	let $state = $watch({ showNotification: false });
+
+	@render {
+		<p>
+			The button below shows or hides an inline notification. You can
+			alternatively position the notification anywhere in the viewport
+			using CSS.
+		</p>
+		<p>
+			<button type="button" onclick={(e) => ($state.showNotification = !$state.showNotification)}>
+				Show a notification
+			</button>
+		</p>
+
+		<Notification class="example-notification" &visible={$state.showNotification}>
+			<NotificationContent>Thank you for doing something!</NotificationContent>
+			<NotificationClose>X</NotificationClose>
+		</Notification>
+	}
+
+	@style {
+		.example-notification {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+
+			display: grid;
+			grid-template-columns: auto min-content;
+			gap: 15px;
+
+			width: 340px;
+			padding: 10px;
+		}
+	}
+}

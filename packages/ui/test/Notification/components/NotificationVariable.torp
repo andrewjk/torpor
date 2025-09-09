@@ -1,0 +1,22 @@
+import {
+	Notification,
+	NotificationContent,
+	NotificationClose
+} from '../../../src/Notification/index';
+
+export default function NotificationVariable() {
+	let $state = $watch({
+		showNotification: false
+	});
+
+	@render {
+		<button type="button" onclick={(e) => ($state.showNotification = !$state.showNotification)}>
+			Show a notification
+		</button>
+
+		<Notification &visible={$state.showNotification}>
+			<NotificationContent>Here's a notification</NotificationContent>
+			<NotificationClose>Close me</NotificationClose>
+		</Notification>
+	}
+}

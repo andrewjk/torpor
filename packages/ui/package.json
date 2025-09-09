@@ -37,6 +37,11 @@
 			"import": "./dist/NavMenu/index.js",
 			"require": "./dist/NavMenu/index.cjs"
 		},
+		"./Notification": {
+			"types": "./dist/Notification/index.d.ts",
+			"import": "./dist/Notification/index.js",
+			"require": "./dist/Notification/index.cjs"
+		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js",

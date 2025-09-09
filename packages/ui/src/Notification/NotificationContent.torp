@@ -1,0 +1,13 @@
+/**
+ * The content to display within a Notification.
+ */
+export default function NotificationContent() {
+	@render {
+		<div 
+			id={$props.id}
+			class={`torp-notification-content ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}

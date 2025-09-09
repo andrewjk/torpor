@@ -1,0 +1,27 @@
+import { Notification, NotificationContent, NotificationClose } from '@torpor/ui/Notification';
+
+export default function CustomNotification() {
+	@render {
+		<Notification class="custom-notification-function">
+			<NotificationContent>{$props.text}</NotificationContent>
+			<NotificationClose>X</NotificationClose>
+		</Notification>
+	}
+
+	@style {
+		.custom-notification-function {
+			pointer-events: all;
+
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+
+			display: grid;
+			grid-template-columns: auto min-content;
+			gap: 15px;
+
+			width: 340px;
+			padding: 10px;
+		}
+	}
+}
