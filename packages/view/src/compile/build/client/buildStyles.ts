@@ -65,7 +65,15 @@ function addSelector(
 	if (end > start) {
 		let s = selector.substring(start, end);
 		if (!global) {
-			s += `.torp-${styleHash}`;
+			let pre = s;
+			let post = "";
+			// We might need to handle e.g. `:hover` or `::before`
+			let colonPosition = s.indexOf(":");
+			if (colonPosition !== -1) {
+				pre = s.substring(0, colonPosition);
+				post = s.substring(colonPosition);
+			}
+			s = `${pre}.torp-${styleHash}${post}`;
 		}
 		selectors.push(s);
 	}

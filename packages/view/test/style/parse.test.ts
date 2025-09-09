@@ -510,3 +510,121 @@ export default function Test(/* @params */) {
 	};
 	expect(output).toEqual(expected);
 });
+
+test("style with pseudo-elements", () => {
+	const input = `
+export default function Test() {
+	@style {
+		p::before {
+			content: "~";
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: "p::before",
+								attributes: [
+									{
+										name: "content",
+										value: '"~"',
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "5cr73h",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "5cr73h");
+	const expectedStyle = `
+p.torp-5cr73h::before {
+	content: "~";
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
+});
+
+test("style with selectors", () => {
+	const input = `
+export default function Test() {
+	@style {
+		p:hover {
+			color: "blue";
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: "p:hover",
+								attributes: [
+									{
+										name: "color",
+										value: '"blue"',
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "1pq0u26",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "1pq0u26");
+	const expectedStyle = `
+p.torp-1pq0u26:hover {
+	color: "blue";
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
+});
