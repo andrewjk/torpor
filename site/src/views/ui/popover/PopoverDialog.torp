@@ -27,13 +27,13 @@ export default function PopoverDialog($props: Props) {
 	}
 
 	@style {
-		:global(.popover-dialog-close) {
+		.popover-dialog-close {
 			position: absolute;
 			top: 5px;
 			right: 5px;
 		}
 
-		:global(.popover-dialog-content) {
+		.popover-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -44,7 +44,7 @@ export default function PopoverDialog($props: Props) {
 			z-index: 200;
 		}
 
-		:global(.popover-dialog-footer) {
+		.popover-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

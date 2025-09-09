@@ -33,12 +33,12 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.example-navmenu) {
+		.example-navmenu {
 			display: flex;
 			flex-direction: row;
 		}
 
-		:global(.example-navmenu-link) {
+		.example-navmenu-link {
 			all: unset;
 			cursor: default;
 			display: flex;
@@ -48,15 +48,15 @@ export default function ExampleBasic($props: any) {
 			padding: 5px 10px;
 		}
 
-		:global(.example-navmenu-link:hover),
-		:global(.example-navmenu-link:focus),
-		:global(.example-navmenu-link:active) {
+		.example-navmenu-link:hover,
+		.example-navmenu-link:focus,
+		.example-navmenu-link:active {
 			background-color: dodgerblue;
 			border-radius: 4px;
 			color: white;
 		}
 
-		:global(.example-navmenu-link-content) {
+		.example-navmenu-link-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -66,13 +66,13 @@ export default function ExampleBasic($props: any) {
 			z-index: 200;
 		}
 
-		:global(.example-navmenu-sub-menu) {
+		.example-navmenu-sub-menu {
 			display: flex;
 			flex-direction: column;
 			gap: 5px;
 		}
 
-		:global(.example-navmenu-separator) {
+		.example-navmenu-separator {
 			border-right: 1px solid gainsboro;
 		}
 	}

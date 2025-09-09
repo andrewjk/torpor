@@ -23,7 +23,7 @@ export default function CustomDialog($props: any) {
 	}
 
 	@style {
-		:global(.custom-dialog-overlay) {
+		.custom-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -33,7 +33,7 @@ export default function CustomDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.custom-dialog-content) {
+		.custom-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -46,7 +46,7 @@ export default function CustomDialog($props: any) {
 			z-index: 200;
 		}
 
-		:global(.custom-dialog-footer) {
+		.custom-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

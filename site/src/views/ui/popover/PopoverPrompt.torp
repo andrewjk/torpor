@@ -28,13 +28,13 @@ export default function PopoverPrompt($props: Props) {
 	}
 
 	@style {
-		:global(.popover-prompt-close) {
+		.popover-prompt-close {
 			position: absolute;
 			top: 5px;
 			right: 5px;
 		}
 
-		:global(.popover-prompt-content) {
+		.popover-prompt-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -45,7 +45,7 @@ export default function PopoverPrompt($props: Props) {
 			z-index: 200;
 		}
 
-		:global(.popover-prompt-footer) {
+		.popover-prompt-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

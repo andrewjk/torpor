@@ -34,7 +34,7 @@ export default function ConfirmDialog($props: any) {
 	}
 
 	@style {
-		:global(.confirm-dialog-overlay) {
+		.confirm-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -44,7 +44,7 @@ export default function ConfirmDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.confirm-dialog-content) {
+		.confirm-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -57,7 +57,7 @@ export default function ConfirmDialog($props: any) {
 			z-index: 200;
 		}
 
-		:global(.confirm-dialog-footer) {
+		.confirm-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

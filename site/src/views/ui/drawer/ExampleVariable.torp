@@ -22,7 +22,7 @@ export default function ExampleVariable($props: any) {
 	}
 
 	@style {
-		:global(.example-drawer-content) {
+		.example-drawer-content {
 			background: white;
 			padding: 10px;
 			top: 0;

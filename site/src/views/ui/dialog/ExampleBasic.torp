@@ -38,7 +38,7 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.example-dialog-overlay) {
+		.example-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -48,7 +48,7 @@ export default function ExampleBasic($props: any) {
 			z-index: 100;
 		}
 
-		:global(.example-dialog-content) {
+		.example-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -61,7 +61,7 @@ export default function ExampleBasic($props: any) {
 			z-index: 200;
 		}
 
-		:global(.example-dialog-footer) {
+		.example-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

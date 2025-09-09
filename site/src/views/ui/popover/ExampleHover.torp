@@ -17,14 +17,14 @@ export default function ExampleHover($props: any) {
 	}
 
 	@style {
-		:global(.example-popover-target) {
+		.example-popover-target {
 			border: 1px dashed #222;
 			border-radius: 4px;
 			cursor: default;
 			padding: 20px;
 		}
 
-		:global(.example-popover-content) {
+		.example-popover-content {
 			background: #333;
 			border: 1px solid gainsboro;
 			border-radius: 4px;

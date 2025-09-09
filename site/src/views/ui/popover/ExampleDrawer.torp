@@ -20,7 +20,7 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@style {
-		:global(.example-popover-overlay) {
+		.example-popover-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -30,7 +30,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.example-popover-content) {
+		.example-popover-content {
 			background: white;
 			padding: 10px;
 			top: 0;

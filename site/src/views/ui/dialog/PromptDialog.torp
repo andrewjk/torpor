@@ -41,7 +41,7 @@ export default function PromptDialog($props: any) {
 	}
 
 	@style {
-		:global(.prompt-dialog-overlay) {
+		.prompt-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -51,7 +51,7 @@ export default function PromptDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.prompt-dialog-content) {
+		.prompt-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -68,7 +68,7 @@ export default function PromptDialog($props: any) {
 			width: 100%;
 		}
 
-		:global(.prompt-dialog-footer) {
+		.prompt-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

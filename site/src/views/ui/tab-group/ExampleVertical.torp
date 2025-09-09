@@ -25,32 +25,32 @@ export default function ExampleVertical(props: any) {
 	}
 
 	@style {
-		:global(.example-tab) {
+		.example-tab {
 			display: grid;
 			grid-template-columns: auto 1fr;
 		}
 
-		:global(.example-tab-list) {
+		.example-tab-list {
 			display: flex;
 			flex-direction: column;
 		}
 
-		:global(.example-tab-trigger) {
+		.example-tab-trigger {
 			all: unset;
 			cursor: default;
 			border-right: 2px solid gainsboro;
 			padding: 5px 10px;
 		}
 
-		:global(.example-tab-trigger[data-state='active']) {
+		.example-tab-trigger[data-state='active'] {
 			border-right: 2px solid black;
 		}
 
-		:global(.example-tab-content) {
+		.example-tab-content {
 			display: none;
 		}
 
-		:global(.example-tab-content[data-state='active']) {
+		.example-tab-content[data-state='active'] {
 			display: flex;
 			align-items: center;
 			justify-content: center;

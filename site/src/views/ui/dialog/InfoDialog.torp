@@ -30,7 +30,7 @@ export default function InfoDialog($props: any) {
 	}
 
 	@style {
-		:global(.info-dialog-overlay) {
+		.info-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -40,7 +40,7 @@ export default function InfoDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.info-dialog-content) {
+		.info-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -53,7 +53,7 @@ export default function InfoDialog($props: any) {
 			z-index: 200;
 		}
 
-		:global(.info-dialog-footer) {
+		.info-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

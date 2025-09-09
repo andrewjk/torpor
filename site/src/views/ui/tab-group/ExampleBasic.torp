@@ -27,22 +27,22 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.example-tab-trigger) {
+		.example-tab-trigger {
 			all: unset;
 			cursor: default;
 			border-bottom: 2px solid gainsboro;
 			padding: 5px 10px;
 		}
 
-		:global(.example-tab-trigger[data-state="active"]) {
+		.example-tab-trigger[data-state="active"] {
 			border-bottom: 2px solid black;
 		}
 
-		:global(.example-tab-content) {
+		.example-tab-content {
 			display: none;
 		}
 
-		:global(.example-tab-content[data-state="active"]) {
+		.example-tab-content[data-state="active"] {
 			display: flex;
 			align-items: center;
 			justify-content: center;

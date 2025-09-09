@@ -31,33 +31,33 @@ export default function ExampleBasic($props: any) {
 	}
 
 	@style {
-		:global(.example-dialog) {
+		.example-dialog {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			width: 200px;
 		}
 
-		:global(.example-dialog-trigger) {
+		.example-dialog-trigger {
 			all: unset;
 			cursor: default;
 			padding: 5px;
 			width: 100%;
 		}
 
-		:global(.example-dialog-trigger:focus-visible) {
+		.example-dialog-trigger:focus-visible {
 			box-shadow: black 0px 0px 0px 2px;
 		}
 
-		:global(.example-dialog-content) {
+		.example-dialog-content {
 			padding: 5px;
 			width: 100%;
 		}
 
-		:global(.example-dialog-item + .example-dialog-item) {
+		.example-dialog-item + .example-dialog-item {
 			border-top: 1px solid gainsboro;
 		}
 
-		:global(.example-dialog-trigger[data-state="open"]) {
+		.example-dialog-trigger[data-state="open"] {
 			border-bottom: 2px solid black;
 		}
 	}

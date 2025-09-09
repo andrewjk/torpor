@@ -33,7 +33,7 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@style {
-		:global(.example-popover-overlay) {
+		.example-popover-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
 			position: fixed;
 			top: 0;
@@ -43,7 +43,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 100;
 		}
 
-		:global(.example-popover-content) {
+		.example-popover-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
@@ -56,7 +56,7 @@ export default function ExampleDialog($props: any) {
 			z-index: 200;
 		}
 
-		:global(.example-popover-footer) {
+		.example-popover-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;
