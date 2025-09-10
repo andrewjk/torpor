@@ -34,6 +34,7 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 				start = i + 1;
 				global = false;
 			} else if ("*,>+~".includes(block.selector[i])) {
+				addSelector(selectors, block.selector, styleHash, start, i, global);
 				selectors.push(block.selector[i]);
 				start = i + 1;
 			} else if (i === block.selector.length) {
@@ -43,7 +44,7 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 				start = i + 1;
 			}
 		}
-		b.append(`${selectors.join(" ")} {`);
+		b.append(`${selectors.join(" ").replaceAll(" ,", ",")} {`);
 	}
 	for (let attribute of block.attributes) {
 		buildStyleAttribute(attribute, b);

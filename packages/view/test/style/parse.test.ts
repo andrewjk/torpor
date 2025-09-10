@@ -628,3 +628,64 @@ p.torp-1pq0u26:hover {
 `.trimStart();
 	expect(style).toEqual(expectedStyle);
 });
+
+test("style with multiple selectors", () => {
+	const input = `
+export default function Test() {
+	@style {
+		p:hover,
+		p:active,
+		p:focused {
+			color: "blue";
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	const expected: ParseResult = {
+		ok: true,
+		errors: [],
+		template: {
+			imports: [],
+			script: `
+export default function Test(/* @params */) {
+	/* @start */
+	
+	/* @end */
+}
+`,
+			components: [
+				{
+					start: 25,
+					name: "Test",
+					default: true,
+					style: {
+						global: false,
+						blocks: [
+							{
+								selector: "p:hover,\n\t\tp:active,\n\t\tp:focused",
+								attributes: [
+									{
+										name: "color",
+										value: '"blue"',
+									},
+								],
+								children: [],
+							},
+						],
+						hash: "1ib1oex",
+					},
+				},
+			],
+		},
+	};
+	expect(output).toEqual(expected);
+
+	const style = buildStyles(expected.template?.components[0].style!, "1ib1oex");
+	const expectedStyle = `
+p.torp-1ib1oex:hover, p.torp-1ib1oex:active, p.torp-1ib1oex:focused {
+	color: "blue";
+}
+`.trimStart();
+	expect(style).toEqual(expectedStyle);
+});
