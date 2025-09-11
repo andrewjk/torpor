@@ -3,13 +3,13 @@ import {
 	Notification,
 	NotificationContent,
 	NotificationClose
-} from '@torpor/ui/Notification';
+} from "@torpor/ui/Notification";
 
 export default function ExampleQueue() {
 	let nextId = 0;
 	let $state = $watch({
 		notifications: [],
-		position: 'top'
+		position: "top"
 	});
 
 	function addNotification() {
@@ -43,7 +43,7 @@ export default function ExampleQueue() {
 			</select>
 		</p>
 
-		<NotificationContainer class={['example-notification-container', $state.position].join(' ')}>
+		<NotificationContainer class={["example-notification-container", $state.position].join(" ")}>
 			@for (let note of $state.notifications) {
 				@key = note.id;
 				<Notification class="example-notification" onclose={() => removeNotification(note.id)}>

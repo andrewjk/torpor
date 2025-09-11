@@ -1,5 +1,5 @@
-import Counter from './Counter.torp';
-import torporLogo from '@/assets/torpor.svg';
+import Counter from "./Counter.torp";
+import torporLogo from "@/assets/torpor.svg";
 
 /**
  * The home component

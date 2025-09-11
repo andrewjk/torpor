@@ -1,9 +1,9 @@
-import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
+import { Popover, PopoverOverlay, PopoverContent } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ConfirmDialog($props: any) {
-	$props.confirmText ||= 'OK';
-	$props.cancelText ||= 'Cancel';
+	$props.confirmText ||= "OK";
+	$props.cancelText ||= "Cancel";
 
 	@render {
 		<Popover visible callback={$props.callback}>

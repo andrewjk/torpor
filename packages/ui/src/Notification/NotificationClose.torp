@@ -1,4 +1,4 @@
-import { NotificationContextName, type NotificationContext } from './NotificationTypes';
+import { NotificationContextName, type NotificationContext } from "./NotificationTypes";
 
 /**
  * The button that a user can press to close this Notification.
@@ -7,7 +7,7 @@ export default function NotificationClose() {
 	// Get stuff out of the NotificationContext
 	const context = $context[NotificationContextName] as NotificationContext;
 	if (!context) {
-		throw new Error('NotificationClose must be contained within a Notification');
+		throw new Error("NotificationClose must be contained within a Notification");
 	}
 	const { closeNotification } = context;
 

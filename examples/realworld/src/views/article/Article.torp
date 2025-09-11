@@ -1,6 +1,6 @@
 import { $page } from "@torpor/build/state";
-import ArticleMeta from './ArticleMeta.torp';
-import CommentContainer from '../comment/CommentContainer.torp';
+import ArticleMeta from "./ArticleMeta.torp";
+import CommentContainer from "../comment/CommentContainer.torp";
 
 export default function Article() {
 	@render {

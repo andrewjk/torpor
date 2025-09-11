@@ -1,5 +1,5 @@
-import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
+import { Popover, PopoverOverlay, PopoverContent } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function CustomDialog($props: any) {
 	@render {

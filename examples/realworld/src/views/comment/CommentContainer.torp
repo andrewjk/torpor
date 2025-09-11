@@ -1,5 +1,5 @@
-import CommentInput from './CommentInput.torp';
-import Comment from './Comment.torp';
+import CommentInput from "./CommentInput.torp";
+import Comment from "./Comment.torp";
 
 export default function CommentContainer() {
 	@render {

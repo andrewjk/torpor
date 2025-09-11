@@ -26,11 +26,11 @@ export default function ExampleCSS($props: any) {
 
 		.example-breadcrumb-item + .example-breadcrumb-item::before {
 			display: inline-block;
-			content: '»';
+			content: "»";
 			margin: 0 4px;
 		}
 
-		.example-breadcrumb-item[data-current='current'] {
+		.example-breadcrumb-item[data-current="current"] {
 			color: currentcolor;
 			text-decoration: none;
 		}

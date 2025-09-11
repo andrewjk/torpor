@@ -4,8 +4,8 @@ import {
 	NotificationContent,
 	NotificationClose,
 	showNotification
-} from '../../../src/Notification/index';
-import CustomNotification from './CustomNotification.torp';
+} from "../../../src/Notification/index";
+import CustomNotification from "./CustomNotification.torp";
 
 export default function NotificationFunction() {
 	function show() {

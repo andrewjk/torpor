@@ -1,4 +1,4 @@
-import List from './List.torp'
+import List from "./List.torp"
 
 export default function Let($props: any) {
 	@render {

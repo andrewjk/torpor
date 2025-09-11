@@ -1,4 +1,4 @@
-import ArticlePreview from './ArticlePreview.torp';
+import ArticlePreview from "./ArticlePreview.torp";
 
 export default function ArticleList() {
 	@render {

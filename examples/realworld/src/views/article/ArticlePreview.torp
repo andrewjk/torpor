@@ -1,4 +1,4 @@
-//import { enhance } from '$app/forms';
+//import { enhance } from "$app/forms";
 
 export default function ArticlePreview() {
 	let { article, user } = $props;
@@ -22,7 +22,7 @@ export default function ArticlePreview() {
 						class="pull-xs-right"
 					>
 						<input hidden type="checkbox" name="favorited" checked={article.favorited} />
-						<button class="btn btn-sm {article.favorited ? 'btn-primary' : 'btn-outline-primary'}">
+						<button class="btn btn-sm {article.favorited ? "btn-primary" : "btn-outline-primary"}">
 							<i class="ion-heart" />
 							{article.favoritesCount}
 						</button>
@@ -43,12 +43,12 @@ export default function ArticlePreview() {
 								article.favoritesCount += 1;
 							}
 
-							const button = form.querySelector('button');
+							const button = form.querySelector("button");
 							button.disabled = true;
 
 							return ({ result, update }) => {
 								button.disabled = false;
-								if (result.type === 'error') update();
+								if (result.type === "error") update();
 							};
 						}}
 

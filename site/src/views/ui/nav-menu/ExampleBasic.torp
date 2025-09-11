@@ -5,7 +5,7 @@ import {
 	NavMenuPopoutButton,
 	NavMenuPopoutContent,
 	NavMenuSeparator
-} from '@torpor/ui/NavMenu';
+} from "@torpor/ui/NavMenu";
 
 export default function ExampleBasic($props: any) {
 	@render {

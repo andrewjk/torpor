@@ -1,4 +1,4 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator } from '@torpor/ui/Breadcrumb';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator } from "@torpor/ui/Breadcrumb";
 
 export default function ExampleSeparators() {
 	@render {
@@ -25,7 +25,7 @@ export default function ExampleSeparators() {
 			gap: 8px;
 		}
 
-		.example-breadcrumb-item[data-current='current'] {
+		.example-breadcrumb-item[data-current="current"] {
 			color: currentcolor;
 			text-decoration: none;
 		}

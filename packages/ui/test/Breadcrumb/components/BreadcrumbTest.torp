@@ -4,10 +4,10 @@ export default function BreadcrumbAccessibility() {
 	@render {
 		<Breadcrumb ariaLabel="Breadcrumb">
 			<BreadcrumbItem>
-				<a href={location + '#mainpage'}>Main page</a>
+				<a href={location + "#mainpage"}>Main page</a>
 			</BreadcrumbItem>
 			<BreadcrumbItem>
-				<a href={location + '#subpage'}>Sub page</a>
+				<a href={location + "#subpage"}>Sub page</a>
 			</BreadcrumbItem>
 			<BreadcrumbItem current>Current page</BreadcrumbItem>
 		</Breadcrumb>

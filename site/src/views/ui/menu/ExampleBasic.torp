@@ -1,4 +1,4 @@
-import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from '@torpor/ui/Popover';
+import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import {
 	Menu,
 	MenuButton,
@@ -10,19 +10,19 @@ import {
 	MenuPopoutTrigger,
 	MenuPopoutContent,
 	MenuSeparator
-} from '@torpor/ui/Menu';
+} from "@torpor/ui/Menu";
 
 export default function ExampleBasic() {
 	let $state = $watch({
-		text: 'Style this paragraph',
+		text: "Style this paragraph",
 		bold: false,
 		italic: false,
 		underline: false,
-		color: 'default',
+		color: "default",
 	});
 
 	async function setText() {
-		$state.text = prompt('Enter the new paragraph text below:', $state.text) || $state.text;
+		$state.text = prompt("Enter the new paragraph text below:", $state.text) || $state.text;
 	}
 
 	function resetStyle() {
@@ -43,9 +43,9 @@ export default function ExampleBasic() {
 				bold: $state.bold,
 				italic: $state.italic,
 				underline: $state.underline,
-				red: $state.color === 'red',
-				blue: $state.color === 'blue',
-				green: $state.color === 'green'
+				red: $state.color === "red",
+				blue: $state.color === "blue",
+				green: $state.color === "green"
 			}}
 		>
 			{$state.text}

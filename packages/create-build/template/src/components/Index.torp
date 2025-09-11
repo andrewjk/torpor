@@ -1,4 +1,4 @@
-import torporLogo from '@/assets/torpor.svg'
+import torporLogo from "@/assets/torpor.svg"
 import Counter from "./Counter.torp";
 
 /**

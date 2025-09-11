@@ -1,4 +1,4 @@
-import Article from './Article.torp'
+import Article from "./Article.torp"
 
 export default function Named() {
 	@render {

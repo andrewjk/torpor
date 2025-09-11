@@ -1,12 +1,12 @@
 
-import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from '@torpor/ui/TabGroup';
-import buildItems from '../../../lib/buildItems';
+import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import buildItems from "../../../lib/buildItems";
 
 export default function ExampleBound($props: any) {
 	let itemCount = 5;
 	let items = buildItems(itemCount);
 
-	let $state = $watch({ value: '0' });
+	let $state = $watch({ value: "0" });
 
 	@render {
 		<p>Selected value: <input type="number" &value={$state.value} /></p>
@@ -39,7 +39,7 @@ export default function ExampleBound($props: any) {
 			padding: 5px 10px;
 		}
 
-		.example-tab-trigger[data-state='active'] {
+		.example-tab-trigger[data-state="active"] {
 			border-bottom: 2px solid black;
 		}
 
@@ -47,7 +47,7 @@ export default function ExampleBound($props: any) {
 			display: none;
 		}
 
-		.example-tab-content[data-state='active'] {
+		.example-tab-content[data-state="active"] {
 			display: flex;
 			align-items: center;
 			justify-content: center;

@@ -2,7 +2,7 @@ import {
 	Notification,
 	NotificationContent,
 	NotificationClose
-} from '../../../src/Notification/index';
+} from "../../../src/Notification/index";
 
 export default function CustomNotification() {
 	@render {

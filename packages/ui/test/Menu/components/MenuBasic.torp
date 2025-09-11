@@ -1,4 +1,4 @@
-import { Popover, PopoverContent } from '../../../src/Popover';
+import { Popover, PopoverContent } from "../../../src/Popover";
 import {
 	Menu,
 	MenuButton,
@@ -10,7 +10,7 @@ import {
 	MenuPopoutTrigger,
 	MenuPopoutContent,
 	MenuSeparator
-} from '../../../src/Menu';
+} from "../../../src/Menu";
 
 export default function MenuBasic() {
 	@render {

@@ -38,7 +38,7 @@ export default function Layout() {
 			padding: 5px;
 		}
 
-		:global(.example-tab-header[data-state='active']) {
+		:global(.example-tab-header[data-state="active"]) {
 			border-bottom: 2px solid black;
 		}
 

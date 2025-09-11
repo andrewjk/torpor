@@ -1,5 +1,5 @@
-import { MenuBar, MenuBarItem, MenuBarItemTrigger, MenuBarItemContent } from '@torpor/ui/MenuBar';
-import { Menu, MenuButton, MenuSeparator } from '@torpor/ui/Menu';
+import { MenuBar, MenuBarItem, MenuBarItemTrigger, MenuBarItemContent } from "@torpor/ui/MenuBar";
+import { Menu, MenuButton, MenuSeparator } from "@torpor/ui/Menu";
 
 export default function ExampleBasic() {
 	@render {

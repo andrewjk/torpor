@@ -1,4 +1,4 @@
-import Header from './Header.torp';
+import Header from "./Header.torp";
 
 export default function Component() {
 	@render {

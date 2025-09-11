@@ -1,9 +1,9 @@
-import { showPopover } from '../../../src/Popover/index';
-import CustomDialog from './CustomDialog.torp';
+import { showPopover } from "../../../src/Popover/index";
+import CustomDialog from "./CustomDialog.torp";
 
 export default function PromptFunction() {
 	let anchor;
-	let $state = $watch({ color: '' });
+	let $state = $watch({ color: "" });
 
 	async function show() {
 		showPopover(CustomDialog, anchor, { callback: (x) => $state.color = x });

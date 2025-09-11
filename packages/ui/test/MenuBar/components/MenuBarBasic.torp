@@ -3,8 +3,8 @@ import {
 	MenuBarItem,
 	MenuBarItemTrigger,
 	MenuBarItemContent
-} from '../../../src/MenuBar';
-import { Menu, MenuButton, MenuSeparator } from '../../../src/Menu';
+} from "../../../src/MenuBar";
+import { Menu, MenuButton, MenuSeparator } from "../../../src/Menu";
 
 export default function MenuBarBasic() {
 	@render {

@@ -1,5 +1,5 @@
-import { NotificationContainer, showNotification } from '@torpor/ui/Notification';
-import CustomNotification from './CustomNotification.torp';
+import { NotificationContainer, showNotification } from "@torpor/ui/Notification";
+import CustomNotification from "./CustomNotification.torp";
 
 export default function ExampleFunction() {
 	let nextNumber = 1;

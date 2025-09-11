@@ -1,5 +1,5 @@
-import { Popover, PopoverOverlay, PopoverContent } from '@torpor/ui/Popover';
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from '@torpor/ui/Dialog';
+import { Popover, PopoverOverlay, PopoverContent } from "@torpor/ui/Popover";
+import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ExampleBasic($props: any) {
 	let $state = $watch({
@@ -29,8 +29,8 @@ export default function ExampleBasic($props: any) {
 						<p>Which color do you prefer?</p>
 					</DialogBody>
 					<DialogFooter class="example-dialog-footer">
-						<DialogButton onclick={() => handleOption('blue')}>Blue</DialogButton>
-						<DialogButton onclick={() => handleOption('red')}>Red</DialogButton>
+						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
+						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
 			</PopoverContent>
