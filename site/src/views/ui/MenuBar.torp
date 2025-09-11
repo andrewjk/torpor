@@ -1,0 +1,69 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../lib/copyCode";
+import ExampleBasic from "./menu-bar/ExampleBasic.torp";
+
+import ExampleBasicCode from "./menu-bar/ExampleBasic.torp?raw";
+
+export default function Component() {
+	@render {
+		<:head>
+			<title>Menu | Torpor</title>
+		</:head>
+
+		<h1>Menu</h1>
+		<p>
+			A menu bar, similar to that shown at the top of Windows
+			applications or at the top of the screen on Macs.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/menu/">the WAI ARIA guidelines for Menus</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<MenuBar>
+    <MenuBarItem>
+        <MenuBarItemTrigger />
+        <MenuBarItemContent>
+            <Menu />
+        </MenuBarItemContent>
+    </MenuBarItem>
+    ...
+</MenuBar>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleBasic />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

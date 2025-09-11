@@ -32,6 +32,16 @@
 			"import": "./dist/Drawer/index.js",
 			"require": "./dist/Drawer/index.cjs"
 		},
+		"./Menu": {
+			"types": "./dist/Menu/index.d.ts",
+			"import": "./dist/Menu/index.js",
+			"require": "./dist/Menu/index.cjs"
+		},
+		"./MenuBar": {
+			"types": "./dist/MenuBar/index.d.ts",
+			"import": "./dist/MenuBar/index.js",
+			"require": "./dist/MenuBar/index.cjs"
+		},
 		"./NavMenu": {
 			"types": "./dist/NavMenu/index.d.ts",
 			"import": "./dist/NavMenu/index.js",

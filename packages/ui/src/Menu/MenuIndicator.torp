@@ -1,0 +1,29 @@
+import { MenuButtonContextName, type MenuButtonContext } from "./MenuTypes";
+
+/**
+ * An indicator for a MenuCheck or MenuRadio component, which is displayed
+ * when the value of checked is true.
+ *
+ * @prop {boolean} disabled -- Whether this item is disabled
+ */ 
+export default function MenuIndicator() {
+	// Get stuff out of the MenuButtonContext
+	const context = $context[MenuButtonContextName] as MenuButtonContext;
+	if (!context) {
+		throw new Error("MenuIndicator must be contained within a MenuCheck or MenuRadio");
+	}
+	let $state = context.state;
+
+	@render {
+		@if ($state.checked) {
+			<div
+				id={$props.id}
+				class={`torp-menu-indicator ${$props.class ?? ""}`.trim()}
+				aria-disabled={$props.disabled ? "true" : undefined}
+				data-disabled={$props.disabled ? "true" : undefined}
+			>
+				<:slot />
+			</div>
+		}
+	}
+}

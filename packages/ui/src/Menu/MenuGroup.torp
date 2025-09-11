@@ -1,0 +1,19 @@
+/**
+ * A container for a logical group of menu items.
+ *
+ * @prop {string} ariaLabel -- An ARIA label for describing the group to screen readers
+ */
+export default function MenuGroup() {
+	// TODO: Intercept the context to steal toggleItem??
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-menu-group ${$props.class ?? ""}`.trim()}
+			role="group"
+			aria-label={$props.ariaLabel}
+		>
+			<:slot />
+		</div>
+	}
+}

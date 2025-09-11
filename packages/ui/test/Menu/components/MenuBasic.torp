@@ -1,0 +1,58 @@
+import { Popover, PopoverContent } from '../../../src/Popover';
+import {
+	Menu,
+	MenuButton,
+	MenuRadioGroup,
+	MenuCheck,
+	MenuRadio,
+	MenuIndicator,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent,
+	MenuSeparator
+} from '../../../src/Menu';
+
+export default function MenuBasic() {
+	@render {
+		<Popover visible>
+			<PopoverContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Menu button</MenuButton>
+					<MenuSeparator>---</MenuSeparator>
+					<MenuPopout>
+						<MenuPopoutTrigger>Check popout button</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A checked menu">
+								<MenuCheck>
+									<MenuIndicator>Tick 1</MenuIndicator>
+									Checked 1
+								</MenuCheck>
+								<MenuCheck>
+									<MenuIndicator>Tick 2</MenuIndicator>
+									Checked 2
+								</MenuCheck>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+					<MenuPopout>
+						<MenuPopoutTrigger>Radio popout button</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A radio menu">
+								<MenuRadioGroup ariaLabel="Font color">
+									<MenuRadio value="radio1">
+										<MenuIndicator>Circle 1</MenuIndicator>
+										Radio 1
+									</MenuRadio>
+									<MenuRadio value="radio2">
+										<MenuIndicator>Circle 2</MenuIndicator>
+										Radio 2
+									</MenuRadio>
+								</MenuRadioGroup>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</PopoverContent>
+		</Popover>
+	}
+}

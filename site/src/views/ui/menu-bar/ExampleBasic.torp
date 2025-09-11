@@ -1,0 +1,79 @@
+import { MenuBar, MenuBarItem, MenuBarItemTrigger, MenuBarItemContent } from '@torpor/ui/MenuBar';
+import { Menu, MenuButton, MenuSeparator } from '@torpor/ui/Menu';
+
+export default function ExampleBasic() {
+	@render {
+		<MenuBar class="example-menu-bar" ariaLabel="Window menu">
+			<MenuBarItem class="example-menu-bar-item">
+				<MenuBarItemTrigger class="example-menu-bar-item-button">File</MenuBarItemTrigger>
+				<MenuBarItemContent class="example-menu-bar-item-content">
+					<Menu class="example-menu-bar-menu">
+						<MenuButton class="example-menu-bar-item-button">New</MenuButton>
+						<MenuButton class="example-menu-bar-item-button">Open</MenuButton>
+						<MenuSeparator class="example-menu-bar-separator" />
+						<MenuButton class="example-menu-bar-item-button">Save</MenuButton>
+						<MenuSeparator class="example-menu-bar-separator" />
+						<MenuButton class="example-menu-bar-item-button">Exit</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+			<MenuBarItem class="example-menu-bar-item">
+				<MenuBarItemTrigger class="example-menu-bar-item-button">Edit</MenuBarItemTrigger>
+				<MenuBarItemContent class="example-menu-bar-item-content">
+					<Menu class="example-menu-bar-menu">
+						<MenuButton class="example-menu-bar-item-button">Undo</MenuButton>
+						<MenuButton class="example-menu-bar-item-button">Redo</MenuButton>
+						<MenuSeparator class="example-menu-bar-separator" />
+						<MenuButton class="example-menu-bar-item-button">Cut</MenuButton>
+						<MenuButton class="example-menu-bar-item-button">Copy</MenuButton>
+						<MenuButton class="example-menu-bar-item-button">Paste</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+		</MenuBar>
+	}
+
+	@style {
+		.example-menu-bar {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.example-menu-bar-item-button {
+			all: unset;
+			cursor: default;
+			display: flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		.example-menu-bar-item-button:hover,
+		.example-menu-bar-item-button:focus,
+		.example-menu-bar-item-button:active {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		.example-menu-bar-item-content {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			min-width: 100px;
+			padding: 5px;
+			position: absolute;
+			z-index: 200;
+		}
+
+		.example-menu-bar-menu {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.example-menu-bar-separator {
+			border-bottom: 1px solid gainsboro;
+		}
+	}
+}

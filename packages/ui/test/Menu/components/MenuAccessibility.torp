@@ -1,0 +1,59 @@
+import { Popover, PopoverContent } from '../../../src/Popover';
+import {
+	Menu,
+	MenuButton,
+	MenuRadioGroup,
+	MenuCheck,
+	MenuRadio,
+	MenuIndicator,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent,
+	MenuSeparator
+} from '../../../src/Menu';
+
+export default function MenuAccessibility() {
+	@render {
+		<Popover visible>
+			<PopoverContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Menu button</MenuButton>
+					<MenuButton disabled>Disabled button</MenuButton>
+					<MenuSeparator>---</MenuSeparator>
+					<MenuPopout>
+						<MenuPopoutTrigger>Check popout button</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A checked menu">
+								<MenuCheck>
+									<MenuIndicator>✔</MenuIndicator>
+									Checked 1
+								</MenuCheck>
+								<MenuCheck>
+									<MenuIndicator>✔</MenuIndicator>
+									Checked 2
+								</MenuCheck>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+					<MenuPopout>
+						<MenuPopoutTrigger>Radio popout button</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A radio menu">
+								<MenuRadioGroup ariaLabel="Options">
+									<MenuRadio value="radio1">
+										<MenuIndicator>•</MenuIndicator>
+										Radio 1
+									</MenuRadio>
+									<MenuRadio value="radio2">
+										<MenuIndicator>•</MenuIndicator>
+										Radio 2
+									</MenuRadio>
+								</MenuRadioGroup>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</PopoverContent>
+		</Popover>
+	}
+}

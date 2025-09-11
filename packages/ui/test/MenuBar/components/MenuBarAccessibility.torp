@@ -1,0 +1,34 @@
+import {
+	MenuBar,
+	MenuBarItem,
+	MenuBarItemTrigger,
+	MenuBarItemContent
+} from '../../../src/MenuBar';
+import { Menu, MenuButton, MenuSeparator } from '../../../src/Menu';
+
+export default function MenuBarAccessibility() {
+	@render {
+		<MenuBar ariaLabel="Window menu">
+			<MenuBarItem>
+				<MenuBarItemTrigger>Top level</MenuBarItemTrigger>
+				<MenuBarItemContent>
+					<Menu ariaLabel="Sub window menu">
+						<MenuButton>Sub item 1</MenuButton>
+						<MenuButton>Sub item 2</MenuButton>
+						<MenuSeparator>---</MenuSeparator>
+						<MenuButton>Sub item 3</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+			<MenuBarItem>
+				<MenuBarItemTrigger disabled>Disabled</MenuBarItemTrigger>
+				<MenuBarItemContent>
+					<Menu ariaLabel="Disabled sub window menu">
+						<MenuButton>Disabled sub 1</MenuButton>
+						<MenuButton>Disabled sub 2</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+		</MenuBar>
+	}
+}

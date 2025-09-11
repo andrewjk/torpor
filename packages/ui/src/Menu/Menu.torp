@@ -1,0 +1,160 @@
+import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
+import {
+	MenuContextName,
+	type MenuContext,
+	type ItemState,
+	MenuPopoutContextName,
+	type MenuPopoutContext
+} from "./MenuTypes";
+
+/**
+ * A list of choices for the user, such as a set of actions or functions. A
+ * menu is usually hidden until made visible by the user.
+ *
+ * See [the WAI ARIA guidelines for Menus](https://www.w3.org/WAI/ARIA/apg/patterns/menu/).
+ *
+ * The structure of a Menu is:
+ *
+ * ```
+ * <Menu>
+ *     <MenuButton />
+ *     <MenuSeparator /> (optional)
+ *     <MenuGroup> (optional)
+ *         <MenuButton />
+ *     </MenuGroup>
+ * </Menu>
+ * ```
+ *
+ * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
+ */
+export default function Menu() {
+	// A collection containing the state and some functions for each item
+	let itemStates: ItemState[] = [];
+	let focusIndex = -1;
+
+	// Get stuff out of the PopoverContext
+	const popoverContext = $context[PopoverContextName] as PopoverContext;
+	if (!popoverContext) {
+		throw new Error("Menu must be contained within a Contextual, Prompt or Popover");
+	}
+	const { setVisible, handleButton, modal, visible } = popoverContext;
+
+	// Check whether this is a menu in a popout
+	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
+	const inPopout = !!popoutContext;
+	const setPopoutVisible = popoutContext?.setVisible;
+
+	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
+	popoverContext.focusFirstElement = focusFirstElement;
+	if (popoutContext) {
+		popoutContext.focusFirstElement = focusFirstElement;
+	}
+
+	// Set the context to pass down to items
+	let context: MenuContext = {
+		setVisible,
+		handleButton,
+		handleItemFocus,
+		handleItemKey,
+		visible,
+		registerItem
+	};
+	$context[MenuContextName] = context;
+
+	function focusFirstElement() {
+		if (itemStates.length) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function registerItem(setFocused: () => void) {
+		// Add the item"s state to the array and return its index
+		const newItemState: ItemState = {
+			setFocused
+		};
+		itemStates.push(newItemState);
+		itemStates = itemStates;
+		return { index: itemStates.length - 1 };
+	}
+
+	function handleItemFocus(index: number) {
+		focusIndex = index;
+	}
+
+	function handleItemKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Esc":
+			case "Escape": {
+				e.preventDefault();
+				setVisible(false);
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				e.preventDefault();
+				focusItem("next");
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				e.preventDefault();
+				focusItem("previous");
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				// TODO: This should be based on what side the menu shows on
+				if (inPopout) {
+					e.preventDefault();
+					setPopoutVisible(false);
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusItem("start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusItem("end");
+				break;
+			}
+		}
+	}
+
+	function focusItem(target: "start" | "previous" | "next" | "end") {
+		switch (target) {
+			case "start": {
+				focusIndex = 0;
+				break;
+			}
+			case "previous": {
+				focusIndex = Math.max(0, focusIndex - 1);
+				break;
+			}
+			case "next": {
+				focusIndex = Math.min(itemStates.length - 1, focusIndex + 1);
+				break;
+			}
+			case "end": {
+				focusIndex = itemStates.length - 1;
+				break;
+			}
+		}
+		itemStates[focusIndex]?.setFocused();
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-menu ${$props.class ?? ""}`.trim()}
+			tabindex="-1"
+			role="menu"
+			aria-label={$props.ariaLabel}
+			aria-orientation="vertical"
+		>
+			<:slot />
+		</div>
+	}
+}

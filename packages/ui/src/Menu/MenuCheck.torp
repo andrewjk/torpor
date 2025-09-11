@@ -1,0 +1,70 @@
+import {
+	MenuButtonContextName,
+	MenuContextName,
+	type MenuButtonContext,
+	type MenuContext
+} from "./MenuTypes";
+
+/**
+ * A button that is placed in a Menu or MenuGroup to allow the user to turn an
+ * option on or off.
+ *
+ * @prop {boolean} checked -- Whether this item is checked
+ * @prop {boolean} disabled -- Whether this item is disabled
+ */
+export default function MenuCheck() {
+	let $state = $watch({
+		checked: $props.checked
+	});
+
+	$run(() => {
+		$props.checked = $state.checked;
+	});
+
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the MenuContext
+	const menuContext = $context[MenuContextName] as MenuContext;
+	if (!menuContext) {
+		throw new Error("MenuCheck must be contained within a Menu");
+	}
+	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
+
+	// Register this item with the parent Menu
+	const { index } = registerItem(setFocused);
+
+	// Set the context to pass down to items
+	let context: MenuButtonContext = {
+		state: $state
+	};
+	$context[MenuButtonContextName] = context;
+
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		$state.checked = !$state.checked;
+		if ($props.onclick) $props.onclick();
+	}
+
+	@render {
+		<button
+			id={$props.id}
+			class={`torp-menu-check ${$props.class ?? ""}`.trim()}
+			type="button"
+			{$props.disabled}
+			role="menuitemcheckbox"
+			aria-checked={$props.checked ? "true" : "false"}
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-state={$props.checked ? "checked" : "unchecked"}
+			data-disabled={$props.disabled ? "true" : undefined}
+			onkeydown={handleItemKey}
+			onclick={handleClick}
+			onfocus={() => handleItemFocus(index)}
+			&ref={button}
+		>
+			<:slot />
+		</button>
+	}
+}

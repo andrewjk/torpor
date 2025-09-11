@@ -12,6 +12,8 @@ export default defineConfig({
 		"src/Dialog/index.ts",
 		"src/Disclosure/index.ts",
 		"src/Drawer/index.ts",
+		"src/Menu/index.ts",
+		"src/MenuBar/index.ts",
 		"src/NavMenu/index.ts",
 		"src/Notification/index.ts",
 		"src/Popover/index.ts",

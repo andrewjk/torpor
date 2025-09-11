@@ -1,0 +1,205 @@
+import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from '@torpor/ui/Popover';
+import {
+	Menu,
+	MenuButton,
+	MenuRadioGroup,
+	MenuCheck,
+	MenuRadio,
+	MenuIndicator,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent,
+	MenuSeparator
+} from '@torpor/ui/Menu';
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		text: 'Style this paragraph',
+		bold: false,
+		italic: false,
+		underline: false,
+		color: 'default',
+	});
+
+	async function setText() {
+		$state.text = prompt('Enter the new paragraph text below:', $state.text) || $state.text;
+	}
+
+	function resetStyle() {
+		$state.bold = false;
+		$state.italic = false;
+		$state.underline = false;
+	}
+
+	@render {
+		<p>
+			The button below shows or hides a basic menu in a <a href="/ui/popover">Popover</a>. You can also
+			display a menu in a <a href="/ui/contextual">Contextual</a> or a <a href="/ui/prompt">Prompt</a>.
+		</p>
+
+		<p
+			class={{
+				"example-menu-message": true,
+				bold: $state.bold,
+				italic: $state.italic,
+				underline: $state.underline,
+				red: $state.color === 'red',
+				blue: $state.color === 'blue',
+				green: $state.color === 'green'
+			}}
+		>
+			{$state.text}
+		</p>
+
+		<Popover>
+			<PopoverOverlay class="example-menu-popover-overlay" />
+			<PopoverTrigger>Show a menu</PopoverTrigger>
+			<PopoverContent class="example-menu-popover-content">
+				<Menu class="example-menu" ariaLabel="Formatting">
+					<MenuButton class="example-menu-button" onclick={setText}>Set text...</MenuButton>
+					<MenuSeparator class="example-menu-separator" />
+					<MenuPopout class="example-menu-popout">
+						<MenuPopoutTrigger class="example-menu-button">Style ›</MenuPopoutTrigger>
+						<MenuPopoutContent class="example-menu-popover-content">
+							<Menu class="example-menu" ariaLabel="Font style">
+								<MenuCheck class="example-menu-button" &checked={$state.bold}>
+									<MenuIndicator class="example-menu-indicator">✔</MenuIndicator>
+									Bold
+								</MenuCheck>
+								<MenuCheck class="example-menu-button" &checked={$state.italic}>
+									<MenuIndicator class="example-menu-indicator">✔</MenuIndicator>
+									Italic
+								</MenuCheck>
+								<MenuCheck class="example-menu-button" &checked={$state.underline}>
+									<MenuIndicator class="example-menu-indicator">✔</MenuIndicator>
+									Underline
+								</MenuCheck>
+								<MenuSeparator class="example-menu-separator" />
+								<MenuButton class="example-menu-button" onclick={resetStyle}>Reset style</MenuButton>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+					<MenuPopout class="example-menu-popout">
+						<MenuPopoutTrigger class="example-menu-button">Font color ›</MenuPopoutTrigger>
+						<MenuPopoutContent class="example-menu-popover-content">
+							<Menu class="example-menu" ariaLabel="Font color">
+								<MenuRadioGroup class="example-menu-group" &value={$state.color} ariaLabel="Font color">
+									<MenuRadio class="example-menu-button" value="default">
+										<MenuIndicator class="example-menu-indicator">•</MenuIndicator>
+										Inherit
+									</MenuRadio>
+									<MenuRadio class="example-menu-button" value="red">
+										<MenuIndicator class="example-menu-indicator">•</MenuIndicator>
+										Red
+									</MenuRadio>
+									<MenuRadio class="example-menu-button" value="blue">
+										<MenuIndicator class="example-menu-indicator">•</MenuIndicator>
+										Blue
+									</MenuRadio>
+									<MenuRadio class="example-menu-button" value="green">
+										<MenuIndicator class="example-menu-indicator">•</MenuIndicator>
+										Green
+									</MenuRadio>
+								</MenuRadioGroup>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</PopoverContent>
+		</Popover>
+	}
+
+	@style {
+		.example-menu-popover-overlay {
+			background-color: rgba(0, 0, 0, 0.6);
+			position: fixed;
+			top: 0;
+			left: 0;
+			height: 100vh;
+			width: 100vw;
+			z-index: 100;
+		}
+
+		.example-menu-popover-content {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			min-width: 100px;
+			padding: 5px;
+			position: absolute;
+			z-index: 200;
+		}
+
+		.example-menu,
+		.example-menu-group {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.example-menu-button {
+			all: unset;
+			cursor: default;
+			display: flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+
+			/** For positioning the checked indicators */
+			position: relative;
+			padding: 5px 5px 5px 30px;
+		}
+
+		.example-menu-button:hover,
+		.example-menu-button:focus,
+		.example-menu-button:active {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		.example-menu-indicator {
+			position: absolute;
+			left: 10px;
+		}
+
+		.example-menu-popout {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.example-menu-separator {
+			border-bottom: 1px solid gainsboro;
+		}
+
+		.example-menu-message {
+			border: 1px dashed gray;
+			border-radius: 5px;
+			padding: 10px;
+		}
+
+		.example-menu-message.bold {
+			font-weight: bold;
+		}
+
+		.example-menu-message.italic {
+			font-style: italic;
+		}
+
+		.example-menu-message.underline {
+			text-decoration: underline;
+		}
+
+		.example-menu-message.red {
+			color: red;
+		}
+
+		.example-menu-message.blue {
+			color: blue;
+		}
+
+		.example-menu-message.green {
+			color: green;
+		}
+	}
+}

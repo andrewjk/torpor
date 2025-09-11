@@ -1,0 +1,89 @@
+import {
+	MenuBarContextName,
+	MenuBarItemContextName,
+	type MenuBarContext,
+	type MenuBarItemContext
+} from "./MenuBarTypes";
+
+/**
+ * A button that is placed in a MenuBar and opens a submenu.
+ *
+ * @prop {boolean} disabled -- Whether this button is disabled
+ */
+export default function MenuBarItemTrigger() {
+	$props.disabled ??= false;
+
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the MenuBarContext
+	const menubarContext = $context[MenuBarContextName] as MenuBarContext;
+	if (!menubarContext) {
+		throw new Error("MenuBarItemTrigger must be contained within a MenuBar");
+	}
+	const { registerItem, handleButtonKey, handleButtonFocus } = menubarContext;
+
+	// Get stuff out of the MenuBarItemContext
+	const itemContext = $context[MenuBarItemContextName] as MenuBarItemContext;
+	if (!itemContext) {
+		throw new Error("MenuBarItemTrigger must be contained within a MenuBarItem");
+	}
+	const { state: $state, setVisible } = itemContext;
+
+	// Register this item with the parent MenuBar and store the index
+	const { index } = registerItem(setVisible, setFocused);
+
+	$mount(() => {
+		// Set the anchor element to the button when it exists
+		//itemContext.anchorElement = button;
+		itemContext.index = index;
+	});
+
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		menubarContext.state.active = !menubarContext.state.active;
+		setVisible(menubarContext.state.active);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Down":
+			case "ArrowDown":
+				// TODO: This should be based on what side the menu shows on
+				e.preventDefault();
+				menubarContext.state.active = true;
+				setVisible(true);
+				break;
+			default:
+				handleButtonKey(e);
+		}
+	}
+
+	function handleMouseEnter() {
+		setVisible(true);
+	}
+
+	@render {
+		<button
+			id={$props.id}
+			class={`torp-menu-bar-item-button ${$props.class ?? ""}`.trim()}
+			type="button"
+			{$props.disabled}
+			role="menuitem"
+			aria-haspopup="true"
+			aria-expanded={($state.visible ?? false).toString()}
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-disabled={$props.disabled ? "true" : undefined}
+			onkeydown={handleKey}
+			onclick={handleClick}
+			onfocus={() => handleButtonFocus(index)}
+			onmouseenter={handleMouseEnter}
+			&ref={button}
+			:onmount={(el) => itemContext.anchorElement = el}
+		>
+			<:slot />
+		</button>
+	}
+}

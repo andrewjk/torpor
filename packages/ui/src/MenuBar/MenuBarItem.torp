@@ -1,0 +1,104 @@
+import {
+	MenuBarContextName,
+	MenuBarItemContextName,
+	type MenuBarContext,
+	type MenuBarItemContext
+} from "./MenuBarTypes";
+import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
+
+/**
+ * A popout that is attached to a menubar button and can be used to show a submenu.
+ *
+ * The structure of a MenuBarItem is:
+ *
+ * ```
+ * <MenuBarItem>
+ *     <MenuBarItemTrigger /> (optional)
+ *     <MenuBarItemContent />
+ * </MenuBarItem>
+ * ```
+ *
+ * @prop {boolean} visible -- Whether the item is visible
+ * @prop {(boolean) => void} ontoggle -- Called when the item is opened or closed
+ * @prop {() => void} onopen -- Called when the item has opened
+ * @prop {() => void} onclose -- Called when the item has closed
+ */
+export default function MenuBarItem() {
+	$props.visible ??= false;
+
+	let $state = $watch({
+		visible: $props.visible
+	});
+
+	let result: any;
+
+	// Get stuff out of the MenuBarContext
+	const menubarContext = $context[MenuBarContextName] as MenuBarContext;
+	if (!menubarContext) {
+		throw new Error("MenuBarItem must be contained within a MenuBar");
+	}
+	const { handleItemShow } = menubarContext;
+
+	// Set the context to pass down to items
+	let context: MenuBarItemContext = {
+		setVisible,
+		state: $state,
+		index: -1
+	};
+	$context[MenuBarItemContextName] = context;
+
+	// Set the context to pass down to items
+	let popoverContext: PopoverContext = {
+		setVisible,
+		handleButton,
+		modal: false,
+		state: $state,
+		//anchorElement: anchor,
+	};
+	$context[PopoverContextName] = popoverContext;
+
+	$mount(() => {
+		setVisible();
+	});
+
+	function setVisible(value: boolean) {
+		if (!value || menubarContext.state.active) {
+			$state.visible = value;
+			if (value) {
+				handleItemShow(context.index);
+			}
+		}
+	}
+
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
+
+	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+		menubarContext.state.active = false;
+		setVisible(false);
+	}
+
+	@render {
+		<div 
+			id={$props.id}
+			class={`torp-menu-bar-item ${$props.class ?? ""}`.trim()}
+		>
+			<:slot />
+		</div>
+	}
+}

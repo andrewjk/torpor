@@ -1,0 +1,74 @@
+
+import setPopoverPosition from "../utils/setPopoverPosition";
+import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
+
+/**
+ * The content that is displayed for a MenuPopout when it is open.
+ *
+ * @prop {"top" | "right" | "bottom" | "left"} side -- Where the popout will be shown, relative to the popout button
+ * @prop {"start" | "center" | "end"} alignment -- How the popout will be aligned, relative to the popout button
+ */
+export default function MenuPopoutContent() {
+	$props.side ??= "right";
+	$props.alignment ??= "start";
+
+	let div: HTMLDivElement;
+	let shown = false;
+
+	// Get stuff out of the MenuPopoutContext
+	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
+	if (!popoutContext) {
+		throw new Error("MenuPopoutContent must be contained within a MenuPopout");
+	}
+	let $state = popoutContext.state;
+
+	$run(() => {
+		if (!$state.visible) {
+			hide();
+		}
+	});
+
+	function show() {
+		shown = true;
+
+		// Set the position and listen for window resize and scroll to reset the position
+		setPosition();
+		if (popoutContext.focusFirstElement) {
+			popoutContext.focusFirstElement();
+		}
+		addEventListener("resize", setPosition);
+		addEventListener("scroll", setPosition);
+	}
+
+	function hide() {
+		if (!shown) return;
+
+		// Stop listening for window resize and focus the anchor element per WAI guidelines
+		removeEventListener("resize", setPosition);
+		removeEventListener("scroll", setPosition);
+		if (popoutContext.anchorElement?.focus) {
+			popoutContext.anchorElement.focus();
+		}
+	}
+
+	function setPosition() {
+		if (!popoutContext.anchorElement) {
+			throw new Error("MenuPopoutContent must have an anchor element");
+		}
+
+		setPopoverPosition(popoutContext.anchorElement, div, $props.side, $props.alignment);
+	}
+
+	@render {
+		@if ($state.visible) {
+			<div
+				id={$props.id}
+				class={`torp-menu-popout-content ${$props.class ?? ""}`.trim()}
+				&ref={div}
+				:onmount={show}
+			>
+				<:slot />
+			</div>
+		}
+	}
+}

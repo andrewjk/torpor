@@ -1,0 +1,150 @@
+import { MenuBarContextName, type MenuBarContext, type ItemState } from "./MenuBarTypes";
+
+/**
+ * A menu bar, similar to that shown at the top of Windows applications or at the top of the screen on Macs.
+ *
+ * See [the WAI ARIA guidelines for Menus](https://www.w3.org/WAI/ARIA/apg/patterns/menu/).
+ *
+ * The structure of a MenuBar is:
+ *
+ * ```
+ * <MenuBar>
+ *     <MenuBarItem>
+ *         <MenuBarItemTrigger />
+ *         <MenuBarItemContent>
+ *             <Menu />
+ *         </MenuBarItemContent>
+ *     </MenuBarItem>
+ * </MenuBar>
+ * ```
+ *
+ * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
+ * @prop {"horizontal" | "vertical"} orientation -- The orientation of the menu, which affects keyboard navigation
+ */
+export default function MenuBar() {
+	$props.orientation ??= "horizontal";
+
+	let $state = $watch({
+		active: false,
+	});
+
+	// A collection containing the state and some functions for each item
+	let itemStates: ItemState[] = [];
+	let focusIndex = -1;
+
+	// Set the context to pass down to items
+	let context: MenuBarContext = {
+		handleItemShow,
+		handleButtonFocus,
+		handleButtonKey,
+		registerItem,
+		state: $state
+	};
+	$context[MenuBarContextName] = context;
+
+	function registerItem(setVisible: (value: boolean) => void, setFocused: () => void) {
+		// Add the item"s state to the array and return its index
+		const newItemState: ItemState = {
+			setVisible,
+			setFocused
+		};
+		itemStates.push(newItemState);
+		itemStates = itemStates;
+		return { index: itemStates.length - 1 };
+	}
+
+	function handleItemShow(index: number) {
+		// Make sure other items are hidden
+		itemStates.forEach((item, i) => {
+			if (i !== index) {
+				item.setVisible(false);
+			}
+		});
+	}
+
+	function handleButtonFocus(index: number) {
+		focusIndex = index;
+	}
+
+	function handleButtonKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Right":
+			case "ArrowRight": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("previous");
+				}
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("previous");
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusItem("start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusItem("end");
+				break;
+			}
+		}
+	}
+
+	function focusItem(target: "start" | "previous" | "next" | "end") {
+		switch (target) {
+			case "start": {
+				focusIndex = 0;
+				break;
+			}
+			case "previous": {
+				focusIndex = Math.max(0, focusIndex - 1);
+				break;
+			}
+			case "next": {
+				focusIndex = Math.min(itemStates.length - 1, focusIndex + 1);
+				break;
+			}
+			case "end": {
+				focusIndex = itemStates.length - 1;
+				break;
+			}
+		}
+		itemStates[focusIndex]?.setFocused();
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-menu-bar ${$props.class ?? ""}`.trim()}
+			tabindex="-1"
+			role="menubar"
+			aria-label={$props.ariaLabel}
+			aria-orientation={$props.orientation}
+		>
+			<:slot />
+		</div>
+	}
+}

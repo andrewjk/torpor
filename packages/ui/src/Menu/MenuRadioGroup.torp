@@ -1,0 +1,86 @@
+import {
+	type MenuRadioGroupContext,
+	MenuRadioGroupContextName,
+	type RadioGroupItemState
+} from "./MenuTypes";
+
+/**
+ * A container for a logical group of menu RadioGroup items.
+ *
+ * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
+ * @prop {string | undefined} value -- The value of the checked MenuRadio
+ * @prop {(any) => void} onchange - Called when the checked item has changed
+ */
+export default function MenuRadioGroup() {
+	// A collection containing the state and some functions for each item
+	let itemStates: RadioGroupItemState[] = [];
+
+	// Set the context to pass down to items
+	let context: MenuRadioGroupContext = {
+		registerItemInGroup,
+		toggleItem
+	};
+	$context[MenuRadioGroupContextName] = context;
+
+	$mount(() => {
+		// Set the initial checked item
+		setValue($props.value);
+	});
+
+	function registerItemInGroup(itemValue: string, setChecked: (value: boolean) => void) {
+		// Add the item"s state to the array
+		const newItemState: RadioGroupItemState = {
+			value: itemValue,
+			checked: false,
+			setChecked
+		};
+		itemStates.push(newItemState);
+		itemStates = itemStates;
+	}
+
+	function setValue(newValue?: string) {
+		// No point doing this if there aren't any items yet (e.g. from the initial setValue() call)
+		if (!itemStates.length) {
+			return;
+		}
+
+		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
+		newValue = newValue?.toString();
+		for (let item of itemStates) {
+			item.checked = item.value === newValue;
+			item.setChecked(item.checked);
+		}
+
+		// Set the value
+		if ($props.value !== newValue) {
+			$props.value = newValue;
+
+			if ($props.onchange) {
+				$props.onchange($props.value);
+			}
+		}
+	}
+
+	function toggleItem(toggleValue: string) {
+		let newValue = "";
+		for (let item of itemStates) {
+			const checked = item.value === toggleValue;
+			item.setChecked(checked);
+			if (checked) {
+				newValue = item.value;
+			}
+		}
+		$props.value = newValue;
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-menu-radio-group ${$props.class ?? ""}`.trim()}
+			role="group"
+			aria-label={$props.ariaLabel}
+		>
+			<:slot />
+		</div>
+	}
+}

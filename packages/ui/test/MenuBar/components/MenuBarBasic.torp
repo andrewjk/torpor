@@ -1,0 +1,25 @@
+import {
+	MenuBar,
+	MenuBarItem,
+	MenuBarItemTrigger,
+	MenuBarItemContent
+} from '../../../src/MenuBar';
+import { Menu, MenuButton, MenuSeparator } from '../../../src/Menu';
+
+export default function MenuBarBasic() {
+	@render {
+		<MenuBar ariaLabel="Window menu">
+			<MenuBarItem>
+				<MenuBarItemTrigger>Top level</MenuBarItemTrigger>
+				<MenuBarItemContent>
+					<Menu ariaLabel="Sub window menu">
+						<MenuButton>Sub item 1</MenuButton>
+						<MenuButton>Sub item 2</MenuButton>
+						<MenuSeparator />
+						<MenuButton>Sub item 3</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+		</MenuBar>
+	}
+}

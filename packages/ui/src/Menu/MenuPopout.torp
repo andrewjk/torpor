@@ -1,0 +1,71 @@
+import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
+
+/**
+ * A popout that is attached to a menu button and can be used to show a submenu.
+ *
+ * The structure of a MenuPopout is:
+ *
+ * ```
+ * <MenuPopout>
+ *     <MenuPopoutTrigger /> (optional)
+ * 	<MenuPopoutContent />
+ * </MenuPopout>
+ * ```
+ *
+ * @prop {boolean} visible -- Whether the popout is visible
+ * @prop {(boolean) => void} ontoggle -- Called when the popout is opened or closed
+ * @prop {() => void} onopen -- Called when the popout has opened
+ * @prop {() => void} onclose -- Called when the popout has closed
+ */
+export default function MenuPopout($props) {
+	$props.visible ??= false;
+
+	let $state = $watch({
+		visible: $props.visible
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: MenuPopoutContext = {
+		setVisible,
+		state: $state
+	};
+	$context[MenuPopoutContextName] = context;
+
+	function setVisible(value: boolean) {
+		$state.visible = value;
+	}
+
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
+
+	function handleMouseLeave() {
+		setVisible(false);
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-menu-popout ${$props.class ?? ""}`.trim()}
+			onmouseleave={handleMouseLeave}
+		>
+			<:slot />
+		</div>
+	}
+}

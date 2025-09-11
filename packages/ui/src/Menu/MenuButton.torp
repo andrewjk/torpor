@@ -1,0 +1,53 @@
+import { MenuContextName, type MenuContext } from "./MenuTypes";
+
+/**
+ * A button that is placed in a Menu or MenuGroup and signals a response by a user.
+ *
+ * @prop {any} value -- The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover
+ * @prop {boolean} disabled -- Whether this button is disabled
+ */
+export default function MenuButton() {
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the MenuContext
+	const menuContext = $context[MenuContextName] as MenuContext;
+	if (!menuContext) {
+		throw new Error("MenuButton must be contained within a Menu");
+	}
+	const { registerItem, handleButton, handleItemKey, handleItemFocus } = menuContext;
+
+	// Register this item with the parent Menu and store the index
+	const { index } = registerItem(setFocused);
+
+	function handleKeyDown(e) {
+		handleItemKey(e);
+		if ($props.onkeydown) $props.onkeydown(e);
+	}
+
+	function handleClick(e) {
+		handleButton($props.value);
+		if ($props.onclick) $props.onclick(e);
+	}
+
+	function setFocused() {
+		button.focus();
+	}
+
+	@render {
+		<button
+			id={$props.id}
+			class={`torp-menu-button ${$props.class ?? ""}`.trim()}
+			type="button"
+			{$props.disabled}
+			role="menuitem"
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-disabled={$props.disabled ? "true" : undefined}
+			onkeydown={handleKeyDown}
+			onclick={handleClick}
+			onfocus={() => handleItemFocus(index)}
+			&ref={button}
+		>
+			<:slot />
+		</button>
+	}
+}

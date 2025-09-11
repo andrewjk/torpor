@@ -1,0 +1,88 @@
+import {
+	MenuButtonContextName,
+	MenuContextName,
+	MenuRadioGroupContextName,
+	type MenuButtonContext,
+	type MenuContext,
+	type MenuRadioGroupContext
+} from "./MenuTypes";
+
+/**
+ * A button that is placed in a Menu or MenuGroup to allow the user to select
+ * from a number of options.
+ *
+ * @prop {string} value -- The value of the item
+ * @prop {boolean} checked -- Whether this item is checked
+ * @prop {boolean} disabled -- Whether this item is disabled
+ */
+export default function MenuRadio() {
+	let $state = $watch({
+		checked: $props.checked,
+	});
+
+	$run(() => {
+		$props.checked = $state.checked;
+	});
+
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the MenuContext
+	const menuContext = $context[MenuContextName] as MenuContext;
+	if (!menuContext) {
+		throw new Error("MenuRadio must be contained within a Menu");
+	}
+	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
+
+	// Get stuff out of the MenuRadioGroupContext
+	const groupContext = $context[MenuRadioGroupContextName] as MenuRadioGroupContext;
+	if (!groupContext) {
+		throw new Error("MenuRadio must be contained within a MenuRadioGroup");
+	}
+	const { registerItemInGroup, toggleItem } = groupContext;
+
+	// Register this item with the parent Menu
+	const { index } = registerItem(setFocused);
+
+	// Register this item with the parent MenuRadioGroup
+	registerItemInGroup($props.value, setChecked);
+
+	// Set the context to pass down to items
+	let context: MenuButtonContext = {
+		state: $state
+	};
+	$context[MenuButtonContextName] = context;
+
+	function setFocused() {
+		button.focus();
+	}
+
+	function setChecked(value: boolean) {
+		$state.checked = value;
+	}
+
+	function handleClick() {
+		if (!$state.checked) {
+			toggleItem($props.value);
+		}
+	}
+
+	@render {
+		<button
+			id={$props.id}
+			class={`torp-menu-radio ${$props.class ?? ""}`.trim()}
+			type="button"
+			{$props.disabled}
+			role="menuitemradio"
+			aria-checked={$props.checked}
+			aria-disabled={$props.disabled ? "true" : undefined}
+			data-state={$props.checked ? "checked" : "unchecked"}
+			data-disabled={$props.disabled ? "true" : undefined}
+			onkeydown={handleItemKey}
+			onclick={handleClick}
+			onfocus={() => handleItemFocus(index)}
+			&ref={button}
+		>
+			<:slot />
+		</button>
+	}
+}
