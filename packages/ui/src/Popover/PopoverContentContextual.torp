@@ -10,7 +10,7 @@ import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
  */
 export default function PopoverContentContextual($props: any) {	
 	let div: HTMLDivElement;
-
+	let shown = false;
 	let closeOnClick = false;
 
 	// Get stuff out of the PopoverContext
@@ -20,42 +20,45 @@ export default function PopoverContentContextual($props: any) {
 	}
 	let $state = context.state;
 
-	let first = true;
 	$run(() => {
-		let visible = $state.visible;
-
-		if (first) {
-			first = false;
-			return;
-		}
-
-		if (visible) {
-			// HACK: Because this Contextual could be shown with a click, we need to wait for another mousedown
-			// before we close on click. Otherwise the click immediately bubbles to the document
-			closeOnClick = false;
-			addDocumentEvent("mousedown", handleDocumentMouseDown);
-			addDocumentEvent("click", handleDocumentClick);
-			// Wait for the content div to be shown, set its position, and listen for window resize to re-position
-			//await tick();
-			setPosition();
-			if (context.focusFirstElement) {
-				context.focusFirstElement();
-			}
-			const scrollParent = getScrollParent(context.anchorElement)
-			scrollParent.addEventListener("resize", setPosition);
-			scrollParent.addEventListener("scroll", setPosition);
-		} else {
-			removeDocumentEvent("mousedown", handleDocumentMouseDown);
-			removeDocumentEvent("click", handleDocumentClick);
-			// Stop listening for window resize and focus the anchor element per WAI guidelines
-			const scrollParent = getScrollParent(context.anchorElement)
-			scrollParent.removeEventListener("resize", setPosition);
-			scrollParent.removeEventListener("scroll", setPosition);
-			if (context.anchorElement?.focus) {
-				context.anchorElement.focus();
-			}
+		if (!$state.visible) {
+			hide();
 		}
 	});
+
+	function show() {
+		shown = true;
+
+		// HACK: Because this Contextual could be shown with a click, we need to wait for another mousedown
+		// before we close on click. Otherwise the click immediately bubbles to the document
+		closeOnClick = false;
+		addDocumentEvent("mousedown", handleDocumentMouseDown);
+		addDocumentEvent("click", handleDocumentClick);
+
+		// Set the position and listen for window resize and scroll to reset the position
+		setPosition();
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.addEventListener("resize", setPosition);
+		scrollParent.addEventListener("scroll", setPosition);
+		if (context.focusFirstElement) {
+			context.focusFirstElement();
+		}
+	}
+
+	function hide() {
+		if (!shown) return;
+
+		removeDocumentEvent("mousedown", handleDocumentMouseDown);
+		removeDocumentEvent("click", handleDocumentClick);
+
+		// Stop listening for window resize and focus the anchor element per WAI guidelines
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.removeEventListener("resize", setPosition);
+		scrollParent.removeEventListener("scroll", setPosition);
+		if (context.anchorElement?.focus) {
+			context.anchorElement.focus();
+		}
+	}
 
 	function handleDocumentMouseDown() {
 		closeOnClick = true;
@@ -77,7 +80,7 @@ export default function PopoverContentContextual($props: any) {
 			throw new Error("ContextualContent must have an anchor element");
 		}
 
-		if (div && $state.position) {
+		if ($state.position) {
 			setContextPosition(context.anchorElement, div, $state.position);
 		}
 	}
@@ -88,7 +91,7 @@ export default function PopoverContentContextual($props: any) {
 				id={$props.id}
 				class={`torp-popover-content-contextual ${$props.class ?? ""}`.trim()}
 				&ref={div}
-				:onmount={(el) => setContextPosition(context.anchorElement, el, $state.position)}
+				:onmount={show}
 			>
 				<:slot />
 			</div>

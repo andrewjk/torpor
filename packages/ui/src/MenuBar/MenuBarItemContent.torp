@@ -53,11 +53,11 @@ export default function MenuBarItemContent() {
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
+		addEventListener("resize", setPosition);
+		addEventListener("scroll", setPosition);
 		if (itemContext.focusFirstElement) {
 			itemContext.focusFirstElement();
 		}
-		addEventListener("resize", setPosition);
-		addEventListener("scroll", setPosition);
 	}
 
 	function hide() {

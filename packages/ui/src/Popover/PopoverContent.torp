@@ -7,6 +7,8 @@ import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
  */
 export default function PopoverContent($props: any) {
 	let div: HTMLDivElement;
+	let shown = false;
+	let closeOnClick = false;
 
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
@@ -15,37 +17,37 @@ export default function PopoverContent($props: any) {
 	}
 	let $state = context.state;
 
-	let closeOnClick = false;
-
-	let first = true;
 	$run(() => {
-		let visible = $state.visible;
-
-		if (first) {
-			first = false;
-			return;
-		}
-
-		if (visible) {
-			// HACK: Because this Popover could be shown with a click, we need to wait for another mousedown
-			// before we close on click. Otherwise the click immediately bubbles to the document
-			closeOnClick = false;
-			addDocumentEvent("mousedown", handleDocumentMouseDown);
-			addDocumentEvent("click", handleDocumentClick);
-			// Wait for the content div to be shown, set its position, and listen for window resize to re-position
-			//await tick();
-			if (context.focusFirstElement) {
-				context.focusFirstElement();
-			}
-		} else {
-			removeDocumentEvent("mousedown", handleDocumentMouseDown);
-			removeDocumentEvent("click", handleDocumentClick);
-			// Focus the anchor element per WAI guidelines
-			if (context.anchorElement?.focus) {
-				context.anchorElement.focus();
-			}
+		if (!$state.visible) {
+			hide();
 		}
 	});
+
+	function show() {
+		shown = true;
+
+		// HACK: Because this Popover could be shown with a click, we need to wait for another mousedown
+		// before we close on click. Otherwise the click immediately bubbles to the document
+		closeOnClick = false;
+		addDocumentEvent("mousedown", handleDocumentMouseDown);
+		addDocumentEvent("click", handleDocumentClick);
+
+		if (context.focusFirstElement) {
+			context.focusFirstElement();
+		}
+	}
+
+	function hide() {
+		if (!shown) return;
+
+		removeDocumentEvent("mousedown", handleDocumentMouseDown);
+		removeDocumentEvent("click", handleDocumentClick);
+
+		// Focus the anchor element per WAI guidelines
+		if (context.anchorElement?.focus) {
+			context.anchorElement.focus();
+		}
+	}
 
 	function handleDocumentMouseDown() {
 		closeOnClick = true;
@@ -68,6 +70,7 @@ export default function PopoverContent($props: any) {
 				id={$props.id}
 				class={`torp-popover-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
+				:onmount={show}
 			>
 				<:slot />
 			</div>

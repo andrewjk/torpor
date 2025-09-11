@@ -33,11 +33,11 @@ export default function MenuPopoutContent() {
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
+		addEventListener("resize", setPosition);
+		addEventListener("scroll", setPosition);
 		if (popoutContext.focusFirstElement) {
 			popoutContext.focusFirstElement();
 		}
-		addEventListener("resize", setPosition);
-		addEventListener("scroll", setPosition);
 	}
 
 	function hide() {

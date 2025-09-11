@@ -14,6 +14,7 @@ export default function NavMenuPopoutContent($props: any) {
 	$props.alignment ??= "start";
 
 	let div: HTMLDivElement;
+	let shown = false;
 
 	// Get stuff out of the NavMenuPopoutContext
 	const context = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
@@ -22,35 +23,36 @@ export default function NavMenuPopoutContent($props: any) {
 	}
 	let $state = context.state;
 
-	let first = true;
 	$run(() => {
-		let visible = $state.visible;
-
-		if (first) {
-			first = false;
-			return;
-		}
-
-		if (visible) {
-			// Wait for the content div to be shown, set its position, and listen for window resize to re-position
-			//await tick();
-			setPosition();
-			if (context.focusFirstElement) {
-				context.focusFirstElement();
-			}
-			const scrollParent = getScrollParent(context.anchorElement)
-			scrollParent.addEventListener("resize", setPosition);
-			scrollParent.addEventListener("scroll", setPosition);
-		} else {
-			// Stop listening for window resize and focus the anchor element per WAI guidelines
-			const scrollParent = getScrollParent(context.anchorElement)
-			scrollParent.removeEventListener("resize", setPosition);
-			scrollParent.removeEventListener("scroll", setPosition);
-			if (context.anchorElement?.focus) {
-				context.anchorElement.focus();
-			}
+		if (!$state.visible) {
+			hide();
 		}
 	});
+
+	function show() {
+		shown = true;
+
+		// Set the position and listen for window resize and scroll to reset the position
+		setPosition();
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.addEventListener("resize", setPosition);
+		scrollParent.addEventListener("scroll", setPosition);
+		if (context.focusFirstElement) {
+			context.focusFirstElement();
+		}
+	}
+
+	function hide() {
+		if (!shown) return;
+
+		// Stop listening for window resize and focus the anchor element per WAI guidelines
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.removeEventListener("resize", setPosition);
+		scrollParent.removeEventListener("scroll", setPosition);
+		if (context.anchorElement?.focus) {
+			context.anchorElement.focus();
+		}
+	}
 
 	function setPosition() {
 		if (!context.anchorElement) {
@@ -68,7 +70,7 @@ export default function NavMenuPopoutContent($props: any) {
 				id={$props.id}
 				class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
-				:onmount={(el) => setPopoverPosition(context.anchorElement, el, $props.side, $props.alignment)}
+				:onmount={show}
 			>
 				<:slot />
 			</div>
