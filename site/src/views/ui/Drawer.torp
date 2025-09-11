@@ -51,7 +51,7 @@ export default function Component() {
 					</TabContent>
 					<TabContent>
 						<div class="example-code">
-							<button type="button" class="example-copy-button" on:click={copyCode}>
+							<button type="button" class="example-copy-button" onclick={copyCode}>
 								Copy to clipboard
 							</button>
 							<pre><code>{ExampleVariableCode.trim()}</code></pre>
@@ -76,7 +76,7 @@ export default function Component() {
 					</TabContent>
 					<TabContent>
 						<div class="example-code">
-							<button type="button" class="example-copy-button" on:click={copyCode}>
+							<button type="button" class="example-copy-button" onclick={copyCode}>
 								Copy to clipboard
 							</button>
 							<pre><code>{ExamplePopoverCode.trim()}</code></pre>
