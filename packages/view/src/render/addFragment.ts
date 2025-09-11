@@ -36,6 +36,7 @@ export default function addFragment(
 		// passing a before element...
 		if (parentIsFragment) {
 			parent = before!.parentNode!;
+			parentIsFragment = isFragmentNode(parent);
 		}
 
 		// Add the fragment

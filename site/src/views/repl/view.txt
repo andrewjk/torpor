@@ -337,6 +337,7 @@ function addFragment(fragment, parent, before, endNode) {
   if (!hydrationNode) {
     if (parentIsFragment) {
       parent = before.parentNode;
+      parentIsFragment = isFragmentNode(parent);
     }
     parent.insertBefore(fragment, before);
   }
