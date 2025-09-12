@@ -1,4 +1,4 @@
-import component from "@/views/ui/MenuBar.torp";
+import component from "@/views/ui/MenuBarPage.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {

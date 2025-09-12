@@ -1,4 +1,4 @@
-import component from "@/views/ui/Accordion.torp";
+import component from "@/views/ui/AccordionPage.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {

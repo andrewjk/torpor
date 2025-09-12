@@ -1,4 +1,4 @@
-import component from "@/views/Error.torp";
+import component from "@/views/ErrorPage.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {

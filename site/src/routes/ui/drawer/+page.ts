@@ -1,4 +1,4 @@
-import component from "@/views/ui/Drawer.torp";
+import component from "@/views/ui/DrawerPage.torp";
 import { type PageEndPoint } from "@torpor/build";
 
 export default {
