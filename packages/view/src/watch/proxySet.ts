@@ -11,7 +11,7 @@ export default function proxySet(
 	receiver: any,
 	data: ProxyData,
 ) {
-	//console.log(`object set '${String(prop)}' to '`, value, `' on`, target);
+	//console.log(`object set '${String(key)}' to`, value, `on`, target);
 
 	// Only do things if the value has changed
 	const oldValue = target[key];

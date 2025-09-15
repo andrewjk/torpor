@@ -33,12 +33,16 @@ import { type ListItem } from "./types/ListItem";
 import { type ServerComponent } from "./types/ServerComponent";
 import { type ServerSlotRender } from "./types/ServerSlotRender";
 import { type SlotRender } from "./types/SlotRender";
+import ReactiveDate from "./wrappers/ReactiveDate";
 
 // Mount and hydrate
 export { mount, hydrate, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
 export { $watch, $unwrap, $run, $mount };
+
+// Wrapped objects for using in reactive objects
+export { ReactiveDate };
 
 // Functions for use within generated code
 export {

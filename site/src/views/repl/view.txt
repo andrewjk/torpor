@@ -59,6 +59,7 @@ function $run(fn) {
 	runEffect(effect);
 }
 const proxyDataSymbol = Symbol("_proxy_data");
+const proxyHandledSymbol = Symbol("_proxy_handled");
 function $unwrap(object) {
 	return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
 }
@@ -102,9 +103,11 @@ function triggerEffects(data, key) {
 function proxyGet(target, key, receiver, data) {
 	if (key === proxyDataSymbol) return data;
 	if (!data.propData.has(key)) {
-		if (!data.shallow) {
-			let value = target[key];
-			if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) target[key] = $watch(value);
+		if (Object.getOwnPropertyDescriptor(target, key)?.writable) {
+			if (!data.shallow) {
+				let value = target[key];
+				if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) target[key] = $watch(value);
+			}
 		}
 		data.propData.set(key, null);
 	}
@@ -121,28 +124,7 @@ function proxyGet(target, key, receiver, data) {
 	else trackEffect(data, key);
 	return Reflect.get(target, key, receiver);
 }
-function transferEffects(oldValue, newValue) {
-	const oldData = oldValue[proxyDataSymbol];
-	const newData = newValue[proxyDataSymbol];
-	moveChildEffects(oldValue, newValue, oldData, newData);
-}
-function moveChildEffects(oldValue, newValue, oldData, newData) {
-	for (let [key, props] of oldData.propData.entries()) if (props) {
-		newData.propData.set(key, props);
-		let oldPropValue = oldValue[key];
-		let oldPropData = oldPropValue != null ? oldPropValue[proxyDataSymbol] : void 0;
-		if (oldPropData) newValue[key] = $watch(newValue[key]);
-		let newPropValue = newValue[key];
-		if (props.effects) for (let effect of props.effects) {
-			if (effect.cleanup) effect.cleanup();
-			if (newPropValue) effect.run();
-		}
-		if (oldPropData) {
-			let newPropData = newPropValue[proxyDataSymbol];
-			moveChildEffects(oldPropValue, newPropValue, oldPropData, newPropData);
-		}
-	}
-}
+function transferEffects(oldValue, newValue) {}
 function proxySet(target, key, value, receiver, data) {
 	const oldValue = target[key];
 	if (value !== oldValue) {
@@ -158,7 +140,7 @@ function proxySet(target, key, value, receiver, data) {
 	return true;
 }
 function $watch(object, options) {
-	if (object == null || object[proxyDataSymbol]) return object;
+	if (object == null || object[proxyDataSymbol] || object[proxyHandledSymbol]) return object;
 	const data = {
 		target: object,
 		isArray: Array.isArray(object),
@@ -588,6 +570,40 @@ function setDynamicElement(el, tag) {
 	el.replaceWith(newElement);
 	return newElement;
 }
+let initialized = false;
+var ReactiveDate = class ReactiveDate extends Date {
+	constructor(...params) {
+		super(...params);
+		if (!initialized) this.#init();
+		this[proxyHandledSymbol] = true;
+		this[proxyDataSymbol] = {
+			target: this,
+			isArray: false,
+			shallow: true,
+			propData: /* @__PURE__ */ new Map()
+		};
+	}
+	#init() {
+		initialized = true;
+		let reactivePrototype = ReactiveDate.prototype;
+		let datePrototype = Date.prototype;
+		const methods = Object.getOwnPropertyNames(datePrototype);
+		for (const method of methods) {
+			if (method.startsWith("get") || method.startsWith("to") || method === "valueOf") reactivePrototype[method] = function(...args) {
+				const data = this[proxyDataSymbol];
+				const result = datePrototype[method].apply(this, args);
+				trackEffect(data, "#time");
+				return result;
+			};
+			if (method.startsWith("set")) reactivePrototype[method] = function(...args) {
+				const data = this[proxyDataSymbol];
+				const result = datePrototype[method].apply(this, args);
+				triggerEffects(data, "#time");
+				return result;
+			};
+		}
+	}
+};
 let t_add_fragment = addFragment;
 let t_anchor = nodeAnchor;
 let t_animate = addAnimation;

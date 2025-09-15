@@ -2,7 +2,7 @@ import { type ProxyData } from "../types/ProxyData";
 import { type WatchOptions } from "../types/WatchOptions";
 import proxyGet from "../watch/proxyGet";
 import proxySet from "../watch/proxySet";
-import { proxyDataSymbol } from "../watch/symbols";
+import { proxyDataSymbol, proxyHandledSymbol } from "../watch/symbols";
 
 /**
  * Watches an object and runs effects when its properties are changed
@@ -14,7 +14,7 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 	options?: WatchOptions,
 ): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
-	if (object == null || object[proxyDataSymbol]) {
+	if (object == null || object[proxyDataSymbol] || object[proxyHandledSymbol]) {
 		return object;
 	}
 

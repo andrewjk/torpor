@@ -15,15 +15,17 @@ export default function proxyGet(
 		return data;
 	}
 
-	//console.log(`object get '${String(prop)}' on`, target);
+	//console.log(`object get '${String(key)}' on`, target);
 
 	// Set the value to a new proxy if it's an object
 	// But not if it's a Promise (i.e. has a `then` method)
 	if (!data.propData.has(key)) {
-		if (!data.shallow) {
-			let value = target[key];
-			if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) {
-				target[key] = $watch(value);
+		if (Object.getOwnPropertyDescriptor(target, key)?.writable) {
+			if (!data.shallow) {
+				let value = target[key];
+				if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) {
+					target[key] = $watch(value);
+				}
 			}
 		}
 		data.propData.set(key, null);
