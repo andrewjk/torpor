@@ -1,7 +1,7 @@
 import $watch from "../render/$watch";
 import { type ProxyData } from "../types/ProxyData";
 import { proxyDataSymbol } from "./symbols";
-import transferEffects from "./transferEffects";
+//import transferEffects from "./transferEffects";
 import triggerEffects from "./triggerEffects";
 
 export default function proxySet(
@@ -22,7 +22,7 @@ export default function proxySet(
 		// its effect subscriptions
 		if (oldValue && oldValue[proxyDataSymbol]) {
 			newValue = $watch(value);
-			transferEffects(oldValue, newValue);
+			//transferEffects(oldValue, newValue);
 		}
 
 		// Set the property value on the target
