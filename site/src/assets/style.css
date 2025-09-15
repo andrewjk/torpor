@@ -184,6 +184,14 @@ td {
 	padding: 0.5rem 1rem;
 }
 
+.torp-icon {
+	display: inline-block;
+	max-width: 1em;
+	width: 100%;
+	stroke: currentColor;
+	fill: currentColor;
+}
+
 /*
 
 :root {
