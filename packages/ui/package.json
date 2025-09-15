@@ -12,6 +12,11 @@
 			"types": "./dist/Breadcrumb/index.d.ts",
 			"import": "./dist/Breadcrumb/index.js"
 		},
+		"./Calendar": {
+			"types": "./dist/Calendar/index.d.ts",
+			"import": "./dist/Calendar/index.js",
+			"require": "./dist/Calendar/index.cjs"
+		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
 			"import": "./dist/Dialog/index.js"

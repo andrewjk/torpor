@@ -1,0 +1,67 @@
+import { areDatesEqual } from "../utils/dateUtils";
+import { type CalendarContext, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
+
+export default function CalendarDay() {
+	$props.date ??= new Date();
+	$props.selectable ??= false;
+	$props.muted ??= false;
+	$props.active ??= false;
+	$props.events ??= [];
+
+	// HACK: can't unwrap in @render
+	let date = $unwrap($props.date);
+
+	// Register this item with the parent Calendar, which will handle toggling active for all days
+	const { registerDay } = $context[CalendarContextName] as CalendarContext;
+	registerDay($props.date, setActive);
+
+	// This function is called by the parent Calendar to set this item's active value
+	function setActive(value: boolean) {
+		//if (active !== value) {
+		//	active = value;
+		//	dispatch("activeChange", value);
+		//}
+	}
+
+	function isToday() {
+		const today = new Date();
+		return areDatesEqual(date, today);
+	}
+
+	async function handleClick() {
+		//dispatch("click", date);
+		if ($props.onclick) $props.onclick($props.date);
+	}
+
+	async function handleKey() {
+		//dispatch("click", date);
+		if ($props.onkeydown) $props.onkeydown();
+	}
+
+	@render {
+		<div 
+			id={$props.id}
+			class={[
+				`torp-calendar-day ${$props.class ?? ""}`.trim(),
+				{
+					muted: $props.muted,
+					today: isToday(),
+					active: $props.selectable && $props.active
+				}
+			]}
+		>
+			@if ($props.selectable) {
+				<button type="button" tabindex="-1" onclick={handleClick} onkeydown={handleKey}>
+					<span>{date.getDate()}</span>
+				</button>
+			} else {
+				<span>{date.getDate()}</span>
+			}
+			<ul class={`torp-calendar-day-events ${$props.class ?? ""}`.trim()}>
+				@for (ev of $props.events) {
+					<li title={ev.content} />
+				}
+			</ul>
+		</div>
+	}
+}

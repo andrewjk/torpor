@@ -1,0 +1,263 @@
+import { ReactiveDate } from "@torpor/view";
+import { areDatesEqual, dayNames, monthNames } from "../utils/dateUtils";
+import CalendarDay from "./CalendarDay.torp";
+import { type CalendarContext, type DayState, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
+
+// TODO: Split this out into Calendar, CalendarHeader, CalendarPreviousTrigger, CalendarGrid etc
+
+export default function Calendar() {
+	$props.startOfWeek ??= 1;
+	$props.selectable ??= false;
+	$props.value ??= new Date();
+	$props.events ??= [];
+
+	// Ensure the value is a reactive date
+	$props.value = new ReactiveDate($unwrap($props.value));
+
+	// A note on dates:
+	// * value is the selected value
+	// * activeDate is the date that is active when the user is navigating via keyboard
+	// * visibleDate is the date that is currently being displayed in the calendar (really only the month part is important here)
+
+	let $state = $watch({
+		activeDate: $props.value,
+		visibleDate: $props.value,
+		//get days() {
+		//	// TODO: $cache
+		//	return buildDays($state.visibleDate, $props.startOfWeek)
+		//},
+	});
+
+	let visibleStartDate = $props.value;
+	let visibleEndDate = $props.value;
+	let container: HTMLElement;
+	let refocus = false;
+
+	const context: CalendarContext = {
+		registerDay
+	};
+	$context[CalendarContextName] = context;
+
+	$run(() => {
+		$state.days = buildDays($state.visibleDate, $props.startOfWeek)
+
+		// HACK: Shouldn't need this
+		if (refocus) {
+			refocus = false;
+			const el = container.getElementsByClassName("active")[0];
+			if (el && el.children[0] instanceof HTMLElement) {
+				el.children[0].focus();
+			}
+		}
+	});
+
+	function registerDay(date: ReactiveDate, setActive: (value: boolean) => void) {
+		const day = $state.days.find((day) => areDatesEqual(day.date, date));
+		if (day) {
+			day.setActive = setActive;
+		}
+	}
+
+	function buildDays(date: ReactiveDate, start: number): DayState[] {
+		const newDays = [];
+
+		// Set the first day to the start of the week before the first day of
+		// the month (e.g. Monday the 28th of the previous month)
+		visibleStartDate = new Date();
+		visibleStartDate.setFullYear(date.getFullYear(), date.getMonth(), 1);
+		visibleStartDate.setDate(
+			visibleStartDate.getDate() - ((visibleStartDate.getDay() + 7 - start) % 7)
+		);
+
+		// Set the last day to the end of the week after the last day of the
+		// month (e.g. Sunday the 6th of the next month)
+		visibleEndDate = new Date();
+		visibleEndDate.setFullYear(date.getFullYear(), date.getMonth() + 1, 0);
+		visibleEndDate.setDate(
+			visibleEndDate.getDate() + ((start - 1 - visibleEndDate.getDay() + 7) % 7)
+		);
+
+		const dayDiff =
+			Math.round((visibleEndDate.getTime() - visibleStartDate.getTime()) / (1000 * 60 * 60 * 24)) +
+			1;
+
+		for (let i = 0; i < dayDiff; i++) {
+			const dayDate = new ReactiveDate();
+			dayDate.setFullYear(
+				visibleStartDate.getFullYear(),
+				visibleStartDate.getMonth(),
+				visibleStartDate.getDate() + i
+			);
+			dayDate.setHours(0);
+			dayDate.setMinutes(0);
+			dayDate.setSeconds(0);
+			dayDate.setMilliseconds(0);
+			const newDay: DayState = {
+				date: dayDate,
+				muted: dayDate.getMonth() !== date.getMonth(),
+				active: areDatesEqual(dayDate, $state.activeDate)
+			};
+			newDays.push(newDay);
+		}
+
+		return newDays;
+	}
+
+	function setValue(date: Date) {
+		$state.value = new ReactiveDate(date);
+
+		// Also set the active date so that the user knows where they are
+		setActiveDate(date);
+
+		if ($props.onchange) $props.onchange(value);
+	}
+
+	function setActiveDate(date: Date) {
+		$state.activeDate = new ReactiveDate(date);
+
+		// If the selected date is outside the visible date range, move the date range
+		if (date < visibleStartDate || date > visibleEndDate) {
+			refocus = true;
+			$state.visibleDate = new ReactiveDate(date);
+			if ($props.onchangedate) $props.onchangedate(date);
+		}
+
+		$state.days.forEach((day) => {
+			const active = areDatesEqual(day.date, new Date(date));
+			if (day.setActive) {
+				day.setActive(active);
+			}
+			day.active = active;
+		});
+	}
+
+	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
+		const el = e.currentTarget.getElementsByClassName("active")[0];
+		if (el && el.children[0] instanceof HTMLElement) {
+			el.children[0].focus();
+			e.preventDefault();
+		}
+	}
+
+	function handlePrevMonth(e: Event) {
+		e.preventDefault();
+		$state.visibleDate.setMonth($state.visibleDate.getMonth() - 1);
+		if ($props.onchangedate) $props.onchangedate(visibleDate);
+	}
+
+	function handleNextMonth(e: Event) {
+		e.preventDefault();
+		$state.visibleDate.setMonth($state.visibleDate.getMonth() + 1);
+		if ($props.onchangedate) $props.onchangedate(visibleDate);
+	}
+
+	async function handleDayClick(date: ReactiveDate) {
+		if (!$props.selectable) return;
+
+		setValue(date);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (!$props.selectable) return;
+
+		switch (e.key) {
+			case "Enter": {
+				e.preventDefault();
+				setValue($state.activeDate);
+				break;
+			}
+			case "Esc":
+			case "Escape": {
+				e.preventDefault();
+				if ($props.onclose) $props.onclose();
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				e.preventDefault();
+				// Move to the date one day before
+				const newDate = new Date($state.activeDate.getTime() - 1 * 86400000)
+				setActiveDate(newDate);
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				e.preventDefault();
+				// Move to the date seven days before
+				const newDate = new Date($state.activeDate.getTime() - 7 * 86400000)
+				setActiveDate(newDate);
+				break;
+			}
+			case "Right":
+			case "ArrowRight": {
+				e.preventDefault();
+				// Move to the date one day after
+				const newDate = new Date($state.activeDate.getTime() + 1 * 86400000)
+				setActiveDate(newDate);
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				e.preventDefault();
+				// Move to the date seven days after
+				const newDate = new Date($state.activeDate.getTime() + 7 * 86400000)
+				setActiveDate(newDate);
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-calendar ${$props.class ?? ""}`.trim()}
+			&ref={container}
+		>
+			<div class={`torp-calendar-header ${$props.class ?? ""}`.trim()}>
+				<button class={`torp-calendar-previous-trigger ${$props.class ?? ""}`.trim()} onclick={handlePrevMonth}>
+					<:slot name="prev-button">
+						&lt;&lt;
+					</:slot>
+				</button>
+				<span class={`torp-calendar-month-name ${$props.class ?? ""}`.trim()}>
+					{monthNames[$state.visibleDate.getMonth()] + " " + $state.visibleDate.getFullYear()}
+				</span>
+				<button class={`torp-calendar-next-trigger ${$props.class ?? ""}`.trim()} onclick={handleNextMonth}>
+					<:slot name="next-button">
+						&gt;&gt;
+					</:slot>
+				</button>
+			</div>
+			<div
+				class={`torp-calendar-grid ${$props.class ?? ""}`.trim()}
+				tabindex={$props.selectable ? 0 : -1}
+				onfocus={handleFocus}
+				onkeydown={handleKey}
+			>
+				@for (let index of [0, 1, 2, 3, 4, 5, 6]) {
+					<span>
+						{dayNames[(Math.abs($props.startOfWeek) + index) % 7].substring(0, 2)}
+					</span>
+				}
+				@for (let day of $state.days) {
+					@key = day.date;
+					<CalendarDay
+						{day.date}
+						{day.muted}
+						{day.active}
+						{$props.selectable}
+						events={$props.events.filter((ev) => areDatesEqual(new Date(ev.date), day.date))}
+						onclick={handleDayClick}
+					/>
+				}
+			</div>
+		</div>
+	}
+
+	@style {
+		.torp-calendar-grid {
+			display: grid;
+			grid-template-columns: repeat(7, 1fr);
+		}
+	}
+}

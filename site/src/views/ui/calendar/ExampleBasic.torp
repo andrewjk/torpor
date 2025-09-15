@@ -1,0 +1,65 @@
+import {
+	Calendar
+} from "@torpor/ui/Calendar";
+
+export default function ExampleBasic() {
+	@render {
+		<Calendar selectable />
+	}
+
+	@style {
+		:global(.torp-calendar) {
+			text-align: center;
+		}
+
+		:global(
+			.torp-calendar-previous-trigger,
+			.torp-calendar-next-trigger,
+			.torp-calendar-day > button
+		) {
+			all: unset;
+			cursor: default;
+			display: inline-flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		:global(
+			.torp-calendar-previous-trigger:hover,
+			.torp-calendar-previous-trigger:focus,
+			.torp-calendar-next-trigger:hover,
+			.torp-calendar-next-trigger:focus,
+			.torp-calendar-day > button:hover,
+			.torp-calendar-day > button:focus,
+			.torp-calendar-day.active > button
+		) {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		:global(
+			.torp-calendar-day.today > button
+		) {
+			font-weight: bold;
+		}
+
+		:global(.torp-calendar-header) {
+			display: flex;
+			align-items: center;
+		}
+
+		:global(.torp-calendar-month-name) {
+			flex: 1 1 auto;
+		}
+
+		:global(.torp-calendar-grid) {
+		}
+
+		:global(.torp-calendar-day.muted) {
+			color: #bbb;
+		}
+	}
+}

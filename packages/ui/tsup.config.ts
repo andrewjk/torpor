@@ -9,6 +9,7 @@ export default defineConfig({
 	entry: [
 		"src/Accordion/index.ts",
 		"src/Breadcrumb/index.ts",
+		"src/Calendar/index.ts",
 		"src/Dialog/index.ts",
 		"src/Disclosure/index.ts",
 		"src/Drawer/index.ts",

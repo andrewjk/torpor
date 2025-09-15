@@ -1,0 +1,9 @@
+import {
+	Calendar,
+} from "../../../src/Calendar/index";
+
+export default function CalendarTest() {
+	@render {
+		<Calendar {$props.selectable} {$props.value} />
+	}
+}
