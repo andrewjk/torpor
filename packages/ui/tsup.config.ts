@@ -20,6 +20,7 @@ export default defineConfig({
 		"src/Popover/index.ts",
 		"src/TabGroup/index.ts",
 		"src/motion.ts",
+		"src/icons/index.ts",
 	],
 	format: "esm",
 	dts: { entry: ["src/motion.ts"] },

@@ -65,8 +65,7 @@
 		"build": "tsgo --noEmit && tsup",
 		"build:fix": "esno scripts/postbuild.ts",
 		"check": "tsgo --noEmit",
-		"test": "vitest run",
-		"test:watch": "vitest"
+		"test": "vitest"
 	},
 	"keywords": [],
 	"author": "",

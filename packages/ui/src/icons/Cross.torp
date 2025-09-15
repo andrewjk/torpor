@@ -1,0 +1,16 @@
+export default function Cross() {
+	@render {
+		<svg
+			{$props.id}
+			class={`torp-icon ${$props.class ?? ""}`.trim()}
+			viewBox="0 0 100 100"
+			stroke-linejoin="round"
+			stroke-width="12"
+		>
+			<g>
+				<path d="M15,15 L85,85" />
+				<path d="M15,85 L85,15" />
+			</g>
+		</svg>
+	}
+}

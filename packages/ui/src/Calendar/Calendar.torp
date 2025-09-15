@@ -2,6 +2,8 @@ import { ReactiveDate } from "@torpor/view";
 import { areDatesEqual, dayNames, monthNames } from "../utils/dateUtils";
 import CalendarDay from "./CalendarDay.torp";
 import { type CalendarContext, type DayState, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
+import ChevronLeft from "../icons/ChevronLeft.torp";
+import ChevronRight from "../icons/ChevronRight.torp";
 
 // TODO: Split this out into Calendar, CalendarHeader, CalendarPreviousTrigger, CalendarGrid etc
 
@@ -215,17 +217,17 @@ export default function Calendar() {
 		>
 			<div class={`torp-calendar-header ${$props.class ?? ""}`.trim()}>
 				<button class={`torp-calendar-previous-trigger ${$props.class ?? ""}`.trim()} onclick={handlePrevMonth}>
-					<:slot name="prev-button">
-						&lt;&lt;
-					</:slot>
+					<:fill name="prev-button">
+						<ChevronLeft />
+					</:fill>
 				</button>
 				<span class={`torp-calendar-month-name ${$props.class ?? ""}`.trim()}>
 					{monthNames[$state.visibleDate.getMonth()] + " " + $state.visibleDate.getFullYear()}
 				</span>
 				<button class={`torp-calendar-next-trigger ${$props.class ?? ""}`.trim()} onclick={handleNextMonth}>
-					<:slot name="next-button">
-						&gt;&gt;
-					</:slot>
+					<:fill name="next-button">
+						<ChevronRight />
+					</:fill>
 				</button>
 			</div>
 			<div

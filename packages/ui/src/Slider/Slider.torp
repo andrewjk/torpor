@@ -1,0 +1,83 @@
+export default function Slider() {
+	//export let value = 0;
+	//export let total = 0;
+
+	let position = 0;
+	let dragging = false;
+	let background: HTMLElement;
+	let handle: HTMLElement;
+	let skipRecalc = false;
+
+	$mount(() => {
+		calculatePosition();
+	});
+
+	beforeUpdate(() => {
+		if (background && handle) {
+			if (skipRecalc) {
+				skipRecalc = false;
+			} else {
+				calculatePosition();
+			}
+		}
+	});
+
+	function calculatePosition() {
+		// Calculate the initial handle position
+		const handleRect = handle.getBoundingClientRect();
+		const backgroundRect = background.getBoundingClientRect();
+		const offsetX = (value / total) * backgroundRect.width;
+		position = offsetX - handleRect.width / 2;
+	}
+
+	function handleMouseDown() {
+		dragging = true;
+	}
+
+	function handleMouseUp() {
+		dragging = false;
+	}
+
+	function handleMouseMove(e: MouseEvent) {
+		if (!e.buttons) {
+			dragging = false;
+		}
+
+		if (dragging) {
+			const handleRect = handle.getBoundingClientRect();
+			const backgroundRect = background.getBoundingClientRect();
+			let offsetX = e.clientX - backgroundRect.left;
+
+			const minWidth = handleRect.width / 2;
+			const maxWidth = backgroundRect.width - handleRect.width / 2;
+
+			if (offsetX < minWidth) {
+				offsetX = minWidth;
+				value = 0;
+			} else if (offsetX > maxWidth) {
+				offsetX = maxWidth;
+				value = total;
+			} else {
+				const width = backgroundRect.width - handleRect.width;
+				value = Math.floor((total / width) * offsetX);
+			}
+
+			position = offsetX - handleRect.width / 2;
+		}
+
+		// Don't recalc with the value change - we know where everything should be
+		skipRecalc = true;
+	}
+
+	@render {
+		<div
+			id={$props.id}
+			class={`torp-slider ${$props.class ?? ""}`.trim()}
+			onmousemove={handleMouseMove}
+			onmouseup={handleMouseUp}
+		>
+			<div &ref={background} />
+			<div &ref={handle} style={`left: ${position}px;`} onmousedown={handleMouseDown} />
+		</div>
+	}
+}

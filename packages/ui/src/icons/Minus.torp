@@ -1,0 +1,15 @@
+export default function Minus() {
+	@render {
+		<svg
+			{$props.id}
+			class={`torp-icon ${$props.class ?? ""}`.trim()}
+			viewBox="0 0 100 100"
+			stroke-linejoin="round"
+			stroke-width="12"
+		>
+			<g>
+				<path d="M10,50 L90,50" />
+			</g>
+		</svg>
+	}
+}

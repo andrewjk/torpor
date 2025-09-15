@@ -1,0 +1,15 @@
+export default function ChevronLeft() {
+	@render {
+		<svg
+			{$props.id}
+			class={`torp-icon ${$props.class ?? ""}`.trim()}
+			viewBox="0 0 100 100"
+			stroke-linejoin="round"
+			stroke-width="12"
+		>
+			<g>
+				<path d="M70,10 L30,50 L70,90" fill="none" />
+			</g>
+		</svg>
+	}
+}

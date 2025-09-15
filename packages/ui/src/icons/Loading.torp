@@ -1,0 +1,16 @@
+export default function Loading() {
+	@render {
+		<svg
+			{$props.id}
+			class={`torp-icon ${$props.class ?? ""}`.trim()}
+			viewBox="0 0 100 100"
+			stroke-linejoin="round"
+			stroke-width="20"
+		>
+			<g>
+				<circle cx="50" cy="50" r="40" fill="none" opacity="0.3" />
+				<path d="M 22 22 A 40 40 0 0 1 78 22" fill="none" />
+			</g>
+		</svg>
+	}
+}
