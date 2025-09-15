@@ -22,11 +22,16 @@ export default function buildElementNode(
 	if (status.inHead) {
 		if (node.tagName === "title") {
 			buildTitleNode(node, status, b);
-			return;
 		} else {
 			buildHeadNode(node, status, b);
-			return;
 		}
+		return;
+	}
+
+	const svgElement = node.tagName === "svg";
+	const oldns = status.ns;
+	if (svgElement) {
+		status.ns = true;
 	}
 
 	const varName = node.varName;
@@ -54,6 +59,10 @@ export default function buildElementNode(
 		buildNode(child, status, b, parentName, "null");
 	}
 	status.preserveWhitespace = oldPreserveWhitespace;
+
+	if (svgElement) {
+		status.ns = oldns;
+	}
 }
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
@@ -192,7 +201,14 @@ function buildElementAttributes(
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
-				buildRun("setClasses", `${varName}.className = t_class(${params.join(", ")});`, status, b);
+				// SVGs have a different className
+				const propName = status.ns ? "className.baseVal" : "className";
+				buildRun(
+					"setClasses",
+					`${varName}.${propName} = t_class(${params.join(", ")});`,
+					status,
+					b,
+				);
 			} else if (name === ":style") {
 				status.imports.add("t_style");
 				buildRun("setStyles", `${varName}.setAttribute("style", t_style(${value}));`, status, b);
