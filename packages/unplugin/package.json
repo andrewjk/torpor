@@ -61,8 +61,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsc --noEmit && tsup",
-		"build:watch": "tsup --watch src",
+		"build": "tsc --noEmit && tsdown",
+		"build:watch": "tsdown --watch src",
 		"check": "tsc --noEmit",
 		"lint": "eslint .",
 		"play": "npm -C playground run dev",
@@ -117,7 +117,7 @@
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.50.1",
-		"tsup": "^8.5.0",
+		"tsdown": "^0.15.1",
 		"typescript": "^5.9.2",
 		"vite": "^7.1.4",
 		"vitest": "^3.2.4",

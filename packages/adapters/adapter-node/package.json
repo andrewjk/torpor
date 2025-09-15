@@ -11,8 +11,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsc --noEmit && tsup",
-		"build:watch": "tsup --watch",
+		"build": "tsc --noEmit && tsdown",
+		"build:watch": "tsdown --watch",
 		"check": "tsc --noEmit"
 	},
 	"keywords": [],
@@ -24,7 +24,7 @@
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"tsup": "^8.5.0",
+		"tsdown": "^0.15.1",
 		"tsx": "^4.20.5",
 		"typescript": "^5.9.2"
 	}

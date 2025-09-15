@@ -21,8 +21,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "tsc --noEmit && tsup && tsx ./scripts/copyToRepl.ts",
-		"build:watch": "tsup --watch",
+		"build": "tsc --noEmit && tsdown && tsx ./scripts/copyToRepl.ts",
+		"build:watch": "tsdown --watch",
 		"check": "tsc --noEmit",
 		"test": "vitest",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
@@ -43,7 +43,7 @@
 		"jsdom": "^26.1.0",
 		"sucrase": "^3.35.0",
 		"tinybench": "^5.0.1",
-		"tsup": "^8.5.0",
+		"tsdown": "^0.15.1",
 		"tsx": "^4.20.5",
 		"typescript": "^5.9.2",
 		"vitest": "^3.2.4"

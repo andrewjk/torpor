@@ -1,4 +1,4 @@
-import { type Options, defineConfig } from "tsup";
+import { type Options, defineConfig } from "tsdown";
 
 type Config =
 	| Options
@@ -9,7 +9,5 @@ export default defineConfig({
 	entry: ["src/index.ts"],
 	format: "esm",
 	dts: true,
-	clean: true,
-	metafile: true,
 	sourcemap: true,
 }) satisfies Config as Config;

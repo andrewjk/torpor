@@ -1,846 +1,593 @@
 
-// src/render/buildClasses.ts
 function buildClasses(value, styleHash) {
-  if (typeof value === "string") {
-    if (styleHash) {
-      value += " " + styleHash;
-    }
-    return value;
-  } else {
-    let classes = [];
-    gatherNames("", value, classes);
-    if (styleHash) {
-      classes.push(styleHash);
-    }
-    return classes.join(" ");
-  }
+	if (typeof value === "string") {
+		if (styleHash) value += " " + styleHash;
+		return value;
+	} else {
+		let classes = [];
+		gatherNames("", value, classes);
+		if (styleHash) classes.push(styleHash);
+		return classes.join(" ");
+	}
 }
 function gatherNames(name, value, classes) {
-  if (value) {
-    if (Array.isArray(value)) {
-      for (let v of value) {
-        gatherNames(v, v, classes);
-      }
-    } else if (typeof value === "object") {
-      for (let [n, v] of Object.entries(value)) {
-        gatherNames(n, v, classes);
-      }
-    } else {
-      classes.push(name);
-    }
-  }
+	if (value) if (Array.isArray(value)) for (let v of value) gatherNames(v, v, classes);
+	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) gatherNames(n, v, classes);
+	else classes.push(name);
 }
-
-// src/render/buildStyles.ts
 function buildStyles(value) {
-  if (typeof value === "string") {
-    return value;
-  } else {
-    let styles = [];
-    if (value) {
-      if (Array.isArray(value)) {
-        for (let v of value) {
-          styles.push(v);
-        }
-      } else if (typeof value === "object") {
-        for (let [n, v] of Object.entries(value)) {
-          styles.push(`${n}: ${v}`);
-        }
-      }
-    }
-    return styles.join("; ");
-  }
+	if (typeof value === "string") return value;
+	else {
+		let styles = [];
+		if (value) {
+			if (Array.isArray(value)) for (let v of value) styles.push(v);
+			else if (typeof value === "object") for (let [n, v] of Object.entries(value)) styles.push(`${n}: ${v}`);
+		}
+		return styles.join("; ");
+	}
 }
-
-// src/render/formatText.ts
 function formatText(value) {
-  return value ?? "";
+	return value ?? "";
 }
-
-
-
-
-// src/render/context.ts
-var context = {
-  activeEffect: null,
-  activeRange: null,
-  mountEffects: [],
-  stashedEvents: [],
-  stashedAnimations: [],
-  hydrationNode: null
-  //hn: null,
-  //get hydrationNode() {
-  //	return this.hn;
-  //},
-  //set hydrationNode(value) {
-  //	console.log(`set hydration ${printNode(value)}`);
-  //	this.hn = value;
-  //},
+const context = {
+	activeEffect: null,
+	activeRange: null,
+	mountEffects: [],
+	stashedEvents: [],
+	stashedAnimations: [],
+	hydrationNode: null
 };
 var context_default = context;
-
-// src/render/$mount.ts
 function $mount(fn) {
-  context_default.mountEffects.push(fn);
+	context_default.mountEffects.push(fn);
 }
-
-// src/watch/runEffect.ts
 function runEffect(effect) {
-  effect.active = true;
-  context_default.activeEffect = effect;
-  const cleanup = effect.run();
-  if (typeof cleanup === "function") {
-    effect.cleanup = cleanup;
-  }
-  context_default.activeEffect = null;
+	effect.active = true;
+	context_default.activeEffect = effect;
+	const cleanup = effect.run();
+	if (typeof cleanup === "function") effect.cleanup = cleanup;
+	context_default.activeEffect = null;
 }
-
-// src/render/$run.ts
 function $run(fn) {
-  let effect = {
-    run: fn,
-    cleanup: null,
-    props: null,
-    active: true
-  };
-  if (context_default.activeRange) {
-    (context_default.activeRange.effects ??= []).push(effect);
-  }
-  runEffect(effect);
+	let effect = {
+		run: fn,
+		cleanup: null,
+		props: null,
+		active: true
+	};
+	if (context_default.activeRange) (context_default.activeRange.effects ??= []).push(effect);
+	runEffect(effect);
 }
-
-// src/watch/symbols.ts
-var proxyDataSymbol = Symbol("_proxy_data");
-
-// src/render/$unwrap.ts
+const proxyDataSymbol = Symbol("_proxy_data");
 function $unwrap(object) {
-  return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
+	return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
 }
-
-// src/watch/trackEffect.ts
 function trackEffect(data, key) {
-  if (context_default.activeEffect) {
-    let propState = data.propData.get(key);
-    if (!propState) {
-      propState = { effects: [] };
-      data.propData.set(key, propState);
-    }
-    propState.effects ||= [];
-    propState.effects.push(context_default.activeEffect);
-    context_default.activeEffect.props ||= [];
-    context_default.activeEffect.props.push(propState);
-  }
+	if (context_default.activeEffect) {
+		let propState = data.propData.get(key);
+		if (!propState) {
+			propState = { effects: [] };
+			data.propData.set(key, propState);
+		}
+		propState.effects ||= [];
+		propState.effects.push(context_default.activeEffect);
+		context_default.activeEffect.props ||= [];
+		context_default.activeEffect.props.push(propState);
+	}
 }
-
-// src/watch/removeEffect.ts
 function removeEffect(effect) {
-  if (effect.cleanup) {
-    effect.cleanup();
-  }
-  if (effect.props) {
-    for (let prop of effect.props) {
-      if (prop.effects) {
-        let length = prop.effects.length;
-        let i = length;
-        while (i--) {
-          if (prop.effects[i] === effect) {
-            prop.effects[i] = prop.effects[length - 1];
-            prop.effects.pop();
-            length -= 1;
-          }
-        }
-      }
-    }
-  }
-  effect.active = false;
+	if (effect.cleanup) effect.cleanup();
+	if (effect.props) {
+		for (let prop of effect.props) if (prop.effects) {
+			let length = prop.effects.length;
+			let i = length;
+			while (i--) if (prop.effects[i] === effect) {
+				prop.effects[i] = prop.effects[length - 1];
+				prop.effects.pop();
+				length -= 1;
+			}
+		}
+	}
+	effect.active = false;
 }
-
-// src/watch/triggerEffects.ts
 function triggerEffects(data, key) {
-  let effects = data.propData.get(key)?.effects;
-  if (effects) {
-    for (let effect of effects.slice()) {
-      if (effect.active) {
-        removeEffect(effect);
-        runEffect(effect);
-      }
-    }
-  }
+	let effects = data.propData.get(key)?.effects;
+	if (effects) {
+		for (let effect of effects.slice()) if (effect.active) {
+			removeEffect(effect);
+			runEffect(effect);
+		}
+	}
 }
-
-// src/watch/proxyGet.ts
 function proxyGet(target, key, receiver, data) {
-  if (key === proxyDataSymbol) {
-    return data;
-  }
-  if (!data.propData.has(key)) {
-    if (!data.shallow) {
-      let value = target[key];
-      if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) {
-        target[key] = $watch(value);
-      }
-    }
-    data.propData.set(key, null);
-  }
-  if (data.isArray) {
-    if (key === "pop" || key === "push" || key === "reverse" || key === "shift" || key === "sort" || key === "splice" || key === "unshift") {
-      const targetFunction = target[key];
-      return function(...args) {
-        targetFunction.apply(target, args);
-        triggerEffects(data, "length");
-      };
-    } else if (key === Symbol.iterator) {
-      trackEffect(data, "length");
-      context_default.activeEffect = null;
-    } else {
-      trackEffect(data, key);
-    }
-  } else {
-    trackEffect(data, key);
-  }
-  return Reflect.get(target, key, receiver);
+	if (key === proxyDataSymbol) return data;
+	if (!data.propData.has(key)) {
+		if (!data.shallow) {
+			let value = target[key];
+			if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) target[key] = $watch(value);
+		}
+		data.propData.set(key, null);
+	}
+	if (data.isArray) if (key === "pop" || key === "push" || key === "reverse" || key === "shift" || key === "sort" || key === "splice" || key === "unshift") {
+		const targetFunction = target[key];
+		return function(...args) {
+			targetFunction.apply(target, args);
+			triggerEffects(data, "length");
+		};
+	} else if (key === Symbol.iterator) {
+		trackEffect(data, "length");
+		context_default.activeEffect = null;
+	} else trackEffect(data, key);
+	else trackEffect(data, key);
+	return Reflect.get(target, key, receiver);
 }
-
-// src/watch/transferEffects.ts
 function transferEffects(oldValue, newValue) {
-  const oldData = oldValue[proxyDataSymbol];
-  const newData = newValue[proxyDataSymbol];
-  moveChildEffects(oldValue, newValue, oldData, newData);
+	const oldData = oldValue[proxyDataSymbol];
+	const newData = newValue[proxyDataSymbol];
+	moveChildEffects(oldValue, newValue, oldData, newData);
 }
 function moveChildEffects(oldValue, newValue, oldData, newData) {
-  for (let [key, props] of oldData.propData.entries()) {
-    if (props) {
-      newData.propData.set(key, props);
-      let oldPropValue = oldValue[key];
-      let oldPropData = oldPropValue != null ? oldPropValue[proxyDataSymbol] : void 0;
-      if (oldPropData) {
-        newValue[key] = $watch(newValue[key]);
-      }
-      let newPropValue = newValue[key];
-      if (props.effects) {
-        for (let effect of props.effects) {
-          if (effect.cleanup) {
-            effect.cleanup();
-          }
-          if (newPropValue) {
-            effect.run();
-          }
-        }
-      }
-      if (oldPropData) {
-        let newPropData = newPropValue[proxyDataSymbol];
-        moveChildEffects(oldPropValue, newPropValue, oldPropData, newPropData);
-      }
-    }
-  }
+	for (let [key, props] of oldData.propData.entries()) if (props) {
+		newData.propData.set(key, props);
+		let oldPropValue = oldValue[key];
+		let oldPropData = oldPropValue != null ? oldPropValue[proxyDataSymbol] : void 0;
+		if (oldPropData) newValue[key] = $watch(newValue[key]);
+		let newPropValue = newValue[key];
+		if (props.effects) for (let effect of props.effects) {
+			if (effect.cleanup) effect.cleanup();
+			if (newPropValue) effect.run();
+		}
+		if (oldPropData) {
+			let newPropData = newPropValue[proxyDataSymbol];
+			moveChildEffects(oldPropValue, newPropValue, oldPropData, newPropData);
+		}
+	}
 }
-
-// src/watch/proxySet.ts
 function proxySet(target, key, value, receiver, data) {
-  const oldValue = target[key];
-  if (value !== oldValue) {
-    let newValue = value;
-    if (oldValue && oldValue[proxyDataSymbol]) {
-      newValue = $watch(value);
-      transferEffects(oldValue, newValue);
-    }
-    Reflect.set(target, key, newValue, receiver);
-    triggerEffects(data, key);
-    if (data.isArray && !isNaN(+String(key))) {
-      triggerEffects(data, "length");
-    }
-  }
-  return true;
+	const oldValue = target[key];
+	if (value !== oldValue) {
+		let newValue = value;
+		if (oldValue && oldValue[proxyDataSymbol]) {
+			newValue = $watch(value);
+			transferEffects(oldValue, newValue);
+		}
+		Reflect.set(target, key, newValue, receiver);
+		triggerEffects(data, key);
+		if (data.isArray && !isNaN(+String(key))) triggerEffects(data, "length");
+	}
+	return true;
 }
-
-// src/render/$watch.ts
 function $watch(object, options) {
-  if (object == null || object[proxyDataSymbol]) {
-    return object;
-  }
-  const data = {
-    target: object,
-    isArray: Array.isArray(object),
-    shallow: !!options?.shallow,
-    propData: /* @__PURE__ */ new Map()
-  };
-  const handler = {
-    get: function(target, prop, receiver) {
-      return proxyGet(target, prop, receiver, data);
-    },
-    set: function(target, prop, value, receiver) {
-      return proxySet(target, prop, value, receiver, data);
-    }
-  };
-  return new Proxy(object, handler);
+	if (object == null || object[proxyDataSymbol]) return object;
+	const data = {
+		target: object,
+		isArray: Array.isArray(object),
+		shallow: !!options?.shallow,
+		propData: /* @__PURE__ */ new Map()
+	};
+	return new Proxy(object, {
+		get: function(target, prop, receiver) {
+			return proxyGet(target, prop, receiver, data);
+		},
+		set: function(target, prop, value, receiver) {
+			return proxySet(target, prop, value, receiver, data);
+		}
+	});
 }
-
-// src/render/addAnimation.ts
 function addAnimation(el, entry, exit) {
-  context_default.stashedAnimations.push({
-    range: context_default.activeRange,
-    el,
-    in: entry,
-    out: exit
-  });
+	context_default.stashedAnimations.push({
+		range: context_default.activeRange,
+		el,
+		in: entry,
+		out: exit
+	});
 }
-
-// src/render/addEvent.ts
 function addEvent(el, type, listener) {
-  context_default.stashedEvents.push({ range: context_default.activeRange, el, type, listener });
+	context_default.stashedEvents.push({
+		range: context_default.activeRange,
+		el,
+		type,
+		listener
+	});
 }
-
-// src/motion/animate.ts
 async function animate(el, enter, keyframes, options) {
-  let animationOptions = Object.assign(
-    {
-      direction: enter ? "normal" : "reverse",
-      // TODO: Should probably have a global setting for these somewhere
-      // And respect browser reduce motion settings
-      duration: 300,
-      easing: "ease-in-out",
-      fill: "forwards"
-    },
-    options
-  );
-  const animation = el.animate(keyframes, animationOptions);
-  setTimeout(() => {
-    animation.timeline = el.ownerDocument.timeline;
-  }, 1);
-  let activeRange = context_default.activeRange;
-  if (activeRange) {
-    activeRange.animations ??= /* @__PURE__ */ new Set();
-    activeRange.animations.add(animation);
-    await animation.finished;
-    activeRange.animations.delete(animation);
-  }
+	let animationOptions = Object.assign({
+		direction: enter ? "normal" : "reverse",
+		duration: 300,
+		easing: "ease-in-out",
+		fill: "forwards"
+	}, options);
+	const animation = el.animate(keyframes, animationOptions);
+	setTimeout(() => {
+		animation.timeline = el.ownerDocument.timeline;
+	}, 1);
+	let activeRange = context_default.activeRange;
+	if (activeRange) {
+		activeRange.animations ??= /* @__PURE__ */ new Set();
+		activeRange.animations.add(animation);
+		await animation.finished;
+		activeRange.animations.delete(animation);
+	}
 }
-
-// src/render/isFragmentNode.ts
 function isFragmentNode(node) {
-  return node?.nodeType === 11;
+	return node?.nodeType === 11;
 }
-
-// src/render/addFragment.ts
 function addFragment(fragment, parent, before, endNode) {
-  const range = context_default.activeRange;
-  const hydrationNode = context_default.hydrationNode;
-  if (range) {
-    if (hydrationNode) {
-      range.endNode = endNode ?? hydrationNode;
-    } else {
-      range.startNode = fragment.firstChild;
-      range.endNode = fragment.lastChild;
-    }
-  }
-  let parentIsFragment = isFragmentNode(parent);
-  if (!hydrationNode) {
-    if (parentIsFragment) {
-      parent = before.parentNode;
-      parentIsFragment = isFragmentNode(parent);
-    }
-    parent.insertBefore(fragment, before);
-  }
-  if (!parentIsFragment) {
-    if (!hydrationNode) {
-      for (let effect of context_default.mountEffects) {
-        $run(effect);
-      }
-      context_default.mountEffects.length = 0;
-    }
-    for (let event of context_default.stashedEvents) {
-      context_default.activeRange = event.range;
-      $run(function addFragmentEvent() {
-        event.el.addEventListener(event.type, event.listener);
-        return () => {
-          event.el.removeEventListener(event.type, event.listener);
-        };
-      });
-    }
-    context_default.stashedEvents.length = 0;
-    for (let animation of context_default.stashedAnimations) {
-      context_default.activeRange = animation.range;
-      $run(function addFragmentAnimation() {
-        if (animation.in) {
-          animate(animation.el, true, animation.in.keyframes, animation.in.options);
-        }
-        if (animation.out) {
-          return () => {
-            animate(animation.el, false, animation.out.keyframes, animation.out.options);
-          };
-        }
-      });
-    }
-    context_default.stashedAnimations.length = 0;
-    context_default.activeRange = range;
-  }
+	const range = context_default.activeRange;
+	const hydrationNode = context_default.hydrationNode;
+	if (range) if (hydrationNode) range.endNode = endNode ?? hydrationNode;
+	else {
+		range.startNode = fragment.firstChild;
+		range.endNode = fragment.lastChild;
+	}
+	let parentIsFragment = isFragmentNode(parent);
+	if (!hydrationNode) {
+		if (parentIsFragment) {
+			parent = before.parentNode;
+			parentIsFragment = isFragmentNode(parent);
+		}
+		parent.insertBefore(fragment, before);
+	}
+	if (!parentIsFragment) {
+		if (!hydrationNode) {
+			for (let effect of context_default.mountEffects) $run(effect);
+			context_default.mountEffects.length = 0;
+		}
+		for (let event of context_default.stashedEvents) {
+			context_default.activeRange = event.range;
+			$run(function addFragmentEvent() {
+				event.el.addEventListener(event.type, event.listener);
+				return () => {
+					event.el.removeEventListener(event.type, event.listener);
+				};
+			});
+		}
+		context_default.stashedEvents.length = 0;
+		for (let animation of context_default.stashedAnimations) {
+			context_default.activeRange = animation.range;
+			$run(function addFragmentAnimation() {
+				if (animation.in) animate(animation.el, true, animation.in.keyframes, animation.in.options);
+				if (animation.out) return () => {
+					animate(animation.el, false, animation.out.keyframes, animation.out.options);
+				};
+			});
+		}
+		context_default.stashedAnimations.length = 0;
+		context_default.activeRange = range;
+	}
 }
-
-// src/render/applyProps.ts
 function applyProps(el, props, propNamesUsed) {
-  if (props) {
-    for (let [name, value] of Object.entries(props)) {
-      if (!propNamesUsed.includes(name)) {
-        if (name.startsWith("on")) {
-          const eventName = name.substring(2);
-          el.addEventListener(eventName, value);
-        } else {
-          $run(function setAttribute2() {
-            el.setAttribute(name, value);
-          });
-        }
-      }
-    }
-  }
+	if (props) {
+		for (let [name, value] of Object.entries(props)) if (!propNamesUsed.includes(name)) if (name.startsWith("on")) {
+			const eventName = name.substring(2);
+			el.addEventListener(eventName, value);
+		} else $run(function setAttribute$1() {
+			el.setAttribute(name, value);
+		});
+	}
 }
-
-// src/render/clearRange.ts
 function clearRange(range) {
-  let animations = [];
-  clearEffects(range, animations);
-  if (animations.length) {
-    Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
-  } else {
-    clearNodes(range);
-  }
+	let animations = [];
+	clearEffects(range, animations);
+	if (animations.length) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
+	else clearNodes(range);
 }
 function clearEffects(range, animations) {
-  if (range.effects) {
-    const oldRange = context_default.activeRange;
-    context_default.activeRange = range;
-    for (let effect of range.effects) {
-      removeEffect(effect);
-    }
-    context_default.activeRange = oldRange;
-  }
-  if (range.animations) {
-    for (let animation of range.animations) {
-      animations.push(animation);
-    }
-  }
-  if (range.children) {
-    for (let child of range.children) {
-      clearEffects(child, animations);
-    }
-    range.children.length = 0;
-  }
+	if (range.effects) {
+		const oldRange = context_default.activeRange;
+		context_default.activeRange = range;
+		for (let effect of range.effects) removeEffect(effect);
+		context_default.activeRange = oldRange;
+	}
+	if (range.animations) for (let animation of range.animations) animations.push(animation);
+	if (range.children) {
+		for (let child of range.children) clearEffects(child, animations);
+		range.children.length = 0;
+	}
 }
 function clearNodes(range) {
-  if (range.startNode) {
-    let currentNode = range.endNode || range.startNode;
-    if (range.startNode.parentNode !== currentNode.parentNode) {
-      throw new Error("range nodes have different parents");
-    }
-    while (currentNode !== range.startNode) {
-      let nextNode = currentNode.previousSibling;
-      currentNode.remove();
-      currentNode = nextNode;
-    }
-    currentNode.remove();
-    range.startNode = null;
-    range.endNode = null;
-  }
+	if (range.startNode) {
+		let currentNode = range.endNode || range.startNode;
+		if (range.startNode.parentNode !== currentNode.parentNode) throw new Error("range nodes have different parents");
+		while (currentNode !== range.startNode) {
+			let nextNode = currentNode.previousSibling;
+			currentNode.remove();
+			currentNode = nextNode;
+		}
+		currentNode.remove();
+		range.startNode = null;
+		range.endNode = null;
+	}
 }
-
-// src/render/clearLayoutSlot.ts
 function clearLayoutSlot(range) {
-  clearRange(range);
+	clearRange(range);
 }
-
-// src/render/newRange.ts
 function newRange() {
-  return {
-    startNode: null,
-    endNode: null,
-    children: null,
-    index: 0,
-    effects: null,
-    animations: null
-  };
+	return {
+		startNode: null,
+		endNode: null,
+		children: null,
+		index: 0,
+		effects: null,
+		animations: null
+	};
 }
-
-// src/render/popRange.ts
 function popRange(oldRange) {
-  context_default.activeRange = oldRange;
+	context_default.activeRange = oldRange;
 }
-
-// src/render/pushRange.ts
 function pushRange(range, toParent = false) {
-  const activeRange = context_default.activeRange;
-  if (toParent && activeRange) {
-    (activeRange.children ??= []).push(range);
-  }
-  context_default.activeRange = range;
-  return activeRange;
+	const activeRange = context_default.activeRange;
+	if (toParent && activeRange) (activeRange.children ??= []).push(range);
+	context_default.activeRange = range;
+	return activeRange;
 }
-
-// src/render/fillLayoutSlot.ts
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
-  const range = newRange();
-  const oldRange = pushRange(range);
-  component(parent, anchor, $props, $context, {
-    _: slot
-  });
-  popRange(oldRange);
-  return range;
+	const range = newRange();
+	const oldRange = pushRange(range);
+	component(parent, anchor, $props, $context, { _: slot });
+	popRange(oldRange);
+	return range;
 }
-
-// src/render/getFragment.ts
 function getFragment(document, array, index, html, ns) {
-  if (array[index] === void 0) {
-    if (ns) {
-      const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
-      template.innerHTML = html;
-      const fragment2 = new DocumentFragment();
-      fragment2.append(...template.childNodes);
-      array[index] = fragment2;
-    } else {
-      const template = document.createElement("template");
-      template.innerHTML = html;
-      array[index] = template.content;
-    }
-  }
-  let fragment = array[index].cloneNode(true);
-  return fragment;
+	if (array[index] === void 0) if (ns) {
+		const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
+		template.innerHTML = html;
+		const fragment = new DocumentFragment();
+		fragment.append(...template.childNodes);
+		array[index] = fragment;
+	} else {
+		const template = document.createElement("template");
+		template.innerHTML = html;
+		array[index] = template.content;
+	}
+	return array[index].cloneNode(true);
 }
-
-// src/render/hydrate.ts
 function hydrate(parent, component, props, slots) {
-  context_default.hydrationNode = parent.firstChild;
-  component(parent, null, props, void 0, slots);
-  context_default.hydrationNode = null;
-  for (let effect of context_default.mountEffects) {
-    $run(effect);
-  }
-  context_default.mountEffects.length = 0;
+	context_default.hydrationNode = parent.firstChild;
+	component(parent, null, props, void 0, slots);
+	context_default.hydrationNode = null;
+	for (let effect of context_default.mountEffects) $run(effect);
+	context_default.mountEffects.length = 0;
 }
-
-// src/render/mount.ts
 function mount(parent, component, props, slots) {
-  if (parent.childElementCount) {
-    throw new Error("The parent node must have no child elements");
-  }
-  while (parent.firstChild) {
-    parent.firstChild.remove();
-  }
-  component(parent, null, props, void 0, slots);
+	if (parent.childElementCount) throw new Error("The parent node must have no child elements");
+	while (parent.firstChild) parent.firstChild.remove();
+	component(parent, null, props, void 0, slots);
 }
-
-// src/render/newListItem.ts
 function newListItem(data, key) {
-  return {
-    startNode: null,
-    endNode: null,
-    children: null,
-    index: 0,
-    effects: null,
-    animations: null,
-    data,
-    key
-  };
+	return {
+		startNode: null,
+		endNode: null,
+		children: null,
+		index: 0,
+		effects: null,
+		animations: null,
+		data,
+		key
+	};
 }
-
-// src/render/hydrationMarkers.ts
-var HYDRATION_START = "[";
-var HYDRATION_END = "]";
-var HYDRATION_BREAK = "^";
-
-// src/render/isCommentNode.ts
+const HYDRATION_START = "[";
+const HYDRATION_END = "]";
+const HYDRATION_BREAK = "^";
 function isCommentNode(node) {
-  return node?.nodeType === 8;
+	return node?.nodeType === 8;
 }
-
-// src/render/isTextNode.ts
 function isTextNode(node) {
-  return node?.nodeType === 3;
+	return node?.nodeType === 3;
 }
-
-// src/render/nodeCheckHydrationBreak.ts
 function nodeCheckHydrationBreak(node) {
-  if (context_default.hydrationNode) {
-    if (node && isCommentNode(node) && node.data === HYDRATION_BREAK) {
-      let comment = node;
-      node = node.nextSibling;
-      comment.remove();
-    }
-    context_default.hydrationNode = node;
-  }
-  return node;
+	if (context_default.hydrationNode) {
+		if (node && isCommentNode(node) && node.data === HYDRATION_BREAK) {
+			let comment = node;
+			node = node.nextSibling;
+			comment.remove();
+		}
+		context_default.hydrationNode = node;
+	}
+	return node;
 }
-
-// src/render/nodeNext.ts
 function nodeNext(node, text = false) {
-  if (context_default.hydrationNode && text && isTextNode(node)) {
-    return node;
-  }
-  let nextNode = nodeCheckHydrationBreak(node.nextSibling);
-  return nextNode;
+	if (context_default.hydrationNode && text && isTextNode(node)) return node;
+	return nodeCheckHydrationBreak(node.nextSibling);
 }
-
-// src/render/nodeAnchor.ts
 function nodeAnchor(node) {
-  if (context_default.hydrationNode) {
-    if (isCommentNode(node) && node.data === HYDRATION_START) {
-      let currentNode = nodeNext(node);
-      node.remove();
-      let level = 1;
-      while (currentNode) {
-        if (isCommentNode(currentNode)) {
-          if (currentNode.data === HYDRATION_START) {
-            level += 1;
-          } else if (currentNode.data === HYDRATION_END) {
-            level -= 1;
-            if (level === 0) {
-              const endNode = currentNode.nextSibling;
-              currentNode.remove();
-              if (context_default.hydrationNode === currentNode) {
-                context_default.hydrationNode = endNode;
-              }
-              return endNode;
-            }
-          }
-        }
-        currentNode = currentNode.nextSibling;
-      }
-      if (!currentNode) {
-        throw new Error("End hydration comment not found");
-      }
-    }
-  }
-  return node;
+	if (context_default.hydrationNode) {
+		if (isCommentNode(node) && node.data === HYDRATION_START) {
+			let currentNode = nodeNext(node);
+			node.remove();
+			let level = 1;
+			while (currentNode) {
+				if (isCommentNode(currentNode)) {
+					if (currentNode.data === HYDRATION_START) level += 1;
+					else if (currentNode.data === HYDRATION_END) {
+						level -= 1;
+						if (level === 0) {
+							const endNode = currentNode.nextSibling;
+							currentNode.remove();
+							if (context_default.hydrationNode === currentNode) context_default.hydrationNode = endNode;
+							return endNode;
+						}
+					}
+				}
+				currentNode = currentNode.nextSibling;
+			}
+			if (!currentNode) throw new Error("End hydration comment not found");
+		}
+	}
+	return node;
 }
-
-// src/render/nodeChild.ts
 function nodeChild(parent) {
-  let childNode = parent.firstChild;
-  if (context_default.hydrationNode) {
-    if (!childNode) {
-      childNode = parent.appendChild(parent.ownerDocument.createTextNode(""));
-    }
-    context_default.hydrationNode = childNode;
-  }
-  return childNode;
+	let childNode = parent.firstChild;
+	if (context_default.hydrationNode) {
+		if (!childNode) childNode = parent.appendChild(parent.ownerDocument.createTextNode(""));
+		context_default.hydrationNode = childNode;
+	}
+	return childNode;
 }
-
-// src/render/nodeRoot.ts
 function nodeRoot(parent, text = false) {
-  if (context_default.hydrationNode) {
-    let rootNode = context_default.hydrationNode;
-    if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
-      rootNode = rootNode.previousSibling;
-      context_default.hydrationNode = rootNode;
-    }
-    if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
-      rootNode = rootNode.nextSibling;
-      context_default.hydrationNode = rootNode;
-    }
-    const range = context_default.activeRange;
-    if (range && !range.startNode) {
-      range.startNode = rootNode;
-    }
-    return rootNode;
-  } else {
-    return parent.firstChild;
-  }
+	if (context_default.hydrationNode) {
+		let rootNode = context_default.hydrationNode;
+		if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
+			rootNode = rootNode.previousSibling;
+			context_default.hydrationNode = rootNode;
+		}
+		if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
+			rootNode = rootNode.nextSibling;
+			context_default.hydrationNode = rootNode;
+		}
+		const range = context_default.activeRange;
+		if (range && !range.startNode) range.startNode = rootNode;
+		return rootNode;
+	} else return parent.firstChild;
 }
-
-// src/render/nodeSkip.ts
 function nodeSkip(node, count) {
-  let nextNode = node;
-  for (let i = 0; i < count; i++) {
-    nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
-  }
-  return nextNode;
+	let nextNode = node;
+	for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
+	return nextNode;
 }
-
-// src/render/runControl.ts
 function runControl(range, anchor, create) {
-  range.index = -1;
-  const oldRange = pushRange(range, true);
-  $run(function runControl2() {
-    const oldBranchRange = pushRange(range);
-    create(anchor);
-    popRange(oldBranchRange);
-  });
-  if (context_default.hydrationNode) {
-    anchor = context_default.hydrationNode.nextSibling;
-  }
-  popRange(oldRange);
+	range.index = -1;
+	const oldRange = pushRange(range, true);
+	$run(function runControl$1() {
+		const oldBranchRange = pushRange(range);
+		create(anchor);
+		popRange(oldBranchRange);
+	});
+	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
+	popRange(oldRange);
 }
-
-// src/render/runControlBranch.ts
 function runControlBranch(range, index, create) {
-  if (index >= 0 && range.index === index) {
-    return;
-  }
-  if (range.children?.length) {
-    clearRange(range.children[0]);
-    range.children.length = 0;
-  }
-  const oldRange = pushRange(newRange(), true);
-  const oldEffect = context_default.activeEffect;
-  context_default.activeEffect = null;
-  create();
-  context_default.activeEffect = oldEffect;
-  popRange(oldRange);
-  range.index = index;
+	if (index >= 0 && range.index === index) return;
+	if (range.children?.length) {
+		clearRange(range.children[0]);
+		range.children.length = 0;
+	}
+	const oldRange = pushRange(newRange(), true);
+	const oldEffect = context_default.activeEffect;
+	context_default.activeEffect = null;
+	create();
+	context_default.activeEffect = oldEffect;
+	popRange(oldRange);
+	range.index = index;
 }
-
-// src/render/moveRange.ts
 function moveRange(parent, range, before) {
-  const endNode = range.endNode || range.startNode;
-  let currentNode = range.startNode;
-  if (isFragmentNode(parent)) {
-    parent = before.parentNode;
-  }
-  while (currentNode) {
-    const nextNode = currentNode.nextSibling;
-    parent.insertBefore(currentNode, before);
-    if (currentNode === endNode) break;
-    currentNode = nextNode;
-  }
+	const endNode = range.endNode || range.startNode;
+	let currentNode = range.startNode;
+	if (isFragmentNode(parent)) parent = before.parentNode;
+	while (currentNode) {
+		const nextNode = currentNode.nextSibling;
+		parent.insertBefore(currentNode, before);
+		if (currentNode === endNode) break;
+		currentNode = nextNode;
+	}
 }
-
-// src/render/runListItems.ts
 function runListItems(range, parent, anchor, oldItems, newItems, create) {
-  let oldStartIndex = 0;
-  let oldEndIndex = oldItems.length - 1;
-  let oldStartItem = oldItems[0];
-  let oldEndItem = oldItems[oldEndIndex];
-  let newStartIndex = 0;
-  let newEndIndex = newItems.length - 1;
-  let newStartItem = newItems[0];
-  let newEndItem = newItems[newEndIndex];
-  let oldKeyToIndex;
-  let newKeyToIndex;
-  while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-    if (oldStartItem == null) {
-      oldStartItem = oldItems[++oldStartIndex];
-    } else if (oldEndItem == null) {
-      oldEndItem = oldItems[--oldEndIndex];
-    } else if (newStartItem == null) {
-      newStartItem = newItems[++newStartIndex];
-    } else if (newEndItem == null) {
-      newEndItem = newItems[--newEndIndex];
-    } else if (oldStartItem.key === newStartItem.key) {
-      transferRangeMarkers(oldStartItem, newStartItem);
-      oldStartItem = oldItems[++oldStartIndex];
-      newStartItem = newItems[++newStartIndex];
-    } else if (oldEndItem.key === newEndItem.key) {
-      transferRangeMarkers(oldEndItem, newEndItem);
-      oldEndItem = oldItems[--oldEndIndex];
-      newEndItem = newItems[--newEndIndex];
-    } else if (oldStartItem.key === newEndItem.key) {
-      moveRange(parent, oldStartItem, oldEndItem.endNode?.nextSibling);
-      transferRangeMarkers(oldStartItem, newEndItem);
-      oldStartItem = oldItems[++oldStartIndex];
-      newEndItem = newItems[--newEndIndex];
-    } else if (oldEndItem.key === newStartItem.key) {
-      moveRange(parent, oldEndItem, oldStartItem?.startNode);
-      transferRangeMarkers(oldEndItem, newStartItem);
-      oldEndItem = oldItems[--oldEndIndex];
-      newStartItem = newItems[++newStartIndex];
-    } else {
-      if (!oldKeyToIndex || !newKeyToIndex) {
-        oldKeyToIndex = /* @__PURE__ */ new Map();
-        for (let i = oldStartIndex; i < oldEndIndex; i++) {
-          oldKeyToIndex.set(oldItems[i].key, i);
-        }
-        newKeyToIndex = /* @__PURE__ */ new Map();
-        for (let i = newStartIndex; i < newEndIndex; i++) {
-          newKeyToIndex.set(newItems[i].key, i);
-        }
-      }
-      let oldIndex = oldKeyToIndex.get(newStartItem.key);
-      let newIndex = newKeyToIndex.get(oldStartItem.key);
-      if (oldIndex === void 0 && newIndex === void 0) {
-        newStartItem.data = $watch(newStartItem.data);
-        create(newStartItem, oldStartItem.startNode);
-        clearRange(oldStartItem);
-        context_default.activeRange.children.splice(oldStartIndex, 1);
-        oldStartItem = oldItems[++oldStartIndex];
-        newStartItem = newItems[++newStartIndex];
-      } else if (oldIndex === void 0) {
-        newStartItem.data = $watch(newStartItem.data);
-        create(newStartItem, oldStartItem.startNode);
-        newStartItem = newItems[++newStartIndex];
-      } else if (newIndex === void 0) {
-        clearRange(oldStartItem);
-        context_default.activeRange.children.splice(oldStartIndex, 1);
-        oldStartItem = oldItems[++oldStartIndex];
-      } else {
-        const oldData = oldItems[oldIndex];
-        moveRange(parent, oldData, oldStartItem.startNode);
-        transferRangeMarkers(oldData, newStartItem);
-        oldItems[oldIndex] = null;
-        newStartItem = newItems[++newStartIndex];
-      }
-    }
-  }
-  if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
-    if (oldStartIndex > oldEndIndex) {
-      let before = oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
-      for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-        newStartItem.data = $watch(newStartItem.data);
-        create(newStartItem, before);
-        before = newStartItem.endNode?.nextSibling;
-      }
-    } else {
-      if (range.children) {
-        range.children.length = oldStartIndex;
-      }
-      for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
-        clearRange(oldStartItem);
-      }
-    }
-  }
+	let oldStartIndex = 0;
+	let oldEndIndex = oldItems.length - 1;
+	let oldStartItem = oldItems[0];
+	let oldEndItem = oldItems[oldEndIndex];
+	let newStartIndex = 0;
+	let newEndIndex = newItems.length - 1;
+	let newStartItem = newItems[0];
+	let newEndItem = newItems[newEndIndex];
+	let oldKeyToIndex;
+	let newKeyToIndex;
+	while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) if (oldStartItem == null) oldStartItem = oldItems[++oldStartIndex];
+	else if (oldEndItem == null) oldEndItem = oldItems[--oldEndIndex];
+	else if (newStartItem == null) newStartItem = newItems[++newStartIndex];
+	else if (newEndItem == null) newEndItem = newItems[--newEndIndex];
+	else if (oldStartItem.key === newStartItem.key) {
+		transferRangeMarkers(oldStartItem, newStartItem);
+		oldStartItem = oldItems[++oldStartIndex];
+		newStartItem = newItems[++newStartIndex];
+	} else if (oldEndItem.key === newEndItem.key) {
+		transferRangeMarkers(oldEndItem, newEndItem);
+		oldEndItem = oldItems[--oldEndIndex];
+		newEndItem = newItems[--newEndIndex];
+	} else if (oldStartItem.key === newEndItem.key) {
+		moveRange(parent, oldStartItem, oldEndItem.endNode?.nextSibling);
+		transferRangeMarkers(oldStartItem, newEndItem);
+		oldStartItem = oldItems[++oldStartIndex];
+		newEndItem = newItems[--newEndIndex];
+	} else if (oldEndItem.key === newStartItem.key) {
+		moveRange(parent, oldEndItem, oldStartItem?.startNode);
+		transferRangeMarkers(oldEndItem, newStartItem);
+		oldEndItem = oldItems[--oldEndIndex];
+		newStartItem = newItems[++newStartIndex];
+	} else {
+		if (!oldKeyToIndex || !newKeyToIndex) {
+			oldKeyToIndex = /* @__PURE__ */ new Map();
+			for (let i = oldStartIndex; i < oldEndIndex; i++) oldKeyToIndex.set(oldItems[i].key, i);
+			newKeyToIndex = /* @__PURE__ */ new Map();
+			for (let i = newStartIndex; i < newEndIndex; i++) newKeyToIndex.set(newItems[i].key, i);
+		}
+		let oldIndex = oldKeyToIndex.get(newStartItem.key);
+		let newIndex = newKeyToIndex.get(oldStartItem.key);
+		if (oldIndex === void 0 && newIndex === void 0) {
+			newStartItem.data = $watch(newStartItem.data);
+			create(newStartItem, oldStartItem.startNode);
+			clearRange(oldStartItem);
+			context_default.activeRange.children.splice(oldStartIndex, 1);
+			oldStartItem = oldItems[++oldStartIndex];
+			newStartItem = newItems[++newStartIndex];
+		} else if (oldIndex === void 0) {
+			newStartItem.data = $watch(newStartItem.data);
+			create(newStartItem, oldStartItem.startNode);
+			newStartItem = newItems[++newStartIndex];
+		} else if (newIndex === void 0) {
+			clearRange(oldStartItem);
+			context_default.activeRange.children.splice(oldStartIndex, 1);
+			oldStartItem = oldItems[++oldStartIndex];
+		} else {
+			const oldData = oldItems[oldIndex];
+			moveRange(parent, oldData, oldStartItem.startNode);
+			transferRangeMarkers(oldData, newStartItem);
+			oldItems[oldIndex] = null;
+			newStartItem = newItems[++newStartIndex];
+		}
+	}
+	if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) if (oldStartIndex > oldEndIndex) {
+		let before = oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
+		for (; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
+			newStartItem.data = $watch(newStartItem.data);
+			create(newStartItem, before);
+			before = newStartItem.endNode?.nextSibling;
+		}
+	} else {
+		if (range.children) range.children.length = oldStartIndex;
+		for (; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) clearRange(oldStartItem);
+	}
 }
 function transferRangeMarkers(oldItem, newItem) {
-  newItem.startNode = oldItem.startNode;
-  newItem.endNode = oldItem.endNode;
-  for (let prop in oldItem.data) {
-    oldItem.data[prop] = newItem.data[prop];
-  }
-  newItem.data = oldItem.data;
+	newItem.startNode = oldItem.startNode;
+	newItem.endNode = oldItem.endNode;
+	for (let prop in oldItem.data) oldItem.data[prop] = newItem.data[prop];
+	newItem.data = oldItem.data;
 }
-
-// src/render/runList.ts
 function runList(range, parent, anchor, buildItems, create) {
-  const oldRange = pushRange(range, true);
-  let listItems = [];
-  $run(function runList2() {
-    const oldBranchRange = pushRange(range);
-    const newItems = buildItems();
-    context_default.activeEffect = null;
-    runListItems(range, parent, anchor, listItems, newItems, create);
-    listItems = newItems;
-    popRange(oldBranchRange);
-  });
-  if (context_default.hydrationNode) {
-    anchor = context_default.hydrationNode.nextSibling;
-  }
-  popRange(oldRange);
+	const oldRange = pushRange(range, true);
+	let listItems = [];
+	$run(function runList$1() {
+		const oldBranchRange = pushRange(range);
+		const newItems = buildItems();
+		context_default.activeEffect = null;
+		runListItems(range, parent, anchor, listItems, newItems, create);
+		listItems = newItems;
+		popRange(oldBranchRange);
+	});
+	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
+	popRange(oldRange);
 }
-
-// src/render/setAttribute.ts
 function setAttribute(el, name, value) {
-  if (value === false || value == null) {
-    el.removeAttribute(name);
-  } else {
-    el.setAttribute(name, value);
-  }
+	if (value === false || value == null) el.removeAttribute(name);
+	else el.setAttribute(name, value);
 }
-
-// src/render/setDynamicElement.ts
 function setDynamicElement(el, tag) {
-  if (context_default.hydrationNode) {
-    return el;
-  }
-  let newElement = el.ownerDocument.createElement(tag);
-  el.replaceWith(newElement);
-  return newElement;
+	if (context_default.hydrationNode) return el;
+	let newElement = el.ownerDocument.createElement(tag);
+	el.replaceWith(newElement);
+	return newElement;
 }
-
 let t_add_fragment = addFragment;
 let t_anchor = nodeAnchor;
 let t_animate = addAnimation;
@@ -863,4 +610,3 @@ let t_run_control = runControl;
 let t_run_list = runList;
 let t_skip = nodeSkip;
 let t_style = buildStyles;
-
