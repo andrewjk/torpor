@@ -7,10 +7,8 @@ type Config =
 
 export default defineConfig({
 	entry: ["src/*.ts"],
-	format: ["esm", "cjs"],
+	format: "esm",
 	dts: true,
-	cjsInterop: true,
 	clean: true,
 	splitting: true,
-	onSuccess: "npm run build:fix",
 }) satisfies Config as Config;

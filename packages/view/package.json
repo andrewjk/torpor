@@ -3,24 +3,18 @@
 	"version": "0.2.0",
 	"description": "Torpor's view library, for writing and mounting components",
 	"type": "module",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		},
 		"./compile": {
 			"types": "./dist/compile.d.ts",
-			"import": "./dist/compile.js",
-			"require": "./dist/compile.cjs"
+			"import": "./dist/compile.js"
 		},
 		"./ssr": {
 			"types": "./dist/ssr.d.ts",
-			"import": "./dist/ssr.js",
-			"require": "./dist/ssr.cjs"
+			"import": "./dist/ssr.js"
 		}
 	},
 	"publishConfig": {

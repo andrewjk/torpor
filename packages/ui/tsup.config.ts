@@ -20,7 +20,7 @@ export default defineConfig({
 		"src/TabGroup/index.ts",
 		"src/motion.ts",
 	],
-	format: ["esm", "cjs"],
+	format: "esm",
 	dts: { entry: ["src/motion.ts"] },
 	clean: true,
 	metafile: true,

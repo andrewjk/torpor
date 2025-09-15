@@ -3,39 +3,30 @@
 	"version": "0.2.0",
 	"description": "A framework for building sites and apps with Torpor",
 	"type": "module",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js",
-			"require": "./dist/index.cjs"
+			"import": "./dist/index.js"
 		},
 		"./response": {
 			"types": "./dist/response.d.ts",
-			"import": "./dist/response.js",
-			"require": "./dist/response.cjs"
+			"import": "./dist/response.js"
 		},
 		"./state": {
 			"types": "./dist/state.d.ts",
-			"import": "./dist/state.js",
-			"require": "./dist/state.cjs"
+			"import": "./dist/state.js"
 		},
 		"./run": {
 			"types": "./dist/run.d.ts",
-			"import": "./dist/run.js",
-			"require": "./dist/run.cjs"
+			"import": "./dist/run.js"
 		},
 		"./server": {
 			"types": "./dist/server.d.ts",
-			"import": "./dist/server.js",
-			"require": "./dist/server.cjs"
+			"import": "./dist/server.js"
 		},
 		"./test": {
 			"types": "./dist/test.d.ts",
-			"import": "./dist/test.js",
-			"require": "./dist/test.cjs"
+			"import": "./dist/test.js"
 		},
 		"./manifest": {
 			"types": "./src/types/manifest.d.ts"

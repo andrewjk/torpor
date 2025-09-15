@@ -3,69 +3,54 @@
 	"version": "0.1.7",
 	"description": "Accessible, unstyled components for use in your Torpor front-end",
 	"type": "module",
-	"main": "dist/index.cjs",
-	"module": "dist/index.js",
-	"types": "dist/index.d.ts",
 	"exports": {
 		"./Accordion": {
 			"types": "./dist/Accordion/index.d.ts",
-			"import": "./dist/Accordion/index.js",
-			"require": "./dist/Accordion/index.cjs"
+			"import": "./dist/Accordion/index.js"
 		},
 		"./Breadcrumb": {
 			"types": "./dist/Breadcrumb/index.d.ts",
-			"import": "./dist/Breadcrumb/index.js",
-			"require": "./dist/Breadcrumb/index.cjs"
+			"import": "./dist/Breadcrumb/index.js"
 		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
-			"import": "./dist/Dialog/index.js",
-			"require": "./dist/Dialog/index.cjs"
+			"import": "./dist/Dialog/index.js"
 		},
 		"./Disclosure": {
 			"types": "./dist/Disclosure/index.d.ts",
-			"import": "./dist/Disclosure/index.js",
-			"require": "./dist/Disclosure/index.cjs"
+			"import": "./dist/Disclosure/index.js"
 		},
 		"./Drawer": {
 			"types": "./dist/Drawer/index.d.ts",
-			"import": "./dist/Drawer/index.js",
-			"require": "./dist/Drawer/index.cjs"
+			"import": "./dist/Drawer/index.js"
 		},
 		"./Menu": {
 			"types": "./dist/Menu/index.d.ts",
-			"import": "./dist/Menu/index.js",
-			"require": "./dist/Menu/index.cjs"
+			"import": "./dist/Menu/index.js"
 		},
 		"./MenuBar": {
 			"types": "./dist/MenuBar/index.d.ts",
-			"import": "./dist/MenuBar/index.js",
-			"require": "./dist/MenuBar/index.cjs"
+			"import": "./dist/MenuBar/index.js"
 		},
 		"./NavMenu": {
 			"types": "./dist/NavMenu/index.d.ts",
-			"import": "./dist/NavMenu/index.js",
-			"require": "./dist/NavMenu/index.cjs"
+			"import": "./dist/NavMenu/index.js"
 		},
 		"./Notification": {
 			"types": "./dist/Notification/index.d.ts",
-			"import": "./dist/Notification/index.js",
-			"require": "./dist/Notification/index.cjs"
+			"import": "./dist/Notification/index.js"
 		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
-			"import": "./dist/Popover/index.js",
-			"require": "./dist/Popover/index.cjs"
+			"import": "./dist/Popover/index.js"
 		},
 		"./TabGroup": {
 			"types": "./dist/TabGroup/index.d.ts",
-			"import": "./dist/TabGroup/index.js",
-			"require": "./dist/TabGroup/index.cjs"
+			"import": "./dist/TabGroup/index.js"
 		},
 		"./motion": {
 			"types": "./dist/motion.d.ts",
-			"import": "./dist/motion.js",
-			"require": "./dist/motion.cjs"
+			"import": "./dist/motion.js"
 		}
 	},
 	"publishConfig": {

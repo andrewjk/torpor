@@ -15,7 +15,7 @@ export default defineConfig({
 		"src/test.ts",
 		"src/bin/index.ts",
 	],
-	format: ["esm", "cjs"],
+	format: "esm",
 	dts: true,
 	clean: true,
 	metafile: true,
