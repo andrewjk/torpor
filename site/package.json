@@ -6,15 +6,16 @@
 	"private": true,
 	"scripts": {
 		"dev": "tb --dev",
-		"build": "tsc --noEmit && tb --build",
+		"build": "tsgo --noEmit && tb --build",
 		"build:cf": "tsx buildcf.ts",
-		"check": "tsc --noEmit"
+		"check": "tsgo --noEmit"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/adapter-cloudflare": "workspace:^",
+		"@torpor/adapter-node": "workspace:^",
 		"@torpor/build": "workspace:^",
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
@@ -22,6 +23,7 @@
 		"sucrase": "^3.35.0"
 	},
 	"devDependencies": {
+		"@typescript/native-preview": "7.0.0-dev.20250914.1",
 		"tsx": "^4.20.5",
 		"typescript": "^5.9.2",
 		"wrangler": "^4.34.0"
