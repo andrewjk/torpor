@@ -124,15 +124,11 @@ function proxyGet(target, key, receiver, data) {
 	else trackEffect(data, key);
 	return Reflect.get(target, key, receiver);
 }
-function transferEffects(oldValue, newValue) {}
 function proxySet(target, key, value, receiver, data) {
 	const oldValue = target[key];
 	if (value !== oldValue) {
 		let newValue = value;
-		if (oldValue && oldValue[proxyDataSymbol]) {
-			newValue = $watch(value);
-			transferEffects(oldValue, newValue);
-		}
+		if (oldValue && oldValue[proxyDataSymbol]) newValue = $watch(value);
 		Reflect.set(target, key, newValue, receiver);
 		triggerEffects(data, key);
 		if (data.isArray && !isNaN(+String(key))) triggerEffects(data, "length");
