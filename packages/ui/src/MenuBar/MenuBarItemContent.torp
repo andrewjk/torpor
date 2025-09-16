@@ -99,9 +99,9 @@ export default function MenuBarItemContent() {
 				id={$props.id}
 				class={`torp-menu-bar-item-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
-				:onmount={show}
+				onmount={show}
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

@@ -37,7 +37,7 @@ export default function NavMenuElement($props: any) {
 			onclick
 			onfocus={() => handleItemFocus(index)}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

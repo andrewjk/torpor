@@ -22,7 +22,7 @@ export default function NotificationClose() {
 			type="button"
 			onclick={handleClick}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

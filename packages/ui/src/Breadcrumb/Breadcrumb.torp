@@ -27,7 +27,7 @@ export default function Breadcrumb($props: any) {
 			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
 			aria-label={$props.ariaLabel}
 		>
-			<:slot />
+			<slot />
 		</nav>
 	}
 }

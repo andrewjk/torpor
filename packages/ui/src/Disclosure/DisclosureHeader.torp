@@ -28,7 +28,7 @@ export default function DisclosureHeader($props: any) {
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}
 		>
-			<:slot />
+			<slot />
 		</h4>
 	}
 }

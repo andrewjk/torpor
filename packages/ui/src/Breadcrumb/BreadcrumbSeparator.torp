@@ -10,7 +10,7 @@ export default function BreadcrumbSeparator($props: any) {
 			class={`torp-breadcrumb-separator ${$props.class ?? ""}`.trim()}
 			aria-hidden="true"
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

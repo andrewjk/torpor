@@ -22,7 +22,7 @@ export default function MenuIndicator() {
 				aria-disabled={$props.disabled ? "true" : undefined}
 				data-disabled={$props.disabled ? "true" : undefined}
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

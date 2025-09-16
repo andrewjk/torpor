@@ -41,7 +41,7 @@ export default function Notification($props) {
 				class={`torp-notification ${$props.class ?? ""}`.trim()}
 				role="alert"
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

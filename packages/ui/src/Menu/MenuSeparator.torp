@@ -8,7 +8,7 @@ export default function MenuSeparator() {
 			class={`torp-menu-separator ${$props.class ?? ""}`.trim()}
 			role="separator"
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

@@ -40,7 +40,7 @@ export default function NavMenuButton($props: any) {
 			onfocus={() => handleItemFocus(index)}
 			&ref={button}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

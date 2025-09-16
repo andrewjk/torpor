@@ -17,10 +17,10 @@ export default function parseTag(status: ParseStatus): ElementNode {
 
 	consumeSpace(status);
 
-	let special = accept(":", status);
+	let snailed = accept("@", status);
 	let tagName = consumeAlphaNumeric(status);
-	if (special) {
-		tagName = ":" + tagName;
+	if (snailed) {
+		tagName = "@" + tagName;
 	}
 	if (closeTag) {
 		tagName = "/" + tagName;
@@ -45,6 +45,8 @@ export default function parseTag(status: ParseStatus): ElementNode {
 	if (closeTag) {
 		selfClosed = true;
 	}
+
+	let special = ["slot", "fill", "@component", "@element"].includes(tagName);
 
 	return {
 		type: special ? "special" : "element",

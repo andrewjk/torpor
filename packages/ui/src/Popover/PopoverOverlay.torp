@@ -21,9 +21,9 @@ export default function PopoverOverlay($props: any) {
 				id={$props.id}
 				class={`torp-popover-overlay ${$props.class ?? ""}`.trim()}
 				tabindex="-1"
-				:onmount={(el) => disableScroll(el)}
+				onmount={(el) => disableScroll(el)}
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

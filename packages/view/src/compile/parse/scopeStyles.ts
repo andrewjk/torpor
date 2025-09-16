@@ -23,8 +23,7 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 		let scopeStyles = selectors.includes(node.tagName);
 		if (!scopeStyles) {
 			for (let a of node.attributes) {
-				if ((a.name === "class" || a.name === ":class") && a.reactive) {
-					// NOTE: :class is obsolete, but let's keep it for a version or two
+				if (a.name === "class" && a.reactive) {
 					// Any reactivity in a class attribute makes it scoped,
 					// because we can't tell what's going on in there
 					scopeStyles = true;

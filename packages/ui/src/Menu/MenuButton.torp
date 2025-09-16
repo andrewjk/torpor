@@ -47,7 +47,7 @@ export default function MenuButton() {
 			onfocus={() => handleItemFocus(index)}
 			&ref={button}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

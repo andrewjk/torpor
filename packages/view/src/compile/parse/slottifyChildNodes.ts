@@ -3,8 +3,8 @@ import { type TemplateNode } from "../types/nodes/TemplateNode";
 import isSpecialNode from "../types/nodes/isSpecialNode";
 
 /**
- * Moves any child nodes that aren't already in a <:fill> node into a default
- * <:fill> node
+ * Moves any child nodes that aren't already in a <fill> node into a default
+ * <fill> node
  */
 export default function slottifyChildNodes(node: ElementNode): void {
 	const nonFillNodes = node.children.filter((c) => !isFillNode(c));
@@ -16,7 +16,7 @@ export default function slottifyChildNodes(node: ElementNode): void {
 		if (!defaultFillNode) {
 			defaultFillNode = {
 				type: "special",
-				tagName: ":fill",
+				tagName: "fill",
 				attributes: [],
 				children: nonFillNodes,
 			};
@@ -27,5 +27,5 @@ export default function slottifyChildNodes(node: ElementNode): void {
 }
 
 function isFillNode(n: TemplateNode): n is ElementNode {
-	return isSpecialNode(n) && n.tagName === ":fill";
+	return isSpecialNode(n) && n.tagName === "fill";
 }

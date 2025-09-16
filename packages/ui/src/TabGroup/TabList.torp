@@ -44,7 +44,7 @@ export default function TabList($props: any) {
 			tabindex="0"
 			onfocus={handleFocus}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

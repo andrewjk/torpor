@@ -8,7 +8,7 @@ export default function NotificationContainer() {
 			id={$props.id}
 			class={`torp-notification-container ${$props.class ?? ""}`.trim()}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

@@ -55,7 +55,7 @@ export default function buildServerSlotNode(
 	////b.append(`t_head += ${slotResult}.head;`);
 
 	// TODO: Not if there's only a single space node -- maybe check in parse
-	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");
+	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === "fill");
 	if (fill && isSpecialNode(fill) && fill.children.length) {
 		b.append(`} else {`);
 

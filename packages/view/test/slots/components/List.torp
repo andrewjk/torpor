@@ -3,7 +3,7 @@ export default function List() {
 		<ul>
 			@for (let item of $props.items) {
 				<li>
-					<:slot item={item} />
+					<slot item={item} />
 				</li> 
 			}
 		</ul>

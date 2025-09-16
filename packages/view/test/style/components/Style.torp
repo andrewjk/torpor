@@ -1,6 +1,6 @@
 export default function Style() {
 	@render {
-		<div :style={{ color: $props.color }}>
+		<div style={{ color: $props.color }}>
 			Hello!
 		</div>
 	}

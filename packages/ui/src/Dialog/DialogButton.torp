@@ -42,7 +42,7 @@ export default function DialogButton($props: any) {
 			onclick={handleClick}
 			&ref={button}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

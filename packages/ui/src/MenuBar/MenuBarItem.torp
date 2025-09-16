@@ -98,7 +98,7 @@ export default function MenuBarItem() {
 			id={$props.id}
 			class={`torp-menu-bar-item ${$props.class ?? ""}`.trim()}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

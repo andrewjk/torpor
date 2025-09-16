@@ -32,16 +32,14 @@ export default function buildServerComponentNode(
 		// TODO: defaults etc props
 		b.append(`const ${propsName}: any = {};`);
 		for (let { name, value } of node.attributes) {
-			if ((name === "class" || name === ":class") && value != null) {
-				// NOTE: :class is obsolete, but let's keep it for a version or two
+			if (name === "class" && value != null) {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
 				b.append(`${propsName}["class"] = t_class(${params.join(", ")});`);
-			} else if ((name === "style" || name === ":style") && value != null) {
-				// NOTE: :style is obsolete, but let's keep it for a version or two
+			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
 				b.append(`${propsName}["style"] = t_style(${value});`);
 			} else if (value != null) {
@@ -98,7 +96,7 @@ export default function buildServerComponentNode(
 	}
 
 	let componentName = node.tagName;
-	if (componentName === ":component") {
+	if (componentName === "@component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
 		if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 			componentName = selfAttribute.value;

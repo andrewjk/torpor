@@ -42,11 +42,11 @@ npm install torpor
 - Two-way binding with `&value`, `&checked`, etc
 - Element binding to a script variable with `&ref={...}`
 - Element in and out transitions using the Web Animations API
-- Run an effect when an element is added to the DOM with `:onmount={(el) => ...}`
+- Run an effect when an element is added to the DOM with `onmount={(el) => ...}`
 - Special tags
-  - `<:component self={...}>` inserts a dynamic component
-  - `<:element self={...}>` inserts a dynamic element
-  - <:trim> trims whitespace around the tag (TODO)
+  - `<@component self={...}>` inserts a dynamic component
+  - `<@element self={...}>` inserts a dynamic element
+  - `<@trim>` trims whitespace around the tag (TODO)
 
 ### Not yet
 

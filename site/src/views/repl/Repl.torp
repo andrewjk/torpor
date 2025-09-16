@@ -75,7 +75,7 @@ try {
 					id="input"
 					class="code"
 					&value={$state.input}
-					:onmount={textAreaMount}
+					onmount={textAreaMount}
 					oninput={textAreaInput}
 					onkeydown={textAreaKeyDown}
 				/>

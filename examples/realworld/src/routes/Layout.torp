@@ -12,7 +12,7 @@ export default function Layout() {
 		<Nav user={$props.data.user} />
 
 		<main>
-			<:slot />
+			<slot />
 		</main>
 	}
 }

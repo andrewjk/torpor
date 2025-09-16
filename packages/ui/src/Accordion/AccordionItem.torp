@@ -74,7 +74,7 @@ export default function AccordionItem($props: any) {
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

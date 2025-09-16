@@ -13,19 +13,19 @@ export default function buildSpecialNode(
 	root = false,
 ) {
 	switch (node.tagName) {
-		case ":slot": {
+		case "slot": {
 			buildSlotNode(node, status, b);
 			break;
 		}
-		case ":element": {
+		case "@element": {
 			buildElementNode(node, status, b, parentName, root);
 			break;
 		}
-		case ":component": {
+		case "@component": {
 			buildComponentNode(node, status, b, root);
 			break;
 		}
-		case ":fill": {
+		case "fill": {
 			// HACK:
 			break;
 		}

@@ -11,7 +11,7 @@ beforeAll(async () => {
 	await buildOutputFiles(componentPath);
 });
 
-test(":onmount -- mounted", async () => {
+test("onmount -- mounted", async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
 	mountComponent(container, component);
@@ -19,7 +19,7 @@ test(":onmount -- mounted", async () => {
 	await check(container);
 });
 
-test(":onmount -- hydrated", async () => {
+test("onmount -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");
 	const serverComponent = await importComponent(componentPath, "server");

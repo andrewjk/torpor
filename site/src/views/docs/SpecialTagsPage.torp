@@ -11,19 +11,19 @@ export default function SpecialTagsPage() {
 			not rendered, but instead provide functionality.
 		</p>
 
-		<h2>&lt;:component&gt;</h2>
+		<h2>&lt;@component&gt;</h2>
 		<p>
-			&lt;:component self=&lbrace;...&rbrace;> inserts a dynamic component.
+			&lt;@component self=&lbrace;...&rbrace;> inserts a dynamic component.
 		</p>
 
-		<h2>&lt;:element&gt;</h2>
+		<h2>&lt;@element&gt;</h2>
 		<p>
-			&lt;:element self=&lbrace;...&rbrace;> inserts a dynamic element.
+			&lt;@element self=&lbrace;...&rbrace;> inserts a dynamic element.
 		</p>
 
-		<h2>TODO: &lt;:trim&gt;</h2>
+		<h2>TODO: &lt;:@trim&gt;</h2>
 		<p>
-			&lt;:trim> trims whitespace around the tag.
+			&lt;@trim> trims whitespace around the tag.
 		</p>
 	}
 }

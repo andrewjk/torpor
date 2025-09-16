@@ -24,7 +24,7 @@ export default function NavMenuGroup($props: any) {
 			aria-label={$props.ariaLabel}
 			aria-labelledby={$state.headerId}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

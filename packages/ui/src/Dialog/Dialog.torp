@@ -147,10 +147,10 @@ export default function Dialog($props: any) {
 			aria-labelledby={!$props.ariaLabel && $state.headerId ? $state.headerId : undefined}
 			aria-describedby={$state.bodyId ? $state.bodyId : undefined}
 			onkeydown={handleKey}
-			:onmount={(el) => trapFocus(el, trapFocusOptions)}
+			onmount={(el) => trapFocus(el, trapFocusOptions)}
 			&ref={div}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

@@ -1,7 +1,7 @@
 export default function Layout() {
 	@render {
 		<main>
-			<:slot />
+			<slot />
 		</main>
 	}
 }

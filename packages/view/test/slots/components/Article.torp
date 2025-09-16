@@ -2,10 +2,10 @@ export default function Article() {
 	@render {
 		<section>
 			<h2>
-				<:slot name="header" />
+				<slot name="header" />
 			</h2>
-			<:slot />
-			<:slot name="footer" />
+			<slot />
+			<slot name="footer" />
 		</section>
 	}
 }

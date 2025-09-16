@@ -70,9 +70,9 @@ export default function NavMenuPopoutContent($props: any) {
 				id={$props.id}
 				class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
-				:onmount={show}
+				onmount={show}
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

@@ -98,7 +98,7 @@ export default function Layout() {
 							</ul>
 						</div>
 
-						<:slot />
+						<slot />
 					</div>
 				</div>
 			</div>

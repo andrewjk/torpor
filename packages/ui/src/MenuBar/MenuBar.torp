@@ -144,7 +144,7 @@ export default function MenuBar() {
 			aria-label={$props.ariaLabel}
 			aria-orientation={$props.orientation}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

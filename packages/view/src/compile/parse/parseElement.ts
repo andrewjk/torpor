@@ -27,7 +27,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	const element = parseTag(status);
 
 	if (element.tagName.startsWith("/")) {
-		addError(status, `Non matching close tag: ${element.tagName.substring(1)}`, start);
+		addError(status, `Non-matching close tag: ${element.tagName.substring(1)}`, start);
 		return element;
 	}
 
@@ -75,26 +75,26 @@ export default function parseElement(status: ParseStatus): ElementNode {
 		current!.stack.pop();
 	}
 
-	// If this is a component element, add a default <:fill> node
+	// If this is a component element, add a default <fill> node
 	// HACK: For now, we just treat all tags starting with a capital as components
-	if (!element.tagName.startsWith(":") && /[A-Z]/.test(element.tagName[0])) {
+	if (/[A-Z]/.test(element.tagName[0])) {
 		element.type = "component";
 		slottifyChildNodes(element);
 		current.needsContext = true;
 	}
 
 	if (isSpecialNode(element)) {
-		if (element.tagName === ":slot") {
-			// If this is a <:slot> element, add a <:fill> node for its fallback
-			// content. Anchors will be created for <:slot> nodes and fragments will
-			// be created for the <:fill> content
+		if (element.tagName === "slot") {
+			// If this is a <slot> element, add a <fill> node for its fallback
+			// content. Anchors will be created for <slot> nodes and fragments will
+			// be created for the <fill> content
 			slottifyChildNodes(element);
 			current.needsContext = true;
 
 			// Add it to the component's slots collection
 			current.slotProps ??= [];
 			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
-		} else if (element.tagName === ":component") {
+		} else if (element.tagName === "@component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
 			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 				element.type = "component";
@@ -117,7 +117,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 
 				return replaceGroup as any;
 			} else {
-				addError(status, ":component element must have a self attribute", start);
+				addError(status, "@component element must have a self attribute", start);
 			}
 		}
 	}
@@ -228,10 +228,10 @@ function checkCloseTag(status: ParseStatus, element: ElementNode, current: Parse
 
 	accept("</", status);
 	consumeSpace(status);
-	let special = accept(":", status);
+	let snailed = accept("@", status);
 	let closingTagName = consumeAlphaNumeric(status);
-	if (special) {
-		closingTagName = ":" + closingTagName;
+	if (snailed) {
+		closingTagName = "@" + closingTagName;
 	}
 	consumeSpace(status);
 	accept(">", status);
@@ -249,7 +249,7 @@ function checkCloseTag(status: ParseStatus, element: ElementNode, current: Parse
 	if (!found) {
 		addError(
 			status,
-			`Non matching close tag: ${closingTagName} (expected ${element.tagName})`,
+			`Non-matching close tag: ${closingTagName} (expected ${element.tagName})`,
 			start,
 		);
 	}

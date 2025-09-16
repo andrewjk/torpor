@@ -8,8 +8,8 @@ export default function Component($props) {
 	};
 
 	@render {
-		<:component self={components[$props.self]}>
+		<@component self={components[$props.self]}>
 			Hello!
-		</:component>
+		</@component>
 	}
 }

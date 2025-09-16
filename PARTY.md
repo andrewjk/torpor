@@ -287,9 +287,9 @@ function FunnyButton() {
         outline: 0;
       "
     >
-      <:slot>
+      <slot>
         <span>No content found</span>
-      </:slot>
+      </slot>
     </button>
   }
 }

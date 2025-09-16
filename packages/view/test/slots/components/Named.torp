@@ -3,9 +3,9 @@ import Article from "./Article.torp"
 export default function Named() {
 	@render {
 		<Article>
-			<:fill name="header">
+			<fill name="header">
 				The article's header
-			</:fill>
+			</fill>
 			<p>
 				The article's body
 			</p>

@@ -217,17 +217,17 @@ export default function Calendar() {
 		>
 			<div class={`torp-calendar-header ${$props.class ?? ""}`.trim()}>
 				<button class={`torp-calendar-previous-trigger ${$props.class ?? ""}`.trim()} onclick={handlePrevMonth}>
-					<:fill name="prev-button">
+					<fill name="prev-button">
 						<ChevronLeft />
-					</:fill>
+					</fill>
 				</button>
 				<span class={`torp-calendar-month-name ${$props.class ?? ""}`.trim()}>
 					{monthNames[$state.visibleDate.getMonth()] + " " + $state.visibleDate.getFullYear()}
 				</span>
 				<button class={`torp-calendar-next-trigger ${$props.class ?? ""}`.trim()} onclick={handleNextMonth}>
-					<:fill name="next-button">
+					<fill name="next-button">
 						<ChevronRight />
-					</:fill>
+					</fill>
 				</button>
 			</div>
 			<div

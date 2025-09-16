@@ -172,7 +172,7 @@ export default function NavMenu($props: any) {
 			aria-orientation={$props.orientation}
 			onfocus={handleFocus}
 		>
-			<:slot />
+			<slot />
 		</nav>
 	}
 }

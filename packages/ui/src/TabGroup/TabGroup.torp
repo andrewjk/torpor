@@ -222,7 +222,7 @@ export default function TabGroup($props: any) {
 			class={`torp-tab-group ${$props.class ?? ""}`.trim()}
 			data-orientation={$props.orientation}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }

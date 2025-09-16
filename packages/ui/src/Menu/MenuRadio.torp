@@ -82,7 +82,7 @@ export default function MenuRadio() {
 			onfocus={() => handleItemFocus(index)}
 			&ref={button}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

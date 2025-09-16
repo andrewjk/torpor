@@ -170,7 +170,7 @@ export default function Test() {
 			//	column: 3,
 			//},
 			{
-				message: "Non matching close tag: input",
+				message: "Non-matching close tag: input",
 				start: 76,
 				line: 6,
 				column: 2,
@@ -198,7 +198,7 @@ export default function Test() {
 		ok: false,
 		errors: [
 			{
-				message: "Non matching close tag: input (expected div)",
+				message: "Non-matching close tag: input (expected div)",
 				start: 87,
 				line: 7,
 				column: 3,
@@ -229,7 +229,7 @@ export default function Test() {
 				column: 3,
 			},
 			{
-				message: "Non matching close tag: li (expected p)",
+				message: "Non-matching close tag: li (expected p)",
 				start: 80,
 				line: 5,
 				column: 27,
@@ -264,7 +264,7 @@ export default function Test() {
 				column: 4,
 			},
 			{
-				message: "Non matching close tag: span (expected p)",
+				message: "Non-matching close tag: span (expected p)",
 				start: 106,
 				line: 9,
 				column: 3,

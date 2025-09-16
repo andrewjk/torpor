@@ -81,9 +81,9 @@ export default function MenuBarItemTrigger() {
 			onfocus={() => handleButtonFocus(index)}
 			onmouseenter={handleMouseEnter}
 			&ref={button}
-			:onmount={(el) => itemContext.anchorElement = el}
+			onmount={(el) => itemContext.anchorElement = el}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

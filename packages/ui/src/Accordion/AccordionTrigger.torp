@@ -53,7 +53,7 @@ export default function AccordionTrigger() {
 			onclick={handleClick}
 			onkeydown={handleKey}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

@@ -370,7 +370,7 @@ function declareElementFragmentVars(
 	lastChild: boolean,
 	declare: boolean,
 ) {
-	const tagName = node.tagName === ":element" ? "element" : node.tagName;
+	const tagName = node.tagName === "@element" ? "element" : node.tagName;
 
 	let elementPath = { parent: path, type: tagName, children: [] };
 	path.children.push(elementPath);
@@ -388,7 +388,7 @@ function declareElementFragmentVars(
 			if (status.options?.useCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
-				if (node.tagName === ":element") {
+				if (node.tagName === "@element") {
 					b.append(`let ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				} else {
 					// HACK: Not great
@@ -410,7 +410,7 @@ function declareElementFragmentVars(
 
 	if (!declare) {
 		let attributes = node.attributes
-			.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
+			.filter((a) => !a.name.startsWith("on"))
 			.map((a) => {
 				if (a.value && a.reactive) {
 					// Adding a placeholder for reactive attributes seems to speed things
@@ -463,7 +463,7 @@ function declareElementFragmentVars(
 function elementNodeNeedsDeclaration(node: ElementNode, topLevel: boolean, lastChild: boolean) {
 	const hasReactiveAttribute = node.attributes.some((a) => a.value && a.reactive);
 	const isDynamicElement =
-		node.tagName === ":element" && node.attributes.find((a) => a.name === "self");
+		node.tagName === "@element" && node.attributes.find((a) => a.name === "self");
 	return hasReactiveAttribute || isDynamicElement || (topLevel && lastChild);
 }
 
@@ -536,7 +536,7 @@ function declareSpecialFragmentVars(
 	lastChild: boolean,
 	declare: boolean,
 ) {
-	if (node.tagName === ":slot") {
+	if (node.tagName === "slot") {
 		declareParentAndAnchorFragmentVars(
 			fragment,
 			node,
@@ -552,8 +552,8 @@ function declareSpecialFragmentVars(
 	}
 
 	switch (node.tagName) {
-		case ":slot":
-		case ":fill": {
+		case "slot":
+		case "fill": {
 			for (let [i, child] of node.children.entries()) {
 				declareFragmentVars(
 					fragment,
@@ -570,7 +570,7 @@ function declareSpecialFragmentVars(
 			}
 			break;
 		}
-		case ":element": {
+		case "@element": {
 			declareElementFragmentVars(
 				fragment,
 				node,
@@ -585,7 +585,7 @@ function declareSpecialFragmentVars(
 			);
 			break;
 		}
-		case ":component": {
+		case "@component": {
 			declareComponentFragmentVars(
 				fragment,
 				node,

@@ -30,7 +30,7 @@ export default function buildComponentNode(
 		b.append(`const ${propsName}: any = $watch({});`);
 
 		for (let { name, value, reactive, fullyReactive } of node.attributes) {
-			if (name === "self" && node.tagName === ":component") {
+			if (name === "self" && node.tagName === "@component") {
 				// Ignore this special attribute
 			} else if (name.startsWith("&") && value != null && fullyReactive) {
 				// It's a bound property
@@ -41,16 +41,14 @@ export default function buildComponentNode(
 				name = name.substring(1);
 				buildRun("setProp", `${propsName}["${name}"] = ${value};`, status, b);
 				buildRun("setBinding", `${value} = ${propsName}["${name}"];`, status, b);
-			} else if ((name === "class" || name === ":class") && value != null) {
-				// NOTE: :class is obsolete, but let's keep it for a version or two
+			} else if (name === "class" && value != null) {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
 				buildRun("setClasses", `${propsName}["class"] = t_class(${params.join(", ")});`, status, b);
-			} else if ((name === "style" || name === ":style") && value != null) {
-				// NOTE: :style is obsolete, but let's keep it for a version or two
+			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
 				buildRun("setStyles", `${propsName}["style"] = t_style(${value});`, status, b);
 			} else if (value != null) {
@@ -123,7 +121,7 @@ export default function buildComponentNode(
 	}
 
 	let componentName = node.tagName;
-	if (componentName === ":component") {
+	if (componentName === "@component") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
 		if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 			componentName = selfAttribute.value;

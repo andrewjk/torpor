@@ -36,7 +36,7 @@ export default function buildElementNode(
 
 	const varName = node.varName;
 	if (varName) {
-		if (node.tagName === ":element") {
+		if (node.tagName === "@element") {
 			buildDynamicElementNode(node, status, b);
 		}
 
@@ -176,7 +176,7 @@ function buildElementAttributes(
 	}
 
 	for (let { name, value, reactive } of node.attributes) {
-		if (name === "self" && node.tagName === ":element") {
+		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// Ignore this one, it should have been done already, above
@@ -185,17 +185,16 @@ function buildElementAttributes(
 				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === "&value" || name === "&checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
-			} else if (name === ":onmount") {
-				// The :onmount event is faked by us by creating a $mount. This
+			} else if (name === "onmount") {
+				// The onmount event is faked by us by creating a $mount. This
 				// also means that you can have unmount functionality by
 				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
 				buildEventAttribute(varName, name, value, status, b);
-			} else if (name.startsWith(":transition")) {
+			} else if (name.startsWith("transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
-			} else if (name === "class" || name === ":class") {
-				// NOTE: :class is obsolete, but let's keep it for a version or two
+			} else if (name === "class") {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
@@ -209,7 +208,7 @@ function buildElementAttributes(
 					status,
 					b,
 				);
-			} else if (name === ":style") {
+			} else if (name === "style") {
 				status.imports.add("t_style");
 				buildRun("setStyles", `${varName}.setAttribute("style", t_style(${value}));`, status, b);
 			} else if (name.includes("-")) {
@@ -332,12 +331,12 @@ function buildTransitionAttribute(
 	let entryVarName = nextVarName("trans_in", status);
 	let exitVarName = nextVarName("trans_out", status);
 
-	if (name === ":transition") {
+	if (name === "transition") {
 		b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
 		b.append(`const ${exitVarName} = ${entryVarName};`);
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
-	} else if (name === ":transition-in") {
-		let outAttribute = node.attributes.find((a) => a.name === ":transition-out");
+	} else if (name === "transition-in") {
+		let outAttribute = node.attributes.find((a) => a.name === "transition-out");
 		if (outAttribute && outAttribute.value && outAttribute.fullyReactive) {
 			let outValue = outAttribute.value;
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
@@ -347,10 +346,10 @@ function buildTransitionAttribute(
 			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
 			b.append(`t_animate(${varName}, ${entryVarName});`);
 		}
-	} else if (name === ":transition-out") {
-		let inAttribute = node.attributes.find((a) => a.name === ":transition-in");
+	} else if (name === "transition-out") {
+		let inAttribute = node.attributes.find((a) => a.name === "transition-in");
 		if (inAttribute) {
-			// This has already been handled with :transition-in, above
+			// This has already been handled with transition-in, above
 			return;
 		} else {
 			b.append(`const ${exitVarName} = ${getAnimationDetails(value)};`);

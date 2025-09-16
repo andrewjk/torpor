@@ -134,7 +134,7 @@ function buildComponentFragmentText(
 		};
 		fragments.push(node.fragment);
 		for (let child of node.children) {
-			// TODO: Make sure it's not a :fill node
+			// TODO: Make sure it's not a fill node
 			buildNodeFragmentText(child, status, fragments, node.fragment);
 		}
 	}
@@ -149,9 +149,9 @@ function buildElementFragmentText(
 	let needsClass = node.scopeStyles;
 	currentFragment.text += `<${node.tagName}`;
 	let attributesText = node.attributes
-		.filter((a) => !a.name.startsWith("on") && !a.name.includes(":"))
+		.filter((a) => !a.name.startsWith("on"))
 		.map((a) => {
-			if (a.value && a.reactive && !a.name.includes(":")) {
+			if (a.value && a.reactive) {
 				// Adding a placeholder for reactive attributes seems to speed things
 				// up, especially in the case of data attributes. Otherwise don't set it
 				if (a.name.startsWith("data-")) {
@@ -189,7 +189,7 @@ function buildSpecialFragmentText(
 	currentFragment: Fragment,
 ) {
 	switch (node.tagName) {
-		case ":slot": {
+		case "slot": {
 			// Add an anchor for the slot
 			currentFragment.text += ANCHOR_COMMENT;
 			for (let child of node.children) {
@@ -197,7 +197,7 @@ function buildSpecialFragmentText(
 			}
 			break;
 		}
-		case ":fill": {
+		case "fill": {
 			// Add a new fragment for filled slot content
 			node.fragment = {
 				number: fragments.length,
@@ -212,12 +212,12 @@ function buildSpecialFragmentText(
 			}
 			break;
 		}
-		case ":element": {
+		case "@element": {
 			// HACK: Just treat it as a component node as that does what we need for now
 			buildComponentFragmentText(node, status, fragments, currentFragment);
 			break;
 		}
-		case ":component": {
+		case "@component": {
 			buildComponentFragmentText(node, status, fragments, currentFragment);
 			break;
 		}

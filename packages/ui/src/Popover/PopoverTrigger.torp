@@ -23,7 +23,7 @@ export default function PopoverTrigger($props: any) {
 			onclick={handleClick}
 			&ref={context.anchorElement}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

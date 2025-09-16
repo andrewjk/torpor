@@ -1,9 +1,9 @@
 export default function Header() {
 	@render {
 		<h2>
-			<:slot>
+			<slot>
 				Default header...
-			</:slot>
+			</slot>
 		</h2>
 	}
 }

@@ -11,7 +11,7 @@ export default function ExampleMount($props: any) {
 
 		<div
 			class="example-popover-target"
-			:onmount={(el) => hoverPopover(el, { popover: PopoverTooltip, props: { text: "This is a tooltip" } })}
+			onmount={(el) => hoverPopover(el, { popover: PopoverTooltip, props: { text: "This is a tooltip" } })}
 		>
 			Show a tooltip
 		</div>

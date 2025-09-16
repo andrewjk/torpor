@@ -72,10 +72,10 @@ export default function Drawer($props: any) {
 				id={$props.id}
 				class={`torp-offscreen ${$props.class ?? ""}`.trim()}
 				style="position: fixed;"
-				:transition={transitionArgs()}
+				transition={transitionArgs()}
 				&ref={offscreen}
 			>
-				<:slot />
+				<slot />
 			</div>
 		}
 	}

@@ -11,19 +11,19 @@ export default function buildServerSpecialNode(
 	b: Builder,
 ): void {
 	switch (node.tagName) {
-		case ":slot": {
+		case "slot": {
 			buildServerSlotNode(node, status, b);
 			break;
 		}
-		case ":element": {
+		case "@element": {
 			buildServerElementNode(node, status, b);
 			break;
 		}
-		case ":component": {
+		case "@component": {
 			buildServerComponentNode(node, status, b);
 			break;
 		}
-		case ":fill": {
+		case "fill": {
 			// HACK:
 			break;
 		}

@@ -16,7 +16,7 @@ export default function buildServerElementNode(
 	}
 
 	let tagName = node.tagName;
-	if (tagName === ":element") {
+	if (tagName === "@element") {
 		let selfAttribute = node.attributes.find((a) => a.name === "self");
 		if (selfAttribute) {
 			tagName = `$\{${selfAttribute.value}}`;
@@ -41,11 +41,11 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 	let needsClass = node.scopeStyles;
 	let attributes: string[] = [];
 	for (let { name, value, reactive, fullyReactive } of node.attributes) {
-		if (name === "self" && node.tagName === ":element") {
+		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name.startsWith("on") || name.startsWith(":on")) {
 			// No events on the server
-		} else if (name.startsWith(":transition") && value) {
+		} else if (name.startsWith("transition") && value) {
 			// No animation on the server, but we do need to set the attributes
 			// from the first keyframe
 			// HACK: use a regex instead maybe?
@@ -82,8 +82,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				let valueOrDefault = `${value} || ${defaultValue}`;
 				const propName = name.substring(1);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
-			} else if (name === "class" || name === ":class") {
-				// NOTE: :class is obsolete, but let's keep it for a version or two
+			} else if (name === "class") {
 				status.imports.add("t_class");
 				let params = [value];
 				if (node.scopeStyles) {
@@ -91,8 +90,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 					needsClass = false;
 				}
 				attributes.push(`class="\${t_class(${params.join(", ")})}"`);
-			} else if (name === "style" || name === ":style") {
-				// NOTE: :style is obsolete, but let's keep it for a version or two
+			} else if (name === "style") {
 				status.imports.add("t_style");
 				attributes.push(`style="\${t_style(${value})}"`);
 			} else {

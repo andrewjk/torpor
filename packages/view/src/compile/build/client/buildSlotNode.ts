@@ -44,7 +44,7 @@ export default function buildSlotNode(node: ElementNode, status: BuildStatus, b:
 	b.append(`$slots["${slotName}"](${params.join(", ")})`);
 
 	// TODO: Maybe not if there's only a single space node?
-	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === ":fill");
+	const fill = node.children.find((c) => isSpecialNode(c) && c.tagName === "fill");
 	if (fill && isSpecialNode(fill) && fill.children.length) {
 		b.append(`} else {`);
 

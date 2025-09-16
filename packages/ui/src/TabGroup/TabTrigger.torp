@@ -59,7 +59,7 @@ export default function TabTrigger() {
 			onclick={handleClick}
 			onkeydown={handleKey}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

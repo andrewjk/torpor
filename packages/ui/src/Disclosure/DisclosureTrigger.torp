@@ -30,7 +30,7 @@ export default function DisclosureTrigger() {
 			data-disabled={$state.disabled}
 			onclick={() => $state.expanded = !$state.expanded}
 		>
-			<:slot />
+			<slot />
 		</button>
 	}
 }

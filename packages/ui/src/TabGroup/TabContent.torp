@@ -29,7 +29,7 @@ export default function TabContent($props: any) {
 			data-disabled={$state.dataDisabled}
 		>
 			@if ($state.active) {
-				<:slot />
+				<slot />
 			}
 		</div>
 	}

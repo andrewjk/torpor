@@ -80,7 +80,7 @@ export default function MenuRadioGroup() {
 			role="group"
 			aria-label={$props.ariaLabel}
 		>
-			<:slot />
+			<slot />
 		</div>
 	}
 }
