@@ -24,7 +24,7 @@
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.8.0",
 		"@testing-library/user-event": "^14.6.1",
-		"@typescript/native-preview": "7.0.0-dev.20250914.1",
+		"@typescript/native-preview": "7.0.0-dev.20250915.1",
 		"happy-dom": "^18.0.1",
 		"oxlint-tsgolint": "^0.2.0",
 		"typescript": "^5.9.2",

@@ -103,14 +103,14 @@
 		"unplugin": "^2.3.10"
 	},
 	"devDependencies": {
-		"@antfu/eslint-config": "^5.2.2",
-		"@nuxt/kit": "^4.1.1",
-		"@nuxt/schema": "^4.1.1",
+		"@antfu/eslint-config": "^5.3.0",
+		"@nuxt/kit": "^4.1.2",
+		"@nuxt/schema": "^4.1.2",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/node": "^24.3.1",
-		"@typescript/native-preview": "7.0.0-dev.20250914.1",
+		"@types/node": "^24.5.0",
+		"@typescript/native-preview": "7.0.0-dev.20250915.1",
 		"bumpp": "^10.2.3",
-		"chalk": "^5.6.0",
+		"chalk": "^5.6.2",
 		"eslint": "^9.35.0",
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
@@ -118,10 +118,10 @@
 		"oxlint-tsgolint": "^0.2.0",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
-		"rollup": "^4.50.1",
+		"rollup": "^4.50.2",
 		"tsdown": "^0.15.1",
 		"typescript": "^5.9.2",
-		"vite": "^7.1.4",
+		"vite": "^7.1.5",
 		"vitest": "^3.2.4",
 		"webpack": "^5.101.3"
 	}
