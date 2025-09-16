@@ -17,7 +17,7 @@ export default function MenuIndicator() {
 	@render {
 		@if ($state.checked) {
 			<div
-				id={$props.id}
+				{$props.id}
 				class={`torp-menu-indicator ${$props.class ?? ""}`.trim()}
 				aria-disabled={$props.disabled ? "true" : undefined}
 				data-disabled={$props.disabled ? "true" : undefined}

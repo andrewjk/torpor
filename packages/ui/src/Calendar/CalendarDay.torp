@@ -40,7 +40,7 @@ export default function CalendarDay() {
 
 	@render {
 		<div 
-			id={$props.id}
+			{$props.id}
 			class={[
 				`torp-calendar-day ${$props.class ?? ""}`.trim(),
 				{

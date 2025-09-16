@@ -25,7 +25,7 @@ export default function DialogHeader($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-dialog-footer ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

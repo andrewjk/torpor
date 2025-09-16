@@ -96,7 +96,7 @@ export default function NavMenuPopoutButton($props: any) {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu-popout-button ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

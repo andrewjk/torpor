@@ -26,7 +26,7 @@ export default function PopoverTriggerContextual($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-popover-trigger-contextual ${$props.class ?? ""}`.trim()}
 			oncontextmenu={handleContextual}
 			&ref={context.anchorElement}

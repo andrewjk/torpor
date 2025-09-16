@@ -8,7 +8,7 @@ export default function MenuGroup() {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-group ${$props.class ?? ""}`.trim()}
 			role="group"
 			aria-label={$props.ariaLabel}

@@ -59,7 +59,7 @@ export default function NavMenuPopout($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu-popout ${$props.class ?? ""}`.trim()}
 			onmouseleave={handleMouseLeave}
 		>

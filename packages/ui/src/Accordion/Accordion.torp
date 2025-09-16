@@ -198,7 +198,7 @@ export default function Accordion($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-accordion ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

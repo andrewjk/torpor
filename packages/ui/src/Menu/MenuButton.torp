@@ -35,7 +35,7 @@ export default function MenuButton() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-button ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

@@ -69,7 +69,7 @@ export default function AccordionItem($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-accordion-item ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}

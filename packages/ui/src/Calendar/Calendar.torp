@@ -211,7 +211,7 @@ export default function Calendar() {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-calendar ${$props.class ?? ""}`.trim()}
 			&ref={container}
 		>

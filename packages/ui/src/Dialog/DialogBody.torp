@@ -25,7 +25,7 @@ export default function DialogBody($props: any) {
 
 	@render {
 		<div
-			id={$props.id} 
+			{$props.id} 
 			class={`torp-dialog-body ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

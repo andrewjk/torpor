@@ -68,7 +68,7 @@ export default function MenuRadio() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-radio ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

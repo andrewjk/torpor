@@ -23,7 +23,7 @@
 export default function Breadcrumb($props: any) {
 	@render {
 		<nav
-			id={$props.id}
+			{$props.id}
 			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
 			aria-label={$props.ariaLabel}
 		>

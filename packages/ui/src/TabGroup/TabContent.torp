@@ -20,7 +20,7 @@ export default function TabContent($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-tab-content ${$props.class ?? ""}`.trim()}
 			role="tabpanel"
 			aria-labelledby={$state.headerId}

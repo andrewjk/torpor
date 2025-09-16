@@ -58,7 +58,7 @@ export default function Disclosure($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-disclosure-item ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}

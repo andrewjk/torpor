@@ -21,7 +21,7 @@ export default function AccordionContent($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-accordion-content ${$props.class ?? ""}`.trim()}
 			role={$props.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}

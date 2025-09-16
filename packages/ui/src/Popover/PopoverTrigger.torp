@@ -18,7 +18,7 @@ export default function PopoverTrigger($props: any) {
 	@render {
 		<button
 			type="button"
-			id={$props.id}
+			{$props.id}
 			class={`torp-popover-trigger ${$props.class ?? ""}`.trim()}
 			onclick={handleClick}
 			&ref={context.anchorElement}

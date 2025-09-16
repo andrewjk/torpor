@@ -20,7 +20,7 @@ export default function DisclosureTrigger() {
 	@render {
 		<button
 			type="button"
-			id={$props.id}
+			{$props.id}
 			class={`torp-disclosure-trigger ${$props.class ?? ""}`.trim()}
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-expanded={$state.expanded.toString()}

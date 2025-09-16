@@ -164,7 +164,7 @@ export default function NavMenu($props: any) {
 
 	@render {
 		<nav
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu ${$props.class ?? ""}`.trim()}
 			tabindex="0"
 			role="menubar"

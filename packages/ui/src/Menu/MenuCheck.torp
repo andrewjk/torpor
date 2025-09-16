@@ -50,7 +50,7 @@ export default function MenuCheck() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-check ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

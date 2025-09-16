@@ -5,7 +5,7 @@
 export default function NotificationContainer() {
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-notification-container ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

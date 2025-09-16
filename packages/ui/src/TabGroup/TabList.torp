@@ -35,7 +35,7 @@ export default function TabList($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-tab-list ${$props.class ?? ""}`.trim()}
 			role="tablist"
 			aria-label={$props.ariaLabel}

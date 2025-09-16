@@ -8,7 +8,7 @@
 export default function BreadcrumbItem($props: any) {
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
 			aria-current={$props.current ? "page" : undefined}
 			data-current={$props.current ? "current" : undefined}

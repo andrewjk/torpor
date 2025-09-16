@@ -93,7 +93,7 @@ export default function MenuPopoutTrigger() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-popout-trigger ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

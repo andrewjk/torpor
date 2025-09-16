@@ -21,7 +21,7 @@ export default function NavMenuGroupHeader($props: any) {
 	@render {
 		<h4
 			@// TODO: self={$props.as}
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu-group-header ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

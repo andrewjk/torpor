@@ -27,7 +27,7 @@ export default function PopoverTriggerHover($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-popover-trigger-hover ${$props.class ?? ""}`.trim()}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

@@ -32,7 +32,7 @@ export default function NavMenuLink($props: any) {
 
 	@render {
 		<a
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu-link ${$props.class ?? ""}`.trim()}
 			href={$props.href}
 			{$props.disabled}

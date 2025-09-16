@@ -37,7 +37,7 @@ export default function TabHeader($props: any) {
 	@render {
 		@// TODO: $props.as
 		<h4
-			id={$props.id}
+			{$props.id}
 			class={[
 				"torp-tab-header",
 				$props.class,

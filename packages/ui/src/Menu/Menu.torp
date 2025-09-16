@@ -147,7 +147,7 @@ export default function Menu() {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu ${$props.class ?? ""}`.trim()}
 			tabindex="-1"
 			role="menu"

@@ -44,7 +44,7 @@ export default function TabTrigger() {
 	@render {
 		<button
 			type="button"
-			id={$props.id}
+			{$props.id}
 			class={`torp-tab-trigger ${$props.class ?? ""}`.trim()}
 			role="tab"
 			tabindex="-1"

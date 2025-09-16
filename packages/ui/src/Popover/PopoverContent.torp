@@ -67,7 +67,7 @@ export default function PopoverContent($props: any) {
 	@render {
 		@if ($state.visible) {
 			<div
-				id={$props.id}
+				{$props.id}
 				class={`torp-popover-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}

@@ -6,7 +6,7 @@
 export default function BreadcrumbSeparator($props: any) {
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-breadcrumb-separator ${$props.class ?? ""}`.trim()}
 			aria-hidden="true"
 		>

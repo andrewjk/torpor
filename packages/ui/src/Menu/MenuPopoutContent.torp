@@ -62,7 +62,7 @@ export default function MenuPopoutContent() {
 	@render {
 		@if ($state.visible) {
 			<div
-				id={$props.id}
+				{$props.id}
 				class={`torp-menu-popout-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}

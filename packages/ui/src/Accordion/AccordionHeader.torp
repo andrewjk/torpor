@@ -23,7 +23,7 @@ export default function AccordionHeader($props: any) {
 	@render {
 		@// TODO: $props.as
 		<h4
-			id={$props.id}
+			{$props.id}
 			class={`torp-accordion-header ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}

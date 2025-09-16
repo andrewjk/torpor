@@ -23,7 +23,7 @@ export default function DisclosureHeader($props: any) {
 	@render {
 		@// TODO: $props.as
 		<h4
-			id={$props.id}
+			{$props.id}
 			class={`torp-disclosure-header ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
 			data-disabled={$state.dataDisabled}

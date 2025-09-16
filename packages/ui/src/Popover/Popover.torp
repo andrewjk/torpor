@@ -96,7 +96,7 @@ export default function Popover($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-popover ${$props.class ?? ""}`.trim()}
 		>
 			<slot />

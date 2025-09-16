@@ -96,7 +96,7 @@ export default function MenuBarItemContent() {
 	@render {
 		@if ($state.visible) {
 			<div
-				id={$props.id}
+				{$props.id}
 				class={`torp-menu-bar-item-content ${$props.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}

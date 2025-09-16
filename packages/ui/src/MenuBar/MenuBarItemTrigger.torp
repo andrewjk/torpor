@@ -67,7 +67,7 @@ export default function MenuBarItemTrigger() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-menu-bar-item-button ${$props.class ?? ""}`.trim()}
 			type="button"
 			{$props.disabled}

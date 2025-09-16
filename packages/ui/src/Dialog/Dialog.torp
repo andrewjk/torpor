@@ -138,7 +138,7 @@ export default function Dialog($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-dialog ${$props.class ?? ""}`.trim()}
 			tabindex="0"
 			role={$props.alert ? "alertdialog" : "dialog"}

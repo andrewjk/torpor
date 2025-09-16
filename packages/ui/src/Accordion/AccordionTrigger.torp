@@ -41,7 +41,7 @@ export default function AccordionTrigger() {
 	@render {
 		<button
 			type="button"
-			id={$props.id}
+			{$props.id}
 			class={`torp-accordion-trigger ${$props.class ?? ""}`.trim()}
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-expanded={$state.expanded.toString()}

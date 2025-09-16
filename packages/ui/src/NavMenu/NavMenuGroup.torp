@@ -18,7 +18,7 @@ export default function NavMenuGroup($props: any) {
 
 	@render {
 		<div
-			id={$props.id}
+			{$props.id}
 			class={`torp-nav-menu-group ${$props.class ?? ""}`.trim()}
 			role="group"
 			aria-label={$props.ariaLabel}

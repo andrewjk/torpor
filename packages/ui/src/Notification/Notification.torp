@@ -37,7 +37,7 @@ export default function Notification($props) {
 	@render {
 		@if ($props.visible) {
 			<div 
-				id={$props.id}
+				{$props.id}
 				class={`torp-notification ${$props.class ?? ""}`.trim()}
 				role="alert"
 			>

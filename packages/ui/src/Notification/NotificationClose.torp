@@ -17,7 +17,7 @@ export default function NotificationClose() {
 
 	@render {
 		<button
-			id={$props.id}
+			{$props.id}
 			class={`torp-notification-close ${$props.class ?? ""}`.trim()}
 			type="button"
 			onclick={handleClick}

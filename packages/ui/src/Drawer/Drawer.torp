@@ -69,7 +69,7 @@ export default function Drawer($props: any) {
 	@render {
 		@if ($props.visible) {
 			<div
-				id={$props.id}
+				{$props.id}
 				class={`torp-offscreen ${$props.class ?? ""}`.trim()}
 				style="position: fixed;"
 				transition={transitionArgs()}
