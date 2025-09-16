@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsgo --noEmit && tb --build",
-		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"db:generate": "prisma generate"
 	},
 	"keywords": [],

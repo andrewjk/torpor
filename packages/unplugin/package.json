@@ -63,7 +63,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsdown",
 		"build:watch": "tsdown --watch src",
-		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"lint": "eslint .",
 		"play": "npm -C playground run dev",
 		"prepublishOnly": "npm run build",

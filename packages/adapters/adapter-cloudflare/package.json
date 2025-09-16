@@ -13,7 +13,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsdown",
 		"build:watch": "tsdown --watch",
-		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit"
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware"
 	},
 	"keywords": [],
 	"author": "",

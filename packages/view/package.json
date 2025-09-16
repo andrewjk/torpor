@@ -23,7 +23,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsdown && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsdown --watch",
-		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"test": "vitest",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
 		"bench": "tsx ./bench/bench.ts",

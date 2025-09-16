@@ -64,7 +64,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsup",
 		"build:fix": "esno scripts/postbuild.ts",
-		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"test": "vitest"
 	},
 	"keywords": [],
