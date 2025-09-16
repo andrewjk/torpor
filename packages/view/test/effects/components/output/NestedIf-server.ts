@@ -8,10 +8,10 @@ export default function NestedIf(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 	if ($props.condition) {
 		t_body += `<!^> <![>`;

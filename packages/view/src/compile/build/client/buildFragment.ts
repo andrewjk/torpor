@@ -598,10 +598,6 @@ function declareSpecialFragmentVars(
 			);
 			break;
 		}
-		case ":head": {
-			// Don't need to do anything here
-			break;
-		}
 		default: {
 			throw new Error(`Invalid special node: ${node.tagName}`);
 		}

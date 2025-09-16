@@ -10,11 +10,11 @@ export default function Function(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({ counter: 0 })
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <button id="increment">Increment</button> `;
 
 	function increment() {

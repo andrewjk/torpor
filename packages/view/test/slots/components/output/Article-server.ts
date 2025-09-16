@@ -7,10 +7,10 @@ export default function Article(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <section> <h2> <![>`;
 	if ($slots && $slots["header"]) {
 		t_body += $slots["header"](undefined, $context);

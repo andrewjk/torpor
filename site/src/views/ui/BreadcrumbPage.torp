@@ -6,12 +6,12 @@ import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
 import ExampleCSSCode from "./breadcrumb/ExampleCSS.torp?raw";
 import ExampleSeparatorsCode from "./breadcrumb/ExampleSeparators.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Breadcrumb | Torpor</title>
-		</:head>
+export default function BreadcrumbPage() {
+	@head {
+		<title>Breadcrumb | Torpor</title>
+	}
 
+	@render {
 		<h1>Breadcrumb</h1>
 		<p>
 			A list of links to the parent pages of the current page in hierarchical order.

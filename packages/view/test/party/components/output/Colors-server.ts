@@ -9,11 +9,11 @@ export default function Colors(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	const colors = ["red", "green", "blue"];
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <ul> <![>`;
 	for (let color of colors) {
 		t_body += `<!^>  <li>${t_fmt(color)}</li> `;

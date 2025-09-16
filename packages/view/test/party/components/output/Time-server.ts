@@ -11,6 +11,8 @@ export default function Time(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		time: new Date().toLocaleTimeString()
 	});
@@ -24,8 +26,6 @@ export default function Time(
 	});
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <p>Current time: ${t_fmt($state.time)}</p> `;
 
 	return { body: t_body, head: t_head };

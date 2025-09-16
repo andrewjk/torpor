@@ -9,10 +9,10 @@ export default function Const(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` `;
 	const name = "Boris";
 	t_body += ` <p> Hello, ${t_fmt(name)}! </p> `;

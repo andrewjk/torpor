@@ -9,11 +9,11 @@ export default function Replace(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
+	let t_body = "";
+	let t_head = "";
 	let counter = 0;
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <![>`;
 	$props.name;
 	t_body += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;

@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function State() {
-	@render {
-		<:head>
-			<title>State | Torpor</title>
-		</:head>
+export default function StatePage() {
+	@head {
+		<title>State | Torpor</title>
+	}
 
+	@render {
 		<h1>State</h1>
 		<p>
 			Data that is stored within a component is called its <code>state</code>. State can

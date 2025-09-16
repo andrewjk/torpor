@@ -11,6 +11,8 @@ export default function PageTitle(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		pageTitle: ""
 	});
@@ -20,8 +22,6 @@ export default function PageTitle(
 	});
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <p>Page title: ${t_fmt($state.pageTitle)}</p> `;
 
 	return { body: t_body, head: t_head };

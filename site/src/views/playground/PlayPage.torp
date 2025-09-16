@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Playground() {
-	@render {
-		<:head>
-			<title>Playground | Torpor</title>
-		</:head>
+export default function PlaygroundPage() {
+	@head {
+		<title>Playground | Torpor</title>
+	}
 
+	@render {
 		<h1>Playground</h1>
 		<Repl input={`
 export default function Counter() {

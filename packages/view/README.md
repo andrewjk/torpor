@@ -18,38 +18,35 @@ npm install torpor
 - Components are functions
   - In a file with the `.torp` extension
   - HTML markup in a `@render` section
+  - `<head>` content in a `@head` section
   - CSS in a `@style` section
   - Child components in child component functions
 - In-markup JavaScript logic
-  - @if statement
-  - @for loop
-  - @switch statement
-  - @await statement for loading data from an async function
+  - `@if` statement
+  - `@for` loop
+  - `@switch` statement
+  - `@await` statement for loading data from an async function
   - And
-    - @replace to re-run a section when a property changes
-    - @const to declare a const variable in markup
-    - @console for logging
-    - @debugger for debugging
-    - @function to declare a function in markup
-    - @html to render HTML e.g. from $props
+    - `@replace` to re-run a section when a property changes
+    - `@const` to declare a const variable in markup
+    - `@console` for logging
+    - `@debugger` for debugging
+    - `@function` or `@async function` to declare a function in markup
+    - `@html` to render HTML e.g. from $props
 - Runtime reactivity
-  - $watch to create a proxy that updates UI on property changes
-  - $run to create an effect that is re-run when its dependencies change
-  - $mount to create an effect that runs after a component has been mounted
-  - $unwrap to get the target object from the proxy
+  - `$watch` to create a proxy that updates UI on property changes
+  - `$run` to create an effect that is re-run when its dependencies change
+  - `$mount` to create an effect that runs after a component has been mounted
+  - `$unwrap` to get the target object from the proxy
 - Automatic scoping of styles to component
-- Two-way binding with &value, &checked, etc
-- Element binding to a script variable with &ref={...}
+- Two-way binding with `&value`, `&checked`, etc
+- Element binding to a script variable with `&ref={...}`
 - Element in and out transitions using the Web Animations API
-- Run an effect when an element is added to the DOM with :onmount={(el) => ...}
-- Special tags (mostly not yet implemented...)
-  - <:component self={...}> inserts a dynamic component
-  - <:element self={...}> inserts a dynamic element
-  - <:trim> trims whitespace around the tag
-  - <:head> for adding content to the <head> tag
-  - <:window> for adding events to the `window` object
-  - <:document> for adding events to the `document` object
-  - <:body> for adding events to the `body` object
+- Run an effect when an element is added to the DOM with `:onmount={(el) => ...}`
+- Special tags
+  - `<:component self={...}>` inserts a dynamic component
+  - `<:element self={...}>` inserts a dynamic element
+  - <:trim> trims whitespace around the tag (TODO)
 
 ### Not yet
 

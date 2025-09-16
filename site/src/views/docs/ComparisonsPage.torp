@@ -1,10 +1,10 @@
 
-export default function Comparisons() {
-	@render {
-		<:head>
-			<title>Comparisons | Torpor</title>
-		</:head>
+export default function ComparisonsPage() {
+	@head {
+		<title>Comparisons | Torpor</title>
+	}
 
+	@render {
 		<h1>Comparisons</h1>
 		<p>
 			There are many JavaScript frameworks! Below is an overview of some of the major

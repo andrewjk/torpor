@@ -4,12 +4,12 @@ import ExampleBasic from "./nav-menu/ExampleBasic.torp";
 
 import ExampleBasicCode from "./nav-menu/ExampleBasic.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Nav Menu | Torpor</title>
-		</:head>
+export default function NavMenuPage() {
+	@head {
+		<title>Nav Menu | Torpor</title>
+	}
 
+	@render {
 		<h1>Nav Menu</h1>
 		<p>
 			A list of links for navigating a website.

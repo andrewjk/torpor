@@ -9,10 +9,10 @@ export default function For(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <section> <![>`;
 	for (let i = 0; i < 5; i++) {
 		t_body += `<!^> <p> ${t_fmt(i)} </p> `;

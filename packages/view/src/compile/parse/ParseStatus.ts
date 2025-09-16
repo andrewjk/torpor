@@ -27,6 +27,7 @@ export interface ParseComponentStatus {
 	/** Params declared by the user in the component's function */
 	params?: string;
 	markup?: RootNode;
+	head?: RootNode;
 	stack?: ElementNode[];
 	style?: Style;
 	/** $props that are used in the component's function */

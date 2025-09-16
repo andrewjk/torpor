@@ -135,6 +135,34 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 			}
 
 			marker = i + "/* @render */".length;
+		} else if (script.substring(i, i + "/* @head */".length) === "/* @head */") {
+			b.append(script.substring(marker, i));
+
+			if (current.head) {
+				const status: BuildStatus = {
+					imports,
+					props: current.props || [],
+					contextProps: current.contextProps || [],
+					slotProps: current.slotProps || [],
+					styleHash: current.style?.hash || "",
+					varNames: {},
+					fragmentStack: [],
+					forVarNames: [],
+					ns: false,
+					preserveWhitespace: false,
+				};
+
+				// Add the head tags
+				b.append("");
+				b.append("/* Head */");
+				status.inHead = true;
+				buildNode(current.head, status, b, "$parent", "$anchor", true);
+				status.inHead = false;
+			}
+
+			marker = i + "/* @head */".length;
+		} else if (script.substring(i, i + "/* @style */".length) === "/* @style */") {
+			marker = i + "/* @style */".length;
 		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
 			b.append(script.substring(marker, i));
 

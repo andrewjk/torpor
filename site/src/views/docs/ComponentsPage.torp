@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Components() {
-	@render {
-		<:head>
-			<title>Components | Torpor</title>
-		</:head>
+export default function ComponentsPage() {
+	@head {
+		<title>Components | Torpor</title>
+	}
 
+	@render {
 		<h1>Components</h1>
 		<p>
 			Each component is a JavaScript function located in a file with the <code>.torp</code>

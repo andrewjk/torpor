@@ -10,6 +10,7 @@ export type TemplateComponent = {
 	/** Params declared by the user in the component's function */
 	params?: string;
 	markup?: RootNode;
+	head?: RootNode;
 	style?: Style;
 	/** $props that are used in the component's function */
 	props?: string[];

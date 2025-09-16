@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Styles() {
-	@render {
-		<:head>
-			<title>Styles | Torpor</title>
-		</:head>
+export default function StylesPage() {
+	@head {
+		<title>Styles | Torpor</title>
+	}
 
+	@render {
 		<h1>Styles</h1>
 		<p>
 			The CSS for styling a component's elements is declared with a <code>&commat;style</code>

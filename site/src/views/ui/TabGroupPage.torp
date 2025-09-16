@@ -8,12 +8,12 @@ import ExampleBasicCode from "./tab-group/ExampleBasic.torp?raw";
 import ExampleBoundCode from "./tab-group/ExampleBound.torp?raw";
 import ExampleVerticalCode from "./tab-group/ExampleVertical.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Tab Group | Torpor</title>
-		</:head>
+export default function TabGroupPage() {
+	@head {
+		<title>Tab Group | Torpor</title>
+	}
 
+	@render {
 		<h1>Tab Group</h1>
 		<p>
 			A list of interactive headings coupled with layered sections of content that

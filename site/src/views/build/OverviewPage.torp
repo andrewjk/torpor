@@ -1,10 +1,10 @@
 
-export default function Build() {
-	@render {
-		<:head>
-			<title>Build | Torpor</title>
-		</:head>
+export default function OverviewPage() {
+	@head {
+		<title>Build | Torpor</title>
+	}
 
+	@render {
 		<h1>Build</h1>
 		<p>
 			Build is Torpor's site and app building framework. It is built on top of 

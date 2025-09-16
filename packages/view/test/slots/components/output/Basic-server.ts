@@ -10,10 +10,10 @@ export default function Basic(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (

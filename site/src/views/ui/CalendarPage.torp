@@ -4,12 +4,12 @@ import ExampleBasic from "./calendar/ExampleBasic.torp";
 
 import ExampleBasicCode from "./calendar/ExampleBasic.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Calendar | Torpor</title>
-		</:head>
+export default function CalendarPage() {
+	@head {
+		<title>Calendar | Torpor</title>
+	}
 
+	@render {
 		<h1>Calendar</h1>
 		<p>
 			A basic calendar.

@@ -8,10 +8,10 @@ export default function AnswerButton(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <button>YES</button> <button>NO</button> `;
 
 	return { body: t_body, head: t_head };

@@ -9,6 +9,8 @@ export default function Await(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	// Use the $watch function to declare reactive state
 	const $state = $watch({})
 
@@ -27,8 +29,6 @@ export default function Await(
 		}
 
 		/* User interface */
-		let t_body = "";
-		let t_head = "";
 		t_body += ` <![>`;
 		t_body += ` <p>Hmm...</p> `;
 		t_body += `<!]><!> <button> Guess again </button> `;

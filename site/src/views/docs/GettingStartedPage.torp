@@ -1,10 +1,10 @@
 
-export default function GettingStarted() {
-	@render {
-		<:head>
-			<title>Getting Started | Torpor</title>
-		</:head>
+export default function GettingStartedPage() {
+	@head {
+		<title>Getting Started | Torpor</title>
+	}
 
+	@render {
 		<h1>Getting Started</h1>
 		<p>
 			Use <code>npm</code> (or your preferred package manager) to add Torpor to your project:

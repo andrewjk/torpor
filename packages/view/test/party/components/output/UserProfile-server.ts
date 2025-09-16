@@ -14,10 +14,10 @@ export default function UserProfile(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <p>My name is ${t_fmt($props.name)}!</p> <p>My age is ${t_fmt($props.age)}!</p> <p>My favourite colors are ${t_fmt($props.favouriteColors.join(", "))}!</p> <p>I am ${t_fmt($props.isAvailable ? "available" : "not available")}</p> `;
 
 	return { body: t_body, head: t_head };

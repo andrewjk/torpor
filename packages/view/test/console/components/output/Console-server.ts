@@ -8,10 +8,10 @@ export default function Console(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <div>  </div> `;
 
 	return { body: t_body, head: t_head };

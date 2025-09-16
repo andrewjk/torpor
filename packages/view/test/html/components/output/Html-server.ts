@@ -8,10 +8,10 @@ export default function Html(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <p> <![>${$props.html}<!]><!> </p> `;
 
 	return { body: t_body, head: t_head };

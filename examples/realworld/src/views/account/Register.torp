@@ -2,12 +2,12 @@
 import FormErrors from "@/views/FormErrors.torp";
 
 export default function Register() {
+	@head {
+		<title>Sign up • Conduit</title>
+	}
+
 	@render {
 		<div class="auth-page">
-			<:head>
-				<title>Sign up • Conduit</title>
-			</:head>
-
 			<div class="container page">
 				<div class="row">
 					<div class="col-md-6 offset-md-3 col-xs-12">

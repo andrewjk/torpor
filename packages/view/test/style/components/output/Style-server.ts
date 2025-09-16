@@ -9,10 +9,10 @@ export default function Style(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <div style="${t_style({ color: $props.color })}"> Hello! </div> `;
 
 	return { body: t_body, head: t_head };

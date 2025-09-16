@@ -3,12 +3,12 @@ import ArticleMeta from "./ArticleMeta.torp";
 import CommentContainer from "../comment/CommentContainer.torp";
 
 export default function Article() {
+	@head {
+		<title>{$props.data.article.title}</title>
+	}
+
 	@render {
 		<div class="article-page">
-			<:head>
-				<title>{$props.data.article.title}</title>
-			</:head>
-
 			<div class="banner">
 				<div class="container">
 					<h1>{$props.data.article.title}</h1>

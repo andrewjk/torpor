@@ -8,10 +8,10 @@ export default function IfFalse(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 	if ($props.counter > 7) {
 		t_body += `<!^> <p> It's true! </p> `;

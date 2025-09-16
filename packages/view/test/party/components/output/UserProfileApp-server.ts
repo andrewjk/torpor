@@ -10,10 +10,10 @@ export default function UserProfileApp(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["name"] = "John";

@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Party() {
-	@render {
-		<:head>
-			<title>Component Party | Torpor</title>
-		</:head>
+export default function PartyPage() {
+	@head {
+		<title>Component Party | Torpor</title>
+	}
 
+	@render {
 		<h1>Component Party</h1>
 		<p>
 			Examples from <a href="https://component-party.dev">Component Party</a>.

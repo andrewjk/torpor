@@ -84,6 +84,10 @@ function buildServerTemplate(
 				b.append(`$context = Object.assign({}, $context);`);
 			}
 
+			// Declare t_head and t_body
+			b.append(`let t_body = "";`);
+			b.append(`let t_head = "";`);
+
 			marker = i + "/* @start */".length;
 		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
 			b.append(script.substring(marker, i));
@@ -101,16 +105,6 @@ function buildServerTemplate(
 				// Add the interface
 				b.append("");
 				b.append("/* User interface */");
-				b.append(`let t_body = "";`);
-				if (current.style) {
-					// Replace multiple spaces with a single space
-					const styles = buildStyles(current.style, current.style.hash)
-						.replaceAll('"', '\\"')
-						.replaceAll(/\s+/g, " ");
-					b.append(`let t_head = "<style id='${current.style.hash}'>${styles}</style>";\n`);
-				} else {
-					b.append(`let t_head = "";`);
-				}
 
 				buildServerNode(current.markup, status, b);
 
@@ -121,6 +115,22 @@ function buildServerTemplate(
 			}
 
 			marker = i + "/* @render */".length;
+		} else if (script.substring(i, i + "/* @head */".length) === "/* @head */") {
+			// TODO: need to add e.g. a title to the head, but remove when changing page
+			marker = i + "/* @head */".length;
+		} else if (script.substring(i, i + "/* @style */".length) === "/* @style */") {
+			if (current.style) {
+				b.append("");
+				b.append("/* Style */");
+
+				// Replace multiple spaces with a single space
+				const styles = buildStyles(current.style, current.style.hash)
+					.replaceAll('"', '\\"')
+					.replaceAll(/\s+/g, " ");
+				b.append(`t_head += "<style id='${current.style.hash}'>${styles}</style>";\n`);
+			}
+
+			marker = i + "/* @style */".length;
 		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
 			b.append(script.substring(marker, i));
 			b.append(`return { body: t_body, head: t_head };`);

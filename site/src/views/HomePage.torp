@@ -4,13 +4,13 @@ import torporLogo from "@/assets/torpor.svg";
 /**
  * The home component
  */
-export default function Home() {
+export default function HomePage() {
+	@head {
+		<title>Torpor</title>
+	}
+
 	@render {
 		<div id="home-container">
-			<:head>
-				<title>Torpor</title>
-			</:head>
-
 			<div class="hstack spaced">
 				<a href="https://torpor.dev/" target="_blank">
 					<img src={torporLogo} class="logo" alt="Torpor logo" />

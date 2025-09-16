@@ -3,7 +3,6 @@ import Builder from "../../utils/Builder";
 import { type BuildStatus } from "./BuildStatus";
 import buildComponentNode from "./buildComponentNode";
 import buildElementNode from "./buildElementNode";
-import buildHeadNode from "./buildHeadNode";
 import buildSlotNode from "./buildSlotNode";
 
 export default function buildSpecialNode(
@@ -24,10 +23,6 @@ export default function buildSpecialNode(
 		}
 		case ":component": {
 			buildComponentNode(node, status, b, root);
-			break;
-		}
-		case ":head": {
-			buildHeadNode(node, status, b);
 			break;
 		}
 		case ":fill": {

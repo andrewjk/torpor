@@ -10,6 +10,8 @@ export default function Counter(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		count: 0
 	});
@@ -19,8 +21,6 @@ export default function Counter(
 	}
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <p>Counter: ${t_fmt($state.count)}</p> <button>+1</button> `;
 
 	return { body: t_body, head: t_head };

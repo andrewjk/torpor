@@ -12,6 +12,8 @@ export default function AnswerButtonApp(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		isHappy: true
 	});
@@ -25,8 +27,6 @@ export default function AnswerButtonApp(
 	}
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <p>Are you happy?</p> <![>`;
 	const t_props_1: any = {};
 	t_props_1["onYes"] = onAnswerYes;

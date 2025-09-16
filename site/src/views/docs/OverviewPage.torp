@@ -1,12 +1,12 @@
 import Demo from "./Demo.torp?raw"
 import Repl from "../repl/Repl.torp"
 
-export default function Overview() {
-	@render {
-		<:head>
-			<title>Overview | Torpor</title>
-		</:head>
+export default function OverviewPage() {
+	@head {
+		<title>Overview | Torpor</title>
+	}
 
+	@render {
 		<h1>Overview</h1>
 		<p>
 			Torpor is a JavaScript framework, designed for simplicity and completeness.

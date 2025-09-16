@@ -6,12 +6,12 @@ import ExamplePopover from "./drawer/ExamplePopover.torp";
 import ExampleVariableCode from "./drawer/ExampleVariable.torp?raw";
 import ExamplePopoverCode from "./drawer/ExamplePopover.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Drawer | Torpor</title>
-		</:head>
+export default function DrawerPage() {
+	@head {
+		<title>Drawer | Torpor</title>
+	}
 
+	@render {
 		<h1>Drawer</h1>
 		<p>
 			A container that can be hidden offscreen and slid out when needed.

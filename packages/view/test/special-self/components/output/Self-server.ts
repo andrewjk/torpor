@@ -9,10 +9,10 @@ export default function Self(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <p>Level ${t_fmt($props.level)}</p> <![>`;
 	if ($props.level < 3) {
 		t_body += `<!^> <![>`;

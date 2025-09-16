@@ -4,12 +4,12 @@ import ExampleBasic from "./menu-bar/ExampleBasic.torp";
 
 import ExampleBasicCode from "./menu-bar/ExampleBasic.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Menu | Torpor</title>
-		</:head>
+export default function MenuBarPage() {
+	@head {
+		<title>Menu | Torpor</title>
+	}
 
+	@render {
 		<h1>Menu</h1>
 		<p>
 			A menu bar, similar to that shown at the top of Windows

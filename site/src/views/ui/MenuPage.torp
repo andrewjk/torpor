@@ -4,12 +4,12 @@ import ExampleBasic from "./menu/ExampleBasic.torp";
 
 import ExampleBasicCode from "./menu/ExampleBasic.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Menu | Torpor</title>
-		</:head>
+export default function MenuPage() {
+	@head {
+		<title>Menu | Torpor</title>
+	}
 
+	@render {
 		<h1>Menu</h1>
 		<p>
 			A list of choices for the user, such as a set of actions or

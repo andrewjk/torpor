@@ -7,10 +7,10 @@ export default function FunnyButton(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <button style="
 				background: rgba(0, 0, 0, 0.4);
 				color: #fff;

@@ -1,12 +1,12 @@
 import Repl from "../repl/Repl.torp"
 import DemoText from "./Demo.txt?raw"
 
-export default function Demo() {
-	@render {
-		<:head>
-			<title>Demo | Torpor</title>
-		</:head>
+export default function DemoPage() {
+	@head {
+		<title>Demo | Torpor</title>
+	}
 
+	@render {
 		<h1>Demo</h1>
 
 		<h2>Basic reactivity</h2>

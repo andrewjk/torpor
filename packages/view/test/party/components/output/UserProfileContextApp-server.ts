@@ -13,6 +13,8 @@ export default function UserProfileContextApp(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$context = Object.assign({}, $context);
+	let t_body = "";
+	let t_head = "";
 	const $user = $watch({
 		id: 1,
 		username: "unicorn42",
@@ -23,8 +25,6 @@ export default function UserProfileContextApp(
 	$context.user = $user;
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
 
 	const t_comp_1 = UserProfileContext(undefined, $context);

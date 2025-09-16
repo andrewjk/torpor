@@ -9,10 +9,10 @@ export default function Header(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <h2>Hi, ${t_fmt($props.name)}</h2> `;
 
 	return { body: t_body, head: t_head };

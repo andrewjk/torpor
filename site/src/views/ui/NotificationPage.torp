@@ -8,12 +8,12 @@ import ExampleBasicCode from "./notification/ExampleBasic.torp?raw";
 import ExampleFunctionCode from "./notification/ExampleFunction.torp?raw";
 import ExampleQueueCode from "./notification/ExampleQueue.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Notification | Torpor</title>
-		</:head>
+export default function NotificationPage() {
+	@head {
+		<title>Notification | Torpor</title>
+	}
 
+	@render {
 		<h1>Notification</h1>
 		<p>
 			An element that displays a brief, important message in a way that

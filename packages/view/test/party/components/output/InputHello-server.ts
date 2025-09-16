@@ -11,13 +11,13 @@ export default function InputHello(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		text: "Hello World"
 	});
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> `;
 
 	return { body: t_body, head: t_head };

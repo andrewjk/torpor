@@ -12,12 +12,12 @@ import ExampleInfoCode from "./dialog/ExampleInfo.torp?raw";
 import ExampleConfirmCode from "./dialog/ExampleConfirm.torp?raw";
 import ExamplePromptCode from "./dialog/ExamplePrompt.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Dialog | Torpor</title>
-		</:head>
+export default function DialogPage() {
+	@head {
+		<title>Dialog | Torpor</title>
+	}
 
+	@render {
 		<h1>Dialog</h1>
 		<p>
 			Content for a window displayed in a Popover.

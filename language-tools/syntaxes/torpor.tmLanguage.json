@@ -13,6 +13,20 @@
 			"end": "\\}",
 			"patterns": [{ "include": "#parens" }]
 		},
+		"head": {
+			"comments": "TODO: this should support only tags that are valid in <head> sections",
+			"begin": "(@head)\\s*(\\{)",
+			"beginCaptures": {
+				"1": { "name": "support.function.torp" },
+				"2": { "name": "punctuation.definition.block" }
+			},
+			"end": "(\\})",
+			"endCaptures": {
+				"1": { "name": "punctuation.definition.block" }
+			},
+			"name": "head.group.torp",
+			"patterns": [{ "include": "#render-markup" }]
+		},
 		"render": {
 			"begin": "(@render)\\s*(\\{)",
 			"beginCaptures": {

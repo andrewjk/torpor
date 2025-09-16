@@ -23,10 +23,6 @@ export default function buildServerSpecialNode(
 			buildServerComponentNode(node, status, b);
 			break;
 		}
-		case ":head": {
-			// TODO: For now this is just being done in hydrate
-			break;
-		}
 		case ":fill": {
 			// HACK:
 			break;

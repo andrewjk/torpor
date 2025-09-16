@@ -11,14 +11,14 @@ export default function Component(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
+	let t_body = "";
+	let t_head = "";
 	let components = {
 		BigTitle,
 		SmallTitle
 	};
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <![>`;
 	components[$props.self];
 	t_body += `<![>`;

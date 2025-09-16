@@ -10,6 +10,8 @@ export default function DoubleCount(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		count: 10,
 		get doubleCount() {
@@ -18,8 +20,6 @@ export default function DoubleCount(
 	});
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <div>${t_fmt($state.doubleCount)}</div> `;
 
 	return { body: t_body, head: t_head };

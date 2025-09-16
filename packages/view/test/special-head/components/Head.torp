@@ -1,7 +1,5 @@
 export default function Head() {
-	@render {
-		<:head>
-			<title>Hello</title>
-		</:head>
+	@head {
+		<title>Hello</title>
 	}
 }

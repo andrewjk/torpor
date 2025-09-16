@@ -10,6 +10,8 @@ export default function Mount(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let inputElement;
 
 	$mount(() => {
@@ -17,8 +19,6 @@ export default function Mount(
 	});
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <input ref="${t_attr(inputElement) || ""}"> `;
 
 	return { body: t_body, head: t_head };

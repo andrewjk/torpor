@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Binding() {
-	@render {
-		<:head>
-			<title>Binding | Torpor</title>
-		</:head>
+export default function BindingPage() {
+	@head {
+		<title>Binding | Torpor</title>
+	}
 
+	@render {
 		<h1>Binding</h1>
 		<p>
 			Torpor supports two-way binding for updating the application's state from user input.

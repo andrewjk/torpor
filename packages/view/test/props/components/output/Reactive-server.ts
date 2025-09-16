@@ -9,11 +9,11 @@ export default function Reactive(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({ text: "before" })
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <button>Update text</button> <![>`;
 	const t_props_1: any = {};
 	t_props_1["text"] = $state.text;
@@ -34,10 +34,10 @@ function Child(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <p> ${t_fmt($props.text)} </p> `;
 
 	return { body: t_body, head: t_head };

@@ -11,12 +11,12 @@ export default function Index() {
 	})
 	$state.pageLinkBase = $state.tag ? `tag=${$state.tag}` : `tab=${$state.tab}`
 
+	@head {
+		<title>Conduit</title>
+	}
+
 	@render {
 		<div class="home-page">
-			<:head>
-				<title>Conduit</title>
-			</:head>
-
 			@if (!$props.data.user) {
 				<div class="banner">
 					<div class="container">

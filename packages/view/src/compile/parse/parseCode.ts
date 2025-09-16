@@ -80,6 +80,8 @@ export default function parseCode(source: string): ParseResult {
 			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
+		} else if (accept("@head", status, false)) {
+			parseComponentHead(status);
 		} else if (accept("@style", status, false)) {
 			parseComponentStyle(status);
 		}
@@ -107,6 +109,7 @@ export default function parseCode(source: string): ParseResult {
 							default: c.default,
 							params: c.params,
 							markup: c.markup,
+							head: c.head,
 							style: c.style,
 							props: c.props,
 							contextProps: c.contextProps,
@@ -198,6 +201,36 @@ function parseComponentRender(status: ParseStatus) {
 	status.marker = status.i;
 }
 
+function parseComponentHead(status: ParseStatus) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
+	if (current.head) {
+		addError(status, `Multiple @head sections`, status.i);
+	}
+
+	status.script += status.source.substring(status.marker, status.i) + "/* @head */";
+
+	// HACK: add a new component, and move its markup into the current
+	// component's head section after
+	status.components.push({
+		start: status.i,
+	});
+
+	accept("@head", status);
+	consumeSpace(status);
+	if (accept("{", status)) {
+		parseMarkup(status, status.source);
+		accept("}", status);
+	}
+
+	// Swap render and markup
+	const head = status.components.pop();
+	current.head = head?.markup;
+
+	status.marker = status.i;
+}
+
 function parseComponentStyle(status: ParseStatus) {
 	const current = status.components.at(-1);
 	if (!current) return;
@@ -206,7 +239,7 @@ function parseComponentStyle(status: ParseStatus) {
 		addError(status, `Multiple @style sections`, status.i);
 	}
 
-	status.script += status.source.substring(status.marker, status.i);
+	status.script += status.source.substring(status.marker, status.i) + "/* @style */";
 
 	let start = -1;
 	let end = status.source.length;

@@ -9,10 +9,10 @@ export default function ArrayEntries(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <section> <p>^</p> <![>`;
 	for (let [i, item] of $props.items.entries()) {
 		t_body += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt(item.text)} </span> `;

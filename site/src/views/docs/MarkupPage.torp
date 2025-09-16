@@ -1,11 +1,11 @@
 import Repl from "../repl/Repl.torp"
 
-export default function Markup() {
-	@render {
-		<:head>
-			<title>Markup | Torpor</title>
-		</:head>
+export default function MarkupPage() {
+	@head {
+		<title>Markup | Torpor</title>
+	}
 
+	@render {
 		<h1>Markup</h1>
 		<p>
 			The HTML that a component outputs is declared within a <code>&commat;render</code>

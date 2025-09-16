@@ -2,12 +2,12 @@
 import FormErrors from "@/views/FormErrors.torp";
 
 export default function Settings() {
+	@head {
+		<title>Settings • Conduit</title>
+	}
+
 	@render {
 		<div class="settings-page">
-			<:head>
-				<title>Settings • Conduit</title>
-			</:head>
-
 			<div class="container page">
 				<div class="row">
 					<div class="col-md-6 offset-md-3 col-xs-12">

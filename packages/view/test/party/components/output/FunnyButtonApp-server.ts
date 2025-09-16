@@ -10,10 +10,10 @@ export default function FunnyButtonApp(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 
 	const t_comp_1 = FunnyButton(undefined, $context);

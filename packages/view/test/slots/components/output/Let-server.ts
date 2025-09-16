@@ -11,10 +11,10 @@ export default function Let(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["items"] = $props.items;

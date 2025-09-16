@@ -18,12 +18,12 @@ import ExampleFunctionCode from "./popover/ExampleFunction.torp?raw";
 import ExampleMountCode from "./popover/ExampleMount.torp?raw";
 import ExampleVariableCode from "./popover/ExampleVariable.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Popover | Torpor</title>
-		</:head>
+export default function PopoverPage() {
+	@head {
+		<title>Popover | Torpor</title>
+	}
 
+	@render {
 		<h1>Popover</h1>
 		<p>
 			A popover that can be used to show rich content or obtain information from a user.

@@ -10,6 +10,8 @@ export default function TrafficLight(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
 		lightIndex: 0,
@@ -23,8 +25,6 @@ export default function TrafficLight(
 	}
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 	if ($state.light === "red") {
 		t_body += `<!^> <span>STOP</span> `;

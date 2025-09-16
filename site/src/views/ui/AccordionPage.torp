@@ -6,12 +6,12 @@ import ExampleBound from "./accordion/ExampleBound.torp";
 import ExampleBasicCode from "./accordion/ExampleBasic.torp?raw";
 import ExampleBoundCode from "./accordion/ExampleBound.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Accordion | Torpor</title>
-		</:head>
+export default function AccordionPage() {
+	@head {
+		<title>Accordion | Torpor</title>
+	}
 
+	@render {
 		<h1>Accordion</h1>
 		<p>
 			A vertically stacked set of interactive headings that enable users to reveal

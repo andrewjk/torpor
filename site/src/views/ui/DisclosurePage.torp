@@ -6,12 +6,12 @@ import ExampleBound from "./disclosure/ExampleBound.torp";
 import ExampleBasicCode from "./disclosure/ExampleBasic.torp?raw";
 import ExampleBoundCode from "./disclosure/ExampleBound.torp?raw";
 
-export default function Component() {
-	@render {
-		<:head>
-			<title>Disclosure | Torpor</title>
-		</:head>
+export default function DisclosurePage() {
+	@head {
+		<title>Disclosure | Torpor</title>
+	}
 
+	@render {
 		<h1>Disclosure</h1>
 		<p>
 			An interactive header that enables users to reveal or hide an

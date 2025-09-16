@@ -1,6 +1,10 @@
 import { $page } from "@torpor/build/state";
 
-export default function Error() {
+export default function ErrorPage() {
+	@head {
+		<title>Error | Torpor</title>
+	}
+
 	@render {
 		<h1>Error {$page.status}</h1>
 		<p>{$page.error.message}</p>

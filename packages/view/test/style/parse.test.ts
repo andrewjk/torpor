@@ -27,7 +27,7 @@ export default function Test(/* @params */) {
 	/* @start */
 	/* @render */
 
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -77,7 +77,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -129,7 +129,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -184,7 +184,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -243,7 +243,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -302,7 +302,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -363,7 +363,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -428,7 +428,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -479,7 +479,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -530,7 +530,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -589,7 +589,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,
@@ -650,7 +650,7 @@ export default function Test() {
 			script: `
 export default function Test(/* @params */) {
 	/* @start */
-	
+	/* @style */
 	/* @end */
 }
 `,

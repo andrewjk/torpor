@@ -9,10 +9,10 @@ export default function ArrayIndexes(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <section> <p>^</p> <![>`;
 	for (let i = 0; i < $props.items.length; i++) {
 		t_body += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span> `;

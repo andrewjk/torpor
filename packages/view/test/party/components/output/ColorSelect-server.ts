@@ -11,6 +11,8 @@ export default function ColorSelect(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		selectedColorId: 2
 	});
@@ -23,8 +25,6 @@ export default function ColorSelect(
 	];
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
 	for (let color of colors) {
 		t_body += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;

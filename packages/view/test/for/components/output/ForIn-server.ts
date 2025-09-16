@@ -9,10 +9,10 @@ export default function ForIn(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <section> <![>`;
 	for (let key in $props.item) {
 		t_body += `<!^> <p> ${t_fmt($props.item[key])} </p> `;

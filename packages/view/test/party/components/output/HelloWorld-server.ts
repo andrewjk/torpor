@@ -8,10 +8,10 @@ export default function HelloWorld(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <h1>Hello world</h1> `;
 
 	return { body: t_body, head: t_head };

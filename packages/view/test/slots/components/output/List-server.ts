@@ -7,10 +7,10 @@ export default function List(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <ul> <![>`;
 	for (let item of $props.items) {
 		t_body += `<!^> <li> <![>`;

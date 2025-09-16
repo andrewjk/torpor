@@ -6,12 +6,12 @@ export default function Layout() {
 		isFavorites: $page.route === "/profile/@[user]/favorites"
 	});
 
+	@head {
+		<title>{$props.data.profile.username} • Conduit</title>
+	}
+
 	@render {
 		<div class="profile-page">
-			<:head>
-				<title>{$props.data.profile.username} • Conduit</title>
-			</:head>
-
 			<div class="user-info">
 				<div class="container">
 					<div class="row">

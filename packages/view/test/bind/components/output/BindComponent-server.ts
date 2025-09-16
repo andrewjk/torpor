@@ -11,11 +11,11 @@ export default function BindComponent(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <![>`;
 	const t_props_1: any = {};
 	t_props_1["&name"] = $state.name;
@@ -36,10 +36,10 @@ function BindText(
 	$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
-
-	/* User interface */
 	let t_body = "";
 	let t_head = "";
+
+	/* User interface */
 	t_body += ` <input value="${t_attr($props.name) || ""}"> `;
 
 	return { body: t_body, head: t_head };

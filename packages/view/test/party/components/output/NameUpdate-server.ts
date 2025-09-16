@@ -10,14 +10,14 @@ export default function NameUpdate(
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ) {
+	let t_body = "";
+	let t_head = "";
 	let $state = $watch({
 		name: "John"
 	});
 	$state.name = "Jane"
 
 	/* User interface */
-	let t_body = "";
-	let t_head = "";
 	t_body += ` <h1>Hello ${t_fmt($state.name)}</h1> `;
 
 	return { body: t_body, head: t_head };
