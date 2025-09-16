@@ -83,9 +83,11 @@ export default function buildServerControlNode(
 				b.append(`t_body += \`${status.output}\`;`);
 				status.output = "";
 			}
+			//b.append("/* eslint-disable */");
 			b.append("");
 			buildServerScriptNode(node, b);
 			b.append("");
+			//b.append("/* eslint-enable */");
 			break;
 		}
 		case "@console":

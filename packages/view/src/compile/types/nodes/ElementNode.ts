@@ -14,4 +14,7 @@ export type ElementNode = ParentNode & {
 	// This gets set when building
 	fragment?: Fragment;
 	parentName?: string;
+
+	// For <fill> only -- maybe we should make a SpecialNode type?
+	hasSlotProps?: boolean;
 };

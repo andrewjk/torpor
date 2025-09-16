@@ -19,7 +19,7 @@ export default function Await() {
 	@render {
 		@await ($state.guesser) {
 				<p>Hmm...</p>
-		} then (number) {
+		} then (_number) {
 				<p>Is it a number?</p>
 		} catch (ex) {
 				<p class="error">Something went wrong: {ex}!</p>

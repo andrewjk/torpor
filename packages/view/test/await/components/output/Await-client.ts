@@ -65,7 +65,7 @@ export default function Await(
 			});
 			((token) => {
 				$state.guesser
-				.then((number) => {
+				.then((_number) => {
 					if (token === t_await_token_1) {
 						let t_old_range_1 = t_push_range(t_await_range_1);
 						t_run_branch(t_await_range_1, 1, () => {

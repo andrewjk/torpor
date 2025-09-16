@@ -16,7 +16,6 @@ export default function Function(
 
 	function increment() {
 		$state.counter += 1;
-		let x = "";
 	};
 
 	t_body += ` <p> The count is ${t_fmt($state.counter)}. </p> `;

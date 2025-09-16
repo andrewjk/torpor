@@ -28,9 +28,8 @@ export default function Named(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		//@ts-ignore
-		$sprops?: Record<PropertyKey, any>,
-		//@ts-ignore
+		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> The article's body </p> `);
@@ -44,9 +43,8 @@ export default function Named(
 	t_slots_1["header"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		//@ts-ignore
-		$sprops?: Record<PropertyKey, any>,
-		//@ts-ignore
+		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` The article's header `);

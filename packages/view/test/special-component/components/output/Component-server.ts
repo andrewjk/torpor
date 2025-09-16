@@ -24,8 +24,7 @@ export default function Component(
 	t_props_1["self"] = components[$props.self];
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		_$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

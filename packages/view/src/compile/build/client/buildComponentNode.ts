@@ -83,14 +83,14 @@ export default function buildComponentNode(
 	if (componentHasSlots) {
 		b.append(`const ${slotsName}: Record<string, SlotRender> = {};`);
 		for (let slot of node.children) {
-			if (isSpecialNode(slot)) {
+			if (isSpecialNode(slot) && slot.tagName === "fill") {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				const slotParams = [
 					"$sparent: ParentNode",
 					"$sanchor: Node | null",
-					"//@ts-ignore\n$sprops?: Record<PropertyKey, any>",
-					"//@ts-ignore\n$context?: Record<PropertyKey, any>",
+					`${slot.hasSlotProps ? "$sprops" : "_$sprops?"}: Record<PropertyKey, any>`,
+					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
 				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
 

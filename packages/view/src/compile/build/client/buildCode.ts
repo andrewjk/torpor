@@ -82,8 +82,8 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 
 			// TODO: Support other params, like the user setting $context
 			let params = [
-				"$parent: ParentNode",
-				"$anchor: Node | null",
+				`${current.markup ? "$parent" : "_$parent"}: ParentNode`,
+				`${current.markup ? "$anchor" : "_$anchor"}: Node | null`,
 				current.params ??
 					`${current.props?.length ? "$props" : "_$props"}: Record<PropertyKey, any>`,
 				`${current.contextProps?.length || current.needsContext ? "$context" : "_$context"}: Record<PropertyKey, any>`,

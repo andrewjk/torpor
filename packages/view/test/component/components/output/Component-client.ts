@@ -1,11 +1,10 @@
 import $watch from "../../../../src/render/$watch";
-import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
-import t_anchor from "../../../../src/render/nodeAnchor";
 import t_fragment from "../../../../src/render/getFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
-
+import { type SlotRender } from "../../../../src/types/SlotRender";
 import Header from "../output/./Header-client";
 
 export default function Component(
@@ -13,9 +12,8 @@ export default function Component(
 	$anchor: Node | null,
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	_$slots?: Record<string, SlotRender>,
 ) {
-
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -33,5 +31,4 @@ export default function Component(
 	const t_text_1 = t_next(t_comp_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
-
 }

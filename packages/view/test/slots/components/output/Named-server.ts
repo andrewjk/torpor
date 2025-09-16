@@ -14,8 +14,7 @@ export default function Named(
 	t_body += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		_$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -24,8 +23,7 @@ export default function Named(
 		return t_body;
 	}
 	t_slots_1["header"] = (
-		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		_$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

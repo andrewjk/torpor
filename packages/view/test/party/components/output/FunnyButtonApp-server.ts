@@ -19,8 +19,7 @@ export default function FunnyButtonApp(
 	t_body += `<!]><!> <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		_$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

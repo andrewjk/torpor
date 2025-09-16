@@ -50,9 +50,8 @@ export default function Component(
 			t_slots_1["_"] = (
 				$sparent: ParentNode,
 				$sanchor: Node | null,
-				//@ts-ignore
-				$sprops?: Record<PropertyKey, any>,
-				//@ts-ignore
+				_$sprops?: Record<PropertyKey, any>,
+				// @ts-ignore
 				$context?: Record<PropertyKey, any>
 			) => {
 				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` Hello! `);

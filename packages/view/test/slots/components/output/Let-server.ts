@@ -18,8 +18,7 @@ export default function Let(
 	t_props_1["items"] = $props.items;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		$sprops: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

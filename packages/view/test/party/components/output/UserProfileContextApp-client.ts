@@ -1,5 +1,4 @@
 import $run from "../../../../src/render/$run";
-import $unwrap from "../../../../src/render/$unwrap";
 import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -27,7 +26,7 @@ export default function UserProfileContextApp(
 		email: "unicorn42@example.com",
 	});
 
-	// TODO: I think we're supposed to $unwrap this and pass in an update function?
+	// TODO: I think we're supposed to unwrap this and pass in an update function?
 	$context.user = $user;
 
 	/* User interface */

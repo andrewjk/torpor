@@ -94,6 +94,9 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// Add it to the component's slots collection
 			current.slotProps ??= [];
 			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
+		} else if (element.tagName === "fill") {
+			const fillSource = status.source.substring(start, status.i);
+			element.hasSlotProps = /\$sprops\b/.test(fillSource);
 		} else if (element.tagName === "@component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
 			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {

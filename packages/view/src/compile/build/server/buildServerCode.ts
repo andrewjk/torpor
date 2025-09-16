@@ -91,6 +91,11 @@ function buildServerTemplate(
 			marker = i + "/* @start */".length;
 		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
 			b.append(script.substring(marker, i));
+			//let userScript = script.substring(marker, i);
+			//if (/[^\s]/.test(userScript)) {
+			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
+			//	b.append(userScript);
+			//}
 
 			if (current.markup) {
 				const status: BuildServerStatus = {
@@ -116,9 +121,23 @@ function buildServerTemplate(
 
 			marker = i + "/* @render */".length;
 		} else if (script.substring(i, i + "/* @head */".length) === "/* @head */") {
+			b.append(script.substring(marker, i));
+			//let userScript = script.substring(marker, i);
+			//if (/[^\s]/.test(userScript)) {
+			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
+			//	b.append(userScript);
+			//}
+
 			// TODO: need to add e.g. a title to the head, but remove when changing page
 			marker = i + "/* @head */".length;
 		} else if (script.substring(i, i + "/* @style */".length) === "/* @style */") {
+			b.append(script.substring(marker, i));
+			//let userScript = script.substring(marker, i);
+			//if (/[^\s]/.test(userScript)) {
+			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
+			//	b.append(userScript);
+			//}
+
 			if (current.style) {
 				b.append("");
 				b.append("/* Style */");

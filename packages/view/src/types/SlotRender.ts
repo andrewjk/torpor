@@ -1,6 +1,6 @@
 export type SlotRender = (
 	parent: ParentNode,
 	anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	$sprops?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 ) => void;
