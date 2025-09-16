@@ -8,8 +8,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/party/components/HelloWorld";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("minimal template -- mounted", async () => {

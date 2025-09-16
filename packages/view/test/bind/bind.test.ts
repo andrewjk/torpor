@@ -8,8 +8,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/bind/components/BindText";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("bind text value -- mounted", async () => {

@@ -14,10 +14,8 @@ export default function Let(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 	$props ??= $watch({});
 

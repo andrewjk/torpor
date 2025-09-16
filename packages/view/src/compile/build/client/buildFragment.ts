@@ -235,6 +235,7 @@ function declareFragmentVars(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid node type: ${node.type}`);
 		}
 	}
@@ -599,6 +600,7 @@ function declareSpecialFragmentVars(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid special node: ${node.tagName}`);
 		}
 	}

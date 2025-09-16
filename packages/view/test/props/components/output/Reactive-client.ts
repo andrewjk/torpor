@@ -14,10 +14,8 @@ export default function Reactive(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 
 	let $state = $watch({ text: "before" })
@@ -50,10 +48,8 @@ function Child(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 	$props ??= $watch({});
 

@@ -36,6 +36,7 @@ export default async function nodeMessageToRequest(
 	return new Request(url, {
 		method: req.method,
 		headers: headers,
+		// eslint-disable-next-line no-invalid-fetch-options
 		body: body,
 		// @ts-ignore this is needed for using a Readable for some reason
 		duplex: "half",

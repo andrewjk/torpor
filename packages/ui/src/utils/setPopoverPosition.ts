@@ -42,6 +42,7 @@ export default function setPopoverPosition(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid MenuPopout side: ${side}`);
 		}
 	}
@@ -68,6 +69,7 @@ export default function setPopoverPosition(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid MenuPopout side: ${side}`);
 		}
 	}
@@ -94,6 +96,7 @@ function setVerticalAlignment(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid Popout alignment: ${alignment}`);
 		}
 	}
@@ -126,6 +129,7 @@ function setHorizontalAlignment(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid Popout alignment: ${alignment}`);
 		}
 	}

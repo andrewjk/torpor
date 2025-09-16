@@ -9,8 +9,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/party/components/ColorSelect";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("input select -- mounted", async () => {

@@ -11,6 +11,7 @@ export default function clearRange(range: Range): void {
 
 	// Wait for animations, if any, then clear the range's nodes
 	if (animations.length) {
+		// eslint-disable-next-line
 		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	} else {
 		clearNodes(range);

@@ -38,6 +38,7 @@ export default function connectMiddleware(
 
 			const cnext = async (error?: unknown) => {
 				if (error) {
+					// eslint-disable-next-line no-base-to-string
 					reject(error instanceof Error ? error : new Error(String(error)));
 				} else {
 					// TODO: Can we nest the next functions less? This is a bit weird
@@ -53,7 +54,7 @@ export default function connectMiddleware(
 					resolve();
 				}
 			} catch (e) {
-				cnext(e);
+				await cnext(e);
 			}
 		});
 	};

@@ -10,12 +10,9 @@ import Header from "../output/./Header-client"
 export default function Basic(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 
 	/* User interface */

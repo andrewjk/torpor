@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsgo --noEmit && tb --build",
-		"check": "tsgo --noEmit",
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
 		"test": "vitest"
 	},
 	"keywords": [],
@@ -26,6 +26,7 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@typescript/native-preview": "7.0.0-dev.20250914.1",
 		"happy-dom": "^18.0.1",
+		"oxlint-tsgolint": "^0.2.0",
 		"typescript": "^5.9.2",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^3.2.4"

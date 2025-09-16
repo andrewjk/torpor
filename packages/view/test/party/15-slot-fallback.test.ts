@@ -8,8 +8,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/party/components/FunnyButtonApp";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("slot fallback -- mounted", async () => {

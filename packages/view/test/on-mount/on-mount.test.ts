@@ -7,8 +7,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/on-mount/components/OnMount";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test(":onmount -- mounted", async () => {
@@ -16,7 +16,7 @@ test(":onmount -- mounted", async () => {
 	const component = await importComponent(componentPath, "client");
 	mountComponent(container, component);
 
-	check(container);
+	await check(container);
 });
 
 test(":onmount -- hydrated", async () => {
@@ -25,7 +25,7 @@ test(":onmount -- hydrated", async () => {
 	const serverComponent = await importComponent(componentPath, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	check(container);
+	await check(container);
 });
 
 async function check(container: HTMLElement) {

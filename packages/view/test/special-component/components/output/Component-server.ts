@@ -5,10 +5,8 @@ import SmallTitle from "../output/./SmallTitle-server";
 
 export default function Component(
 	$props,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

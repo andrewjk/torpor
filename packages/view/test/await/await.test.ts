@@ -9,8 +9,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/await/components/Await";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("await -- mounted", async () => {

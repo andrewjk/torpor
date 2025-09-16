@@ -18,10 +18,8 @@ export default function Text(
 		value: string;
 		empty: string;
 	},
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 	$props ??= $watch({});
 

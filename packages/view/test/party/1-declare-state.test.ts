@@ -8,8 +8,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/party/components/Name";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("declare state -- mounted", async () => {

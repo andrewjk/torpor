@@ -5,10 +5,8 @@ import List from "../output/./List-server"
 
 export default function Let(
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

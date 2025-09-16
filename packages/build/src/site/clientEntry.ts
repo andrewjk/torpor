@@ -108,7 +108,7 @@ window.addEventListener("popstate", async () => {
 });
 
 // Do the initial navigation and hydration
-navigateToLocation(document.location, true);
+await navigateToLocation(document.location, true);
 
 async function navigateToLocation(location: Location, firstTime = false) {
 	return await navigate(new URL(location.toString()), firstTime);

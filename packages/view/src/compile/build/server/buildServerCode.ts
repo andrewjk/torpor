@@ -64,9 +64,9 @@ function buildServerTemplate(
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				current.params ??
-					`${current.props?.length ? "$props" : "// @ts-ignore\n$props?"}: Record<PropertyKey, any>`,
-				`${current.contextProps?.length ? "" : "// @ts-ignore\n"}$context?: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "" : "// @ts-ignore\n"}$slots?: Record<string, ServerSlotRender>`,
+					`${current.props?.length ? "$props" : "_$props"}: Record<PropertyKey, any>`,
+				`${current.contextProps?.length || current.needsContext ? "$context" : "_$context"}: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "$slots" : "_$slots?"}: Record<string, ServerSlotRender>`,
 			];
 			b.append(params.join(",\n"));
 

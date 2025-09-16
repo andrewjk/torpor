@@ -8,10 +8,8 @@ export default function Switch(
 		/** The value to switch on */
 		value: number
 	},
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

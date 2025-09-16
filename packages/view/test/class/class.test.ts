@@ -9,8 +9,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/class/components/Class";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 interface State {

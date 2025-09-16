@@ -9,8 +9,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/for/components/ForEscape";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("for escape -- mounted", async () => {

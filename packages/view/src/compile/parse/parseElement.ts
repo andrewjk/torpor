@@ -19,6 +19,9 @@ import consumeSpace from "./utils/consumeSpace";
 import isSpaceChar from "./utils/isSpaceChar";
 
 export default function parseElement(status: ParseStatus): ElementNode {
+	const current = status.components.at(-1);
+	if (!current) throw new Error("No component in stack");
+
 	const start = status.i;
 
 	const element = parseTag(status);
@@ -33,7 +36,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
-		const current = status.components[status.components.length - 1];
 		current.stack ??= [];
 		current.stack.push(element);
 
@@ -70,7 +72,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			}
 		}
 
-		current.stack.pop();
+		current!.stack.pop();
 	}
 
 	// If this is a component element, add a default <:fill> node
@@ -78,6 +80,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	if (!element.tagName.startsWith(":") && /[A-Z]/.test(element.tagName[0])) {
 		element.type = "component";
 		slottifyChildNodes(element);
+		current.needsContext = true;
 	}
 
 	if (isSpecialNode(element)) {
@@ -86,9 +89,9 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// content. Anchors will be created for <:slot> nodes and fragments will
 			// be created for the <:fill> content
 			slottifyChildNodes(element);
+			current.needsContext = true;
 
 			// Add it to the component's slots collection
-			const current = status.components[status.components.length - 1];
 			current.slotProps ??= [];
 			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
 		} else if (element.tagName === ":component") {
@@ -96,6 +99,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 				element.type = "component";
 				slottifyChildNodes(element);
+				current.needsContext = true;
 
 				const selfValue = selfAttribute.value;
 				const replace: ControlNode = {

@@ -68,9 +68,9 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
-	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
+	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
 
 	let currentIndex = 0;
 	let current = template.components[0];
@@ -85,9 +85,9 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				"$parent: ParentNode",
 				"$anchor: Node | null",
 				current.params ??
-					`${current.props?.length ? "$props" : "// @ts-ignore\n$props?"}: Record<PropertyKey, any>`,
-				`${current.contextProps?.length ? "" : "// @ts-ignore\n"}$context?: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "" : "// @ts-ignore\n"}$slots?: Record<string, SlotRender>`,
+					`${current.props?.length ? "$props" : "_$props"}: Record<PropertyKey, any>`,
+				`${current.contextProps?.length || current.needsContext ? "$context" : "_$context"}: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "$slots" : "_$slots?"}: Record<string, SlotRender>`,
 			];
 			b.append(params.join(",\n"));
 

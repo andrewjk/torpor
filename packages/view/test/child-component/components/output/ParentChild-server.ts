@@ -2,12 +2,9 @@ import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function ParentChild(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	let t_body = "";
 	let t_head = "";
@@ -27,10 +24,8 @@ export default function ParentChild(
 
 function Child(
 	$props: { name: string },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

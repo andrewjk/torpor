@@ -5,7 +5,7 @@ export type TemplateComponent = {
 	start?: number;
 	/** The component's name */
 	name?: string;
-	/** Whether the component is defined in a default function */
+	/** Whether the component is defined with a default function */
 	default?: boolean;
 	/** Params declared by the user in the component's function */
 	params?: string;
@@ -16,6 +16,7 @@ export type TemplateComponent = {
 	props?: string[];
 	/** $context props that are used in the component's function */
 	contextProps?: string[];
+	needsContext?: boolean;
 	/** $slot props that are used in the component's function */
 	slotProps?: string[];
 };

@@ -45,9 +45,9 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		} else {
 			// Show an error component
 			let name = id
-				.split(/[\\\/]/)
+				.split(/[\\/]/)
 				.at(-1)
-				?.replace(/\.torp$/, "")!;
+				.replace(/\.torp$/, "")!;
 			let errorMessages = parsed.errors.map((e) => `${e.line},${e.column}: ${e.message}`);
 			console.log(`\nERRORS: ${id}\n======\n${errorMessages.join("\n")}`);
 			let errorCode = `

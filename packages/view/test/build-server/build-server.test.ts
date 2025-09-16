@@ -29,6 +29,7 @@ IfNested;
 	// Strip TypeScript
 	code = transform(code, { transforms: ["typescript"] }).code;
 
+	// eslint-disable-next-line
 	const html = eval(code)(state).body;
 
 	const container = document.createElement("div");

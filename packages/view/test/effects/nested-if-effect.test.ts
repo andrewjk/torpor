@@ -11,8 +11,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/effects/components/NestedIf";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 interface State {

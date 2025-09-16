@@ -11,8 +11,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/effects/components/If";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("if effect -- mounted", async () => {

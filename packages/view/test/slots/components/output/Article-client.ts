@@ -9,11 +9,9 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Article(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	$slots: Record<string, SlotRender>
 ) {
 
 	/* User interface */

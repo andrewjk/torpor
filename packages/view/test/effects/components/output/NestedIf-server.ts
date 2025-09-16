@@ -2,10 +2,8 @@ import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 
 export default function NestedIf(
 	$props: { condition: boolean, counter: number },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

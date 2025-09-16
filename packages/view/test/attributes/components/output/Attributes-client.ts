@@ -11,10 +11,8 @@ export default function Attributes(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 	$props ??= $watch({});
 

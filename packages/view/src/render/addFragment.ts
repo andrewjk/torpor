@@ -70,14 +70,17 @@ export default function addFragment(
 
 		// Set the active range for each animation so it will get attached to
 		// the right one and set it back afterwards
+		// Don't await animations
 		for (let animation of context.stashedAnimations) {
 			context.activeRange = animation.range;
 			$run(function addFragmentAnimation() {
 				if (animation.in) {
+					// eslint-disable-next-line
 					animate(animation.el, true, animation.in.keyframes, animation.in.options);
 				}
 				if (animation.out) {
 					return () => {
+						// eslint-disable-next-line
 						animate(animation.el, false, animation.out!.keyframes, animation.out!.options);
 					};
 				}

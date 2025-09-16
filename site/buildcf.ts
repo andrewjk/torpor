@@ -8,4 +8,4 @@ import { run } from "@torpor/build/run";
 // So instead we build from code...
 
 const workingDir = process.cwd();
-run(workingDir, "build");
+await run(workingDir, "build");

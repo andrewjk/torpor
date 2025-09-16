@@ -9,8 +9,8 @@ import { type ArrayState } from "./ArrayState";
 
 const componentPath = "./test/watch-array/components/Array";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("array unshift -- mounted", async () => {

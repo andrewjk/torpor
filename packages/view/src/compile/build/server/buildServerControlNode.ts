@@ -94,6 +94,7 @@ export default function buildServerControlNode(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid operation: ${node.operation}`);
 		}
 	}

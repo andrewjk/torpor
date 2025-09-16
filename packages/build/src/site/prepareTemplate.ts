@@ -11,7 +11,7 @@ export default function prepareTemplate(template: string, clientScript: string):
 
 	// Put %COMPONENT_BODY% inside <div id="app"></div>
 	// This is where the component's HTML will go
-	let bodyStart = regexIndexOf(result, /\<div\s+id=("app"|'app'|app)\s+/);
+	let bodyStart = regexIndexOf(result, /<div\s+id=("app"|'app'|app)\s+/);
 	bodyStart = result.indexOf(">", bodyStart) + 1;
 	let bodyEnd = result.indexOf("</div>", bodyStart);
 	if (bodyStart === -1 || bodyEnd === -1) {

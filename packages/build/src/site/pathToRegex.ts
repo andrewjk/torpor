@@ -4,7 +4,7 @@ export default function pathToRegex(path: string): RegExp {
 			.split("/")
 			// Replace `[slug]` with a grouped match so we can pull out params
 			.map((p) => {
-				return p.replace(/\[([^\/]+?)\]/, "(?<$1>[^\\/]+?)");
+				return p.replace(/\[([^/]+?)\]/, "(?<$1>[^\\/]+?)");
 			})
 			.join("\\/")
 			// Replace globs with regex syntax

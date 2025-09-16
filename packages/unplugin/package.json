@@ -63,7 +63,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsdown",
 		"build:watch": "tsdown --watch src",
-		"check": "tsgo --noEmit",
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
 		"lint": "eslint .",
 		"play": "npm -C playground run dev",
 		"prepublishOnly": "npm run build",
@@ -115,6 +115,7 @@
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
 		"nodemon": "^3.1.10",
+		"oxlint-tsgolint": "^0.2.0",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
 		"rollup": "^4.50.1",

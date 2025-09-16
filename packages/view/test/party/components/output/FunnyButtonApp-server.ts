@@ -3,12 +3,9 @@ import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
 import FunnyButton from "../output/./FunnyButton-server";
 
 export default function FunnyButtonApp(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	let t_body = "";
 	let t_head = "";

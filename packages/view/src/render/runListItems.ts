@@ -79,7 +79,7 @@ export default function runListItems(
 		} else if (oldStartItem.key === newEndItem.key) {
 			// Move to the end
 			//console.log("move", oldStartItem.key, "to the end");
-			moveRange(parent, oldStartItem, oldEndItem.endNode?.nextSibling!);
+			moveRange(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
 			transferRangeMarkers(oldStartItem, newEndItem);
 			oldStartItem = oldItems[++oldStartIndex];
 			newEndItem = newItems[--newEndIndex];
@@ -157,7 +157,7 @@ export default function runListItems(
 				//console.log("create", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data);
 				create(newStartItem, before!);
-				before = newStartItem.endNode?.nextSibling!;
+				before = newStartItem.endNode!.nextSibling!;
 			}
 		} else {
 			// The new list is exhausted; process old list removals

@@ -12,4 +12,4 @@ async function run() {
 	console.log("Done\n");
 }
 
-run();
+await run();

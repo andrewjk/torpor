@@ -8,7 +8,7 @@
 		"dev": "tb --dev",
 		"build": "tsgo --noEmit && tb --build",
 		"build:cf": "tsx buildcf.ts",
-		"check": "tsgo --noEmit"
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit"
 	},
 	"keywords": [],
 	"author": "",
@@ -24,6 +24,7 @@
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20250914.1",
+		"oxlint-tsgolint": "^0.2.0",
 		"tsx": "^4.20.5",
 		"typescript": "^5.9.2",
 		"wrangler": "^4.34.0"

@@ -23,7 +23,7 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsdown && tsx ./scripts/copyToRepl.ts",
 		"build:watch": "tsdown --watch",
-		"check": "tsgo --noEmit",
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
 		"test": "vitest",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
 		"bench": "tsx ./bench/bench.ts",
@@ -42,6 +42,7 @@
 		"@typescript/native-preview": "7.0.0-dev.20250914.1",
 		"fast-glob": "^3.3.3",
 		"jsdom": "^26.1.0",
+		"oxlint-tsgolint": "^0.2.0",
 		"sucrase": "^3.35.0",
 		"tinybench": "^5.0.1",
 		"tsdown": "^0.15.1",

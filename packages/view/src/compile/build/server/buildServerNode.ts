@@ -43,6 +43,7 @@ export default function buildServerNode(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid node type: ${node.type}`);
 		}
 	}

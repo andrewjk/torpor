@@ -4,10 +4,8 @@ import t_fmt from "../../../../src/render/formatText";
 
 export default function Reactive(
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	let t_body = "";
 	let t_head = "";
@@ -28,10 +26,8 @@ export default function Reactive(
 
 function Child(
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	$props ??= {};
 	let t_body = "";

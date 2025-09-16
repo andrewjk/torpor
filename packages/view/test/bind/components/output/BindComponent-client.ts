@@ -13,12 +13,9 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function BindComponent(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 
 	let $state = $watch({ name: "Alice", selected: 1 });
@@ -56,10 +53,8 @@ function BindText(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 	$props ??= $watch({});
 

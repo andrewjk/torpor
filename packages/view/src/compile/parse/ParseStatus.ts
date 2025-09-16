@@ -34,6 +34,7 @@ export interface ParseComponentStatus {
 	props?: string[];
 	/** $context props that are used in the component's function */
 	contextProps?: string[];
+	needsContext?: boolean;
 	/** $slot props that are used in the component's function */
 	slotProps?: string[];
 }

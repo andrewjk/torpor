@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "tb --dev",
 		"build": "tsgo --noEmit && tb --build",
-		"check": "tsgo --noEmit"
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit"
 	},
 	"keywords": [],
 	"author": "",
@@ -19,6 +19,7 @@
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20250914.1",
+		"oxlint-tsgolint": "^0.2.0",
 		"typescript": "^5.8.2"
 	}
 }

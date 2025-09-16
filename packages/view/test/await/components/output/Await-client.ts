@@ -18,12 +18,9 @@ import t_run_control from "../../../../src/render/runControl";
 export default function Await(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	_$props: Record<PropertyKey, any>,
+	_$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>
 ) {
 
 	// Use the $watch function to declare reactive state

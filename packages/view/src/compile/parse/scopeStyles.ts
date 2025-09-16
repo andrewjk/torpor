@@ -23,13 +23,14 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 		let scopeStyles = selectors.includes(node.tagName);
 		if (!scopeStyles) {
 			for (let a of node.attributes) {
-				if (a.name === "class" || a.name === ":class") {
+				if ((a.name === "class" || a.name === ":class") && a.reactive) {
 					// NOTE: :class is obsolete, but let's keep it for a version or two
+					// Any reactivity in a class attribute makes it scoped,
+					// because we can't tell what's going on in there
 					scopeStyles = true;
 				} else if (a.name === "id" && a.value) {
 					scopeStyles = selectors.includes(`#${trimQuotes(a.value)}`);
 				} else if (a.name === "class" && a.value) {
-					// TODO: Never getting here?
 					scopeStyles = selectors.includes(`.${trimQuotes(a.value)}`);
 				}
 				if (scopeStyles) {

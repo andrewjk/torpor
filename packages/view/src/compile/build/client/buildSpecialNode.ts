@@ -30,6 +30,7 @@ export default function buildSpecialNode(
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid special node: ${node.tagName}`);
 		}
 	}

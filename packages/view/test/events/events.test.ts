@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, expect, test, vi } from "vitest";
+import { beforeAll, expect, test } from "vitest";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -9,8 +9,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/events/components/Increment";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("events -- mounted", async () => {
@@ -18,7 +18,7 @@ test("events -- mounted", async () => {
 	const component = await importComponent(componentPath, "client");
 	mountComponent(container, component);
 
-	check(container);
+	await check(container);
 });
 
 test("events -- hydrated", async () => {
@@ -27,16 +27,10 @@ test("events -- hydrated", async () => {
 	const serverComponent = await importComponent(componentPath, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	check(container);
+	await check(container);
 });
 
 async function check(container: HTMLElement) {
-	// HACK: this useFakeTimers call seems to prevent intermittent exceptions
-	// being thrown
-	vi.useFakeTimers({
-		shouldAdvanceTime: true,
-	});
-
 	expect(queryByText(container, "The count is 0.")).not.toBeNull();
 
 	const increment = Array.from(container.children).find((e) => e.id === "increment");

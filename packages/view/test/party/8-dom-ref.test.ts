@@ -7,8 +7,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/party/components/InputFocused";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("dom ref -- mounted", async () => {
@@ -16,7 +16,7 @@ test("dom ref -- mounted", async () => {
 	const component = await importComponent(componentPath, "client");
 	mountComponent(container, component);
 
-	check(container);
+	await check(container);
 });
 
 test("dom ref -- hydrated", async () => {
@@ -25,7 +25,7 @@ test("dom ref -- hydrated", async () => {
 	const serverComponent = await importComponent(componentPath, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	check(container);
+	await check(container);
 });
 
 async function check(container: HTMLElement) {

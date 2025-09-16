@@ -61,6 +61,7 @@ ${template.components.find((t) => t.default)!.name};
 		console.log("===");
 	}
 
+	// eslint-disable-next-line
 	const html = eval(code)(state).body.replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");

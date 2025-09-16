@@ -5,12 +5,9 @@ import t_fmt from "../../../../src/render/formatText";
 import AnswerButton from "../output/./AnswerButton-server";
 
 export default function AnswerButtonApp(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
+	_$props: Record<PropertyKey, any>,
+	$context: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>
 ) {
 	let t_body = "";
 	let t_head = "";

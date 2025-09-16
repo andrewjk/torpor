@@ -33,4 +33,4 @@ async function run() {
 	await fs.writeFile(destFile, source);
 }
 
-run();
+await run();

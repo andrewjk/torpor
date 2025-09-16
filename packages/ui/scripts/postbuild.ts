@@ -58,8 +58,8 @@ async function run() {
 	}
 
 	// Move all utils/*.ts files into the dest folder
-	moveUtils(distFolder, "utils");
-	moveUtils(distFolder, "mount");
+	await moveUtils(distFolder, "utils");
+	await moveUtils(distFolder, "mount");
 }
 
 async function moveUtils(distFolder: string, folderName: string) {
@@ -77,4 +77,4 @@ async function moveUtils(distFolder: string, folderName: string) {
 	}
 }
 
-run();
+await run();

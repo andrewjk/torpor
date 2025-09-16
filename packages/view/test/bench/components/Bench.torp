@@ -98,9 +98,9 @@ export default function Bench() {
 				label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
 		}
 
-		function buildData(count = 1000) {
-				const data = new Array(count);
-				for (let i = 0; i < count; i++) {
+		function buildData(length = 1000) {
+				const data = Array.from({ length })
+				for (let i = 0; i < length; i++) {
 						data[i] = $watch(new Item());
 				}
 				return data;

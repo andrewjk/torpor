@@ -64,12 +64,16 @@
 	"scripts": {
 		"build": "tsgo --noEmit && tsup",
 		"build:fix": "esno scripts/postbuild.ts",
-		"check": "tsgo --noEmit",
+		"check": "pnpm dlx oxlint --type-aware && tsgo --noEmit",
 		"test": "vitest"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
+	"dependencies": {
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^"
+	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.8.0",
@@ -82,12 +86,9 @@
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
 		"jsdom": "^26.1.0",
+		"oxlint-tsgolint": "^0.2.0",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.2",
 		"vitest": "^3.2.4"
-	},
-	"dependencies": {
-		"@torpor/unplugin": "workspace:^",
-		"@torpor/view": "workspace:^"
 	}
 }

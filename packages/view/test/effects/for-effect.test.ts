@@ -10,8 +10,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/effects/components/For";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 test("for effect -- mounted", async () => {

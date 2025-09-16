@@ -79,6 +79,7 @@ export default function buildControlNode(node: ControlNode, status: BuildStatus,
 			break;
 		}
 		default: {
+			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid operation: ${node.operation}`);
 		}
 	}

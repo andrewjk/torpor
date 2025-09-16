@@ -6,8 +6,8 @@ import mountComponent from "../mountComponent";
 
 const componentPath = "./test/console/components/Console";
 
-beforeAll(() => {
-	buildOutputFiles(componentPath);
+beforeAll(async () => {
+	await buildOutputFiles(componentPath);
 });
 
 describe("console", () => {
