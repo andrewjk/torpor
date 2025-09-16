@@ -7,6 +7,7 @@ import { type TemplateNode } from "../../types/nodes/TemplateNode";
 import { type TextNode } from "../../types/nodes/TextNode";
 import isControlNode from "../../types/nodes/isControlNode";
 import isElementNode from "../../types/nodes/isElementNode";
+import isSpecialNode from "../../types/nodes/isSpecialNode";
 import isTextNode from "../../types/nodes/isTextNode";
 import Builder from "../../utils/Builder";
 import isReactive from "../../utils/isReactive";
@@ -555,6 +556,10 @@ function declareSpecialFragmentVars(
 		case "slot":
 		case "fill": {
 			for (let [i, child] of node.children.entries()) {
+				// Don't build the fill node twice
+				if (node.tagName === "slot" && isSpecialNode(child) && child.tagName === "fill") {
+					continue;
+				}
 				declareFragmentVars(
 					fragment,
 					child,

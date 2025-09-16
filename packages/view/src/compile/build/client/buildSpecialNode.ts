@@ -17,16 +17,16 @@ export default function buildSpecialNode(
 			buildSlotNode(node, status, b);
 			break;
 		}
+		case "fill": {
+			// HACK:
+			break;
+		}
 		case "@element": {
 			buildElementNode(node, status, b, parentName, root);
 			break;
 		}
 		case "@component": {
 			buildComponentNode(node, status, b, root);
-			break;
-		}
-		case "fill": {
-			// HACK:
 			break;
 		}
 		default: {

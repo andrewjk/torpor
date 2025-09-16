@@ -15,16 +15,16 @@ export default function buildServerSpecialNode(
 			buildServerSlotNode(node, status, b);
 			break;
 		}
+		case "fill": {
+			// HACK:
+			break;
+		}
 		case "@element": {
 			buildServerElementNode(node, status, b);
 			break;
 		}
 		case "@component": {
 			buildServerComponentNode(node, status, b);
-			break;
-		}
-		case "fill": {
-			// HACK:
 			break;
 		}
 		default: {
