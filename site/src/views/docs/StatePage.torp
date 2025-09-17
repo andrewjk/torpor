@@ -36,6 +36,10 @@ export default function Component() {
 			in your markup.
 		</p>
 		<p>
+			Objects created with $watch are deeply reactive, which means that their child objects
+			will also update the UI when their properties are changed.
+		</p>
+		<p>
 			Dependent state can be created using object properties:
 		</p>
 		<pre><code>{`
@@ -93,16 +97,32 @@ export default function Component() {
 
 		<h2>The $mount function</h2>
 		<p>
-			The <code>$mount</code> function is like the $run function, but it delays its first run until
-			after the @render block has been completed and all elements have been mounted.
+			The <code>$mount</code> function is like the $run function, but it delays its first
+			run until after the @render block has been completed and all elements have been mounted.
 			It is automatically imported into your component if used.
 		</p>
 
-		<h2>The $unwrap function</h2>
+		<h2>Other functions</h2>
 		<p>
-			The <code>$unwrap</code> function returns the underlying object from a state object returned
-			from $watch.
-			It is automatically imported into your component if used.
+			Occasionally, you may also need to use the <code>$unwrap</code>, <code>$peek</code>
+			or <code>$batch</code> functions, all of which are automatically imported into your
+			component if used.
+		</p>
+
+		<p>
+			The <code>$unwrap</code> function returns the underlying object from a state object
+			created with $watch. It may be handy when passing a state object to an external
+			function that doesn't like to deal with Proxy objects.
+		</p>
+
+		<p>
+			The <code>$peek</code> function wraps some code to prevent it from updating the UI,
+			even if reactive values are accessed.
+		</p>
+
+		<p>
+			The <code>$batch</code> function wraps some code to prevent it from updating the UI
+			until the end, where all UI will be updated at once.
 		</p>
 
 		<h2>Props</h2>

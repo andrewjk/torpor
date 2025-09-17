@@ -1,8 +1,10 @@
-import { type ProxyPropData } from "./ProxyPropData";
+import { type Computed } from "./Computed";
+import { type ProxySignal } from "./ProxySignal";
 
+// TODO: Rename to DataSource?
 export type ProxyData = {
 	target: Record<PropertyKey, any>;
 	isArray: boolean;
 	shallow: boolean;
-	propData: Map<PropertyKey, ProxyPropData | null>;
+	signals: Map<PropertyKey, ProxySignal | Computed | null>;
 };

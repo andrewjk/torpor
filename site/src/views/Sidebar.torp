@@ -11,6 +11,7 @@ export default function Sidebar() {
 				<li><a href="/docs/components">Components</a></li>
 				<li><a href="/docs/markup">Markup</a></li>
 				<li><a href="/docs/state">State</a></li>
+				<li><a href="/docs/reactivity">Reactivity</a></li>
 				<li><a href="/docs/binding">Binding</a></li>
 				<li><a href="/docs/styles">Styles</a></li>
 				<li><a href="/docs/special-tags">Special Tags</a></li>

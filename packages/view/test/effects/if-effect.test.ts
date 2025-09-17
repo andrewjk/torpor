@@ -40,8 +40,8 @@ function check(container: HTMLElement, state: any) {
 	expect(queryByText(container, "It's small")).not.toBeNull();
 
 	// `counter`
-	expect(proxyData(state).propData.size).toBe(1);
-	//expect(Object.keys(proxyData(state).propData).length).toBe(1);
+	expect(proxyData(state).signals.size).toBe(1);
+	//expect(Object.keys(proxyData(state).signals).length).toBe(1);
 }
 
 function proxyData(object: any): ProxyData {

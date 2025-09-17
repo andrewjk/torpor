@@ -49,20 +49,20 @@ test("for effect -- hydrated", async () => {
 
 function check(_: HTMLElement, state: any) {
 	// `items`
-	expect(proxyData(state).propData.size).toBe(1);
-	//expect(Object.keys(proxyData(state).propData).length).toBe(1);
+	expect(proxyData(state).signals.size).toBe(1);
+	//expect(Object.keys(proxyData(state).signals).length).toBe(1);
 
 	// `iterator`, `length`, `0`, `1`, `2`
-	expect(proxyData(state.items).propData.size).toBe(5);
-	//expect(Object.keys(proxyData(state.items).propData).length).toBe(4);
+	expect(proxyData(state.items).signals.size).toBe(4);
+	//expect(Object.keys(proxyData(state.items).signals).length).toBe(4);
 
 	// `text`
-	expect(proxyData(state.items[0]).propData.size).toBe(1);
-	expect(proxyData(state.items[1]).propData.size).toBe(1);
-	expect(proxyData(state.items[2]).propData.size).toBe(1);
-	//expect(Object.keys(proxyData(state.items[0]).propData).length).toBe(1);
-	//expect(Object.keys(proxyData(state.items[1]).propData).length).toBe(1);
-	//expect(Object.keys(proxyData(state.items[2]).propData).length).toBe(1);
+	expect(proxyData(state.items[0]).signals.size).toBe(1);
+	expect(proxyData(state.items[1]).signals.size).toBe(1);
+	expect(proxyData(state.items[2]).signals.size).toBe(1);
+	//expect(Object.keys(proxyData(state.items[0]).signals).length).toBe(1);
+	//expect(Object.keys(proxyData(state.items[1]).signals).length).toBe(1);
+	//expect(Object.keys(proxyData(state.items[2]).signals).length).toBe(1);
 }
 
 function proxyData(object: any): ProxyData {

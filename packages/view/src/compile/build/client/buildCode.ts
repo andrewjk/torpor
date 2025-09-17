@@ -7,9 +7,12 @@ import buildNode from "./buildNode";
 
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
-	$unwrap: 'import { $unwrap } from "${folder}";',
+	$cache: 'import { $cache } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
+	$unwrap: 'import { $unwrap } from "${folder}";',
+	$peek: 'import { $peek } from "${folder}";',
+	$batch: 'import { $batch } from "${folder}";',
 	t_range: 'import { t_range } from "${folder}";',
 	t_push_range: 'import { t_push_range } from "${folder}";',
 	t_pop_range: 'import { t_pop_range } from "${folder}";',
@@ -68,9 +71,12 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
+	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
+	if (/\$peek\b/.test(script)) imports.add("$peek");
+	if (/\$batch\b/.test(script)) imports.add("$batch");
 
 	let currentIndex = 0;
 	let current = template.components[0];

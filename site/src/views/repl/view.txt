@@ -1,4 +1,266 @@
 
+const context = {
+	activeTarget: null,
+	previousEffect: null,
+	extent: 0,
+	batch: 0,
+	batchOperation: 0,
+	registerComputed: null,
+	firstEffectToRun: null,
+	firstSignalToUpdate: null,
+	activeRange: null,
+	mountEffects: [],
+	stashedEvents: [],
+	stashedAnimations: [],
+	hydrationNode: null
+};
+var context_default = context;
+const SIGNAL_TYPE = 0;
+const COMPUTED_TYPE = 1;
+const EFFECT_TYPE = 2;
+function clearSources(target) {
+	let previousSub = null;
+	for (let clearSub = target.firstSource; clearSub !== null; clearSub = clearSub.nextSource) if (target.didError || !clearSub.active) {
+		if (previousSub === null) target.firstSource = clearSub.nextSource;
+		else previousSub.nextSource = clearSub.nextSource;
+		if (clearSub.previousTarget === null) {
+			if (clearSub.source.firstTarget === clearSub) clearSub.source.firstTarget = clearSub.nextTarget;
+		} else clearSub.previousTarget.nextTarget = clearSub.nextTarget;
+	} else {
+		clearSub.recalc = false;
+		previousSub = clearSub;
+	}
+}
+function deactivateSources(target) {
+	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) sourceSub.active = false;
+}
+function trackEffect(signal) {
+	const target = context_default.activeTarget;
+	if (target !== null) {
+		let sub = null;
+		let lastSub = null;
+		for (let nextSub = signal.firstTarget; nextSub !== null; nextSub = nextSub.nextTarget) {
+			lastSub = nextSub;
+			if (nextSub.target === target) {
+				sub = nextSub;
+				break;
+			}
+		}
+		if (sub === null) {
+			sub = {
+				source: signal,
+				target,
+				previousTarget: lastSub,
+				nextTarget: null,
+				nextSource: null,
+				active: true,
+				recalc: false
+			};
+			if (lastSub === null) signal.firstTarget = sub;
+			else lastSub.nextTarget = sub;
+			if (target.firstSource === null) target.firstSource = sub;
+			else {
+				let lastEffectSub = target.firstSource;
+				for (let nextSub = lastEffectSub.nextSource; nextSub !== null; nextSub = nextSub.nextSource) lastEffectSub = nextSub;
+				lastEffectSub.nextSource = sub;
+			}
+		} else sub.active = true;
+	}
+}
+function runComputed(computed) {
+	const oldActiveTarget = context_default.activeTarget;
+	computed.running = true;
+	computed.didError = false;
+	try {
+		context_default.activeTarget = computed;
+		computed.value = computed.run();
+	} catch (err) {
+		computed.didError = true;
+		computed.value = err;
+		throw err;
+	} finally {
+		context_default.activeTarget = oldActiveTarget;
+		computed.running = false;
+	}
+	trackEffect(computed);
+	return computed.value;
+}
+function checkComputed(computed) {
+	let rerun = checkSources(computed);
+	let changed = false;
+	if (rerun) {
+		deactivateSources(computed);
+		const oldValue = computed.value;
+		runComputed(computed);
+		changed = computed.value !== oldValue;
+		clearSources(computed);
+	}
+	computed.recalc = false;
+	if (!changed) for (let targetSub = computed.firstTarget; targetSub !== null; targetSub = targetSub.nextTarget) {
+		targetSub.active = true;
+		targetSub.recalc = false;
+	}
+	return changed;
+}
+function checkSources(target) {
+	let haveComputed = false;
+	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc) if (sourceSub.source.type === SIGNAL_TYPE) return true;
+	else if (sourceSub.source.recalc) haveComputed = true;
+	else return true;
+	if (haveComputed) {
+		for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc && sourceSub.source.type === COMPUTED_TYPE && sourceSub.source.recalc) {
+			const oldActiveTarget = context_default.activeTarget;
+			context_default.activeTarget = target;
+			const recalc = checkComputed(sourceSub.source);
+			context_default.activeTarget = oldActiveTarget;
+			if (recalc) return true;
+		}
+	}
+	return false;
+}
+function runCleanups(effect) {
+	let effectToClean = effect;
+	for (let i = 0; i < effect.extent; i++) {
+		if (typeof effectToClean.cleanup === "function") {
+			const oldActiveTarget = context_default.activeTarget;
+			context_default.activeTarget = null;
+			try {
+				effectToClean.cleanup();
+			} catch (err) {
+				effectToClean.didError = true;
+				clearSources(effectToClean);
+				throw err;
+			} finally {
+				effectToClean.cleanup = void 0;
+				context_default.activeTarget = oldActiveTarget;
+			}
+		}
+		const nextEffect = effectToClean.nextEffect;
+		if (i !== 0 && effect.nextEffectToRun === effectToClean) {
+			effect.nextEffectToRun = effectToClean.nextEffectToRun;
+			effectToClean.nextEffect = effectToClean.nextEffectToRun = null;
+		}
+		effectToClean = nextEffect;
+	}
+}
+function batchStart() {
+	context_default.batch++;
+}
+function runEffect(effect) {
+	const oldActiveTarget = context_default.activeTarget;
+	const oldExtent = context_default.extent;
+	effect.didError = false;
+	batchStart();
+	try {
+		if (context_default.previousEffect !== null) context_default.previousEffect.nextEffect = effect;
+		context_default.activeTarget = effect;
+		context_default.previousEffect = effect;
+		context_default.extent = 1;
+		effect.cleanup = effect.run();
+		effect.extent = context_default.extent;
+	} catch (err) {
+		effect.didError = true;
+		clearSources(effect);
+		throw err;
+	} finally {
+		context_default.activeTarget = oldActiveTarget;
+		context_default.extent += oldExtent;
+		batchEnd();
+	}
+}
+function checkEffect(effect) {
+	if (checkSources(effect)) {
+		runCleanups(effect);
+		deactivateSources(effect);
+		runEffect(effect);
+		clearSources(effect);
+	}
+}
+function clearTargets(source) {
+	let previousSub = null;
+	for (let clearSub = source.firstTarget; clearSub !== null; clearSub = clearSub.nextTarget) if (!clearSub.active) if (previousSub === null) source.firstTarget = clearSub.nextTarget;
+	else previousSub.nextTarget = clearSub.nextTarget;
+	else previousSub = clearSub;
+}
+function triggerEffects() {
+	let didError = false;
+	let error;
+	let effect = context_default.firstEffectToRun;
+	while (effect !== null) {
+		context_default.batchOperation++;
+		try {
+			checkEffect(effect);
+		} catch (err) {
+			if (!didError) {
+				didError = true;
+				error = err;
+			}
+		}
+		effect = effect.nextEffectToRun;
+	}
+	effect = context_default.firstEffectToRun;
+	context_default.firstEffectToRun = null;
+	while (effect !== null) {
+		let nextEffect = effect.nextEffectToRun;
+		effect.nextEffectToRun = null;
+		effect = nextEffect;
+	}
+	let signal = context_default.firstSignalToUpdate;
+	context_default.firstSignalToUpdate = null;
+	while (signal !== null) {
+		clearTargets(signal);
+		const nextSignal = signal.nextSignalToUpdate;
+		signal.nextSignalToUpdate = null;
+		signal = nextSignal;
+	}
+	if (didError) throw error;
+}
+function batchEnd() {
+	if (context_default.batch > 1) {
+		context_default.batch--;
+		return;
+	}
+	try {
+		triggerEffects();
+	} finally {
+		context_default.batch = 0;
+		context_default.batchOperation = 0;
+		context_default.previousEffect = null;
+	}
+}
+function $batch(fn) {
+	if (context_default.batch > 0) return fn();
+	batchStart();
+	try {
+		return fn();
+	} finally {
+		batchEnd();
+	}
+}
+function $cache(fn) {
+	if (context_default.registerComputed === null) throw new Error("$cache must be used in a getter");
+	let computed = {
+		type: COMPUTED_TYPE,
+		value: null,
+		run: fn,
+		firstSource: null,
+		firstTarget: null,
+		recalc: false,
+		running: false,
+		didError: false,
+		rollback: null
+	};
+	context_default.registerComputed(computed);
+	runComputed(computed);
+	return computed.value;
+}
+function $peek(fn) {
+	const oldActiveTarget = context_default.activeTarget;
+	context_default.activeTarget = null;
+	const result = fn();
+	context_default.activeTarget = oldActiveTarget;
+	return result;
+}
 function buildClasses(value, styleHash) {
 	if (typeof value === "string") {
 		if (styleHash) value += " " + styleHash;
@@ -29,128 +291,182 @@ function buildStyles(value) {
 function formatText(value) {
 	return value ?? "";
 }
-const context = {
-	activeEffect: null,
-	activeRange: null,
-	mountEffects: [],
-	stashedEvents: [],
-	stashedAnimations: [],
-	hydrationNode: null
-};
-var context_default = context;
 function $mount(fn) {
 	context_default.mountEffects.push(fn);
 }
-function runEffect(effect) {
-	effect.active = true;
-	context_default.activeEffect = effect;
-	const cleanup = effect.run();
-	if (typeof cleanup === "function") effect.cleanup = cleanup;
-	context_default.activeEffect = null;
-}
-function $run(fn) {
+function $run(fn, name) {
 	let effect = {
+		type: EFFECT_TYPE,
 		run: fn,
-		cleanup: null,
-		props: null,
-		active: true
+		cleanup: void 0,
+		firstSource: null,
+		nextEffect: null,
+		extent: 0,
+		nextEffectToRun: null,
+		didError: false,
+		name
 	};
-	if (context_default.activeRange) (context_default.activeRange.effects ??= []).push(effect);
 	runEffect(effect);
+	return effect;
 }
 const proxyDataSymbol = Symbol("_proxy_data");
 const proxyHandledSymbol = Symbol("_proxy_handled");
 function $unwrap(object) {
 	return object && object[proxyDataSymbol] ? object[proxyDataSymbol].target || object : object;
 }
-function trackEffect(data, key) {
-	if (context_default.activeEffect) {
-		let propState = data.propData.get(key);
-		if (!propState) {
-			propState = { effects: [] };
-			data.propData.set(key, propState);
+function trackProxyEffect(data, key) {
+	if (context_default.activeTarget !== null) {
+		let signal = data.signals.get(key);
+		if (signal === void 0 || signal === null) {
+			signal = {
+				type: SIGNAL_TYPE,
+				firstTarget: null,
+				nextSignalToUpdate: null
+			};
+			data.signals.set(key, signal);
 		}
-		propState.effects ||= [];
-		propState.effects.push(context_default.activeEffect);
-		context_default.activeEffect.props ||= [];
-		context_default.activeEffect.props.push(propState);
+		trackEffect(signal);
 	}
 }
-function removeEffect(effect) {
-	if (effect.cleanup) effect.cleanup();
-	if (effect.props) {
-		for (let prop of effect.props) if (prop.effects) {
-			let length = prop.effects.length;
-			let i = length;
-			while (i--) if (prop.effects[i] === effect) {
-				prop.effects[i] = prop.effects[length - 1];
-				prop.effects.pop();
-				length -= 1;
+let lastEffect;
+function updateSignal(proxy, key) {
+	let signal = proxy.signals.get(key);
+	if (signal !== void 0 && signal !== null && signal.firstTarget !== null) {
+		batchStart();
+		try {
+			if (context_default.firstSignalToUpdate === null) context_default.firstSignalToUpdate = signal;
+			else if (signal.nextSignalToUpdate === null) {
+				let lastSignal = context_default.firstSignalToUpdate;
+				while (lastSignal.nextSignalToUpdate !== null) lastSignal = lastSignal.nextSignalToUpdate;
+				lastSignal.nextSignalToUpdate = signal;
 			}
+			lastEffect = context_default.firstEffectToRun;
+			if (lastEffect !== null) while (lastEffect.nextEffectToRun !== null) lastEffect = lastEffect.nextEffectToRun;
+			let targetSub = signal.firstTarget;
+			let computed;
+			outer: while (true) {
+				targetSub.active = false;
+				targetSub.recalc = true;
+				const target = targetSub.target;
+				if (target.type === EFFECT_TYPE) {
+					if (lastEffect === null) {
+						context_default.firstEffectToRun = target;
+						lastEffect = target;
+					} else if (target.nextEffectToRun === null && lastEffect !== target) {
+						lastEffect.nextEffectToRun = target;
+						lastEffect = target;
+					}
+				} else if (!target.recalc) {
+					target.recalc = true;
+					if (target.firstTarget !== null) {
+						computed = target;
+						computed.rollback = targetSub;
+						targetSub = target.firstTarget;
+						continue;
+					}
+				}
+				while (targetSub.nextTarget === null && computed !== void 0) {
+					targetSub = computed.rollback;
+					if (targetSub.source.type !== COMPUTED_TYPE) {
+						computed = void 0;
+						continue outer;
+					}
+					computed = targetSub.source;
+				}
+				if (targetSub.nextTarget === null) break;
+				targetSub = targetSub.nextTarget;
+			}
+		} finally {
+			batchEnd();
 		}
 	}
-	effect.active = false;
 }
-function triggerEffects(data, key) {
-	let effects = data.propData.get(key)?.effects;
-	if (effects) {
-		for (let effect of effects.slice()) if (effect.active) {
-			removeEffect(effect);
-			runEffect(effect);
-		}
-	}
-}
-function proxyGet(target, key, receiver, data) {
+function proxyGet(target, key, receiver) {
+	let data = target[proxyDataSymbol];
 	if (key === proxyDataSymbol) return data;
-	if (!data.propData.has(key)) {
-		if (Object.getOwnPropertyDescriptor(target, key)?.writable) {
-			if (!data.shallow) {
-				let value = target[key];
-				if (value && typeof value === "object" && !value[proxyDataSymbol] && !value.then) target[key] = $watch(value);
+	const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
+	if (propDescriptor !== void 0) {
+		if (propDescriptor.writable) {
+			if (!data.signals.has(key)) {
+				if (data.shallow !== true) {
+					const value = target[key];
+					if (value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) target[key] = $watch(value);
+				}
+				data.signals.set(key, null);
 			}
+			trackProxyEffect(data, key);
+		} else if (propDescriptor.get) {
+			let signal = data.signals.get(key);
+			if (signal === void 0 || signal === null) {
+				let value;
+				const oldRegisterComputed = context_default.registerComputed;
+				try {
+					context_default.registerComputed = (computed) => {
+						data.signals.set(key, computed);
+					};
+					value = Reflect.get(target, key, receiver);
+				} finally {
+					context_default.registerComputed = oldRegisterComputed;
+				}
+				return value;
+			} else if (signal.running) throw new Error("Cycle detected");
+			else if (signal.recalc) checkComputed(signal);
+			else if (signal.didError) throw signal.value;
+			else trackEffect(signal);
+			return signal.value;
 		}
-		data.propData.set(key, null);
+	} else if (data.isArray) {
+		if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
 	}
-	if (data.isArray) if (key === "pop" || key === "push" || key === "reverse" || key === "shift" || key === "sort" || key === "splice" || key === "unshift") {
-		const targetFunction = target[key];
-		return function(...args) {
-			targetFunction.apply(target, args);
-			triggerEffects(data, "length");
-		};
-	} else if (key === Symbol.iterator) {
-		trackEffect(data, "length");
-		context_default.activeEffect = null;
-	} else trackEffect(data, key);
-	else trackEffect(data, key);
 	return Reflect.get(target, key, receiver);
 }
-function proxySet(target, key, value, receiver, data) {
+const arrayWrapper = {
+	[Symbol.iterator]: function(data, target, key) {
+		trackProxyEffect(data, "length");
+		context_default.activeTarget = null;
+		return target[key];
+	},
+	pop: arrayHandle,
+	push: arrayHandle,
+	reverse: arrayHandle,
+	shift: arrayHandle,
+	sort: arrayHandle,
+	splice: arrayHandle,
+	unshift: arrayHandle
+};
+function arrayHandle(data, target, key) {
+	return function(...args) {
+		const result = target[key].apply(target, args);
+		updateSignal(data, "length");
+		return result;
+	};
+}
+function proxySet(target, key, value, receiver) {
 	const oldValue = target[key];
 	if (value !== oldValue) {
+		if (context_default.batchOperation > 100) throw new Error("Cycle detected");
+		let data = target[proxyDataSymbol];
 		let newValue = value;
-		if (oldValue && oldValue[proxyDataSymbol]) newValue = $watch(value);
+		if (oldValue && oldValue[proxyDataSymbol] !== void 0) newValue = $watch(value);
 		Reflect.set(target, key, newValue, receiver);
-		triggerEffects(data, key);
-		if (data.isArray && !isNaN(+String(key))) triggerEffects(data, "length");
+		updateSignal(data, key);
+		if (data.isArray && !isNaN(+String(key))) updateSignal(data, "length");
 	}
 	return true;
 }
 function $watch(object, options) {
-	if (object == null || object[proxyDataSymbol] || object[proxyHandledSymbol]) return object;
-	const data = {
+	if (object === void 0 || object === null || object[proxyDataSymbol] !== void 0) return object;
+	object[proxyDataSymbol] = {
 		target: object,
 		isArray: Array.isArray(object),
-		shallow: !!options?.shallow,
-		propData: /* @__PURE__ */ new Map()
+		shallow: options !== void 0 && options.shallow !== void 0 ? options.shallow : false,
+		signals: /* @__PURE__ */ new Map()
 	};
-	return new Proxy(object, {
-		get: function(target, prop, receiver) {
-			return proxyGet(target, prop, receiver, data);
-		},
-		set: function(target, prop, value, receiver) {
-			return proxySet(target, prop, value, receiver, data);
-		}
-	});
+	const handler = {
+		get: proxyGet,
+		set: proxySet
+	};
+	return new Proxy(object, handler);
 }
 function addAnimation(el, entry, exit) {
 	context_default.stashedAnimations.push({
@@ -251,12 +567,6 @@ function clearRange(range) {
 	else clearNodes(range);
 }
 function clearEffects(range, animations) {
-	if (range.effects) {
-		const oldRange = context_default.activeRange;
-		context_default.activeRange = range;
-		for (let effect of range.effects) removeEffect(effect);
-		context_default.activeRange = oldRange;
-	}
 	if (range.animations) for (let animation of range.animations) animations.push(animation);
 	if (range.children) {
 		for (let child of range.children) clearEffects(child, animations);
@@ -435,16 +745,15 @@ function runControl(range, anchor, create) {
 	popRange(oldRange);
 }
 function runControlBranch(range, index, create) {
-	if (index >= 0 && range.index === index) return;
 	if (range.children?.length) {
 		clearRange(range.children[0]);
 		range.children.length = 0;
 	}
 	const oldRange = pushRange(newRange(), true);
-	const oldEffect = context_default.activeEffect;
-	context_default.activeEffect = null;
+	const oldTarget = context_default.activeTarget;
+	context_default.activeTarget = null;
 	create();
-	context_default.activeEffect = oldEffect;
+	context_default.activeTarget = oldTarget;
 	popRange(oldRange);
 	range.index = index;
 }
@@ -548,7 +857,7 @@ function runList(range, parent, anchor, buildItems, create) {
 	$run(function runList$1() {
 		const oldBranchRange = pushRange(range);
 		const newItems = buildItems();
-		context_default.activeEffect = null;
+		context_default.activeTarget = null;
 		runListItems(range, parent, anchor, listItems, newItems, create);
 		listItems = newItems;
 		popRange(oldBranchRange);
@@ -576,7 +885,7 @@ var ReactiveDate = class ReactiveDate extends Date {
 			target: this,
 			isArray: false,
 			shallow: true,
-			propData: /* @__PURE__ */ new Map()
+			signals: /* @__PURE__ */ new Map()
 		};
 	}
 	#init() {
@@ -588,13 +897,13 @@ var ReactiveDate = class ReactiveDate extends Date {
 			if (method.startsWith("get") || method.startsWith("to") || method === "valueOf") reactivePrototype[method] = function(...args) {
 				const data = this[proxyDataSymbol];
 				const result = datePrototype[method].apply(this, args);
-				trackEffect(data, "#time");
+				trackProxyEffect(data, "#time");
 				return result;
 			};
 			if (method.startsWith("set")) reactivePrototype[method] = function(...args) {
 				const data = this[proxyDataSymbol];
 				const result = datePrototype[method].apply(this, args);
-				triggerEffects(data, "#time");
+				updateSignal(data, "#time");
 				return result;
 			};
 		}

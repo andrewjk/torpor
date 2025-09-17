@@ -1,21 +1,46 @@
 import context from "../render/context";
 import { type Effect } from "../types/Effect";
+import batchEnd from "./batchEnd";
+import batchStart from "./batchStart";
+import clearSources from "./clearSources";
 
 export default function runEffect(effect: Effect): void {
-	// Reactivate it in case it's been deactivated
-	effect.active = true;
+	//console.log(`running effect '${effect.name}'`);
 
-	// Set the active effect, so that any properties accessed while running it
-	// will trigger it in future
-	context.activeEffect = effect;
+	// Store the active target
+	const oldActiveTarget = context.activeTarget;
+	const oldExtent = context.extent;
 
-	// Run the effect to register its subscriptions and get its (optional)
-	// cleanup function
-	const cleanup = effect.run();
+	effect.didError = false;
 
-	if (typeof cleanup === "function") {
-		effect.cleanup = cleanup;
+	batchStart();
+
+	try {
+		// Set the next effect for navigating through
+		if (context.previousEffect !== null) {
+			context.previousEffect.nextEffect = effect;
+		}
+
+		// Set the active effect, so that any properties accessed while running it
+		// will trigger it in future
+		context.activeTarget = effect;
+		context.previousEffect = effect;
+		context.extent = 1;
+
+		// Run the effect to register its subscriptions and get its (optional)
+		// cleanup function
+		effect.cleanup = effect.run();
+
+		effect.extent = context.extent;
+	} catch (err) {
+		effect.didError = true;
+		clearSources(effect);
+		throw err;
+	} finally {
+		// Set the active target back to what it was previously
+		context.activeTarget = oldActiveTarget;
+		context.extent += oldExtent;
+
+		batchEnd();
 	}
-
-	context.activeEffect = null;
 }

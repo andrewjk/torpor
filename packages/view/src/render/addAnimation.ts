@@ -1,4 +1,4 @@
-import { type Animation } from "../types/Animation";
+import { Animation } from "../types/Animation";
 import context from "./context";
 
 export default function addAnimation(el: HTMLElement, entry?: Animation, exit?: Animation): void {

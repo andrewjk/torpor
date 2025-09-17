@@ -30,11 +30,12 @@ export default function runList(
 		// Build the array of items with keys and data
 		const newItems = buildItems();
 
+		// TODO: Should I just be using $run?? or $peek?
 		// Do NOT re-run the list for properties accessed while updating its
 		// items. E.g. we want to re-run the list for `@for (item of $items)`
 		// (in buildItems, above) but not for `<span>{item.id}</span>` (in
 		// runListItems, below)
-		context.activeEffect = null;
+		context.activeTarget = null;
 
 		// Run the function that updates the list's items
 		runListItems(range, parent, anchor, listItems, newItems, create);

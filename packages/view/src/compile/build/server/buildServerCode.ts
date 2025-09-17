@@ -7,9 +7,12 @@ import buildServerNode from "./buildServerNode";
 
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
-	$unwrap: 'import { $unwrap } from "${folder}";',
+	$cache: 'import { $cache } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
+	$unwrap: 'import { $unwrap } from "${folder}";',
+	$peek: 'import { $peek } from "${folder}";',
+	$batch: 'import { $batch } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_attr: 'import { t_attr } from "${folder}";',
 	t_class: 'import { t_class } from "${folder}";',
@@ -49,9 +52,12 @@ function buildServerTemplate(
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
-	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
+	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
+	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
+	if (/\$peek\b/.test(script)) imports.add("$peek");
+	if (/\$batch\b/.test(script)) imports.add("$batch");
 
 	let currentIndex = 0;
 	let current = template.components[0];

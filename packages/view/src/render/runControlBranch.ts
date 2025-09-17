@@ -18,18 +18,19 @@ export default function runControlBranch(range: Range, index: number, create: ()
 
 	const oldRange = pushRange(newRange(), true);
 
+	// TODO: Should I just be using $run?? or $peek?
 	// Do NOT re-run the entire control for properties accessed while updating
 	// its branches. E.g. we want to re-run the control for `@if ($state.x > 5)`
 	// (in runControl) but not for `<span>{$state.text}</span>` (in
 	// runControlBranch)
-	const oldEffect = context.activeEffect;
-	context.activeEffect = null;
+	const oldTarget = context.activeTarget;
+	context.activeTarget = null;
 
 	// Run the create function
 	create();
 
 	// Set the active effect back for the next branch
-	context.activeEffect = oldEffect;
+	context.activeTarget = oldTarget;
 
 	popRange(oldRange);
 

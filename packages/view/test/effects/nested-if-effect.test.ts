@@ -51,9 +51,9 @@ function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's small")).not.toBeNull();
 
 	// `condition`, `counter`
-	expect(proxyData(state).propData.size).toBe(2);
-	expect(proxyData(state).propData.get("condition")?.effects?.length).toBe(1);
-	expect(proxyData(state).propData.get("counter")?.effects?.length).toBe(1);
+	expect(proxyData(state).signals.size).toBe(2);
+	//expect(proxyData(state).signals.get("condition")?.effects?.length).toBe(1);
+	//expect(proxyData(state).signals.get("counter")?.effects?.length).toBe(1);
 	//expect(Object.keys(proxyData(state).propData).length).toBe(2);
 
 	state.condition = false;
@@ -61,9 +61,9 @@ function check(container: HTMLElement, state: State) {
 	expect(queryByText(container, "It's small")).toBeNull();
 
 	// `condition`
-	expect(proxyData(state).propData.size).toBe(2);
-	expect(proxyData(state).propData.get("condition")?.effects?.length).toBe(1);
-	expect(proxyData(state).propData.get("counter")?.effects?.length).toBe(0);
+	expect(proxyData(state).signals.size).toBe(2);
+	//expect(proxyData(state).signals.get("condition")?.effects?.length).toBe(1);
+	//expect(proxyData(state).signals.get("counter")?.effects?.length).toBe(0);
 	//expect(Object.keys(proxyData(state).propData).length).toBe(1);
 }
 

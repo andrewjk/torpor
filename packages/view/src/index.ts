@@ -1,4 +1,7 @@
+import $batch from "./render/$batch";
+import $cache from "./render/$cache";
 import $mount from "./render/$mount";
+import $peek from "./render/$peek";
 import $run from "./render/$run";
 import $unwrap from "./render/$unwrap";
 import $watch from "./render/$watch";
@@ -39,7 +42,7 @@ import ReactiveDate from "./wrappers/ReactiveDate";
 export { mount, hydrate, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
-export { $watch, $unwrap, $run, $mount };
+export { $watch, $cache, $run, $mount, $unwrap, $peek, $batch };
 
 // Wrapped objects for using in reactive objects
 export { ReactiveDate };

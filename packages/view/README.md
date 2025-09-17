@@ -35,9 +35,13 @@ npm install torpor
     - `@html` to render HTML e.g. from $props
 - Runtime reactivity
   - `$watch` to create a proxy that updates UI on property changes
+  - `$cache` to cache proxy getter values that are expensive to update
   - `$run` to create an effect that is re-run when its dependencies change
   - `$mount` to create an effect that runs after a component has been mounted
-  - `$unwrap` to get the target object from the proxy
+  - And
+    - `$unwrap` to get the target object from the proxy
+    - `$peek` to get the value of a target object without re-running effects on change
+    - `$batch` to delay effects and then run them all at once
 - Automatic scoping of styles to component
 - Two-way binding with `&value`, `&checked`, etc
 - Element binding to a script variable with `&ref={...}`
