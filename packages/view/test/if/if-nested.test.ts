@@ -18,7 +18,7 @@ interface State {
 }
 
 test("if nested -- mounted", async () => {
-	const $state = $watch({ counter: 8 });
+	let $state = $watch({ counter: 8 });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -28,7 +28,7 @@ test("if nested -- mounted", async () => {
 });
 
 test("if nested -- hydrated", async () => {
-	const $state = $watch({ counter: 8 });
+	let $state = $watch({ counter: 8 });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");

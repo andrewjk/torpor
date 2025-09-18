@@ -13,7 +13,7 @@ export default function DemoPage() {
 		<Repl input={`
 export default function Index($props: { name: string }) {
 	// Use the $watch function to declare reactive state
-	const $state = $watch({
+	let $state = $watch({
 		count: 0,
 		get isEven() {
 			return this.count % 2 === 0
@@ -51,7 +51,7 @@ export default function Index($props: { name: string }) {
 		<h2>If statements</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		count: 0,
 		get isEven() {
 			return this.count % 2 === 0
@@ -85,7 +85,7 @@ export default function Index($props: { name: string }) {
 		<h2>For loops</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		tasks: []
 	})
 
@@ -133,7 +133,7 @@ export default function Index($props: { name: string }) {
 		<h2>Switch statements</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		count: 0,
 		get isEven() {
 			return this.count % 2 === 0
@@ -173,7 +173,7 @@ export default function Index($props: { name: string }) {
 		<h2>Await statements</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({})
+	let $state = $watch({})
 
 	let attempt = 0
 	$state.guesser = guessNumber(1000)
@@ -220,7 +220,7 @@ export default function Index($props: { name: string }) {
 		<h2>Two way binding</h2>	
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		count: 0
 	})
 
@@ -249,7 +249,7 @@ export default function Index($props: { name: string }) {
 		<h2>Functions</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		count: 0
 	})
 
@@ -282,7 +282,7 @@ export default function Index($props: { name: string }) {
 		<h2>Child components</h2>
 		<Repl input={`
 export default function Index($props: { name: string }) {
-	const $state = $watch({
+	let $state = $watch({
 		tasks: []
 	})
 

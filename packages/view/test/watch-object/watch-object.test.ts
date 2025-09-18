@@ -23,7 +23,7 @@ interface State {
 }
 
 test("watch object -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		text: "top",
 		child: {
 			childText: "child",
@@ -41,7 +41,7 @@ test("watch object -- mounted", async () => {
 });
 
 test("watch object -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		text: "top",
 		child: {
 			childText: "child",

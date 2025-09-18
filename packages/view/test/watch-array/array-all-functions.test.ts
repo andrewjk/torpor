@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("array calling all functions -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },
@@ -31,7 +31,7 @@ test("array calling all functions -- mounted", async () => {
 });
 
 test("array calling all functions -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },

@@ -16,7 +16,7 @@ beforeAll(async () => {
 });
 
 test("if effect -- mounted", async () => {
-	const $state = $watch({ counter: 0 });
+	let $state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -26,7 +26,7 @@ test("if effect -- mounted", async () => {
 });
 
 test("if effect -- hydrated", async () => {
-	const $state = $watch({ counter: 0 });
+	let $state = $watch({ counter: 0 });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");

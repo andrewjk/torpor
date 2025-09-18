@@ -81,7 +81,7 @@ export default function Component() {
 		</p>
 		<pre><code>{`
 export default function Component() {
-	const $state = $watch({
+	let $state = $watch({
 		count: 1
 	})
 
@@ -150,7 +150,7 @@ export default function Component() {
 		<h2>Playground</h2>
 		<Repl input={`
 export default function Component() {
-	const $state = $watch({
+	let $state = $watch({
 		count: 1
 	})
 

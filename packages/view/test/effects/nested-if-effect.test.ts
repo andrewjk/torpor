@@ -21,7 +21,7 @@ interface State {
 }
 
 test("nested if effect -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		condition: true,
 		counter: 0,
 	});
@@ -34,7 +34,7 @@ test("nested if effect -- mounted", async () => {
 });
 
 test("nested if effect -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		condition: true,
 		counter: 0,
 	});

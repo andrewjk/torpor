@@ -2,7 +2,7 @@
 import { $page } from "@torpor/build/state";
 
 export default function Layout() {
-	const $state = $watch({
+	let $state = $watch({
 		isFavorites: $page.route === "/profile/@[user]/favorites"
 	});
 

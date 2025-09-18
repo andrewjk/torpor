@@ -9,7 +9,7 @@ export default function Await(
 	let t_body = "";
 	let t_head = "";
 	// Use the $watch function to declare reactive state
-	const $state = $watch({})
+	let $state = $watch({})
 
 	// This is an async function
 	let attempt = 0

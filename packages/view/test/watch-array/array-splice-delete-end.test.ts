@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("array splice delete from end -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },
@@ -31,7 +31,7 @@ test("array splice delete from end -- mounted", async () => {
 });
 
 test("array splice delete from end -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },

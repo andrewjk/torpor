@@ -34,7 +34,7 @@ See the [torpor/view](./packages/view) sub-repo for a more in-depth example.
  */
 export default function Component($props: { name: string }) {
     // Use the $watch function to declare reactive state
-    const $state = $watch({
+    let $state = $watch({
         count: 0,
         get isEven() {
             return this.count % 2 === 0

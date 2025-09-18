@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("array reassign and update -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },
@@ -31,7 +31,7 @@ test("array reassign and update -- mounted", async () => {
 });
 
 test("array reassign and update -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "a" },
 			{ id: 2, text: "b" },

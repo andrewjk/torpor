@@ -17,7 +17,7 @@ export default function Increment(
 	_$slots?: Record<string, SlotRender>
 ) {
 
-	const $state = $watch({ counter: 0 })
+	let $state = $watch({ counter: 0 })
 
 	function increment(e, num) {
 		$state.counter += num || 1;

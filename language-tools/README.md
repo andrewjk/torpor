@@ -12,7 +12,7 @@ The language server provides syntax highlighting for `.torp` files, which contai
  */
 export default function Counter() {
     // Use the $watch function to declare reactive state
-    const $state = $watch({
+    let $state = $watch({
         count: 0,
     })
 

@@ -19,7 +19,7 @@ interface State {
 }
 
 test("text -- mounted", async () => {
-	const $state = $watch({ value: "hi", empty: "" });
+	let $state = $watch({ value: "hi", empty: "" });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -29,7 +29,7 @@ test("text -- mounted", async () => {
 });
 
 test("switch values -- hydrated", async () => {
-	const $state = $watch({ value: "hi", empty: "" });
+	let $state = $watch({ value: "hi", empty: "" });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");

@@ -9,7 +9,7 @@ export default function Increment(
 ) {
 	let t_body = "";
 	let t_head = "";
-	const $state = $watch({ counter: 0 })
+	let $state = $watch({ counter: 0 })
 
 	function increment(e, num) {
 		$state.counter += num || 1;

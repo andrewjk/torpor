@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("array indexes -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "b" },
 			{ id: 2, text: "a" },
@@ -31,7 +31,7 @@ test("array indexes -- mounted", async () => {
 });
 
 test("array indexes -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 1, text: "b" },
 			{ id: 2, text: "a" },

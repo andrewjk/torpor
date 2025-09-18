@@ -18,7 +18,7 @@ interface State {
 }
 
 test("if else true -- mounted", async () => {
-	const $state = $watch({ counter: 10 });
+	let $state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -28,7 +28,7 @@ test("if else true -- mounted", async () => {
 });
 
 test("if else true -- hydrated", async () => {
-	const $state = $watch({ counter: 10 });
+	let $state = $watch({ counter: 10 });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");

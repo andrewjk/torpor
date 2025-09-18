@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("for of -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: ["1", "2", "3", "4", "5"],
 	});
 
@@ -26,7 +26,7 @@ test("for of -- mounted", async () => {
 });
 
 test("for of -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: ["1", "2", "3", "4", "5"],
 	});
 

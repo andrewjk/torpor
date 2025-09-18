@@ -13,7 +13,7 @@ beforeAll(async () => {
 });
 
 test("array empty -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [],
 	});
 
@@ -25,7 +25,7 @@ test("array empty -- mounted", async () => {
 });
 
 test("array empty -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [],
 	});
 

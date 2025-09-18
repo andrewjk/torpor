@@ -15,7 +15,7 @@ beforeAll(async () => {
 });
 
 test("for effect -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },
@@ -31,7 +31,7 @@ test("for effect -- mounted", async () => {
 });
 
 test("for effect -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [
 			{ id: 0, text: "first" },
 			{ id: 1, text: "second" },

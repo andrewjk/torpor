@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 test("let slot -- mounted", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [{ text: "item 1" }, { text: "item 2" }, { text: "item 3" }],
 	});
 
@@ -26,7 +26,7 @@ test("let slot -- mounted", async () => {
 });
 
 test("let slot -- hydrated", async () => {
-	const $state = $watch({
+	let $state = $watch({
 		items: [{ text: "item 1" }, { text: "item 2" }, { text: "item 3" }],
 	});
 

@@ -24,7 +24,7 @@ export default function Await(
 ) {
 
 	// Use the $watch function to declare reactive state
-	const $state = $watch({})
+	let $state = $watch({})
 
 	// This is an async function
 	let attempt = 0

@@ -18,7 +18,7 @@ interface State {
 }
 
 test("switch values -- mounted", async () => {
-	const $state = $watch({ value: 1 });
+	let $state = $watch({ value: 1 });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -28,7 +28,7 @@ test("switch values -- mounted", async () => {
 });
 
 test("switch values -- hydrated", async () => {
-	const $state = $watch({ value: 1 });
+	let $state = $watch({ value: 1 });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");

@@ -18,7 +18,7 @@ interface State {
 }
 
 test("svg -- mounted", async () => {
-	const $state = $watch({ name: "rect" });
+	let $state = $watch({ name: "rect" });
 
 	const container = document.createElement("div");
 	const component = await importComponent(componentPath, "client");
@@ -28,7 +28,7 @@ test("svg -- mounted", async () => {
 });
 
 test("svg -- hydrated", async () => {
-	const $state = $watch({ name: "rect" });
+	let $state = $watch({ name: "rect" });
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(componentPath, "client");
