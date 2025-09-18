@@ -90,7 +90,7 @@ export default function Await(
 							const t_text_3 = t_child(t_next(t_root_3));
 							// @ts-ignore
 							const t_text_4 = t_next(t_next(t_root_3), true);
-							$run(function setTextContent() {
+							$run(function setAttributes() {
 								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
 							});
 							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);

@@ -43,7 +43,7 @@ export default function Let(
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `#`);
 		// @ts-ignore
 		const t_text_1 = t_root(t_fragment_2);
-		$run(function setTextContent() {
+		$run(function setAttributes() {
 			t_text_1.textContent = ` ${t_fmt($sprops.item.text)} `;
 		});
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);

@@ -36,7 +36,7 @@ export default function Increment(
 	const t_text_2 = t_next(t_next(t_next(t_button_2, true)), true);
 	t_event(t_button_1, "click", increment);
 	t_event(t_button_2, "click", (e) => increment(e, 5));
-	$run(function setTextContent() {
+	$run(function setAttributes() {
 		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

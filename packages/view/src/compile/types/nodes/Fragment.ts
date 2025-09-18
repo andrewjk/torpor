@@ -2,6 +2,7 @@ export default interface Fragment {
 	number: number;
 	text: string;
 	ns: boolean;
+	effects: string[];
 	events: {
 		varName: string;
 		eventName: string;

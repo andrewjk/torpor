@@ -39,19 +39,11 @@ export default function Class(
 
 	// @ts-ignore
 	const t_text_1 = t_next(t_comp_anchor_1, true);
-	$run(function setClasses() {
+	$run(function setAttributes() {
 		t_a_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
-	});
-	$run(function setClasses() {
 		t_div_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
-	});
-	$run(function setClasses() {
 		t_div_2.className = t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ljxz83");
-	});
-	$run(function setClasses() {
 		t_div_3.className = t_class([ "foo", false, true && "baz", undefined ], "torp-1ljxz83");
-	});
-	$run(function setClasses() {
 		t_div_4.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-1ljxz83");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
@@ -77,7 +69,7 @@ function Child(
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
 	// @ts-ignore
 	const t_text_1 = t_next(t_div_1, true);
-	$run(function setClasses() {
+	$run(function setAttributes() {
 		t_div_1.className = t_class($props.class);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);

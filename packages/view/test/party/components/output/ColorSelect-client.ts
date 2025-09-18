@@ -71,13 +71,9 @@ export default function ColorSelect(
 			const t_text_2 = t_child(t_option_1);
 			// @ts-ignore
 			const t_text_3 = t_next(t_option_1, true);
-			$run(function setAttribute() {
+			$run(function setAttributes() {
 				t_attribute(t_option_1, "value", t_item.data.color.id);
-			});
-			$run(function setAttribute() {
 				t_attribute(t_option_1, "disabled", t_item.data.color.isDisabled);
-			});
-			$run(function setTextContent() {
 				t_text_2.textContent = ` ${t_fmt(t_item.data.color.text)} `;
 			});
 			t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
@@ -88,13 +84,13 @@ export default function ColorSelect(
 
 	// @ts-ignore
 	const t_text_4 = t_next(t_select_1, true);
-	$run(function setTextContent() {
-		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
-	});
 	$run(function setBinding() {
 		t_select_1.value = $state.selectedColorId || "";
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
+	$run(function setAttributes() {
+		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
+	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
 

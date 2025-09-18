@@ -1,11 +1,13 @@
 import type TextNode from "../../types/nodes/TextNode";
-import Builder from "../../utils/Builder";
 import endOfString from "../../utils/endOfString";
 import endOfTemplateString from "../../utils/endOfTemplateString";
 import type BuildStatus from "./BuildStatus";
-import buildRun from "./buildRun";
+import stashRun from "./stashRun";
 
-export default function buildTextNode(node: TextNode, status: BuildStatus, b: Builder): void {
+export default function buildTextNode(node: TextNode, status: BuildStatus): void {
+	let fragment = status.fragmentStack.at(-1)?.fragment;
+	if (!fragment) return; // probably in @head...
+
 	let content = node.content || "";
 
 	if (!status.preserveWhitespace) {
@@ -77,6 +79,6 @@ export default function buildTextNode(node: TextNode, status: BuildStatus, b: Bu
 		}
 
 		status.imports.add("t_fmt");
-		buildRun("setTextContent", `${node.varName}.textContent = ${textContent};`, status, b);
+		stashRun(fragment, `${node.varName}.textContent = ${textContent};`, status);
 	}
 }

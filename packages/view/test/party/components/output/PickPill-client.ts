@@ -32,9 +32,6 @@ export default function PickPill(
 	const t_input_2 = t_next(t_next(t_next(t_next(t_input_1, true)), true)) as HTMLInputElement;
 	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_next(t_input_2, true)), true);
-	$run(function setTextContent() {
-		t_text_1.textContent = `Picked: ${t_fmt($state.picked)}`;
-	});
 	$run(function setBinding() {
 		t_input_1.checked = $state.picked == "blue";
 	});
@@ -46,6 +43,9 @@ export default function PickPill(
 	});
 	t_event(t_input_2, "change", (e) => {
 		if (e.target.checked) $state.picked = "red";
+	});
+	$run(function setAttributes() {
+		t_text_1.textContent = `Picked: ${t_fmt($state.picked)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);

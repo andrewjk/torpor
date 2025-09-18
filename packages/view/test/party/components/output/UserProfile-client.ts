@@ -34,16 +34,10 @@ export default function UserProfile(
 	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)));
 	// @ts-ignore
 	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true);
-	$run(function setTextContent() {
+	$run(function setAttributes() {
 		t_text_1.textContent = `My name is ${t_fmt($props.name)}!`;
-	});
-	$run(function setTextContent() {
 		t_text_2.textContent = `My age is ${t_fmt($props.age)}!`;
-	});
-	$run(function setTextContent() {
 		t_text_3.textContent = `My favourite colors are ${t_fmt($props.favouriteColors.join(", "))}!`;
-	});
-	$run(function setTextContent() {
 		t_text_4.textContent = `I am ${t_fmt($props.isAvailable ? "available" : "not available")}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);

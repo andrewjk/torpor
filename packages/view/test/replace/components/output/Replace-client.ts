@@ -42,7 +42,7 @@ export default function Replace(
 			const t_text_1 = t_child(t_next(t_root_1));
 			// @ts-ignore
 			const t_text_2 = t_next(t_next(t_root_1), true);
-			$run(function setTextContent() {
+			$run(function setAttributes() {
 				t_text_1.textContent = `The replace count is ${t_fmt(counter++)}.`;
 			});
 			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);

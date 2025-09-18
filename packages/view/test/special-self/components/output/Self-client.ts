@@ -70,7 +70,7 @@ export default function Self(
 
 	// @ts-ignore
 	const t_text_3 = t_next(t_if_anchor_1, true);
-	$run(function setTextContent() {
+	$run(function setAttributes() {
 		t_text_1.textContent = `Level ${t_fmt($props.level)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);

@@ -63,32 +63,18 @@ export default function ForEscape(
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
 			// @ts-ignore
 			const t_text_2 = t_next(t_input_1, true);
-			$run(function setTextContent() {
-				t_text_1.textContent = t_fmt(t_item.data.i);
-			});
-			$run(function setDataAttribute() {
-				t_attribute(t_div_1, "data-testid", `input1-${t_item.data.i}`);
-			});
-			$run(function setAttribute() {
-				t_attribute(t_div_1, "name", t_item.data.i);
-			});
-			$run(function setDataAttribute() {
-				t_attribute(t_div_2, "data-testid", `input2-${t_item.data.i}`);
-			});
-			$run(function setAttribute() {
-				t_attribute(t_div_2, "name", `${t_item.data.i}`);
-			});
-			$run(function setDataAttribute() {
-				t_attribute(t_div_3, "data-testid", `input3-${t_item.data.i}`);
-			});
-			$run(function setAttribute() {
-				t_attribute(t_div_3, "name", things[t_item.data.i]);
-			});
 			$run(function setBinding() {
 				t_input_1.value = t_item.data.i || "";
 			});
 			t_event(t_input_1, "input", (e) => t_item.data.i = e.target.value);
-			$run(function setAttribute() {
+			$run(function setAttributes() {
+				t_text_1.textContent = t_fmt(t_item.data.i);
+				t_attribute(t_div_1, "data-testid", `input1-${t_item.data.i}`);
+				t_attribute(t_div_1, "name", t_item.data.i);
+				t_attribute(t_div_2, "data-testid", `input2-${t_item.data.i}`);
+				t_attribute(t_div_2, "name", `${t_item.data.i}`);
+				t_attribute(t_div_3, "data-testid", `input3-${t_item.data.i}`);
+				t_attribute(t_div_3, "name", things[t_item.data.i]);
 				t_attribute(t_input_1, "name", `${t_item.data.i}`);
 			});
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);

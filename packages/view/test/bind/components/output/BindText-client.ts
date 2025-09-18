@@ -39,10 +39,8 @@ export default function BindText(
 		t_select_1.value = $state.selected || "";
 	});
 	t_event(t_select_1, "change", (e) => $state.selected = e.target.value);
-	$run(function setTextContent() {
+	$run(function setAttributes() {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
-	});
-	$run(function setTextContent() {
 		t_text_2.textContent = `You have selected, ${t_fmt($state.selected)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);

@@ -68,7 +68,14 @@ function buildNodeFragmentText(
 }
 
 function buildRootFragmentText(node: RootNode, status: BuildStatus, fragments: Fragment[]) {
-	node.fragment = { number: fragments.length, text: "", ns: status.ns, events: [], animations: [] };
+	node.fragment = {
+		number: fragments.length,
+		text: "",
+		ns: status.ns,
+		effects: [],
+		events: [],
+		animations: [],
+	};
 	fragments.push(node.fragment);
 	for (let child of node.children) {
 		buildNodeFragmentText(child, status, fragments, node.fragment);
@@ -103,6 +110,7 @@ function buildControlFragmentText(
 				number: fragments.length,
 				text: "",
 				ns: status.ns,
+				effects: [],
 				events: [],
 				animations: [],
 			};
@@ -129,6 +137,7 @@ function buildComponentFragmentText(
 			number: fragments.length,
 			text: "",
 			ns: status.ns,
+			effects: [],
 			events: [],
 			animations: [],
 		};
@@ -203,6 +212,7 @@ function buildSpecialFragmentText(
 				number: fragments.length,
 				text: "",
 				ns: status.ns,
+				effects: [],
 				events: [],
 				animations: [],
 			};

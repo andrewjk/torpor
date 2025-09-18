@@ -55,7 +55,7 @@ function Child(
 	const t_text_1 = t_child(t_next(t_root_0));
 	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_root_0), true);
-	$run(function setTextContent() {
+	$run(function setAttributes() {
 		t_text_1.textContent = `Hello, ${t_fmt($props.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

@@ -11,6 +11,7 @@ import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 import replaceForVarNames from "./replaceForVarNames";
+import stashRun from "./stashRun";
 
 export default function buildElementNode(
 	node: ElementNode,
@@ -142,11 +143,8 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 		$run(function runHead() {
 			const t_headel = document.createElement("${node.tagName}");
 			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
-	for (let { name, value, reactive } of node.attributes) {
-		if (value != null && reactive) {
-			status.imports.add("t_attribute");
-			buildRun("setAttribute", `t_attribute(t_headel, "${name}", ${value});`, status, b);
-		} else if (value != null) {
+	for (let { name, value } of node.attributes) {
+		if (value != null) {
 			status.imports.add("t_attribute");
 			b.append(`t_attribute(t_headel, "${name}", ${value});`);
 		}
@@ -161,7 +159,9 @@ function buildElementAttributes(
 	status: BuildStatus,
 	b: Builder,
 ) {
-	// TODO: Flatten this out
+	let fragment = status.fragmentStack.at(-1)?.fragment;
+	if (!fragment) throw new Error("No fragment on stack");
+
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
 	// Do &ref first, just in case any other attributes depend on it being set
@@ -202,25 +202,20 @@ function buildElementAttributes(
 				}
 				// SVGs have a different className
 				const propName = status.ns ? "className.baseVal" : "className";
-				buildRun(
-					"setClasses",
-					`${varName}.${propName} = t_class(${params.join(", ")});`,
-					status,
-					b,
-				);
+				stashRun(fragment, `${varName}.${propName} = t_class(${params.join(", ")});`, status);
 			} else if (name === "style") {
 				status.imports.add("t_style");
-				buildRun("setStyles", `${varName}.setAttribute("style", t_style(${value}));`, status, b);
+				stashRun(fragment, `${varName}.setAttribute("style", t_style(${value}));`, status);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");
-				buildRun("setDataAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", ${value});`, status);
 				// NOTE: dataset seems to be a tiny bit slower?
 				//const propName = name.substring(name.indexOf("-"));
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
 			} else {
 				status.imports.add("t_attribute");
-				buildRun("setAttribute", `t_attribute(${varName}, "${name}", ${value});`, status, b);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", ${value});`, status);
 			}
 		}
 	}

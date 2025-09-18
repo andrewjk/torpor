@@ -45,7 +45,7 @@ export default function buildNode(
 			break;
 		}
 		case "text": {
-			buildTextNode(node as TextNode, status, b);
+			buildTextNode(node as TextNode, status);
 			break;
 		}
 		case "special": {

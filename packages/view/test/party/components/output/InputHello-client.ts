@@ -31,13 +31,13 @@ export default function InputHello(
 	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
 	// @ts-ignore
 	const t_text_2 = t_next(t_input_1, true);
-	$run(function setTextContent() {
-		t_text_1.textContent = t_fmt($state.text);
-	});
 	$run(function setBinding() {
 		t_input_1.value = $state.text || "";
 	});
 	t_event(t_input_1, "input", (e) => $state.text = e.target.value);
+	$run(function setAttributes() {
+		t_text_1.textContent = t_fmt($state.text);
+	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 

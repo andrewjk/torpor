@@ -3,6 +3,7 @@ import type ElementNode from "../../types/nodes/ElementNode";
 import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
+import buildRun from "./buildRun";
 
 export default function buildAddFragment(
 	node: RootNode | ControlNode | ElementNode,
@@ -15,6 +16,9 @@ export default function buildAddFragment(
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;
 		status.imports.add("t_add_fragment");
+		if (fragment.effects.length > 0) {
+			buildRun("setAttributes", fragment.effects.join("\n"), status, b);
+		}
 		let params = [fragmentName, parentName, anchorName];
 		if (fragment.endVarName) {
 			params.push(fragment.endVarName);
