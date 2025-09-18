@@ -1,5 +1,6 @@
 import type Cleanup from "./Cleanup";
 import type Subscription from "./Subscription";
+import { EFFECT_TYPE } from "./constants";
 
 /**
  * An effect that is run and re-run when the properties it depends on change.
@@ -8,7 +9,7 @@ export default interface Effect {
 	/**
 	 * EFFECT.
 	 */
-	type: 2;
+	type: typeof EFFECT_TYPE;
 
 	/**
 	 *

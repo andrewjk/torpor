@@ -1,4 +1,5 @@
 import type Subscription from "./Subscription";
+import { COMPUTED_TYPE } from "./constants";
 
 /**
  * A computed value that is lazily refreshed when accessed from an Effect or
@@ -9,7 +10,7 @@ export default interface Computed<T = any> {
 	/**
 	 * COMPUTED.
 	 */
-	type: 1;
+	type: typeof COMPUTED_TYPE;
 
 	/**
 	 * The cached, computed value.

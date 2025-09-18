@@ -1,4 +1,5 @@
 import type Subscription from "./Subscription";
+import { SIGNAL_TYPE } from "./constants";
 
 /**
  * A value that causes dependent Computeds and Effects to be re-run. Our signals
@@ -8,7 +9,7 @@ export default interface ProxySignal {
 	/**
 	 * SIGNAL.
 	 */
-	type: 0;
+	type: typeof SIGNAL_TYPE;
 
 	/**
 	 * The first Computed or Effect that is triggered when this property is changed.
