@@ -1,13 +1,13 @@
 export default function buildClasses(value: unknown, styleHash?: string): string {
 	if (typeof value === "string") {
-		if (styleHash) {
+		if (styleHash !== undefined) {
 			value += " " + styleHash;
 		}
 		return value;
 	} else {
 		let classes: string[] = [];
 		gatherNames("", value, classes);
-		if (styleHash) {
+		if (styleHash !== undefined) {
 			classes.push(styleHash);
 		}
 		return classes.join(" ");

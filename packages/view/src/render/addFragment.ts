@@ -16,8 +16,8 @@ export default function addFragment(
 	const hydrationNode = context.hydrationNode;
 
 	// Set the active range's end node to the last node in the fragment
-	if (range) {
-		if (hydrationNode) {
+	if (range !== null) {
+		if (hydrationNode !== null) {
 			range.endNode = endNode ?? hydrationNode;
 		} else {
 			range.startNode = fragment.firstChild;
@@ -27,7 +27,7 @@ export default function addFragment(
 
 	let parentIsFragment = isFragmentNode(parent);
 
-	if (!hydrationNode) {
+	if (hydrationNode === null) {
 		// HACK: We need to be able to add fragments to new fragments as well as
 		// fragments that have already been added to the document. New fragments will
 		// be ok, but fragments that have been added will not be parents of the before
@@ -48,7 +48,7 @@ export default function addFragment(
 	if (!parentIsFragment) {
 		// Only run $mount effects if not hydrating (if hydrating, they will get
 		// run at the end when everything is hooked up)
-		if (!hydrationNode) {
+		if (hydrationNode === null) {
 			for (let effect of context.mountEffects) {
 				$run(effect);
 			}
@@ -74,11 +74,11 @@ export default function addFragment(
 		for (let animation of context.stashedAnimations) {
 			context.activeRange = animation.range;
 			$run(function addFragmentAnimation() {
-				if (animation.in) {
+				if (animation.in !== undefined) {
 					// eslint-disable-next-line
 					animate(animation.el, true, animation.in.keyframes, animation.in.options);
 				}
-				if (animation.out) {
+				if (animation.out !== undefined) {
 					return () => {
 						// eslint-disable-next-line
 						animate(animation.el, false, animation.out!.keyframes, animation.out!.options);

@@ -4,7 +4,7 @@ import context from "./context";
 
 export default function setDynamicElement(el: HTMLElement, tag: string): HTMLElement {
 	// If hydrating, it should already have been created as the correct element
-	if (context.hydrationNode) {
+	if (context.hydrationNode !== null) {
 		return el;
 	}
 

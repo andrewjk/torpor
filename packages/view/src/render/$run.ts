@@ -3,8 +3,6 @@ import type Effect from "../types/Effect";
 import { EFFECT_TYPE } from "../types/constants";
 import runEffect from "../watch/runEffect";
 
-//import context from "./context";
-
 // TODO: Take a pipeline of operators e.g. debounce
 
 /**
@@ -25,11 +23,6 @@ export default function $run(fn: () => Cleanup | void, name?: string): Effect {
 		name,
 		//name: dev.effectName(fn),
 	};
-
-	//if (context.activeRange) {
-	//	//console.log("the range is ", context.activeRange.id);
-	//	(context.activeRange.effects ??= []).push(effect);
-	//}
 
 	runEffect(effect);
 

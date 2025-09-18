@@ -13,7 +13,7 @@ import nodeCheckHydrationBreak from "./nodeCheckHydrationBreak";
 export default function nodeNext(node: ChildNode, text = false): ChildNode {
 	// If the required node is a text node, and we already have one, just use
 	// it. This is caused by text nodes being merged in HTML
-	if (context.hydrationNode && text && isTextNode(node)) {
+	if (text && context.hydrationNode !== null && isTextNode(node)) {
 		return node;
 	}
 

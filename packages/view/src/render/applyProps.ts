@@ -5,7 +5,7 @@ export default function applyProps(
 	props: Record<string, any> | undefined,
 	propNamesUsed: string[],
 ): void {
-	if (props) {
+	if (props !== undefined) {
 		for (let [name, value] of Object.entries(props)) {
 			if (!propNamesUsed.includes(name)) {
 				if (name.startsWith("on")) {

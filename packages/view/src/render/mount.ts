@@ -16,12 +16,12 @@ export default function mount(
 ): void {
 	// The parent node must have no child elements, so that we can hydrate
 	// without worrying about where to start
-	if (parent.childElementCount) {
+	if (parent.childElementCount > 0) {
 		throw new Error("The parent node must have no child elements");
 	}
 
 	// Remove all text, commments, etc
-	while (parent.firstChild) {
+	while (parent.firstChild !== null) {
 		parent.firstChild.remove();
 	}
 

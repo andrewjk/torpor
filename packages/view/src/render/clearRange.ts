@@ -8,7 +8,7 @@ export default function clearRange(range: Range): void {
 	clearEffects(range, animations);
 
 	// Wait for animations, if any, then clear the range's nodes
-	if (animations.length) {
+	if (animations.length > 0) {
 		// eslint-disable-next-line
 		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	} else {
@@ -18,14 +18,14 @@ export default function clearRange(range: Range): void {
 
 function clearEffects(range: Range, animations: Animation[]) {
 	// Collect any running animations, including ones from the effect cleanups
-	if (range.animations) {
+	if (range.animations !== null) {
 		for (let animation of range.animations) {
 			animations.push(animation);
 		}
 	}
 
 	// Recurse through the children
-	if (range.children) {
+	if (range.children !== null) {
 		for (let child of range.children) {
 			clearEffects(child, animations);
 		}
@@ -35,8 +35,8 @@ function clearEffects(range: Range, animations: Animation[]) {
 
 function clearNodes(range: Range) {
 	// Clear the nodes for this range
-	if (range.startNode) {
-		let currentNode = range.endNode || range.startNode;
+	if (range.startNode !== null) {
+		let currentNode = range.endNode ?? range.startNode;
 		// DEBUG:
 		if (range.startNode.parentNode !== currentNode.parentNode) {
 			throw new Error("range nodes have different parents");

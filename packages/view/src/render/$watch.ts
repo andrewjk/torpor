@@ -44,7 +44,7 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 	const data: ProxyData = {
 		target: object,
 		isArray: Array.isArray(object),
-		shallow: options !== undefined && options.shallow !== undefined ? options.shallow : false,
+		shallow: options?.shallow === true,
 		signals: new Map(),
 	};
 

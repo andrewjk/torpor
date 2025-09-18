@@ -2,7 +2,7 @@ import type Range from "../types/Range";
 import isFragmentNode from "./isFragmentNode";
 
 export default function moveRange(parent: Node, range: Range, before: ChildNode | null): void {
-	const endNode = range.endNode || range.startNode;
+	const endNode = range.endNode ?? range.startNode;
 	let currentNode = range.startNode;
 
 	// HACK: The parent may have once been a document fragment, but will now be
@@ -12,7 +12,7 @@ export default function moveRange(parent: Node, range: Range, before: ChildNode 
 		parent = before!.parentNode!;
 	}
 
-	while (currentNode) {
+	while (currentNode !== null) {
 		const nextNode = currentNode.nextSibling;
 		parent.insertBefore(currentNode, before);
 		if (currentNode === endNode) break;

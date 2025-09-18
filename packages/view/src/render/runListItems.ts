@@ -60,13 +60,13 @@ export default function runListItems(
 	let newKeyToIndex: Map<any, number> | undefined;
 
 	while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-		if (oldStartItem == null) {
+		if (oldStartItem === null) {
 			oldStartItem = oldItems[++oldStartIndex];
-		} else if (oldEndItem == null) {
+		} else if (oldEndItem === null) {
 			oldEndItem = oldItems[--oldEndIndex];
-		} else if (newStartItem == null) {
+		} else if (newStartItem === null) {
 			newStartItem = newItems[++newStartIndex];
-		} else if (newEndItem == null) {
+		} else if (newEndItem === null) {
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldStartItem.key === newStartItem.key) {
 			transferRangeMarkers(oldStartItem, newStartItem);
@@ -86,7 +86,7 @@ export default function runListItems(
 		} else if (oldEndItem.key === newStartItem.key) {
 			// Move to the start
 			//console.log("move", oldEndItem.key, "to the start");
-			moveRange(parent, oldEndItem, oldStartItem?.startNode);
+			moveRange(parent, oldEndItem, oldStartItem!.startNode);
 			transferRangeMarkers(oldEndItem, newStartItem);
 			oldEndItem = oldItems[--oldEndIndex];
 			newStartItem = newItems[++newStartIndex];
@@ -95,7 +95,7 @@ export default function runListItems(
 			// They are relevant only if there has been a move, or a mid-list
 			// insertion or deletion, and not if there has been an insertion
 			// at the end or deletion from the front
-			if (!oldKeyToIndex || !newKeyToIndex) {
+			if (oldKeyToIndex === undefined || newKeyToIndex === undefined) {
 				oldKeyToIndex = new Map();
 				for (let i = oldStartIndex; i < oldEndIndex; i++) {
 					oldKeyToIndex.set(oldItems[i].key, i);
@@ -151,20 +151,18 @@ export default function runListItems(
 		if (oldStartIndex > oldEndIndex) {
 			// The old list is exhausted; process new list additions
 			// HACK: I think it would be better to move anchors to the end?
-			let before: Node | null =
-				oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
+			let before =
+				oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data);
-				create(newStartItem, before!);
-				before = newStartItem.endNode!.nextSibling!;
+				create(newStartItem, before);
+				before = newStartItem.endNode!.nextSibling;
 			}
 		} else {
 			// The new list is exhausted; process old list removals
 			// Just truncate the parent range's children collection
-			if (range.children) {
-				range.children.length = oldStartIndex;
-			}
+			range.children!.length = oldStartIndex;
 			for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
 				//console.log("clear", oldStartItem.key);
 				clearRange(oldStartItem);

@@ -9,10 +9,10 @@ import context from "./context";
  */
 export default function nodeChild(parent: Node): ChildNode {
 	let childNode = parent.firstChild;
-	if (context.hydrationNode) {
+	if (context.hydrationNode !== null) {
 		// The child may be null when hydrating the sole text child of an
 		// element with no text
-		if (!childNode) {
+		if (childNode === null) {
 			childNode = parent.appendChild(parent.ownerDocument!.createTextNode(""));
 		}
 		context.hydrationNode = childNode;

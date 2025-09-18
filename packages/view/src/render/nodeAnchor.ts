@@ -18,7 +18,7 @@ import nodeNext from "./nodeNext";
  * @returns The anchor node.
  */
 export default function nodeAnchor(node: ChildNode): ChildNode {
-	if (context.hydrationNode) {
+	if (context.hydrationNode !== null) {
 		if (isCommentNode(node) && node.data === HYDRATION_START) {
 			// Skip and remove the start node, setting the hydration node in
 			// nodeNext
@@ -27,7 +27,7 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 
 			// Go through siblings until we get to the end
 			let level = 1;
-			while (currentNode) {
+			while (currentNode !== null) {
 				if (isCommentNode(currentNode)) {
 					if (currentNode.data === HYDRATION_START) {
 						level += 1;
@@ -56,7 +56,7 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 				currentNode = currentNode.nextSibling!;
 			}
 
-			if (!currentNode) {
+			if (currentNode === null) {
 				throw new Error("End hydration comment not found");
 			}
 		}

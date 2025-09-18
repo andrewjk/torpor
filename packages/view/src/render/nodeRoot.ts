@@ -12,13 +12,18 @@ import isTextNode from "./isTextNode";
  * @param text Whether we require a text node.
  */
 export default function nodeRoot(parent: Node, text = false): ChildNode {
-	if (context.hydrationNode) {
+	if (context.hydrationNode !== null) {
 		let rootNode = context.hydrationNode;
 
 		// If the root node we need is a text node, and the hydration node is
 		// not a text node but the previous node is, use the previous node. This
 		// is caused by text nodes being merged in HTML
-		if (text && !isTextNode(rootNode) && isTextNode(rootNode.previousSibling)) {
+		if (
+			text &&
+			!isTextNode(rootNode) &&
+			rootNode.previousSibling !== null &&
+			isTextNode(rootNode.previousSibling)
+		) {
 			rootNode = rootNode.previousSibling;
 			context.hydrationNode = rootNode;
 		}
@@ -32,7 +37,7 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 
 		// If hydrating, set the active range's start node
 		const range = context.activeRange;
-		if (range && !range.startNode) {
+		if (range !== null && range.startNode === null) {
 			range.startNode = rootNode;
 		}
 

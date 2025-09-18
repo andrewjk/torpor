@@ -312,7 +312,7 @@ function $run(fn, name) {
 const proxyDataSymbol = Symbol("_proxy_data");
 const proxyHandledSymbol = Symbol("_proxy_handled");
 function $unwrap(object) {
-	return object && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
+	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
 }
 function trackProxyEffect(data, key) {
 	if (context_default.activeTarget !== null) {
@@ -459,7 +459,7 @@ function $watch(object, options) {
 	object[proxyDataSymbol] = {
 		target: object,
 		isArray: Array.isArray(object),
-		shallow: options !== void 0 && options.shallow === true,
+		shallow: options?.shallow === true,
 		signals: /* @__PURE__ */ new Map()
 	};
 	const handler = {
@@ -795,7 +795,7 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 		oldStartItem = oldItems[++oldStartIndex];
 		newEndItem = newItems[--newEndIndex];
 	} else if (oldEndItem.key === newStartItem.key) {
-		moveRange(parent, oldEndItem, oldStartItem?.startNode);
+		moveRange(parent, oldEndItem, oldStartItem.startNode);
 		transferRangeMarkers(oldEndItem, newStartItem);
 		oldEndItem = oldItems[--oldEndIndex];
 		newStartItem = newItems[++newStartIndex];
@@ -832,14 +832,14 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 		}
 	}
 	if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) if (oldStartIndex > oldEndIndex) {
-		let before = oldStartItem?.startNode || oldItems[oldItems.length - 1]?.endNode?.nextSibling || anchor;
+		let before = oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
 		for (; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 			newStartItem.data = $watch(newStartItem.data);
 			create(newStartItem, before);
 			before = newStartItem.endNode.nextSibling;
 		}
 	} else {
-		if (range.children !== null) range.children.length = oldStartIndex;
+		range.children.length = oldStartIndex;
 		for (; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) clearRange(oldStartItem);
 	}
 }

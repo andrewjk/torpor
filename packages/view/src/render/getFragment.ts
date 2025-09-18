@@ -8,7 +8,7 @@ export default function getFragment(
 	// Create the fragment in the array if it hasn't yet been used
 	if (array[index] === undefined) {
 		// TODO: Should pass a string for the ns, when we support other element types
-		if (ns) {
+		if (ns === true) {
 			const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
 			template.innerHTML = html;
 			const fragment = new DocumentFragment();

@@ -48,7 +48,7 @@ export default function runList(
 	// If we're mounting, the anchor will be the one that is passed in, but if
 	// we're hydrating it will be after the items' HTML elements, so we need to
 	// update it after all of the items have been hydrated
-	if (context.hydrationNode) {
+	if (context.hydrationNode !== null) {
 		anchor = context.hydrationNode.nextSibling;
 	}
 
