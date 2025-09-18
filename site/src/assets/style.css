@@ -101,7 +101,7 @@ pre {
 
 code {
 	background: var(--code-back);
-	padding: 0.5rem;
+	padding: 0.3rem;
 }
 
 textarea.code {
@@ -109,7 +109,7 @@ textarea.code {
 	font-family: monospace;
 	font-size: 1.3rem;
 	line-height: 1.5;
-	padding: 0.5rem;
+	padding: 0.3rem;
 	tab-size: 4;
 	white-space: nowrap;
 	white-space-collapse: preserve;

@@ -38,8 +38,8 @@ export default function OverviewPage() {
 		<h2>A simple component</h2>
 		<pre><code>{`
 /**
-* Components are functions that are declared in a \`.torp\` file
-*/
+ * Components are functions that are declared in a \`.torp\` file
+ */
 export default function Component($props: { name: string }) {
 	// Use the $watch function to declare reactive state
 	const $state = $watch({
