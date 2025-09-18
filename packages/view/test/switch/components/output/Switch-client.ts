@@ -1,3 +1,4 @@
+import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -34,9 +35,17 @@ export default function Switch(
 
 	/* @switch */
 	const t_switch_range_1 = t_range();
-	t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
+	let $t_switch_state_1 = $watch({ index: -1 });
+	$run(function runSwitch() {
 		switch ($props.value) {
-			case 1: {
+			case 1: { $t_switch_state_1.index = 0; break; }
+			case 100: { $t_switch_state_1.index = 1; break; }
+			default: { $t_switch_state_1.index = 2; break; }
+		}
+	});
+	t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
+		switch ($t_switch_state_1.index) {
+			case 0: {
 				t_run_branch(t_switch_range_1, 0, () => {
 					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> A small value. </p> `);
 					// @ts-ignore
@@ -48,7 +57,7 @@ export default function Switch(
 				});
 				break;
 			}
-			case 100: {
+			case 1: {
 				t_run_branch(t_switch_range_1, 1, () => {
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> A large value. </p> `);
 					// @ts-ignore
@@ -60,7 +69,7 @@ export default function Switch(
 				});
 				break;
 			}
-			default: {
+			case 2: {
 				t_run_branch(t_switch_range_1, 2, () => {
 					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p> Another value. </p> `);
 					// @ts-ignore

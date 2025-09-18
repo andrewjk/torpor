@@ -1,3 +1,4 @@
+import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import { type SlotRender } from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -28,50 +29,68 @@ export default function NestedIf(
 
 	/* @if */
 	const t_if_range_1 = t_range();
+	let $t_if_state_1 = $watch({ index: -1 });
+	$run(function runIf() {
+		if ($props.condition) { $t_if_state_1.index = 0; }
+		else { $t_if_state_1.index = 1; }
+	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		if ($props.condition) {
-			t_run_branch(t_if_range_1, 0, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
-				// @ts-ignore
-				const t_root_1 = t_root(t_fragment_1, true);
-				let t_if_anchor_2 = t_anchor(t_next(t_root_1)) as HTMLElement;
+		switch ($t_if_state_1.index) {
+			case 0: {
+				t_run_branch(t_if_range_1, 0, () => {
+					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
+					// @ts-ignore
+					const t_root_1 = t_root(t_fragment_1, true);
+					let t_if_anchor_2 = t_anchor(t_next(t_root_1)) as HTMLElement;
 
-				/* @if */
-				const t_if_range_2 = t_range();
-				t_run_control(t_if_range_2, t_if_anchor_2, (t_before) => {
-					if ($props.counter > 5) {
-						t_run_branch(t_if_range_2, 0, () => {
-							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>It's big</p> `);
-							// @ts-ignore
-							const t_root_2 = t_root(t_fragment_2, true);
-							// @ts-ignore
-							const t_text_1 = t_next(t_next(t_root_2), true);
-							t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_text_1);
-							t_next(t_text_1);
-						});
-					}
-					else {
-						t_run_branch(t_if_range_2, 1, () => {
-							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p>It's small</p> `);
-							// @ts-ignore
-							const t_root_3 = t_root(t_fragment_3, true);
-							// @ts-ignore
-							const t_text_2 = t_next(t_next(t_root_3), true);
-							t_add_fragment(t_fragment_3, t_fragment_1, t_before, t_text_2);
-							t_next(t_text_2);
-						});
-					}
+					/* @if */
+					const t_if_range_2 = t_range();
+					let $t_if_state_2 = $watch({ index: -1 });
+					$run(function runIf() {
+						if ($props.counter > 5) { $t_if_state_2.index = 0; }
+						else { $t_if_state_2.index = 1; }
+					});
+					t_run_control(t_if_range_2, t_if_anchor_2, (t_before) => {
+						switch ($t_if_state_2.index) {
+							case 0: {
+								t_run_branch(t_if_range_2, 0, () => {
+									const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>It's big</p> `);
+									// @ts-ignore
+									const t_root_2 = t_root(t_fragment_2, true);
+									// @ts-ignore
+									const t_text_1 = t_next(t_next(t_root_2), true);
+									t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_text_1);
+									t_next(t_text_1);
+								});
+								break;
+							}
+							case 1: {
+								t_run_branch(t_if_range_2, 1, () => {
+									const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p>It's small</p> `);
+									// @ts-ignore
+									const t_root_3 = t_root(t_fragment_3, true);
+									// @ts-ignore
+									const t_text_2 = t_next(t_next(t_root_3), true);
+									t_add_fragment(t_fragment_3, t_fragment_1, t_before, t_text_2);
+									t_next(t_text_2);
+								});
+								break;
+							}
+						}
+					});
+
+					// @ts-ignore
+					const t_text_3 = t_next(t_if_anchor_2, true);
+					t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_3);
+					t_next(t_text_3);
 				});
-
-				// @ts-ignore
-				const t_text_3 = t_next(t_if_anchor_2, true);
-				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_3);
-				t_next(t_text_3);
-			});
-		}
-		else {
-			t_run_branch(t_if_range_1, 1, () => {
-			});
+				break;
+			}
+			case 1: {
+				t_run_branch(t_if_range_1, 1, () => {
+				});
+				break;
+			}
 		}
 	});
 

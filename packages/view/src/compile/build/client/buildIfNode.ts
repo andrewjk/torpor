@@ -14,6 +14,7 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	const ifAnchorName = node.varName!;
 	const ifParentName = node.parentName || ifAnchorName + ".parentNode";
 	const ifRangeName = nextVarName("if_range", status);
+	const ifStateName = "$" + nextVarName("if_state", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -29,20 +30,34 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 		branches.push(elseBranch);
 	}
 
+	status.imports.add("$watch");
+	status.imports.add("$run");
 	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
-	/* @if */
-	const ${ifRangeName} = t_range();
-	t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {`);
+		/* @if */
+		const ${ifRangeName} = t_range();
+		let ${ifStateName} = $watch({ index: -1 });`);
+
+	b.append(`$run(function runIf() {`);
+	for (let [i, branch] of branches.entries()) {
+		b.append(`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`);
+	}
+	b.append(`});`);
+
+	b.append(`
+		t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {
+		switch (${ifStateName}.index) {`);
 
 	for (let [i, branch] of branches.entries()) {
 		buildIfBranch(branch, status, b, ifParentName, ifRangeName, i);
 	}
 
-	b.append("});");
+	b.append(`
+		}
+	});`);
 	b.append("");
 }
 
@@ -56,8 +71,9 @@ function buildIfBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${replaceForVarNames(node.statement, status)} {`);
-	b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
+	b.append(`
+		case ${index}: {
+		t_run_branch(${rangeName}, ${index}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -72,6 +88,8 @@ function buildIfBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`});`);
-	b.append(`}`);
+	b.append(`
+		});
+		break;
+	}`);
 }

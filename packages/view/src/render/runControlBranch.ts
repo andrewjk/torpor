@@ -6,19 +6,14 @@ import popRange from "./popRange";
 import pushRange from "./pushRange";
 
 export default function runControlBranch(range: Range, index: number, create: () => void): void {
-	// Only run the branch if it's not the current branch
-	if (index >= 0 && range.index === index) {
-		return;
-	}
+	// Branching ranges have exactly one child -- remove it if necessary
 	if (range.children?.length) {
-		// Branching ranges have exactly one child
 		clearRange(range.children[0]);
 		range.children.length = 0;
 	}
 
 	const oldRange = pushRange(newRange(), true);
 
-	// TODO: Should I just be using $run?? or $peek?
 	// Do NOT re-run the entire control for properties accessed while updating
 	// its branches. E.g. we want to re-run the control for `@if ($state.x > 5)`
 	// (in runControl) but not for `<span>{$state.text}</span>` (in

@@ -12,6 +12,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	const switchParentName = node.parentName!;
 	const switchAnchorName = node.varName!;
 	const switchRangeName = nextVarName("switch_range", status);
+	const switchStateName = "$" + nextVarName("switch_state", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -27,21 +28,39 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		branches.push(defaultBranch);
 	}
 
+	status.imports.add("$watch");
+	status.imports.add("$run");
 	status.imports.add("t_range");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
-	/* @switch */
-	const ${switchRangeName} = t_range();
-	t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
+		/* @switch */
+		const ${switchRangeName} = t_range();
+		let ${switchStateName} = $watch({ index: -1 });`);
+
+	b.append(`
+		$run(function runSwitch() {
 		${node.statement} {`);
+	for (let [i, branch] of branches.entries()) {
+		b.append(
+			`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; break; }`,
+		);
+	}
+	b.append(`
+		}
+	});`);
+
+	b.append(`
+		t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
+		switch (${switchStateName}.index) {`);
 
 	for (let [i, branch] of branches.entries()) {
 		buildSwitchBranch(branch as ControlNode, status, b, switchParentName, switchRangeName, i);
 	}
 
-	b.append(`}
+	b.append(`
+		}
 	});`);
 	b.append("");
 }
@@ -56,8 +75,9 @@ function buildSwitchBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${replaceForVarNames(node.statement, status)} {`);
-	b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
+	b.append(`
+		case ${index}: {
+		t_run_branch(${rangeName}, ${index}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -72,7 +92,8 @@ function buildSwitchBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`});`);
-	b.append(`break;`);
-	b.append(`}`);
+	b.append(`
+		});
+		break;
+	}`);
 }

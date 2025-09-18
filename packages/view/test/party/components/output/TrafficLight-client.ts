@@ -46,43 +46,56 @@ export default function TrafficLight(
 
 	/* @if */
 	const t_if_range_1 = t_range();
+	let $t_if_state_1 = $watch({ index: -1 });
+	$run(function runIf() {
+		if ($state.light === "red") { $t_if_state_1.index = 0; }
+		else if ($state.light === "orange") { $t_if_state_1.index = 1; }
+		else if ($state.light === "green") { $t_if_state_1.index = 2; }
+		else { $t_if_state_1.index = 3; }
+	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		if ($state.light === "red") {
-			t_run_branch(t_if_range_1, 0, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
-				// @ts-ignore
-				const t_root_1 = t_root(t_fragment_1, true);
-				// @ts-ignore
-				const t_text_2 = t_next(t_next(t_root_1), true);
-				t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
-				t_next(t_text_2);
-			});
-		}
-		else if ($state.light === "orange") {
-			t_run_branch(t_if_range_1, 1, () => {
-				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
-				// @ts-ignore
-				const t_root_2 = t_root(t_fragment_2, true);
-				// @ts-ignore
-				const t_text_3 = t_next(t_next(t_root_2), true);
-				t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
-				t_next(t_text_3);
-			});
-		}
-		else if ($state.light === "green") {
-			t_run_branch(t_if_range_1, 2, () => {
-				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
-				// @ts-ignore
-				const t_root_3 = t_root(t_fragment_3, true);
-				// @ts-ignore
-				const t_text_4 = t_next(t_next(t_root_3), true);
-				t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
-				t_next(t_text_4);
-			});
-		}
-		else {
-			t_run_branch(t_if_range_1, 3, () => {
-			});
+		switch ($t_if_state_1.index) {
+			case 0: {
+				t_run_branch(t_if_range_1, 0, () => {
+					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
+					// @ts-ignore
+					const t_root_1 = t_root(t_fragment_1, true);
+					// @ts-ignore
+					const t_text_2 = t_next(t_next(t_root_1), true);
+					t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
+					t_next(t_text_2);
+				});
+				break;
+			}
+			case 1: {
+				t_run_branch(t_if_range_1, 1, () => {
+					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
+					// @ts-ignore
+					const t_root_2 = t_root(t_fragment_2, true);
+					// @ts-ignore
+					const t_text_3 = t_next(t_next(t_root_2), true);
+					t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
+					t_next(t_text_3);
+				});
+				break;
+			}
+			case 2: {
+				t_run_branch(t_if_range_1, 2, () => {
+					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
+					// @ts-ignore
+					const t_root_3 = t_root(t_fragment_3, true);
+					// @ts-ignore
+					const t_text_4 = t_next(t_next(t_root_3), true);
+					t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
+					t_next(t_text_4);
+				});
+				break;
+			}
+			case 3: {
+				t_run_branch(t_if_range_1, 3, () => {
+				});
+				break;
+			}
 		}
 	});
 
