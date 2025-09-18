@@ -1,6 +1,6 @@
-import { type Computed } from "../types/Computed";
-import { type Effect } from "../types/Effect";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type Effect from "../types/Effect";
+import type Subscription from "../types/Subscription";
 
 /**
  * Clear unused source subscriptions after each Computed or Effect has been run.

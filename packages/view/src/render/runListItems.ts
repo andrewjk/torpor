@@ -23,8 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import { type ListItem } from "../types/ListItem";
-import { type Range } from "../types/Range";
+import type ListItem from "../types/ListItem";
+import type Range from "../types/Range";
 import $watch from "./$watch";
 import clearRange from "./clearRange";
 import context from "./context";

@@ -1,4 +1,4 @@
-export type BuildOptions = {
+export default interface BuildOptions {
 	/**
 	 * Whether to create the component for server side rendering
 	 */
@@ -14,4 +14,4 @@ export type BuildOptions = {
 	 * For internal testing and benchmarking
 	 */
 	renderFolder?: string;
-};
+}

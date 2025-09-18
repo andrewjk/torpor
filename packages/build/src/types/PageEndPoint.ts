@@ -4,7 +4,7 @@ import type PageLoadEvent from "./PageLoadEvent";
 /**
  * For +page.
  */
-type PageEndPoint = {
+export default interface PageEndPoint {
 	/**
 	 * Builds the route path for the page in a type-safe manner.
 	 * TODO: Not sure this is actually the best way to do it...
@@ -25,9 +25,7 @@ type PageEndPoint = {
 	 * The head element data for the page, which may include a <title> and <meta> elements.
 	 */
 	head?: HeadElement[] | ((event: PageLoadEvent) => HeadElement[]);
-};
-
-export default PageEndPoint;
+}
 
 type HeadElement = TitleElement | MetaElement;
 

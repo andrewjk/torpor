@@ -1,10 +1,10 @@
-import { type Subscription } from "./Subscription";
+import type Subscription from "./Subscription";
 
 /**
  * A value that causes dependent Computeds and Effects to be re-run. Our signals
  * are implemented as object properties.
  */
-export type ProxySignal = {
+export default interface ProxySignal {
 	/**
 	 * SIGNAL.
 	 */
@@ -24,4 +24,4 @@ export type ProxySignal = {
 	 * The name of the property, for debugging.
 	 */
 	name?: string;
-};
+}

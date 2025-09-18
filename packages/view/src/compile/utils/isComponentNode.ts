@@ -1,5 +1,5 @@
-import { type ElementNode } from "./ElementNode";
-import { type TemplateNode } from "./TemplateNode";
+import type ElementNode from "../types/nodes/ElementNode";
+import type TemplateNode from "../types/nodes/TemplateNode";
 
 export default function isComponentNode(node: TemplateNode): node is ElementNode {
 	return node.type === "component";

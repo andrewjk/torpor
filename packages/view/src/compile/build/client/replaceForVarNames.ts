@@ -1,4 +1,4 @@
-import type { BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 
 /**
  * Variables used within a for loop need to be retrieved from the loop data.

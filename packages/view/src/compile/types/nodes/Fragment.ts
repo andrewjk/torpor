@@ -1,4 +1,4 @@
-export type Fragment = {
+export default interface Fragment {
 	number: number;
 	text: string;
 	ns: boolean;
@@ -9,4 +9,4 @@ export type Fragment = {
 	}[];
 	animations: string[];
 	endVarName?: string;
-};
+}

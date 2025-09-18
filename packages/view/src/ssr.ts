@@ -9,7 +9,7 @@ import t_class from "./render/buildClasses";
 import t_style from "./render/buildStyles";
 import t_attr from "./render/formatAttributeText";
 import t_fmt from "./render/formatText";
-import { type ServerSlotRender } from "./types/ServerSlotRender";
+import type ServerSlotRender from "./types/ServerSlotRender";
 
 export { $watch, $cache, $run, $mount, $unwrap, $peek, $batch, t_fmt, t_attr, t_class, t_style };
 

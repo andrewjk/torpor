@@ -1,10 +1,9 @@
 /**
  * Options for $watch.
  */
-type WatchOptions = {
+export default interface WatchOptions {
 	/**
 	 * Only watch top-level properties, don't recursively watch children.
 	 */
 	shallow?: boolean;
-};
-export default WatchOptions;
+}

@@ -1,19 +1,19 @@
 import isSpace from "../../parse/utils/isSpace";
-import { type ControlNode } from "../../types/nodes/ControlNode";
-import { type ElementNode } from "../../types/nodes/ElementNode";
-import { type Fragment } from "../../types/nodes/Fragment";
-import { type RootNode } from "../../types/nodes/RootNode";
-import { type TemplateNode } from "../../types/nodes/TemplateNode";
-import { type TextNode } from "../../types/nodes/TextNode";
-import isControlNode from "../../types/nodes/isControlNode";
-import isElementNode from "../../types/nodes/isElementNode";
-import isSpecialNode from "../../types/nodes/isSpecialNode";
-import isTextNode from "../../types/nodes/isTextNode";
+import type ControlNode from "../../types/nodes/ControlNode";
+import type ElementNode from "../../types/nodes/ElementNode";
+import type Fragment from "../../types/nodes/Fragment";
+import type RootNode from "../../types/nodes/RootNode";
+import type TemplateNode from "../../types/nodes/TemplateNode";
+import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import isControlNode from "../../utils/isControlNode";
+import isElementNode from "../../utils/isElementNode";
 import isReactive from "../../utils/isReactive";
+import isSpecialNode from "../../utils/isSpecialNode";
+import isTextNode from "../../utils/isTextNode";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildNode from "./buildNode";
 
 interface VariablePath {

@@ -1,10 +1,10 @@
-import { type ElementNode } from "../../types/nodes/ElementNode";
-import { type TextNode } from "../../types/nodes/TextNode";
+import type ElementNode from "../../types/nodes/ElementNode";
+import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import trimEnd from "../../utils/trimEnd";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";

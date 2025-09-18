@@ -1,5 +1,5 @@
 import context from "../render/context";
-import { type ProxyData } from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 import { SIGNAL_TYPE } from "../types/constants";
 import trackEffect from "./trackEffect";
 

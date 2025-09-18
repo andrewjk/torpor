@@ -1,8 +1,8 @@
-import { type BuildOptions } from "../../../types/BuildOptions";
-import { type Template } from "../../../types/Template";
+import type BuildOptions from "../../../types/BuildOptions";
+import type Template from "../../../types/Template";
 import Builder from "../../utils/Builder";
 import buildStyles from "../client/buildStyles";
-import { type BuildServerStatus } from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 const importsMap: Record<string, string> = {

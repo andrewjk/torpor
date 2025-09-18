@@ -1,6 +1,6 @@
-import { type ControlNode } from "../../types/nodes/ControlNode";
+import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
-import { type BuildServerStatus } from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerHtmlNode from "./buildServerHtmlNode";

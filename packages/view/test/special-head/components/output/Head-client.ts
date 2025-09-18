@@ -1,5 +1,5 @@
 import $run from "../../../../src/render/$run";
-import { type SlotRender } from "../../../../src/types/SlotRender";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Head(
 	_$parent: ParentNode,

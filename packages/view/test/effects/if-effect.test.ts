@@ -2,7 +2,7 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
-import { type ProxyData } from "../../src/types/ProxyData";
+import type ProxyData from "../../src/types/ProxyData";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";

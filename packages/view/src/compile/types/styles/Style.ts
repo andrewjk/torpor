@@ -1,7 +1,7 @@
-import { type StyleBlock } from "./StyleBlock";
+import type StyleBlock from "./StyleBlock";
 
-export type Style = {
+export default interface Style {
 	global: boolean;
 	blocks: StyleBlock[];
 	hash: string;
-};
+}

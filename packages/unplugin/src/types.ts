@@ -1,4 +1,4 @@
-export interface Options {
+export default interface Options {
 	/**
 	 * Whether to generate server components which will render HTML
 	 */

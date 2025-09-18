@@ -1,6 +1,6 @@
 import type RouteLayoutHandler from "./RouteLayoutHandler";
 
-type RouteHandler = {
+export default interface RouteHandler {
 	path: string;
 	type: number;
 	endPoint: () => Promise<any>;
@@ -9,6 +9,4 @@ type RouteHandler = {
 	layouts?: RouteLayoutHandler[];
 	serverEndPoint?: () => Promise<any>;
 	serverHook?: () => Promise<any>;
-};
-
-export default RouteHandler;
+}

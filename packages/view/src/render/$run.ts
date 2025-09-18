@@ -1,5 +1,5 @@
-import { type Cleanup } from "../types/Cleanup";
-import { type Effect } from "../types/Effect";
+import type Cleanup from "../types/Cleanup";
+import type Effect from "../types/Effect";
 import { EFFECT_TYPE } from "../types/constants";
 import runEffect from "../watch/runEffect";
 

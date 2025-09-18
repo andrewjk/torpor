@@ -1,5 +1,5 @@
-import { type BuildStatus } from "../client/BuildStatus";
-import { type BuildServerStatus } from "../server/BuildServerStatus";
+import type BuildStatus from "../client/BuildStatus";
+import type BuildServerStatus from "../server/BuildServerStatus";
 
 /**
  * Makes a supplied variable name (hopefully!) unique by prepending `t_` and

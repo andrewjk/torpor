@@ -1,10 +1,10 @@
-import { type Cleanup } from "./Cleanup";
-import { type Subscription } from "./Subscription";
+import type Cleanup from "./Cleanup";
+import type Subscription from "./Subscription";
 
 /**
  * An effect that is run and re-run when the properties it depends on change.
  */
-export type Effect = {
+export default interface Effect {
 	/**
 	 * EFFECT.
 	 */
@@ -50,4 +50,4 @@ export type Effect = {
 	 * The name of the effect, for debugging.
 	 */
 	name?: string;
-};
+}

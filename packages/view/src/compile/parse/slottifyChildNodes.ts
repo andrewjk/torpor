@@ -1,6 +1,6 @@
-import { type ElementNode } from "../types/nodes/ElementNode";
-import { type TemplateNode } from "../types/nodes/TemplateNode";
-import isSpecialNode from "../types/nodes/isSpecialNode";
+import type ElementNode from "../types/nodes/ElementNode";
+import type TemplateNode from "../types/nodes/TemplateNode";
+import isSpecialNode from "../utils/isSpecialNode";
 
 /**
  * Moves any child nodes that aren't already in a <fill> node into a default

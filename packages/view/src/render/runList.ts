@@ -1,5 +1,5 @@
-import { type ListItem } from "../types/ListItem";
-import { type Range } from "../types/Range";
+import type ListItem from "../types/ListItem";
+import type Range from "../types/Range";
 import $run from "./$run";
 import context from "./context";
 import popRange from "./popRange";

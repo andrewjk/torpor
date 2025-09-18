@@ -1,4 +1,4 @@
-import { type ListItem } from "../types/ListItem";
+import type ListItem from "../types/ListItem";
 
 export default function newListItem(data: Record<PropertyKey, any>, key?: any): ListItem {
 	return {

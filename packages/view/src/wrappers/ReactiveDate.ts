@@ -1,4 +1,4 @@
-import type { ProxyData } from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 import { proxyDataSymbol, proxyHandledSymbol } from "../watch/symbols";
 import trackProxyEffect from "../watch/trackProxyEffect";
 import updateSignal from "../watch/updateSignal";

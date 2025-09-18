@@ -1,5 +1,5 @@
 import $watch from "../../../../src/render/$watch";
-import { type SlotRender } from "../../../../src/types/SlotRender";
+import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_event from "../../../../src/render/addEvent";
 import t_fragment from "../../../../src/render/getFragment";

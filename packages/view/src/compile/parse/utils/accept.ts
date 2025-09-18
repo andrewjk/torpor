@@ -1,4 +1,4 @@
-import { type ParseStatus } from "../ParseStatus";
+import type ParseStatus from "../ParseStatus";
 
 /**
  * Checks whether the source at the current parse position matches the supplied

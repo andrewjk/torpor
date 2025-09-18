@@ -9,7 +9,7 @@ import Site from "../site/Site";
 import $page from "../state/$page.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
-import RouteHandler from "../types/RouteHandler.ts";
+import type RouteHandler from "../types/RouteHandler.ts";
 import {
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,

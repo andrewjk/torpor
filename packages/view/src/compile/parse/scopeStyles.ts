@@ -1,10 +1,10 @@
-import { type TemplateNode } from "../types/nodes/TemplateNode";
-import isComponentNode from "../types/nodes/isComponentNode";
-import isElementNode from "../types/nodes/isElementNode";
-import isParentNode from "../types/nodes/isParentNode";
-import { type StyleBlock } from "../types/styles/StyleBlock";
+import type TemplateNode from "../types/nodes/TemplateNode";
+import type StyleBlock from "../types/styles/StyleBlock";
+import isComponentNode from "../utils/isComponentNode";
+import isElementNode from "../utils/isElementNode";
+import isParentNode from "../utils/isParentNode";
 import trimQuotes from "../utils/trimQuotes";
-import { type ParseStatus } from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 
 export default function scopeStyles(status: ParseStatus): void {
 	let selectors: string[] = [];

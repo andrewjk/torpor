@@ -1,14 +1,14 @@
-import { type Animation } from "./Animation";
-import { type Cleanup } from "./Cleanup";
-import { type Computed } from "./Computed";
-import { type Effect } from "./Effect";
-import { type ProxySignal } from "./ProxySignal";
-import { type Range } from "./Range";
+import type Animation from "./Animation";
+import type Cleanup from "./Cleanup";
+import type Computed from "./Computed";
+import type Effect from "./Effect";
+import type ProxySignal from "./ProxySignal";
+import type Range from "./Range";
 
 /**
  * The global context for setting up effects and updating subscriptions.
  */
-export interface Context {
+export default interface Context {
 	/**
 	 * The target (effect or computed value) that is currently being run.
 	 */

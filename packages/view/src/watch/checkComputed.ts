@@ -1,5 +1,5 @@
-import { type Computed } from "../types/Computed";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type Subscription from "../types/Subscription";
 import checkSources from "./checkSources";
 import clearSources from "./clearSources";
 import deactivateSources from "./deactivateSources";

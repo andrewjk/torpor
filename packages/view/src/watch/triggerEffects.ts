@@ -1,6 +1,6 @@
 import context from "../render/context";
-import { type Effect } from "../types/Effect";
-import { type ProxySignal } from "../types/ProxySignal";
+import type Effect from "../types/Effect";
+import type ProxySignal from "../types/ProxySignal";
 import checkEffect from "./checkEffect";
 import clearTargets from "./clearTargets";
 

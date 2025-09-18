@@ -1,6 +1,6 @@
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
-import { type ParseStatus } from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 import accept from "./utils/accept";
 
 export default function parseInlineScript(status: ParseStatus): string {

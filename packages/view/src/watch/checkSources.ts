@@ -1,7 +1,7 @@
 import context from "../render/context";
-import { type Computed } from "../types/Computed";
-import { type Effect } from "../types/Effect";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type Effect from "../types/Effect";
+import type Subscription from "../types/Subscription";
 import { COMPUTED_TYPE, SIGNAL_TYPE } from "../types/constants";
 import checkComputed from "./checkComputed";
 

@@ -1,4 +1,4 @@
-import { type Range } from "../types/Range";
+import type Range from "../types/Range";
 import isFragmentNode from "./isFragmentNode";
 
 export default function moveRange(parent: Node, range: Range, before: ChildNode | null): void {

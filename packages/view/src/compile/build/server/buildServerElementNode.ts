@@ -1,8 +1,8 @@
-import { type ElementNode } from "../../types/nodes/ElementNode";
+import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
-import { type BuildServerStatus } from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
 
 export default function buildServerElementNode(

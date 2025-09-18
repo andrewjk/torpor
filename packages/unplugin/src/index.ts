@@ -2,7 +2,7 @@ import { type Template, build, parse } from "@torpor/view/compile";
 import { type UnpluginFactory, type UnpluginInstance } from "unplugin";
 import { createUnplugin } from "unplugin";
 import { transformWithEsbuild } from "vite";
-import { type Options } from "./types";
+import type Options from "./types";
 
 const styles = new Map<string, string>();
 

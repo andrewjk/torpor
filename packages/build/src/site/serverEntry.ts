@@ -8,7 +8,7 @@ import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
-import RouteHandler from "../types/RouteHandler.ts";
+import type RouteHandler from "../types/RouteHandler.ts";
 import {
 	ERROR_ROUTE,
 	HOOK_ROUTE,

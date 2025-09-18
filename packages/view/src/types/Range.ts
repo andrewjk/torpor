@@ -1,6 +1,6 @@
-import { type Effect } from "./Effect";
+import type Effect from "./Effect";
 
-export type Range = {
+export default interface Range {
 	startNode: ChildNode | null;
 	endNode: ChildNode | null;
 
@@ -22,4 +22,4 @@ export type Range = {
 	 * awaited or canceled before it is removed
 	 */
 	animations: Set<Animation> | null;
-};
+}

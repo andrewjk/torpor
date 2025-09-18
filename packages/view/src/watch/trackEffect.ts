@@ -1,7 +1,7 @@
 import context from "../render/context";
-import { type Computed } from "../types/Computed";
-import { type ProxySignal } from "../types/ProxySignal";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type ProxySignal from "../types/ProxySignal";
+import type Subscription from "../types/Subscription";
 
 // TODO: Rename this to `subscribe` because its purpose has changed a bit
 

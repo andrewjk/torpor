@@ -81,9 +81,9 @@ export default function nodeMessageToNodeResponse(
 	};
 }
 
-type ServerResponseResponse = {
+interface ServerResponseResponse {
 	res: ServerResponse;
 	onReadable: (
 		cb: (result: { readable: Readable; headers: OutgoingHttpHeaders; status: number }) => void,
 	) => void;
-};
+}

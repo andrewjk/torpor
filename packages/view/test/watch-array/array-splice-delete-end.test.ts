@@ -5,7 +5,7 @@ import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
-import { type ArrayState } from "./ArrayState";
+import ArrayState from "./ArrayState";
 
 const componentPath = "./test/watch-array/components/Array";
 

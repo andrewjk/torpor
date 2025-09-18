@@ -3,9 +3,9 @@ import {
 	HYDRATION_END_COMMENT,
 	HYDRATION_START_COMMENT,
 } from "../../types/comments";
-import { type ControlNode } from "../../types/nodes/ControlNode";
-import isControlNode from "../../types/nodes/isControlNode";
-import { type BuildServerStatus } from "./BuildServerStatus";
+import type ControlNode from "../../types/nodes/ControlNode";
+import isControlNode from "../../utils/isControlNode";
+import type BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerHtmlNode(node: ControlNode, status: BuildServerStatus): void {
 	// Surround the entire control statement with bracketed comments, so that we

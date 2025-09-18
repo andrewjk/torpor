@@ -1,5 +1,5 @@
-import { type Component } from "../types/Component";
-import { type SlotRender } from "../types/SlotRender";
+import type Component from "../types/Component";
+import type SlotRender from "../types/SlotRender";
 
 /**
  * Mounts a component into a DOM node

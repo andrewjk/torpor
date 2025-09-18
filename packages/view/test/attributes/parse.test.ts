@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import { type ParseResult } from "../../src/compile/types/ParseResult";
+import type ParseResult from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
 
 test("attribute with double quotes", () => {

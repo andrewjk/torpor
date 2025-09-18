@@ -1,4 +1,4 @@
-import { type Range } from "../types/Range";
+import type Range from "../types/Range";
 import $run from "./$run";
 import context from "./context";
 import popRange from "./popRange";

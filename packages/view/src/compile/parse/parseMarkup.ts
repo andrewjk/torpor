@@ -1,5 +1,5 @@
-import type { TextNode } from "../types/nodes/TextNode";
-import type { ParseStatus } from "./ParseStatus";
+import type TextNode from "../types/nodes/TextNode";
+import type ParseStatus from "./ParseStatus";
 import parseControl from "./parseControl";
 import parseElement from "./parseElement";
 import accept from "./utils/accept";

@@ -1,7 +1,7 @@
-import { type NodeType } from "./NodeType";
-import { type TemplateNode } from "./TemplateNode";
+import type NodeType from "./NodeType";
+import type TemplateNode from "./TemplateNode";
 
-export type ParentNode = TemplateNode & {
+export default interface ParentNode extends TemplateNode {
 	type: NodeType;
 	children: TemplateNode[];
-};
+}

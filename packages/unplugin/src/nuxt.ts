@@ -1,7 +1,7 @@
 import { addVitePlugin, addWebpackPlugin, defineNuxtModule } from "@nuxt/kit";
 import "@nuxt/schema";
 import type { NuxtModule } from "@nuxt/schema";
-import { type Options } from "./types";
+import type Options from "./types";
 import vite from "./vite";
 import webpack from "./webpack";
 

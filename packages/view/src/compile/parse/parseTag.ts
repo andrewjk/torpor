@@ -1,9 +1,9 @@
-import { type Attribute } from "../types/nodes/Attribute";
-import { type ElementNode } from "../types/nodes/ElementNode";
+import type Attribute from "../types/nodes/Attribute";
+import type ElementNode from "../types/nodes/ElementNode";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import trimQuotes from "../utils/trimQuotes";
-import { type ParseStatus } from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import accept from "./utils/accept";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";

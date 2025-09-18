@@ -1,6 +1,6 @@
-import { type Range } from "./Range";
+import type Range from "./Range";
 
-export type ListItem = Range & {
+export default interface ListItem extends Range {
 	data: Record<string, any>;
 	key: any;
-};
+}

@@ -1,7 +1,7 @@
-import { type ControlNode } from "../../types/nodes/ControlNode";
+import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 
 export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder): void {

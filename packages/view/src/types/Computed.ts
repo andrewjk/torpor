@@ -1,11 +1,11 @@
-import { type Subscription } from "./Subscription";
+import type Subscription from "./Subscription";
 
 /**
  * A computed value that is lazily refreshed when accessed from an Effect or
  * another Computed. Our computed values are implemented as property getter
  * functions.
  */
-export type Computed<T = any> = {
+export default interface Computed<T = any> {
 	/**
 	 * COMPUTED.
 	 */
@@ -58,4 +58,4 @@ export type Computed<T = any> = {
 	 * The name of the computed property, for debugging.
 	 */
 	name?: string;
-};
+}

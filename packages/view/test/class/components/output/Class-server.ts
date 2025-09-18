@@ -1,4 +1,4 @@
-import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_class from "../../../../src/render/buildClasses";
 
 export default function Class(

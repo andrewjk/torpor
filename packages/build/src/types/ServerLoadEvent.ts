@@ -1,7 +1,7 @@
 import CookieHelper from "../server/CookieHelper";
 import HeaderHelper from "../server/HeaderHelper";
 
-type ServerLoadEvent = {
+export default interface ServerLoadEvent {
 	/**
 	 * The URL for the server function.
 	 */
@@ -34,6 +34,4 @@ type ServerLoadEvent = {
 	 * An optional adapter object, containing adapter-specific functionality.
 	 */
 	adapter: Record<PropertyKey, any>;
-};
-
-export default ServerLoadEvent;
+}

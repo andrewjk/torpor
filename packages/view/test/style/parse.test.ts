@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import buildStyles from "../../src/compile/build/client/buildStyles";
 import parse from "../../src/compile/parse";
-import { type ParseResult } from "../../src/compile/types/ParseResult";
+import type ParseResult from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {

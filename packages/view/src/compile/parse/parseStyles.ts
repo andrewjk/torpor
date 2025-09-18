@@ -1,7 +1,7 @@
-import { type Attribute } from "../types/styles/Attribute";
-import { type StyleBlock } from "../types/styles/StyleBlock";
+import type Attribute from "../types/styles/Attribute";
+import type StyleBlock from "../types/styles/StyleBlock";
 import hash from "../utils/hash";
-import { type ParseStatus } from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 import accept from "./utils/accept";
 import consumeSpace from "./utils/consumeSpace";
 import consumeUntil from "./utils/consumeUntil";

@@ -1,4 +1,4 @@
-import { type Computed } from "../types/Computed";
+import type Computed from "../types/Computed";
 import { COMPUTED_TYPE } from "../types/constants";
 import runComputed from "../watch/runComputed";
 import context from "./context";

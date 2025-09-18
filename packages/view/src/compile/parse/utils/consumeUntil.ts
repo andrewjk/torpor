@@ -1,4 +1,4 @@
-import { type ParseStatus } from "../ParseStatus";
+import type ParseStatus from "../ParseStatus";
 
 /**
  * Consumes characters until one of the characters in the supplied string is

@@ -1,6 +1,6 @@
-import type { Component } from "../types/Component";
-import { type Range } from "../types/Range";
-import type { SlotRender } from "../types/SlotRender";
+import type Component from "../types/Component";
+import type Range from "../types/Range";
+import type SlotRender from "../types/SlotRender";
 import newRange from "./newRange";
 import popRange from "./popRange";
 import pushRange from "./pushRange";

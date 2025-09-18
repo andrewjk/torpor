@@ -1,10 +1,10 @@
-import { type BuildOptions } from "../../../types/BuildOptions";
+import type BuildOptions from "../../../types/BuildOptions";
 
-export type BuildServerStatus = {
+export default interface BuildServerStatus {
 	imports: Set<string>;
 	output: string;
 	styleHash: string;
 	varNames: Record<string, number>;
 	preserveWhitespace: boolean;
 	options?: BuildOptions;
-};
+}

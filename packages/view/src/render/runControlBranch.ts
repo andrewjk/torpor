@@ -1,4 +1,4 @@
-import { type Range } from "../types/Range";
+import type Range from "../types/Range";
 import clearRange from "./clearRange";
 import context from "./context";
 import newRange from "./newRange";

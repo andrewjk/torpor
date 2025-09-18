@@ -1,4 +1,4 @@
-import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 import BigTitle from "../output/./BigTitle-server";
 import SmallTitle from "../output/./SmallTitle-server";

@@ -1,4 +1,4 @@
-export type OperationType =
+type OperationType =
 	| "@if group"
 	| "@if"
 	| "@else if"
@@ -22,3 +22,5 @@ export type OperationType =
 	| "@debugger"
 	| "@function"
 	| "@async function";
+
+export default OperationType;

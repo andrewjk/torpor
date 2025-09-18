@@ -1,7 +1,7 @@
-export type Import = {
+export default interface Import {
 	name: string;
 	alias?: string;
 	path: string;
 	nonDefault: boolean;
 	component: boolean;
-};
+}

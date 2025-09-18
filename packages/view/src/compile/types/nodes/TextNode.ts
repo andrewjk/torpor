@@ -1,7 +1,7 @@
-import { type TemplateNode } from "./TemplateNode";
+import type TemplateNode from "./TemplateNode";
 
-export type TextNode = TemplateNode & {
+export default interface TextNode extends TemplateNode {
 	type: "text";
 	content: string;
 	//reactive: boolean;
-};
+}

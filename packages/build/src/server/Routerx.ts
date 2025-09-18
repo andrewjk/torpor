@@ -66,7 +66,7 @@ class MiddlewareHandler {
 	}
 }
 
-type Match = {
+interface Match {
 	fn: ServerFunction;
 	params?: Record<string, string>;
-};
+}

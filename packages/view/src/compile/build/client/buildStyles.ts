@@ -1,6 +1,6 @@
-import { type Attribute } from "../../types/styles/Attribute";
-import { type Style } from "../../types/styles/Style";
-import { type StyleBlock } from "../../types/styles/StyleBlock";
+import type Attribute from "../../types/styles/Attribute";
+import type Style from "../../types/styles/Style";
+import type StyleBlock from "../../types/styles/StyleBlock";
 import Builder from "../../utils/Builder";
 
 export default function buildStyles(style: Style, styleHash: string): string {

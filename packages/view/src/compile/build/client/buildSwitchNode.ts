@@ -1,8 +1,8 @@
-import { type ControlNode } from "../../types/nodes/ControlNode";
-import isControlNode from "../../types/nodes/isControlNode";
+import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
+import isControlNode from "../../utils/isControlNode";
 import nextVarName from "../utils/nextVarName";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";

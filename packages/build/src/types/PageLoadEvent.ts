@@ -1,4 +1,4 @@
-type PageLoadEvent = {
+export default interface PageLoadEvent {
 	/**
 	 * The URL for the server function.
 	 */
@@ -11,6 +11,4 @@ type PageLoadEvent = {
 	 * Data that is (optionally) loaded from the load function and passed into the page as $props.data.
 	 */
 	data: Record<string, any>;
-};
-
-export default PageLoadEvent;
+}

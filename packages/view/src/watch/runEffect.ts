@@ -1,5 +1,5 @@
 import context from "../render/context";
-import { type Effect } from "../types/Effect";
+import type Effect from "../types/Effect";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 import clearSources from "./clearSources";

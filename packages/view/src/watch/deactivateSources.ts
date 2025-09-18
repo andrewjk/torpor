@@ -1,6 +1,6 @@
-import { type Computed } from "../types/Computed";
-import { type Effect } from "../types/Effect";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type Effect from "../types/Effect";
+import type Subscription from "../types/Subscription";
 
 /**
  * Sets source subscriptions to inactive for a Computed or Effect.

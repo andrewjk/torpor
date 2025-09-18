@@ -1,4 +1,4 @@
-import { type ProxyData } from "../types/ProxyData";
+import type ProxyData from "../types/ProxyData";
 import type WatchOptions from "../types/WatchOptions";
 import proxyGet from "../watch/proxyGet";
 import proxySet from "../watch/proxySet";

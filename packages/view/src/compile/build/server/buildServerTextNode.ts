@@ -1,7 +1,7 @@
-import { type TextNode } from "../../types/nodes/TextNode";
+import type TextNode from "../../types/nodes/TextNode";
 import endOfString from "../../utils/endOfString";
 import endOfTemplateString from "../../utils/endOfTemplateString";
-import { type BuildServerStatus } from "./BuildServerStatus";
+import type BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus): void {
 	let content = node.content || "";

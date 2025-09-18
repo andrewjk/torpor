@@ -1,7 +1,7 @@
-import { type RootNode } from "../compile/types/nodes/RootNode";
-import { type Style } from "../compile/types/styles/Style";
+import type RootNode from "../compile/types/nodes/RootNode";
+import type Style from "../compile/types/styles/Style";
 
-export type TemplateComponent = {
+export default interface TemplateComponent {
 	start?: number;
 	/** The component's name */
 	name?: string;
@@ -19,4 +19,4 @@ export type TemplateComponent = {
 	needsContext?: boolean;
 	/** $slot props that are used in the component's function */
 	slotProps?: string[];
-};
+}

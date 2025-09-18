@@ -1,6 +1,6 @@
-import { type NodeType } from "./NodeType";
+import type NodeType from "./NodeType";
 
-export type TemplateNode = {
+export default interface TemplateNode {
 	type: NodeType;
 
 	// Whether to add a scoped class name
@@ -15,4 +15,4 @@ export type TemplateNode = {
 	// Nodes with anchors need to be hydrated immediately (while we have the
 	// correct anchor node) rather than at the end of the fragment
 	handled?: boolean;
-};
+}

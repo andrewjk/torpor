@@ -1,4 +1,4 @@
-import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 
 export default function Attributes(

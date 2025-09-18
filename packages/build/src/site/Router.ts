@@ -158,8 +158,8 @@ class Route {
 	}
 }
 
-type Match = {
+interface Match {
 	handler: RouteHandler;
 	params?: Record<string, string>;
 	query: URLSearchParams;
-};
+}

@@ -1,6 +1,6 @@
-import { type RootNode } from "../../types/nodes/RootNode";
+import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../../utils/Builder";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";

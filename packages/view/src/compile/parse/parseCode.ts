@@ -1,11 +1,11 @@
-import { type TemplateComponent } from "../../types/TemplateComponent";
-import { type ParseResult } from "../types/ParseResult";
-import isElementNode from "../types/nodes/isElementNode";
-import isSpaceNode from "../types/nodes/isSpaceNode";
+import type TemplateComponent from "../../types/TemplateComponent";
+import type ParseResult from "../types/ParseResult";
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
+import isElementNode from "../utils/isElementNode";
+import isSpaceNode from "../utils/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
-import { type ParseStatus } from "./ParseStatus";
+import type ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";

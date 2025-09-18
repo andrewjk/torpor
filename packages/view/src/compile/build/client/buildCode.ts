@@ -1,7 +1,7 @@
-import { type BuildOptions } from "../../../types/BuildOptions";
-import { type Template } from "../../../types/Template";
+import type BuildOptions from "../../../types/BuildOptions";
+import type Template from "../../../types/Template";
 import Builder from "../../utils/Builder";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 

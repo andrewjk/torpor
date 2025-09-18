@@ -1,6 +1,6 @@
-type AnimationFrame = {
+interface AnimationFrame {
 	opacity: number;
-};
+}
 
 const animationFrames: AnimationFrame[] = [{ opacity: 0 }, { opacity: 1 }];
 

@@ -1,8 +1,8 @@
-import { type TextNode } from "../../types/nodes/TextNode";
+import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import endOfString from "../../utils/endOfString";
 import endOfTemplateString from "../../utils/endOfTemplateString";
-import { type BuildStatus } from "./BuildStatus";
+import type BuildStatus from "./BuildStatus";
 import buildRun from "./buildRun";
 
 export default function buildTextNode(node: TextNode, status: BuildStatus, b: Builder): void {

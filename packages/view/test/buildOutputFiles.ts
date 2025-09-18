@@ -152,9 +152,9 @@ const importsMap: Record<string, string> = {
 	'import { t_cmt } from "@torpor/view";':
 		'import t_cmt from "../../../../src/render/createComment";',
 	'import { type ListItem } from "@torpor/view";':
-		'import { type ListItem } from "../../../../src/types/ListItem";',
+		'import type ListItem from "../../../../src/types/ListItem";',
 	'import { type SlotRender } from "@torpor/view";':
-		'import { type SlotRender } from "../../../../src/types/SlotRender";',
+		'import type SlotRender from "../../../../src/types/SlotRender";',
 	'import { $watch } from "@torpor/view/ssr";':
 		'import $watch from "../../../../src/render/$serverWatch";',
 	'import { $unwrap } from "@torpor/view/ssr";':
@@ -174,5 +174,5 @@ const importsMap: Record<string, string> = {
 	'import { t_print } from "@torpor/view";':
 		'import t_print from "../../../../src/debug/printNode";',
 	'import { type ServerSlotRender } from "@torpor/view/ssr";':
-		'import { type ServerSlotRender } from "../../../../src/types/ServerSlotRender";',
+		'import type ServerSlotRender from "../../../../src/types/ServerSlotRender";',
 };

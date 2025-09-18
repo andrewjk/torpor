@@ -1,4 +1,4 @@
-import { type Range } from "../types/Range";
+import type Range from "../types/Range";
 
 export default function clearRange(range: Range): void {
 	//console.log("clearing range", range.startNode, "to", range.endNode);

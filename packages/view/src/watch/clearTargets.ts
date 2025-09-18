@@ -1,6 +1,6 @@
-import { type Computed } from "../types/Computed";
-import { type ProxySignal } from "../types/ProxySignal";
-import { type Subscription } from "../types/Subscription";
+import type Computed from "../types/Computed";
+import type ProxySignal from "../types/ProxySignal";
+import type Subscription from "../types/Subscription";
 
 /**
  * Clear unused target subscriptions after all Effects have been run.

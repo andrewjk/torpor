@@ -1,4 +1,4 @@
-import { type Effect } from "../types/Effect";
+import type Effect from "../types/Effect";
 import checkSources from "./checkSources";
 import clearSources from "./clearSources";
 import deactivateSources from "./deactivateSources";

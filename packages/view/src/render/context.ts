@@ -1,4 +1,4 @@
-import { type Context } from "../types/Context";
+import type Context from "../types/Context";
 
 const context: Context = {
 	activeTarget: null,

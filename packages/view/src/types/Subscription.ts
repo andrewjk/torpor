@@ -1,12 +1,12 @@
-import { type Computed } from "./Computed";
-import { type Effect } from "./Effect";
-import { type ProxySignal } from "./ProxySignal";
+import type Computed from "./Computed";
+import type Effect from "./Effect";
+import type ProxySignal from "./ProxySignal";
 
 /**
  * A subscription that connects a source Signal or Computed to a target Computed
  * or Effect.
  */
-export type Subscription = {
+export default interface Subscription {
 	/**
 	 * The source Signal or Computed.
 	 */
@@ -54,4 +54,4 @@ export type Subscription = {
 	 * The name of the subscription, for debugging.
 	 */
 	name?: string;
-};
+}

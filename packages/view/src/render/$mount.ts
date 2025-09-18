@@ -1,4 +1,4 @@
-import { type Cleanup } from "../types/Cleanup";
+import type Cleanup from "../types/Cleanup";
 import context from "./context";
 
 /**

@@ -1,4 +1,4 @@
-import { type ParseStatus } from "../ParseStatus";
+import type ParseStatus from "../ParseStatus";
 import isSpaceChar from "./isSpaceChar";
 
 /**
