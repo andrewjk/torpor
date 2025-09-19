@@ -38,9 +38,9 @@ function clearNodes(range: Range) {
 	if (range.startNode !== null) {
 		let currentNode = range.endNode ?? range.startNode;
 		// DEBUG:
-		if (range.startNode.parentNode !== currentNode.parentNode) {
-			throw new Error("range nodes have different parents");
-		}
+		//if (range.startNode.parentNode !== currentNode.parentNode) {
+		//	throw new Error("range nodes have different parents");
+		//}
 		while (currentNode !== range.startNode) {
 			let nextNode = currentNode.previousSibling;
 			currentNode.remove();
