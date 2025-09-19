@@ -3,9 +3,10 @@ import type Range from "../types/Range";
 export default function clearRange(range: Range): void {
 	//console.log("clearing range", range.startNode, "to", range.endNode);
 
-	// Clear effects and collect animations that take place within this range and its children
+	// Clear child ranges and collect animations that take place within this
+	// range and its children
 	let animations: Animation[] = [];
-	clearEffects(range, animations);
+	clearChildren(range, animations);
 
 	// Wait for animations, if any, then clear the range's nodes
 	if (animations.length > 0) {
@@ -16,7 +17,7 @@ export default function clearRange(range: Range): void {
 	}
 }
 
-function clearEffects(range: Range, animations: Animation[]) {
+function clearChildren(range: Range, animations: Animation[]) {
 	// Collect any running animations, including ones from the effect cleanups
 	if (range.animations !== null) {
 		for (let animation of range.animations) {
@@ -27,9 +28,14 @@ function clearEffects(range: Range, animations: Animation[]) {
 	// Recurse through the children
 	if (range.children !== null) {
 		for (let child of range.children) {
-			clearEffects(child, animations);
+			clearChildren(child, animations);
+
+			// Release the nodes
+			child.startNode = null;
+			child.endNode = null;
+			child.children = null;
+			child.animations = null;
 		}
-		range.children.length = 0;
 	}
 }
 
@@ -51,5 +57,7 @@ function clearNodes(range: Range) {
 		// Release the nodes
 		range.startNode = null;
 		range.endNode = null;
+		range.children = null;
+		range.animations = null;
 	}
 }
