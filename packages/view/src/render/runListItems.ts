@@ -161,12 +161,12 @@ export default function runListItems(
 			}
 		} else {
 			// The new list is exhausted; process old list removals
-			// Just truncate the parent range's children collection
-			range.children!.length = oldStartIndex;
-			for (oldStartIndex; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) {
+			for (oldEndIndex; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) {
 				//console.log("clear", oldStartItem.key);
 				clearRange(oldStartItem);
 			}
+			// Just truncate the parent range's children collection
+			range.children!.length = oldStartIndex;
 		}
 	}
 }
