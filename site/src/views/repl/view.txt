@@ -315,23 +315,21 @@ function $unwrap(object) {
 	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
 }
 function trackProxyEffect(data, key) {
-	if (context_default.activeTarget !== null) {
-		let signal = data.signals.get(key);
-		if (signal === void 0 || signal === null) {
-			signal = {
-				type: SIGNAL_TYPE,
-				firstTarget: null,
-				nextSignalToUpdate: null
-			};
-			data.signals.set(key, signal);
-		}
-		trackEffect(signal);
+	let signal = data.signals.get(key);
+	if (signal === void 0) {
+		signal = {
+			type: SIGNAL_TYPE,
+			firstTarget: null,
+			nextSignalToUpdate: null
+		};
+		data.signals.set(key, signal);
 	}
+	trackEffect(signal);
 }
 let lastEffect;
 function updateSignal(proxy, key) {
 	let signal = proxy.signals.get(key);
-	if (signal !== void 0 && signal !== null && signal.firstTarget !== null) {
+	if (signal !== void 0 && signal.firstTarget !== null) {
 		batchStart();
 		try {
 			if (context_default.firstSignalToUpdate === null) context_default.firstSignalToUpdate = signal;
@@ -385,7 +383,7 @@ function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
 	if (key === proxyDataSymbol) return data;
 	let signal = data.signals.get(key);
-	if (signal === void 0 || signal === null) {
+	if (signal === void 0) {
 		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
 		if (propDescriptor !== void 0) {
 			if (propDescriptor.writable) {
@@ -393,7 +391,6 @@ function proxyGet(target, key, receiver) {
 					const value = target[key];
 					if (value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) target[key] = $watch(value);
 				}
-				data.signals.set(key, null);
 				trackProxyEffect(data, key);
 			} else if (propDescriptor.get) {
 				const oldRegisterComputed = context_default.registerComputed;

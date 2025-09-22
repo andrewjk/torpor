@@ -24,7 +24,7 @@ export default function proxyGet(
 	//console.log(`object get '${String(key)}'`);
 
 	let signal = data.signals.get(key);
-	if (signal === undefined || signal === null) {
+	if (signal === undefined) {
 		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
 		if (propDescriptor !== undefined) {
 			if (propDescriptor.writable) {
@@ -43,7 +43,6 @@ export default function proxyGet(
 						target[key] = $watch(value);
 					}
 				}
-				data.signals.set(key, null);
 
 				// If a property is being accessed in the course of setting up an
 				// effect, track it

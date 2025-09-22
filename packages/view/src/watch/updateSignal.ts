@@ -22,7 +22,7 @@ export default function updateSignal(proxy: ProxyData, key: PropertyKey): void {
 	//console.log(`triggering effects for '${String(key)}'`);
 
 	let signal = proxy.signals.get(key) as ProxySignal;
-	if (signal !== undefined && signal !== null && signal.firstTarget !== null) {
+	if (signal !== undefined && signal.firstTarget !== null) {
 		batchStart();
 
 		try {

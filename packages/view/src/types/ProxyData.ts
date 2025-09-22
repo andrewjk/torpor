@@ -6,5 +6,5 @@ export default interface ProxyData {
 	target: Record<PropertyKey, any>;
 	isArray: boolean;
 	shallow: boolean;
-	signals: Map<PropertyKey, ProxySignal | Computed | null>;
+	signals: Map<PropertyKey, ProxySignal | Computed>;
 }
