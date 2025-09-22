@@ -4,7 +4,10 @@ export default function newRange(): Range {
 	return {
 		startNode: null,
 		endNode: null,
-		children: null,
+		previousRange: null,
+		nextRange: null,
+		lastRange: null,
+		children: 0,
 		index: 0,
 		animations: null,
 	};

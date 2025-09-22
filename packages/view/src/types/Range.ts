@@ -2,7 +2,10 @@ export default interface Range {
 	startNode: ChildNode | null;
 	endNode: ChildNode | null;
 
-	children: Range[] | null;
+	previousRange: Range | null;
+	nextRange: Range | null;
+	lastRange: Range | null;
+	children: number;
 
 	/**
 	 * The index of the range if it is a branch in e.g. an if, switch or loop

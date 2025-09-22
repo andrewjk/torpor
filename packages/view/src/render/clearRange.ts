@@ -5,8 +5,24 @@ export default function clearRange(range: Range): void {
 
 	// Clear child ranges and collect animations that take place within this
 	// range and its children
-	let animations: Animation[] = [];
-	clearChildren(range, animations);
+	let animations: Animation[] = range.animations !== null ? Array.from(range.animations) : [];
+	if (range.children > 0) {
+		let nextRange = range.nextRange!;
+		for (let i = 1; i < range.children; i++) {
+			if (nextRange.animations !== null) {
+				for (let animation of nextRange.animations) {
+					animations.push(animation);
+				}
+			}
+			let nr = nextRange.nextRange!;
+			releaseRange(nextRange);
+			nextRange = nr;
+		}
+		range.nextRange = nextRange;
+		if (nextRange !== null) {
+			nextRange.previousRange = range;
+		}
+	}
 
 	// Wait for animations, if any, then clear the range's nodes
 	if (animations.length > 0) {
@@ -14,28 +30,6 @@ export default function clearRange(range: Range): void {
 		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	} else {
 		clearNodes(range);
-	}
-}
-
-function clearChildren(range: Range, animations: Animation[]) {
-	// Collect any running animations, including ones from the effect cleanups
-	if (range.animations !== null) {
-		for (let animation of range.animations) {
-			animations.push(animation);
-		}
-	}
-
-	// Recurse through the children
-	if (range.children !== null) {
-		for (let child of range.children) {
-			clearChildren(child, animations);
-
-			// Release the nodes
-			child.startNode = null;
-			child.endNode = null;
-			child.children = null;
-			child.animations = null;
-		}
 	}
 }
 
@@ -53,11 +47,15 @@ function clearNodes(range: Range) {
 			currentNode = nextNode!;
 		}
 		currentNode.remove();
-
-		// Release the nodes
-		range.startNode = null;
-		range.endNode = null;
-		range.children = null;
-		range.animations = null;
+		releaseRange(range);
 	}
+}
+
+function releaseRange(range: Range) {
+	range.startNode = null;
+	range.endNode = null;
+	range.previousRange = null;
+	range.nextRange = null;
+	range.lastRange = null;
+	range.animations = null;
 }

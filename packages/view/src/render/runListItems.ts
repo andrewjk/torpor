@@ -27,7 +27,6 @@ import type ListItem from "../types/ListItem";
 import type Range from "../types/Range";
 import $watch from "./$watch";
 import clearRange from "./clearRange";
-import context from "./context";
 import moveRange from "./moveRange";
 
 /**
@@ -115,10 +114,10 @@ export default function runListItems(
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
+				newStartItem.previousRange = oldStartItem.previousRange;
+				newStartItem.nextRange = oldStartItem;
+				oldStartItem.previousRange = newStartItem;
 				clearRange(oldStartItem);
-				// @ts-ignore We know we have an active range (the for loop) and that it
-				// has children (because we're replacing one)
-				context.activeRange.children.splice(oldStartIndex, 1);
 				oldStartItem = oldItems[++oldStartIndex];
 				newStartItem = newItems[++newStartIndex];
 			} else if (oldIndex === undefined) {
@@ -131,9 +130,6 @@ export default function runListItems(
 				// Delete
 				//console.log("delete", oldStartItem.key);
 				clearRange(oldStartItem);
-				// @ts-ignore We know we have an active range (the for loop) and that it
-				// has children (because we're deleting one)
-				context.activeRange.children.splice(oldStartIndex, 1);
 				oldStartItem = oldItems[++oldStartIndex];
 			} else {
 				// Move
@@ -166,10 +162,10 @@ export default function runListItems(
 				//console.log("clear", oldStartItem.key);
 				clearRange(oldStartItem);
 			}
-			// Just truncate the parent range's children collection
-			range.children!.length = oldStartIndex;
 		}
 	}
+
+	range.children = newItems.length;
 }
 
 function transferListItemData(

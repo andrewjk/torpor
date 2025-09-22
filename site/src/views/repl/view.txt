@@ -561,20 +561,25 @@ function applyProps(el, props, propNamesUsed) {
 	}
 }
 function clearRange(range) {
-	let animations = [];
-	clearChildren(range, animations);
+	let animations = range.animations !== null ? Array.from(range.animations) : [];
+	if (range.children > 0) {
+		let nextRange = range.nextRange;
+		for (let i = 1; i < range.children; i++) {
+			if (nextRange.animations !== null) for (let animation of nextRange.animations) animations.push(animation);
+			let nr = nextRange.nextRange;
+			nextRange.startNode = null;
+			nextRange.endNode = null;
+			nextRange.previousRange = null;
+			nextRange.nextRange = null;
+			nextRange.lastRange = null;
+			nextRange.animations = null;
+			nextRange = nr;
+		}
+		range.nextRange = nextRange;
+		if (nextRange !== null) nextRange.previousRange = range;
+	}
 	if (animations.length > 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	else clearNodes(range);
-}
-function clearChildren(range, animations) {
-	if (range.animations !== null) for (let animation of range.animations) animations.push(animation);
-	if (range.children !== null) for (let child of range.children) {
-		clearChildren(child, animations);
-		child.startNode = null;
-		child.endNode = null;
-		child.children = null;
-		child.animations = null;
-	}
 }
 function clearNodes(range) {
 	if (range.startNode !== null) {
@@ -587,7 +592,9 @@ function clearNodes(range) {
 		currentNode.remove();
 		range.startNode = null;
 		range.endNode = null;
-		range.children = null;
+		range.previousRange = null;
+		range.nextRange = null;
+		range.lastRange = null;
 		range.animations = null;
 	}
 }
@@ -598,7 +605,10 @@ function newRange() {
 	return {
 		startNode: null,
 		endNode: null,
-		children: null,
+		previousRange: null,
+		nextRange: null,
+		lastRange: null,
+		children: 0,
 		index: 0,
 		animations: null
 	};
@@ -608,7 +618,17 @@ function popRange(oldRange) {
 }
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
-	if (toParent && activeRange !== null) (activeRange.children ??= []).push(range);
+	if (toParent && activeRange) {
+		if (activeRange.lastRange !== null) {
+			range.previousRange = activeRange.lastRange;
+			activeRange.lastRange.nextRange = range;
+			activeRange.lastRange = range;
+		} else {
+			range.previousRange = activeRange;
+			activeRange.nextRange = range;
+		}
+		activeRange.children++;
+	}
 	context_default.activeRange = range;
 	return activeRange;
 }
@@ -649,7 +669,10 @@ function newListItem(data, key) {
 	return {
 		startNode: null,
 		endNode: null,
-		children: null,
+		previousRange: null,
+		nextRange: null,
+		lastRange: null,
+		children: 0,
 		index: 0,
 		animations: null,
 		data,
@@ -747,9 +770,9 @@ function runControl(range, anchor, create) {
 	popRange(oldRange);
 }
 function runControlBranch(range, index, create) {
-	if (range.children !== null && range.children.length > 0) {
-		clearRange(range.children[0]);
-		range.children.length = 0;
+	if (range.children === 1) {
+		clearRange(range.nextRange);
+		range.children = 0;
 	}
 	const oldRange = pushRange(newRange(), true);
 	const oldTarget = context_default.activeTarget;
@@ -815,8 +838,10 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 		if (oldIndex === void 0 && newIndex === void 0) {
 			newStartItem.data = $watch(newStartItem.data, { shallow: true });
 			create(newStartItem, oldStartItem.startNode);
+			newStartItem.previousRange = oldStartItem.previousRange;
+			newStartItem.nextRange = oldStartItem;
+			oldStartItem.previousRange = newStartItem;
 			clearRange(oldStartItem);
-			context_default.activeRange.children.splice(oldStartIndex, 1);
 			oldStartItem = oldItems[++oldStartIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else if (oldIndex === void 0) {
@@ -825,7 +850,6 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 			newStartItem = newItems[++newStartIndex];
 		} else if (newIndex === void 0) {
 			clearRange(oldStartItem);
-			context_default.activeRange.children.splice(oldStartIndex, 1);
 			oldStartItem = oldItems[++oldStartIndex];
 		} else {
 			const oldData = oldItems[oldIndex];
@@ -842,10 +866,8 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 			create(newStartItem, before);
 			before = newStartItem.endNode.nextSibling;
 		}
-	} else {
-		for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
-		range.children.length = oldStartIndex;
-	}
+	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
+	range.children = newItems.length;
 }
 function transferListItemData(oldItem, newItem, update) {
 	newItem.startNode = oldItem.startNode;

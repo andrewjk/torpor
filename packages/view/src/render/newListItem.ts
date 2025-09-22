@@ -4,7 +4,10 @@ export default function newListItem(data: Record<PropertyKey, any>, key?: any): 
 	return {
 		startNode: null,
 		endNode: null,
-		children: null,
+		previousRange: null,
+		nextRange: null,
+		lastRange: null,
+		children: 0,
 		index: 0,
 		animations: null,
 		data,

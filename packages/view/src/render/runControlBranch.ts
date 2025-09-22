@@ -7,9 +7,9 @@ import pushRange from "./pushRange";
 
 export default function runControlBranch(range: Range, index: number, create: () => void): void {
 	// Branching ranges have exactly one child -- remove it if necessary
-	if (range.children !== null && range.children.length > 0) {
-		clearRange(range.children[0]);
-		range.children.length = 0;
+	if (range.children === 1) {
+		clearRange(range.nextRange!);
+		range.children = 0;
 	}
 
 	const oldRange = pushRange(newRange(), true);
