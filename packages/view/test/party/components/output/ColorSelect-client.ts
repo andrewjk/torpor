@@ -79,6 +79,9 @@ export default function ColorSelect(
 			t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
 			t_next(t_text_3);
 			t_pop_range(t_old_range_1);
+		},
+		function updateListItem(t_old_item, t_new_item) {
+			t_old_item.data.color = t_new_item.data.color;
 		}
 	);
 

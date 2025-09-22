@@ -89,8 +89,13 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	buildForItem(node, status, b, forParentName);
 	status.forVarNames = [];
 
-	b.append(`}`);
-	b.append(`);`);
+	b.append(`},
+	function updateListItem(t_old_item, t_new_item) {`);
+	for (let varName of forVarNames) {
+		b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);
+	}
+	b.append(`}
+		);`);
 	b.append("");
 }
 

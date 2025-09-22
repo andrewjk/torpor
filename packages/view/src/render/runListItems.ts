@@ -44,7 +44,8 @@ export default function runListItems(
 	anchor: Node | null,
 	oldItems: ListItem[],
 	newItems: ListItem[],
-	create: (data: ListItem, before: Node | null) => void,
+	create: (item: ListItem, before: Node | null) => void,
+	update: (oldItem: ListItem, newItem: ListItem) => void,
 ): void {
 	let oldStartIndex = 0;
 	let oldEndIndex = oldItems.length - 1;
@@ -69,25 +70,25 @@ export default function runListItems(
 		} else if (newEndItem === null) {
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldStartItem.key === newStartItem.key) {
-			transferRangeMarkers(oldStartItem, newStartItem);
+			transferListItemData(oldStartItem, newStartItem, update);
 			oldStartItem = oldItems[++oldStartIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else if (oldEndItem.key === newEndItem.key) {
-			transferRangeMarkers(oldEndItem, newEndItem);
+			transferListItemData(oldEndItem, newEndItem, update);
 			oldEndItem = oldItems[--oldEndIndex];
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldStartItem.key === newEndItem.key) {
 			// Move to the end
 			//console.log("move", oldStartItem.key, "to the end");
 			moveRange(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
-			transferRangeMarkers(oldStartItem, newEndItem);
+			transferListItemData(oldStartItem, newEndItem, update);
 			oldStartItem = oldItems[++oldStartIndex];
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldEndItem.key === newStartItem.key) {
 			// Move to the start
 			//console.log("move", oldEndItem.key, "to the start");
 			moveRange(parent, oldEndItem, oldStartItem!.startNode);
-			transferRangeMarkers(oldEndItem, newStartItem);
+			transferListItemData(oldEndItem, newStartItem, update);
 			oldEndItem = oldItems[--oldEndIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else {
@@ -112,7 +113,7 @@ export default function runListItems(
 			if (oldIndex === undefined && newIndex === undefined) {
 				// Replace
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
 				clearRange(oldStartItem);
 				// @ts-ignore We know we have an active range (the for loop) and that it
@@ -123,7 +124,7 @@ export default function runListItems(
 			} else if (oldIndex === undefined) {
 				// Insert
 				//console.log("insert", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
 				newStartItem = newItems[++newStartIndex];
 			} else if (newIndex === undefined) {
@@ -139,7 +140,7 @@ export default function runListItems(
 				//console.log("move", newStartItem.key, "before", oldStartItem.key);
 				const oldData = oldItems[oldIndex];
 				moveRange(parent, oldData, oldStartItem.startNode);
-				transferRangeMarkers(oldData, newStartItem);
+				transferListItemData(oldData, newStartItem, update);
 				// @ts-ignore TODO: Set key null instead?
 				oldItems[oldIndex] = null;
 				newStartItem = newItems[++newStartIndex];
@@ -155,7 +156,7 @@ export default function runListItems(
 				oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, before);
 				before = newStartItem.endNode!.nextSibling;
 			}
@@ -171,14 +172,15 @@ export default function runListItems(
 	}
 }
 
-function transferRangeMarkers(oldItem: ListItem, newItem: ListItem) {
+function transferListItemData(
+	oldItem: ListItem,
+	newItem: ListItem,
+	update: (oldItem: ListItem, newItem: ListItem) => void,
+) {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
-
 	// Manually transfer the new data's props to the old ones (to run effects)
 	// and then set the new data to the old one
-	for (let prop in oldItem.data) {
-		oldItem.data[prop] = newItem.data[prop];
-	}
+	update(oldItem, newItem);
 	newItem.data = oldItem.data;
 }

@@ -63,6 +63,9 @@ export default function ForOf(
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);
 			t_next(t_text_2);
 			t_pop_range(t_old_range_1);
+		},
+		function updateListItem(t_old_item, t_new_item) {
+			t_old_item.data.item = t_new_item.data.item;
 		}
 	);
 

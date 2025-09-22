@@ -562,21 +562,23 @@ function applyProps(el, props, propNamesUsed) {
 }
 function clearRange(range) {
 	let animations = [];
-	clearEffects(range, animations);
+	clearChildren(range, animations);
 	if (animations.length > 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	else clearNodes(range);
 }
-function clearEffects(range, animations) {
+function clearChildren(range, animations) {
 	if (range.animations !== null) for (let animation of range.animations) animations.push(animation);
-	if (range.children !== null) {
-		for (let child of range.children) clearEffects(child, animations);
-		range.children.length = 0;
+	if (range.children !== null) for (let child of range.children) {
+		clearChildren(child, animations);
+		child.startNode = null;
+		child.endNode = null;
+		child.children = null;
+		child.animations = null;
 	}
 }
 function clearNodes(range) {
 	if (range.startNode !== null) {
-		let currentNode = range.endNode || range.startNode;
-		if (range.startNode.parentNode !== currentNode.parentNode) throw new Error("range nodes have different parents");
+		let currentNode = range.endNode ?? range.startNode;
 		while (currentNode !== range.startNode) {
 			let nextNode = currentNode.previousSibling;
 			currentNode.remove();
@@ -585,6 +587,8 @@ function clearNodes(range) {
 		currentNode.remove();
 		range.startNode = null;
 		range.endNode = null;
+		range.children = null;
+		range.animations = null;
 	}
 }
 function clearLayoutSlot(range) {
@@ -756,7 +760,7 @@ function runControlBranch(range, index, create) {
 	range.index = index;
 }
 function moveRange(parent, range, before) {
-	const endNode = range.endNode || range.startNode;
+	const endNode = range.endNode ?? range.startNode;
 	let currentNode = range.startNode;
 	if (isFragmentNode(parent)) parent = before.parentNode;
 	while (currentNode !== null) {
@@ -766,7 +770,7 @@ function moveRange(parent, range, before) {
 		currentNode = nextNode;
 	}
 }
-function runListItems(range, parent, anchor, oldItems, newItems, create) {
+function runListItems(range, parent, anchor, oldItems, newItems, create, update) {
 	let oldStartIndex = 0;
 	let oldEndIndex = oldItems.length - 1;
 	let oldStartItem = oldItems[0];
@@ -782,21 +786,21 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 	else if (newStartItem === null) newStartItem = newItems[++newStartIndex];
 	else if (newEndItem === null) newEndItem = newItems[--newEndIndex];
 	else if (oldStartItem.key === newStartItem.key) {
-		transferRangeMarkers(oldStartItem, newStartItem);
+		transferListItemData(oldStartItem, newStartItem, update);
 		oldStartItem = oldItems[++oldStartIndex];
 		newStartItem = newItems[++newStartIndex];
 	} else if (oldEndItem.key === newEndItem.key) {
-		transferRangeMarkers(oldEndItem, newEndItem);
+		transferListItemData(oldEndItem, newEndItem, update);
 		oldEndItem = oldItems[--oldEndIndex];
 		newEndItem = newItems[--newEndIndex];
 	} else if (oldStartItem.key === newEndItem.key) {
 		moveRange(parent, oldStartItem, oldEndItem.endNode.nextSibling);
-		transferRangeMarkers(oldStartItem, newEndItem);
+		transferListItemData(oldStartItem, newEndItem, update);
 		oldStartItem = oldItems[++oldStartIndex];
 		newEndItem = newItems[--newEndIndex];
 	} else if (oldEndItem.key === newStartItem.key) {
 		moveRange(parent, oldEndItem, oldStartItem.startNode);
-		transferRangeMarkers(oldEndItem, newStartItem);
+		transferListItemData(oldEndItem, newStartItem, update);
 		oldEndItem = oldItems[--oldEndIndex];
 		newStartItem = newItems[++newStartIndex];
 	} else {
@@ -809,14 +813,14 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 		let oldIndex = oldKeyToIndex.get(newStartItem.key);
 		let newIndex = newKeyToIndex.get(oldStartItem.key);
 		if (oldIndex === void 0 && newIndex === void 0) {
-			newStartItem.data = $watch(newStartItem.data);
+			newStartItem.data = $watch(newStartItem.data, { shallow: true });
 			create(newStartItem, oldStartItem.startNode);
 			clearRange(oldStartItem);
 			context_default.activeRange.children.splice(oldStartIndex, 1);
 			oldStartItem = oldItems[++oldStartIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else if (oldIndex === void 0) {
-			newStartItem.data = $watch(newStartItem.data);
+			newStartItem.data = $watch(newStartItem.data, { shallow: true });
 			create(newStartItem, oldStartItem.startNode);
 			newStartItem = newItems[++newStartIndex];
 		} else if (newIndex === void 0) {
@@ -826,7 +830,7 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 		} else {
 			const oldData = oldItems[oldIndex];
 			moveRange(parent, oldData, oldStartItem.startNode);
-			transferRangeMarkers(oldData, newStartItem);
+			transferListItemData(oldData, newStartItem, update);
 			oldItems[oldIndex] = null;
 			newStartItem = newItems[++newStartIndex];
 		}
@@ -834,29 +838,29 @@ function runListItems(range, parent, anchor, oldItems, newItems, create) {
 	if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) if (oldStartIndex > oldEndIndex) {
 		let before = oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
 		for (; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-			newStartItem.data = $watch(newStartItem.data);
+			newStartItem.data = $watch(newStartItem.data, { shallow: true });
 			create(newStartItem, before);
 			before = newStartItem.endNode.nextSibling;
 		}
 	} else {
+		for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
 		range.children.length = oldStartIndex;
-		for (; oldStartIndex <= oldEndIndex; oldStartItem = oldItems[++oldStartIndex]) clearRange(oldStartItem);
 	}
 }
-function transferRangeMarkers(oldItem, newItem) {
+function transferListItemData(oldItem, newItem, update) {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
-	for (let prop in oldItem.data) oldItem.data[prop] = newItem.data[prop];
+	update(oldItem, newItem);
 	newItem.data = oldItem.data;
 }
-function runList(range, parent, anchor, buildItems, create) {
+function runList(range, parent, anchor, buildItems, create, update) {
 	const oldRange = pushRange(range, true);
 	let listItems = [];
 	$run(function runList$1() {
 		const oldBranchRange = pushRange(range);
 		const newItems = buildItems();
 		context_default.activeTarget = null;
-		runListItems(range, parent, anchor, listItems, newItems, create);
+		runListItems(range, parent, anchor, listItems, newItems, create, update);
 		listItems = newItems;
 		popRange(oldBranchRange);
 	});

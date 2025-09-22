@@ -16,6 +16,7 @@ export default function runList(
 	anchor: Node | null,
 	buildItems: () => ListItem[],
 	create: (item: ListItem, anchor: Node | null) => void,
+	update: (oldItem: ListItem, newItem: ListItem) => void,
 ): void {
 	const oldRange = pushRange(range, true);
 
@@ -30,7 +31,6 @@ export default function runList(
 		// Build the array of items with keys and data
 		const newItems = buildItems();
 
-		// TODO: Should I just be using $run?? or $peek?
 		// Do NOT re-run the list for properties accessed while updating its
 		// items. E.g. we want to re-run the list for `@for (item of $items)`
 		// (in buildItems, above) but not for `<span>{item.id}</span>` (in
@@ -38,7 +38,7 @@ export default function runList(
 		context.activeTarget = null;
 
 		// Run the function that updates the list's items
-		runListItems(range, parent, anchor, listItems, newItems, create);
+		runListItems(range, parent, anchor, listItems, newItems, create, update);
 
 		listItems = newItems;
 
