@@ -384,39 +384,38 @@ function updateSignal(proxy, key) {
 function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
 	if (key === proxyDataSymbol) return data;
-	const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
-	if (propDescriptor !== void 0) {
-		if (propDescriptor.writable) {
-			if (!data.signals.has(key)) {
+	let signal = data.signals.get(key);
+	if (signal === void 0 || signal === null) {
+		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
+		if (propDescriptor !== void 0) {
+			if (propDescriptor.writable) {
 				if (data.shallow !== true) {
 					const value = target[key];
 					if (value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) target[key] = $watch(value);
 				}
 				data.signals.set(key, null);
-			}
-			trackProxyEffect(data, key);
-		} else if (propDescriptor.get) {
-			let signal = data.signals.get(key);
-			if (signal === void 0 || signal === null) {
-				let value;
+				trackProxyEffect(data, key);
+			} else if (propDescriptor.get) {
 				const oldRegisterComputed = context_default.registerComputed;
 				try {
 					context_default.registerComputed = (computed) => {
 						data.signals.set(key, computed);
 					};
-					value = Reflect.get(target, key, receiver);
+					return Reflect.get(target, key, receiver);
 				} finally {
 					context_default.registerComputed = oldRegisterComputed;
 				}
-				return value;
-			} else if (signal.running) throw new Error("Cycle detected");
-			else if (signal.recalc) checkComputed(signal);
-			else if (signal.didError) throw signal.value;
-			else trackEffect(signal);
-			return signal.value;
+			}
+		} else if (data.isArray) {
+			if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
 		}
-	} else if (data.isArray) {
-		if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
+	} else if (signal.type === SIGNAL_TYPE) trackProxyEffect(data, key);
+	else if (signal.type === COMPUTED_TYPE) {
+		if (signal.running) throw new Error("Cycle detected");
+		else if (signal.recalc) checkComputed(signal);
+		else if (signal.didError) throw signal.value;
+		else trackEffect(signal);
+		return signal.value;
 	}
 	return Reflect.get(target, key, receiver);
 }
@@ -614,7 +613,7 @@ function popRange(oldRange) {
 }
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
-	if (toParent && activeRange) {
+	if (toParent && activeRange !== null) {
 		if (activeRange.lastRange !== null) {
 			range.previousRange = activeRange.lastRange;
 			activeRange.lastRange.nextRange = range;

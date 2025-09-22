@@ -2,6 +2,7 @@ import $watch from "../render/$watch";
 import context from "../render/context";
 import type Computed from "../types/Computed";
 import type ProxyData from "../types/ProxyData";
+import { COMPUTED_TYPE, SIGNAL_TYPE } from "../types/constants";
 import checkComputed from "./checkComputed";
 import { proxyDataSymbol } from "./symbols";
 import trackEffect from "./trackEffect";
@@ -22,10 +23,11 @@ export default function proxyGet(
 	//console.log(`object get '${String(key)}' on`, target);
 	//console.log(`object get '${String(key)}'`);
 
-	const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
-	if (propDescriptor !== undefined) {
-		if (propDescriptor.writable) {
-			if (!data.signals.has(key)) {
+	let signal = data.signals.get(key);
+	if (signal === undefined || signal === null) {
+		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
+		if (propDescriptor !== undefined) {
+			if (propDescriptor.writable) {
 				// Setup data for the property
 				if (data.shallow !== true) {
 					// Set the value to a new proxy if it's an object
@@ -42,21 +44,16 @@ export default function proxyGet(
 					}
 				}
 				data.signals.set(key, null);
-			}
 
-			// If a property is being accessed in the course of setting up an
-			// effect, track it
-			trackProxyEffect(data, key);
-		} else if (propDescriptor.get) {
-			// OK, we're only checking for computed values if it's read-only for
-			// now, but we probably need to check any getter's value -- e.g. the
-			// user may wish to add a setter to optimistically set a value, have
-			// the UI update, then set the value concretely later (e.g. if
-			// updating a `count` via a fetch)
-
-			let signal = data.signals.get(key) as Computed | null;
-			if (signal === undefined || signal === null) {
-				let value: any;
+				// If a property is being accessed in the course of setting up an
+				// effect, track it
+				trackProxyEffect(data, key);
+			} else if (propDescriptor.get) {
+				// OK, we're only checking for computed values if it's read-only for
+				// now, but we probably need to check any getter's value -- e.g. the
+				// user may wish to add a setter to optimistically set a value, have
+				// the UI update, then set the value concretely later (e.g. if
+				// updating a `count` via a fetch)
 
 				const oldRegisterComputed = context.registerComputed;
 				try {
@@ -65,40 +62,37 @@ export default function proxyGet(
 					context.registerComputed = (computed: Computed) => {
 						data.signals.set(key, computed);
 					};
-
-					value = Reflect.get(target, key, receiver);
+					return Reflect.get(target, key, receiver);
 				} finally {
 					context.registerComputed = oldRegisterComputed;
 				}
-
-				return value;
-			} else {
-				if (signal.running) {
-					throw new Error("Cycle detected");
-				} else if (signal.recalc) {
-					// If a signal that the computed depends on has been changed,
-					// but the computed hasn't yet been read, it may need to be
-					// re-computed
-					checkComputed(signal);
-				} else if (signal.didError) {
-					// If there was a previous error, and no dependencies have
-					// changed, throw the error again
-					throw signal.value;
-				} else {
-					trackEffect(signal);
-				}
 			}
-
-			// TODO: We should only check for dirty subs if a global int has
-			// been incremented, ala Preact?
-
-			return signal.value;
+		} else if (data.isArray) {
+			// If it's a function in an array, we may intercept it
+			if (arrayWrapper[key] !== undefined) {
+				return arrayWrapper[key](data, target, key);
+			}
 		}
-	} else if (data.isArray) {
-		// If it's a function in an array, we may intercept it
-		if (arrayWrapper[key] !== undefined) {
-			return arrayWrapper[key](data, target, key);
+	} else if (signal.type === SIGNAL_TYPE) {
+		// If a property is being accessed in the course of setting up an
+		// effect, track it
+		trackProxyEffect(data, key);
+	} else if (signal.type === COMPUTED_TYPE) {
+		if (signal.running) {
+			throw new Error("Cycle detected");
+		} else if (signal.recalc) {
+			// If a signal that the computed depends on has been changed,
+			// but the computed hasn't yet been read, it may need to be
+			// re-computed
+			checkComputed(signal);
+		} else if (signal.didError) {
+			// If there was a previous error, and no dependencies have
+			// changed, throw the error again
+			throw signal.value;
+		} else {
+			trackEffect(signal);
 		}
+		return signal.value;
 	}
 
 	// Return the property value
