@@ -446,9 +446,8 @@ function proxySet(target, key, value, receiver) {
 	if (value !== oldValue) {
 		if (context_default.batchOperation > 100) throw new Error("Cycle detected");
 		let data = target[proxyDataSymbol];
-		let newValue = value;
-		if (oldValue && oldValue[proxyDataSymbol] !== void 0) newValue = $watch(value);
-		Reflect.set(target, key, newValue, receiver);
+		if (oldValue && oldValue[proxyDataSymbol] !== void 0) value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
+		Reflect.set(target, key, value, receiver);
 		updateSignal(data, key);
 		if (data.isArray && !isNaN(+String(key))) updateSignal(data, "length");
 	}
@@ -696,7 +695,7 @@ function nodeCheckHydrationBreak(node) {
 	return node;
 }
 function nodeNext(node, text = false) {
-	if (text && context_default.hydrationNode !== null && isTextNode(node)) return node;
+	if (context_default.hydrationNode !== null && text && isTextNode(node)) return node;
 	return nodeCheckHydrationBreak(node.nextSibling);
 }
 function nodeAnchor(node) {

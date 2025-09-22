@@ -18,27 +18,10 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 		return object;
 	}
 
-	// Make sure we can proxy this value
-	// TODO: In debug mode maybe?
+	// DEBUG: Make sure we can proxy this value
 	//if (typeof object !== "object") {
 	//	throw new Error(`$watch can't be called with a ${typeof object}`);
 	//}
-
-	// TODO: See if no closures helps
-	// Store some data for the proxy in the target object itself
-	//const data: ProxyData = {
-	//	target: object,
-	//	isArray: Array.isArray(object),
-	//	shallow: !!options?.shallow,
-	//	signals: new Map(),
-	//};
-	// @ts-ignore
-	//object[proxyDataSymbol] = data;
-
-	//const handler: ProxyHandler<T> = {
-	//	get: proxyGet,
-	//	set: proxySet,
-	//};
 
 	// Create a proxy handler for each object, and store some data for it here
 	const data: ProxyData = {
