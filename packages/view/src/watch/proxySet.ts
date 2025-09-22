@@ -16,24 +16,21 @@ export default function proxySet(
 	// Only do things if the value has changed
 	const oldValue = target[key];
 	if (value !== oldValue) {
-		//context.batchOperation++;
 		if (context.batchOperation > 100) {
 			throw new Error("Cycle detected");
 		}
 
 		let data = target[proxyDataSymbol];
 
-		let newValue = value;
-
 		// If the value was previously a proxy, watch the new value and update
 		// its effect subscriptions
 		if (oldValue && oldValue[proxyDataSymbol] !== undefined) {
-			newValue = $watch(value);
+			value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
 			//transferEffects(oldValue, newValue);
 		}
 
 		// Set the property value on the target
-		Reflect.set(target, key, newValue, receiver);
+		Reflect.set(target, key, value, receiver);
 
 		// Re-run effects
 		updateSignal(data, key);
