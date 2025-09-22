@@ -59,7 +59,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
 		${awaitTokenName}++;`);
 
-	buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName, 0);
+	buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName);
 
 	status.imports.add("t_push_range");
 	status.imports.add("t_pop_range");
@@ -70,7 +70,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		if (token === ${awaitTokenName}) {
 			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
-	buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitRangeName, 1);
+	buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitRangeName);
 
 	b.append(`t_pop_range(${oldRangeName});
 		}
@@ -79,7 +79,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		if (token === ${awaitTokenName}) {
 			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
 
-	buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitRangeName, 2);
+	buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitRangeName);
 
 	b.append(`t_pop_range(${oldRangeName});
 				}
@@ -95,11 +95,10 @@ function buildAwaitBranch(
 	b: Builder,
 	parentName: string,
 	rangeName: string,
-	index: number,
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`t_run_branch(${rangeName}, ${index}, () => {`);
+	b.append(`t_run_branch(${rangeName}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

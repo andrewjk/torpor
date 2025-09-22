@@ -73,7 +73,7 @@ function buildIfBranch(
 
 	b.append(`
 		case ${index}: {
-		t_run_branch(${rangeName}, ${index}, () => {`);
+		t_run_branch(${rangeName}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

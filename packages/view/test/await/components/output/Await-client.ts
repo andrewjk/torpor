@@ -54,7 +54,7 @@ export default function Await(
 		let t_await_token_1 = 0;
 		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
 			t_await_token_1++;
-			t_run_branch(t_await_range_1, 0, () => {
+			t_run_branch(t_await_range_1, () => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
 				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1, true);
@@ -68,7 +68,7 @@ export default function Await(
 				.then((_number) => {
 					if (token === t_await_token_1) {
 						let t_old_range_1 = t_push_range(t_await_range_1);
-						t_run_branch(t_await_range_1, 1, () => {
+						t_run_branch(t_await_range_1, () => {
 							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Is it a number?</p> `);
 							// @ts-ignore
 							const t_root_2 = t_root(t_fragment_2, true);
@@ -83,7 +83,7 @@ export default function Await(
 				.catch((ex) => {
 					if (token === t_await_token_1) {
 						let t_old_range_1 = t_push_range(t_await_range_1);
-						t_run_branch(t_await_range_1, 2, () => {
+						t_run_branch(t_await_range_1, () => {
 							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p class="error">#</p> `);
 							// @ts-ignore
 							const t_root_3 = t_root(t_fragment_3, true);

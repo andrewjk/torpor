@@ -567,12 +567,7 @@ function clearRange(range) {
 		for (let i = 1; i < range.children; i++) {
 			if (nextRange.animations !== null) for (let animation of nextRange.animations) animations.push(animation);
 			let nr = nextRange.nextRange;
-			nextRange.startNode = null;
-			nextRange.endNode = null;
-			nextRange.previousRange = null;
-			nextRange.nextRange = null;
-			nextRange.lastRange = null;
-			nextRange.animations = null;
+			releaseRange(nextRange);
 			nextRange = nr;
 		}
 		range.nextRange = nextRange;
@@ -590,13 +585,16 @@ function clearNodes(range) {
 			currentNode = nextNode;
 		}
 		currentNode.remove();
-		range.startNode = null;
-		range.endNode = null;
-		range.previousRange = null;
-		range.nextRange = null;
-		range.lastRange = null;
-		range.animations = null;
+		releaseRange(range);
 	}
+}
+function releaseRange(range) {
+	range.startNode = null;
+	range.endNode = null;
+	range.previousRange = null;
+	range.nextRange = null;
+	range.lastRange = null;
+	range.animations = null;
 }
 function clearLayoutSlot(range) {
 	clearRange(range);
@@ -609,7 +607,6 @@ function newRange() {
 		nextRange: null,
 		lastRange: null,
 		children: 0,
-		index: 0,
 		animations: null
 	};
 }
@@ -673,7 +670,6 @@ function newListItem(data, key) {
 		nextRange: null,
 		lastRange: null,
 		children: 0,
-		index: 0,
 		animations: null,
 		data,
 		key
@@ -759,7 +755,6 @@ function nodeSkip(node, count) {
 	return nextNode;
 }
 function runControl(range, anchor, create) {
-	range.index = -1;
 	const oldRange = pushRange(range, true);
 	$run(function runControl$1() {
 		const oldBranchRange = pushRange(range);
@@ -769,7 +764,7 @@ function runControl(range, anchor, create) {
 	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
 	popRange(oldRange);
 }
-function runControlBranch(range, index, create) {
+function runControlBranch(range, create) {
 	if (range.children === 1) {
 		clearRange(range.nextRange);
 		range.children = 0;
@@ -780,7 +775,6 @@ function runControlBranch(range, index, create) {
 	create();
 	context_default.activeTarget = oldTarget;
 	popRange(oldRange);
-	range.index = index;
 }
 function moveRange(parent, range, before) {
 	const endNode = range.endNode ?? range.startNode;

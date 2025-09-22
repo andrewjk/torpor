@@ -35,7 +35,7 @@ export default function Replace(
 	const t_replace_range_1 = t_range();
 	t_run_control(t_replace_range_1, t_replace_anchor_1, (t_before) => {
 		$props.name;
-		t_run_branch(t_replace_range_1, -1, () => {
+		t_run_branch(t_replace_range_1, () => {
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);

@@ -5,7 +5,7 @@ import newRange from "./newRange";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
 
-export default function runControlBranch(range: Range, index: number, create: () => void): void {
+export default function runControlBranch(range: Range, create: () => void): void {
 	// Branching ranges have exactly one child -- remove it if necessary
 	if (range.children === 1) {
 		clearRange(range.nextRange!);
@@ -28,7 +28,4 @@ export default function runControlBranch(range: Range, index: number, create: ()
 	context.activeTarget = oldTarget;
 
 	popRange(oldRange);
-
-	// Set the index on the branching range
-	range.index = index;
 }

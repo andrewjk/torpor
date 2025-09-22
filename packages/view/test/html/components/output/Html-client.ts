@@ -32,7 +32,7 @@ export default function Html(
 	const t_html_range_1 = t_range();
 	t_run_control(t_html_range_1, t_html_anchor_1, (t_before) => {
 		$props.html;
-		t_run_branch(t_html_range_1, -1, () => {
+		t_run_branch(t_html_range_1, () => {
 			const t_template_1 = document.createElement("template");
 			t_template_1.innerHTML = $props.html;
 			let t_fragment_1 = t_template_1.content.cloneNode(true) as DocumentFragment;

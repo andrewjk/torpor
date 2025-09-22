@@ -40,7 +40,7 @@ function buildReplaceBranch(
 	status.imports.add("t_run_branch");
 
 	b.append(`${replaceForVarNames(node.statement, status)};`);
-	b.append(`t_run_branch(${rangeName}, -1, () => {`);
+	b.append(`t_run_branch(${rangeName}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

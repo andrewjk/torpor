@@ -8,7 +8,6 @@ export default function newRange(): Range {
 		nextRange: null,
 		lastRange: null,
 		children: 0,
-		index: 0,
 		animations: null,
 	};
 }

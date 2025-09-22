@@ -38,7 +38,7 @@ export default function IfElseIf(
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
 		switch ($t_if_state_1.index) {
 			case 0: {
-				t_run_branch(t_if_range_1, 0, () => {
+				t_run_branch(t_if_range_1, () => {
 					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's over ten! </p> `);
 					// @ts-ignore
 					const t_root_1 = t_root(t_fragment_1, true);
@@ -50,7 +50,7 @@ export default function IfElseIf(
 				break;
 			}
 			case 1: {
-				t_run_branch(t_if_range_1, 1, () => {
+				t_run_branch(t_if_range_1, () => {
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> It's over five! </p> `);
 					// @ts-ignore
 					const t_root_2 = t_root(t_fragment_2, true);
@@ -62,7 +62,7 @@ export default function IfElseIf(
 				break;
 			}
 			case 2: {
-				t_run_branch(t_if_range_1, 2, () => {
+				t_run_branch(t_if_range_1, () => {
 					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p> It's not there yet </p> `);
 					// @ts-ignore
 					const t_root_3 = t_root(t_fragment_3, true);
