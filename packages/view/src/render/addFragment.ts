@@ -25,27 +25,16 @@ export default function addFragment(
 		}
 	}
 
-	let parentIsFragment = isFragmentNode(parent);
+	parent = before?.parentNode ?? parent;
 
+	// Add the fragment
 	if (hydrationNode === null) {
-		// HACK: We need to be able to add fragments to new fragments as well as
-		// fragments that have already been added to the document. New fragments will
-		// be ok, but fragments that have been added will not be parents of the before
-		// element (because it's now in the document). In this case we will have to
-		// use the before element's parent, which should work as long as we are always
-		// passing a before element...
-		if (parentIsFragment) {
-			parent = before!.parentNode!;
-			parentIsFragment = isFragmentNode(parent);
-		}
-
-		// Add the fragment
 		parent.insertBefore(fragment, before);
 	}
 
 	// If we're adding this fragment to the DOM, we can now run any $mount
 	// effects, add our stashed events and play our stashed animations
-	if (!parentIsFragment) {
+	if (!isFragmentNode(parent)) {
 		// Only run $mount effects if not hydrating (if hydrating, they will get
 		// run at the end when everything is hooked up)
 		if (hydrationNode === null) {
