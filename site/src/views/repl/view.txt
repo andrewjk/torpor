@@ -506,7 +506,7 @@ function isFragmentNode(node) {
 function addFragment(fragment, parent, before, endNode) {
 	const range = context_default.activeRange;
 	const hydrationNode = context_default.hydrationNode;
-	if (range !== null) if (hydrationNode !== null) range.endNode = endNode ?? hydrationNode;
+	if (hydrationNode !== null) range.endNode = endNode ?? hydrationNode;
 	else {
 		range.startNode = fragment.firstChild;
 		range.endNode = fragment.lastChild;
@@ -609,13 +609,12 @@ function popRange(oldRange) {
 }
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
-	if (toParent && activeRange !== null) {
-		range.previousRange = context_default.previousRange;
-		if (context_default.previousRange) {
-			let nr = context_default.previousRange.nextRange;
-			context_default.previousRange.nextRange = range;
-			range.nextRange = nr;
-		}
+	if (toParent) {
+		const previousRange = context_default.previousRange;
+		range.previousRange = previousRange;
+		const nextRange = previousRange.nextRange;
+		previousRange.nextRange = range;
+		range.nextRange = nextRange;
 		activeRange.children++;
 	}
 	context_default.activeRange = range;
@@ -743,7 +742,7 @@ function nodeRoot(parent, text = false) {
 			context_default.hydrationNode = rootNode;
 		}
 		const range = context_default.activeRange;
-		if (range !== null && range.startNode === null) range.startNode = rootNode;
+		if (range.startNode === null) range.startNode = rootNode;
 		return rootNode;
 	} else return parent.firstChild;
 }

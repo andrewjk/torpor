@@ -53,17 +53,17 @@ export default interface Context {
 	/**
 	 * The range that is currently being created.
 	 */
-	activeRange: Range | null;
+	activeRange: Range;
 
 	/**
 	 * The range that was previously created, for setting range navigation.
 	 */
-	previousRange: Range | null;
+	previousRange: Range;
 
 	/**
 	 * The root range of the current UI, for debugging.
 	 */
-	rootRange: Range | null;
+	rootRange: Range;
 
 	/**
 	 * Functions that were run via $mount, which should be collected and flushed
@@ -76,7 +76,7 @@ export default interface Context {
 	 * DOM
 	 */
 	stashedEvents: {
-		range: Range | null;
+		range: Range;
 		el: Element;
 		type: string;
 		listener: (this: Element, ev: any) => any;
@@ -87,7 +87,7 @@ export default interface Context {
 	 * the DOM
 	 */
 	stashedAnimations: {
-		range: Range | null;
+		range: Range;
 		el: HTMLElement;
 		in?: Animation;
 		out?: Animation;
