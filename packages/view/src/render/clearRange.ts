@@ -23,9 +23,6 @@ export default function clearRange(range: Range): void {
 
 	if (range.previousRange !== null) {
 		range.previousRange.nextRange = range.nextRange;
-		if (range.previousRange.lastRange === range) {
-			range.previousRange.lastRange = range.nextRange;
-		}
 	}
 	if (range.nextRange !== null) {
 		range.nextRange.previousRange = range.previousRange;
@@ -63,6 +60,5 @@ function releaseRange(range: Range) {
 	range.endNode = null;
 	range.previousRange = null;
 	range.nextRange = null;
-	range.lastRange = null;
 	range.animations = null;
 }

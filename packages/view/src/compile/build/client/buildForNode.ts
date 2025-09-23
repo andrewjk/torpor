@@ -106,7 +106,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 	const oldRangeName = nextVarName("old_range", status);
 
 	status.imports.add("t_push_range");
-	b.append(`let ${oldRangeName} = t_push_range(t_item, true);`);
+	b.append(`let ${oldRangeName} = t_push_range(t_item);`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

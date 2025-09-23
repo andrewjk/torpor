@@ -6,7 +6,6 @@ export default function newListItem(data: Record<PropertyKey, any>, key?: any): 
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		lastRange: null,
 		children: 0,
 		animations: null,
 		data,

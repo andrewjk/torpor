@@ -56,7 +56,7 @@ export default function ForEscape(
 			return t_new_items;
 		},
 		function createListItem(t_item, t_before) {
-			let t_old_range_1 = t_push_range(t_item, true);
+			let t_old_range_1 = t_push_range(t_item);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input></input> `);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);
