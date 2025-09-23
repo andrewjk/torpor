@@ -566,8 +566,12 @@ function clearRange(range) {
 			nextRange = nr;
 		}
 		range.nextRange = nextRange;
-		if (nextRange !== null) nextRange.previousRange = range;
 	}
+	if (range.previousRange !== null) {
+		range.previousRange.nextRange = range.nextRange;
+		if (range.previousRange.lastRange === range) range.previousRange.lastRange = range.nextRange;
+	}
+	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
 	if (animations.length > 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	else clearNodes(range);
 }
@@ -580,8 +584,8 @@ function clearNodes(range) {
 			currentNode = nextNode;
 		}
 		currentNode.remove();
-		releaseRange(range);
 	}
+	releaseRange(range);
 }
 function releaseRange(range) {
 	range.startNode = null;
@@ -611,14 +615,10 @@ function popRange(oldRange) {
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
 	if (toParent && activeRange !== null) {
-		if (activeRange.lastRange !== null) {
-			range.previousRange = activeRange.lastRange;
-			activeRange.lastRange.nextRange = range;
-			activeRange.lastRange = range;
-		} else {
-			range.previousRange = activeRange;
-			activeRange.nextRange = range;
-		}
+		const lastRange = activeRange.lastRange ?? activeRange;
+		range.previousRange = lastRange;
+		lastRange.nextRange = range;
+		activeRange.lastRange = range;
 		activeRange.children++;
 	}
 	context_default.activeRange = range;
@@ -857,6 +857,13 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 		}
 	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
 	range.children = newItems.length;
+	if (newItems.length > 0) {
+		range.nextRange = newItems[0];
+		range.lastRange = newItems[newItems.length - 1];
+	} else if (oldItems.length > 0) {
+		range.nextRange = oldItems[oldItems.length - 1].nextRange;
+		range.lastRange = null;
+	}
 }
 function transferListItemData(oldItem, newItem, update) {
 	newItem.startNode = oldItem.startNode;

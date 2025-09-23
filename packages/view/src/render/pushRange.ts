@@ -7,14 +7,11 @@ export default function pushRange(range: Range, toParent = false): Range | null 
 	// Add the new range to the currently active range's children, so that we
 	// can delete the children with the parent
 	if (toParent && activeRange !== null) {
-		if (activeRange.lastRange !== null) {
-			range.previousRange = activeRange.lastRange;
-			activeRange.lastRange.nextRange = range;
-			activeRange.lastRange = range;
-		} else {
-			range.previousRange = activeRange;
-			activeRange.nextRange = range;
-		}
+		const lastRange = activeRange.lastRange ?? activeRange;
+		range.previousRange = lastRange;
+		lastRange.nextRange = range;
+
+		activeRange.lastRange = range;
 		activeRange.children++;
 	}
 

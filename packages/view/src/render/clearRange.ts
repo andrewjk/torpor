@@ -19,9 +19,16 @@ export default function clearRange(range: Range): void {
 			nextRange = nr;
 		}
 		range.nextRange = nextRange;
-		if (nextRange !== null) {
-			nextRange.previousRange = range;
+	}
+
+	if (range.previousRange !== null) {
+		range.previousRange.nextRange = range.nextRange;
+		if (range.previousRange.lastRange === range) {
+			range.previousRange.lastRange = range.nextRange;
 		}
+	}
+	if (range.nextRange !== null) {
+		range.nextRange.previousRange = range.previousRange;
 	}
 
 	// Wait for animations, if any, then clear the range's nodes
@@ -47,8 +54,8 @@ function clearNodes(range: Range) {
 			currentNode = nextNode!;
 		}
 		currentNode.remove();
-		releaseRange(range);
 	}
+	releaseRange(range);
 }
 
 function releaseRange(range: Range) {

@@ -74,13 +74,16 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	${forAnchorName},
 	function createNewItems() {
 		let t_new_items: ListItem[] = [];
+		let t_previous_item = ${forRangeName};
+		let t_next_item = ${forRangeName}.nextRange;
 		${node.statement} {
-			t_new_items.push(t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""}));
-			/*t_new_items.push({
-				${keyStatement ? `key: ${keyStatement},` : ";"}
-				data: { ${forVarNames.join(",\n")} }
-			});*/
+			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
+			t_new_item.previousRange = t_previous_item;
+			t_previous_item.nextRange = t_new_item;
+			t_previous_item = t_new_item;
+			t_new_items.push(t_new_item);
 		}
+		${forRangeName}.nextRange = t_next_item;
 		return t_new_items;
 	},
 	function createListItem(t_item, t_before) {`);
