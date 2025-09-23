@@ -168,10 +168,8 @@ export default function runListItems(
 	range.children = newItems.length;
 	if (newItems.length > 0) {
 		range.nextRange = newItems[0];
-		range.lastRange = newItems[newItems.length - 1];
 	} else if (oldItems.length > 0) {
 		range.nextRange = oldItems[oldItems.length - 1].nextRange;
-		range.lastRange = null;
 	}
 }
 

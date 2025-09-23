@@ -4,7 +4,6 @@ export default interface Range {
 
 	previousRange: Range | null;
 	nextRange: Range | null;
-	lastRange: Range | null;
 	children: number;
 
 	/**

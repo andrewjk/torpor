@@ -567,10 +567,7 @@ function clearRange(range) {
 		}
 		range.nextRange = nextRange;
 	}
-	if (range.previousRange !== null) {
-		range.previousRange.nextRange = range.nextRange;
-		if (range.previousRange.lastRange === range) range.previousRange.lastRange = range.nextRange;
-	}
+	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
 	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
 	if (animations.length > 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	else clearNodes(range);
@@ -592,7 +589,6 @@ function releaseRange(range) {
 	range.endNode = null;
 	range.previousRange = null;
 	range.nextRange = null;
-	range.lastRange = null;
 	range.animations = null;
 }
 function clearLayoutSlot(range) {
@@ -604,7 +600,6 @@ function newRange() {
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		lastRange: null,
 		children: 0,
 		animations: null
 	};
@@ -615,10 +610,10 @@ function popRange(oldRange) {
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
 	if (toParent && activeRange !== null) {
-		const lastRange = activeRange.lastRange ?? activeRange;
-		range.previousRange = lastRange;
+		let lastRange = activeRange;
+		for (let i = 1; i < activeRange.children; i++) lastRange = lastRange.nextRange;
 		lastRange.nextRange = range;
-		activeRange.lastRange = range;
+		range.previousRange = lastRange;
 		activeRange.children++;
 	}
 	context_default.activeRange = range;
@@ -663,7 +658,6 @@ function newListItem(data, key) {
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		lastRange: null,
 		children: 0,
 		animations: null,
 		data,
@@ -857,13 +851,8 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 		}
 	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
 	range.children = newItems.length;
-	if (newItems.length > 0) {
-		range.nextRange = newItems[0];
-		range.lastRange = newItems[newItems.length - 1];
-	} else if (oldItems.length > 0) {
-		range.nextRange = oldItems[oldItems.length - 1].nextRange;
-		range.lastRange = null;
-	}
+	if (newItems.length > 0) range.nextRange = newItems[0];
+	else if (oldItems.length > 0) range.nextRange = oldItems[oldItems.length - 1].nextRange;
 }
 function transferListItemData(oldItem, newItem, update) {
 	newItem.startNode = oldItem.startNode;
