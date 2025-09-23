@@ -5,14 +5,14 @@ export default function clearRange(range: Range): void {
 
 	// Clear child ranges and collect animations that take place within this
 	// range and its children
-	let animations: Animation[] = range.animations !== null ? Array.from(range.animations) : [];
+	let animations: Animation[] | undefined =
+		range.animations !== null ? Array.from(range.animations) : undefined;
 	if (range.children > 0) {
 		let nextRange = range.nextRange!;
 		for (let i = 1; i < range.children; i++) {
 			if (nextRange.animations !== null) {
-				for (let animation of nextRange.animations) {
-					animations.push(animation);
-				}
+				animations ??= [];
+				animations.push(...nextRange.animations);
 			}
 			let nr = nextRange.nextRange!;
 			releaseRange(nextRange);
@@ -29,7 +29,7 @@ export default function clearRange(range: Range): void {
 	}
 
 	// Wait for animations, if any, then clear the range's nodes
-	if (animations.length > 0) {
+	if (animations !== undefined) {
 		// eslint-disable-next-line
 		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	} else {
