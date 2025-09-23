@@ -9,6 +9,8 @@ const context = {
 	firstEffectToRun: null,
 	firstSignalToUpdate: null,
 	activeRange: null,
+	previousRange: null,
+	rootRange: null,
 	mountEffects: [],
 	stashedEvents: [],
 	stashedAnimations: [],
@@ -509,15 +511,9 @@ function addFragment(fragment, parent, before, endNode) {
 		range.startNode = fragment.firstChild;
 		range.endNode = fragment.lastChild;
 	}
-	let parentIsFragment = isFragmentNode(parent);
-	if (hydrationNode === null) {
-		if (parentIsFragment) {
-			parent = before.parentNode;
-			parentIsFragment = isFragmentNode(parent);
-		}
-		parent.insertBefore(fragment, before);
-	}
-	if (!parentIsFragment) {
+	parent = before?.parentNode ?? parent;
+	if (hydrationNode === null) parent.insertBefore(fragment, before);
+	if (!isFragmentNode(parent)) {
 		if (hydrationNode === null) {
 			for (let effect of context_default.mountEffects) $run(effect);
 			context_default.mountEffects.length = 0;
@@ -556,11 +552,14 @@ function applyProps(el, props, propNamesUsed) {
 	}
 }
 function clearRange(range) {
-	let animations = range.animations !== null ? Array.from(range.animations) : [];
+	let animations = range.animations !== null ? Array.from(range.animations) : void 0;
 	if (range.children > 0) {
 		let nextRange = range.nextRange;
 		for (let i = 1; i < range.children; i++) {
-			if (nextRange.animations !== null) for (let animation of nextRange.animations) animations.push(animation);
+			if (nextRange.animations !== null) {
+				animations ??= [];
+				animations.push(...nextRange.animations);
+			}
 			let nr = nextRange.nextRange;
 			releaseRange(nextRange);
 			nextRange = nr;
@@ -569,7 +568,7 @@ function clearRange(range) {
 	}
 	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
 	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
-	if (animations.length > 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
+	if (animations !== void 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	else clearNodes(range);
 }
 function clearNodes(range) {
@@ -594,14 +593,15 @@ function releaseRange(range) {
 function clearLayoutSlot(range) {
 	clearRange(range);
 }
-function newRange() {
+function newRange(name) {
 	return {
 		startNode: null,
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
 		children: 0,
-		animations: null
+		animations: null,
+		name
 	};
 }
 function popRange(oldRange) {
@@ -610,13 +610,16 @@ function popRange(oldRange) {
 function pushRange(range, toParent = false) {
 	const activeRange = context_default.activeRange;
 	if (toParent && activeRange !== null) {
-		let lastRange = activeRange;
-		for (let i = 1; i < activeRange.children; i++) lastRange = lastRange.nextRange;
-		lastRange.nextRange = range;
-		range.previousRange = lastRange;
+		range.previousRange = context_default.previousRange;
+		if (context_default.previousRange) {
+			let nr = context_default.previousRange.nextRange;
+			context_default.previousRange.nextRange = range;
+			range.nextRange = nr;
+		}
 		activeRange.children++;
 	}
 	context_default.activeRange = range;
+	context_default.previousRange = range;
 	return activeRange;
 }
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
@@ -642,6 +645,9 @@ function getFragment(document, array, index, html, ns) {
 }
 function hydrate(parent, component, props, slots) {
 	context_default.hydrationNode = parent.firstChild;
+	context_default.rootRange = newRange();
+	context_default.previousRange = context_default.rootRange;
+	pushRange(context_default.rootRange);
 	component(parent, null, props, void 0, slots);
 	context_default.hydrationNode = null;
 	for (let effect of context_default.mountEffects) $run(effect);
@@ -650,6 +656,9 @@ function hydrate(parent, component, props, slots) {
 function mount(parent, component, props, slots) {
 	if (parent.childElementCount > 0) throw new Error("The parent node must have no child elements");
 	while (parent.firstChild !== null) parent.firstChild.remove();
+	context_default.rootRange = newRange();
+	context_default.previousRange = context_default.rootRange;
+	pushRange(context_default.rootRange);
 	component(parent, null, props, void 0, slots);
 }
 function newListItem(data, key) {
@@ -766,9 +775,9 @@ function runControlBranch(range, create) {
 	popRange(oldRange);
 }
 function moveRange(parent, range, before) {
+	parent = before?.parentNode ?? parent;
 	const endNode = range.endNode ?? range.startNode;
 	let currentNode = range.startNode;
-	if (isFragmentNode(parent)) parent = before.parentNode;
 	while (currentNode !== null) {
 		const nextNode = currentNode.nextSibling;
 		parent.insertBefore(currentNode, before);

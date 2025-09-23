@@ -1,5 +1,8 @@
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
+import context from "./context";
+import newRange from "./newRange";
+import pushRange from "./pushRange";
 
 /**
  * Mounts a component into a DOM node
@@ -24,6 +27,11 @@ export default function mount(
 	while (parent.firstChild !== null) {
 		parent.firstChild.remove();
 	}
+
+	// Create and push the root range
+	context.rootRange = newRange();
+	context.previousRange = context.rootRange;
+	pushRange(context.rootRange);
 
 	// Call the component's render function
 	component(parent, null, props, undefined, slots);

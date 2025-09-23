@@ -50,8 +50,20 @@ export default interface Context {
 	 */
 	firstSignalToUpdate: ProxySignal | null;
 
-	/** The range that is currently being created. */
+	/**
+	 * The range that is currently being created.
+	 */
 	activeRange: Range | null;
+
+	/**
+	 * The range that was previously created, for setting range navigation.
+	 */
+	previousRange: Range | null;
+
+	/**
+	 * The root range of the current UI, for debugging.
+	 */
+	rootRange: Range | null;
 
 	/**
 	 * Functions that were run via $mount, which should be collected and flushed
