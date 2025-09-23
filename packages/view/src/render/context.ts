@@ -11,8 +11,12 @@ const context: Context = {
 	firstEffectToRun: null,
 	firstSignalToUpdate: null,
 
+	// These will definitely be set, in mount or render
+	// @ts-ignore
 	activeRange: null,
+	// @ts-ignore
 	previousRange: null,
+	// @ts-ignore
 	rootRange: null,
 
 	mountEffects: [],
