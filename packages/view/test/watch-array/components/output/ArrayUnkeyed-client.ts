@@ -41,12 +41,16 @@ export default function ArrayUnkeyed(
 		t_for_anchor_1,
 		function createNewItems() {
 			let t_new_items: ListItem[] = [];
+			let t_previous_item = t_for_range_1;
+			let t_next_item = t_for_range_1.nextRange;
 			for (let item of $props.items) {
-				t_new_items.push(t_list_item({ item }));
-				/*t_new_items.push({
-					data: { item }
-				});*/
+				let t_new_item = t_list_item({ item });
+				t_new_item.previousRange = t_previous_item;
+				t_previous_item.nextRange = t_new_item;
+				t_previous_item = t_new_item;
+				t_new_items.push(t_new_item);
 			}
+			t_for_range_1.nextRange = t_next_item;
 			return t_new_items;
 		},
 		function createListItem(t_item, t_before) {
