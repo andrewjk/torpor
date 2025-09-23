@@ -2,6 +2,8 @@ import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import $run from "./$run";
 import context from "./context";
+import newRange from "./newRange";
+import pushRange from "./pushRange";
 
 /**
  * Hydrates a component into an existing DOM tree
@@ -18,6 +20,11 @@ export default function hydrate(
 	// When mounting, the parent must have no child elements, so  we can just set
 	// the hydration node to the first child node
 	context.hydrationNode = parent.firstChild;
+
+	// Create and push the root range
+	context.rootRange = newRange();
+	context.previousRange = context.rootRange;
+	pushRange(context.rootRange);
 
 	// Call the component's render function
 	component(parent, null, props, undefined, slots);

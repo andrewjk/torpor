@@ -1,6 +1,6 @@
 import type Range from "../types/Range";
 
-export default function newRange(): Range {
+export default function newRange(name?: string): Range {
 	return {
 		startNode: null,
 		endNode: null,
@@ -8,5 +8,6 @@ export default function newRange(): Range {
 		nextRange: null,
 		children: 0,
 		animations: null,
+		name,
 	};
 }

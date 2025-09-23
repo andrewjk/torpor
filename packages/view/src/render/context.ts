@@ -12,6 +12,9 @@ const context: Context = {
 	firstSignalToUpdate: null,
 
 	activeRange: null,
+	previousRange: null,
+	rootRange: null,
+
 	mountEffects: [],
 	stashedEvents: [],
 	stashedAnimations: [],

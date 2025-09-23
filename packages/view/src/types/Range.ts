@@ -11,4 +11,9 @@ export default interface Range {
 	 * awaited or canceled before it is removed
 	 */
 	animations: Set<Animation> | null;
+
+	/**
+	 * The name of the range, for debugging.
+	 */
+	name?: string;
 }
