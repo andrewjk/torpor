@@ -8,17 +8,16 @@ export default function clearRange(range: Range): void {
 	let animations: Animation[] | undefined =
 		range.animations !== null ? Array.from(range.animations) : undefined;
 	if (range.children > 0) {
-		let nextRange = range.nextRange!;
-		for (let i = 1; i < range.children; i++) {
-			if (nextRange.animations !== null) {
+		let childRange = range;
+		for (let i = 0; i < range.children; i++) {
+			childRange = childRange.nextRange!;
+			if (childRange.animations !== null) {
 				animations ??= [];
-				animations.push(...nextRange.animations);
+				animations.push(...childRange.animations);
 			}
-			let nr = nextRange.nextRange!;
-			releaseRange(nextRange);
-			nextRange = nr;
+			releaseRange(childRange);
 		}
-		range.nextRange = nextRange;
+		range.nextRange = childRange;
 	}
 
 	if (range.previousRange !== null) {
@@ -39,16 +38,16 @@ export default function clearRange(range: Range): void {
 
 function clearNodes(range: Range) {
 	// Clear the nodes for this range
-	if (range.startNode !== null) {
-		let currentNode = range.endNode ?? range.startNode;
+	if (range.startNode !== null && range.endNode !== null) {
+		let currentNode = range.endNode;
 		// DEBUG:
 		//if (range.startNode.parentNode !== currentNode.parentNode) {
 		//	throw new Error("range nodes have different parents");
 		//}
 		while (currentNode !== range.startNode) {
-			let nextNode = currentNode.previousSibling;
+			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
-			currentNode = nextNode!;
+			currentNode = previousNode!;
 		}
 		currentNode.remove();
 	}

@@ -554,17 +554,16 @@ function applyProps(el, props, propNamesUsed) {
 function clearRange(range) {
 	let animations = range.animations !== null ? Array.from(range.animations) : void 0;
 	if (range.children > 0) {
-		let nextRange = range.nextRange;
-		for (let i = 1; i < range.children; i++) {
-			if (nextRange.animations !== null) {
+		let childRange = range;
+		for (let i = 0; i < range.children; i++) {
+			childRange = childRange.nextRange;
+			if (childRange.animations !== null) {
 				animations ??= [];
-				animations.push(...nextRange.animations);
+				animations.push(...childRange.animations);
 			}
-			let nr = nextRange.nextRange;
-			releaseRange(nextRange);
-			nextRange = nr;
+			releaseRange(childRange);
 		}
-		range.nextRange = nextRange;
+		range.nextRange = childRange;
 	}
 	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
 	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
@@ -572,12 +571,12 @@ function clearRange(range) {
 	else clearNodes(range);
 }
 function clearNodes(range) {
-	if (range.startNode !== null) {
-		let currentNode = range.endNode ?? range.startNode;
+	if (range.startNode !== null && range.endNode !== null) {
+		let currentNode = range.endNode;
 		while (currentNode !== range.startNode) {
-			let nextNode = currentNode.previousSibling;
+			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
-			currentNode = nextNode;
+			currentNode = previousNode;
 		}
 		currentNode.remove();
 	}
@@ -763,14 +762,12 @@ function runControl(range, anchor, create) {
 }
 function runControlBranch(range, create) {
 	if (range.children === 1) {
+		if (range.nextRange === null) return;
 		clearRange(range.nextRange);
 		range.children = 0;
 	}
 	const oldRange = pushRange(newRange(), true);
-	const oldTarget = context_default.activeTarget;
-	context_default.activeTarget = null;
 	create();
-	context_default.activeTarget = oldTarget;
 	popRange(oldRange);
 }
 function moveRange(parent, range, before) {
