@@ -166,7 +166,7 @@ function runEffect(effect) {
 		throw err;
 	} finally {
 		context_default.activeTarget = oldActiveTarget;
-		context_default.extent += oldExtent;
+		context_default.extent += oldExtent - 1;
 		batchEnd();
 	}
 }

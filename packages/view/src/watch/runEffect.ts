@@ -39,7 +39,7 @@ export default function runEffect(effect: Effect): void {
 	} finally {
 		// Set the active target back to what it was previously
 		context.activeTarget = oldActiveTarget;
-		context.extent += oldExtent;
+		context.extent += oldExtent - 1;
 
 		batchEnd();
 	}
