@@ -138,7 +138,7 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	$page.url = url;
 	if (path.endsWith("/_error")) {
 		$page.status = parseInt(query.get("status") ?? "404");
-		$page.error.message = query.get("message") ?? "";
+		$page.error = { message: query.get("message") ?? "" };
 		// Make it look a bit classier by removing the query
 		window.history.replaceState({}, "", url.toString().split("?")[0]);
 	} else {
@@ -163,7 +163,8 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 	let newLayoutStack: LayoutPath[] = [];
 
 	// Pass the data into $props
-	// TODO: Don't load if this is the first time -- it should have been passed to us, somehow...
+	// TODO: Don't load if this is the first time -- it should have been passed
+	// to us, somehow...
 	const data = await loadData(
 		handler,
 		params,
@@ -172,7 +173,16 @@ async function navigate(url: URL, firstTime = false): Promise<boolean> {
 		clientEndPoint,
 		serverEndPoint,
 	);
-	const $props: Record<string, any> = { data };
+	// We may have form data in a hidden input -- not sure if this is the best
+	// way to do it
+	let formInput = document.getElementById("t-form-data") as HTMLInputElement;
+	let form: Record<string, string> | undefined;
+	if (formInput) {
+		form = JSON.parse(formInput.value);
+		$page.form = form;
+		formInput.remove();
+	}
+	const $props: Record<string, any> = { data, form };
 
 	layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRange: null });
 	layoutStack = newLayoutStack;

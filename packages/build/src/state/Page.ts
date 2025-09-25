@@ -1,7 +1,8 @@
 export default interface Page {
 	status: number;
 	url: URL;
-	error: {
+	form?: Record<string, string>;
+	error?: {
 		message: string;
 	};
 }

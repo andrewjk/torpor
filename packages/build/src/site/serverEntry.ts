@@ -30,33 +30,6 @@ router.addPages(manifest.routes);
 
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
-async function handleResponse(response: Response): Promise<Response> {
-	$page.status = response.status;
-
-	// Success codes and redirect codes are acceptable
-	if (response.status >= 200 && response.status <= 399) {
-		return response;
-	}
-
-	// It's an error, so redirect to the error page
-	// We're just pushing the status and message in the URL, but maybe there's a
-	// more sophisticated way to do this?
-	// TODO: Should be returning loadView rather than redirecting
-	// TODO: Should be returning the NEAREST error page to this path, including layouts
-	let params = new URLSearchParams();
-	params.append("status", $page.status.toString());
-	let message = await response.text();
-	if (response.headers.get("Content-Type")?.includes("application/json")) {
-		const data = JSON.parse(message);
-		message = data.message ?? message;
-	}
-	if (message) {
-		$page.error.message = message;
-		params.append("message", message);
-	}
-	return seeOther(`/_error?${params.toString()}`);
-}
-
 export async function load(ev: ServerEvent, template: string): Promise<Response> {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
@@ -69,18 +42,17 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 	if (!route) {
 		return handleResponse(notFound());
 	}
+	const handler = route.handler;
+	const params = route.params || {};
 
 	// Update $page before building the components
 	$page.url = url;
 	if (path.endsWith("/_error")) {
 		$page.status = parseInt(query.get("status") ?? "404");
-		$page.error.message = query.get("message") ?? "";
+		$page.error = { message: query.get("message") ?? "" };
 	} else {
 		$page.status = 200;
 	}
-
-	const handler = route.handler;
-	const params = route.params || {};
 
 	// TODO: Hit the server hook out here
 	// We could maybe set data loading up as middleware on a route??????
@@ -92,7 +64,7 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 			if (ev.request.method === "GET") {
 				return handleResponse(await loadView(ev, url, handler, params, template));
 			} else if (ev.request.method === "POST") {
-				return handleResponse(await runAction(ev, url, handler, params, query));
+				return handleResponse(await runAction(ev, url, handler, params, query, template));
 			}
 			break;
 		}
@@ -119,6 +91,37 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 	}
 
 	return notFound();
+}
+
+async function handleResponse(response: Response): Promise<Response> {
+	$page.status = response.status;
+
+	// Success codes and redirect codes are acceptable
+	if (response.status >= 200 && response.status <= 399) {
+		return response;
+	}
+
+	// It's an error, so redirect to the error page
+	// We're just pushing the status and message in the URL, but maybe there's a
+	// more sophisticated way to do this?
+	// TODO: Should be returning loadView rather than redirecting
+	// TODO: Should be returning the NEAREST error page to this path, including layouts
+	let params = new URLSearchParams();
+	params.append("status", $page.status.toString());
+	let message = await response.text();
+	if (response.headers.get("Content-Type")?.includes("application/json")) {
+		const data = JSON.parse(message);
+		message = data.message ?? message;
+	}
+	if (message) {
+		if ($page.error) {
+			$page.error.message = message;
+		} else {
+			$page.error = { message };
+		}
+		params.append("message", message);
+	}
+	return seeOther(`/_error?${params.toString()}`);
 }
 
 async function loadData(
@@ -155,6 +158,8 @@ async function loadView(
 	handler: RouteHandler,
 	params: Record<string, string>,
 	template: string,
+	formStatus?: number,
+	form?: Record<string, string>,
 ) {
 	// There must be a client endpoint with a component
 	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
@@ -209,7 +214,7 @@ async function loadView(
 	if (endPointResponse?.ok === false) {
 		return endPointResponse;
 	}
-	let $props: Record<string, any> = { data };
+	let $props: Record<string, any> = { data, form };
 
 	let styles = "";
 
@@ -217,7 +222,6 @@ async function loadView(
 	// the default slot of its parent
 	// TODO: Also handle layout server data
 	// TODO: There's probably a nicer way to do this with reducers or something
-	// TODO: Re-use parent layouts
 	let component = clientEndPoint.component as ServerComponent;
 	let slots: Record<string, ServerSlotRender> | undefined = undefined;
 	if (handler.layouts) {
@@ -250,6 +254,12 @@ async function loadView(
 	let html;
 	try {
 		let { body, head } = component($props, undefined, slots);
+
+		// Put the form info in a hidden input so that it can be accessed on the client
+		if (form) {
+			body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
+		}
+
 		styles += head;
 		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD%", styles);
 	} catch (error) {
@@ -259,7 +269,7 @@ async function loadView(
 	}
 
 	return new Response(html, {
-		status: 200,
+		status: formStatus ?? 200,
 		headers: {
 			"Content-Type": "text/html",
 		},
@@ -272,6 +282,7 @@ async function runAction(
 	handler: RouteHandler,
 	params: Record<string, string>,
 	query: URLSearchParams,
+	template: string,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
 	const serverEndPoint: PageServerEndPoint | undefined =
@@ -279,7 +290,6 @@ async function runAction(
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
-			// TODO: form.errors etc
 			const serverParams = buildServerParams(ev, url, params);
 
 			if (handler.serverHook) {
@@ -291,12 +301,32 @@ async function runAction(
 
 			const result = await action(serverParams);
 
-			// Return the response if it was not ok (i.e. errors or a redirect)
-			// Otherwise, reload the page by redirecting
-			if (result && !result.ok) {
-				return result;
+			// If no result, ok or 4xx error, re-render the view with
+			// If redirect or server error, just return the result to handle it as normal
+			// TODO: on redirect, should we render the new view and replace the url on the client?
+			// As it is now, it breaks back buttons
+			// TODO: do not re-run hooks?
+			if (
+				!result ||
+				(result.status >= 200 && result.status <= 299) ||
+				(result.status >= 400 && result.status <= 499)
+			) {
+				const newUrl = new URL(url.pathname, url);
+				const formStatus = result?.status;
+				const form = await result?.json();
+				$page.form = form;
+				return await loadView(ev, newUrl, handler, params, template, formStatus, form);
+				//} else if (result.status >= 300 && result.status <= 399) {
+				//	const newUrl = new URL(result.headers.get("location") ?? url.pathname, url);
+				//	const route = router.match(newUrl.pathname, query);
+				//	if (!route) {
+				//		return notFound();
+				//	}
+				//	const handler = route.handler;
+				//	const params = route.params || {};
+				//	return await loadView(ev, newUrl, handler, params, template);
 			} else {
-				return seeOther(url.pathname);
+				return result;
 			}
 		}
 	}
