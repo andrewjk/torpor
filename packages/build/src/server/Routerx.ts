@@ -1,4 +1,4 @@
-import pathToRegex from "../site/pathToRegex";
+import pathToRegex from "../utils/pathToRegex";
 import type HttpMethod from "./types/HttpMethod";
 import type MiddlewareFunction from "./types/MiddlewareFunction";
 import type ServerFunction from "./types/ServerFunction";

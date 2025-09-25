@@ -7,8 +7,8 @@ import { createServer as createViteServer } from "vite";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
 import connectMiddleware from "../server/connect/connectMiddleware.ts";
-import Site from "./Site.ts";
-import manifest from "./manifest.ts";
+import Site from "../site/Site.ts";
+import manifest from "../site/manifest.ts";
 import prepareTemplate from "./prepareTemplate.ts";
 
 export default async function runDev(site: Site): Promise<void> {

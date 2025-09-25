@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import run from "../site/run";
+import run from "../run/run";
 
 const workingDir = process.cwd();
 if (process.argv.includes("--dev")) {

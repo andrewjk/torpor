@@ -2,8 +2,8 @@ import torpor from "@torpor/unplugin/vite";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
-import Site from "./Site.ts";
-import manifest from "./manifest.ts";
+import Site from "../site/Site";
+import manifest from "../site/manifest.ts";
 
 // TODO: Don't cache index.html in dev?
 // TODO: Multiple hook.server locations

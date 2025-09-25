@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { transformWithEsbuild } from "vite";
-import Site from "./Site";
+import Site from "../site/Site";
 import runBuild from "./runBuild";
 import runDev from "./runDev";
 import runPreview from "./runPreview";

@@ -4,7 +4,7 @@ import path from "node:path";
 import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
 import contentType from "../server/contentType.ts";
-import Site from "./Site";
+import Site from "../site/Site";
 import prepareTemplate from "./prepareTemplate.ts";
 import runBuild from "./runBuild";
 

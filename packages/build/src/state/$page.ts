@@ -1,5 +1,5 @@
 import { $watch } from "@torpor/view";
-import type Page from "./Page";
+import type Page from "../types/Page";
 
 const $page: Page = $watch(
 	{

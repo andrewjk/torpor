@@ -1,7 +1,7 @@
 import type LayoutHandler from "../types/LayoutHandler";
 import type ManifestRoute from "../types/ManifestRoute";
 import type RouteHandler from "../types/RouteHandler";
-import pathToRegex from "./pathToRegex";
+import pathToRegex from "../utils/pathToRegex";
 
 /**
  * A router that handles file routes with layouts, hooks, etc.

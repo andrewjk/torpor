@@ -1,4 +1,4 @@
-import pathToRegex from "../site/pathToRegex";
+import pathToRegex from "../utils/pathToRegex";
 import ServerEvent from "./ServerEvent";
 import type MiddlewareFunction from "./types/MiddlewareFunction";
 import type ServerFunction from "./types/ServerFunction";
