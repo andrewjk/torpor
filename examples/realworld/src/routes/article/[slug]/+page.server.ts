@@ -1,6 +1,6 @@
 import * as api from "@/lib/api.js";
 import { type PageServerEndPoint } from "@torpor/build";
-import { ok, redirect, unauthorized, unprocessable } from "@torpor/build/response";
+import { ok, temporaryRedirect, unauthorized, unprocessable } from "@torpor/build/response";
 import { marked } from "marked";
 import sanitizeHtml from "sanitize-html";
 
@@ -63,7 +63,7 @@ export default {
 				return unprocessable(result);
 			}
 
-			return redirect("/");
+			return temporaryRedirect("/");
 		},
 		toggleFavorite: async ({ appData, params, request }) => {
 			const user = appData.user;
@@ -86,7 +86,7 @@ export default {
 				}
 			}
 
-			return redirect(request.headers.get("referer") ?? `/article/${params.slug}`);
+			return temporaryRedirect(request.headers.get("referer") ?? `/article/${params.slug}`);
 		},
 	},
 } satisfies PageServerEndPoint;

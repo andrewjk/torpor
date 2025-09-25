@@ -1,12 +1,12 @@
 import * as api from "@/lib/api.js";
 import { type PageServerEndPoint } from "@torpor/build";
-import { redirect, seeOther, unprocessable } from "@torpor/build/response";
+import { seeOther, temporaryRedirect, unprocessable } from "@torpor/build/response";
 
 export default {
 	load: async ({ appData }) => {
 		const user = appData.user;
 		if (user) {
-			return redirect("/");
+			return temporaryRedirect("/");
 		}
 	},
 	actions: {
