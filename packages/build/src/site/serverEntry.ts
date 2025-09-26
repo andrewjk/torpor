@@ -63,7 +63,7 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 			if (ev.request.method === "GET") {
 				return handleResponse(await loadView(ev, url, handler, params, template));
 			} else if (ev.request.method === "POST") {
-				return handleResponse(await runAction(ev, url, handler, params, query, template));
+				return handleResponse(await runAction(ev, url, handler, params, query, template), true);
 			}
 			break;
 		}
@@ -92,11 +92,16 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 	return notFound();
 }
 
-async function handleResponse(response: Response): Promise<Response> {
+async function handleResponse(response: Response, fromForm = false): Promise<Response> {
 	$page.status = response.status;
 
 	// Success codes and redirect codes are acceptable
 	if (response.status >= 200 && response.status <= 399) {
+		return response;
+	}
+
+	// 4xx error codes are acceptable from form actions
+	if (fromForm && response.status >= 400 && response.status <= 499) {
 		return response;
 	}
 
@@ -300,10 +305,8 @@ async function runAction(
 
 			const result = await action(serverParams);
 
-			// If no result, ok or 4xx error, re-render the view with
+			// If no result, ok or 4xx error, re-render the view with the form result
 			// If redirect or server error, just return the result to handle it as normal
-			// TODO: on redirect, should we render the new view and replace the url on the client?
-			// As it is now, it breaks back buttons
 			// TODO: do not re-run hooks?
 			if (
 				!result ||
@@ -315,15 +318,6 @@ async function runAction(
 				const form = await result?.json();
 				$page.form = form;
 				return await loadView(ev, newUrl, handler, params, template, formStatus, form);
-				//} else if (result.status >= 300 && result.status <= 399) {
-				//	const newUrl = new URL(result.headers.get("location") ?? url.pathname, url);
-				//	const route = router.match(newUrl.pathname, query);
-				//	if (!route) {
-				//		return notFound();
-				//	}
-				//	const handler = route.handler;
-				//	const params = route.params || {};
-				//	return await loadView(ev, newUrl, handler, params, template);
 			} else {
 				return result;
 			}
