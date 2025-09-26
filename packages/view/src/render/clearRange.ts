@@ -1,24 +1,24 @@
 import type Range from "../types/Range";
 
 export default function clearRange(range: Range): void {
-	//console.log("clearing range", range.startNode, "to", range.endNode);
+	//console.log("clearing range", range.name, "from", range.startNode, "to", range.endNode);
 
 	// Clear child ranges and collect animations that take place within this
 	// range and its children
 	let animations: Animation[] | undefined =
 		range.animations !== null ? Array.from(range.animations) : undefined;
-	if (range.children > 0) {
-		let childRange = range;
-		for (let i = 0; i < range.children; i++) {
-			childRange = childRange.nextRange!;
-			if (childRange.animations !== null) {
-				animations ??= [];
-				animations.push(...childRange.animations);
-			}
-			releaseRange(childRange);
+	let childRange = range.nextRange;
+	while (childRange !== null && childRange.depth > range.depth) {
+		if (childRange.animations !== null) {
+			animations ??= [];
+			animations.push(...childRange.animations);
 		}
-		range.nextRange = childRange;
+		releaseRange(childRange);
+		// HACK: see runControlBranch
+		childRange.depth = -2;
+		childRange = childRange.nextRange;
 	}
+	range.nextRange = childRange;
 
 	if (range.previousRange !== null) {
 		range.previousRange.nextRange = range.nextRange;

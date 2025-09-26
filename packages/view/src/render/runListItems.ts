@@ -165,7 +165,6 @@ export default function runListItems(
 		}
 	}
 
-	range.children = newItems.length;
 	if (newItems.length > 0) {
 		range.nextRange = newItems[0];
 	} else if (oldItems.length > 0) {

@@ -6,7 +6,7 @@ export default function newRange(name?: string): Range {
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		children: 0,
+		depth: -1,
 		animations: null,
 		name,
 	};

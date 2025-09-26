@@ -5,15 +5,14 @@ import popRange from "./popRange";
 import pushRange from "./pushRange";
 
 export default function runControlBranch(range: Range, create: () => void): void {
-	// Branching ranges have exactly one child -- remove it if necessary
-	if (range.children === 1) {
-		// HACK: This is bad -- it means that the parent range has been cleared,
-		// but that should have cleared the effect that runs this child range??
-		// TODO: Look into this further...
-		if (range.nextRange === null) return;
+	// HACK: This is bad -- it means that the parent range has been cleared,
+	// but that should have cleared the effect that runs this child range??
+	// TODO: Look into this further...
+	if (range.depth === -2) return;
 
+	// Branching ranges have exactly one child -- remove it if necessary
+	if (range.nextRange !== null && range.nextRange.depth > range.depth) {
 		clearRange(range.nextRange!);
-		range.children = 0;
 	}
 
 	const oldRange = pushRange(newRange(), true);

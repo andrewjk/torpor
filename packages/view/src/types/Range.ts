@@ -4,7 +4,7 @@ export default interface Range {
 
 	previousRange: Range | null;
 	nextRange: Range | null;
-	children: number;
+	depth: number;
 
 	/**
 	 * Animations that are currently running in the range, and which need to

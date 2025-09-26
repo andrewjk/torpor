@@ -553,18 +553,17 @@ function applyProps(el, props, propNamesUsed) {
 }
 function clearRange(range) {
 	let animations = range.animations !== null ? Array.from(range.animations) : void 0;
-	if (range.children > 0) {
-		let childRange = range;
-		for (let i = 0; i < range.children; i++) {
-			childRange = childRange.nextRange;
-			if (childRange.animations !== null) {
-				animations ??= [];
-				animations.push(...childRange.animations);
-			}
-			releaseRange(childRange);
+	let childRange = range.nextRange;
+	while (childRange !== null && childRange.depth > range.depth) {
+		if (childRange.animations !== null) {
+			animations ??= [];
+			animations.push(...childRange.animations);
 		}
-		range.nextRange = childRange;
+		releaseRange(childRange);
+		childRange.depth = -2;
+		childRange = childRange.nextRange;
 	}
+	range.nextRange = childRange;
 	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
 	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
 	if (animations !== void 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
@@ -598,7 +597,7 @@ function newRange(name) {
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		children: 0,
+		depth: -1,
 		animations: null,
 		name
 	};
@@ -614,7 +613,7 @@ function pushRange(range, toParent = false) {
 		const nextRange = previousRange.nextRange;
 		previousRange.nextRange = range;
 		range.nextRange = nextRange;
-		activeRange.children++;
+		range.depth = activeRange.depth + 1;
 	}
 	context_default.activeRange = range;
 	context_default.previousRange = range;
@@ -665,7 +664,7 @@ function newListItem(data, key) {
 		endNode: null,
 		previousRange: null,
 		nextRange: null,
-		children: 0,
+		depth: -1,
 		animations: null,
 		data,
 		key
@@ -761,11 +760,8 @@ function runControl(range, anchor, create) {
 	popRange(oldRange);
 }
 function runControlBranch(range, create) {
-	if (range.children === 1) {
-		if (range.nextRange === null) return;
-		clearRange(range.nextRange);
-		range.children = 0;
-	}
+	if (range.depth === -2) return;
+	if (range.nextRange !== null && range.nextRange.depth > range.depth) clearRange(range.nextRange);
 	const oldRange = pushRange(newRange(), true);
 	create();
 	popRange(oldRange);
@@ -855,7 +851,6 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 			before = newStartItem.endNode.nextSibling;
 		}
 	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
-	range.children = newItems.length;
 	if (newItems.length > 0) range.nextRange = newItems[0];
 	else if (oldItems.length > 0) range.nextRange = oldItems[oldItems.length - 1].nextRange;
 }

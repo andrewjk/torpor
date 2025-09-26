@@ -14,7 +14,7 @@ export default function pushRange(range: Range, toParent = false): Range {
 		previousRange.nextRange = range;
 		range.nextRange = nextRange;
 
-		activeRange.children++;
+		range.depth = activeRange.depth + 1;
 	}
 
 	// Set the new active range
