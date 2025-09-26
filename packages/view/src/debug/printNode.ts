@@ -1,3 +1,7 @@
+/**
+ * Prints the contents of an HTML node with the things we care about
+ * highlighted.
+ */
 export default function printNode(node: Node | null | undefined, colored = true): string {
 	if (!node) {
 		return colored ? "\x1b[41m[null]\x1b[0m" : "[null]";
