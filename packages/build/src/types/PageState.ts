@@ -1,4 +1,4 @@
-export default interface Page {
+export default interface PageState {
 	status: number;
 	url: URL;
 	form?: Record<string, string>;

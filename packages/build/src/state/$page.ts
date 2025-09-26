@@ -1,18 +1,6 @@
-import { $watch } from "@torpor/view";
-import type Page from "../types/Page";
+import type PageState from "../types/PageState";
+import internal from "./internal";
 
-const $page: Page = $watch(
-	{
-		status: 404,
-		url: new URL("http://localhost"),
-		form: {},
-		error: {
-			message: "",
-		},
-	},
-	{
-		shallow: true,
-	},
-);
+const $page: PageState = internal().$page;
 
 export default $page;

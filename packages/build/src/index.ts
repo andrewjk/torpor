@@ -11,6 +11,9 @@ import type ServerHook from "./types/ServerHook";
 import type ServerLoadEvent from "./types/ServerLoadEvent";
 import type ServerRequest from "./types/ServerRequest";
 
+// NOTE: Don't export any general functionality from here -- it may result in
+// Vite errors like `Could not resolve '../pkg' in lightningcss` etc
+
 export { Site, Router };
 
 export type {

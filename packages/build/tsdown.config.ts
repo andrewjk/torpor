@@ -8,6 +8,7 @@ type Config =
 export default defineConfig({
 	entry: [
 		"src/index.ts",
+		"src/nav.ts",
 		"src/response.ts",
 		"src/run.ts",
 		"src/server.ts",
