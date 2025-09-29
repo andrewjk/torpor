@@ -4,7 +4,7 @@
 	"patterns": [{ "include": "source.ts" }],
 	"injections": {
 		"L:meta.block.ts": {
-			"patterns": [{ "include": "#render" }, { "include": "#style" }]
+			"patterns": [{ "include": "#head" }, { "include": "#render" }, { "include": "#style" }]
 		}
 	},
 	"repository": {
