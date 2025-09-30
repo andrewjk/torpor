@@ -1,7 +1,3 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { LanguageService as HTMLLanguageService, LanguageMode, Position } from "../languageModes";
 

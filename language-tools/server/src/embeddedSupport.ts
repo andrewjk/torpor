@@ -1,7 +1,3 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
 import { LanguageService, Position, Range, TextDocument, TokenType } from "./languageModes";
 
 export interface LanguageRange extends Range {
@@ -9,7 +5,7 @@ export interface LanguageRange extends Range {
 	attributeValue?: boolean;
 }
 
-export interface TorporDocumentRegions {
+export interface DocumentRegions {
 	getEmbeddedDocument(languageId: string, ignoreAttributeValues?: boolean): TextDocument;
 	getLanguageRanges(range?: Range): LanguageRange[];
 	getLanguageAtPosition(position: Position): string | undefined;
@@ -26,7 +22,7 @@ interface EmbeddedRegion {
 	attributeValue?: boolean;
 }
 
-export function getDocumentRegions(document: TextDocument): TorporDocumentRegions {
+export function getDocumentRegions(document: TextDocument): DocumentRegions {
 	const regions: EmbeddedRegion[] = [];
 	let documentText = document.getText();
 

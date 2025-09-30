@@ -1,7 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
 	CompletionList,
@@ -11,15 +7,15 @@ import {
 	TextDocumentSyncKind,
 	TextDocuments,
 	createConnection,
-} from "vscode-languageserver/node";
+} from "vscode-languageserver/node.js";
 import { LanguageModes, getLanguageModes } from "./languageModes";
 
-// Create a connection for the server. The connection uses Node's IPC as a transport.
-// Also include all preview / proposed LSP features.
+// Create a connection for the server. The connection uses Node's IPC as a
+// transport. Also include all preview / proposed LSP features
 const connection = createConnection(ProposedFeatures.all);
 
-// Create a simple text document manager. The text document manager
-// supports full document sync only
+// Create a simple text document manager. The text document manager supports
+// full document sync only
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
 let languageModes: LanguageModes;

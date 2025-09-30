@@ -1,7 +1,3 @@
-/* --------------------------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Licensed under the MIT License. See License.txt in the project root for license information.
- * ------------------------------------------------------------------------------------------ */
 import * as path from "path";
 import { ExtensionContext } from "vscode";
 import {
@@ -28,14 +24,14 @@ export function activate(context: ExtensionContext) {
 
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
-		// Register the server for plain text documents
+		// Register the server for *.torp documents (defined in the top-level package.json)
 		documentSelector: [{ scheme: "file", language: "torpor" }],
 	};
 
-	// Create the language client and start the client.
+	// Create the language client
 	client = new LanguageClient(
-		"languageServerExample",
-		"Language Server Example",
+		"torporLanguageClient",
+		"Torpor Language Client",
 		serverOptions,
 		clientOptions,
 	);

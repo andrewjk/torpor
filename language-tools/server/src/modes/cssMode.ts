@@ -1,16 +1,12 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
 import { LanguageService as CSSLanguageService } from "vscode-css-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { TorporDocumentRegions } from "../embeddedSupport";
+import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
 import { LanguageMode, Position } from "../languageModes";
 
 export function getCSSMode(
 	cssLanguageService: CSSLanguageService,
-	documentRegions: LanguageModelCache<TorporDocumentRegions>,
+	documentRegions: LanguageModelCache<DocumentRegions>,
 ): LanguageMode {
 	return {
 		getId() {

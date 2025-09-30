@@ -1,8 +1,3 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
 import { getCSSLanguageService } from 'vscode-css-languageservice';
 import {
 	CompletionList,
@@ -13,7 +8,7 @@ import {
 } from 'vscode-html-languageservice';
 import { TextDocument } from 'vscode-languageserver-textdocument';
 import { getCSSMode } from './modes/cssMode';
-import { getDocumentRegions, TorporDocumentRegions as TorporDocumentRegions } from './embeddedSupport';
+import { getDocumentRegions, DocumentRegions } from './embeddedSupport';
 import { getHTMLMode } from './modes/htmlMode';
 import { getLanguageModelCache, LanguageModelCache } from './languageModelCache';
 import { getScriptMode } from './modes/scriptMode';
@@ -47,7 +42,7 @@ export function getLanguageModes(): LanguageModes {
 	const htmlLanguageService = getHTMLLanguageService();
 	const cssLanguageService = getCSSLanguageService();
 
-	const documentRegions = getLanguageModelCache<TorporDocumentRegions>(10, 60, document =>
+	const documentRegions = getLanguageModelCache<DocumentRegions>(10, 60, document =>
 		getDocumentRegions( document)
 	);
 
