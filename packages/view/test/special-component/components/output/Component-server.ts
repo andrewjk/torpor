@@ -11,6 +11,7 @@ export default function Component(
 	$props ??= {};
 	let t_body = "";
 	let t_head = "";
+
 	let components = {
 		BigTitle,
 		SmallTitle

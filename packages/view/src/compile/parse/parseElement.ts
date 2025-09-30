@@ -27,7 +27,12 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	const element = parseTag(status);
 
 	if (element.tagName.startsWith("/")) {
-		addError(status, `Non-matching close tag: ${element.tagName.substring(1)}`, start);
+		addError(
+			status,
+			`Non-matching close tag: ${element.tagName.substring(1)}`,
+			start,
+			start + element.tagName.length,
+		);
 		return element;
 	}
 
@@ -120,13 +125,23 @@ export default function parseElement(status: ParseStatus): ElementNode {
 
 				return replaceGroup as any;
 			} else {
-				addError(status, "@component element must have a self attribute", start);
+				addError(
+					status,
+					"@component element must have a self attribute",
+					start,
+					start + element.tagName.length + 1,
+				);
 			}
 		}
 	}
 
 	if (!element.closed && !voidTags.includes(element.tagName)) {
-		addError(status, `Unclosed non-void element: ${element.tagName}`, start);
+		addError(
+			status,
+			`Unclosed non-void element: ${element.tagName}`,
+			start,
+			start + element.tagName.length + 1,
+		);
 	}
 
 	return element;
@@ -216,7 +231,12 @@ function checkVoidElement(status: ParseStatus, element: ElementNode) {
 	if (accept("</", status)) {
 		consumeSpace(status);
 		if (accept(element.tagName, status)) {
-			addError(status, `Closed void element: ${element.tagName}`, i);
+			addError(
+				status,
+				`Closed void element: ${element.tagName}`,
+				i,
+				i + element.tagName.length + 1,
+			);
 			consumeSpace(status);
 			accept(">", status);
 			return;
@@ -254,6 +274,7 @@ function checkCloseTag(status: ParseStatus, element: ElementNode, current: Parse
 			status,
 			`Non-matching close tag: ${closingTagName} (expected ${element.tagName})`,
 			start,
+			start + element.tagName.length + 1,
 		);
 	}
 

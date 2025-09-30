@@ -10,6 +10,7 @@ export default function ColorSelect(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		selectedColorId: 2
 	});

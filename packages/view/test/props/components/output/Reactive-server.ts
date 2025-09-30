@@ -9,6 +9,7 @@ export default function Reactive(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({ text: "before" })
 
 	/* User interface */

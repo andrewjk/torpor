@@ -21,7 +21,7 @@ const importsMap: Record<string, string> = {
 };
 
 export default function buildServerCode(template: Template, options?: BuildOptions): string {
-	let b = new Builder();
+	let b = new Builder(options?.mapped);
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
@@ -48,7 +48,8 @@ function buildServerTemplate(
 	b: Builder,
 	options?: BuildOptions,
 ) {
-	let script = template.script || "";
+	// TODO: Do this while looping chunks
+	let script = template.script.map((s) => s.script).join("\n");
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
@@ -62,11 +63,8 @@ function buildServerTemplate(
 	let currentIndex = 0;
 	let current = template.components[0];
 
-	let marker = 0;
-	for (let i = 0; i < script.length; i++) {
-		if (script.substring(i, i + "/* @params */".length) === "/* @params */") {
-			b.append(script.substring(marker, i));
-
+	for (let chunk of template.script) {
+		if (chunk.script === "/* @params */") {
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				current.params ??
@@ -75,11 +73,7 @@ function buildServerTemplate(
 				`${current.slotProps?.length ? "$slots" : "_$slots?"}: Record<string, ServerSlotRender>`,
 			];
 			b.append(params.join(",\n"));
-
-			marker = i + "/* @params */".length;
-		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
-			b.append(script.substring(marker, i));
-
+		} else if (chunk.script === "/* @start */") {
 			// Make sure we've got $props if we're going to be using it
 			if (current.props?.length) {
 				b.append(`$props ??= {};`);
@@ -93,10 +87,7 @@ function buildServerTemplate(
 			// Declare t_head and t_body
 			b.append(`let t_body = "";`);
 			b.append(`let t_head = "";`);
-
-			marker = i + "/* @start */".length;
-		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
-			b.append(script.substring(marker, i));
+		} else if (chunk.script === "/* @render */") {
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {
 			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
@@ -124,20 +115,14 @@ function buildServerTemplate(
 					status.output = "";
 				}
 			}
-
-			marker = i + "/* @render */".length;
-		} else if (script.substring(i, i + "/* @head */".length) === "/* @head */") {
-			b.append(script.substring(marker, i));
+		} else if (chunk.script === "/* @head */") {
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {
 			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
 			//	b.append(userScript);
 			//}
-
 			// TODO: need to add e.g. a title to the head, but remove when changing page
-			marker = i + "/* @head */".length;
-		} else if (script.substring(i, i + "/* @style */".length) === "/* @style */") {
-			b.append(script.substring(marker, i));
+		} else if (chunk.script === "/* @style */") {
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {
 			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
@@ -154,18 +139,13 @@ function buildServerTemplate(
 					.replaceAll(/\s+/g, " ");
 				b.append(`t_head += "<style id='${current.style.hash}'>${styles}</style>";\n`);
 			}
-
-			marker = i + "/* @style */".length;
-		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
-			b.append(script.substring(marker, i));
+		} else if (chunk.script === "/* @end */") {
 			b.append(`return { body: t_body, head: t_head };`);
 
 			currentIndex += 1;
 			current = template.components[currentIndex];
-
-			marker = i + "/* @end */".length;
+		} else {
+			b.append(chunk.script);
 		}
 	}
-
-	b.append(script.substring(marker));
 }

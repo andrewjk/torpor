@@ -3,12 +3,22 @@ import endOfTemplateString from "./endOfTemplateString";
 export default class Builder {
 	#text = "";
 	#space = 0;
+	#mapped = false;
+
+	constructor(mapped?: boolean) {
+		this.#mapped = mapped === true;
+	}
 
 	prepend(text: string): void {
 		this.#text = text + "\n" + this.#text;
 	}
 
 	append(text: string): void {
+		if (this.#mapped) {
+			this.#text += "\n" + text;
+			return;
+		}
+
 		text = text.trim();
 		let i = 0;
 		//let newline = !!text.length && !text.endsWith("\n");

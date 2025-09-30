@@ -10,6 +10,7 @@ export default function Time(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		time: new Date().toLocaleTimeString()
 	});

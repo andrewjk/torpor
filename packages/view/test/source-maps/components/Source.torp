@@ -1,0 +1,17 @@
+export default function Source($props: { counter: number }) {
+const x = 5;
+
+	@render {
+		@if ($props.counter > 10) {
+			<p>
+				It's large.
+			</p>
+		} else {
+			<p>
+				It's small.
+			</p>
+		}
+	}
+
+const y = 10;
+}

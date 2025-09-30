@@ -8,6 +8,7 @@ export default function Colors(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	const colors = ["red", "green", "blue"];
 
 	/* User interface */

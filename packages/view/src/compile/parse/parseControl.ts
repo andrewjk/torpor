@@ -86,7 +86,13 @@ export default function parseControl(
 		} else {
 			// Can't have text content in control blocks
 			const char = status.source[status.i];
-			addError(status, `Unexpected token in control block: ${char}`, status.i);
+			addError(
+				status,
+				`Unexpected token in control block: ${char}`,
+				status.i,
+				// TODO: Should probably go until a boundary
+				status.i + 1,
+			);
 			break;
 		}
 	}
@@ -134,7 +140,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 		}
 	} else {
 		// TODO: Should probably advance until a closing brace or a newline
-		addError(status, `Unknown operation: ${operation}`, status.i);
+		addError(status, `Unknown operation: ${operation}`, status.i, status.i + operation.length);
 		return null;
 	}
 

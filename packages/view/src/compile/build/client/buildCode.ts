@@ -1,5 +1,6 @@
 import type BuildOptions from "../../../types/BuildOptions";
 import type Template from "../../../types/Template";
+import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import buildFragmentText from "./buildFragmentText";
@@ -44,15 +45,21 @@ const importsMap: Record<string, string> = {
 	SlotRender: 'import { type SlotRender } from "${folder}";',
 };
 
-export default function buildCode(template: Template, options?: BuildOptions): string {
-	let b = new Builder();
+export default function buildCode(
+	template: Template,
+	map: SourceMapping[],
+	options?: BuildOptions,
+): string {
+	let b = new Builder(options?.mapped);
 
 	// Gather imports as we go so they can be placed at the top
 	let imports = new Set<string>();
 	imports.add("SlotRender");
 
 	// Build the component
-	buildTemplate(template, imports, b);
+	buildTemplate(template, map, imports, b, options);
+
+	let startSize = b.toString().length;
 
 	// Add the gathered imports in alphabetical order
 	if (imports.size) {
@@ -63,11 +70,33 @@ export default function buildCode(template: Template, options?: BuildOptions): s
 		}
 	}
 
+	let endText = b.toString();
+	let endSize = endText.length;
+	let diff = endSize - startSize + 1;
+	let importLines = imports.size + 2;
+	//let importLines = 0;
+	//for (let i = 0; i < diff; i++) {
+	//	if (endText[i] === "\n") importLines++;
+	//}
+	for (let m of map) {
+		m.compiled.startIndex += diff;
+		m.compiled.startLine += importLines;
+		m.compiled.endIndex += diff;
+		m.compiled.endLine += importLines;
+	}
+
 	return b.toString();
 }
 
-function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
-	let script = template.script || "";
+function buildTemplate(
+	template: Template,
+	map: SourceMapping[],
+	imports: Set<string>,
+	b: Builder,
+	options?: BuildOptions,
+) {
+	// TODO: Do this while looping chunks
+	let script = template.script.map((s) => s.script).join("\n");
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
@@ -81,11 +110,8 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 	let currentIndex = 0;
 	let current = template.components[0];
 
-	let marker = 0;
-	for (let i = 0; i < script.length; i++) {
-		if (script.substring(i, i + "/* @params */".length) === "/* @params */") {
-			b.append(script.substring(marker, i));
-
+	for (let chunk of template.script) {
+		if (chunk.script === "/* @params */") {
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				`${current.markup ? "$parent" : "_$parent"}: ParentNode`,
@@ -96,11 +122,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				`${current.slotProps?.length ? "$slots" : "_$slots?"}: Record<string, SlotRender>`,
 			];
 			b.append(params.join(",\n"));
-
-			marker = i + "/* @params */".length;
-		} else if (script.substring(i, i + "/* @start */".length) === "/* @start */") {
-			b.append(script.substring(marker, i));
-
+		} else if (chunk.script === "/* @start */") {
 			// Make sure we've got $props if we're going to be using it
 			if (current.props?.length) {
 				imports.add("$watch");
@@ -113,11 +135,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 			}
 
 			b.append("");
-
-			marker = i + "/* @start */".length;
-		} else if (script.substring(i, i + "/* @render */".length) === "/* @render */") {
-			b.append(script.substring(marker, i));
-
+		} else if (chunk.script === "/* @render */") {
 			if (current.markup) {
 				const status: BuildStatus = {
 					imports,
@@ -139,11 +157,7 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				b.append("");
 				buildNode(current.markup, status, b, "$parent", "$anchor", true);
 			}
-
-			marker = i + "/* @render */".length;
-		} else if (script.substring(i, i + "/* @head */".length) === "/* @head */") {
-			b.append(script.substring(marker, i));
-
+		} else if (chunk.script === "/* @head */") {
 			if (current.head) {
 				const status: BuildStatus = {
 					imports,
@@ -165,19 +179,53 @@ function buildTemplate(template: Template, imports: Set<string>, b: Builder) {
 				buildNode(current.head, status, b, "$parent", "$anchor", true);
 				status.inHead = false;
 			}
-
-			marker = i + "/* @head */".length;
-		} else if (script.substring(i, i + "/* @style */".length) === "/* @style */") {
-			marker = i + "/* @style */".length;
-		} else if (script.substring(i, i + "/* @end */".length) === "/* @end */") {
-			b.append(script.substring(marker, i));
-
+		} else if (chunk.script === "/* @style */") {
+			// No styles in the client
+		} else if (chunk.script === "/* @end */") {
 			currentIndex += 1;
 			current = template.components[currentIndex];
+		} else {
+			b.append(chunk.script);
 
-			marker = i + "/* @end */".length;
+			if (options?.mapped) {
+				// TODO: Be more efficient here
+				let text = b.toString();
+				let startIndex = text.length;
+				let startLine = 0;
+				let startChar = 0;
+				for (let i = 0; i < text.length; i++) {
+					if (text[i] === "\n") {
+						startLine++;
+						startChar = 0;
+					} else {
+						startChar++;
+					}
+				}
+				let endIndex = startIndex + chunk.script.length;
+				let endLine = startLine;
+				let endChar = startChar;
+				for (let i = 0; i < chunk.script.length; i++) {
+					if (chunk.script[i] === "\n") {
+						endLine++;
+						endChar = 0;
+					} else {
+						endChar++;
+					}
+				}
+
+				map.push({
+					//script: chunk.script,
+					source: chunk.range,
+					compiled: {
+						startIndex,
+						startLine,
+						startChar,
+						endIndex,
+						endLine,
+						endChar,
+					},
+				});
+			}
 		}
 	}
-
-	b.append(script.substring(marker));
 }

@@ -1,4 +1,5 @@
 import type Import from "../compile/types/Import";
+import type ScriptChunk from "../compile/types/ScriptChunk";
 import type TemplateComponent from "./TemplateComponent";
 
 /**
@@ -6,6 +7,6 @@ import type TemplateComponent from "./TemplateComponent";
  */
 export default interface Template {
 	imports: Import[];
-	script: string;
+	script: ScriptChunk[];
 	components: TemplateComponent[];
 }

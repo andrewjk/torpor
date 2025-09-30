@@ -10,6 +10,7 @@ export default function UserProfileContext(
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
+
 	$context.user = $watch($context.user);
 
 	/* User interface */

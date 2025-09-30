@@ -1,8 +1,7 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
-import t_fmt from "../../../../src/render/formatText";
 
-export default function Replace(
-	$props: { name: string},
+export default function Source(
+	$props: { counter: number },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ) {
@@ -10,13 +9,17 @@ export default function Replace(
 	let t_body = "";
 	let t_head = "";
 
-	let counter = 0;
+	const x = 5;
 
 	/* User interface */
 	t_body += ` <![>`;
-	$props.name;
-	t_body += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
+	if ($props.counter > 10) {
+		t_body += `<!^> <p> It's large. </p> `;
+	}
+	else {
+		t_body += `<!^> <p> It's small. </p> `;
+	}
 	t_body += `<!]><!> `;
-
+	const y = 10;
 	return { body: t_body, head: t_head };
 }

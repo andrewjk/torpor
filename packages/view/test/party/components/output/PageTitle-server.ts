@@ -10,6 +10,7 @@ export default function PageTitle(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		pageTitle: ""
 	});

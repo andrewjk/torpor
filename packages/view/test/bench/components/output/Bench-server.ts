@@ -10,6 +10,7 @@ export default function Bench(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let rowId = 1;
 	let $state = $watch({
 		data: [],

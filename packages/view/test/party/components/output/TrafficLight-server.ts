@@ -9,6 +9,7 @@ export default function TrafficLight(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
 		lightIndex: 0,

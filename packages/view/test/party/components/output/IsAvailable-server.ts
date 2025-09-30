@@ -9,6 +9,7 @@ export default function IsAvailable(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		isAvailable: false
 	});

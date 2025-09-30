@@ -10,6 +10,7 @@ export default function BindComponent(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */

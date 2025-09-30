@@ -8,6 +8,7 @@ export default function Await(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	// Use the $watch function to declare reactive state
 	let $state = $watch({})
 

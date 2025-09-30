@@ -12,15 +12,33 @@ export default function addError(
 	status: ParseStatus,
 	message: string,
 	start: number = status.i,
+	end: number = status.i,
 ): void {
-	let line = 1;
+	let startLine = 0;
 	let lastLineStart = 0;
-	for (let i = 0; i < start; i++) {
+	let i = 0;
+	for (; i < start; i++) {
 		if (status.source[i] === "\n") {
-			line += 1;
+			startLine += 1;
 			lastLineStart = i + 1;
 		}
 	}
-	let column = start - lastLineStart;
-	status.errors.push({ message, start, line, column });
+	let startChar = start - lastLineStart;
+	let endLine = startLine;
+	for (; i < end; i++) {
+		if (status.source[i] === "\n") {
+			endLine += 1;
+			lastLineStart = i + 1;
+		}
+	}
+	let endChar = end - lastLineStart;
+	status.errors.push({
+		message,
+		startIndex: start,
+		startLine,
+		startChar,
+		endIndex: end,
+		endLine,
+		endChar,
+	});
 }

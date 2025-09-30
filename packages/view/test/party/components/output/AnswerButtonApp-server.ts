@@ -11,6 +11,7 @@ export default function AnswerButtonApp(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		isHappy: true
 	});

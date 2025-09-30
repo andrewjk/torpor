@@ -1,5 +1,6 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
+import type SourceRange from "../types/SourceRange";
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
@@ -19,9 +20,12 @@ export default function parseCode(source: string): ParseResult {
 		source,
 		i: 0,
 		marker: 0,
+		line: 0,
+		char: 0,
 		level: 0,
+		lastRange: emptyRange(),
 		imports: [],
-		script: "",
+		script: [],
 		components: [],
 		errors: [],
 	};
@@ -86,13 +90,16 @@ export default function parseCode(source: string): ParseResult {
 			parseComponentStyle(status);
 		}
 	}
-	status.script += source.substring(status.marker, source.length);
+	status.script.push({
+		script: source.substring(status.marker, source.length),
+		range: rangeAtIndex(status, status.marker, source.length),
+	});
 
 	scopeStyles(status);
 
 	const ok = !status.errors.length;
 	if (!ok) {
-		status.errors = status.errors.sort((a, b) => a.start - b.start);
+		status.errors = status.errors.sort((a, b) => a.startIndex - b.startIndex);
 	}
 
 	return {
@@ -157,7 +164,11 @@ function parseComponentStart(status: ParseStatus) {
 		}
 	}
 
-	status.script += status.source.substring(status.marker, start) + "/* @params */";
+	status.script.push({
+		script: status.source.substring(status.marker, start),
+		range: rangeAtIndex(status, status.marker, start),
+	});
+	status.script.push({ script: "/* @params */", range: emptyRange() });
 
 	current.params = status.source.substring(start, end).trim() || undefined;
 
@@ -175,8 +186,21 @@ function parseComponentStart(status: ParseStatus) {
 	accept("{", status);
 	status.level += 1;
 
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
+	status.script.push({
+		script: "/* @start */",
+		range: emptyRange(),
+	});
+
+	status.marker = status.i;
 	const space = consumeSpace(status);
-	status.script += status.source.substring(status.marker, status.i) + "/* @start */" + space;
+	status.script.push({
+		script: space,
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
 
 	status.marker = status.i;
 	status.i -= 1;
@@ -187,10 +211,17 @@ function parseComponentRender(status: ParseStatus) {
 	if (!current) return;
 
 	if (current.markup) {
-		addError(status, `Multiple @render sections`, status.i);
+		addError(status, `Multiple @render sections`, status.i, status.i + "@render".length);
 	}
 
-	status.script += status.source.substring(status.marker, status.i) + "/* @render */";
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
+	status.script.push({
+		script: "/* @render */",
+		range: emptyRange(),
+	});
 
 	accept("@render", status);
 	consumeSpace(status);
@@ -207,10 +238,17 @@ function parseComponentHead(status: ParseStatus) {
 	if (!current) return;
 
 	if (current.head) {
-		addError(status, `Multiple @head sections`, status.i);
+		addError(status, `Multiple @head sections`, status.i, status.i + "@head".length);
 	}
 
-	status.script += status.source.substring(status.marker, status.i) + "/* @head */";
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
+	status.script.push({
+		script: "/* @head */",
+		range: emptyRange(),
+	});
 
 	// HACK: add a new component, and move its markup into the current
 	// component's head section after
@@ -237,10 +275,17 @@ function parseComponentStyle(status: ParseStatus) {
 	if (!current) return;
 
 	if (current.style) {
-		addError(status, `Multiple @style sections`, status.i);
+		addError(status, `Multiple @style sections`, status.i, status.i + "@style".length);
 	}
 
-	status.script += status.source.substring(status.marker, status.i) + "/* @style */";
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
+	status.script.push({
+		script: "/* @style */",
+		range: emptyRange(),
+	});
 
 	let start = -1;
 	let end = status.source.length;
@@ -299,12 +344,15 @@ function parseComponentEnd(status: ParseStatus) {
 	const current = status.components.at(-1);
 	if (!current) return;
 
-	status.script += status.source.substring(status.marker, status.i);
-	if (status.script.endsWith("\n")) {
-		status.script += "\t/* @end */\n";
-	} else {
-		status.script += "/* @end */";
-	}
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		range: rangeAtIndex(status, status.marker, status.i),
+	});
+
+	status.script.push({
+		script: "/* @end */",
+		range: emptyRange(),
+	});
 
 	// Get all usages of $props.name and $props["name"]
 	// Get all usages of $context.name and $context["name"]
@@ -372,4 +420,50 @@ function consumeScriptComments(status: ParseStatus): boolean {
 		return true;
 	}
 	return false;
+}
+
+function rangeAtIndex(status: ParseStatus, start: number, end: number): SourceRange {
+	const { lastRange, source } = status;
+	let startIndex = lastRange.endIndex;
+	let startLine = lastRange.endLine;
+	let startChar = lastRange.endChar;
+	for (; startIndex < start && startIndex < source.length; startIndex++) {
+		if (source[startIndex] === "\n") {
+			startLine++;
+			startChar = 0;
+		} else {
+			startChar++;
+		}
+	}
+	let endIndex = startIndex;
+	let endLine = startLine;
+	let endChar = startChar;
+	for (; endIndex < end && endIndex < source.length; endIndex++) {
+		if (source[endIndex] === "\n") {
+			endLine++;
+			endChar = 0;
+		} else {
+			endChar++;
+		}
+	}
+	status.lastRange = {
+		startIndex,
+		startLine,
+		startChar,
+		endIndex,
+		endLine,
+		endChar,
+	};
+	return status.lastRange;
+}
+
+function emptyRange(): SourceRange {
+	return {
+		startIndex: 0,
+		startLine: 0,
+		startChar: 0,
+		endIndex: 0,
+		endLine: 0,
+		endChar: 0,
+	};
 }

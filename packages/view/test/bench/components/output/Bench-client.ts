@@ -155,17 +155,20 @@ export default function Bench(
 		t_for_anchor_1,
 		function createNewItems() {
 			let t_new_items: ListItem[] = [];
+			let t_previous_item = t_for_range_1;
+			let t_next_item = t_for_range_1.nextRange;
 			for (let row of $state.data) {
-				t_new_items.push(t_list_item({ row }, row.id));
-				/*t_new_items.push({
-					key: row.id,
-					data: { row }
-				});*/
+				let t_new_item = t_list_item({ row }, row.id);
+				t_new_item.previousRange = t_previous_item;
+				t_previous_item.nextRange = t_new_item;
+				t_previous_item = t_new_item;
+				t_new_items.push(t_new_item);
 			}
+			t_for_range_1.nextRange = t_next_item;
 			return t_new_items;
 		},
 		function createListItem(t_item, t_before) {
-			let t_old_range_1 = t_push_range(t_item, true);
+			let t_old_range_1 = t_push_range(t_item);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `);
 			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);
@@ -176,20 +179,19 @@ export default function Bench(
 			const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true)))) as HTMLElement;
 			// @ts-ignore
 			const t_text_3 = t_next(t_tr_1, true);
-			$run(function setClasses() {
-				t_tr_1.className = t_class({ danger: $state.selected === t_item.data.row.id });
-			});
-			$run(function setTextContent() {
-				t_text_1.textContent = t_fmt(t_item.data.row.id);
-			});
 			t_event(t_a_1, "click", () => $state.selected = t_item.data.row.id);
-			$run(function setTextContent() {
+			t_event(t_a_2, "click", () => remove(t_item.data.row));
+			$run(function setAttributes() {
+				t_tr_1.className = t_class({ danger: $state.selected === t_item.data.row.id });
+				t_text_1.textContent = t_fmt(t_item.data.row.id);
 				t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;
 			});
-			t_event(t_a_2, "click", () => remove(t_item.data.row));
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_3);
 			t_next(t_text_3);
 			t_pop_range(t_old_range_1);
+		},
+		function updateListItem(t_old_item, t_new_item) {
+			t_old_item.data.row = t_new_item.data.row;
 		}
 	);
 

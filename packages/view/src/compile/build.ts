@@ -4,6 +4,7 @@ import buildCode from "./build/client/buildCode";
 import buildStyles from "./build/client/buildStyles";
 import buildServerCode from "./build/server/buildServerCode";
 import type BuildResult from "./types/BuildResult";
+import type SourceMapping from "./types/SourceMapping";
 
 /**
  * Builds a component template into code and styles for rendering
@@ -13,7 +14,10 @@ import type BuildResult from "./types/BuildResult";
  * @returns The component's code and styles
  */
 export default function build(template: Template, options?: BuildOptions): BuildResult {
-	let code = options?.server ? buildServerCode(template, options) : buildCode(template, options);
+	let map: SourceMapping[] = [];
+	let code = options?.server
+		? buildServerCode(template, options)
+		: buildCode(template, map, options);
 	let styles = template.components
 		.map((c) =>
 			c.style ? { style: buildStyles(c.style, c.style.hash), hash: c.style.hash } : undefined,
@@ -22,5 +26,6 @@ export default function build(template: Template, options?: BuildOptions): Build
 	return {
 		code,
 		styles,
+		map,
 	};
 }

@@ -9,6 +9,7 @@ export default function InputFocused(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let inputElement;
 
 	$mount(() => {

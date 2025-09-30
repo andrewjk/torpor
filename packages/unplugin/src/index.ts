@@ -48,7 +48,9 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 				.split(/[\\/]/)
 				.at(-1)
 				.replace(/\.torp$/, "")!;
-			let errorMessages = parsed.errors.map((e) => `${e.line},${e.column}: ${e.message}`);
+			let errorMessages = parsed.errors.map(
+				(e) => `${e.startLine + 1},${e.startChar}: ${e.message}`,
+			);
 			console.log(`\nERRORS: ${id}\n======\n${errorMessages.join("\n")}`);
 			let errorCode = `
 export default function Error() {

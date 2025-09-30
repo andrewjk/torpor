@@ -12,6 +12,7 @@ export default function UserProfileContextApp(
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
+
 	const $user = $watch({
 		id: 1,
 		username: "unicorn42",

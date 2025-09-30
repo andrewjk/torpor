@@ -9,6 +9,7 @@ export default function DoubleCount(
 ) {
 	let t_body = "";
 	let t_head = "";
+
 	let $state = $watch({
 		count: 10,
 		get doubleCount() {
