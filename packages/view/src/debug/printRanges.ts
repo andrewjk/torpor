@@ -55,11 +55,12 @@ function printRangeNode(
 		}
 	} else if (node.nodeType === Node.TEXT_NODE) {
 		let el = node as Text;
-		rt.line1 += `«${el.textContent}»`;
+		let text = el.textContent ?? "";
+		rt.line1 += `«${text}»`;
 		if (node === startNode || node === endNode) {
-			rt.line2 += `└${"─".repeat(el.textContent.length)}┘`;
+			rt.line2 += `└${"─".repeat(text.length)}┘`;
 		} else {
-			rt.line2 += " ".repeat(el.textContent.length + 2);
+			rt.line2 += " ".repeat(text.length + 2);
 		}
 	} else if (node.nodeType === Node.COMMENT_NODE) {
 		rt.line1 += `<!>`;
