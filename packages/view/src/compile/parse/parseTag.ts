@@ -18,8 +18,12 @@ export default function parseTag(status: ParseStatus): ElementNode {
 
 	consumeSpace(status);
 
+	let tagStart = status.i;
 	let snailed = accept("@", status);
 	let tagName = consumeAlphaNumeric(status);
+	let tagEnd = status.i;
+	const range = rangeAtIndex(status, tagStart, tagEnd);
+
 	if (snailed) {
 		tagName = "@" + tagName;
 	}
@@ -56,7 +60,8 @@ export default function parseTag(status: ParseStatus): ElementNode {
 		closed: selfClosed || undefined,
 		attributes,
 		children: [],
-	};
+		range,
+	} satisfies ElementNode;
 }
 
 function parseTagAttributes(status: ParseStatus): Attribute[] {
@@ -100,12 +105,15 @@ function parseAttribute(status: ParseStatus): Attribute {
 			valueStart++;
 			valueEnd--;
 		} else if (reactive) {
+			// TODO: Ranges etc, like text nodes -- I think we would need to
+			// leave things reactive (or fully reactive) and check it when
+			// building instead
 			value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 		}
 	} else if (name.startsWith("{") && name.endsWith("}")) {
-		// It's a shortcut attribute
-		// It could be e.g. {width} or it could be {$state.width}, but
-		// in either case we set the value of the width property
+		// It's a shortcut attribute. It could be e.g. {width} or it could be
+		// {$state.width}, but in either case we set the value of the width
+		// property
 		value = name.substring(1, name.length - 1);
 		valueStart++;
 		valueEnd = valueStart + name.length;

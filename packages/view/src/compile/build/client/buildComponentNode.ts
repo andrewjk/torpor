@@ -18,6 +18,8 @@ export default function buildComponentNode(
 	b.append("");
 	b.append("/* @component */");
 
+	// TODO: map params to props
+
 	// Props
 	const componentHasProps = node.attributes.length || root;
 	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
@@ -128,6 +130,22 @@ export default function buildComponentNode(
 		}
 	}
 
-	b.append(`${componentName}(${renderParams});`);
+	if (status.options?.mapped) {
+		let startIndex = b.toString().length;
+		let startLine = b.lineMap.length;
+		b.append(`${componentName}(${renderParams});`);
+		let startChar = startIndex - b.lineMap.at(-1)!;
+		let endIndex = startIndex + componentName.length;
+		let endLine = startLine;
+		let endChar = endIndex - b.lineMap.at(-1)!;
+		status.map.push({
+			script: componentName,
+			source: node.range,
+			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+		});
+	} else {
+		b.append(`${componentName}(${renderParams});`);
+	}
+
 	b.append("");
 }

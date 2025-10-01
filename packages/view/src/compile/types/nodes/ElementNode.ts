@@ -1,3 +1,4 @@
+import type SourceRange from "../SourceRange";
 import type Attribute from "./Attribute";
 import type Fragment from "./Fragment";
 import type ParentNode from "./ParentNode";
@@ -10,6 +11,7 @@ export default interface ElementNode extends ParentNode {
 	selfClosed?: boolean;
 	attributes: Attribute[];
 	children: TemplateNode[];
+	range: SourceRange;
 
 	// This gets set when building
 	fragment?: Fragment;

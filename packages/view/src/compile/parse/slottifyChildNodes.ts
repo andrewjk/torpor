@@ -19,6 +19,7 @@ export default function slottifyChildNodes(node: ElementNode): void {
 				tagName: "fill",
 				attributes: [],
 				children: nonFillNodes,
+				range: { startIndex: 0, startLine: 0, startChar: 0, endIndex: 0, endLine: 0, endChar: 0 },
 			};
 			node.children.unshift(defaultFillNode);
 		}
