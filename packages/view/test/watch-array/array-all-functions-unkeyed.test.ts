@@ -49,40 +49,40 @@ test("array calling all functions (unkeyed) -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.pop();
 	// console.log('pop', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abc$");
 
 	state.items.push({ id: 5, text: "e" });
 	// console.log('push', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abce$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abce$");
 
 	state.items.reverse();
 	// console.log('reverse', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^ecba$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^ecba$");
 
 	state.items.shift();
 	// console.log('shift', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^cba$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^cba$");
 
 	state.items.sort((a, b) => a.text.localeCompare(b.text));
 	// console.log('sort', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abc$");
 
 	state.items.splice(1, 1, { id: 6, text: "f" });
 	// console.log('splice', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^afc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^afc$");
 
 	state.items.unshift({ id: 7, text: "g" });
 	// console.log('unshift', container.innerHTML)
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^gafc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^gafc$");
 }

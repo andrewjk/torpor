@@ -49,9 +49,9 @@ test("array reverse -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.reverse();
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^dcba$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^dcba$");
 }

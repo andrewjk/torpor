@@ -49,13 +49,13 @@ test("array sort -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^badc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^badc$");
 
 	state.items.sort((a, b) => a.text.localeCompare(b.text));
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.sort((a, b) => b.text.localeCompare(a.text));
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^dcba$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^dcba$");
 }

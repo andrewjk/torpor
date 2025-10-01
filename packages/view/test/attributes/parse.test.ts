@@ -1,6 +1,5 @@
-import { expect, test } from "vitest";
+import { assert, expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import type ParseResult from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
 
 test("attribute with double quotes", () => {
@@ -13,31 +12,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("a", [att("href", '"http://example.com"')], [text("Link")])]),
+	);
 });
 
 test("attribute with single quotes", () => {
@@ -50,31 +41,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("a", [att("href", "'http://example.com'")], [text("Link")])]),
+	);
 });
 
 test("attribute with no quotes", () => {
@@ -87,31 +70,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("href", "http://example.com")], [text("Link")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("a", [att("href", "http://example.com")], [text("Link")])]),
+	);
 });
 
 test("attribute with no quotes in self-closed element", () => {
@@ -122,31 +97,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("href", "http://example.com")], [], true)]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("a", [att("href", "http://example.com")], [], true)]),
+	);
 });
 
 test("multiple attributes", () => {
@@ -159,41 +126,33 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([
-						el(
-							"a",
-							[
-								att("href1", '"http://example.com"'),
-								att("href2", "'http://example.com'"),
-								att("href3", "http://example.com"),
-							],
-							[text("Link")],
-						),
-					]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([
+			el(
+				"a",
+				[
+					att("href1", '"http://example.com"'),
+					att("href2", "'http://example.com'"),
+					att("href3", "http://example.com"),
+				],
+				[text("Link")],
+			),
+		]),
+	);
 });
 
 test("multiple attributes with no values", () => {
@@ -204,31 +163,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("input", [att("text"), att("required")], [], true)]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("input", [att("text"), att("required")], [], true)]),
+	);
 });
 
 test("event attribute with name", () => {
@@ -241,31 +192,23 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("button", [att("onclick", "{increment}")], [text("Increment")])]),
+	);
 });
 
 test("event attribute with code", () => {
@@ -280,37 +223,25 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([
-						el(
-							"button",
-							[att("onclick", "{() => {\n\t\t\tincrement();\n\t\t}}")],
-							[text("Increment")],
-						),
-					]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([
+			el("button", [att("onclick", "{() => {\n\t\t\tincrement();\n\t\t}}")], [text("Increment")]),
+		]),
+	);
 });
 
 test("shorthand attribute", () => {
@@ -321,31 +252,21 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("{href}")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(root([el("a", [att("{href}")])]));
 });
 
 test("multiple shorthand attributes", () => {
@@ -356,29 +277,21 @@ export default function Test() {
 	}
 }
 `;
-
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("a", [att("{href1}"), att("{href2}")])]),
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("a", [att("{href1}"), att("{href2}")])]),
+	);
 });

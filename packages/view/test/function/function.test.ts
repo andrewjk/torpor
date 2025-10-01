@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, expect, test } from "vitest";
+import { assert, beforeAll, expect, test } from "vitest";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -34,8 +34,8 @@ async function check(container: HTMLElement) {
 	expect(queryByText(container, "The count is 0.")).not.toBeNull();
 
 	const increment = Array.from(container.children).find((e) => e.id === "increment");
-	expect(increment).not.toBeNull();
-	await userEvent.click(increment!);
+	assert(increment);
+	await userEvent.click(increment);
 
 	expect(queryByText(container, "The count is 1.")).not.toBeNull();
 }

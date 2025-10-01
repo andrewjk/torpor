@@ -49,9 +49,9 @@ test("array set object -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items[1] = { id: 2, text: "f" };
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^afcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^afcd$");
 }

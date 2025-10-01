@@ -49,9 +49,9 @@ test("array shift -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.shift();
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^bcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^bcd$");
 }

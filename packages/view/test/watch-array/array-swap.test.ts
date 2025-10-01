@@ -49,7 +49,7 @@ test("array swap -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	const clone = state.items.slice();
 	const tmp = clone[1];
@@ -57,5 +57,5 @@ function check(container: HTMLElement, state: ArrayState) {
 	clone[3] = tmp;
 	state.items = clone;
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^adcb$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^adcb$");
 }

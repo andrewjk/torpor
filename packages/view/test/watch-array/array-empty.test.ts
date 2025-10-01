@@ -38,5 +38,5 @@ test("array empty -- hydrated", async () => {
 });
 
 function check(container: HTMLElement) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^$");
 }

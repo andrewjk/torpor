@@ -49,9 +49,9 @@ test("array splice delete -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.splice(1, 2);
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^ad$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^ad$");
 }

@@ -49,7 +49,7 @@ test("array reassign and update -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items = [
 		{ id: 5, text: "e" },
@@ -58,9 +58,9 @@ function check(container: HTMLElement, state: ArrayState) {
 		{ id: 8, text: "h" },
 	];
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^efgh$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^efgh$");
 
 	state.items.push({ id: 9, text: "i" });
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^efghi$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^efghi$");
 }

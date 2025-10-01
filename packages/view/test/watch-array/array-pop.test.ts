@@ -49,9 +49,9 @@ test("array pop -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.pop();
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abc$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abc$");
 }

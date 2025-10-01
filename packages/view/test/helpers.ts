@@ -81,9 +81,11 @@ export function control(
 }
 
 export function text(content: string): TextNode {
+	// @ts-ignore
 	return {
 		type: "text",
 		content,
+		//ranges: [],
 	};
 }
 
@@ -104,6 +106,7 @@ export function att(name: string, value?: string): Attribute {
 		name = value;
 		reactive = fullyReactive = true;
 	}
+	// @ts-ignore
 	return {
 		name,
 		value,
@@ -134,9 +137,18 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 			if (!textChild.content) {
 				el.children.splice(i, 1);
 			}
-		} else if (child.type === "element" || child.type === "control") {
+			// @ts-ignore
+			delete textChild.ranges;
+		} else if (child.type === "element") {
 			// HACK:
+			(child as ElementNode).attributes.forEach(
+				(a) =>
+					// @ts-ignore
+					delete a.range,
+			);
 			trimElement(child as ElementNode);
+		} else if (child.type === "control") {
+			trimElement(child as ControlNode);
 		}
 	}
 }

@@ -50,13 +50,13 @@ test("array entries -- hydrated", async () => {
 
 function check(container: HTMLElement, state: ArrayState) {
 	// TODO: Should have spaces between letter items
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^b,a,d,c$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^b,a,d,c$");
 
 	state.items.sort((a, b) => a.text.localeCompare(b.text));
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^a,b,c,d$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^a,b,c,d$");
 
 	state.items[1].text = "e";
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^a,e,c,d$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^a,e,c,d$");
 }

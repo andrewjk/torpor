@@ -42,9 +42,12 @@ export default function Test() {
 		errors: [
 			{
 				message: "Unclosed non-void element: p",
-				start: 47,
-				line: 4,
-				column: 2,
+				startIndex: 47,
+				startLine: 3,
+				startChar: 2,
+				endIndex: 49,
+				endLine: 3,
+				endChar: 4,
 			},
 		],
 	};
@@ -68,9 +71,12 @@ export default function Test() {
 		errors: [
 			{
 				message: "Unclosed non-void element: p",
-				start: 56,
-				line: 5,
-				column: 3,
+				startIndex: 56,
+				startLine: 4,
+				startChar: 3,
+				endIndex: 58,
+				endLine: 4,
+				endChar: 5,
 			},
 		],
 	};
@@ -115,9 +121,12 @@ export default function Test() {
 		errors: [
 			{
 				message: "Closed void element: input",
-				start: 54,
-				line: 4,
-				column: 9,
+				startIndex: 54,
+				startLine: 3,
+				startChar: 9,
+				endIndex: 60,
+				endLine: 3,
+				endChar: 15,
 			},
 		],
 	};
@@ -140,9 +149,12 @@ export default function Test() {
 		errors: [
 			{
 				message: "Closed void element: input",
-				start: 63,
-				line: 5,
-				column: 10,
+				startIndex: 63,
+				startLine: 4,
+				startChar: 10,
+				endIndex: 69,
+				endLine: 4,
+				endChar: 16,
 			},
 		],
 	};
@@ -171,9 +183,12 @@ export default function Test() {
 			//},
 			{
 				message: "Non-matching close tag: input",
-				start: 76,
-				line: 6,
-				column: 2,
+				startIndex: 76,
+				startLine: 5,
+				startChar: 2,
+				endIndex: 82,
+				endLine: 5,
+				endChar: 8,
 			},
 		],
 	};
@@ -199,9 +214,12 @@ export default function Test() {
 		errors: [
 			{
 				message: "Non-matching close tag: input (expected div)",
-				start: 87,
-				line: 7,
-				column: 3,
+				startIndex: 87,
+				startLine: 6,
+				startChar: 3,
+				endIndex: 91,
+				endLine: 6,
+				endChar: 7,
 			},
 		],
 	};
@@ -224,15 +242,21 @@ export default function Test() {
 		errors: [
 			{
 				message: "Unclosed non-void element: p",
-				start: 56,
-				line: 5,
-				column: 3,
+				startIndex: 56,
+				startLine: 4,
+				startChar: 3,
+				endIndex: 58,
+				endLine: 4,
+				endChar: 5,
 			},
 			{
 				message: "Non-matching close tag: li (expected p)",
-				start: 80,
-				line: 5,
-				column: 27,
+				startIndex: 80,
+				startLine: 4,
+				startChar: 27,
+				endIndex: 82,
+				endLine: 4,
+				endChar: 29,
 			},
 		],
 	};
@@ -259,15 +283,21 @@ export default function Test() {
 		errors: [
 			{
 				message: "Unclosed non-void element: span",
-				start: 64,
-				line: 6,
-				column: 4,
+				startIndex: 64,
+				startLine: 5,
+				startChar: 4,
+				endIndex: 69,
+				endLine: 5,
+				endChar: 9,
 			},
 			{
 				message: "Non-matching close tag: span (expected p)",
-				start: 106,
-				line: 9,
-				column: 3,
+				startIndex: 106,
+				startLine: 8,
+				startChar: 3,
+				endIndex: 108,
+				endLine: 8,
+				endChar: 5,
 			},
 		],
 	};

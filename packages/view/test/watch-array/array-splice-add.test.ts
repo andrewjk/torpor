@@ -49,9 +49,9 @@ test("array splice add -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^abcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.splice(1, 0, { id: 5, text: "e" }, { id: 6, text: "f" });
 
-	expect(container.textContent!.replace(/\s/g, "")).toBe("^aefbcd$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^aefbcd$");
 }

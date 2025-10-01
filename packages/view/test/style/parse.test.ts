@@ -1,7 +1,6 @@
-import { expect, test } from "vitest";
+import { assert, expect, test } from "vitest";
 import buildStyles from "../../src/compile/build/client/buildStyles";
 import parse from "../../src/compile/parse";
-import type ParseResult from "../../src/compile/types/ParseResult";
 import { att, el, root, text, trimParsed } from "../helpers";
 
 test("simple style", () => {
@@ -17,47 +16,40 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @render */
 
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					markup: root([el("h1", [att("class", '"torp-1wvcb3a"')], [text("Hi")])]),
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "h1",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "1wvcb3a",
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].markup).toEqual(
+		root([el("h1", [att("class", '"torp-1wvcb3a"')], [text("Hi")])]),
+	);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: "h1",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+				],
+				children: [],
+			},
+		],
+		hash: "1wvcb3a",
+	});
 });
 
 test("style with multiple selectors", () => {
@@ -69,44 +61,35 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: ".h1, p",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "5fqf2e",
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: ".h1, p",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+				],
+				children: [],
+			},
+		],
+		hash: "5fqf2e",
+	});
 });
 
 test("style with multiple values", () => {
@@ -121,48 +104,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: ".h1, p",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-									{
-										name: "background-color",
-										value: "green",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "bv7ypa",
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: ".h1, p",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+					{
+						name: "background-color",
+						value: "green",
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "bv7ypa",
+	});
 });
 
 test("style with combinators", () => {
@@ -176,46 +150,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: ".h1.blah p > .child + .next",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "1hfc9nc",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "1hfc9nc");
+	const styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: ".h1.blah p > .child + .next",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "1hfc9nc",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "1hfc9nc");
 	const expectedStyle = `
 .h1.blah.torp-1hfc9nc p.torp-1hfc9nc > .child.torp-1hfc9nc + .next.torp-1hfc9nc {
 	color: blue;
@@ -235,46 +202,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: ":global(.h1.blah p > .child + .next)",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "wbexfk",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "wbexfk");
+	const styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: ":global(.h1.blah p > .child + .next)",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "wbexfk",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "wbexfk");
 	const expectedStyle = `
 .h1.blah p > .child + .next {
 	color: blue;
@@ -294,46 +254,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: ":global(.h1.blah) p > .child + :global(.next)",
-								attributes: [
-									{
-										name: "color",
-										value: "blue",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "1cfcedi",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "1cfcedi");
+	const styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: ":global(.h1.blah) p > .child + :global(.next)",
+				attributes: [
+					{
+						name: "color",
+						value: "blue",
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "1cfcedi",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "1cfcedi");
 	const expectedStyle = `
 .h1.blah p.torp-1cfcedi > .child.torp-1cfcedi + .next {
 	color: blue;
@@ -355,50 +308,41 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: "@media screen and (min-width: 480px)",
+				attributes: [],
+				children: [
+					{
+						selector: "button",
+						attributes: [
 							{
-								selector: "@media screen and (min-width: 480px)",
-								attributes: [],
-								children: [
-									{
-										selector: "button",
-										attributes: [
-											{
-												name: "color",
-												value: "green",
-											},
-										],
-										children: [],
-									},
-								],
+								name: "color",
+								value: "green",
 							},
 						],
-						hash: "c2o17j",
+						children: [],
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+				],
+			},
+		],
+		hash: "c2o17j",
+	});
 });
 
 test("style with comments", () => {
@@ -420,44 +364,35 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "button",
-								attributes: [
-									{
-										name: "color",
-										value: "green",
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "z7n1b7",
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: "button",
+				attributes: [
+					{
+						name: "color",
+						value: "green",
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+				],
+				children: [],
+			},
+		],
+		hash: "z7n1b7",
+	});
 });
 
 test("style with quotes", () => {
@@ -471,44 +406,35 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "p",
-								attributes: [
-									{
-										name: "color",
-										value: '"blue"',
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "7qpvk6",
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
+	expect(output.template.components[0].style).toEqual({
+		global: false,
+		blocks: [
+			{
+				selector: "p",
+				attributes: [
+					{
+						name: "color",
+						value: '"blue"',
 					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+				],
+				children: [],
+			},
+		],
+		hash: "7qpvk6",
+	});
 });
 
 test("style with pseudo-elements", () => {
@@ -522,46 +448,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "p::before",
-								attributes: [
-									{
-										name: "content",
-										value: '"~"',
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "5cr73h",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "5cr73h");
+	const styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: "p::before",
+				attributes: [
+					{
+						name: "content",
+						value: '"~"',
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "5cr73h",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "5cr73h");
 	const expectedStyle = `
 p.torp-5cr73h::before {
 	content: "~";
@@ -581,46 +500,39 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "p:hover",
-								attributes: [
-									{
-										name: "color",
-										value: '"blue"',
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "1pq0u26",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "1pq0u26");
+	const styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: "p:hover",
+				attributes: [
+					{
+						name: "color",
+						value: '"blue"',
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "1pq0u26",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "1pq0u26");
 	const expectedStyle = `
 p.torp-1pq0u26:hover {
 	color: "blue";
@@ -642,46 +554,40 @@ export default function Test() {
 }
 `;
 	const output = trimParsed(parse(input));
-	const expected: ParseResult = {
-		ok: true,
-		errors: [],
-		template: {
-			imports: [],
-			script: `
-export default function Test(/* @params */) {
-	/* @start */
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.imports).toEqual([]);
+	expect(output.template.script.map((s) => s.script).join("")).toBe(`
+export default function Test(/* @params */) {/* @start */
 	/* @style */
-	/* @end */
-}
-`,
-			components: [
-				{
-					start: 25,
-					name: "Test",
-					default: true,
-					style: {
-						global: false,
-						blocks: [
-							{
-								selector: "p:hover,\n\t\tp:active,\n\t\tp:focused",
-								attributes: [
-									{
-										name: "color",
-										value: '"blue"',
-									},
-								],
-								children: [],
-							},
-						],
-						hash: "1ib1oex",
-					},
-				},
-			],
-		},
-	};
-	expect(output).toEqual(expected);
+/* @end */}
+`);
+	expect(output.template.components.length).toBe(1);
+	expect(output.template.components[0].start).toBe(25);
+	expect(output.template.components[0].name).toBe("Test");
+	expect(output.template.components[0].default).toBe(true);
 
-	const style = buildStyles(expected.template?.components[0].style!, "1ib1oex");
+	let styleObject = {
+		global: false,
+		blocks: [
+			{
+				selector: "p:hover,\n\t\tp:active,\n\t\tp:focused",
+				attributes: [
+					{
+						name: "color",
+						value: '"blue"',
+					},
+				],
+				children: [],
+			},
+		],
+		hash: "1ib1oex",
+	};
+
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	const style = buildStyles(styleObject, "1ib1oex");
 	const expectedStyle = `
 p.torp-1ib1oex:hover, p.torp-1ib1oex:active, p.torp-1ib1oex:focused {
 	color: "blue";
