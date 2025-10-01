@@ -9,6 +9,7 @@ import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
+import rangeAtIndex from "./rangeAtIndex";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
@@ -420,41 +421,6 @@ function consumeScriptComments(status: ParseStatus): boolean {
 		return true;
 	}
 	return false;
-}
-
-function rangeAtIndex(status: ParseStatus, start: number, end: number): SourceRange {
-	const { lastRange, source } = status;
-	let startIndex = lastRange.endIndex;
-	let startLine = lastRange.endLine;
-	let startChar = lastRange.endChar;
-	for (; startIndex < start && startIndex < source.length; startIndex++) {
-		if (source[startIndex] === "\n") {
-			startLine++;
-			startChar = 0;
-		} else {
-			startChar++;
-		}
-	}
-	let endIndex = startIndex;
-	let endLine = startLine;
-	let endChar = startChar;
-	for (; endIndex < end && endIndex < source.length; endIndex++) {
-		if (source[endIndex] === "\n") {
-			endLine++;
-			endChar = 0;
-		} else {
-			endChar++;
-		}
-	}
-	status.lastRange = {
-		startIndex,
-		startLine,
-		startChar,
-		endIndex,
-		endLine,
-		endChar,
-	};
-	return status.lastRange;
 }
 
 function emptyRange(): SourceRange {

@@ -1,3 +1,4 @@
+import type SourceRange from "../types/SourceRange";
 import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
 import type TextNode from "../types/nodes/TextNode";
@@ -11,6 +12,7 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
 import parseTag from "./parseTag";
+import rangeAtIndex from "./rangeAtIndex";
 import slottifyChildNodes from "./slottifyChildNodes";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
@@ -148,11 +150,15 @@ export default function parseElement(status: ParseStatus): ElementNode {
 }
 
 function parseText(status: ParseStatus, element: ElementNode) {
+	// Add a range for each reactive part of the text so that we can map them
+	// back when building
+	let ranges: SourceRange[] = [];
+
+	// Text ends at the next element, or at the next control statement, or at
+	// the end of the render
+	// But only if the control statement is after a newline, so we don't mess
+	// with emails etc. This may need more finessing
 	const start = status.i;
-	// It ends at the next element, or at the next control statement, or at the end of
-	// the render
-	// But only if the control statement is after a newline, so we don't mess with
-	// emails etc. This may need more finessing
 	let end = -1;
 	for (let j = status.i; j < status.source.length; j++) {
 		if (status.source[j] === "}") {
@@ -160,6 +166,7 @@ function parseText(status: ParseStatus, element: ElementNode) {
 			end = j;
 		} else if (status.source[j] === "{") {
 			// Skip reactive content
+			const reactiveStart = j;
 			let level = 0;
 			for (let k = j; k < status.source.length; k++) {
 				const char = status.source[k];
@@ -186,6 +193,8 @@ function parseText(status: ParseStatus, element: ElementNode) {
 					}
 				}
 			}
+			// Add the source range
+			ranges.push(rangeAtIndex(status, reactiveStart, j));
 		} else if (status.source[j] === "<") {
 			end = j;
 		} else if (status.source[j] === "@") {
@@ -210,10 +219,14 @@ function parseText(status: ParseStatus, element: ElementNode) {
 			const previousNode = element.children[element.children.length - 1];
 			if (previousNode && isTextNode(previousNode)) {
 				previousNode.content += content + spaceContent;
+				previousNode.ranges.push(...ranges);
+				//previousNode.range.endIndex += content.length + spaceContent.length;
+				// TODO: end char etc
 			} else {
 				const text: TextNode = {
 					type: "text",
 					content: content + spaceContent,
+					ranges,
 				};
 				element.children.push(text);
 			}

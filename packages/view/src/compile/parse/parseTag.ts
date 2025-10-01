@@ -5,6 +5,7 @@ import isReactive from "../utils/isReactive";
 import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
+import rangeAtIndex from "./rangeAtIndex";
 import accept from "./utils/accept";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
@@ -80,6 +81,7 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 }
 
 function parseAttribute(status: ParseStatus): Attribute {
+	const start = status.i;
 	let name = consumeUntil("= \t\r\n/>", status);
 	let value: string | undefined = undefined;
 	let reactive = false;
@@ -103,7 +105,13 @@ function parseAttribute(status: ParseStatus): Attribute {
 		name = value.split(".").at(-1)!;
 		reactive = fullyReactive = true;
 	}
-	return { name, value, reactive, fullyReactive };
+	return {
+		name,
+		value,
+		reactive,
+		fullyReactive,
+		range: rangeAtIndex(status, start, status.i),
+	};
 }
 
 function parseAttributeValue(status: ParseStatus): string {

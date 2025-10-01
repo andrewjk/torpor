@@ -55,7 +55,7 @@ export default function buildElementNode(
 	}
 
 	const oldPreserveWhitespace = status.preserveWhitespace;
-	status.preserveWhitespace = ["code", "pre"].includes(node.tagName);
+	status.preserveWhitespace = node.tagName === "code" || node.tagName === "pre";
 	for (let child of node.children) {
 		buildNode(child, status, b, parentName, "null");
 	}
@@ -175,7 +175,7 @@ function buildElementAttributes(
 		}
 	}
 
-	for (let { name, value, reactive } of node.attributes) {
+	for (let { name, value, reactive, range } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
@@ -202,20 +202,34 @@ function buildElementAttributes(
 				}
 				// SVGs have a different className
 				const propName = status.ns ? "className.baseVal" : "className";
-				stashRun(fragment, `${varName}.${propName} = t_class(${params.join(", ")});`, status);
+				stashRun(
+					fragment,
+					`${varName}.${propName} = t_class(`,
+					params.join(", "),
+					");",
+					range,
+					status,
+				);
 			} else if (name === "style") {
 				status.imports.add("t_style");
-				stashRun(fragment, `${varName}.setAttribute("style", t_style(${value}));`, status);
+				stashRun(
+					fragment,
+					`${varName}.setAttribute("style", t_style(`,
+					value,
+					"));",
+					range,
+					status,
+				);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");
-				stashRun(fragment, `t_attribute(${varName}, "${name}", ${value});`, status);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", range, status);
 				// NOTE: dataset seems to be a tiny bit slower?
 				//const propName = name.substring(name.indexOf("-"));
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
 			} else {
 				status.imports.add("t_attribute");
-				stashRun(fragment, `t_attribute(${varName}, "${name}", ${value});`, status);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", range, status);
 			}
 		}
 	}

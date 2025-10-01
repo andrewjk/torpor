@@ -70,19 +70,21 @@ export default function buildCode(
 		}
 	}
 
-	let endText = b.toString();
-	let endSize = endText.length;
-	let diff = endSize - startSize + 1;
-	let importLines = imports.size + 2;
-	//let importLines = 0;
-	//for (let i = 0; i < diff; i++) {
-	//	if (endText[i] === "\n") importLines++;
-	//}
-	for (let m of map) {
-		m.compiled.startIndex += diff;
-		m.compiled.startLine += importLines;
-		m.compiled.endIndex += diff;
-		m.compiled.endLine += importLines;
+	if (options?.mapped) {
+		let endText = b.toString();
+		let endSize = endText.length;
+		let diff = endSize - startSize + 1;
+		let importLines = imports.size + 2;
+		//let importLines = 0;
+		//for (let i = 0; i < diff; i++) {
+		//	if (endText[i] === "\n") importLines++;
+		//}
+		for (let m of map) {
+			m.compiled.startIndex += diff;
+			m.compiled.startLine += importLines;
+			m.compiled.endIndex += diff;
+			m.compiled.endLine += importLines;
+		}
 	}
 
 	return b.toString();
@@ -143,11 +145,13 @@ function buildTemplate(
 					contextProps: current.contextProps || [],
 					slotProps: current.slotProps || [],
 					styleHash: current.style?.hash || "",
+					map,
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],
 					ns: false,
 					preserveWhitespace: false,
+					options,
 				};
 
 				// Add the interface
@@ -165,11 +169,13 @@ function buildTemplate(
 					contextProps: current.contextProps || [],
 					slotProps: current.slotProps || [],
 					styleHash: current.style?.hash || "",
+					map,
 					varNames: {},
 					fragmentStack: [],
 					forVarNames: [],
 					ns: false,
 					preserveWhitespace: false,
+					options,
 				};
 
 				// Add the head tags
@@ -185,11 +191,10 @@ function buildTemplate(
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
-			b.append(chunk.script);
-
 			if (options?.mapped) {
 				// TODO: Be more efficient here
 				let text = b.toString();
+				b.append(chunk.script);
 				let startIndex = text.length;
 				let startLine = 0;
 				let startChar = 0;
@@ -212,9 +217,8 @@ function buildTemplate(
 						endChar++;
 					}
 				}
-
 				map.push({
-					//script: chunk.script,
+					script: chunk.script,
 					source: chunk.range,
 					compiled: {
 						startIndex,
@@ -225,6 +229,8 @@ function buildTemplate(
 						endChar,
 					},
 				});
+			} else {
+				b.append(chunk.script);
 			}
 		}
 	}

@@ -25,7 +25,13 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 			status.i = status.source.indexOf("*/", status.i) + 2;
 		} else if (isSpaceChar(status.source, status.i)) {
 			current.markup ??= { type: "root", children: [] };
-			const text: TextNode = { type: "text", content: consumeSpace(status) };
+			//const start = status.i;
+			const space = consumeSpace(status);
+			const text: TextNode = {
+				type: "text",
+				content: space,
+				ranges: [],
+			};
 			current.markup.children.push(text);
 		} else if (accept("<", status, false)) {
 			// Parse the element

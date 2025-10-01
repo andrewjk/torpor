@@ -5,19 +5,30 @@ export default class Builder {
 	#space = 0;
 	#mapped = false;
 
+	lineMap: number[] = [];
+
 	constructor(mapped?: boolean) {
 		this.#mapped = mapped === true;
 	}
 
 	prepend(text: string): void {
+		// TODO: adjust line map
 		this.#text = text + "\n" + this.#text;
 	}
 
 	append(text: string): void {
 		if (this.#mapped) {
+			this.lineMap.push(this.#text.length);
+			for (let i = 0; i < text.length; i++) {
+				if (text[i] === "\n") {
+					this.lineMap.push(this.#text.length + i);
+				}
+			}
 			this.#text += "\n" + text;
 			return;
 		}
+
+		const start = this.#text.length;
 
 		text = text.trim();
 		let i = 0;
@@ -32,6 +43,7 @@ export default class Builder {
 				// HACK: we just set ; to ignore the line
 				i++;
 			} else if (text[i] === "\n") {
+				this.lineMap.push(start + i);
 				this.#text += "\n";
 			} else {
 				// Maybe outdent

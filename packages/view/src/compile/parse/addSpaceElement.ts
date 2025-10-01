@@ -18,6 +18,7 @@ export default function addSpaceElement(
 			const space: TextNode = {
 				type: "text",
 				content,
+				ranges: [],
 			};
 			parent.children.push(space);
 		}

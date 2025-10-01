@@ -2,7 +2,7 @@ import type TextNode from "../../types/nodes/TextNode";
 import endOfString from "../../utils/endOfString";
 import endOfTemplateString from "../../utils/endOfTemplateString";
 import type BuildStatus from "./BuildStatus";
-import stashRun from "./stashRun";
+import stashRunWithOffsets from "./stashRunWithOffsets";
 
 export default function buildTextNode(node: TextNode, status: BuildStatus): void {
 	let fragment = status.fragmentStack.at(-1)?.fragment;
@@ -17,8 +17,12 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 	}
 
 	// TODO: Move all of this logic into parse, for text nodes and attribute values
+	// Or, we could do it based on the node's ranges...
 	let textContent = "";
 	let reactiveCount = 0;
+	let reactiveStart = 0;
+	let offsets: number[] = [];
+	let lengths: number[] = [];
 	let level = 0;
 	let maxLevel = 0;
 	for (let i = 0; i < content.length; i++) {
@@ -30,11 +34,14 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 			if (level === 1) {
 				reactiveCount += 1;
 				textContent += "${t_fmt(";
+				reactiveStart = textContent.length;
+				offsets.push(reactiveStart);
 				continue;
 			}
 		} else if (char === "}") {
 			level--;
 			if (level === 0) {
+				lengths.push(textContent.length - reactiveStart);
 				textContent += ")";
 			}
 		} else if (char === "`" && level === 0) {
@@ -70,15 +77,23 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 		textContent += content[i];
 	}
 
-	// TODO: Only need to build if this is not 0
+	// Only need to build if there is any reactive content, otherwise the plain
+	// text content will be output in fragment text
 	if (maxLevel) {
+		let offsetChange = 0;
 		if (reactiveCount === 1 && content.startsWith("{") && content.endsWith("}")) {
 			textContent = textContent.substring(2, textContent.length - 1);
+			offsetChange = -2;
 		} else {
 			textContent = `\`${textContent}\``;
+			offsetChange = 1;
 		}
 
 		status.imports.add("t_fmt");
-		stashRun(fragment, `${node.varName}.textContent = ${textContent};`, status);
+		let functionBody = `${node.varName}.textContent = `;
+		offsetChange += functionBody.length;
+		offsets.map((_, i) => (offsets[i] += offsetChange));
+		functionBody += `${textContent};`;
+		stashRunWithOffsets(fragment, functionBody, node.ranges, offsets, lengths, status);
 	}
 }

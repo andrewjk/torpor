@@ -16,7 +16,7 @@ const compilerOpts: ts.CompilerOptions = {
 	target: ts.ScriptTarget.ESNext,
 	esModuleInterop: true,
 };
-const fsMap = new Map<string, string>();
+const virtualFiles = new Map<string, string>();
 
 let loaded = false;
 let projectRoot = "";
@@ -102,9 +102,9 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				const content = transformed.content;
 				map = transformed.map;
 
-				fsMap.set(key, content);
+				virtualFiles.set(key, content);
 
-				const system = tsvfs.createFSBackedSystem(fsMap, projectRoot, ts);
+				const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
 				env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, compilerOpts);
 
 				loaded = true;
@@ -125,11 +125,11 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				}
 				const content = transformed.content;
 				map = transformed.map;
-				if (!fsMap.has(key)) {
-					fsMap.set(key, content);
+				if (!virtualFiles.has(key)) {
+					virtualFiles.set(key, content);
 					env.createFile(key, content);
 				} else {
-					fsMap.set(key, content);
+					virtualFiles.set(key, content);
 					env.updateFile(key, content);
 				}
 			}
@@ -139,13 +139,18 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				...env.languageService.getSyntacticDiagnostics(key),
 			]
 				.map((d) => {
-					let startIndex = d.start ?? 0;
-					let endIndex = (d.start ?? 0) + (d.length ?? 0);
-
+					// Find the mapping between source and compiled, if it
+					// exists. If it doesn't exist, the error must be in
+					// non-user code. Not great, but the user doesn't need to
+					// know about it
+					let start = d.start ?? 0;
+					let end = (d.start ?? 0) + (d.length ?? 0);
 					let mapped = map.find(
-						(m: any) => startIndex >= m.compiled.startIndex && endIndex <= m.compiled.endIndex,
+						(m: any) => start >= m.compiled.startIndex && end <= m.compiled.endIndex,
 					);
 
+					// HACK: Couldn't map back to the source, so return a
+					// special message that will be removed with `filter`
 					if (!mapped) {
 						return {
 							message: "!",
@@ -156,30 +161,33 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 						} satisfies Diagnostic;
 					}
 
-					let startDiff = d.start - mapped.compiled.startIndex;
-					let endDiff = d.start + d.length - mapped.compiled.startIndex;
+					// We have the mapping, so we know roughly where in the
+					// source the error occurs, but now we need to narrow it
+					// down to the exact location
+					let startDiff = start - mapped.compiled.startIndex;
+					let endDiff = end - mapped.compiled.startIndex;
 
-					let startIndex2 = mapped.source.startIndex;
-					let startLine2 = mapped.source.startLine;
-					let startChar2 = mapped.source.startChar;
+					let startIndex = mapped.source.startIndex;
+					let startLine = mapped.source.startLine;
+					let startChar = mapped.source.startChar;
 					for (let i = 0; i < startDiff; i++) {
-						if (text[startIndex2 + i] === "\n") {
-							startLine2++;
-							startChar2 = 0;
+						if (text[startIndex + i] === "\n") {
+							startLine++;
+							startChar = 0;
 						} else {
-							startChar2++;
+							startChar++;
 						}
 					}
 
-					let endIndex2 = startIndex2;
-					let endLine2 = startLine2;
-					let endChar2 = startChar2;
+					let endIndex = startIndex;
+					let endLine = startLine;
+					let endChar = startChar;
 					for (let i = 0; i < endDiff - startDiff; i++) {
-						if (text[endIndex2 + i] === "\n") {
-							endLine2++;
-							endChar2 = 0;
+						if (text[endIndex + i] === "\n") {
+							endLine++;
+							endChar = 0;
 						} else {
-							endChar2++;
+							endChar++;
 						}
 					}
 
@@ -187,19 +195,18 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 						message: String(d.messageText),
 						range: {
 							start: {
-								line: startLine2,
-								character: startChar2,
+								line: startLine,
+								character: startChar,
 							},
 							end: {
-								line: endLine2,
-								character: endChar2,
+								line: endLine,
+								character: endChar,
 							},
 						},
 					} satisfies Diagnostic;
 				})
 				.filter((d) => d.message !== "!");
 
-			//console.log(JSON.stringify(diagnostics, null, 2));
 			return diagnostics;
 		},
 		onDocumentRemoved(_document: TextDocument) {
@@ -250,6 +257,7 @@ function transform(source: string, projectRoot: string) {
 	// Build imported component files as types
 	// TODO: Cache the imported files
 	// TODO: Handle files from node_modules
+	// TODO: Get the code from fsMap if set, in case it has been edited and not saved
 	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
 	for (let match of imports) {
 		const value = match[0];
