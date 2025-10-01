@@ -1,3 +1,4 @@
+import emptyRange from "../../parse/utils/emptyRange";
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
@@ -7,6 +8,8 @@ import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+
+// TODO: type checking
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const awaitParentName = node.parentName!;
@@ -30,6 +33,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@then",
 			statement: "then",
 			children: [],
+			range: emptyRange(),
 		};
 	}
 	let catchBranch = branches.find((n) => n.operation === "@catch");
@@ -39,6 +43,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@catch",
 			statement: "catch",
 			children: [],
+			range: emptyRange(),
 		};
 	}
 

@@ -68,13 +68,13 @@ export default function buildControlNode(node: ControlNode, status: BuildStatus,
 		case "@const":
 		case "@console":
 		case "@debugger": {
-			buildScriptNode(node, b);
+			buildScriptNode(node, status, b);
 			break;
 		}
 		case "@function":
 		case "@async function": {
 			b.append("");
-			buildScriptNode(node, b);
+			buildScriptNode(node, status, b);
 			b.append("");
 			break;
 		}

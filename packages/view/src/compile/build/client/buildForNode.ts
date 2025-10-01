@@ -75,8 +75,27 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	function createNewItems() {
 		let t_new_items: ListItem[] = [];
 		let t_previous_item = ${forRangeName};
-		let t_next_item = ${forRangeName}.nextRange;
-		${node.statement} {
+		let t_next_item = ${forRangeName}.nextRange;`);
+
+	if (status.options?.mapped) {
+		// TODO: replaceForVarNames is going to throw mapping out
+		let startIndex = b.toString().length;
+		let startLine = b.lineMap.length;
+		b.append(`${node.statement} {`);
+		let startChar = startIndex - b.lineMap.at(-1)!;
+		let endIndex = startIndex + node.statement.length;
+		let endLine = startLine;
+		let endChar = endIndex - b.lineMap.at(-1)!;
+		status.map.push({
+			script: node.statement,
+			source: node.range,
+			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+		});
+	} else {
+		b.append(`${node.statement} {`);
+	}
+
+	b.append(`
 			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
 			t_new_item.previousRange = t_previous_item;
 			t_previous_item.nextRange = t_new_item;

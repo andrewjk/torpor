@@ -1,6 +1,5 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
-import type SourceRange from "../types/SourceRange";
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
@@ -15,6 +14,7 @@ import accept from "./utils/accept";
 import addError from "./utils/addError";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
+import emptyRange from "./utils/emptyRange";
 
 export default function parseCode(source: string): ParseResult {
 	const status: ParseStatus = {
@@ -421,15 +421,4 @@ function consumeScriptComments(status: ParseStatus): boolean {
 		return true;
 	}
 	return false;
-}
-
-function emptyRange(): SourceRange {
-	return {
-		startIndex: 0,
-		startLine: 0,
-		startChar: 0,
-		endIndex: 0,
-		endLine: 0,
-		endChar: 0,
-	};
 }

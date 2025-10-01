@@ -1,6 +1,9 @@
 import type SourceRange from "../types/SourceRange";
 import type ParseStatus from "./ParseStatus";
 
+// TODO: I think when parsing we should just return the start/end indexes, and
+// only calculate line and char when necessary (in the extension, for example)
+
 export default function rangeAtIndex(status: ParseStatus, start: number, end: number): SourceRange {
 	const { lastRange, source } = status;
 	let startIndex = lastRange.endIndex;

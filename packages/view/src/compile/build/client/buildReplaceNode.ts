@@ -7,6 +7,8 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import replaceForVarNames from "./replaceForVarNames";
 
+// TODO: type checking
+
 export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const replaceAnchorName = node.varName!;
 	const replaceParentName = node.parentName || replaceAnchorName + ".parentNode";

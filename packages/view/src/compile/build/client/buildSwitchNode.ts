@@ -1,3 +1,4 @@
+import emptyRange from "../../parse/utils/emptyRange";
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
@@ -24,6 +25,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 			operation: "@default",
 			statement: "default",
 			children: [],
+			range: emptyRange(),
 		};
 		branches.push(defaultBranch);
 	}
@@ -40,12 +42,46 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		let ${switchStateName} = $watch({ index: -1 });`);
 
 	b.append(`
-		$run(function runSwitch() {
-		${node.statement} {`);
+		$run(function runSwitch() {`);
+	if (status.options?.mapped) {
+		// TODO: replaceForVarNames is going to throw mapping out
+		let startIndex = b.toString().length;
+		let startLine = b.lineMap.length;
+		b.append(`${replaceForVarNames(node.statement, status)} {`);
+		let startChar = startIndex - b.lineMap.at(-1)!;
+		let endIndex = startIndex + node.statement.length;
+		let endLine = startLine;
+		let endChar = endIndex - b.lineMap.at(-1)!;
+		status.map.push({
+			script: node.statement,
+			source: node.range,
+			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+		});
+	} else {
+		b.append(`${replaceForVarNames(node.statement, status)} {`);
+	}
 	for (let [i, branch] of branches.entries()) {
-		b.append(
-			`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; break; }`,
-		);
+		if (status.options?.mapped) {
+			// TODO: replaceForVarNames is going to throw mapping out
+			let startIndex = b.toString().length;
+			let startLine = b.lineMap.length;
+			b.append(
+				`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; }`,
+			);
+			let startChar = startIndex - b.lineMap.at(-1)!;
+			let endIndex = startIndex + branch.statement.length;
+			let endLine = startLine;
+			let endChar = endIndex - b.lineMap.at(-1)!;
+			status.map.push({
+				script: branch.statement,
+				source: branch.range,
+				compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+			});
+		} else {
+			b.append(
+				`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; }`,
+			);
+		}
 	}
 	b.append(`
 		}

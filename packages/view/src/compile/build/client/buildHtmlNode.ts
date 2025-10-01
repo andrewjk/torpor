@@ -4,6 +4,8 @@ import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 
+// TODO: type checking
+
 export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const htmlAnchorName = node.varName!;
 	const htmlParentName = node.parentName || htmlAnchorName + ".parentNode";
