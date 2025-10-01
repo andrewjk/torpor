@@ -1,8 +1,10 @@
 import type BuildOptions from "../../../types/BuildOptions";
 import type Template from "../../../types/Template";
+import type TemplateComponent from "../../../types/TemplateComponent";
 import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
@@ -132,22 +134,8 @@ function buildTemplate(
 			b.append("");
 		} else if (chunk.script === "/* @render */") {
 			if (current.markup) {
-				const status: BuildStatus = {
-					imports,
-					props: current.props || [],
-					contextProps: current.contextProps || [],
-					slotProps: current.slotProps || [],
-					styleHash: current.style?.hash || "",
-					map,
-					varNames: {},
-					fragmentStack: [],
-					forVarNames: [],
-					ns: false,
-					preserveWhitespace: false,
-					options,
-				};
-
 				// Add the interface
+				let status = makeStatus(imports, map, current, options);
 				b.append("");
 				b.append("/* User interface */");
 				buildFragmentText(current.markup, status, b);
@@ -156,22 +144,8 @@ function buildTemplate(
 			}
 		} else if (chunk.script === "/* @head */") {
 			if (current.head) {
-				const status: BuildStatus = {
-					imports,
-					props: current.props || [],
-					contextProps: current.contextProps || [],
-					slotProps: current.slotProps || [],
-					styleHash: current.style?.hash || "",
-					map,
-					varNames: {},
-					fragmentStack: [],
-					forVarNames: [],
-					ns: false,
-					preserveWhitespace: false,
-					options,
-				};
-
 				// Add the head tags
+				let status = makeStatus(imports, map, current, options);
 				b.append("");
 				b.append("/* Head */");
 				status.inHead = true;
@@ -184,18 +158,30 @@ function buildTemplate(
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
-			if (options?.mapped) {
-				let start = b.toString().length;
-				b.append(chunk.script);
-				let end = start + chunk.script.length;
-				map.push({
-					script: chunk.script,
-					source: chunk.range,
-					compiled: { start, end },
-				});
-			} else {
-				b.append(chunk.script);
-			}
+			let status = makeStatus(imports, map, current, options);
+			addMappedText(chunk.script, chunk.range, status, b);
 		}
 	}
+}
+
+function makeStatus(
+	imports: Set<string>,
+	map: SourceMapping[],
+	current?: TemplateComponent,
+	options?: BuildOptions,
+): BuildStatus {
+	return {
+		imports,
+		props: current?.props ?? [],
+		contextProps: current?.contextProps ?? [],
+		slotProps: current?.slotProps ?? [],
+		styleHash: current?.style?.hash ?? "",
+		map,
+		varNames: {},
+		fragmentStack: [],
+		forVarNames: [],
+		ns: false,
+		preserveWhitespace: false,
+		options,
+	};
 }

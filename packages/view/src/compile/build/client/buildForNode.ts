@@ -5,6 +5,7 @@ import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -77,19 +78,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		let t_previous_item = ${forRangeName};
 		let t_next_item = ${forRangeName}.nextRange;`);
 
-	if (status.options?.mapped) {
-		// TODO: replaceForVarNames is going to throw mapping out
-		let start = b.toString().length;
-		b.append(`${node.statement} {`);
-		let end = start + node.statement.length;
-		status.map.push({
-			script: node.statement,
-			source: node.range,
-			compiled: { start, end },
-		});
-	} else {
-		b.append(`${node.statement} {`);
-	}
+	addMappedText(`${node.statement} {`, node.range, status, b);
 
 	b.append(`
 			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});

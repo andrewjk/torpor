@@ -3,6 +3,7 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -44,19 +45,13 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 
 	b.append(`$run(function runIf() {`);
 	for (let [i, branch] of branches.entries()) {
-		if (status.options?.mapped) {
-			// TODO: replaceForVarNames is going to throw mapping out
-			let start = b.toString().length;
-			b.append(`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`);
-			let end = start + branch.statement.length;
-			status.map.push({
-				script: branch.statement,
-				source: branch.range,
-				compiled: { start, end },
-			});
-		} else {
-			b.append(`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`);
-		}
+		// TODO: replaceForVarNames is going to throw mapping out
+		addMappedText(
+			`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`,
+			branch.range,
+			status,
+			b,
+		);
 	}
 	b.append(`});`);
 

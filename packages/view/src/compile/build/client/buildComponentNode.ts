@@ -4,6 +4,7 @@ import isSpecialNode from "../../utils/isSpecialNode";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -130,18 +131,7 @@ export default function buildComponentNode(
 		}
 	}
 
-	if (status.options?.mapped) {
-		let start = b.toString().length;
-		b.append(`${componentName}(${renderParams});`);
-		let end = start + componentName.length;
-		status.map.push({
-			script: componentName,
-			source: node.range,
-			compiled: { start, end },
-		});
-	} else {
-		b.append(`${componentName}(${renderParams});`);
-	}
+	addMappedText(`${componentName}(${renderParams});`, node.range, status, b);
 
 	b.append("");
 }
