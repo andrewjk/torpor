@@ -11,11 +11,9 @@ import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseElement from "./parseElement";
 import parseInlineScript from "./parseInlineScript";
-import rangeAtIndex from "./rangeAtIndex";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
 import consumeSpace from "./utils/consumeSpace";
-import emptyRange from "./utils/emptyRange";
 import isSpaceChar from "./utils/isSpaceChar";
 
 const controlOperations = [
@@ -154,7 +152,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 		operation: operation as OperationType,
 		statement,
 		children: [],
-		range: rangeAtIndex(status, statementStart, status.i),
+		range: { start: statementStart, end: status.i },
 	};
 }
 
@@ -211,7 +209,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@if group",
 			statement: "",
 			children: [node],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		parentNode.children.push(ifGroup);
 	} else if (node.operation === "@else") {
@@ -234,7 +232,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@for group",
 			statement: "",
 			children: [node],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		parentNode.children.push(forGroup);
 	}
@@ -248,7 +246,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@await group",
 			statement: "",
 			children: [node],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		parentNode.children.push(awaitGroup);
 	} else if (node.operation === "@then" || node.operation === "@catch") {
@@ -266,7 +264,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@replace group",
 			statement: "",
 			children: [node],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		parentNode.children.push(replaceGroup);
 	} else if (node.operation === "@html") {
@@ -275,7 +273,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@html group",
 			statement: "",
 			children: [node],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		parentNode.children.push(htmlGroup);
 	} else {

@@ -1,7 +1,6 @@
 import type ElementNode from "../types/nodes/ElementNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import isSpecialNode from "../utils/isSpecialNode";
-import emptyRange from "./utils/emptyRange";
 
 /**
  * Moves any child nodes that aren't already in a <fill> node into a default
@@ -20,7 +19,7 @@ export default function slottifyChildNodes(node: ElementNode): void {
 				tagName: "fill",
 				attributes: [],
 				children: nonFillNodes,
-				range: emptyRange(),
+				range: { start: 0, end: 0 },
 			};
 			node.children.unshift(defaultFillNode);
 		}

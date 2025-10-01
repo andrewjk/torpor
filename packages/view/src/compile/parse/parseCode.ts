@@ -8,23 +8,18 @@ import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
-import rangeAtIndex from "./rangeAtIndex";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
 import addError from "./utils/addError";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
-import emptyRange from "./utils/emptyRange";
 
 export default function parseCode(source: string): ParseResult {
 	const status: ParseStatus = {
 		source,
 		i: 0,
 		marker: 0,
-		line: 0,
-		char: 0,
 		level: 0,
-		lastRange: emptyRange(),
 		imports: [],
 		script: [],
 		components: [],
@@ -93,7 +88,7 @@ export default function parseCode(source: string): ParseResult {
 	}
 	status.script.push({
 		script: source.substring(status.marker, source.length),
-		range: rangeAtIndex(status, status.marker, source.length),
+		range: { start: status.marker, end: source.length },
 	});
 
 	scopeStyles(status);
@@ -167,9 +162,9 @@ function parseComponentStart(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, start),
-		range: rangeAtIndex(status, status.marker, start),
+		range: { start: status.marker, end: start },
 	});
-	status.script.push({ script: "/* @params */", range: emptyRange() });
+	status.script.push({ script: "/* @params */", range: { start: 0, end: 0 } });
 
 	current.params = status.source.substring(start, end).trim() || undefined;
 
@@ -189,18 +184,18 @@ function parseComponentStart(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, status.i),
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 	status.script.push({
 		script: "/* @start */",
-		range: emptyRange(),
+		range: { start: 0, end: 0 },
 	});
 
 	status.marker = status.i;
 	const space = consumeSpace(status);
 	status.script.push({
 		script: space,
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 
 	status.marker = status.i;
@@ -217,11 +212,11 @@ function parseComponentRender(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, status.i),
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 	status.script.push({
 		script: "/* @render */",
-		range: emptyRange(),
+		range: { start: 0, end: 0 },
 	});
 
 	accept("@render", status);
@@ -244,11 +239,11 @@ function parseComponentHead(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, status.i),
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 	status.script.push({
 		script: "/* @head */",
-		range: emptyRange(),
+		range: { start: 0, end: 0 },
 	});
 
 	// HACK: add a new component, and move its markup into the current
@@ -281,11 +276,11 @@ function parseComponentStyle(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, status.i),
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 	status.script.push({
 		script: "/* @style */",
-		range: emptyRange(),
+		range: { start: 0, end: 0 },
 	});
 
 	let start = -1;
@@ -347,12 +342,12 @@ function parseComponentEnd(status: ParseStatus) {
 
 	status.script.push({
 		script: status.source.substring(status.marker, status.i),
-		range: rangeAtIndex(status, status.marker, status.i),
+		range: { start: status.marker, end: status.i },
 	});
 
 	status.script.push({
 		script: "/* @end */",
-		range: emptyRange(),
+		range: { start: 0, end: 0 },
 	});
 
 	// Get all usages of $props.name and $props["name"]

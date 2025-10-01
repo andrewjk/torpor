@@ -1,4 +1,3 @@
-import emptyRange from "../../parse/utils/emptyRange";
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
@@ -27,7 +26,7 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 			operation: "@else",
 			statement: "else",
 			children: [],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		branches.push(elseBranch);
 	}
@@ -47,17 +46,13 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	for (let [i, branch] of branches.entries()) {
 		if (status.options?.mapped) {
 			// TODO: replaceForVarNames is going to throw mapping out
-			let startIndex = b.toString().length;
-			let startLine = b.lineMap.length;
+			let start = b.toString().length;
 			b.append(`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`);
-			let startChar = startIndex - b.lineMap.at(-1)!;
-			let endIndex = startIndex + branch.statement.length;
-			let endLine = startLine;
-			let endChar = endIndex - b.lineMap.at(-1)!;
+			let end = start + branch.statement.length;
 			status.map.push({
 				script: branch.statement,
 				source: branch.range,
-				compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+				compiled: { start, end },
 			});
 		} else {
 			b.append(`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`);

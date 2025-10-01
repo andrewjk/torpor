@@ -5,7 +5,6 @@ import isReactive from "../utils/isReactive";
 import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
-import rangeAtIndex from "./rangeAtIndex";
 import accept from "./utils/accept";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
@@ -22,7 +21,6 @@ export default function parseTag(status: ParseStatus): ElementNode {
 	let snailed = accept("@", status);
 	let tagName = consumeAlphaNumeric(status);
 	let tagEnd = status.i;
-	const range = rangeAtIndex(status, tagStart, tagEnd);
 
 	if (snailed) {
 		tagName = "@" + tagName;
@@ -60,7 +58,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 		closed: selfClosed || undefined,
 		attributes,
 		children: [],
-		range,
+		range: { start: tagStart, end: tagEnd },
 	} satisfies ElementNode;
 }
 
@@ -125,7 +123,7 @@ function parseAttribute(status: ParseStatus): Attribute {
 		value,
 		reactive,
 		fullyReactive,
-		range: rangeAtIndex(status, valueStart, valueEnd),
+		range: { start: valueStart, end: valueEnd },
 	};
 }
 

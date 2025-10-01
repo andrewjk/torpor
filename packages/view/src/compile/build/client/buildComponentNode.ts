@@ -131,17 +131,13 @@ export default function buildComponentNode(
 	}
 
 	if (status.options?.mapped) {
-		let startIndex = b.toString().length;
-		let startLine = b.lineMap.length;
+		let start = b.toString().length;
 		b.append(`${componentName}(${renderParams});`);
-		let startChar = startIndex - b.lineMap.at(-1)!;
-		let endIndex = startIndex + componentName.length;
-		let endLine = startLine;
-		let endChar = endIndex - b.lineMap.at(-1)!;
+		let end = start + componentName.length;
 		status.map.push({
 			script: componentName,
 			source: node.range,
-			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+			compiled: { start, end },
 		});
 	} else {
 		b.append(`${componentName}(${renderParams});`);

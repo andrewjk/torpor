@@ -84,11 +84,10 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				}
 				*/
 
-				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
-
 				const transformed = transform(text, projectRoot);
+
+				// If there were parse or build errors, return them immediately
 				if (!transformed.ok) {
-					console.log(transformed.errors);
 					return transformed.errors.map((e: any) => {
 						return {
 							message: e.message,
@@ -99,9 +98,11 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 						} satisfies Diagnostic;
 					});
 				}
+
 				const content = transformed.content;
 				map = transformed.map;
 
+				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
 				virtualFiles.set(key, content);
 
 				const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
@@ -110,8 +111,9 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				loaded = true;
 				console.log("Torpor type checking loaded");
 			} else {
-				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
 				const transformed = transform(text, projectRoot);
+
+				// If there were parse or build errors, return them immediately
 				if (!transformed.ok) {
 					return transformed.errors.map((e: any) => {
 						return {
@@ -123,8 +125,11 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 						} satisfies Diagnostic;
 					});
 				}
+
 				const content = transformed.content;
 				map = transformed.map;
+
+				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
 				if (!virtualFiles.has(key)) {
 					virtualFiles.set(key, content);
 					env.createFile(key, content);
@@ -145,13 +150,13 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					// know about it
 					let start = d.start ?? 0;
 					let end = (d.start ?? 0) + (d.length ?? 0);
-					let mapped = map.find(
-						(m: any) => start >= m.compiled.startIndex && end <= m.compiled.endIndex,
-					);
+					let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
 
 					// HACK: Couldn't map back to the source, so return a
 					// special message that will be removed with `filter`
 					if (!mapped) {
+						// Log it for diagnostics
+						console.log(d.messageText);
 						return {
 							message: "!",
 							range: {
@@ -164,32 +169,27 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					// We have the mapping, so we know roughly where in the
 					// source the error occurs, but now we need to narrow it
 					// down to the exact location
-					let startDiff = start - mapped.compiled.startIndex;
-					let endDiff = end - mapped.compiled.startIndex;
+					let sourceStart = mapped.source.start + start - mapped.compiled.start;
+					let sourceEnd = mapped.source.start + end - mapped.compiled.start;
 
-					let startIndex = mapped.source.startIndex;
-					let startLine = mapped.source.startLine;
-					let startChar = mapped.source.startChar;
-					for (let i = 0; i < startDiff; i++) {
-						if (text[startIndex + i] === "\n") {
+					// TODO: Store this, so we don't need to start from 0 every time
+					let lastLineStart = 0;
+					let startLine = 0;
+					for (let i = 0; i < sourceStart; i++) {
+						if (text[i] === "\n") {
+							lastLineStart = i;
 							startLine++;
-							startChar = 0;
-						} else {
-							startChar++;
 						}
 					}
-
-					let endIndex = startIndex;
+					let startChar = sourceStart - lastLineStart - 1;
 					let endLine = startLine;
-					let endChar = startChar;
-					for (let i = 0; i < endDiff - startDiff; i++) {
-						if (text[endIndex + i] === "\n") {
+					for (let i = sourceStart; i < sourceEnd; i++) {
+						if (text[i] === "\n") {
+							lastLineStart = i;
 							endLine++;
-							endChar = 0;
-						} else {
-							endChar++;
 						}
 					}
+					let endChar = sourceEnd - lastLineStart - 1;
 
 					return {
 						message: String(d.messageText),

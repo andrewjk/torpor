@@ -5,7 +5,6 @@ import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
 import isTextNode from "../utils/isTextNode";
 import type ParseStatus from "./ParseStatus";
-import rangeAtIndex from "./rangeAtIndex";
 import isSpaceChar from "./utils/isSpaceChar";
 
 export default function parseText(status: ParseStatus, element: ElementNode): void {
@@ -53,7 +52,7 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 				}
 			}
 			// Add the source range
-			ranges.push(rangeAtIndex(status, reactiveStart, j));
+			ranges.push({ start: reactiveStart, end: j });
 		} else if (status.source[j] === "<") {
 			end = j;
 		} else if (status.source[j] === "@") {

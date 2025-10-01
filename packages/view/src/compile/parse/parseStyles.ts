@@ -5,7 +5,6 @@ import type ParseStatus from "./ParseStatus";
 import accept from "./utils/accept";
 import consumeSpace from "./utils/consumeSpace";
 import consumeUntil from "./utils/consumeUntil";
-import emptyRange from "./utils/emptyRange";
 import expect from "./utils/expect";
 import isSpaceChar from "./utils/isSpaceChar";
 
@@ -23,10 +22,7 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 		source,
 		i: 0,
 		marker: 0,
-		line: 0,
-		char: 0,
 		level: 0,
-		lastRange: emptyRange(),
 		imports: [],
 		script: [],
 		components: [],

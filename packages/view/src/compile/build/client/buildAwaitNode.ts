@@ -1,4 +1,3 @@
-import emptyRange from "../../parse/utils/emptyRange";
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
@@ -33,7 +32,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@then",
 			statement: "then",
 			children: [],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 	}
 	let catchBranch = branches.find((n) => n.operation === "@catch");
@@ -43,7 +42,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@catch",
 			statement: "catch",
 			children: [],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 	}
 

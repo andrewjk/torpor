@@ -1,4 +1,3 @@
-import emptyRange from "../../parse/utils/emptyRange";
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
@@ -25,7 +24,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 			operation: "@default",
 			statement: "default",
 			children: [],
-			range: emptyRange(),
+			range: { start: 0, end: 0 },
 		};
 		branches.push(defaultBranch);
 	}
@@ -45,17 +44,13 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		$run(function runSwitch() {`);
 	if (status.options?.mapped) {
 		// TODO: replaceForVarNames is going to throw mapping out
-		let startIndex = b.toString().length;
-		let startLine = b.lineMap.length;
+		let start = b.toString().length;
 		b.append(`${replaceForVarNames(node.statement, status)} {`);
-		let startChar = startIndex - b.lineMap.at(-1)!;
-		let endIndex = startIndex + node.statement.length;
-		let endLine = startLine;
-		let endChar = endIndex - b.lineMap.at(-1)!;
+		let end = start + node.statement.length;
 		status.map.push({
 			script: node.statement,
 			source: node.range,
-			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+			compiled: { start, end },
 		});
 	} else {
 		b.append(`${replaceForVarNames(node.statement, status)} {`);
@@ -63,19 +58,15 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	for (let [i, branch] of branches.entries()) {
 		if (status.options?.mapped) {
 			// TODO: replaceForVarNames is going to throw mapping out
-			let startIndex = b.toString().length;
-			let startLine = b.lineMap.length;
+			let start = b.toString().length;
 			b.append(
 				`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; }`,
 			);
-			let startChar = startIndex - b.lineMap.at(-1)!;
-			let endIndex = startIndex + branch.statement.length;
-			let endLine = startLine;
-			let endChar = endIndex - b.lineMap.at(-1)!;
+			let end = start + branch.statement.length;
 			status.map.push({
 				script: branch.statement,
 				source: branch.range,
-				compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+				compiled: { start, end },
 			});
 		} else {
 			b.append(

@@ -7,17 +7,13 @@ export default function buildScriptNode(node: ControlNode, status: BuildStatus, 
 
 	if (status.options?.mapped) {
 		// TODO: replaceForVarNames is going to throw mapping out
-		let startIndex = b.toString().length;
-		let startLine = b.lineMap.length;
+		let start = b.toString().length;
 		b.append(`${maybeAppend(node.statement, ";")}`);
-		let startChar = startIndex - b.lineMap.at(-1)!;
-		let endIndex = startIndex + node.statement.length;
-		let endLine = startLine;
-		let endChar = endIndex - b.lineMap.at(-1)!;
+		let end = start + node.statement.length;
 		status.map.push({
 			script: node.statement,
 			source: node.range,
-			compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+			compiled: { start, end },
 		});
 	} else {
 		b.append(`${maybeAppend(node.statement, ";")}`);

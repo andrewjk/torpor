@@ -22,17 +22,13 @@ export default function buildAddFragment(
 			if (status.options?.mapped) {
 				for (let effect of fragment.effects) {
 					for (let i = 0; i < effect.ranges.length; i++) {
-						let startIndex = b.toString().length + effect.offsets[i];
-						let startLine = b.lineMap.length;
+						let start = b.toString().length + effect.offsets[i];
 						b.append(effect.functionBody);
-						let startChar = startIndex - b.lineMap.at(-1)!;
-						let endIndex = startIndex + effect.lengths[i];
-						let endLine = startLine;
-						let endChar = endIndex - b.lineMap.at(-1)!;
+						let end = start + effect.lengths[i];
 						status.map.push({
 							script: effect.functionBody,
 							source: effect.ranges[i],
-							compiled: { startIndex, startLine, startChar, endIndex, endLine, endChar },
+							compiled: { start, end },
 						});
 					}
 				}

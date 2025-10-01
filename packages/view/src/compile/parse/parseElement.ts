@@ -13,7 +13,6 @@ import accept from "./utils/accept";
 import addError from "./utils/addError";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
-import emptyRange from "./utils/emptyRange";
 
 export default function parseElement(status: ParseStatus): ElementNode {
 	const current = status.components.at(-1);
@@ -112,14 +111,14 @@ export default function parseElement(status: ParseStatus): ElementNode {
 					operation: "@replace",
 					statement: selfValue,
 					children: [element],
-					range: emptyRange(),
+					range: { start: 0, end: 0 },
 				};
 				const replaceGroup: ControlNode = {
 					type: "control",
 					operation: "@replace group",
 					statement: selfValue,
 					children: [replace],
-					range: emptyRange(),
+					range: { start: 0, end: 0 },
 				};
 
 				return replaceGroup as any;

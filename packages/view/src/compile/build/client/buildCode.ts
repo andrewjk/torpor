@@ -74,16 +74,9 @@ export default function buildCode(
 		let endText = b.toString();
 		let endSize = endText.length;
 		let diff = endSize - startSize + 1;
-		let importLines = imports.size + 2;
-		//let importLines = 0;
-		//for (let i = 0; i < diff; i++) {
-		//	if (endText[i] === "\n") importLines++;
-		//}
 		for (let m of map) {
-			m.compiled.startIndex += diff;
-			m.compiled.startLine += importLines;
-			m.compiled.endIndex += diff;
-			m.compiled.endLine += importLines;
+			m.compiled.start += diff;
+			m.compiled.end += diff;
 		}
 	}
 
@@ -192,42 +185,13 @@ function buildTemplate(
 			current = template.components[currentIndex];
 		} else {
 			if (options?.mapped) {
-				// TODO: Be more efficient here
-				let text = b.toString();
+				let start = b.toString().length;
 				b.append(chunk.script);
-				let startIndex = text.length;
-				let startLine = 0;
-				let startChar = 0;
-				for (let i = 0; i < text.length; i++) {
-					if (text[i] === "\n") {
-						startLine++;
-						startChar = 0;
-					} else {
-						startChar++;
-					}
-				}
-				let endIndex = startIndex + chunk.script.length;
-				let endLine = startLine;
-				let endChar = startChar;
-				for (let i = 0; i < chunk.script.length; i++) {
-					if (chunk.script[i] === "\n") {
-						endLine++;
-						endChar = 0;
-					} else {
-						endChar++;
-					}
-				}
+				let end = start + chunk.script.length;
 				map.push({
 					script: chunk.script,
 					source: chunk.range,
-					compiled: {
-						startIndex,
-						startLine,
-						startChar,
-						endIndex,
-						endLine,
-						endChar,
-					},
+					compiled: { start, end },
 				});
 			} else {
 				b.append(chunk.script);
