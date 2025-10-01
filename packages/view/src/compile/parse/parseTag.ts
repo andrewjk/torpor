@@ -81,7 +81,8 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 }
 
 function parseAttribute(status: ParseStatus): Attribute {
-	const start = status.i;
+	let valueStart = status.i;
+	let valueEnd = status.i;
 	let name = consumeUntil("= \t\r\n/>", status);
 	let value: string | undefined = undefined;
 	let reactive = false;
@@ -89,11 +90,15 @@ function parseAttribute(status: ParseStatus): Attribute {
 	consumeSpace(status);
 	if (accept("=", status)) {
 		consumeSpace(status);
+		valueStart = status.i;
 		value = parseAttributeValue(status);
+		valueEnd = status.i;
 		reactive = isReactive(value);
 		fullyReactive = isFullyReactive(value);
 		if (fullyReactive) {
 			value = value.substring(1, value.length - 1);
+			valueStart++;
+			valueEnd--;
 		} else if (reactive) {
 			value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 		}
@@ -102,6 +107,8 @@ function parseAttribute(status: ParseStatus): Attribute {
 		// It could be e.g. {width} or it could be {$state.width}, but
 		// in either case we set the value of the width property
 		value = name.substring(1, name.length - 1);
+		valueStart++;
+		valueEnd = valueStart + name.length;
 		name = value.split(".").at(-1)!;
 		reactive = fullyReactive = true;
 	}
@@ -110,7 +117,7 @@ function parseAttribute(status: ParseStatus): Attribute {
 		value,
 		reactive,
 		fullyReactive,
-		range: rangeAtIndex(status, start, status.i),
+		range: rangeAtIndex(status, valueStart, valueEnd),
 	};
 }
 
