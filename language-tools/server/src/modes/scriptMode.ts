@@ -7,13 +7,15 @@ import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
 import { Diagnostic, LanguageMode, LanguageService, Position, Range } from "../languageModes";
 
+//const torpor = require("@torpor/view/compile");
 const torpor = require("../../../../packages/view/dist/compile");
 const tsvfs = require("@typescript/vfs");
-//const torpor = require("@torpor/view/compile");
 
 // TODO: use the user's tsconfig
 const compilerOpts: ts.CompilerOptions = {
-	target: ts.ScriptTarget.ESNext,
+	target: ts.ScriptTarget.ES2022,
+	module: ts.ModuleKind.ESNext,
+	moduleResolution: ts.ModuleResolutionKind.Bundler,
 	esModuleInterop: true,
 };
 const virtualFiles = new Map<string, string>();
@@ -31,30 +33,19 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 		//	/* TODO: JS completion?? */
 		//},
 		doValidation(document: TextDocument) {
-			// I can't get this to handle importing virtual files, maybe that's not supported?
-			// Leaving this simple example here in case there's something obvious I'm doing wrong
-			/*
-			const projectRoot = path.join(__dirname, "..");
-			const key = "index.ts";
-			fsMap.set("index.ts", `import sum from "./sum.ts";\nconsole.log(sum(1, 2));`);
-			fsMap.set("sum.ts", "export default function sum(a: number, b: number) {\nreturn a + b;\n}");
-			//fsMap.set(
-			//	"sum.d.ts",
-			//	"declare function sum(a: number, b: number): number;\nexport default sum;",
-			//);
-			*/
-
 			const filename = url.fileURLToPath(document.uri);
+			const key = filename.replace(/\.torp$/, ".ts");
 			const text = document.getText();
-			let key = "";
-			let content: string;
-			let map: any;
+
 			if (!loaded) {
 				// If using imports where the types don't directly match up to
 				// their FS representation (like the imports for node) then use
 				// triple-slash directives to make sure globals are set up
 				// first.
-				//const content = `/// <reference types="node" />\nimport * as path from 'path';\npath.`;
+				//const content = `
+				//	/// <reference types="node" />
+				//	import * as path from 'path';
+				//	path.`.replaceAll(/\s+/, " ").trim();
 
 				// By providing a project root, the system knows how to resolve
 				// node_modules correctly
@@ -62,84 +53,64 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				while (projectRoot && !fs.existsSync(path.join(projectRoot, "node_modules"))) {
 					projectRoot = path.join(projectRoot, "..");
 				}
-
 				if (!projectRoot) {
 					console.log("No project root found");
 					return;
 				}
 
-				// I thought maybe we could import all files??
-				/*
-				let files: string[] = [];
-				walk(path.join(projectRoot, "src"), files);
+				// NOTE: We can do this, and it works, but it seems like it
+				// might use a lot of memory and be quite slow? Instead, we're
+				// just inserting type definitions from components in the bottom
+				// of the source code where they won't interfere with anything
 
-				for (let inFile of files) {
-					const content = transform(inFile);
-					// TODO: if not ok, don't validate!
-					const outFile = path.relative(projectRoot, inFile.replace(/\.torp$/, ".ts"));
-					fsMap.set(outFile, content[0]);
+				// Import all `.torp` files
+				// TODO: Work on making compilation faster!
+				//let torporFiles: string[] = [];
+				//walk(path.join(projectRoot, "src"), torporFiles);
+				//for (let projectFile of torporFiles) {
+				//	console.log(projectFile);
+				//	const source = fs.readFileSync(projectFile, "utf8");
+				//	const { content } = transform(source, projectRoot);
+				//	const projectFileKey = projectFile.replace(/\.torp$/, ".ts");
+				//	virtualFiles.set(projectFileKey, content);
+				//}
 
-					const dtsFile = path.relative(projectRoot, inFile.replace(/\.torp$/, ".d.ts"));
-					fsMap.set(dtsFile, content[1]);
-					console.log(dtsFile, content[1]);
-				}
-				*/
-
-				const transformed = transform(text, projectRoot);
-
-				// If there were parse or build errors, return them immediately
-				if (!transformed.ok) {
-					return transformed.errors.map((e: any) => {
-						return {
-							message: e.message,
-							range: {
-								start: { line: e.startLine, character: e.startChar },
-								end: { line: e.endLine, character: e.endChar },
-							},
-						} satisfies Diagnostic;
-					});
-				}
-
-				content = transformed.content;
-				map = transformed.map;
-
-				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
-				virtualFiles.set(key, content);
+				// Push a dummy file into the map, it will get updated shortly
+				virtualFiles.set(key, "const x = 5;");
 
 				const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
 				env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, compilerOpts);
 
 				loaded = true;
 				console.log("Torpor type checking loaded");
-			} else {
-				const transformed = transform(text, projectRoot);
-
-				// If there were parse or build errors, return them immediately
-				if (!transformed.ok) {
-					return transformed.errors.map((e: any) => {
-						return {
-							message: e.message,
-							range: {
-								start: { line: e.startLine, character: e.startChar },
-								end: { line: e.endLine, character: e.endChar },
-							},
-						} satisfies Diagnostic;
-					});
-				}
-
-				content = transformed.content;
-				map = transformed.map;
-
-				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
-				if (!virtualFiles.has(key)) {
-					virtualFiles.set(key, content);
-					env.createFile(key, content);
-				} else {
-					virtualFiles.set(key, content);
-					env.updateFile(key, content);
-				}
 			}
 
+			const transformed = transform(text, projectRoot);
+
+			// If there were parse or build errors, return them immediately
+			if (!transformed.ok) {
+				return transformed.errors.map((e: any) => {
+					return {
+						message: e.message,
+						range: {
+							start: { line: e.startLine, character: e.startChar },
+							end: { line: e.endLine, character: e.endChar },
+						},
+					} satisfies Diagnostic;
+				});
+			}
+
+			// Load the virtual file from the transformed code
+			const { content, map } = transformed;
+			if (!virtualFiles.has(key)) {
+				virtualFiles.set(key, content);
+				env.createFile(key, content);
+			} else {
+				virtualFiles.set(key, content);
+				env.updateFile(key, content);
+			}
+
+			//console.log(content);
 			const diagnostics = [
 				...env.languageService.getSemanticDiagnostics(key),
 				...env.languageService.getSyntacticDiagnostics(key),
@@ -232,7 +203,6 @@ function walk(folder: string, out: string[]) {
 			}
 		} else {
 			let extname = path.extname(file.name);
-			// TODO: probably other extensions
 			if (extname !== ".torp") {
 				continue;
 			}
@@ -241,32 +211,79 @@ function walk(folder: string, out: string[]) {
 	}
 }
 */
-function transform(source: string, projectRoot: string) {
-	// Build the main file as a component
-	const parsed = torpor.parse(source);
+function transform(source: string, _projectRoot: string) {
+	try {
+		// replaceImportFileNames(source, projectRoot);
 
-	// If not ok, don't validate
-	if (!parsed.ok) {
+		// Build the main file as a component
+		const parsed = torpor.parse(source);
+
+		// If not ok, don't validate
+		if (!parsed.ok) {
+			return {
+				ok: false,
+				errors: parsed.errors,
+				content: "",
+				map: [],
+			};
+		}
+
+		let { code, map } = torpor.build(parsed.template, { mapped: true });
+
+		code = importFileTypes(code);
+
+		return {
+			ok: true,
+			errors: [],
+			content: code,
+			map,
+		};
+	} catch (ex) {
+		console.log("Failed to compile", source);
+		console.log(ex);
 		return {
 			ok: false,
-			errors: parsed.errors,
+			errors: [],
 			content: "",
 			map: [],
 		};
 	}
+}
+/*
+function replaceImportFileNames(source: string): string {
+	// Replace `.torp` imports with `.ts` and any imports in `@/` with `src/`
+	const imports = source.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
+	for (let match of imports) {
+		const value = match[0];
+		const name = match[1];
+		let file = match[2];
 
-	let built = torpor.build(parsed.template, { mapped: true });
-	let content: string = built.code;
-	let map = built.map;
+		if (
+			(file.startsWith("'") && file.endsWith("'")) ||
+			(file.startsWith('"') && file.endsWith('"'))
+		) {
+			file = file.substring(1, file.length - 1);
+		}
 
+		if (!file.endsWith(".torp")) continue;
+
+		// TODO: Get this from tsconfig, if set by the user
+		if (file.startsWith("@/")) file = file.replace("@/", "src/");
+		if (!file.startsWith("/")) file = path.resolve(projectRoot, file);
+
+		source = source.replace(value, `import ${name} from "${file.replace(".torp", "")}";`);
+	}
+	return source;
+}
+*/
+function importFileTypes(content: string): string {
 	// Build imported component files as types
 	// TODO: Cache the imported files
-	// TODO: Handle files from node_modules
-	// TODO: Get the code from fsMap if set, in case it has been edited and not saved
+	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
+	// TODO: Get the code from virtualFiles if set, in case it has been edited and not saved
 	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
 	for (let match of imports) {
 		const value = match[0];
-		//const name = match[1];
 		let file = match[2];
 
 		if (!file.includes(".torp")) continue;
@@ -295,11 +312,5 @@ function transform(source: string, projectRoot: string) {
 			content += "\n" + typeContent;
 		}
 	}
-
-	return {
-		ok: true,
-		errors: [],
-		content,
-		map,
-	};
+	return content;
 }
