@@ -129,6 +129,8 @@ export function trimParsed(result: ParseResult): ParseResult {
 }
 
 function trimElement(el: RootNode | ElementNode | ControlNode) {
+	// @ts-ignore
+	delete el.range;
 	for (let i = el.children.length - 1; i >= 0; i--) {
 		const child = el.children[i];
 		if (child.type === "text") {
@@ -138,7 +140,7 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 				el.children.splice(i, 1);
 			}
 			// @ts-ignore
-			delete textChild.ranges;
+			delete child.ranges;
 		} else if (child.type === "element") {
 			// HACK:
 			(child as ElementNode).attributes.forEach(
