@@ -47,6 +47,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 			const filename = url.fileURLToPath(document.uri);
 			const text = document.getText();
 			let key = "";
+			let content: string;
 			let map: any;
 			if (!loaded) {
 				// If using imports where the types don't directly match up to
@@ -99,7 +100,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					});
 				}
 
-				const content = transformed.content;
+				content = transformed.content;
 				map = transformed.map;
 
 				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
@@ -126,7 +127,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					});
 				}
 
-				const content = transformed.content;
+				content = transformed.content;
 				map = transformed.map;
 
 				key = path.relative(projectRoot, filename.replace(/\.torp$/, ".ts"));
@@ -156,7 +157,11 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					// special message that will be removed with `filter`
 					if (!mapped) {
 						// Log it for diagnostics
-						console.log(d.messageText);
+						const line = (d.file.lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
+						const char = d.start - d.file.lineMap[line];
+						console.log("Error in generated code: ", d.messageText);
+						console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+
 						return {
 							message: "!",
 							range: {
