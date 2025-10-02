@@ -1,3 +1,4 @@
+import type SourceRange from "../../types/SourceRange";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
@@ -5,6 +6,7 @@ import trimEnd from "../../utils/trimEnd";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";
@@ -191,7 +193,7 @@ function buildElementAttributes(
 				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
-				buildEventAttribute(varName, name, value, status, b);
+				buildEventAttribute(varName, name, value, range, status, b);
 			} else if (name.startsWith("transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
@@ -311,6 +313,7 @@ function buildEventAttribute(
 	varName: string,
 	name: string,
 	value: string,
+	range: SourceRange,
 	status: BuildStatus,
 	b: Builder,
 ) {
@@ -319,7 +322,9 @@ function buildEventAttribute(
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
 	status.imports.add("t_event");
-	b.append(`t_event(${varName}, "${eventName}", ${value});`);
+	b.append(`t_event(${varName}, "${eventName}", `);
+	addMappedText(value, range, status, b);
+	b.append(`);`);
 }
 
 function buildTransitionAttribute(
