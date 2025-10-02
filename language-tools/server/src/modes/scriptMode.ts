@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
-import ts from "typescript";
+import ts, { DiagnosticMessageChain } from "typescript";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
@@ -156,8 +156,24 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					}
 					let endChar = sourceEnd - lastLineStart - 1;
 
+					let message = String(d.messageText);
+					if (typeof d.messageText !== "string") {
+						// HACK: I think this should get the messages in the
+						// right order? But who knows...
+						function getMessages(chain: DiagnosticMessageChain, messages: string[]) {
+							messages.push(chain.messageText);
+							if (chain.next !== undefined) {
+								for (let next of chain.next) {
+									getMessages(next, messages);
+								}
+							}
+						}
+						let messages: string[] = [];
+						getMessages(d.messageText, messages);
+						message = messages.join("\n");
+					}
 					return {
-						message: String(d.messageText),
+						message,
 						range: {
 							start: {
 								line: startLine,

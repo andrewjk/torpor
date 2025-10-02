@@ -1,4 +1,4 @@
-import { LanguageService, Position, Range, TextDocument, TokenType } from "./languageModes";
+import { Position, Range, TextDocument } from "./languageModes";
 
 export interface LanguageRange extends Range {
 	languageId: string | undefined;
