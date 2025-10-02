@@ -8,8 +8,6 @@ import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_pop_range from "../../../../src/render/popRange";
-import t_push_range from "../../../../src/render/pushRange";
 import t_range from "../../../../src/render/newRange";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
@@ -50,56 +48,72 @@ export default function Await(
 
 		/* @await */
 		const t_await_range_1 = t_range();
-		t_await_range_1.index = -1;
-		let t_await_token_1 = 0;
-		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
-			t_await_token_1++;
-			t_run_branch(t_await_range_1, () => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
-				// @ts-ignore
-				const t_root_1 = t_root(t_fragment_1, true);
-				// @ts-ignore
-				const t_text_1 = t_next(t_next(t_root_1), true);
-				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
-				t_next(t_text_1);
-			});
-			((token) => {
+		let $t_await_state_1 = $watch({ index: 0 });
+		let t_await_vars_1 = { t_token: 0 };
+		$run(function runAwait() {
+			$t_await_state_1.index = 0;
+			t_await_vars_1.t_token++;
+			((t_token) => {
 				$state.guesser
 				.then((_number) => {
-					if (token === t_await_token_1) {
-						let t_old_range_1 = t_push_range(t_await_range_1);
-						t_run_branch(t_await_range_1, () => {
-							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Is it a number?</p> `);
-							// @ts-ignore
-							const t_root_2 = t_root(t_fragment_2, true);
-							// @ts-ignore
-							const t_text_2 = t_next(t_next(t_root_2), true);
-							t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
-							t_next(t_text_2);
-						});
-						t_pop_range(t_old_range_1);
+					if (t_token === t_await_vars_1.t_token) {
+						t_await_vars_1._number = _number;
+						$t_await_state_1.index = 1;
 					}
 				})
 				.catch((ex) => {
-					if (token === t_await_token_1) {
-						let t_old_range_1 = t_push_range(t_await_range_1);
-						t_run_branch(t_await_range_1, () => {
-							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p class="error">#</p> `);
-							// @ts-ignore
-							const t_root_3 = t_root(t_fragment_3, true);
-							const t_text_3 = t_child(t_next(t_root_3));
-							// @ts-ignore
-							const t_text_4 = t_next(t_next(t_root_3), true);
-							$run(function setAttributes() {
-								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
-							});
-							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);
-							t_next(t_text_4);
-						});
-						t_pop_range(t_old_range_1);
+					if (t_token === t_await_vars_1.t_token) {
+						t_await_vars_1.ex = ex;
+						$t_await_state_1.index = 2;
 					}
 				});
-			})(t_await_token_1);
+			})(t_await_vars_1.t_token);
+		});
+		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
+			switch ($t_await_state_1.index) {
+				case 0: {
+					t_run_branch(t_await_range_1, () => {
+						const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
+						// @ts-ignore
+						const t_root_1 = t_root(t_fragment_1, true);
+						// @ts-ignore
+						const t_text_1 = t_next(t_next(t_root_1), true);
+						t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
+						t_next(t_text_1);
+					});
+					break;
+				}
+				case 1: {
+					t_run_branch(t_await_range_1, () => {
+						const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Is it a number?</p> `);
+						// @ts-ignore
+						const t_root_2 = t_root(t_fragment_2, true);
+						// @ts-ignore
+						const t_text_2 = t_next(t_next(t_root_2), true);
+						let _number = t_await_vars_1._number;
+						t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
+						t_next(t_text_2);
+					});
+					break;
+				}
+				case 2: {
+					t_run_branch(t_await_range_1, () => {
+						const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p class="error">#</p> `);
+						// @ts-ignore
+						const t_root_3 = t_root(t_fragment_3, true);
+						const t_text_3 = t_child(t_next(t_root_3));
+						// @ts-ignore
+						const t_text_4 = t_next(t_next(t_root_3), true);
+						let ex = t_await_vars_1.ex;
+						$run(function setAttributes() {
+							t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
+						});
+						t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);
+						t_next(t_text_4);
+					});
+					break;
+				}
+			}
 		});
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;

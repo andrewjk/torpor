@@ -4,18 +4,18 @@ import isControlNode from "../../utils/isControlNode";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
-
-// TODO: type checking
+import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const awaitParentName = node.parentName!;
 	const awaitAnchorName = node.varName!;
 	const awaitRangeName = nextVarName("await_range", status);
-	const awaitTokenName = nextVarName("await_token", status);
-	const oldRangeName = nextVarName("old_range", status);
+	const awaitStateName = "$" + nextVarName("await_state", status);
+	const awaitVarsName = nextVarName("await_vars", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -56,39 +56,74 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	status.imports.add("t_run_control");
 	b.append("");
 	b.append(`
-	/* @await */
-	const ${awaitRangeName} = t_range();
-	${awaitRangeName}.index = -1;
-	let ${awaitTokenName} = 0;
-	t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
-		${awaitTokenName}++;`);
+		/* @await */
+		const ${awaitRangeName} = t_range();
+		let ${awaitStateName} = $watch({ index: 0 });`);
 
-	buildAwaitBranch(awaitBranch, status, b, awaitParentName, awaitRangeName);
-
-	status.imports.add("t_push_range");
-	status.imports.add("t_pop_range");
 	b.append(`
-	((token) => {
-		${awaiterName}
-		.then((${thenVar}) => {
-		if (token === ${awaitTokenName}) {
-			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
+		let ${awaitVarsName} = { t_token: 0 };
+		$run(function runAwait() {
+			${awaitStateName}.index = 0;
+			${awaitVarsName}.t_token++;
+			((t_token) => {`);
 
-	buildAwaitBranch(thenBranch, status, b, awaitParentName, awaitRangeName);
+	// TODO: replaceForVarNames is going to throw mapping out
+	awaitBranch.range.start += "await".length + 2;
+	addMappedText(`${replaceForVarNames(awaiterName, status)}`, awaitBranch.range, status, b);
 
-	b.append(`t_pop_range(${oldRangeName});
+	// TODO: replaceForVarNames is going to throw mapping out
+	thenBranch.range.start -= 1;
+	addMappedText(`.then((${replaceForVarNames(thenVar, status)}) => {`, thenBranch.range, status, b);
+
+	b.append(`if (t_token === ${awaitVarsName}.t_token) {`);
+	if (thenVar.length > 0) {
+		b.append(`${awaitVarsName}.${thenVar} = ${thenVar};`);
+	}
+	b.append(`
+				${awaitStateName}.index = 1;
+			}
+		})`);
+
+	// TODO: replaceForVarNames is going to throw mapping out
+	catchBranch.range.start -= 1;
+	addMappedText(
+		`.catch((${replaceForVarNames(catchVar, status)}) => {`,
+		catchBranch.range,
+		status,
+		b,
+	);
+
+	b.append(`
+		if (t_token === ${awaitVarsName}.t_token) {`);
+	if (catchVar.length > 0) {
+		b.append(`${awaitVarsName}.${catchVar} = ${catchVar};`);
+	}
+	b.append(`
+						${awaitStateName}.index = 2;
+					}
+				});
+			})(${awaitVarsName}.t_token);
+		});`);
+
+	b.append(`
+		t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
+		switch (${awaitStateName}.index) {`);
+
+	for (let [i, branch] of branches.entries()) {
+		buildAwaitBranch(
+			branch,
+			status,
+			b,
+			awaitParentName,
+			awaitRangeName,
+			i,
+			awaitVarsName,
+			i === 0 ? "" : i === 1 ? thenVar : catchVar,
+		);
+	}
+
+	b.append(`
 		}
-	})
-	.catch((${catchVar}) => {
-		if (token === ${awaitTokenName}) {
-			let ${oldRangeName} = t_push_range(${awaitRangeName});`);
-
-	buildAwaitBranch(catchBranch, status, b, awaitParentName, awaitRangeName);
-
-	b.append(`t_pop_range(${oldRangeName});
-				}
-			});
-		})(${awaitTokenName});
 	});`);
 	b.append("");
 }
@@ -99,12 +134,21 @@ function buildAwaitBranch(
 	b: Builder,
 	parentName: string,
 	rangeName: string,
+	index: number,
+	awaitVarsName: string,
+	varName: string,
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`t_run_branch(${rangeName}, () => {`);
+	b.append(`
+		case ${index}: {
+		t_run_branch(${rangeName}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
+
+	if (varName.length > 0) {
+		b.append(`let ${varName} = ${awaitVarsName}.${varName};`);
+	}
 
 	status.fragmentStack.push({
 		fragment: node.fragment!,
@@ -117,5 +161,8 @@ function buildAwaitBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`});`);
+	b.append(`
+		});
+		break;
+	}`);
 }
