@@ -1,19 +1,19 @@
-import { getCSSLanguageService } from 'vscode-css-languageservice';
+import { getCSSLanguageService } from "vscode-css-languageservice";
 import {
 	CompletionList,
 	Diagnostic,
 	getLanguageService as getHTMLLanguageService,
 	Position,
 	Range,
-} from 'vscode-html-languageservice';
-import { TextDocument } from 'vscode-languageserver-textdocument';
-import { getCSSMode } from './modes/cssMode';
-import { getDocumentRegions, DocumentRegions } from './embeddedSupport';
-import { getHTMLMode } from './modes/htmlMode';
-import { getLanguageModelCache, LanguageModelCache } from './languageModelCache';
-import { getScriptMode } from './modes/scriptMode';
+} from "vscode-html-languageservice";
+import { TextDocument } from "vscode-languageserver-textdocument";
+import { getCSSMode } from "./modes/cssMode";
+import { getDocumentRegions, DocumentRegions } from "./embeddedSupport";
+import { getHTMLMode } from "./modes/htmlMode";
+import { getLanguageModelCache, LanguageModelCache } from "./languageModelCache";
+import { getScriptMode } from "./modes/scriptMode";
 
-export * from 'vscode-html-languageservice';
+export * from "vscode-html-languageservice";
 
 export interface LanguageMode {
 	getId(): string;
@@ -50,9 +50,9 @@ export function getLanguageModes(): LanguageModes {
 	modelCaches.push(documentRegions);
 
 	let modes = Object.create(null);
-	modes['script'] = getScriptMode(documentRegions);
-	modes['html'] = getHTMLMode(htmlLanguageService);
-	modes['css'] = getCSSMode(cssLanguageService, documentRegions);
+	modes["script"] = getScriptMode(documentRegions);
+	modes["html"] = getHTMLMode(htmlLanguageService);
+	modes["css"] = getCSSMode(cssLanguageService, documentRegions);
 
 	return {
 		getModeAtPosition(

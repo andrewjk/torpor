@@ -34,8 +34,7 @@
 				"scopeName": "source.torp",
 				"path": "./syntaxes/torpor.tmLanguage.json",
 				"embeddedLanguages": {
-					"meta.embedded.block.javascript": "javascript",
-					"meta.embedded.block.typescript": "typescript",
+					"meta.embedded.block.typescript": "script",
 					"meta.embedded.block.html": "html",
 					"meta.embedded.block.css": "css"
 				}

@@ -36,6 +36,10 @@ connection.onInitialize((_params: InitializeParams) => {
 			// Tell the client that the server supports code completion
 			completionProvider: {
 				resolveProvider: false,
+				triggerCharacters: ["."],
+				completionItem: {
+					labelDetailsSupport: true,
+				},
 			},
 		},
 	};
@@ -77,7 +81,7 @@ async function validateTextDocument(textDocument: TextDocument) {
 	}
 }
 
-connection.onCompletion(async (textDocumentPosition, token) => {
+connection.onCompletion(async (textDocumentPosition, _token) => {
 	const document = documents.get(textDocumentPosition.textDocument.uri);
 	if (!document) {
 		return null;

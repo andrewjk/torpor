@@ -5,7 +5,7 @@ import ts from "typescript";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
-import { Diagnostic, LanguageMode, LanguageService, Position, Range } from "../languageModes";
+import { CompletionItem, Diagnostic, LanguageMode, Position } from "../languageModes";
 
 //const torpor = require("@torpor/view/compile");
 const torpor = require("../../../../packages/view/dist/compile");
@@ -29,65 +29,57 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 		getId() {
 			return "script";
 		},
-		//doComplete(document: TextDocument, position: Position) {
-		//	/* TODO: JS completion?? */
-		//},
+		doComplete(document: TextDocument, position: Position) {
+			const filename = url.fileURLToPath(document.uri);
+			const key = filename.replace(/\.torp$/, ".ts");
+			const text = document.getText();
+			loadTypeScriptEnv(filename, key);
+			const transformed = transform(text);
+			const { content, map } = transformed;
+			updateVirtualFile(key, content);
+
+			// HACK: maybe we need to generate lineMaps
+			let index = 0;
+			let line = 0;
+			for (; index < text.length; index++) {
+				if (text[index] === "\n") {
+					line++;
+					if (line === position.line) {
+						index += position.character + 1;
+						break;
+					}
+				}
+			}
+
+			let mapped = map.find((m: any) => index >= m.source.start && index <= m.source.end);
+			if (!mapped) {
+				return [];
+			}
+			let compiledIndex = mapped.compiled.start + (index - mapped.source.start);
+
+			const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
+
+			//console.log(JSON.stringify(completions, null, 2));
+			return completions.entries.map((e: any) => {
+				return {
+					label: e.name,
+					kind: 10,
+					sortText: e.sortText,
+					// TODO: need to get these somehow
+					detail: e.detail,
+					documentation: e.documentation,
+				} satisfies CompletionItem;
+			});
+		},
 		doValidation(document: TextDocument) {
 			const filename = url.fileURLToPath(document.uri);
 			const key = filename.replace(/\.torp$/, ".ts");
 			const text = document.getText();
-
-			if (!loaded) {
-				// If using imports where the types don't directly match up to
-				// their FS representation (like the imports for node) then use
-				// triple-slash directives to make sure globals are set up
-				// first.
-				//const content = `
-				//	/// <reference types="node" />
-				//	import * as path from 'path';
-				//	path.`.replaceAll(/\s+/, " ").trim();
-
-				// By providing a project root, the system knows how to resolve
-				// node_modules correctly
-				projectRoot = path.join(filename, ".");
-				while (projectRoot && !fs.existsSync(path.join(projectRoot, "node_modules"))) {
-					projectRoot = path.join(projectRoot, "..");
-				}
-				if (!projectRoot) {
-					console.log("No project root found");
-					return;
-				}
-
-				// NOTE: We can do this, and it works, but it seems like it
-				// might use a lot of memory and be quite slow? Instead, we're
-				// just inserting type definitions from components in the bottom
-				// of the source code where they won't interfere with anything
-
-				// Import all `.torp` files
-				// TODO: Work on making compilation faster!
-				//let torporFiles: string[] = [];
-				//walk(path.join(projectRoot, "src"), torporFiles);
-				//for (let projectFile of torporFiles) {
-				//	console.log(projectFile);
-				//	const source = fs.readFileSync(projectFile, "utf8");
-				//	const { content } = transform(source, projectRoot);
-				//	const projectFileKey = projectFile.replace(/\.torp$/, ".ts");
-				//	virtualFiles.set(projectFileKey, content);
-				//}
-
-				// Push a dummy file into the map, it will get updated shortly
-				virtualFiles.set(key, "const x = 5;");
-
-				const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
-				env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, compilerOpts);
-
-				loaded = true;
-				console.log("Torpor type checking loaded");
-			}
-
-			const transformed = transform(text, projectRoot);
+			loadTypeScriptEnv(filename, key);
+			const transformed = transform(text);
 
 			// If there were parse or build errors, return them immediately
+			// TODO: Do we want to clear the virtual file??
 			if (!transformed.ok) {
 				return transformed.errors.map((e: any) => {
 					return {
@@ -100,22 +92,15 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				});
 			}
 
-			// Load the virtual file from the transformed code
 			const { content, map } = transformed;
-			if (!virtualFiles.has(key)) {
-				virtualFiles.set(key, content);
-				env.createFile(key, content);
-			} else {
-				virtualFiles.set(key, content);
-				env.updateFile(key, content);
-			}
+			updateVirtualFile(key, content);
 
 			//console.log(content);
 			const diagnostics = [
 				...env.languageService.getSemanticDiagnostics(key),
 				...env.languageService.getSyntacticDiagnostics(key),
 			]
-				.map((d) => {
+				.map((d: ts.Diagnostic) => {
 					// Find the mapping between source and compiled, if it
 					// exists. If it doesn't exist, the error must be in
 					// non-user code. Not great, but the user doesn't need to
@@ -128,10 +113,14 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 					// special message that will be removed with `filter`
 					if (!mapped) {
 						// Log it for diagnostics
-						const line = (d.file.lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
-						const char = d.start - d.file.lineMap[line];
 						console.log("Error in generated code: ", d.messageText);
-						console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+						// @ts-ignore
+						const lineMap: number[] = d.file?.lineMap;
+						if (lineMap) {
+							const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
+							const char = start - lineMap[line];
+							console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+						}
 
 						return {
 							message: "!",
@@ -183,6 +172,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 				})
 				.filter((d) => d.message !== "!");
 
+			//console.log(JSON.stringify(diagnostics, null, 2));
 			return diagnostics;
 		},
 		onDocumentRemoved(_document: TextDocument) {
@@ -193,6 +183,67 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 		},
 	};
 }
+
+function loadTypeScriptEnv(filename: string, key: string) {
+	if (!loaded) {
+		// If using imports where the types don't directly match up to
+		// their FS representation (like the imports for node) then use
+		// triple-slash directives to make sure globals are set up
+		// first.
+		//const content = `
+		//	/// <reference types="node" />
+		//	import * as path from 'path';
+		//	path.`.replaceAll(/\s+/, " ").trim();
+
+		// By providing a project root, the system knows how to resolve
+		// node_modules correctly
+		projectRoot = path.join(filename, ".");
+		while (projectRoot && !fs.existsSync(path.join(projectRoot, "node_modules"))) {
+			projectRoot = path.join(projectRoot, "..");
+		}
+		if (!projectRoot) {
+			console.log("No project root found");
+			return;
+		}
+
+		// NOTE: We can do this, and it works, but it seems like it
+		// might use a lot of memory and be quite slow? Instead, we're
+		// just inserting type definitions from components in the bottom
+		// of the source code where they won't interfere with anything
+
+		// Import all `.torp` files
+		// TODO: Work on making compilation faster!
+		//let torporFiles: string[] = [];
+		//walk(path.join(projectRoot, "src"), torporFiles);
+		//for (let projectFile of torporFiles) {
+		//	console.log(projectFile);
+		//	const source = fs.readFileSync(projectFile, "utf8");
+		//	const { content } = transform(source, projectRoot);
+		//	const projectFileKey = projectFile.replace(/\.torp$/, ".ts");
+		//	virtualFiles.set(projectFileKey, content);
+		//}
+
+		// Push a dummy file into the map, it will get updated shortly
+		virtualFiles.set(key, "const x = 5;");
+
+		const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
+		env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, compilerOpts);
+
+		loaded = true;
+		console.log("Torpor type checking loaded");
+	}
+}
+
+function updateVirtualFile(key: string, content: string) {
+	if (!virtualFiles.has(key)) {
+		virtualFiles.set(key, content);
+		env.createFile(key, content);
+	} else {
+		virtualFiles.set(key, content);
+		env.updateFile(key, content);
+	}
+}
+
 /*
 function walk(folder: string, out: string[]) {
 	for (let file of fs.readdirSync(folder, { withFileTypes: true })) {
@@ -211,7 +262,15 @@ function walk(folder: string, out: string[]) {
 	}
 }
 */
-function transform(source: string, _projectRoot: string) {
+
+interface TransformResult {
+	ok: boolean;
+	errors: any[];
+	content: string;
+	map: any;
+}
+
+function transform(source: string): TransformResult {
 	try {
 		// replaceImportFileNames(source, projectRoot);
 

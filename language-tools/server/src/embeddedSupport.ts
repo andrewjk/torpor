@@ -62,7 +62,10 @@ export function getDocumentRegions(document: TextDocument): DocumentRegions {
 			}
 		} else if (char === "@") {
 			// TODO: Regexes to account for space etc
-			if (documentText.substring(i + 1).startsWith("render")) {
+			if (
+				documentText.substring(i + 1).startsWith("render") ||
+				documentText.substring(i + 1).startsWith("head")
+			) {
 				let end = documentText.indexOf("{", i) + 1;
 				if (end === -1) {
 					end = documentText.length;
@@ -83,6 +86,9 @@ export function getDocumentRegions(document: TextDocument): DocumentRegions {
 			}
 		}
 	}
+
+	const end = documentText.length;
+	regions.push({ languageId: "script", start, end });
 
 	return {
 		getLanguageRanges: (range?: Range) => getLanguageRanges(document, regions, range),
