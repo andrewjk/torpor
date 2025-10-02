@@ -1,5 +1,4 @@
-//import { beforeAll, assert.deepStrictEqual, test } from "vitest";
-import * as assert from "node:assert";
+import { assert, test } from "vitest";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { getDocumentRegions } from "../src/embeddedSupport";
 
@@ -113,7 +112,7 @@ function td(source: string): TextDocument {
 		uri: "",
 		languageId: "torpor",
 		version: 1,
-		getText: (TextRange?) => source,
+		getText: () => source,
 		positionAt: (offset) => {
 			let line = 0;
 			let lastLineStart = 0;

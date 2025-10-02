@@ -46,6 +46,7 @@
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
+		"test": "vitest",
 		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
 		"publish": "vsce publish",
 		"publish:patch": "vsce publish patch",
@@ -58,6 +59,7 @@
 		"@typescript-eslint/eslint-plugin": "^8.44.1",
 		"@typescript-eslint/parser": "^8.44.1",
 		"eslint": "^9.36.0",
-		"typescript": "5.5.4"
+		"typescript": "5.5.4",
+		"vitest": "^3.2.4"
 	}
 }
