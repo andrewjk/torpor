@@ -6,22 +6,23 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
 import { CompletionItem, Diagnostic, LanguageMode, Position } from "../languageModes";
+import pathReplace from "../utils/pathReplace";
 
 //const torpor = require("@torpor/view/compile");
 const torpor = require("../../../../packages/view/dist/compile");
 const tsvfs = require("@typescript/vfs");
 
-// TODO: use the user's tsconfig
-const compilerOpts: ts.CompilerOptions = {
+// This is just the default config, it should be overwritten by the one from the
+// user's tsconfig.json
+let tsConfig: ts.CompilerOptions = {
 	target: ts.ScriptTarget.ES2022,
 	module: ts.ModuleKind.ESNext,
 	moduleResolution: ts.ModuleResolutionKind.Bundler,
 	esModuleInterop: true,
 };
-const virtualFiles = new Map<string, string>();
 
-let loaded = false;
 let projectRoot = "";
+let virtualFiles = new Map<string, string>();
 let env: any; //tsvfs.VirtualTypeScriptEnvironment;
 
 export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): LanguageMode {
@@ -63,7 +64,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 			return completions.entries.map((e: any) => {
 				return {
 					label: e.name,
-					kind: 10,
+					kind: e.kind,
 					sortText: e.sortText,
 					// TODO: need to get these somehow
 					detail: e.detail,
@@ -201,7 +202,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 }
 
 function loadTypeScriptEnv(filename: string, key: string) {
-	if (!loaded) {
+	if (env === undefined) {
 		// If using imports where the types don't directly match up to
 		// their FS representation (like the imports for node) then use
 		// triple-slash directives to make sure globals are set up
@@ -222,6 +223,17 @@ function loadTypeScriptEnv(filename: string, key: string) {
 			return;
 		}
 
+		// Maybe load tsconfig from a file
+		// TODO: reload if the file is changed
+		try {
+			let fileConfig = loadTypeScriptConfig();
+			if (fileConfig?.options) {
+				tsConfig = fileConfig.options;
+			}
+		} catch {
+			console.log("No tsconfig.json file found, using default");
+		}
+
 		// NOTE: We can do this, and it works, but it seems like it
 		// might use a lot of memory and be quite slow? Instead, we're
 		// just inserting type definitions from components in the bottom
@@ -229,6 +241,7 @@ function loadTypeScriptEnv(filename: string, key: string) {
 
 		// Import all `.torp` files
 		// TODO: Work on making compilation faster!
+		// TODO: Use tsconfig include paths instead of "src"
 		//let torporFiles: string[] = [];
 		//walk(path.join(projectRoot, "src"), torporFiles);
 		//for (let projectFile of torporFiles) {
@@ -243,9 +256,8 @@ function loadTypeScriptEnv(filename: string, key: string) {
 		virtualFiles.set(key, "const x = 5;");
 
 		const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
-		env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, compilerOpts);
+		env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, tsConfig);
 
-		loaded = true;
 		console.log("Torpor type checking loaded");
 	}
 }
@@ -257,6 +269,14 @@ function updateVirtualFile(key: string, content: string) {
 	} else {
 		virtualFiles.set(key, content);
 		env.updateFile(key, content);
+	}
+}
+
+function loadTypeScriptConfig(): Record<string, any> | undefined {
+	const configFileName = ts.findConfigFile(projectRoot, ts.sys.fileExists);
+	if (configFileName) {
+		const configFile = ts.readConfigFile(configFileName, ts.sys.readFile);
+		return ts.parseJsonConfigFileContent(configFile.config, ts.sys, projectRoot);
 	}
 }
 
@@ -372,8 +392,13 @@ function importFileTypes(content: string): string {
 
 		content = content.replace(value, " ".repeat(value.length));
 
-		// TODO: Get this from tsconfig, if set by the user
-		file = file.replace("@/", "src/");
+		if (tsConfig.paths) {
+			for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
+				for (let destGlob of paths) {
+					file = pathReplace(srcGlob, destGlob, file);
+				}
+			}
+		}
 
 		const typeFile = path.join(projectRoot, file);
 		const typeSource = fs.readFileSync(typeFile, "utf8");
