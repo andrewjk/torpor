@@ -124,10 +124,6 @@ function maybeAddRootNodeDeclaration(
 			params.push("true");
 		}
 		const rootPath = `t_root(${params.join(", ")})`;
-		// HACK: We don't know whether this variable will be used by other child
-		// nodes, so we have to create it regardless and ignore the error if
-		// it's not used -- maybe we could be smarter about this
-		b.append("// @ts-ignore");
 		b.append(`const ${rootName} = ${rootPath};`);
 		// HACK: pretend we don't have the text param, so that subsequent t_root
 		// uses will be shortened, even if we don't know they are text nodes
@@ -392,12 +388,7 @@ function declareElementFragmentVars(
 				if (node.tagName === "@element") {
 					b.append(`let ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 				} else {
-					// HACK: Not great
-					if (topLevel && lastChild) {
-						b.append("// @ts-ignore");
-					}
 					b.append(`const ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
-
 					printDebug(node.varName, status, b);
 				}
 			}
@@ -502,12 +493,7 @@ function declareTextFragmentVars(
 			if (status.options?.useCreateElement) {
 				b.append(`let ${node.varName};`);
 			} else {
-				// HACK: Not great
-				if (topLevel && lastChild) {
-					b.append("// @ts-ignore");
-				}
 				b.append(`const ${node.varName} = ${varPath};`);
-
 				printDebug(node.varName, status, b);
 			}
 		}

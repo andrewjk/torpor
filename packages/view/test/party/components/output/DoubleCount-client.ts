@@ -27,10 +27,8 @@ export default function DoubleCount(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#</div> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
-	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_root_0), true);
 	$run(function setAttributes() {
 		t_text_1.textContent = t_fmt($state.doubleCount);

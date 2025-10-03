@@ -25,12 +25,10 @@ export default function PickPill(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#</div> <input id="blue-pill" type="radio" value="blue"></input> <label for="blue-pill">Blue pill</label> <input id="red-pill" type="radio" value="red"></input> <label for="red-pill">Red pill</label> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
 	const t_input_2 = t_next(t_next(t_next(t_next(t_input_1, true)), true)) as HTMLInputElement;
-	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_next(t_input_2, true)), true);
 	$run(function setBinding() {
 		t_input_1.checked = $state.picked == "blue";

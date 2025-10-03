@@ -24,12 +24,10 @@ export default function UserProfileContext(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <h2>My Profile</h2> <p>#</p> <p>#</p> <button> Update username to Jane </button> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_next(t_next(t_root_0), true)));
 	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
 	const t_button_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)) as HTMLElement;
-	// @ts-ignore
 	const t_text_3 = t_next(t_button_1, true);
 	t_event(t_button_1, "click",
 	() => ($context.user.username = "Jane")

@@ -1,31 +1,32 @@
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
-import t_event from "../../../../src/render/addEvent";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_attribute from "../../../../src/render/setAttribute";
+import t_child from "../../../../src/render/nodeChild";
+import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_list_item from "../../../../src/render/newListItem";
-import t_range from "../../../../src/render/newRange";
-import t_anchor from "../../../../src/render/nodeAnchor";
-import t_child from "../../../../src/render/nodeChild";
 import t_next from "../../../../src/render/nodeNext";
-import t_root from "../../../../src/render/nodeRoot";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
+import t_range from "../../../../src/render/newRange";
+import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
-import t_attribute from "../../../../src/render/setAttribute";
-import type ListItem from "../../../../src/types/ListItem";
-import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function ColorSelect(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any> | undefined,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>,
+	_$slots?: Record<string, SlotRender>
 ): void {
+
 	let $state = $watch({
-		selectedColorId: 2,
+		selectedColorId: 2
 	});
 
 	const colors = [
@@ -38,16 +39,10 @@ export default function ColorSelect(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment(
-		$parent.ownerDocument!,
-		t_fragments,
-		0,
-		` <div>#</div> <select> <!> </select> `,
-	);
-	// @ts-ignore
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#</div> <select> <!> </select> `);
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
-	const t_select_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLSelectElement;
+	const t_select_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_next(t_child(t_select_1))) as HTMLElement;
 
 	/* @for */
@@ -72,17 +67,10 @@ export default function ColorSelect(
 		},
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item);
-			const t_fragment_1 = t_fragment(
-				$parent.ownerDocument!,
-				t_fragments,
-				1,
-				` <option>#</option> `,
-			);
-			// @ts-ignore
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_option_1 = t_next(t_root_1) as HTMLElement;
 			const t_text_2 = t_child(t_option_1);
-			// @ts-ignore
 			const t_text_3 = t_next(t_option_1, true);
 			$run(function setAttributes() {
 				t_attribute(t_option_1, "value", t_item.data.color.id);
@@ -95,18 +83,18 @@ export default function ColorSelect(
 		},
 		function updateListItem(t_old_item, t_new_item) {
 			t_old_item.data.color = t_new_item.data.color;
-		},
+		}
 	);
 
-	// @ts-ignore
 	const t_text_4 = t_next(t_select_1, true);
 	$run(function setBinding() {
 		t_select_1.value = $state.selectedColorId || "";
 	});
-	t_event(t_select_1, "change", (e) => ($state.selectedColorId = e.target.value));
+	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
 	$run(function setAttributes() {
 		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
+
 }

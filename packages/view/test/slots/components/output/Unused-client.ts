@@ -19,14 +19,12 @@ export default function Unused(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context);
 
-	// @ts-ignore
 	const t_text_1 = t_next(t_comp_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);

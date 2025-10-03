@@ -24,7 +24,6 @@ export default function Self(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
 	let t_if_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
@@ -36,7 +35,6 @@ export default function Self(
 		if ($props.level < 3) {
 			$t_if_state_1.creator = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
-				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1, true);
 				let t_comp_anchor_1 = t_anchor(t_next(t_root_1)) as HTMLElement;
 
@@ -47,7 +45,6 @@ export default function Self(
 				});
 				Self(t_fragment_1, t_comp_anchor_1, t_props_1, $context);
 
-				// @ts-ignore
 				const t_text_2 = t_next(t_comp_anchor_1, true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);
 				t_next(t_text_2);
@@ -61,7 +58,6 @@ export default function Self(
 		t_run_branch(t_if_range_1, () => $t_if_state_1.creator(t_before));
 	});
 
-	// @ts-ignore
 	const t_text_3 = t_next(t_if_anchor_1, true);
 	$run(function setAttributes() {
 		t_text_1.textContent = `Level ${t_fmt($props.level)}`;

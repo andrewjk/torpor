@@ -24,7 +24,6 @@ export default function Reactive(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button>Update text</button> <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_button_1 = t_next(t_root_0) as HTMLElement;
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1, true))) as HTMLElement;
@@ -36,7 +35,6 @@ export default function Reactive(
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	// @ts-ignore
 	const t_text_1 = t_next(t_comp_anchor_1, true);
 	t_event(t_button_1, "click",
 	() => $state.text = "after"
@@ -58,10 +56,8 @@ _$slots?: Record<string, SlotRender>
 const t_fragments: DocumentFragment[] = [];
 
 const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> `);
-// @ts-ignore
 const t_root_0 = t_root(t_fragment_0, true);
 const t_text_1 = t_child(t_next(t_root_0));
-// @ts-ignore
 const t_text_2 = t_next(t_next(t_root_0), true);
 $run(function setAttributes() {
 	t_text_1.textContent = ` ${t_fmt($props.text)} `;

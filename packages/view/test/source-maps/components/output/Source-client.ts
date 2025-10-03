@@ -25,7 +25,6 @@ export default function Source(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_if_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
@@ -36,9 +35,7 @@ export default function Source(
 		if ($props.counter > 10) {
 			$t_if_state_1.creator = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's large. </p> `);
-				// @ts-ignore
 				const t_root_1 = t_root(t_fragment_1, true);
-				// @ts-ignore
 				const t_text_1 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
@@ -47,9 +44,7 @@ export default function Source(
 		else {
 			$t_if_state_1.creator = (t_before) => {
 				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> It's small. </p> `);
-				// @ts-ignore
 				const t_root_2 = t_root(t_fragment_2, true);
-				// @ts-ignore
 				const t_text_2 = t_next(t_next(t_root_2), true);
 				t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 				t_next(t_text_2);
@@ -60,7 +55,6 @@ export default function Source(
 		t_run_branch(t_if_range_1, () => $t_if_state_1.creator(t_before));
 	});
 
-	// @ts-ignore
 	const t_text_3 = t_next(t_if_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);

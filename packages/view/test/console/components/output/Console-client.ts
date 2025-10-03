@@ -16,9 +16,7 @@ export default function Console(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> </div> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
-	// @ts-ignore
 	const t_text_1 = t_next(t_next(t_root_0), true);
 	/* @console */
 	console.log("@console is logging here");

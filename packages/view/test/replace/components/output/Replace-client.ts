@@ -25,7 +25,6 @@ export default function Replace(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_replace_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
@@ -35,10 +34,8 @@ export default function Replace(
 		$props.name;
 		t_run_branch(t_replace_range_1, () => {
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
-			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
-			// @ts-ignore
 			const t_text_2 = t_next(t_next(t_root_1), true);
 			$run(function setAttributes() {
 				t_text_1.textContent = `The replace count is ${t_fmt(counter++)}.`;
@@ -48,7 +45,6 @@ export default function Replace(
 		});
 	});
 
-	// @ts-ignore
 	const t_text_3 = t_next(t_replace_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);

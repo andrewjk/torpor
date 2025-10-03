@@ -18,10 +18,8 @@ export default function Element(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_element_1 = t_next(t_root_0) as HTMLElement;
-	// @ts-ignore
 	const t_text_1 = t_next(t_element_1, true);
 	$run(function setDynamic() {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);

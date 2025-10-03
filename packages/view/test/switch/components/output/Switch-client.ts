@@ -28,7 +28,6 @@ export default function Switch(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_switch_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
@@ -40,9 +39,7 @@ export default function Switch(
 			case 1: {
 				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> A small value. </p> `);
-					// @ts-ignore
 					const t_root_1 = t_root(t_fragment_1, true);
-					// @ts-ignore
 					const t_text_1 = t_next(t_next(t_root_1), true);
 					t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 					t_next(t_text_1);
@@ -52,9 +49,7 @@ export default function Switch(
 			case 100: {
 				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> A large value. </p> `);
-					// @ts-ignore
 					const t_root_2 = t_root(t_fragment_2, true);
-					// @ts-ignore
 					const t_text_2 = t_next(t_next(t_root_2), true);
 					t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 					t_next(t_text_2);
@@ -64,9 +59,7 @@ export default function Switch(
 			default: {
 				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p> Another value. </p> `);
-					// @ts-ignore
 					const t_root_3 = t_root(t_fragment_3, true);
-					// @ts-ignore
 					const t_text_3 = t_next(t_next(t_root_3), true);
 					t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_3);
 					t_next(t_text_3);
@@ -79,7 +72,6 @@ export default function Switch(
 		t_run_branch(t_switch_range_1, () => $t_switch_state_1.creator(t_before));
 	});
 
-	// @ts-ignore
 	const t_text_4 = t_next(t_switch_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);

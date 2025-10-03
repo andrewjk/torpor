@@ -35,7 +35,6 @@ export default function AnswerButtonApp(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>Are you happy?</p> <!> <p style="font-size: 50px;">#</p> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
 
@@ -50,7 +49,6 @@ export default function AnswerButtonApp(
 	AnswerButton(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
-	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_next(t_comp_anchor_1, true)), true);
 	$run(function setAttributes() {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");

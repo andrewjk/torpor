@@ -20,7 +20,6 @@ export default function Class(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div id="divid" class="torp-1ljxz83"> From id </div> <div class="divclass torp-1ljxz83"> From string </div> <a class="torp-1ljxz83"> From state </a> <div class="torp-1ljxz83"> From state with scope </div> <div class="torp-1ljxz83"> Class object </div> <div class="torp-1ljxz83"> Class array </div> <div class="torp-1ljxz83"> Class nested </div> <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_a_1 = t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)) as HTMLElement;
 	const t_div_1 = t_next(t_next(t_a_1, true)) as HTMLDivElement;
@@ -36,7 +35,6 @@ export default function Class(
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	// @ts-ignore
 	const t_text_1 = t_next(t_comp_anchor_1, true);
 	$run(function setAttributes() {
 		t_a_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
@@ -62,10 +60,8 @@ function Child(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> Child class </div> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
-	// @ts-ignore
 	const t_text_1 = t_next(t_div_1, true);
 	$run(function setAttributes() {
 		t_div_1.className = t_class($props.class);

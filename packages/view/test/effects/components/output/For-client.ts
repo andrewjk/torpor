@@ -26,7 +26,6 @@ export default function For(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_for_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
@@ -53,10 +52,8 @@ export default function For(
 		function createListItem(t_item, t_before) {
 			let t_old_range_1 = t_push_range(t_item);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
-			// @ts-ignore
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
-			// @ts-ignore
 			const t_text_2 = t_next(t_next(t_root_1), true);
 			$run(function setAttributes() {
 				t_text_1.textContent = t_fmt(t_item.data.item.text);
@@ -70,7 +67,6 @@ export default function For(
 		}
 	);
 
-	// @ts-ignore
 	const t_text_3 = t_next(t_for_anchor_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);

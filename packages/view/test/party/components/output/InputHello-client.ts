@@ -25,11 +25,9 @@ export default function InputHello(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <input></input> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
-	// @ts-ignore
 	const t_text_2 = t_next(t_input_1, true);
 	$run(function setBinding() {
 		t_input_1.value = $state.text || "";

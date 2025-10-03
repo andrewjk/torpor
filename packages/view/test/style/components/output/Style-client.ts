@@ -18,10 +18,8 @@ export default function Style(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> Hello! </div> `);
-	// @ts-ignore
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
-	// @ts-ignore
 	const t_text_1 = t_next(t_div_1, true);
 	$run(function setAttributes() {
 		t_div_1.setAttribute("style", t_style({ color: $props.color }));
