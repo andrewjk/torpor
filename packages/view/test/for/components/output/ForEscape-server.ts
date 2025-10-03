@@ -3,7 +3,7 @@ import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function ForEscape(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

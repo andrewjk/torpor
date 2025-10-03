@@ -17,7 +17,7 @@ import t_run_list from "../../../../src/render/runList";
 export default function ArrayUnkeyed(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

@@ -9,7 +9,7 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Attributes(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

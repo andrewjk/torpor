@@ -19,7 +19,7 @@ import t_run_list from "../../../../src/render/runList";
 export default function ForEscape(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

@@ -72,23 +72,28 @@ function buildSwitchBranch(
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
 
-	b.append(`${stateName}.creator = (t_before) => {`);
+	if (node.children.length > 0) {
+		b.append(`${stateName}.creator = (t_before) => {`);
 
-	buildFragment(node, status, b, parentName, "t_before");
+		buildFragment(node, status, b, parentName, "t_before");
 
-	status.fragmentStack.push({
-		fragment: node.fragment,
-		path: "",
-	});
-	for (let child of node.children) {
-		buildNode(child, status, b, parentName, "t_before");
+		status.fragmentStack.push({
+			fragment: node.fragment,
+			path: "",
+		});
+		for (let child of node.children) {
+			buildNode(child, status, b, parentName, "t_before");
+		}
+		status.fragmentStack.pop();
+
+		buildAddFragment(node, status, b, parentName, "t_before");
+
+		b.append("};");
+	} else {
+		b.append(`${stateName}.creator = (_) => {};`);
 	}
-	status.fragmentStack.pop();
-
-	buildAddFragment(node, status, b, parentName, "t_before");
 
 	b.append(`
-		};
-		break;
-	}`);
+			break;
+		}`);
 }

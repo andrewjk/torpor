@@ -3,7 +3,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import Header from "../output/./Header-server"
 
 export default function Unused(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

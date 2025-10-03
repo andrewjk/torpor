@@ -43,6 +43,8 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 	for (let { name, value, reactive, fullyReactive } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
+		} else if (name === "&ref") {
+			// No elements on the server
 		} else if (name.startsWith("on") || name.startsWith(":on")) {
 			// No events on the server
 		} else if (name.startsWith("transition") && value) {
@@ -59,7 +61,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				`style="\${Object.entries(${value}).map(([k, v]) => \`$\{k}: $\{v}\`).join("; ")}"`,
 			);
 		} else if (value != null && fullyReactive) {
-			if (name === "&ref" || name === "&value" || name === "&checked" || name === "&group") {
+			if (name === "&value" || name === "&checked" || name === "&group") {
 				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
 				if (typeAttribute && typeAttribute.value) {

@@ -2,7 +2,7 @@ import $watch from "../../../../src/render/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Await(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

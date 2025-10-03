@@ -5,7 +5,7 @@ export default function UserProfileApp() {
 		<UserProfile
 			name="John"
 			age={20}
-			favouriteColors={["green", "blue", "red"]}
+			favoriteColors={["green", "blue", "red"]}
 			isAvailable
 		/>
 	}

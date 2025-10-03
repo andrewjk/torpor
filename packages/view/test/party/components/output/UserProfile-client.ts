@@ -35,7 +35,7 @@ export default function UserProfile(
 	$run(function setAttributes() {
 		t_text_1.textContent = `My name is ${t_fmt($props.name)}!`;
 		t_text_2.textContent = `My age is ${t_fmt($props.age)}!`;
-		t_text_3.textContent = `My favourite colors are ${t_fmt($props.favouriteColors.join(", "))}!`;
+		t_text_3.textContent = `My favourite colors are ${t_fmt($props.favoriteColors.join(", "))}!`;
 		t_text_4.textContent = `I am ${t_fmt($props.isAvailable ? "available" : "not available")}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);

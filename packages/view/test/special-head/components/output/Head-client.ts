@@ -4,7 +4,7 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function Head(
 	_$parent: ParentNode,
 	_$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

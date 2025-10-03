@@ -3,7 +3,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import Article from "../output/./Article-server"
 
 export default function Named(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

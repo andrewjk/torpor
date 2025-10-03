@@ -13,7 +13,7 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function BindComponent(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

@@ -16,7 +16,7 @@ import t_run_control from "../../../../src/render/runControl";
 export default function Await(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
@@ -59,7 +59,7 @@ export default function Await(
 				const t_text_1 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
-			}
+			};
 			t_await_vars_1.t_token++;
 			((t_token) => {
 				$state.guesser
@@ -73,7 +73,7 @@ export default function Await(
 							const t_text_2 = t_next(t_next(t_root_2), true);
 							t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 							t_next(t_text_2);
-						}
+						};
 					}
 				})
 				.catch((ex) => {
@@ -90,7 +90,7 @@ export default function Await(
 							});
 							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);
 							t_next(t_text_4);
-						}
+						};
 					}
 				});
 			})(t_await_vars_1.t_token);

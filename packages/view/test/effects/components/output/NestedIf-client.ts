@@ -50,7 +50,7 @@ export default function NestedIf(
 							const t_text_1 = t_next(t_next(t_root_2), true);
 							t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_text_1);
 							t_next(t_text_1);
-						}
+						};
 					}
 					else {
 						$t_if_state_2.creator = (t_before) => {
@@ -61,7 +61,7 @@ export default function NestedIf(
 							const t_text_2 = t_next(t_next(t_root_3), true);
 							t_add_fragment(t_fragment_3, t_fragment_1, t_before, t_text_2);
 							t_next(t_text_2);
-						}
+						};
 					}
 				});
 				t_run_control(t_if_range_2, t_if_anchor_2, (t_before) => {
@@ -72,11 +72,10 @@ export default function NestedIf(
 				const t_text_3 = t_next(t_if_anchor_2, true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_3);
 				t_next(t_text_3);
-			}
+			};
 		}
 		else {
-			$t_if_state_1.creator = (t_before) => {
-			}
+			$t_if_state_1.creator = (_) => {};
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {

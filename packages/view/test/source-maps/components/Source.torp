@@ -1,5 +1,6 @@
 export default function Source($props: { counter: number }) {
 const x = 5;
+console.log(x);
 
 	@render {
 		@if ($props.counter > 10) {
@@ -14,4 +15,5 @@ const x = 5;
 	}
 
 const y = 10;
+console.log(y);
 }

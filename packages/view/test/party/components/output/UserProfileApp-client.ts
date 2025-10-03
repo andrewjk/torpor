@@ -12,7 +12,7 @@ import UserProfile from "../output/./UserProfile-client";
 export default function UserProfileApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
@@ -32,7 +32,7 @@ export default function UserProfileApp(
 		t_props_1["age"] = 20;
 	});
 	$run(function setProp() {
-		t_props_1["favouriteColors"] = ["green", "blue", "red"];
+		t_props_1["favoriteColors"] = ["green", "blue", "red"];
 	});
 	t_props_1["isAvailable"] = true;
 	UserProfile(t_fragment_0, t_comp_anchor_1, t_props_1, $context);

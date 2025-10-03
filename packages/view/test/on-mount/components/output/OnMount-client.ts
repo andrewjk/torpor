@@ -8,7 +8,7 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function OnMount(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

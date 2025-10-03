@@ -12,7 +12,7 @@ import t_run_control from "../../../../src/render/runControl";
 export default function Html(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

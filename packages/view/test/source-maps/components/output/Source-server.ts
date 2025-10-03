@@ -9,6 +9,7 @@ export default function Source(
 	let t_head = "";
 
 	const x = 5;
+	console.log(x);
 
 	/* User interface */
 	t_body += ` <![>`;
@@ -20,5 +21,6 @@ export default function Source(
 	}
 	t_body += `<!]><!> `;
 	const y = 10;
+	console.log(y);
 	return { body: t_body, head: t_head };
 }

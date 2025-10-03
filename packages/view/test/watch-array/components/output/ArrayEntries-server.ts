@@ -2,7 +2,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function ArrayEntries(
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

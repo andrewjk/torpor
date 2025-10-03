@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { assert, beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
@@ -60,6 +60,8 @@ test("watch object -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: State) {
+	assert(container.textContent);
+
 	expect(container.textContent.replace(/\s+/g, " ").trim()).toBe("top child grandchild");
 
 	//console.log("setting state.child.grandChild");

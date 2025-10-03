@@ -29,7 +29,7 @@ export default function clearRange(range: Range): void {
 
 	// Wait for animations, if any, then clear the range's nodes
 	if (animations !== undefined) {
-		// eslint-disable-next-line
+		// eslint-disable-next-line no-floating-promises
 		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
 	} else {
 		clearNodes(range);

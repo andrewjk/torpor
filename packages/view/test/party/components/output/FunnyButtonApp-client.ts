@@ -10,7 +10,7 @@ import FunnyButton from "../output/./FunnyButton-client";
 export default function FunnyButtonApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

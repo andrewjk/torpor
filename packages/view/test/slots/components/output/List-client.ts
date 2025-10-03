@@ -1,27 +1,26 @@
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
-import type ListItem from "../../../../src/types/ListItem";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
-import t_anchor from "../../../../src/render/nodeAnchor";
-import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_list_item from "../../../../src/render/newListItem";
+import t_range from "../../../../src/render/newRange";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
 import t_next from "../../../../src/render/nodeNext";
+import t_root from "../../../../src/render/nodeRoot";
 import t_pop_range from "../../../../src/render/popRange";
 import t_push_range from "../../../../src/render/pushRange";
-import t_range from "../../../../src/render/newRange";
-import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function List(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
-	$slots: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
-
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -63,7 +62,7 @@ export default function List(
 				t_sprops_1["item"] = t_item.data.item;
 			});
 			if ($slots && $slots["_"]) {
-				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_sprops_1, $context)
+				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_sprops_1, $context);
 			}
 			// @ts-ignore
 			const t_text_1 = t_next(t_slot_parent_1, true);
@@ -73,12 +72,11 @@ export default function List(
 		},
 		function updateListItem(t_old_item, t_new_item) {
 			t_old_item.data.item = t_new_item.data.item;
-		}
+		},
 	);
 
 	// @ts-ignore
 	const t_text_2 = t_next(t_for_parent_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
-
 }

@@ -9,9 +9,9 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function BigTitle(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	$slots: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>
 ): void {
 
 	/* User interface */

@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { assert, beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
@@ -49,6 +49,8 @@ test("array entries -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
+	assert(container.textContent);
+
 	// TODO: Should have spaces between letter items
 	expect(container.textContent.replace(/\s/g, "")).toBe("^b,a,d,c$");
 

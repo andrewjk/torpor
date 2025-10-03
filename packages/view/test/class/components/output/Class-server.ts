@@ -2,7 +2,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_class from "../../../../src/render/buildClasses";
 
 export default function Class(
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -26,7 +26,7 @@ export default function Class(
 }
 
 function Child(
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

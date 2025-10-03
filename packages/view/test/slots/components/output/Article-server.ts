@@ -1,9 +1,9 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Article(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	$slots: Record<string, ServerSlotRender>
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

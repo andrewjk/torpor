@@ -39,11 +39,10 @@ export default function IfFalse(
 				const t_text_1 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
-			}
+			};
 		}
 		else {
-			$t_if_state_1.creator = (t_before) => {
-			}
+			$t_if_state_1.creator = (_) => {};
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {

@@ -62,12 +62,12 @@ export default function addFragment(
 			context.activeRange = animation.range;
 			$run(function addFragmentAnimation() {
 				if (animation.in !== undefined) {
-					// eslint-disable-next-line
+					// eslint-disable-next-line no-floating-promises
 					animate(animation.el, true, animation.in.keyframes, animation.in.options);
 				}
 				if (animation.out !== undefined) {
 					return () => {
-						// eslint-disable-next-line
+						// eslint-disable-next-line no-floating-promises
 						animate(animation.el, false, animation.out!.keyframes, animation.out!.options);
 					};
 				}

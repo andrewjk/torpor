@@ -16,7 +16,7 @@ import t_run_control from "../../../../src/render/runControl";
 export default function TrafficLight(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
@@ -57,7 +57,7 @@ export default function TrafficLight(
 				const t_text_2 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
 				t_next(t_text_2);
-			}
+			};
 		}
 		else if ($state.light === "orange") {
 			$t_if_state_1.creator = (t_before) => {
@@ -68,7 +68,7 @@ export default function TrafficLight(
 				const t_text_3 = t_next(t_next(t_root_2), true);
 				t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
 				t_next(t_text_3);
-			}
+			};
 		}
 		else if ($state.light === "green") {
 			$t_if_state_1.creator = (t_before) => {
@@ -79,11 +79,10 @@ export default function TrafficLight(
 				const t_text_4 = t_next(t_next(t_root_3), true);
 				t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
 				t_next(t_text_4);
-			}
+			};
 		}
 		else {
-			$t_if_state_1.creator = (t_before) => {
-			}
+			$t_if_state_1.creator = (_) => {};
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {

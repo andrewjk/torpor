@@ -1,7 +1,7 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Head(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

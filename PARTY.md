@@ -114,7 +114,7 @@ export default function Counter() {
 
 ```
 export default function InputFocused() {
-  let inputElement;
+	let inputElement: HTMLInputElement;
 
   $run(() => {
     inputElement.focus();
@@ -207,7 +207,7 @@ export default function App() {
     <UserProfile
       name="John"
       age={20}
-      favouriteColors={["green", "blue", "red"]}
+      favoriteColors={["green", "blue", "red"]}
       isAvailable
     />
   }
@@ -216,13 +216,13 @@ export default function App() {
 function UserProfile($props = {
   name: "",
   age: null,
-  favouriteColors: [],
+  favoriteColors: [],
   isAvailable: false,
 }) {
   @render {
     <p>My name is {$props.name}!</p>
     <p>My age is {$props.age}!</p>
-    <p>My favourite colors are {$props.favouriteColors.join(", ")}!</p>
+    <p>My favourite colors are {$props.favoriteColors.join(", ")}!</p>
     <p>I am {$props.isAvailable ? "available" : "not available"}</p>
   }
 }

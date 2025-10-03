@@ -5,7 +5,7 @@ import t_fmt from "../../../../src/render/formatText";
 import UserProfileContext from "../output/./UserProfileContext-server";
 
 export default function UserProfileContextApp(
-	_$props: Record<PropertyKey, any>,
+	_$props:  Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

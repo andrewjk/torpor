@@ -1,9 +1,9 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function List(
-	$props: Record<PropertyKey, any>,
+	$props:  Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
-	$slots: Record<string, ServerSlotRender>
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

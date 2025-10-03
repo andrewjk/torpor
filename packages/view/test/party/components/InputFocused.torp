@@ -1,5 +1,5 @@
 export default function InputFocused() {
-	let inputElement;
+	let inputElement: HTMLInputElement;
 
 	$mount(() => {
 		// HACK: This is easier to test for

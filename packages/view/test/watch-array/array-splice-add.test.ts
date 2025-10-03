@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { assert, beforeAll, expect, test } from "vitest";
 import $watch from "../../src/render/$watch";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
@@ -49,6 +49,8 @@ test("array splice add -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: ArrayState) {
+	assert(container.textContent);
+
 	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
 	state.items.splice(1, 0, { id: 5, text: "e" }, { id: 6, text: "f" });
