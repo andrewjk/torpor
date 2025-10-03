@@ -1,0 +1,8 @@
+
+export default function ChildB() {
+	$context["ChildBContext"] = "hi!";
+
+	@render {
+		<p>Nothing to see here...</p>
+	}
+}

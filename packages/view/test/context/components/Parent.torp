@@ -1,0 +1,11 @@
+import ChildA from "./ChildA.torp";
+import ChildB from "./ChildB.torp";
+
+export default function Parent() {
+	$context["ParentContext"] = "hi from the parent";
+
+	@render {
+		<ChildA />
+		<ChildB />
+	}
+}

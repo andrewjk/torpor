@@ -1,0 +1,10 @@
+
+export default function ChildA() {
+	$context["ChildAContext"] = "hi!";
+
+	@render {
+		<p>Parent: {$context["ParentContext"]}</p>
+		<p>Child a: {$context["ChildAContext"]}</p>
+		<p>Child b: {$context["ChildBContext"] ?? "???"}</p>
+	}
+}
