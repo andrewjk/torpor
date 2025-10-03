@@ -1,3 +1,4 @@
+import { buildType, parse } from "@torpor/view/compile";
 import chalk from "chalk";
 import { existsSync, promises as fs, lstatSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
@@ -10,6 +11,11 @@ async function run() {
 	const scriptsFolder = dirname(fileURLToPath(import.meta.url));
 	const sourceFolder = resolve(scriptsFolder, "../src");
 	const distFolder = resolve(scriptsFolder, "../dist");
+
+	// Wait for the types to be generated, then wait another 500ms, because
+	// otherwise the types WE generate get deleted
+	await waitUntilFileExists(join(distFolder, "index.d.ts"));
+	await new Promise((resolve, _reject) => setTimeout(() => resolve(true), 500));
 
 	// Read the dist files first, not for every component
 	const distFiles = (await fs.readdir(distFolder)).filter((f) => f.endsWith(".torp"));
@@ -32,6 +38,8 @@ async function run() {
 		}
 
 		// Move all *.torp files for the component into this folder
+		// And while we're at it, create type definitions
+		let typeDefs: string[] = [];
 		let relatedFiles = (await fs.readdir(join(sourceFolder, component)))
 			.filter((f) => f.endsWith(".torp") && f !== component)
 			.map((f) => basename(f, ".torp"))
@@ -43,8 +51,13 @@ async function run() {
 				return output!;
 			});
 		for (let file of relatedFiles) {
-			const newfile = file.substring(0, file.indexOf("-")) + ".torp";
-			await fs.rename(join(distFolder, file), join(distFolder, component, newfile));
+			const newFileName = file.substring(0, file.indexOf("-")) + ".torp";
+			const newFilePath = join(distFolder, component, newFileName);
+			await fs.rename(join(distFolder, file), newFilePath);
+
+			const parsed = parse(await fs.readFile(newFilePath, "utf8"));
+			// HACK: by this point we should be certain there's no errors
+			typeDefs.push(buildType(parsed.template!));
 		}
 
 		// Move all *.ts files into this folder
@@ -55,6 +68,21 @@ async function run() {
 		for (const file of tsFiles) {
 			await fs.copyFile(join(srcFolder, file), join(distFolder, component, file));
 		}
+
+		// Create the d.ts file from the type definitions
+		let dts = `import { type SlotRender } from "@torpor/view";\n`;
+		let exportNames: string[] = [];
+		for (let typeDef of typeDefs) {
+			const match = /export default (.+?);/.exec(typeDef);
+			if (match) {
+				exportNames.push(match[1]);
+				typeDef = typeDef.replace(match[0], "");
+			}
+			typeDef = typeDef.replace(`import { type SlotRender } from "@torpor/view";`, "");
+			dts += typeDef;
+		}
+		dts += `export { ${exportNames.join(", ")} };`;
+		await fs.writeFile(join(distFolder, component, "index.d.ts"), dts);
 	}
 
 	// Move all utils/*.ts files into the dest folder
@@ -75,6 +103,15 @@ async function moveUtils(distFolder: string, folderName: string) {
 	for (const file of utilsFiles) {
 		await fs.copyFile(join(utilsFolder, file), join(distFolder, folderName, file));
 	}
+}
+
+// From https://stackoverflow.com/a/62339353
+async function waitUntilFileExists(filePath: string, currentTime = 0, timeout = 5000) {
+	if (existsSync(filePath)) return true;
+	if (currentTime === timeout) return false;
+	const interval = 500;
+	await new Promise((resolve, _reject) => setTimeout(() => resolve(true), interval));
+	return waitUntilFileExists(filePath, currentTime + interval, timeout);
 }
 
 await run();
