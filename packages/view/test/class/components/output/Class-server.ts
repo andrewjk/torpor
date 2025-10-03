@@ -5,7 +5,7 @@ export default function Class(
 	$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 
@@ -29,7 +29,7 @@ function Child(
 	$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 

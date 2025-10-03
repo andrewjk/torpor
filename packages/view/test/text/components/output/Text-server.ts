@@ -11,7 +11,7 @@ export default function Text(
 	},
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 

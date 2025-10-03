@@ -11,7 +11,7 @@ test("basic file with export default function", () => {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
-		"export default function Test(/* @params */): void {/* @start *//* @end */}",
+		"export default function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
 	expect(output.template.components.length).toBe(1);
 	expect(output.template.components[0].start).toBe(24);
@@ -27,7 +27,7 @@ test("basic file with export function", () => {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
-		"export function Test(/* @params */): void {/* @start *//* @end */}",
+		"export function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
 	expect(output.template.components.length).toBe(1);
 	expect(output.template.components[0].start).toBe(16);
@@ -43,7 +43,7 @@ test("basic file with function", () => {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(
-		"function Test(/* @params */): void {/* @start *//* @end */}",
+		"function Test(/* @params */) /* @return_type */ {/* @start *//* @end */}",
 	);
 	expect(output.template.components.length).toBe(1);
 	expect(output.template.components[0].start).toBe(9);

@@ -188,7 +188,7 @@ function parseComponentStart(status: ParseStatus) {
 		range: { start: status.marker, end: status.i },
 	};
 	if (/\)\s+\{/.test(postFunctionChunk.script)) {
-		postFunctionChunk.script = "): void {";
+		postFunctionChunk.script = ") /* @return_type */ {";
 	}
 	status.script.push(postFunctionChunk);
 

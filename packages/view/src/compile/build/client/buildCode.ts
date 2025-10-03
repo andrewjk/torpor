@@ -119,6 +119,8 @@ function buildTemplate(
 				`${current.slotProps?.length ? "$slots" : "_$slots?"}: Record<string, SlotRender>`,
 			];
 			b.append(params.join(",\n"));
+		} else if (chunk.script === ") /* @return_type */ {") {
+			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {

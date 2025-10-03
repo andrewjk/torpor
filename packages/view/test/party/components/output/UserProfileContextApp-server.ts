@@ -8,7 +8,7 @@ export default function UserProfileContextApp(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";

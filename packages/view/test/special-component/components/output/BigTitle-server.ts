@@ -4,7 +4,7 @@ export default function BigTitle(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	$slots: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 

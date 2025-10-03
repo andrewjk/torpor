@@ -4,7 +4,7 @@ export default function NestedIf(
 	$props: { condition: boolean, counter: number },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-): void {
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 
