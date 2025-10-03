@@ -94,10 +94,8 @@ export default function Await(
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;
 		const t_text_5 = t_next(t_button_1, true);
-		t_event(t_button_1, "click",
-		() => $state.guesser = guessNumber(100)
-	);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
-	t_next(t_text_5);
+		t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));
+		t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
+		t_next(t_text_5);
 
-}
+	}

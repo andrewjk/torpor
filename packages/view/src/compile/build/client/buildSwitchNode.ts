@@ -46,7 +46,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		$run(function runSwitch() {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
+	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.range, status, b);
 
 	for (let branch of branches) {
 		buildSwitchBranch(branch, status, b, parentName, stateName);
@@ -70,7 +70,7 @@ function buildSwitchBranch(
 	stateName: string,
 ) {
 	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
+	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.range, status, b);
 
 	if (node.children.length > 0) {
 		b.append(`${stateName}.creator = (t_before) => {`);

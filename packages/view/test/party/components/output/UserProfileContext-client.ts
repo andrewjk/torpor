@@ -29,14 +29,12 @@ export default function UserProfileContext(
 	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
 	const t_button_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)) as HTMLElement;
 	const t_text_3 = t_next(t_button_1, true);
-	t_event(t_button_1, "click",
-	() => ($context.user.username = "Jane")
-);
-$run(function setAttributes() {
-	t_text_1.textContent = `Username: ${t_fmt($context.user.username)}`;
-	t_text_2.textContent = `Email: ${t_fmt($context.user.email)}`;
-});
-t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-t_next(t_text_3);
+	t_event(t_button_1, "click", () => ($context.user.username = "Jane"));
+	$run(function setAttributes() {
+		t_text_1.textContent = `Username: ${t_fmt($context.user.username)}`;
+		t_text_2.textContent = `Email: ${t_fmt($context.user.email)}`;
+	});
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
+	t_next(t_text_3);
 
 }

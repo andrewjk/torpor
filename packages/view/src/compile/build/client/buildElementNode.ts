@@ -322,9 +322,7 @@ function buildEventAttribute(
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
 	status.imports.add("t_event");
-	b.append(`t_event(${varName}, "${eventName}", `);
-	addMappedText(value, range, status, b);
-	b.append(`);`);
+	addMappedText(`t_event(${varName}, "${eventName}", `, value, `);`, range, status, b);
 }
 
 function buildTransitionAttribute(

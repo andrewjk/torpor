@@ -155,7 +155,7 @@ function buildTemplate(
 			current = template.components[currentIndex];
 		} else {
 			let status = makeStatus(imports, map, current, options);
-			addMappedText(chunk.script, chunk.range, status, b);
+			addMappedText("", chunk.script, "", chunk.range, status, b);
 		}
 	}
 }

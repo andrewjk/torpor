@@ -83,13 +83,11 @@ export default function TrafficLight(
 	});
 
 	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_button_1, true)), true)), true);
-	t_event(t_button_1, "click",
-	nextLight
-);
-$run(function setAttributes() {
-	t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
-});
-t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
-t_next(t_text_5);
+	t_event(t_button_1, "click", nextLight);
+	$run(function setAttributes() {
+		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
+	});
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
+	t_next(t_text_5);
 
 }

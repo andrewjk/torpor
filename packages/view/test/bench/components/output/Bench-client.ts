@@ -176,46 +176,30 @@ export default function Bench(
 			const t_text_2 = t_child(t_a_1);
 			const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true)))) as HTMLElement;
 			const t_text_3 = t_next(t_tr_1, true);
-			t_event(t_a_1, "click",
-			() => $state.selected = t_item.data.row.id
-		);
-		t_event(t_a_2, "click",
-		() => remove(t_item.data.row)
+			t_event(t_a_1, "click", () => $state.selected = t_item.data.row.id);
+			t_event(t_a_2, "click", () => remove(t_item.data.row));
+			$run(function setAttributes() {
+				t_tr_1.className = t_class({ danger: $state.selected === t_item.data.row.id });
+				t_text_1.textContent = t_fmt(t_item.data.row.id);
+				t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;
+			});
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_3);
+			t_next(t_text_3);
+			t_pop_range(t_old_range_1);
+		},
+		function updateListItem(t_old_item, t_new_item) {
+			t_old_item.data.row = t_new_item.data.row;
+		}
 	);
-	$run(function setAttributes() {
-		t_tr_1.className = t_class({ danger: $state.selected === t_item.data.row.id });
-		t_text_1.textContent = t_fmt(t_item.data.row.id);
-		t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;
-	});
-	t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_3);
-	t_next(t_text_3);
-	t_pop_range(t_old_range_1);
-},
-function updateListItem(t_old_item, t_new_item) {
-	t_old_item.data.row = t_new_item.data.row;
-}
-);
 
-const t_text_4 = t_next(t_next(t_root_0), true);
-t_event(t_button_1, "click",
-create
-);
-t_event(t_button_2, "click",
-createLots
-);
-t_event(t_button_3, "click",
-append
-);
-t_event(t_button_4, "click",
-partialUpdate
-);
-t_event(t_button_5, "click",
-clear
-);
-t_event(t_button_6, "click",
-swapRows
-);
-t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
-t_next(t_text_4);
+	const t_text_4 = t_next(t_next(t_root_0), true);
+	t_event(t_button_1, "click", create);
+	t_event(t_button_2, "click", createLots);
+	t_event(t_button_3, "click", append);
+	t_event(t_button_4, "click", partialUpdate);
+	t_event(t_button_5, "click", clear);
+	t_event(t_button_6, "click", swapRows);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
+	t_next(t_text_4);
 
 }

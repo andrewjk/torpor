@@ -78,7 +78,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		let t_previous_item = ${forRangeName};
 		let t_next_item = ${forRangeName}.nextRange;`);
 
-	addMappedText(`${node.statement} {`, node.range, status, b);
+	addMappedText("", `${node.statement}`, " {", node.range, status, b);
 
 	b.append(`
 			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
