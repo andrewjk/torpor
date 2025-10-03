@@ -21,7 +21,7 @@ export default function Array(
 	$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

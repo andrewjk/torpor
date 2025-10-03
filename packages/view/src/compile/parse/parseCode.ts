@@ -182,10 +182,16 @@ function parseComponentStart(status: ParseStatus) {
 	accept("{", status);
 	status.level += 1;
 
-	status.script.push({
+	// Sneak in a function type
+	const postFunctionChunk = {
 		script: status.source.substring(status.marker, status.i),
 		range: { start: status.marker, end: status.i },
-	});
+	};
+	if (/\)\s+\{/.test(postFunctionChunk.script)) {
+		postFunctionChunk.script = "): void {";
+	}
+	status.script.push(postFunctionChunk);
+
 	status.script.push({
 		script: "/* @start */",
 		range: { start: 0, end: 0 },

@@ -19,7 +19,7 @@ export default function Await(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	// Use the $watch function to declare reactive state
 	let $state = $watch({})

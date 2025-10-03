@@ -16,7 +16,7 @@ export default function Reactive(
 	$props: any,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({ text: "before" })
 
@@ -52,7 +52,7 @@ $anchor: Node | null,
 $props: any,
 _$context: Record<PropertyKey, any>,
 _$slots?: Record<string, SlotRender>
-) {
+): void {
 $props ??= $watch({});
 
 /* User interface */

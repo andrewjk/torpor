@@ -1,3 +1,4 @@
+// eslint-disable no-unused-expressions
 import { afterEach, describe, expect, it, vi } from "vitest";
 import $batch from "../src/render/$batch";
 import $cache from "../src/render/$cache";

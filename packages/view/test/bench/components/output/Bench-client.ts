@@ -23,7 +23,7 @@ export default function Bench(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let rowId = 1;
 	let $state = $watch({

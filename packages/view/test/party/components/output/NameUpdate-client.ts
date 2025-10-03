@@ -14,7 +14,7 @@ export default function NameUpdate(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({
 		name: "John"

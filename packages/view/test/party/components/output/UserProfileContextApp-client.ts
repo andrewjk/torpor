@@ -17,7 +17,7 @@ export default function UserProfileContextApp(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$context = Object.assign({}, $context);
 
 	const $user = $watch({

@@ -7,7 +7,7 @@ export default function Head(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	/* Head */
 	$run(function runTitle() {

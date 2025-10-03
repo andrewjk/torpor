@@ -15,7 +15,7 @@ export default function Counter(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({
 		count: 0

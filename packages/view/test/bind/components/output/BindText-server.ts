@@ -7,7 +7,7 @@ export default function BindText(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-) {
+): void {
 	let t_body = "";
 	let t_head = "";
 

@@ -17,7 +17,7 @@ export default function AnswerButtonApp(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({
 		isHappy: true

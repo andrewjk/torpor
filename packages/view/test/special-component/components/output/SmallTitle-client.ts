@@ -12,7 +12,7 @@ export default function SmallTitle(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	$slots: Record<string, SlotRender>
-) {
+): void {
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

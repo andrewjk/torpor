@@ -18,7 +18,7 @@ export default function Component(
 	$props,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	let components = {

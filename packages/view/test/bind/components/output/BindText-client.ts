@@ -15,7 +15,7 @@ export default function BindText(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({ name: "Alice", selected: 1 });
 

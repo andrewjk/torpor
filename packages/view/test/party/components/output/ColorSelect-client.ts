@@ -23,7 +23,7 @@ export default function ColorSelect(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({
 		selectedColorId: 2

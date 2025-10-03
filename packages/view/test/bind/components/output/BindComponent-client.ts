@@ -16,7 +16,7 @@ export default function BindComponent(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let $state = $watch({ name: "Alice", selected: 1 });
 
@@ -55,7 +55,7 @@ function BindText(
 	$props: any,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

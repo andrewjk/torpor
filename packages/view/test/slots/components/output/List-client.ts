@@ -20,7 +20,7 @@ export default function List(
 	$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	$slots: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

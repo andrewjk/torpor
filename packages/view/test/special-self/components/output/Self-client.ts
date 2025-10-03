@@ -18,7 +18,7 @@ export default function Self(
 	$props: { level: number },
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

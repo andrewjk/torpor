@@ -18,7 +18,7 @@ export default function Shape(
 	$props: { name: string },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

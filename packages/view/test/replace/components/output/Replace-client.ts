@@ -18,7 +18,7 @@ export default function Replace(
 	$props: { name: string},
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	let counter = 0;

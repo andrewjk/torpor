@@ -14,7 +14,7 @@ export default function Component(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

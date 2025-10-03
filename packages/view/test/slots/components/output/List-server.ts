@@ -4,7 +4,7 @@ export default function List(
 	$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	$slots: Record<string, ServerSlotRender>
-) {
+): void {
 	$props ??= {};
 	let t_body = "";
 	let t_head = "";

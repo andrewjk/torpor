@@ -6,7 +6,7 @@ export default function Reactive(
 	$props: any,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-) {
+): void {
 	let t_body = "";
 	let t_head = "";
 
@@ -29,7 +29,7 @@ function Child(
 	$props: any,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-) {
+): void {
 	$props ??= {};
 	let t_body = "";
 	let t_head = "";

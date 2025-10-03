@@ -22,7 +22,7 @@ export default function ForEscape(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	let things = ["a", "b", "c", "d", "e"]
 

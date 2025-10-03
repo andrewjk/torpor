@@ -18,7 +18,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -47,7 +47,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -76,7 +76,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -103,7 +103,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -132,7 +132,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -169,7 +169,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -198,7 +198,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -229,7 +229,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -258,7 +258,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);
@@ -283,7 +283,7 @@ export default function Test() {
 	assert(output.template);
 	expect(output.template.imports).toEqual([]);
 	expect(output.template.script.map((s) => s.script).join("")).toBe(`
-export default function Test(/* @params */) {/* @start */
+export default function Test(/* @params */): void {/* @start */
 	/* @render */
 /* @end */}
 `);

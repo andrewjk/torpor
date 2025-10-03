@@ -15,7 +15,7 @@ export default function ParentChild(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -43,7 +43,7 @@ function Child(
 	$props: { name: string },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */

@@ -5,7 +5,7 @@ export default function ParentChild(
 	_$props: Record<PropertyKey, any>,
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-) {
+): void {
 	let t_body = "";
 	let t_head = "";
 
@@ -26,7 +26,7 @@ function Child(
 	$props: { name: string },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
-) {
+): void {
 	$props ??= {};
 	let t_body = "";
 	let t_head = "";

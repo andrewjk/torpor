@@ -11,7 +11,7 @@ export default function OnMount(
 	_$props: Record<PropertyKey, any>,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

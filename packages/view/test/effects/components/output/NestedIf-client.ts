@@ -16,7 +16,7 @@ export default function NestedIf(
 	$props: { condition: boolean, counter: number },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
-) {
+): void {
 	$props ??= $watch({});
 
 	/* User interface */
