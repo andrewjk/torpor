@@ -35,18 +35,11 @@ export default function Switch(
 
 	/* @switch */
 	const t_switch_range_1 = t_range();
-	let $t_switch_state_1 = $watch({ index: -1 });
+	let $t_switch_state_1 = $watch({ creator: (_: Node | null) => {} });
 	$run(function runSwitch() {
 		switch ($props.value) {
-			case 1: { $t_switch_state_1.index = 0; break; }
-			case 100: { $t_switch_state_1.index = 1; break; }
-			default: { $t_switch_state_1.index = 2; break; }
-		}
-	});
-	t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
-		switch ($t_switch_state_1.index) {
-			case 0: {
-				t_run_branch(t_switch_range_1, () => {
+			case 1: {
+				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> A small value. </p> `);
 					// @ts-ignore
 					const t_root_1 = t_root(t_fragment_1, true);
@@ -54,11 +47,11 @@ export default function Switch(
 					const t_text_1 = t_next(t_next(t_root_1), true);
 					t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 					t_next(t_text_1);
-				});
+				};
 				break;
 			}
-			case 1: {
-				t_run_branch(t_switch_range_1, () => {
+			case 100: {
+				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> A large value. </p> `);
 					// @ts-ignore
 					const t_root_2 = t_root(t_fragment_2, true);
@@ -66,11 +59,11 @@ export default function Switch(
 					const t_text_2 = t_next(t_next(t_root_2), true);
 					t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 					t_next(t_text_2);
-				});
+				};
 				break;
 			}
-			case 2: {
-				t_run_branch(t_switch_range_1, () => {
+			default: {
+				$t_switch_state_1.creator = (t_before) => {
 					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p> Another value. </p> `);
 					// @ts-ignore
 					const t_root_3 = t_root(t_fragment_3, true);
@@ -78,10 +71,13 @@ export default function Switch(
 					const t_text_3 = t_next(t_next(t_root_3), true);
 					t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_3);
 					t_next(t_text_3);
-				});
+				};
 				break;
 			}
 		}
+	});
+	t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
+		t_run_branch(t_switch_range_1, () => $t_switch_state_1.creator(t_before));
 	});
 
 	// @ts-ignore

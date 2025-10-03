@@ -10,10 +10,10 @@ import buildNode from "./buildNode";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const switchParentName = node.parentName!;
-	const switchAnchorName = node.varName!;
-	const switchRangeName = nextVarName("switch_range", status);
-	const switchStateName = "$" + nextVarName("switch_state", status);
+	const anchorName = node.varName!;
+	const parentName = node.parentName!;
+	const rangeName = nextVarName("switch_range", status);
+	const stateName = "$" + nextVarName("switch_state", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -34,12 +34,13 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	status.imports.add("$run");
 	status.imports.add("t_range");
 	status.imports.add("t_run_control");
+	status.imports.add("t_run_branch");
 
 	b.append("");
 	b.append(`
 		/* @switch */
-		const ${switchRangeName} = t_range();
-		let ${switchStateName} = $watch({ index: -1 });`);
+		const ${rangeName} = t_range();
+		let ${stateName} = $watch({ creator: (_: Node | null) => {} });`);
 
 	b.append(`
 		$run(function runSwitch() {`);
@@ -47,30 +48,17 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
 
-	for (let [i, branch] of branches.entries()) {
-		// TODO: replaceForVarNames is going to throw mapping out
-		addMappedText(
-			`${replaceForVarNames(branch.statement, status)} { ${switchStateName}.index = ${i}; break; }`,
-			branch.range,
-			status,
-			b,
-		);
+	for (let branch of branches) {
+		buildSwitchBranch(branch, status, b, parentName, stateName);
 	}
 	b.append(`
 		}
 	});`);
 
 	b.append(`
-		t_run_control(${switchRangeName}, ${switchAnchorName}, (t_before) => {
-		switch (${switchStateName}.index) {`);
-
-	for (let [i, branch] of branches.entries()) {
-		buildSwitchBranch(branch as ControlNode, status, b, switchParentName, switchRangeName, i);
-	}
-
-	b.append(`
-		}
-	});`);
+		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
+			t_run_branch(${rangeName}, () => ${stateName}.creator(t_before));
+		});`);
 	b.append("");
 }
 
@@ -79,14 +67,12 @@ function buildSwitchBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	rangeName: string,
-	index: number,
+	stateName: string,
 ) {
-	status.imports.add("t_run_branch");
+	// TODO: replaceForVarNames is going to throw mapping out
+	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
 
-	b.append(`
-		case ${index}: {
-		t_run_branch(${rangeName}, () => {`);
+	b.append(`${stateName}.creator = (t_before) => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -102,7 +88,7 @@ function buildSwitchBranch(
 	buildAddFragment(node, status, b, parentName, "t_before");
 
 	b.append(`
-		});
+		};
 		break;
 	}`);
 }

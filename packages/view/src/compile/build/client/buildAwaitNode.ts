@@ -11,10 +11,10 @@ import buildNode from "./buildNode";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const awaitParentName = node.parentName!;
-	const awaitAnchorName = node.varName!;
-	const awaitRangeName = nextVarName("await_range", status);
-	const awaitStateName = "$" + nextVarName("await_state", status);
+	const anchorName = node.varName!;
+	const parentName = node.parentName!;
+	const rangeName = nextVarName("await_range", status);
+	const stateName = "$" + nextVarName("await_state", status);
 	const awaitVarsName = nextVarName("await_vars", status);
 
 	// Filter non-control branches (spaces)
@@ -52,19 +52,26 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 
 	// Use an incrementing token to make sure only the last request gets handled
 	// TODO: This might have unforeseen consequences
+	status.imports.add("$watch");
+	status.imports.add("$run");
 	status.imports.add("t_range");
 	status.imports.add("t_run_control");
+	status.imports.add("t_run_branch");
+
 	b.append("");
 	b.append(`
 		/* @await */
-		const ${awaitRangeName} = t_range();
-		let ${awaitStateName} = $watch({ index: 0 });`);
+		const ${rangeName} = t_range();
+		let ${stateName} = $watch({ creator: (_: Node | null) => {} });`);
 
 	b.append(`
 		let ${awaitVarsName} = { t_token: 0 };
-		$run(function runAwait() {
-			${awaitStateName}.index = 0;
-			${awaitVarsName}.t_token++;
+		$run(function runAwait() {`);
+
+	// Build the waiting branch before anything happens
+	buildAwaitBranch(awaitBranch, status, b, parentName, stateName);
+
+	b.append(`${awaitVarsName}.t_token++;
 			((t_token) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
@@ -76,12 +83,8 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	addMappedText(`.then((${replaceForVarNames(thenVar, status)}) => {`, thenBranch.range, status, b);
 
 	b.append(`if (t_token === ${awaitVarsName}.t_token) {`);
-	if (thenVar.length > 0) {
-		b.append(`${awaitVarsName}.${thenVar} = ${thenVar};`);
-	}
-	b.append(`
-				${awaitStateName}.index = 1;
-			}
+	buildAwaitBranch(thenBranch, status, b, parentName, stateName);
+	b.append(`}
 		})`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
@@ -95,36 +98,16 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 
 	b.append(`
 		if (t_token === ${awaitVarsName}.t_token) {`);
-	if (catchVar.length > 0) {
-		b.append(`${awaitVarsName}.${catchVar} = ${catchVar};`);
-	}
-	b.append(`
-						${awaitStateName}.index = 2;
-					}
+	buildAwaitBranch(catchBranch, status, b, parentName, stateName);
+	b.append(`}
 				});
 			})(${awaitVarsName}.t_token);
 		});`);
 
 	b.append(`
-		t_run_control(${awaitRangeName}, ${awaitAnchorName}, (t_before) => {
-		switch (${awaitStateName}.index) {`);
-
-	for (let [i, branch] of branches.entries()) {
-		buildAwaitBranch(
-			branch,
-			status,
-			b,
-			awaitParentName,
-			awaitRangeName,
-			i,
-			awaitVarsName,
-			i === 0 ? "" : i === 1 ? thenVar : catchVar,
-		);
-	}
-
-	b.append(`
-		}
-	});`);
+		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
+			t_run_branch(${rangeName}, () => ${stateName}.creator(t_before));
+		});`);
 	b.append("");
 }
 
@@ -133,22 +116,11 @@ function buildAwaitBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	rangeName: string,
-	index: number,
-	awaitVarsName: string,
-	varName: string,
+	stateName: string,
 ) {
-	status.imports.add("t_run_branch");
-
-	b.append(`
-		case ${index}: {
-		t_run_branch(${rangeName}, () => {`);
+	b.append(`${stateName}.creator = (t_before) => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
-
-	if (varName.length > 0) {
-		b.append(`let ${varName} = ${awaitVarsName}.${varName};`);
-	}
 
 	status.fragmentStack.push({
 		fragment: node.fragment!,
@@ -161,8 +133,5 @@ function buildAwaitBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`
-		});
-		break;
-	}`);
+	b.append(`}`);
 }

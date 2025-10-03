@@ -32,38 +32,33 @@ export default function Shape(
 
 	/* @if */
 	const t_if_range_1 = t_range();
-	let $t_if_state_1 = $watch({ index: -1 });
+	let $t_if_state_1 = $watch({ creator: (_: Node | null) => {} });
 	$run(function runIf() {
-		if ($props.name === "rect") { $t_if_state_1.index = 0; }
-		else { $t_if_state_1.index = 1; }
-	});
-	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		switch ($t_if_state_1.index) {
-			case 0: {
-				t_run_branch(t_if_range_1, () => {
-					const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <rect width="100" height="100" fill="red"></rect> `, true);
-					// @ts-ignore
-					const t_root_1 = t_root(t_fragment_1, true);
-					// @ts-ignore
-					const t_text_1 = t_next(t_next(t_root_1), true);
-					t_add_fragment(t_fragment_1, t_svg_1, t_before, t_text_1);
-					t_next(t_text_1);
-				});
-				break;
-			}
-			case 1: {
-				t_run_branch(t_if_range_1, () => {
-					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <circle r="45" cx="50" cy="50" fill="red"></circle> `, true);
-					// @ts-ignore
-					const t_root_2 = t_root(t_fragment_2, true);
-					// @ts-ignore
-					const t_text_2 = t_next(t_next(t_root_2), true);
-					t_add_fragment(t_fragment_2, t_svg_1, t_before, t_text_2);
-					t_next(t_text_2);
-				});
-				break;
+		if ($props.name === "rect") {
+			$t_if_state_1.creator = (t_before) => {
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <rect width="100" height="100" fill="red"></rect> `, true);
+				// @ts-ignore
+				const t_root_1 = t_root(t_fragment_1, true);
+				// @ts-ignore
+				const t_text_1 = t_next(t_next(t_root_1), true);
+				t_add_fragment(t_fragment_1, t_svg_1, t_before, t_text_1);
+				t_next(t_text_1);
 			}
 		}
+		else {
+			$t_if_state_1.creator = (t_before) => {
+				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <circle r="45" cx="50" cy="50" fill="red"></circle> `, true);
+				// @ts-ignore
+				const t_root_2 = t_root(t_fragment_2, true);
+				// @ts-ignore
+				const t_text_2 = t_next(t_next(t_root_2), true);
+				t_add_fragment(t_fragment_2, t_svg_1, t_before, t_text_2);
+				t_next(t_text_2);
+			}
+		}
+	});
+	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
+		t_run_branch(t_if_range_1, () => $t_if_state_1.creator(t_before));
 	});
 
 	// @ts-ignore

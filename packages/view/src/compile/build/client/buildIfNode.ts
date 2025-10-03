@@ -12,10 +12,10 @@ import replaceForVarNames from "./replaceForVarNames";
 // TODO: Are there too many branches for ifs etc?
 
 export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const ifAnchorName = node.varName!;
-	const ifParentName = node.parentName || ifAnchorName + ".parentNode";
-	const ifRangeName = nextVarName("if_range", status);
-	const ifStateName = "$" + nextVarName("if_state", status);
+	const anchorName = node.varName!;
+	const parentName = node.parentName || anchorName + ".parentNode";
+	const rangeName = nextVarName("if_range", status);
+	const stateName = "$" + nextVarName("if_state", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -36,36 +36,24 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	status.imports.add("$run");
 	status.imports.add("t_range");
 	status.imports.add("t_run_control");
+	status.imports.add("t_run_branch");
 
 	b.append("");
 	b.append(`
 		/* @if */
-		const ${ifRangeName} = t_range();
-		let ${ifStateName} = $watch({ index: -1 });`);
+		const ${rangeName} = t_range();
+		let ${stateName} = $watch({ creator: (_: Node | null) => {} });`);
 
 	b.append(`$run(function runIf() {`);
-	for (let [i, branch] of branches.entries()) {
-		// TODO: replaceForVarNames is going to throw mapping out
-		addMappedText(
-			`${replaceForVarNames(branch.statement, status)} { ${ifStateName}.index = ${i}; }`,
-			branch.range,
-			status,
-			b,
-		);
+	for (let branch of branches) {
+		buildIfBranch(branch, status, b, parentName, stateName);
 	}
 	b.append(`});`);
 
 	b.append(`
-		t_run_control(${ifRangeName}, ${ifAnchorName}, (t_before) => {
-		switch (${ifStateName}.index) {`);
-
-	for (let [i, branch] of branches.entries()) {
-		buildIfBranch(branch, status, b, ifParentName, ifRangeName, i);
-	}
-
-	b.append(`
-		}
-	});`);
+		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
+			t_run_branch(${rangeName}, () => ${stateName}.creator(t_before));
+		});`);
 	b.append("");
 }
 
@@ -74,14 +62,12 @@ function buildIfBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	rangeName: string,
-	index: number,
+	stateName: string,
 ) {
-	status.imports.add("t_run_branch");
+	// TODO: replaceForVarNames is going to throw mapping out
+	addMappedText(`${replaceForVarNames(node.statement, status)} {`, node.range, status, b);
 
-	b.append(`
-		case ${index}: {
-		t_run_branch(${rangeName}, () => {`);
+	b.append(`${stateName}.creator = (t_before) => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -97,7 +83,6 @@ function buildIfBranch(
 	buildAddFragment(node, status, b, parentName, "t_before");
 
 	b.append(`
-		});
-		break;
-	}`);
+			}
+		}`);
 }

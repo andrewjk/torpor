@@ -29,17 +29,19 @@ export default function Function(
 	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
 	// @ts-ignore
 	const t_text_2 = t_next(t_next(t_next(t_button_1, true)), true);
-	t_event(t_button_1, "click", increment);
+	t_event(t_button_1, "click",
+	increment
+);
 
-	/* @function */
-	function increment() {
-		$state.counter += 1;
-	};
+/* @function */
+function increment() {
+	$state.counter += 1;
+};
 
-	$run(function setAttributes() {
-		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
-	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+$run(function setAttributes() {
+	t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
+});
+t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+t_next(t_text_2);
 
 }

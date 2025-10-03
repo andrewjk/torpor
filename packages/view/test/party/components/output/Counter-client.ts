@@ -35,11 +35,13 @@ export default function Counter(
 	const t_button_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLElement;
 	// @ts-ignore
 	const t_text_2 = t_next(t_button_1, true);
-	t_event(t_button_1, "click", incrementCount);
-	$run(function setAttributes() {
-		t_text_1.textContent = `Counter: ${t_fmt($state.count)}`;
-	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_event(t_button_1, "click",
+	incrementCount
+);
+$run(function setAttributes() {
+	t_text_1.textContent = `Counter: ${t_fmt($state.count)}`;
+});
+t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
+t_next(t_text_2);
 
 }
