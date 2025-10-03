@@ -19,7 +19,6 @@ export default function Shape(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
-	$props ??= $watch({});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

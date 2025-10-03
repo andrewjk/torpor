@@ -6,7 +6,6 @@ export default function Class(
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): void {
-	$props ??= {};
 	let t_body = "";
 	let t_head = "";
 
@@ -31,7 +30,6 @@ function Child(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): void {
-	$props ??= {};
 	let t_body = "";
 	let t_head = "";
 

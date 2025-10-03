@@ -19,7 +19,6 @@ export default function Component(
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
-	$props ??= $watch({});
 
 	let components = {
 		BigTitle,

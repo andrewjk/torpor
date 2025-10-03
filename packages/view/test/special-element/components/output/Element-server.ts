@@ -5,7 +5,6 @@ export default function Element(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): void {
-	$props ??= {};
 	let t_body = "";
 	let t_head = "";
 

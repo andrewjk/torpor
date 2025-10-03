@@ -74,11 +74,6 @@ function buildServerTemplate(
 			];
 			b.append(params.join(",\n"));
 		} else if (chunk.script === "/* @start */") {
-			// Make sure we've got $props if we're going to be using it
-			if (current.props?.length) {
-				b.append(`$props ??= {};`);
-			}
-
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);

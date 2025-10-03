@@ -1,5 +1,4 @@
 import $run from "../../../../src/render/$run";
-import $watch from "../../../../src/render/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -19,7 +18,6 @@ export default function Replace(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
-	$props ??= $watch({});
 
 	let counter = 0;
 

@@ -21,7 +21,6 @@ export default function List(
 	$context: Record<PropertyKey, any>,
 	$slots: Record<string, SlotRender>
 ): void {
-	$props ??= $watch({});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];

@@ -1,5 +1,4 @@
 import $run from "../../../../src/render/$run";
-import $watch from "../../../../src/render/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
@@ -15,7 +14,6 @@ export default function Header(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
-	$props ??= $watch({});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
