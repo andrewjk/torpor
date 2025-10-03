@@ -1,6 +1,7 @@
 import { getCSSLanguageService } from "vscode-css-languageservice";
 import {
 	CompletionList,
+	Hover,
 	Diagnostic,
 	getLanguageService as getHTMLLanguageService,
 	Position,
@@ -19,6 +20,7 @@ export interface LanguageMode {
 	getId(): string;
 	doValidation?: (document: TextDocument) => Diagnostic[];
 	doComplete?: (document: TextDocument, position: Position) => CompletionList;
+	doHover?: (document: TextDocument, position: Position) => Hover | null;
 	onDocumentRemoved(document: TextDocument): void;
 	dispose(): void;
 }

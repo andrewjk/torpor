@@ -41,6 +41,7 @@ connection.onInitialize((_params: InitializeParams) => {
 					labelDetailsSupport: true,
 				},
 			},
+			hoverProvider: true,
 		},
 	};
 });
@@ -94,6 +95,21 @@ connection.onCompletion(async (textDocumentPosition, _token) => {
 	const doComplete = mode.doComplete!;
 
 	return doComplete(document, textDocumentPosition.position);
+});
+
+connection.onHover(async (params) => {
+	const document = documents.get(params.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+
+	const mode = languageModes.getModeAtPosition(document, params.position);
+	if (!mode || !mode.doHover) {
+		return null;
+	}
+	const doHover = mode.doHover!;
+
+	return doHover(document, params.position);
 });
 
 // Make the text document manager listen on the connection

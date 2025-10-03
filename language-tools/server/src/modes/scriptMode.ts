@@ -5,8 +5,9 @@ import ts, { DiagnosticMessageChain } from "typescript";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
-import { CompletionItem, Diagnostic, LanguageMode, Position } from "../languageModes";
+import { CompletionItem, Diagnostic, Hover, LanguageMode, Position } from "../languageModes";
 import pathReplace from "../utils/pathReplace";
+import { getMarkdownDocumentation } from "../utils/previewer";
 
 //const torpor = require("@torpor/view/compile");
 const torpor = require("../../../../packages/view/dist/compile");
@@ -30,168 +31,9 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 		getId() {
 			return "script";
 		},
-		doComplete(document: TextDocument, position: Position) {
-			const filename = url.fileURLToPath(document.uri);
-			const key = filename.replace(/\.torp$/, ".ts");
-			const text = document.getText();
-			loadTypeScriptEnv(filename, key);
-			const transformed = transform(text);
-			const { content, map } = transformed;
-			updateVirtualFile(key, content);
-
-			// HACK: maybe we need to generate lineMaps
-			let index = 0;
-			let line = 0;
-			for (; index < text.length; index++) {
-				if (text[index] === "\n") {
-					line++;
-					if (line === position.line) {
-						index += position.character + 1;
-						break;
-					}
-				}
-			}
-
-			let mapped = map.find((m: any) => index >= m.source.start && index <= m.source.end);
-			if (!mapped) {
-				return [];
-			}
-			let compiledIndex = mapped.compiled.start + (index - mapped.source.start);
-
-			const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
-
-			//console.log(JSON.stringify(completions, null, 2));
-			return completions.entries.map((e: any) => {
-				return {
-					label: e.name,
-					kind: e.kind,
-					sortText: e.sortText,
-					// TODO: need to get these somehow
-					detail: e.detail,
-					documentation: e.documentation,
-				} satisfies CompletionItem;
-			});
-		},
-		doValidation(document: TextDocument) {
-			const filename = url.fileURLToPath(document.uri);
-			const key = filename.replace(/\.torp$/, ".ts");
-			const text = document.getText();
-			loadTypeScriptEnv(filename, key);
-			const transformed = transform(text);
-
-			// If there were parse or build errors, return them immediately
-			// TODO: Do we want to clear the virtual file??
-			if (!transformed.ok) {
-				return transformed.errors.map((e: any) => {
-					return {
-						message: e.message,
-						range: {
-							start: { line: e.startLine, character: e.startChar },
-							end: { line: e.endLine, character: e.endChar },
-						},
-					} satisfies Diagnostic;
-				});
-			}
-
-			const { content, map } = transformed;
-			updateVirtualFile(key, content);
-
-			//console.log(content);
-			const diagnostics = [
-				...env.languageService.getSemanticDiagnostics(key),
-				...env.languageService.getSyntacticDiagnostics(key),
-			]
-				.map((d: ts.Diagnostic) => {
-					// Find the mapping between source and compiled, if it
-					// exists. If it doesn't exist, the error must be in
-					// non-user code. Not great, but the user doesn't need to
-					// know about it
-					let start = d.start ?? 0;
-					let end = (d.start ?? 0) + (d.length ?? 0);
-					let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
-
-					// HACK: Couldn't map back to the source, so return a
-					// special message that will be removed with `filter`
-					if (!mapped) {
-						// Log it for diagnostics
-						console.log("Error in generated code: ", d.messageText);
-						// @ts-ignore
-						const lineMap: number[] = d.file?.lineMap;
-						if (lineMap) {
-							const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
-							const char = start - lineMap[line];
-							console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
-						}
-
-						return {
-							message: "!",
-							range: {
-								start: { line: 0, character: 0 },
-								end: { line: 0, character: 0 },
-							},
-						} satisfies Diagnostic;
-					}
-
-					// We have the mapping, so we know roughly where in the
-					// source the error occurs, but now we need to narrow it
-					// down to the exact location
-					let sourceStart = mapped.source.start + start - mapped.compiled.start;
-					let sourceEnd = mapped.source.start + end - mapped.compiled.start;
-
-					// TODO: Store this, so we don't need to start from 0 every time
-					let lastLineStart = 0;
-					let startLine = 0;
-					for (let i = 0; i < sourceStart; i++) {
-						if (text[i] === "\n") {
-							lastLineStart = i;
-							startLine++;
-						}
-					}
-					let startChar = sourceStart - lastLineStart - 1;
-					let endLine = startLine;
-					for (let i = sourceStart; i < sourceEnd; i++) {
-						if (text[i] === "\n") {
-							lastLineStart = i;
-							endLine++;
-						}
-					}
-					let endChar = sourceEnd - lastLineStart - 1;
-
-					let message = String(d.messageText);
-					if (typeof d.messageText !== "string") {
-						// HACK: I think this should get the messages in the
-						// right order? But who knows...
-						function getMessages(chain: DiagnosticMessageChain, messages: string[]) {
-							messages.push(chain.messageText);
-							if (chain.next !== undefined) {
-								for (let next of chain.next) {
-									getMessages(next, messages);
-								}
-							}
-						}
-						let messages: string[] = [];
-						getMessages(d.messageText, messages);
-						message = messages.join("\n");
-					}
-					return {
-						message,
-						range: {
-							start: {
-								line: startLine,
-								character: startChar,
-							},
-							end: {
-								line: endLine,
-								character: endChar,
-							},
-						},
-					} satisfies Diagnostic;
-				})
-				.filter((d) => d.message !== "!");
-
-			//console.log(JSON.stringify(diagnostics, null, 2));
-			return diagnostics;
-		},
+		doComplete,
+		doValidation,
+		doHover,
 		onDocumentRemoved(_document: TextDocument) {
 			/* nothing to do */
 		},
@@ -199,6 +41,226 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 			/* nothing to do */
 		},
 	};
+}
+
+function doComplete(document: TextDocument, position: Position) {
+	const filename = url.fileURLToPath(document.uri);
+	const key = filename.replace(/\.torp$/, ".ts");
+	const text = document.getText();
+	loadTypeScriptEnv(filename, key);
+	const transformed = transform(text);
+	const { content, map } = transformed;
+	updateVirtualFile(key, content);
+
+	// HACK: maybe we need to generate lineMaps
+	let index = 0;
+	let line = 0;
+	for (; index < text.length; index++) {
+		if (text[index] === "\n") {
+			line++;
+			if (line === position.line) {
+				index += position.character + 1;
+				break;
+			}
+		}
+	}
+
+	let compiledIndex = translatePosition(text, position, map);
+	if (compiledIndex === -1) {
+		return [];
+	}
+
+	const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
+	if (!completions) {
+		return [];
+	}
+
+	//console.log(JSON.stringify(completions, null, 2));
+	return completions.entries.map((e: any) => {
+		return {
+			label: e.name,
+			kind: e.kind,
+			sortText: e.sortText,
+			// I guess these ones?
+			commitCharacters: [".", ",", ";", "("],
+			// TODO: need to get these somehow
+			detail: e.detail,
+			documentation: e.documentation,
+		} satisfies CompletionItem;
+	});
+}
+
+function doHover(document: TextDocument, position: Position): Hover | null {
+	const filename = url.fileURLToPath(document.uri);
+	const key = filename.replace(/\.torp$/, ".ts");
+	const text = document.getText();
+	loadTypeScriptEnv(filename, key);
+	const transformed = transform(text);
+	const { content, map } = transformed;
+	updateVirtualFile(key, content);
+
+	let compiledIndex = translatePosition(text, position, map);
+	if (compiledIndex === -1) {
+		return null;
+	}
+
+	const info = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
+	if (!info) {
+		return null;
+	}
+
+	// Stole this from the Svelte extension:
+	let declaration = ts.displayPartsToString(info.displayParts);
+	const documentation = getMarkdownDocumentation(info.documentation, info.tags);
+	// https://microsoft.github.io/language-server-protocol/specification#textDocument_hover
+	const contents = ["```typescript", declaration, "```"]
+		.concat(documentation ? ["---", documentation] : [])
+		.join("\n");
+
+	return {
+		contents,
+	};
+}
+
+function translatePosition(text: string, position: Position, map: any): number {
+	// HACK: maybe we need to generate lineMaps
+	let index = 0;
+	let line = 0;
+	for (; index < text.length; index++) {
+		if (text[index] === "\n") {
+			line++;
+			if (line === position.line) {
+				index += position.character + 1;
+				break;
+			}
+		}
+	}
+	const mapped = map.find((m: any) => index >= m.source.start && index <= m.source.end);
+	if (!mapped) {
+		return -1;
+	}
+	return mapped.compiled.start + (index - mapped.source.start);
+}
+
+function doValidation(document: TextDocument) {
+	const filename = url.fileURLToPath(document.uri);
+	const key = filename.replace(/\.torp$/, ".ts");
+	const text = document.getText();
+	loadTypeScriptEnv(filename, key);
+	const transformed = transform(text);
+
+	// If there were parse or build errors, return them immediately
+	// TODO: Do we want to clear the virtual file??
+	if (!transformed.ok) {
+		return transformed.errors.map((e: any) => {
+			return {
+				message: e.message,
+				range: {
+					start: { line: e.startLine, character: e.startChar },
+					end: { line: e.endLine, character: e.endChar },
+				},
+			} satisfies Diagnostic;
+		});
+	}
+
+	const { content, map } = transformed;
+	updateVirtualFile(key, content);
+
+	//console.log(content);
+	const diagnostics = [
+		...env.languageService.getSemanticDiagnostics(key),
+		...env.languageService.getSyntacticDiagnostics(key),
+	]
+		.map((d: ts.Diagnostic) => {
+			// Find the mapping between source and compiled, if it
+			// exists. If it doesn't exist, the error must be in
+			// non-user code. Not great, but the user doesn't need to
+			// know about it
+			let start = d.start ?? 0;
+			let end = (d.start ?? 0) + (d.length ?? 0);
+			let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
+
+			// HACK: Couldn't map back to the source, so return a
+			// special message that will be removed with `filter`
+			if (!mapped) {
+				// Log it for diagnostics
+				console.log("Error in generated code: ", d.messageText);
+				// @ts-ignore
+				const lineMap: number[] = d.file?.lineMap;
+				if (lineMap) {
+					const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
+					const char = start - lineMap[line];
+					console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+				}
+
+				return {
+					message: "!",
+					range: {
+						start: { line: 0, character: 0 },
+						end: { line: 0, character: 0 },
+					},
+				} satisfies Diagnostic;
+			}
+
+			// We have the mapping, so we know roughly where in the
+			// source the error occurs, but now we need to narrow it
+			// down to the exact location
+			let sourceStart = mapped.source.start + start - mapped.compiled.start;
+			let sourceEnd = mapped.source.start + end - mapped.compiled.start;
+
+			// TODO: Store this, so we don't need to start from 0 every time
+			let lastLineStart = 0;
+			let startLine = 0;
+			for (let i = 0; i < sourceStart; i++) {
+				if (text[i] === "\n") {
+					lastLineStart = i;
+					startLine++;
+				}
+			}
+			let startChar = sourceStart - lastLineStart - 1;
+			let endLine = startLine;
+			for (let i = sourceStart; i < sourceEnd; i++) {
+				if (text[i] === "\n") {
+					lastLineStart = i;
+					endLine++;
+				}
+			}
+			let endChar = sourceEnd - lastLineStart - 1;
+
+			let message = String(d.messageText);
+			if (typeof d.messageText !== "string") {
+				// HACK: I think this should get the messages in the
+				// right order? But who knows...
+				function getMessages(chain: DiagnosticMessageChain, messages: string[]) {
+					messages.push(chain.messageText);
+					if (chain.next !== undefined) {
+						for (let next of chain.next) {
+							getMessages(next, messages);
+						}
+					}
+				}
+				let messages: string[] = [];
+				getMessages(d.messageText, messages);
+				message = messages.join("\n");
+			}
+			return {
+				message,
+				range: {
+					start: {
+						line: startLine,
+						character: startChar,
+					},
+					end: {
+						line: endLine,
+						character: endChar,
+					},
+				},
+			} satisfies Diagnostic;
+		})
+		.filter((d) => d.message !== "!");
+
+	//console.log(JSON.stringify(diagnostics, null, 2));
+	return diagnostics;
 }
 
 function loadTypeScriptEnv(filename: string, key: string) {
