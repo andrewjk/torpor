@@ -48,7 +48,7 @@ function doComplete(document: TextDocument, position: Position) {
 	const key = filename.replace(/\.torp$/, ".ts");
 	const text = document.getText();
 	loadTypeScriptEnv(filename, key);
-	const transformed = transform(text);
+	const transformed = transform(filename, text);
 	const { content, map } = transformed;
 	updateVirtualFile(key, content);
 
@@ -95,7 +95,7 @@ function doHover(document: TextDocument, position: Position): Hover | null {
 	const key = filename.replace(/\.torp$/, ".ts");
 	const text = document.getText();
 	loadTypeScriptEnv(filename, key);
-	const transformed = transform(text);
+	const transformed = transform(filename, text);
 	const { content, map } = transformed;
 	updateVirtualFile(key, content);
 
@@ -147,7 +147,7 @@ function doValidation(document: TextDocument) {
 	const key = filename.replace(/\.torp$/, ".ts");
 	const text = document.getText();
 	loadTypeScriptEnv(filename, key);
-	const transformed = transform(text);
+	const transformed = transform(filename, text);
 
 	// If there were parse or build errors, return them immediately
 	// TODO: Do we want to clear the virtual file??
@@ -368,7 +368,7 @@ interface TransformResult {
 	map: any;
 }
 
-function transform(source: string): TransformResult {
+function transform(filename: string, source: string): TransformResult {
 	try {
 		// replaceImportFileNames(source, projectRoot);
 
@@ -387,7 +387,7 @@ function transform(source: string): TransformResult {
 
 		let { code, map } = torpor.build(parsed.template, { mapped: true });
 
-		code = importFileTypes(code);
+		code = importFileTypes(filename, code);
 
 		return {
 			ok: true,
@@ -433,7 +433,8 @@ function replaceImportFileNames(source: string): string {
 	return source;
 }
 */
-function importFileTypes(content: string): string {
+function importFileTypes(filename: string, content: string): string {
+	const filepath = path.dirname(filename);
 	// Build imported component files as types
 	// TODO: Cache the imported files
 	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
@@ -441,15 +442,15 @@ function importFileTypes(content: string): string {
 	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
 	for (let match of imports) {
 		const value = match[0];
-		let file = match[2];
+		let importFile = match[2];
 
-		if (!file.includes(".torp")) continue;
+		if (!importFile.includes(".torp")) continue;
 
 		if (
-			(file.startsWith("'") && file.endsWith("'")) ||
-			(file.startsWith('"') && file.endsWith('"'))
+			(importFile.startsWith("'") && importFile.endsWith("'")) ||
+			(importFile.startsWith('"') && importFile.endsWith('"'))
 		) {
-			file = file.substring(1, file.length - 1);
+			importFile = importFile.substring(1, importFile.length - 1);
 		}
 
 		content = content.replace(value, " ".repeat(value.length));
@@ -457,21 +458,23 @@ function importFileTypes(content: string): string {
 		if (tsConfig.paths) {
 			for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
 				for (let destGlob of paths) {
-					file = pathReplace(srcGlob, destGlob, file);
+					importFile = pathReplace(srcGlob, destGlob, importFile);
 				}
 			}
 		}
 
-		const typeFile = path.join(projectRoot, file);
-		const typeSource = fs.readFileSync(typeFile, "utf8");
-		const typeParsed = torpor.parse(typeSource);
-		if (typeParsed.template) {
-			const typeContent = torpor
-				.buildType(typeParsed.template!)
-				// TODO: Handle imports with more finesse
-				.replaceAll('import { type SlotRender } from "@torpor/view";', "")
-				.replaceAll(/export default (.+?);/g, "");
-			content += "\n" + typeContent;
+		const typeFile = path.join(filepath, importFile);
+		if (fs.existsSync(typeFile)) {
+			const typeSource = fs.readFileSync(typeFile, "utf8");
+			const typeParsed = torpor.parse(typeSource);
+			if (typeParsed.ok && typeParsed.template) {
+				const typeContent = torpor
+					.buildType(typeParsed.template!)
+					// TODO: Handle imports with more finesse
+					.replaceAll('import { type SlotRender } from "@torpor/view";', "")
+					.replaceAll(/export default (.+?);/g, "");
+				content += "\n" + typeContent;
+			}
 		}
 	}
 	return content;

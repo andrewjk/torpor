@@ -6,9 +6,16 @@
 **/tsconfig.base.json
 contributing.md
 .travis.yml
-client/node_modules/**
+
+# client
+# client/node_modules/**
 !client/node_modules/vscode-jsonrpc/**
 !client/node_modules/vscode-languageclient/**
 !client/node_modules/vscode-languageserver-protocol/**
 !client/node_modules/vscode-languageserver-types/**
 !client/node_modules/semver/**
+
+# server
+# server/node_modules/**
+# lib/*.d.ts files are needed for typescript-vfs
+!server/node_modules/typescript/lib/*.d.ts
