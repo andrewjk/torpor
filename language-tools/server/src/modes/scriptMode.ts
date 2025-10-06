@@ -9,8 +9,8 @@ import { CompletionItem, Diagnostic, Hover, LanguageMode, Position } from "../la
 import pathReplace from "../utils/pathReplace";
 import { getMarkdownDocumentation } from "../utils/previewer";
 
-//const torpor = require("@torpor/view/compile");
-const torpor = require("../../../../packages/view/dist/compile");
+const torpor = require("@torpor/view/compile");
+//const torpor = require("../../../../packages/view/dist/compile");
 const tsvfs = require("@typescript/vfs");
 
 // This is just the default config, it should be overwritten by the one from the
