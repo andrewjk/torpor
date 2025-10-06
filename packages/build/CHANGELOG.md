@@ -1,5 +1,36 @@
 # @torpor/build
 
+## 0.3.0
+
+### Minor Changes
+
+- 51dbba7: Chore: drop CJS build and go ESM only
+- 62b0d2e: !Edit: renamed responses and updated documentation
+
+### Patch Changes
+
+- bbdc8d3: Feat: return form errors from the server
+- e1ae2bb: Feat: load and reload methods for navigation
+- Updated dependencies [be98b35]
+- Updated dependencies [51dbba7]
+- Updated dependencies [2298a87]
+- Updated dependencies [3a8431a]
+- Updated dependencies [eb58d37]
+- Updated dependencies [e0637be]
+- Updated dependencies [9fcc613]
+- Updated dependencies [f5f84e6]
+- Updated dependencies [6cc57ff]
+- Updated dependencies [c4f9d18]
+- Updated dependencies [5598bc9]
+- Updated dependencies [18f1ccf]
+- Updated dependencies [c2b5c02]
+- Updated dependencies [91d1536]
+- Updated dependencies [4dc16df]
+- Updated dependencies [543b229]
+- Updated dependencies [3cf3ae6]
+  - @torpor/view@0.3.0
+  - @torpor/unplugin@0.2.0
+
 ## 0.2.0
 
 ### Minor Changes

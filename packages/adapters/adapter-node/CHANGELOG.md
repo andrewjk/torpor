@@ -1,5 +1,19 @@
 # @torpor/adapter-node
 
+## 0.1.0
+
+### Minor Changes
+
+- 51dbba7: Chore: drop CJS build and go ESM only
+
+### Patch Changes
+
+- Updated dependencies [bbdc8d3]
+- Updated dependencies [e1ae2bb]
+- Updated dependencies [51dbba7]
+- Updated dependencies [62b0d2e]
+  - @torpor/build@0.3.0
+
 ## 0.0.30
 
 ### Patch Changes

@@ -1,5 +1,30 @@
 # @torpor/view
 
+## 0.3.0
+
+### Minor Changes
+
+- 51dbba7: Chore: drop CJS build and go ESM only
+- 9fcc613: Feat: add proper signals reactivity
+- c4f9d18: !Feat: replaced <:head> with @head
+- 5598bc9: !Feat: remove `:` from special tags and attributes
+- c2b5c02: Feat: source maps
+
+### Patch Changes
+
+- be98b35: Fix: keep options when setting a new proxied value
+- 2298a87: Fix: SVG classes
+- 3a8431a: Fix: run @ifs, @switches and @awaits with a closure signal
+- eb58d37: Feat: ReactiveDate wrapper for use in reactive state
+- e0637be: Fix: moving a range that was in a fragment
+- f5f84e6: Fix: slightly better global style parsing
+- 6cc57ff: Fix: don't double render slots
+- 18f1ccf: Perf: combine fragment effects
+- 91d1536: Fix: re-check whether the parent is a fragment
+- 4dc16df: Fix: slightly better selector style parsing
+- 543b229: Fix: run @ifs and @switches with an index signal
+- 3cf3ae6: Fix: skip hydration start when getting the root
+
 ## 0.2.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/unplugin",
-	"version": "0.1.17",
+	"version": "0.2.0",
 	"description": "Unplugin package to compile Torpor components for Vite, Rollup, and other bundlers",
 	"keywords": [
 		"torpor",

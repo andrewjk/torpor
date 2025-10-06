@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/create-build",
-	"version": "0.1.3",
+	"version": "0.2.0",
 	"description": "A starter template for building an app or site with Torpor Build",
 	"publishConfig": {
 		"access": "public"

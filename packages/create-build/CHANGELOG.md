@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 0.2.0
+
+### Minor Changes
+
+- 51dbba7: Chore: drop CJS build and go ESM only
+
 ## 0.1.3
 
 ### Patch Changes

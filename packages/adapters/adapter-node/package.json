@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/adapter-node",
-	"version": "0.0.30",
+	"version": "0.1.0",
 	"description": "A @torpor/build adapter for running on Node",
 	"type": "module",
 	"exports": {
