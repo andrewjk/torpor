@@ -18,7 +18,7 @@ export default function HomePage() {
 				<h1>Torpor</h1>
 			</div>
 			<p>
-				Torpor is a full-stack JavaScript framework that is designed for
+				Torpor is a full-stack JavaScript framework that aims for
 				simplicity and completeness.
 			</p>
 			<p class="warning">

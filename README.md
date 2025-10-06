@@ -1,6 +1,6 @@
 # Torpor
 
-Yet another JavaScript framework, designed for simplicity and completeness.
+Torpor is a full-stack JavaScript framework that aims for simplicity and completeness.
 
 🚧 WARNING: WORK IN PROGRESS 🚧
 

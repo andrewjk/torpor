@@ -9,7 +9,7 @@ export default function OverviewPage() {
 	@render {
 		<h1>Overview</h1>
 		<p>
-			Torpor is a JavaScript framework, designed for simplicity and completeness.
+			Torpor is a full-stack JavaScript framework that aims for simplicity and completeness.
 		</p>
 		<p class="warning">
 			🚧 WARNING: WORK IN PROGRESS 🚧

@@ -1,7 +1,7 @@
 {
 	"name": "@torpor/workspace",
 	"version": "0.0.1",
-	"description": "Yet another JavaScript framework, designed for simplicity and completeness",
+	"description": "A full-stack JavaScript framework that aims for simplicity and completeness",
 	"type": "module",
 	"main": "index.js",
 	"private": true,
