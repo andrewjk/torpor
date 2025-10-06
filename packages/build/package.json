@@ -55,16 +55,16 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"cookie": "^1.0.2",
-		"dotenv": "^17.2.2",
-		"vite": "^7.1.6",
+		"dotenv": "^17.2.3",
+		"vite": "^7.1.9",
 		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@typescript/native-preview": "7.0.0-dev.20250918.1",
+		"@typescript/native-preview": "7.0.0-dev.20251005.1",
 		"oxlint-tsgolint": "^0.2.0",
-		"tsdown": "^0.15.2",
-		"typescript": "^5.9.2",
+		"tsdown": "^0.15.6",
+		"typescript": "^5.9.3",
 		"vitest": "^3.2.4"
 	}
 }

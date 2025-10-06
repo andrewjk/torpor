@@ -23,10 +23,10 @@
 		"sucrase": "^3.35.0"
 	},
 	"devDependencies": {
-		"@typescript/native-preview": "7.0.0-dev.20250918.1",
+		"@typescript/native-preview": "7.0.0-dev.20251005.1",
 		"oxlint-tsgolint": "^0.2.0",
-		"tsx": "^4.20.5",
-		"typescript": "^5.9.2",
-		"wrangler": "^4.38.0"
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3",
+		"wrangler": "^4.42.0"
 	}
 }
