@@ -4,7 +4,7 @@ This is the Visual Studio Code language server for [Torpor](https://torpor.dev) 
 
 Torpor is yet another JavaScript framework, designed for simplicity and completeness.
 
-The language server provides syntax highlighting for `.torp` files, which contain components, and look something like this:
+The language server provides syntax highlighting, type checking and auto-completion for `.torp` files, which look something like this:
 
 ```
 /**
