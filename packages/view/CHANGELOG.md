@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.3.1
+
+### Patch Changes
+
+- 29f5441: Chore: re-add the CJS build for @torpor/view
+
 ## 0.3.0
 
 ### Minor Changes
