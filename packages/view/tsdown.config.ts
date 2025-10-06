@@ -7,7 +7,7 @@ type Config =
 
 export default defineConfig({
 	entry: ["src/index.ts", "src/compile.ts", "src/ssr.ts"],
-	format: "esm",
+	format: ["esm", "cjs"],
 	dts: true,
 	sourcemap: true,
 }) satisfies Config as Config;

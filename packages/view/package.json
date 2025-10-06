@@ -6,15 +6,18 @@
 	"exports": {
 		".": {
 			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"import": "./dist/index.js",
+			"require": "./dist/index.cjs"
 		},
 		"./compile": {
 			"types": "./dist/compile.d.ts",
-			"import": "./dist/compile.js"
+			"import": "./dist/compile.js",
+			"require": "./dist/compile.cjs"
 		},
 		"./ssr": {
 			"types": "./dist/ssr.d.ts",
-			"import": "./dist/ssr.js"
+			"import": "./dist/ssr.js",
+			"require": "./dist/ssr.cjs"
 		}
 	},
 	"publishConfig": {
