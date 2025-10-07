@@ -54,117 +54,142 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 }
 
 function doComplete(document: TextDocument, position: Position) {
-	const filename = url.fileURLToPath(document.uri);
-	const key = filename.replace(/\.torp$/, ".ts");
-	const text = document.getText();
-	loadTypeScriptEnv(filename, key);
-	const transformed = transform(filename, text);
-	const { content, map } = transformed;
-	updateVirtualFile(key, content);
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
 
-	let compiledIndex = translatePosition(text, position, map);
-	if (compiledIndex === -1) {
-		return [];
+		let compiledIndex = translatePosition(text, position, map);
+		if (compiledIndex === -1) {
+			return [];
+		}
+
+		const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
+		if (!completions) {
+			return [];
+		}
+
+		//console.log(JSON.stringify(completions, null, 2));
+		const result = completions.entries.map((e: any) => {
+			return {
+				label: e.name,
+				kind: e.kind,
+				sortText: e.sortText,
+				// HACK: completing a variable starting with `$` inserts another `$`
+				// This might not be the best way to solve this -- maybe use resolveProvider
+				insertText: e.insertText ?? (e.name.startsWith("$") ? e.name.substring(1) : e.name),
+				// I guess these ones?
+				commitCharacters: [".", ",", ";", "("],
+				// TODO: need to get these somehow
+				detail: e.detail,
+				documentation: e.documentation,
+			} satisfies CompletionItem;
+		});
+		//console.log(JSON.stringify(result, null, 2));
+
+		return result;
+	} catch (ex) {
+		console.log("COMPLETE ERROR:", ex);
+		return null;
 	}
-
-	const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
-	if (!completions) {
-		return [];
-	}
-
-	//console.log(JSON.stringify(completions, null, 2));
-	const result = completions.entries.map((e: any) => {
-		return {
-			label: e.name,
-			kind: e.kind,
-			sortText: e.sortText,
-			// HACK: completing a variable starting with `$` inserts another `$`
-			// This might not be the best way to solve this -- maybe use resolveProvider
-			insertText: e.insertText ?? (e.name.startsWith("$") ? e.name.substring(1) : e.name),
-			// I guess these ones?
-			commitCharacters: [".", ",", ";", "("],
-			// TODO: need to get these somehow
-			detail: e.detail,
-			documentation: e.documentation,
-		} satisfies CompletionItem;
-	});
-	//console.log(JSON.stringify(result, null, 2));
-	return result;
 }
 
 function doHover(document: TextDocument, position: Position): Hover | null {
-	const filename = url.fileURLToPath(document.uri);
-	const key = filename.replace(/\.torp$/, ".ts");
-	const text = document.getText();
-	loadTypeScriptEnv(filename, key);
-	const transformed = transform(filename, text);
-	const { content, map } = transformed;
-	updateVirtualFile(key, content);
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
 
-	let compiledIndex = translatePosition(text, position, map);
-	if (compiledIndex === -1) {
+		let compiledIndex = translatePosition(text, position, map);
+		if (compiledIndex === -1) {
+			return null;
+		}
+
+		const info = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
+		if (!info) {
+			return null;
+		}
+
+		// Stole this from the Svelte extension:
+		let declaration = ts.displayPartsToString(info.displayParts);
+		const documentation = getMarkdownDocumentation(info.documentation, info.tags);
+		// https://microsoft.github.io/language-server-protocol/specification#textDocument_hover
+		const contents = ["```typescript", declaration, "```"]
+			.concat(documentation ? ["---", documentation] : [])
+			.join("\n");
+
+		return {
+			contents,
+		};
+	} catch (ex) {
+		console.log("HOVER ERROR:", ex);
 		return null;
 	}
-
-	const info = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
-	if (!info) {
-		return null;
-	}
-
-	// Stole this from the Svelte extension:
-	let declaration = ts.displayPartsToString(info.displayParts);
-	const documentation = getMarkdownDocumentation(info.documentation, info.tags);
-	// https://microsoft.github.io/language-server-protocol/specification#textDocument_hover
-	const contents = ["```typescript", declaration, "```"]
-		.concat(documentation ? ["---", documentation] : [])
-		.join("\n");
-
-	return {
-		contents,
-	};
 }
 
 function doDefinition(document: TextDocument, position: Position): Definition | null {
-	const filename = url.fileURLToPath(document.uri);
-	const key = filename.replace(/\.torp$/, ".ts");
-	const text = document.getText();
-	loadTypeScriptEnv(filename, key);
-	const transformed = transform(filename, text);
-	const { content, map } = transformed;
-	updateVirtualFile(key, content);
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
 
-	let compiledIndex = translatePosition(text, position, map);
-	if (compiledIndex === -1) {
+		let compiledIndex = translatePosition(text, position, map);
+		if (compiledIndex === -1) {
+			return null;
+		}
+
+		const defs = env.languageService.getDefinitionAtPosition(key, compiledIndex);
+		if (!defs || !defs.length) {
+			return null;
+		}
+
+		let definitionFile = defs[0].fileName;
+		// HACK: We could maintain a map or something here, but I'm just assuming
+		// it's a component file for now
+		if (!fs.existsSync(definitionFile)) {
+			definitionFile = definitionFile.replace(".ts", ".torp");
+		}
+		if (!fs.existsSync(definitionFile)) {
+			return null;
+		}
+
+		const definitionSource = fs.readFileSync(definitionFile, "utf8");
+
+		// TODO: Get the definition map for translating the definition range
+
+		return {
+			uri: definitionFile,
+			range: getRange(
+				definitionSource,
+				defs[0].textSpan.start,
+				defs[0].textSpan.start + defs[0].textSpan.length,
+			),
+		};
+	} catch (ex) {
+		console.log("DEFINITION ERROR:", ex);
 		return null;
 	}
-
-	const defs = env.languageService.getDefinitionAtPosition(key, compiledIndex);
-	if (!defs || !defs.length) {
-		return null;
-	}
-
-	let definitionFile = defs[0].fileName;
-	// HACK: We could maintain a map or something here, but I'm just assuming
-	// it's a component file for now
-	if (!fs.existsSync(definitionFile)) {
-		definitionFile = definitionFile.replace(".ts", ".torp");
-	}
-	if (!fs.existsSync(definitionFile)) {
-		return null;
-	}
-
-	const definitionSource = fs.readFileSync(definitionFile, "utf8");
-
-	// TODO: Get the definition map for translating the definition range
-
-	return {
-		uri: definitionFile,
-		range: getRange(
-			definitionSource,
-			defs[0].textSpan.start,
-			defs[0].textSpan.start + defs[0].textSpan.length,
-		),
-	};
 }
 
 function getRange(text: string, start: number, end: number): Range {
@@ -376,12 +401,11 @@ function loadTypeScriptEnv(filename: string, key: string) {
 
 function updateVirtualFile(key: string, content: string) {
 	if (!virtualFiles.has(key)) {
-		virtualFiles.set(key, content);
 		env.createFile(key, content);
 	} else {
-		virtualFiles.set(key, content);
 		env.updateFile(key, content);
 	}
+	virtualFiles.set(key, content);
 }
 
 function loadTypeScriptConfig(): Record<string, any> | undefined {
