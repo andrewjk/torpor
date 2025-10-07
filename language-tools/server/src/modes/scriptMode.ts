@@ -485,7 +485,7 @@ function importComponentFiles(filename: string, content: string, map: any): stri
 
 	// Build imported component files and add them to the virtual file map
 	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
-	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
+	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gms);
 	for (let match of imports) {
 		const value = match[0];
 		const names = match[1];
