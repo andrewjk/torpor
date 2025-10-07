@@ -75,6 +75,13 @@ function parseTagAttributes(status: ParseStatus): Attribute[] {
 		} else if (accept("/>", status, false) || accept(">", status, false)) {
 			// That's the end of the attributes
 			break;
+		} else if (
+			accept("<", status, false) ||
+			accept("@", status, false) ||
+			accept("}", status, false)
+		) {
+			// It's an unclosed tag -- just bail out here
+			break;
 		} else {
 			const attribute = parseAttribute(status);
 			attributes.push(attribute);
