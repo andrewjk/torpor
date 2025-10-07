@@ -73,11 +73,14 @@ function doComplete(document: TextDocument, position: Position) {
 	}
 
 	//console.log(JSON.stringify(completions, null, 2));
-	return completions.entries.map((e: any) => {
+	const result = completions.entries.map((e: any) => {
 		return {
 			label: e.name,
 			kind: e.kind,
 			sortText: e.sortText,
+			// HACK: completing a variable starting with `$` inserts another `$`
+			// This might not be the best way to solve this -- maybe use resolveProvider
+			insertText: e.insertText ?? (e.name.startsWith("$") ? e.name.substring(1) : e.name),
 			// I guess these ones?
 			commitCharacters: [".", ",", ";", "("],
 			// TODO: need to get these somehow
@@ -85,6 +88,8 @@ function doComplete(document: TextDocument, position: Position) {
 			documentation: e.documentation,
 		} satisfies CompletionItem;
 	});
+	//console.log(JSON.stringify(result, null, 2));
+	return result;
 }
 
 function doHover(document: TextDocument, position: Position): Hover | null {
