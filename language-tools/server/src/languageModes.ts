@@ -6,6 +6,7 @@ import {
 	getLanguageService as getHTMLLanguageService,
 	Position,
 	Range,
+	Definition,
 } from "vscode-html-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { getCSSMode } from "./modes/cssMode";
@@ -21,6 +22,7 @@ export interface LanguageMode {
 	doValidation?: (document: TextDocument) => Diagnostic[];
 	doComplete?: (document: TextDocument, position: Position) => CompletionList;
 	doHover?: (document: TextDocument, position: Position) => Hover | null;
+	doDefinition?: (document: TextDocument, position: Position) => Definition | null;
 	onDocumentRemoved(document: TextDocument): void;
 	dispose(): void;
 }

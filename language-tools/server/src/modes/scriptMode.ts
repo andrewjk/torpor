@@ -5,7 +5,15 @@ import ts, { DiagnosticMessageChain } from "typescript";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
-import { CompletionItem, Diagnostic, Hover, LanguageMode, Position } from "../languageModes";
+import {
+	CompletionItem,
+	Definition,
+	Diagnostic,
+	Hover,
+	LanguageMode,
+	Position,
+	Range,
+} from "../languageModes";
 import pathReplace from "../utils/pathReplace";
 import { getMarkdownDocumentation } from "../utils/previewer";
 
@@ -34,6 +42,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 		doComplete,
 		doValidation,
 		doHover,
+		doDefinition,
 		onDocumentRemoved(_document: TextDocument) {
 			/* nothing to do */
 		},
@@ -120,6 +129,59 @@ function doHover(document: TextDocument, position: Position): Hover | null {
 	return {
 		contents,
 	};
+}
+
+function doDefinition(document: TextDocument, position: Position): Definition | null {
+	const filename = url.fileURLToPath(document.uri);
+	const key = filename.replace(/\.torp$/, ".ts");
+	const text = document.getText();
+	loadTypeScriptEnv(filename, key);
+	const transformed = transform(filename, text);
+	const { content, map } = transformed;
+	updateVirtualFile(key, content);
+
+	let compiledIndex = translatePosition(text, position, map);
+	if (compiledIndex === -1) {
+		return null;
+	}
+
+	const defs = env.languageService.getDefinitionAtPosition(key, compiledIndex);
+	if (!defs || !defs.length) {
+		return null;
+	}
+
+	let definitionFile = defs[0].fileName;
+	const definitionSource = fs.readFileSync(definitionFile, "utf8");
+
+	return {
+		uri: definitionFile,
+		range: getRange(
+			definitionSource,
+			defs[0].textSpan.start,
+			defs[0].textSpan.start + defs[0].textSpan.length,
+		),
+	};
+}
+
+function getRange(text: string, start: number, end: number): Range {
+	let line = 0;
+	let lastLineStart = 0;
+	let range = { start: { line: 0, character: 0 }, end: { line: 0, character: 0 } };
+	for (let i = 0; i < text.length; i++) {
+		if (text[i] === "\n") {
+			line++;
+			lastLineStart = i;
+		}
+		if (i === start) {
+			range.start.line = line;
+			range.start.character = start - lastLineStart - 1;
+		} else if (i === end) {
+			range.end.line = line;
+			range.end.character = end - lastLineStart - 1;
+			break;
+		}
+	}
+	return range;
 }
 
 function translatePosition(text: string, position: Position, map: any): number {
