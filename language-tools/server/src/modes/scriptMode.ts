@@ -29,6 +29,7 @@ let tsConfig: ts.CompilerOptions = {
 	moduleResolution: ts.ModuleResolutionKind.Bundler,
 	esModuleInterop: true,
 };
+let tsConfigPath: string | undefined;
 
 let projectRoot = "";
 let virtualFiles = new Map<string, string>();
@@ -60,19 +61,6 @@ function doComplete(document: TextDocument, position: Position) {
 	const transformed = transform(filename, text);
 	const { content, map } = transformed;
 	updateVirtualFile(key, content);
-
-	// HACK: maybe we need to generate lineMaps
-	let index = 0;
-	let line = 0;
-	for (; index < text.length; index++) {
-		if (text[index] === "\n") {
-			line++;
-			if (line === position.line) {
-				index += position.character + 1;
-				break;
-			}
-		}
-	}
 
 	let compiledIndex = translatePosition(text, position, map);
 	if (compiledIndex === -1) {
@@ -151,7 +139,18 @@ function doDefinition(document: TextDocument, position: Position): Definition | 
 	}
 
 	let definitionFile = defs[0].fileName;
+	// HACK: We could maintain a map or something here, but I'm just assuming
+	// it's a component file for now
+	if (!fs.existsSync(definitionFile)) {
+		definitionFile = definitionFile.replace(".ts", ".torp");
+	}
+	if (!fs.existsSync(definitionFile)) {
+		return null;
+	}
+
 	const definitionSource = fs.readFileSync(definitionFile, "utf8");
+
+	// TODO: Get the definition map for translating the definition range
 
 	return {
 		uri: definitionFile,
@@ -229,6 +228,8 @@ function doValidation(document: TextDocument) {
 	updateVirtualFile(key, content);
 
 	//console.log(content);
+	//console.log(map);
+
 	const diagnostics = [
 		...env.languageService.getSemanticDiagnostics(key),
 		...env.languageService.getSyntacticDiagnostics(key),
@@ -358,24 +359,6 @@ function loadTypeScriptEnv(filename: string, key: string) {
 			console.log("No tsconfig.json file found, using default");
 		}
 
-		// NOTE: We can do this, and it works, but it seems like it
-		// might use a lot of memory and be quite slow? Instead, we're
-		// just inserting type definitions from components in the bottom
-		// of the source code where they won't interfere with anything
-
-		// Import all `.torp` files
-		// TODO: Work on making compilation faster!
-		// TODO: Use tsconfig include paths instead of "src"
-		//let torporFiles: string[] = [];
-		//walk(path.join(projectRoot, "src"), torporFiles);
-		//for (let projectFile of torporFiles) {
-		//	console.log(projectFile);
-		//	const source = fs.readFileSync(projectFile, "utf8");
-		//	const { content } = transform(source, projectRoot);
-		//	const projectFileKey = projectFile.replace(/\.torp$/, ".ts");
-		//	virtualFiles.set(projectFileKey, content);
-		//}
-
 		// Push a dummy file into the map, it will get updated shortly
 		virtualFiles.set(key, "const x = 5;");
 
@@ -399,6 +382,7 @@ function updateVirtualFile(key: string, content: string) {
 function loadTypeScriptConfig(): Record<string, any> | undefined {
 	const configFileName = ts.findConfigFile(projectRoot, ts.sys.fileExists);
 	if (configFileName) {
+		tsConfigPath = path.dirname(configFileName);
 		const configFile = ts.readConfigFile(configFileName, ts.sys.readFile);
 		return ts.parseJsonConfigFileContent(configFile.config, ts.sys, projectRoot);
 	}
@@ -432,8 +416,6 @@ interface TransformResult {
 
 function transform(filename: string, source: string): TransformResult {
 	try {
-		// replaceImportFileNames(source, projectRoot);
-
 		// Build the main file as a component
 		const parsed = torpor.parse(source);
 
@@ -449,7 +431,7 @@ function transform(filename: string, source: string): TransformResult {
 
 		let { code, map } = torpor.build(parsed.template, { mapped: true });
 
-		code = importFileTypes(filename, code);
+		code = importComponentFiles(filename, code, map);
 
 		return {
 			ok: true,
@@ -468,42 +450,16 @@ function transform(filename: string, source: string): TransformResult {
 		};
 	}
 }
-/*
-function replaceImportFileNames(source: string): string {
-	// Replace `.torp` imports with `.ts` and any imports in `@/` with `src/`
-	const imports = source.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
-	for (let match of imports) {
-		const value = match[0];
-		const name = match[1];
-		let file = match[2];
 
-		if (
-			(file.startsWith("'") && file.endsWith("'")) ||
-			(file.startsWith('"') && file.endsWith('"'))
-		) {
-			file = file.substring(1, file.length - 1);
-		}
-
-		if (!file.endsWith(".torp")) continue;
-
-		// TODO: Get this from tsconfig, if set by the user
-		if (file.startsWith("@/")) file = file.replace("@/", "src/");
-		if (!file.startsWith("/")) file = path.resolve(projectRoot, file);
-
-		source = source.replace(value, `import ${name} from "${file.replace(".torp", "")}";`);
-	}
-	return source;
-}
-*/
-function importFileTypes(filename: string, content: string): string {
+function importComponentFiles(filename: string, content: string, map: any): string {
 	const filepath = path.dirname(filename);
-	// Build imported component files as types
-	// TODO: Cache the imported files
+
+	// Build imported component files and add them to the virtual file map
 	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
-	// TODO: Get the code from virtualFiles if set, in case it has been edited and not saved
 	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gm);
 	for (let match of imports) {
 		const value = match[0];
+		const names = match[1];
 		let importFile = match[2];
 
 		if (!importFile.includes(".torp")) continue;
@@ -515,29 +471,41 @@ function importFileTypes(filename: string, content: string): string {
 			importFile = importFile.substring(1, importFile.length - 1);
 		}
 
-		content = content.replace(value, " ".repeat(value.length));
-
-		if (tsConfig.paths) {
+		if (tsConfigPath && tsConfig.paths) {
+			// HACK: Get the longest match etc
+			const oldImportFile = importFile;
 			for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
 				for (let destGlob of paths) {
 					importFile = pathReplace(srcGlob, destGlob, importFile);
 				}
 			}
-		}
-
-		const typeFile = path.join(filepath, importFile);
-		if (fs.existsSync(typeFile)) {
-			const typeSource = fs.readFileSync(typeFile, "utf8");
-			const typeParsed = torpor.parse(typeSource);
-			if (typeParsed.ok && typeParsed.template) {
-				const typeContent = torpor
-					.buildType(typeParsed.template!)
-					// TODO: Handle imports with more finesse
-					.replaceAll('import { type SlotRender } from "@torpor/view";', "")
-					.replaceAll(/export default (.+?);/g, "");
-				content += "\n" + typeContent;
+			// The import may now be relative to the tsconfig file, so make it absolute
+			if (importFile !== oldImportFile && importFile.startsWith(".")) {
+				importFile = path.join(tsConfigPath, importFile);
 			}
 		}
+
+		const typeFile = importFile.startsWith(".") ? path.join(filepath, importFile) : importFile;
+		if (!virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
+			const typeSource = fs.readFileSync(typeFile, "utf8");
+			const { content } = transform(typeFile, typeSource);
+			const key = typeFile.replace(/\.torp$/, ".ts");
+			virtualFiles.set(key, content);
+			env.createFile(key, content);
+		}
+
+		let oldLength = content.length;
+		let newValue = typeFile.replace(".torp", ".ts");
+		content = content.replace(value, `import ${names} from "${newValue}";`);
+
+		// Move subsequent ranges around
+		// TODO: Add a range for the changed import
+		let diff = content.length - oldLength;
+		for (let mapped of map) {
+			mapped.compiled.start += diff;
+			mapped.compiled.end += diff;
+		}
 	}
+
 	return content;
 }

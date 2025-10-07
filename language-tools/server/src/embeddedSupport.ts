@@ -118,6 +118,20 @@ function getRenderRegions(start: number, documentText: string, regions: Embedded
 		} else if (char === "<" && documentText.substring(i + 1).startsWith("!--")) {
 			// Skip HTML comments
 			i = documentText.indexOf("-->", i) + 2;
+		} else if (char === "<" && /[A-Z]/.test(documentText.substring(i + 1))) {
+			// Component names are function calls
+			i++;
+			regions.push({ languageId: "html", start, end: i });
+			start = i;
+			end = documentText.length;
+			for (let j = i; j < documentText.length; j++) {
+				if (/[\s>]/.test(documentText[j])) {
+					end = j;
+					break;
+				}
+			}
+			regions.push({ languageId: "script", start, end });
+			start = i = end;
 		} else if (char === '"' || char === "'") {
 			// Skip string contents
 			for (let j = i + 1; j < documentText.length; j++) {
