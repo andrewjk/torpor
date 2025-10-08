@@ -298,6 +298,12 @@ function doValidation(document: TextDocument) {
 	//console.log(content);
 	//console.log(map);
 
+	// HACK: Is this ok to do every check? We're doing it because otherwise
+	// changes to linked files (e.g. adding or removing a field in an interface)
+	// don't get picked up. But doing it here also means that it only happens
+	// when the file is edited...
+	env.languageService.cleanupSemanticCache();
+
 	const diagnostics = [
 		...env.languageService.getSemanticDiagnostics(key),
 		...env.languageService.getSyntacticDiagnostics(key),
@@ -316,7 +322,7 @@ function doValidation(document: TextDocument) {
 			if (!mapped) {
 				// Log it for diagnostics
 				console.log("Error in generated code: ", d.messageText);
-				// @ts-ignore
+				// @ts-ignore we know this exists
 				const lineMap: number[] = d.file?.lineMap;
 				if (lineMap) {
 					const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
