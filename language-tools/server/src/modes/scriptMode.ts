@@ -128,7 +128,8 @@ function doComplete(document: TextDocument, position: Position, context?: Comple
 					completion.textEdit = {
 						range: {
 							start: { line: position.line, character: position.character - 1 },
-							end: { line: position.line, character: position.character - 1 + e.name.length },
+							// TODO: What should end be?
+							end: { line: position.line, character: position.character - 1 },
 						},
 						newText: e.name,
 					};
