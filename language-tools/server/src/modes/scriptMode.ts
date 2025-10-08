@@ -48,7 +48,15 @@ let tsConfigPath: string | undefined;
 
 let projectRoot = "";
 let virtualFiles = new Map<string, string>();
+let virtualFileMaps = new Map<string, { sourceFile: string; map: SourceMap[] }>();
 let env: any; //tsvfs.VirtualTypeScriptEnvironment;
+
+// Copied from @torpor/view because I can't get the types out of there...
+interface SourceMap {
+	script: string;
+	source: { start: number; end: number };
+	compiled: { start: number; end: number };
+}
 
 export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): LanguageMode {
 	return {
@@ -79,7 +87,7 @@ function doComplete(document: TextDocument, position: Position, context?: Comple
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
@@ -149,7 +157,7 @@ function doHover(document: TextDocument, position: Position): Hover | null {
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
@@ -189,7 +197,7 @@ function doDefinition(document: TextDocument, position: Position): Definition | 
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
@@ -201,27 +209,20 @@ function doDefinition(document: TextDocument, position: Position): Definition | 
 			return null;
 		}
 
-		let definitionFile = defs[0].fileName;
-		// HACK: We could maintain a map or something here, but I'm just assuming
-		// it's a component file for now
-		if (!fs.existsSync(definitionFile)) {
-			definitionFile = definitionFile.replace(".ts", ".torp");
-		}
-		if (!fs.existsSync(definitionFile)) {
-			return null;
+		let { fileName, textSpan } = defs[0];
+		let fileMap = virtualFileMaps.get(fileName);
+		if (fileMap) {
+			fileName = fileMap.sourceFile;
 		}
 
-		const definitionSource = fs.readFileSync(definitionFile, "utf8");
+		const fileContent = fs.readFileSync(filename, "utf8");
 
-		// TODO: Get the definition map for translating the definition range
+		const start = fileMap ? compiledToSourceIndex(textSpan.start, fileMap.map) : textSpan.start;
+		const range = getRange(fileContent, start, start + textSpan.length);
 
 		return {
-			uri: definitionFile,
-			range: getRange(
-				definitionSource,
-				defs[0].textSpan.start,
-				defs[0].textSpan.start + defs[0].textSpan.length,
-			),
+			uri: fileName,
+			range,
 		};
 	} catch (ex) {
 		console.log("DEFINITION ERROR:", ex);
@@ -250,7 +251,7 @@ function getRange(text: string, start: number, end: number): Range {
 	return range;
 }
 
-function sourceToCompiledIndex(text: string, position: Position, map: any): number {
+function sourceToCompiledIndex(text: string, position: Position, map: SourceMap[]): number {
 	// HACK: maybe we need to generate lineMaps
 	let index = 0;
 	let line = 0;
@@ -292,7 +293,7 @@ function doValidation(document: TextDocument) {
 	}
 
 	const { content, map } = transformed;
-	updateVirtualFile(key, content);
+	updateVirtualFile(key, content, filename, map);
 
 	//console.log(content);
 	//console.log(map);
@@ -436,13 +437,14 @@ function loadTypeScriptEnv(filename: string, key: string) {
 	}
 }
 
-function updateVirtualFile(key: string, content: string) {
+function updateVirtualFile(key: string, content: string, sourceFile: string, map: SourceMap[]) {
 	if (!virtualFiles.has(key)) {
 		env.createFile(key, content);
 	} else {
 		env.updateFile(key, content);
 	}
 	virtualFiles.set(key, content);
+	virtualFileMaps.set(key, { sourceFile, map });
 }
 
 function loadTypeScriptConfig(): Record<string, any> | undefined {
@@ -477,7 +479,7 @@ interface TransformResult {
 	ok: boolean;
 	errors: any[];
 	content: string;
-	map: any;
+	map: SourceMap[];
 }
 
 function transform(filename: string, source: string): TransformResult {
@@ -517,7 +519,7 @@ function transform(filename: string, source: string): TransformResult {
 	}
 }
 
-function importComponentFiles(filename: string, content: string, map: any): string {
+function importComponentFiles(filename: string, content: string, map: SourceMap[]): string {
 	const filepath = path.dirname(filename);
 
 	// Build imported component files and add them to the virtual file map
@@ -590,8 +592,8 @@ export function getSelectionRanges(
 		if (!transformed.ok) {
 			return null;
 		}
-		const { content /*, map*/ } = transformed;
-		updateVirtualFile(key, content);
+		const { content, map } = transformed;
+		updateVirtualFile(key, content, filename, map);
 
 		let ranges: SelectionRange[] = [];
 
@@ -601,7 +603,7 @@ export function getSelectionRanges(
 
 		return ranges;
 	} catch (ex) {
-		console.log("COMPLETE ERROR:", ex);
+		console.log("SELECTION RANGE ERROR:", ex);
 		return null;
 	}
 }
@@ -621,7 +623,7 @@ export function getSemanticTokens(
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		const { spans }: Classifications = env.languageService.getEncodedSemanticClassifications(
 			key,
@@ -643,7 +645,7 @@ export function getSemanticTokens(
 
 		return sourceSpans;
 	} catch (ex) {
-		console.log("COMPLETE ERROR:", ex);
+		console.log("SEMANTIC TOKENS ERROR:", ex);
 		return null;
 	}
 }
@@ -662,7 +664,7 @@ export function getDocumentSymbols(
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		const tree: NavigationTree = env.languageService.getNavigationTree(key);
 
@@ -672,12 +674,17 @@ export function getDocumentSymbols(
 
 		return symbols;
 	} catch (ex) {
-		console.log("COMPLETE ERROR:", ex);
+		console.log("DOCUMENT SYMBOLS ERROR:", ex);
 		return null;
 	}
 }
 
-function collectSymbols(tree: NavigationTree, symbols: DocumentSymbol[], text: string, map: any) {
+function collectSymbols(
+	tree: NavigationTree,
+	symbols: DocumentSymbol[],
+	text: string,
+	map: SourceMap[],
+) {
 	//const range = rangeFromTextSpan(tree.nameSpan);
 	const span = tree.nameSpan ?? tree.spans[0];
 	const sourceIndex = span ? compiledToSourceIndex(span.start, map) : -1;
@@ -762,7 +769,7 @@ export function getImplementation(
 			return null;
 		}
 		const { content, map } = transformed;
-		updateVirtualFile(key, content);
+		updateVirtualFile(key, content, filename, map);
 
 		const compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
@@ -777,35 +784,28 @@ export function getImplementation(
 			return null;
 		}
 
-		let implementationFile = imps[0].fileName;
-		// HACK: We could maintain a map or something here, but I'm just assuming
-		// it's a component file for now
-		if (!fs.existsSync(implementationFile)) {
-			implementationFile = implementationFile.replace(".ts", ".torp");
-		}
-		if (!fs.existsSync(implementationFile)) {
-			return null;
+		let { fileName, textSpan } = imps[0];
+		let fileMap = virtualFileMaps.get(fileName);
+		if (fileMap) {
+			fileName = fileMap.sourceFile;
 		}
 
-		const implementationSource = fs.readFileSync(implementationFile, "utf8");
+		const fileContent = fs.readFileSync(filename, "utf8");
 
-		// TODO: Get the implementation map for translating the implementation range
+		const start = fileMap ? compiledToSourceIndex(textSpan.start, fileMap.map) : textSpan.start;
+		const range = getRange(fileContent, start, start + textSpan.length);
 
 		return {
-			uri: implementationFile,
-			range: getRange(
-				implementationSource,
-				imps[0].textSpan.start,
-				imps[0].textSpan.start + imps[0].textSpan.length,
-			),
+			uri: fileName,
+			range,
 		};
 	} catch (ex) {
-		console.log("COMPLETE ERROR:", ex);
+		console.log("IMPLEMENTATION ERROR:", ex);
 		return null;
 	}
 }
 
-function compiledToSourceIndex(index: number, map: any): number {
+function compiledToSourceIndex(index: number, map: SourceMap[]): number {
 	const mapped = map.find((m: any) => index >= m.compiled.start && index <= m.compiled.end);
 	if (!mapped) {
 		return -1;
