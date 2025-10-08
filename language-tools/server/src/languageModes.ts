@@ -14,13 +14,14 @@ import { getDocumentRegions, DocumentRegions } from "./embeddedSupport";
 import { getHTMLMode } from "./modes/htmlMode";
 import { getLanguageModelCache, LanguageModelCache } from "./languageModelCache";
 import { getScriptMode } from "./modes/scriptMode";
+import { CompletionContext } from 'vscode-languageserver';
 
 export * from "vscode-html-languageservice";
 
 export interface LanguageMode {
 	getId(): string;
 	doValidation?: (document: TextDocument) => Diagnostic[];
-	doComplete?: (document: TextDocument, position: Position) => CompletionList;
+	doComplete?: (document: TextDocument, position: Position, context?: CompletionContext) => CompletionList;
 	doHover?: (document: TextDocument, position: Position) => Hover | null;
 	doDefinition?: (document: TextDocument, position: Position) => Definition | null;
 	onDocumentRemoved(document: TextDocument): void;

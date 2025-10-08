@@ -1,7 +1,22 @@
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
-import ts, { DiagnosticMessageChain } from "typescript";
+import ts, {
+	Classifications,
+	DefinitionInfo,
+	DiagnosticMessageChain,
+	ImplementationLocation,
+	NavigationTree,
+	QuickInfo,
+} from "typescript";
+import {
+	CancellationToken,
+	CompletionContext,
+	DocumentSymbol,
+	Location,
+	SelectionRange,
+	SymbolKind,
+} from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { DocumentRegions } from "../embeddedSupport";
 import { LanguageModelCache } from "../languageModelCache";
@@ -53,7 +68,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 	};
 }
 
-function doComplete(document: TextDocument, position: Position) {
+function doComplete(document: TextDocument, position: Position, context?: CompletionContext) {
 	try {
 		const filename = url.fileURLToPath(document.uri);
 		const key = filename.replace(/\.torp$/, ".ts");
@@ -66,32 +81,54 @@ function doComplete(document: TextDocument, position: Position) {
 		const { content, map } = transformed;
 		updateVirtualFile(key, content);
 
-		let compiledIndex = translatePosition(text, position, map);
+		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
 			return [];
 		}
 
-		const completions = env.languageService.getCompletionsAtPosition(key, compiledIndex, {});
+		const completions /*: CompletionInfo*/ = env.languageService.getCompletionsAtPosition(
+			key,
+			compiledIndex,
+			{ triggerKind: context?.triggerKind },
+		);
 		if (!completions) {
 			return [];
 		}
 
-		//console.log(JSON.stringify(completions, null, 2));
-		const result = completions.entries.map((e: any) => {
-			return {
-				label: e.name,
-				kind: e.kind,
-				sortText: e.sortText,
-				// HACK: completing a variable starting with `$` inserts another `$`
-				// This might not be the best way to solve this -- maybe use resolveProvider
-				insertText: e.insertText ?? (e.name.startsWith("$") ? e.name.substring(1) : e.name),
-				// I guess these ones?
-				commitCharacters: [".", ",", ";", "("],
-				// TODO: need to get these somehow
-				detail: e.detail,
-				documentation: e.documentation,
-			} satisfies CompletionItem;
-		});
+		const result = completions.entries
+			.map((e: any) => {
+				// HACK: probably a better way to do this -- the `$` isn't
+				// included in the symbol for some reason
+				if (context?.triggerCharacter === "$" && !e.name.startsWith("$")) {
+					return null;
+				}
+
+				let completion: CompletionItem = {
+					label: e.name,
+					kind: e.kind,
+					insertText: e.insertText,
+					sortText: e.sortText,
+					// I guess these ones?
+					commitCharacters: [".", ",", ";", "("],
+					// TODO: need to get these somehow
+					detail: e.detail,
+					documentation: e.documentation,
+				};
+
+				// HACK: see above
+				if (e.name.startsWith("$")) {
+					completion.textEdit = {
+						range: {
+							start: { line: position.line, character: position.character - 1 },
+							end: { line: position.line, character: position.character - 1 + e.name.length },
+						},
+						newText: e.name,
+					};
+				}
+				return completion;
+			})
+			.filter(Boolean);
+
 		//console.log(JSON.stringify(result, null, 2));
 
 		return result;
@@ -114,12 +151,12 @@ function doHover(document: TextDocument, position: Position): Hover | null {
 		const { content, map } = transformed;
 		updateVirtualFile(key, content);
 
-		let compiledIndex = translatePosition(text, position, map);
+		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
 			return null;
 		}
 
-		const info = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
+		const info: QuickInfo = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
 		if (!info) {
 			return null;
 		}
@@ -154,12 +191,12 @@ function doDefinition(document: TextDocument, position: Position): Definition | 
 		const { content, map } = transformed;
 		updateVirtualFile(key, content);
 
-		let compiledIndex = translatePosition(text, position, map);
+		let compiledIndex = sourceToCompiledIndex(text, position, map);
 		if (compiledIndex === -1) {
 			return null;
 		}
 
-		const defs = env.languageService.getDefinitionAtPosition(key, compiledIndex);
+		const defs: DefinitionInfo[] = env.languageService.getDefinitionAtPosition(key, compiledIndex);
 		if (!defs || !defs.length) {
 			return null;
 		}
@@ -213,7 +250,7 @@ function getRange(text: string, start: number, end: number): Range {
 	return range;
 }
 
-function translatePosition(text: string, position: Position, map: any): number {
+function sourceToCompiledIndex(text: string, position: Position, map: any): number {
 	// HACK: maybe we need to generate lineMaps
 	let index = 0;
 	let line = 0;
@@ -393,7 +430,7 @@ function loadTypeScriptEnv(filename: string, key: string) {
 		virtualFiles.set(key, "const x = 5;");
 
 		const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
-		env = tsvfs.createVirtualTypeScriptEnvironment(system, key, ts, tsConfig);
+		env = tsvfs.createVirtualTypeScriptEnvironment(system, [key], ts, tsConfig);
 
 		console.log("Torpor type checking loaded");
 	}
@@ -491,14 +528,14 @@ function importComponentFiles(filename: string, content: string, map: any): stri
 		const names = match[1];
 		let importFile = match[2];
 
-		if (!importFile.includes(".torp")) continue;
-
 		if (
 			(importFile.startsWith("'") && importFile.endsWith("'")) ||
 			(importFile.startsWith('"') && importFile.endsWith('"'))
 		) {
 			importFile = importFile.substring(1, importFile.length - 1);
 		}
+
+		if (!importFile.endsWith(".torp")) continue;
 
 		if (tsConfigPath && tsConfig.paths) {
 			// HACK: Get the longest match etc
@@ -537,4 +574,241 @@ function importComponentFiles(filename: string, content: string, map: any): stri
 	}
 
 	return content;
+}
+
+export function getSelectionRanges(
+	document: TextDocument,
+	_positions: Position[],
+	_cancellationToken?: CancellationToken,
+): SelectionRange[] | null {
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content /*, map*/ } = transformed;
+		updateVirtualFile(key, content);
+
+		let ranges: SelectionRange[] = [];
+
+		//for (let position of positions) {
+		//	const selection: SelectionRange = env.languageService.getSmartSelectionRange(key, position);
+		//}
+
+		return ranges;
+	} catch (ex) {
+		console.log("COMPLETE ERROR:", ex);
+		return null;
+	}
+}
+
+export function getSemanticTokens(
+	document: TextDocument,
+	_range?: Range,
+	_cancellationToken?: CancellationToken,
+) {
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
+
+		const { spans }: Classifications = env.languageService.getEncodedSemanticClassifications(
+			key,
+			// TODO: Range
+			{ start: 0, length: content.length },
+			ts.SemanticClassificationFormat.TwentyTwenty,
+		);
+
+		let sourceSpans = [] as number[];
+		for (let i = 0; i < spans.length; ) {
+			const start = spans[i++];
+			const length = spans[i++];
+			const tokenType = spans[i++];
+			const sourceIndex = compiledToSourceIndex(start, map);
+			if (sourceIndex !== -1) {
+				sourceSpans.push(sourceIndex, length, tokenType);
+			}
+		}
+
+		return sourceSpans;
+	} catch (ex) {
+		console.log("COMPLETE ERROR:", ex);
+		return null;
+	}
+}
+
+export function getDocumentSymbols(
+	document: TextDocument,
+	_cancellationToken?: CancellationToken,
+): DocumentSymbol[] | null {
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
+
+		const tree: NavigationTree = env.languageService.getNavigationTree(key);
+
+		let symbols: DocumentSymbol[] = [];
+
+		collectSymbols(tree, symbols, text, map);
+
+		return symbols;
+	} catch (ex) {
+		console.log("COMPLETE ERROR:", ex);
+		return null;
+	}
+}
+
+function collectSymbols(tree: NavigationTree, symbols: DocumentSymbol[], text: string, map: any) {
+	//const range = rangeFromTextSpan(tree.nameSpan);
+	const span = tree.nameSpan ?? tree.spans[0];
+	const sourceIndex = span ? compiledToSourceIndex(span.start, map) : -1;
+	if (sourceIndex !== -1) {
+		const range = getRange(text, sourceIndex, sourceIndex + span.length);
+		const symbol = {
+			name: tree.text,
+			kind: symbolKindFromString(tree.kind),
+			range,
+			selectionRange: range,
+		};
+		symbols.push(symbol);
+	}
+	if (tree.childItems) {
+		for (let child of tree.childItems) {
+			collectSymbols(child, symbols, text, map);
+		}
+	}
+}
+
+function symbolKindFromString(kind: string): SymbolKind {
+	switch (kind) {
+		case "module":
+			return SymbolKind.Module;
+		case "class":
+			return SymbolKind.Class;
+		case "local class":
+			return SymbolKind.Class;
+		case "interface":
+			return SymbolKind.Interface;
+		case "enum":
+			return SymbolKind.Enum;
+		case "enum member":
+			return SymbolKind.Constant;
+		case "var":
+			return SymbolKind.Variable;
+		case "local var":
+			return SymbolKind.Variable;
+		case "function":
+			return SymbolKind.Function;
+		case "local function":
+			return SymbolKind.Function;
+		case "method":
+			return SymbolKind.Method;
+		case "getter":
+			return SymbolKind.Method;
+		case "setter":
+			return SymbolKind.Method;
+		case "property":
+			return SymbolKind.Property;
+		case "constructor":
+			return SymbolKind.Constructor;
+		case "parameter":
+			return SymbolKind.Variable;
+		case "type parameter":
+			return SymbolKind.Variable;
+		case "alias":
+			return SymbolKind.Variable;
+		case "let":
+			return SymbolKind.Variable;
+		case "const":
+			return SymbolKind.Constant;
+		case "JSX attribute":
+			return SymbolKind.Property;
+		default:
+			return SymbolKind.Variable;
+	}
+}
+
+export function getImplementation(
+	document: TextDocument,
+	position: Position,
+	_cancellationToken?: CancellationToken,
+): Location | null {
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return null;
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content);
+
+		const compiledIndex = sourceToCompiledIndex(text, position, map);
+		if (compiledIndex === -1) {
+			return null;
+		}
+
+		const imps: ImplementationLocation[] = env.languageService.getImplementationAtPosition(
+			key,
+			compiledIndex,
+		);
+		if (!imps || !imps.length) {
+			return null;
+		}
+
+		let implementationFile = imps[0].fileName;
+		// HACK: We could maintain a map or something here, but I'm just assuming
+		// it's a component file for now
+		if (!fs.existsSync(implementationFile)) {
+			implementationFile = implementationFile.replace(".ts", ".torp");
+		}
+		if (!fs.existsSync(implementationFile)) {
+			return null;
+		}
+
+		const implementationSource = fs.readFileSync(implementationFile, "utf8");
+
+		// TODO: Get the implementation map for translating the implementation range
+
+		return {
+			uri: implementationFile,
+			range: getRange(
+				implementationSource,
+				imps[0].textSpan.start,
+				imps[0].textSpan.start + imps[0].textSpan.length,
+			),
+		};
+	} catch (ex) {
+		console.log("COMPLETE ERROR:", ex);
+		return null;
+	}
+}
+
+function compiledToSourceIndex(index: number, map: any): number {
+	const mapped = map.find((m: any) => index >= m.compiled.start && index <= m.compiled.end);
+	if (!mapped) {
+		return -1;
+	}
+	return mapped.source.start + (index - mapped.compiled.start);
 }

@@ -4,11 +4,20 @@ import {
 	Diagnostic,
 	InitializeParams,
 	ProposedFeatures,
+	SemanticTokensRangeRequest,
+	SemanticTokensRequest,
 	TextDocumentSyncKind,
 	TextDocuments,
 	createConnection,
 } from "vscode-languageserver/node.js";
+//import { getSemanticTokensLegend } from "./getSemanticTokensLegend";
 import { LanguageModes, getLanguageModes } from "./languageModes";
+import {
+	getDocumentSymbols,
+	getImplementation,
+	getSelectionRanges,
+	getSemanticTokens,
+} from "./modes/scriptMode";
 
 // Create a connection for the server. The connection uses Node's IPC as a
 // transport. Also include all preview / proposed LSP features
@@ -33,7 +42,6 @@ connection.onInitialize((_params: InitializeParams) => {
 	return {
 		capabilities: {
 			textDocumentSync: TextDocumentSyncKind.Full,
-			// Tell the client that the server supports code completion
 			completionProvider: {
 				resolveProvider: false,
 				triggerCharacters: [".", "$"],
@@ -43,6 +51,16 @@ connection.onInitialize((_params: InitializeParams) => {
 			},
 			hoverProvider: true,
 			definitionProvider: true,
+			implementationProvider: true,
+			// HACK: Implemented these while trying to get `$` completion working
+			// They will probably be required at some stage, when I figure out what they are for
+			//documentSymbolProvider: true,
+			//selectionRangeProvider: true,
+			//semanticTokensProvider: {
+			//	legend: getSemanticTokensLegend(),
+			//	range: true,
+			//	full: true,
+			//},
 		},
 	};
 });
@@ -83,18 +101,18 @@ async function validateTextDocument(textDocument: TextDocument) {
 	}
 }
 
-connection.onCompletion(async (textDocumentPosition, _token) => {
-	const document = documents.get(textDocumentPosition.textDocument.uri);
+connection.onCompletion(async (evt, _cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
 	if (!document) {
 		return null;
 	}
 
-	const mode = languageModes.getModeAtPosition(document, textDocumentPosition.position);
+	const mode = languageModes.getModeAtPosition(document, evt.position);
 	if (!mode || !mode.doComplete) {
 		return CompletionList.create();
 	}
 
-	return mode.doComplete(document, textDocumentPosition.position);
+	return mode.doComplete(document, evt.position, evt.context);
 });
 
 connection.onHover(async (params) => {
@@ -123,6 +141,45 @@ connection.onDefinition(async (params) => {
 	}
 
 	return mode.doDefinition(document, params.position);
+});
+
+connection.onDocumentSymbol((evt, cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+	return getDocumentSymbols(document, cancellationToken);
+});
+
+connection.onImplementation((evt, cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+	return getImplementation(document, evt.position, cancellationToken);
+});
+
+connection.onSelectionRanges((evt, cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+	return getSelectionRanges(document, evt.positions, cancellationToken);
+});
+
+connection.onRequest(SemanticTokensRequest.method, (evt, cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+	return getSemanticTokens(document, undefined, cancellationToken);
+});
+connection.onRequest(SemanticTokensRangeRequest.method, (evt, cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+	return getSemanticTokens(document, evt.range, cancellationToken);
 });
 
 // Make the text document manager listen on the connection
