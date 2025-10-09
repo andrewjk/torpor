@@ -1,0 +1,52 @@
+import { Form, Field, Label, Input, Message } from "@torpor/ui/Form";
+import * as z from "zod";
+
+export default function ExampleBasic($props: any) {
+	const schema = z.object({
+		text: z.string().trim().min(1, { message: 'Required' }),
+	});
+
+	let $state = $watch({
+		data: {
+			text: $props?.form?.text ?? "",
+		}
+	});
+
+	@render {
+		<p>
+			Type OK into the field below to sucessfully submit the form,
+			or anything else to see an error message.
+		</p>
+
+		@if ($props?.form) {
+			@if ($props.form.ok) {
+				<p style="color: green">
+					All good
+				</p>
+			} else {
+				<p style="color: red">
+					{$props.form.message}
+				</p>
+			}
+		}
+		<Form class="example-form" {$state.data} {schema}>
+			@console.trace("hey")
+			<Field class="example-form-field" name="text" &value={$state.data.text}>
+				<Label>Text</Label>
+				<Input placeholder="Type ok to succeed" />
+				<Message />
+			</Field>
+			<button>Submit</button>
+		</Form>
+	}
+
+	@style {
+		.example-form {
+			width: 100%;
+		}
+
+		.example-form-field {
+			padding: 10px 0;
+		}
+	}
+}

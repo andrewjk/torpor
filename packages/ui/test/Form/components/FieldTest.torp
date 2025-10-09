@@ -1,0 +1,25 @@
+import {
+	Field,
+	Label,
+	Input,
+	Message,
+} from "../../../src/Form/index";
+import * as z from "zod";
+
+export default function FormTest($props: { value: string }) {
+	const schema = z.string().trim().min(1, { message: 'Name is required!' });
+
+	let $state = $watch({
+		data: {
+			name: "",
+		}
+	});
+
+	@render {
+		<Field name="name" &value={$state.data.name} {schema}>
+			<Label>Name:</Label>
+			<Input id="name-id" placeholder="Name..." />
+			<Message />
+		</Field>
+	}
+}

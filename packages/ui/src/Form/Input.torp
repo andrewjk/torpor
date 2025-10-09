@@ -1,0 +1,94 @@
+import getId from "../utils/getId";
+import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+
+interface Props {
+	/** An ID for the input element */
+	id?: string;
+	/** Class name(s) for the input element */
+	class?: string,
+	/** The input type */
+	type?: "text" | "number" | "password" | "email" | "url" | "tel",
+	/** The name of the input's form data field */
+	name?: string,
+	/** The data value that this field is bound to */
+	value?: any,
+	/** Text to display when the input value is empty */
+	placeholder?: string,
+	/** Whether the input should be readonly */
+	readonly?: boolean,
+	/** The maximum number of characters allowed for the input value */
+	maxlength?: number,
+	/** An ARIA label for describing the input to screen readers when there is no associated label element */
+	ariaLabel?: string,
+};
+
+/**
+ * A standard input in a form.
+ */
+export default function Input($props?: Props) {
+	$props ??= $watch({});
+	$props.id ??= getId();
+	$props.type ??= "text";
+
+	let blurred = false;
+
+	// Get stuff out of the FormContext and FieldContext
+	const formContext = $context[FormContextName] as FormContext;
+	const fieldContext = $context[FieldContextName] as FieldContext;
+	if (fieldContext) {
+		$props.name ??= fieldContext.name;
+	}
+
+	// Use the FieldContext's state, or create a new one
+	let $state = fieldContext?.state ?? $watch({
+		inputId: $props.id,
+		value: $props.value,
+		errors: {} as Record<string, string>,
+		valid: false,
+		message: "",
+	});
+
+	// Binding
+	$run(() => {
+		$props.value = $state.value;
+	});
+
+	// Set the input ID now that we know it and it will get linked with the associated label
+	$state.inputId = $props.id;
+
+	// NOTE: Adapted this from https://stackoverflow.com/a/57393751,
+	// not sure if it's still a good way to do things
+	function handleInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
+		$state.value = $props!.type?.match(/^(number|range)$/) ? +e.currentTarget.value : e.currentTarget.value;
+		if (formContext) {
+			formContext.validate();
+		}
+		if (fieldContext && blurred) {
+			fieldContext.validate();
+		}
+	}
+
+	function handleBlur() {
+		if (fieldContext) {
+			fieldContext.validate();
+		}
+		blurred = true;
+	}
+
+	@render {
+		<input
+			{$props.id}
+			class={`torp-input ${$props.class ?? ""}`.trim()}
+			{$props.name}
+			&value={$state.value}
+			{$props.type}
+			{$props.placeholder}
+			{$props.readonly}
+			{$props.maxlength}
+			aria-label={$props.ariaLabel}
+			data-valid={$state.valid ? "valid" : "invalid"}
+			oninput={handleInput}
+			onblur={handleBlur}
+		/>
+	}
+}

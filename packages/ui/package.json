@@ -29,6 +29,10 @@
 			"types": "./dist/Drawer/index.d.ts",
 			"import": "./dist/Drawer/index.js"
 		},
+		"./Form": {
+			"types": "./dist/Form/index.d.ts",
+			"import": "./dist/Form/index.js"
+		},
 		"./Menu": {
 			"types": "./dist/Menu/index.d.ts",
 			"import": "./dist/Menu/index.js"
@@ -89,6 +93,7 @@
 		"oxlint-tsgolint": "^0.2.0",
 		"tsup": "^8.5.0",
 		"typescript": "^5.9.3",
-		"vitest": "^3.2.4"
+		"vitest": "^3.2.4",
+		"zod": "^4.1.12"
 	}
 }

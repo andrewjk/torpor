@@ -20,7 +20,8 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"sucrase": "^3.35.0"
+		"sucrase": "^3.35.0",
+		"zod": "^4.1.12"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20251005.1",

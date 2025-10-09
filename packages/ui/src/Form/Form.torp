@@ -1,0 +1,129 @@
+import { FormContextName, type ValidationIssue, type FormContext } from "./FormTypes";
+import { StandardSchemaV1 } from "./StandardSchemaV1"
+
+interface Props {
+	/** An ID for the form element */
+	id?: string;
+	/** Class name(s) for the form element */
+	class?: string,
+	/** The data to display in the form */
+	data?: any,
+	/** Where to post the form's data **/
+	action?: string,
+	/** The schema validator to use for this form */
+	schema?: StandardSchemaV1,
+	onsubmit?: (e: SubmitEvent) => boolean | void | Promise<boolean | void>,
+};
+
+/**
+ * A form for submitting values.
+ */
+export default function Form($props: Props) {
+	let $state = $watch({
+		data: $props.data ?? {},
+		issues: [] as ValidationIssue[],
+		get valid() {
+			return this.issues.length === 0;
+		}
+	});
+
+	let submitted = false;
+
+	// TODO: Load context from build with a submit method that submits to a form action
+
+	// Set the context to pass down to Fields
+	let context: FormContext = {
+		schema: $props.schema,
+		state: $state,
+		validate: handleValidate
+	};
+	
+	$context[FormContextName] = context;
+
+	async function validate() {
+		if ($props.schema) {
+			const validator = $props.schema["~standard"];
+			let result = validator.validate($props.data);
+			if (result instanceof Promise) {
+				result = await result;
+			}
+			let issues: ValidationIssue[] = [];
+			if (result.issues) {
+				for (let issue of result.issues) {
+					if (issue.path) {
+						// TODO: arrays with `[0]`
+						issues.push({ path: issue.path.join("."), message: issue.message });
+					}
+				}
+			}
+			$state.issues = issues;
+		}
+	}
+
+	async function handleSubmit(e: SubmitEvent) {
+		// Validate, and proceed with submission if there are no errors
+		await validate();
+		let proceed = $state.valid;
+
+		// Changing inputs from now on will cause revalidation
+		submitted = true;
+
+		// If validation failed, don't continue
+		if (!proceed) {
+			e.preventDefault();
+			return false;
+		}
+
+		// Dispatch the submit event for the user to handle
+		if ($props.onsubmit) {
+			let userSubmit = $props.onsubmit(e);
+			if (userSubmit instanceof Promise) {
+				userSubmit = await userSubmit;
+			}
+			proceed = userSubmit !== false && !e.defaultPrevented;
+		}
+		
+		// If the user handled the submit, don't continue
+		if (!proceed) {
+			e.preventDefault();
+			return false;
+		}
+
+		// If there's a @torpor/build context, call its submit event
+		let buildContext = $context["TorporBuildContext"];
+		if (buildContext?.onformsubmit) {
+			let buildSubmit = buildContext.onformsubmit(e);
+			if (buildSubmit instanceof Promise) {
+				buildSubmit = await buildSubmit;
+			}
+			proceed = buildSubmit !== false && !e.defaultPrevented;
+		}
+
+		// If @torpor/build handled the submit, don't continue
+		if (!proceed) {
+			e.preventDefault();
+			return false;
+		}
+
+		// Otherwise just let normal form submission go ahead...
+	}
+
+	async function handleValidate() {
+		if (submitted) {
+			await validate();
+		}
+	}
+
+	@render {
+		<form
+			{$props.id}
+			class={`torp-form ${$props.class ?? ""}`.trim()}
+			method="POST"
+			onsubmit={handleSubmit}
+			@// Set novalidate only if JS is enabled (to override HTML validation)
+			onmount={(e) => e.novalidate = true }
+		>
+			<slot />
+		</form>
+	}
+}

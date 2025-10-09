@@ -1,0 +1,9 @@
+import {
+	Input,
+} from "../../../src/Form/index";
+
+export default function FormTest($props: { value: string }) {
+	@render {
+		<Input id="name-id" placeholder="Name..." &value={$props.value} />
+	}
+}

@@ -1,0 +1,91 @@
+import {
+	FormContextName,
+	FieldContextName,
+	type ValidationIssue,
+	type FormContext,
+	type FieldContext,
+} from "./FormTypes";
+import { StandardSchemaV1 } from "./StandardSchemaV1"
+
+interface Props {
+	/** An ID for the div container */
+	id?: string;
+	/** Class name(s) for the div container */
+	class?: string,
+	/** The name of the data that this field contains */
+	name: string,
+	/** The data value that this field is bound to */
+	value?: any,
+	/** The schema validator to use for this form */
+	schema?: StandardSchemaV1,
+};
+
+/**
+ * A field in a form which automatically links up a Label and/or an input
+ * component and/or a Message.
+ */
+export default function Field($props: Props) {
+	let $state = $watch({
+		inputId: "-1",
+		value: $props.value,
+		issues: [] as ValidationIssue[],
+		get valid() {
+			return this.issues.find((i) => i.path === $props.name) === undefined;
+		},
+		get message() {
+			return this.issues.filter((i) => i.path === $props.name).map((i) => i.message).join("\n");
+		},
+	});
+
+	// Binding
+	$run(() => {
+		$props.value = $state.value;
+	});
+
+	// Get stuff out of the FormContext, if applicable
+	const formContext = $context[FormContextName] as FormContext;
+	if (formContext) {
+		$run(() => {
+			$state.issues = formContext.state.issues;
+		});
+	}
+
+	// Set the context to pass down to Labels, Inputs and Messages
+	let context: FieldContext = {
+		name: $props.name,
+		state: $state,
+		validate: handleValidate
+	};
+	$context[FieldContextName] = context;
+
+	async function validate() {
+		if ($props.schema) {
+			const validator = $props.schema["~standard"];
+			let result = validator.validate($props.value);
+			if (result instanceof Promise) {
+				result = await result;
+			}
+			let issues: ValidationIssue[] = [];
+			if (result.issues) {
+				for (let issue of result.issues) {
+					issues.push({ path: $props.name, message: issue.message });
+				}
+			}
+			$state.issues = $state.issues.filter((e) => e.path !== $props.name).concat(issues);
+		}
+	}
+
+	async function handleValidate() {
+		await validate();
+	}
+
+	@render {
+		<div
+			{$props.id}
+			class={`torp-field ${$props.class ?? ""}`.trim()}
+			data-valid={$state.valid ? "valid" : "invalid"}
+		>
+			<slot />
+		</div>
+	}
+}

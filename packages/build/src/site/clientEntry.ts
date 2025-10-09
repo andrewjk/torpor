@@ -1,6 +1,7 @@
 import manifest from "@torpor/build/manifest";
 import loadData from "../nav/loadData.ts";
 import navigate from "../nav/navigate.ts";
+import $page from "../state/$page.ts";
 import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
@@ -99,5 +100,9 @@ window.addEventListener("popstate", async () => {
 await navigateToLocation(document.location, true);
 
 async function navigateToLocation(location: Location, firstTime = false) {
+	// Reset $page on submit and link navigation
+	// TODO: Should we put data in $page.data??
+	$page.form = undefined;
+
 	return await navigate(new URL(location.toString()), firstTime);
 }

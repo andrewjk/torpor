@@ -6,6 +6,7 @@ import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
+import formSubmit from "./formSubmit";
 import loadData from "./loadData";
 
 // @ts-ignore
@@ -20,7 +21,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	const path = url.pathname;
 	const query = url.searchParams;
 
-	console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
+	//console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
 	const route = client.router.match(path, query);
 	if (!route) {
@@ -39,7 +40,6 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	} else {
 		$page.status = 200;
 	}
-
 	const handler = route.handler;
 	const params = route.params || {};
 
@@ -77,7 +77,16 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		$page.form = form;
 		formInput.remove();
 	}
-	const $props: Record<string, any> = { data, form };
+	let $props: Record<string, any> = { data };
+
+	// We may have form data in $page.form, either from the hidden input
+	// (above), or added via onformsubmit (below)
+	$props.form = $page.form;
+
+	// Add some special context for submitting Forms client-side
+	const $context = {
+		TorporBuildContext: { onformsubmit: formSubmit },
+	};
 
 	client.layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRange: null });
 	client.layoutStack = newLayoutStack;
@@ -91,7 +100,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
-		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor, _, $context) {
+		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor) {
 			let i = layoutStack.length - 1;
 			layoutStack[i].slotRange = fillLayoutSlot(
 				clientEndPoint.component!,

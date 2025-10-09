@@ -30,7 +30,6 @@ router.addPages(manifest.routes);
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
 export async function load(ev: ServerEvent, template: string): Promise<Response> {
-	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
 	const url = new URL(ev.request.url);
 	const path = url.pathname;
 	const query = url.searchParams;
@@ -303,22 +302,41 @@ async function runAction(
 				}
 			}
 
-			const result = await action(serverParams);
+			let result = await action(serverParams);
 
-			// If no result, ok or 4xx error, re-render the view with the form result
-			// If redirect or server error, just return the result to handle it as normal
-			// TODO: do not re-run hooks?
-			if (
+			if (ev.request.headers.has("x-torpor-form-submit")) {
+				// If the form was submitted from javascript, just return the
+				// response and it will be handled on the client
+				// TODO: Should we make the user return a response??
+				result ??= ok();
+
+				// If it's a redirect, we need to stop the browser handling it
+				if (result.status >= 300 && result.status <= 399) {
+					const location = result.headers.get("location") ?? "";
+					result = ok();
+					result.headers.set("x-torpor-form-redirect", "");
+					result.headers.set("location", location);
+				}
+
+				return result;
+			} else if (
 				!result ||
 				(result.status >= 200 && result.status <= 299) ||
 				(result.status >= 400 && result.status <= 499)
 			) {
+				// If the form was submitted without javascript, and there was
+				// no result, an ok result, or a 4xx error, re-render the view
+				// with the form result
+				// TODO: do not re-run hooks?
 				const newUrl = new URL(url.pathname, url);
 				const formStatus = result?.status;
 				const form = await result?.json();
 				$page.form = form;
 				return await loadView(ev, newUrl, handler, params, template, formStatus, form);
 			} else {
+				// If the form was submitted without javascript and there was a
+				// redirect or server error, just return the result to handle it
+				// as normal
 				return result;
 			}
 		}

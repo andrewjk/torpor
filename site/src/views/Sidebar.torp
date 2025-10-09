@@ -26,6 +26,7 @@ export default function Sidebar() {
 				<li><a href="/ui/dialog">Dialog</a></li>
 				<li><a href="/ui/disclosure">Disclosure</a></li>
 				<li><a href="/ui/drawer">Drawer</a></li>
+				<li><a href="/ui/form">Form</a></li>
 				<li><a href="/ui/menu">Menu</a></li>
 				<li><a href="/ui/menu-bar">MenuBar</a></li>
 				<li><a href="/ui/nav-menu">NavMenu</a></li>

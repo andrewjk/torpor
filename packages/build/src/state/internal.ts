@@ -17,7 +17,7 @@ export default function internal(): InternalState {
 			{
 				status: 404,
 				url: new URL("http://localhost"),
-				form: {},
+				form: undefined,
 				error: {
 					message: "",
 				},
