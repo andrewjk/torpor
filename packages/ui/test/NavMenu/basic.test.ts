@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import NavMenu from "./components/NavMenu.torp";
+import NavMenu from "./components/NavMenuBasic.torp";
 
 describe("NavMenu", () => {
 	it("Basic operation", async () => {

@@ -7,7 +7,7 @@ import {
 	NavMenuSeparator
 } from "../../../src/NavMenu";
 
-export default function NavMenu($props: any) {
+export default function NavMenuBasic($props: any) {
 	@render {
 		<NavMenu ariaLabel="Site navigation">
 			<NavMenuLink href="/">Home</NavMenuLink>
