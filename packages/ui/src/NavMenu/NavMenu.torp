@@ -6,6 +6,17 @@ import {
 	type NavMenuPopoutContext
 } from "./NavMenuTypes";
 
+interface NavMenuProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the menu to screen readers  */
+	ariaLabel?: string | undefined,
+	/** The orientation of the menu, which affects keyboard navigation */
+	orientation?: "horizontal" | "vertical",
+}
+
 /**
  * A list of links for navigating a website.
  *
@@ -21,11 +32,9 @@ import {
  *	 ...
  * </NavMenu>
  * ```
- *
- * @prop {string | undefined} ariaLabel -- An ARIA label for describing the menu to screen readers 
- * @prop {"horizontal" | "vertical"} orientation -- The orientation of the menu, which affects keyboard navigation
  */
-export default function NavMenu($props: any) {
+export default function NavMenu($props: NavMenuProps) {
+	$props ??= $watch({});
 	$props.orientation ||= "horizontal";
 
 	// A collection containing the state and some functions for each item

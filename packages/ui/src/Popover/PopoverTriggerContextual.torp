@@ -1,9 +1,18 @@
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
+interface PopoverTriggerContextualProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The element that causes a Popover to appear or disappear when right-clicked.
  */
-export default function PopoverTriggerContextual($props: any) {
+export default function PopoverTriggerContextual($props: PopoverTriggerContextualProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
 	if (!context) {

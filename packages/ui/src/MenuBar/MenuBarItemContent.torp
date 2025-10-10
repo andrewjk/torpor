@@ -7,13 +7,22 @@ import {
 	type MenuBarItemContext
 } from "./MenuBarTypes";
 
+interface MenuBarItemContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Where the popout will be shown, relative to the popout button */
+	side?: "top" | "right" | "bottom" | "left",
+	/** How the popout will be aligned, relative to the popout button */
+	alignment?: "start" | "center" | "end",
+}
+
 /**
  * The content that is displayed for a MenuBarItem when it is open.
- *
- * @prop {"top" | "right" | "bottom" | "left"} side -- Where the popout will be shown, relative to the popout button
- * @prop {"start" | "center" | "end"} alignment -- How the popout will be aligned, relative to the popout button
  */
-export default function MenuBarItemContent() {
+export default function MenuBarItemContent($props: MenuBarItemContentProps) {
+	$props ??= $watch({});
 	$props.side ??= "bottom";
 	$props.alignment ??= "start";
 

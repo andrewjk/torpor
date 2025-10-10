@@ -1,5 +1,14 @@
 import { NavMenuPopoutContextName, type NavMenuPopoutContext } from "./NavMenuTypes";
 
+interface NavMenuPopoutProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the popout is visible */
+	visible?: boolean,
+}
+
 /**
  * A popout that is attached to a menu button and can be used to show a submenu.
  *
@@ -11,10 +20,9 @@ import { NavMenuPopoutContextName, type NavMenuPopoutContext } from "./NavMenuTy
  * 	<NavMenuPopoutContent />
  * </NavMenuPopout>
  * ```
- *
- * @prop {boolean} visible -- Whether the popout is visible
  */
-export default function NavMenuPopout($props: any) {
+export default function NavMenuPopout($props: NavMenuPopoutProps) {
+	$props ??= $watch({});
 	$props.visible ??= false;
 
 	let $state = $watch({

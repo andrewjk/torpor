@@ -1,16 +1,26 @@
 import { NotificationContextName, type NotificationContext } from "./NotificationTypes";
 
+interface NotificationProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the notification is visible */
+	visible?: boolean,
+	/** The duration, in milliseconds, to keep the notification visible */
+	duration?: number,
+	/** Raised when the notification has closed, either after the duration has elapsed, or when the user has pressed the close button */
+	onclose?: () => void,
+}
+
 /**
  * An element that displays a brief, important message in a way that attracts
  * the user's attention without interrupting the user's task.
  *
  * See [the WAI ARIA guidelines for Alerts](https://www.w3.org/WAI/ARIA/apg/patterns/alert/).
- *
- * @prop {boolean} visible -- Whether the notification is visible
- * @prop {number | undefined} duration -- The duration, in milliseconds, to keep the notification visible
- * @prop {() => void} onclose -- Raised when the notification has closed, either after the duration has elapsed, or when the user has pressed the close button
  */
-export default function Notification($props) {
+export default function Notification($props: NotificationProps) {
+	$props ??= $watch({});
 	$props.visible ??= true;
 	$props.duration ??= 5000;
 

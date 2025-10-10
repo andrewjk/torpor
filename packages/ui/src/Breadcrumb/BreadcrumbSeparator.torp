@@ -1,9 +1,18 @@
 
+interface BreadcrumbSeparatorProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * A separator between links in a Breadcrumb component. It is hidden from
  * screen readers.
  */
-export default function BreadcrumbSeparator($props: any) {
+export default function BreadcrumbSeparator($props: BreadcrumbSeparatorProps) {
+	$props ??= $watch({});
+
 	@render {
 		<div
 			{$props.id}

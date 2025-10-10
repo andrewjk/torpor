@@ -1,5 +1,20 @@
 import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
 
+interface MenuPopoutProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the popout is visible */
+	visible?: boolean,
+	/** Called when the popout is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Called when the popout has opened */
+	onopen?: () => void,
+	/** Called when the popout has closed */
+	onclose?: () => void,
+}
+
 /**
  * A popout that is attached to a menu button and can be used to show a submenu.
  *
@@ -11,13 +26,9 @@ import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
  * 	<MenuPopoutContent />
  * </MenuPopout>
  * ```
- *
- * @prop {boolean} visible -- Whether the popout is visible
- * @prop {(boolean) => void} ontoggle -- Called when the popout is opened or closed
- * @prop {() => void} onopen -- Called when the popout has opened
- * @prop {() => void} onclose -- Called when the popout has closed
  */
-export default function MenuPopout($props) {
+export default function MenuPopout($props: MenuPopoutProps) {
+	$props ??= $watch({});
 	$props.visible ??= false;
 
 	let $state = $watch({

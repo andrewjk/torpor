@@ -1,10 +1,19 @@
 import { disableScroll } from "../mount/disableScroll";
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
+interface PopoverOverlayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The background overlay for a Popover. Adding an overlay automatically sets the Popover to modal.
  */
-export default function PopoverOverlay($props: any) {
+export default function PopoverOverlay($props: PopoverOverlayProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
 	if (!context) {

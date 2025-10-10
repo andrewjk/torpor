@@ -4,6 +4,17 @@ import { trapFocus, type TrapFocusOptions } from "../mount/trapFocus";
 import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
 import { DialogContextName, type DialogContext, type DialogState } from "./DialogTypes";
 
+interface DialogProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the popover to screen readers  */
+	ariaLabel?: string,
+	/** Whether the dialog should alert the user via the screen reader */
+	alert?: boolean,
+}
+
 /**
  * Content for a window displayed in a Popover.
  * 
@@ -21,10 +32,9 @@ import { DialogContextName, type DialogContext, type DialogState } from "./Dialo
  * </Dialog>
  * ```
  * 
- * @prop {string | undefined} ariaLabel -- An ARIA label for describing the popover to screen readers 
- * @prop {boolean} alert -- Whether the dialog should alert the user via the screen reader
  */
-export default function Dialog($props: any) {
+export default function Dialog($props: DialogProps) {
+	$props ??= $watch({});
 	$props.id ??= getId();
 	$props.dialog ??= false;
 

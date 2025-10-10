@@ -1,13 +1,21 @@
 import getId from "../utils/getId";
 import { DialogContextName, type DialogContext } from "./DialogTypes";
 
+interface DialogBodyProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the body content will be announced by screen readers when the Dialog is opened */
+	ariaAnnounce?: boolean,
+}
+
 /**
  * The body information for a Dialog. Content in the body will be announced by
  * screen readers when the Dialog is opened, unless ariaAnnounce is false.
- * 
- * @prop {boolean} ariaAnnounce -- Whether the body content will be announced by screen readers when the Dialog is opened
  */
-export default function DialogBody($props: any) {
+export default function DialogBody($props: DialogBodyProps) {
+	$props ??= $watch({});
 	$props.id ??= getId();
 	$props.ariaAnnounce ??= true;
 

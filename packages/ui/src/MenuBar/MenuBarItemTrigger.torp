@@ -5,12 +5,21 @@ import {
 	type MenuBarItemContext
 } from "./MenuBarTypes";
 
+interface MenuBarItemTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this button is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a MenuBar and opens a submenu.
  *
- * @prop {boolean} disabled -- Whether this button is disabled
  */
-export default function MenuBarItemTrigger() {
+export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps) {
+	$props ??= $watch({});
 	$props.disabled ??= false;
 
 	let button: HTMLButtonElement;

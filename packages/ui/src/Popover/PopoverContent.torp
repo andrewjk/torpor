@@ -1,11 +1,20 @@
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
+interface PopoverContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The content that is displayed for a Popover when it is open, such as a Dialog
  * in the middle of the screen or a div that slides in from the side.
  */
-export default function PopoverContent($props: any) {
+export default function PopoverContent($props: PopoverContentProps) {
+	$props ??= $watch({});
+
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;

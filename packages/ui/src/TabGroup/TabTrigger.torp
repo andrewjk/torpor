@@ -1,13 +1,21 @@
 import getId from "../utils/getId";
 import { TabItemContextName, type TabItemContext } from "./TabGroupTypes";
 
+interface TabTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * A header button for a tab item, which can be used to reveal an associated TabContent.
  */
-export default function TabTrigger() {
-	let button: HTMLButtonElement;
-
+export default function TabTrigger($props: TabTriggerProps) {
+	$props ??= $watch({});
 	$props.id ||= getId();
+
+	let button: HTMLButtonElement;
 
 	// Get stuff out of the TabItemContext
 	const context = $context[TabItemContextName] as TabItemContext;

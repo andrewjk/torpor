@@ -1,12 +1,20 @@
 import getId from "../utils/getId";
 import { NavMenuGroupContextName, type NavMenuGroupContext } from "./NavMenuTypes";
 
+interface NavMenuGroupHeaderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The type of HTML header to use */
+	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
+}
+
 /**
  * The header for a NavMenuGroup.
- *
- * @prop {"h1" | "h2" | "h3" | "h4" | "h5" | "h6"} as -- The type of HTML header to use
  */
-export default function NavMenuGroupHeader($props: any) {
+export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps) {
+	$props ??= $watch({});
 	$props.id ??= getId();
 
 	const context = $context[NavMenuGroupContextName] as NavMenuGroupContext;
@@ -19,8 +27,8 @@ export default function NavMenuGroupHeader($props: any) {
 	$state.headerId = $props.id;
 
 	@render {
+		@// TODO: self={$props.as}
 		<h4
-			@// TODO: self={$props.as}
 			{$props.id}
 			class={`torp-nav-menu-group-header ${$props.class ?? ""}`.trim()}
 		>

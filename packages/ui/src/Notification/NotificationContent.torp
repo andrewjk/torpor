@@ -1,7 +1,17 @@
+
+interface NotificationContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The content to display within a Notification.
  */
-export default function NotificationContent() {
+export default function NotificationContent($props: NotificationContentProps) {
+	$props ??= $watch({});
+
 	@render {
 		<div 
 			{$props.id}

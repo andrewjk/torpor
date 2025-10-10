@@ -1,9 +1,19 @@
+
+interface MenuGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the group to screen readers */
+	ariaLabel?: string,
+}
+
 /**
  * A container for a logical group of menu items.
- *
- * @prop {string} ariaLabel -- An ARIA label for describing the group to screen readers
  */
-export default function MenuGroup() {
+export default function MenuGroup($props: MenuGroupProps) {
+	$props ??= $watch({});
+
 	// TODO: Intercept the context to steal toggleItem??
 
 	@render {

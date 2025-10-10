@@ -1,12 +1,21 @@
 import { MenuButtonContextName, type MenuButtonContext } from "./MenuTypes";
 
+interface MenuIndicatorProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this item is disabled */
+	disabled?: boolean,
+}
+
 /**
  * An indicator for a MenuCheck or MenuRadio component, which is displayed
  * when the value of checked is true.
- *
- * @prop {boolean} disabled -- Whether this item is disabled
  */ 
-export default function MenuIndicator() {
+export default function MenuIndicator($props: MenuIndicatorProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the MenuButtonContext
 	const context = $context[MenuButtonContextName] as MenuButtonContext;
 	if (!context) {

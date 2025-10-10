@@ -4,11 +4,20 @@ import getScrollParent from "../utils/getScrollParent";
 import setContextPosition from "../utils/setContextPosition";
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
+interface PopoverContentContextualProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The content that is displayed for a Popover when it is open, displayed at the
  * position that the user right-clicked.
  */
-export default function PopoverContentContextual($props: any) {	
+export default function PopoverContentContextual($props: PopoverContentContextualProps) {	
+	$props ??= $watch({});
+
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;

@@ -5,13 +5,22 @@ import {
 	type MenuPopoutContext
 } from "./MenuTypes";
 
+interface MenuPopoutTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The delay before showing the popout, in milliseconds */
+	hoverDelay?: number,
+	/** Whether this button is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a Menu or MenuGroup and signals a response by a user.
- *
- * @prop {number} hoverDelay -- The delay before showing the popout, in milliseconds
- * @prop {boolean} disabled -- Whether this button is disabled
  */
-export default function MenuPopoutTrigger() {
+export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps) {
+	$props ??= $watch({});
 	$props.hoverDelay ??= 500;
 	$props.disabled ??= false;
 

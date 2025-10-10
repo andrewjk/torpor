@@ -1,8 +1,17 @@
 
+interface NavMenuSeparatorProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * An element in a menu that separates logical sets of menu items.
  */
-export default function NavMenuSeparator($props: any) {
+export default function NavMenuSeparator($props: NavMenuSeparatorProps) {
+	$props ??= $watch({});
+
 	@render {
 		<div
 			{$props.id}

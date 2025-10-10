@@ -1,5 +1,14 @@
 import { AccordionItemContextName, type AccordionItemContext } from "./AccordionTypes";
 
+interface AccordionHeaderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The type of HTML header to use */
+	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
+}
+
 /**
  * The header for an AccordionItem, which contains the AccordionTrigger.
  *
@@ -10,10 +19,10 @@ import { AccordionItemContextName, type AccordionItemContext } from "./Accordion
  * 	<AccordionTrigger />
  * </AccordionHeader>
  * ```
- *
- * @prop {"h1" | "h2" | "h3" | "h4" | "h5" | "h6"} as -- The type of HTML header to use
  */
-export default function AccordionHeader($props: any) {
+export default function AccordionHeader($props: AccordionHeaderProps) {
+	$props ??= $watch({});
+
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
 		throw new Error("AccordionHeader must be contained within an AccordionItem");

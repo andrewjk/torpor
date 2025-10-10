@@ -1,5 +1,15 @@
 
-export default function Drawer($props: any) {
+interface DrawerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	visible?: boolean,
+	position?: "left" | "right",
+}
+
+export default function Drawer($props: DrawerProps) {
+	$props ??= $watch({});
 	$props.visible ??= true;
 	$props.position ||= "left";
 

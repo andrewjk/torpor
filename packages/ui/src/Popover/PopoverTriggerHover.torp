@@ -2,10 +2,19 @@
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 import hoverTrigger from "../mount/hoverTrigger";
 
+interface PopoverTriggerHoverProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The div that causes a Popover to appear or disappear when hovered.
  */
-export default function PopoverTriggerHover($props: any) {
+export default function PopoverTriggerHover($props: PopoverTriggerHoverProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
 	if (!context) {
@@ -13,7 +22,7 @@ export default function PopoverTriggerHover($props: any) {
 	}
 	let $state = context.state;
 
-	function handleHover(node, e) {
+	function handleHover(node: HTMLElement, e: TouchEvent | MouseEvent) {
 		if ($state.position) {
 			// Get the position relative to the element, so we can reposition on scroll
 			const rect = node.getBoundingClientRect();

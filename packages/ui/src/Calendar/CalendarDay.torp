@@ -1,7 +1,15 @@
 import { areDatesEqual } from "../utils/dateUtils";
 import { type CalendarContext, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
 
-export default function CalendarDay() {
+interface CalendarDayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
+export default function CalendarDay($props: CalendarDayProps) {
+	$props ??= $watch({});
 	$props.date ??= new Date();
 	$props.selectable ??= false;
 	$props.muted ??= false;

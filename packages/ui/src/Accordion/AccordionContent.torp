@@ -1,13 +1,20 @@
 import getId from "../utils/getId";
 import { AccordionItemContextName, type AccordionItemContext } from "./AccordionTypes";
 
+interface AccordionContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion */
+	ariaRegion?: boolean,
+}
+
 /**
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
- *
- * @prop {string} [id] -- An ID for the AccordionContent's div container
- * @prop {boolean} [ariaRegion] -- Whether this content should act as a region. Set this when the content contains heading elements or a nested Accordion
  */
-export default function AccordionContent($props: any) {
+export default function AccordionContent($props: AccordionContentProps) {
+	$props ??= $watch({});
 	$props.id ||= getId();
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;

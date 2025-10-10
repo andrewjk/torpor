@@ -1,7 +1,17 @@
+
+interface MenuSeparatorProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * An element in a menu that separates logical sets of menu items.
  */
-export default function MenuSeparator() {
+export default function MenuSeparator($props: MenuSeparatorProps) {
+	$props ??= $watch({});
+
 	@render {
 		<div
 			{$props.id}

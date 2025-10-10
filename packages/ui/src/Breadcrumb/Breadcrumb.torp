@@ -1,4 +1,13 @@
 
+interface BreadcrumbProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the popover to screen readers  */
+	ariaLabel?: string | undefined,
+}
+
 /**
  *
  * A list of links to the parent pages of the current page in hierarchical order.
@@ -17,10 +26,10 @@
  * ```
  *
  * You can separate BreadcrumbItems using BreadcrumbSeparators or by using CSS.
- *
- * @prop {string | undefined} ariaLabel -- An ARIA label for describing the popover to screen readers 
  */
-export default function Breadcrumb($props: any) {
+export default function Breadcrumb($props: BreadcrumbProps) {
+	$props ??= $watch({});
+
 	@render {
 		<nav
 			{$props.id}

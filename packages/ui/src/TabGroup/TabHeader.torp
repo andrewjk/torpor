@@ -1,5 +1,14 @@
 import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from "./TabGroupTypes";
 
+interface TabHeaderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The type of HTML header to use */
+	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+}
+
 /**
  * The header for a tab item, which contains the TabTrigger.
  *
@@ -10,10 +19,10 @@ import { TabGroupContextName, TabItemContextName, type TabGroupContext, type Tab
  * 	<TabTrigger />
  * </TabHeader>
  * ```
- *
- * @prop {"h1" | "h2" | "h3" | "h4" | "h5" | "h6"} as -- The type of HTML header to use
  */
-export default function TabHeader($props: any) {
+export default function TabHeader($props: TabHeaderProps) {
+	$props ??= $watch({});
+
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {
 		throw new Error("TabHeader must be contained within a TabGroup");

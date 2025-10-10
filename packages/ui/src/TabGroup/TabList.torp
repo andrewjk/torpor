@@ -1,4 +1,13 @@
-import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from "./TabGroupTypes";
+import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
+
+interface TabListProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the tab list to screen readers */
+	ariaLabel?: string,
+}
 
 /**
  * A component that holds the TabHeaders of a TabGroup.
@@ -12,10 +21,10 @@ import { TabGroupContextName, TabItemContextName, type TabGroupContext, type Tab
  * 	</TabHeader>
  * </TabList>
  * ```
- *
- * @prop {string} ariaLabel -- An ARIA label for describing the tab list to screen readers
  */
-export default function TabList($props: any) {
+export default function TabList($props: TabListProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the TabGroupContext
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {

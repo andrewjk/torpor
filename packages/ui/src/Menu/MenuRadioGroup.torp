@@ -4,14 +4,25 @@ import {
 	type RadioGroupItemState
 } from "./MenuTypes";
 
+interface MenuRadioGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the menu to screen readers */
+	ariaLabel?: string,
+	/** The value of the checked MenuRadio */
+	value?: string | undefined,
+	/** Called when the checked item has changed */
+	onchange?: (value: any) => void,
+}
+
 /**
  * A container for a logical group of menu RadioGroup items.
- *
- * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
- * @prop {string | undefined} value -- The value of the checked MenuRadio
- * @prop {(any) => void} onchange - Called when the checked item has changed
  */
-export default function MenuRadioGroup() {
+export default function MenuRadioGroup($props: MenuRadioGroupProps) {
+	$props ??= $watch({});
+
 	// A collection containing the state and some functions for each item
 	let itemStates: RadioGroupItemState[] = [];
 

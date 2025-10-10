@@ -1,12 +1,18 @@
 import getId from "../utils/getId";
 import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
 
+interface TabContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * Content for a TabGroup, which can be revealed or hidden by an associated TabTrigger.
- *
- * @prop {string} [id] -- An ID for the TabContent's div container
  */
-export default function TabContent($props: any) {
+export default function TabContent($props: TabContentProps) {
+	$props ??= $watch({});
 	$props.id ||= getId();
 
 	const context = $context[TabGroupContextName] as TabGroupContext;

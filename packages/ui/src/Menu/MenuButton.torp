@@ -1,12 +1,23 @@
 import { MenuContextName, type MenuContext } from "./MenuTypes";
 
+interface MenuButtonProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover */
+	value?: any,
+	/** Whether this button is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a Menu or MenuGroup and signals a response by a user.
  *
- * @prop {any} value -- The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover
- * @prop {boolean} disabled -- Whether this button is disabled
  */
-export default function MenuButton() {
+export default function MenuButton($props: MenuButtonProps) {
+	$props ??= $watch({});
+
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the MenuContext

@@ -1,9 +1,9 @@
 import { FieldContextName, type FieldContext } from "./FormTypes";
 
-interface Message {
-	/** An ID for the div container */
+interface MessageProps {
+	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the div container */
+	/** Class name(s) for the root element */
 	class?: string,
 }
 
@@ -11,7 +11,7 @@ interface Message {
  * A validation message to show when the contents of an input component have
  * problems that need to be fixed.
  */
-export default function Message($props?: Props) {
+export default function Message($props?: MessageProps) {
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;
 	if (!context) {

@@ -1,10 +1,10 @@
 import { FormContextName, type ValidationIssue, type FormContext } from "./FormTypes";
 import { StandardSchemaV1 } from "./StandardSchemaV1"
 
-interface Props {
-	/** An ID for the form element */
+interface FormProps {
+	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the form element */
+	/** Class name(s) for the root element */
 	class?: string,
 	/** The data to display in the form */
 	data?: any,
@@ -18,7 +18,9 @@ interface Props {
 /**
  * A form for submitting values.
  */
-export default function Form($props: Props) {
+export default function Form($props: FormProps) {
+	$props ??= $watch({});
+
 	let $state = $watch({
 		data: $props.data ?? {},
 		issues: [] as ValidationIssue[],

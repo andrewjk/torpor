@@ -7,15 +7,26 @@ import {
 	type MenuRadioGroupContext
 } from "./MenuTypes";
 
+interface MenuRadioProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The value of the item */
+	value?: string,
+	/** Whether this item is checked */
+	checked?: boolean,
+	/** Whether this item is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a Menu or MenuGroup to allow the user to select
  * from a number of options.
- *
- * @prop {string} value -- The value of the item
- * @prop {boolean} checked -- Whether this item is checked
- * @prop {boolean} disabled -- Whether this item is disabled
  */
-export default function MenuRadio() {
+export default function MenuRadio($props: MenuRadioProps) {
+	$props ??= $watch({});
+
 	let $state = $watch({
 		checked: $props.checked,
 	});

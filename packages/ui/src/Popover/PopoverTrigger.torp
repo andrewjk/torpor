@@ -1,9 +1,18 @@
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
+interface PopoverTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The button that causes a Popover to appear or disappear.
  */
-export default function PopoverTrigger($props: any) {
+export default function PopoverTrigger($props: PopoverTriggerProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
 	if (!context) {

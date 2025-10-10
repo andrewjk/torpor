@@ -1,8 +1,8 @@
-export default function Minus() {
+export default function Minus($props: any) {
 	@render {
 		<svg
-			{$props.id}
-			class={`torp-icon ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-icon ${$props?.class ?? ""}`.trim()}
 			viewBox="0 0 100 100"
 			stroke-linejoin="round"
 			stroke-width="12"

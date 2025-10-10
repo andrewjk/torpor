@@ -1,10 +1,10 @@
 import getId from "../utils/getId";
 import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
 
-interface Props {
-	/** An ID for the input element */
+interface InputProps {
+	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the input element */
+	/** Class name(s) for the root element */
 	class?: string,
 	/** The input type */
 	type?: "text" | "number" | "password" | "email" | "url" | "tel",
@@ -25,7 +25,7 @@ interface Props {
 /**
  * A standard input in a form.
  */
-export default function Input($props?: Props) {
+export default function Input($props: InputProps) {
 	$props ??= $watch({});
 	$props.id ??= getId();
 	$props.type ??= "text";

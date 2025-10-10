@@ -1,5 +1,22 @@
 import { PopoverContextName, type Point, type PopoverContext, type PopoverState } from "./PopoverTypes";
 
+interface PopoverProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers  */
+	modal?: boolean,
+	/** Whether the popover is visible  */
+	visible?: boolean,
+	/** The element to anchor this popover to, as an alternative to supplying a PopoverTrigger  */
+	anchor?: HTMLElement,
+	/** The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual  */
+	position?: Point,
+	/** A function to be called when the user selects a response */
+	callback?: ((value: any) => void),
+}
+
 /**
  * A popover that can be used to show rich content or obtain information from a user.
  *
@@ -14,13 +31,10 @@ import { PopoverContextName, type Point, type PopoverContext, type PopoverState 
  * 	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
  * </Popover>
  * ```
- * @prop {boolean} modal -- Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers 
- * @prop {boolean} visible -- Whether the popover is visible 
- * @prop {HTMLElement | undefined} anchor -- The element to anchor this popover to, as an alternative to supplying a PopoverTrigger 
- * @prop {Point | undefined} position -- The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual 
- * @prop {((value: any) => void) | undefined} [callback] -- A function to be called when the user selects a response
  */
-export default function Popover($props: any) {
+export default function Popover($props: PopoverProps) {
+	$props ??= $watch({});
+
 	let $state: PopoverState = $watch({
 		visible: false,
 		position: { x: 0, y: 0 }

@@ -1,16 +1,16 @@
 import { FieldContextName, type FieldContext } from "./FormTypes";
 
-interface Props {
-	/** An ID for the label element */
+interface LabelProps {
+	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the label element */
+	/** Class name(s) for the root element */
 	class?: string,
 }
 
 /**
  * A label to describe the contents of an input in a form.
  */
-export default function Label($props?: Props) {
+export default function Label($props?: LabelProps) {
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;
 	if (!context) {

@@ -1,12 +1,23 @@
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
+interface NavMenuElementProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this button is disabled  */
+	disabled?: boolean,
+	/** An element that can be focused via keyboard navigation */
+	element?: HTMLElement,
+}
+
 /**
  * An element of any type that can be placed in a NavMenu.
  *
- * @prop {boolean} disabled -- Whether this button is disabled 
- * @prop {HTMLElement} element -- An element that can be focused via keyboard navigation
  */
-export default function NavMenuElement($props: any) {
+export default function NavMenuElement($props: NavMenuElementProps) {
+	$props ??= $watch({});
+
 	/** Set when the item is disabled */
 	let dataDisabled = $props.disabled || undefined;
 

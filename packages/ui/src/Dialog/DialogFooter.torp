@@ -1,7 +1,17 @@
+
+interface DialogFooterProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The footer for a Dialog, which may contain one or more DialogButtons.
  */
-export default function DialogFooter($props: any) {
+export default function DialogFooter($props: DialogFooterProps) {
+	$props ??= $watch({});
+
 	@render {
 		<div
 			{$props.id}

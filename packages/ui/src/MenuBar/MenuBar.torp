@@ -1,5 +1,16 @@
 import { MenuBarContextName, type MenuBarContext, type ItemState } from "./MenuBarTypes";
 
+interface MenuBarProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the menu to screen readers */
+	ariaLabel?: string,
+	/** The orientation of the menu, which affects keyboard navigation */
+	orientation?: "horizontal" | "vertical",
+}
+
 /**
  * A menu bar, similar to that shown at the top of Windows applications or at the top of the screen on Macs.
  *
@@ -17,11 +28,9 @@ import { MenuBarContextName, type MenuBarContext, type ItemState } from "./MenuB
  *     </MenuBarItem>
  * </MenuBar>
  * ```
- *
- * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
- * @prop {"horizontal" | "vertical"} orientation -- The orientation of the menu, which affects keyboard navigation
  */
-export default function MenuBar() {
+export default function MenuBar($props: MenuBarProps) {
+	$props ??= $watch({});
 	$props.orientation ??= "horizontal";
 
 	let $state = $watch({

@@ -7,10 +7,10 @@ import {
 } from "./FormTypes";
 import { StandardSchemaV1 } from "./StandardSchemaV1"
 
-interface Props {
-	/** An ID for the div container */
+interface FieldProps {
+	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the div container */
+	/** Class name(s) for the root element */
 	class?: string,
 	/** The name of the data that this field contains */
 	name: string,
@@ -24,7 +24,9 @@ interface Props {
  * A field in a form which automatically links up a Label and/or an input
  * component and/or a Message.
  */
-export default function Field($props: Props) {
+export default function Field($props: FieldProps) {
+	$props ??= $watch({ name: "" });
+
 	let $state = $watch({
 		inputId: "-1",
 		value: $props.value,

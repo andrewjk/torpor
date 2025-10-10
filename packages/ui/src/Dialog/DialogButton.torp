@@ -1,13 +1,25 @@
 import { DialogContextName, type DialogContext } from "./DialogTypes";
 
+interface DialogButtonProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover */
+	value?: any,
+	/** "confirm" if the button should respond to the Enter key or "cancel" if the button should respond to the Escape key */
+	type?: "confirm" | "cancel",
+	/** Whether this button is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a DialogFooter and signals a response by a user.
  * 
- * @prop {any | undefined} value -- The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover
- * @prop {"confirm" | "cancel" | undefined} type -- "confirm" if the button should respond to the Enter key or "cancel" if the button should respond to the Escape key
- * @prop {boolean} disabled -- Whether this button is disabled
  */
-export default function DialogButton($props: any) {
+export default function DialogButton($props: DialogButtonProps) {
+	$props ??= $watch({});
+
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the DialogContext

@@ -1,13 +1,22 @@
 import getId from "../utils/getId";
 import { DialogContextName, type DialogContext } from "./DialogTypes";
 
+interface DialogHeaderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the header will be announced by screen readers when the Dialog is opened */
+	ariaAnnounce?: boolean,
+}
+
 /**
  * The header for a Dialog. Content in the header will be announced by screen
  * readers when the Dialog is opened, unless ariaAnnounce is false.
  * 
- * @prop {boolean} ariaAnnounce -- Whether the header will be announced by screen readers when the Dialog is opened
  */
-export default function DialogHeader($props: any) {
+export default function DialogHeader($props: DialogHeaderProps) {
+	$props ??= $watch({});
 	$props.id ??= getId();
 	$props.ariaAnnounce ??= true;
 

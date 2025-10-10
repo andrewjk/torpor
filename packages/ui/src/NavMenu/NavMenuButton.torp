@@ -1,11 +1,21 @@
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
+interface NavMenuButtonProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this button is disabled  */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a NavMenu to carry out a non-navigation action such as logging out.
  *
- * @prop {boolean} disabled -- Whether this button is disabled 
  */
-export default function NavMenuButton($props: any) {
+export default function NavMenuButton($props: NavMenuButtonProps) {
+	$props ??= $watch({});
+
 	/** Set when the item is disabled */
 	let dataDisabled = $props.disabled || undefined;
 

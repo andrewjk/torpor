@@ -7,7 +7,15 @@ import ChevronRight from "../icons/ChevronRight.torp";
 
 // TODO: Split this out into Calendar, CalendarHeader, CalendarPreviousTrigger, CalendarGrid etc
 
-export default function Calendar() {
+interface CalendarProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
+export default function Calendar($props: CalendarProps) {
+	$props ??= $watch({});
 	$props.startOfWeek ??= 1;
 	$props.selectable ??= false;
 	$props.value ??= new Date();

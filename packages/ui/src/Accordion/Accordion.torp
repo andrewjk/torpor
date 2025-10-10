@@ -1,5 +1,20 @@
 import { AccordionContextName, type AccordionContext, type ItemState } from "./AccordionTypes";
 
+interface AccordionProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
+	type?: "single" | "multiple",
+	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
+	value?: string | string[],
+	/** If set to true, the user cannot interact with any items in the Accordion */
+	disabled?: boolean,
+	/** Raised when the expanded item(s) have changed */
+	onchange?: (value: string | string[]) => void,
+}
+
 /**
  * A vertically stacked set of interactive headings that enable users to reveal
  * or hide associated sections of content.
@@ -18,13 +33,10 @@ import { AccordionContextName, type AccordionContext, type ItemState } from "./A
  * 	</AccordionItem>
  * </Accordion>
  * ```
- *
- * @prop {"single" | "multiple"} type -- Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time
- * @prop {string | string[]} value -- The value of the expanded AccordionItem, or an array of values if the type is "multiple"
- * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the Accordion
- * @prop {(value: string | string[]) => void} [onchange] -- Raised when the expanded item(s) have changed
  */
-export default function Accordion($props: any) {
+export default function Accordion($props: AccordionProps) {
+	$props ??= $watch({ type: "single", value: "" });
+
 	$props.type ||= "single";
 	$props.value ||= $props.type === "single" ? "" : [];
 
@@ -44,10 +56,10 @@ export default function Accordion($props: any) {
 
 	$run(() => {
 		// HACK: This should probably be done with setters?
-		let newValue = $props.value;
+		let newValue = $props.value!;
 
 		// Get the value
-		switch ($props.type) {
+		switch ($props!.type) {
 			case "single": {
 				// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
 				newValue = newValue?.toString();
@@ -73,7 +85,7 @@ export default function Accordion($props: any) {
 	})
 
 	$run(() => {
-		itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+		itemStates.forEach((s) => s.parentDisabled = $props.disabled === true);
 	});
 
 	// Dispatch the change event when the value changes
@@ -84,7 +96,7 @@ export default function Accordion($props: any) {
 		if (firstChange) {
 			firstChange = false;
 		} else if (ev) {
-			ev(value);
+			ev(value!);
 		}
 	});
 
@@ -114,7 +126,7 @@ export default function Accordion($props: any) {
 		}
 
 		// Set whether the Accordion itself is disabled
-		itemState.parentDisabled = $props.disabled
+		itemState.parentDisabled = $props.disabled === true
 
 		// Add the item's state to the array
 		itemStates.splice(itemState.index, 0, itemState);

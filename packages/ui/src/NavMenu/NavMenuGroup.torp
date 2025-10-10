@@ -1,11 +1,20 @@
 import { NavMenuGroupContextName, type NavMenuGroupContext } from "./NavMenuTypes";
 
+interface NavMenuGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the group to screen readers  */
+	ariaLabel?: string,
+}
+
 /**
  * A container for a logical group of navigation menu items.
- *
- * @prop {string | undefined} ariaLabel -- An ARIA label for describing the group to screen readers 
  */
-export default function NavMenuGroup($props: any) {
+export default function NavMenuGroup($props: NavMenuGroupProps) {
+	$props ??= $watch({});
+
 	let $state = $watch({
 		headerId: ""
 	});

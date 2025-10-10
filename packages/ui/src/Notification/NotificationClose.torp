@@ -1,9 +1,18 @@
 import { NotificationContextName, type NotificationContext } from "./NotificationTypes";
 
+interface NotificationCloseProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
 /**
  * The button that a user can press to close this Notification.
  */
-export default function NotificationClose() {
+export default function NotificationClose($props: NotificationCloseProps) {
+	$props ??= $watch({});
+
 	// Get stuff out of the NotificationContext
 	const context = $context[NotificationContextName] as NotificationContext;
 	if (!context) {

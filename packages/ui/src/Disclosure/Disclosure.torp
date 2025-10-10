@@ -1,4 +1,17 @@
-import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+import { DisclosureContextName, type DisclosureContext, type DisclosureState } from "./DisclosureTypes";
+
+interface DisclosureProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the Disclosure is expanded and its content visible */
+	expanded?: boolean,
+	/** If set to true, the user cannot interact with this Disclosure */
+	disabled?: boolean,
+	/** Raised when this item is opened or closed */
+	ontoggle?: (open: boolean) => void,
+}
 
 /**
  * An interactive header that enables users to reveal or hide an associated section of content.
@@ -15,12 +28,9 @@ import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes
  *     <DisclosureContent />
  * </Disclosure>
  * ```
- *
- * @prop {boolean} [expanded] -- Whether the Disclosure is expanded and its content visible
- * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this Disclosure
- * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
  */
-export default function Disclosure($props: any) {
+export default function Disclosure($props: DisclosureProps) {
+	$props ??= $watch({});
 	$props.expanded ??= false;
 	$props.disabled ??= false;
 

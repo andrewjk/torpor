@@ -1,4 +1,19 @@
-import { AccordionContextName, AccordionItemContextName, type AccordionContext, type AccordionItemContext } from "./AccordionTypes";
+import { AccordionContextName, AccordionItemContextName, type ItemState, type AccordionContext, type AccordionItemContext } from "./AccordionTypes";
+
+interface AccordionItemProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically */
+	index?: number,
+	/** A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index */
+	value?: string,
+	/** If set to true, the user cannot interact with this AccordionItem */
+	disabled?: boolean,
+	/** Raised when this item is opened or closed */
+	ontoggle?: (open: boolean) => void,
+}
 
 /**
  * An item in an Accordion, which must consist of an AccordionTrigger and an AccordionContent.
@@ -13,13 +28,10 @@ import { AccordionContextName, AccordionItemContextName, type AccordionContext, 
  * 	<AccordionContent />
  * </AccordionItem>
  * ```
- *
- * @prop {number} [index] -- The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically
- * @prop {string} [value] -- A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index
- * @prop {boolean} [disabled] -- If set to true, the user cannot interact with this AccordionItem
- * @prop {(boolean) => void} [ontoggle] -- Raised when this item is opened or closed
  */
-export default function AccordionItem($props: any) {
+export default function AccordionItem($props: AccordionItemProps) {
+	$props ??= $watch({});
+
 	let $state: ItemState = $watch({
 		index: -1,
 		value: "",

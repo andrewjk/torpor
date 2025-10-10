@@ -1,5 +1,22 @@
 import { TabGroupContextName, type TabGroupContext, type ItemState } from "./TabGroupTypes";
 
+interface TabGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The orientation of the tab buttons, which affects keyboard navigation */
+	orientation?: "horizontal" | "vertical",
+	/** How tabs are activated; if automatic they are shown on focus, if manual they must be clicked */
+	activation?: "automatic" | "manual",
+	/** The value of the active TabContent */
+	value?: string | string[],
+	/** If set to true, the user cannot interact with any items in the TabGroup */
+	disabled?: boolean,
+	/** Raised when the active item has changed */
+	onchange?: (value: string | string[]) => void
+}
+
 /**
  * A list of interactive headings coupled with layered sections of content that
  * enable users to reveal a single section of content at a time.
@@ -18,14 +35,9 @@ import { TabGroupContextName, type TabGroupContext, type ItemState } from "./Tab
  * 	<TabContent />
  * </TabGroup>
  * ```
- *
- * @prop {"horizontal" | "vertical"} orientation -- The orientation of the tab buttons, which affects keyboard navigation
- * @prop {"automatic" | "manual"} activation -- How tabs are activated; if automatic they are shown on focus, if manual they must be clicked
- * @prop {string | string[]} value -- The value of the active TabContent
- * @prop {boolean} disabled -- If set to true, the user cannot interact with any items in the TabGroup
- * @prop {(value: string | string[]) => void} [onchange] -- Raised when the active item has changed
  */
-export default function TabGroup($props: any) {
+export default function TabGroup($props: TabGroupProps) {
+	$props ??= $watch({});
 	$props.orientation ||= "horizontal";
 	$props.activation ||= "automatic";
 	$props.value ||= "";
@@ -63,7 +75,7 @@ export default function TabGroup($props: any) {
 	});
 
 	$run(() => {
-		itemStates.forEach((s) => s.parentDisabled = $props.disabled);
+		itemStates.forEach((s) => s.parentDisabled = $props.disabled === true);
 	});
 
 	// Dispatch the change event when the value changes
@@ -74,7 +86,7 @@ export default function TabGroup($props: any) {
 		if (firstChange) {
 			firstChange = false;
 		} else if (ev) {
-			ev(value);
+			ev(value!);
 		}
 	});
 

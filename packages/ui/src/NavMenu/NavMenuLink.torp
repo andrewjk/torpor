@@ -1,14 +1,25 @@
 
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
+interface NavMenuLinkProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The URL for the menu link */
+	href: string,
+	/** Whether the menu link should open in a new tab/window */
+	newWindow?: boolean,
+	/** Whether this link is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A link that is placed in a NavMenu and signals a response by a user.
  *
- * @prop {string} href -- The URL for the menu link
- * @prop {newWindow} boolean -- Whether the menu link should open in a new tab/window
- * @prop {boolean} disabled -- Whether this link is disabled
  */
-export default function NavMenuLink($props: any) {
+export default function NavMenuLink($props: NavMenuLinkProps) {
+	$props ??= $watch({ href: "#" });
 	$props.newWindow ??= false;
 
 	/** Set when the item is disabled */

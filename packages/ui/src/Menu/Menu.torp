@@ -7,6 +7,15 @@ import {
 	type MenuPopoutContext
 } from "./MenuTypes";
 
+interface MenuProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** An ARIA label for describing the menu to screen readers */
+	ariaLabel?: string,
+}
+
 /**
  * A list of choices for the user, such as a set of actions or functions. A
  * menu is usually hidden until made visible by the user.
@@ -24,10 +33,10 @@ import {
  *     </MenuGroup>
  * </Menu>
  * ```
- *
- * @prop {string} ariaLabel -- An ARIA label for describing the menu to screen readers
  */
-export default function Menu() {
+export default function Menu($props: MenuProps) {
+	$props ??= $watch({});
+
 	// A collection containing the state and some functions for each item
 	let itemStates: ItemState[] = [];
 	let focusIndex = -1;

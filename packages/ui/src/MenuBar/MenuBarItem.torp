@@ -6,6 +6,21 @@ import {
 } from "./MenuBarTypes";
 import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
 
+interface MenuBarItemProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the item is visible */
+	visible?: boolean,
+	/** Called when the item is opened or closed */
+	ontoggle?: (visible: boolean) => void,
+	/** Called when the item has opened */
+	onopen?: () => void,
+	/** Called when the item has closed */
+	onclose?: () => void,
+}
+
 /**
  * A popout that is attached to a menubar button and can be used to show a submenu.
  *
@@ -17,13 +32,9 @@ import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes
  *     <MenuBarItemContent />
  * </MenuBarItem>
  * ```
- *
- * @prop {boolean} visible -- Whether the item is visible
- * @prop {(boolean) => void} ontoggle -- Called when the item is opened or closed
- * @prop {() => void} onopen -- Called when the item has opened
- * @prop {() => void} onclose -- Called when the item has closed
  */
-export default function MenuBarItem() {
+export default function MenuBarItem($props: MenuBarItemProps) {
+	$props ??= $watch({});
 	$props.visible ??= false;
 
 	let $state = $watch({

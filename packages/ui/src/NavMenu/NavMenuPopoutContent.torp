@@ -3,13 +3,23 @@ import getScrollParent from "../utils/getScrollParent";
 import setPopoverPosition from "../utils/setPopoverPosition";
 import { NavMenuPopoutContextName, type NavMenuPopoutContext } from "./NavMenuTypes";
 
+interface NavMenuPopoutContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Where the popout will be shown, relative to the popout button */
+	side?: "top" | "right" | "bottom" | "left",
+	/** How the popout will be aligned, relative to the popout button */
+	alignment?: "start" | "center" | "end",
+}
+
 /**
  * The content that is displayed for a NavMenuPopout when it is open.
  *
- * @prop {"top" | "right" | "bottom" | "left"} side -- Where the popout will be shown, relative to the popout button
- * @prop {"start" | "center" | "end"} alignment -- How the popout will be aligned, relative to the popout button
  */
-export default function NavMenuPopoutContent($props: any) {
+export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps) {
+	$props ??= $watch({});
 	$props.side ??= "bottom";
 	$props.alignment ??= "start";
 

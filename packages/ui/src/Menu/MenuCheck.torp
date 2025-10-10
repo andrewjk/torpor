@@ -5,14 +5,25 @@ import {
 	type MenuContext
 } from "./MenuTypes";
 
+interface MenuCheckProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether this item is checked */
+	checked?: boolean,
+	/** Whether this item is disabled */
+	disabled?: boolean,
+}
+
 /**
  * A button that is placed in a Menu or MenuGroup to allow the user to turn an
  * option on or off.
  *
- * @prop {boolean} checked -- Whether this item is checked
- * @prop {boolean} disabled -- Whether this item is disabled
  */
-export default function MenuCheck() {
+export default function MenuCheck($props: MenuCheckProps) {
+	$props ??= $watch({});
+
 	let $state = $watch({
 		checked: $props.checked
 	});

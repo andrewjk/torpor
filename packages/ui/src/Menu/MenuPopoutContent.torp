@@ -2,13 +2,22 @@
 import setPopoverPosition from "../utils/setPopoverPosition";
 import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
 
+interface MenuPopoutContentProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Where the popout will be shown, relative to the popout button */
+	side?: "top" | "right" | "bottom" | "left",
+	/** How the popout will be aligned, relative to the popout button */
+	alignment?: "start" | "center" | "end",
+}
+
 /**
  * The content that is displayed for a MenuPopout when it is open.
- *
- * @prop {"top" | "right" | "bottom" | "left"} side -- Where the popout will be shown, relative to the popout button
- * @prop {"start" | "center" | "end"} alignment -- How the popout will be aligned, relative to the popout button
  */
-export default function MenuPopoutContent() {
+export default function MenuPopoutContent($props: MenuPopoutContentProps) {
+	$props ??= $watch({});
 	$props.side ??= "right";
 	$props.alignment ??= "start";
 
