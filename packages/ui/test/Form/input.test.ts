@@ -6,8 +6,6 @@ import { expect, test } from "vitest";
 import Input from "./components/InputTest.torp";
 
 test("Input", async () => {
-	const user = userEvent.setup();
-
 	let props = { value: "" };
 
 	const container = document.createElement("div");
@@ -16,6 +14,6 @@ test("Input", async () => {
 
 	expect(queryByPlaceholderText(container, "Name...")).not.toBeNull();
 
-	await user.type(getByPlaceholderText(container, "Name..."), "Greg");
+	await userEvent.type(getByPlaceholderText(container, "Name..."), "Greg");
 	expect(props.value).toBe("Greg");
 });

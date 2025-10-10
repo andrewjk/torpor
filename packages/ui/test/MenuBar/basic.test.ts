@@ -1,5 +1,6 @@
-import { fireEvent, getByText, queryByText } from "@testing-library/dom";
+import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import MenuBarBasic from "./components/MenuBarBasic.torp";
@@ -15,7 +16,7 @@ describe("MenuBar", () => {
 		expect(queryByText(container, "Sub item 1")).not.toBeInTheDocument();
 
 		// Clicking the top level item should show the sub item
-		fireEvent.click(getByText(container, "Top level"));
+		await userEvent.click(getByText(container, "Top level"));
 		expect(queryByText(container, "Sub item 1")).toBeInTheDocument();
 	});
 });

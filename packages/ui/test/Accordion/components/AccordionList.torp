@@ -7,6 +7,8 @@ import {
 } from "../../../src/Accordion/index";
 
 export default function AccordionList() {
+	$props ??= $watch({});
+
 	@render {
 		<Accordion value={$props.value}>
 			@for (let item of $props.items) {

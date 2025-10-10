@@ -1,5 +1,6 @@
-import { fireEvent, getByText, queryByText } from "@testing-library/dom";
+import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import MenuBarAccessibility from "./components/MenuBarAccessibility.torp";
@@ -38,7 +39,7 @@ describe("MenuBar", () => {
 		// A parent menuitem has aria-expanded set to false when its child menu is not visible and set
 		// to true when the child menu is visible
 		expect(queryByText(container, "Top level")).toHaveAttribute("aria-expanded", "false");
-		fireEvent.click(getByText(container, "Top level"));
+		await userEvent.click(getByText(container, "Top level"));
 		expect(queryByText(container, "Top level")).toHaveAttribute("aria-expanded", "true");
 
 		// One of the following approaches is used to enable scripts to move focus among items in a

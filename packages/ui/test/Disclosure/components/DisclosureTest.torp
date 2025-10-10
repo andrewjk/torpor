@@ -6,6 +6,8 @@ import {
 } from "../../../src/Disclosure/index";
 
 export default function DisclosureAccessibility($props: { expanded: boolean }) {
+	$props ??= $watch({ expanded: false });
+
 	@render {
 		<Disclosure {$props.expanded}>
 			<DisclosureHeader as="h4">

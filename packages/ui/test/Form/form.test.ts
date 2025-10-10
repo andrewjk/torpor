@@ -11,8 +11,6 @@ import { expect, test } from "vitest";
 import Form from "./components/FormTest.torp";
 
 test("Form", async () => {
-	const user = userEvent.setup();
-
 	const container = document.createElement("div");
 	document.body.appendChild(container);
 	mount(container, Form);
@@ -27,10 +25,10 @@ test("Form", async () => {
 	expect(queryByText(container, "Name:")).toHaveAttribute("for", "name-id");
 
 	// Validation should be fired on submit
-	await user.click(getByText(container, "Submit"));
+	await userEvent.click(getByText(container, "Submit"));
 	expect(queryByText(container, "Name is required!")).not.toBeNull();
 
 	// After submitting, validation should fire on input
-	await user.type(getByPlaceholderText(container, "Name..."), "G");
+	await userEvent.type(getByPlaceholderText(container, "Name..."), "G");
 	expect(queryByText(container, "Name is required!")).toBeNull();
 });

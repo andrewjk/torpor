@@ -1,5 +1,6 @@
-import { fireEvent, getByText, queryByText } from "@testing-library/dom";
+import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import DisclosureTest from "./components/DisclosureTest.torp";
@@ -13,7 +14,7 @@ describe("Disclosure", () => {
 		expect(queryByText(container, "Disclosure content")).not.toBeInTheDocument();
 
 		// Clicking the header should reveal the body
-		fireEvent.click(getByText(container, "Disclosure header"));
+		await userEvent.click(getByText(container, "Disclosure header"));
 		expect(queryByText(container, "Disclosure content")).toBeInTheDocument();
 	});
 });

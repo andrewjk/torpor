@@ -11,8 +11,6 @@ import { expect, test } from "vitest";
 import Field from "./components/FieldTest.torp";
 
 test("Field", async () => {
-	const user = userEvent.setup();
-
 	const container = document.createElement("div");
 	document.body.appendChild(container);
 	mount(container, Field);
@@ -31,6 +29,6 @@ test("Field", async () => {
 	expect(queryByText(container, "Name is required!")).not.toBeNull();
 
 	// After blur, validation should fire on input
-	await user.type(getByPlaceholderText(container, "Name..."), "G");
+	await userEvent.type(getByPlaceholderText(container, "Name..."), "G");
 	expect(queryByText(container, "Name is required!")).toBeNull();
 });
