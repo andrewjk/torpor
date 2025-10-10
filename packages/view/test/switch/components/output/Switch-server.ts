@@ -1,13 +1,15 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
+interface Props {
+	/** The value to switch on */
+	value: number
+}
+
 /**
  * A component with a switch statement in it.
  */
 export default function Switch(
-	$props: {
-		/** The value to switch on */
-		value: number
-	},
+	$props: Props,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

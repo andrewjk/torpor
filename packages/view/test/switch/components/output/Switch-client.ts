@@ -11,16 +11,18 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
+interface Props {
+	/** The value to switch on */
+	value: number
+}
+
 /**
  * A component with a switch statement in it.
  */
 export default function Switch(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: {
-		/** The value to switch on */
-		value: number
-	},
+	$props: Props,
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {

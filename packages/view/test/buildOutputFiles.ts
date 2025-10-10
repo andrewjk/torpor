@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import { existsSync, promises as fs, unlinkSync } from "node:fs";
 import path from "node:path";
 import build from "../src/compile/build";
+import buildType from "../src/compile/buildType";
 import parse from "../src/compile/parse";
 
 export default async function buildOutputFiles(componentPath: string): Promise<void> {
@@ -23,8 +24,10 @@ export async function buildFiles(file: string): Promise<void> {
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
 		let clientCode = formatCode(build(parsed.template).code, "client");
+		let typesCode = formatCode(buildType(parsed.template), "types");
 		await maybeWriteFile(file, clientCode, "client");
 		await maybeWriteFile(file, serverCode, "server");
+		await maybeWriteFile(file, typesCode, "types");
 	} else {
 		// Just log the message and continue with output/testing
 		console.log("PARSE FAILED for " + file);

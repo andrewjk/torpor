@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -17,6 +18,7 @@ export default function Source(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	const x = 5;
 	console.log(x);
@@ -30,29 +32,32 @@ export default function Source(
 
 	/* @if */
 	const t_if_range_1 = t_range();
-	let $t_if_state_1 = $watch({ creator: (_: Node | null) => {} });
+	let $t_if_state_1 = $watch({ index: -1 });
+	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
 	$run(function runIf() {
 		if ($props.counter > 10) {
-			$t_if_state_1.creator = (t_before) => {
+			t_if_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's large. </p> `);
 				const t_root_1 = t_root(t_fragment_1, true);
 				const t_text_1 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
 			};
+			$t_if_state_1.index = 0;
 		}
 		else {
-			$t_if_state_1.creator = (t_before) => {
+			t_if_creators_1[1] = (t_before) => {
 				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> It's small. </p> `);
 				const t_root_2 = t_root(t_fragment_2, true);
 				const t_text_2 = t_next(t_next(t_root_2), true);
 				t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 				t_next(t_text_2);
 			};
+			$t_if_state_1.index = 1;
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		t_run_branch(t_if_range_1, () => $t_if_state_1.creator(t_before));
+		t_run_branch(t_if_range_1, () => t_if_creators_1[$t_if_state_1.index](t_before));
 	});
 
 	const t_text_3 = t_next(t_if_anchor_1, true);
@@ -60,4 +65,5 @@ export default function Source(
 	t_next(t_text_3);
 	const y = 10;
 	console.log(y);
+	/**/ });
 }

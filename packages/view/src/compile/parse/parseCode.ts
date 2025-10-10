@@ -5,7 +5,9 @@ import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
 import isSpaceNode from "../utils/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
+import ParseComponentStatus from "./ParseComponentStatus";
 import type ParseStatus from "./ParseStatus";
+import parseInlineScript from "./parseInlineScript";
 import parseMarkup from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
@@ -109,11 +111,14 @@ export default function parseCode(source: string): ParseResult {
 						return {
 							start: c.start,
 							name: c.name,
+							exported: c.exported,
 							default: c.default,
+							documentation: c.documentation,
 							params: c.params,
 							markup: c.markup,
 							head: c.head,
 							style: c.style,
+							propsType: c.propsType,
 							props: c.props,
 							contextProps: c.contextProps,
 							slotProps: c.slotProps,
@@ -126,18 +131,37 @@ export default function parseCode(source: string): ParseResult {
 }
 
 function parseComponentStart(status: ParseStatus) {
-	let source = status.source.substring(0, status.i);
+	let source = status.source.substring(status.marker, status.i);
+	let exported = /export\s+(default\s+)*(function\s+|const\s+)*$/.test(source);
 	let def = /export\s+default\s+(function\s+|const\s+)*$/.test(source);
 	let isConst = /const\s+$/.test(source);
 	let isAnon = /export default\s+$/.test(source);
 
-	status.components.push({
-		start: status.i,
-		name: consumeAlphaNumeric(status),
+	let componentStart = status.i;
+	let name = consumeAlphaNumeric(status);
+
+	const current: ParseComponentStatus = {
+		start: componentStart,
+		name,
+		exported,
 		default: def,
-	});
-	const current = status.components.at(-1);
-	if (!current) return;
+	};
+	status.components.push(current);
+
+	// Look for /** ... */ documentation comments
+	let presource = source.substring(0, status.i).trimEnd();
+	let lastNewline = presource.lastIndexOf("\n");
+	if (lastNewline !== -1) {
+		presource = presource.substring(0, lastNewline).trimEnd();
+		if (presource.endsWith("*/")) {
+			for (let i = presource.length; i >= 0; i--) {
+				if (presource.substring(i, i + 3) === "/**") {
+					current.documentation = presource.substring(i);
+					break;
+				}
+			}
+		}
+	}
 
 	let start = -1;
 	let end = -1;
@@ -167,6 +191,36 @@ function parseComponentStart(status: ParseStatus) {
 	status.script.push({ script: "/* @params */", range: { start: 0, end: 0 } });
 
 	current.params = status.source.substring(start, end).trim() || undefined;
+
+	// Look for a params type or interface
+	// Might need to get fancier with this
+	const paramsMatch = current.params?.match(/\$props:\s*([$A-Za-z0-9]+)/);
+	if (paramsMatch) {
+		let propsTypeName = paramsMatch[1];
+		let propsTypeStart = status.source.search(new RegExp(`interface\\s+${propsTypeName}`));
+		if (propsTypeStart === -1) {
+			propsTypeStart = status.source.search(new RegExp(`type\\s+${propsTypeName}`));
+		}
+		if (propsTypeStart !== -1) {
+			let bracesStart = status.source.indexOf("{", propsTypeStart);
+			if (bracesStart !== -1) {
+				const status2: ParseStatus = {
+					source: status.source,
+					i: bracesStart + 1,
+					marker: 0,
+					level: 0,
+					imports: [],
+					script: [],
+					components: [],
+					errors: [],
+				};
+				const propsType = parseInlineScript(status2);
+				if (propsType) {
+					current.propsType = `${status.source.substring(propsTypeStart, bracesStart)}{${propsType}}`;
+				}
+			}
+		}
+	}
 
 	status.marker = end;
 	status.i = status.marker;

@@ -1,10 +1,12 @@
+interface Props {
+	/** The value to switch on */
+	value: number
+}
+
 /**
  * A component with a switch statement in it.
  */
- export default function Switch($props: {
-	/** The value to switch on */
-	value: number
-}) {
+export default function Switch($props: Props) {
 	@render {
 		@switch ($props.value) {
 			case 1: {
