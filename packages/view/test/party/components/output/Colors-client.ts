@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import type ListItem from "../../../../src/types/ListItem";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -21,6 +22,7 @@ export default function Colors(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	const colors = ["red", "green", "blue"];
 
@@ -74,4 +76,5 @@ export default function Colors(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
+	/**/ });
 }

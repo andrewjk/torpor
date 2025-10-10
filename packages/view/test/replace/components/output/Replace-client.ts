@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -18,6 +19,7 @@ export default function Replace(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	let counter = 0;
 
@@ -49,4 +51,5 @@ export default function Replace(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
+	/**/ });
 }

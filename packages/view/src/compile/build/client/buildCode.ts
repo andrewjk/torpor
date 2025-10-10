@@ -101,7 +101,7 @@ function buildTemplate(
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
-	if (/\$peek\b/.test(script)) imports.add("$peek");
+	/*if (/\$peek\b/.test(script))*/ imports.add("$peek");
 	if (/\$batch\b/.test(script)) imports.add("$batch");
 
 	let currentIndex = 0;
@@ -127,6 +127,12 @@ function buildTemplate(
 				b.append(`$context = Object.assign({}, $context);`);
 			}
 
+			// NOTE: We're isolating the user script by setting `context.activeTarget =
+			// null` and then setting it back at the end, but maybe it would be better to
+			// make it so that signals only affect effects that they are under e.g. so
+			// that creating a $state in a component doesn't affect any $runs outside
+			// the component?
+			b.append("$peek(() => { /**/");
 			b.append("");
 		} else if (chunk.script === "/* @render */") {
 			if (current.markup) {
@@ -151,6 +157,7 @@ function buildTemplate(
 		} else if (chunk.script === "/* @style */") {
 			// No styles in the client
 		} else if (chunk.script === "/* @end */") {
+			b.append("/**/ });");
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {

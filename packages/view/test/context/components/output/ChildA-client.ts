@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -15,6 +16,7 @@ export default function ChildA(
 	_$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
+	$peek(() => { /**/
 
 	$context["ChildAContext"] = "hi!";
 
@@ -35,4 +37,5 @@ export default function ChildA(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
 
+	/**/ });
 }

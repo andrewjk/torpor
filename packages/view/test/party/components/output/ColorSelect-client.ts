@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import type ListItem from "../../../../src/types/ListItem";
@@ -24,6 +25,7 @@ export default function ColorSelect(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	let $state = $watch({
 		selectedColorId: 2
@@ -97,4 +99,5 @@ export default function ColorSelect(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
 
+	/**/ });
 }

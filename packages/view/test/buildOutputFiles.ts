@@ -100,10 +100,13 @@ function formatCode(code: string, suffix: string): string {
 // HACK: We could probably be smarter about this
 const importsMap: Record<string, string> = {
 	'import { $watch } from "@torpor/view";': 'import $watch from "../../../../src/render/$watch";',
-	'import { $unwrap } from "@torpor/view";':
-		'import $unwrap from "../../../../src/render/$unwrap";',
+	'import { $cache } from "@torpor/view";': 'import $cache from "../../../../src/render/$cache";',
 	'import { $run } from "@torpor/view";': 'import $run from "../../../../src/render/$run";',
 	'import { $mount } from "@torpor/view";': 'import $mount from "../../../../src/render/$mount";',
+	'import { $unwrap } from "@torpor/view";':
+		'import $unwrap from "../../../../src/render/$unwrap";',
+	'import { $peek } from "@torpor/view";': 'import $peek from "../../../../src/render/$peek";',
+	'import { $batch } from "@torpor/view";': 'import $batch from "../../../../src/render/$batch";',
 	'import { t_range } from "@torpor/view";':
 		'import t_range from "../../../../src/render/newRange";',
 	'import { t_push_range } from "@torpor/view";':
@@ -157,12 +160,18 @@ const importsMap: Record<string, string> = {
 		'import type SlotRender from "../../../../src/types/SlotRender";',
 	'import { $watch } from "@torpor/view/ssr";':
 		'import $watch from "../../../../src/render/$serverWatch";',
-	'import { $unwrap } from "@torpor/view/ssr";':
-		'import $unwrap from "../../../../src/render/$serverUnwrap";',
+	'import { $cache } from "@torpor/view/ssr";':
+		'import $cache from "../../../../src/render/$serverCache";',
 	'import { $run } from "@torpor/view/ssr";':
 		'import $run from "../../../../src/render/$serverRun";',
 	'import { $mount } from "@torpor/view/ssr";':
 		'import $mount from "../../../../src/render/$serverMount";',
+	'import { $unwrap } from "@torpor/view/ssr";':
+		'import $unwrap from "../../../../src/render/$serverUnwrap";',
+	'import { $peek } from "@torpor/view/ssr";':
+		'import $peek from "../../../../src/render/$serverPeek";',
+	'import { $batch } from "@torpor/view/ssr";':
+		'import $batch from "../../../../src/render/$serverBatch";',
 	'import { t_fmt } from "@torpor/view/ssr";':
 		'import t_fmt from "../../../../src/render/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':

@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import type ListItem from "../../../../src/types/ListItem";
@@ -21,6 +22,7 @@ export default function List(
 	$context: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -77,4 +79,5 @@ export default function List(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
+	/**/ });
 }

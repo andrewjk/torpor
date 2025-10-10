@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import $watch from "../../../../src/render/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
@@ -19,6 +20,7 @@ export default function Component(
 	$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	let components = {
 		BigTitle,
@@ -66,4 +68,5 @@ export default function Component(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
+	/**/ });
 }

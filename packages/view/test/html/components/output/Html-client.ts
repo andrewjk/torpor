@@ -1,3 +1,4 @@
+import $peek from "../../../../src/render/$peek";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -16,6 +17,7 @@ export default function Html(
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
+	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -41,4 +43,5 @@ export default function Html(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
+	/**/ });
 }
