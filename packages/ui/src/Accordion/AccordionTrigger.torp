@@ -22,7 +22,7 @@ export default function AccordionTrigger($props: AccordionTriggerProps) {
 	if (!context) {
 		throw new Error("AccordionTrigger must be contained within an AccordionItem");
 	}
-	let $state = $context[AccordionItemContextName].state;
+	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in AccordionContent
 	$state.headerId = $props.id;
@@ -53,10 +53,10 @@ export default function AccordionTrigger($props: AccordionTriggerProps) {
 			class={`torp-accordion-trigger ${$props.class ?? ""}`.trim()}
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-expanded={$state.expanded.toString()}
-			aria-disabled={$state.disabled}
+			aria-disabled={$state.disabled ? "true" : undefined}
 			aria-controls={$state.contentId}
 			data-state={$state.dataState}
-			data-disabled={$state.disabled}
+			data-disabled={$state.disabled ? "true" : undefined}
 			&ref={button}
 			onclick={handleClick}
 			onkeydown={handleKey}

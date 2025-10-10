@@ -25,6 +25,8 @@ export interface ItemState {
 	index: number;
 	value: string;
 	expanded: boolean;
+	headerId: string;
+	contentId: string;
 	disabled: boolean;
 	parentDisabled: boolean;
 	dataState: "open" | "closed";

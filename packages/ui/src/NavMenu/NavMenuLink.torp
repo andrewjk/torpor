@@ -22,9 +22,6 @@ export default function NavMenuLink($props: NavMenuLinkProps) {
 	$props ??= $watch({ href: "#" });
 	$props.newWindow ??= false;
 
-	/** Set when the item is disabled */
-	let dataDisabled = $props.disabled || undefined;
-
 	let link: HTMLAnchorElement;
 
 	// Get stuff out of the NavMenuContext
@@ -50,7 +47,7 @@ export default function NavMenuLink($props: NavMenuLinkProps) {
 			target={$props.newWindow ? "_blank" : undefined}
 			role="menuitem"
 			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={dataDisabled}
+			data-disabled={$props.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

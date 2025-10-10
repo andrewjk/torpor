@@ -21,7 +21,7 @@ export default function DisclosureContent($props: DisclosureContentProps) {
 	if (!context) {
 		throw new Error("DisclosureContent must be contained within a Disclosure");
 	}
-	let $state = $context[DisclosureContextName].state
+	let $state = context.state
 
 	// Set the content ID so that it can be used with aria-controls in DisclosureTrigger
 	$state.contentId = $props.id;
@@ -33,7 +33,7 @@ export default function DisclosureContent($props: DisclosureContentProps) {
 			role={$props.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}
 			data-state={$state.dataState}
-			data-disabled={$state.dataDisabled}
+			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			@if ($state.expanded) {
 				<slot />

@@ -18,9 +18,6 @@ interface NavMenuElementProps {
 export default function NavMenuElement($props: NavMenuElementProps) {
 	$props ??= $watch({});
 
-	/** Set when the item is disabled */
-	let dataDisabled = $props.disabled || undefined;
-
 	// Get stuff out of the NavMenuContext
 	const menuContext = $context[NavMenuContextName] as NavMenuContext;
 	if (!menuContext) {
@@ -42,7 +39,7 @@ export default function NavMenuElement($props: NavMenuElementProps) {
 			type="div"
 			role="menuitem"
 			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={dataDisabled}
+			data-disabled={$props.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

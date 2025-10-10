@@ -20,7 +20,7 @@ export default function DisclosureTrigger($props: DisclosureTriggerProps) {
 	if (!context) {
 		throw new Error("DisclosureTrigger must be contained within a Disclosure");
 	}
-	let $state = $context[DisclosureContextName].state;
+	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in DisclosureContent
 	$state.headerId = $props.id;

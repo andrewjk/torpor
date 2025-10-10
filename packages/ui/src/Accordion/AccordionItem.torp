@@ -36,6 +36,8 @@ export default function AccordionItem($props: AccordionItemProps) {
 		index: -1,
 		value: "",
 		expanded: false,
+		headerId: "",
+		contentId: "",
 		disabled: $props.disabled,
 		parentDisabled: false,
 		get dataState() {
@@ -84,7 +86,7 @@ export default function AccordionItem($props: AccordionItemProps) {
 			{$props.id}
 			class={`torp-accordion-item ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
-			data-disabled={$state.dataDisabled}
+			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
 		</div>

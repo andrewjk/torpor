@@ -71,7 +71,7 @@ export default function Disclosure($props: DisclosureProps) {
 			{$props.id}
 			class={`torp-disclosure-item ${$props.class ?? ""}`.trim()}
 			data-state={$state.dataState}
-			data-disabled={$state.dataDisabled}
+			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
 		</div>

@@ -22,7 +22,7 @@ export default function TabTrigger($props: TabTriggerProps) {
 	if (!context) {
 		throw new Error("TabTrigger must be contained within a TabHeader");
 	}
-	let $state = $context[TabItemContextName].state;
+	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in TabContent
 	$state.headerId = $props.id;

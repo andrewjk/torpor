@@ -24,9 +24,6 @@ export default function NavMenuPopoutButton($props: NavMenuPopoutButtonProps) {
 	$props ??= $watch({});
 	$props.hoverDelay ??= 500;
 
-	/** Set when the item is disabled */
-	let dataDisabled = $props.disabled || undefined;
-
 	let button: HTMLButtonElement;
 	let interval: NodeJS.Timeout | undefined;
 
@@ -113,7 +110,7 @@ export default function NavMenuPopoutButton($props: NavMenuPopoutButtonProps) {
 			aria-haspopup="true"
 			aria-expanded={$state.visible.toString()}
 			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={dataDisabled}
+			data-disabled={$state.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

@@ -16,9 +16,6 @@ interface NavMenuButtonProps {
 export default function NavMenuButton($props: NavMenuButtonProps) {
 	$props ??= $watch({});
 
-	/** Set when the item is disabled */
-	let dataDisabled = $props.disabled || undefined;
-
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the NavMenuContext
@@ -43,7 +40,7 @@ export default function NavMenuButton($props: NavMenuButtonProps) {
 			{$props.disabled}
 			role="menuitem"
 			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={dataDisabled}
+			data-disabled={$props.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick
