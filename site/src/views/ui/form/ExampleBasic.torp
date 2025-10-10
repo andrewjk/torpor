@@ -1,3 +1,4 @@
+import { $page } from "@torpor/build/state";
 import { Form, Field, Label, Input, Message } from "@torpor/ui/Form";
 import * as z from "zod";
 
@@ -18,19 +19,18 @@ export default function ExampleBasic($props: any) {
 			or anything else to see an error message.
 		</p>
 
-		@if ($props?.form) {
-			@if ($props.form.ok) {
+		@if ($page?.form) {
+			@if ($page?.form?.ok) {
 				<p style="color: green">
 					All good
 				</p>
 			} else {
 				<p style="color: red">
-					{$props.form.message}
+					{$page?.form?.message}
 				</p>
 			}
 		}
 		<Form class="example-form" {$state.data} {schema}>
-			@console.trace("hey")
 			<Field class="example-form-field" name="text" &value={$state.data.text}>
 				<Label>Text</Label>
 				<Input placeholder="Type ok to succeed" />
