@@ -1,3 +1,4 @@
+import $mount from "../../../../src/render/$mount";
 import $run from "../../../../src/render/$run";
 import $watch from "../../../../src/render/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -10,10 +11,10 @@ import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
-export default function If(
+export default function IfCache(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { counter: number },
+	$props: { counter: number, i: number },
 	_$context: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>
 ): void {
@@ -30,11 +31,15 @@ export default function If(
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
 	$run(function runIf() {
-		if ($props.counter > 5) {
+		if ($props.counter < 5) {
 			t_if_creators_1[0] = (t_before) => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>It's big</p> `);
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> It's small! </p> `);
 				const t_root_1 = t_root(t_fragment_1, true);
-				const t_text_1 = t_next(t_next(t_root_1), true);
+				const t_p_1 = t_next(t_root_1) as HTMLElement;
+				const t_text_1 = t_next(t_p_1, true);
+				$mount(function elMount() {
+					return (() => $props.i++)(t_p_1);
+				});
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
 			};
@@ -42,7 +47,7 @@ export default function If(
 		}
 		else {
 			t_if_creators_1[1] = (t_before) => {
-				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>It's small</p> `);
+				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> It's not small... </p> `);
 				const t_root_2 = t_root(t_fragment_2, true);
 				const t_text_2 = t_next(t_next(t_root_2), true);
 				t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);

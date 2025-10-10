@@ -47,33 +47,36 @@ export default function Await(
 
 		/* @await */
 		const t_await_range_1 = t_range();
-		let $t_await_state_1 = $watch({ creator: (_: Node | null) => {} });
+		let $t_await_state_1 = $watch({ index: -1 });
+		let t_await_creators_1: ((t_before: Node | null) => void)[] = [];
 		let t_await_vars_1 = { t_token: 0 };
 		$run(function runAwait() {
-			$t_await_state_1.creator = (t_before) => {
+			t_await_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
 				const t_root_1 = t_root(t_fragment_1, true);
 				const t_text_1 = t_next(t_next(t_root_1), true);
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
 				t_next(t_text_1);
 			};
+			$t_await_state_1.index = 0;
 			t_await_vars_1.t_token++;
 			((t_token) => {
 				$state.guesser
 				.then((_number) => {
 					if (t_token === t_await_vars_1.t_token) {
-						$t_await_state_1.creator = (t_before) => {
+						t_await_creators_1[1] = (t_before) => {
 							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Is it a number?</p> `);
 							const t_root_2 = t_root(t_fragment_2, true);
 							const t_text_2 = t_next(t_next(t_root_2), true);
 							t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
 							t_next(t_text_2);
 						};
+						$t_await_state_1.index = 1;
 					}
 				})
 				.catch((ex) => {
 					if (t_token === t_await_vars_1.t_token) {
-						$t_await_state_1.creator = (t_before) => {
+						t_await_creators_1[2] = (t_before) => {
 							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p class="error">#</p> `);
 							const t_root_3 = t_root(t_fragment_3, true);
 							const t_text_3 = t_child(t_next(t_root_3));
@@ -84,12 +87,13 @@ export default function Await(
 							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);
 							t_next(t_text_4);
 						};
+						$t_await_state_1.index = 2;
 					}
 				});
 			})(t_await_vars_1.t_token);
 		});
 		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
-			t_run_branch(t_await_range_1, () => $t_await_state_1.creator(t_before));
+			t_run_branch(t_await_range_1, () => t_await_creators_1[$t_await_state_1.index](t_before));
 		});
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;

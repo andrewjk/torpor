@@ -15,6 +15,8 @@ export default function checkEffect(effect: Effect): void {
 	let rerun = checkSources(effect);
 
 	if (rerun) {
+		//console.log(`running effect '${String(effect.run)}'`);
+
 		// Run cleanup functions for the effect and its children
 		runCleanups(effect);
 

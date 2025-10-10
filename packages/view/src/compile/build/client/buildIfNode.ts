@@ -16,6 +16,7 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	const parentName = node.parentName || anchorName + ".parentNode";
 	const rangeName = nextVarName("if_range", status);
 	const stateName = "$" + nextVarName("if_state", status);
+	const creatorsName = nextVarName("if_creators", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -42,17 +43,19 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	b.append(`
 		/* @if */
 		const ${rangeName} = t_range();
-		let ${stateName} = $watch({ creator: (_: Node | null) => {} });`);
+		let ${stateName} = $watch({ index: -1 });
+		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
 	b.append(`$run(function runIf() {`);
+	let index = 0;
 	for (let branch of branches) {
-		buildIfBranch(branch, status, b, parentName, stateName);
+		buildIfBranch(branch, status, b, parentName, stateName, creatorsName, index++);
 	}
 	b.append(`});`);
 
 	b.append(`
 		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
-			t_run_branch(${rangeName}, () => ${stateName}.creator(t_before));
+			t_run_branch(${rangeName}, () => ${creatorsName}[${stateName}.index](t_before));
 		});`);
 	b.append("");
 }
@@ -63,12 +66,14 @@ function buildIfBranch(
 	b: Builder,
 	parentName: string,
 	stateName: string,
+	creatorsName: string,
+	index: number,
 ) {
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.range, status, b);
 
 	if (node.children.length > 0) {
-		b.append(`${stateName}.creator = (t_before) => {`);
+		b.append(`${creatorsName}[${index}] = (t_before) => {`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 
@@ -85,8 +90,9 @@ function buildIfBranch(
 
 		b.append("};");
 	} else {
-		b.append(`${stateName}.creator = (_) => {};`);
+		b.append(`${creatorsName}[${index}] = (_) => {};`);
 	}
 
+	b.append(`${stateName}.index = ${index};`);
 	b.append("}");
 }

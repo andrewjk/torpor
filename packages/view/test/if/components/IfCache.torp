@@ -1,0 +1,14 @@
+
+export default function IfCache($props: { counter: number, i: number }) {
+	@render {
+		@if ($props.counter < 5) {
+			<p onmount={() => $props.i++;}>
+				It's small!
+			</p>
+		} else {
+			<p>
+				It's not small...
+			</p>
+		}
+	}
+}
