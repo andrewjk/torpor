@@ -1,5 +1,16 @@
 # @torpor/build
 
+## 0.3.1
+
+### Patch Changes
+
+- 34d17f7: Feat: UI Form component and client-side submit
+- Updated dependencies [f4716c5]
+- Updated dependencies [1253f7a]
+- Updated dependencies [6268e00]
+- Updated dependencies [f2fb547]
+  - @torpor/view@0.3.2
+
 ## 0.3.0
 
 ### Minor Changes

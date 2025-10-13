@@ -1,5 +1,14 @@
 # @torpor/view
 
+## 0.3.2
+
+### Patch Changes
+
+- f4716c5: Fix: isolate components
+- 1253f7a: Fix: handle unclosed elements
+- 6268e00: Fix: run @if, @switch and @await with cached signals
+- f2fb547: Fix: better type definition generation
+
 ## 0.3.1
 
 ### Patch Changes
