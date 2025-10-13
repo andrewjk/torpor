@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.3.3
+
+### Patch Changes
+
+- 456f793: Fix: be less fancy about unused $context and $slots
+
 ## 0.3.2
 
 ### Patch Changes
