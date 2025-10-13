@@ -106,9 +106,17 @@ function buildTemplate(
 
 	let currentIndex = 0;
 	let current = template.components[0];
+	let status: BuildStatus = makeStatus(imports, map, current, options);
+	let first = true;
 
 	for (let chunk of template.script) {
 		if (chunk.script === "/* @params */") {
+			// Reset the status for each new function body
+			if (!first) {
+				status = makeStatus(imports, map, current, options);
+			}
+			first = false;
+
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				`${current.markup ? "$parent" : "_$parent"}: ParentNode`,
@@ -137,7 +145,6 @@ function buildTemplate(
 		} else if (chunk.script === "/* @render */") {
 			if (current.markup) {
 				// Add the interface
-				let status = makeStatus(imports, map, current, options);
 				b.append("");
 				b.append("/* User interface */");
 				buildFragmentText(current.markup, status, b);
@@ -147,7 +154,6 @@ function buildTemplate(
 		} else if (chunk.script === "/* @head */") {
 			if (current.head) {
 				// Add the head tags
-				let status = makeStatus(imports, map, current, options);
 				b.append("");
 				b.append("/* Head */");
 				status.inHead = true;
@@ -161,7 +167,6 @@ function buildTemplate(
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
-			let status = makeStatus(imports, map, current, options);
 			addMappedText("", chunk.script, "", chunk.range, status, b);
 		}
 	}
