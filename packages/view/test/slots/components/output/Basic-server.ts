@@ -3,9 +3,12 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import Header from "../output/./Header-server"
 
 export default function Basic(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

@@ -4,9 +4,11 @@ import ChildA from "../output/./ChildA-server";
 import ChildB from "../output/./ChildB-server";
 
 export default function Parent(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";

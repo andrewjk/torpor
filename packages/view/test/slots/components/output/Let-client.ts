@@ -15,8 +15,10 @@ export default function Let(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

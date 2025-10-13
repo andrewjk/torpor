@@ -68,9 +68,9 @@ function buildServerTemplate(
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				current.params ??
-					`${current.props?.length ? "$props:  Record<PropertyKey, any>" : "_$props:  Record<PropertyKey, any> | undefined"}`,
-				`${current.contextProps?.length || current.needsContext ? "$context" : "_$context"}: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "$slots" : "_$slots"}?: Record<string, ServerSlotRender>`,
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props: Record<PropertyKey, any> | undefined"}`,
+				`${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, ServerSlotRender>`,
 			];
 			b.append(params.join(",\n"));
 		} else if (chunk.script === ") /* @return_type */ {") {

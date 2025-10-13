@@ -10,7 +10,9 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function SmallTitle(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {

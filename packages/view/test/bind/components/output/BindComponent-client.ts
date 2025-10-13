@@ -14,9 +14,12 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function BindComponent(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 
@@ -54,8 +57,10 @@ function BindText(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

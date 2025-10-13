@@ -114,9 +114,9 @@ function buildTemplate(
 				`${current.markup ? "$parent" : "_$parent"}: ParentNode`,
 				`${current.markup ? "$anchor" : "_$anchor"}: Node | null`,
 				current.params ??
-					`${current.props?.length ? "$props:  Record<PropertyKey, any>" : "_$props:  Record<PropertyKey, any> | undefined"}`,
-				`${current.contextProps?.length || current.needsContext ? "$context" : "_$context"}: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "$slots" : "_$slots"}?: Record<string, SlotRender>`,
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props: Record<PropertyKey, any> | undefined"}`,
+				`${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>`,
 			];
 			b.append(params.join(",\n"));
 		} else if (chunk.script === ") /* @return_type */ {") {

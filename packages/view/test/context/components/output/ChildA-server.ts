@@ -2,9 +2,11 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function ChildA(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";

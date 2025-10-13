@@ -81,7 +81,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	if (/[A-Z]/.test(element.tagName[0])) {
 		element.type = "component";
 		slottifyChildNodes(element);
-		current.needsContext = true;
 	}
 
 	if (isSpecialNode(element)) {
@@ -90,7 +89,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// content. Anchors will be created for <slot> nodes and fragments will
 			// be created for the <fill> content
 			slottifyChildNodes(element);
-			current.needsContext = true;
 
 			// Add it to the component's slots collection
 			current.slotProps ??= [];
@@ -103,7 +101,6 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 				element.type = "component";
 				slottifyChildNodes(element);
-				current.needsContext = true;
 
 				const selfValue = selfAttribute.value;
 				const replace: ControlNode = {

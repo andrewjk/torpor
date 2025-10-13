@@ -1,9 +1,11 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ChildB(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";

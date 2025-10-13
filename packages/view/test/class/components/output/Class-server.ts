@@ -2,9 +2,11 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_class from "../../../../src/render/buildClasses";
 
 export default function Class(
-	$props:  Record<PropertyKey, any>,
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
@@ -26,9 +28,11 @@ export default function Class(
 }
 
 function Child(
-	$props:  Record<PropertyKey, any>,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

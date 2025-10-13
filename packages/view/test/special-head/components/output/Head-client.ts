@@ -5,9 +5,12 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function Head(
 	_$parent: ParentNode,
 	_$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

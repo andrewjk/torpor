@@ -4,9 +4,12 @@ import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function BindComponent(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
@@ -28,8 +31,10 @@ export default function BindComponent(
 
 function BindText(
 	$props: any,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

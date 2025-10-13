@@ -11,9 +11,12 @@ import Article from "../output/./Article-client"
 export default function Named(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

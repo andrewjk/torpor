@@ -10,8 +10,10 @@ interface Props {
  */
 export default function Switch(
 	$props: Props,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, ServerSlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";

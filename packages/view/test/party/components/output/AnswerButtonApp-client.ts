@@ -15,9 +15,12 @@ import AnswerButton from "../output/./AnswerButton-client";
 export default function AnswerButtonApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

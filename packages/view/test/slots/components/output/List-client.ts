@@ -18,7 +18,8 @@ import t_run_list from "../../../../src/render/runList";
 export default function List(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props:  Record<PropertyKey, any>,
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {

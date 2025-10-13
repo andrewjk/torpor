@@ -15,8 +15,10 @@ export default function IfFalse(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { counter: number },
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

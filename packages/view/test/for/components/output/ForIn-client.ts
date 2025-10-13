@@ -18,9 +18,11 @@ import t_run_list from "../../../../src/render/runList";
 export default function ForIn(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props:  Record<PropertyKey, any>,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	$props: Record<PropertyKey, any>,
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

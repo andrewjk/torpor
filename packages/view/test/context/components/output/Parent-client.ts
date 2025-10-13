@@ -12,9 +12,11 @@ import ChildB from "../output/./ChildB-client";
 export default function Parent(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
 	$peek(() => { /**/

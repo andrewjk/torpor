@@ -1,7 +1,9 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function SmallTitle(
-	_$props:  Record<PropertyKey, any> | undefined,
+	// @ts-ignore
+	$props: Record<PropertyKey, any> | undefined,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

@@ -15,8 +15,10 @@ export default function Reactive(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
+	// @ts-ignore
 	$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 
@@ -49,8 +51,10 @@ function Child(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: any,
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 

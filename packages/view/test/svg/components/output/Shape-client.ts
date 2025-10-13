@@ -17,8 +17,10 @@ export default function Shape(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { name: string },
-	_$context: Record<PropertyKey, any>,
-	_$slots?: Record<string, SlotRender>
+	// @ts-ignore
+	$context: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/
 
