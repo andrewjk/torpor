@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.3.4
+
+### Patch Changes
+
+- 07d8266: Fix: share var names between @head and @render
+
 ## 0.3.3
 
 ### Patch Changes
