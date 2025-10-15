@@ -15,7 +15,7 @@ interface AccordionContentProps {
  */
 export default function AccordionContent($props: AccordionContentProps) {
 	$props ??= $watch({});
-	$props.id ||= getId();
+	$props.id ??= getId();
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
@@ -32,7 +32,7 @@ export default function AccordionContent($props: AccordionContentProps) {
 			class={`torp-accordion-content ${$props.class ?? ""}`.trim()}
 			role={$props.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			@if ($state.expanded) {

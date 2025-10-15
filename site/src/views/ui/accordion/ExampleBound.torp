@@ -5,6 +5,7 @@ import {
 	AccordionTrigger,
 	AccordionContent
 } from "@torpor/ui/Accordion";
+import { grow } from "@torpor/ui/motion"
 
 export default function ExampleBound($props: any) {
 	let $state = $watch({ value: "0" });
@@ -18,7 +19,7 @@ export default function ExampleBound($props: any) {
 					<AccordionTrigger class="example-accordion-trigger">Item 1</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-accordion-content" @/* transition:slide */>The first item</div>
+					<div class="example-accordion-content" transition={grow}>The first item</div>
 				</AccordionContent>
 			</AccordionItem>
 			<AccordionItem class="example-accordion-item">
@@ -26,7 +27,7 @@ export default function ExampleBound($props: any) {
 					<AccordionTrigger class="example-accordion-trigger">Item 2</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-accordion-content" @/* transition:slide */>Another item</div>
+					<div class="example-accordion-content" transition={grow}>Another item</div>
 				</AccordionContent>
 			</AccordionItem>
 			<AccordionItem class="example-accordion-item">
@@ -34,7 +35,7 @@ export default function ExampleBound($props: any) {
 					<AccordionTrigger class="example-accordion-trigger">Item 3</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>
-					<div class="example-accordion-content" @/* transition:slide */>The last item</div>
+					<div class="example-accordion-content" transition={grow}>The last item</div>
 				</AccordionContent>
 			</AccordionItem>
 		</Accordion>

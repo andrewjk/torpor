@@ -35,10 +35,10 @@ interface AccordionProps {
  * ```
  */
 export default function Accordion($props: AccordionProps) {
-	$props ??= $watch({ type: "single", value: "" });
+	$props ??= $watch({});
 
-	$props.type ||= "single";
-	$props.value ||= $props.type === "single" ? "" : [];
+	$props.type ??= "single";
+	$props.value ??= $props.type === "single" ? "" : [];
 
 	let itemStates: ItemState[] = [];
 

@@ -13,7 +13,7 @@ interface AccordionTriggerProps {
  */
 export default function AccordionTrigger($props: AccordionTriggerProps) {
 	$props ??= $watch({});
-	$props.id ||= getId();
+	$props.id ??= getId();
 
 	let button: HTMLButtonElement;
 
@@ -55,7 +55,7 @@ export default function AccordionTrigger($props: AccordionTriggerProps) {
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled ? "true" : undefined}
 			aria-controls={$state.contentId}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 			&ref={button}
 			onclick={handleClick}

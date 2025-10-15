@@ -19,6 +19,8 @@ export interface AccordionItemContext {
 	handleHeaderKey: (index: number, e: KeyboardEvent) => void;
 	/** The reactive state for an AccordionItem */
 	state: ItemState;
+	/** Called in an AccordionItem when its header needs to be focused */
+	setHeaderFocused?: () => void;
 }
 
 export interface ItemState {
@@ -29,7 +31,6 @@ export interface ItemState {
 	contentId: string;
 	disabled: boolean;
 	parentDisabled: boolean;
-	dataState: "open" | "closed";
 	/** Called in the Accordion when a header needs to be focused */
 	setFocused: () => void;
 }

@@ -38,11 +38,9 @@ export default function AccordionItem($props: AccordionItemProps) {
 		expanded: false,
 		headerId: "",
 		contentId: "",
-		disabled: $props.disabled,
+		disabled: $props.disabled ?? false,
 		parentDisabled: false,
-		get dataState() {
-			return this.expanded ? "open" : "closed";
-		},
+		setFocused
 	})
 
 	// Get stuff out of the AccordionContext
@@ -60,7 +58,7 @@ export default function AccordionItem($props: AccordionItemProps) {
 	$context[AccordionItemContextName] = itemContext;
 
 	// Register this item with the parent Accordion, which will handle toggling expanded for all items
-	context.registerItem($state);
+	context.registerItem($state, setFocused);
 
 	// Remove the item from the parent Accordion when this item is destroyed
 	$run(() => {
@@ -81,11 +79,18 @@ export default function AccordionItem($props: AccordionItemProps) {
 		}
 	});
 
+	// Called from the parent Accordion; pass the focus command along to the AccordionButton
+	function setFocused() {
+		if (itemContext.setHeaderFocused) {
+			itemContext.setHeaderFocused();
+		}
+	}
+
 	@render {
 		<div
 			{$props.id}
 			class={`torp-accordion-item ${$props.class ?? ""}`.trim()}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
