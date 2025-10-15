@@ -277,7 +277,7 @@ function doValidation(document: TextDocument) {
 	const key = filename.replace(/\.torp$/, ".ts");
 	const text = document.getText();
 	loadTypeScriptEnv(filename, key);
-	const transformed = transform(filename, text);
+	const transformed = transform(filename, text, true);
 
 	// If there were parse or build errors, return them immediately
 	// TODO: Do we want to clear the virtual file??
@@ -318,6 +318,16 @@ function doValidation(document: TextDocument) {
 			let end = (d.start ?? 0) + (d.length ?? 0);
 			let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
 
+			// HACK: We don't care about these? Maybe there's a better way to
+			// ignore/fix them
+			let message = String(d.messageText);
+			if (
+				message.startsWith("This import uses a '.ts' extension to resolve") ||
+				/Cannot find module '(.+?)\?raw'/.test(message)
+			) {
+				mapped = undefined;
+			}
+
 			// HACK: Couldn't map back to the source, so return a
 			// special message that will be removed with `filter`
 			if (!mapped) {
@@ -330,7 +340,6 @@ function doValidation(document: TextDocument) {
 					const char = start - lineMap[line];
 					console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
 				}
-
 				return {
 					message: "!",
 					range: {
@@ -345,6 +354,16 @@ function doValidation(document: TextDocument) {
 			// down to the exact location
 			let sourceStart = mapped.source.start + start - mapped.compiled.start;
 			let sourceEnd = mapped.source.start + end - mapped.compiled.start;
+
+			// HACK: If the translated mapping is outside of the source mapping,
+			// just highlight the source mapping. It won't be 100% accurate, but
+			// better than showing it way off in the middle of nowhere. This
+			// happens e.g. when the $props are bad (as `<Component>` maps to
+			// something like `Component($parent, $anchor, $props)`
+			if (sourceStart > mapped.source.end) {
+				sourceStart = mapped.source.start;
+				sourceEnd = mapped.source.end;
+			}
 
 			// TODO: Store this, so we don't need to start from 0 every time
 			let lastLineStart = 0;
@@ -365,7 +384,6 @@ function doValidation(document: TextDocument) {
 			}
 			let endChar = sourceEnd - lastLineStart - 1;
 
-			let message = String(d.messageText);
 			if (typeof d.messageText !== "string") {
 				// HACK: I think this should get the messages in the
 				// right order? But who knows...
@@ -381,6 +399,7 @@ function doValidation(document: TextDocument) {
 				getMessages(d.messageText, messages);
 				message = messages.join("\n");
 			}
+
 			return {
 				message,
 				range: {
@@ -489,7 +508,7 @@ interface TransformResult {
 	map: SourceMap[];
 }
 
-function transform(filename: string, source: string): TransformResult {
+function transform(filename: string, source: string, debug = false): TransformResult {
 	try {
 		// Build the main file as a component
 		const parsed = torpor.parse(source);
@@ -506,7 +525,7 @@ function transform(filename: string, source: string): TransformResult {
 
 		let { code, map } = torpor.build(parsed.template, { mapped: true });
 
-		code = importComponentFiles(filename, code, map);
+		code = importComponentFiles(filename, code, map, debug);
 
 		return {
 			ok: true,
@@ -526,8 +545,18 @@ function transform(filename: string, source: string): TransformResult {
 	}
 }
 
-function importComponentFiles(filename: string, content: string, map: SourceMap[]): string {
+function importComponentFiles(
+	filename: string,
+	content: string,
+	map: SourceMap[],
+	_debug = false,
+): string {
 	const filepath = path.dirname(filename);
+	//if (debug) {
+	//	console.log(content);
+	//	console.log("PRE");
+	//	console.log(map);
+	//}
 
 	// Build imported component files and add them to the virtual file map
 	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
@@ -581,6 +610,11 @@ function importComponentFiles(filename: string, content: string, map: SourceMap[
 			mapped.compiled.end += diff;
 		}
 	}
+
+	//if (debug) {
+	//	console.log("POST");
+	//	console.log(map);
+	//}
 
 	return content;
 }
