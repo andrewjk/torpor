@@ -7,7 +7,7 @@ export default function ExampleDialog($props: any) {
 		</p>
 
 		<Drawer>
-			<DrawerTrigger>Show a popover</DrawerTrigger>
+			<DrawerTrigger>Show a drawer</DrawerTrigger>
 			<DrawerOverlay class="example-drawer-overlay" />
 			<DrawerContent class="example-drawer-content">
 				<p>Here I am</p>
