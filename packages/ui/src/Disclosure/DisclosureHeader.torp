@@ -34,7 +34,7 @@ export default function DisclosureHeader($props: DisclosureHeaderProps) {
 		<h4
 			{$props.id}
 			class={`torp-disclosure-header ${$props.class ?? ""}`.trim()}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />

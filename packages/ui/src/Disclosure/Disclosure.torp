@@ -35,17 +35,20 @@ export default function Disclosure($props: DisclosureProps) {
 	$props.disabled ??= false;
 
 	let $state: DisclosureState = $watch({
-		expanded: $props.expanded && $props.expanded !== "false",
-		disabled: $props.disabled,
-		get dataState() {
-			return this.expanded ? "open" : "closed";
-		},
+		expanded: false,
+		disabled: false,
+		headerId: "",
+		contentId: "",
 	});
 
 	// Update $state with $props
 	$run(() => {
-		$state.expanded = $props.expanded && $props.expanded !== "false";
-		$state.disabled = $props.disabled;
+		$state.expanded = $props.expanded === true ||
+			// @ts-ignore
+			$props.expanded === "true";
+		$state.disabled = $props.disabled === true ||
+			// @ts-ignore
+			$props.disabled === "true";
 	});
 
 	// Put stuff into a DisclosureContext
@@ -70,7 +73,7 @@ export default function Disclosure($props: DisclosureProps) {
 		<div
 			{$props.id}
 			class={`torp-disclosure-item ${$props.class ?? ""}`.trim()}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />

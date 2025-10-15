@@ -10,5 +10,4 @@ export interface DisclosureState {
 	contentId: string;
 	expanded: boolean;
 	disabled: boolean;
-	dataState: "open" | "closed";
 }

@@ -13,7 +13,7 @@ interface DisclosureTriggerProps {
  */
 export default function DisclosureTrigger($props: DisclosureTriggerProps) {
 	$props ??= $watch({});
-	$props.id ||= getId();
+	$props.id ??= getId();
 
 	// Get stuff out of the DisclosureContext
 	const context = $context[DisclosureContextName] as DisclosureContext;
@@ -30,11 +30,11 @@ export default function DisclosureTrigger($props: DisclosureTriggerProps) {
 			type="button"
 			{$props.id}
 			class={`torp-disclosure-trigger ${$props.class ?? ""}`.trim()}
-			disabled={$state.disabled || $state.parentDisabled}
+			disabled={$state.disabled}
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled}
 			aria-controls={$state.contentId}
-			data-state={$state.dataState}
+			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled}
 			onclick={() => $state.expanded = !$state.expanded}
 		>

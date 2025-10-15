@@ -4,6 +4,7 @@ import {
 	DisclosureTrigger,
 	DisclosureContent
 } from "@torpor/ui/Disclosure";
+import { grow } from "@torpor/ui/motion"
 
 export default function ExampleBound($props: any) {
 	let $state = $watch({ expanded: false });
@@ -21,7 +22,7 @@ export default function ExampleBound($props: any) {
 				<DisclosureTrigger class="example-disclosure-trigger">Click me</DisclosureTrigger>
 			</DisclosureHeader>
 			<DisclosureContent>
-				<div class="example-disclosure-content" @/* transition:slide */>Here I am</div>
+				<div class="example-disclosure-content" transition={grow}>Here I am</div>
 			</DisclosureContent>
 		</Disclosure>
 	}
