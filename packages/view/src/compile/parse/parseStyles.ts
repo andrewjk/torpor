@@ -26,6 +26,7 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 		imports: [],
 		script: [],
 		components: [],
+		stack: [],
 		errors: [],
 	};
 

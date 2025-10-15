@@ -5,7 +5,6 @@ import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
 import isSpaceNode from "../utils/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
-import ParseComponentStatus from "./ParseComponentStatus";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import parseMarkup from "./parseMarkup";
@@ -25,6 +24,7 @@ export default function parseCode(source: string): ParseResult {
 		imports: [],
 		script: [],
 		components: [],
+		stack: [],
 		errors: [],
 	};
 
@@ -107,23 +107,7 @@ export default function parseCode(source: string): ParseResult {
 			? {
 					imports: status.imports,
 					script: status.script,
-					components: status.components.map((c) => {
-						return {
-							start: c.start,
-							name: c.name,
-							exported: c.exported,
-							default: c.default,
-							documentation: c.documentation,
-							params: c.params,
-							markup: c.markup,
-							head: c.head,
-							style: c.style,
-							propsType: c.propsType,
-							props: c.props,
-							contextProps: c.contextProps,
-							slotProps: c.slotProps,
-						} satisfies TemplateComponent;
-					}),
+					components: status.components,
 				}
 			: undefined,
 	};
@@ -139,7 +123,7 @@ function parseComponentStart(status: ParseStatus) {
 	let componentStart = status.i;
 	let name = consumeAlphaNumeric(status);
 
-	const current: ParseComponentStatus = {
+	const current: TemplateComponent = {
 		start: componentStart,
 		name,
 		exported,
@@ -211,6 +195,7 @@ function parseComponentStart(status: ParseStatus) {
 					imports: [],
 					script: [],
 					components: [],
+					stack: [],
 					errors: [],
 				};
 				const propsType = parseInlineScript(status2);

@@ -1,7 +1,8 @@
+import type TemplateComponent from "../../types/TemplateComponent";
 import type CompileError from "../types/CompileError";
 import type Import from "../types/Import";
 import type ScriptChunk from "../types/ScriptChunk";
-import type ParseComponentStatus from "./ParseComponentStatus";
+import ElementNode from "../types/nodes/ElementNode";
 
 export default interface ParseStatus {
 	source: string;
@@ -12,7 +13,8 @@ export default interface ParseStatus {
 	imports: Import[];
 	script: ScriptChunk[];
 
-	components: ParseComponentStatus[];
+	components: TemplateComponent[];
+	stack: ElementNode[];
 
 	errors: CompileError[];
 }

@@ -2,7 +2,6 @@ import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
 import isSpecialNode from "../utils/isSpecialNode";
 import voidTags from "../utils/voidTags";
-import type ParseComponentStatus from "./ParseComponentStatus";
 import type ParseStatus from "./ParseStatus";
 import addSpaceElement from "./addSpaceElement";
 import parseControl from "./parseControl";
@@ -37,8 +36,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	}
 
 	if (!element.selfClosed && !voidTags.includes(element.tagName)) {
-		current.stack ??= [];
-		current.stack.push(element);
+		status.stack.push(element);
 
 		// Get the children
 		while (status.i < status.source.length) {
@@ -57,7 +55,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 				status.i = status.source.indexOf("*/", status.i) + 2;
 			} else if (accept("</", status, false)) {
 				// It's a close tag, so we're done here
-				if (checkCloseTag(status, element, current)) {
+				if (checkCloseTag(status, element)) {
 					break;
 				}
 			} else if (accept("<", status, false)) {
@@ -73,7 +71,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			}
 		}
 
-		current!.stack.pop();
+		status.stack.pop();
 	}
 
 	// If this is a component element, add a default <fill> node
@@ -164,7 +162,7 @@ function checkVoidElement(status: ParseStatus, element: ElementNode) {
 	status.i = i;
 }
 
-function checkCloseTag(status: ParseStatus, element: ElementNode, current: ParseComponentStatus) {
+function checkCloseTag(status: ParseStatus, element: ElementNode) {
 	const start = status.i;
 
 	accept("</", status);
@@ -178,15 +176,14 @@ function checkCloseTag(status: ParseStatus, element: ElementNode, current: Parse
 	accept(">", status);
 
 	let found = false;
-	if (current.stack) {
-		for (let i = current.stack.length - 1; i >= 0; i--) {
-			if (closingTagName === current.stack[i].tagName) {
-				current.stack[i].closed = true;
-				found = true;
-				break;
-			}
+	for (let i = status.stack.length - 1; i >= 0; i--) {
+		if (closingTagName === status.stack[i].tagName) {
+			status.stack[i].closed = true;
+			found = true;
+			break;
 		}
 	}
+
 	if (!found) {
 		addError(
 			status,
