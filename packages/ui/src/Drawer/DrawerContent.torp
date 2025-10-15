@@ -1,3 +1,5 @@
+import { type Animation } from "@torpor/view";
+import { slide } from "../motion";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
 
@@ -42,9 +44,6 @@ export default function DrawerContent($props?: DrawerContentProps) {
 		closeOnClick = false;
 		addDocumentEvent("mousedown", handleDocumentMouseDown);
 		addDocumentEvent("click", handleDocumentClick);
-
-		// Set the position and listen for window resize and scroll to reset the position
-		//setPosition();
 	}
 
 	function hide() {
@@ -69,74 +68,13 @@ export default function DrawerContent($props?: DrawerContentProps) {
 		}
 	}
 
-	// From https://stackoverflow.com/a/46707458
-	function measure(el: HTMLElement, fn: (_: HTMLElement) => any) {
-		let oldVisibility = el.style.visibility;
-		let oldPosition = el.style.position;
-
-		let oldParent = el.parentNode;
-		let oldBefore = el.nextNode;
-
-		el.style.visibility = "hidden";
-		el.style.position = "absolute";
-
-		document.body.appendChild(el);
-		let result = fn(el);
-		el.parentNode.removeChild(el);
-
-		oldParent.appendChild(el, oldBefore);
-		el.style.visibility = oldVisibility;
-		el.style.position = oldPosition;
-
-		return result;
-	}
-
-	function transitionArgs() {
-		if (drawer) {
-			switch ($state.position) {
-				case "left": {
-					drawer.style.left = "0px";
-					const width = measure(drawer, (el) => el.offsetWidth);
-					return [
-						{ transform: `translateX(-${width}px)` },
-						{ transform: "translateX(0px)" }
-					];
-				}
-				case "top": {
-					drawer.style.top = "0px";
-					const height = measure(drawer, (el) => el.offsetHeight);
-					return [
-						{ transform: `translateY(-${height}px)` },
-						{ transform: "translateY(0px)" }
-					];
-				}
-				case "right": {
-					drawer.style.right = "0px";
-					const width = measure(drawer, (el) => el.offsetWidth);
-					return [
-						{ transform: `translateX(${width}px)` },
-						{ transform: "translateX(0px)" }
-					];
-				}
-				case "bottom": {
-					drawer.style.bottom = "0px";
-					const height = measure(drawer, (el) => el.offsetHeight);
-					return [
-						{ transform: `translateY(${height}px)` },
-						{ transform: "translateY(0px)" }
-					];
-				}
-			}
-		}
-	}
-
 	@render {
 		@if ($state.visible) {
 			<div
 				{$props.id}
 				class={`torp-drawer-content ${$props.class ?? ""}`.trim()}
 				style="position: fixed;"
-				transition={transitionArgs()}
+				transition={(e) => slide(e, { side: $state.position })}
 				&ref={drawer}
 				onmount={show}
 			>

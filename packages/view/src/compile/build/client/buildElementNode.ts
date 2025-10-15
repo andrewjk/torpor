@@ -344,18 +344,18 @@ function buildTransitionAttribute(
 	let exitVarName = nextVarName("trans_out", status);
 
 	if (name === "transition") {
-		b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
+		b.append(`const ${entryVarName} = (${value})(${varName});`);
 		b.append(`const ${exitVarName} = ${entryVarName};`);
 		b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 	} else if (name === "transition-in") {
 		let outAttribute = node.attributes.find((a) => a.name === "transition-out");
 		if (outAttribute && outAttribute.value && outAttribute.fullyReactive) {
 			let outValue = outAttribute.value;
-			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
-			b.append(`const ${exitVarName} = ${getAnimationDetails(outValue)};`);
+			b.append(`const ${entryVarName} = (${value})(${varName});`);
+			b.append(`const ${exitVarName} = (${outValue})(${varName});`);
 			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);
 		} else {
-			b.append(`const ${entryVarName} = ${getAnimationDetails(value)};`);
+			b.append(`const ${entryVarName} = (${value})(${varName});`);
 			b.append(`t_animate(${varName}, ${entryVarName});`);
 		}
 	} else if (name === "transition-out") {
@@ -364,56 +364,10 @@ function buildTransitionAttribute(
 			// This has already been handled with transition-in, above
 			return;
 		} else {
-			b.append(`const ${exitVarName} = ${getAnimationDetails(value)};`);
+			b.append(`const ${exitVarName} = (${value})(${varName});`);
 			b.append(`t_animate(${varName}, null, ${entryVarName});`);
 		}
 	} else {
 		// TODO: Add an error
 	}
-}
-
-function getAnimationDetails(value: string) {
-	// HACK: Split by commas, but not when in brackets
-	let parts: string[] = [];
-	let start = 0;
-	let squareCount = 0;
-	let curlyCount = 0;
-	for (let i = 0; i < value.length; i++) {
-		let char = value[i];
-		switch (char) {
-			case ",":
-				if (squareCount === 0 && curlyCount === 0) {
-					parts.push(value.substring(start, i));
-					start = i + 1;
-				}
-				break;
-			case "[":
-				squareCount += 1;
-				break;
-			case "]":
-				squareCount -= 1;
-				break;
-			case "{":
-				curlyCount += 1;
-				break;
-			case "}":
-				curlyCount -= 1;
-				break;
-		}
-	}
-	parts.push(value.substring(start));
-
-	//let func = parts[0].trim();
-	//let isAnimateFunction = func === "animate";
-	//let options = isAnimateFunction ? parts[2]?.trim() : parts[1]?.trim();
-	//let keyframes = isAnimateFunction ? parts[1]?.trim() : undefined;
-	//if (isAnimateFunction) {
-	//	status.imports.add("t_animate");
-	//	func = "t_animate";
-	//}
-
-	let keyframes = parts[0]?.trim();
-	let options = parts[1]?.trim();
-
-	return `{ ${[`keyframes: ${keyframes}`, options ? `options: ${options}` : null].filter(Boolean).join(", ")} }`;
 }

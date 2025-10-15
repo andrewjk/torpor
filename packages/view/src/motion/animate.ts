@@ -49,6 +49,5 @@ export default async function animate(
 		activeRange.animations ??= new Set();
 		activeRange.animations.add(animation);
 		await animation.finished;
-		activeRange.animations.delete(animation);
 	}
 }

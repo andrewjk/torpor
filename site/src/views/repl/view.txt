@@ -497,7 +497,6 @@ async function animate(el, enter, keyframes, options) {
 		activeRange.animations ??= /* @__PURE__ */ new Set();
 		activeRange.animations.add(animation);
 		await animation.finished;
-		activeRange.animations.delete(animation);
 	}
 }
 function isFragmentNode(node) {
@@ -566,8 +565,13 @@ function clearRange(range) {
 	range.nextRange = childRange;
 	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
 	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
-	if (animations !== void 0) Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
-	else clearNodes(range);
+	if (animations !== void 0) {
+		animations.forEach((a) => {
+			a.reverse();
+			a.play();
+		});
+		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
+	} else clearNodes(range);
 }
 function clearNodes(range) {
 	if (range.startNode !== null && range.endNode !== null) {

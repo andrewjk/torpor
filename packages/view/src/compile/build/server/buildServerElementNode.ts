@@ -48,18 +48,18 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 		} else if (name.startsWith("on") || name.startsWith(":on")) {
 			// No events on the server
 		} else if (name.startsWith("transition") && value) {
-			// No animation on the server, but we do need to set the attributes
-			// from the first keyframe
+			// TODO: No animation on the server, but we do need to set the
+			// attributes from the first keyframe
 			// HACK: use a regex instead maybe?
-			value = value.split(",")[0].trim();
-			if (value.startsWith("[")) {
-				value = value.substring(1);
-			} else {
-				value = value + "[0]";
-			}
-			attributes.push(
-				`style="\${Object.entries(${value}).map(([k, v]) => \`$\{k}: $\{v}\`).join("; ")}"`,
-			);
+			//value = value.split(",")[0].trim();
+			//if (value.startsWith("[")) {
+			//	value = value.substring(1);
+			//} else {
+			//	value = value + "[0]";
+			//}
+			//attributes.push(
+			//	`style="\${Object.entries(${value}).map(([k, v]) => \`$\{k}: $\{v}\`).join("; ")}"`,
+			//);
 		} else if (value != null && fullyReactive) {
 			if (name === "&value" || name === "&checked" || name === "&group") {
 				let defaultValue = "";

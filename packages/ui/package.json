@@ -65,12 +65,12 @@
 			"import": "./dist/TabGroup/index.js"
 		},
 		"./icons": {
-			"types": "./dist/icons.d.ts",
-			"import": "./dist/icons.js"
+			"types": "./dist/icons/index.d.ts",
+			"import": "./dist/icons/index.js"
 		},
 		"./motion": {
-			"types": "./dist/motion.d.ts",
-			"import": "./dist/motion.js"
+			"types": "./dist/motion/index.d.ts",
+			"import": "./dist/motion/index.js"
 		}
 	},
 	"publishConfig": {

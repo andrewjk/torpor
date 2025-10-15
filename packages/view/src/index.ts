@@ -31,6 +31,7 @@ import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
+import type Animation from "./types/Animation";
 import type Component from "./types/Component";
 import type ListItem from "./types/ListItem";
 import type ServerComponent from "./types/ServerComponent";
@@ -73,4 +74,4 @@ export {
 	t_dynamic,
 };
 
-export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem };
+export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem, Animation };
