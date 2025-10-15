@@ -13,7 +13,7 @@ export default function addMappedText(
 	if (status.options?.mapped) {
 		let start = b.toString().length + preText.length;
 		b.append(preText + text + postText);
-		let end = start + text.length - postText.length;
+		let end = start + text.length;
 		status.map.push({
 			script: text,
 			source: range,

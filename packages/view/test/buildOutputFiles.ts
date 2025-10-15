@@ -24,9 +24,11 @@ export async function buildFiles(file: string): Promise<void> {
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
 		let clientCode = formatCode(build(parsed.template).code, "client");
+		//let clientMap = formatMap(source, build(parsed.template, { mapped: true }));
 		let typesCode = formatCode(buildType(parsed.template), "types");
 		await maybeWriteFile(file, clientCode, "client");
 		await maybeWriteFile(file, serverCode, "server");
+		//await maybeWriteFile(file, clientMap, "map");
 		await maybeWriteFile(file, typesCode, "types");
 	} else {
 		// Just log the message and continue with output/testing
@@ -99,6 +101,25 @@ function formatCode(code: string, suffix: string): string {
 
 	return code;
 }
+
+/*
+function formatMap(source: string, result: BuildResult) {
+	let code = "";
+
+	for (let mapped of result.map) {
+		let from = source.substring(mapped.source.start, mapped.source.end);
+		let to = result.code.substring(mapped.compiled.start, mapped.compiled.end);
+		if (from !== to) {
+			code += from + "\n";
+			code += ".\n";
+			code += to + "\n";
+			code += "-----\n";
+		}
+	}
+
+	return code;
+}
+*/
 
 // HACK: We could probably be smarter about this
 const importsMap: Record<string, string> = {

@@ -131,7 +131,8 @@ export default function buildComponentNode(
 		}
 	}
 
-	addMappedText("", `${componentName}(${renderParams})`, ";", node.range, status, b);
+	// TODO: Map the params
+	addMappedText("", componentName, `(${renderParams});`, node.range, status, b);
 
 	b.append("");
 }
