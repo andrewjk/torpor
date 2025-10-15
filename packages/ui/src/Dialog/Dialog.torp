@@ -1,8 +1,9 @@
 import getId from "../utils/getId";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { trapFocus, type TrapFocusOptions } from "../mount/trapFocus";
-import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
-import { DialogContextName, type DialogContext, type DialogState } from "./DialogTypes";
+import { ModalContextName, type ModalContext } from "../Modal/ModalTypes";
+import { PopoverContextName } from "../Popover/PopoverTypes";
+import { DialogContextName, type DialogContext, type DialogState, type HandleButtonPress } from "./DialogTypes";
 
 interface DialogProps {
 	/** An ID for the root element */
@@ -16,7 +17,9 @@ interface DialogProps {
 }
 
 /**
- * Content for a window displayed in a Popover.
+ * A dialog that can be used to show a message to the user, or get information from the user.
+ * 
+ * Dialogs are typically shown within a Modal or Popover.
  * 
  * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
  * 
@@ -24,11 +27,12 @@ interface DialogProps {
  * 
  * ```
  * <Dialog>
- *     <DialogHeader /> (optional)
- *     <DialogBody /> (optional)
- *     <DialogFooter> (optional)
- *         <DialogButton /> (optional)
- *     </DialogFooter>
+ * 	<ModalOverlay /> (optional -- will set `modal` to true)
+ * 	<DialogHeader /> (optional)
+ * 	<DialogBody /> (optional)
+ * 	<DialogFooter> (optional)
+ * 		<DialogButton /> (optional)
+ * 	</DialogFooter>
  * </Dialog>
  * ```
  * 
@@ -36,26 +40,29 @@ interface DialogProps {
 export default function Dialog($props: DialogProps) {
 	$props ??= $watch({});
 	$props.id ??= getId();
-	$props.dialog ??= false;
+	//$props.alert ??= false;
 
-	let div: HTMLDivElement;
+	//let div: HTMLDivElement;
 
 	let trapFocusOptions: TrapFocusOptions = {
 		focusableElements: []
 	};
 
-	// Get stuff out of the PopoverContext
-	const popoverContext = $context[PopoverContextName] as PopoverContext;
-	if (!popoverContext) {
-		throw new Error("Dialog must be contained within a Popover");
-	}
-	const { handleButton, modal } = popoverContext;
-	const visible = popoverContext.state.visible;
+	// Maybe get stuff out of a Modal context
+	let modal = false;
+	let visible = true;
+	let handleButton: HandleButtonPress | undefined = undefined;
+	const modalContext = $context[ModalContextName] ?? $context[PopoverContextName] as ModalContext;
+	if (modalContext) {
+		modal = true;
+		visible = modalContext.state.visible;
+		handleButton = modalContext.handleButton;
 
-	popoverContext.handleClickOutside = handleClickOutside;
-	// Set the focusFirstElement method in the PopoverContext so that it can be
-	// called after everything has been shown
-	popoverContext.focusFirstElement = focusFirstElement;
+		modalContext.handleClickOutside = handleClickOutside;
+		// Set the focusFirstElement method in the ModalContext so that it can be
+		// called after everything has been shown
+		modalContext.focusFirstElement = focusFirstElement;
+	}
 
 	// Set the IDs for using in the Dialog's ARIA attributes
 	let $state: DialogState = $watch({
@@ -69,31 +76,31 @@ export default function Dialog($props: DialogProps) {
 	let context: DialogContext = {
 		handleButton,
 		state: $state,
-		anchorElement: popoverContext.anchorElement
+		anchorElement: modalContext ? modalContext.anchorElement : undefined
 	};
 	$context[DialogContextName] = context;
 
-	let closeOnClick = false;
-
-	$mount(() => {
-		if ($state.visible) {
-			// HACK: Because this Dialog could be shown with a click, we need to
-			// wait for another mousedown before we close on click. Otherwise
-			// the click immediately bubbles to the document. I guess we could
-			// require the user to preventDefault after calling showPrompt etc,
-			// but that seems very error-prone?
-			closeOnClick = false;
-			addDocumentEvent("mousedown", handleDocumentMouseDown);
-			addDocumentEvent("click", handleDocumentClick);
-		} else {
-			removeDocumentEvent("mousedown", handleDocumentMouseDown);
-			removeDocumentEvent("click", handleDocumentClick);
-			// Focus the anchor element per WAI guidelines
-			if (context.anchorElement?.focus) {
-				context.anchorElement.focus();
-			}
-		}
-	});
+	//let closeOnClick = false;
+//
+	//$mount(() => {
+	//	if ($state.visible) {
+	//		// HACK: Because this Dialog could be shown with a click, we need to
+	//		// wait for another mousedown before we close on click. Otherwise
+	//		// the click immediately bubbles to the document. I guess we could
+	//		// require the user to preventDefault after calling showPrompt etc,
+	//		// but that seems very error-prone?
+	//		closeOnClick = false;
+	//		addDocumentEvent("mousedown", handleDocumentMouseDown);
+	//		addDocumentEvent("click", handleDocumentClick);
+	//	} else {
+	//		removeDocumentEvent("mousedown", handleDocumentMouseDown);
+	//		removeDocumentEvent("click", handleDocumentClick);
+	//		// Focus the anchor element per WAI guidelines
+	//		if (context.anchorElement?.focus) {
+	//			context.anchorElement.focus();
+	//		}
+	//	}
+	//});
 
 	function focusFirstElement() {
 		if (trapFocusOptions.focusableElements.length) {
@@ -101,27 +108,27 @@ export default function Dialog($props: DialogProps) {
 		}
 	}
 
-	function handleDocumentMouseDown() {
-		closeOnClick = true;
-	}
-
-	function handleDocumentClick(e: MouseEvent) {
-		if (
-			closeOnClick &&
-			div &&
-			!div.contains(e.target as HTMLElement) &&
-			(!context.anchorElement || !context.anchorElement.contains(e.target as HTMLElement))
-		) {
-			handleClickOutside(e);
-		}
-	}
+	//function handleDocumentMouseDown() {
+	//	closeOnClick = true;
+	//}
+//
+	//function handleDocumentClick(e: MouseEvent) {
+	//	if (
+	//		closeOnClick &&
+	//		div &&
+	//		!div.contains(e.target as HTMLElement) &&
+	//		(!context.anchorElement || !context.anchorElement.contains(e.target as HTMLElement))
+	//	) {
+	//		handleClickOutside(e);
+	//	}
+	//}
 
 	function handleClickOutside(e: MouseEvent) {
 		// Don't allow the user to click outside -- they must press a button or
 		// the Esc key
 		e.preventDefault();
 		if (!modal) {
-			popoverContext.state.visible = false;
+			modalContext.state.visible = false;
 			context.state.visible = false;
 		}
 	}
@@ -158,7 +165,7 @@ export default function Dialog($props: DialogProps) {
 			aria-describedby={$state.bodyId ? $state.bodyId : undefined}
 			onkeydown={handleKey}
 			onmount={(el) => trapFocus(el, trapFocusOptions)}
-			&ref={div}
+			@//&ref={div}
 		>
 			<slot />
 		</div>

@@ -1,4 +1,4 @@
-import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import {
 	Menu,
 	MenuButton,
@@ -52,7 +52,6 @@ export default function ExampleBasic() {
 		</p>
 
 		<Popover>
-			<PopoverOverlay class="example-menu-popover-overlay" />
 			<PopoverTrigger>Show a menu</PopoverTrigger>
 			<PopoverContent class="example-menu-popover-content">
 				<Menu class="example-menu" ariaLabel="Formatting">

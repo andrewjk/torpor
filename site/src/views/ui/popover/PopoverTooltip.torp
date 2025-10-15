@@ -1,4 +1,4 @@
-import { Popover, PopoverContentContextual } from "@torpor/ui/Popover";
+import { Popover, PopoverContent } from "@torpor/ui/Popover";
 
 interface Props {
 	anchor: HTMLElement;
@@ -8,9 +8,9 @@ interface Props {
 export default function PopoverTooltip($props: Props) {
 	@render {
 		<Popover anchor={$props.anchor} position={$props.position} visible>
-			<PopoverContentContextual class="popover-tooltip-content" side="top">
+			<PopoverContent class="popover-tooltip-content" side="top">
 				{$props.text}
-			</PopoverContentContextual>
+			</PopoverContent>
 		</Popover>
 	}
 

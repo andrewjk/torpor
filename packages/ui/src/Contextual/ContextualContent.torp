@@ -2,9 +2,9 @@
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getScrollParent from "../utils/getScrollParent";
 import setContextPosition from "../utils/setContextPosition";
-import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
+import { ContextualContextName, type ContextualContext } from "./ContextualTypes";
 
-interface PopoverContentContextualProps {
+interface ContextualContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Class name(s) for the root element */
@@ -12,20 +12,20 @@ interface PopoverContentContextualProps {
 }
 
 /**
- * The content that is displayed for a Popover when it is open, displayed at the
+ * The content that is displayed for a Contextual when it is open, displayed at the
  * position that the user right-clicked.
  */
-export default function PopoverContentContextual($props: PopoverContentContextualProps) {	
+export default function ContextualContent($props: ContextualContentProps) {	
 	$props ??= $watch({});
 
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
 
-	// Get stuff out of the PopoverContext
-	const context = $context[PopoverContextName] as PopoverContext;
+	// Get stuff out of the ContextualContext
+	const context = $context[ContextualContextName] as ContextualContext;
 	if (!context) {
-		throw new Error("PopoverContentContextual must be contained within a Popover");
+		throw new Error("ContextualContent must be contained within a Contextual");
 	}
 	let $state = context.state;
 

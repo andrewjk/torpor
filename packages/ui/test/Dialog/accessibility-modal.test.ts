@@ -2,13 +2,13 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { assert, describe, expect, it } from "vitest";
-import DialogAccessibility from "./components/DialogAccessibility.torp";
+import DialogModal from "./components/DialogModal.torp";
 
 describe("Dialog", () => {
 	it("Accessibility -- modal", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, DialogAccessibility, { modal: true, ariaAnnounce: false });
+		mount(container, DialogModal, { modal: true, ariaAnnounce: false });
 
 		// Tests from https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/
 		// This is for a Dialog in a Popover with its modal property set to true

@@ -1,0 +1,51 @@
+import { ModalContextName, type ModalContext } from "./ModalTypes";
+import hoverTrigger from "../mount/hoverTrigger";
+
+interface ModalTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the modal is activated by click/press or by hover **/
+	activation?: "press" | "hover"
+}
+
+/**
+ * The button that causes a Modal to appear or disappear.
+ */
+export default function ModalTrigger($props: ModalTriggerProps) {
+	$props ??= $watch({});
+	$props.activation ??= "press";
+
+	// Get stuff out of the ModalContext
+	const context = $context[ModalContextName] as ModalContext;
+	if (!context) {
+		throw new Error("ModalTrigger must be contained within a Modal");
+	}
+	let $state = context.state;
+
+	function handleClick() {
+		if ($props.activation !== "press") return;
+
+		$state.visible = !$state.visible;
+	}
+
+	function handleHover() {
+		if ($props.activation !== "hover") return;
+
+		$state.visible = !$state.visible
+	}
+
+	@render {
+		<button
+			type="button"
+			{$props.id}
+			class={`torp-modal-trigger ${$props.class ?? ""}`.trim()}
+			onclick={handleClick}
+			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
+			&ref={context.anchorElement}
+		>
+			<slot />
+		</button>
+	}
+}

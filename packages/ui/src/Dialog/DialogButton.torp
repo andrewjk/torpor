@@ -42,7 +42,9 @@ export default function DialogButton($props: DialogButtonProps) {
 		if ($props.onclick) {
 			$props.onclick(e)
 		}
-		handleButton($props.type, $props.value);
+		if (handleButton) {
+			handleButton($props.type, $props.value);
+		}
 	}
 
 	@render {

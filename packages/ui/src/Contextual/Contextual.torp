@@ -1,0 +1,119 @@
+import { ContextualContextName, type Point, type ContextualContext, type ContextualState } from "./ContextualTypes";
+
+interface ContextualProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the context is modal. If true, an overlay should be supplied to obscure outside content, and only the context content will be visible to screen readers  */
+	modal?: boolean,
+	/** Whether the context is visible  */
+	visible?: boolean,
+	/** The element to anchor this context to, as an alternative to supplying a ContextualTrigger  */
+	anchor?: HTMLElement,
+	/** The position to display this context at  */
+	position?: Point,
+	/** A function to be called when the user selects a response */
+	callback?: ((value: any) => void),
+}
+
+/**
+ * A contextual window that is shown to the user at the cursor's location.
+ *
+ * The structure of a Contextual is:
+ *
+ * ```
+ * <Contextual>
+ * 	<ContextualTrigger /> (optional)
+ * 	<ContextualContent />
+ * </Contextual>
+ * ```
+ */
+export default function Contextual($props: ContextualProps) {
+	$props ??= $watch({});
+
+	let $state: ContextualState = $watch({
+		visible: false,
+		position: { x: 0, y: 0 }
+	})
+
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+		$state.position = $props.position ?? { x: 0, y: 0 };
+	});
+	$run(() => {
+		$props.visible = $state.visible;
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: ContextualContext = {
+		handleButton,
+		handleClickOutside,
+		state: $state,
+		modal: $props.modal,
+		anchorElement: $unwrap($props.anchor),
+	};
+	$context[ContextualContextName] = context;
+
+	// Dispatch the toggle event when the context is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
+
+	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+		// Get the button's result
+		switch (type) {
+			case "confirm": {
+				result = value || true;
+				break;
+			}
+			case "cancel": {
+				result = value || false;
+				break;
+			}
+			default: {
+				result = value;
+				break;
+			}
+		}
+
+		// Hide the context
+		$state.visible = false;
+
+		// Call the callback
+		if ($props.callback) {
+			$props.callback(result);
+		}
+	}
+
+	function handleClickOutside(e: MouseEvent) {
+		e.preventDefault();
+		$state.visible = false;
+	}
+
+	@render {
+		<div
+			{$props.id}
+			class={`torp-context ${$props.class ?? ""}`.trim()}
+		>
+			<slot />
+		</div>
+	}
+}

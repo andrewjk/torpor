@@ -1,0 +1,40 @@
+import { disableScroll } from "../mount/disableScroll";
+import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
+
+interface DrawerOverlayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
+/**
+ * The background overlay for a Drawer component.
+ * Adding an overlay automatically sets the component's `modal` value to true.
+ */
+export default function DrawerOverlay($props?: DrawerOverlayProps) {
+	$props ??= $watch({});
+
+	// Get stuff out of the DrawerContext
+	const context = $context[DrawerContextName] as DrawerContext;
+	if (!context) {
+		throw new Error("DrawerOverlay must be contained within a Drawer");
+	}
+	let $state = context.state;
+
+	// Any drawer with an overlay is modal
+	$state.modal = true;
+
+	@render {
+		@if ($state.visible) {
+			<div
+				{$props.id}
+				class={`torp-drawer-overlay ${$props.class ?? ""}`.trim()}
+				tabindex="-1"
+				onmount={(el) => disableScroll(el)}
+			>
+				<slot />
+			</div>
+		}
+	}
+}

@@ -25,6 +25,12 @@ async function run() {
 		lstatSync(join(distFolder, f)).isDirectory(),
 	);
 	for (const component of componentFolders) {
+		// If it's an old folder, delete it
+		if (!existsSync(join(sourceFolder, component))) {
+			await fs.rmdir(join(distFolder, component));
+			continue;
+		}
+
 		console.log(chalk.cyan.inverse(" POST "), `Tidy ${component}`);
 
 		// Loop through files and change declarations to imports so they get

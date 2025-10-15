@@ -1,0 +1,30 @@
+import { Modal, ModalContent } from "../../../src/Modal/index";
+import {
+	Dialog,
+	DialogHeader,
+	DialogBody,
+	DialogFooter,
+	DialogButton
+} from "../../../src/Dialog/index";
+
+export default function DialogModal($props: any) {
+	$props.alert ??= false;
+	$props.ariaAnnounce ??= true;
+
+	let color = "";
+
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Dialog alert={$props.alert}>
+					<DialogHeader>Color preference</DialogHeader>
+					<DialogBody ariaAnnounce={$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
+					<DialogFooter>
+						<DialogButton value="blue" onclick={() => (color = "blue")}>Blue</DialogButton>
+						<DialogButton value="red" onclick={() => (color = "red")}>Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</ModalContent>
+		</Modal>
+	}
+}

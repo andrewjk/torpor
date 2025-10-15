@@ -1,92 +1,118 @@
+import { DrawerContextName, type DrawerContext, type DrawerState } from "./DrawerTypes";
 
 interface DrawerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
+	/** Whether the drawer is modal. If true, an overlay should be supplied to obscure outside content, and only the drawer content will be visible to screen readers  */
+	modal?: boolean,
+	/** Whether the drawer is visible  */
 	visible?: boolean,
-	position?: "left" | "right",
+	/** Which side of the window to show the drawer from */
+	position?: "left" | "right" | "top" | "bottom",
+	/** A function to be called when the user selects a response */
+	callback?: ((value: any) => void),
 }
 
+/**
+ * A drawer that can be used to show rich content or obtain information from a user.
+ *
+ * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
+ *
+ * The structure of a Drawer is:
+ *
+ * ```
+ * <Drawer>
+ * 	<DrawerTrigger /> (optional)
+ * 	<DrawerContent />
+ * </Drawer>
+ * ```
+ */
 export default function Drawer($props: DrawerProps) {
 	$props ??= $watch({});
-	$props.visible ??= true;
-	$props.position ||= "left";
+	$props.position ??= "left";
 
-	let offscreen: HTMLElement | undefined;
+	let $state: DrawerState = $watch({
+		visible: false,
+		modal: $props.modal,
+		position: $props.position,
+	})
 
-	// From https://stackoverflow.com/a/46707458
-	function measure(el, fn) {
-		let oldVisibility = el.style.visibility;
-		let oldPosition = el.style.position;
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+	});
+	$run(() => {
+		$props.visible = $state.visible;
+	});
 
-		let oldParent = el.parentNode;
-		let oldBefore = el.nextNode;
+	let result: any;
 
-		el.style.visibility = "hidden";
-		el.style.position = "absolute";
+	// Set the context to pass down to items
+	let context: DrawerContext = {
+		handleButton,
+		handleClickOutside,
+		state: $state,
+	};
+	$context[DrawerContextName] = context;
 
-		document.body.appendChild(el);
-		let result = fn(el);
-		el.parentNode.removeChild(el);
-
-		oldParent.appendChild(el, oldBefore);
-		el.style.visibility = oldVisibility;
-		el.style.position = oldPosition;
-
-		return result;
-	}
-
-	function transitionArgs() {
-		if (offscreen) {
-			switch ($props.position) {
-				case "left": {
-					offscreen.style.left = 0;
-					const width = measure(offscreen, (el) => el.offsetWidth);
-					return [
-						{ transform: `translateX(-${width}px)` },
-						{ transform: "translateX(0px)" }
-					];
-				}
-				case "top": {
-					offscreen.style.top = 0;
-					const height = measure(offscreen, (el) => el.offsetHeight);
-					return [
-						{ transform: `translateY(-${height}px)` },
-						{ transform: "translateY(0px)" }
-					];
-				}
-				case "right": {
-					offscreen.style.right = 0;
-					const width = measure(offscreen, (el) => el.offsetWidth);
-					return [
-						{ transform: `translateX(${width}px)` },
-						{ transform: "translateX(0px)" }
-					];
-				}
-				case "bottom": {
-					offscreen.style.bottom = 0;
-					const height = measure(offscreen, (el) => el.offsetHeight);
-					return [
-						{ transform: `translateY(${height}px)` },
-						{ transform: "translateY(0px)" }
-					];
-				}
+	// Dispatch the toggle event when the popout is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
 			}
 		}
+	});
+
+	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+		// Get the button's result
+		switch (type) {
+			case "confirm": {
+				result = value || true;
+				break;
+			}
+			case "cancel": {
+				result = value || false;
+				break;
+			}
+			default: {
+				result = value;
+				break;
+			}
+		}
+
+		// Hide the drawer
+		$state.visible = false;
+
+		// Call the callback
+		if ($props.callback) {
+			$props.callback(result);
+		}
+	}
+
+	function handleClickOutside(e: MouseEvent) {
+		e.preventDefault();
+		$state.visible = false;
 	}
 
 	@render {
-		@if ($props.visible) {
-			<div
-				{$props.id}
-				class={`torp-offscreen ${$props.class ?? ""}`.trim()}
-				style="position: fixed;"
-				transition={transitionArgs()}
-				&ref={offscreen}
-			>
-				<slot />
-			</div>
-		}
+		<div
+			{$props.id}
+			class={`torp-drawer ${$props.class ?? ""}`.trim()}
+		>
+			<slot />
+		</div>
 	}
 }

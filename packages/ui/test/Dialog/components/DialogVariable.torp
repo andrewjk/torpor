@@ -1,14 +1,14 @@
-import { Popover, PopoverContent } from "../../../src/Popover/index";
+import { Modal, ModalContent } from "../../../src/Modal/index";
 import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function DialogVariable($props: any) {
 	let $state = $watch({
 		color: "",
-		showPopover: false
+		showModal: false
 	});
 
 	@render {
-		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+		<button type="button" onclick={(e) => ($state.showModal = !$state.showModal)}>
 			Show the modal
 		</button>
 
@@ -16,8 +16,8 @@ export default function DialogVariable($props: any) {
 			<p>Your favorite color is {$state.color}?!</p>
 		}
 
-		<Popover visible={$state.showPopover}>
-			<PopoverContent>
+		<Modal &visible={$state.showModal}>
+			<ModalContent>
 				<Dialog>
 					<DialogBody>
 						<p>Which color do you prefer?</p>
@@ -27,7 +27,7 @@ export default function DialogVariable($props: any) {
 						<DialogButton value="red" onclick={() => ($state.color = "red")}>Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContent>
-		</Popover>
+			</ModalContent>
+		</Modal>
 	}
 }

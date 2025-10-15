@@ -1,4 +1,4 @@
-import { Popover, PopoverTriggerHover, PopoverContentContextual } from "@torpor/ui/Popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 
 export default function ExampleHover($props: any) {
 	function handleOption(color: string) {
@@ -9,10 +9,10 @@ export default function ExampleHover($props: any) {
 		<p>Hover over the panel below to trigger a tooltip.</p>
 
 		<Popover>
-			<PopoverTriggerHover class="example-popover-target">Hover me</PopoverTriggerHover>
-			<PopoverContentContextual class="example-popover-content">
+			<PopoverTrigger activation="hover" class="example-popover-target">Hover me</PopoverTrigger>
+			<PopoverContent class="example-popover-content">
 				I'm a tooltip...
-			</PopoverContentContextual>
+			</PopoverContent>
 		</Popover>
 	}
 

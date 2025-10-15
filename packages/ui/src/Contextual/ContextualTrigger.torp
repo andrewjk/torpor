@@ -1,0 +1,65 @@
+import { ContextualContextName, type ContextualContext } from "./ContextualTypes";
+import hoverTrigger from "../mount/hoverTrigger";
+
+interface ContextualTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the popover is activated by click/press or by hover **/
+	activation?: "press" | "hover"
+}
+
+/**
+ * The element that causes a Contextual to appear or disappear when right-clicked.
+ */
+export default function ContextualTrigger($props: ContextualTriggerProps) {
+	$props ??= $watch({});
+	$props.activation ??= "press";
+
+	// Get stuff out of the ContextualContext
+	const context = $context[ContextualContextName] as ContextualContext;
+	if (!context) {
+		throw new Error("ContextualTrigger must be contained within a Contextual");
+	}
+	let $state = context.state;
+
+	function handleContextualMenu(e: MouseEvent & { currentTarget: EventTarget & HTMLDivElement }) {
+		e.preventDefault();
+		if ($state.position) {
+			// Get the position relative to the element, so we can reposition on scroll
+			const rect = e.currentTarget.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			$state.position = { x, y };
+			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
+		}
+		$state.visible = !$state.visible;
+	}
+
+	function handleHover(node: HTMLElement, e: TouchEvent | MouseEvent) {
+		if ($props.activation !== "hover") return;
+
+		if ($state.position) {
+			// Get the position relative to the element, so we can reposition on scroll
+			const rect = node.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			$state.position = { x, y };
+			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
+		}
+		$state.visible = !$state.visible
+	}
+
+	@render {
+		<div
+			{$props.id}
+			class={`torp-popover-trigger-contextual ${$props.class ?? ""}`.trim()}
+			oncontextmenu={handleContextualMenu}
+			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
+			&ref={context.anchorElement}
+		>
+			<slot />
+		</div>
+	}
+}

@@ -1,21 +1,13 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
 import copyCode from "../../lib/copyCode";
 import ExampleDialog from "./popover/ExampleDialog.torp";
-import ExampleDrawer from "./popover/ExampleDrawer.torp";
-import ExampleAnchored from "./popover/ExampleAnchored.torp";
-import ExampleContextual from "./popover/ExampleContextual.torp";
 import ExampleHover from "./popover/ExampleHover.torp";
 import ExampleFunction from "./popover/ExampleFunction.torp";
-import ExampleMount from "./popover/ExampleMount.torp";
 import ExampleVariable from "./popover/ExampleVariable.torp";
 
 import ExampleDialogCode from "./popover/ExampleDialog.torp?raw";
-import ExampleDrawerCode from "./popover/ExampleDrawer.torp?raw";
-import ExampleAnchoredCode from "./popover/ExampleAnchored.torp?raw";
-import ExampleContextualCode from "./popover/ExampleContextual.torp?raw";
 import ExampleHoverCode from "./popover/ExampleHover.torp?raw";
 import ExampleFunctionCode from "./popover/ExampleFunction.torp?raw";
-import ExampleMountCode from "./popover/ExampleMount.torp?raw";
 import ExampleVariableCode from "./popover/ExampleVariable.torp?raw";
 
 export default function PopoverPage() {
@@ -26,17 +18,13 @@ export default function PopoverPage() {
 	@render {
 		<h1>Popover</h1>
 		<p>
-			A popover that can be used to show rich content or obtain information from a user.
-		</p>
-		<p>
-			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/">the WAI ARIA guidelines for Dialogs</a>.
+			A popover window that is shown to the user relative to an anchor element.
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
 <Popover>
-	<PopoverOverlay /> (optional, if modal)
-	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
-	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
+	<PopoverTrigger /> (optional)
+	<PopoverContent />
 </Popover>
 `.trim()}</code></pre>
 		<h2>Demo</h2>
@@ -49,32 +37,12 @@ export default function PopoverPage() {
 				</TabHeader>
 				<TabHeader>
 					<TabTrigger class="example-tab-header">
-						Drawer
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Anchored
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Contextual
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
 						Hover
 					</TabTrigger>
 				</TabHeader>
 				<TabHeader>
 					<TabTrigger class="example-tab-header">
 						Function
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Mount
 					</TabTrigger>
 				</TabHeader>
 				<TabHeader>
@@ -120,81 +88,6 @@ export default function PopoverPage() {
 					</TabList>
 					<TabContent>
 						<p class="example-preview">
-							<ExampleDrawer />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleDrawerCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
-			</TabContent>
-			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleAnchored />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleAnchoredCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
-			</TabContent>
-			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleContextual />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleContextualCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
-			</TabContent>
-							<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
 							<ExampleHover />
 						</p>
 					</TabContent>
@@ -229,31 +122,6 @@ export default function PopoverPage() {
 								Copy to clipboard
 							</button>
 							<pre><code>{ExampleFunctionCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
-			</TabContent>
-			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleMount />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleMountCode.trim()}</code></pre>
 						</div>
 					</TabContent>
 				</TabGroup>

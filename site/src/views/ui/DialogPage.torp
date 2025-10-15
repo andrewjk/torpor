@@ -20,7 +20,10 @@ export default function DialogPage() {
 	@render {
 		<h1>Dialog</h1>
 		<p>
-			Content for a window displayed in a Popover.
+			A dialog that can be used to show a message to the user, or get information from the user.
+		</p>
+		<p>
+			Dialogs are typically shown within a Modal or Popover.
 		</p>
 		<p>
 			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/">the WAI ARIA guidelines for Dialogs</a>.

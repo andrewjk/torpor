@@ -7,7 +7,7 @@ export interface PopoverContext {
 	// There may be a more elegant way to accomplish this too
 	handleClickOutside?: (e: MouseEvent) => void;
 	state: PopoverState;
-	modal: boolean;
+	//modal: boolean;
 	anchorElement?: HTMLElement;
 	// HACK: focusFirstElement is necessary because if we focus the first element e.g. in a Dialog's
 	// onMount, it will scroll the page to the focused element and mess up our careful positioning

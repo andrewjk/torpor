@@ -1,12 +1,11 @@
-import { showPopoverPrompt } from "../../../src/Popover";
-import CustomDialog from "./CustomDialog.torp";
+import { Modal, ModalContent, showPrompt } from "../../../src/Modal/index";
+import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function DialogFunction($props: any) {
 	let $state = $watch({ color: "" });
 
 	async function show() {
-		// @ts-ignore
-		$state.color = await showPopoverPrompt(CustomDialog, null, $parent);
+		$state.color = await showPrompt(CustomDialog, null, $parent);
 	}
 
 	@render {
@@ -18,3 +17,20 @@ export default function DialogFunction($props: any) {
 	}
 }
 
+function CustomDialog($props: any) {
+	@render {
+		<Modal visible callback={$props.callback}>
+			<ModalContent>
+				<Dialog>
+					<DialogBody>
+						<p>Which color do you prefer?</p>
+					</DialogBody>
+					<DialogFooter>
+						<DialogButton value="blue">Blue</DialogButton>
+						<DialogButton value="red">Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</ModalContent>
+		</Modal>
+	}
+}

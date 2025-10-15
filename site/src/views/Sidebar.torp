@@ -23,16 +23,17 @@ export default function Sidebar() {
 				<li><a href="/ui/accordion">Accordion</a></li>
 				<li><a href="/ui/breadcrumb">Breadcrumb</a></li>
 				<li><a href="/ui/calendar">Calendar</a></li>
+				<li><a href="/ui/contextual">Contextual</a></li>
 				<li><a href="/ui/dialog">Dialog</a></li>
 				<li><a href="/ui/disclosure">Disclosure</a></li>
 				<li><a href="/ui/drawer">Drawer</a></li>
 				<li><a href="/ui/form">Form</a></li>
 				<li><a href="/ui/menu">Menu</a></li>
 				<li><a href="/ui/menu-bar">MenuBar</a></li>
+				<li><a href="/ui/modal">Modal</a></li>
 				<li><a href="/ui/nav-menu">NavMenu</a></li>
 				<li><a href="/ui/notification">Notification</a></li>
 				<li><a href="/ui/popover">Popover</a></li>
-				<li><a href="/ui/slider">Slider</a></li>
 				<li><a href="/ui/tab-group">TabGroup</a></li>
 			</ul>
 			<h4>Build</h4>

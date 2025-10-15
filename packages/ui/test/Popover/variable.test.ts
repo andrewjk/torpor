@@ -3,13 +3,13 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
-import PromptVariable from "./components/PromptVariable.torp";
+import PopoverVariable from "./components/PopoverVariable.torp";
 
 describe("Prompt", () => {
 	it("Showing with a variable", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, PromptVariable);
+		mount(container, PopoverVariable);
 
 		// By default, the prompt shouldn't be shown
 		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();

@@ -1,3 +1,5 @@
+import { ContextualContextName } from "../Contextual/ContextualTypes";
+import { ModalContextName } from "../Modal/ModalTypes";
 import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
 import {
 	MenuContextName,
@@ -26,11 +28,11 @@ interface MenuProps {
  *
  * ```
  * <Menu>
- *     <MenuButton />
- *     <MenuSeparator /> (optional)
- *     <MenuGroup> (optional)
- *         <MenuButton />
- *     </MenuGroup>
+ * 	<MenuButton />
+ * 	<MenuSeparator /> (optional)
+ * 	<MenuGroup> (optional)
+ * 		<MenuButton />
+ * 	</MenuGroup>
  * </Menu>
  * ```
  */
@@ -42,11 +44,12 @@ export default function Menu($props: MenuProps) {
 	let focusIndex = -1;
 
 	// Get stuff out of the PopoverContext
-	const popoverContext = $context[PopoverContextName] as PopoverContext;
+	// HACK: share state in PopupState and extend in context/modal/popover
+	const popoverContext = $context[ContextContextName] ?? $context[ModalContextName] ?? $context[PopoverContextName] as PopoverContext;
 	if (!popoverContext) {
-		throw new Error("Menu must be contained within a Contextual, Prompt or Popover");
+		throw new Error("Menu must be contained within a Context, Modal or Popover");
 	}
-	const { setVisible, handleButton, modal, visible } = popoverContext;
+	const { setVisible, handleButton, visible } = popoverContext;
 
 	// Check whether this is a menu in a popout
 	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;

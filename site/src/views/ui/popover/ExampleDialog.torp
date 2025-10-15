@@ -1,4 +1,5 @@
-import { Popover, PopoverOverlay, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
+
+import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ExampleDialog($props: any) {
@@ -8,12 +9,11 @@ export default function ExampleDialog($props: any) {
 
 	@render {
 		<p>
-			The button below shows a popover Dialog using the Popover, PopoverTrigger
-			and PopoverContent components.
+			The button below shows a popover Dialog below itself using the Popover,
+			PopoverTrigger and PopoverContent components.
 		</p>
 
 		<Popover>
-			<PopoverOverlay class="example-popover-overlay" />
 			<PopoverTrigger>Show a popover</PopoverTrigger>
 			<PopoverContent class="example-popover-content">
 				<Dialog>
@@ -33,25 +33,11 @@ export default function ExampleDialog($props: any) {
 	}
 
 	@style {
-		.example-popover-overlay {
-			background-color: rgba(0, 0, 0, 0.6);
-			position: fixed;
-			top: 0;
-			left: 0;
-			height: 100vh;
-			width: 100vw;
-			z-index: 100;
-		}
-
 		.example-popover-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			padding: 10px;
-			position: fixed;
-			top: 50%;
-			left: 50%;
-			transform: translate(-50%, -50%);
 			width: 340px;
 			z-index: 200;
 		}

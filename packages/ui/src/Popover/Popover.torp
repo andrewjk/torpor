@@ -18,17 +18,14 @@ interface PopoverProps {
 }
 
 /**
- * A popover that can be used to show rich content or obtain information from a user.
- *
- * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
+ * A popover window that is shown to the user relative to an anchor element.
  *
  * The structure of a Popover is:
  *
  * ```
  * <Popover>
- * 	<PopoverOverlay /> (optional, if modal)
- * 	<PopoverTrigger/PopoverTriggerContextual/PopoverTriggerHover /> (optional)
- * 	<PopoverContent/PopoverContentAnchored/PopoverContentContextual />
+ * 	<PopoverTrigger /> (optional)
+ * 	<PopoverContent />
  * </Popover>
  * ```
  */
@@ -39,6 +36,15 @@ export default function Popover($props: PopoverProps) {
 		visible: false,
 		position: { x: 0, y: 0 }
 	})
+
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+		$state.position = $props.position ?? { x: 0, y: 0 };
+	});
+	$run(() => {
+		$props.visible = $state.visible;
+	});
 
 	let result: any;
 
@@ -51,12 +57,6 @@ export default function Popover($props: PopoverProps) {
 		anchorElement: $unwrap($props.anchor),
 	};
 	$context[PopoverContextName] = context;
-
-	// Copy props into state whenever they change
-	$run(() => {
-		$state.visible = $props.visible ?? false;
-		$state.position = $props.position ?? { x: 0, y: 0 };
-	})
 
 	// Dispatch the toggle event when the popout is opened or closed
 	let firstToggle = true;

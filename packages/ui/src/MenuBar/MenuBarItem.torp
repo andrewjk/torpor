@@ -28,8 +28,8 @@ interface MenuBarItemProps {
  *
  * ```
  * <MenuBarItem>
- *     <MenuBarItemTrigger /> (optional)
- *     <MenuBarItemContent />
+ * 	<MenuBarItemTrigger /> (optional)
+ * 	<MenuBarItemContent />
  * </MenuBarItem>
  * ```
  */

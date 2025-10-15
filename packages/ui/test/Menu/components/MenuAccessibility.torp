@@ -1,4 +1,4 @@
-import { Popover, PopoverContent } from "../../../src/Popover";
+import { Modal, ModalContent } from "../../../src/Modal";
 import {
 	Menu,
 	MenuButton,
@@ -14,8 +14,8 @@ import {
 
 export default function MenuAccessibility() {
 	@render {
-		<Popover visible>
-			<PopoverContent>
+		<Modal visible>
+			<ModalContent>
 				<Menu ariaLabel="A menu">
 					<MenuButton>Menu button</MenuButton>
 					<MenuButton disabled>Disabled button</MenuButton>
@@ -53,7 +53,7 @@ export default function MenuAccessibility() {
 						</MenuPopoutContent>
 					</MenuPopout>
 				</Menu>
-			</PopoverContent>
-		</Popover>
+			</ModalContent>
+		</Modal>
 	}
 }

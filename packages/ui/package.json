@@ -14,8 +14,11 @@
 		},
 		"./Calendar": {
 			"types": "./dist/Calendar/index.d.ts",
-			"import": "./dist/Calendar/index.js",
-			"require": "./dist/Calendar/index.cjs"
+			"import": "./dist/Calendar/index.js"
+		},
+		"./Contextual": {
+			"types": "./dist/Contextual/index.d.ts",
+			"import": "./dist/Contextual/index.js"
 		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
@@ -40,6 +43,10 @@
 		"./MenuBar": {
 			"types": "./dist/MenuBar/index.d.ts",
 			"import": "./dist/MenuBar/index.js"
+		},
+		"./Modal": {
+			"types": "./dist/Modal/index.d.ts",
+			"import": "./dist/Modal/index.js"
 		},
 		"./NavMenu": {
 			"types": "./dist/NavMenu/index.d.ts",

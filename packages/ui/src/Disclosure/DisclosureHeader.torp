@@ -16,7 +16,7 @@ interface DisclosureHeaderProps {
  * 
  * ```
  * <DisclosureHeader>
- *    <DisclosureTrigger />
+ * 	<DisclosureTrigger />
  * </DisclosureHeader>
  * ```
  */

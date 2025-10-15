@@ -1,7 +1,9 @@
 export const DialogContextName = "Dialog";
 
+export type HandleButtonPress = (type: "confirm" | "cancel" | undefined, value?: any) => void;
+
 export interface DialogContext {
-	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
+	handleButton: HandleButtonPress;
 	state: DialogState;
 	anchorElement?: HTMLElement;
 	confirmButton?: HTMLButtonElement;

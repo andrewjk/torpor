@@ -1,4 +1,6 @@
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getScrollParent from "../utils/getScrollParent";
+import setPopoverPosition from "../utils/setPopoverPosition";
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 
 interface PopoverContentProps {
@@ -6,14 +8,23 @@ interface PopoverContentProps {
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
+	/** Where the popover will be shown, relative to the popover trigger */
+	side?: "top" | "right" | "bottom" | "left",
+	/** How the popover will be aligned, relative to the popover trigger */
+	alignment?: "start" | "center" | "end",
 }
 
 /**
- * The content that is displayed for a Popover when it is open, such as a Dialog
- * in the middle of the screen or a div that slides in from the side.
+ * The content that is displayed for a Popover when it is open, displayed
+ * alongside an element.
  */
-export default function PopoverContent($props: PopoverContentProps) {
+export default function PopoverContent($props?: PopoverContentProps) {
 	$props ??= $watch({});
+	$props.side ??= "bottom";
+	$props.alignment ??= "center";
+
+	// HACK:
+	if (!$props) return;
 
 	let div: HTMLDivElement;
 	let shown = false;
@@ -41,6 +52,11 @@ export default function PopoverContent($props: PopoverContentProps) {
 		addDocumentEvent("mousedown", handleDocumentMouseDown);
 		addDocumentEvent("click", handleDocumentClick);
 
+		// Set the position and listen for window resize and scroll to reset the position
+		setPosition();
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.addEventListener("resize", setPosition);
+		scrollParent.addEventListener("scroll", setPosition);
 		if (context.focusFirstElement) {
 			context.focusFirstElement();
 		}
@@ -52,7 +68,10 @@ export default function PopoverContent($props: PopoverContentProps) {
 		removeDocumentEvent("mousedown", handleDocumentMouseDown);
 		removeDocumentEvent("click", handleDocumentClick);
 
-		// Focus the anchor element per WAI guidelines
+		// Stop listening for window resize and focus the anchor element per WAI guidelines
+		const scrollParent = getScrollParent(context.anchorElement)
+		scrollParent.removeEventListener("resize", setPosition);
+		scrollParent.removeEventListener("scroll", setPosition);
 		if (context.anchorElement?.focus) {
 			context.anchorElement.focus();
 		}
@@ -69,8 +88,17 @@ export default function PopoverContent($props: PopoverContentProps) {
 			!div.contains(e.target as HTMLElement) &&
 			(!context.anchorElement || !context.anchorElement.contains(e.target as HTMLElement))
 		) {
+			e.preventDefault();
 			context.handleClickOutside!(e);
 		}
+	}
+
+	function setPosition() {
+		if (!context.anchorElement) {
+			throw new Error("Popover must have an anchor element");
+		}
+
+		setPopoverPosition(context.anchorElement, div, $props.side, $props.alignment);
 	}
 
 	@render {

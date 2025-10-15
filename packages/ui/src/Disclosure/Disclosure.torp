@@ -22,10 +22,10 @@ interface DisclosureProps {
  *
  * ```
  * <Disclosure>
- *     <DisclosureHeader>
- *         <DisclosureTrigger />
- *     </DisclosureHeader>
- *     <DisclosureContent />
+ * 	<DisclosureHeader>
+ * 		<DisclosureTrigger />
+ * 	</DisclosureHeader>
+ * 	<DisclosureContent />
  * </Disclosure>
  * ```
  */

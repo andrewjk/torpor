@@ -6,14 +6,16 @@ import {
 	DialogButton
 } from "../../../src/Dialog/index";
 
-export default function PromptVariable() {
+export default function PopoverVariable() {
 	let $state = $watch({
 		color: "",
 		showPopover: false
 	});
 
+	let button: HTMLButtonElement;
+
 	@render {
-		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
+		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)} &ref={button}>
 			Show the prompt
 		</button>
 
@@ -21,7 +23,7 @@ export default function PromptVariable() {
 			<p>Your favorite color is {$state.color}?!</p>
 		}
 
-		<Popover &visible={$state.showPopover}>
+		<Popover &visible={$state.showPopover} anchor={button}>
 			<PopoverContent>
 				<Dialog>
 					<DialogBody>

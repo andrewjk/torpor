@@ -22,7 +22,7 @@ interface MenuPopoutProps {
  *
  * ```
  * <MenuPopout>
- *     <MenuPopoutTrigger /> (optional)
+ * 	<MenuPopoutTrigger /> (optional)
  * 	<MenuPopoutContent />
  * </MenuPopout>
  * ```

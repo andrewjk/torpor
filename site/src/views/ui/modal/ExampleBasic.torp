@@ -1,37 +1,46 @@
-import { Popover, PopoverTriggerContextual, PopoverContentContextual } from "@torpor/ui/Popover";
+import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
-export default function ExampleContextual($props: any) {
+export default function ExampleBasic($props: any) {
+	let $state = $watch({
+		showDialog: false
+	});
+
 	function handleOption(color: string) {
 		alert(`You prefer ${color}?!`);
 	}
 
 	@render {
-		<p>Right-click on the panel below to trigger a context menu.</p>
+		<p>The button below shows a basic modal dialog.</p>
+		<p>
+			<button type="button" onclick={() => $state.showDialog = true}>
+				Show a dialog
+			</button>
+		</p>
 
-		<Popover>
-			<PopoverTriggerContextual class="example-popover-element">Show a contextual</PopoverTriggerContextual>
-			<PopoverContentContextual class="example-popover-content">
-				<Dialog>
+		<Modal &visible={$state.showDialog}>
+			<ModalOverlay class="example-dialog-overlay" />
+			<ModalContent>
+				<Dialog class="example-dialog-content">
 					<DialogHeader>
 						<h4>Header</h4>
 					</DialogHeader>
 					<DialogBody>
 						<p>Which color do you prefer?</p>
 					</DialogBody>
-					<DialogFooter class="example-popover-footer">
+					<DialogFooter class="example-dialog-footer">
 						<DialogButton onclick={() => handleOption("blue")}>Blue</DialogButton>
 						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentContextual>
-		</Popover>
+			</ModalContent>
+		</Modal>
 	}
 
 	@style {
-		.example-popover-overlay {
+		.example-dialog-overlay {
 			background-color: rgba(0, 0, 0, 0.6);
-			position: absolute;
+			position: fixed;
 			top: 0;
 			left: 0;
 			height: 100vh;
@@ -39,23 +48,20 @@ export default function ExampleContextual($props: any) {
 			z-index: 100;
 		}
 
-		.example-popover-element {
-			border: 1px dashed #222;
-			border-radius: 4px;
-			cursor: default;
-			padding: 20px;
-		}
-
-		.example-popover-content {
+		.example-dialog-content {
 			background: white;
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			padding: 10px;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
 			width: 340px;
 			z-index: 200;
 		}
 
-		.example-popover-footer {
+		.example-dialog-footer {
 			display: flex;
 			gap: 10px;
 			justify-content: right;

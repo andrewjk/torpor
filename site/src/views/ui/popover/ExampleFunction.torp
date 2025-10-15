@@ -1,11 +1,11 @@
 import { showPopover } from "@torpor/ui/Popover";
-import PopoverDialog from "./PopoverDialog.torp";
+import PopoverTooltip from "./PopoverTooltip.torp";
 
 export default function ExampleFunction($props: any) {
 	let button: HTMLButtonElement;
 
 	async function show() {
-		showPopover(PopoverDialog, button);
+		showPopover(PopoverTooltip, button, { text: "You showed the popover!" });
 	}
 
 	@render {

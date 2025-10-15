@@ -18,10 +18,11 @@ interface BreadcrumbProps {
  *
  * ```
  * <Breadcrumb>
- *     <BreadcrumbItem />
- *     <BreadcrumbSeparator /> (optional)
- *     <BreadcrumbItem />
- * 	...
+ * 	<BreadcrumbItem />
+ * 	<BreadcrumbSeparator /> (optional)
+ * 	<BreadcrumbItem>
+ * 		...
+ * 	</BreadcrumbItem>
  * </Breadcrumb>
  * ```
  *

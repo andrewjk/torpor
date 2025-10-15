@@ -1,9 +1,9 @@
-import { Popover, PopoverOverlay, PopoverContent } from "@torpor/ui/Popover";
+import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ExampleBasic($props: any) {
 	let $state = $watch({
-		showPopover: false
+		showDialog: false
 	});
 
 	function handleOption(color: string) {
@@ -13,15 +13,15 @@ export default function ExampleBasic($props: any) {
 	@render {
 		<p>The button below shows a basic modal dialog.</p>
 		<p>
-			<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)}>
-				Show a modal
+			<button type="button" onclick={() => $state.showDialog = true}>
+				Show a dialog
 			</button>
 		</p>
 
-		<Popover class="modal" visible={$state.showPopover}>
-			<PopoverOverlay class="example-dialog-overlay" />
-			<PopoverContent class="example-dialog-content">
-				<Dialog>
+		<Modal &visible={$state.showDialog}>
+			<ModalOverlay class="example-dialog-overlay" />
+			<ModalContent>
+				<Dialog class="example-dialog-content">
 					<DialogHeader>
 						<h4>Header</h4>
 					</DialogHeader>
@@ -33,8 +33,8 @@ export default function ExampleBasic($props: any) {
 						<DialogButton onclick={() => handleOption("red")}>Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContent>
-		</Popover>
+			</ModalContent>
+		</Modal>
 	}
 
 	@style {

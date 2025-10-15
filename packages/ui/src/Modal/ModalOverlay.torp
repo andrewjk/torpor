@@ -1,0 +1,40 @@
+import { disableScroll } from "../mount/disableScroll";
+import { ModalContextName, type ModalContext } from "./ModalTypes";
+
+interface ModalOverlayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+}
+
+/**
+ * The background overlay for a modal popup component (e.g. Context, Dialog or Popover).
+ * Adding an overlay automatically sets the component's `modal` value to true.
+ */
+export default function ModalOverlay($props?: ModalOverlayProps) {
+	$props ??= $watch({});
+
+	// Get stuff out of the ModalContext
+	const context = $context[ModalContextName] as ModalContext;
+	if (!context) {
+		throw new Error("ModalOverlay must be contained within a Modal");
+	}
+	let $state = context.state;
+
+	// Any popup with an overlay is modal
+	$state.modal = true;
+
+	@render {
+		@if ($state.visible) {
+			<div
+				{$props.id}
+				class={`torp-modal-overlay ${$props.class ?? ""}`.trim()}
+				tabindex="-1"
+				onmount={(el) => disableScroll(el)}
+			>
+				<slot />
+			</div>
+		}
+	}
+}

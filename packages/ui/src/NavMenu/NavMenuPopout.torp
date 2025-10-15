@@ -16,7 +16,7 @@ interface NavMenuPopoutProps {
  *
  * ```
  * <NavMenuPopout>
- *     <NavMenuPopoutButton />
+ * 	<NavMenuPopoutButton />
  * 	<NavMenuPopoutContent />
  * </NavMenuPopout>
  * ```
@@ -29,6 +29,14 @@ export default function NavMenuPopout($props: NavMenuPopoutProps) {
 		visible: $props.visible
 	});
 
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+	});
+	$run(() => {
+		$props.visible = $state.visible;
+	});
+
 	let result: any;
 
 	// Set the context to pass down to items
@@ -36,11 +44,6 @@ export default function NavMenuPopout($props: NavMenuPopoutProps) {
 		state: $state,
 	};
 	$context[NavMenuPopoutContextName] = context;
-
-	// Copy props into state whenever they change
-	$run(() => {
-		$state.visible = $props.visible ?? false;
-	});
 
 	// Dispatch the toggle event when the popout is opened or closed
 	let firstToggle = true;

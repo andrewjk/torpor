@@ -1,4 +1,4 @@
-import { Popover, PopoverContentAnchored } from "@torpor/ui/Popover";
+import { Popover, PopoverContent } from "@torpor/ui/Popover";
 
 export default function ExampleVariable($props: any) {
 	let $state = $watch({
@@ -15,9 +15,9 @@ export default function ExampleVariable($props: any) {
 
 		@if ($state.showPopover) {
 			<Popover anchor={button} visible>
-				<PopoverContentAnchored class="example-popover-content" side="bottom">
+				<PopoverContent class="example-popover-content" side="bottom">
 					You showed the popover!
-				</PopoverContentAnchored>
+				</PopoverContent>
 			</Popover>
 		}
 	}

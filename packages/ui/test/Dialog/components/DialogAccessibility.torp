@@ -1,4 +1,3 @@
-import { Popover, PopoverContent } from "../../../src/Popover/index";
 import {
 	Dialog,
 	DialogHeader,
@@ -8,24 +7,19 @@ import {
 } from "../../../src/Dialog/index";
 
 export default function DialogAccessibility($props: any) {
-	$props.modal ??= false;
 	$props.alert ??= false;
 	$props.ariaAnnounce ??= true;
 
 	let color = "";
 
 	@render {
-		<Popover visible modal={$props.modal}>
-			<PopoverContent>
-				<Dialog alert={$props.alert}>
-					<DialogHeader>Color preference</DialogHeader>
-					<DialogBody ariaAnnounce={$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
-					<DialogFooter>
-						<DialogButton value="blue" onclick={() => (color = "blue")}>Blue</DialogButton>
-						<DialogButton value="red" onclick={() => (color = "red")}>Red</DialogButton>
-					</DialogFooter>
-				</Dialog>
-			</PopoverContent>
-		</Popover>
+		<Dialog alert={$props.alert}>
+			<DialogHeader>Color preference</DialogHeader>
+			<DialogBody ariaAnnounce={$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
+			<DialogFooter>
+				<DialogButton value="blue" onclick={() => (color = "blue")}>Blue</DialogButton>
+				<DialogButton value="red" onclick={() => (color = "red")}>Red</DialogButton>
+			</DialogFooter>
+		</Dialog>
 	}
 }

@@ -20,12 +20,12 @@ interface MenuBarProps {
  *
  * ```
  * <MenuBar>
- *     <MenuBarItem>
- *         <MenuBarItemTrigger />
- *         <MenuBarItemContent>
- *             <Menu />
- *         </MenuBarItemContent>
- *     </MenuBarItem>
+ * 	<MenuBarItem>
+ * 		<MenuBarItemTrigger />
+ * 		<MenuBarItemContent>
+ * 			<Menu />
+ * 		</MenuBarItemContent>
+ * 	</MenuBarItem>
  * </MenuBar>
  * ```
  */

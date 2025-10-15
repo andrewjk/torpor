@@ -1,4 +1,4 @@
-import { Popover, PopoverContentAnchored } from "@torpor/ui/Popover";
+import { Popover, PopoverContent } from "@torpor/ui/Popover";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
 export default function PopoverDialog($props: Props) {
 	@render {
 		<Popover anchor={$props.anchor} visible>
-			<PopoverContentAnchored class="popover-dialog-content">
+			<PopoverContent class="popover-dialog-content">
 				<Dialog>
 					<DialogButton class="popover-dialog-close" type="cancel">X</DialogButton>
 					<DialogHeader>
@@ -22,7 +22,7 @@ export default function PopoverDialog($props: Props) {
 						<DialogButton value="red">Red</DialogButton>
 					</DialogFooter>
 				</Dialog>
-			</PopoverContentAnchored>
+			</PopoverContent>
 		</Popover>
 	}
 

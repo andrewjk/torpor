@@ -1,0 +1,123 @@
+import { Contextual, ContextualTrigger, ContextualContent } from "@torpor/ui/Contextual";
+import { Menu, MenuCheck, MenuIndicator, MenuSeparator, MenuButton } from "@torpor/ui/Menu";
+
+export default function Example($props: any) {
+	let $state = $watch({
+		bold: false,
+		italic: false,
+		underline: false,
+	});
+
+	function resetStyle() {
+		$state.bold = false;
+		$state.italic = false;
+		$state.underline = false;
+	}
+
+	@render {
+		<p>Right-click on the panel below to trigger a contextual menu.</p>
+
+		<Contextual>
+			<ContextualTrigger class="example-contextual-element" activation="hover">
+				<p
+					class={{
+						"example-contextual-menu-message": true,
+						bold: $state.bold,
+						italic: $state.italic,
+						underline: $state.underline,
+					}}
+				>
+					Style this paragraph
+				</p>
+			</ContextualTrigger>
+			<ContextualContent class="example-contextual-content">
+				<Menu class="example-contextual-menu" ariaLabel="Font style">
+					<MenuCheck class="example-contextual-menu-button" &checked={$state.bold}>
+						<MenuIndicator class="example-contextual-menu-indicator">✔</MenuIndicator>
+						Bold
+					</MenuCheck>
+					<MenuCheck class="example-contextual-menu-button" &checked={$state.italic}>
+						<MenuIndicator class="example-contextual-menu-indicator">✔</MenuIndicator>
+						Italic
+					</MenuCheck>
+					<MenuCheck class="example-contextual-menu-button" &checked={$state.underline}>
+						<MenuIndicator class="example-contextual-menu-indicator">✔</MenuIndicator>
+						Underline
+					</MenuCheck>
+					<MenuSeparator class="example-contextual-menu-separator" />
+					<MenuButton class="example-contextual-menu-button" onclick={resetStyle}>Reset style</MenuButton>
+				</Menu>
+			</ContextualContent>
+		</Contextual>
+	}
+
+	@style {
+		.example-contextual-element {
+			border: 1px dashed #222;
+			border-radius: 4px;
+			cursor: default;
+			padding: 20px;
+		}
+
+		.example-contextual-content {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			padding: 10px;
+			width: 340px;
+			z-index: 200;
+		}
+
+		.example-contextual-menu,
+		.example-contextual-menu-group {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.example-contextual-menu-button {
+			all: unset;
+			cursor: default;
+			display: flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+
+			/** For positioning the checked indicators */
+			position: relative;
+			padding: 5px 5px 5px 30px;
+		}
+
+		.example-contextual-menu-button:hover,
+		.example-contextual-menu-button:focus,
+		.example-contextual-menu-button:active {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		.example-contextual-menu-indicator {
+			position: absolute;
+			left: 10px;
+		}
+
+		.example-contextual-menu-separator {
+			border-bottom: 1px solid gainsboro;
+		}
+
+		.example-contextual-menu-message {
+		}
+
+		.example-contextual-menu-message.bold {
+			font-weight: bold;
+		}
+
+		.example-contextual-menu-message.italic {
+			font-style: italic;
+		}
+
+		.example-contextual-menu-message.underline {
+			text-decoration: underline;
+		}
+	}
+}

@@ -1,10 +1,13 @@
 import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
+import hoverTrigger from "../mount/hoverTrigger";
 
 interface PopoverTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
+	/** Whether the popover is activated by click/press or by hover **/
+	activation?: "press" | "hover"
 }
 
 /**
@@ -12,6 +15,7 @@ interface PopoverTriggerProps {
  */
 export default function PopoverTrigger($props: PopoverTriggerProps) {
 	$props ??= $watch({});
+	$props.activation ??= "press";
 
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
@@ -21,7 +25,23 @@ export default function PopoverTrigger($props: PopoverTriggerProps) {
 	let $state = context.state;
 
 	function handleClick() {
+		if ($props.activation !== "press") return;
+
 		$state.visible = !$state.visible;
+	}
+
+	function handleHover(node: HTMLElement, e: TouchEvent | MouseEvent) {
+		if ($props.activation !== "hover") return;
+
+		if ($state.position) {
+			// Get the position relative to the element, so we can reposition on scroll
+			const rect = node.getBoundingClientRect();
+			const x = e.clientX - rect.left;
+			const y = e.clientY - rect.top;
+			$state.position = { x, y };
+			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
+		}
+		$state.visible = !$state.visible
 	}
 
 	@render {
@@ -30,6 +50,7 @@ export default function PopoverTrigger($props: PopoverTriggerProps) {
 			{$props.id}
 			class={`torp-popover-trigger ${$props.class ?? ""}`.trim()}
 			onclick={handleClick}
+			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}
 		>
 			<slot />

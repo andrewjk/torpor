@@ -1,0 +1,112 @@
+import { ModalContextName, type ModalContext, type ModalState } from "./ModalTypes";
+
+interface ModalProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** Whether the modal is visible  */
+	visible?: boolean,
+	/** A function to be called when the user selects a response */
+	callback?: ((value: any) => void),
+}
+
+/**
+ * A modal window that can be used to show rich content or obtain information from a user.
+ *
+ * See [the WAI ARIA guidelines for Modals](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
+ *
+ * The structure of a Modal is:
+ *
+ * ```
+ * <Modal>
+ * 	<ModalOverlay />
+ * 	<ModalTrigger /> (optional)
+ * 	<ModalContent />
+ * </Modal>
+ * ```
+ */
+export default function Modal($props: ModalProps) {
+	$props ??= $watch({});
+
+	let $state: ModalState = $watch({
+		visible: false,
+	})
+
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props.visible ?? false;
+	});
+	$run(() => {
+		$props.visible = $state.visible;
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: ModalContext = {
+		handleButton,
+		handleClickOutside,
+		state: $state,
+	};
+	$context[ModalContextName] = context;
+
+	// Dispatch the toggle event when the modal is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props.ontoggle;
+		const onopen = $props.onopen;
+		const onclose = $props.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
+
+	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+		// Get the button's result
+		switch (type) {
+			case "confirm": {
+				result = value || true;
+				break;
+			}
+			case "cancel": {
+				result = value || false;
+				break;
+			}
+			default: {
+				result = value;
+				break;
+			}
+		}
+
+		// Hide the modal
+		$state.visible = false;
+
+		// Call the callback
+		if ($props.callback) {
+			$props.callback(result);
+		}
+	}
+
+	function handleClickOutside(e: MouseEvent) {
+		e.preventDefault();
+		$state.visible = false;
+	}
+
+	@render {
+		<div
+			{$props.id}
+			class={`torp-modal ${$props.class ?? ""}`.trim()}
+		>
+			<slot />
+		</div>
+	}
+}
