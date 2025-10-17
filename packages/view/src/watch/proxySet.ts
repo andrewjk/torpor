@@ -1,8 +1,8 @@
 import context from "../render/context";
 import $watch from "./$watch";
-import { proxyDataSymbol } from "./symbols";
 //import transferEffects from "./transferEffects";
-import updateSignal from "./updateSignal";
+import propagateSignal from "./propagateSignal";
+import { proxyDataSymbol } from "./symbols";
 
 export default function proxySet(
 	target: Record<PropertyKey, any>,
@@ -33,13 +33,13 @@ export default function proxySet(
 		Reflect.set(target, key, value, receiver);
 
 		// Re-run effects
-		updateSignal(data, key);
+		propagateSignal(data, key);
 
 		// If an item in an array is being set directly, trigger the length to
 		// cause any lists to be re-run and data re-bound
 		// TODO: Can we update the single item's data directly somehow?
 		if (data.isArray && !isNaN(+String(key))) {
-			updateSignal(data, "length");
+			propagateSignal(data, "length");
 		}
 	}
 

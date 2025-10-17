@@ -1,7 +1,7 @@
 import type ProxyData from "../types/ProxyData";
+import propagateSignal from "../watch/propagateSignal";
 import { proxyDataSymbol, proxyHandledSymbol } from "../watch/symbols";
-import trackProxyEffect from "../watch/trackProxyEffect";
-import updateSignal from "../watch/updateSignal";
+import trackProxySignal from "../watch/trackProxySignal";
 
 // NOTE: this is mostly copied from SvelteDate, without the memoization
 // I'm not 100% sold on it, maybe it would be better to intercept $watch calls on a Date?
@@ -47,7 +47,7 @@ export default class ReactiveDate extends Date {
 					const data = this[proxyDataSymbol];
 					// @ts-ignore
 					const result = datePrototype[method].apply(this, args);
-					trackProxyEffect(data, "#time");
+					trackProxySignal(data, "#time");
 					return result;
 				};
 			}
@@ -59,7 +59,7 @@ export default class ReactiveDate extends Date {
 					const data = this[proxyDataSymbol];
 					// @ts-ignore
 					const result = datePrototype[method].apply(this, args);
-					updateSignal(data, "#time");
+					propagateSignal(data, "#time");
 					return result;
 				};
 			}

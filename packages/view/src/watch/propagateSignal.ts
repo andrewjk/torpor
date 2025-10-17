@@ -1,6 +1,5 @@
 import context from "../render/context";
 import type Computed from "../types/Computed";
-import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
 import type ProxySignal from "../types/ProxySignal";
 import type Subscription from "../types/Subscription";
@@ -8,15 +7,13 @@ import { COMPUTED_TYPE, EFFECT_TYPE } from "../types/constants";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 
-let lastEffect: Effect | null;
-
 /**
  * When a signal is changed, we need to
  * - Set the signal's subscriptions to recalc
  * - Set any dependent computed values to recalc
  * - Gather dependent effects that will need to be re-run
  */
-export default function updateSignal(proxy: ProxyData, key: PropertyKey): void {
+export default function propagateSignal(proxy: ProxyData, key: PropertyKey): void {
 	//console.log(`triggering effects for '${String(key)}' on`, proxy);
 	//console.log("===");
 	//console.log(`triggering effects for '${String(key)}'`);
@@ -39,7 +36,7 @@ export default function updateSignal(proxy: ProxyData, key: PropertyKey): void {
 
 			// Cache the last effect in the chain, so we don't have to keep
 			// looping in cases where there are lots of them for this signal
-			lastEffect = context.firstEffectToRun;
+			let lastEffect = context.firstEffectToRun;
 			if (lastEffect !== null) {
 				while (lastEffect.nextEffectToRun !== null) {
 					lastEffect = lastEffect.nextEffectToRun;

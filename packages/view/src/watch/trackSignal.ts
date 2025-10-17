@@ -3,13 +3,11 @@ import type Computed from "../types/Computed";
 import type ProxySignal from "../types/ProxySignal";
 import type Subscription from "../types/Subscription";
 
-// TODO: Rename this to `subscribe` because its purpose has changed a bit
-
 /**
  * If there's an active target, subscribe it to this signal, so that it will be
  * run when the signal changes.
  */
-export default function trackEffect(signal: ProxySignal | Computed): void {
+export default function trackSignal(signal: ProxySignal | Computed): void {
 	const target = context.activeTarget;
 	if (target !== null) {
 		let sub: Subscription | null = null;

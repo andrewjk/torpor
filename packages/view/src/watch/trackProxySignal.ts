@@ -1,8 +1,8 @@
 import type ProxyData from "../types/ProxyData";
 import { SIGNAL_TYPE } from "../types/constants";
-import trackEffect from "./trackEffect";
+import trackSignal from "./trackSignal";
 
-export default function trackProxyEffect(data: ProxyData, key: PropertyKey): void {
+export default function trackProxySignal(data: ProxyData, key: PropertyKey): void {
 	//console.log(`tracking effect '${context.activeTarget.name}' for '${String(key)}' prop`);
 
 	// Create or get the signals
@@ -17,5 +17,5 @@ export default function trackProxyEffect(data: ProxyData, key: PropertyKey): voi
 		data.signals.set(key, signal);
 	}
 
-	trackEffect(signal);
+	trackSignal(signal);
 }

@@ -4,10 +4,10 @@ import type ProxyData from "../types/ProxyData";
 import { COMPUTED_TYPE, SIGNAL_TYPE } from "../types/constants";
 import $watch from "./$watch";
 import checkComputed from "./checkComputed";
+import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol } from "./symbols";
-import trackEffect from "./trackEffect";
-import trackProxyEffect from "./trackProxyEffect";
-import updateSignal from "./updateSignal";
+import trackProxySignal from "./trackProxySignal";
+import trackSignal from "./trackSignal";
 
 export default function proxyGet(
 	target: Record<PropertyKey, any>,
@@ -46,7 +46,7 @@ export default function proxyGet(
 
 				// If a property is being accessed in the course of setting up an
 				// effect, track it
-				trackProxyEffect(data, key);
+				trackProxySignal(data, key);
 			} else if (propDescriptor.get) {
 				// OK, we're only checking for computed values if it's read-only for
 				// now, but we probably need to check any getter's value -- e.g. the
@@ -75,7 +75,7 @@ export default function proxyGet(
 	} else if (signal.type === SIGNAL_TYPE) {
 		// If a property is being accessed in the course of setting up an
 		// effect, track it
-		trackProxyEffect(data, key);
+		trackProxySignal(data, key);
 	} else if (signal.type === COMPUTED_TYPE) {
 		if (signal.running) {
 			throw new Error("Cycle detected");
@@ -89,7 +89,7 @@ export default function proxyGet(
 			// changed, throw the error again
 			throw signal.value;
 		} else {
-			trackEffect(signal);
+			trackSignal(signal);
 		}
 		return signal.value;
 	}
@@ -102,7 +102,7 @@ export default function proxyGet(
 // ways (e.g. calling splice sets length before adding items)
 const arrayWrapper: Record<PropertyKey, any> = {
 	[Symbol.iterator]: function (data: ProxyData, target: any, key: PropertyKey) {
-		trackProxyEffect(data, "length");
+		trackProxySignal(data, "length");
 		// HACK: This prevents lists being re-run on every random property
 		// access by disabling the active effect before properties get
 		// accessed. I'm not sure if this is the best way to achieve this...
@@ -124,7 +124,7 @@ function arrayHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	return function (...args: any[]) {
 		const func = target[key];
 		const result = func.apply(target, args);
-		updateSignal(data, "length");
+		propagateSignal(data, "length");
 		return result;
 	};
 }

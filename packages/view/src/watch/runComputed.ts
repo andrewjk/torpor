@@ -1,6 +1,6 @@
 import context from "../render/context";
 import type Computed from "../types/Computed";
-import trackEffect from "./trackEffect";
+import trackSignal from "./trackSignal";
 
 export default function runComputed<T>(computed: Computed<T>): T {
 	//console.log(`running computed '${computed.name}'`);
@@ -30,7 +30,7 @@ export default function runComputed<T>(computed: Computed<T>): T {
 		computed.running = false;
 	}
 
-	trackEffect(computed);
+	trackSignal(computed);
 
 	return computed.value;
 }
