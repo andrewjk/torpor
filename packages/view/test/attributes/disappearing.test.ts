@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { beforeAll, expect, test } from "vitest";
-import $watch from "../../src/render/$watch";
+import $watch from "../../src/watch/$watch";
 import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";

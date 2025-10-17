@@ -1,6 +1,6 @@
-import batchEnd from "../watch/batchEnd";
-import batchStart from "../watch/batchStart";
-import context from "./context";
+import context from "../render/context";
+import batchEnd from "./batchEnd";
+import batchStart from "./batchStart";
 
 /**
  * Runs updates to proxy values in a batch, where the updates are stored in

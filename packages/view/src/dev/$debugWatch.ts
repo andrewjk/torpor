@@ -1,5 +1,5 @@
-import $watch from "../render/$watch";
 import type WatchOptions from "../types/WatchOptions";
+import $watch from "../watch/$watch";
 import devContext from "./devContext";
 
 export default function $debugWatch<T extends Record<PropertyKey, any>>(

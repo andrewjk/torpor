@@ -1,7 +1,7 @@
+import context from "../render/context";
 import type Computed from "../types/Computed";
 import { COMPUTED_TYPE } from "../types/constants";
-import runComputed from "../watch/runComputed";
-import context from "./context";
+import runComputed from "./runComputed";
 
 /**
  * Caches a computed value from signals accessed in a property getter.

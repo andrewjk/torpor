@@ -1,7 +1,7 @@
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
 import { EFFECT_TYPE } from "../types/constants";
-import runEffect from "../watch/runEffect";
+import runEffect from "./runEffect";
 
 // TODO: Take a pipeline of operators e.g. debounce
 

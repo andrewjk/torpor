@@ -1,4 +1,4 @@
-import { proxyDataSymbol } from "../watch/symbols";
+import { proxyDataSymbol } from "./symbols";
 
 /**
  * Returns the target object of a proxy

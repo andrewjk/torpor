@@ -1,10 +1,3 @@
-import $batch from "./render/$batch";
-import $cache from "./render/$cache";
-import $mount from "./render/$mount";
-import $peek from "./render/$peek";
-import $run from "./render/$run";
-import $unwrap from "./render/$unwrap";
-import $watch from "./render/$watch";
 import t_animate from "./render/addAnimation";
 import t_event from "./render/addEvent";
 import t_add_fragment from "./render/addFragment";
@@ -34,9 +27,14 @@ import t_dynamic from "./render/setDynamicElement";
 import type Animation from "./types/Animation";
 import type Component from "./types/Component";
 import type ListItem from "./types/ListItem";
-import type ServerComponent from "./types/ServerComponent";
-import type ServerSlotRender from "./types/ServerSlotRender";
 import type SlotRender from "./types/SlotRender";
+import $batch from "./watch/$batch";
+import $cache from "./watch/$cache";
+import $mount from "./watch/$mount";
+import $peek from "./watch/$peek";
+import $run from "./watch/$run";
+import $unwrap from "./watch/$unwrap";
+import $watch from "./watch/$watch";
 import ReactiveDate from "./wrappers/ReactiveDate";
 
 // Mount and hydrate
@@ -74,4 +72,4 @@ export {
 	t_dynamic,
 };
 
-export type { Component, ServerComponent, SlotRender, ServerSlotRender, ListItem, Animation };
+export type { Component, SlotRender, ListItem, Animation };

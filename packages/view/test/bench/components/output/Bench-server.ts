@@ -1,7 +1,7 @@
-import $watch from "../../../../src/render/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_class from "../../../../src/render/buildClasses";
 import t_fmt from "../../../../src/render/formatText";
+import $watch from "../../../../src/ssr/$serverWatch";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Bench(
 	// @ts-ignore
@@ -9,8 +9,8 @@ export default function Bench(
 	// @ts-ignore
 	$context: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
 
@@ -47,7 +47,19 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const colours = [
+		"red",
+		"yellow",
+		"blue",
+		"green",
+		"pink",
+		"brown",
+		"purple",
+		"brown",
+		"white",
+		"black",
+		"orange",
+	];
 	const nouns = [
 		"table",
 		"chair",
@@ -114,7 +126,7 @@ export default function Bench(
 	}
 
 	function buildData(length = 1000) {
-		const data = Array.from({ length })
+		const data = Array.from({ length });
 		for (let i = 0; i < length; i++) {
 			data[i] = $watch(new Item());
 		}

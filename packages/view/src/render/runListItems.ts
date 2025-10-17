@@ -25,7 +25,7 @@
  */
 import type ListItem from "../types/ListItem";
 import type Range from "../types/Range";
-import $watch from "./$watch";
+import $watch from "../watch/$watch";
 import clearRange from "./clearRange";
 import moveRange from "./moveRange";
 

@@ -1,7 +1,7 @@
 // I don't think we need this anymore, but I'm worried I'm missing somewhere it IS needed
 // If it's 2026, it's probably safe to delete this file
 
-//import $watch from "../render/$watch";
+//import $watch from "../watch/$watch";
 //import { type ProxyData } from "../types/ProxyData";
 //import { proxyDataSymbol } from "./symbols";
 //

@@ -1,11 +1,11 @@
 // eslint-disable no-unused-expressions
 import { afterEach, describe, expect, it, vi } from "vitest";
-import $batch from "../src/render/$batch";
-import $cache from "../src/render/$cache";
-import $peek from "../src/render/$peek";
-import $run from "../src/render/$run";
-import $watch from "../src/render/$watch";
 import context from "../src/render/context";
+import $batch from "../src/watch/$batch";
+import $cache from "../src/watch/$cache";
+import $peek from "../src/watch/$peek";
+import $run from "../src/watch/$run";
+import $watch from "../src/watch/$watch";
 
 //import checkState from "./checkState";
 //import printDiagram from "./printDiagram";

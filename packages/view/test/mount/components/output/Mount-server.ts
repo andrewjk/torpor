@@ -1,4 +1,4 @@
-import $mount from "../../../../src/render/$serverMount";
+import $mount from "../../../../src/ssr/$serverMount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Mount(

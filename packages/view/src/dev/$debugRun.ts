@@ -1,6 +1,6 @@
-import $run from "../render/$run";
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
+import $run from "../watch/$run";
 import devContext from "./devContext";
 
 export default function $debugRun(fn: () => Cleanup | void, name?: string): Effect {

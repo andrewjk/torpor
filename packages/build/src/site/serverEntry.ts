@@ -1,5 +1,5 @@
 import manifest from "@torpor/build/manifest";
-import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
+import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import $run from "../../src/render/$run";
-import $watch from "../../src/render/$watch";
+import $run from "../../src/watch/$run";
+import $watch from "../../src/watch/$watch";
 
 test("watching a defined property effect", () => {
 	let person = $watch({

@@ -1,5 +1,5 @@
-import $watch from "../render/$watch";
 import context from "../render/context";
+import $watch from "./$watch";
 import { proxyDataSymbol } from "./symbols";
 //import transferEffects from "./transferEffects";
 import updateSignal from "./updateSignal";

@@ -1,8 +1,8 @@
-import $watch from "../render/$watch";
 import context from "../render/context";
 import type Computed from "../types/Computed";
 import type ProxyData from "../types/ProxyData";
 import { COMPUTED_TYPE, SIGNAL_TYPE } from "../types/constants";
+import $watch from "./$watch";
 import checkComputed from "./checkComputed";
 import { proxyDataSymbol } from "./symbols";
 import trackEffect from "./trackEffect";

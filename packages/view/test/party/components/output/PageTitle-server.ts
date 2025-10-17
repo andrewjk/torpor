@@ -1,5 +1,5 @@
-import $run from "../../../../src/render/$serverRun";
-import $watch from "../../../../src/render/$serverWatch";
+import $run from "../../../../src/ssr/$serverRun";
+import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 

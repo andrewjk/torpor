@@ -1,4 +1,4 @@
-import { type ServerComponent, type ServerSlotRender } from "@torpor/view";
+import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import path from "node:path";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";

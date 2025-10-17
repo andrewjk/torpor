@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import $watch from "../../src/render/$watch";
+import $watch from "../../src/watch/$watch";
 
 test("watching an undefined property", () => {
 	const input = {};

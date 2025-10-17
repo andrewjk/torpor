@@ -1,4 +1,4 @@
-import $run from "./$run";
+import $run from "../watch/$run";
 
 export default function applyProps(
 	el: Element,

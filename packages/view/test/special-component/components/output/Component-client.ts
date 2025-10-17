@@ -1,5 +1,5 @@
-import $peek from "../../../../src/render/$peek";
-import $watch from "../../../../src/render/$watch";
+import $peek from "../../../../src/watch/$peek";
+import $watch from "../../../../src/watch/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";

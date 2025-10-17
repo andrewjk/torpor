@@ -1,5 +1,5 @@
 import type Range from "../types/Range";
-import $run from "./$run";
+import $run from "../watch/$run";
 import context from "./context";
 import popRange from "./popRange";
 import pushRange from "./pushRange";

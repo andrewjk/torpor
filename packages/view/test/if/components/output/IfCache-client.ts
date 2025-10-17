@@ -1,7 +1,7 @@
-import $mount from "../../../../src/render/$mount";
-import $peek from "../../../../src/render/$peek";
-import $run from "../../../../src/render/$run";
-import $watch from "../../../../src/render/$watch";
+import $mount from "../../../../src/watch/$mount";
+import $peek from "../../../../src/watch/$peek";
+import $run from "../../../../src/watch/$run";
+import $watch from "../../../../src/watch/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";

@@ -1,7 +1,7 @@
 import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
-import $run from "./$run";
+import $run from "../watch/$run";
 import context from "./context";
 import newRange from "./newRange";
 import pushRange from "./pushRange";

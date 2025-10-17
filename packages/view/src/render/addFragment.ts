@@ -1,4 +1,4 @@
-import $run from "./$run";
+import $run from "../watch/$run";
 import animate from "./animate";
 import context from "./context";
 import isFragmentNode from "./isFragmentNode";
