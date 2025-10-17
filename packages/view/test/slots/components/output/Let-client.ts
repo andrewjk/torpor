@@ -31,7 +31,7 @@ export default function Let(
 
 	/* @component */
 	const t_props_1: any = $watch({});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["items"] = $props.items;
 	});
 	const t_slots_1: Record<string, SlotRender> = {};
@@ -44,7 +44,7 @@ export default function Let(
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `#`);
 		const t_text_1 = t_root(t_fragment_2);
-		$run(function setAttributes() {
+		$run(() => {
 			t_text_1.textContent = ` ${t_fmt($sprops.item.text)} `;
 		});
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);

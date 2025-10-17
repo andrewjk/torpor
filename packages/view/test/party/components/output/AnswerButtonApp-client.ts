@@ -45,17 +45,17 @@ export default function AnswerButtonApp(
 
 	/* @component */
 	const t_props_1: any = $watch({});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["onYes"] = onAnswerYes;
 	});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["onNo"] = onAnswerNo;
 	});
 	AnswerButton(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
 	const t_text_2 = t_next(t_next(t_next(t_comp_anchor_1, true)), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = t_fmt($state.isHappy ? "😀" : "😥");
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

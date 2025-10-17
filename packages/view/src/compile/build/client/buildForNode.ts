@@ -68,7 +68,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append("");
 	b.append(`
 	/* @for */
-	let ${forRangeName} = t_range();
+	let ${forRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
 	t_run_list(
 	${forRangeName},
 	${forParentName},

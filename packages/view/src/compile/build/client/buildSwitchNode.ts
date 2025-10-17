@@ -3,6 +3,7 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -40,12 +41,13 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	b.append("");
 	b.append(`
 		/* @switch */
-		const ${rangeName} = t_range();
+		const ${rangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
-	b.append(`
-		$run(function runSwitch() {`);
+	addDevBoundary(`@${branches[0].statement}`, status, b);
+
+	b.append("$run(() => {");
 
 	let index = 0;
 
@@ -57,7 +59,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	}
 	b.append(`
 		}
-	});`);
+	}${status.options.dev === true ? `, "runSwitch"` : ""});`);
 
 	b.append(`
 		t_run_control(${rangeName}, ${anchorName}, (t_before) => {

@@ -18,6 +18,11 @@
 			"types": "./dist/ssr.d.ts",
 			"import": "./dist/ssr.js",
 			"require": "./dist/ssr.cjs"
+		},
+		"./dev": {
+			"types": "./dist/dev.d.ts",
+			"import": "./dist/dev.js",
+			"require": "./dist/dev.cjs"
 		}
 	},
 	"publishConfig": {

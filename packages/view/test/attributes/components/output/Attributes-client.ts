@@ -25,7 +25,7 @@ export default function Attributes(
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
 	const t_text_1 = t_next(t_div_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_attribute(t_div_1, "thing", $props.thing);
 		t_attribute(t_div_1, "data-thing", $props.dataThing);
 		t_attribute(t_div_1, "caption", `this attribute is for ${$props.description}`);

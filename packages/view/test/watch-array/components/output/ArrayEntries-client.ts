@@ -61,7 +61,7 @@ export default function ArrayEntries(
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_text_2 = t_next(t_next(t_root_1), true);
-			$run(function setAttributes() {
+			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item.data.i > 0 ? ", " : "")} ${t_fmt(t_item.data.item.text)} `;
 			});
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);

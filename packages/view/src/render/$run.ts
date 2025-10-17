@@ -21,7 +21,6 @@ export default function $run(fn: () => Cleanup | void, name?: string): Effect {
 		nextEffectToRun: null,
 		didError: false,
 		name,
-		//name: dev.effectName(fn),
 	};
 
 	runEffect(effect);

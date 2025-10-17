@@ -1,7 +1,11 @@
+import { devContext } from "../dev";
 import type Range from "../types/Range";
 
 export default function clearRange(range: Range): void {
 	//console.log("clearing range", range.name, "from", range.startNode, "to", range.endNode);
+
+	// DEBUG:
+	devContext.onRangeCleared(range);
 
 	// Clear child ranges and collect animations that take place within this
 	// range and its children

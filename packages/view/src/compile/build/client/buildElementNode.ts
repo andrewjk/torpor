@@ -74,7 +74,8 @@ function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Buil
 		status.imports.add("$run");
 		status.imports.add("t_dynamic");
 		let selfValue = selfAttribute.value;
-		b.append(`$run(function setDynamic() {`);
+
+		b.append("$run(() => {");
 		b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
 
 		let parentName = node.varName;
@@ -92,7 +93,7 @@ function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Buil
 
 		buildAddFragment(node, status, b, parentName!, "null");
 
-		b.append(`});`);
+		b.append(`}${status.options.dev === true ? `, "setDynamic"` : ""});`);
 	}
 }
 
@@ -130,19 +131,19 @@ function buildTitleNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	}
 
 	status.imports.add("$run");
+	b.append("$run(() => {");
 	b.append(`
-		$run(function runTitle() {
 			const t_old_title = document.title;
 			document.title = ${content};
 			return () => document.title = t_old_title;
-		});`);
+		}${status.options.dev === true ? `, "runTitle"` : ""});`);
 }
 
 function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	status.imports.add("$run");
 	// TODO: dedupe e.g. <meta name="x"> or on special key
+	b.append("$run(() => {");
 	b.append(`
-		$run(function runHead() {
 			const t_headel = document.createElement("${node.tagName}");
 			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
 	for (let { name, value } of node.attributes) {
@@ -151,8 +152,7 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 			b.append(`t_attribute(t_headel, "${name}", ${value});`);
 		}
 	}
-	b.append(`
-		});`);
+	b.append(`}${status.options.dev === true ? `, "runHead"` : ""});`);
 }
 
 function buildElementAttributes(

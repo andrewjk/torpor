@@ -39,7 +39,7 @@ export default function Function(
 		$state.counter += 1;
 	};
 
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = ` The count is ${t_fmt($state.counter)}. `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

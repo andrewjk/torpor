@@ -34,11 +34,11 @@ export default function InputHello(
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
 	const t_text_2 = t_next(t_input_1, true);
-	$run(function setBinding() {
+	$run(() => {
 		t_input_1.value = $state.text || "";
 	});
 	t_event(t_input_1, "input", (e) => $state.text = e.target.value);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = t_fmt($state.text);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

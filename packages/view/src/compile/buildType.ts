@@ -1,5 +1,5 @@
-import type BuildOptions from "../types/BuildOptions";
 import type Template from "../types/Template";
+import type BuildOptions from "./types/BuildOptions";
 import Builder from "./utils/Builder";
 
 /**

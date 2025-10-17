@@ -1,4 +1,4 @@
-import context from "../render/context";
+import context from "./context";
 
 /**
  * Adds an animation for an element

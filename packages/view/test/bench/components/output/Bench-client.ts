@@ -183,7 +183,7 @@ export default function Bench(
 			const t_text_3 = t_next(t_tr_1, true);
 			t_event(t_a_1, "click", () => $state.selected = t_item.data.row.id);
 			t_event(t_a_2, "click", () => remove(t_item.data.row));
-			$run(function setAttributes() {
+			$run(() => {
 				t_tr_1.className = t_class({ danger: $state.selected === t_item.data.row.id });
 				t_text_1.textContent = t_fmt(t_item.data.row.id);
 				t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;

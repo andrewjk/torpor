@@ -35,7 +35,7 @@ export default function buildFragment(
 	if (node.fragment) {
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;
-		if (status.options?.useCreateElement) {
+		if (status.options.useCreateElement === true) {
 			// Declarations, then createXxx calls
 			let fragmentPath = { parent: null, type: "fragment", children: [] };
 			let varPaths = new Map<string, string>();
@@ -382,7 +382,7 @@ function declareElementFragmentVars(
 				fragment.endVarName = node.varName;
 			}
 			const varPath = getFragmentVarPath(fragment, status, node.varName, elementPath, varPaths);
-			if (status.options?.useCreateElement) {
+			if (status.options.useCreateElement === true) {
 				b.append(`let ${node.varName};`);
 			} else {
 				if (node.tagName === "@element") {
@@ -490,7 +490,7 @@ function declareTextFragmentVars(
 				fragment.endVarName = node.varName;
 			}
 			const varPath = getFragmentVarPath(fragment, status, node.varName, textPath, varPaths);
-			if (status.options?.useCreateElement) {
+			if (status.options.useCreateElement === true) {
 				b.append(`let ${node.varName};`);
 			} else {
 				b.append(`const ${node.varName} = ${varPath};`);
@@ -627,7 +627,7 @@ function declareParentAndAnchorFragmentVars(
 		} else {
 			if (declare) {
 				node.parentName = nextVarName(`${name}_parent`, status);
-				if (status.options?.useCreateElement) {
+				if (status.options.useCreateElement === true) {
 					b.append(`let ${node.parentName} as HTMLElement;`);
 				} else {
 					b.append(`const ${node.parentName} = ${parentVarPath} as HTMLElement;`);
@@ -648,7 +648,7 @@ function declareParentAndAnchorFragmentVars(
 
 		node.varName = nextVarName(`${name}_anchor`, status);
 		const anchorVarPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
-		if (status.options?.useCreateElement) {
+		if (status.options.useCreateElement === true) {
 			b.append(`let ${node.varName};`);
 		} else {
 			status.imports.add("t_anchor");

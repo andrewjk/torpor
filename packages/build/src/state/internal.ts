@@ -4,8 +4,9 @@ import type InternalState from "../types/InternalState";
 import type PageState from "../types/PageState";
 
 // Do a weird little dance to ensure that everyone has the same $page and
-// client, regardless of if they are entering via serverEntry/clientEntry or the
-// built library. There may be an easier way to do this!
+// client, regardless of if they are entering via serverEntry/clientEntry or
+// importing from the @torpor/build library (e.g. in components). There may be
+// an easier way to do this!
 
 const INTERNAL_GLOBAL: unique symbol = Symbol.for("torpor-internal");
 

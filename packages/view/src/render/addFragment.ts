@@ -1,5 +1,5 @@
-import animate from "../motion/animate";
 import $run from "./$run";
+import animate from "./animate";
 import context from "./context";
 import isFragmentNode from "./isFragmentNode";
 

@@ -33,7 +33,7 @@ export default function NestedIf(
 	const t_if_range_1 = t_range();
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
-	$run(function runIf() {
+	$run(() => {
 		if ($props.condition) {
 			t_if_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
@@ -44,7 +44,7 @@ export default function NestedIf(
 				const t_if_range_2 = t_range();
 				let $t_if_state_2 = $watch({ index: -1 });
 				let t_if_creators_2: ((t_before: Node | null) => void)[] = [];
-				$run(function runIf() {
+				$run(() => {
 					if ($props.counter > 5) {
 						t_if_creators_2[0] = (t_before) => {
 							const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>It's big</p> `);
@@ -67,7 +67,8 @@ export default function NestedIf(
 					}
 				});
 				t_run_control(t_if_range_2, t_if_anchor_2, (t_before) => {
-					t_run_branch(t_if_range_2, () => t_if_creators_2[$t_if_state_2.index](t_before));
+					const index = $t_if_state_2.index;
+					t_run_branch(t_if_range_2, () => t_if_creators_2[index](t_before));
 				});
 
 				const t_text_3 = t_next(t_if_anchor_2, true);
@@ -82,7 +83,8 @@ export default function NestedIf(
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		t_run_branch(t_if_range_1, () => t_if_creators_1[$t_if_state_1.index](t_before));
+		const index = $t_if_state_1.index;
+		t_run_branch(t_if_range_1, () => t_if_creators_1[index](t_before));
 	});
 
 	const t_text_4 = t_next(t_if_anchor_1, true);

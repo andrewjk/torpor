@@ -1,4 +1,4 @@
-import type BuildOptions from "../../../types/BuildOptions";
+import type BuildOptions from "../../types/BuildOptions";
 
 export default interface BuildServerStatus {
 	imports: Set<string>;

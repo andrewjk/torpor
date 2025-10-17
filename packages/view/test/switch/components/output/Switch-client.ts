@@ -41,7 +41,7 @@ export default function Switch(
 	const t_switch_range_1 = t_range();
 	let $t_switch_state_1 = $watch({ index: -1 });
 	let t_switch_creators_1: ((t_before: Node | null) => void)[] = [];
-	$run(function runSwitch() {
+	$run(() => {
 		switch ($props.value) {
 			case 1: {
 				t_switch_creators_1[0] = (t_before) => {

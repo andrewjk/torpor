@@ -27,7 +27,6 @@ export default async function runBuild(site: Site): Promise<void> {
 	// TODO: From a setting
 	let siteHtml = path.resolve(site.root, "src/site.html");
 
-	// TODO: Is this going to be the correct path after installing from npm?
 	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
 	let clientScript = path.join(siteFolder, "clientEntry.ts");
 	let serverScript = path.join(siteFolder, "serverEntry.ts");

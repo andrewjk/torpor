@@ -15,7 +15,7 @@ export default function Head(
 	$peek(() => { /**/
 
 	/* Head */
-	$run(function runTitle() {
+	$run(() => {
 		const t_old_title = document.title;
 		document.title = "Hello";
 		return () => document.title = t_old_title;

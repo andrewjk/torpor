@@ -6,7 +6,7 @@ type Config =
 	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
 
 export default defineConfig({
-	entry: ["src/index.ts", "src/compile.ts", "src/ssr.ts"],
+	entry: ["src/index.ts", "src/compile.ts", "src/ssr.ts", "src/dev.ts"],
 	format: ["esm", "cjs"],
 	dts: true,
 	sourcemap: true,

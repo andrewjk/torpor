@@ -10,7 +10,7 @@ export default function addMappedText(
 	status: BuildStatus,
 	b: Builder,
 ): void {
-	if (status.options?.mapped) {
+	if (status.options.mapped === true) {
 		let start = b.toString().length + preText.length;
 		b.append(preText + text + postText);
 		let end = start + text.length;

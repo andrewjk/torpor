@@ -23,7 +23,7 @@ export default function buildReplaceNode(node: ControlNode, status: BuildStatus,
 	b.append("");
 	b.append(`
 	/* @replace */
-	const ${replaceRangeName} = t_range();
+	const ${replaceRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
 	t_run_control(${replaceRangeName}, ${replaceAnchorName}, (t_before) => {`);
 
 	buildReplaceBranch(node, status, b, replaceParentName, replaceRangeName);

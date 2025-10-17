@@ -4,6 +4,7 @@ import isControlNode from "../../utils/isControlNode";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -62,13 +63,14 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	b.append("");
 	b.append(`
 		/* @await */
-		const ${rangeName} = t_range();
+		const ${rangeName} = t_range(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
-	b.append(`
-		let ${awaitVarsName} = { t_token: 0 };
-		$run(function runAwait() {`);
+	b.append(`let ${awaitVarsName} = { t_token: 0 };`);
+
+	addDevBoundary(`@${branches[0].statement}`, status, b);
+	b.append("$run(() => {");
 
 	let index = 0;
 
@@ -115,7 +117,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	b.append(`}
 				});
 			})(${awaitVarsName}.t_token);
-		});`);
+		}${status.options.dev === true ? `, "runAwait"` : ""});`);
 
 	b.append(`
 		t_run_control(${rangeName}, ${anchorName}, (t_before) => {

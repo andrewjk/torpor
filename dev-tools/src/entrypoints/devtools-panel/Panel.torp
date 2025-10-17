@@ -1,0 +1,9 @@
+export default function Panel($props) {    
+    @render {
+		<button onclick={$props.data.reload}>Refresh</button>
+
+        @for (let bound of $props.data.boundaries) {
+            <p>{bound}</p>
+        }
+    }
+}

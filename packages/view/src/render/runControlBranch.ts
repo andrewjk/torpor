@@ -4,7 +4,7 @@ import newRange from "./newRange";
 import popRange from "./popRange";
 import pushRange from "./pushRange";
 
-export default function runControlBranch(range: Range, create: () => void): void {
+export default function runControlBranch(range: Range, create: () => void, name?: string): void {
 	// HACK: This is bad -- it means that the parent range has been cleared,
 	// but that should have cleared the effect that runs this child range??
 	// TODO: Look into this further...
@@ -15,7 +15,8 @@ export default function runControlBranch(range: Range, create: () => void): void
 		clearRange(range.nextRange!);
 	}
 
-	const oldRange = pushRange(newRange(), true);
+	const branchRange = newRange(name);
+	const oldRange = pushRange(branchRange, true);
 
 	// Run the create function
 	create();

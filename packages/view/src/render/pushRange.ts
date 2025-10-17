@@ -1,3 +1,4 @@
+import { devContext } from "../dev";
 import type Range from "../types/Range";
 import context from "./context";
 
@@ -20,6 +21,9 @@ export default function pushRange(range: Range, toParent = false): Range {
 	// Set the new active range
 	context.activeRange = range;
 	context.previousRange = range;
+
+	// DEBUG:
+	devContext.onRangePushed(range);
 
 	// Return the old active range, so that it can be reset when done
 	return activeRange;

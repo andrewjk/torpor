@@ -36,7 +36,7 @@ export default function Shape(
 	const t_if_range_1 = t_range();
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
-	$run(function runIf() {
+	$run(() => {
 		if ($props.name === "rect") {
 			t_if_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <rect width="100" height="100" fill="red"></rect> `, true);
@@ -59,11 +59,12 @@ export default function Shape(
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		t_run_branch(t_if_range_1, () => t_if_creators_1[$t_if_state_1.index](t_before));
+		const index = $t_if_state_1.index;
+		t_run_branch(t_if_range_1, () => t_if_creators_1[index](t_before));
 	});
 
 	const t_text_3 = t_next(t_svg_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_svg_1.className.baseVal = t_class({ "svg-cls": true });
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);

@@ -1,4 +1,4 @@
-import type BuildOptions from "../../../types/BuildOptions";
+import type BuildOptions from "../../types/BuildOptions";
 import type SourceMapping from "../../types/SourceMapping";
 import type Fragment from "../../types/nodes/Fragment";
 
@@ -17,6 +17,6 @@ export default interface BuildStatus {
 	forVarNames: string[];
 	ns: boolean;
 	preserveWhitespace: boolean;
-	inHead?: boolean;
-	options?: BuildOptions;
+	inHead: boolean;
+	options: BuildOptions;
 }

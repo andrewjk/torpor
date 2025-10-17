@@ -34,17 +34,17 @@ export default function BindComponent(
 
 	/* @component */
 	const t_props_1: any = $watch({});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["name"] = $state.name;
 	});
-	$run(function setBinding() {
+	$run(() => {
 		$state.name = t_props_1["name"];
 	});
 	BindText(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_child(t_next(t_next(t_comp_anchor_1, true)));
 	const t_text_2 = t_next(t_next(t_next(t_comp_anchor_1, true)), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
@@ -71,7 +71,7 @@ function BindText(
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_input_1 = t_next(t_root_0) as HTMLInputElement;
 	const t_text_1 = t_next(t_input_1, true);
-	$run(function setBinding() {
+	$run(() => {
 		t_input_1.value = $props.name || "";
 	});
 	t_event(t_input_1, "input", (e) => $props.name = e.target.value);

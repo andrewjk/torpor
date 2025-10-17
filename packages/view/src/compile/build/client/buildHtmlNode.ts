@@ -20,7 +20,7 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append("");
 	b.append(`
 	/* @html */
-	const ${htmlRangeName} = t_range();
+	const ${htmlRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
 	t_run_control(${htmlRangeName}, ${htmlAnchorName}, (t_before) => {`);
 
 	buildHtmlBranch(node, status, b, htmlParentName, htmlRangeName);

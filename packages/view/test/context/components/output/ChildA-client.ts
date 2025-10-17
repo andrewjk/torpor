@@ -31,7 +31,7 @@ export default function ChildA(
 	const t_text_2 = t_child(t_next(t_next(t_next(t_root_0), true)));
 	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
 	const t_text_4 = t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Parent: ${t_fmt($context["ParentContext"])}`;
 		t_text_2.textContent = `Child a: ${t_fmt($context["ChildAContext"])}`;
 		t_text_3.textContent = `Child b: ${t_fmt($context["ChildBContext"] ?? "???")}`;

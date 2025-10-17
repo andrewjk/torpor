@@ -1,8 +1,8 @@
-import type BuildOptions from "../types/BuildOptions";
 import type Template from "../types/Template";
 import buildCode from "./build/client/buildCode";
 import buildStyles from "./build/client/buildStyles";
 import buildServerCode from "./build/server/buildServerCode";
+import type BuildOptions from "./types/BuildOptions";
 import type BuildResult from "./types/BuildResult";
 import type SourceMapping from "./types/SourceMapping";
 

@@ -26,6 +26,12 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 	// @ts-ignore
 	transform(code, id, viteOptions) {
+		// We may be in dev mode
+		if (viteOptions && viteOptions.dev !== undefined) {
+			options ??= {};
+			options.dev = viteOptions.dev;
+		}
+
 		// Vite can override user server options
 		if (viteOptions && viteOptions.ssr !== undefined) {
 			options ??= {};

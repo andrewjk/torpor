@@ -25,7 +25,7 @@ export default function Style(
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
 	const t_text_1 = t_next(t_div_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_div_1.setAttribute("style", t_style({ color: $props.color }));
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);

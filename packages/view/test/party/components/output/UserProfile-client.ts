@@ -34,7 +34,7 @@ export default function UserProfile(
 	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
 	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)));
 	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `My name is ${t_fmt($props.name)}!`;
 		t_text_2.textContent = `My age is ${t_fmt($props.age)}!`;
 		t_text_3.textContent = `My favourite colors are ${t_fmt($props.favoriteColors.join(", "))}!`;

@@ -1,4 +1,8 @@
-export default function prepareTemplate(template: string, clientScript: string): string {
+export default function prepareTemplate(
+	template: string,
+	clientScript: string,
+	clientDevScript?: string,
+): string {
 	let result = template;
 
 	// Put %COMPONENT_HEAD% before </head>
@@ -20,6 +24,9 @@ export default function prepareTemplate(template: string, clientScript: string):
 	result = result.substring(0, bodyStart) + "%COMPONENT_BODY%" + result.substring(bodyEnd);
 
 	// Add the clientEntry script at the very end, for hydrating and navigating
+	if (clientDevScript) {
+		result += `<script type="module" src="${clientDevScript}"></script>`;
+	}
 	result += `<script type="module" src="${clientScript}"></script>`;
 
 	return result;

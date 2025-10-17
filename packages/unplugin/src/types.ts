@@ -4,6 +4,10 @@ export default interface Options {
 	 */
 	server?: boolean;
 	/**
+	 * Whether the plugin is running in a dev environment
+	 */
+	dev?: boolean;
+	/**
 	 * Whether the plugin is running in a test context
 	 */
 	test?: boolean;

@@ -34,15 +34,15 @@ export default function BindText(
 	const t_text_1 = t_child(t_next(t_next(t_select_1, true)));
 	const t_text_2 = t_child(t_next(t_next(t_next(t_next(t_select_1, true)), true)));
 	const t_text_3 = t_next(t_next(t_next(t_next(t_next(t_select_1, true)), true)), true);
-	$run(function setBinding() {
+	$run(() => {
 		t_input_1.value = $state.name || "";
 	});
 	t_event(t_input_1, "input", (e) => $state.name = e.target.value);
-	$run(function setBinding() {
+	$run(() => {
 		t_select_1.value = $state.selected || "";
 	});
 	t_event(t_select_1, "change", (e) => $state.selected = e.target.value);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Hello, ${t_fmt($state.name)}`;
 		t_text_2.textContent = `You have selected, ${t_fmt($state.selected)}`;
 	});

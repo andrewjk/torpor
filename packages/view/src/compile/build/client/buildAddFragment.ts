@@ -18,8 +18,8 @@ export default function buildAddFragment(
 		if (fragment.effects.length > 0) {
 			// TODO: nicer mapping
 			status.imports.add("$run");
-			b.append(`$run(function setAttributes() {`);
-			if (status.options?.mapped) {
+			b.append("$run(() => {");
+			if (status.options.mapped === true) {
 				for (let effect of fragment.effects) {
 					for (let i = 0; i < effect.ranges.length; i++) {
 						let start = b.toString().length + effect.offsets[i];
@@ -35,7 +35,7 @@ export default function buildAddFragment(
 			} else {
 				b.append(fragment.effects.map((e) => e.functionBody).join("\n"));
 			}
-			b.append("});");
+			b.append(`}${status.options.dev === true ? `, "setAttributes"` : ""});`);
 		}
 		let params = [fragmentName, parentName, anchorName];
 		if (fragment.endVarName) {

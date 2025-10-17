@@ -69,11 +69,11 @@ export default function ForEscape(
 			const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
 			const t_text_2 = t_next(t_input_1, true);
-			$run(function setBinding() {
+			$run(() => {
 				t_input_1.value = t_item.data.i || "";
 			});
 			t_event(t_input_1, "input", (e) => t_item.data.i = e.target.value);
-			$run(function setAttributes() {
+			$run(() => {
 				t_text_1.textContent = t_fmt(t_item.data.i);
 				t_attribute(t_div_1, "data-testid", `input1-${t_item.data.i}`);
 				t_attribute(t_div_1, "name", t_item.data.i);

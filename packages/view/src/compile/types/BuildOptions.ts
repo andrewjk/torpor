@@ -4,9 +4,13 @@ export default interface BuildOptions {
 	 */
 	server?: boolean;
 	/**
-	 * Whether to create source maps.
+	 * Whether to create source maps
 	 */
 	mapped?: boolean;
+	/**
+	 * Whether to add debugging info etc for development mode
+	 */
+	dev?: boolean;
 	/**
 	 * If true, fragments will be built with calls to createElement etc. If
 	 * false, fragments will be built with innerHTML. Using createElement is a

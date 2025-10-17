@@ -45,7 +45,7 @@ export default function UserProfileContextApp(
 	UserProfileContext(t_fragment_0, t_comp_anchor_1, undefined, $context);
 
 	const t_text_2 = t_next(t_comp_anchor_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Welcome back, ${t_fmt($user.username)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

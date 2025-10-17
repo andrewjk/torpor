@@ -60,7 +60,7 @@ export default function ForIn(
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_text_2 = t_next(t_next(t_root_1), true);
-			$run(function setAttributes() {
+			$run(() => {
 				t_text_1.textContent = ` ${t_fmt($props.item[t_item.data.key])} `;
 			});
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);

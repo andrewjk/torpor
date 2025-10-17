@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import $run from "./$run";
@@ -22,7 +23,8 @@ export default function hydrate(
 	context.hydrationNode = parent.firstChild;
 
 	// Create and push the root range
-	context.rootRange = newRange();
+	// TODO: Does it need to be on context??
+	context.rootRange = newRange(devContext.enabled ? "Root" : undefined);
 	context.previousRange = context.rootRange;
 	pushRange(context.rootRange);
 

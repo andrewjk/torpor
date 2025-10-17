@@ -3,6 +3,7 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
@@ -42,20 +43,31 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	b.append("");
 	b.append(`
 		/* @if */
-		const ${rangeName} = t_range();
+		const ${rangeName} = t_range(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
-	b.append(`$run(function runIf() {`);
+	addDevBoundary(`@${branches[0].statement}`, status, b);
+
+	b.append("$run(() => {");
 	let index = 0;
 	for (let branch of branches) {
 		buildIfBranch(branch, status, b, parentName, stateName, creatorsName, index++);
 	}
-	b.append(`});`);
+	b.append(`}${status.options.dev === true ? `, "runIf"` : ""});`);
 
 	b.append(`
 		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
-			t_run_branch(${rangeName}, () => ${creatorsName}[${stateName}.index](t_before));
+			const index = ${stateName}.index;`);
+
+	// Add the component to devContext for display in DevTools
+	if (status.options.dev === true) {
+		status.imports.add("devContext");
+		b.append("devContext.boundaries.push(`branch ${index}`);");
+		b.append("");
+	}
+
+	b.append(`t_run_branch(${rangeName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});
 		});`);
 	b.append("");
 }

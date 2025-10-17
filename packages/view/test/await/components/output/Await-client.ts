@@ -55,7 +55,7 @@ export default function Await(
 		let $t_await_state_1 = $watch({ index: -1 });
 		let t_await_creators_1: ((t_before: Node | null) => void)[] = [];
 		let t_await_vars_1 = { t_token: 0 };
-		$run(function runAwait() {
+		$run(() => {
 			t_await_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>Hmm...</p> `);
 				const t_root_1 = t_root(t_fragment_1, true);
@@ -86,7 +86,7 @@ export default function Await(
 							const t_root_3 = t_root(t_fragment_3, true);
 							const t_text_3 = t_child(t_next(t_root_3));
 							const t_text_4 = t_next(t_next(t_root_3), true);
-							$run(function setAttributes() {
+							$run(() => {
 								t_text_3.textContent = `Something went wrong: ${t_fmt(ex)}!`;
 							});
 							t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_4);

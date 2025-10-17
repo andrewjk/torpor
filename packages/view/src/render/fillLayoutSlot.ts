@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type Range from "../types/Range";
 import type SlotRender from "../types/SlotRender";
@@ -13,8 +14,8 @@ export default function fillLayoutSlot(
 	$props: Record<string, string>,
 	$context?: Record<PropertyKey, any>,
 ): Range {
-	const range = newRange();
-	const oldRange = pushRange(range);
+	const range = newRange(devContext.enabled ? component.name : undefined);
+	const oldRange = pushRange(range, true);
 
 	component(parent, anchor, $props, $context, {
 		_: slot,

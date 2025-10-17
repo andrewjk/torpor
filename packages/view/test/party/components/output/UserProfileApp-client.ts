@@ -32,10 +32,10 @@ export default function UserProfileApp(
 	/* @component */
 	const t_props_1: any = $watch({});
 	t_props_1["name"] = "John";
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["age"] = 20;
 	});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["favoriteColors"] = ["green", "blue", "red"];
 	});
 	t_props_1["isAvailable"] = true;

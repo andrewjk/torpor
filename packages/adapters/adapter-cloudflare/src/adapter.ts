@@ -21,7 +21,6 @@ async function postbuild(site: Site): Promise<void> {
 	const tempFolder = path.join(distFolder, "temp");
 	const cloudflareFolder = path.join(distFolder, "cloudflare");
 
-	// TODO: Is this going to be the correct path after installing from npm?
 	const buildSrcFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/");
 	const adapterSrcFolder = path.resolve(
 		site.root,

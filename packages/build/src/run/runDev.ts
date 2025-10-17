@@ -20,7 +20,7 @@ export default async function runDev(site: Site): Promise<void> {
 	const config = structuredClone(site.viteConfig ?? {});
 	config.server = { middlewareMode: true };
 	config.appType = "custom";
-	config.plugins = [manifest(site, true), torpor(), ...site.plugins];
+	config.plugins = [manifest(site, true), torpor({ dev: true }), ...site.plugins];
 
 	// HACK: To be able to import `.torp` files from barrel files in
 	// node_modules, we need to add their libraries to `ssr.noExternal` in
@@ -45,13 +45,13 @@ export default async function runDev(site: Site): Promise<void> {
 	// universal transform, not individual transforms for each route
 	template = await vite.transformIndexHtml("", template);
 
-	// TODO: Is this going to be the correct path after installing from npm?
 	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
 	let clientScript = path.join(siteFolder, "clientEntry.ts");
+	let clientDevScript = path.join(siteFolder, "clientEntryDev.ts");
 	let serverScript = path.join(siteFolder, "serverEntry.ts");
 
 	// Prepare site.html so that we can just splice components into it
-	template = prepareTemplate(template, clientScript);
+	template = prepareTemplate(template, clientScript, clientDevScript);
 
 	// Use Vite's Connect instance as middleware. We need to wrap it with
 	// createMiddlewareHandler that converts Connect middleware to

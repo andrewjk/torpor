@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import context from "./context";
@@ -29,9 +30,11 @@ export default function mount(
 	}
 
 	// Create and push the root range
-	context.rootRange = newRange();
-	context.previousRange = context.rootRange;
-	pushRange(context.rootRange);
+	if (context.rootRange === null) {
+		context.rootRange = newRange(devContext.enabled ? "Root" : undefined);
+		context.previousRange = context.rootRange;
+		pushRange(context.rootRange);
+	}
 
 	// Call the component's render function
 	component(parent, null, props, undefined, slots);

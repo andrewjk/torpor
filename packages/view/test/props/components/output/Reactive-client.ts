@@ -34,7 +34,7 @@ export default function Reactive(
 
 	/* @component */
 	const t_props_1: any = $watch({});
-	$run(function setProp() {
+	$run(() => {
 		t_props_1["text"] = $state.text;
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
@@ -65,7 +65,7 @@ function Child(
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_text_2 = t_next(t_next(t_root_0), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = ` ${t_fmt($props.text)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

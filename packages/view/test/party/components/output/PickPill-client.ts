@@ -35,19 +35,19 @@ export default function PickPill(
 	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
 	const t_input_2 = t_next(t_next(t_next(t_next(t_input_1, true)), true)) as HTMLInputElement;
 	const t_text_2 = t_next(t_next(t_next(t_input_2, true)), true);
-	$run(function setBinding() {
+	$run(() => {
 		t_input_1.checked = $state.picked == "blue";
 	});
 	t_event(t_input_1, "change", (e) => {
 		if (e.target.checked) $state.picked = "blue";
 	});
-	$run(function setBinding() {
+	$run(() => {
 		t_input_2.checked = $state.picked == "red";
 	});
 	t_event(t_input_2, "change", (e) => {
 		if (e.target.checked) $state.picked = "red";
 	});
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Picked: ${t_fmt($state.picked)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

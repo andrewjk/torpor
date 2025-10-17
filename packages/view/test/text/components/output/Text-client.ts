@@ -33,7 +33,7 @@ export default function Text(
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_text_2 = t_child(t_next(t_next(t_next(t_root_0), true)));
 	const t_text_3 = t_next(t_next(t_next(t_next(t_root_0), true)), true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = ` ${t_fmt($props.value)} `;
 		t_text_2.textContent = t_fmt($props.empty);
 	});

@@ -29,7 +29,7 @@ export default function Const(
 	const t_text_2 = t_next(t_next(t_root_0), true);
 	/* @const */
 	const name = "Boris";
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = ` Hello, ${t_fmt(name)}! `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);

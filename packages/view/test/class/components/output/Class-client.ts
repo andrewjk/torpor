@@ -34,13 +34,13 @@ export default function Class(
 
 	/* @component */
 	const t_props_1: any = $watch({});
-	$run(function setClasses() {
+	$run(() => {
 		t_props_1["class"] = t_class({ "child-class": true }, "torp-1ljxz83");
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_next(t_comp_anchor_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_a_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
 		t_div_1.className = t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ljxz83");
 		t_div_2.className = t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ljxz83");
@@ -71,7 +71,7 @@ function Child(
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
 	const t_text_1 = t_next(t_div_1, true);
-	$run(function setAttributes() {
+	$run(() => {
 		t_div_1.className = t_class($props.class);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);

@@ -1,9 +1,10 @@
-import type BuildOptions from "../../../types/BuildOptions";
 import type Template from "../../../types/Template";
 import type TemplateComponent from "../../../types/TemplateComponent";
+import type BuildOptions from "../../types/BuildOptions";
 import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
+import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
@@ -45,6 +46,8 @@ const importsMap: Record<string, string> = {
 	t_print: 'import { t_print } from "${folder}";',
 	ListItem: 'import { type ListItem } from "${folder}";',
 	SlotRender: 'import { type SlotRender } from "${folder}";',
+	// HACK: this one's a bit different
+	devContext: 'import { devContext } from "${folder}/dev";',
 };
 
 export default function buildCode(
@@ -67,8 +70,12 @@ export default function buildCode(
 	if (imports.size) {
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
-			imp = importsMap[imp] || imp;
-			b.prepend(imp.replace("${folder}", options?.renderFolder || "@torpor/view"));
+			let importStatement = importsMap[imp] ?? imp;
+			let folder =
+				options?.renderFolder ??
+				(options?.dev === true && imp.startsWith("$") ? "@torpor/view/dev" : "@torpor/view");
+			importStatement = importStatement.replace("${folder}", folder);
+			b.prepend(importStatement);
 		}
 	}
 
@@ -130,6 +137,9 @@ function buildTemplate(
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {
+			// Add the component to devContext for display in DevTools
+			addDevBoundary(current.name ?? "AnonComponent", status, b);
+
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
@@ -190,6 +200,7 @@ function makeStatus(
 		forVarNames: [],
 		ns: false,
 		preserveWhitespace: false,
-		options,
+		inHead: false,
+		options: options ?? {},
 	};
 }

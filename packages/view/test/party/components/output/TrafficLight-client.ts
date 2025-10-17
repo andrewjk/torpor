@@ -52,7 +52,7 @@ export default function TrafficLight(
 	const t_if_range_1 = t_range();
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
-	$run(function runIf() {
+	$run(() => {
 		if ($state.light === "red") {
 			t_if_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
@@ -89,12 +89,13 @@ export default function TrafficLight(
 		}
 	});
 	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
-		t_run_branch(t_if_range_1, () => t_if_creators_1[$t_if_state_1.index](t_before));
+		const index = $t_if_state_1.index;
+		t_run_branch(t_if_range_1, () => t_if_creators_1[index](t_before));
 	});
 
 	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_button_1, true)), true)), true);
 	t_event(t_button_1, "click", nextLight);
-	$run(function setAttributes() {
+	$run(() => {
 		t_text_1.textContent = `Light is: ${t_fmt($state.light)}`;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);

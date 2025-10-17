@@ -60,7 +60,7 @@ export default function List(
 			const t_slot_parent_1 = t_next(t_root_1) as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
 			const t_sprops_1 = $watch({});
-			$run(function setProp() {
+			$run(() => {
 				t_sprops_1["item"] = t_item.data.item;
 			});
 			if ($slots && $slots["_"]) {
