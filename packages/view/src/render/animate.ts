@@ -42,12 +42,11 @@ export default async function animate(
 
 	// Add the animation to the active range, so that the range won't be cleared
 	// until the animation is completed
-	let activeRange = context.activeRange;
-	if (activeRange) {
-		// TODO: An option for whether to await or cancel events on range remove
-		// e.g. if you are doing a client side navigation, you don't want to run animations
-		activeRange.animations ??= new Set();
-		activeRange.animations.add(animation);
-		await animation.finished;
-	}
+	const activeRange = context.activeRange;
+	// TODO: An option for whether to await or cancel events on range remove
+	// e.g. if you are doing a client side navigation, you don't want to run animations
+	activeRange.animations ??= new Set();
+	activeRange.animations.add(animation);
+
+	await animation.finished;
 }

@@ -12,15 +12,15 @@ export default function addFragment(
 	//console.log(`adding fragment '${fragment.textContent}' to `, parent);
 	//console.log("before", before);
 
-	const range = context.activeRange;
+	const activeRange = context.activeRange;
 	const hydrationNode = context.hydrationNode;
 
 	// Set the active range's end node to the last node in the fragment
 	if (hydrationNode !== null) {
-		range.endNode = endNode ?? hydrationNode;
+		activeRange.endNode = endNode ?? hydrationNode;
 	} else {
-		range.startNode = fragment.firstChild;
-		range.endNode = fragment.lastChild;
+		activeRange.startNode = fragment.firstChild;
+		activeRange.endNode = fragment.lastChild;
 	}
 
 	parent = before?.parentNode ?? parent;
@@ -76,6 +76,6 @@ export default function addFragment(
 		context.stashedAnimations.length = 0;
 
 		// Set the active range back
-		context.activeRange = range;
+		context.activeRange = activeRange;
 	}
 }
