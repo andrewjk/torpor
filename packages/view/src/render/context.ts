@@ -13,11 +13,11 @@ const context: Context = {
 
 	// These will definitely be set, in mount or render
 	// @ts-ignore
-	activeRange: null,
+	activeRegion: null,
 	// @ts-ignore
-	previousRange: null,
+	previousRegion: null,
 	// @ts-ignore
-	rootRange: null,
+	rootRegion: null,
 
 	mountEffects: [],
 	stashedEvents: [],

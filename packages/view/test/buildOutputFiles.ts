@@ -130,12 +130,12 @@ const importsMap: Record<string, string> = {
 	'import { $unwrap } from "@torpor/view";': 'import $unwrap from "../../../../src/watch/$unwrap";',
 	'import { $peek } from "@torpor/view";': 'import $peek from "../../../../src/watch/$peek";',
 	'import { $batch } from "@torpor/view";': 'import $batch from "../../../../src/watch/$batch";',
-	'import { t_range } from "@torpor/view";':
-		'import t_range from "../../../../src/render/newRange";',
-	'import { t_push_range } from "@torpor/view";':
-		'import t_push_range from "../../../../src/render/pushRange";',
-	'import { t_pop_range } from "@torpor/view";':
-		'import t_pop_range from "../../../../src/render/popRange";',
+	'import { t_region } from "@torpor/view";':
+		'import t_region from "../../../../src/render/newRegion";',
+	'import { t_push_region } from "@torpor/view";':
+		'import t_push_region from "../../../../src/render/pushRegion";',
+	'import { t_pop_region } from "@torpor/view";':
+		'import t_pop_region from "../../../../src/render/popRegion";',
 	'import { t_run_control } from "@torpor/view";':
 		'import t_run_control from "../../../../src/render/runControl";',
 	'import { t_run_branch } from "@torpor/view";':

@@ -1,6 +1,6 @@
-import type SourceRange from "./SourceRange";
+import type SourceSpan from "./SourceSpan";
 
 export default interface ScriptChunk {
 	script: string;
-	range: SourceRange;
+	span: SourceSpan;
 }

@@ -1,34 +1,34 @@
 import context from "../render/context";
-import type Range from "../types/Range";
+import type Region from "../types/Region";
 
 /**
- * Creates a description of all the ranges in the context, from the root range
+ * Creates a description of all the regions in the context, from the root region
  * onward.
  */
-export default function printRanges(container: HTMLElement): string {
-	let range: Range | null = context.rootRange;
+export default function printRegions(container: HTMLElement): string {
+	let region: Region | null = context.rootRegion;
 	let lines: string[] = [];
 	let i = 1;
-	while (range !== null && i < 100) {
-		lines.push(`RANGE ${i++} - ${range.name}`);
-		lines.push(printRange(container, range.startNode, range.endNode));
-		range = range.nextRange;
+	while (region !== null && i < 100) {
+		lines.push(`RANGE ${i++} - ${region.name}`);
+		lines.push(printRegion(container, region.startNode, region.endNode));
+		region = region.nextRegion;
 	}
 	return lines.join("\n");
 }
 
-function printRange(container: Node, startNode: ChildNode | null, endNode: ChildNode | null) {
+function printRegion(container: Node, startNode: ChildNode | null, endNode: ChildNode | null) {
 	let rt = {
 		line1: "",
 		line2: "",
 	};
 
-	printRangeNode(container, startNode, endNode, rt);
+	printRegionNode(container, startNode, endNode, rt);
 
 	return rt.line1 + "\n" + rt.line2;
 }
 
-function printRangeNode(
+function printRegionNode(
 	node: Node,
 	startNode: ChildNode | null,
 	endNode: ChildNode | null,
@@ -44,7 +44,7 @@ function printRangeNode(
 		}
 
 		for (let cnode of node.childNodes) {
-			printRangeNode(cnode, startNode, endNode, rt);
+			printRegionNode(cnode, startNode, endNode, rt);
 		}
 
 		rt.line1 += `</${el.tagName.toLowerCase()}>`;

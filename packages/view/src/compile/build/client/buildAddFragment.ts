@@ -21,13 +21,13 @@ export default function buildAddFragment(
 			b.append("$run(() => {");
 			if (status.options.mapped === true) {
 				for (let effect of fragment.effects) {
-					for (let i = 0; i < effect.ranges.length; i++) {
+					for (let i = 0; i < effect.spans.length; i++) {
 						let start = b.toString().length + effect.offsets[i];
 						b.append(effect.functionBody);
 						let end = start + effect.lengths[i];
 						status.map.push({
 							script: effect.functionBody,
-							source: effect.ranges[i],
+							source: effect.spans[i],
 							compiled: { start, end },
 						});
 					}

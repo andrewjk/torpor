@@ -1,4 +1,4 @@
-import type SourceRange from "../types/SourceRange";
+import type SourceSpan from "../types/SourceSpan";
 import type ElementNode from "../types/nodes/ElementNode";
 import type TextNode from "../types/nodes/TextNode";
 import endOfString from "../utils/endOfString";
@@ -10,7 +10,7 @@ import isSpaceChar from "./utils/isSpaceChar";
 export default function parseText(status: ParseStatus, element: ElementNode): void {
 	// Add a range for each reactive part of the text so that we can map them
 	// back when building
-	let ranges: SourceRange[] = [];
+	let spans: SourceSpan[] = [];
 
 	// Text ends at the next element, or at the next control statement, or at
 	// the end of the render
@@ -52,7 +52,7 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 				}
 			}
 			// Add the source range
-			ranges.push({ start: reactiveStart, end: j });
+			spans.push({ start: reactiveStart, end: j });
 		} else if (status.source[j] === "<") {
 			end = j;
 		} else if (status.source[j] === "@") {
@@ -77,14 +77,14 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 			const previousNode = element.children[element.children.length - 1];
 			if (previousNode && isTextNode(previousNode)) {
 				previousNode.content += content + spaceContent;
-				previousNode.ranges.push(...ranges);
+				previousNode.spans.push(...spans);
 				//previousNode.range.endIndex += content.length + spaceContent.length;
 				// TODO: end char etc
 			} else {
 				const text: TextNode = {
 					type: "text",
 					content: content + spaceContent,
-					ranges,
+					spans: spans,
 				};
 				element.children.push(text);
 			}

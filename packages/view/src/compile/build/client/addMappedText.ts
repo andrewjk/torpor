@@ -1,4 +1,4 @@
-import type SourceRange from "../../types/SourceRange";
+import type SourceSpan from "../../types/SourceSpan";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 
@@ -6,7 +6,7 @@ export default function addMappedText(
 	preText: string,
 	text: string,
 	postText: string,
-	range: SourceRange,
+	span: SourceSpan,
 	status: BuildStatus,
 	b: Builder,
 ): void {
@@ -16,7 +16,7 @@ export default function addMappedText(
 		let end = start + text.length;
 		status.map.push({
 			script: text,
-			source: range,
+			source: span,
 			compiled: { start, end },
 		});
 	} else {

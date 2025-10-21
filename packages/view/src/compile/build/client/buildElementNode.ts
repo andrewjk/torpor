@@ -1,4 +1,4 @@
-import type SourceRange from "../../types/SourceRange";
+import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
@@ -177,7 +177,7 @@ function buildElementAttributes(
 		}
 	}
 
-	for (let { name, value, reactive, range } of node.attributes) {
+	for (let { name, value, reactive, span: range } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
@@ -313,7 +313,7 @@ function buildEventAttribute(
 	varName: string,
 	name: string,
 	value: string,
-	range: SourceRange,
+	span: SourceSpan,
 	status: BuildStatus,
 	b: Builder,
 ) {
@@ -322,7 +322,7 @@ function buildEventAttribute(
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
 	status.imports.add("t_event");
-	addMappedText(`t_event(${varName}, "${eventName}", `, value, `);`, range, status, b);
+	addMappedText(`t_event(${varName}, "${eventName}", `, value, `);`, span, status, b);
 }
 
 function buildTransitionAttribute(

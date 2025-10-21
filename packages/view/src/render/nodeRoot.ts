@@ -36,9 +36,9 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 		}
 
 		// If hydrating, set the active range's start node
-		const range = context.activeRange;
-		if (range.startNode === null) {
-			range.startNode = rootNode;
+		const region = context.activeRegion;
+		if (region.startNode === null) {
+			region.startNode = rootNode;
 		}
 
 		return rootNode;

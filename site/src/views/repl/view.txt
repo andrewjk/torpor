@@ -31,7 +31,7 @@ function formatText(value) {
 }
 function addAnimation(el, entry, exit) {
 	context_default.stashedAnimations.push({
-		range: context_default.activeRange,
+		region: context_default.activeRegion,
 		el,
 		in: entry,
 		out: exit
@@ -39,7 +39,7 @@ function addAnimation(el, entry, exit) {
 }
 function addEvent(el, type, listener) {
 	context_default.stashedEvents.push({
-		range: context_default.activeRange,
+		region: context_default.activeRegion,
 		el,
 		type,
 		listener
@@ -56,23 +56,21 @@ async function animate(el, enter, keyframes, options) {
 	setTimeout(() => {
 		animation.timeline = el.ownerDocument.timeline;
 	}, 1);
-	let activeRange = context_default.activeRange;
-	if (activeRange) {
-		activeRange.animations ??= /* @__PURE__ */ new Set();
-		activeRange.animations.add(animation);
-		await animation.finished;
-	}
+	const activeRegion = context_default.activeRegion;
+	activeRegion.animations ??= /* @__PURE__ */ new Set();
+	activeRegion.animations.add(animation);
+	await animation.finished;
 }
 function isFragmentNode(node) {
 	return node.nodeType === 11;
 }
 function addFragment(fragment, parent, before, endNode) {
-	const range = context_default.activeRange;
+	const activeRegion = context_default.activeRegion;
 	const hydrationNode = context_default.hydrationNode;
-	if (hydrationNode !== null) range.endNode = endNode ?? hydrationNode;
+	if (hydrationNode !== null) activeRegion.endNode = endNode ?? hydrationNode;
 	else {
-		range.startNode = fragment.firstChild;
-		range.endNode = fragment.lastChild;
+		activeRegion.startNode = fragment.firstChild;
+		activeRegion.endNode = fragment.lastChild;
 	}
 	parent = before?.parentNode ?? parent;
 	if (hydrationNode === null) parent.insertBefore(fragment, before);
@@ -82,7 +80,7 @@ function addFragment(fragment, parent, before, endNode) {
 			context_default.mountEffects.length = 0;
 		}
 		for (let event of context_default.stashedEvents) {
-			context_default.activeRange = event.range;
+			context_default.activeRegion = event.region;
 			$run(function addFragmentEvent() {
 				event.el.addEventListener(event.type, event.listener);
 				return () => {
@@ -92,7 +90,7 @@ function addFragment(fragment, parent, before, endNode) {
 		}
 		context_default.stashedEvents.length = 0;
 		for (let animation of context_default.stashedAnimations) {
-			context_default.activeRange = animation.range;
+			context_default.activeRegion = animation.region;
 			$run(function addFragmentAnimation() {
 				if (animation.in !== void 0) animate(animation.el, true, animation.in.keyframes, animation.in.options);
 				if (animation.out !== void 0) return () => {
@@ -101,7 +99,7 @@ function addFragment(fragment, parent, before, endNode) {
 			});
 		}
 		context_default.stashedAnimations.length = 0;
-		context_default.activeRange = range;
+		context_default.activeRegion = activeRegion;
 	}
 }
 function applyProps(el, props, propNamesUsed) {
@@ -114,88 +112,88 @@ function applyProps(el, props, propNamesUsed) {
 		});
 	}
 }
-function clearRange(range) {
-	devContext_default.onRangeCleared(range);
-	let animations = range.animations !== null ? Array.from(range.animations) : void 0;
-	let childRange = range.nextRange;
-	while (childRange !== null && childRange.depth > range.depth) {
-		if (childRange.animations !== null) {
+function clearRegion(region) {
+	devContext_default.onRegionCleared(region);
+	let animations = region.animations !== null ? Array.from(region.animations) : void 0;
+	let childRegion = region.nextRegion;
+	while (childRegion !== null && childRegion.depth > region.depth) {
+		if (childRegion.animations !== null) {
 			animations ??= [];
-			animations.push(...childRange.animations);
+			animations.push(...childRegion.animations);
 		}
-		releaseRange(childRange);
-		childRange.depth = -2;
-		childRange = childRange.nextRange;
+		releaseRegion(childRegion);
+		childRegion.depth = -2;
+		childRegion = childRegion.nextRegion;
 	}
-	range.nextRange = childRange;
-	if (range.previousRange !== null) range.previousRange.nextRange = range.nextRange;
-	if (range.nextRange !== null) range.nextRange.previousRange = range.previousRange;
+	region.nextRegion = childRegion;
+	if (region.previousRegion !== null) region.previousRegion.nextRegion = region.nextRegion;
+	if (region.nextRegion !== null) region.nextRegion.previousRegion = region.previousRegion;
 	if (animations !== void 0) {
 		animations.forEach((a) => {
 			a.reverse();
 			a.play();
 		});
-		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(range));
-	} else clearNodes(range);
+		Promise.all(animations.map((a) => a.finished)).then(() => clearNodes(region));
+	} else clearNodes(region);
 }
-function clearNodes(range) {
-	if (range.startNode !== null && range.endNode !== null) {
-		let currentNode = range.endNode;
-		while (currentNode !== range.startNode) {
+function clearNodes(region) {
+	if (region.startNode !== null && region.endNode !== null) {
+		let currentNode = region.endNode;
+		while (currentNode !== region.startNode) {
 			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
 			currentNode = previousNode;
 		}
 		currentNode.remove();
 	}
-	releaseRange(range);
+	releaseRegion(region);
 }
-function releaseRange(range) {
-	range.startNode = null;
-	range.endNode = null;
-	range.previousRange = null;
-	range.nextRange = null;
-	range.animations = null;
+function releaseRegion(region) {
+	region.startNode = null;
+	region.endNode = null;
+	region.previousRegion = null;
+	region.nextRegion = null;
+	region.animations = null;
 }
-function clearLayoutSlot(range) {
-	context_default.previousRange = range.previousRange;
-	clearRange(range);
+function clearLayoutSlot(region) {
+	context_default.previousRegion = region.previousRegion;
+	clearRegion(region);
 }
-function newRange(name) {
+function newRegion(name) {
 	return {
 		startNode: null,
 		endNode: null,
-		previousRange: null,
-		nextRange: null,
+		previousRegion: null,
+		nextRegion: null,
 		depth: -1,
 		animations: null,
 		name
 	};
 }
-function popRange(oldRange) {
-	context_default.activeRange = oldRange;
+function popRegion(oldRegion) {
+	context_default.activeRegion = oldRegion;
 }
-function pushRange(range, toParent = false) {
-	const activeRange = context_default.activeRange;
+function pushRegion(region, toParent = false) {
+	const activeRegion = context_default.activeRegion;
 	if (toParent) {
-		const previousRange = context_default.previousRange;
-		range.previousRange = previousRange;
-		const nextRange = previousRange.nextRange;
-		previousRange.nextRange = range;
-		range.nextRange = nextRange;
-		range.depth = activeRange.depth + 1;
+		const previousRegion = context_default.previousRegion;
+		region.previousRegion = previousRegion;
+		const nextRegion = previousRegion.nextRegion;
+		previousRegion.nextRegion = region;
+		region.nextRegion = nextRegion;
+		region.depth = activeRegion.depth + 1;
 	}
-	context_default.activeRange = range;
-	context_default.previousRange = range;
-	devContext_default.onRangePushed(range);
-	return activeRange;
+	context_default.activeRegion = region;
+	context_default.previousRegion = region;
+	devContext_default.onRegionPushed(region);
+	return activeRegion;
 }
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
-	const range = newRange(devContext_default.enabled ? component.name : void 0);
-	const oldRange = pushRange(range, true);
+	const region = newRegion(devContext_default.enabled ? component.name : void 0);
+	const oldRegion = pushRegion(region, true);
 	component(parent, anchor, $props, $context, { _: slot });
-	popRange(oldRange);
-	return range;
+	popRegion(oldRegion);
+	return region;
 }
 function getFragment(document, array, index, html, ns) {
 	if (array[index] === void 0) if (ns === true) {
@@ -213,9 +211,9 @@ function getFragment(document, array, index, html, ns) {
 }
 function hydrate(parent, component, props, slots) {
 	context_default.hydrationNode = parent.firstChild;
-	context_default.rootRange = newRange(devContext_default.enabled ? "Root" : void 0);
-	context_default.previousRange = context_default.rootRange;
-	pushRange(context_default.rootRange);
+	context_default.rootRegion = newRegion(devContext_default.enabled ? "Root" : void 0);
+	context_default.previousRegion = context_default.rootRegion;
+	pushRegion(context_default.rootRegion);
 	component(parent, null, props, void 0, slots);
 	context_default.hydrationNode = null;
 	for (let effect of context_default.mountEffects) $run(effect);
@@ -224,10 +222,10 @@ function hydrate(parent, component, props, slots) {
 function mount(parent, component, props, slots) {
 	if (parent.childElementCount > 0) throw new Error("The parent node must have no child elements");
 	while (parent.firstChild !== null) parent.firstChild.remove();
-	if (context_default.rootRange === null) {
-		context_default.rootRange = newRange(devContext_default.enabled ? "Root" : void 0);
-		context_default.previousRange = context_default.rootRange;
-		pushRange(context_default.rootRange);
+	if (context_default.rootRegion === null) {
+		context_default.rootRegion = newRegion(devContext_default.enabled ? "Root" : void 0);
+		context_default.previousRegion = context_default.rootRegion;
+		pushRegion(context_default.rootRegion);
 	}
 	component(parent, null, props, void 0, slots);
 }
@@ -235,8 +233,8 @@ function newListItem(data, key) {
 	return {
 		startNode: null,
 		endNode: null,
-		previousRange: null,
-		nextRange: null,
+		previousRegion: null,
+		nextRegion: null,
 		depth: -1,
 		animations: null,
 		data,
@@ -312,7 +310,7 @@ function nodeRoot(parent, text = false) {
 			rootNode = rootNode.nextSibling;
 			context_default.hydrationNode = rootNode;
 		}
-		const range = context_default.activeRange;
+		const range = context_default.activeRegion;
 		if (range.startNode === null) range.startNode = rootNode;
 		return rootNode;
 	} else return parent.firstChild;
@@ -322,27 +320,27 @@ function nodeSkip(node, count) {
 	for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
 	return nextNode;
 }
-function runControl(range, anchor, create) {
-	const oldRange = pushRange(range, true);
+function runControl(region, anchor, create) {
+	const oldRegion = pushRegion(region, true);
 	$run(function runControl$1() {
-		const oldBranchRange = pushRange(range);
+		const oldBranchRegion = pushRegion(region);
 		create(anchor);
-		popRange(oldBranchRange);
+		popRegion(oldBranchRegion);
 	});
 	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
-	popRange(oldRange);
+	popRegion(oldRegion);
 }
-function runControlBranch(range, create, name) {
-	if (range.depth === -2) return;
-	if (range.nextRange !== null && range.nextRange.depth > range.depth) clearRange(range.nextRange);
-	const oldRange = pushRange(newRange(name), true);
+function runControlBranch(region, create, name) {
+	if (region.depth === -2) return;
+	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
+	const oldRegion = pushRegion(newRegion(name), true);
 	create();
-	popRange(oldRange);
+	popRegion(oldRegion);
 }
-function moveRange(parent, range, before) {
+function moveRegion(parent, region, before) {
 	parent = before?.parentNode ?? parent;
-	const endNode = range.endNode ?? range.startNode;
-	let currentNode = range.startNode;
+	const endNode = region.endNode ?? region.startNode;
+	let currentNode = region.startNode;
 	while (currentNode !== null) {
 		const nextNode = currentNode.nextSibling;
 		parent.insertBefore(currentNode, before);
@@ -350,7 +348,7 @@ function moveRange(parent, range, before) {
 		currentNode = nextNode;
 	}
 }
-function runListItems(range, parent, anchor, oldItems, newItems, create, update) {
+function runListItems(region, parent, anchor, oldItems, newItems, create, update) {
 	let oldStartIndex = 0;
 	let oldEndIndex = oldItems.length - 1;
 	let oldStartItem = oldItems[0];
@@ -374,12 +372,12 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 		oldEndItem = oldItems[--oldEndIndex];
 		newEndItem = newItems[--newEndIndex];
 	} else if (oldStartItem.key === newEndItem.key) {
-		moveRange(parent, oldStartItem, oldEndItem.endNode.nextSibling);
+		moveRegion(parent, oldStartItem, oldEndItem.endNode.nextSibling);
 		transferListItemData(oldStartItem, newEndItem, update);
 		oldStartItem = oldItems[++oldStartIndex];
 		newEndItem = newItems[--newEndIndex];
 	} else if (oldEndItem.key === newStartItem.key) {
-		moveRange(parent, oldEndItem, oldStartItem.startNode);
+		moveRegion(parent, oldEndItem, oldStartItem.startNode);
 		transferListItemData(oldEndItem, newStartItem, update);
 		oldEndItem = oldItems[--oldEndIndex];
 		newStartItem = newItems[++newStartIndex];
@@ -395,10 +393,10 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 		if (oldIndex === void 0 && newIndex === void 0) {
 			newStartItem.data = $watch(newStartItem.data, { shallow: true });
 			create(newStartItem, oldStartItem.startNode);
-			newStartItem.previousRange = oldStartItem.previousRange;
-			newStartItem.nextRange = oldStartItem;
-			oldStartItem.previousRange = newStartItem;
-			clearRange(oldStartItem);
+			newStartItem.previousRegion = oldStartItem.previousRegion;
+			newStartItem.nextRegion = oldStartItem;
+			oldStartItem.previousRegion = newStartItem;
+			clearRegion(oldStartItem);
 			oldStartItem = oldItems[++oldStartIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else if (oldIndex === void 0) {
@@ -406,11 +404,11 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 			create(newStartItem, oldStartItem.startNode);
 			newStartItem = newItems[++newStartIndex];
 		} else if (newIndex === void 0) {
-			clearRange(oldStartItem);
+			clearRegion(oldStartItem);
 			oldStartItem = oldItems[++oldStartIndex];
 		} else {
 			const oldData = oldItems[oldIndex];
-			moveRange(parent, oldData, oldStartItem.startNode);
+			moveRegion(parent, oldData, oldStartItem.startNode);
 			transferListItemData(oldData, newStartItem, update);
 			oldItems[oldIndex] = null;
 			newStartItem = newItems[++newStartIndex];
@@ -423,9 +421,9 @@ function runListItems(range, parent, anchor, oldItems, newItems, create, update)
 			create(newStartItem, before);
 			before = newStartItem.endNode.nextSibling;
 		}
-	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRange(oldStartItem);
-	if (newItems.length > 0) range.nextRange = newItems[0];
-	else if (oldItems.length > 0) range.nextRange = oldItems[oldItems.length - 1].nextRange;
+	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRegion(oldStartItem);
+	if (newItems.length > 0) region.nextRegion = newItems[0];
+	else if (oldItems.length > 0) region.nextRegion = oldItems[oldItems.length - 1].nextRegion;
 }
 function transferListItemData(oldItem, newItem, update) {
 	newItem.startNode = oldItem.startNode;
@@ -433,19 +431,19 @@ function transferListItemData(oldItem, newItem, update) {
 	update(oldItem, newItem);
 	newItem.data = oldItem.data;
 }
-function runList(range, parent, anchor, buildItems, create, update) {
-	const oldRange = pushRange(range, true);
+function runList(region, parent, anchor, buildItems, create, update) {
+	const oldRegion = pushRegion(region, true);
 	let listItems = [];
 	$run(function runList$1() {
-		const oldBranchRange = pushRange(range);
+		const oldBranchRegion = pushRegion(region);
 		const newItems = buildItems();
 		context_default.activeTarget = null;
-		runListItems(range, parent, anchor, listItems, newItems, create, update);
+		runListItems(region, parent, anchor, listItems, newItems, create, update);
 		listItems = newItems;
-		popRange(oldBranchRange);
+		popRegion(oldBranchRegion);
 	});
 	if (context_default.hydrationNode !== null) anchor = context_default.hydrationNode.nextSibling;
-	popRange(oldRange);
+	popRegion(oldRegion);
 }
 function setAttribute(el, name, value) {
 	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
@@ -479,13 +477,13 @@ var ReactiveDate = class ReactiveDate extends Date {
 			if (method.startsWith("get") || method.startsWith("to") || method === "valueOf") reactivePrototype[method] = function(...args) {
 				const data = this[proxyDataSymbol];
 				const result = datePrototype[method].apply(this, args);
-				trackProxyEffect(data, "#time");
+				trackProxySignal(data, "#time");
 				return result;
 			};
 			if (method.startsWith("set")) reactivePrototype[method] = function(...args) {
 				const data = this[proxyDataSymbol];
 				const result = datePrototype[method].apply(this, args);
-				updateSignal(data, "#time");
+				propagateSignal(data, "#time");
 				return result;
 			};
 		}
@@ -504,9 +502,9 @@ let t_fmt = formatText;
 let t_fragment = getFragment;
 let t_list_item = newListItem;
 let t_next = nodeNext;
-let t_pop_range = popRange;
-let t_push_range = pushRange;
-let t_range = newRange;
+let t_pop_region = popRegion;
+let t_push_region = pushRegion;
+let t_region = newRegion;
 let t_root = nodeRoot;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;

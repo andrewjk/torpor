@@ -17,9 +17,9 @@ const importsMap: Record<string, string> = {
 	$unwrap: 'import { $unwrap } from "${folder}";',
 	$peek: 'import { $peek } from "${folder}";',
 	$batch: 'import { $batch } from "${folder}";',
-	t_range: 'import { t_range } from "${folder}";',
-	t_push_range: 'import { t_push_range } from "${folder}";',
-	t_pop_range: 'import { t_pop_range } from "${folder}";',
+	t_region: 'import { t_region } from "${folder}";',
+	t_push_region: 'import { t_push_region } from "${folder}";',
+	t_pop_region: 'import { t_pop_region } from "${folder}";',
 	t_run_control: 'import { t_run_control } from "${folder}";',
 	t_run_branch: 'import { t_run_branch } from "${folder}";',
 	t_list_item: 'import { t_list_item } from "${folder}";',
@@ -177,7 +177,7 @@ function buildTemplate(
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
-			addMappedText("", chunk.script, "", chunk.range, status, b);
+			addMappedText("", chunk.script, "", chunk.span, status, b);
 		}
 	}
 }

@@ -16,7 +16,7 @@ export default async function animate(
 	// This is quite simplistic
 	// We might need to
 	// - store the animation
-	// - reverse it if it's running and the range appears/disappears
+	// - reverse it if it's running and the region appears/disappears
 	// - transfer the animation to the new element
 	let animationOptions = Object.assign(
 		{
@@ -40,13 +40,13 @@ export default async function animate(
 		animation.timeline = el.ownerDocument.timeline;
 	}, 1);
 
-	// Add the animation to the active range, so that the range won't be cleared
+	// Add the animation to the active region, so that the region won't be cleared
 	// until the animation is completed
-	const activeRange = context.activeRange;
-	// TODO: An option for whether to await or cancel events on range remove
+	const activeRegion = context.activeRegion;
+	// TODO: An option for whether to await or cancel events on region remove
 	// e.g. if you are doing a client side navigation, you don't want to run animations
-	activeRange.animations ??= new Set();
-	activeRange.animations.add(animation);
+	activeRegion.animations ??= new Set();
+	activeRegion.animations.add(animation);
 
 	await animation.finished;
 }

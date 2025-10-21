@@ -132,7 +132,7 @@ export default function buildComponentNode(
 	}
 
 	// TODO: Map the params
-	addMappedText("", componentName, `(${renderParams});`, node.range, status, b);
+	addMappedText("", componentName, `(${renderParams});`, node.span, status, b);
 
 	b.append("");
 }

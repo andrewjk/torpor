@@ -9,21 +9,21 @@ import buildAddFragment from "./buildAddFragment";
 export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const htmlAnchorName = node.varName!;
 	const htmlParentName = node.parentName || htmlAnchorName + ".parentNode";
-	const htmlRangeName = nextVarName("html_range", status);
+	const htmlRegionName = nextVarName("html_region", status);
 
 	// HACK: I'm not actually sure we need this here (or in @replace, where I copied it from)
 	node = node.children[0] as ControlNode;
 
-	status.imports.add("t_range");
+	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
 	/* @html */
-	const ${htmlRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
-	t_run_control(${htmlRangeName}, ${htmlAnchorName}, (t_before) => {`);
+	const ${htmlRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
+	t_run_control(${htmlRegionName}, ${htmlAnchorName}, (t_before) => {`);
 
-	buildHtmlBranch(node, status, b, htmlParentName, htmlRangeName);
+	buildHtmlBranch(node, status, b, htmlParentName, htmlRegionName);
 
 	b.append("});");
 	b.append("");
@@ -34,12 +34,12 @@ function buildHtmlBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	rangeName: string,
+	regionName: string,
 ) {
 	status.imports.add("t_run_branch");
 
 	b.append(`${node.statement};`);
-	b.append(`t_run_branch(${rangeName}, () => {`);
+	b.append(`t_run_branch(${regionName}, () => {`);
 
 	const templateName = nextVarName("template", status);
 	const fragmentName = `t_fragment_${node.fragment!.number}`;

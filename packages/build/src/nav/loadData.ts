@@ -29,7 +29,7 @@ export default async function loadData(
 				newLayoutStack[i] = layoutStack[i];
 				Object.assign(data, layoutStack[i].data);
 			} else {
-				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRange: null };
+				const stackLayout = { path: layoutPath, data: {}, reuse: false, slotRegion: null };
 				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
 				const layoutServerEndPoint: PageServerEndPoint | undefined =
 					layout.serverEndPoint && (await layout.serverEndPoint())?.default;

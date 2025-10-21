@@ -9,7 +9,7 @@ import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_range from "../../../../src/render/newRange";
+import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -51,7 +51,7 @@ export default function Await(
 		let t_await_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 		/* @await */
-		const t_await_range_1 = t_range();
+		const t_await_region_1 = t_region();
 		let $t_await_state_1 = $watch({ index: -1 });
 		let t_await_creators_1: ((t_before: Node | null) => void)[] = [];
 		let t_await_vars_1 = { t_token: 0 };
@@ -97,8 +97,8 @@ export default function Await(
 				});
 			})(t_await_vars_1.t_token);
 		});
-		t_run_control(t_await_range_1, t_await_anchor_1, (t_before) => {
-			t_run_branch(t_await_range_1, () => t_await_creators_1[$t_await_state_1.index](t_before));
+		t_run_control(t_await_region_1, t_await_anchor_1, (t_before) => {
+			t_run_branch(t_await_region_1, () => t_await_creators_1[$t_await_state_1.index](t_before));
 		});
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;

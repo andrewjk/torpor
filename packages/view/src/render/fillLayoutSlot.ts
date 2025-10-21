@@ -1,10 +1,10 @@
 import devContext from "../dev/devContext";
 import type Component from "../types/Component";
-import type Range from "../types/Range";
+import type Region from "../types/Region";
 import type SlotRender from "../types/SlotRender";
-import newRange from "./newRange";
-import popRange from "./popRange";
-import pushRange from "./pushRange";
+import newRegion from "./newRegion";
+import popRegion from "./popRegion";
+import pushRegion from "./pushRegion";
 
 export default function fillLayoutSlot(
 	component: Component,
@@ -13,15 +13,15 @@ export default function fillLayoutSlot(
 	anchor: Node | null,
 	$props: Record<string, string>,
 	$context?: Record<PropertyKey, any>,
-): Range {
-	const range = newRange(devContext.enabled ? component.name : undefined);
-	const oldRange = pushRange(range, true);
+): Region {
+	const region = newRegion(devContext.enabled ? component.name : undefined);
+	const oldRegion = pushRegion(region, true);
 
 	component(parent, anchor, $props, $context, {
 		_: slot,
 	});
 
-	popRange(oldRange);
+	popRegion(oldRegion);
 
-	return range;
+	return region;
 }

@@ -2,8 +2,8 @@ import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import context from "./context";
-import newRange from "./newRange";
-import pushRange from "./pushRange";
+import newRegion from "./newRegion";
+import pushRegion from "./pushRegion";
 
 /**
  * Mounts a component into a DOM node
@@ -29,11 +29,11 @@ export default function mount(
 		parent.firstChild.remove();
 	}
 
-	// Create and push the root range
-	if (context.rootRange === null) {
-		context.rootRange = newRange(devContext.enabled ? "Root" : undefined);
-		context.previousRange = context.rootRange;
-		pushRange(context.rootRange);
+	// Create and push the root region
+	if (context.rootRegion === null) {
+		context.rootRegion = newRegion(devContext.enabled ? "Root" : undefined);
+		context.previousRegion = context.rootRegion;
+		pushRegion(context.rootRegion);
 	}
 
 	// Call the component's render function

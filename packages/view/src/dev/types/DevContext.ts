@@ -1,10 +1,10 @@
-import type Range from "../../types/Range";
+import type Region from "../../types/Region";
 
 export default interface DevContext {
 	enabled: boolean;
 	boundaries: string[];
 
 	// Hooks
-	onRangePushed: (_: Range) => void;
-	onRangeCleared: (_: Range) => void;
+	onRegionPushed: (_: Region) => void;
+	onRegionCleared: (_: Region) => void;
 }

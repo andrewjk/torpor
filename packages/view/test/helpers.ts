@@ -85,7 +85,7 @@ export function text(content: string): TextNode {
 	return {
 		type: "text",
 		content,
-		//ranges: [],
+		//spans: [],
 	};
 }
 
@@ -130,7 +130,7 @@ export function trimParsed(result: ParseResult): ParseResult {
 
 function trimElement(el: RootNode | ElementNode | ControlNode) {
 	// @ts-ignore
-	delete el.range;
+	delete el.span;
 	for (let i = el.children.length - 1; i >= 0; i--) {
 		const child = el.children[i];
 		if (child.type === "text") {
@@ -140,13 +140,13 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 				el.children.splice(i, 1);
 			}
 			// @ts-ignore
-			delete child.ranges;
+			delete child.spans;
 		} else if (child.type === "element") {
 			// HACK:
 			(child as ElementNode).attributes.forEach(
 				(a) =>
 					// @ts-ignore
-					delete a.range,
+					delete a.span,
 			);
 			trimElement(child as ElementNode);
 		} else if (child.type === "control") {

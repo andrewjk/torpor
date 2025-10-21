@@ -6,5 +6,5 @@ export default interface LayoutPath {
 	/** Data loaded from endpoints that should be re-used */
 	data: any;
 	/** The range of the UI in this layout's slot */
-	slotRange: any;
+	slotRegion: any;
 }

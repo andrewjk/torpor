@@ -3,8 +3,8 @@ import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import $run from "../watch/$run";
 import context from "./context";
-import newRange from "./newRange";
-import pushRange from "./pushRange";
+import newRegion from "./newRegion";
+import pushRegion from "./pushRegion";
 
 /**
  * Hydrates a component into an existing DOM tree
@@ -22,11 +22,11 @@ export default function hydrate(
 	// the hydration node to the first child node
 	context.hydrationNode = parent.firstChild;
 
-	// Create and push the root range
+	// Create and push the root region
 	// TODO: Does it need to be on context??
-	context.rootRange = newRange(devContext.enabled ? "Root" : undefined);
-	context.previousRange = context.rootRange;
-	pushRange(context.rootRange);
+	context.rootRegion = newRegion(devContext.enabled ? "Root" : undefined);
+	context.previousRegion = context.rootRegion;
+	pushRegion(context.rootRegion);
 
 	// Call the component's render function
 	component(parent, null, props, undefined, slots);

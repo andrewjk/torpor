@@ -1,9 +1,9 @@
 import type ListItem from "../types/ListItem";
-import type Range from "../types/Range";
+import type Region from "../types/Region";
 import $run from "../watch/$run";
 import context from "./context";
-import popRange from "./popRange";
-import pushRange from "./pushRange";
+import popRegion from "./popRegion";
+import pushRegion from "./pushRegion";
 import runListItems from "./runListItems";
 
 /**
@@ -11,22 +11,22 @@ import runListItems from "./runListItems";
  * @param create A function that creates the control statement's branches
  */
 export default function runList(
-	range: Range,
+	region: Region,
 	parent: ParentNode,
 	anchor: Node | null,
 	buildItems: () => ListItem[],
 	create: (item: ListItem, anchor: Node | null) => void,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
 ): void {
-	const oldRange = pushRange(range, true);
+	const oldRegion = pushRegion(region, true);
 
 	let listItems: ListItem[] = [];
 
 	// Run the list in an effect
 	$run(function runList() {
 		// Push and pop the control statement on subsequent runs, so that new
-		// item ranges will be added to its children
-		const oldBranchRange = pushRange(range);
+		// item regions will be added to its children
+		const oldBranchRegion = pushRegion(region);
 
 		// Build the array of items with keys and data
 		const newItems = buildItems();
@@ -38,11 +38,11 @@ export default function runList(
 		context.activeTarget = null;
 
 		// Run the function that updates the list's items
-		runListItems(range, parent, anchor, listItems, newItems, create, update);
+		runListItems(region, parent, anchor, listItems, newItems, create, update);
 
 		listItems = newItems;
 
-		popRange(oldBranchRange);
+		popRegion(oldBranchRegion);
 	});
 
 	// If we're mounting, the anchor will be the one that is passed in, but if
@@ -52,5 +52,5 @@ export default function runList(
 		anchor = context.hydrationNode.nextSibling;
 	}
 
-	popRange(oldRange);
+	popRegion(oldRegion);
 }

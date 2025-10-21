@@ -14,7 +14,7 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName!;
 	const parentName = node.parentName!;
-	const rangeName = nextVarName("await_range", status);
+	const rangeName = nextVarName("await_region", status);
 	const stateName = "$" + nextVarName("await_state", status);
 	const creatorsName = nextVarName("await_creators", status);
 	const awaitVarsName = nextVarName("await_vars", status);
@@ -34,7 +34,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@then",
 			statement: "then",
 			children: [],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 	}
 	let catchBranch = branches.find((n) => n.operation === "@catch");
@@ -44,7 +44,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			operation: "@catch",
 			statement: "catch",
 			children: [],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 	}
 
@@ -56,14 +56,14 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	// TODO: This might have unforeseen consequences
 	status.imports.add("$watch");
 	status.imports.add("$run");
-	status.imports.add("t_range");
+	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 	status.imports.add("t_run_branch");
 
 	b.append("");
 	b.append(`
 		/* @await */
-		const ${rangeName} = t_range(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
+		const ${rangeName} = t_region(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
@@ -81,16 +81,16 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 			((t_token) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
-	awaitBranch.range.start += "await".length + 2;
-	addMappedText("", replaceForVarNames(awaiterName, status), "", awaitBranch.range, status, b);
+	awaitBranch.span.start += "await".length + 2;
+	addMappedText("", replaceForVarNames(awaiterName, status), "", awaitBranch.span, status, b);
 
 	// TODO: replaceForVarNames is going to throw mapping out
-	thenBranch.range.start -= 1;
+	thenBranch.span.start -= 1;
 	addMappedText(
 		".then((",
 		replaceForVarNames(thenVar, status),
 		") => {",
-		thenBranch.range,
+		thenBranch.span,
 		status,
 		b,
 	);
@@ -101,12 +101,12 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		})`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
-	catchBranch.range.start -= 1;
+	catchBranch.span.start -= 1;
 	addMappedText(
 		".catch((",
 		replaceForVarNames(catchVar, status),
 		") => {",
-		catchBranch.range,
+		catchBranch.span,
 		status,
 		b,
 	);

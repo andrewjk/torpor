@@ -106,14 +106,14 @@ export default function parseElement(status: ParseStatus): ElementNode {
 					operation: "@replace",
 					statement: selfValue,
 					children: [element],
-					range: { start: 0, end: 0 },
+					span: { start: 0, end: 0 },
 				};
 				const replaceGroup: ControlNode = {
 					type: "control",
 					operation: "@replace group",
 					statement: selfValue,
 					children: [replace],
-					range: { start: 0, end: 0 },
+					span: { start: 0, end: 0 },
 				};
 
 				return replaceGroup as any;

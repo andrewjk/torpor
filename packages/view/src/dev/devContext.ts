@@ -7,8 +7,8 @@ const devContext: DevContext = {
 	boundaries: [],
 
 	// Hooks
-	onRangePushed: noop,
-	onRangeCleared: noop,
+	onRegionPushed: noop,
+	onRegionCleared: noop,
 };
 
 // @ts-ignore

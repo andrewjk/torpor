@@ -3,7 +3,7 @@ import type Cleanup from "./Cleanup";
 import type Computed from "./Computed";
 import type Effect from "./Effect";
 import type ProxySignal from "./ProxySignal";
-import type Range from "./Range";
+import type Region from "./Region";
 
 /**
  * The global context for setting up effects and updating subscriptions.
@@ -51,19 +51,19 @@ export default interface Context {
 	firstSignalToUpdate: ProxySignal | null;
 
 	/**
-	 * The range that is currently being created.
+	 * The region that is currently being created.
 	 */
-	activeRange: Range;
+	activeRegion: Region;
 
 	/**
-	 * The range that was previously created, for setting range navigation.
+	 * The region that was previously created, for setting region navigation.
 	 */
-	previousRange: Range;
+	previousRegion: Region;
 
 	/**
-	 * The root range of the current UI, for debugging.
+	 * The root region of the current UI, for debugging.
 	 */
-	rootRange: Range;
+	rootRegion: Region;
 
 	/**
 	 * Functions that were run via $mount, which should be collected and flushed
@@ -76,7 +76,7 @@ export default interface Context {
 	 * DOM
 	 */
 	stashedEvents: {
-		range: Range;
+		region: Region;
 		el: Element;
 		type: string;
 		listener: (this: Element, ev: any) => any;
@@ -87,7 +87,7 @@ export default interface Context {
 	 * the DOM
 	 */
 	stashedAnimations: {
-		range: Range;
+		region: Region;
 		el: HTMLElement;
 		in?: Animation;
 		out?: Animation;

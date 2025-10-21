@@ -1,4 +1,4 @@
-import type SourceRange from "../../types/SourceRange";
+import type SourceSpan from "../../types/SourceSpan";
 import type Fragment from "../../types/nodes/Fragment";
 import type BuildStatus from "./BuildStatus";
 import replaceForVarNames from "./replaceForVarNames";
@@ -8,14 +8,14 @@ export default function stashRun(
 	functionStart: string,
 	value: string,
 	functionEnd: string,
-	range: SourceRange,
+	span: SourceSpan,
 	status: BuildStatus,
 ): void {
 	value = replaceForVarNames(value, status);
 	let functionBody = functionStart + value + functionEnd;
 	fragment.effects.push({
 		functionBody,
-		ranges: [range],
+		spans: [span],
 		offsets: [functionStart.length],
 		lengths: [value.length],
 	});

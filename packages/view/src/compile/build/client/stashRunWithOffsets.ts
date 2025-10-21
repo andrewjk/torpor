@@ -1,4 +1,4 @@
-import type SourceRange from "../../types/SourceRange";
+import type SourceSpan from "../../types/SourceSpan";
 import type Fragment from "../../types/nodes/Fragment";
 import type BuildStatus from "./BuildStatus";
 import replaceForVarNames from "./replaceForVarNames";
@@ -6,7 +6,7 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function stashRunWithOffsets(
 	fragment: Fragment,
 	functionBody: string,
-	ranges: SourceRange[],
+	spans: SourceSpan[],
 	offsets: number[],
 	lengths: number[],
 	status: BuildStatus,
@@ -25,7 +25,7 @@ export default function stashRunWithOffsets(
 	}
 	fragment.effects.push({
 		functionBody,
-		ranges,
+		spans: spans,
 		offsets,
 		lengths,
 	});

@@ -49,7 +49,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		}
 	}
 
-	const forRangeName = nextVarName("for_range", status);
+	const forRegionName = nextVarName("for_region", status);
 
 	// Get the key node if it's been set
 	const key = node.children.find(
@@ -60,7 +60,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		keyStatement = trimEnd(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";");
 	}
 
-	status.imports.add("t_range");
+	status.imports.add("t_region");
 	status.imports.add("t_run_list");
 	status.imports.add("t_list_item");
 	status.imports.add("ListItem");
@@ -68,26 +68,26 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append("");
 	b.append(`
 	/* @for */
-	let ${forRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
+	let ${forRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
 	t_run_list(
-	${forRangeName},
+	${forRegionName},
 	${forParentName},
 	${forAnchorName},
 	function createNewItems() {
 		let t_new_items: ListItem[] = [];
-		let t_previous_item = ${forRangeName};
-		let t_next_item = ${forRangeName}.nextRange;`);
+		let t_previous_item = ${forRegionName};
+		let t_next_item = ${forRegionName}.nextRegion;`);
 
-	addMappedText("", `${node.statement}`, " {", node.range, status, b);
+	addMappedText("", `${node.statement}`, " {", node.span, status, b);
 
 	b.append(`
 			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
-			t_new_item.previousRange = t_previous_item;
-			t_previous_item.nextRange = t_new_item;
+			t_new_item.previousRegion = t_previous_item;
+			t_previous_item.nextRegion = t_new_item;
 			t_previous_item = t_new_item;
 			t_new_items.push(t_new_item);
 		}
-		${forRangeName}.nextRange = t_next_item;
+		${forRegionName}.nextRegion = t_next_item;
 		return t_new_items;
 	},
 	function createListItem(t_item, t_before) {`);
@@ -107,10 +107,10 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 }
 
 function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
-	const oldRangeName = nextVarName("old_range", status);
+	const oldRegionName = nextVarName("old_region", status);
 
-	status.imports.add("t_push_range");
-	b.append(`let ${oldRangeName} = t_push_range(t_item);`);
+	status.imports.add("t_push_region");
+	b.append(`let ${oldRegionName} = t_push_region(t_item);`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -135,8 +135,8 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 	//  b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
 	//}
 
-	status.imports.add("t_pop_range");
-	b.append(`t_pop_range(${oldRangeName});`);
+	status.imports.add("t_pop_region");
+	b.append(`t_pop_region(${oldRegionName});`);
 
 	// If we wanted to return the fragment instead:
 	//b.append(`return t_fragment_${node.fragment!.number};`);

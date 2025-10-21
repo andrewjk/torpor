@@ -1,22 +1,22 @@
-import Range from "../types/Range";
+import Region from "../types/Region";
 import devContext from "./devContext";
 
 export default function setDevMode(): void {
 	devContext.enabled = true;
 
-	devContext.onRangePushed = (range: Range) => {
-		if (!range.name?.startsWith("R: ")) {
-			range.name = `R: ${range.name} [${crypto.randomUUID()}]`;
-			devContext.boundaries.push(range.name);
+	devContext.onRegionPushed = (region: Region) => {
+		if (!region.name?.startsWith("R: ")) {
+			region.name = `R: ${region.name} [${crypto.randomUUID()}]`;
+			devContext.boundaries.push(region.name);
 		}
 	};
 
-	devContext.onRangeCleared = (range: Range) => {
-		let nextRange: Range | null = range;
+	devContext.onRegionCleared = (region: Region) => {
+		let nextRegion: Region | null = region;
 		while (true) {
-			//const name = `RANGE: ${nextRange.name}`;
-			//console.log("CLEARING", nextRange.name);
-			let i = devContext.boundaries.indexOf(nextRange.name!);
+			//const name = `RANGE: ${nextRegion.name}`;
+			//console.log("CLEARING", nextRegion.name);
+			let i = devContext.boundaries.indexOf(nextRegion.name!);
 			//if (i !== -1) {
 			let start = i;
 			let end = devContext.boundaries.length;
@@ -29,8 +29,8 @@ export default function setDevMode(): void {
 			/*const rem =*/ devContext.boundaries.splice(start, end - start);
 			//console.log("SPLICING DEV", rem);
 			//}
-			nextRange = nextRange.nextRange;
-			if (nextRange === null || nextRange.depth <= range.depth) {
+			nextRegion = nextRegion.nextRegion;
+			if (nextRegion === null || nextRegion.depth <= region.depth) {
 				break;
 			}
 		}

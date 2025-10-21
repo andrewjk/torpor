@@ -1,4 +1,4 @@
-import type SourceRange from "../SourceRange";
+import type SourceSpan from "../SourceSpan";
 
 export default interface Fragment {
 	number: number;
@@ -6,7 +6,7 @@ export default interface Fragment {
 	ns: boolean;
 	effects: {
 		functionBody: string;
-		ranges: SourceRange[];
+		spans: SourceSpan[];
 		offsets: number[];
 		lengths: number[];
 	}[];

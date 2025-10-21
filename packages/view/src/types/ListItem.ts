@@ -1,6 +1,6 @@
-import type Range from "./Range";
+import type Region from "./Region";
 
-export default interface ListItem extends Range {
+export default interface ListItem extends Region {
 	data: Record<string, any>;
 	key: any;
 }

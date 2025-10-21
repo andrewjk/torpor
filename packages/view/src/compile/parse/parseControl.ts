@@ -152,7 +152,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 		operation: operation as OperationType,
 		statement,
 		children: [],
-		range: { start: statementStart, end: status.i },
+		span: { start: statementStart, end: status.i },
 	};
 }
 
@@ -209,7 +209,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@if group",
 			statement: "",
 			children: [node],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(ifGroup);
 	} else if (node.operation === "@else") {
@@ -232,7 +232,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@for group",
 			statement: "",
 			children: [node],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(forGroup);
 	}
@@ -246,7 +246,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@await group",
 			statement: "",
 			children: [node],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(awaitGroup);
 	} else if (node.operation === "@then" || node.operation === "@catch") {
@@ -264,7 +264,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@replace group",
 			statement: "",
 			children: [node],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(replaceGroup);
 	} else if (node.operation === "@html") {
@@ -273,7 +273,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			operation: "@html group",
 			statement: "",
 			children: [node],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(htmlGroup);
 	} else {

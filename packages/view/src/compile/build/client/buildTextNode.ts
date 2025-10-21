@@ -94,6 +94,6 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 		offsetChange += functionBody.length;
 		offsets.map((_, i) => (offsets[i] += offsetChange));
 		functionBody += `${textContent};`;
-		stashRunWithOffsets(fragment, functionBody, node.ranges, offsets, lengths, status);
+		stashRunWithOffsets(fragment, functionBody, node.spans, offsets, lengths, status);
 	}
 }

@@ -4,8 +4,8 @@ export default function newListItem(data: Record<PropertyKey, any>, key?: any): 
 	return {
 		startNode: null,
 		endNode: null,
-		previousRange: null,
-		nextRange: null,
+		previousRegion: null,
+		nextRegion: null,
 		depth: -1,
 		animations: null,
 		data,

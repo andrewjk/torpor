@@ -27,21 +27,21 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 			operation: "@default",
 			statement: "default",
 			children: [],
-			range: { start: 0, end: 0 },
+			span: { start: 0, end: 0 },
 		};
 		branches.push(defaultBranch);
 	}
 
 	status.imports.add("$watch");
 	status.imports.add("$run");
-	status.imports.add("t_range");
+	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 	status.imports.add("t_run_branch");
 
 	b.append("");
 	b.append(`
 		/* @switch */
-		const ${rangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
+		const ${rangeName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
@@ -52,7 +52,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	let index = 0;
 
 	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.range, status, b);
+	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	for (let branch of branches) {
 		buildSwitchBranch(branch, status, b, parentName, stateName, creatorsName, index++);
@@ -78,7 +78,7 @@ function buildSwitchBranch(
 	index: number,
 ) {
 	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.range, status, b);
+	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	if (node.children.length > 0) {
 		b.append(`${creatorsName}[${index}] = (t_before) => {`);

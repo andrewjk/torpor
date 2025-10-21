@@ -1,4 +1,4 @@
-import type SourceRange from "../SourceRange";
+import type SourceSpan from "../SourceSpan";
 import type Fragment from "./Fragment";
 import type OperationType from "./OperationType";
 import type ParentNode from "./ParentNode";
@@ -9,7 +9,7 @@ export default interface ControlNode extends ParentNode {
 	operation: OperationType;
 	statement: string;
 	children: TemplateNode[];
-	range: SourceRange;
+	span: SourceSpan;
 
 	singleRooted?: boolean;
 

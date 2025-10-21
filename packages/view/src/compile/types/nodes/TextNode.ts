@@ -1,9 +1,9 @@
-import type SourceRange from "../SourceRange";
+import type SourceSpan from "../SourceSpan";
 import type TemplateNode from "./TemplateNode";
 
 export default interface TextNode extends TemplateNode {
 	type: "text";
 	content: string;
 	//reactive: boolean;
-	ranges: SourceRange[];
+	spans: SourceSpan[];
 }

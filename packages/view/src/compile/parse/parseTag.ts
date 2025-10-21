@@ -58,7 +58,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 		closed: selfClosed || undefined,
 		attributes,
 		children: [],
-		range: { start: tagStart, end: tagEnd },
+		span: { start: tagStart, end: tagEnd },
 	} satisfies ElementNode;
 }
 
@@ -130,7 +130,7 @@ function parseAttribute(status: ParseStatus): Attribute {
 		value,
 		reactive,
 		fullyReactive,
-		range: { start: valueStart, end: valueEnd },
+		span: { start: valueStart, end: valueEnd },
 	};
 }
 

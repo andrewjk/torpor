@@ -30,7 +30,7 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 			const text: TextNode = {
 				type: "text",
 				content: space,
-				ranges: [],
+				spans: [],
 			};
 			current.markup.children.push(text);
 		} else if (accept("<", status, false)) {

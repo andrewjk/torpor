@@ -88,7 +88,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		TorporBuildContext: { onformsubmit: formSubmit },
 	};
 
-	client.layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRange: null });
+	client.layoutStack.push({ path: route.handler.path, data: {}, reuse: false, slotRegion: null });
 	client.layoutStack = newLayoutStack;
 	let layoutStack = client.layoutStack;
 
@@ -102,7 +102,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		// The last slot function will render the client component
 		slotFunctions[handler.layouts.length] = function clientComponent(parent, anchor) {
 			let i = layoutStack.length - 1;
-			layoutStack[i].slotRange = fillLayoutSlot(
+			layoutStack[i].slotRegion = fillLayoutSlot(
 				clientEndPoint.component!,
 				slotFunctions[i + 1],
 				parent,
@@ -121,8 +121,8 @@ export default async function navigate(url: URL, withHydration = false): Promise
 					// Set the parent to add the new content to (from the old
 					// content), clear the range under this point, and set the
 					// component to the slot function within this layout
-					parent = layoutStack[i].slotRange.startNode.parentNode as HTMLElement;
-					clearLayoutSlot(layoutStack[i].slotRange);
+					parent = layoutStack[i].slotRegion.startNode.parentNode as HTMLElement;
+					clearLayoutSlot(layoutStack[i].slotRegion);
 					component = slotFunctions[i + 1];
 					break;
 				} else if (i === 0) {
@@ -130,7 +130,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 					slots = { _: slotFunctions[i + 1] };
 				} else {
 					slotFunctions[i] = function layoutComponent(parent, anchor, _, $context) {
-						layoutStack[i - 1].slotRange = fillLayoutSlot(
+						layoutStack[i - 1].slotRegion = fillLayoutSlot(
 							layoutEndPoint.component!,
 							slotFunctions[i + 1],
 							parent,

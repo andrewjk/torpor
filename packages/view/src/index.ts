@@ -11,14 +11,14 @@ import t_fragment from "./render/getFragment";
 import hydrate from "./render/hydrate";
 import mount from "./render/mount";
 import t_list_item from "./render/newListItem";
-import t_range from "./render/newRange";
+import t_region from "./render/newRegion";
 import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
 import t_next from "./render/nodeNext";
 import t_root from "./render/nodeRoot";
 import t_skip from "./render/nodeSkip";
-import t_pop_range from "./render/popRange";
-import t_push_range from "./render/pushRange";
+import t_pop_region from "./render/popRegion";
+import t_push_region from "./render/pushRegion";
 import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
@@ -56,14 +56,14 @@ export {
 	t_class,
 	t_fragment,
 	t_style,
-	t_range,
+	t_region,
 	t_anchor,
 	t_child,
 	t_next,
 	t_root,
 	t_skip,
-	t_pop_range,
-	t_push_range,
+	t_pop_region,
+	t_push_region,
 	t_run_control,
 	t_run_branch,
 	t_list_item,

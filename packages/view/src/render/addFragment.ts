@@ -12,15 +12,15 @@ export default function addFragment(
 	//console.log(`adding fragment '${fragment.textContent}' to `, parent);
 	//console.log("before", before);
 
-	const activeRange = context.activeRange;
+	const activeRegion = context.activeRegion;
 	const hydrationNode = context.hydrationNode;
 
-	// Set the active range's end node to the last node in the fragment
+	// Set the active region's end node to the last node in the fragment
 	if (hydrationNode !== null) {
-		activeRange.endNode = endNode ?? hydrationNode;
+		activeRegion.endNode = endNode ?? hydrationNode;
 	} else {
-		activeRange.startNode = fragment.firstChild;
-		activeRange.endNode = fragment.lastChild;
+		activeRegion.startNode = fragment.firstChild;
+		activeRegion.endNode = fragment.lastChild;
 	}
 
 	parent = before?.parentNode ?? parent;
@@ -42,10 +42,10 @@ export default function addFragment(
 			context.mountEffects.length = 0;
 		}
 
-		// Set the active range for each event so it will get attached to the
+		// Set the active region for each event so it will get attached to the
 		// right one and set it back afterwards
 		for (let event of context.stashedEvents) {
-			context.activeRange = event.range;
+			context.activeRegion = event.region;
 			$run(function addFragmentEvent() {
 				event.el.addEventListener(event.type, event.listener);
 				return () => {
@@ -55,11 +55,11 @@ export default function addFragment(
 		}
 		context.stashedEvents.length = 0;
 
-		// Set the active range for each animation so it will get attached to
+		// Set the active region for each animation so it will get attached to
 		// the right one and set it back afterwards
 		// Don't await animations
 		for (let animation of context.stashedAnimations) {
-			context.activeRange = animation.range;
+			context.activeRegion = animation.region;
 			$run(function addFragmentAnimation() {
 				if (animation.in !== undefined) {
 					// eslint-disable-next-line no-floating-promises
@@ -75,7 +75,7 @@ export default function addFragment(
 		}
 		context.stashedAnimations.length = 0;
 
-		// Set the active range back
-		context.activeRange = activeRange;
+		// Set the active region back
+		context.activeRegion = activeRegion;
 	}
 }

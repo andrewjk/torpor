@@ -9,7 +9,7 @@ import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_range from "../../../../src/render/newRange";
+import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -49,7 +49,7 @@ export default function TrafficLight(
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_next(t_next(t_next(t_next(t_button_1, true)), true))))) as HTMLElement;
 
 	/* @if */
-	const t_if_range_1 = t_range();
+	const t_if_range_1 = t_region();
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
 	$run(() => {

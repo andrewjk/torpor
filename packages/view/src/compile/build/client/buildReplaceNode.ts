@@ -12,21 +12,21 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function buildReplaceNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const replaceAnchorName = node.varName!;
 	const replaceParentName = node.parentName || replaceAnchorName + ".parentNode";
-	const replaceRangeName = nextVarName("replace_range", status);
+	const replaceRegionName = nextVarName("replace_region", status);
 
 	// HACK:
 	node = node.children[0] as ControlNode;
 
-	status.imports.add("t_range");
+	status.imports.add("t_region");
 	status.imports.add("t_run_control");
 
 	b.append("");
 	b.append(`
 	/* @replace */
-	const ${replaceRangeName} = t_range(${status.options.dev === true ? `"${node.statement}"` : ""});
-	t_run_control(${replaceRangeName}, ${replaceAnchorName}, (t_before) => {`);
+	const ${replaceRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
+	t_run_control(${replaceRegionName}, ${replaceAnchorName}, (t_before) => {`);
 
-	buildReplaceBranch(node, status, b, replaceParentName, replaceRangeName);
+	buildReplaceBranch(node, status, b, replaceParentName, replaceRegionName);
 
 	b.append("});");
 	b.append("");
@@ -37,12 +37,12 @@ function buildReplaceBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	rangeName: string,
+	regionName: string,
 ) {
 	status.imports.add("t_run_branch");
 
 	b.append(`${replaceForVarNames(node.statement, status)};`);
-	b.append(`t_run_branch(${rangeName}, () => {`);
+	b.append(`t_run_branch(${regionName}, () => {`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

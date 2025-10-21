@@ -7,7 +7,7 @@ export default function addAnimation(el: HTMLElement, entry?: Animation, exit?: 
 	// NOTE: We don't need to do this for hydration, but it's simpler to do it
 	// the same way in both processes
 	context.stashedAnimations.push({
-		range: context.activeRange,
+		region: context.activeRegion,
 		el,
 		in: entry,
 		out: exit,

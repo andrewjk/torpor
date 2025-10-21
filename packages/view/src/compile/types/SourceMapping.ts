@@ -1,7 +1,7 @@
-import type SourceRange from "./SourceRange";
+import type SourceSpan from "./SourceSpan";
 
 export default interface SourceMapping {
 	script: string;
-	source: SourceRange;
-	compiled: SourceRange;
+	source: SourceSpan;
+	compiled: SourceSpan;
 }

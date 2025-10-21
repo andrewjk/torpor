@@ -24,13 +24,13 @@
  * SOFTWARE.
  */
 import type ListItem from "../types/ListItem";
-import type Range from "../types/Range";
+import type Region from "../types/Region";
 import $watch from "../watch/$watch";
-import clearRange from "./clearRange";
-import moveRange from "./moveRange";
+import clearRegion from "./clearRegion";
+import moveRegion from "./moveRegion";
 
 /**
- * @param range The list's range
+ * @param region The list's region
  * @param parent The parent DOM element
  * @param anchor The DOM element to create new items before
  * @param oldItems The list of current items
@@ -38,7 +38,7 @@ import moveRange from "./moveRange";
  * @param create A function that creates the DOM elements for a new item
  */
 export default function runListItems(
-	range: Range,
+	region: Region,
 	parent: ParentNode,
 	anchor: Node | null,
 	oldItems: ListItem[],
@@ -79,14 +79,14 @@ export default function runListItems(
 		} else if (oldStartItem.key === newEndItem.key) {
 			// Move to the end
 			//console.log("move", oldStartItem.key, "to the end");
-			moveRange(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
+			moveRegion(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
 			transferListItemData(oldStartItem, newEndItem, update);
 			oldStartItem = oldItems[++oldStartIndex];
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldEndItem.key === newStartItem.key) {
 			// Move to the start
 			//console.log("move", oldEndItem.key, "to the start");
-			moveRange(parent, oldEndItem, oldStartItem!.startNode);
+			moveRegion(parent, oldEndItem, oldStartItem!.startNode);
 			transferListItemData(oldEndItem, newStartItem, update);
 			oldEndItem = oldItems[--oldEndIndex];
 			newStartItem = newItems[++newStartIndex];
@@ -114,10 +114,10 @@ export default function runListItems(
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
-				newStartItem.previousRange = oldStartItem.previousRange;
-				newStartItem.nextRange = oldStartItem;
-				oldStartItem.previousRange = newStartItem;
-				clearRange(oldStartItem);
+				newStartItem.previousRegion = oldStartItem.previousRegion;
+				newStartItem.nextRegion = oldStartItem;
+				oldStartItem.previousRegion = newStartItem;
+				clearRegion(oldStartItem);
 				oldStartItem = oldItems[++oldStartIndex];
 				newStartItem = newItems[++newStartIndex];
 			} else if (oldIndex === undefined) {
@@ -129,13 +129,13 @@ export default function runListItems(
 			} else if (newIndex === undefined) {
 				// Delete
 				//console.log("delete", oldStartItem.key);
-				clearRange(oldStartItem);
+				clearRegion(oldStartItem);
 				oldStartItem = oldItems[++oldStartIndex];
 			} else {
 				// Move
 				//console.log("move", newStartItem.key, "before", oldStartItem.key);
 				const oldData = oldItems[oldIndex];
-				moveRange(parent, oldData, oldStartItem.startNode);
+				moveRegion(parent, oldData, oldStartItem.startNode);
 				transferListItemData(oldData, newStartItem, update);
 				// @ts-ignore TODO: Set key null instead?
 				oldItems[oldIndex] = null;
@@ -160,15 +160,15 @@ export default function runListItems(
 			// The new list is exhausted; process old list removals
 			for (oldEndIndex; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) {
 				//console.log("clear", oldStartItem.key);
-				clearRange(oldStartItem);
+				clearRegion(oldStartItem);
 			}
 		}
 	}
 
 	if (newItems.length > 0) {
-		range.nextRange = newItems[0];
+		region.nextRegion = newItems[0];
 	} else if (oldItems.length > 0) {
-		range.nextRange = oldItems[oldItems.length - 1].nextRange;
+		region.nextRegion = oldItems[oldItems.length - 1].nextRegion;
 	}
 }
 

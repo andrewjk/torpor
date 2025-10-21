@@ -9,5 +9,5 @@ export default function addEvent(
 	// added to the DOM
 	// NOTE: We don't need to do this for hydration, but it's simpler to do it
 	// the same way in both processes
-	context.stashedEvents.push({ range: context.activeRange, el, type, listener });
+	context.stashedEvents.push({ region: context.activeRegion, el, type, listener });
 }
