@@ -3,7 +3,7 @@ import type Effect from "../types/Effect";
 import $run from "../watch/$run";
 import devContext from "./devContext";
 
-export default function $debugRun(fn: () => Cleanup | void, name?: string): Effect {
+export default function $devRun(fn: () => Cleanup | void, name?: string): Effect {
 	if (name === undefined) {
 		name = String(fn);
 		name = name.substring(name.indexOf("{") + 1).trimStart();

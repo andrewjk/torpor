@@ -22,7 +22,7 @@ export default function pushRegion(region: Region, toParent = false): Region {
 	context.activeRegion = region;
 	context.previousRegion = region;
 
-	// DEBUG:
+	// DEV:
 	devContext.onRegionPushed(region);
 
 	// Return the old active region, so that it can be reset when done

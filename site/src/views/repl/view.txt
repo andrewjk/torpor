@@ -310,8 +310,8 @@ function nodeRoot(parent, text = false) {
 			rootNode = rootNode.nextSibling;
 			context_default.hydrationNode = rootNode;
 		}
-		const range = context_default.activeRegion;
-		if (range.startNode === null) range.startNode = rootNode;
+		const region = context_default.activeRegion;
+		if (region.startNode === null) region.startNode = rootNode;
 		return rootNode;
 	} else return parent.firstChild;
 }

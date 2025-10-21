@@ -4,7 +4,7 @@ import type Region from "../types/Region";
 export default function clearRegion(region: Region): void {
 	//console.log("clearing region", region.name, "from", region.startNode, "to", region.endNode);
 
-	// DEBUG:
+	// DEV:
 	devContext.onRegionCleared(region);
 
 	// Clear child regions and collect animations that take place within this
