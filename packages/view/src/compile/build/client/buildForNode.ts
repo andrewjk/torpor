@@ -9,6 +9,7 @@ import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import replaceForVarNames from "./replaceForVarNames";
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
 const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;
@@ -78,7 +79,8 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		let t_previous_item = ${forRegionName};
 		let t_next_item = ${forRegionName}.nextRegion;`);
 
-	addMappedText("", `${node.statement}`, " {", node.span, status, b);
+	// TODO: replaceForVarNames is going to throw mapping out
+	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	b.append(`
 			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
@@ -92,9 +94,10 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	},
 	function createListItem(t_item, t_before) {`);
 
-	status.forVarNames = forVarNames;
+	let oldForVarNames = status.forVarNames;
+	status.forVarNames = [...status.forVarNames, ...forVarNames];
 	buildForItem(node, status, b, forParentName);
-	status.forVarNames = [];
+	status.forVarNames = oldForVarNames;
 
 	b.append(`},
 	function updateListItem(t_old_item, t_new_item) {`);
