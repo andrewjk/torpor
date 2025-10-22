@@ -20,12 +20,12 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append("");
 	b.append(`
 	/* @html */
-	const ${htmlRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
+	const ${htmlRegionName} = t_region(${status.options.dev === true ? `"html"` : ""});
 	t_run_control(${htmlRegionName}, ${htmlAnchorName}, (t_before) => {`);
 
 	buildHtmlBranch(node, status, b, htmlParentName, htmlRegionName);
 
-	b.append("});");
+	b.append(`}${status.options.dev === true ? ', "html"' : ""});`);
 	b.append("");
 }
 
@@ -49,5 +49,5 @@ function buildHtmlBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`});`);
+	b.append(`}${status.options.dev === true ? ', "html"' : ""});`);
 }

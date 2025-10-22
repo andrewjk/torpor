@@ -3,8 +3,9 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
-import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
+import addPopDevBoundary from "./addPopDevBoundary";
+import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -15,7 +16,7 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName!;
 	const parentName = node.parentName || anchorName + ".parentNode";
-	const rangeName = nextVarName("if_range", status);
+	const regionName = nextVarName("if_region", status);
 	const stateName = "$" + nextVarName("if_state", status);
 	const creatorsName = nextVarName("if_creators", status);
 
@@ -43,11 +44,11 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	b.append("");
 	b.append(`
 		/* @if */
-		const ${rangeName} = t_region(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
+		const ${regionName} = t_region(${status.options.dev === true ? `"if"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
-	addDevBoundary(`@${branches[0].statement}`, status, b);
+	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
 
 	b.append("$run(() => {");
 	let index = 0;
@@ -57,18 +58,17 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	b.append(`}${status.options.dev === true ? `, "runIf"` : ""});`);
 
 	b.append(`
-		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
+		t_run_control(${regionName}, ${anchorName}, (t_before) => {
 			const index = ${stateName}.index;`);
+	addPushDevBoundary("branch", "`branch ${index}`", status, b);
+	b.append(
+		`t_run_branch(${regionName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});`,
+	);
+	addPopDevBoundary(status, b);
+	b.append("});");
 
-	// Add the component to devContext for display in DevTools
-	if (status.options.dev === true) {
-		status.imports.add("devContext");
-		b.append("devContext.boundaries.push(`branch ${index}`);");
-		b.append("");
-	}
+	addPopDevBoundary(status, b);
 
-	b.append(`t_run_branch(${rangeName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});
-		});`);
 	b.append("");
 }
 

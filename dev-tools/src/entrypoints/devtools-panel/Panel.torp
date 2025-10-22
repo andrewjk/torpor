@@ -1,9 +1,61 @@
-export default function Panel($props) {    
-    @render {
+export default function Panel($props) {
+	@render {
 		<button onclick={$props.data.reload}>Refresh</button>
 
-        @for (let bound of $props.data.boundaries) {
-            <p>{bound}</p>
-        }
-    }
+		@for (let bound of $props.data.boundaries) {
+			@//  style="padding-left: {bound.depth * 4}px"
+			<section>
+				<div class="indent">
+				@for (let i = 0; i < bound.depth; i++) {
+					<span>•</span>
+				}
+				</div>
+				<div>
+				<button class="plain" onclick={() => bound.expanded = !bound.expanded}>
+					{bound.type.toUpperCase()}: {bound.name}
+				</button>
+				@if (bound.expanded) {
+					<p>HI!</p>
+					<p>{bound.details}</p>
+				}
+				</div>
+			</section>
+		}
+	}
+
+	@style {
+		section {
+			display: flex;
+			gap: 6px;
+			border-bottom: 1px solid gainsboro;
+			padding: 0;
+		}
+
+		.indent {
+			display: flex;
+			gap: 4px;
+			color: gainsboro;
+			padding: 4px 0;
+		}
+
+		.indent > div {
+			background-color: gainsboro;
+			width: 2px;
+			display: inline-block;
+		}
+
+		.plain {
+			background: none;
+			border: none;
+			min-width: auto;
+			margin: 0;
+			padding: 6px 0;
+			cursor: pointer;
+		}
+
+		p {
+			margin: 0;
+			padding: 6px 0;
+		}
+	}
 }

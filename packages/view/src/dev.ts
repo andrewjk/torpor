@@ -6,6 +6,10 @@ import $run from "./dev/$devRun";
 import $unwrap from "./dev/$devUnwrap";
 import $watch from "./dev/$devWatch";
 import devContext from "./dev/devContext";
+import t_pop_dev_bound from "./dev/popDevBoundary";
+import t_push_dev_bound from "./dev/pushDevBoundary";
 import setDevMode from "./dev/setDevMode";
 
-export { devContext, setDevMode, $batch, $cache, $mount, $peek, $run, $unwrap, $watch };
+export { devContext, setDevMode, t_push_dev_bound, t_pop_dev_bound };
+
+export { $batch, $cache, $mount, $peek, $run, $unwrap, $watch };

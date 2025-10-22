@@ -23,12 +23,12 @@ export default function buildReplaceNode(node: ControlNode, status: BuildStatus,
 	b.append("");
 	b.append(`
 	/* @replace */
-	const ${replaceRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
+	const ${replaceRegionName} = t_region(${status.options.dev === true ? `"replace"` : ""});
 	t_run_control(${replaceRegionName}, ${replaceAnchorName}, (t_before) => {`);
 
 	buildReplaceBranch(node, status, b, replaceParentName, replaceRegionName);
 
-	b.append("});");
+	b.append(`}${status.options.dev === true ? ', "replace"' : ""});`);
 	b.append("");
 }
 
@@ -57,5 +57,5 @@ function buildReplaceBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`});`);
+	b.append(`}${status.options.dev === true ? ', "replace"' : ""});`);
 }

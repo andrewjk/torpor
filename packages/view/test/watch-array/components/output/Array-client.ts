@@ -40,7 +40,7 @@ export default function Array(
 		t_for_region_1,
 		t_for_parent_1,
 		t_for_anchor_1,
-		function createNewItems() {
+		() => {
 			let t_new_items: ListItem[] = [];
 			let t_previous_item = t_for_region_1;
 			let t_next_item = t_for_region_1.nextRegion;
@@ -54,7 +54,7 @@ export default function Array(
 			t_for_region_1.nextRegion = t_next_item;
 			return t_new_items;
 		},
-		function createListItem(t_item, t_before) {
+		(t_item, t_before) => {
 			let t_old_region_1 = t_push_region(t_item);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
 			const t_root_1 = t_root(t_fragment_1, true);
@@ -67,7 +67,7 @@ export default function Array(
 			t_next(t_text_2);
 			t_pop_region(t_old_region_1);
 		},
-		function updateListItem(t_old_item, t_new_item) {
+		(t_old_item, t_new_item) => {
 			t_old_item.data.item = t_new_item.data.item;
 		}
 	);

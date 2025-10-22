@@ -19,7 +19,8 @@ mount(document.getElementById("app")!, Panel, $state);
 function loadDevContext() {
 	const script = `
 if (globalThis.T_DEV_CTX) {
-    globalThis.T_DEV_CTX();
+	//console.log(JSON.stringify(globalThis.T_DEV_CTX(), null, 2));
+	globalThis.T_DEV_CTX();
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {

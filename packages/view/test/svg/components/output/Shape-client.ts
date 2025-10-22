@@ -33,7 +33,7 @@ export default function Shape(
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_svg_1))) as HTMLElement;
 
 	/* @if */
-	const t_if_range_1 = t_region();
+	const t_if_region_1 = t_region();
 	let $t_if_state_1 = $watch({ index: -1 });
 	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
 	$run(() => {
@@ -58,9 +58,9 @@ export default function Shape(
 			$t_if_state_1.index = 1;
 		}
 	});
-	t_run_control(t_if_range_1, t_if_anchor_1, (t_before) => {
+	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 		const index = $t_if_state_1.index;
-		t_run_branch(t_if_range_1, () => t_if_creators_1[index](t_before));
+		t_run_branch(t_if_region_1, () => t_if_creators_1[index](t_before));
 	});
 
 	const t_text_3 = t_next(t_svg_1, true);

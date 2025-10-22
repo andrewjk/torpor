@@ -4,10 +4,12 @@ const noop = () => {};
 
 const devContext: DevContext = {
 	enabled: false,
+	depth: 0,
 	boundaries: [],
 
 	// Hooks
 	onRegionPushed: noop,
+	onRegionPopped: noop,
 	onRegionCleared: noop,
 };
 

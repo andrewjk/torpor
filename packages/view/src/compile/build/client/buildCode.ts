@@ -4,8 +4,9 @@ import type BuildOptions from "../../types/BuildOptions";
 import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
-import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
+import addPopDevBoundary from "./addPopDevBoundary";
+import addPushDevBoundary from "./addPushDevBoundary";
 import buildFragmentText from "./buildFragmentText";
 import buildNode from "./buildNode";
 
@@ -48,6 +49,8 @@ const importsMap: Record<string, string> = {
 	SlotRender: 'import { type SlotRender } from "${folder}";',
 	// HACK: this one's a bit different
 	devContext: 'import { devContext } from "${folder}/dev";',
+	t_push_dev_bound: 'import { t_push_dev_bound } from "${folder}/dev";',
+	t_pop_dev_bound: 'import { t_pop_dev_bound } from "${folder}/dev";',
 };
 
 export default function buildCode(
@@ -138,7 +141,7 @@ function buildTemplate(
 			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {
 			// Add the component to devContext for display in DevTools
-			addDevBoundary(current.name ?? "AnonComponent", status, b);
+			addPushDevBoundary("component", current.name || "Anon Component", status, b);
 
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
@@ -173,6 +176,7 @@ function buildTemplate(
 		} else if (chunk.script === "/* @style */") {
 			// No styles in the client
 		} else if (chunk.script === "/* @end */") {
+			addPopDevBoundary(status, b);
 			b.append("/**/ });");
 			currentIndex += 1;
 			current = template.components[currentIndex];

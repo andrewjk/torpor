@@ -4,8 +4,9 @@ import isControlNode from "../../utils/isControlNode";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
-import addDevBoundary from "./addDevBoundary";
 import addMappedText from "./addMappedText";
+import addPopDevBoundary from "./addPopDevBoundary";
+import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -14,7 +15,7 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName!;
 	const parentName = node.parentName!;
-	const rangeName = nextVarName("await_region", status);
+	const regionName = nextVarName("await_region", status);
 	const stateName = "$" + nextVarName("await_state", status);
 	const creatorsName = nextVarName("await_creators", status);
 	const awaitVarsName = nextVarName("await_vars", status);
@@ -63,13 +64,13 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	b.append("");
 	b.append(`
 		/* @await */
-		const ${rangeName} = t_region(${status.options.dev === true ? `"${branches[0].statement}"` : ""});
+		const ${regionName} = t_region(${status.options.dev === true ? `"await"` : ""});
 		let ${stateName} = $watch({ index: -1 });
 		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
 
 	b.append(`let ${awaitVarsName} = { t_token: 0 };`);
 
-	addDevBoundary(`@${branches[0].statement}`, status, b);
+	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
 	b.append("$run(() => {");
 
 	let index = 0;
@@ -120,9 +121,17 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		}${status.options.dev === true ? `, "runAwait"` : ""});`);
 
 	b.append(`
-		t_run_control(${rangeName}, ${anchorName}, (t_before) => {
-			t_run_branch(${rangeName}, () => ${creatorsName}[${stateName}.index](t_before));
-		});`);
+		t_run_control(${regionName}, ${anchorName}, (t_before) => {
+			const index = ${stateName}.index;`);
+	addPushDevBoundary("branch", "`branch ${index}`", status, b);
+	b.append(
+		`t_run_branch(${regionName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});`,
+	);
+	addPopDevBoundary(status, b);
+	b.append("});");
+
+	addPopDevBoundary(status, b);
+
 	b.append("");
 }
 

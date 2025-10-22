@@ -98,7 +98,8 @@ export default function Await(
 			})(t_await_vars_1.t_token);
 		});
 		t_run_control(t_await_region_1, t_await_anchor_1, (t_before) => {
-			t_run_branch(t_await_region_1, () => t_await_creators_1[$t_await_state_1.index](t_before));
+			const index = $t_await_state_1.index;
+			t_run_branch(t_await_region_1, () => t_await_creators_1[index](t_before));
 		});
 
 		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;

@@ -6,7 +6,19 @@ export default function $devWatch<T extends Record<PropertyKey, any>>(
 	object: T,
 	options?: WatchOptions,
 ): T {
-	devContext.boundaries.push(`$watch({ ${Object.keys(object).join(", ")} })`);
+	let keys = Object.keys(object);
+	if (keys.length > 5) {
+		keys = [...keys.slice(0, 5), "…"];
+	}
+	let name = keys.length > 0 ? `{ ${keys.join(", ")} }` : "{}";
+	devContext.boundaries.push({
+		type: "watch",
+		id: "",
+		name,
+		depth: devContext.depth,
+		expanded: false,
+		details: "",
+	});
 
 	return $watch(object, options);
 }

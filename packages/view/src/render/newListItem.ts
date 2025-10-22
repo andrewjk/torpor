@@ -1,6 +1,10 @@
 import type ListItem from "../types/ListItem";
 
-export default function newListItem(data: Record<PropertyKey, any>, key?: any): ListItem {
+export default function newListItem(
+	data: Record<PropertyKey, any>,
+	key?: any,
+	name?: string,
+): ListItem {
 	return {
 		startNode: null,
 		endNode: null,
@@ -8,6 +12,7 @@ export default function newListItem(data: Record<PropertyKey, any>, key?: any): 
 		nextRegion: null,
 		depth: -1,
 		animations: null,
+		name,
 		data,
 		key,
 	};

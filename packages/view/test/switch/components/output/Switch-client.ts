@@ -38,7 +38,7 @@ export default function Switch(
 	let t_switch_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @switch */
-	const t_switch_range_1 = t_region();
+	const t_switch_region_1 = t_region();
 	let $t_switch_state_1 = $watch({ index: -1 });
 	let t_switch_creators_1: ((t_before: Node | null) => void)[] = [];
 	$run(() => {
@@ -78,8 +78,9 @@ export default function Switch(
 			}
 		}
 	});
-	t_run_control(t_switch_range_1, t_switch_anchor_1, (t_before) => {
-		t_run_branch(t_switch_range_1, () => t_switch_creators_1[$t_switch_state_1.index](t_before));
+	t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
+		const index = $t_switch_state_1.index;
+		t_run_branch(t_switch_region_1, () => t_switch_creators_1[index](t_before));
 	});
 
 	const t_text_4 = t_next(t_switch_anchor_1, true);

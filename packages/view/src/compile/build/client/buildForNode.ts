@@ -69,12 +69,12 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append("");
 	b.append(`
 	/* @for */
-	let ${forRegionName} = t_region(${status.options.dev === true ? `"${node.statement}"` : ""});
+	let ${forRegionName} = t_region(${status.options.dev === true ? `"for"` : ""});
 	t_run_list(
 	${forRegionName},
 	${forParentName},
 	${forAnchorName},
-	function createNewItems() {
+	${status.options.dev === true ? "function createNewItems() {" : "() => {"}
 		let t_new_items: ListItem[] = [];
 		let t_previous_item = ${forRegionName};
 		let t_next_item = ${forRegionName}.nextRegion;`);
@@ -82,8 +82,11 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
+	let params = [`{ ${forVarNames.join(",\n")} }`];
+	if (keyStatement) params.push(keyStatement);
+	if (status.options.dev === true) params.push(`"for item"`);
 	b.append(`
-			let t_new_item = t_list_item({ ${forVarNames.join(",\n")} }${keyStatement ? `, ${keyStatement}` : ""});
+			let t_new_item = t_list_item(${params.join(", ")});
 			t_new_item.previousRegion = t_previous_item;
 			t_previous_item.nextRegion = t_new_item;
 			t_previous_item = t_new_item;
@@ -92,7 +95,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		${forRegionName}.nextRegion = t_next_item;
 		return t_new_items;
 	},
-	function createListItem(t_item, t_before) {`);
+	${status.options.dev === true ? "function createListItem(t_item, t_before) {" : "(t_item, t_before) => {"}`);
 
 	let oldForVarNames = status.forVarNames;
 	status.forVarNames = [...status.forVarNames, ...forVarNames];
@@ -100,7 +103,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	status.forVarNames = oldForVarNames;
 
 	b.append(`},
-	function updateListItem(t_old_item, t_new_item) {`);
+	${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item) {" : "(t_old_item, t_new_item) => {"}`);
 	for (let varName of forVarNames) {
 		b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);
 	}

@@ -1,6 +1,7 @@
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
-import addDevBoundary from "./addDevBoundary";
+import addPopDevBoundary from "./addPopDevBoundary";
+import addPushDevBoundary from "./addPushDevBoundary";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildRun(
@@ -11,10 +12,12 @@ export default function buildRun(
 ): void {
 	functionBody = replaceForVarNames(functionBody, status);
 
-	addDevBoundary(`$run(${functionName})`, status, b);
+	addPushDevBoundary("run", functionName, status, b);
 
 	status.imports.add("$run");
 	b.append("$run(() => {");
 	b.append(functionBody);
 	b.append(`}${status.options.dev === true ? `, "${functionName}"` : ""});`);
+
+	addPopDevBoundary(status, b);
 }

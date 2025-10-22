@@ -172,6 +172,7 @@ function newRegion(name) {
 }
 function popRegion(oldRegion) {
 	context_default.activeRegion = oldRegion;
+	devContext_default.onRegionPopped();
 }
 function pushRegion(region, toParent = false) {
 	const activeRegion = context_default.activeRegion;
@@ -185,7 +186,7 @@ function pushRegion(region, toParent = false) {
 	}
 	context_default.activeRegion = region;
 	context_default.previousRegion = region;
-	devContext_default.onRegionPushed(region);
+	devContext_default.onRegionPushed(region, toParent, region.name);
 	return activeRegion;
 }
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
@@ -229,7 +230,7 @@ function mount(parent, component, props, slots) {
 	}
 	component(parent, null, props, void 0, slots);
 }
-function newListItem(data, key) {
+function newListItem(data, key, name) {
 	return {
 		startNode: null,
 		endNode: null,
@@ -237,6 +238,7 @@ function newListItem(data, key) {
 		nextRegion: null,
 		depth: -1,
 		animations: null,
+		name,
 		data,
 		key
 	};
