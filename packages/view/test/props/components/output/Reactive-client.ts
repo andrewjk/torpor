@@ -33,7 +33,7 @@ export default function Reactive(
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_button_1, true))) as HTMLElement;
 
 	/* @component */
-	const t_props_1: any = $watch({});
+	const t_props_1 = $watch({ text: $state.text });
 	$run(() => {
 		t_props_1["text"] = $state.text;
 	});

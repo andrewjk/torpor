@@ -30,7 +30,11 @@ export default function buildComponentNode(
 		// attribute
 		// TODO: default props etc
 		status.imports.add("$watch");
-		b.append(`const ${propsName}: any = $watch({});`);
+
+		// Gather props, runs and binding runs, and set them all at once
+		let props: { name: string; value: string }[] = [];
+		let runs: string[] = [];
+		let bindingRuns: string[] = [];
 
 		for (let { name, value, reactive, fullyReactive } of node.attributes) {
 			if (name === "self" && node.tagName === "@component") {
@@ -42,29 +46,44 @@ export default function buildComponentNode(
 				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
 				// e.g. Component($props: { text: Bindable<string> })
 				name = name.substring(1);
-				buildRun("setProp", `${propsName}["${name}"] = ${value};`, status, b);
-				buildRun("setBinding", `${value} = ${propsName}["${name}"];`, status, b);
+				props.push({ name, value });
+				runs.push(`${propsName}["${name}"] = ${value};`);
+				bindingRuns.push(`${value} = ${propsName}["${name}"];`);
 			} else if (name === "class" && value != null) {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
-				buildRun("setClasses", `${propsName}["class"] = t_class(${params.join(", ")});`, status, b);
+				value = `t_class(${params.join(", ")})`;
+				props.push({ name, value });
+				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
-				buildRun("setStyles", `${propsName}["style"] = t_style(${value});`, status, b);
+				value = `t_style(${value})`;
+				props.push({ name, value });
+				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (value != null) {
-				const setProp = `${propsName}["${name}"] = ${value};`;
+				props.push({ name, value });
 				if (reactive) {
-					buildRun("setProp", setProp, status, b);
-				} else {
-					b.append(setProp);
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else {
-				b.append(`${propsName}["${name}"] = true;`);
+				props.push({ name, value: "true" });
 			}
 		}
+
+		// Set the props, runs and binding runs that we gathered
+		b.append(
+			`const ${propsName} = $watch({ ${props.map((p) => `${p.name}: ${p.value}`).join(", ")} });`,
+		);
+		if (runs.length) {
+			buildRun("setProps", runs.join("\n"), status, b);
+		}
+		if (bindingRuns.length) {
+			buildRun("setBindings", bindingRuns.join("\n"), status, b);
+		}
+
 		// PERF: Does this have much of an impact??
 		if (root) {
 			status.imports.add("$run");
@@ -131,8 +150,10 @@ export default function buildComponentNode(
 		}
 	}
 
-	// TODO: Map the params
-	addMappedText("", componentName, `(${renderParams});`, node.span, status, b);
+	// TODO: Map the params properly, either by checking for things ourselves,
+	// or better checking for $props being undefined in components
+	//addMappedText("", componentName, `(${renderParams});`, node.span, status, b);
+	addMappedText("", `${componentName}(${renderParams})`, ";", node.span, status, b);
 
 	b.append("");
 }

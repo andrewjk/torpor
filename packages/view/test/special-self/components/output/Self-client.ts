@@ -44,7 +44,7 @@ export default function Self(
 				let t_comp_anchor_1 = t_anchor(t_next(t_root_1)) as HTMLElement;
 
 				/* @component */
-				const t_props_1: any = $watch({});
+				const t_props_1 = $watch({ level: $props.level + 1 });
 				$run(() => {
 					t_props_1["level"] = $props.level + 1;
 				});

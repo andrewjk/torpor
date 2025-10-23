@@ -30,15 +30,11 @@ export default function UserProfileApp(
 	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
-	const t_props_1: any = $watch({});
-	t_props_1["name"] = "John";
+	const t_props_1 = $watch({ name: "John", age: 20, favoriteColors: ["green", "blue", "red"], isAvailable: true });
 	$run(() => {
 		t_props_1["age"] = 20;
-	});
-	$run(() => {
 		t_props_1["favoriteColors"] = ["green", "blue", "red"];
 	});
-	t_props_1["isAvailable"] = true;
 	UserProfile(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
 	const t_text_1 = t_next(t_comp_anchor_1, true);
