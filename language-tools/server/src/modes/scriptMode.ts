@@ -318,9 +318,10 @@ function doValidation(document: TextDocument) {
 			let end = (d.start ?? 0) + (d.length ?? 0);
 			let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
 
+			let message = getMessageText(d);
+
 			// HACK: We don't care about these? Maybe there's a better way to
 			// ignore/fix them
-			let message = String(d.messageText);
 			if (
 				message.startsWith("This import uses a '.ts' extension to resolve") ||
 				/Cannot find module '(.+?)\?raw'/.test(message)
@@ -328,18 +329,19 @@ function doValidation(document: TextDocument) {
 				mapped = undefined;
 			}
 
+			// Log it for diagnostics
+			console.log(`Error${!mapped ? " (unmapped)" : ""}:`, message);
+			// @ts-ignore we know this exists
+			const lineMap: number[] = d.file?.lineMap;
+			if (lineMap) {
+				const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
+				const char = start - lineMap[line];
+				console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+			}
+
 			// HACK: Couldn't map back to the source, so return a
 			// special message that will be removed with `filter`
 			if (!mapped) {
-				// Log it for diagnostics
-				console.log("Error in generated code: ", d.messageText);
-				// @ts-ignore we know this exists
-				const lineMap: number[] = d.file?.lineMap;
-				if (lineMap) {
-					const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
-					const char = start - lineMap[line];
-					console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
-				}
 				return {
 					message: "!",
 					range: {
@@ -384,22 +386,6 @@ function doValidation(document: TextDocument) {
 			}
 			let endChar = sourceEnd - lastLineStart - 1;
 
-			if (typeof d.messageText !== "string") {
-				// HACK: I think this should get the messages in the
-				// right order? But who knows...
-				function getMessages(chain: DiagnosticMessageChain, messages: string[]) {
-					messages.push(chain.messageText);
-					if (chain.next !== undefined) {
-						for (let next of chain.next) {
-							getMessages(next, messages);
-						}
-					}
-				}
-				let messages: string[] = [];
-				getMessages(d.messageText, messages);
-				message = messages.join("\n");
-			}
-
 			return {
 				message,
 				range: {
@@ -418,6 +404,25 @@ function doValidation(document: TextDocument) {
 
 	//console.log(JSON.stringify(diagnostics, null, 2));
 	return diagnostics;
+}
+
+function getMessageText(d: ts.Diagnostic): string {
+	if (typeof d.messageText === "string") {
+		return d.messageText;
+	} else {
+		let messages: string[] = [];
+		getMessages(d.messageText, messages);
+		return messages.map((m, i) => " ".repeat(i * 2) + m).join("\n");
+	}
+}
+
+function getMessages(chain: DiagnosticMessageChain, messages: string[]) {
+	messages.push(chain.messageText);
+	if (chain.next !== undefined) {
+		for (let next of chain.next) {
+			getMessages(next, messages);
+		}
+	}
 }
 
 function loadTypeScriptEnv(filename: string, key: string) {
