@@ -89,50 +89,44 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
-	let params = [`{ ${forVarNames.join(",\n")} }`];
-	//// Not sure if we need to be storing the key
+	status.imports.add("$watch");
+	let params = [`$watch({ ${forVarNames.join(", ")} }, { shallow: true })`, "t_index"];
+	// Not sure if we need to be storing the key
 	if (keyStatement) params.push(keyStatement);
 	if (status.options.dev === true) params.push(`"for item"`);
 	b.append(`
 			let t_key = ${keyStatement || "t_index"};
-			let t_new_item: ListItem;
+			let t_item: ListItem;
 			let t_old_item = t_old_items.get(t_key);
 			if (t_old_item !== undefined) {
 				t_new_items.set(t_key, t_old_item);
-				t_new_item = t_old_item;
-				t_new_item.state = 1;
-			} else {
-				t_new_item = t_list_item(${params.join(", ")});
-				t_new_item.state = 2;
-				t_new_item.create = (t_before) => {`);
-
+				t_item = t_old_item;
+				t_item.state = 1;`);
+	for (let varName of forVarNames) {
+		b.append(`t_item.data.${varName} = ${varName};`);
+	}
+	b.append(`} else {
+				t_item = t_list_item(
+					$watch({ ${forVarNames.join(", ")} }, { shallow: true }),
+					t_index,
+					(t_before) => {`);
+	let oldForVarNames = status.forVarNames;
+	status.forVarNames = [...status.forVarNames, ...forVarNames];
 	buildForItem(node, status, b, forParentName);
-
-	b.append(`};
-				t_new_items.set(t_key, t_new_item);
+	status.forVarNames = oldForVarNames;
+	b.append(`
+					},
+					${keyStatement ?? "undefined"}${status.options.dev === true ? ',\n"for item"' : ""});
+				t_new_items.set(t_key, t_item);
 			}
-			t_new_item.previousRegion = t_previous_region;
-			t_previous_region.nextRegion = t_new_item;
-			t_previous_region = t_new_item;
+			t_item.previousRegion = t_previous_region;
+			t_previous_region.nextRegion = t_item;
+			t_previous_region = t_item;
 			t_index++;
 		}
-		${/*forRegionName*/ "t_previous_region"}.nextRegion = t_next_region;
+		t_previous_region.nextRegion = t_next_region;
 		return t_new_items;
-	},
-	${status.options.dev === true ? "function createListItem(t_item, t_before) {" : "(t_item, t_before) => {"}`);
-
-	//let oldForVarNames = status.forVarNames;
-	//status.forVarNames = [...status.forVarNames, ...forVarNames];
-	//buildForItem(node, status, b, forParentName);
-	//status.forVarNames = oldForVarNames;
-
-	b.append(`},
-	${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item) {" : "(t_old_item, t_new_item) => {"}`);
-	//for (let varName of forVarNames) {
-	//	b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);
-	//}
-	b.append(`}
-		);`);
+	});`);
 	b.append("");
 }
 
@@ -140,7 +134,7 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 	const oldRegionName = nextVarName("old_region", status);
 
 	status.imports.add("t_push_region");
-	b.append(`let ${oldRegionName} = t_push_region(t_new_item);`);
+	b.append(`let ${oldRegionName} = t_push_region(t_item);`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 

@@ -68,57 +68,55 @@ export default function ColorSelect(
 			let t_index = 0;
 			for (let color of colors) {
 				let t_key = t_index;
-				let t_new_item: ListItem;
+				let t_item: ListItem;
 				let t_old_item = t_old_items.get(t_key);
 				if (t_old_item !== undefined) {
 					t_new_items.set(t_key, t_old_item);
-					t_new_item = t_old_item;
-					t_new_item.state = 1;
+					t_item = t_old_item;
+					t_item.state = 1;
+					t_item.data.color = color;
 				} else {
-					t_new_item = t_list_item({ color });
-					t_new_item.state = 2;
-					t_new_item.create = (t_before) => {
-						let t_old_region_1 = t_push_region(t_new_item);
-						const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
-						const t_root_1 = t_root(t_fragment_1, true);
-						const t_option_1 = t_next(t_root_1) as HTMLElement;
-						const t_text_2 = t_child(t_option_1);
-						const t_text_3 = t_next(t_option_1, true);
-						$run(() => {
-							t_attribute(t_option_1, "value", color.id);
-							t_attribute(t_option_1, "disabled", color.isDisabled);
-							t_text_2.textContent = ` ${t_fmt(color.text)} `;
-						});
-						t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
-						t_next(t_text_3);
-						t_pop_region(t_old_region_1);
-					};
-					t_new_items.set(t_key, t_new_item);
+					t_item = t_list_item(
+						$watch({ color }, { shallow: true }),
+						t_index,
+						(t_before) => {
+							let t_old_region_1 = t_push_region(t_item);
+							const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
+							const t_root_1 = t_root(t_fragment_1, true);
+							const t_option_1 = t_next(t_root_1) as HTMLElement;
+							const t_text_2 = t_child(t_option_1);
+							const t_text_3 = t_next(t_option_1, true);
+							$run(() => {
+								t_attribute(t_option_1, "value", t_item.data.color.id);
+								t_attribute(t_option_1, "disabled", t_item.data.color.isDisabled);
+								t_text_2.textContent = ` ${t_fmt(t_item.data.color.text)} `;
+							});
+							t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
+							t_next(t_text_3);
+							t_pop_region(t_old_region_1);
+						},
+					);
+					t_new_items.set(t_key, t_item);
 				}
-				t_new_item.previousRegion = t_previous_region;
-				t_previous_region.nextRegion = t_new_item;
-				t_previous_region = t_new_item;
+				t_item.previousRegion = t_previous_region;
+				t_previous_region.nextRegion = t_item;
+				t_previous_region = t_item;
 				t_index++;
 			}
 			t_previous_region.nextRegion = t_next_region;
 			return t_new_items;
-		},
-		(t_item, t_before) => {
-		},
-		(t_old_item, t_new_item) => {
-		}
-	);
+		});
 
-	const t_text_4 = t_next(t_select_1, true);
-	$run(() => {
-		t_select_1.value = $state.selectedColorId || "";
-	});
-	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
-	$run(() => {
-		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
-	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
-	t_next(t_text_4);
+		const t_text_4 = t_next(t_select_1, true);
+		$run(() => {
+			t_select_1.value = $state.selectedColorId || "";
+		});
+		t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
+		$run(() => {
+			t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
+		});
+		t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
+		t_next(t_text_4);
 
-	/**/ });
-}
+		/**/ });
+	}

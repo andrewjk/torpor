@@ -30,7 +30,7 @@ test("array sort -- mounted", async () => {
 	check(container, $state);
 });
 
-test.skip("array sort -- hydrated", async () => {
+test("array sort -- hydrated", async () => {
 	let $state = $watch({
 		items: [
 			{ id: 1, text: "b" },
