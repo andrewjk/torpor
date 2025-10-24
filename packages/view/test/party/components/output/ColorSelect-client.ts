@@ -56,38 +56,56 @@ export default function ColorSelect(
 		t_for_region_1,
 		t_select_1,
 		t_for_anchor_1,
-		() => {
-			let t_new_items: ListItem[] = [];
-			let t_previous_item = t_for_region_1;
-			let t_next_item = t_for_region_1.nextRegion;
-			for (let color of colors) {
-				let t_new_item = t_list_item({ color });
-				t_new_item.previousRegion = t_previous_item;
-				t_previous_item.nextRegion = t_new_item;
-				t_previous_item = t_new_item;
-				t_new_items.push(t_new_item);
+		(t_old_items) => {
+			let t_new_items = new Map<PropertyKey, ListItem>();
+			let t_previous_region = t_for_region_1;
+			// TODO: store nextSiblingRegion? for lists only???
+			let t_next_region = t_for_region_1.nextRegion;
+			while (t_next_region !== null) {
+				if (t_next_region.depth <= t_for_region_1.depth) break;
+				t_next_region = t_next_region.nextRegion;
 			}
-			t_for_region_1.nextRegion = t_next_item;
+			let t_index = 0;
+			for (let color of colors) {
+				let t_key = t_index;
+				let t_new_item: ListItem;
+				let t_old_item = t_old_items.get(t_key);
+				if (t_old_item !== undefined) {
+					t_new_items.set(t_key, t_old_item);
+					t_new_item = t_old_item;
+					t_new_item.state = 1;
+				} else {
+					t_new_item = t_list_item({ color });
+					t_new_item.state = 2;
+					t_new_item.create = (t_before) => {
+						let t_old_region_1 = t_push_region(t_new_item);
+						const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
+						const t_root_1 = t_root(t_fragment_1, true);
+						const t_option_1 = t_next(t_root_1) as HTMLElement;
+						const t_text_2 = t_child(t_option_1);
+						const t_text_3 = t_next(t_option_1, true);
+						$run(() => {
+							t_attribute(t_option_1, "value", color.id);
+							t_attribute(t_option_1, "disabled", color.isDisabled);
+							t_text_2.textContent = ` ${t_fmt(color.text)} `;
+						});
+						t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
+						t_next(t_text_3);
+						t_pop_region(t_old_region_1);
+					};
+					t_new_items.set(t_key, t_new_item);
+				}
+				t_new_item.previousRegion = t_previous_region;
+				t_previous_region.nextRegion = t_new_item;
+				t_previous_region = t_new_item;
+				t_index++;
+			}
+			t_previous_region.nextRegion = t_next_region;
 			return t_new_items;
 		},
 		(t_item, t_before) => {
-			let t_old_region_1 = t_push_region(t_item);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_option_1 = t_next(t_root_1) as HTMLElement;
-			const t_text_2 = t_child(t_option_1);
-			const t_text_3 = t_next(t_option_1, true);
-			$run(() => {
-				t_attribute(t_option_1, "value", t_item.data.color.id);
-				t_attribute(t_option_1, "disabled", t_item.data.color.isDisabled);
-				t_text_2.textContent = ` ${t_fmt(t_item.data.color.text)} `;
-			});
-			t_add_fragment(t_fragment_1, t_select_1, t_before, t_text_3);
-			t_next(t_text_3);
-			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
-			t_old_item.data.color = t_new_item.data.color;
 		}
 	);
 

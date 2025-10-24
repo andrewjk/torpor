@@ -13,13 +13,13 @@ beforeAll(async () => {
 	await buildOutputFiles(componentPath);
 });
 
-test("array sort -- mounted", async () => {
+test("array move -- mounted", async () => {
 	let $state = $watch({
 		items: [
-			{ id: 1, text: "b" },
-			{ id: 2, text: "a" },
-			{ id: 3, text: "d" },
-			{ id: 4, text: "c" },
+			{ id: 1, text: "a" },
+			{ id: 2, text: "b" },
+			{ id: 3, text: "c" },
+			{ id: 4, text: "d" },
 		],
 	});
 
@@ -30,13 +30,13 @@ test("array sort -- mounted", async () => {
 	check(container, $state);
 });
 
-test.skip("array sort -- hydrated", async () => {
+test("array move -- hydrated", async () => {
 	let $state = $watch({
 		items: [
-			{ id: 1, text: "b" },
-			{ id: 2, text: "a" },
-			{ id: 3, text: "d" },
-			{ id: 4, text: "c" },
+			{ id: 1, text: "a" },
+			{ id: 2, text: "b" },
+			{ id: 3, text: "c" },
+			{ id: 4, text: "d" },
 		],
 	});
 
@@ -51,13 +51,25 @@ test.skip("array sort -- hydrated", async () => {
 function check(container: HTMLElement, state: ArrayState) {
 	assert(container.textContent);
 
-	expect(container.textContent.replace(/\s/g, "")).toBe("^badc$");
-
-	state.items.sort((a, b) => a.text.localeCompare(b.text));
-
 	expect(container.textContent.replace(/\s/g, "")).toBe("^abcd$");
 
-	state.items.sort((a, b) => b.text.localeCompare(a.text));
+	state.items = [
+		{ id: 1, text: "a" },
+		{ id: 4, text: "d" }, // <-
+		{ id: 2, text: "b" },
+		{ id: 3, text: "c" },
+		// ---------------------->
+	];
 
-	expect(container.textContent.replace(/\s/g, "")).toBe("^dcba$");
+	expect(container.textContent.replace(/\s/g, "")).toBe("^adbc$");
+
+	state.items = [
+		// ---------------------->
+		{ id: 4, text: "d" },
+		{ id: 2, text: "b" },
+		{ id: 3, text: "c" },
+		{ id: 1, text: "a" }, // <-
+	];
+
+	expect(container.textContent.replace(/\s/g, "")).toBe("^dbca$");
 }
