@@ -11,7 +11,7 @@ interface MessageProps {
  * A validation message to show when the contents of an input component have
  * problems that need to be fixed.
  */
-export default function Message($props?: MessageProps) {
+export default function Message($props: MessageProps | undefined) {
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;
 	if (!context) {

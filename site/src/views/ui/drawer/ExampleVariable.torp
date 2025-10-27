@@ -1,4 +1,4 @@
-import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "@torpor/ui/Drawer";
+import { Drawer, DrawerContent, DrawerOverlay } from "@torpor/ui/Drawer";
 
 export default function ExampleVariable($props: any) {
 	let $state = $watch({

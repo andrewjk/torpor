@@ -15,6 +15,12 @@ interface PopoverProps {
 	position?: Point,
 	/** A function to be called when the user selects a response */
 	callback?: ((value: any) => void),
+	/** Raised when the popover is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the popover has opened */
+	onopen?: () => void,
+	/** Raised when the popover has closed */
+	onclose?: (result: any) => void,
 }
 
 /**
@@ -29,9 +35,7 @@ interface PopoverProps {
  * </Popover>
  * ```
  */
-export default function Popover($props: PopoverProps) {
-	$props ??= $watch({});
-
+export default function Popover($props: PopoverProps | undefined) {
 	let $state: PopoverState = $watch({
 		visible: false,
 		position: { x: 0, y: 0 }
@@ -39,11 +43,13 @@ export default function Popover($props: PopoverProps) {
 
 	// Sync props and state
 	$run(() => {
-		$state.visible = $props.visible ?? false;
-		$state.position = $props.position ?? { x: 0, y: 0 };
+		$state.visible = $props?.visible ?? false;
+		$state.position = $props?.position ?? { x: 0, y: 0 };
 	});
 	$run(() => {
-		$props.visible = $state.visible;
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
 	});
 
 	let result: any;
@@ -53,17 +59,17 @@ export default function Popover($props: PopoverProps) {
 		handleButton,
 		handleClickOutside,
 		state: $state,
-		modal: $props.modal,
-		anchorElement: $unwrap($props.anchor),
+		modal: $props?.modal,
+		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
 	};
 	$context[PopoverContextName] = context;
 
-	// Dispatch the toggle event when the popout is opened or closed
+	// Dispatch the toggle event when the popover is opened or closed
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
 		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
@@ -98,8 +104,8 @@ export default function Popover($props: PopoverProps) {
 		$state.visible = false;
 
 		// Call the callback
-		if ($props.callback) {
-			$props.callback(result);
+		if ($props?.callback) {
+			$props?.callback(result);
 		}
 	}
 
@@ -110,8 +116,8 @@ export default function Popover($props: PopoverProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-popover ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-popover ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

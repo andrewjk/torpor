@@ -7,10 +7,8 @@ import {
 } from "../../../src/TabGroup/index";
 
 export default function TabGroupList() {
-	$props ??= $watch({});
-
 	@render {
-		<TabGroup value={$props.value}>
+		<TabGroup value={$props?.value}>
 			<TabList>
 			@for (let item of $props.items) {
 				@key = item.id

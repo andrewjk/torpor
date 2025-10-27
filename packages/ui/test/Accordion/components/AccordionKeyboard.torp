@@ -6,9 +6,7 @@ import {
 	AccordionContent,
 } from "../../../src/Accordion/index";
 
-export default function AccordionKeyboard() {
-	$props ??= $watch({});
-
+export default function AccordionKeyboard($props: any) {
 	@render {
 		<Accordion value={$props.value} type="multiple">
 			<AccordionItem>

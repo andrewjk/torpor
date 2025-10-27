@@ -10,7 +10,7 @@ export default function NotificationVariable() {
 	});
 
 	@render {
-		<button type="button" onclick={(e) => ($state.showNotification = !$state.showNotification)}>
+		<button type="button" onclick={() => ($state.showNotification = !$state.showNotification)}>
 			Show a notification
 		</button>
 

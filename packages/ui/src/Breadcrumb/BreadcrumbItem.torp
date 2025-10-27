@@ -12,15 +12,13 @@ interface BreadcrumbItemProps {
  * An item in a breadcrumb, containing a link to one of the parent pages of the
  * current page (or the current page).
  */
-export default function BreadcrumbItem($props: BreadcrumbItemProps) {
-	$props ??= $watch({});
-
+export default function BreadcrumbItem($props: BreadcrumbItemProps | undefined) {
 	@render {
 		<div
-			{$props.id}
-			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
-			aria-current={$props.current ? "page" : undefined}
-			data-current={$props.current ? "current" : undefined}
+			{$props?.id}
+			class={`torp-breadcrumb ${$props?.class ?? ""}`.trim()}
+			aria-current={$props?.current ? "page" : undefined}
+			data-current={$props?.current ? "current" : undefined}
 		>
 			<slot />
 		</div>

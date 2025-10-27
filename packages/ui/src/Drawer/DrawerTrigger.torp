@@ -10,9 +10,7 @@ interface DrawerTriggerProps {
 /**
  * The button that causes a Drawer to appear or disappear.
  */
-export default function DrawerTrigger($props: DrawerTriggerProps) {
-	$props ??= $watch({});
-
+export default function DrawerTrigger($props: DrawerTriggerProps | undefined) {
 	// Get stuff out of the DrawerContext
 	const context = $context[DrawerContextName] as DrawerContext;
 	if (!context) {
@@ -27,8 +25,8 @@ export default function DrawerTrigger($props: DrawerTriggerProps) {
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-drawer-trigger ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-drawer-trigger ${$props?.class ?? ""}`.trim()}
 			onclick={handleClick}
 		>
 			<slot />

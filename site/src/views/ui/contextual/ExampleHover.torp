@@ -64,7 +64,6 @@ export default function Example($props: any) {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			padding: 10px;
-			width: 340px;
 			z-index: 200;
 		}
 

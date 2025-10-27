@@ -32,10 +32,11 @@ export default function Calendar($props: CalendarProps) {
 	let $state = $watch({
 		activeDate: $props.value,
 		visibleDate: $props.value,
-		//get days() {
-		//	// TODO: $cache
-		//	return buildDays($state.visibleDate, $props.startOfWeek)
-		//},
+		get days() {
+			return $cache(() => {
+				return buildDays($state.visibleDate, $props.startOfWeek)
+			});
+		},
 	});
 
 	let visibleStartDate = $props.value;
@@ -49,8 +50,6 @@ export default function Calendar($props: CalendarProps) {
 	$context[CalendarContextName] = context;
 
 	$run(() => {
-		$state.days = buildDays($state.visibleDate, $props.startOfWeek)
-
 		// HACK: Shouldn't need this
 		if (refocus) {
 			refocus = false;
@@ -219,27 +218,27 @@ export default function Calendar($props: CalendarProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-calendar ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-calendar ${$props?.class ?? ""}`.trim()}
 			&ref={container}
 		>
-			<div class={`torp-calendar-header ${$props.class ?? ""}`.trim()}>
-				<button class={`torp-calendar-previous-trigger ${$props.class ?? ""}`.trim()} onclick={handlePrevMonth}>
+			<div class={`torp-calendar-header ${$props?.class ?? ""}`.trim()}>
+				<button class={`torp-calendar-previous-trigger ${$props?.class ?? ""}`.trim()} onclick={handlePrevMonth}>
 					<slot name="prev-button">
 						<ChevronLeft />
 					</slot>
 				</button>
-				<span class={`torp-calendar-month-name ${$props.class ?? ""}`.trim()}>
+				<span class={`torp-calendar-month-name ${$props?.class ?? ""}`.trim()}>
 					{monthNames[$state.visibleDate.getMonth()] + " " + $state.visibleDate.getFullYear()}
 				</span>
-				<button class={`torp-calendar-next-trigger ${$props.class ?? ""}`.trim()} onclick={handleNextMonth}>
+				<button class={`torp-calendar-next-trigger ${$props?.class ?? ""}`.trim()} onclick={handleNextMonth}>
 					<slot name="next-button">
 						<ChevronRight />
 					</slot>
 				</button>
 			</div>
 			<div
-				class={`torp-calendar-grid ${$props.class ?? ""}`.trim()}
+				class={`torp-calendar-grid ${$props?.class ?? ""}`.trim()}
 				tabindex={$props.selectable ? 0 : -1}
 				onfocus={handleFocus}
 				onkeydown={handleKey}

@@ -36,16 +36,14 @@ interface MenuProps {
  * </Menu>
  * ```
  */
-export default function Menu($props: MenuProps) {
-	$props ??= $watch({});
-
+export default function Menu($props: MenuProps | undefined) {
 	// A collection containing the state and some functions for each item
 	let itemStates: ItemState[] = [];
 	let focusIndex = -1;
 
 	// Get stuff out of the PopoverContext
 	// HACK: share state in PopupState and extend in context/modal/popover
-	const popoverContext = $context[ContextContextName] ?? $context[ModalContextName] ?? $context[PopoverContextName] as PopoverContext;
+	const popoverContext = $context[ContextualContextName] ?? $context[ModalContextName] ?? $context[PopoverContextName] as PopoverContext;
 	if (!popoverContext) {
 		throw new Error("Menu must be contained within a Context, Modal or Popover");
 	}
@@ -80,7 +78,7 @@ export default function Menu($props: MenuProps) {
 	}
 
 	function registerItem(setFocused: () => void) {
-		// Add the item"s state to the array and return its index
+		// Add the item's state to the array and return its index
 		const newItemState: ItemState = {
 			setFocused
 		};
@@ -159,11 +157,11 @@ export default function Menu($props: MenuProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-menu ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu ${$props?.class ?? ""}`.trim()}
 			tabindex="-1"
 			role="menu"
-			aria-label={$props.ariaLabel}
+			aria-label={$props?.ariaLabel}
 			aria-orientation="vertical"
 		>
 			<slot />

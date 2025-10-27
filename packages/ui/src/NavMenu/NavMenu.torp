@@ -33,9 +33,8 @@ interface NavMenuProps {
  * </NavMenu>
  * ```
  */
-export default function NavMenu($props: NavMenuProps) {
-	$props ??= $watch({});
-	$props.orientation ||= "horizontal";
+export default function NavMenu($props: NavMenuProps | undefined) {
+	let orientation = $props?.orientation ?? "horizontal";
 
 	// A collection containing the state and some functions for each item
 	let itemStates: ItemState[] = [];
@@ -60,7 +59,7 @@ export default function NavMenu($props: NavMenuProps) {
 	$context[NavMenuContextName] = context;
 
 	// If the NavMenu is not in a popout, focus its first item. Otherwise the popout will call focusFirstElement, below
-	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
+	function handleFocus() {
 		if (!popoutContext && itemStates.length) {
 			itemStates[0].setFocused();
 		}
@@ -173,12 +172,12 @@ export default function NavMenu($props: NavMenuProps) {
 
 	@render {
 		<nav
-			{$props.id}
-			class={`torp-nav-menu ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-nav-menu ${$props?.class ?? ""}`.trim()}
 			tabindex="0"
 			role="menubar"
-			aria-label={$props.ariaLabel}
-			aria-orientation={$props.orientation}
+			aria-label={$props?.ariaLabel}
+			aria-orientation={orientation}
 			onfocus={handleFocus}
 		>
 			<slot />

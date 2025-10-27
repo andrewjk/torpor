@@ -13,9 +13,8 @@ interface NavMenuGroupHeaderProps {
 /**
  * The header for a NavMenuGroup.
  */
-export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
+export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps | undefined) {
+	let defaultId = getId();
 
 	const context = $context[NavMenuGroupContextName] as NavMenuGroupContext;
 	if (!context) {
@@ -24,13 +23,13 @@ export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps) {
 	let $state = context.state;
 
 	// Set the header ID now that we know what it is
-	$state.headerId = $props.id;
+	$state.headerId = $props?.id ?? defaultId;
 
 	@render {
 		@// TODO: self={$props.as}
 		<h4
-			{$props.id}
-			class={`torp-nav-menu-group-header ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-nav-menu-group-header ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</h4>

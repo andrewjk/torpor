@@ -1,4 +1,6 @@
-export default function ChevronUp($props: any) {
+import { type IconProps } from "./IconTypes";
+
+export default function ChevronUp($props: IconProps | undefined) {
 	@render {
 		<svg
 			{$props?.id}

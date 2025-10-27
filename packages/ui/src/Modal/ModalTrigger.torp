@@ -13,9 +13,8 @@ interface ModalTriggerProps {
 /**
  * The button that causes a Modal to appear or disappear.
  */
-export default function ModalTrigger($props: ModalTriggerProps) {
-	$props ??= $watch({});
-	$props.activation ??= "press";
+export default function ModalTrigger($props: ModalTriggerProps | undefined) {
+	let activation = $props?.activation ?? "press";
 
 	// Get stuff out of the ModalContext
 	const context = $context[ModalContextName] as ModalContext;
@@ -25,13 +24,13 @@ export default function ModalTrigger($props: ModalTriggerProps) {
 	let $state = context.state;
 
 	function handleClick() {
-		if ($props.activation !== "press") return;
+		if (activation !== "press") return;
 
 		$state.visible = !$state.visible;
 	}
 
 	function handleHover() {
-		if ($props.activation !== "hover") return;
+		if (activation !== "hover") return;
 
 		$state.visible = !$state.visible
 	}
@@ -39,8 +38,8 @@ export default function ModalTrigger($props: ModalTriggerProps) {
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-modal-trigger ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-modal-trigger ${$props?.class ?? ""}`.trim()}
 			onclick={handleClick}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

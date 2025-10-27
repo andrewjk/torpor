@@ -18,11 +18,7 @@ interface NavMenuPopoutContentProps {
  * The content that is displayed for a NavMenuPopout when it is open.
  *
  */
-export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps) {
-	$props ??= $watch({});
-	$props.side ??= "bottom";
-	$props.alignment ??= "start";
-
+export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps | undefined) {
 	let div: HTMLDivElement;
 	let shown = false;
 
@@ -44,7 +40,8 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps) 
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.addEventListener("resize", setPosition);
 		scrollParent.addEventListener("scroll", setPosition);
 		if (context.focusFirstElement) {
@@ -56,11 +53,12 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps) 
 		if (!shown) return;
 
 		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.removeEventListener("resize", setPosition);
 		scrollParent.removeEventListener("scroll", setPosition);
-		if (context.anchorElement?.focus) {
-			context.anchorElement.focus();
+		if (anchorElement.focus) {
+			anchorElement.focus();
 		}
 	}
 
@@ -70,15 +68,17 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps) 
 		}
 
 		if (div) {
-			setPopoverPosition(context.anchorElement, div, $props.side, $props.alignment);
+			let side = $props?.side ?? "bottom";
+			let alignment = $props?.alignment ?? "start";
+			setPopoverPosition(context.anchorElement, div, side, alignment);
 		}
 	}
 
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-nav-menu-popout-content ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-nav-menu-popout-content ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

@@ -5,16 +5,22 @@ interface ContextualProps {
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
-	/** Whether the context is modal. If true, an overlay should be supplied to obscure outside content, and only the context content will be visible to screen readers  */
+	/** Whether the contextual is modal. If true, an overlay should be supplied to obscure outside content, and only the context content will be visible to screen readers  */
 	modal?: boolean,
-	/** Whether the context is visible  */
+	/** Whether the contextual is visible  */
 	visible?: boolean,
-	/** The element to anchor this context to, as an alternative to supplying a ContextualTrigger  */
+	/** The element to anchor this contextual to, as an alternative to supplying a ContextualTrigger  */
 	anchor?: HTMLElement,
-	/** The position to display this context at  */
+	/** The position to display this contextual at  */
 	position?: Point,
 	/** A function to be called when the user selects a response */
 	callback?: ((value: any) => void),
+	/** Raised when this contextual is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the contextual has opened */
+	onopen?: () => void,
+	/** Raised when the contextual has closed */
+	onclose?: (result: any) => void,
 }
 
 /**
@@ -29,9 +35,7 @@ interface ContextualProps {
  * </Contextual>
  * ```
  */
-export default function Contextual($props: ContextualProps) {
-	$props ??= $watch({});
-
+export default function Contextual($props: ContextualProps | undefined) {
 	let $state: ContextualState = $watch({
 		visible: false,
 		position: { x: 0, y: 0 }
@@ -39,11 +43,13 @@ export default function Contextual($props: ContextualProps) {
 
 	// Sync props and state
 	$run(() => {
-		$state.visible = $props.visible ?? false;
-		$state.position = $props.position ?? { x: 0, y: 0 };
+		$state.visible = $props?.visible ?? false;
+		$state.position = $props?.position ?? { x: 0, y: 0 };
 	});
 	$run(() => {
-		$props.visible = $state.visible;
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
 	});
 
 	let result: any;
@@ -53,17 +59,17 @@ export default function Contextual($props: ContextualProps) {
 		handleButton,
 		handleClickOutside,
 		state: $state,
-		modal: $props.modal,
-		anchorElement: $unwrap($props.anchor),
+		modal: $props?.modal,
+		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
 	};
 	$context[ContextualContextName] = context;
 
-	// Dispatch the toggle event when the context is opened or closed
+	// Dispatch the toggle event when the contextual is opened or closed
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
 		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
@@ -94,11 +100,11 @@ export default function Contextual($props: ContextualProps) {
 			}
 		}
 
-		// Hide the context
+		// Hide the contextual
 		$state.visible = false;
 
 		// Call the callback
-		if ($props.callback) {
+		if ($props?.callback) {
 			$props.callback(result);
 		}
 	}
@@ -110,8 +116,8 @@ export default function Contextual($props: ContextualProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-context ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-context ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

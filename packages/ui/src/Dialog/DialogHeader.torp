@@ -15,10 +15,8 @@ interface DialogHeaderProps {
  * readers when the Dialog is opened, unless ariaAnnounce is false.
  * 
  */
-export default function DialogHeader($props: DialogHeaderProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
-	$props.ariaAnnounce ??= true;
+export default function DialogHeader($props: DialogHeaderProps | undefined) {
+	let defaultId = getId();
 
 	// Get stuff out of the DialogContext
 	const context = $context[DialogContextName] as DialogContext;
@@ -28,14 +26,14 @@ export default function DialogHeader($props: DialogHeaderProps) {
 	let $state = context.state;
 
 	// Set the header id for using in the Dialog's ARIA attributes
-	if ($props.ariaAnnounce) {
-		$state.headerId = $props.id;
+	if ($props?.ariaAnnounce !== false) {
+		$state.headerId = $props?.id ?? defaultId;
 	}
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-dialog-footer ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-dialog-footer ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

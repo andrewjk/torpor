@@ -18,14 +18,7 @@ interface PopoverContentProps {
  * The content that is displayed for a Popover when it is open, displayed
  * alongside an element.
  */
-export default function PopoverContent($props?: PopoverContentProps) {
-	$props ??= $watch({});
-	$props.side ??= "bottom";
-	$props.alignment ??= "center";
-
-	// HACK:
-	if (!$props) return;
-
+export default function PopoverContent($props?: PopoverContentProps | undefined) {
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -54,7 +47,8 @@ export default function PopoverContent($props?: PopoverContentProps) {
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.addEventListener("resize", setPosition);
 		scrollParent.addEventListener("scroll", setPosition);
 		if (context.focusFirstElement) {
@@ -69,11 +63,12 @@ export default function PopoverContent($props?: PopoverContentProps) {
 		removeDocumentEvent("click", handleDocumentClick);
 
 		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.removeEventListener("resize", setPosition);
 		scrollParent.removeEventListener("scroll", setPosition);
-		if (context.anchorElement?.focus) {
-			context.anchorElement.focus();
+		if (anchorElement.focus) {
+			anchorElement.focus();
 		}
 	}
 
@@ -98,14 +93,16 @@ export default function PopoverContent($props?: PopoverContentProps) {
 			throw new Error("Popover must have an anchor element");
 		}
 
-		setPopoverPosition(context.anchorElement, div, $props.side, $props.alignment);
+		let side = $props?.side ?? "bottom";
+		let alignment = $props?.alignment ?? "center";
+		setPopoverPosition(context.anchorElement, div, side, alignment);
 	}
 
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-popover-content ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-popover-content ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

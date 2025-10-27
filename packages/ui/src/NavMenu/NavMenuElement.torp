@@ -15,9 +15,7 @@ interface NavMenuElementProps {
  * An element of any type that can be placed in a NavMenu.
  *
  */
-export default function NavMenuElement($props: NavMenuElementProps) {
-	$props ??= $watch({});
-
+export default function NavMenuElement($props: NavMenuElementProps | undefined) {
 	// Get stuff out of the NavMenuContext
 	const menuContext = $context[NavMenuContextName] as NavMenuContext;
 	if (!menuContext) {
@@ -29,17 +27,19 @@ export default function NavMenuElement($props: NavMenuElementProps) {
 	const { index } = registerItem(setFocused);
 
 	function setFocused() {
-		element.focus();
+		if ($props?.element) {
+			$props.element.focus();
+		}
 	}
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-nav-menu-div ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-nav-menu-div ${$props?.class ?? ""}`.trim()}
 			type="div"
 			role="menuitem"
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

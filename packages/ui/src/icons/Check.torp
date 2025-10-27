@@ -1,4 +1,6 @@
-export default function Check($props: any) {
+import { type IconProps } from "./IconTypes";
+
+export default function Check($props: IconProps | undefined) {
 	@render {
 		<svg
 			{$props?.id}

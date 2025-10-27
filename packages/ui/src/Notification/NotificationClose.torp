@@ -10,9 +10,7 @@ interface NotificationCloseProps {
 /**
  * The button that a user can press to close this Notification.
  */
-export default function NotificationClose($props: NotificationCloseProps) {
-	$props ??= $watch({});
-
+export default function NotificationClose($props: NotificationCloseProps | undefined) {
 	// Get stuff out of the NotificationContext
 	const context = $context[NotificationContextName] as NotificationContext;
 	if (!context) {
@@ -26,8 +24,8 @@ export default function NotificationClose($props: NotificationCloseProps) {
 
 	@render {
 		<button
-			{$props.id}
-			class={`torp-notification-close ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-notification-close ${$props?.class ?? ""}`.trim()}
 			type="button"
 			onclick={handleClick}
 		>

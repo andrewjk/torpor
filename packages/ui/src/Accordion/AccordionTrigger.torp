@@ -11,9 +11,8 @@ interface AccordionTriggerProps {
 /**
  * A header button for an AccordionItem, which can be used to reveal or hide an associated AccordionContent.
  */
-export default function AccordionTrigger($props: AccordionTriggerProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
+export default function AccordionTrigger($props: AccordionTriggerProps | undefined) {
+	let defaultId = getId();
 
 	let button: HTMLButtonElement;
 
@@ -25,7 +24,7 @@ export default function AccordionTrigger($props: AccordionTriggerProps) {
 	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in AccordionContent
-	$state.headerId = $props.id;
+	$state.headerId = $props?.id ?? defaultId;
 
 	// Let the item know how to set the button's focus
 	$state.setFocused = setFocused;
@@ -49,8 +48,8 @@ export default function AccordionTrigger($props: AccordionTriggerProps) {
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-accordion-trigger ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-accordion-trigger ${$props?.class ?? ""}`.trim()}
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled ? "true" : undefined}

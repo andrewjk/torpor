@@ -15,7 +15,7 @@ export default function PopoverVariable() {
 	let button: HTMLButtonElement;
 
 	@render {
-		<button type="button" onclick={(e) => ($state.showPopover = !$state.showPopover)} &ref={button}>
+		<button type="button" onclick={() => ($state.showPopover = !$state.showPopover)} &ref={button}>
 			Show the prompt
 		</button>
 

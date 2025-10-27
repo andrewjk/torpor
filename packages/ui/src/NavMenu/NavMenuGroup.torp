@@ -12,9 +12,7 @@ interface NavMenuGroupProps {
 /**
  * A container for a logical group of navigation menu items.
  */
-export default function NavMenuGroup($props: NavMenuGroupProps) {
-	$props ??= $watch({});
-
+export default function NavMenuGroup($props: NavMenuGroupProps | undefined) {
 	let $state = $watch({
 		headerId: ""
 	});
@@ -27,10 +25,10 @@ export default function NavMenuGroup($props: NavMenuGroupProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-nav-menu-group ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-nav-menu-group ${$props?.class ?? ""}`.trim()}
 			role="group"
-			aria-label={$props.ariaLabel}
+			aria-label={$props?.ariaLabel}
 			aria-labelledby={$state.headerId}
 		>
 			<slot />

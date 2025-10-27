@@ -5,11 +5,11 @@ interface DisclosureProps {
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
-	/** Whether the Disclosure is expanded and its content visible */
+	/** Whether the disclosure is expanded and its content visible */
 	expanded?: boolean,
-	/** If set to true, the user cannot interact with this Disclosure */
+	/** If set to true, the user cannot interact with this disclosure */
 	disabled?: boolean,
-	/** Raised when this item is opened or closed */
+	/** Raised when the disclosure is opened or closed */
 	ontoggle?: (open: boolean) => void,
 }
 
@@ -29,11 +29,7 @@ interface DisclosureProps {
  * </Disclosure>
  * ```
  */
-export default function Disclosure($props: DisclosureProps) {
-	$props ??= $watch({});
-	$props.expanded ??= false;
-	$props.disabled ??= false;
-
+export default function Disclosure($props: DisclosureProps | undefined) {
 	let $state: DisclosureState = $watch({
 		expanded: false,
 		disabled: false,
@@ -43,12 +39,12 @@ export default function Disclosure($props: DisclosureProps) {
 
 	// Update $state with $props
 	$run(() => {
-		$state.expanded = $props.expanded === true ||
+		$state.expanded = $props?.expanded === true ||
 			// @ts-ignore
-			$props.expanded === "true";
-		$state.disabled = $props.disabled === true ||
+			$props?.expanded === "true";
+		$state.disabled = $props?.disabled === true ||
 			// @ts-ignore
-			$props.disabled === "true";
+			$props?.disabled === "true";
 	});
 
 	// Put stuff into a DisclosureContext
@@ -60,7 +56,7 @@ export default function Disclosure($props: DisclosureProps) {
 	// Dispatch the toggle event when the value of expanded changes
 	let firstToggle = true;
 	$run(() => {
-		const ev = $props.ontoggle;
+		const ev = $props?.ontoggle;
 		const expanded = $state.expanded;
 		if (firstToggle) {
 			firstToggle = false;
@@ -71,8 +67,8 @@ export default function Disclosure($props: DisclosureProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-disclosure-item ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-disclosure-item ${$props?.class ?? ""}`.trim()}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>

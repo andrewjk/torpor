@@ -11,17 +11,15 @@ interface MenuGroupProps {
 /**
  * A container for a logical group of menu items.
  */
-export default function MenuGroup($props: MenuGroupProps) {
-	$props ??= $watch({});
-
+export default function MenuGroup($props: MenuGroupProps | undefined) {
 	// TODO: Intercept the context to steal toggleItem??
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-menu-group ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-group ${$props?.class ?? ""}`.trim()}
 			role="group"
-			aria-label={$props.ariaLabel}
+			aria-label={$props?.ariaLabel}
 		>
 			<slot />
 		</div>

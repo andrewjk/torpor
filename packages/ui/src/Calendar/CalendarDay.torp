@@ -48,9 +48,9 @@ export default function CalendarDay($props: CalendarDayProps) {
 
 	@render {
 		<div 
-			{$props.id}
+			{$props?.id}
 			class={[
-				`torp-calendar-day ${$props.class ?? ""}`.trim(),
+				`torp-calendar-day ${$props?.class ?? ""}`.trim(),
 				{
 					muted: $props.muted,
 					today: isToday(),
@@ -65,7 +65,7 @@ export default function CalendarDay($props: CalendarDayProps) {
 			} else {
 				<span>{date.getDate()}</span>
 			}
-			<ul class={`torp-calendar-day-events ${$props.class ?? ""}`.trim()}>
+			<ul class={`torp-calendar-day-events ${$props?.class ?? ""}`.trim()}>
 				@for (ev of $props.events) {
 					<li title={ev.content} />
 				}

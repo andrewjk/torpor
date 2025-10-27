@@ -18,11 +18,9 @@ interface FormProps {
 /**
  * A form for submitting values.
  */
-export default function Form($props: FormProps) {
-	$props ??= $watch({});
-
+export default function Form($props: FormProps | undefined) {
 	let $state = $watch({
-		data: $props.data ?? {},
+		data: $props?.data ?? {},
 		issues: [] as ValidationIssue[],
 		get valid() {
 			return this.issues.length === 0;
@@ -35,7 +33,7 @@ export default function Form($props: FormProps) {
 
 	// Set the context to pass down to Fields
 	let context: FormContext = {
-		schema: $props.schema,
+		schema: $props?.schema,
 		state: $state,
 		validate: handleValidate
 	};
@@ -43,7 +41,7 @@ export default function Form($props: FormProps) {
 	$context[FormContextName] = context;
 
 	async function validate() {
-		if ($props.schema) {
+		if ($props?.schema) {
 			const validator = $props.schema["~standard"];
 			let result = validator.validate($props.data);
 			if (result instanceof Promise) {
@@ -77,7 +75,7 @@ export default function Form($props: FormProps) {
 		}
 
 		// Dispatch the submit event for the user to handle
-		if ($props.onsubmit) {
+		if ($props?.onsubmit) {
 			let userSubmit = $props.onsubmit(e);
 			if (userSubmit instanceof Promise) {
 				userSubmit = await userSubmit;
@@ -118,8 +116,8 @@ export default function Form($props: FormProps) {
 
 	@render {
 		<form
-			{$props.id}
-			class={`torp-form ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-form ${$props?.class ?? ""}`.trim()}
 			method="POST"
 			onsubmit={handleSubmit}
 			@// Set novalidate only if JS is enabled (to override HTML validation)

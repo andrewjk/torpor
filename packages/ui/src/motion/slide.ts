@@ -5,7 +5,7 @@ interface Options extends KeyframeAnimationOptions {
 	side: "left" | "right" | "top" | "bottom";
 }
 
-export default function fade(el: HTMLElement, options?: Options): Animation {
+export default function slide(el: HTMLElement, options?: Options): Animation {
 	let position = options?.side ?? "left";
 	switch (position) {
 		case "left": {

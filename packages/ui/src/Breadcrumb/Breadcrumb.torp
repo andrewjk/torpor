@@ -28,14 +28,12 @@ interface BreadcrumbProps {
  *
  * You can separate BreadcrumbItems using BreadcrumbSeparators or by using CSS.
  */
-export default function Breadcrumb($props: BreadcrumbProps) {
-	$props ??= $watch({});
-
+export default function Breadcrumb($props: BreadcrumbProps | undefined) {
 	@render {
 		<nav
-			{$props.id}
-			class={`torp-breadcrumb ${$props.class ?? ""}`.trim()}
-			aria-label={$props.ariaLabel}
+			{$props?.id}
+			class={`torp-breadcrumb ${$props?.class ?? ""}`.trim()}
+			aria-label={$props?.ariaLabel}
 		>
 			<slot />
 		</nav>

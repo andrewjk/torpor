@@ -13,8 +13,11 @@ interface DrawerProps {
 	position?: "left" | "right" | "top" | "bottom",
 	/** A function to be called when the user selects a response */
 	callback?: ((value: any) => void),
-	ontoggle?: (visible: boolean) => void,
+	/** Raised when the drawer is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the drawer has opened */
 	onopen?: () => void,
+	/** Raised when the drawer has closed */
 	onclose?: (result: any) => void,
 }
 
@@ -32,23 +35,21 @@ interface DrawerProps {
  * </Drawer>
  * ```
  */
-export default function Drawer($props: DrawerProps) {
-	$props ??= $watch({});
-	$props.position ??= "left";
-	$props.modal ??= false;
-
+export default function Drawer($props: DrawerProps | undefined) {
 	let $state: DrawerState = $watch({
 		visible: false,
-		modal: $props.modal,
-		position: $props.position,
-	})
+		modal: $props?.modal ?? false,
+		position: $props?.position ?? "left",
+	});
 
 	// Sync props and state
 	$run(() => {
-		$state.visible = $props.visible ?? false;
+		$state.visible = $props?.visible ?? false;
 	});
 	$run(() => {
-		$props.visible = $state.visible;
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
 	});
 
 	let result: any;
@@ -61,12 +62,12 @@ export default function Drawer($props: DrawerProps) {
 	};
 	$context[DrawerContextName] = context;
 
-	// Dispatch the toggle event when the popout is opened or closed
+	// Dispatch the toggle event when the drawer is opened or closed
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
 		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
@@ -101,8 +102,8 @@ export default function Drawer($props: DrawerProps) {
 		$state.visible = false;
 
 		// Call the callback
-		if ($props.callback) {
-			$props.callback(result);
+		if ($props?.callback) {
+			$props?.callback(result);
 		}
 	}
 
@@ -113,8 +114,8 @@ export default function Drawer($props: DrawerProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-drawer ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-drawer ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

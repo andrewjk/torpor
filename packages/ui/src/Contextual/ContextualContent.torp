@@ -15,9 +15,7 @@ interface ContextualContentProps {
  * The content that is displayed for a Contextual when it is open, displayed at the
  * position that the user right-clicked.
  */
-export default function ContextualContent($props: ContextualContentProps) {	
-	$props ??= $watch({});
-
+export default function ContextualContent($props: ContextualContentProps | undefined) {	
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -46,7 +44,8 @@ export default function ContextualContent($props: ContextualContentProps) {
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!;
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.addEventListener("resize", setPosition);
 		scrollParent.addEventListener("scroll", setPosition);
 		if (context.focusFirstElement) {
@@ -61,11 +60,12 @@ export default function ContextualContent($props: ContextualContentProps) {
 		removeDocumentEvent("click", handleDocumentClick);
 
 		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		const scrollParent = getScrollParent(context.anchorElement)
+		const anchorElement = context.anchorElement!;
+		const scrollParent = getScrollParent(anchorElement)
 		scrollParent.removeEventListener("resize", setPosition);
 		scrollParent.removeEventListener("scroll", setPosition);
-		if (context.anchorElement?.focus) {
-			context.anchorElement.focus();
+		if (anchorElement.focus) {
+			anchorElement.focus();
 		}
 	}
 
@@ -97,8 +97,8 @@ export default function ContextualContent($props: ContextualContentProps) {
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-popover-content-contextual ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-popover-content-contextual ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

@@ -25,8 +25,6 @@ interface FieldProps {
  * component and/or a Message.
  */
 export default function Field($props: FieldProps) {
-	$props ??= $watch({ name: "" });
-
 	let $state = $watch({
 		inputId: "-1",
 		value: $props.value,
@@ -83,8 +81,8 @@ export default function Field($props: FieldProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-field ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-field ${$props?.class ?? ""}`.trim()}
 			data-valid={$state.valid ? "valid" : "invalid"}
 		>
 			<slot />

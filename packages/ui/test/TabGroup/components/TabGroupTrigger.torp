@@ -7,10 +7,8 @@ import {
 } from "../../../src/TabGroup/index";
 
 export default function TabGroupTrigger() {
-	$props ??= $watch({});
-
 	@render {
-		<TabGroup value={$props.value}>
+		<TabGroup value={$props?.value}>
 			<TabList>
 				<TabHeader as="h4">
 					<TabTrigger>Header 1</TabTrigger>

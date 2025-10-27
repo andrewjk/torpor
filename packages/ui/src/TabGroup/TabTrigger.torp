@@ -11,9 +11,8 @@ interface TabTriggerProps {
 /**
  * A header button for a tab item, which can be used to reveal an associated TabContent.
  */
-export default function TabTrigger($props: TabTriggerProps) {
-	$props ??= $watch({});
-	$props.id ||= getId();
+export default function TabTrigger($props: TabTriggerProps | undefined) {
+	let defaultId = getId();
 
 	let button: HTMLButtonElement;
 
@@ -25,7 +24,7 @@ export default function TabTrigger($props: TabTriggerProps) {
 	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in TabContent
-	$state.headerId = $props.id;
+	$state.headerId = $props?.id ?? defaultId;
 
 	// Let the item know how to set the button's focus
 	$state.setFocused = setFocused;
@@ -33,7 +32,7 @@ export default function TabTrigger($props: TabTriggerProps) {
 	// This function is called by the parent TabGroup to focus this item's button
 	function setFocused() {
 		button.focus();
-		if ($state.activation === "automatic") {
+		if (context.activation === "automatic") {
 			context.triggerItem($state.value);
 		}
 	}
@@ -52,17 +51,17 @@ export default function TabTrigger($props: TabTriggerProps) {
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-tab-trigger ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-tab-trigger ${$props?.class ?? ""}`.trim()}
 			role="tab"
 			tabindex="-1"
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-selected={$state.active.toString()}
 			aria-disabled={$state.disabled}
 			aria-controls={$state.contentId}
-			data-state={$state.dataState}
+			data-state={$state.active ? "active" : "inactive"}
 			data-disabled={$state.disabled}
-			data-orientation={$state.orientation}
+			data-orientation={context.orientation}
 			&ref={button}
 			onclick={handleClick}
 			onkeydown={handleKey}

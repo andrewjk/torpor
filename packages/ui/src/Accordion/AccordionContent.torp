@@ -13,9 +13,8 @@ interface AccordionContentProps {
 /**
  * Content for an AccordionItem, which can be revealed or hidden by an associated AccordionTrigger.
  */
-export default function AccordionContent($props: AccordionContentProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
+export default function AccordionContent($props: AccordionContentProps | undefined) {
+	let defaultId = getId();
 
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
@@ -24,13 +23,13 @@ export default function AccordionContent($props: AccordionContentProps) {
 	let $state = context.state
 
 	// Set the content ID so that it can be used with aria-controls in AccordionTrigger
-	$state.contentId = $props.id;
+	$state.contentId = $props?.id ?? defaultId;
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-accordion-content ${$props.class ?? ""}`.trim()}
-			role={$props.ariaRegion ? "region" : undefined}
+			id={$props?.id ?? defaultId}
+			class={`torp-accordion-content ${$props?.class ?? ""}`.trim()}
+			role={$props?.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}

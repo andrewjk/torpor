@@ -1,4 +1,6 @@
-export default function ArrowDown($props: any) {
+import { type IconProps } from "./IconTypes";
+
+export default function ArrowDown($props: IconProps | undefined) {
 	@render {
 		<svg
 			{$props?.id}

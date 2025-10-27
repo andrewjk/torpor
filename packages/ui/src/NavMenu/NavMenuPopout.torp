@@ -7,6 +7,12 @@ interface NavMenuPopoutProps {
 	class?: string,
 	/** Whether the popout is visible */
 	visible?: boolean,
+	/** Raised when the popout is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the popout has opened */
+	onopen?: () => void,
+	/** Raised when the popout has closed */
+	onclose?: (result: any) => void,
 }
 
 /**
@@ -21,20 +27,19 @@ interface NavMenuPopoutProps {
  * </NavMenuPopout>
  * ```
  */
-export default function NavMenuPopout($props: NavMenuPopoutProps) {
-	$props ??= $watch({});
-	$props.visible ??= false;
-
+export default function NavMenuPopout($props: NavMenuPopoutProps | undefined) {
 	let $state = $watch({
-		visible: $props.visible
+		visible: false
 	});
 
 	// Sync props and state
 	$run(() => {
-		$state.visible = $props.visible ?? false;
+		$state.visible = $props?.visible ?? false;
 	});
 	$run(() => {
-		$props.visible = $state.visible;
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
 	});
 
 	let result: any;
@@ -48,10 +53,10 @@ export default function NavMenuPopout($props: NavMenuPopoutProps) {
 	// Dispatch the toggle event when the popout is opened or closed
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
-		const visible = $props.visible;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
+		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
 		} else {
@@ -70,8 +75,8 @@ export default function NavMenuPopout($props: NavMenuPopoutProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-nav-menu-popout ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-nav-menu-popout ${$props?.class ?? ""}`.trim()}
 			onmouseleave={handleMouseLeave}
 		>
 			<slot />

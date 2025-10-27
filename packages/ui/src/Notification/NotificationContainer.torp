@@ -10,13 +10,11 @@ interface NotificationContainerProps {
  * The container for one or more Notifications, which can be used to position
  * the notifications inside the viewport.
  */
-export default function NotificationContainer($props: NotificationContainerProps) {
-	$props ??= $watch({});
-
+export default function NotificationContainer($props: NotificationContainerProps | undefined) {
 	@render {
 		<div
-			{$props.id}
-			class={`torp-notification-container ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-notification-container ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

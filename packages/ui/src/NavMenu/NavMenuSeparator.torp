@@ -9,13 +9,11 @@ interface NavMenuSeparatorProps {
 /**
  * An element in a menu that separates logical sets of menu items.
  */
-export default function NavMenuSeparator($props: NavMenuSeparatorProps) {
-	$props ??= $watch({});
-
+export default function NavMenuSeparator($props: NavMenuSeparatorProps | undefined) {
 	@render {
 		<div
-			{$props.id}
-			class={`torp-nav-menu-separator ${$props.class ?? ""}`.trim()} role="separator"
+			{$props?.id}
+			class={`torp-nav-menu-separator ${$props?.class ?? ""}`.trim()} role="separator"
 		>
 			<slot />
 		</div>

@@ -9,6 +9,12 @@ interface ModalProps {
 	visible?: boolean,
 	/** A function to be called when the user selects a response */
 	callback?: ((value: any) => void),
+	/** Raised when the modal is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the modal has opened */
+	onopen?: () => void,
+	/** Raised when the modal has closed */
+	onclose?: (result: any) => void,
 }
 
 /**
@@ -26,19 +32,19 @@ interface ModalProps {
  * </Modal>
  * ```
  */
-export default function Modal($props: ModalProps) {
-	$props ??= $watch({});
-
+export default function Modal($props: ModalProps | undefined) {
 	let $state: ModalState = $watch({
 		visible: false,
 	})
 
 	// Sync props and state
 	$run(() => {
-		$state.visible = $props.visible ?? false;
+		$state.visible = $props?.visible ?? false;
 	});
 	$run(() => {
-		$props.visible = $state.visible;
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
 	});
 
 	let result: any;
@@ -54,9 +60,9 @@ export default function Modal($props: ModalProps) {
 	// Dispatch the toggle event when the modal is opened or closed
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
 		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
@@ -91,8 +97,8 @@ export default function Modal($props: ModalProps) {
 		$state.visible = false;
 
 		// Call the callback
-		if ($props.callback) {
-			$props.callback(result);
+		if ($props?.callback) {
+			$props?.callback(result);
 		}
 	}
 
@@ -103,8 +109,8 @@ export default function Modal($props: ModalProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-modal ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-modal ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

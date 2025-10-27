@@ -7,12 +7,12 @@ interface MenuPopoutProps {
 	class?: string,
 	/** Whether the popout is visible */
 	visible?: boolean,
-	/** Called when the popout is opened or closed */
+	/** Raised when the popout is opened or closed */
 	ontoggle?: (open: boolean) => void,
-	/** Called when the popout has opened */
+	/** Raised when the popout has opened */
 	onopen?: () => void,
-	/** Called when the popout has closed */
-	onclose?: () => void,
+	/** Raised when the popout has closed */
+	onclose?: (result: any) => void,
 }
 
 /**
@@ -27,12 +27,9 @@ interface MenuPopoutProps {
  * </MenuPopout>
  * ```
  */
-export default function MenuPopout($props: MenuPopoutProps) {
-	$props ??= $watch({});
-	$props.visible ??= false;
-
+export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	let $state = $watch({
-		visible: $props.visible
+		visible: $props?.visible ?? false
 	});
 
 	let result: any;
@@ -50,9 +47,9 @@ export default function MenuPopout($props: MenuPopoutProps) {
 
 	let firstToggle = true;
 	$run(() => {
-		const ontoggle = $props.ontoggle;
-		const onopen = $props.onopen;
-		const onclose = $props.onclose;
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
 		const visible = $state.visible;
 		if (firstToggle) {
 			firstToggle = false;
@@ -72,8 +69,8 @@ export default function MenuPopout($props: MenuPopoutProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-menu-popout ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-popout ${$props?.class ?? ""}`.trim()}
 			onmouseleave={handleMouseLeave}
 		>
 			<slot />

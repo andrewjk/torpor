@@ -34,7 +34,7 @@ export default function ExampleBasic() {
 	@render {
 		<p>
 			The button below shows or hides a basic menu in a <a href="/ui/popover">Popover</a>. You can also
-			display a menu in a <a href="/ui/contextual">Contextual</a> or a <a href="/ui/prompt">Prompt</a>.
+			display a menu in a <a href="/ui/contextual">Contextual</a> or a <a href="/ui/modal">Modal</a>.
 		</p>
 
 		<p

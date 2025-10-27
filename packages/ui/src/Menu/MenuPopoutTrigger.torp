@@ -19,10 +19,8 @@ interface MenuPopoutTriggerProps {
 /**
  * A button that is placed in a Menu or MenuGroup and signals a response by a user.
  */
-export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps) {
-	$props ??= $watch({});
-	$props.hoverDelay ??= 500;
-	$props.disabled ??= false;
+export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undefined) {
+	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
 	let interval: NodeJS.Timeout | undefined;
@@ -72,16 +70,16 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps) {
 	}
 
 	function handleMouseEnter() {
-		if ($props.disabled) return;
+		if ($props?.disabled) return;
 
 		// Handle the hover after a delay
 		if (!interval) {
-			interval = setTimeout(() => setVisible(true), $props.hoverDelay);
+			interval = setTimeout(() => setVisible(true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
 	function handleMouseLeave() {
-		if ($props.disabled) return;
+		if ($props?.disabled) return;
 
 		// Prevent short hovers or touches from firing the event
 		if (interval) {
@@ -91,26 +89,26 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps) {
 	}
 
 	function handleMouseMove() {
-		if ($props.disabled) return;
+		if ($props?.disabled) return;
 
 		// Reset the interval on mouse move
 		if (interval) {
 			clearTimeout(interval);
-			interval = setTimeout(() => setVisible(true), $props.hoverDelay);
+			interval = setTimeout(() => setVisible(true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
 	@render {
 		<button
-			{$props.id}
-			class={`torp-menu-popout-trigger ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-popout-trigger ${$props?.class ?? ""}`.trim()}
 			type="button"
-			{$props.disabled}
+			{$props?.disabled}
 			role="menuitem"
 			aria-haspopup="true"
 			aria-expanded={($state.visible ?? false).toString()}
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

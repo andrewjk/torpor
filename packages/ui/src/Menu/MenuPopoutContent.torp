@@ -16,11 +16,7 @@ interface MenuPopoutContentProps {
 /**
  * The content that is displayed for a MenuPopout when it is open.
  */
-export default function MenuPopoutContent($props: MenuPopoutContentProps) {
-	$props ??= $watch({});
-	$props.side ??= "right";
-	$props.alignment ??= "start";
-
+export default function MenuPopoutContent($props: MenuPopoutContentProps | undefined) {
 	let div: HTMLDivElement;
 	let shown = false;
 
@@ -65,14 +61,16 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps) {
 			throw new Error("MenuPopoutContent must have an anchor element");
 		}
 
-		setPopoverPosition(popoutContext.anchorElement, div, $props.side, $props.alignment);
+		let side = $props?.side ?? "right";
+		let alignment = $props?.alignment ?? "start";
+		setPopoverPosition(popoutContext.anchorElement, div, side, alignment);
 	}
 
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-menu-popout-content ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-menu-popout-content ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

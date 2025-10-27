@@ -14,6 +14,8 @@ interface MenuCheckProps {
 	checked?: boolean,
 	/** Whether this item is disabled */
 	disabled?: boolean,
+	/** Raised when the checkbox is clicked */
+	onclick?: (e: MouseEvent) => void,
 }
 
 /**
@@ -21,15 +23,15 @@ interface MenuCheckProps {
  * option on or off.
  *
  */
-export default function MenuCheck($props: MenuCheckProps) {
-	$props ??= $watch({});
-
+export default function MenuCheck($props: MenuCheckProps | undefined) {
 	let $state = $watch({
-		checked: $props.checked
+		checked: $props?.checked ?? false
 	});
 
 	$run(() => {
-		$props.checked = $state.checked;
+		if ($props !== undefined) {
+			$props.checked = $state.checked;
+		}
 	});
 
 	let button: HTMLButtonElement;
@@ -54,22 +56,24 @@ export default function MenuCheck($props: MenuCheckProps) {
 		button.focus();
 	}
 
-	function handleClick() {
+	function handleClick(e: MouseEvent) {
 		$state.checked = !$state.checked;
-		if ($props.onclick) $props.onclick();
+		if ($props?.onclick) {
+			$props.onclick(e);
+		}
 	}
 
 	@render {
 		<button
-			{$props.id}
-			class={`torp-menu-check ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-check ${$props?.class ?? ""}`.trim()}
 			type="button"
-			{$props.disabled}
+			{$props?.disabled}
 			role="menuitemcheckbox"
-			aria-checked={$props.checked ? "true" : "false"}
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-state={$props.checked ? "checked" : "unchecked"}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-checked={$props?.checked ? "true" : "false"}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-state={$props?.checked ? "checked" : "unchecked"}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleItemKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

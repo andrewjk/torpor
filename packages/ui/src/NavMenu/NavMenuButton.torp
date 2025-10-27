@@ -13,9 +13,7 @@ interface NavMenuButtonProps {
  * A button that is placed in a NavMenu to carry out a non-navigation action such as logging out.
  *
  */
-export default function NavMenuButton($props: NavMenuButtonProps) {
-	$props ??= $watch({});
-
+export default function NavMenuButton($props: NavMenuButtonProps | undefined) {
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the NavMenuContext
@@ -34,13 +32,13 @@ export default function NavMenuButton($props: NavMenuButtonProps) {
 
 	@render {
 		<button
-			{$props.id}
-			class={`torp-nav-menu-button ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-nav-menu-button ${$props?.class ?? ""}`.trim()}
 			type="button"
-			{$props.disabled}
+			{$props?.disabled}
 			role="menuitem"
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

@@ -29,16 +29,14 @@ interface AccordionItemProps {
  * </AccordionItem>
  * ```
  */
-export default function AccordionItem($props: AccordionItemProps) {
-	$props ??= $watch({});
-
+export default function AccordionItem($props: AccordionItemProps | undefined) {
 	let $state: ItemState = $watch({
 		index: -1,
 		value: "",
 		expanded: false,
 		headerId: "",
 		contentId: "",
-		disabled: $props.disabled ?? false,
+		disabled: $props?.disabled ?? false,
 		parentDisabled: false,
 		setFocused
 	})
@@ -70,7 +68,7 @@ export default function AccordionItem($props: AccordionItemProps) {
 	// Dispatch the toggle event when the value of expanded changes
 	let firstToggle = true;
 	$run(() => {
-		const ev = $props.ontoggle;
+		const ev = $props?.ontoggle;
 		const expanded = $state.expanded;
 		if (firstToggle) {
 			firstToggle = false;
@@ -88,8 +86,8 @@ export default function AccordionItem($props: AccordionItemProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-accordion-item ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-accordion-item ${$props?.class ?? ""}`.trim()}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>

@@ -11,9 +11,8 @@ interface DisclosureTriggerProps {
 /**
  * A header button for a Disclosure, which can be used to reveal or hide an associated DisclosureContent.
  */
-export default function DisclosureTrigger($props: DisclosureTriggerProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
+export default function DisclosureTrigger($props: DisclosureTriggerProps | undefined) {
+	let defaultId = getId();
 
 	// Get stuff out of the DisclosureContext
 	const context = $context[DisclosureContextName] as DisclosureContext;
@@ -23,13 +22,13 @@ export default function DisclosureTrigger($props: DisclosureTriggerProps) {
 	let $state = context.state;
 
 	// Set the header ID so that it can be used with aria-labelledby in DisclosureContent
-	$state.headerId = $props.id;
+	$state.headerId = $props?.id ?? defaultId;
 
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-disclosure-trigger ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-disclosure-trigger ${$props?.class ?? ""}`.trim()}
 			disabled={$state.disabled}
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled}

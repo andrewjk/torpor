@@ -21,11 +21,7 @@ interface MenuBarItemContentProps {
 /**
  * The content that is displayed for a MenuBarItem when it is open.
  */
-export default function MenuBarItemContent($props: MenuBarItemContentProps) {
-	$props ??= $watch({});
-	$props.side ??= "bottom";
-	$props.alignment ??= "start";
-
+export default function MenuBarItemContent($props: MenuBarItemContentProps | undefined) {
 	let div: HTMLDivElement;
 	let closeOnClick = false;
 	let shown = false;
@@ -89,7 +85,7 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps) {
 
 	function handleDocumentClick(e: MouseEvent) {
 		if (closeOnClick && !div.contains(e.target as HTMLElement)) {
-			context.active = false;
+			//context.active = false;
 			setVisible(false);
 		}
 	}
@@ -99,14 +95,16 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps) {
 			throw new Error("MenuBarItemContent must have an anchor element");
 		}
 
-		setPopoverPosition(itemContext.anchorElement, div, $props.side, $props.alignment);
+		let side = $props?.side ?? "bottom";
+		let alignment = $props?.alignment ?? "start";
+		setPopoverPosition(itemContext.anchorElement, div, side, alignment);
 	}
 
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-menu-bar-item-content ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-menu-bar-item-content ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

@@ -13,9 +13,8 @@ interface DisclosureContentProps {
 /**
  * Content for a Disclosure, which can be revealed or hidden by an associated DisclosureTrigger.
  */
-export default function DisclosureContent($props: DisclosureContentProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
+export default function DisclosureContent($props: DisclosureContentProps | undefined) {
+	let defaultId = getId();
 
 	const context = $context[DisclosureContextName] as DisclosureContext;
 	if (!context) {
@@ -24,13 +23,13 @@ export default function DisclosureContent($props: DisclosureContentProps) {
 	let $state = context.state
 
 	// Set the content ID so that it can be used with aria-controls in DisclosureTrigger
-	$state.contentId = $props.id;
+	$state.contentId = $props?.id ?? defaultId;
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-disclosure-content ${$props.class ?? ""}`.trim()}
-			role={$props.ariaRegion ? "region" : undefined}
+			id={$props?.id ?? defaultId}
+			class={`torp-disclosure-content ${$props?.class ?? ""}`.trim()}
+			role={$props?.ariaRegion ? "region" : undefined}
 			aria-labelledby={$state.headerId}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}

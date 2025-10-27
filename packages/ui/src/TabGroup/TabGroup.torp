@@ -10,7 +10,7 @@ interface TabGroupProps {
 	/** How tabs are activated; if automatic they are shown on focus, if manual they must be clicked */
 	activation?: "automatic" | "manual",
 	/** The value of the active TabContent */
-	value?: string | string[],
+	value?: string,
 	/** If set to true, the user cannot interact with any items in the TabGroup */
 	disabled?: boolean,
 	/** Raised when the active item has changed */
@@ -36,11 +36,23 @@ interface TabGroupProps {
  * </TabGroup>
  * ```
  */
-export default function TabGroup($props: TabGroupProps) {
-	$props ??= $watch({});
-	$props.orientation ||= "horizontal";
-	$props.activation ||= "automatic";
-	$props.value ||= "";
+export default function TabGroup($props: TabGroupProps | undefined) {
+	let orientation = $props?.orientation ?? "horizontal";
+	let activation = $props?.activation ?? "automatic";
+
+	let $state = $watch({
+		value: ""
+	});
+
+	// Sync props and state
+	$run(() => {
+		$state.value = $props?.value ?? "";
+	});
+	$run(() => {
+		if ($props !== undefined) {
+			$props.value = $state.value;
+		}
+	});
 
 	let itemStates: ItemState[] = [];
 
@@ -55,34 +67,28 @@ export default function TabGroup($props: TabGroupProps) {
 		removeItem,
 		triggerItem,
 		handleHeaderKey,
-		orientation: $props.orientation,
-		activation: $props.activation,
+		orientation,
+		activation,
 	};
 	$context[TabGroupContextName] = context;
 
 	$run(() => {
-		// HACK: This should probably be done with setters?
-		let newValue = $props.value;
-
 		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
-		newValue = newValue?.toString();
+		$state.value = $state.value.toString();
 		for (let item of itemStates) {
-			item.active = item.value === newValue;
+			item.active = item.value === $state.value;
 		}
-
-		// Set the value
-		$props.value = newValue;
 	});
 
 	$run(() => {
-		itemStates.forEach((s) => s.parentDisabled = $props.disabled === true);
+		itemStates.forEach((s) => s.parentDisabled = $props?.disabled === true);
 	});
 
 	// Dispatch the change event when the value changes
 	let firstChange = true;
 	$run(() => {
-		const ev = $props.onchange;
-		const value = $props.value;
+		const ev = $props?.onchange;
+		const value = $props?.value;
 		if (firstChange) {
 			firstChange = false;
 		} else if (ev) {
@@ -92,8 +98,8 @@ export default function TabGroup($props: TabGroupProps) {
 
 	// On mount, if no value was set, show the first tab content
 	$mount(() => {
-		if ($props.value === "" && itemStates.length) {
-			$props.value = itemStates[0].value;
+		if ($state.value === "" && itemStates.length) {
+			$state.value = itemStates[0].value;
 		}
 	});
 
@@ -113,7 +119,7 @@ export default function TabGroup($props: TabGroupProps) {
 
 	function registerItem(index: number | undefined, value: string | undefined): ItemState {
 		// If an index wasn't set for the item, set it automatically
-		if (!index) {
+		if (index === undefined) {
 			index = nextItemIndex++;
 		}
 
@@ -130,7 +136,7 @@ export default function TabGroup($props: TabGroupProps) {
 		}
 
 		// If a value wasn't set for the item, set it to the index
-		if (!value) {
+		if (value === undefined) {
 			value = index.toString();
 		}
 
@@ -139,8 +145,8 @@ export default function TabGroup($props: TabGroupProps) {
 			index,
 			value,
 			// TODO: this would be better than using $mount, but it doesn't work with nested tabs
-			// active: value === $props.value || ($props.value === "" && index === 0),
-			active: value === $props.value,
+			// active: value === $props?.value || ($props?.value === "" && index === 0),
+			active: value === $state.value,
 			headerId: "",
 			contentId: "",
 			disabled: false,
@@ -149,8 +155,8 @@ export default function TabGroup($props: TabGroupProps) {
 				return this.active ? "active" : "inactive";
 			},
 			setFocused: () => {},
-			orientation: $props.orientation,
-			activation: $props.activation
+			orientation,
+			activation
 		});
 		itemStates.splice(index, 0, newItemState);
 
@@ -171,7 +177,7 @@ export default function TabGroup($props: TabGroupProps) {
 		for (let item of itemStates) {
 			// The item is active if it has the supplied value
 			if (item.value === toggleValue) {
-				$props.value = item.value;
+				$state.value = item.value;
 				break;
 			}
 		}
@@ -181,7 +187,7 @@ export default function TabGroup($props: TabGroupProps) {
 		switch (e.key) {
 			case "Left":
 			case "ArrowLeft": {
-				if ($props.orientation === "horizontal" && headerIndex > 0) {
+				if (orientation === "horizontal" && headerIndex > 0) {
 					e.preventDefault();
 					itemStates[headerIndex - 1].setFocused();
 				}
@@ -189,7 +195,7 @@ export default function TabGroup($props: TabGroupProps) {
 			}
 			case "Up":
 			case "ArrowUp": {
-				if ($props.orientation === "vertical" && headerIndex > 0) {
+				if (orientation === "vertical" && headerIndex > 0) {
 					e.preventDefault();
 					itemStates[headerIndex - 1].setFocused();
 				}
@@ -197,7 +203,7 @@ export default function TabGroup($props: TabGroupProps) {
 			}
 			case "Right":
 			case "ArrowRight": {
-				if ($props.orientation === "horizontal" && headerIndex < itemStates.length - 1) {
+				if (orientation === "horizontal" && headerIndex < itemStates.length - 1) {
 					e.preventDefault();
 					itemStates[headerIndex + 1].setFocused();
 				}
@@ -205,7 +211,7 @@ export default function TabGroup($props: TabGroupProps) {
 			}
 			case "Down":
 			case "ArrowDown": {
-				if ($props.orientation === "vertical" && headerIndex < itemStates.length - 1) {
+				if (orientation === "vertical" && headerIndex < itemStates.length - 1) {
 					e.preventDefault();
 					itemStates[headerIndex + 1].setFocused();
 				}
@@ -230,9 +236,9 @@ export default function TabGroup($props: TabGroupProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-tab-group ${$props.class ?? ""}`.trim()}
-			data-orientation={$props.orientation}
+			{$props?.id}
+			class={`torp-tab-group ${$props?.class ?? ""}`.trim()}
+			data-orientation={$props?.orientation}
 		>
 			<slot />
 		</div>

@@ -13,9 +13,9 @@ export interface AccordionContext {
 }
 
 export interface AccordionItemContext {
-	/** Called when an AccordionItem is toggled */
+	/** Raised when an AccordionItem is toggled */
 	toggleItem: (value: string) => void;
-	/** Called when an AccordionHeader receives a keyboard event */
+	/** Raised when an AccordionHeader receives a keyboard event */
 	handleHeaderKey: (index: number, e: KeyboardEvent) => void;
 	/** The reactive state for an AccordionItem */
 	state: ItemState;

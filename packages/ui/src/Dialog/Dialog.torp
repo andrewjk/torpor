@@ -1,5 +1,4 @@
 import getId from "../utils/getId";
-import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { trapFocus, type TrapFocusOptions } from "../mount/trapFocus";
 import { ModalContextName, type ModalContext } from "../Modal/ModalTypes";
 import { PopoverContextName } from "../Popover/PopoverTypes";
@@ -37,10 +36,8 @@ interface DialogProps {
  * ```
  * 
  */
-export default function Dialog($props: DialogProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
-	//$props.alert ??= false;
+export default function Dialog($props: DialogProps | undefined) {
+	let defaultId = getId();
 
 	//let div: HTMLDivElement;
 
@@ -66,7 +63,7 @@ export default function Dialog($props: DialogProps) {
 
 	// Set the IDs for using in the Dialog's ARIA attributes
 	let $state: DialogState = $watch({
-		dialogId: $props.id,
+		dialogId: $props?.id ?? defaultId,
 		headerId: "",
 		bodyId: "",
 		visible
@@ -80,48 +77,11 @@ export default function Dialog($props: DialogProps) {
 	};
 	$context[DialogContextName] = context;
 
-	//let closeOnClick = false;
-//
-	//$mount(() => {
-	//	if ($state.visible) {
-	//		// HACK: Because this Dialog could be shown with a click, we need to
-	//		// wait for another mousedown before we close on click. Otherwise
-	//		// the click immediately bubbles to the document. I guess we could
-	//		// require the user to preventDefault after calling showPrompt etc,
-	//		// but that seems very error-prone?
-	//		closeOnClick = false;
-	//		addDocumentEvent("mousedown", handleDocumentMouseDown);
-	//		addDocumentEvent("click", handleDocumentClick);
-	//	} else {
-	//		removeDocumentEvent("mousedown", handleDocumentMouseDown);
-	//		removeDocumentEvent("click", handleDocumentClick);
-	//		// Focus the anchor element per WAI guidelines
-	//		if (context.anchorElement?.focus) {
-	//			context.anchorElement.focus();
-	//		}
-	//	}
-	//});
-
 	function focusFirstElement() {
 		if (trapFocusOptions.focusableElements.length) {
 			trapFocusOptions.focusableElements[0].focus();
 		}
 	}
-
-	//function handleDocumentMouseDown() {
-	//	closeOnClick = true;
-	//}
-//
-	//function handleDocumentClick(e: MouseEvent) {
-	//	if (
-	//		closeOnClick &&
-	//		div &&
-	//		!div.contains(e.target as HTMLElement) &&
-	//		(!context.anchorElement || !context.anchorElement.contains(e.target as HTMLElement))
-	//	) {
-	//		handleClickOutside(e);
-	//	}
-	//}
 
 	function handleClickOutside(e: MouseEvent) {
 		// Don't allow the user to click outside -- they must press a button or
@@ -129,7 +89,6 @@ export default function Dialog($props: DialogProps) {
 		e.preventDefault();
 		if (!modal) {
 			modalContext.state.visible = false;
-			context.state.visible = false;
 		}
 	}
 
@@ -155,13 +114,13 @@ export default function Dialog($props: DialogProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-dialog ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId}
+			class={`torp-dialog ${$props?.class ?? ""}`.trim()}
 			tabindex="0"
-			role={$props.alert ? "alertdialog" : "dialog"}
+			role={$props?.alert === true ? "alertdialog" : "dialog"}
 			aria-modal={modal}
-			aria-label={$props.ariaLabel}
-			aria-labelledby={!$props.ariaLabel && $state.headerId ? $state.headerId : undefined}
+			aria-label={$props?.ariaLabel}
+			aria-labelledby={!$props?.ariaLabel && $state.headerId ? $state.headerId : undefined}
 			aria-describedby={$state.bodyId ? $state.bodyId : undefined}
 			onkeydown={handleKey}
 			onmount={(el) => trapFocus(el, trapFocusOptions)}

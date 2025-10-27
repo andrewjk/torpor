@@ -29,9 +29,8 @@ interface MenuBarProps {
  * </MenuBar>
  * ```
  */
-export default function MenuBar($props: MenuBarProps) {
-	$props ??= $watch({});
-	$props.orientation ??= "horizontal";
+export default function MenuBar($props: MenuBarProps | undefined) {
+	let orientation = $props?.orientation ?? "horizontal";
 
 	let $state = $watch({
 		active: false,
@@ -52,7 +51,7 @@ export default function MenuBar($props: MenuBarProps) {
 	$context[MenuBarContextName] = context;
 
 	function registerItem(setVisible: (value: boolean) => void, setFocused: () => void) {
-		// Add the item"s state to the array and return its index
+		// Add the item's state to the array and return its index
 		const newItemState: ItemState = {
 			setVisible,
 			setFocused
@@ -146,12 +145,12 @@ export default function MenuBar($props: MenuBarProps) {
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-menu-bar ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-bar ${$props?.class ?? ""}`.trim()}
 			tabindex="-1"
 			role="menubar"
-			aria-label={$props.ariaLabel}
-			aria-orientation={$props.orientation}
+			aria-label={$props?.ariaLabel}
+			aria-orientation={orientation}
 		>
 			<slot />
 		</div>

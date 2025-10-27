@@ -12,12 +12,7 @@ interface ModalContentProps {
  * The content that is displayed for a Modal when it is open, displayed
  * alongside an element.
  */
-export default function ModalContent($props?: ModalContentProps) {
-	$props ??= $watch({});
-
-	// HACK:
-	if (!$props) return;
-
+export default function ModalContent($props: ModalContentProps | undefined) {
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -70,8 +65,8 @@ export default function ModalContent($props?: ModalContentProps) {
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props.id}
-				class={`torp-modal-content ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-modal-content ${$props?.class ?? ""}`.trim()}
 				&ref={div}
 				onmount={show}
 			>

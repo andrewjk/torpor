@@ -18,10 +18,7 @@ interface NavMenuLinkProps {
  * A link that is placed in a NavMenu and signals a response by a user.
  *
  */
-export default function NavMenuLink($props: NavMenuLinkProps) {
-	$props ??= $watch({ href: "#" });
-	$props.newWindow ??= false;
-
+export default function NavMenuLink($props: NavMenuLinkProps | undefined) {
 	let link: HTMLAnchorElement;
 
 	// Get stuff out of the NavMenuContext
@@ -40,14 +37,14 @@ export default function NavMenuLink($props: NavMenuLinkProps) {
 
 	@render {
 		<a
-			{$props.id}
-			class={`torp-nav-menu-link ${$props.class ?? ""}`.trim()}
-			href={$props.href}
-			{$props.disabled}
-			target={$props.newWindow ? "_blank" : undefined}
+			{$props?.id}
+			class={`torp-nav-menu-link ${$props?.class ?? ""}`.trim()}
+			{$props?.href}
+			{$props?.disabled}
+			target={$props?.newWindow ? "_blank" : undefined}
 			role="menuitem"
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

@@ -5,10 +5,15 @@ import {
 	NotificationClose
 } from "@torpor/ui/Notification";
 
+interface Hey {
+	id: number,
+	text: string,
+}
+
 export default function ExampleQueue() {
 	let nextId = 0;
 	let $state = $watch({
-		notifications: [],
+		notifications: [] as Hey[],
 		position: "top"
 	});
 

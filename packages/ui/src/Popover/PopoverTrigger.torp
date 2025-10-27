@@ -13,9 +13,8 @@ interface PopoverTriggerProps {
 /**
  * The button that causes a Popover to appear or disappear.
  */
-export default function PopoverTrigger($props: PopoverTriggerProps) {
-	$props ??= $watch({});
-	$props.activation ??= "press";
+export default function PopoverTrigger($props: PopoverTriggerProps | undefined) {
+	let activation = $props?.activation ?? "press";
 
 	// Get stuff out of the PopoverContext
 	const context = $context[PopoverContextName] as PopoverContext;
@@ -25,13 +24,13 @@ export default function PopoverTrigger($props: PopoverTriggerProps) {
 	let $state = context.state;
 
 	function handleClick() {
-		if ($props.activation !== "press") return;
+		if (activation !== "press") return;
 
 		$state.visible = !$state.visible;
 	}
 
-	function handleHover(node: HTMLElement, e: TouchEvent | MouseEvent) {
-		if ($props.activation !== "hover") return;
+	function handleHover(node: HTMLElement, e: MouseEvent) {
+		if (activation !== "hover") return;
 
 		if ($state.position) {
 			// Get the position relative to the element, so we can reposition on scroll
@@ -47,8 +46,8 @@ export default function PopoverTrigger($props: PopoverTriggerProps) {
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-popover-trigger ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-popover-trigger ${$props?.class ?? ""}`.trim()}
 			onclick={handleClick}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

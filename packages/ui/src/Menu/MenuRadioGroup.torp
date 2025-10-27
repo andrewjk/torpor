@@ -13,18 +13,26 @@ interface MenuRadioGroupProps {
 	ariaLabel?: string,
 	/** The value of the checked MenuRadio */
 	value?: string | undefined,
-	/** Called when the checked item has changed */
+	/** Raised when the checked item has changed */
 	onchange?: (value: any) => void,
 }
 
 /**
  * A container for a logical group of menu RadioGroup items.
  */
-export default function MenuRadioGroup($props: MenuRadioGroupProps) {
-	$props ??= $watch({});
-
+export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) {
 	// A collection containing the state and some functions for each item
 	let itemStates: RadioGroupItemState[] = [];
+
+	let $state = $watch({
+		value: $props?.value
+	});
+
+	$run(() => {
+		if ($props !== undefined) {
+			$props.value = $state.value;
+		}
+	});
 
 	// Set the context to pass down to items
 	let context: MenuRadioGroupContext = {
@@ -35,11 +43,11 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps) {
 
 	$mount(() => {
 		// Set the initial checked item
-		setValue($props.value);
+		setValue($props?.value);
 	});
 
 	function registerItemInGroup(itemValue: string, setChecked: (value: boolean) => void) {
-		// Add the item"s state to the array
+		// Add the item's state to the array
 		const newItemState: RadioGroupItemState = {
 			value: itemValue,
 			checked: false,
@@ -63,11 +71,11 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps) {
 		}
 
 		// Set the value
-		if ($props.value !== newValue) {
-			$props.value = newValue;
+		if ($state.value !== newValue) {
+			$state.value = newValue;
 
-			if ($props.onchange) {
-				$props.onchange($props.value);
+			if ($props?.onchange) {
+				$props?.onchange($props?.value);
 			}
 		}
 	}
@@ -81,15 +89,15 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps) {
 				newValue = item.value;
 			}
 		}
-		$props.value = newValue;
+		$state.value = newValue;
 	}
 
 	@render {
 		<div
-			{$props.id}
-			class={`torp-menu-radio-group ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-radio-group ${$props?.class ?? ""}`.trim()}
 			role="group"
-			aria-label={$props.ariaLabel}
+			aria-label={$props?.ariaLabel}
 		>
 			<slot />
 		</div>

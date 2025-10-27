@@ -6,11 +6,9 @@ import {
 	AccordionContent,
 } from "../../../src/Accordion/index";
 
-export default function AccordionSingle() {
-	$props ??= $watch({});
-
+export default function AccordionSingle($props: any) {
 	@render {
-		<Accordion value={$props.value}>
+		<Accordion value={$props?.value}>
 			<AccordionItem>
 				<AccordionHeader as="h4">
 					<AccordionTrigger>Header 1</AccordionTrigger>

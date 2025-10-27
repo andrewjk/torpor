@@ -11,15 +11,15 @@ interface DialogButtonProps {
 	type?: "confirm" | "cancel",
 	/** Whether this button is disabled */
 	disabled?: boolean,
+	/** Raised when the button is clicked */
+	onclick?: (e: MouseEvent) => void,
 }
 
 /**
  * A button that is placed in a DialogFooter and signals a response by a user.
  * 
  */
-export default function DialogButton($props: DialogButtonProps) {
-	$props ??= $watch({});
-
+export default function DialogButton($props: DialogButtonProps | undefined) {
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the DialogContext
@@ -31,28 +31,28 @@ export default function DialogButton($props: DialogButtonProps) {
 
 	$mount(() => {
 		// Store the confirm or cancel button in the DialogContext
-		if ($props.type === "confirm") {
+		if ($props?.type === "confirm") {
 			context.confirmButton = button;
-		} else if ($props.type === "cancel") {
+		} else if ($props?.type === "cancel") {
 			context.cancelButton = button;
 		}
 	});
 
-	function handleClick(e) {
-		if ($props.onclick) {
-			$props.onclick(e)
+	function handleClick(e: MouseEvent) {
+		if ($props?.onclick) {
+			$props?.onclick(e)
 		}
 		if (handleButton) {
-			handleButton($props.type, $props.value);
+			handleButton($props?.type, $props?.value);
 		}
 	}
 
 	@render {
 		<button
 			type="button"
-			{$props.id}
-			class={`torp-dialog-button ${$props.class ?? ""}`.trim()}
-			disabled={$props.disabled}
+			{$props?.id}
+			class={`torp-dialog-button ${$props?.class ?? ""}`.trim()}
+			disabled={$props?.disabled}
 			onclick={handleClick}
 			&ref={button}
 		>

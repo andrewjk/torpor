@@ -10,7 +10,7 @@ interface LabelProps {
 /**
  * A label to describe the contents of an input in a form.
  */
-export default function Label($props?: LabelProps) {
+export default function Label($props: LabelProps | undefined) {
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;
 	if (!context) {

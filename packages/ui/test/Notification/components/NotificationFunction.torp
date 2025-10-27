@@ -1,8 +1,5 @@
 import {
-	Notification,
 	NotificationContainer,
-	NotificationContent,
-	NotificationClose,
 	showNotification
 } from "../../../src/Notification/index";
 import CustomNotification from "./CustomNotification.torp";

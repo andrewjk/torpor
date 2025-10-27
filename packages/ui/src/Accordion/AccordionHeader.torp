@@ -20,9 +20,7 @@ interface AccordionHeaderProps {
  * </AccordionHeader>
  * ```
  */
-export default function AccordionHeader($props: AccordionHeaderProps) {
-	$props ??= $watch({});
-
+export default function AccordionHeader($props: AccordionHeaderProps | undefined) {
 	const context = $context[AccordionItemContextName] as AccordionItemContext;
 	if (!context) {
 		throw new Error("AccordionHeader must be contained within an AccordionItem");
@@ -32,8 +30,8 @@ export default function AccordionHeader($props: AccordionHeaderProps) {
 	@render {
 		@// TODO: $props.as
 		<h4
-			{$props.id}
-			class={`torp-accordion-header ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-accordion-header ${$props?.class ?? ""}`.trim()}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>

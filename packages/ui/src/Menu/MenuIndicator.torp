@@ -13,9 +13,7 @@ interface MenuIndicatorProps {
  * An indicator for a MenuCheck or MenuRadio component, which is displayed
  * when the value of checked is true.
  */ 
-export default function MenuIndicator($props: MenuIndicatorProps) {
-	$props ??= $watch({});
-
+export default function MenuIndicator($props: MenuIndicatorProps | undefined) {
 	// Get stuff out of the MenuButtonContext
 	const context = $context[MenuButtonContextName] as MenuButtonContext;
 	if (!context) {
@@ -26,10 +24,10 @@ export default function MenuIndicator($props: MenuIndicatorProps) {
 	@render {
 		@if ($state.checked) {
 			<div
-				{$props.id}
-				class={`torp-menu-indicator ${$props.class ?? ""}`.trim()}
-				aria-disabled={$props.disabled ? "true" : undefined}
-				data-disabled={$props.disabled ? "true" : undefined}
+				{$props?.id}
+				class={`torp-menu-indicator ${$props?.class ?? ""}`.trim()}
+				aria-disabled={$props?.disabled ? "true" : undefined}
+				data-disabled={$props?.disabled ? "true" : undefined}
 			>
 				<slot />
 			</div>

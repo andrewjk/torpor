@@ -24,15 +24,15 @@ interface MenuRadioProps {
  * A button that is placed in a Menu or MenuGroup to allow the user to select
  * from a number of options.
  */
-export default function MenuRadio($props: MenuRadioProps) {
-	$props ??= $watch({});
-
+export default function MenuRadio($props: MenuRadioProps | undefined) {
 	let $state = $watch({
-		checked: $props.checked,
+		checked: $props?.checked ?? false,
 	});
 
 	$run(() => {
-		$props.checked = $state.checked;
+		if ($props !== undefined) {
+			$props.checked = $state.checked;
+		}
 	});
 
 	let button: HTMLButtonElement;
@@ -55,7 +55,7 @@ export default function MenuRadio($props: MenuRadioProps) {
 	const { index } = registerItem(setFocused);
 
 	// Register this item with the parent MenuRadioGroup
-	registerItemInGroup($props.value, setChecked);
+	registerItemInGroup($props?.value ?? "", setChecked);
 
 	// Set the context to pass down to items
 	let context: MenuButtonContext = {
@@ -73,21 +73,21 @@ export default function MenuRadio($props: MenuRadioProps) {
 
 	function handleClick() {
 		if (!$state.checked) {
-			toggleItem($props.value);
+			toggleItem($props?.value ?? "");
 		}
 	}
 
 	@render {
 		<button
-			{$props.id}
-			class={`torp-menu-radio ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-menu-radio ${$props?.class ?? ""}`.trim()}
 			type="button"
-			{$props.disabled}
+			{$props?.disabled}
 			role="menuitemradio"
-			aria-checked={$props.checked}
-			aria-disabled={$props.disabled ? "true" : undefined}
-			data-state={$props.checked ? "checked" : "unchecked"}
-			data-disabled={$props.disabled ? "true" : undefined}
+			aria-checked={$props?.checked}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-state={$props?.checked ? "checked" : "unchecked"}
+			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleItemKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

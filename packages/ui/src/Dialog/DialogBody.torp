@@ -14,10 +14,8 @@ interface DialogBodyProps {
  * The body information for a Dialog. Content in the body will be announced by
  * screen readers when the Dialog is opened, unless ariaAnnounce is false.
  */
-export default function DialogBody($props: DialogBodyProps) {
-	$props ??= $watch({});
-	$props.id ??= getId();
-	$props.ariaAnnounce ??= true;
+export default function DialogBody($props: DialogBodyProps | undefined) {
+	let defaultId = getId();
 
 	// Get stuff out of the DialogContext
 	const context = $context[DialogContextName] as DialogContext;
@@ -27,14 +25,14 @@ export default function DialogBody($props: DialogBodyProps) {
 	let $state = context.state;
 
 	// Set the body id for using in the Dialog's ARIA attributes
-	if ($props.ariaAnnounce) {
-		$state.bodyId = $props.id;
+	if ($props?.ariaAnnounce !== false) {
+		$state.bodyId = $props?.id || defaultId;
 	}
 
 	@render {
 		<div
-			{$props.id} 
-			class={`torp-dialog-body ${$props.class ?? ""}`.trim()}
+			id={$props?.id ?? defaultId} 
+			class={`torp-dialog-body ${$props?.class ?? ""}`.trim()}
 		>
 			<slot />
 		</div>

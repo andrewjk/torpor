@@ -10,13 +10,11 @@ interface BreadcrumbSeparatorProps {
  * A separator between links in a Breadcrumb component. It is hidden from
  * screen readers.
  */
-export default function BreadcrumbSeparator($props: BreadcrumbSeparatorProps) {
-	$props ??= $watch({});
-
+export default function BreadcrumbSeparator($props: BreadcrumbSeparatorProps | undefined) {
 	@render {
 		<div
-			{$props.id}
-			class={`torp-breadcrumb-separator ${$props.class ?? ""}`.trim()}
+			{$props?.id}
+			class={`torp-breadcrumb-separator ${$props?.class ?? ""}`.trim()}
 			aria-hidden="true"
 		>
 			<slot />

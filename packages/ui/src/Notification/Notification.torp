@@ -19,10 +19,21 @@ interface NotificationProps {
  *
  * See [the WAI ARIA guidelines for Alerts](https://www.w3.org/WAI/ARIA/apg/patterns/alert/).
  */
-export default function Notification($props: NotificationProps) {
-	$props ??= $watch({});
-	$props.visible ??= true;
-	$props.duration ??= 5000;
+export default function Notification($props: NotificationProps | undefined) {
+	let defaultDuration = 5000;
+
+	let $state = $watch({
+		visible: false
+	});
+
+	$run(() => {
+		$state.visible = $props?.visible ?? true;
+	});
+	$run(() => {
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
+	});
 
 	// Set the context to pass down to items
 	let context: NotificationContext = {
@@ -31,24 +42,22 @@ export default function Notification($props: NotificationProps) {
 	$context[NotificationContextName] = context;
 
 	$mount(() => {
-		if ($props.duration) {
-			setTimeout(closeNotification, $props.duration);
-		}
+		setTimeout(closeNotification, $props?.duration ?? defaultDuration);
 	});
 
 	function closeNotification() {
-		$props.visible = false;
+		$state.visible = false;
 
-		if ($props.onclose) {
-			$props.onclose();
+		if ($props?.onclose) {
+			$props?.onclose();
 		}
 	}
 
 	@render {
-		@if ($props.visible) {
+		@if ($state.visible) {
 			<div 
-				{$props.id}
-				class={`torp-notification ${$props.class ?? ""}`.trim()}
+				{$props?.id}
+				class={`torp-notification ${$props?.class ?? ""}`.trim()}
 				role="alert"
 			>
 				<slot />

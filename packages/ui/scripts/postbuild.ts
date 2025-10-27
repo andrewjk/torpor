@@ -91,9 +91,13 @@ async function run() {
 		await fs.writeFile(join(distFolder, component, "index.d.ts"), dts);
 	}
 
-	// Move all utils/*.ts files into the dest folder
+	// Move all `utils` and `mount` TS files into the dest folder
 	await moveUtils(distFolder, "utils");
 	await moveUtils(distFolder, "mount");
+
+	// HACK: Move index.d.ts into the motion folder. This works because it's the
+	// only d.ts file we create (for now...?)
+	await fs.copyFile(join(distFolder, "index.d.ts"), join(distFolder, "motion", "index.d.ts"));
 }
 
 async function moveUtils(distFolder: string, folderName: string) {

@@ -7,7 +7,7 @@ export interface MenuContext {
 	setVisible: (value: boolean, result?: any) => void;
 
 	/** Called from a MenuButton to close the Menu and return a result */
-	handleTrigger: (type: "confirm" | "cancel" | undefined, value?: any) => void;
+	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
 
 	/** Called from a MenuButton when its button is focused */
 	handleItemFocus: (index: number) => void;
@@ -15,16 +15,18 @@ export interface MenuContext {
 	/** Called from a MenuButton when a key is pressed */
 	handleItemKey: (e: KeyboardEvent) => void;
 
-	state: {
-		/** Whether the Menu is visible. Writable so that it can be subscribed to by children */
-		visible: boolean;
-	};
+	state: MenuState;
 
 	/** The element that caused this Menu to be shown */
 	anchorElement?: HTMLElement;
 
 	/** Called from each MenuButton/Check/Radio to register itself with this Menu */
 	registerItem: (setFocused: () => void) => { index: number };
+}
+
+export interface MenuState {
+	/** Whether the Menu is visible */
+	visible: boolean;
 }
 
 export interface MenuButtonContext {
