@@ -9,6 +9,7 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildComponentNode(
 	node: ElementNode,
@@ -75,13 +76,16 @@ export default function buildComponentNode(
 
 		// Set the props, runs and binding runs that we gathered
 		b.append(
-			`const ${propsName} = $watch({ ${props.map((p) => `${p.name}: ${p.value}`).join(", ")} });`,
+			`const ${propsName} = $watch({ ${replaceForVarNames(
+				props.map((p) => `${p.name}: ${p.value}`).join(", "),
+				status,
+			)} });`,
 		);
 		if (runs.length) {
-			buildRun("setProps", runs.join("\n"), status, b);
+			buildRun("setProps", replaceForVarNames(runs.join("\n"), status), status, b);
 		}
 		if (bindingRuns.length) {
-			buildRun("setBindings", bindingRuns.join("\n"), status, b);
+			buildRun("setBindings", replaceForVarNames(bindingRuns.join("\n"), status), status, b);
 		}
 
 		// PERF: Does this have much of an impact??
