@@ -14,7 +14,7 @@ export default interface BuildStatus {
 		fragment?: Fragment;
 		path: string;
 	}[];
-	forVarNames: string[];
+	forVarNames: string[][];
 	ns: boolean;
 	preserveWhitespace: boolean;
 	inHead: boolean;

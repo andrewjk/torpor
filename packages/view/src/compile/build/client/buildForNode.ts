@@ -16,8 +16,8 @@ const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,
 const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 
 export default function buildForNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const forParentName = node.parentName!;
-	const forAnchorName = node.varName!;
+	const parentName = node.parentName!;
+	const anchorName = node.varName!;
 
 	// HACK:
 	node = node.children[0] as ControlNode;
@@ -50,7 +50,13 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		}
 	}
 
-	const forRegionName = nextVarName("for_region", status);
+	const regionName = nextVarName("for_region", status);
+	const listItemsName = nextVarName("new_items", status);
+	const previousItemName = nextVarName("previous_item", status);
+	const nextItemName = nextVarName("next_item", status);
+	const newItemName = nextVarName("new_item", status);
+	const itemName = nextVarName("item", status);
+	const beforeName = nextVarName("before", status);
 
 	// Get the key node if it's been set
 	const key = node.children.find(
@@ -69,15 +75,15 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append("");
 	b.append(`
 	/* @for */
-	let ${forRegionName} = t_region(${status.options.dev === true ? `"for"` : ""});
+	let ${regionName} = t_region(${status.options.dev === true ? `"for"` : ""});
 	t_run_list(
-	${forRegionName},
-	${forParentName},
-	${forAnchorName},
+	${regionName},
+	${parentName},
+	${anchorName},
 	${status.options.dev === true ? "function createNewItems() {" : "() => {"}
-		let t_new_items: ListItem[] = [];
-		let t_previous_item = ${forRegionName};
-		let t_next_item = ${forRegionName}.nextRegion;`);
+		let ${listItemsName}: ListItem[] = [];
+		let ${previousItemName} = ${regionName};
+		let ${nextItemName} = ${regionName}.nextRegion;`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
@@ -86,20 +92,23 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	if (keyStatement) params.push(keyStatement);
 	if (status.options.dev === true) params.push(`"for item"`);
 	b.append(`
-			let t_new_item = t_list_item(${params.join(", ")});
-			t_new_item.previousRegion = t_previous_item;
-			t_previous_item.nextRegion = t_new_item;
-			t_previous_item = t_new_item;
-			t_new_items.push(t_new_item);
+			let ${newItemName} = t_list_item(${params.join(", ")});
+			${newItemName}.previousRegion = ${previousItemName};
+			${previousItemName}.nextRegion = ${newItemName};
+			${previousItemName} = ${newItemName};
+			${listItemsName}.push(${newItemName});
 		}
-		${forRegionName}.nextRegion = t_next_item;
-		return t_new_items;
+		${regionName}.nextRegion = ${nextItemName};
+		return ${listItemsName};
 	},
-	${status.options.dev === true ? "function createListItem(t_item, t_before) {" : "(t_item, t_before) => {"}`);
+	${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
 
 	let oldForVarNames = status.forVarNames;
-	status.forVarNames = [...status.forVarNames, ...forVarNames];
-	buildForItem(node, status, b, forParentName);
+	status.forVarNames = [
+		...status.forVarNames,
+		...forVarNames.map((v) => [v, `${itemName}.data.${v}`]),
+	];
+	buildForItem(node, status, b, parentName, beforeName, itemName);
 	status.forVarNames = oldForVarNames;
 
 	b.append(`},
@@ -112,13 +121,20 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append("");
 }
 
-function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parentName: string) {
+function buildForItem(
+	node: ControlNode,
+	status: BuildStatus,
+	b: Builder,
+	parentName: string,
+	beforeName: string,
+	itemName: string,
+) {
 	const oldRegionName = nextVarName("old_region", status);
 
 	status.imports.add("t_push_region");
-	b.append(`let ${oldRegionName} = t_push_region(t_item);`);
+	b.append(`let ${oldRegionName} = t_push_region(${itemName});`);
 
-	buildFragment(node, status, b, parentName, "t_before");
+	buildFragment(node, status, b, parentName, beforeName);
 
 	status.fragmentStack.push({
 		fragment: node.fragment!,
@@ -128,11 +144,11 @@ function buildForItem(node: ControlNode, status: BuildStatus, b: Builder, parent
 		if (isControlNode(child) && child.operation === "@key") {
 			continue;
 		}
-		buildNode(child, status, b, parentName, "t_before");
+		buildNode(child, status, b, parentName, beforeName);
 	}
 	status.fragmentStack.pop();
 
-	buildAddFragment(node, status, b, parentName, "t_before");
+	buildAddFragment(node, status, b, parentName, beforeName);
 
 	// If we wanted to return the fragment instead:
 	//b.append(`t_item.startNode = t_fragment_1.firstChild;`);

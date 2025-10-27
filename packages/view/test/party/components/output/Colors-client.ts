@@ -44,29 +44,29 @@ export default function Colors(
 		t_for_parent_1,
 		t_for_anchor_1,
 		() => {
-			let t_new_items: ListItem[] = [];
-			let t_previous_item = t_for_region_1;
-			let t_next_item = t_for_region_1.nextRegion;
+			let t_new_items_1: ListItem[] = [];
+			let t_previous_item_1 = t_for_region_1;
+			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let color of colors) {
-				let t_new_item = t_list_item({ color }, color);
-				t_new_item.previousRegion = t_previous_item;
-				t_previous_item.nextRegion = t_new_item;
-				t_previous_item = t_new_item;
-				t_new_items.push(t_new_item);
+				let t_new_item_1 = t_list_item({ color }, color);
+				t_new_item_1.previousRegion = t_previous_item_1;
+				t_previous_item_1.nextRegion = t_new_item_1;
+				t_previous_item_1 = t_new_item_1;
+				t_new_items_1.push(t_new_item_1);
 			}
-			t_for_region_1.nextRegion = t_next_item;
-			return t_new_items;
+			t_for_region_1.nextRegion = t_next_item_1;
+			return t_new_items_1;
 		},
-		(t_item, t_before) => {
-			let t_old_region_1 = t_push_region(t_item);
+		(t_item_1, t_before_1) => {
+			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>#</li> `);
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_text_2 = t_next(t_next(t_root_1), true);
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item.data.color);
+				t_text_1.textContent = t_fmt(t_item_1.data.color);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_2);
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
 			t_next(t_text_2);
 			t_pop_region(t_old_region_1);
 		},
