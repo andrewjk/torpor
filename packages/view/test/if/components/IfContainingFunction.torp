@@ -1,0 +1,10 @@
+export default function IfContainingIf($props: { condition: boolean, counter: number }) {
+	@render {
+		@if ($props.condition) {
+			<button onclick={doit}>do it</button>
+			@function doit() {
+				// it just needs to exist...
+			}
+		}
+	}
+}

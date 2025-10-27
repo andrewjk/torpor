@@ -1,0 +1,16 @@
+export default function ForAfterFor() {
+	@render {
+		<section>
+			@for (let i = 0; i < 5; i++) {
+				<p>
+					{i}
+				</p>
+			}
+			@for (let i = 10; i > 5; i--) {
+				<p>
+					{i}
+				</p>
+			}
+		</section>
+	}
+}

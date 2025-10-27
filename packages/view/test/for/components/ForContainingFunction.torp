@@ -1,0 +1,12 @@
+export default function ForContainingIf() {
+	@render {
+		<section>
+			@for (let i = 0; i < 5; i++) {
+				<button onclick={doit}>do it {i}</button>
+				@function doit() {
+					// it just needs to exist...
+				}
+			}
+		</section>
+	}
+}
