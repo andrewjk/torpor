@@ -46,7 +46,7 @@ export default function ForContainingFor(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let i = 0; i < 5; i++) {
-				let t_new_item_1 = t_list_item({ i });
+				let t_new_item_1 = t_list_item({ i }, undefined);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;
@@ -72,7 +72,7 @@ export default function ForContainingFor(
 					let t_previous_item_2 = t_for_region_2;
 					let t_next_item_2 = t_for_region_2.nextRegion;
 					for (let j = 0; j < 2; j++) {
-						let t_new_item_2 = t_list_item({ j });
+						let t_new_item_2 = t_list_item({ j }, undefined);
 						t_new_item_2.previousRegion = t_previous_item_2;
 						t_previous_item_2.nextRegion = t_new_item_2;
 						t_previous_item_2 = t_new_item_2;

@@ -62,7 +62,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	b.append(`
 		t_run_control(${regionName}, ${anchorName}, (t_before) => {
 			const index = ${stateName}.index;`);
-	addPushDevBoundary("branch", "`branch ${index}`", status, b);
+	//addPushDevBoundary("branch", "`branch ${index}`", status, b);
 	b.append(
 		`t_run_branch(${regionName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});`,
 	);

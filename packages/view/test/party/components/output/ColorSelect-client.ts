@@ -61,7 +61,7 @@ export default function ColorSelect(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let color of colors) {
-				let t_new_item_1 = t_list_item({ color });
+				let t_new_item_1 = t_list_item({ color }, undefined);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;

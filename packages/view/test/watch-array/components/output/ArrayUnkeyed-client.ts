@@ -45,7 +45,7 @@ export default function ArrayUnkeyed(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let item of $props.items) {
-				let t_new_item_1 = t_list_item({ item });
+				let t_new_item_1 = t_list_item({ item }, undefined);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;

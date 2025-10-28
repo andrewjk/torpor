@@ -5,12 +5,18 @@ export default function pushDevBoundary(
 	name: string,
 	target?: any,
 ): void {
-	devContext.depth++;
-	devContext.boundaries.push({
+	const newBoundary = {
 		type,
 		id: crypto.randomUUID(),
 		name,
 		depth: devContext.depth,
 		target,
-	});
+	};
+	if (devContext.index === -1) {
+		devContext.boundaries.push(newBoundary);
+	} else {
+		devContext.boundaries.splice(devContext.index, 0, newBoundary);
+		devContext.index++;
+	}
+	devContext.depth++;
 }

@@ -6,6 +6,8 @@ import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
+import addPopDevBoundary from "./addPopDevBoundary";
+import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
@@ -73,23 +75,23 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	status.imports.add("ListItem");
 
 	b.append("");
+	b.append("/* @for */");
+	addPushDevBoundary("control", `@${node.statement}`, status, b);
 	b.append(`
-	/* @for */
-	let ${regionName} = t_region(${status.options.dev === true ? `"for"` : ""});
-	t_run_list(
-	${regionName},
-	${parentName},
-	${anchorName},
-	${status.options.dev === true ? "function createNewItems() {" : "() => {"}
-		let ${listItemsName}: ListItem[] = [];
-		let ${previousItemName} = ${regionName};
-		let ${nextItemName} = ${regionName}.nextRegion;`);
+		let ${regionName} = t_region(${status.options.dev === true ? `"for"` : ""});
+		t_run_list(
+		${regionName},
+		${parentName},
+		${anchorName},
+		${status.options.dev === true ? "function createNewItems() {" : "() => {"}
+			let ${listItemsName}: ListItem[] = [];
+			let ${previousItemName} = ${regionName};
+			let ${nextItemName} = ${regionName}.nextRegion;`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
-	let params = [`{ ${forVarNames.join(",\n")} }`];
-	if (keyStatement) params.push(keyStatement);
+	let params = [`{ ${forVarNames.join(",\n")} }`, keyStatement || "undefined"];
 	if (status.options.dev === true) params.push(`"for item"`);
 	b.append(`
 			let ${newItemName} = t_list_item(${params.join(", ")});
@@ -118,6 +120,9 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	}
 	b.append(`}
 		);`);
+
+	addPopDevBoundary(status, b);
+
 	b.append("");
 }
 

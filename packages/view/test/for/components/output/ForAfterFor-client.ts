@@ -46,7 +46,7 @@ export default function ForAfterFor(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let i = 0; i < 5; i++) {
-				let t_new_item_1 = t_list_item({ i });
+				let t_new_item_1 = t_list_item({ i }, undefined);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;
@@ -87,7 +87,7 @@ export default function ForAfterFor(
 			let t_previous_item_2 = t_for_region_2;
 			let t_next_item_2 = t_for_region_2.nextRegion;
 			for (let i = 10; i > 5; i--) {
-				let t_new_item_2 = t_list_item({ i });
+				let t_new_item_2 = t_list_item({ i }, undefined);
 				t_new_item_2.previousRegion = t_previous_item_2;
 				t_previous_item_2.nextRegion = t_new_item_2;
 				t_previous_item_2 = t_new_item_2;

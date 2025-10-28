@@ -16,10 +16,6 @@ export default function $devWatch<T extends Record<PropertyKey, any>>(
 		id: crypto.randomUUID(),
 		name,
 		depth: devContext.depth,
-		//expanded: false,
-		//details: "",
-		//startNode: null,
-		//endNode: null,
 		target: null,
 	});
 

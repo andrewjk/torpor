@@ -1,3 +1,4 @@
+import { devContext } from "../dev";
 import context from "../render/context";
 import type Effect from "../types/Effect";
 import batchEnd from "./batchEnd";
@@ -32,6 +33,9 @@ export default function runEffect(effect: Effect): void {
 		effect.cleanup = effect.run();
 
 		effect.extent = context.extent;
+
+		// DEV:
+		devContext.effectRun(effect);
 	} catch (err) {
 		effect.didError = true;
 		clearSources(effect);

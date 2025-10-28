@@ -13,35 +13,23 @@ export default function runControl(
 	anchor: Node | null,
 	create: (anchor: Node | null) => void,
 ): void {
-	const oldRegion = pushRegion(region, true);
-
 	let first = true;
 
 	// Run the control statement in an effect
 	$run(function runControl() {
-		if (first) {
-			// Run the function that creates the control statement's branches
-			create(anchor);
+		const oldRegion = pushRegion(region, first);
+		first = false;
 
-			// If we're mounting, the anchor will be the one that is passed in, but if
-			// we're hydrating it will be after the active branch's HTML elements, so we
-			// need to update it after the branches have been hydrated
-			if (context.hydrationNode) {
-				anchor = context.hydrationNode.nextSibling;
-			}
+		// Run the function that creates the control statement's branches
+		create(anchor);
 
-			first = false;
-		} else {
-			// Push and pop the control statement on subsequent runs, so that new branch
-			// regions will be added to its children
-			const oldBranchRegion = pushRegion(region);
-
-			// Run the function that creates the control statement's branches
-			create(anchor);
-
-			popRegion(oldBranchRegion);
-		}
+		popRegion(oldRegion);
 	});
 
-	popRegion(oldRegion);
+	// If we're mounting, the anchor will be the one that is passed in, but if
+	// we're hydrating it will be after the active branch's HTML elements, so we
+	// need to update it after the branches have been hydrated
+	if (context.hydrationNode) {
+		anchor = context.hydrationNode.nextSibling;
+	}
 }

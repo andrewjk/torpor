@@ -18,15 +18,13 @@ export default function runList(
 	create: (item: ListItem, anchor: Node | null) => void,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
 ): void {
-	const oldRegion = pushRegion(region, true);
-
+	let first = true;
 	let listItems: ListItem[] = [];
 
 	// Run the list in an effect
 	$run(function runList() {
-		// Push and pop the control statement on subsequent runs, so that new
-		// item regions will be added to its children
-		const oldBranchRegion = pushRegion(region);
+		const oldRegion = pushRegion(region, first);
+		first = false;
 
 		// Build the array of items with keys and data
 		const newItems = buildItems();
@@ -42,7 +40,7 @@ export default function runList(
 
 		listItems = newItems;
 
-		popRegion(oldBranchRegion);
+		popRegion(oldRegion);
 	});
 
 	// If we're mounting, the anchor will be the one that is passed in, but if
@@ -51,6 +49,4 @@ export default function runList(
 	if (context.hydrationNode !== null) {
 		anchor = context.hydrationNode.nextSibling;
 	}
-
-	popRegion(oldRegion);
 }

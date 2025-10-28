@@ -1,6 +1,9 @@
 export default function Panel($props) {
 	@render {
-		<button onclick={$props.data.reload}>Refresh</button>
+		<p>
+			<button onclick={$props.data.reload}>Refresh</button>
+		</p>
+
 		@if ($props.error) {
 			<p class="error">{$props.error}</p>
 		}

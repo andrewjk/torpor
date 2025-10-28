@@ -28,6 +28,8 @@ import type Region from "../types/Region";
 import $watch from "../watch/$watch";
 import clearRegion from "./clearRegion";
 import moveRegion from "./moveRegion";
+import popRegion from "./popRegion";
+import pushRegion from "./pushRegion";
 
 /**
  * @param region The list's region
@@ -113,7 +115,9 @@ export default function runListItems(
 				// Replace
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				const oldRegion = pushRegion(newStartItem, true);
 				create(newStartItem, oldStartItem.startNode);
+				popRegion(oldRegion);
 				newStartItem.previousRegion = oldStartItem.previousRegion;
 				newStartItem.nextRegion = oldStartItem;
 				oldStartItem.previousRegion = newStartItem;
@@ -124,7 +128,9 @@ export default function runListItems(
 				// Insert
 				//console.log("insert", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				const oldRegion = pushRegion(newStartItem, true);
 				create(newStartItem, oldStartItem.startNode);
+				popRegion(oldRegion);
 				newStartItem = newItems[++newStartIndex];
 			} else if (newIndex === undefined) {
 				// Delete
@@ -153,7 +159,9 @@ export default function runListItems(
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				const oldRegion = pushRegion(newStartItem, true);
 				create(newStartItem, before);
+				popRegion(oldRegion);
 				before = newStartItem.endNode!.nextSibling;
 			}
 		} else {

@@ -1,25 +1,8 @@
 import { $watch, mount } from "@torpor/view";
 import { browser } from "wxt/browser";
+import { type Boundary, type State } from "./Boundary";
 // @ts-ignore
 import Panel from "./Panel.torp";
-
-interface Boundary {
-	type: string;
-	id: string;
-	name: string;
-	depth: number;
-	expanded: boolean;
-	details: string;
-	onexpand: (id: string) => void;
-}
-
-interface State {
-	warning: string;
-	error: string;
-	data: {
-		boundaries: Boundary[];
-	};
-}
 
 let $state: State = $watch({
 	warning: "",
@@ -41,10 +24,21 @@ mount(document.getElementById("app")!, Panel, $state);
 function loadDevContext() {
 	const script = `
 if (globalThis.T_DEV_CONTEXT) {
-	//console.log(JSON.stringify(globalThis.T_DEV_CONTEXT(), null, 2));
-	globalThis.T_DEV_CONTEXT();
+	//console.log(JSON.stringify(globalThis.T_DEV_CONTEXT, null, 2));
+	globalThis.T_DEV_CONTEXT.format();
 }
 `;
+
+	// Keep expanded entries as-is
+	// TODO: Maybe we should reload their details?
+	let expanded = [];
+	let details: Record<string, string> = {};
+	for (let b of $state.data.boundaries) {
+		if (b.expanded) {
+			expanded.push(b.id);
+			details[b.id] = b.details;
+		}
+	}
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
 		if (isException) {
@@ -65,8 +59,8 @@ if (globalThis.T_DEV_CONTEXT) {
 				id: b.id,
 				name: b.name,
 				depth: b.depth,
-				expanded: false,
-				details: "",
+				expanded: expanded.includes(b.id),
+				details: details[b.id] ?? "",
 				onexpand: expandBoundary,
 				onmark: markBoundary,
 				onunmark: unmarkBoundaries,
@@ -89,8 +83,8 @@ function expandBoundary(id: string) {
 	}
 
 	const script = `
-if (globalThis.T_DEV_DETAILS) {
-	globalThis.T_DEV_DETAILS("${id}");
+if (globalThis.T_DEV_CONTEXT) {
+	globalThis.T_DEV_CONTEXT.getDetails("${id}");
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -116,8 +110,8 @@ function markBoundary(id: string) {
 	}
 
 	const script = `
-if (globalThis.T_DEV_MARK) {
-	globalThis.T_DEV_MARK("${id}");
+if (globalThis.T_DEV_CONTEXT) {
+	globalThis.T_DEV_CONTEXT.mark("${id}");
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -130,8 +124,8 @@ if (globalThis.T_DEV_MARK) {
 
 function unmarkBoundaries() {
 	const script = `
-if (globalThis.T_DEV_UNMARK) {
-	globalThis.T_DEV_UNMARK();
+if (globalThis.T_DEV_CONTEXT) {
+	globalThis.T_DEV_CONTEXT.unmark();
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -141,3 +135,40 @@ if (globalThis.T_DEV_UNMARK) {
 		}
 	});
 }
+
+// Setup messaging
+
+// TODO: Re-add this when tab changes etc
+browser.scripting.executeScript({
+	target: {
+		tabId: browser.devtools.inspectedWindow.tabId,
+	},
+	func: () => {
+		window.addEventListener("message", function (event) {
+			// Only accept messages from the same frame
+			if (event.source !== window) {
+				return;
+			}
+
+			var message = event.data;
+
+			// Only accept messages that we know are ours. Note that this is not foolproof
+			// and the page can easily spoof messages if it wants to
+			if (typeof message !== "object" || message === null || message.source !== "t_dev_tools") {
+				return;
+			}
+
+			// @ts-ignore TODO: Does this work in Firefox?
+			chrome.runtime.sendMessage(message.message);
+		});
+	},
+	//files: ["example.js"],
+});
+
+browser.runtime.onMessage.addListener((message: string, _sender, _sendResponse) => {
+	//console.log("MESSAGE", message);
+
+	if (message === "REFRESH") {
+		loadDevContext();
+	}
+});
