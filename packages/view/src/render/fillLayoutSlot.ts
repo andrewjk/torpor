@@ -14,7 +14,7 @@ export default function fillLayoutSlot(
 	$props: Record<string, string>,
 	$context?: Record<PropertyKey, any>,
 ): Region {
-	const region = newRegion(devContext.enabled ? component.name : undefined);
+	const region = newRegion(devContext.enabled ? "Layout slot" : undefined);
 	const oldRegion = pushRegion(region, true);
 
 	component(parent, anchor, $props, $context, {

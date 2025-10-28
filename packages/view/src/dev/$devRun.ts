@@ -13,7 +13,7 @@ export default function $devRun(fn: () => Cleanup | void, name?: string): Effect
 	//	name += "…";
 	//}
 
-	pushDevBoundary("run", name || "anon run");
+	pushDevBoundary("run", name || "anon run", fn);
 
 	const result = $run(fn, name);
 

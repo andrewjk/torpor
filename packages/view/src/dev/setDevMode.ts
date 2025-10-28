@@ -14,16 +14,16 @@ export default function setDevMode(): void {
 		oldDepth = devContext.depth;
 		if (toParent) {
 			devContext.depth++;
-		} else {
+		} else if (parentName) {
 			// Get the parent's depth
-			console.log("SEARCHING FOR NAME", parentName);
-			let match = parentName!.match(/.+?\[(.+?)\]/);
+			//console.log("SEARCHING FOR NAME", parentName);
+			let match = parentName.match(/.+?\[(.+?)\]/);
 			if (match !== null && match.length > 0) {
 				const id = match[1];
-				console.log("SEARCHING FOR ID", id);
+				//console.log("SEARCHING FOR ID", id);
 				const parent = devContext.boundaries.find((b) => b.id === id);
 				if (parent) {
-					console.log("SEARCHING FOR", JSON.stringify(parent, null, 2));
+					//console.log("SEARCHING FOR", JSON.stringify(parent, null, 2));
 					devContext.depth = parent.depth + 1;
 				}
 			}
@@ -37,8 +37,7 @@ export default function setDevMode(): void {
 			id,
 			name,
 			depth: devContext.depth,
-			expanded: false,
-			details: "",
+			target: region,
 		});
 		//pushDevBoundary("region", name);
 		region.name = `${name} [${id}]`;

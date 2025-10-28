@@ -62,24 +62,23 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	status.imports.add("t_run_branch");
 
 	b.append("");
+	b.append("/* @await */");
+	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
 	b.append(`
-		/* @await */
 		const ${regionName} = t_region(${status.options.dev === true ? `"await"` : ""});
 		let ${stateName} = $watch({ index: -1 });
-		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
-
-	b.append(`let ${awaitVarsName} = { t_token: 0 };`);
-
-	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
-	b.append("$run(() => {");
+		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];
+		let ${awaitVarsName} = { t_token: 0 };
+		$run(() => {`);
 
 	let index = 0;
 
 	// Build the waiting branch before anything happens
 	buildAwaitBranch(awaitBranch, status, b, parentName, stateName, creatorsName, index++);
 
-	b.append(`${awaitVarsName}.t_token++;
-			((t_token) => {`);
+	b.append(`
+		${awaitVarsName}.t_token++;
+		((t_token) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	awaitBranch.span.start += "await".length + 2;
@@ -112,8 +111,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		b,
 	);
 
-	b.append(`
-		if (t_token === ${awaitVarsName}.t_token) {`);
+	b.append(`if (t_token === ${awaitVarsName}.t_token) {`);
 	buildAwaitBranch(catchBranch, status, b, parentName, stateName, creatorsName, index++);
 	b.append(`}
 				});

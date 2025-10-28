@@ -40,21 +40,18 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	status.imports.add("t_run_branch");
 
 	b.append("");
+	b.append("/* @switch */");
+	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
 	b.append(`
-		/* @switch */
 		const ${regionName} = t_region(${status.options.dev === true ? `"switch"` : ""});
 		let ${stateName} = $watch({ index: -1 });
-		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
-
-	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
-
-	b.append("$run(() => {");
-
-	let index = 0;
+		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];
+		$run(() => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
+	let index = 0;
 	for (let branch of branches) {
 		buildSwitchBranch(branch, status, b, parentName, stateName, creatorsName, index++);
 	}

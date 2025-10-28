@@ -13,11 +13,14 @@ export default function $devWatch<T extends Record<PropertyKey, any>>(
 	let name = keys.length > 0 ? `{ ${keys.join(", ")} }` : "{}";
 	devContext.boundaries.push({
 		type: "watch",
-		id: "",
+		id: crypto.randomUUID(),
 		name,
 		depth: devContext.depth,
-		expanded: false,
-		details: "",
+		//expanded: false,
+		//details: "",
+		//startNode: null,
+		//endNode: null,
+		target: null,
 	});
 
 	return $watch(object, options);

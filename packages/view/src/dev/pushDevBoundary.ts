@@ -3,6 +3,7 @@ import { devContext } from "../dev";
 export default function pushDevBoundary(
 	type: "component" | "region" | "run" | "watch" | "control" | "branch",
 	name: string,
+	target?: any,
 ): void {
 	devContext.depth++;
 	devContext.boundaries.push({
@@ -10,7 +11,6 @@ export default function pushDevBoundary(
 		id: crypto.randomUUID(),
 		name,
 		depth: devContext.depth,
-		expanded: false,
-		details: "",
+		target,
 	});
 }

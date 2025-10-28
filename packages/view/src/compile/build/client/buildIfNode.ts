@@ -42,15 +42,14 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	status.imports.add("t_run_branch");
 
 	b.append("");
+	b.append("/* @if */");
+	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
 	b.append(`
-		/* @if */
 		const ${regionName} = t_region(${status.options.dev === true ? `"if"` : ""});
 		let ${stateName} = $watch({ index: -1 });
-		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];`);
+		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];
+		$run(() => {`);
 
-	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
-
-	b.append("$run(() => {");
 	let index = 0;
 	for (let branch of branches) {
 		buildIfBranch(branch, status, b, parentName, stateName, creatorsName, index++);

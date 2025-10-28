@@ -1,6 +1,12 @@
 export default function Panel($props) {
 	@render {
 		<button onclick={$props.data.reload}>Refresh</button>
+		@if ($props.error) {
+			<p class="error">{$props.error}</p>
+		}
+		@if ($props.warning) {
+			<p class="warning">{$props.warning}</p>
+		}
 
 		@for (let bound of $props.data.boundaries) {
 			@//  style="padding-left: {bound.depth * 4}px"
@@ -11,11 +17,15 @@ export default function Panel($props) {
 				}
 				</div>
 				<div>
-				<button class="plain" onclick={() => bound.expanded = !bound.expanded}>
+				<button
+					class="plain"
+					onclick={() => bound.onexpand(bound.id)}
+					onmouseenter={() => bound.onmark(bound.id)}
+					onmouseleave={bound.onunmark}
+				>
 					{bound.type.toUpperCase()}: {bound.name}
 				</button>
 				@if (bound.expanded) {
-					<p>HI!</p>
 					<p>{bound.details}</p>
 				}
 				</div>
@@ -56,6 +66,14 @@ export default function Panel($props) {
 		p {
 			margin: 0;
 			padding: 6px 0;
+		}
+
+		.error {
+			color: red;
+		}
+
+		.warning {
+			color: orange;
 		}
 	}
 }
