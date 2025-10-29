@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 0.2.1
+
+### Patch Changes
+
+- a6672a5: Chore: update dependencies
+
 ## 0.2.0
 
 ### Minor Changes
