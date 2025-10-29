@@ -1,5 +1,27 @@
 # @torpor/build
 
+## 0.4.0
+
+### Minor Changes
+
+- 168dff3: !Edit: rename Range to Region to avoid name conflicts
+
+### Patch Changes
+
+- 051998b: Feat: very rudimentary dev tools
+- Updated dependencies [255aad3]
+- Updated dependencies [8b377a2]
+- Updated dependencies [450b739]
+- Updated dependencies [168dff3]
+- Updated dependencies [fc60fe0]
+- Updated dependencies [42c6b60]
+- Updated dependencies [2818679]
+- Updated dependencies [38fd0a5]
+- Updated dependencies [3e6f3f7]
+- Updated dependencies [051998b]
+  - @torpor/view@0.4.0
+  - @torpor/unplugin@0.2.1
+
 ## 0.3.1
 
 ### Patch Changes

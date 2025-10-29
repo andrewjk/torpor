@@ -1,5 +1,22 @@
 # @torpor/unplugin
 
+## 0.2.1
+
+### Patch Changes
+
+- 051998b: Feat: very rudimentary dev tools
+- Updated dependencies [255aad3]
+- Updated dependencies [8b377a2]
+- Updated dependencies [450b739]
+- Updated dependencies [168dff3]
+- Updated dependencies [fc60fe0]
+- Updated dependencies [42c6b60]
+- Updated dependencies [2818679]
+- Updated dependencies [38fd0a5]
+- Updated dependencies [3e6f3f7]
+- Updated dependencies [051998b]
+  - @torpor/view@0.4.0
+
 ## 0.2.0
 
 ### Minor Changes

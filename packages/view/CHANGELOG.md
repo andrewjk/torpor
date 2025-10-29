@@ -1,5 +1,23 @@
 # @torpor/view
 
+## 0.4.0
+
+### Minor Changes
+
+- 168dff3: !Edit: rename Range to Region to avoid name conflicts
+- 42c6b60: !Fix: transitions
+
+### Patch Changes
+
+- 255aad3: Fix: slightly better source mapping
+- 8b377a2: Fix: nested for statements
+- 450b739: Fix: nested for var names
+- fc60fe0: Fix: only re-push regions on subsequent control runs
+- 2818679: Fix: for var after `!`
+- 38fd0a5: Fix: create a typed $props param
+- 3e6f3f7: Fix: replace for variable names in component props
+- 051998b: Feat: very rudimentary dev tools
+
 ## 0.3.4
 
 ### Patch Changes
