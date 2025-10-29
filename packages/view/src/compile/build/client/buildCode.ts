@@ -74,9 +74,7 @@ export default function buildCode(
 		b.prepend("");
 		for (let imp of Array.from(imports).sort().reverse()) {
 			let importStatement = importsMap[imp] ?? imp;
-			let folder =
-				options?.renderFolder ??
-				(options?.dev === true && imp.startsWith("$") ? "@torpor/view/dev" : "@torpor/view");
+			let folder = options?.renderFolder ?? "@torpor/view";
 			importStatement = importStatement.replace("${folder}", folder);
 			b.prepend(importStatement);
 		}

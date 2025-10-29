@@ -25,7 +25,7 @@ export default function setDevMode(): void {
 		if (boundary) {
 			switch (boundary.type) {
 				case "run": {
-					return String(boundary.target);
+					return String(boundary.target.run);
 				}
 				default: {
 					// TODO:
@@ -181,12 +181,10 @@ export default function setDevMode(): void {
 
 	devContext.onRegionCleared = (region: Region) => {
 		let nextRegion: Region | null = region;
-		console.log("CLEARED", region);
 		while (true) {
 			let match = nextRegion.name!.match(/.+?\[(.+?)\]/);
 			if (match !== null && match.length > 0) {
 				const id = match[1];
-				console.log("CLEARED", id);
 				let i = devContext.boundaries.findIndex((b) => b.id === id);
 				if (i !== -1) {
 					let depth = devContext.boundaries[i].depth;
@@ -198,7 +196,6 @@ export default function setDevMode(): void {
 							break;
 						}
 					}
-					console.log("CLEARED", start, end);
 					devContext.boundaries.splice(start, end - start);
 				}
 			}

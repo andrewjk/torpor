@@ -62,10 +62,7 @@ if (globalThis.T_DEV_CTX) {
 		} else {
 			$state.error = "";
 			$state.warning = "";
-			console.log(
-				"GOT",
-				result.boundaries.map((b: any) => ({ name: b.name, id: b.id })),
-			);
+
 			// Add some fields to the boundaries we received
 			$state.data.boundaries = result.boundaries.map(
 				(b: Boundary) =>
