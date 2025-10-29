@@ -1,5 +1,11 @@
 # @torpor/create-build
 
+## 0.2.2
+
+### Patch Changes
+
+- d521316: Fix: create build
+
 ## 0.2.1
 
 ### Patch Changes
