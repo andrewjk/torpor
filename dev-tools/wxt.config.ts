@@ -8,7 +8,7 @@ export default defineConfig({
 	//	host_permissions: ["<all_urls>"],
 	//},
 	webExt: {
-		startUrls: ["http://localhost:7059/ui/overview"],
+		startUrls: ["http://localhost:7059"],
 	},
 	vite: () => ({
 		plugins: [torpor()],
