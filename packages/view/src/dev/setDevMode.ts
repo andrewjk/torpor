@@ -125,7 +125,6 @@ export default function setDevMode(): void {
 	};
 
 	devContext.onRegionPushed = (region: Region, toParent: boolean) => {
-		console.log("pushed region", toParent, region);
 		oldDepths.push(devContext.depth);
 		if (toParent) {
 			// It's a new region; bump the depth etc
