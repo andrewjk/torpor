@@ -1,37 +1,44 @@
 import type Context from "../types/Context";
 
-const context: Context = {
-	activeTarget: null,
-	previousEffect: null,
-	extent: 0,
-	batch: 0,
-	batchOperation: 0,
-	registerComputed: null,
+// TODO: Possibly create this in mount/hydrate so we aren't always checking
+// whether it exists with `??=`
 
-	firstEffectToRun: null,
-	firstSignalToUpdate: null,
+const CONTEXT_SYMBOL: unique symbol = Symbol.for("t_context");
 
-	// These will definitely be set, in mount or render
+const context: Context =
 	// @ts-ignore
-	activeRegion: null,
-	// @ts-ignore
-	previousRegion: null,
-	// @ts-ignore
-	rootRegion: null,
+	(globalThis[CONTEXT_SYMBOL] ??= {
+		activeTarget: null,
+		previousEffect: null,
+		extent: 0,
+		batch: 0,
+		batchOperation: 0,
+		registerComputed: null,
 
-	mountEffects: [],
-	stashedEvents: [],
-	stashedAnimations: [],
+		firstEffectToRun: null,
+		firstSignalToUpdate: null,
 
-	hydrationNode: null,
-	//hn: null,
-	//get hydrationNode() {
-	//	return this.hn;
-	//},
-	//set hydrationNode(value) {
-	//	console.log(`set hydration ${printNode(value)}`);
-	//	this.hn = value;
-	//},
-};
+		// These will definitely be set, in mount or render
+		// @ts-ignore
+		activeRegion: null,
+		// @ts-ignore
+		previousRegion: null,
+		// @ts-ignore
+		rootRegion: null,
+
+		mountEffects: [],
+		stashedEvents: [],
+		stashedAnimations: [],
+
+		hydrationNode: null,
+		//hn: null,
+		//get hydrationNode() {
+		//	return this.hn;
+		//},
+		//set hydrationNode(value) {
+		//	console.log(`set hydration ${printNode(value)}`);
+		//	this.hn = value;
+		//},
+	});
 
 export default context;

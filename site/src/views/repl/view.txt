@@ -29,7 +29,8 @@ function buildStyles(value) {
 function formatText(value) {
 	return value ?? "";
 }
-const context = {
+const CONTEXT_SYMBOL = Symbol.for("t_context");
+const context = globalThis[CONTEXT_SYMBOL] ??= {
 	activeTarget: null,
 	previousEffect: null,
 	extent: 0,
