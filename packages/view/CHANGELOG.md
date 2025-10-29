@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.1
+
+### Patch Changes
+
+- d5bfa0c: Fix: ensure that context is in scope
+
 ## 0.4.0
 
 ### Minor Changes
