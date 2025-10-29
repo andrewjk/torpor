@@ -46,16 +46,16 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/jsdom": "^27.0.0",
-		"@types/node": "^24.7.2",
-		"@typescript/native-preview": "7.0.0-dev.20251012.1",
+		"@types/node": "^24.9.2",
+		"@typescript/native-preview": "7.0.0-dev.20251027.1",
 		"fast-glob": "^3.3.3",
-		"jsdom": "^27.0.0",
-		"oxlint-tsgolint": "^0.2.0",
+		"jsdom": "^27.0.1",
+		"oxlint-tsgolint": "^0.3.0",
 		"sucrase": "^3.35.0",
-		"tinybench": "^5.0.1",
-		"tsdown": "^0.15.6",
+		"tinybench": "^5.1.0",
+		"tsdown": "^0.15.11",
 		"tsx": "^4.20.6",
 		"typescript": "^5.9.3",
-		"vitest": "^3.2.4"
+		"vitest": "^4.0.4"
 	}
 }

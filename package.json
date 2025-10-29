@@ -27,10 +27,10 @@
 		"@testing-library/user-event": "^14.6.1",
 		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
 		"@types/jsdom": "^27.0.0",
-		"jsdom": "^27.0.0",
+		"jsdom": "^27.0.1",
 		"prettier": "^3.6.2",
 		"typescript": "^5.9.3",
-		"vitest": "^3.2.4"
+		"vitest": "^4.0.4"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",
