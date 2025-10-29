@@ -8,9 +8,6 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 
-/**
- * A component with some text in it.
- */
 export default function Text(
 	$parent: ParentNode,
 	$anchor: Node | null,

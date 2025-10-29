@@ -1,18 +1,21 @@
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import type ProxyData from "../../src/types/ProxyData";
 import $watch from "../../src/watch/$watch";
 import { proxyDataSymbol } from "../../src/watch/symbols";
-import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/effects/components/For";
-
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+const source = `
+export default function For($props: { items: { text: string }[] }) {
+	@render {
+		@for (let item of $props.items) {
+			<p>{item.text}</p>
+		}
+	}
+}
+`;
 
 test("for effect -- mounted", async () => {
 	let $state = $watch({
@@ -24,7 +27,7 @@ test("for effect -- mounted", async () => {
 	});
 
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
 	check(container, $state);
@@ -40,8 +43,8 @@ test("for effect -- hydrated", async () => {
 	});
 
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container, $state);

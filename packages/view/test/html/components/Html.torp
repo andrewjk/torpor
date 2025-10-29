@@ -1,7 +1,0 @@
-export default function Html() {
-	@render {
-		<p>
-			@html($props.html)
-		</p>
-	}
-}

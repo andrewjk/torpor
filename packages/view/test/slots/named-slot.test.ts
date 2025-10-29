@@ -1,20 +1,40 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/slots/components/Named";
+const source = `
+export default function Named() {
+	@render {
+		<Article>
+			<fill name="header">
+				The article's header
+			</fill>
+			<p>
+				The article's body
+			</p>
+		</Article>
+	}
+}
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+function Article() {
+	@render {
+		<section>
+			<h2>
+				<slot name="header" />
+			</h2>
+			<slot />
+			<slot name="footer" />
+		</section>
+	}
+}
+`;
 
 test("named slot -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	check(container);
@@ -22,8 +42,8 @@ test("named slot -- mounted", async () => {
 
 test("named slot -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	check(container);

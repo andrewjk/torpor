@@ -1,21 +1,32 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/party/components/PickPill";
+const source = `
+export default function PickPill() {
+	let $state = $watch({
+		picked: "red"
+	});
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+	@render {
+		<div>Picked: {$state.picked}</div>
+
+		<input id="blue-pill" &group={$state.picked} type="radio" value="blue" />
+		<label for="blue-pill">Blue pill</label>
+
+		<input id="red-pill" &group={$state.picked} type="radio" value="red" />
+		<label for="red-pill">Red pill</label>
+	}
+}
+`;
 
 test("input radio -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	await check(container);
@@ -23,8 +34,8 @@ test("input radio -- mounted", async () => {
 
 test("input radio -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	await check(container);

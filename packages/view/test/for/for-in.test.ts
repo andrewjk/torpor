@@ -1,17 +1,24 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
-import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/for/components/ForIn";
-
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+const source = `
+export default function ForIn() {
+	@render {
+		<section>
+			@for (let key in $props.item) {
+				<p>
+					{$props.item[key]}
+				</p>
+			}
+		</section>
+	}
+}
+`;
 
 test("for in -- mounted", async () => {
 	let $state = $watch({
@@ -23,7 +30,7 @@ test("for in -- mounted", async () => {
 	});
 
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
 	check(container);
@@ -39,8 +46,8 @@ test("for in -- hydrated", async () => {
 	});
 
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container);

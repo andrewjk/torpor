@@ -1,14 +1,17 @@
 import "@testing-library/jest-dom/vitest";
-import { afterAll, beforeAll, describe, expect, test, vi } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { afterAll, describe, expect, test, vi } from "vitest";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/console/components/Console";
-
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+const source = `
+export default function Console() {
+	@render {
+		<div>
+			@console.log("@console is logging here")
+		</div>
+	}
+}
+`;
 
 describe("console", () => {
 	const consoleMock = vi.spyOn(console, "log").mockImplementation(() => undefined);
@@ -19,7 +22,7 @@ describe("console", () => {
 
 	test("console", async () => {
 		const container = document.createElement("div");
-		const component = await importComponent(componentPath, "client");
+		const component = await importComponent(import.meta.filename, source, "client");
 		mountComponent(container, component);
 
 		//expect(consoleMock).toHaveBeenCalledOnce();

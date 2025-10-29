@@ -1,8 +1,5 @@
 import type SlotRender from "../../../../src/types/SlotRender";
 
-/**
- * A component with some text in it.
- */
 declare function Text(
 	$parent: ParentNode,
 	$anchor: Node | null,

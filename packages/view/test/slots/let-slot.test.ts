@@ -1,17 +1,34 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
-import buildOutputFiles from "../buildOutputFiles";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/slots/components/Let";
+const source = `
+export default function Let($props: any) {
+	@render {
+		<List items={$props.items}>
+			<fill>
+				{$sprops.item.text}
+			</fill>
+		</List>
+	}
+}
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+function List() {
+	@render {
+		<ul>
+			@for (let item of $props.items) {
+				<li>
+					<slot item={item} />
+				</li> 
+			}
+		</ul>
+	}
+}
+`;
 
 test("let slot -- mounted", async () => {
 	let $state = $watch({
@@ -19,7 +36,7 @@ test("let slot -- mounted", async () => {
 	});
 
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
 	check(container);
@@ -31,8 +48,8 @@ test("let slot -- hydrated", async () => {
 	});
 
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container);

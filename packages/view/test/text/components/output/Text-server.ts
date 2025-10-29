@@ -1,9 +1,6 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
-/**
- * A component with some text in it.
- */
 export default function Text(
 	$props: {
 		value: string;

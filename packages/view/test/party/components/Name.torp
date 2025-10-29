@@ -1,9 +1,0 @@
-export default function Name() {
-	let $state = $watch({
-		name: "John"
-	});
-
-	@render {
-		<h1>Hello {$state.name}</h1>
-	}
-}

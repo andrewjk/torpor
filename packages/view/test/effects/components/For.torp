@@ -1,7 +1,0 @@
-export default function For($props: { items: { text: string }[] }) {
-	@render {
-		@for (let item of $props.items) {
-			<p>{item.text}</p>
-		}
-	}
-}

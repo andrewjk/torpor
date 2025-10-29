@@ -1,5 +1,0 @@
-export default function OnMount() {
-	@render {
-		<input onmount={(node) => node.value = "hi"} />
-	}
-}

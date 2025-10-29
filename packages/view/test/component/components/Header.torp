@@ -1,5 +1,0 @@
-export default function Header() {
-	@render {
-		<h2>Hi, {$props.name}</h2>
-	}
-}

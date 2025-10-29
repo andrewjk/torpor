@@ -1,9 +1,0 @@
-export default function IfContainingIf($props: { condition: boolean, counter: number }) {
-	@render {
-		@if ($props.condition) {
-			@for (let i = 0; i < $props.counter; i++) {
-				<p>{i}!</p>
-			}
-		}
-	}
-}

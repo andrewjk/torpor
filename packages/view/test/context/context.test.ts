@@ -1,20 +1,42 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/context/components/Parent";
+const source = `
+export default function Parent() {
+	$context["ParentContext"] = "hi from the parent";
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+	@render {
+		<ChildA />
+		<ChildB />
+	}
+}
+
+function ChildA() {
+	$context["ChildAContext"] = "hi!";
+
+	@render {
+		<p>Parent: {$context["ParentContext"]}</p>
+		<p>Child a: {$context["ChildAContext"]}</p>
+		<p>Child b: {$context["ChildBContext"] ?? "???"}</p>
+	}
+}
+
+function ChildB() {
+	$context["ChildBContext"] = "hi!";
+
+	@render {
+		<p>Nothing to see here...</p>
+	}
+}
+`;
 
 test("context -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	check(container);
@@ -22,8 +44,8 @@ test("context -- mounted", async () => {
 
 test("context -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	check(container);

@@ -20,6 +20,10 @@ export async function buildFiles(file: string): Promise<void> {
 	//console.log(`Building files for ${file.substring(path.resolve("./test").length)}`);
 
 	const source = await fs.readFile(file, "utf8");
+	await buildFiles2(file, source);
+}
+
+export async function buildFiles2(file: string, source: string): Promise<void> {
 	const parsed = parse(source);
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
@@ -47,6 +51,10 @@ async function maybeWriteFile(file: string, code: string, suffix: string) {
 		.replace(".torp", `-${suffix}-${hash}.ts`);
 	if (!existsSync(outputFile)) {
 		console.log(`Building files for ${file}`);
+
+		if (!existsSync(path.dirname(file))) {
+			await fs.mkdir(path.dirname(file));
+		}
 
 		let outputFolder = path.dirname(outputFile);
 		if (!existsSync(outputFolder)) {

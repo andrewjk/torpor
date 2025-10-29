@@ -1,20 +1,32 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/for/components/ForAfterFor";
-
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+const source = `
+export default function ForAfterFor() {
+	@render {
+		<section>
+			@for (let i = 0; i < 5; i++) {
+				<p>
+					{i}
+				</p>
+			}
+			@for (let i = 10; i > 5; i--) {
+				<p>
+					{i}
+				</p>
+			}
+		</section>
+	}
+}
+`;
 
 test("for after for -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	check(container);
@@ -22,8 +34,8 @@ test("for after for -- mounted", async () => {
 
 test("for after for -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	check(container);

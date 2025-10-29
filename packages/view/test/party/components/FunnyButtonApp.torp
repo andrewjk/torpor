@@ -1,9 +1,0 @@
-
-import FunnyButton from "./FunnyButton.torp";
-
-export default function FunnyButtonApp() {
-	@render {
-		<FunnyButton />
-		<FunnyButton>Click me!</FunnyButton>
-	}
-}

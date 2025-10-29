@@ -1,22 +1,42 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/party/components/UserProfileApp";
+const source = `
+export default function UserProfileApp() {
+	@render {
+		<UserProfile
+			name="John"
+			age={20}
+			favoriteColors={["green", "blue", "red"]}
+			isAvailable
+		/>
+	}
+}
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+function UserProfile($props: {
+	name: string,
+	age: number,
+	favoriteColors: string[],
+	isAvailable: boolean
+}) {
+	@render {
+		<p>My name is {$props.name}!</p>
+		<p>My age is {$props.age}!</p>
+		<p>My favourite colors are {$props.favoriteColors.join(", ")}!</p>
+		<p>I am {$props.isAvailable ? "available" : "not available"}</p>
+	}
+}
+`;
 
 test("props -- mounted", async () => {
 	document.title = "Document Title";
 
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	check(container);
@@ -24,8 +44,8 @@ test("props -- mounted", async () => {
 
 test("props -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	check(container);

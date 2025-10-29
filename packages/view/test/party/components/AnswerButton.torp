@@ -1,6 +1,0 @@
-export default function AnswerButton($props: any) {
-	@render {
-		<button onclick={$props.onYes}>YES</button>
-		<button onclick={$props.onNo}>NO</button>
-	}
-}

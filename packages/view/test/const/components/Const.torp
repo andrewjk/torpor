@@ -1,8 +1,0 @@
-export default function Const() {
-	@render {
-		@const name = "Boris"
-		<p>
-			Hello, {name}!
-		</p>
-	}
-}

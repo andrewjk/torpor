@@ -1,9 +1,0 @@
-import Header from "./Header.torp"
-
-export default function Basic() {
-	@render {
-		<Header>
-			Basic stuff
-		</Header>
-	}
-}

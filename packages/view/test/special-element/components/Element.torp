@@ -1,7 +1,0 @@
-export default function Element() {
-	@render {
-		<@element self={$props.tag}>
-			Hello!
-		</@element>
-	}
-}

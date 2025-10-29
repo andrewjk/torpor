@@ -1,21 +1,36 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { assert, beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { assert, expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/events/components/Increment";
+const source = `
+export default function Increment() {
+	let $state = $watch({ counter: 0 })
 
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+	function increment(e, num) {
+		$state.counter += num || 1;
+	}
+
+	@render {
+		<button id="increment" onclick={increment}>
+			Increment
+		</button>
+		<button id="increment5" onclick={(e) => increment(e, 5)}>
+			Increment
+		</button>
+		<p>
+			The count is {$state.counter}.
+		</p>
+	}
+}
+`;
 
 test("events -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	await check(container);
@@ -23,8 +38,8 @@ test("events -- mounted", async () => {
 
 test("events -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	await check(container);

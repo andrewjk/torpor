@@ -1,14 +1,14 @@
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { beforeAll, bench } from "vitest";
-import importComponent from "../importComponent";
+import importComponentFromFile from "../importComponentFromFile";
 import mountComponent from "../mountComponent";
 
 const componentPath = "./test/bench/components/Bench";
 
 beforeAll(async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponentFromFile(componentPath, "client");
 	mountComponent(container, component);
 });
 

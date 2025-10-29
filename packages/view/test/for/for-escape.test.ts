@@ -1,21 +1,31 @@
 import { queryByTestId, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, expect, test } from "vitest";
-import buildOutputFiles from "../buildOutputFiles";
+import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-const componentPath = "./test/for/components/ForEscape";
-
-beforeAll(async () => {
-	await buildOutputFiles(componentPath);
-});
+const source = `
+export default function ForEscape() {
+	let things = ["a", "b", "c", "d", "e"]
+	@render {
+		<section>
+			@for (let i = 0; i < 5; i++) {
+				<p>{i}</p>
+				<div data-testid="input1-{i}" name={i} />
+				<div data-testid="input2-{i}" name="{i}" />
+				<div data-testid="input3-{i}" name={things[i]} />
+				<input &value={i} name="{i}" />
+			}
+		</section>
+	}
+}
+`;
 
 test("for escape -- mounted", async () => {
 	const container = document.createElement("div");
-	const component = await importComponent(componentPath, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	await check(container);
@@ -23,8 +33,8 @@ test("for escape -- mounted", async () => {
 
 test("for escape -- hydrated", async () => {
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(componentPath, "client");
-	const serverComponent = await importComponent(componentPath, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	await check(container);
