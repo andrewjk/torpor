@@ -11,7 +11,7 @@ Built on top of [Vite](https://vite.dev).
 Use `npm` (or your preferred package manager) to create a starter project:
 
 ```bash
-npm init @torpor/build my-project
+npm init @torpor/build@latest my-project
 cd my-project
 npm install
 npm run dev
