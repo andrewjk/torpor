@@ -23,6 +23,9 @@ export default function proxySet(
 
 		let data = target[proxyDataSymbol];
 
+		// DEV:
+		devContext.signalSet(data, key);
+
 		// If the value was previously a proxy, watch the new value and update
 		// its effect subscriptions
 		if (oldValue && oldValue[proxyDataSymbol] !== undefined) {
@@ -42,9 +45,6 @@ export default function proxySet(
 		if (data.isArray && !isNaN(+String(key))) {
 			propagateSignal(data, "length");
 		}
-
-		// DEV:
-		devContext.signalSet(data);
 	}
 
 	return true;

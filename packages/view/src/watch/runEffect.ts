@@ -8,6 +8,9 @@ import clearSources from "./clearSources";
 export default function runEffect(effect: Effect): void {
 	//console.log(`running effect '${effect.name}'`);
 
+	// DEV:
+	devContext.effectRun(effect);
+
 	// Store the active target
 	const oldActiveTarget = context.activeTarget;
 	const oldExtent = context.extent;
@@ -44,7 +47,4 @@ export default function runEffect(effect: Effect): void {
 
 		batchEnd();
 	}
-
-	// DEV:
-	devContext.effectRun(effect);
 }

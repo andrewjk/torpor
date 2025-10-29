@@ -21,7 +21,7 @@ export default interface DevContext {
 	onRegionPopped: () => void;
 	onRegionCleared: (region: Region) => void;
 
-	signalSet: (proxy: ProxyData) => void;
+	signalSet: (proxy: ProxyData, key: PropertyKey) => void;
 	effectRun: (effect: Effect) => void;
 
 	//sendMessage: (message: string) => void;

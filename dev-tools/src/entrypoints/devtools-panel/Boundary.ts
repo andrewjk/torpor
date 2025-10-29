@@ -14,7 +14,6 @@ export interface Boundary {
 export interface State {
 	warning: string;
 	error: string;
-	data: {
-		boundaries: Boundary[];
-	};
+	boundaries: Boundary[];
+	events: string[];
 }

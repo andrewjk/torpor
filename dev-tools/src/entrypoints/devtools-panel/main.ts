@@ -9,10 +9,10 @@ let interval: NodeJS.Timeout;
 let $state: State = $watch({
 	warning: "",
 	error: "",
-	data: {
-		boundaries: [],
-		reload: loadDevContext,
-	},
+	boundaries: [],
+	events: [],
+
+	reload: loadDevContext,
 });
 
 // Retrieve the dev context from the displayed page and reload it on tab change
@@ -34,13 +34,13 @@ if (globalThis.T_DEV_CTX) {
 	// Keep expanded entries as-is
 	// TODO: Maybe we should reload their details?
 	let oldBounds = new Map<string, Boundary>();
-	for (let b of $state.data.boundaries) {
+	for (let b of $state.boundaries) {
 		oldBounds.set(b.id, b);
 	}
 	//let expanded = [];
 	//let recent = [];
 	//let details: Record<string, string> = {};
-	//for (let b of $state.data.boundaries) {
+	//for (let b of $state.boundaries) {
 	//	if (b.expanded) {
 	//		expanded.push(b.id);
 	//		details[b.id] = b.details;
@@ -54,17 +54,17 @@ if (globalThis.T_DEV_CTX) {
 		if (isException) {
 			$state.error = JSON.stringify(isException, null, 2);
 			$state.warning = "";
-			$state.data.boundaries.length = 0;
+			$state.boundaries.length = 0;
 		} else if (!result) {
 			$state.error = "";
 			$state.warning = "No dev context found";
-			$state.data.boundaries.length = 0;
+			$state.boundaries.length = 0;
 		} else {
 			$state.error = "";
 			$state.warning = "";
 
 			// Add some fields to the boundaries we received
-			$state.data.boundaries = result.boundaries.map(
+			$state.boundaries = result.boundaries.map(
 				(b: Boundary) =>
 					({
 						type: b.type,
@@ -84,14 +84,14 @@ if (globalThis.T_DEV_CTX) {
 				clearTimeout(interval);
 			}
 			interval = setTimeout(() => {
-				$state.data.boundaries.forEach((b) => (b.recent = false));
+				$state.boundaries.forEach((b) => (b.recent = false));
 			}, 2000);
 		}
 	});
 }
 
 function expandBoundary(id: string) {
-	let boundary = $state.data.boundaries.find((b) => b.id === id);
+	let boundary = $state.boundaries.find((b) => b.id === id);
 	if (!boundary) {
 		$state.error = "Boundary not found: " + id;
 		$state.warning = "";
@@ -124,7 +124,7 @@ if (globalThis.T_DEV_CTX) {
 }
 
 function markBoundary(id: string) {
-	let boundary = $state.data.boundaries.find((b) => b.id === id);
+	let boundary = $state.boundaries.find((b) => b.id === id);
 	if (!boundary) {
 		$state.error = "Boundary not found: " + id;
 		$state.warning = "";
@@ -167,15 +167,15 @@ browser.scripting.executeScript({
 	},
 	func: () => {
 		window.addEventListener("message", function (event) {
-			// Only accept messages from the same frame
+			// Only accept events from the same frame
 			if (event.source !== window) {
 				return;
 			}
 
 			var message = event.data;
 
-			// Only accept messages that we know are ours. Note that this is not foolproof
-			// and the page can easily spoof messages if it wants to
+			// Only accept events that we know are ours. Note that this is not foolproof
+			// and the page can easily spoof events if it wants to
 			if (typeof message !== "object" || message === null || message.source !== "t_dev_tools") {
 				return;
 			}
@@ -192,14 +192,16 @@ browser.runtime.onMessage.addListener((text: string, _sender, _sendResponse) => 
 	if (message.name === "REFRESH") {
 		loadDevContext();
 	} else if (message.name === "Effect run") {
-		const boundary = $state.data.boundaries.find((b) => b.id === message.id);
+		const boundary = $state.boundaries.find((b) => b.id === message.id);
 		if (boundary !== undefined) {
 			boundary.recent = true;
+			$state.events.push(`${message.name}: ${boundary.name}`);
 		}
 	} else if (message.name === "Signal set") {
-		const boundary = $state.data.boundaries.find((b) => b.id === message.id);
+		const boundary = $state.boundaries.find((b) => b.id === message.id);
 		if (boundary !== undefined) {
 			boundary.recent = true;
+			$state.events.push(`${message.name}: ${message.key} in ${boundary.name}`);
 		}
 	}
 });

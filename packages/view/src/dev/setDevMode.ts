@@ -210,10 +210,10 @@ export default function setDevMode(): void {
 
 	// Messages
 
-	devContext.signalSet = (proxy: ProxyData) => {
+	devContext.signalSet = (proxy: ProxyData, key: PropertyKey) => {
 		const boundary = devContext.boundaries.find((b) => b.target === proxy);
 		if (boundary !== undefined) {
-			sendMessage({ name: "Signal set", id: boundary.id });
+			sendMessage({ name: "Signal set", id: boundary.id, key: String(key) });
 		}
 	};
 

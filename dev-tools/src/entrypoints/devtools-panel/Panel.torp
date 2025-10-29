@@ -1,42 +1,93 @@
 export default function Panel($props) {
+	let $state = $watch({
+		mode: "ui"
+	});
+
 	@render {
-		<p>
-			<button onclick={$props.data.reload}>Refresh</button>
-		</p>
+		@// HACK: Should be using @torpor/ui TabGroup
+		<div class="tab-group">
+			<button
+				class={["tab-header", "plain", $state.mode === "ui" ? "active" : ""]}
+				onclick={() => $state.mode = "ui"}
+				aria-controls="tab-content-ui"
+			>
+				UI
+			</button>
+			<button
+				class={["tab-header", "plain", $state.mode === "events" ? "active" : ""]}
+				onclick={() => $state.mode = "events"}
+				aria-controls="tab-content-events"
+			>
+				Events
+			</button>
+		</div>
 
-		@if ($props.error) {
-			<p class="error">{$props.error}</p>
-		}
-		@if ($props.warning) {
-			<p class="warning">{$props.warning}</p>
-		}
+		<div id="tab-content-ui" style={{ display: $state.mode === "ui" ? "block" : "none"}}>
+			<p>
+				<button onclick={$props.reload}>Refresh</button>
+			</p>
 
-		@for (let bound of $props.data.boundaries) {
-			@//  style="padding-left: {bound.depth * 4}px"
-			<section>
-				<div class="indent">
-				@for (let i = 0; i < bound.depth; i++) {
-					<span>•</span>
-				}
-				</div>
-				<div>
-				<button
-					class={["plain", bound.type, bound.recent ? "recent" : null]}
-					onclick={() => bound.onexpand(bound.id)}
-					onmouseenter={() => bound.onmark(bound.id)}
-					onmouseleave={bound.onunmark}
-				>
-					{bound.type.toUpperCase()}: {bound.name}
-				</button>
-				@if (bound.expanded) {
-					<p>{bound.details}</p>
-				}
-				</div>
-			</section>
-		}
+			@if ($props.error) {
+				<p class="error">{$props.error}</p>
+			}
+			@if ($props.warning) {
+				<p class="warning">{$props.warning}</p>
+			}
+
+			@for (let bound of $props.boundaries) {
+				<section>
+					<div class="indent">
+					@for (let i = 0; i < bound.depth; i++) {
+						<span>•</span>
+					}
+					</div>
+					<div>
+					<button
+						class={["plain", bound.type, bound.recent ? "recent" : null]}
+						onclick={() => bound.onexpand(bound.id)}
+						onmouseenter={() => bound.onmark(bound.id)}
+						onmouseleave={bound.onunmark}
+					>
+						{bound.type.toUpperCase()}: {bound.name}
+					</button>
+					@if (bound.expanded) {
+						<p>{bound.details}</p>
+					}
+					</div>
+				</section>
+			}
+		</div>
+
+		<div id="tab-content-events" style={{ display: $state.mode === "events" ? "block" : "none"}}>
+			<p>
+				<button onclick={() => $props.events = []}>Clear</button>
+			</p>
+
+			@for (let message of $props.events) {
+				<p>
+					{message}
+				</p>
+			}
+		</div>
 	}
 
 	@style {
+		.tab-group {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+		}
+
+		.tab-header {
+			background: #efefef !important;
+			border-radius: 4px;
+		}
+
+		.tab-header.active {
+			background: #dedede !important;		
+			font-weight: bold;
+		}
+
 		section {
 			display: flex;
 			gap: 6px;
