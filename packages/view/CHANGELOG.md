@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.2
+
+### Patch Changes
+
+- d1bc0cc: Fix: ensure that dev context is always in scope
+
 ## 0.4.1
 
 ### Patch Changes
