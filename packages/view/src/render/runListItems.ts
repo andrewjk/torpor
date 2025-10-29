@@ -114,8 +114,8 @@ export default function runListItems(
 			if (oldIndex === undefined && newIndex === undefined) {
 				// Replace
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				const oldRegion = pushRegion(newStartItem, true);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				newStartItem.previousRegion = oldStartItem.previousRegion;
@@ -127,8 +127,8 @@ export default function runListItems(
 			} else if (oldIndex === undefined) {
 				// Insert
 				//console.log("insert", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				const oldRegion = pushRegion(newStartItem, true);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				newStartItem = newItems[++newStartIndex];
@@ -158,8 +158,8 @@ export default function runListItems(
 				oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				const oldRegion = pushRegion(newStartItem, true);
+				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, before);
 				popRegion(oldRegion);
 				before = newStartItem.endNode!.nextSibling;
@@ -187,8 +187,12 @@ function transferListItemData(
 ) {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
+
 	// Manually transfer the new data's props to the old ones (to run effects)
 	// and then set the new data to the old one
 	update(oldItem, newItem);
 	newItem.data = oldItem.data;
+
+	// HACK: This is just for dev tools, so we have the right `name [id]`
+	newItem.name = oldItem.name;
 }

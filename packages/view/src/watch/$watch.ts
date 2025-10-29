@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import type ProxyData from "../types/ProxyData";
 import type WatchOptions from "../types/WatchOptions";
 import proxyGet from "./proxyGet";
@@ -39,5 +40,10 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 		set: proxySet,
 	};
 
-	return new Proxy(object, handler) as T;
+	const proxy = new Proxy(object, handler) as T;
+
+	// DEV:
+	devContext.onWatch(data);
+
+	return proxy;
 }

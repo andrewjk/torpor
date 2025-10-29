@@ -1,10 +1,8 @@
 import type Effect from "../types/Effect";
+import type ProxyData from "../types/ProxyData";
 import type Region from "../types/Region";
 import devContext from "./devContext";
 import type DevBoundary from "./types/DevBoundary";
-
-//import popDevBoundary from "./popDevBoundary";
-//import pushDevBoundary from "./pushDevBoundary";
 
 export default function setDevMode(): void {
 	devContext.enabled = true;
@@ -69,13 +67,65 @@ export default function setDevMode(): void {
 			//el.style.border = "2px solid limegreen";
 			el.style.borderRadius = "2px";
 			el.style.boxShadow = "rgba(50, 205, 50, 0.5) 0px 0px 0px 3px";
+			el.style.pointerEvents = "none";
 		}
 	};
 
 	// TODO: make this more robust
 	let oldDepths: number[] = [];
 
+	devContext.onWatch = (proxy: ProxyData) => {
+		let keys = Object.keys(proxy.target);
+		if (keys.length > 5) {
+			keys = [...keys.slice(0, 5), "…"];
+		}
+		let name = keys.length > 0 ? `{ ${keys.join(", ")} }` : "{}";
+		const id = crypto.randomUUID();
+		const newBoundary = {
+			type: "watch",
+			id,
+			name,
+			depth: devContext.depth,
+			target: proxy,
+		} satisfies DevBoundary;
+		if (devContext.index === -1) {
+			devContext.boundaries.push(newBoundary);
+		} else {
+			devContext.boundaries.splice(devContext.index, 0, newBoundary);
+			devContext.index++;
+		}
+	};
+
+	devContext.onRun = (effect: Effect) => {
+		let name = effect.name;
+		if (name === undefined) {
+			const details = String(effect.run);
+			if (details.startsWith("function ")) {
+				name = details.substring(9);
+				name = name.substring(0, name.indexOf("("));
+			}
+		}
+		if (name === undefined) {
+			name = "runAnon";
+		}
+		const id = crypto.randomUUID();
+		const newBoundary = {
+			type: "run",
+			id,
+			name,
+			depth: devContext.depth,
+			target: effect,
+		} satisfies DevBoundary;
+		if (devContext.index === -1) {
+			devContext.boundaries.push(newBoundary);
+		} else {
+			devContext.boundaries.splice(devContext.index, 0, newBoundary);
+			devContext.index++;
+		}
+	};
+
 	devContext.onRegionPushed = (region: Region, toParent: boolean) => {
+		console.log("pushed region", toParent, region);
 		oldDepths.push(devContext.depth);
 		if (toParent) {
 			// It's a new region; bump the depth etc
@@ -99,7 +149,7 @@ export default function setDevMode(): void {
 
 			devContext.depth++;
 
-			sendMessage("REFRESH");
+			sendMessage({ name: "REFRESH" });
 		} else if (region.name) {
 			devContext.index = -1;
 
@@ -131,10 +181,12 @@ export default function setDevMode(): void {
 
 	devContext.onRegionCleared = (region: Region) => {
 		let nextRegion: Region | null = region;
+		console.log("CLEARED", region);
 		while (true) {
 			let match = nextRegion.name!.match(/.+?\[(.+?)\]/);
 			if (match !== null && match.length > 0) {
 				const id = match[1];
+				console.log("CLEARED", id);
 				let i = devContext.boundaries.findIndex((b) => b.id === id);
 				if (i !== -1) {
 					let depth = devContext.boundaries[i].depth;
@@ -146,6 +198,7 @@ export default function setDevMode(): void {
 							break;
 						}
 					}
+					console.log("CLEARED", start, end);
 					devContext.boundaries.splice(start, end - start);
 				}
 			}
@@ -155,20 +208,30 @@ export default function setDevMode(): void {
 			}
 		}
 
-		sendMessage("REFRESH");
+		sendMessage({ name: "REFRESH" });
 	};
 
 	// Messages
 
-	devContext.effectRun = (effect: Effect) => {
-		sendMessage("running effect " + effect.name);
+	devContext.signalSet = (proxy: ProxyData) => {
+		const boundary = devContext.boundaries.find((b) => b.target === proxy);
+		if (boundary !== undefined) {
+			sendMessage({ name: "Signal set", id: boundary.id });
+		}
 	};
 
-	function sendMessage(message: string) {
+	devContext.effectRun = (effect: Effect) => {
+		const boundary = devContext.boundaries.find((b) => b.target === effect);
+		if (boundary !== undefined) {
+			sendMessage({ name: "Effect run", id: boundary.id });
+		}
+	};
+
+	function sendMessage(message: { name: string } & Record<string, string>) {
 		window.postMessage(
 			{
 				source: "t_dev_tools",
-				message,
+				message: JSON.stringify(message),
 			},
 			"*",
 		);

@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
 import { EFFECT_TYPE } from "../types/constants";
@@ -22,6 +23,9 @@ export default function $run(fn: () => Cleanup | void, name?: string): Effect {
 		didError: false,
 		name,
 	};
+
+	// DEV:
+	devContext.onRun(effect);
 
 	runEffect(effect);
 

@@ -21,7 +21,7 @@ export default function Panel($props) {
 				</div>
 				<div>
 				<button
-					class="plain"
+					class={["plain", bound.type, bound.recent ? "recent" : null]}
 					onclick={() => bound.onexpand(bound.id)}
 					onmouseenter={() => bound.onmark(bound.id)}
 					onmouseleave={bound.onunmark}
@@ -64,6 +64,23 @@ export default function Panel($props) {
 			margin: 0;
 			padding: 6px 0;
 			cursor: pointer;
+			transition: color 1s;
+		}
+
+		.recent {
+			transition: none;
+		}
+
+		.watch.recent {
+			color: cornflowerblue;
+		}
+
+		.run.recent {
+			color: fuchsia;
+		}
+
+		.region.recent {
+			color: limegreen;
 		}
 
 		p {

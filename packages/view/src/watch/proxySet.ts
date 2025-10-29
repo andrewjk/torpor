@@ -1,3 +1,4 @@
+import devContext from "../dev/devContext";
 import context from "../render/context";
 import $watch from "./$watch";
 //import transferEffects from "./transferEffects";
@@ -41,6 +42,9 @@ export default function proxySet(
 		if (data.isArray && !isNaN(+String(key))) {
 			propagateSignal(data, "length");
 		}
+
+		// DEV:
+		devContext.signalSet(data);
 	}
 
 	return true;

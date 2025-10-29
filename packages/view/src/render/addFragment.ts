@@ -44,16 +44,20 @@ export default function addFragment(
 
 		// Set the active region for each event so it will get attached to the
 		// right one and set it back afterwards
-		for (let event of context.stashedEvents) {
-			context.activeRegion = event.region;
-			$run(function addFragmentEvent() {
-				event.el.addEventListener(event.type, event.listener);
+		if (context.stashedEvents.length > 0) {
+			const events = [...context.stashedEvents];
+			$run(function addFragmentEvents() {
+				for (let event of events) {
+					event.el.addEventListener(event.type, event.listener);
+				}
 				return () => {
-					event.el.removeEventListener(event.type, event.listener);
+					for (let event of events) {
+						event.el.removeEventListener(event.type, event.listener);
+					}
 				};
 			});
+			context.stashedEvents.length = 0;
 		}
-		context.stashedEvents.length = 0;
 
 		// Set the active region for each animation so it will get attached to
 		// the right one and set it back afterwards

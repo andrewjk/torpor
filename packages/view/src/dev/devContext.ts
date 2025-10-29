@@ -14,15 +14,18 @@ const devContext: DevContext = {
 	mark: noop,
 
 	// Hooks
+	onWatch: noop,
+	onRun: noop,
 	onRegionPushed: noop,
 	onRegionPopped: noop,
 	onRegionCleared: noop,
 
+	signalSet: noop,
 	effectRun: noop,
 };
 
 // Add to globalThis for getting from the extension
 // @ts-ignore
-globalThis.T_DEV_CONTEXT = devContext;
+globalThis.T_DEV_CTX = devContext;
 
 export default devContext;

@@ -1,8 +1,9 @@
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
 import $run from "../watch/$run";
-import popDevBoundary from "./popDevBoundary";
-import pushDevBoundary from "./pushDevBoundary";
+
+//import popDevBoundary from "./popDevBoundary";
+//import pushDevBoundary from "./pushDevBoundary";
 
 export default function $devRun(fn: () => Cleanup | void, name?: string): Effect {
 	//if (name === undefined) {
@@ -12,12 +13,16 @@ export default function $devRun(fn: () => Cleanup | void, name?: string): Effect
 	//	name = name.substring(0, name.indexOf("\n"));
 	//	name += "…";
 	//}
-
-	pushDevBoundary("run", name || "anon run", fn);
+	/*
+	const newBoundary = pushDevBoundary("run", name || "anon run");
 
 	const result = $run(fn, name);
+
+	newBoundary.target = result;
 
 	popDevBoundary();
 
 	return result;
+	*/
+	return $run(fn, name);
 }

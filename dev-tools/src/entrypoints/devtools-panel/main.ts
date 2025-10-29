@@ -4,6 +4,8 @@ import { type Boundary, type State } from "./Boundary";
 // @ts-ignore
 import Panel from "./Panel.torp";
 
+let interval: NodeJS.Timeout;
+
 let $state: State = $watch({
 	warning: "",
 	error: "",
@@ -23,22 +25,30 @@ mount(document.getElementById("app")!, Panel, $state);
 // Retrieves the dev context from the displayed page
 function loadDevContext() {
 	const script = `
-if (globalThis.T_DEV_CONTEXT) {
-	//console.log(JSON.stringify(globalThis.T_DEV_CONTEXT, null, 2));
-	globalThis.T_DEV_CONTEXT.format();
+if (globalThis.T_DEV_CTX) {
+	//console.log(JSON.stringify(globalThis.T_DEV_CTX, null, 2));
+	globalThis.T_DEV_CTX.format();
 }
 `;
 
 	// Keep expanded entries as-is
 	// TODO: Maybe we should reload their details?
-	let expanded = [];
-	let details: Record<string, string> = {};
+	let oldBounds = new Map<string, Boundary>();
 	for (let b of $state.data.boundaries) {
-		if (b.expanded) {
-			expanded.push(b.id);
-			details[b.id] = b.details;
-		}
+		oldBounds.set(b.id, b);
 	}
+	//let expanded = [];
+	//let recent = [];
+	//let details: Record<string, string> = {};
+	//for (let b of $state.data.boundaries) {
+	//	if (b.expanded) {
+	//		expanded.push(b.id);
+	//		details[b.id] = b.details;
+	//	}
+	//	if (b.recent) {
+	//		recent.push(b.id);
+	//	}
+	//}
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
 		if (isException) {
@@ -52,19 +62,33 @@ if (globalThis.T_DEV_CONTEXT) {
 		} else {
 			$state.error = "";
 			$state.warning = "";
-
+			console.log(
+				"GOT",
+				result.boundaries.map((b: any) => ({ name: b.name, id: b.id })),
+			);
 			// Add some fields to the boundaries we received
-			$state.data.boundaries = result.boundaries.map((b: Boundary) => ({
-				type: b.type,
-				id: b.id,
-				name: b.name,
-				depth: b.depth,
-				expanded: expanded.includes(b.id),
-				details: details[b.id] ?? "",
-				onexpand: expandBoundary,
-				onmark: markBoundary,
-				onunmark: unmarkBoundaries,
-			}));
+			$state.data.boundaries = result.boundaries.map(
+				(b: Boundary) =>
+					({
+						type: b.type,
+						id: b.id,
+						name: b.name,
+						depth: b.depth,
+						expanded: oldBounds.get(b.id)?.expanded ?? false,
+						details: oldBounds.get(b.id)?.details ?? "",
+						recent: oldBounds.get(b.id)?.recent ?? true,
+						onexpand: expandBoundary,
+						onmark: markBoundary,
+						onunmark: unmarkBoundaries,
+					}) satisfies Boundary,
+			);
+
+			if (interval) {
+				clearTimeout(interval);
+			}
+			interval = setTimeout(() => {
+				$state.data.boundaries.forEach((b) => (b.recent = false));
+			}, 2000);
 		}
 	});
 }
@@ -79,12 +103,13 @@ function expandBoundary(id: string) {
 
 	if (boundary.expanded) {
 		boundary.expanded = false;
+		boundary.details = "";
 		return;
 	}
 
 	const script = `
-if (globalThis.T_DEV_CONTEXT) {
-	globalThis.T_DEV_CONTEXT.getDetails("${id}");
+if (globalThis.T_DEV_CTX) {
+	globalThis.T_DEV_CTX.getDetails("${id}");
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -110,8 +135,8 @@ function markBoundary(id: string) {
 	}
 
 	const script = `
-if (globalThis.T_DEV_CONTEXT) {
-	globalThis.T_DEV_CONTEXT.mark("${id}");
+if (globalThis.T_DEV_CTX) {
+	globalThis.T_DEV_CTX.mark("${id}");
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -124,8 +149,8 @@ if (globalThis.T_DEV_CONTEXT) {
 
 function unmarkBoundaries() {
 	const script = `
-if (globalThis.T_DEV_CONTEXT) {
-	globalThis.T_DEV_CONTEXT.unmark();
+if (globalThis.T_DEV_CTX) {
+	globalThis.T_DEV_CTX.unmark();
 }`;
 
 	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
@@ -165,10 +190,19 @@ browser.scripting.executeScript({
 	//files: ["example.js"],
 });
 
-browser.runtime.onMessage.addListener((message: string, _sender, _sendResponse) => {
-	//console.log("MESSAGE", message);
-
-	if (message === "REFRESH") {
+browser.runtime.onMessage.addListener((text: string, _sender, _sendResponse) => {
+	const message = JSON.parse(text);
+	if (message.name === "REFRESH") {
 		loadDevContext();
+	} else if (message.name === "Effect run") {
+		const boundary = $state.data.boundaries.find((b) => b.id === message.id);
+		if (boundary !== undefined) {
+			boundary.recent = true;
+		}
+	} else if (message.name === "Signal set") {
+		const boundary = $state.data.boundaries.find((b) => b.id === message.id);
+		if (boundary !== undefined) {
+			boundary.recent = true;
+		}
 	}
 });

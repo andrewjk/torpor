@@ -1,4 +1,4 @@
-import { devContext } from "../dev";
+import devContext from "../dev/devContext";
 import type Region from "../types/Region";
 import context from "./context";
 

@@ -3,6 +3,5 @@ export default interface DevBoundary {
 	id: string;
 	name: string;
 	depth: number;
-	//details: string;
-	target: any;
+	target?: any;
 }
