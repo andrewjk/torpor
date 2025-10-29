@@ -17,27 +17,33 @@ export default async function responseToNodeResponse(
 	const body = (res as any)[INTERNAL_BODY];
 
 	if (body === null || body === undefined) {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end();
 	} else if (typeof body === "string" || body instanceof Uint8Array) {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end(body);
 	} else if (body instanceof Blob) {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end(new Uint8Array(await body.arrayBuffer()));
 	} else if (body instanceof ArrayBuffer) {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end(new Uint8Array(body));
 	} else if (isArrayBufferView(body)) {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end(new Uint8Array(body.buffer));
 	} else if (body instanceof FormData) {
 		// TODO
 		outgoing.setHeader("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end();
 	} else {
+		// @ts-ignore
 		outgoing.writeHead(res.status, res.statusText);
 		outgoing.end();
 	}

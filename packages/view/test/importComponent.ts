@@ -17,7 +17,7 @@ export default async function importComponent(componentPath: string, suffix: str
 	if (!destFile) {
 		throw new Error("Component file not found");
 	}
-	destFile = path.join(destFolder, destFile);
+	destFile = path.join(import.meta.dirname, "..", destFolder, destFile);
 
 	return (await import(destFile)).default;
 }
