@@ -1,31 +1,31 @@
 import type DevContext from "./types/DevContext";
 
+const DEV_CONTEXT_SYMBOL: unique symbol = Symbol.for("t_dev_context");
+
 const noop = () => {};
 
-const devContext: DevContext = {
-	enabled: false,
-	depth: 0,
-	index: -1,
-	boundaries: [],
+const devContext: DevContext =
+	// @ts-ignore
+	(globalThis[DEV_CONTEXT_SYMBOL] ??= {
+		enabled: false,
+		depth: 0,
+		index: -1,
+		boundaries: [],
 
-	format: () => "",
-	getDetails: () => "",
-	unmark: noop,
-	mark: noop,
+		format: () => "",
+		getDetails: () => "",
+		unmark: noop,
+		mark: noop,
 
-	// Hooks
-	onWatch: noop,
-	onRun: noop,
-	onRegionPushed: noop,
-	onRegionPopped: noop,
-	onRegionCleared: noop,
+		// Hooks
+		onWatch: noop,
+		onRun: noop,
+		onRegionPushed: noop,
+		onRegionPopped: noop,
+		onRegionCleared: noop,
 
-	signalSet: noop,
-	effectRun: noop,
-};
-
-// Add to globalThis for getting from the extension
-// @ts-ignore
-globalThis.T_DEV_CTX = devContext;
+		signalSet: noop,
+		effectRun: noop,
+	} satisfies DevContext);
 
 export default devContext;

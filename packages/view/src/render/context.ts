@@ -1,4 +1,5 @@
 import type Context from "../types/Context";
+import type Region from "../types/Region";
 
 // TODO: Possibly create this in mount/hydrate so we aren't always checking
 // whether it exists with `??=`
@@ -19,12 +20,9 @@ const context: Context =
 		firstSignalToUpdate: null,
 
 		// These will definitely be set, in mount or render
-		// @ts-ignore
-		activeRegion: null,
-		// @ts-ignore
-		previousRegion: null,
-		// @ts-ignore
-		rootRegion: null,
+		activeRegion: null as unknown as Region,
+		previousRegion: null as unknown as Region,
+		rootRegion: null as unknown as Region,
 
 		mountEffects: [],
 		stashedEvents: [],
@@ -39,6 +37,6 @@ const context: Context =
 		//	console.log(`set hydration ${printNode(value)}`);
 		//	this.hn = value;
 		//},
-	});
+	} satisfies Context);
 
 export default context;
