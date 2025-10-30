@@ -162,7 +162,7 @@ async function loadView(
 	params: Record<string, string>,
 	template: string,
 	formStatus?: number,
-	form?: Record<string, string>,
+	form?: Record<string, string | number>,
 ) {
 	// There must be a client endpoint with a component
 	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
@@ -330,11 +330,19 @@ async function runAction(
 				// TODO: do not re-run hooks?
 				const newUrl = new URL(url.pathname, url);
 				const formStatus = result?.status;
-				if (result?.headers.get("Content-Type")?.includes("application/json")) {
-					$page.form = await result.json();
+				const formMessage = await result?.text();
+				if (formMessage && result?.headers.get("Content-Type")?.includes("application/json")) {
+					$page.form = JSON.parse(formMessage);
 				} else {
-					$page.form = undefined;
+					$page.form = {};
 				}
+				// Set status and message if they haven't already been set,
+				// which means that you can just return e.g. forbidden() or
+				// forbidden("no!") and there will be something you can work
+				// with in your component, or you can set a completely custom
+				// object with whatever info you need
+				$page.form!.status ??= formStatus ?? 0;
+				$page.form!.message ??= formMessage ?? "";
 				return await loadView(ev, newUrl, handler, params, template, formStatus, $page.form);
 			} else {
 				// If the form was submitted without javascript and there was a

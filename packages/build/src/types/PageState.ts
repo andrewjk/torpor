@@ -1,7 +1,7 @@
 export default interface PageState {
 	status: number;
 	url: URL;
-	form?: Record<string, string>;
+	form?: Record<string, string | number>;
 	error?: {
 		message: string;
 	};
