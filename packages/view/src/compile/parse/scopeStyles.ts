@@ -20,24 +20,25 @@ export default function scopeStyles(status: ParseStatus): void {
 
 function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 	if (isElementNode(node) || isComponentNode(node)) {
-		let scopeStyles = selectors.includes(node.tagName);
-		if (!scopeStyles) {
-			for (let a of node.attributes) {
+		node.scopeStyles =
+			selectors.includes(node.tagName) ||
+			node.attributes.find((a) => {
 				if (a.name === "class" && a.reactive) {
 					// Any reactivity in a class attribute makes it scoped,
 					// because we can't tell what's going on in there
-					scopeStyles = true;
+					return true;
 				} else if (a.name === "id" && a.value) {
-					scopeStyles = selectors.includes(`#${trimQuotes(a.value)}`);
+					if (selectors.includes(`#${trimQuotes(a.value)}`)) {
+						return true;
+					}
 				} else if (a.name === "class" && a.value) {
-					scopeStyles = selectors.includes(`.${trimQuotes(a.value)}`);
+					for (let classname of trimQuotes(a.value).split(/\s+/)) {
+						if (selectors.includes(`.${classname}`)) {
+							return true;
+						}
+					}
 				}
-				if (scopeStyles) {
-					break;
-				}
-			}
-		}
-		node.scopeStyles = scopeStyles;
+			}) !== undefined;
 	}
 
 	if (isParentNode(node)) {
