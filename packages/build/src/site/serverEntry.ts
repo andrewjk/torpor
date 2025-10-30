@@ -330,9 +330,12 @@ async function runAction(
 				// TODO: do not re-run hooks?
 				const newUrl = new URL(url.pathname, url);
 				const formStatus = result?.status;
-				const form = await result?.json();
-				$page.form = form;
-				return await loadView(ev, newUrl, handler, params, template, formStatus, form);
+				if (result?.headers.get("Content-Type")?.includes("application/json")) {
+					$page.form = await result.json();
+				} else {
+					$page.form = undefined;
+				}
+				return await loadView(ev, newUrl, handler, params, template, formStatus, $page.form);
 			} else {
 				// If the form was submitted without javascript and there was a
 				// redirect or server error, just return the result to handle it
