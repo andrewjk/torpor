@@ -1,6 +1,15 @@
 import type ClientState from "../types/ClientState";
-import internal from "./internal";
 
-const client: ClientState = internal().client;
+const CLIENT_SYMBOL: unique symbol = Symbol.for("t_client_state");
+
+const client: ClientState =
+	// @ts-ignore
+	(globalThis[CLIENT_SYMBOL] ??= {
+		// @ts-ignore This will definitely, 100% get set
+		router: null,
+		layoutStack: [],
+		// TODO: Probably expire after 30 seconds or something?
+		prefetchedData: {},
+	});
 
 export default client;
