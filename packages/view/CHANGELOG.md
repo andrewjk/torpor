@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.3
+
+### Patch Changes
+
+- 00a1868: Fix: escape quotes in dev boundary names
+
 ## 0.4.2
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.4.1
+
+### Patch Changes
+
+- 5972cf8: Fix: ensure that $page and client are always in scope
+- Updated dependencies [00a1868]
+  - @torpor/view@0.4.3
+
 ## 0.4.0
 
 ### Minor Changes
