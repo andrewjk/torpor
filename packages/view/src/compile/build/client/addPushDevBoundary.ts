@@ -10,13 +10,16 @@ export default function addPushDevBoundary(
 	if (status.options.dev === true) {
 		status.imports.add("t_push_dev_bound");
 
-		let nameHasQuotes =
+		// Ensure the name is wrapped with quotes, and internal quotes are escaped
+		const nameHasQuotes =
 			(name.startsWith("'") && name.endsWith("'")) ||
 			(name.startsWith('"') && name.endsWith('"')) ||
-			name.startsWith("`") ||
-			name.endsWith("`");
-		if (!nameHasQuotes) {
-			name = `"${name}"`;
+			(name.startsWith("`") && name.endsWith("`"));
+		if (nameHasQuotes) {
+			const quote = name[0];
+			name = quote + name.substring(1, name.length - 1).replaceAll(quote, "\\" + quote) + quote;
+		} else {
+			name = `"${name.replaceAll('"', '\\"')}"`;
 		}
 
 		b.append(`t_push_dev_bound("${type}", ${name});`);
