@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.2
+
+### Patch Changes
+
+- 5dd6a23: Fix: only set $page.form if the result is JSON
+
 ## 0.4.1
 
 ### Patch Changes
