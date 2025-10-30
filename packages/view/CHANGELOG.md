@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.4
+
+### Patch Changes
+
+- 84b5b9e: Fix: for var names before commas
+
 ## 0.4.3
 
 ### Patch Changes
