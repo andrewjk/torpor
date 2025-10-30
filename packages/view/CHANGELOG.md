@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.5
+
+### Patch Changes
+
+- 39a4b1f: Fix: scoping class attributes with multiple values
+
 ## 0.4.4
 
 ### Patch Changes
