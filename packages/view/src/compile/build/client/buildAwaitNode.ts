@@ -13,7 +13,7 @@ import buildNode from "./buildNode";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const anchorName = node.varName!;
+	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName!;
 	const regionName = nextVarName("await_region", status);
 	const stateName = "$" + nextVarName("await_state", status);
@@ -143,7 +143,8 @@ function buildAwaitBranch(
 	index: number,
 ) {
 	if (node.children.length > 0) {
-		b.append(`${creatorsName}[${index}] = (t_before) => {`);
+		let beforeParam = node.fragment !== undefined ? "t_before" : "_";
+		b.append(`${creatorsName}[${index}] = (${beforeParam}) => {`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 

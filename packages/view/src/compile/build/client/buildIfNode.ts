@@ -14,7 +14,7 @@ import replaceForVarNames from "./replaceForVarNames";
 // TODO: Are there too many branches for ifs etc?
 
 export default function buildIfNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const anchorName = node.varName!;
+	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName || anchorName + ".parentNode";
 	const regionName = nextVarName("if_region", status);
 	const stateName = "$" + nextVarName("if_state", status);
@@ -84,7 +84,8 @@ function buildIfBranch(
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	if (node.children.length > 0) {
-		b.append(`${creatorsName}[${index}] = (t_before) => {`);
+		let beforeParam = node.fragment !== undefined ? "t_before" : "_";
+		b.append(`${creatorsName}[${index}] = (${beforeParam}) => {`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 

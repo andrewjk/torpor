@@ -5,7 +5,7 @@ import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
 
 /**
- * Runs an`if`, `switch` or `await` control statement
+ * Runs an `if`, `switch` or `await` control statement
  * @param create A function that creates the control statement's branches
  */
 export default function runControl(

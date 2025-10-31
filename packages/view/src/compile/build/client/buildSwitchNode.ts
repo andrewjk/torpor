@@ -12,7 +12,7 @@ import buildNode from "./buildNode";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder): void {
-	const anchorName = node.varName!;
+	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName!;
 	const regionName = nextVarName("switch_region", status);
 	const stateName = "$" + nextVarName("switch_state", status);
@@ -87,7 +87,8 @@ function buildSwitchBranch(
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	if (node.children.length > 0) {
-		b.append(`${creatorsName}[${index}] = (t_before) => {`);
+		let beforeParam = node.fragment !== undefined ? "t_before" : "_";
+		b.append(`${creatorsName}[${index}] = (${beforeParam}) => {`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 

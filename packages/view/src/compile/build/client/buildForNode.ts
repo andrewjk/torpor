@@ -19,7 +19,7 @@ const forOfRegex = /for\s*\(\s*(?:let\s*|var\s*){0,1}(.+?)\s+(?:of|in).*?\)/;
 
 export default function buildForNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const parentName = node.parentName!;
-	const anchorName = node.varName!;
+	const anchorName = node.varName ?? "null";
 
 	// HACK:
 	node = node.children[0] as ControlNode;
