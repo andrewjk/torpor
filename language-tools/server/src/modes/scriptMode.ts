@@ -556,70 +556,120 @@ function importComponentFiles(
 	map: SourceMap[],
 	_debug = false,
 ): string {
-	const filepath = path.dirname(filename);
-	//if (debug) {
-	//	console.log(content);
-	//	console.log("PRE");
-	//	console.log(map);
-	//}
+	if (!/^\s*import\s+(.+?)\s+from\s+(.+?);*\s*$/ms.test(content)) {
+		return content;
+	}
 
 	// Build imported component files and add them to the virtual file map
 	// TODO: Handle files from node_modules? Might get done automatically by typescript-vfs
-	const imports = content.matchAll(/^import\s+(.+?)\s+from\s+(.+?);*$/gms);
-	for (let match of imports) {
-		const value = match[0];
-		const names = match[1];
-		let importFile = match[2];
 
-		if (
-			(importFile.startsWith("'") && importFile.endsWith("'")) ||
-			(importFile.startsWith('"') && importFile.endsWith('"'))
+	// HACK: We're assuming that all imports are at the top of the file, and
+	// that there are not multiple imports on the one line
+	const first = map.shift()!;
+	const filepath = path.dirname(filename);
+
+	let moved = 0;
+	let newMaps: SourceMap[] = [];
+
+	for (let i = 0; i < first.script.length; i++) {
+		if (first.script[i] === "/") {
+			// Skip comments
+			if (first.script[i + 1] === "/") {
+				i = first.script.indexOf("\n", i);
+			} else if (first.script[i + 1] === "*") {
+				i = first.script.indexOf("*/", i);
+			}
+			if (i === -1) {
+				return content;
+			}
+		} else if (
+			first.script[i] === "i" &&
+			/import\s+(.+?)\s+from\s+(.+?);*\s*$/ms.test(first.script.substring(i))
 		) {
-			importFile = importFile.substring(1, importFile.length - 1);
-		}
+			const match = first.script.substring(i).match(/import\s+(.+?)\s+from\s+(.+?);*\s*$/ms)!;
+			const oldImport = match[0];
+			//const names = match[1];
+			const importedFile = match[2];
 
-		if (!importFile.endsWith(".torp")) continue;
+			let importFile = importedFile;
+			if (
+				(importFile.startsWith("'") && importFile.endsWith("'")) ||
+				(importFile.startsWith('"') && importFile.endsWith('"'))
+			) {
+				importFile = importFile.substring(1, importFile.length - 1);
+			}
 
-		if (tsConfigPath && tsConfig.paths) {
-			// HACK: Get the longest match etc
-			const oldImportFile = importFile;
-			for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
-				for (let destGlob of paths) {
-					importFile = pathReplace(srcGlob, destGlob, importFile);
+			if (!importFile.endsWith(".torp")) {
+				// No change, just straight map it
+				newMaps.push({
+					script: oldImport,
+					source: {
+						start: i,
+						end: i + oldImport.length,
+					},
+					compiled: {
+						start: first.compiled.start + i + moved,
+						end: first.compiled.start + i + moved + oldImport.length,
+					},
+				});
+				continue;
+			}
+
+			if (tsConfigPath && tsConfig.paths) {
+				// HACK: Get the longest match etc
+				const oldImportFile = importFile;
+				for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
+					for (let destGlob of paths) {
+						importFile = pathReplace(srcGlob, destGlob, importFile);
+					}
+				}
+				// The import may now be relative to the tsconfig file, so make it absolute
+				if (importFile !== oldImportFile && importFile.startsWith(".")) {
+					importFile = path.join(tsConfigPath, importFile);
 				}
 			}
-			// The import may now be relative to the tsconfig file, so make it absolute
-			if (importFile !== oldImportFile && importFile.startsWith(".")) {
-				importFile = path.join(tsConfigPath, importFile);
+
+			const typeFile = importFile.startsWith(".") ? path.join(filepath, importFile) : importFile;
+			if (!virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
+				const typeSource = fs.readFileSync(typeFile, "utf8");
+				const { content } = transform(typeFile, typeSource);
+				const key = typeFile.replace(/\.torp$/, ".ts");
+				virtualFiles.set(key, content);
+				env.createFile(key, content);
 			}
-		}
 
-		const typeFile = importFile.startsWith(".") ? path.join(filepath, importFile) : importFile;
-		if (!virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
-			const typeSource = fs.readFileSync(typeFile, "utf8");
-			const { content } = transform(typeFile, typeSource);
-			const key = typeFile.replace(/\.torp$/, ".ts");
-			virtualFiles.set(key, content);
-			env.createFile(key, content);
-		}
+			let oldLength = content.length;
+			let newValue = typeFile.replace(".torp", ".ts");
+			// HACK: We could concat this if we could be bothered
+			let newImport = oldImport.replace(importFile, newValue);
+			content = content.replace(oldImport, newImport);
 
-		let oldLength = content.length;
-		let newValue = typeFile.replace(".torp", ".ts");
-		content = content.replace(value, `import ${names} from "${newValue}";`);
+			// Move subsequent ranges around
+			let diff = content.length - oldLength;
+			for (let mapped of map) {
+				mapped.compiled.start += diff;
+				mapped.compiled.end += diff;
+			}
 
-		// Move subsequent ranges around
-		// TODO: Add a range for the changed import
-		let diff = content.length - oldLength;
-		for (let mapped of map) {
-			mapped.compiled.start += diff;
-			mapped.compiled.end += diff;
+			// Add a range for the changed import
+			newMaps.push({
+				script: oldImport,
+				source: {
+					start: i,
+					end: i + oldImport.length,
+				},
+				compiled: {
+					start: first.compiled.start + i + moved,
+					end: first.compiled.start + i + moved + newImport.length,
+				},
+			});
+
+			moved += diff;
+			i += oldImport.length;
 		}
 	}
 
-	//if (debug) {
-	//	console.log("POST");
-	//	console.log(map);
-	//}
+	map.unshift(...newMaps);
 
 	return content;
 }
