@@ -171,9 +171,12 @@ function parseComponentStart(status: ParseStatus) {
 		script: status.source.substring(status.marker, start),
 		span: { start: status.marker, end: start },
 	});
-	status.script.push({ script: "/* @params */", span: { start: 0, end: 0 } });
+	status.script.push({ script: "/* @params */", span: { start, end } });
 
-	current.params = status.source.substring(start, end).trim() || undefined;
+	current.params = status.source.substring(start, end);
+	if (current.params.trim().length === 0) {
+		current.params = undefined;
+	}
 
 	// Look for a params type or interface
 	// Might need to get fancier with this

@@ -81,8 +81,7 @@ export default function buildCode(
 	}
 
 	if (options?.mapped) {
-		let endText = b.toString();
-		let endSize = endText.length;
+		let endSize = b.toString().length;
 		let diff = endSize - startSize + 1;
 		for (let m of map) {
 			m.compiled.start += diff;
@@ -126,15 +125,19 @@ function buildTemplate(
 			first = false;
 
 			// TODO: Support other params, like the user setting $context
-			let params = [
-				`${current.markup ? "$parent" : "_$parent"}: ParentNode`,
-				`${current.markup ? "$anchor" : "_$anchor"}: Node | null`,
-				current.params ??
-					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props: Record<PropertyKey, any> | undefined"}`,
-				`${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>`,
-			];
-			b.append(params.join(",\n"));
+			b.append(`
+					${current.markup ? "$parent" : "_$parent"}: ParentNode,
+					${current.markup ? "$anchor" : "_$anchor"}: Node | null,`);
+			if (current.params !== undefined) {
+				addMappedText("", current.params, ",", chunk.span, status, b);
+			} else {
+				b.append(
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props: Record<PropertyKey, any> | undefined"},`,
+				);
+			}
+			b.append(`
+					${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}: Record<PropertyKey, any>,
+					${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>`);
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {
