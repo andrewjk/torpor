@@ -144,12 +144,13 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	// TODO: dedupe e.g. <meta name="x"> or on special key
 	b.append("$run(() => {");
 	b.append(`
-			const t_headel = document.createElement("${node.tagName}");
-			document.getElementsByTagName("head")[0].appendChild(t_headel);`);
-	for (let { name, value } of node.attributes) {
+			const t_head_el = document.createElement("${node.tagName}");
+			document.getElementsByTagName("head")[0].appendChild(t_head_el);`);
+	for (let { name, value, span } of node.attributes) {
 		if (value != null) {
 			status.imports.add("t_attribute");
-			b.append(`t_attribute(t_headel, "${name}", ${value});`);
+			value = replaceForVarNames(value, status);
+			addMappedText(`t_attribute(t_head_el, "${name}", `, value, ");", span, status, b);
 		}
 	}
 	b.append(`}${status.options.dev === true ? `, "runHead"` : ""});`);
