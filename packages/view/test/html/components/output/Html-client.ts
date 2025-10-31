@@ -34,7 +34,7 @@ export default function Html(
 	t_run_control(t_html_region_1, t_html_anchor_1, (t_before) => {
 		$props.html;
 		t_run_branch(t_html_region_1, () => {
-			const t_template_1 = document.createElement("template");
+			let t_template_1 = document.createElement("template");
 			t_template_1.innerHTML = $props.html;
 			let t_fragment_1 = t_template_1.content.cloneNode(true) as DocumentFragment;
 			t_add_fragment(t_fragment_1, t_html_parent_1, t_before);

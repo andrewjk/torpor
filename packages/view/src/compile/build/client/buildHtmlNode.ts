@@ -2,7 +2,9 @@ import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
+import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: type checking
 
@@ -43,8 +45,18 @@ function buildHtmlBranch(
 
 	const templateName = nextVarName("template", status);
 	const fragmentName = `t_fragment_${node.fragment!.number}`;
-	b.append(`const ${templateName} = document.createElement("template");`);
-	b.append(`${templateName}.innerHTML = ${node.statement};`);
+	b.append(`let ${templateName} = document.createElement("template");`);
+	// TODO: replaceForVarNames is going to throw mapping out
+	node.span.start += "html(".length;
+	node.span.end -= 2;
+	addMappedText(
+		"",
+		`${templateName}.innerHTML = ${replaceForVarNames(node.statement, status)};`,
+		"",
+		node.span,
+		status,
+		b,
+	);
 	b.append(`let ${fragmentName} = ${templateName}.content.cloneNode(true) as DocumentFragment;`);
 
 	buildAddFragment(node, status, b, parentName, "t_before");
