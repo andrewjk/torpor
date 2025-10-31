@@ -16,4 +16,6 @@ export interface State {
 	error: string;
 	boundaries: Boundary[];
 	events: string[];
+
+	reload: () => void;
 }

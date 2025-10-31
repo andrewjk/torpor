@@ -1,4 +1,6 @@
-export default function Panel($props) {
+import { type State } from "./Boundary";
+
+export default function Panel($props: State) {
 	let $state = $watch({
 		mode: "ui"
 	});
