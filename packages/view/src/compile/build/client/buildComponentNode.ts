@@ -1,3 +1,4 @@
+import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import isSpecialNode from "../../utils/isSpecialNode";
@@ -33,11 +34,11 @@ export default function buildComponentNode(
 		status.imports.add("$watch");
 
 		// Gather props, runs and binding runs, and set them all at once
-		let props: { name: string; value: string }[] = [];
+		let props: { name: string; value: string; span: SourceSpan }[] = [];
 		let runs: string[] = [];
 		let bindingRuns: string[] = [];
 
-		for (let { name, value, reactive, fullyReactive } of node.attributes) {
+		for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
 			if (name === "self" && node.tagName === "@component") {
 				// Ignore this special attribute
 			} else if (name.startsWith("&") && value != null && fullyReactive) {
@@ -47,7 +48,7 @@ export default function buildComponentNode(
 				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
 				// e.g. Component($props: { text: Bindable<string> })
 				name = name.substring(1);
-				props.push({ name, value });
+				props.push({ name, value, span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 				bindingRuns.push(`${value} = ${propsName}["${name}"];`);
 			} else if (name === "class" && value != null) {
@@ -57,30 +58,31 @@ export default function buildComponentNode(
 					params.push(`"torp-${status.styleHash}"`);
 				}
 				value = `t_class(${params.join(", ")})`;
-				props.push({ name, value });
+				props.push({ name, value, span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
 				value = `t_style(${value})`;
-				props.push({ name, value });
+				props.push({ name, value, span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (value != null) {
-				props.push({ name, value });
+				props.push({ name, value, span });
 				if (reactive) {
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else {
-				props.push({ name, value: "true" });
+				props.push({ name, value: "true", span });
 			}
 		}
 
 		// Set the props, runs and binding runs that we gathered
-		b.append(
-			`const ${propsName} = $watch({ ${replaceForVarNames(
-				props.map((p) => `${p.name}: ${p.value}`).join(", "),
-				status,
-			)} });`,
-		);
+		b.append(`const ${propsName} = $watch({`);
+		for (let p of props) {
+			let value = replaceForVarNames(p.value, status);
+			addMappedText(`${p.name}: `, value, ",", p.span, status, b);
+		}
+		b.append("});");
+		// TODO: Map these things:
 		if (runs.length) {
 			buildRun("setProps", replaceForVarNames(runs.join("\n"), status), status, b);
 		}

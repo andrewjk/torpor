@@ -43,7 +43,10 @@ export default function AnswerButtonApp(
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({ onYes: onAnswerYes, onNo: onAnswerNo });
+	const t_props_1 = $watch({
+		onYes: onAnswerYes,
+		onNo: onAnswerNo,
+	});
 	$run(() => {
 		t_props_1["onYes"] = onAnswerYes;
 		t_props_1["onNo"] = onAnswerNo;

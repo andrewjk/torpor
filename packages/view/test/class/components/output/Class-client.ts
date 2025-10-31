@@ -33,7 +33,9 @@ export default function Class(
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_div_4, true))) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({ class: t_class({ "child-class": true }, "torp-1ljxz83") });
+	const t_props_1 = $watch({
+		class: t_class({ "child-class": true }, "torp-1ljxz83"),
+	});
 	$run(() => {
 		t_props_1["class"] = t_class({ "child-class": true }, "torp-1ljxz83");
 	});

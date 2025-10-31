@@ -44,7 +44,8 @@ export default function Component(
 			let t_comp_anchor_1 = t_anchor(t_root_1) as HTMLElement;
 
 			/* @component */
-			const t_props_1 = $watch({  });
+			const t_props_1 = $watch({
+			});
 			const t_slots_1: Record<string, SlotRender> = {};
 			t_slots_1["_"] = (
 				$sparent: ParentNode,
