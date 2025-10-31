@@ -366,6 +366,10 @@ function doValidation(document: TextDocument) {
 				sourceStart = mapped.source.start;
 				sourceEnd = mapped.source.end;
 			}
+			// Same thing for if the error extends too far
+			if (sourceEnd > mapped.source.end) {
+				sourceEnd = mapped.source.end;
+			}
 
 			// TODO: Store this, so we don't need to start from 0 every time
 			let lastLineStart = 0;
