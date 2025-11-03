@@ -123,6 +123,10 @@ function parseAttribute(status: ParseStatus): Attribute {
 		valueStart++;
 		valueEnd = valueStart + name.length;
 		name = value.split(".").at(-1)!;
+		// Handle definite assignment assertions e.g. {$state.width!}
+		if (name.endsWith("!")) {
+			name = name.substring(0, name.length - 1);
+		}
 		reactive = fullyReactive = true;
 	}
 	return {
