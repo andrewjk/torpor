@@ -1,7 +1,6 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
-import trimEnd from "../../utils/trimEnd";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -27,9 +26,9 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// HACK: Need to wrangle the declaration(s) out of the for loop and put them in data
 	// TODO: Handle destructuring, quotes, comments etc
 	const forVarNames: string[] = [];
-	const forIndexMatch = node.statement.match(forLoopRegex);
-	if (forIndexMatch) {
-		const forVarMatches = forIndexMatch[1].matchAll(forLoopVarsRegex);
+	const forLoopMatch = node.statement.match(forLoopRegex);
+	if (forLoopMatch) {
+		const forVarMatches = forLoopMatch[1].matchAll(forLoopVarsRegex);
 		for (let match of forVarMatches) {
 			forVarNames.push(match[1]);
 		}
@@ -61,12 +60,16 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	const beforeName = nextVarName("before", status);
 
 	// Get the key node if it's been set
+	let keyStatement = "";
 	const key = node.children.find(
 		(n) => n.type === "control" && (n as ControlNode).operation === "@key",
-	);
-	let keyStatement = key ? (key as ControlNode).statement : "";
-	if (keyStatement) {
-		keyStatement = trimEnd(keyStatement.substring(keyStatement.indexOf("=") + 1).trim(), ";");
+	) as ControlNode;
+	if (key !== undefined) {
+		let matches = key.statement.match(/^(\s*@*key\s*=\s*)(.+?)\s*;*\s*$/);
+		if (matches) {
+			key.span.start += matches[1].length;
+			keyStatement = matches[2];
+		}
 	}
 
 	status.imports.add("t_region");
@@ -91,10 +94,17 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
-	let params = [`{ ${forVarNames.join(",\n")} }`, keyStatement || "undefined"];
-	if (status.options.dev === true) params.push(`"for item"`);
+	b.append(`let ${newItemName} = t_list_item(`);
+	// TODO: Should map these
+	b.append(`{ ${forVarNames.join(", ")} },`);
+	if (key !== undefined) {
+		addMappedText("", `${keyStatement || "undefined"}`, ",", key.span, status, b);
+	}
+	if (status.options.dev === true) {
+		b.append(`"for item"`);
+	}
+	b.append(");");
 	b.append(`
-			let ${newItemName} = t_list_item(${params.join(", ")});
 			${newItemName}.previousRegion = ${previousItemName};
 			${previousItemName}.nextRegion = ${newItemName};
 			${previousItemName} = ${newItemName};

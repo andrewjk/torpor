@@ -45,7 +45,9 @@ export default function ForIn(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let key in $props.item) {
-				let t_new_item_1 = t_list_item({ key }, undefined);
+				let t_new_item_1 = t_list_item(
+					{ key },
+				);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;

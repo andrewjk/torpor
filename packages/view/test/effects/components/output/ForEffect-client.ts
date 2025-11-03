@@ -44,7 +44,9 @@ export default function For(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let item of $props.items) {
-				let t_new_item_1 = t_list_item({ item }, undefined);
+				let t_new_item_1 = t_list_item(
+					{ item },
+				);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;

@@ -45,8 +45,10 @@ export default function ArrayEntries(
 			let t_previous_item_1 = t_for_region_1;
 			let t_next_item_1 = t_for_region_1.nextRegion;
 			for (let [i, item] of $props.items.entries()) {
-				let t_new_item_1 = t_list_item({ i,
-				item }, item.id);
+				let t_new_item_1 = t_list_item(
+					{ i, item },
+					item.id,
+				);
 				t_new_item_1.previousRegion = t_previous_item_1;
 				t_previous_item_1.nextRegion = t_new_item_1;
 				t_previous_item_1 = t_new_item_1;
