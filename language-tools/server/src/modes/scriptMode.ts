@@ -300,10 +300,9 @@ function doValidation(document: TextDocument) {
 		...tslang.getSyntacticDiagnostics(key),
 	]
 		.map((d: ts.Diagnostic) => {
-			// Find the mapping between source and compiled, if it
-			// exists. If it doesn't exist, the error must be in
-			// non-user code. Not great, but the user doesn't need to
-			// know about it
+			// Find the mapping between source and compiled, if it exists. If it
+			// doesn't exist, the error must be in non-user code. Not great, but
+			// the user doesn't need to know about it
 			let start = d.start ?? 0;
 			let end = (d.start ?? 0) + (d.length ?? 0);
 			let mapped = map.find((m: any) => start >= m.compiled.start && end <= m.compiled.end);
@@ -317,23 +316,27 @@ function doValidation(document: TextDocument) {
 				/Cannot find module '(.+?)\?raw'/.test(message)
 			) {
 				mapped = undefined;
+				// This special message will be filtered out
+				message = "!";
 			}
 
-			// Log it for diagnostics
-			console.log(`Error${!mapped ? " (unmapped)" : ""}:`, message);
-			// @ts-ignore we know this exists
-			const lineMap: number[] = d.file?.lineMap;
-			if (lineMap) {
-				const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
-				const char = start - lineMap[line];
-				console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+			if (!mapped && message !== "!") {
+				// Log it for diagnostics
+				console.log(`Error${!mapped ? " (unmapped)" : ""}:`, message);
+				// @ts-ignore we know this exists
+				const lineMap: number[] = d.file?.lineMap;
+				if (lineMap) {
+					const line = (lineMap.findIndex((l: number) => l > start) ?? 1) - 1;
+					const char = start - lineMap[line];
+					console.log(`(${line + 1}, ${char + 1}):`, content.split("\n")[line]);
+				}
 			}
 
-			// HACK: Couldn't map back to the source, so return a
-			// special message that will be removed with `filter`
+			// HACK: Couldn't map back to the source, so just display it at the
+			// first character
 			if (!mapped) {
 				return {
-					message: "!",
+					message,
 					range: {
 						start: { line: 0, character: 0 },
 						end: { line: 0, character: 0 },
@@ -381,7 +384,6 @@ function doValidation(document: TextDocument) {
 			let endChar = sourceEnd - lastLineStart - 1;
 
 			return {
-				message,
 				range: {
 					start: {
 						line: startLine,
@@ -392,11 +394,12 @@ function doValidation(document: TextDocument) {
 						character: endChar,
 					},
 				},
+				code: d.code,
+				message,
 			} satisfies Diagnostic;
 		})
 		.filter((d) => d.message !== "!");
 
-	//console.log(JSON.stringify(diagnostics, null, 2));
 	return diagnostics;
 }
 
