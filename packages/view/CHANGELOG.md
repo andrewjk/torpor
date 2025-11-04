@@ -1,5 +1,16 @@
 # @torpor/view
 
+## 0.4.6
+
+### Patch Changes
+
+- ebef5ae: Fix: map head element attributes
+- f4a85c3: Fix: type errors in control statements
+- 986ea9e: Fix: map @html params
+- b2ae05b: Fix: map component attributes => props
+- b8c8122: Fix: assignment assertions in shortcut attributes
+- 4c80139: Fix: map user-supplied $props
+
 ## 0.4.5
 
 ### Patch Changes
