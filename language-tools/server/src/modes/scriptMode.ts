@@ -4,6 +4,8 @@ import url from "node:url";
 import ts, { DiagnosticMessageChain, LanguageService, NavigationTree } from "typescript";
 import {
 	CancellationToken,
+	CodeAction,
+	CodeActionContext,
 	CompletionContext,
 	DocumentSymbol,
 	Location,
@@ -58,6 +60,7 @@ export function getScriptMode(_regions: LanguageModelCache<DocumentRegions>): La
 			return "script";
 		},
 		doComplete,
+		doCodeAction,
 		doValidation,
 		doHover,
 		doDefinition,
@@ -134,6 +137,46 @@ function doComplete(document: TextDocument, position: Position, context?: Comple
 	} catch (ex) {
 		console.log("COMPLETE ERROR:", ex);
 		return null;
+	}
+}
+
+function doCodeAction(
+	document: TextDocument,
+	range: Range,
+	context: CodeActionContext,
+): CodeAction[] {
+	try {
+		const filename = url.fileURLToPath(document.uri);
+		const key = filename.replace(/\.torp$/, ".ts");
+		const text = document.getText();
+		loadTypeScriptEnv(filename, key);
+		const transformed = transform(filename, text);
+		if (!transformed.ok) {
+			return [];
+		}
+		const { content, map } = transformed;
+		updateVirtualFile(key, content, filename, map);
+
+		const span = rangeToSpan(text, range);
+		const errorCodes = context.diagnostics.map((d) => Number(d.code));
+
+		const fixes = tslang.getCodeFixesAtPosition(
+			key,
+			span.start,
+			span.start + span.length,
+			errorCodes,
+			{},
+			{},
+		);
+
+		return fixes.map((f) => ({
+			title: f.description,
+			description: f.description,
+			changes: f.changes,
+		}));
+	} catch (ex) {
+		console.log("CODE ACTIONS ERROR:", ex);
+		return [];
 	}
 }
 

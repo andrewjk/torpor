@@ -49,6 +49,7 @@ connection.onInitialize((_params: InitializeParams) => {
 					labelDetailsSupport: true,
 				},
 			},
+			codeActionProvider: true,
 			hoverProvider: true,
 			definitionProvider: true,
 			implementationProvider: true,
@@ -115,32 +116,47 @@ connection.onCompletion(async (evt, _cancellationToken) => {
 	return mode.doComplete(document, evt.position, evt.context);
 });
 
-connection.onHover(async (params) => {
-	const document = documents.get(params.textDocument.uri);
+connection.onCodeAction(async (evt, _cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
 	if (!document) {
 		return null;
 	}
 
-	const mode = languageModes.getModeAtPosition(document, params.position);
+	// HACK: Just checking the mode at the start
+	const mode = languageModes.getModeAtPosition(document, evt.range.start);
+	if (!mode || !mode.doCodeAction) {
+		return null;
+	}
+
+	return mode.doCodeAction(document, evt.range, evt.context);
+});
+
+connection.onHover(async (evt, _cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
+	if (!document) {
+		return null;
+	}
+
+	const mode = languageModes.getModeAtPosition(document, evt.position);
 	if (!mode || !mode.doHover) {
 		return null;
 	}
 
-	return mode.doHover(document, params.position);
+	return mode.doHover(document, evt.position);
 });
 
-connection.onDefinition(async (params) => {
-	const document = documents.get(params.textDocument.uri);
+connection.onDefinition(async (evt, _cancellationToken) => {
+	const document = documents.get(evt.textDocument.uri);
 	if (!document) {
 		return null;
 	}
 
-	const mode = languageModes.getModeAtPosition(document, params.position);
+	const mode = languageModes.getModeAtPosition(document, evt.position);
 	if (!mode || !mode.doDefinition) {
 		return null;
 	}
 
-	return mode.doDefinition(document, params.position);
+	return mode.doDefinition(document, evt.position);
 });
 
 connection.onDocumentSymbol((evt, cancellationToken) => {
@@ -174,6 +190,7 @@ connection.onRequest(SemanticTokensRequest.method, (evt, cancellationToken) => {
 	}
 	return getSemanticTokens(document, undefined, cancellationToken);
 });
+
 connection.onRequest(SemanticTokensRangeRequest.method, (evt, cancellationToken) => {
 	const document = documents.get(evt.textDocument.uri);
 	if (!document) {

@@ -1,12 +1,6 @@
 import { getCSSLanguageService } from "vscode-css-languageservice";
 import {
-	CompletionList,
-	Hover,
-	Diagnostic,
 	getLanguageService as getHTMLLanguageService,
-	Position,
-	Range,
-	Definition,
 } from "vscode-html-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { getCSSMode } from "./modes/cssMode";
@@ -14,7 +8,17 @@ import { getDocumentRegions, DocumentRegions } from "./embeddedSupport";
 import { getHTMLMode } from "./modes/htmlMode";
 import { getLanguageModelCache, LanguageModelCache } from "./languageModelCache";
 import { getScriptMode } from "./modes/scriptMode";
-import { CompletionContext } from 'vscode-languageserver';
+import {
+	CodeAction,
+	CodeActionContext,
+	CompletionContext,
+	CompletionList,
+	Hover,
+	Diagnostic,
+	Position,
+	Range,
+	Definition,
+ } from 'vscode-languageserver';
 
 export * from "vscode-html-languageservice";
 
@@ -22,6 +26,7 @@ export interface LanguageMode {
 	getId(): string;
 	doValidation?: (document: TextDocument) => Diagnostic[];
 	doComplete?: (document: TextDocument, position: Position, context?: CompletionContext) => CompletionList;
+	doCodeAction?: (document: TextDocument, range: Range, context: CodeActionContext) => CodeAction[];
 	doHover?: (document: TextDocument, position: Position) => Hover | null;
 	doDefinition?: (document: TextDocument, position: Position) => Definition | null;
 	onDocumentRemoved(document: TextDocument): void;
