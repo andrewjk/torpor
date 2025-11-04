@@ -1,18 +1,18 @@
 import getId from "../utils/getId";
 import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
 
-interface InputProps {
+interface TextAreaProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Class name(s) for the root element */
 	class?: string,
-	/** The input type */
-	type?: "text" | "number" | "password" | "email" | "url" | "tel",
 	/** The name of the input's form data field */
 	name?: string,
 	/** The data value that this field is bound to */
 	value?: any,
-	/** Text to display when the input value is empty */
+	/** The number of rows to show in the input */
+	rows?: number,
+	/** Text to display when the input's value is empty */
 	placeholder?: string,
 	/** Whether the input should be readonly */
 	readonly?: boolean,
@@ -29,10 +29,9 @@ interface InputProps {
 /**
  * A standard input in a form.
  */
-export default function Input($props: InputProps | undefined) {
+export default function TextArea($props: TextAreaProps | undefined) {
 	let defaultId = getId();
 
-	let type = $props?.type ?? "text";
 	let name = $props?.name
 
 	let blurred = false;
@@ -63,10 +62,7 @@ export default function Input($props: InputProps | undefined) {
 	// Set the input ID now that we know it and it will get linked with the associated label
 	$state.inputId = $props?.id ?? defaultId;
 
-	// NOTE: Adapted this from https://stackoverflow.com/a/57393751,
-	// not sure if it's still a good way to do things
-	function handleInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
-		$state.value = $props!.type?.match(/^(number|range)$/) ? +e.currentTarget.value : e.currentTarget.value;
+	function handleInput(e: Event) {
 		if (formContext) {
 			formContext.validate();
 		}
@@ -88,10 +84,10 @@ export default function Input($props: InputProps | undefined) {
 	@render {
 		<input
 			id={$props?.id ?? defaultId}
-			class={`torp-input ${$props?.class ?? ""}`.trim()}
-			{type}
+			class={`torp-text-area ${$props?.class ?? ""}`.trim()}
 			{name}
 			&value={$state.value}
+			{$props?.rows}
 			{$props?.placeholder}
 			{$props?.readonly}
 			{$props?.maxlength}

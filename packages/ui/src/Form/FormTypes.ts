@@ -11,6 +11,11 @@ export interface ValidationIssue {
 export interface FormContext {
 	schema?: StandardSchemaV1;
 	state: {
+		/**
+		 * Whether there is a file input in the form. If so, the form's enctype
+		 * will be set to `multipart/form-data`
+		 */
+		hasFile: boolean;
 		issues: ValidationIssue[];
 	};
 	validate: () => void;

@@ -10,6 +10,13 @@ interface FormProps {
 	data?: any,
 	/** Where to post the form's data **/
 	action?: string,
+	/** The action to use when submitting the form, which defaults to POST */
+	method?: string,
+	/**
+	 * The form's encoding type e.g. `multipart/form-data` where there are file
+	 * inputs. This will be automatically set unless overridden
+	 */
+	enctype?: string,
 	/** The schema validator to use for this form */
 	schema?: StandardSchemaV1,
 	onsubmit?: (e: SubmitEvent) => boolean | void | Promise<boolean | void>,
@@ -21,6 +28,7 @@ interface FormProps {
 export default function Form($props: FormProps | undefined) {
 	let $state = $watch({
 		data: $props?.data ?? {},
+		hasFile: false,
 		issues: [] as ValidationIssue[],
 		get valid() {
 			return this.issues.length === 0;
@@ -118,7 +126,8 @@ export default function Form($props: FormProps | undefined) {
 		<form
 			{$props?.id}
 			class={`torp-form ${$props?.class ?? ""}`.trim()}
-			method="POST"
+			method={$props?.method ?? "POST"}
+			enctype={$props?.enctype ?? ($state.hasFile ? "multipart/form-data" : undefined)}
 			onsubmit={handleSubmit}
 			@// Set novalidate only if JS is enabled (to override HTML validation)
 			onmount={(e) => e.novalidate = true }

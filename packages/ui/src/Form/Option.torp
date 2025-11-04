@@ -1,0 +1,24 @@
+import getId from "../utils/getId";
+import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+
+interface OptionProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Class name(s) for the root element */
+	class?: string,
+	/** The data value that this option has */
+	value?: any,
+};
+
+/**
+ * An option in a select.
+ */
+export default function Option($props: OptionProps | undefined) {
+	@render {
+		<option
+			{$props?.id}
+			class={`torp-option ${$props?.class ?? ""}`.trim()}
+			&value={$state.value}
+		/>
+	}
+}
