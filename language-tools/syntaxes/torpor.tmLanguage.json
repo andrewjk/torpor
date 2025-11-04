@@ -555,7 +555,7 @@
 			]
 		},
 		"render-control-then": {
-			"begin": "(then)(\\s*\\(.+\\)\\s*)(\\{)",
+			"begin": "(then)(\\s*\\(.+\\)\\s*|\\s*)*(\\{)",
 			"beginCaptures": {
 				"1": {
 					"name": "keyword.control.trycatch"
@@ -585,7 +585,7 @@
 			]
 		},
 		"render-control-catch": {
-			"begin": "(catch\\s*\\(.+\\)*\\s*)(\\{)",
+			"begin": "(catch\\s*(?:\\(.+\\)*\\s*)*)(\\{)",
 			"beginCaptures": {
 				"1": {
 					"patterns": [
