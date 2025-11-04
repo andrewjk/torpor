@@ -332,6 +332,7 @@
 				{ "include": "#render-control-const" },
 				{ "include": "#render-control-console" },
 				{ "include": "#render-control-function" },
+				{ "include": "#render-control-async-function" },
 				{ "include": "#render-control-debugger" }
 			]
 		},
@@ -664,6 +665,36 @@
 		},
 		"render-control-function": {
 			"begin": "(@)(function\\s+.+)(\\{)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.control.indicator.torp"
+				},
+				"2": {
+					"patterns": [
+						{
+							"include": "source.ts"
+						}
+					]
+				},
+				"3": {
+					"name": "punctuation.definition.function.begin.torp"
+				}
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.function.end.torp"
+				}
+			},
+			"name": "meta.control.function.block.torp",
+			"patterns": [
+				{
+					"include": "source.ts"
+				}
+			]
+		},
+		"render-control-async-function": {
+			"begin": "(@)(async function\\s+.+)(\\{)",
 			"beginCaptures": {
 				"1": {
 					"name": "punctuation.definition.control.indicator.torp"
