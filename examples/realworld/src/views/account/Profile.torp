@@ -1,7 +1,0 @@
-import ArticleList from "@/views/article/ArticleList.torp";
-
-export default function Profile() {
-	@render {
-		<ArticleList articles={$props.data.articles} user={$props.data.user} />
-	}
-}
