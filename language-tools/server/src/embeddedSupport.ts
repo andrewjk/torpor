@@ -157,23 +157,20 @@ function getStyleRegions(start: number, documentText: string, regions: EmbeddedR
 	let end = documentText.length;
 	for (let i = start; i < documentText.length; i++) {
 		const char = documentText[i];
-		// TODO: Properly support one-line comments in CSS
-		if (char === "@") {
-			let tail = documentText.substring(i + 1);
-			if (tail.startsWith("//")) {
-				// Skip one-line comments
-				i = documentText.indexOf("\n", i);
-			} else if (tail.startsWith("/*")) {
-				// Skip block comments
-				i = documentText.indexOf("*/", i) + 1;
-			}
-		} else if (char === "/") {
+		// Skip comments in style regions. CSS automatically handles block
+		// comments, but we need to erase line comments, so we might as well
+		// erase both
+		if (char === "/") {
+			let commentEnd = -1;
 			if (documentText[i + 1] === "/") {
-				// Skip one-line comments
-				i = documentText.indexOf("\n", i);
+				commentEnd = documentText.indexOf("\n", i);
 			} else if (documentText[i + 1] === "*") {
-				// Skip block comments
-				i = documentText.indexOf("*/", i) + 1;
+				commentEnd = documentText.indexOf("*/", i) + 1;
+			}
+			if (commentEnd !== -1) {
+				regions.push({ languageId: "css", start, end: i });
+				i = commentEnd;
+				start = i + 1;
 			}
 		} else if (char === "{") {
 			level += 1;
@@ -359,6 +356,7 @@ function getPrefix(c: EmbeddedRegion) {
 	}
 	return "";
 }
+
 function getSuffix(c: EmbeddedRegion) {
 	if (c.attributeValue) {
 		switch (c.languageId) {
