@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.4.7
+
+### Patch Changes
+
+- 3cc2168: Fix: ignore null event attributes
+- 13f2afb: Fix: more HTML variable types
+
 ## 0.4.6
 
 ### Patch Changes

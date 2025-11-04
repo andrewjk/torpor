@@ -1,5 +1,14 @@
 # @torpor/build
 
+## 0.4.4
+
+### Patch Changes
+
+- 5b12119: Fix: don't add error JSON as the message
+- Updated dependencies [3cc2168]
+- Updated dependencies [13f2afb]
+  - @torpor/view@0.4.7
+
 ## 0.4.3
 
 ### Patch Changes

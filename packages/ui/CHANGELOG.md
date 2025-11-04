@@ -1,5 +1,14 @@
 # @torpor/ui
 
+## 0.3.1
+
+### Patch Changes
+
+- b670819: Feat: more UI form components
+- Updated dependencies [3cc2168]
+- Updated dependencies [13f2afb]
+  - @torpor/view@0.4.7
+
 ## 0.3.0
 
 ### Minor Changes
