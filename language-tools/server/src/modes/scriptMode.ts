@@ -1,14 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
-import ts, {
-	Classifications,
-	DefinitionInfo,
-	DiagnosticMessageChain,
-	ImplementationLocation,
-	NavigationTree,
-	QuickInfo,
-} from "typescript";
+import ts, { DiagnosticMessageChain, LanguageService, NavigationTree } from "typescript";
 import {
 	CancellationToken,
 	CompletionContext,
@@ -50,6 +43,7 @@ let projectRoot = "";
 let virtualFiles = new Map<string, string>();
 let virtualFileMaps = new Map<string, { sourceFile: string; map: SourceMap[] }>();
 let env: any; //tsvfs.VirtualTypeScriptEnvironment;
+let tslang: LanguageService;
 
 // Copied from @torpor/view because I can't get the types out of there...
 interface SourceMap {
@@ -94,11 +88,9 @@ function doComplete(document: TextDocument, position: Position, context?: Comple
 			return [];
 		}
 
-		const completions /*: CompletionInfo*/ = env.languageService.getCompletionsAtPosition(
-			key,
-			compiledIndex,
-			{ triggerKind: context?.triggerKind },
-		);
+		const completions = tslang.getCompletionsAtPosition(key, compiledIndex, {
+			triggerKind: context?.triggerKind,
+		});
 		if (!completions) {
 			return [];
 		}
@@ -138,9 +130,7 @@ function doComplete(document: TextDocument, position: Position, context?: Comple
 			})
 			.filter(Boolean);
 
-		//console.log(JSON.stringify(result, null, 2));
-
-		return result;
+		return result as any;
 	} catch (ex) {
 		console.log("COMPLETE ERROR:", ex);
 		return null;
@@ -165,7 +155,7 @@ function doHover(document: TextDocument, position: Position): Hover | null {
 			return null;
 		}
 
-		const info: QuickInfo = env.languageService.getQuickInfoAtPosition(key, compiledIndex);
+		const info = tslang.getQuickInfoAtPosition(key, compiledIndex);
 		if (!info) {
 			return null;
 		}
@@ -205,7 +195,7 @@ function doDefinition(document: TextDocument, position: Position): Definition | 
 			return null;
 		}
 
-		const defs: DefinitionInfo[] = env.languageService.getDefinitionAtPosition(key, compiledIndex);
+		const defs = tslang.getDefinitionAtPosition(key, compiledIndex);
 		if (!defs || !defs.length) {
 			return null;
 		}
@@ -303,11 +293,11 @@ function doValidation(document: TextDocument) {
 	// changes to linked files (e.g. adding or removing a field in an interface)
 	// don't get picked up. But doing it here also means that it only happens
 	// when the file is edited...
-	env.languageService.cleanupSemanticCache();
+	tslang.cleanupSemanticCache();
 
 	const diagnostics = [
-		...env.languageService.getSemanticDiagnostics(key),
-		...env.languageService.getSyntacticDiagnostics(key),
+		...tslang.getSemanticDiagnostics(key),
+		...tslang.getSyntacticDiagnostics(key),
 	]
 		.map((d: ts.Diagnostic) => {
 			// Find the mapping between source and compiled, if it
@@ -467,6 +457,7 @@ function loadTypeScriptEnv(filename: string, key: string) {
 
 		const system = tsvfs.createFSBackedSystem(virtualFiles, projectRoot, ts);
 		env = tsvfs.createVirtualTypeScriptEnvironment(system, [key], ts, tsConfig);
+		tslang = env.languageService as LanguageService;
 
 		console.log("Torpor type checking loaded");
 	}
@@ -698,7 +689,7 @@ export function getSelectionRanges(
 		let ranges: SelectionRange[] = [];
 
 		//for (let position of positions) {
-		//	const selection: SelectionRange = env.languageService.getSmartSelectionRange(key, position);
+		//	const selection: SelectionRange = tslang.getSmartSelectionRange(key, position);
 		//}
 
 		return ranges;
@@ -725,7 +716,7 @@ export function getSemanticTokens(
 		const { content, map } = transformed;
 		updateVirtualFile(key, content, filename, map);
 
-		const { spans }: Classifications = env.languageService.getEncodedSemanticClassifications(
+		const { spans } = tslang.getEncodedSemanticClassifications(
 			key,
 			// TODO: Range
 			{ start: 0, length: content.length },
@@ -766,7 +757,7 @@ export function getDocumentSymbols(
 		const { content, map } = transformed;
 		updateVirtualFile(key, content, filename, map);
 
-		const tree: NavigationTree = env.languageService.getNavigationTree(key);
+		const tree: NavigationTree = tslang.getNavigationTree(key);
 
 		let symbols: DocumentSymbol[] = [];
 
@@ -876,10 +867,7 @@ export function getImplementation(
 			return null;
 		}
 
-		const imps: ImplementationLocation[] = env.languageService.getImplementationAtPosition(
-			key,
-			compiledIndex,
-		);
+		const imps = tslang.getImplementationAtPosition(key, compiledIndex);
 		if (!imps || !imps.length) {
 			return null;
 		}
