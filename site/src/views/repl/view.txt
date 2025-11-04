@@ -57,7 +57,7 @@ function addAnimation(el, entry, exit) {
 	});
 }
 function addEvent(el, type, listener) {
-	context_default.stashedEvents.push({
+	if (listener !== void 0 && listener !== null) context_default.stashedEvents.push({
 		region: context_default.activeRegion,
 		el,
 		type,
