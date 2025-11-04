@@ -330,9 +330,10 @@ async function runAction(
 				// TODO: do not re-run hooks?
 				const newUrl = new URL(url.pathname, url);
 				const formStatus = result?.status;
-				const formMessage = await result?.text();
+				let formMessage = await result?.text();
 				if (formMessage && result?.headers.get("Content-Type")?.includes("application/json")) {
 					$page.form = JSON.parse(formMessage);
+					formMessage = undefined;
 				} else {
 					$page.form = {};
 				}
