@@ -262,6 +262,26 @@ function sourceToCompiledIndex(text: string, position: Position, map: SourceMap[
 	return mapped.compiled.start + (index - mapped.source.start);
 }
 
+function rangeToSpan(text: string, range: Range) {
+	// HACK: maybe we need to generate lineMaps
+	let start = 0;
+	let end = 0;
+	let line = 0;
+	for (let i = 0; i < text.length; i++) {
+		if (text[i] === "\n") {
+			line++;
+			if (line === range.start.line) {
+				start = i + range.start.character;
+			}
+			if (line === range.end.line) {
+				end = i + range.end.character;
+				break;
+			}
+		}
+	}
+	return { start, length: end - start };
+}
+
 function doValidation(document: TextDocument) {
 	const filename = url.fileURLToPath(document.uri);
 	const key = filename.replace(/\.torp$/, ".ts");
@@ -704,7 +724,7 @@ export function getSelectionRanges(
 
 export function getSemanticTokens(
 	document: TextDocument,
-	_range?: Range,
+	range?: Range,
 	_cancellationToken?: CancellationToken,
 ) {
 	try {
@@ -719,10 +739,11 @@ export function getSemanticTokens(
 		const { content, map } = transformed;
 		updateVirtualFile(key, content, filename, map);
 
+		const span = range ? rangeToSpan(text, range) : { start: 0, length: content.length };
+
 		const { spans } = tslang.getEncodedSemanticClassifications(
 			key,
-			// TODO: Range
-			{ start: 0, length: content.length },
+			span,
 			ts.SemanticClassificationFormat.TwentyTwenty,
 		);
 
