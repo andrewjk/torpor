@@ -347,8 +347,17 @@ function elementTypeName(node: ElementNode) {
 	// TODO: Etc
 	switch (node.tagName.toLowerCase()) {
 		case "div":
+		case "span":
 		case "input":
+		case "select":
+		case "option":
+		case "button":
+		case "form":
 			return `HTML${node.tagName.substring(0, 1).toUpperCase() + node.tagName.substring(1)}Element`;
+		case "a":
+			return "HTMLAnchorElement";
+		case "img":
+			return "HTMLImageElement";
 		case "textarea":
 			return "HTMLTextAreaElement";
 	}

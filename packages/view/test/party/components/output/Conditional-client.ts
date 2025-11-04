@@ -43,7 +43,7 @@ export default function TrafficLight(
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button>Next light</button> <p>#</p> <p> You must <!> </p> `);
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_root_0) as HTMLElement;
+	const t_button_1 = t_next(t_root_0) as HTMLButtonElement;
 	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
 	const t_if_parent_1 = t_next(t_next(t_next(t_next(t_button_1, true)), true)) as HTMLElement;
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_next(t_next(t_next(t_next(t_button_1, true)), true))))) as HTMLElement;

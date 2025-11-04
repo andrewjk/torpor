@@ -102,7 +102,7 @@ export default function Await(
 			t_run_branch(t_await_region_1, () => t_await_creators_1[index](t_before));
 		});
 
-		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLElement;
+		const t_button_1 = t_next(t_next(t_await_anchor_1, true)) as HTMLButtonElement;
 		const t_text_5 = t_next(t_button_1, true);
 		t_event(t_button_1, "click", () => $state.guesser = guessNumber(100));
 		t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);

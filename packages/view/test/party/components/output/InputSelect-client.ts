@@ -47,7 +47,7 @@ export default function ColorSelect(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#</div> <select> <!> </select> `);
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
-	const t_select_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLElement;
+	const t_select_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLSelectElement;
 	let t_for_anchor_1 = t_anchor(t_next(t_child(t_select_1))) as HTMLElement;
 
 	/* @for */
@@ -76,7 +76,7 @@ export default function ColorSelect(
 			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <option>#</option> `);
 			const t_root_1 = t_root(t_fragment_1, true);
-			const t_option_1 = t_next(t_root_1) as HTMLElement;
+			const t_option_1 = t_next(t_root_1) as HTMLOptionElement;
 			const t_text_2 = t_child(t_option_1);
 			const t_text_3 = t_next(t_option_1, true);
 			$run(() => {

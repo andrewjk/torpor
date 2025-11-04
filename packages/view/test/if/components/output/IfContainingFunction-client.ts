@@ -39,7 +39,7 @@ export default function IfContainingIf(
 			t_if_creators_1[0] = (t_before) => {
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <button>do it</button> `);
 				const t_root_1 = t_root(t_fragment_1, true);
-				const t_button_1 = t_next(t_root_1) as HTMLElement;
+				const t_button_1 = t_next(t_root_1) as HTMLButtonElement;
 				t_event(t_button_1, "click", doit);
 
 				/* @function */

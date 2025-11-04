@@ -29,7 +29,7 @@ export default function Function(
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button id=increment>Increment</button> <p>#</p> `);
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_root_0) as HTMLElement;
+	const t_button_1 = t_next(t_root_0) as HTMLButtonElement;
 	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
 	const t_text_2 = t_next(t_next(t_next(t_button_1, true)), true);
 	t_event(t_button_1, "click", increment);
