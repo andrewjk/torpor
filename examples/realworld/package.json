@@ -21,7 +21,7 @@
 		"@torpor/build": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"bcryptjs": "^3.0.2",
+		"bcryptjs": "^3.0.3",
 		"dotenv": "^17.2.3",
 		"jose": "^6.1.0",
 		"jsonwebtoken": "^9.0.2",
@@ -31,10 +31,10 @@
 	"devDependencies": {
 		"@types/jsonwebtoken": "^9.0.10",
 		"@types/sanitize-html": "^2.16.0",
-		"@typescript/native-preview": "7.0.0-dev.20251027.1",
+		"@typescript/native-preview": "7.0.0-dev.20251103.1",
 		"dotenv-cli": "^11.0.0",
 		"marked": "^16.4.1",
-		"oxlint-tsgolint": "^0.3.0",
+		"oxlint-tsgolint": "^0.4.0",
 		"prisma": "^6.18.0",
 		"sanitize-html": "^2.17.0",
 		"typescript": "^5.9.3"
