@@ -29,7 +29,7 @@ interface FileProps {
 /**
  * A file input in a form.
  */
-export default function Input($props: FileProps | undefined) {
+export default function File($props: FileProps | undefined) {
 	let defaultId = getId();
 
 	let name = $props?.name
