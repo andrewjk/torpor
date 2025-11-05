@@ -80,7 +80,7 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 			 ${$props?.class ?? ""}`.trim()}
 			type="checkbox"
 			{name}
-			&checked={$state.checked}
+			&checked={$state.value}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
 			onchange={$props?.onchange}
