@@ -16,6 +16,8 @@ interface InputProps {
 	placeholder?: string,
 	/** Whether the input should be readonly */
 	readonly?: boolean,
+	/** Whether the input's value is required */
+	required?: boolean,
 	/** The maximum number of characters allowed for the input value */
 	maxlength?: number,
 	/** An ARIA label for describing the input to screen readers when there is no associated label element */
@@ -94,6 +96,7 @@ export default function Input($props: InputProps | undefined) {
 			&value={$state.value}
 			{$props?.placeholder}
 			{$props?.readonly}
+			{$props?.required}
 			{$props?.maxlength}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
