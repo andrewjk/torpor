@@ -59,8 +59,12 @@ export default function Form($props: FormProps | undefined) {
 			if (result.issues) {
 				for (let issue of result.issues) {
 					if (issue.path) {
-						// TODO: arrays with `[0]`
-						issues.push({ path: issue.path.join("."), message: issue.message });
+						// TODO: arrays with `[0]` etc
+						issues.push({ 
+							// @ts-ignore
+							path: issue.path.map((p) => p.key ?? p).join("."),
+							message: issue.message
+						});
 					}
 				}
 			}
