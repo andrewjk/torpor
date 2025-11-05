@@ -664,6 +664,36 @@
 				}
 			]
 		},
+		"render-control-html": {
+			"begin": "(@)(html)(\\()",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.control.indicator.torp"
+				},
+				"2": {
+					"patterns": [
+						{
+							"include": "source.ts"
+						}
+					]
+				},
+				"3": {
+					"name": "punctuation.definition.html.begin.torp"
+				}
+			},
+			"end": "\\)",
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.html.end.torp"
+				}
+			},
+			"name": "meta.control.console.block.torp",
+			"patterns": [
+				{
+					"include": "source.ts"
+				}
+			]
+		},
 		"render-control-function": {
 			"begin": "(@)(function\\s+.+)(\\{)",
 			"beginCaptures": {
