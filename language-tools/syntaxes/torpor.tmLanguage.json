@@ -331,6 +331,7 @@
 				{ "include": "#render-control-catch" },
 				{ "include": "#render-control-const" },
 				{ "include": "#render-control-console" },
+				{ "include": "#render-control-html" },
 				{ "include": "#render-control-function" },
 				{ "include": "#render-control-async-function" },
 				{ "include": "#render-control-debugger" }
@@ -634,7 +635,7 @@
 			]
 		},
 		"render-control-console": {
-			"begin": "(@)(console\\..+)(\\()",
+			"begin": "(@)(console\\..+)",
 			"beginCaptures": {
 				"1": {
 					"name": "punctuation.definition.control.indicator.torp"
@@ -650,7 +651,7 @@
 					"name": "punctuation.definition.console.begin.torp"
 				}
 			},
-			"end": "\\)",
+			"end": "\\n",
 			"endCaptures": {
 				"0": {
 					"name": "punctuation.definition.console.end.torp"
