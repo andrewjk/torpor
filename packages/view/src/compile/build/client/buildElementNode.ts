@@ -207,7 +207,7 @@ function buildElementAttributes(
 				const propName = status.ns ? "className.baseVal" : "className";
 				stashRun(
 					fragment,
-					`${varName}.${propName} = t_class(`,
+					`${status.ns ? "// @ts-ignore\n" : ""}${varName}.${propName} = t_class(`,
 					params.join(", "),
 					");",
 					range,

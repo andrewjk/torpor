@@ -65,6 +65,7 @@ export default function Shape(
 
 	const t_text_3 = t_next(t_svg_1, true);
 	$run(() => {
+		// @ts-ignore
 		t_svg_1.className.baseVal = t_class({ "svg-cls": true });
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
