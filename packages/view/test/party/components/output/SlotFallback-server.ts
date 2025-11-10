@@ -13,7 +13,6 @@ export default function FunnyButtonApp(
 
 	/* User interface */
 	t_body += ` <![>`;
-
 	const t_comp_1 = FunnyButton(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
@@ -29,7 +28,6 @@ export default function FunnyButtonApp(
 		t_body += `Click me!`;
 		return t_body;
 	}
-
 	const t_comp_2 = FunnyButton(undefined, $context, t_slots_1);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;

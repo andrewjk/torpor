@@ -19,8 +19,9 @@ export default function Component(
 	t_body += ` <![>`;
 	components[$props.self];
 	t_body += `<![>`;
-	const t_props_1: any = {};
-	t_props_1["self"] = components[$props.self];
+	const t_props_1 = {
+		self: components[$props.self],
+	};
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		_$sprops: Record<PropertyKey, any> | undefined,

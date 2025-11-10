@@ -16,9 +16,9 @@ export default function Reactive(
 
 	/* User interface */
 	t_body += ` <button>Update text</button> <![>`;
-	const t_props_1: any = {};
-	t_props_1["text"] = $state.text;
-
+	const t_props_1 = {
+		text: $state.text,
+	};
 	const t_comp_1 = Child(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

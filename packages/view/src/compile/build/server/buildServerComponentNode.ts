@@ -30,24 +30,40 @@ export default function buildServerComponentNode(
 	const propsName = componentHasProps ? nextVarName("props", status) : "undefined";
 	if (componentHasProps) {
 		// TODO: defaults etc props
-		b.append(`const ${propsName}: any = {};`);
+
+		// Gather props, and set them all at once
+		let props: { name: string; value: string }[] = [];
+
 		for (let { name, value } of node.attributes) {
+			// No binding on the server
+			if (name.startsWith("&")) {
+				name = name.substring(1);
+			}
+
 			if (name === "class" && value != null) {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
-				b.append(`${propsName}["class"] = t_class(${params.join(", ")});`);
+				props.push({ name, value: `t_class(${params.join(", ")})` });
 			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
-				b.append(`${propsName}["style"] = t_style(${value});`);
+				props.push({ name, value: `t_style(${value})` });
 			} else if (value != null) {
-				b.append(`${propsName}["${name}"] = ${value};`);
+				props.push({ name, value });
 			} else {
-				b.append(`${propsName}["${name}"] = true;`);
+				props.push({ name, value: "true" });
 			}
 		}
+
+		// Set the props that we gathered
+		b.append(`const ${propsName} = {`);
+		for (let p of props) {
+			b.append(`${p.name}: ${p.value},`);
+		}
+		b.append("};");
+
 		// NOTE: Not sure if this is needed
 		/*
 		if (root) {
@@ -112,7 +128,6 @@ export default function buildServerComponentNode(
 	if (slotsName !== "undefined") {
 		renderParams += `, ${slotsName}`;
 	}
-	b.append("");
 	const componentResult = nextVarName("comp", status);
 	b.append(`const ${componentResult} = ${componentName}(${renderParams});`);
 	b.append(`t_body += ${componentResult}.body;`);

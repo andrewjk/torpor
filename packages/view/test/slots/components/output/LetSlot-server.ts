@@ -13,8 +13,9 @@ export default function Let(
 
 	/* User interface */
 	t_body += ` <![>`;
-	const t_props_1: any = {};
-	t_props_1["items"] = $props.items;
+	const t_props_1 = {
+		items: $props.items,
+	};
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	// @ts-ignore
 	t_slots_1["_"] = (
@@ -26,7 +27,6 @@ export default function Let(
 		t_body += ` ${t_fmt($sprops.item.text)} `;
 		return t_body;
 	}
-
 	const t_comp_1 = List(t_props_1, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

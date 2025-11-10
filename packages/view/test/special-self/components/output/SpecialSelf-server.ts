@@ -15,9 +15,9 @@ export default function Self(
 	t_body += ` <p>Level ${t_fmt($props.level)}</p> <![>`;
 	if ($props.level < 3) {
 		t_body += `<!^> <![>`;
-		const t_props_1: any = {};
-		t_props_1["level"] = $props.level + 1;
-
+		const t_props_1 = {
+			level: $props.level + 1,
+		};
 		const t_comp_1 = Self(t_props_1, $context);
 		t_body += t_comp_1.body;
 		t_head += t_comp_1.head;

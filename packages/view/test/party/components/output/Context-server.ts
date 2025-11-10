@@ -24,7 +24,6 @@ export default function UserProfileContextApp(
 
 	/* User interface */
 	t_body += ` <h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
-
 	const t_comp_1 = UserProfileContext(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

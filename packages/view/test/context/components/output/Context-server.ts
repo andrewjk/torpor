@@ -16,12 +16,10 @@ export default function Parent(
 
 	/* User interface */
 	t_body += ` <![>`;
-
 	const t_comp_1 = ChildA(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <![>`;
-
 	const t_comp_2 = ChildB(undefined, $context);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;

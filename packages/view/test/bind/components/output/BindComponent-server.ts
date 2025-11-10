@@ -18,9 +18,9 @@ export default function BindComponent(
 
 	/* User interface */
 	t_body += ` <![>`;
-	const t_props_1: any = {};
-	t_props_1["&name"] = $state.name;
-
+	const t_props_1 = {
+		name: $state.name,
+	};
 	const t_comp_1 = BindText(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

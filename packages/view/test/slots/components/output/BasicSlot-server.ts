@@ -24,7 +24,6 @@ export default function Basic(
 		t_body += ` Basic stuff `;
 		return t_body;
 	}
-
 	const t_comp_1 = Header(undefined, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

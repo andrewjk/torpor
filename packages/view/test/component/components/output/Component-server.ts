@@ -14,9 +14,9 @@ export default function Component(
 
 	/* User interface */
 	t_body += ` <![>`;
-	const t_props_1: any = {};
-	t_props_1["name"] = "Amy";
-
+	const t_props_1 = {
+		name: "Amy",
+	};
 	const t_comp_1 = Header(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

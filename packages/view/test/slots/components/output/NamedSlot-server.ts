@@ -34,7 +34,6 @@ export default function Named(
 		t_body += ` The article's header `;
 		return t_body;
 	}
-
 	const t_comp_1 = Article(undefined, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

@@ -27,10 +27,10 @@ export default function AnswerButtonApp(
 
 	/* User interface */
 	t_body += ` <p>Are you happy?</p> <![>`;
-	const t_props_1: any = {};
-	t_props_1["onYes"] = onAnswerYes;
-	t_props_1["onNo"] = onAnswerNo;
-
+	const t_props_1 = {
+		onYes: onAnswerYes,
+		onNo: onAnswerNo,
+	};
 	const t_comp_1 = AnswerButton(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
