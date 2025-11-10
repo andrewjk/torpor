@@ -1,5 +1,17 @@
 # @torpor/ui
 
+## 0.3.2
+
+### Patch Changes
+
+- 3f4eef3: Fix: File component name
+- dddec65: Feat: Hidden UI form component
+- fae47e6: Fix: TextArea should be a textarea
+- e9fe640: Fix: get checkbox checked from state value
+- 00c4d30: Feat: allow setting input required
+- e1a3f46: Fix: string unions don't work in $props
+- 14cd367: Fix: valibot uses a different path format
+
 ## 0.3.1
 
 ### Patch Changes
