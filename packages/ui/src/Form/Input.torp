@@ -7,7 +7,7 @@ interface InputProps {
 	/** Class name(s) for the root element */
 	class?: string,
 	/** The input type */
-	type?: "text" | "number" | "password" | "email" | "url" | "tel",
+	type?: string, // TODO: "text" | "number" | "password" | "email" | "url" | "tel",
 	/** The name of the input's form data field */
 	name?: string,
 	/** The data value that this field is bound to */
