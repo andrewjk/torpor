@@ -9,8 +9,8 @@
 		"build": "pnpm -r build",
 		"check": "pnpm -r check",
 		"cs:add": "pnpm changeset add",
-		"cs:version": "pnpm changeset version",
-		"cs:publish": "pnpm -r build && pnpm changeset publish",
+		"cs:version": "pnpm -r build && pnpm changeset version",
+		"cs:publish": "pnpm changeset publish",
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"format": "prettier --write ."
