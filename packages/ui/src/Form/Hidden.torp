@@ -1,0 +1,25 @@
+import getId from "../utils/getId";
+import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+
+interface HiddenProps {
+	/** An ID for the root element */
+	id?: string;
+	/** The name of the input's form data field */
+	name?: string,
+	/** The data value that this field is bound to */
+	value?: any,
+};
+
+/**
+ * A standard input in a form.
+ */
+export default function Input($props: HiddenProps | undefined) {
+	@render {
+		<input
+			{$props?.id}
+			type="hidden"
+			{$props?.name}
+			{$props?.value}
+		/>
+	}
+}
