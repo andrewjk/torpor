@@ -40,7 +40,7 @@ export default function AnswerButtonApp(
 }
 
 function AnswerButton(
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

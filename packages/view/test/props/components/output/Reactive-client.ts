@@ -14,7 +14,8 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Reactive(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: any,
+	// @ts-ignore
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -52,7 +53,7 @@ export default function Reactive(
 function Child(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

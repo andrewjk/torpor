@@ -1,7 +1,7 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Component(
-	$props,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -10,7 +10,7 @@ export default function Component(
 	let t_body = "";
 	let t_head = "";
 
-	let components = {
+	let components: Record<PropertyKey, any> = {
 		BigTitle,
 		SmallTitle
 	};
@@ -24,7 +24,8 @@ export default function Component(
 	};
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		_$sprops: Record<PropertyKey, any> | undefined,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -32,7 +33,6 @@ export default function Component(
 		t_body += ` Hello! `;
 		return t_body;
 	}
-
 	const t_comp_1 = components[$props.self](t_props_1, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;

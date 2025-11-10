@@ -14,7 +14,7 @@ import t_run_control from "../../../../src/render/runControl";
 export default function Component(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -22,7 +22,7 @@ export default function Component(
 ): void {
 	$peek(() => { /**/
 
-	let components = {
+	let components: Record<PropertyKey, any> = {
 		BigTitle,
 		SmallTitle
 	};

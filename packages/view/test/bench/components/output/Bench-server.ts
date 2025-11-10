@@ -1,21 +1,21 @@
-import t_class from "../../../../src/render/buildClasses";
-import t_fmt from "../../../../src/render/formatText";
 import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+import t_class from "../../../../src/render/buildClasses";
+import t_fmt from "../../../../src/render/formatText";
 
 export default function Bench(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+	$slots?: Record<string, ServerSlotRender>
+): { body: string, head: string } {
 	let t_body = "";
 	let t_head = "";
 
 	let rowId = 1;
-	let $state = $watch({
+	let $state: { data: Item[], selected: number | null } = $watch({
 		data: [],
 		selected: null,
 	});
@@ -47,19 +47,7 @@ export default function Bench(
 		"expensive",
 		"fancy",
 	];
-	const colours = [
-		"red",
-		"yellow",
-		"blue",
-		"green",
-		"pink",
-		"brown",
-		"purple",
-		"brown",
-		"white",
-		"black",
-		"orange",
-	];
+	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
 	const nouns = [
 		"table",
 		"chair",
@@ -91,7 +79,7 @@ export default function Bench(
 		}
 	}
 
-	function remove(row) {
+	function remove(row: Item) {
 		const clone = $state.data.slice();
 		clone.splice(clone.indexOf(row), 1);
 		$state.data = clone;
@@ -116,7 +104,7 @@ export default function Bench(
 		}
 	}
 
-	function _random(max) {
+	function _random(max: number) {
 		return Math.round(Math.random() * 1000) % max;
 	}
 
@@ -126,7 +114,7 @@ export default function Bench(
 	}
 
 	function buildData(length = 1000) {
-		const data = Array.from({ length });
+		const data: Item[] = Array.from({ length })
 		for (let i = 0; i < length; i++) {
 			data[i] = $watch(new Item());
 		}

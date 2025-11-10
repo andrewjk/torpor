@@ -3,7 +3,7 @@ import type SlotRender from "../../../../src/types/SlotRender";
 declare function Component(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props,
+	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;

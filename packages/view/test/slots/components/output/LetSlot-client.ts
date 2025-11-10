@@ -19,7 +19,7 @@ import t_run_list from "../../../../src/render/runList";
 export default function Let(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

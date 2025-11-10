@@ -2,7 +2,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function Let(
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

@@ -7,7 +7,7 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function Reactive($props: any) {
+export default function Reactive() {
 	let $state = $watch({ text: "before" })
 
 	@render {
@@ -16,7 +16,7 @@ export default function Reactive($props: any) {
 	}
 }
 
-function Child($props: any) {
+function Child() {
 	@render {
 		<p>
 			{$props.text}

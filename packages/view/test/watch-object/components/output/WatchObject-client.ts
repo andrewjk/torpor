@@ -11,7 +11,7 @@ import t_root from "../../../../src/render/nodeRoot";
 export default function Watched(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

@@ -7,7 +7,7 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function Let($props: any) {
+export default function Let() {
 	@render {
 		<List items={$props.items}>
 			<fill>

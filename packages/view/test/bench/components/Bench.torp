@@ -1,110 +1,110 @@
 export default function Bench() {
-		let rowId = 1;
-		let $state = $watch({
-				data: [],
-				selected: null,
-		});
+	let rowId = 1;
+	let $state: { data: Item[], selected: number | null } = $watch({
+		data: [],
+		selected: null,
+	});
 
-		const adjectives = [
-				"pretty",
-				"large",
-				"big",
-				"small",
-				"tall",
-				"short",
-				"long",
-				"handsome",
-				"plain",
-				"quaint",
-				"clean",
-				"elegant",
-				"easy",
-				"angry",
-				"crazy",
-				"helpful",
-				"mushy",
-				"odd",
-				"unsightly",
-				"adorable",
-				"important",
-				"inexpensive",
-				"cheap",
-				"expensive",
-				"fancy",
-		];
-		const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
-		const nouns = [
-				"table",
-				"chair",
-				"house",
-				"bbq",
-				"desk",
-				"car",
-				"pony",
-				"cookie",
-				"sandwich",
-				"burger",
-				"pizza",
-				"mouse",
-				"keyboard",
-		];
+	const adjectives = [
+		"pretty",
+		"large",
+		"big",
+		"small",
+		"tall",
+		"short",
+		"long",
+		"handsome",
+		"plain",
+		"quaint",
+		"clean",
+		"elegant",
+		"easy",
+		"angry",
+		"crazy",
+		"helpful",
+		"mushy",
+		"odd",
+		"unsightly",
+		"adorable",
+		"important",
+		"inexpensive",
+		"cheap",
+		"expensive",
+		"fancy",
+	];
+	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const nouns = [
+		"table",
+		"chair",
+		"house",
+		"bbq",
+		"desk",
+		"car",
+		"pony",
+		"cookie",
+		"sandwich",
+		"burger",
+		"pizza",
+		"mouse",
+		"keyboard",
+	];
 
-		function append() {
-				$state.data = [...$state.data, ...buildData(1000)];
+	function append() {
+		$state.data = [...$state.data, ...buildData(1000)];
+	}
+
+	function clear() {
+		$state.data = [];
+	}
+
+	function partialUpdate() {
+		for (let i = 0; i < $state.data.length; i += 10) {
+			const row = $state.data[i];
+			row.label = row.label + " !!!";
 		}
+	}
 
-		function clear() {
-				$state.data = [];
-		}
+	function remove(row: Item) {
+		const clone = $state.data.slice();
+		clone.splice(clone.indexOf(row), 1);
+		$state.data = clone;
+	}
 
-		function partialUpdate() {
-				for (let i = 0; i < $state.data.length; i += 10) {
-						const row = $state.data[i];
-						row.label = row.label + " !!!";
-				}
-		}
+	function create() {
+		// TODO: Build this up to 1000:
+		$state.data = buildData(10);
+	}
 
-		function remove(row) {
-				const clone = $state.data.slice();
-				clone.splice(clone.indexOf(row), 1);
-				$state.data = clone;
-		}
+	function createLots() {
+		$state.data = buildData(10000);
+	}
 
-		function create() {
-				// TODO: Build this up to 1000:
-				$state.data = buildData(10);
+	function swapRows() {
+		if ($state.data.length > 998) {
+			const clone = $state.data.slice();
+			const tmp = clone[1];
+			clone[1] = clone[998];
+			clone[998] = tmp;
+			$state.data = clone;
 		}
+	}
 
-		function createLots() {
-				$state.data = buildData(10000);
-		}
+	function _random(max: number) {
+		return Math.round(Math.random() * 1000) % max;
+	}
 
-		function swapRows() {
-				if ($state.data.length > 998) {
-						const clone = $state.data.slice();
-						const tmp = clone[1];
-						clone[1] = clone[998];
-						clone[998] = tmp;
-						$state.data = clone;
-				}
-		}
+	class Item {
+		id = rowId++;
+		label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
+	}
 
-		function _random(max) {
-				return Math.round(Math.random() * 1000) % max;
+	function buildData(length = 1000) {
+		const data: Item[] = Array.from({ length })
+		for (let i = 0; i < length; i++) {
+			data[i] = $watch(new Item());
 		}
-
-		class Item {
-				id = rowId++;
-				label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
-		}
-
-		function buildData(length = 1000) {
-				const data = Array.from({ length })
-				for (let i = 0; i < length; i++) {
-						data[i] = $watch(new Item());
-				}
-				return data;
-		}
+		return data;
+	}
 
 	@render {
 		<div id="main" class="container">
@@ -145,23 +145,23 @@ export default function Bench() {
 			</div>
 			<table class="table table-hover table-striped test-data">
 				<tbody>
-						@for (let row of $state.data) {
-								@key = row.id
-								<tr class={{ danger: $state.selected === row.id }}>
-										<td class="col-md-1">{row.id}</td>
-										<td class="col-md-4">
-												<a onclick={() => $state.selected = row.id}>
-														{row.label}
-												</a>
-										</td>
-										<td class="col-md-1">
-												<a onclick={() => remove(row)}>
-														<span class="glyphicon glyphicon-remove" aria-hidden="true" />
-												</a>
-										</td>
-										<td class="col-md-6" />
-								</tr>
-						}
+					@for (let row of $state.data) {
+						@key = row.id
+						<tr class={{ danger: $state.selected === row.id }}>
+							<td class="col-md-1">{row.id}</td>
+							<td class="col-md-4">
+								<a onclick={() => $state.selected = row.id}>
+									{row.label}
+								</a>
+							</td>
+							<td class="col-md-1">
+								<a onclick={() => remove(row)}>
+									<span class="glyphicon glyphicon-remove" aria-hidden="true" />
+								</a>
+							</td>
+							<td class="col-md-6" />
+						</tr>
+					}
 				</tbody>
 			</table>
 			<span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span>

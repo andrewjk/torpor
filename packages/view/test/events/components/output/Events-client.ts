@@ -24,7 +24,7 @@ export default function Increment(
 
 	let $state = $watch({ counter: 0 })
 
-	function increment(e, num) {
+	function increment(_: Event, num?: number) {
 		$state.counter += num || 1;
 	}
 

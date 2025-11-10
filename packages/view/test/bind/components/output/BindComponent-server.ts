@@ -30,7 +30,7 @@ export default function BindComponent(
 }
 
 function BindText(
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

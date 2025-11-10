@@ -3,7 +3,8 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
 
 export default function Reactive(
-	$props: any,
+	// @ts-ignore
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -28,7 +29,7 @@ export default function Reactive(
 }
 
 function Child(
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

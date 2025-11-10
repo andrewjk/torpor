@@ -1,421 +1,214 @@
-import t_event from "../../../../src/render/addEvent";
-import t_add_fragment from "../../../../src/render/addFragment";
-import t_class from "../../../../src/render/buildClasses";
-import t_fmt from "../../../../src/render/formatText";
-import t_fragment from "../../../../src/render/getFragment";
-import t_list_item from "../../../../src/render/newListItem";
-import t_region from "../../../../src/render/newRegion";
-import t_anchor from "../../../../src/render/nodeAnchor";
-import t_child from "../../../../src/render/nodeChild";
-import t_next from "../../../../src/render/nodeNext";
-import t_root from "../../../../src/render/nodeRoot";
-import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
-import t_run_list from "../../../../src/render/runList";
-import type ListItem from "../../../../src/types/ListItem";
-import type SlotRender from "../../../../src/types/SlotRender";
 import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
+import t_add_fragment from "../../../../src/render/addFragment";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
+import t_class from "../../../../src/render/buildClasses";
+import t_event from "../../../../src/render/addEvent";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment from "../../../../src/render/getFragment";
+import t_list_item from "../../../../src/render/newListItem";
+import t_next from "../../../../src/render/nodeNext";
+import t_pop_region from "../../../../src/render/popRegion";
+import t_push_region from "../../../../src/render/pushRegion";
+import t_region from "../../../../src/render/newRegion";
+import t_root from "../../../../src/render/nodeRoot";
+import t_run_list from "../../../../src/render/runList";
 
 export default function Bench(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => {
-		/**/
+	$peek(() => { /**/
 
-		let rowId = 1;
-		let $state = $watch({
-			data: [],
-			selected: null,
-		});
+	let rowId = 1;
+	let $state: { data: Item[], selected: number | null } = $watch({
+		data: [],
+		selected: null,
+	});
 
-		const adjectives = [
-			"pretty",
-			"large",
-			"big",
-			"small",
-			"tall",
-			"short",
-			"long",
-			"handsome",
-			"plain",
-			"quaint",
-			"clean",
-			"elegant",
-			"easy",
-			"angry",
-			"crazy",
-			"helpful",
-			"mushy",
-			"odd",
-			"unsightly",
-			"adorable",
-			"important",
-			"inexpensive",
-			"cheap",
-			"expensive",
-			"fancy",
-		];
-		const colours = [
-			"red",
-			"yellow",
-			"blue",
-			"green",
-			"pink",
-			"brown",
-			"purple",
-			"brown",
-			"white",
-			"black",
-			"oregion",
-		];
-		const nouns = [
-			"table",
-			"chair",
-			"house",
-			"bbq",
-			"desk",
-			"car",
-			"pony",
-			"cookie",
-			"sandwich",
-			"burger",
-			"pizza",
-			"mouse",
-			"keyboard",
-		];
+	const adjectives = [
+		"pretty",
+		"large",
+		"big",
+		"small",
+		"tall",
+		"short",
+		"long",
+		"handsome",
+		"plain",
+		"quaint",
+		"clean",
+		"elegant",
+		"easy",
+		"angry",
+		"crazy",
+		"helpful",
+		"mushy",
+		"odd",
+		"unsightly",
+		"adorable",
+		"important",
+		"inexpensive",
+		"cheap",
+		"expensive",
+		"fancy",
+	];
+	const colours = ["red", "yellow", "blue", "green", "pink", "brown", "purple", "brown", "white", "black", "orange"];
+	const nouns = [
+		"table",
+		"chair",
+		"house",
+		"bbq",
+		"desk",
+		"car",
+		"pony",
+		"cookie",
+		"sandwich",
+		"burger",
+		"pizza",
+		"mouse",
+		"keyboard",
+	];
 
-		function append() {
-			$state.data = [...$state.data, ...buildData(1000)];
+	function append() {
+		$state.data = [...$state.data, ...buildData(1000)];
+	}
+
+	function clear() {
+		$state.data = [];
+	}
+
+	function partialUpdate() {
+		for (let i = 0; i < $state.data.length; i += 10) {
+			const row = $state.data[i];
+			row.label = row.label + " !!!";
 		}
+	}
 
-		function clear() {
-			$state.data = [];
-		}
+	function remove(row: Item) {
+		const clone = $state.data.slice();
+		clone.splice(clone.indexOf(row), 1);
+		$state.data = clone;
+	}
 
-		function partialUpdate() {
-			for (let i = 0; i < $state.data.length; i += 10) {
-				const row = $state.data[i];
-				row.label = row.label + " !!!";
-			}
-		}
+	function create() {
+		// TODO: Build this up to 1000:
+		$state.data = buildData(10);
+	}
 
-		function remove(row) {
+	function createLots() {
+		$state.data = buildData(10000);
+	}
+
+	function swapRows() {
+		if ($state.data.length > 998) {
 			const clone = $state.data.slice();
-			clone.splice(clone.indexOf(row), 1);
+			const tmp = clone[1];
+			clone[1] = clone[998];
+			clone[998] = tmp;
 			$state.data = clone;
 		}
+	}
 
-		function create() {
-			// TODO: Build this up to 1000:
-			$state.data = buildData(10);
+	function _random(max: number) {
+		return Math.round(Math.random() * 1000) % max;
+	}
+
+	class Item {
+		id = rowId++;
+		label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
+	}
+
+	function buildData(length = 1000) {
+		const data: Item[] = Array.from({ length })
+		for (let i = 0; i < length; i++) {
+			data[i] = $watch(new Item());
 		}
+		return data;
+	}
 
-		function createLots() {
-			$state.data = buildData(10000);
-		}
+	/* User interface */
+	const t_fragments: DocumentFragment[] = [];
 
-		function swapRows() {
-			if ($state.data.length > 998) {
-				const clone = $state.data.slice();
-				const tmp = clone[1];
-				clone[1] = clone[998];
-				clone[998] = tmp;
-				$state.data = clone;
-			}
-		}
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `);
+	const t_root_0 = t_root(t_fragment_0, true);
+	const t_button_1 = t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))))) as HTMLButtonElement;
+	const t_button_2 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)))) as HTMLButtonElement;
+	const t_button_3 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)))) as HTMLButtonElement;
+	const t_button_4 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)))) as HTMLButtonElement;
+	const t_button_5 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)), true)))) as HTMLButtonElement;
+	const t_button_6 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true)))))), true)), true)), true)), true)), true)))) as HTMLButtonElement;
+	const t_for_parent_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)))) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true))))))) as HTMLElement;
 
-		function _random(max) {
-			return Math.round(Math.random() * 1000) % max;
-		}
-
-		class Item {
-			id = rowId++;
-			label = `${adjectives[_random(adjectives.length)]} ${colours[_random(colours.length)]} ${nouns[_random(nouns.length)]}`;
-		}
-
-		function buildData(length = 1000) {
-			const data = Array.from({ length });
-			for (let i = 0; i < length; i++) {
-				data[i] = $watch(new Item());
-			}
-			return data;
-		}
-
-		/* User interface */
-		const t_fragments: DocumentFragment[] = [];
-
-		const t_fragment_0 = t_fragment(
-			$parent.ownerDocument!,
-			t_fragments,
-			0,
-			` <div id="main" class="container"> <div class="jumbotron"> <div class="row"> <div class="col-md-6"> <h1>Torpor (keyed)</h1> </div> <div class="col-md-6"> <div class="row"> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="clear">Clear</button> </div> <div class="col-sm-6 smallpad"> <button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button> </div> </div> </div> </div> </div> <table class="table table-hover table-striped test-data"> <tbody> <!> </tbody> </table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span> </div> `,
-		);
-		const t_root_0 = t_root(t_fragment_0, true);
-		const t_button_1 = t_next(
-			t_child(
-				t_next(
-					t_child(
-						t_next(
-							t_child(
-								t_next(
-									t_next(t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))), true),
-								),
-							),
-						),
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_button_2 = t_next(
-			t_child(
-				t_next(
-					t_next(
-						t_next(
-							t_child(
-								t_next(
-									t_child(
-										t_next(
-											t_next(
-												t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
-												true,
-											),
-										),
-									),
-								),
-							),
-						),
-						true,
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_button_3 = t_next(
-			t_child(
-				t_next(
-					t_next(
-						t_next(
-							t_next(
-								t_next(
-									t_child(
-										t_next(
-											t_child(
-												t_next(
-													t_next(
-														t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
-														true,
-													),
-												),
-											),
-										),
-									),
-								),
-								true,
-							),
-						),
-						true,
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_button_4 = t_next(
-			t_child(
-				t_next(
-					t_next(
-						t_next(
-							t_next(
-								t_next(
-									t_next(
-										t_next(
-											t_child(
-												t_next(
-													t_child(
-														t_next(
-															t_next(
-																t_next(t_child(t_next(t_child(t_next(t_child(t_next(t_root_0))))))),
-																true,
-															),
-														),
-													),
-												),
-											),
-										),
-										true,
-									),
-								),
-								true,
-							),
-						),
-						true,
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_button_5 = t_next(
-			t_child(
-				t_next(
-					t_next(
-						t_next(
-							t_next(
-								t_next(
-									t_next(
-										t_next(
-											t_next(
-												t_next(
-													t_child(
-														t_next(
-															t_child(
-																t_next(
-																	t_next(
-																		t_next(
-																			t_child(t_next(t_child(t_next(t_child(t_next(t_root_0)))))),
-																		),
-																		true,
-																	),
-																),
-															),
-														),
-													),
-												),
-												true,
-											),
-										),
-										true,
-									),
-								),
-								true,
-							),
-						),
-						true,
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_button_6 = t_next(
-			t_child(
-				t_next(
-					t_next(
-						t_next(
-							t_next(
-								t_next(
-									t_next(
-										t_next(
-											t_next(
-												t_next(
-													t_next(
-														t_next(
-															t_child(
-																t_next(
-																	t_child(
-																		t_next(
-																			t_next(
-																				t_next(
-																					t_child(
-																						t_next(t_child(t_next(t_child(t_next(t_root_0))))),
-																					),
-																				),
-																				true,
-																			),
-																		),
-																	),
-																),
-															),
-														),
-														true,
-													),
-												),
-												true,
-											),
-										),
-										true,
-									),
-								),
-								true,
-							),
-						),
-						true,
-					),
-				),
-			),
-		) as HTMLElement;
-		const t_for_parent_1 = t_next(
-			t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true))),
-		) as HTMLElement;
-		let t_for_anchor_1 = t_anchor(
-			t_next(t_child(t_next(t_child(t_next(t_next(t_next(t_child(t_next(t_root_0))), true)))))),
-		) as HTMLElement;
-
-		/* @for */
-		let t_for_region_1 = t_region();
-		t_run_list(
-			t_for_region_1,
-			t_for_parent_1,
-			t_for_anchor_1,
-			function createNewItems() {
-				let t_new_items: ListItem[] = [];
-				let t_previous_item = t_for_region_1;
-				let t_next_item = t_for_region_1.nextRegion;
-				for (let row of $state.data) {
-					let t_new_item = t_list_item({ row }, row.id);
-					t_new_item.previousRegion = t_previous_item;
-					t_previous_item.nextRegion = t_new_item;
-					t_previous_item = t_new_item;
-					t_new_items.push(t_new_item);
-				}
-				t_for_region_1.nextRegion = t_next_item;
-				return t_new_items;
-			},
-			function createListItem(t_item, t_before) {
-				let t_old_region_1 = t_push_region(t_item);
-				const t_fragment_1 = t_fragment(
-					$parent.ownerDocument!,
-					t_fragments,
-					1,
-					` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `,
+	/* @for */
+	let t_for_region_1 = t_region();
+	t_run_list(
+		t_for_region_1,
+		t_for_parent_1,
+		t_for_anchor_1,
+		() => {
+			let t_new_items_1: ListItem[] = [];
+			let t_previous_item_1 = t_for_region_1;
+			let t_next_item_1 = t_for_region_1.nextRegion;
+			for (let row of $state.data) {
+				let t_new_item_1 = t_list_item(
+					{ row },
+					row.id,
 				);
-				const t_root_1 = t_root(t_fragment_1, true);
-				const t_tr_1 = t_next(t_root_1) as HTMLElement;
-				const t_text_1 = t_child(t_next(t_child(t_tr_1)));
-				const t_a_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_tr_1)), true)))) as HTMLElement;
-				const t_text_2 = t_child(t_a_1);
-				const t_a_2 = t_next(
-					t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true))),
-				) as HTMLElement;
-				const t_text_3 = t_next(t_tr_1, true);
-				t_event(t_a_1, "click", () => ($state.selected = t_item.data.row.id));
-				t_event(t_a_2, "click", () => remove(t_item.data.row));
-				$run(() => {
-					t_tr_1.className = t_class({ degionr: $state.selected === t_item.data.row.id });
-					t_text_1.textContent = t_fmt(t_item.data.row.id);
-					t_text_2.textContent = ` ${t_fmt(t_item.data.row.label)} `;
-				});
-				t_add_fragment(t_fragment_1, t_for_parent_1, t_before, t_text_3);
-				t_next(t_text_3);
-				t_pop_region(t_old_region_1);
-			},
-			function updateListItem(t_old_item, t_new_item) {
-				t_old_item.data.row = t_new_item.data.row;
-			},
-		);
+				t_new_item_1.previousRegion = t_previous_item_1;
+				t_previous_item_1.nextRegion = t_new_item_1;
+				t_previous_item_1 = t_new_item_1;
+				t_new_items_1.push(t_new_item_1);
+			}
+			t_for_region_1.nextRegion = t_next_item_1;
+			return t_new_items_1;
+		},
+		(t_item_1, t_before_1) => {
+			let t_old_region_1 = t_push_region(t_item_1);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <tr> <td class="col-md-1">#</td> <td class="col-md-4"> <a>#</a> </td> <td class="col-md-1"> <a> <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> </a> </td> <td class="col-md-6"></td> </tr> `);
+			const t_root_1 = t_root(t_fragment_1, true);
+			const t_tr_1 = t_next(t_root_1) as HTMLElement;
+			const t_text_1 = t_child(t_next(t_child(t_tr_1)));
+			const t_a_1 = t_next(t_child(t_next(t_next(t_next(t_child(t_tr_1)), true)))) as HTMLAnchorElement;
+			const t_text_2 = t_child(t_a_1);
+			const t_a_2 = t_next(t_child(t_next(t_next(t_next(t_next(t_next(t_child(t_tr_1)), true)), true)))) as HTMLAnchorElement;
+			const t_text_3 = t_next(t_tr_1, true);
+			t_event(t_a_1, "click", () => $state.selected = t_item_1.data.row.id);
+			t_event(t_a_2, "click", () => remove(t_item_1.data.row));
+			$run(() => {
+				t_tr_1.className = t_class({ danger: $state.selected === t_item_1.data.row.id });
+				t_text_1.textContent = t_fmt(t_item_1.data.row.id);
+				t_text_2.textContent = ` ${t_fmt(t_item_1.data.row.label)} `;
+			});
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_3);
+			t_next(t_text_3);
+			t_pop_region(t_old_region_1);
+		},
+		(t_old_item, t_new_item) => {
+			t_old_item.data.row = t_new_item.data.row;
+		}
+	);
 
-		const t_text_4 = t_next(t_next(t_root_0), true);
-		t_event(t_button_1, "click", create);
-		t_event(t_button_2, "click", createLots);
-		t_event(t_button_3, "click", append);
-		t_event(t_button_4, "click", partialUpdate);
-		t_event(t_button_5, "click", clear);
-		t_event(t_button_6, "click", swapRows);
-		t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
-		t_next(t_text_4);
+	const t_text_4 = t_next(t_next(t_root_0), true);
+	t_event(t_button_1, "click", create);
+	t_event(t_button_2, "click", createLots);
+	t_event(t_button_3, "click", append);
+	t_event(t_button_4, "click", partialUpdate);
+	t_event(t_button_5, "click", clear);
+	t_event(t_button_6, "click", swapRows);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
+	t_next(t_text_4);
 
-		/**/
-	});
+	/**/ });
 }

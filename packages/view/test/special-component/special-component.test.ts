@@ -11,8 +11,8 @@ interface Props {
 }
 
 const source = `
-export default function Component($props) {
-	let components = {
+export default function Component() {
+	let components: Record<PropertyKey, any> = {
 		BigTitle,
 		SmallTitle
 	};

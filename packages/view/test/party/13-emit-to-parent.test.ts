@@ -27,7 +27,7 @@ export default function AnswerButtonApp() {
 	}
 }
 
-function AnswerButton($props: any) {
+function AnswerButton() {
 	@render {
 		<button onclick={$props.onYes}>YES</button>
 		<button onclick={$props.onNo}>NO</button>

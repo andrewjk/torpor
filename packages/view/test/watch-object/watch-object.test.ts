@@ -16,7 +16,7 @@ interface Props {
 }
 
 const source = `
-export default function Watched($props: any) {
+export default function Watched() {
 	@render {
 		<p>
 			{$props.text}

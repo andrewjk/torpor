@@ -22,6 +22,8 @@ export function cmp(
 		attributes: attributes || [],
 		children: children || [],
 		selfClosed,
+		// @ts-ignore
+		span: undefined,
 	};
 }
 
@@ -42,6 +44,8 @@ export function el(
 		selfClosed,
 		scopeStyles: scopeStyles || undefined,
 		closed: true,
+		// @ts-ignore
+		span: undefined,
 	};
 }
 
@@ -57,6 +61,8 @@ export function sp(
 		attributes: attributes || [],
 		children: children || [],
 		selfClosed,
+		// @ts-ignore
+		span: undefined,
 	};
 }
 
@@ -77,15 +83,17 @@ export function control(
 		operation,
 		statement,
 		children: children || [],
+		// @ts-ignore
+		span: undefined,
 	};
 }
 
 export function text(content: string): TextNode {
-	// @ts-ignore
 	return {
 		type: "text",
 		content,
-		//spans: [],
+		// @ts-ignore
+		spans: undefined,
 	};
 }
 
@@ -106,12 +114,13 @@ export function att(name: string, value?: string): Attribute {
 		name = value;
 		reactive = fullyReactive = true;
 	}
-	// @ts-ignore
 	return {
 		name,
 		value,
 		reactive,
 		fullyReactive,
+		// @ts-ignore
+		span: undefined,
 	};
 }
 

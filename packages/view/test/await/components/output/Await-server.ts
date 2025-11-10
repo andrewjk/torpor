@@ -13,14 +13,16 @@ export default function Await(
 	let t_head = "";
 
 	// Use the $watch function to declare reactive state
-	let $state = $watch({})
+	let $state = $watch({
+		guesser: Promise.resolve(0)
+	});
 
 	// This is an async function
 	let attempt = 0
 	$state.guesser = guessNumber(100)
-	async function guessNumber(ms) {
+	async function guessNumber(ms: number) {
 		attempt++
-		return new Promise((ok, err) => {
+		return new Promise<number>((ok, err) => {
 			return setTimeout(
 				attempt % 3 === 0
 				? () => err("uh oh")

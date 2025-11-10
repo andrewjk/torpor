@@ -67,7 +67,7 @@ export default function AnswerButtonApp(
 function AnswerButton(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: any,
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore

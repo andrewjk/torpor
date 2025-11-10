@@ -15,7 +15,7 @@ export default function BindComponent() {
 	}
 }
 
-function BindText($props: any) {
+function BindText() {
 	@render {
 		<input &value={$props.name} />
 	}
