@@ -117,10 +117,14 @@ export default function buildComponentNode(
 				const slotParams = [
 					"$sparent: ParentNode",
 					"$sanchor: Node | null",
-					`${slot.hasSlotProps ? "$sprops" : "_$sprops?"}: Record<PropertyKey, any>`,
+					slot.hasSlotProps
+						? "$sprops: Record<PropertyKey, any>"
+						: "// @ts-ignore\n$sprops?: Record<PropertyKey, any>",
 					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
-				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
+				b.append(
+					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`,
+				);
 
 				buildFragment(slot, status, b, "$sparent", "$sanchor");
 

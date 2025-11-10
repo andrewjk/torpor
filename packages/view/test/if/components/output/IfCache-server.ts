@@ -3,7 +3,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 export default function IfCache(
 	$props: { counter: number, i: number },
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

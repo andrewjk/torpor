@@ -2,9 +2,9 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Named(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -15,7 +15,8 @@ export default function Named(
 	t_body += ` <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -24,7 +25,8 @@ export default function Named(
 		return t_body;
 	}
 	t_slots_1["header"] = (
-		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -43,9 +45,9 @@ export default function Named(
 
 function Article(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";

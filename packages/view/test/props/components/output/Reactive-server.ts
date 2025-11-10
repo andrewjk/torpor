@@ -5,7 +5,7 @@ import t_fmt from "../../../../src/render/formatText";
 export default function Reactive(
 	$props: any,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -30,7 +30,7 @@ export default function Reactive(
 function Child(
 	$props: any,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

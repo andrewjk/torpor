@@ -11,9 +11,9 @@ export default function Named(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -31,7 +31,8 @@ export default function Named(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -44,7 +45,8 @@ export default function Named(
 	t_slots_1["header"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -66,9 +68,9 @@ function Article(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/

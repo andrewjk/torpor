@@ -4,7 +4,7 @@ import t_fmt from "../../../../src/render/formatText";
 export default function Let(
 	$props: any,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -16,6 +16,7 @@ export default function Let(
 	const t_props_1: any = {};
 	t_props_1["items"] = $props.items;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
+	// @ts-ignore
 	t_slots_1["_"] = (
 		$sprops: Record<PropertyKey, any>,
 		// @ts-ignore
@@ -37,7 +38,7 @@ export default function Let(
 function List(
 	$props: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";

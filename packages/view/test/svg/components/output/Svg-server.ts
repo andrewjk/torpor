@@ -4,7 +4,7 @@ import t_class from "../../../../src/render/buildClasses";
 export default function Shape(
 	$props: { name: string },
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

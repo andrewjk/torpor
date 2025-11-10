@@ -4,7 +4,7 @@ import t_style from "../../../../src/render/buildStyles";
 export default function Style(
 	$props: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

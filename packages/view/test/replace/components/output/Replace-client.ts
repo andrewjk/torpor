@@ -17,7 +17,7 @@ export default function Replace(
 	$anchor: Node | null,
 	$props: { name: string},
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

@@ -4,9 +4,9 @@ import t_fmt from "../../../../src/render/formatText";
 
 export default function TrafficLight(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

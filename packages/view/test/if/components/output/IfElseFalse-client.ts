@@ -16,7 +16,7 @@ export default function IfElse(
 	$anchor: Node | null,
 	$props: { counter: number },
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

@@ -15,8 +15,8 @@ export default function UserProfileContextApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -57,8 +57,8 @@ function UserProfileContext(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

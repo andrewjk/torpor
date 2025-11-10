@@ -18,7 +18,7 @@ export default function Self(
 	$anchor: Node | null,
 	$props: { level: number },
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

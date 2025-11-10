@@ -201,17 +201,21 @@ async function loadView(
 	}
 	let $props: Record<string, any> = { data };
 
+	let styles = "";
+
 	// If there are layouts, work our way upwards, pushing each component into
 	// the default slot of its parent
 	// TODO: Also handle layout server data
 	// TODO: There's probably a nicer way to do this with reducers or something
-	// TODO: Re-use parent layouts
 	let component = clientEndPoint.component as ServerComponent;
 	let slots: Record<string, ServerSlotRender> | undefined = undefined;
 	if (handler.layouts) {
 		let slotFunctions: ServerSlotRender[] = [];
-		slotFunctions[handler.layouts.length] = (_, context) =>
-			(clientEndPoint.component as ServerComponent)($props, context);
+		slotFunctions[handler.layouts.length] = (_, $context) => {
+			let { body, head } = (clientEndPoint.component as ServerComponent)($props, $context);
+			styles += head;
+			return body;
+		};
 		for (let i = handler.layouts.length - 1; i >= 0; i--) {
 			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 				?.default;
@@ -220,10 +224,13 @@ async function loadView(
 					component = layoutEndPoint.component as ServerComponent;
 					slots = { _: slotFunctions[i + 1] };
 				} else {
-					slotFunctions[i] = (_, context) =>
-						(layoutEndPoint.component as ServerComponent)($props, context, {
+					slotFunctions[i] = (_, $context) => {
+						let { body, head } = (layoutEndPoint.component as ServerComponent)($props, $context, {
 							_: slotFunctions[i + 1],
 						});
+						styles += head;
+						return body;
+					};
 				}
 			}
 		}
@@ -232,7 +239,8 @@ async function loadView(
 	let html;
 	try {
 		let { body, head } = component($props, undefined, slots);
-		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD", head);
+		styles += head;
+		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD", styles);
 	} catch (error) {
 		// TODO: Show a proper Error component
 		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";

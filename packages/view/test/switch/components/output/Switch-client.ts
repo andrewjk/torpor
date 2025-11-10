@@ -24,7 +24,7 @@ export default function Switch(
 	$anchor: Node | null,
 	$props: Props,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

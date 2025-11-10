@@ -132,11 +132,11 @@ function buildTemplate(
 				addMappedText("", current.params, ",", chunk.span, status, b);
 			} else {
 				b.append(
-					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props: Record<PropertyKey, any> | undefined"},`,
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props?: Record<PropertyKey, any>"},`,
 				);
 			}
 			b.append(`
-					${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}: Record<PropertyKey, any>,
+					${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}?: Record<PropertyKey, any>,
 					${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>`);
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): void {");

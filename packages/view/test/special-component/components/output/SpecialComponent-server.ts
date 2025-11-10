@@ -3,7 +3,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 export default function Component(
 	$props,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -23,7 +23,7 @@ export default function Component(
 	t_props_1["self"] = components[$props.self];
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
-		_$sprops?: Record<PropertyKey, any>,
+		_$sprops: Record<PropertyKey, any> | undefined,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -43,9 +43,9 @@ export default function Component(
 
 function BigTitle(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";
@@ -63,9 +63,9 @@ function BigTitle(
 
 function SmallTitle(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
 	let t_body = "";

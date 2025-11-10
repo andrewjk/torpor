@@ -4,8 +4,8 @@ import t_fmt from "../../../../src/render/formatText";
 
 export default function UserProfileContextApp(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
@@ -35,8 +35,8 @@ export default function UserProfileContextApp(
 
 function UserProfileContext(
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {

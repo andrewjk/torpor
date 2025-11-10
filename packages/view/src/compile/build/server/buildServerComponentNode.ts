@@ -74,10 +74,14 @@ export default function buildServerComponentNode(
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				const slotParams = [
-					`${slot.hasSlotProps ? "$sprops" : "_$sprops?"}: Record<PropertyKey, any>`,
+					slot.hasSlotProps
+						? "$sprops: Record<PropertyKey, any>"
+						: "// @ts-ignore\n$sprops?: Record<PropertyKey, any>",
 					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
-				b.append(`${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`);
+				b.append(
+					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`,
+				);
 				b.append(`let t_body = "";`);
 
 				for (let child of slot.children) {

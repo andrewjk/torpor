@@ -11,9 +11,9 @@ export default function FunnyButtonApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -36,7 +36,8 @@ export default function FunnyButtonApp(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		_$sprops?: Record<PropertyKey, any>,
+		// @ts-ignore
+		$sprops?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -58,9 +59,9 @@ function FunnyButton(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/

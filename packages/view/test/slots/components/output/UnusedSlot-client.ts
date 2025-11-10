@@ -11,9 +11,9 @@ export default function Unused(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -40,9 +40,9 @@ function Header(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
+	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/

@@ -1,6 +1,6 @@
 type ServerSlotRender = (
-	$props?: Record<PropertyKey, any>,
+	$sprops?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-) => void;
+) => string;
 
 export default ServerSlotRender;

@@ -11,7 +11,7 @@ export default function fillLayoutSlot(
 	slot: SlotRender,
 	parent: ParentNode,
 	anchor: Node | null,
-	$props: Record<string, string>,
+	$props?: Record<string, string>,
 	$context?: Record<PropertyKey, any>,
 ): Region {
 	const region = newRegion(devContext.enabled ? "Layout slot" : undefined);

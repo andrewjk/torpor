@@ -17,7 +17,7 @@ export default function IfCache(
 	$anchor: Node | null,
 	$props: { counter: number, i: number },
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

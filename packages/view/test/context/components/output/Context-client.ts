@@ -13,8 +13,8 @@ export default function Parent(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -49,8 +49,8 @@ function ChildA(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -83,8 +83,8 @@ function ChildB(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props: Record<PropertyKey, any> | undefined,
-	$context: Record<PropertyKey, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {

@@ -21,7 +21,7 @@ export default function Let(
 	$anchor: Node | null,
 	$props: any,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
@@ -42,6 +42,7 @@ export default function Let(
 		t_props_1["items"] = $props.items;
 	});
 	const t_slots_1: Record<string, SlotRender> = {};
+	// @ts-ignore
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
@@ -71,7 +72,7 @@ function List(
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
 	$peek(() => { /**/

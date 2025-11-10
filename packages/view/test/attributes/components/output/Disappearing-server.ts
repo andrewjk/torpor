@@ -4,7 +4,7 @@ import t_attr from "../../../../src/render/formatAttributeText";
 export default function Attributes(
 	$props: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$slots?: Record<string, ServerSlotRender>
 ): { body: string, head: string } {
