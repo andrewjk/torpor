@@ -41,7 +41,8 @@ export default function IfCache(
 				const t_root_1 = t_root(t_fragment_1, true);
 				const t_p_1 = t_next(t_root_1) as HTMLElement;
 				const t_text_1 = t_next(t_p_1, true);
-				$mount(function elMount() {
+				// @ts-ignore
+				$mount(() => {
 					return (() => $props.i++)(t_p_1);
 				});
 				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);

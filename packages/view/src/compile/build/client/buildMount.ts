@@ -3,7 +3,8 @@ import type BuildStatus from "./BuildStatus";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildMount(
-	functionName: string,
+	// TODO: like in buildRun
+	_functionName: string,
 	functionBody: string,
 	status: BuildStatus,
 	b: Builder,
@@ -11,7 +12,8 @@ export default function buildMount(
 	functionBody = replaceForVarNames(functionBody, status);
 
 	status.imports.add("$mount");
-	b.append(`$mount(function ${functionName}() {`);
+	// Ignore errors if the user hasn't returned a cleanup function
+	b.append("// @ts-ignore\n$mount(() => {");
 	b.append(functionBody);
 	b.append("});");
 }
