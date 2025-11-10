@@ -1,13 +1,16 @@
+import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
 import isSpecialNode from "../../utils/isSpecialNode";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildSlotNode(node: ElementNode, status: BuildStatus, b: Builder): void {
 	// If there's a slot, build that, otherwise build the default nodes
@@ -21,18 +24,32 @@ export default function buildSlotNode(node: ElementNode, status: BuildStatus, b:
 	if (slotHasProps) {
 		// TODO: defaults etc props
 		status.imports.add("$watch");
-		b.append(`const ${propsName} = $watch({});`);
-		for (let { name, value, reactive } of slotAttributes) {
+
+		// Gather props, runs and binding runs, and set them all at once
+		let props: { name: string; value: string; span: SourceSpan }[] = [];
+		let runs: string[] = [];
+
+		for (let { name, value, reactive, span } of slotAttributes) {
 			if (value != null) {
-				const setProp = `${propsName}["${name}"] = ${value}`;
+				props.push({ name, value, span });
 				if (reactive) {
-					buildRun("setProp", `${setProp};`, status, b);
-				} else {
-					b.append(`${setProp};`);
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else {
-				b.append(`${propsName}["${name}"] = true;`);
+				props.push({ name, value: "true", span });
 			}
+		}
+
+		// Set the props, runs and binding runs that we gathered
+		b.append(`const ${propsName} = $watch({`);
+		for (let p of props) {
+			let value = replaceForVarNames(p.value, status);
+			addMappedText(`${p.name}: `, value, ",", p.span, status, b);
+		}
+		b.append("});");
+		// TODO: Map these things:
+		if (runs.length) {
+			buildRun("setProps", replaceForVarNames(runs.join("\n"), status), status, b);
 		}
 	}
 

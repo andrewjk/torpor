@@ -113,7 +113,9 @@ function List(
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_slot_parent_1 = t_next(t_root_1) as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
-			const t_sprops_1 = $watch({});
+			const t_sprops_1 = $watch({
+				item: t_item_1.data.item,
+			});
 			$run(() => {
 				t_sprops_1["item"] = t_item_1.data.item;
 			});
