@@ -82,7 +82,7 @@ export default function TextArea($props: TextAreaProps | undefined) {
 	}
 
 	@render {
-		<input
+		<textarea
 			id={$props?.id ?? defaultId}
 			class={`torp-text-area ${$props?.class ?? ""}`.trim()}
 			{name}
