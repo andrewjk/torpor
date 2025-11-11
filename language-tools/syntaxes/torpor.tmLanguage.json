@@ -126,7 +126,7 @@
 			]
 		},
 		"render-attribute": {
-			"begin": "([a-z-]+)",
+			"begin": "([a-zA-Z-]+)",
 			"beginCaptures": {
 				"0": {
 					"name": "entity.other.attribute-name.html"
