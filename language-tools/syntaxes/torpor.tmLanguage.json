@@ -118,7 +118,12 @@
 				}
 			},
 			"name": "meta.tag.structure.$2.start.html",
-			"patterns": [{ "include": "#render-attribute" }, { "include": "#render-attribute-shortcut" }]
+			"patterns": [
+				{ "include": "#render-comment-js-inline" },
+				{ "include": "#render-comment-js-block" },
+				{ "include": "#render-attribute" },
+				{ "include": "#render-attribute-shortcut" }
+			]
 		},
 		"render-attribute": {
 			"begin": "([a-z-]+)",
