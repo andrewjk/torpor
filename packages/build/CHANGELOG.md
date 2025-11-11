@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.5
+
+### Patch Changes
+
+- ec90aef: Fix: submit to a button's formaction if set
+
 ## 0.4.4
 
 ### Patch Changes
