@@ -12,6 +12,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 
 	// Perform a POST fetch to the form's action location
 	const form = e.target as HTMLFormElement;
+	const action = (e.submitter as HTMLButtonElement)?.formAction ?? form.action;
 	const options = {
 		body: new FormData(form),
 		method: "POST",
@@ -25,7 +26,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		},
 	};
 	const response = await fetch(
-		form.action,
+		action,
 		// @ts-ignore -- don't know what it's complaining about here
 		options,
 	);
