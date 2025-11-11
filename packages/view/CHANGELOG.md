@@ -1,5 +1,16 @@
 # @torpor/view
 
+## 0.4.8
+
+### Patch Changes
+
+- ef5c44c: Fix: ignore $mount return errors
+- 6a236a7: Fix: $context is required in slots
+- 6a236a7: Fix: standard optionality for $props, $context, $slots
+- 9fdb297: Fix: create a typed $props param on the server
+- 21a4256: Fix: ignore className.baseVal type error
+- 42cf24c: Fix: create a typed $sprops param
+
 ## 0.4.7
 
 ### Patch Changes
