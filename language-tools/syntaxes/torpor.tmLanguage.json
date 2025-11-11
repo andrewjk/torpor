@@ -168,7 +168,7 @@
 			"match": "([^\\s\"'\\{=<>`/]|/(?!>))+",
 			"name": "string.unquoted.html"
 		},
-		"render-attribute-single-quoted": {
+		"render-attribute-double-quoted": {
 			"begin": "\"",
 			"beginCaptures": {
 				"0": {
@@ -184,11 +184,11 @@
 			"name": "string.quoted.double.html",
 			"patterns": [
 				{
-					"include": "#render-entities"
+					"include": "#render-attribute-reactive"
 				}
 			]
 		},
-		"render-attribute-double-quoted": {
+		"render-attribute-single-quoted": {
 			"begin": "'",
 			"beginCaptures": {
 				"0": {
@@ -204,7 +204,7 @@
 			"name": "string.quoted.single.html",
 			"patterns": [
 				{
-					"include": "#render-entities"
+					"include": "#render-attribute-reactive"
 				}
 			]
 		},
@@ -212,13 +212,13 @@
 			"begin": "\\{",
 			"beginCaptures": {
 				"0": {
-					"name": "punctuation.definition.reactive.begin.html"
+					"name": "keyword.operator.brace.torp"
 				}
 			},
 			"end": "\\}",
 			"endCaptures": {
 				"0": {
-					"name": "punctuation.definition.reactive.end.html"
+					"name": "keyword.operator.brace.torp"
 				}
 			},
 			"name": "value.reactive.torp",
