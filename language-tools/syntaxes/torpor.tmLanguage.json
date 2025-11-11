@@ -671,11 +671,7 @@
 					"name": "punctuation.definition.control.indicator.torp"
 				},
 				"2": {
-					"patterns": [
-						{
-							"include": "source.ts"
-						}
-					]
+					"name": "keyword.control.at-html"
 				},
 				"3": {
 					"name": "punctuation.definition.html.begin.torp"
