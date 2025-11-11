@@ -4,7 +4,7 @@
 	"author": "",
 	"icon": "logo.png",
 	"license": "ISC",
-	"version": "0.3.29",
+	"version": "0.3.30",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/andrewjk/torpor"
