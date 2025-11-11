@@ -13,7 +13,7 @@ interface HiddenProps {
 /**
  * A standard input in a form.
  */
-export default function Input($props: HiddenProps | undefined) {
+export default function Hidden($props: HiddenProps | undefined) {
 	@render {
 		<input
 			{$props?.id}
