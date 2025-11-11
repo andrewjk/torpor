@@ -111,7 +111,7 @@
 					"name": "entity.name.tag.html"
 				}
 			},
-			"end": ">",
+			"end": "/?>",
 			"endCaptures": {
 				"0": {
 					"name": "punctuation.definition.tag.end.html"
@@ -249,10 +249,21 @@
 			]
 		},
 		"render-tag-close": {
-			"begin": "</(\\s*)([^\\s>]+)",
+			"begin": "(</)(\\s*)([^\\s>]+)",
+			"beginCaptures": {
+				"1": {
+					"name": "punctuation.definition.tag.begin.html"
+				},
+				"3": {
+					"name": "entity.name.tag.html"
+				}
+			},
 			"end": ">",
-			"name": "entity.name.tag.html",
-			"contentName": "entity.name.tag"
+			"endCaptures": {
+				"0": {
+					"name": "punctuation.definition.tag.end.html"
+				}
+			}
 		},
 		"render-text-reactive": {
 			"begin": "\\{",
