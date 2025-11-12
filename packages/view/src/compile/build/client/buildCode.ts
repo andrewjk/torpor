@@ -19,6 +19,7 @@ const importsMap: Record<string, string> = {
 	$peek: 'import { $peek } from "${folder}";',
 	$batch: 'import { $batch } from "${folder}";',
 	t_region: 'import { t_region } from "${folder}";',
+	t_clear: 'import { t_clear } from "${folder}";',
 	t_push_region: 'import { t_push_region } from "${folder}";',
 	t_pop_region: 'import { t_pop_region } from "${folder}";',
 	t_run_control: 'import { t_run_control } from "${folder}";',

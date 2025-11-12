@@ -12,7 +12,7 @@ export default function runControlBranch(region: Region, create: () => void, nam
 
 	// Branching regions have exactly one child -- remove it if necessary
 	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) {
-		clearRegion(region.nextRegion!);
+		clearRegion(region.nextRegion);
 	}
 
 	const branchRegion = newRegion(name);

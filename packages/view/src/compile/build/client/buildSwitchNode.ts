@@ -15,8 +15,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName!;
 	const regionName = nextVarName("switch_region", status);
-	const stateName = "$" + nextVarName("switch_state", status);
-	const creatorsName = nextVarName("switch_creators", status);
+	const indexName = nextVarName("switch_index", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -33,41 +32,32 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		branches.push(defaultBranch);
 	}
 
-	status.imports.add("$watch");
-	status.imports.add("$run");
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
-	status.imports.add("t_run_branch");
+	status.imports.add("t_clear");
+	status.imports.add("t_push_region");
+	status.imports.add("t_pop_region");
 
 	b.append("");
 	b.append("/* @switch */");
+
 	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
+
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"switch"` : ""});
-		let ${stateName} = $watch({ index: -1 });
-		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];
-		$run(() => {`);
+		let ${indexName} = -1;
+		t_run_control(${regionName}, ${anchorName}, (t_before) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
 	let index = 0;
 	for (let branch of branches) {
-		buildSwitchBranch(branch, status, b, parentName, stateName, creatorsName, index++);
+		buildSwitchBranch(branch, status, b, parentName, regionName, indexName, index++);
 	}
 	b.append(`
 		}
 	}${status.options.dev === true ? `, "runSwitch"` : ""});`);
-
-	b.append(`
-		t_run_control(${regionName}, ${anchorName}, (t_before) => {
-			const index = ${stateName}.index;`);
-	//addPushDevBoundary("branch", "`branch ${index}`", status, b);
-	b.append(
-		`t_run_branch(${regionName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});`,
-	);
-	addPopDevBoundary(status, b);
-	b.append("});");
 
 	addPopDevBoundary(status, b);
 
@@ -79,16 +69,30 @@ function buildSwitchBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	stateName: string,
-	creatorsName: string,
+	regionName: string,
+	indexName: string,
 	index: number,
 ) {
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
+	b.append(`if (${indexName} === ${index}) return;`);
+
+	// HACK: This is bad -- it means that the parent region has been cleared,
+	// but that should have cleared the effect that runs this child region??
+	// TODO: Look into this further...
+	b.append(`if (${regionName}.depth === -2) return;`);
+
+	b.append(`
+		if (${regionName}.nextRegion !== null && ${regionName}.nextRegion.depth > ${regionName}.depth) {
+			t_clear(${regionName}.nextRegion);
+		}`);
+
 	if (node.children.length > 0) {
-		let beforeParam = node.fragment !== undefined ? "t_before" : "_";
-		b.append(`${creatorsName}[${index}] = (${beforeParam}) => {`);
+		b.append(`
+			const t_new_region = t_region(${status.options.dev === true ? `"switch_branch"` : ""});
+			const t_old_region = t_push_region(t_new_region, true);
+		`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 
@@ -103,13 +107,11 @@ function buildSwitchBranch(
 
 		buildAddFragment(node, status, b, parentName, "t_before");
 
-		b.append("};");
-	} else {
-		b.append(`${creatorsName}[${index}] = (_) => {};`);
+		b.append("t_pop_region(t_old_region);");
 	}
 
-	b.append(`${stateName}.index = ${index};`);
 	b.append(`
+			${indexName} = ${index};
 			break;
 		}`);
 }

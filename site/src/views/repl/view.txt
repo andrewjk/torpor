@@ -571,22 +571,15 @@ function nodeSkip(node, count) {
 	for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
 	return nextNode;
 }
-function runControl(region, anchor, create) {
+function runControl(region, anchor, create, name) {
 	let first = true;
 	$run(function runControl$1() {
 		const oldRegion = pushRegion(region, first);
 		first = false;
 		create(anchor);
 		popRegion(oldRegion);
-	});
+	}, name);
 	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
-}
-function runControlBranch(region, create, name) {
-	if (region.depth === -2) return;
-	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
-	const oldRegion = pushRegion(newRegion(name), true);
-	create();
-	popRegion(oldRegion);
 }
 function propagateSignal(proxy, key) {
 	let signal = proxy.signals.get(key);
@@ -947,6 +940,7 @@ let t_apply_props = applyProps;
 let t_attribute = setAttribute;
 let t_child = nodeChild;
 let t_class = buildClasses;
+let t_clear = clearRegion;
 let t_dynamic = setDynamicElement;
 let t_event = addEvent;
 let t_fmt = formatText;
@@ -957,7 +951,6 @@ let t_pop_region = popRegion;
 let t_push_region = pushRegion;
 let t_region = newRegion;
 let t_root = nodeRoot;
-let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
 let t_skip = nodeSkip;

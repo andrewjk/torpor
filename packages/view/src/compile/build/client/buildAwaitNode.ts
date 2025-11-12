@@ -16,9 +16,8 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	const anchorName = node.varName ?? "null";
 	const parentName = node.parentName!;
 	const regionName = nextVarName("await_region", status);
-	const stateName = "$" + nextVarName("await_state", status);
-	const creatorsName = nextVarName("await_creators", status);
-	const awaitVarsName = nextVarName("await_vars", status);
+	const indexName = nextVarName("await_index", status);
+	const tokenName = nextVarName("await_token", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
@@ -55,29 +54,31 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 
 	// Use an incrementing token to make sure only the last request gets handled
 	// TODO: This might have unforeseen consequences
-	status.imports.add("$watch");
-	status.imports.add("$run");
+
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
-	status.imports.add("t_run_branch");
+	status.imports.add("t_clear");
+	status.imports.add("t_push_region");
+	status.imports.add("t_pop_region");
 
 	b.append("");
 	b.append("/* @await */");
+
 	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
+
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"await"` : ""});
-		let ${stateName} = $watch({ index: -1 });
-		let ${creatorsName}: ((t_before: Node | null) => void)[] = [];
-		let ${awaitVarsName} = { t_token: 0 };
-		$run(() => {`);
+		let ${tokenName} = 0;
+		let ${indexName} = -1;
+		t_run_control(${regionName}, ${anchorName}, (t_before) => {`);
 
 	let index = 0;
 
 	// Build the waiting branch before anything happens
-	buildAwaitBranch(awaitBranch, status, b, parentName, stateName, creatorsName, index++);
+	buildAwaitBranch(awaitBranch, status, b, parentName, regionName, indexName, index++);
 
 	b.append(`
-		${awaitVarsName}.t_token++;
+		${tokenName}++;
 		((t_token) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
@@ -95,8 +96,8 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		b,
 	);
 
-	b.append(`if (t_token === ${awaitVarsName}.t_token) {`);
-	buildAwaitBranch(thenBranch, status, b, parentName, stateName, creatorsName, index++);
+	b.append(`if (t_token === ${tokenName}) {`);
+	buildAwaitBranch(thenBranch, status, b, parentName, regionName, indexName, index++);
 	b.append(`}
 		})`);
 
@@ -111,22 +112,12 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 		b,
 	);
 
-	b.append(`if (t_token === ${awaitVarsName}.t_token) {`);
-	buildAwaitBranch(catchBranch, status, b, parentName, stateName, creatorsName, index++);
+	b.append(`if (t_token === ${tokenName}) {`);
+	buildAwaitBranch(catchBranch, status, b, parentName, regionName, indexName, index++);
 	b.append(`}
 				});
-			})(${awaitVarsName}.t_token);
+			})(${tokenName});
 		}${status.options.dev === true ? `, "runAwait"` : ""});`);
-
-	b.append(`
-		t_run_control(${regionName}, ${anchorName}, (t_before) => {
-			const index = ${stateName}.index;`);
-	//addPushDevBoundary("branch", "`branch ${index}`", status, b);
-	b.append(
-		`t_run_branch(${regionName}, () => ${creatorsName}[index](t_before)${status.options.dev === true ? ", `branch ${index}`" : ""});`,
-	);
-	addPopDevBoundary(status, b);
-	b.append("});");
 
 	addPopDevBoundary(status, b);
 
@@ -138,13 +129,31 @@ function buildAwaitBranch(
 	status: BuildStatus,
 	b: Builder,
 	parentName: string,
-	stateName: string,
-	creatorsName: string,
+	regionName: string,
+	indexName: string,
 	index: number,
 ) {
+	b.append(`if (${indexName} === ${index}) return;`);
+
+	// HACK: This is bad -- it means that the parent region has been cleared,
+	// but that should have cleared the effect that runs this child region??
+	// TODO: Look into this further...
+	b.append(`if (${regionName}.depth === -2) return;`);
+
+	b.append(`
+		if (${regionName}.nextRegion !== null && ${regionName}.nextRegion.depth > ${regionName}.depth) {
+			t_clear(${regionName}.nextRegion);
+		}`);
+
 	if (node.children.length > 0) {
-		let beforeParam = node.fragment !== undefined ? "t_before" : "_";
-		b.append(`${creatorsName}[${index}] = (${beforeParam}) => {`);
+		// NOTE: for await branches, we need to push the control region again,
+		// because it will have been popped by the time the `then` or `catch`
+		// branches are hit
+		b.append(`
+			const t_new_region = t_region(${status.options.dev === true ? `"await_branch"` : ""});
+			const t_old_control_region = t_push_region(${regionName});
+			const t_old_region = t_push_region(t_new_region, true);
+		`);
 
 		buildFragment(node, status, b, parentName, "t_before");
 
@@ -159,10 +168,9 @@ function buildAwaitBranch(
 
 		buildAddFragment(node, status, b, parentName, "t_before");
 
-		b.append("};");
-	} else {
-		b.append(`${creatorsName}[${index}] = (_) => {};`);
+		b.append("t_pop_region(t_old_region);");
+		b.append("t_pop_region(t_old_control_region);");
 	}
 
-	b.append(`${stateName}.index = ${index};`);
+	b.append(`${indexName} = ${index};`);
 }

@@ -5,13 +5,15 @@ import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
+import t_clear from "../../../../src/render/clearRegion";
 import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
+import t_pop_region from "../../../../src/render/popRegion";
+import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
-import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
 export default function TrafficLight(
@@ -50,47 +52,64 @@ export default function TrafficLight(
 
 	/* @if */
 	const t_if_region_1 = t_region();
-	let $t_if_state_1 = $watch({ index: -1 });
-	let t_if_creators_1: ((t_before: Node | null) => void)[] = [];
-	$run(() => {
+	let t_if_index_1 = -1;
+	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 		if ($state.light === "red") {
-			t_if_creators_1[0] = (t_before) => {
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
-				const t_root_1 = t_root(t_fragment_1, true);
-				const t_text_2 = t_next(t_next(t_root_1), true);
-				t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
-				t_next(t_text_2);
-			};
-			$t_if_state_1.index = 0;
+			if (t_if_index_1 === 0) return;
+			if (t_if_region_1.depth === -2) return;
+			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
+				t_clear(t_if_region_1.nextRegion);
+			}
+			const t_new_region = t_region();
+			const t_old_region = t_push_region(t_new_region, true);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>STOP</span> `);
+			const t_root_1 = t_root(t_fragment_1, true);
+			const t_text_2 = t_next(t_next(t_root_1), true);
+			t_add_fragment(t_fragment_1, t_if_parent_1, t_before, t_text_2);
+			t_next(t_text_2);
+			t_pop_region(t_old_region);
+			t_if_index_1 = 0;
 		}
 		else if ($state.light === "orange") {
-			t_if_creators_1[1] = (t_before) => {
-				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
-				const t_root_2 = t_root(t_fragment_2, true);
-				const t_text_3 = t_next(t_next(t_root_2), true);
-				t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
-				t_next(t_text_3);
-			};
-			$t_if_state_1.index = 1;
+			if (t_if_index_1 === 1) return;
+			if (t_if_region_1.depth === -2) return;
+			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
+				t_clear(t_if_region_1.nextRegion);
+			}
+			const t_new_region = t_region();
+			const t_old_region = t_push_region(t_new_region, true);
+			const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <span>SLOW DOWN</span> `);
+			const t_root_2 = t_root(t_fragment_2, true);
+			const t_text_3 = t_next(t_next(t_root_2), true);
+			t_add_fragment(t_fragment_2, t_if_parent_1, t_before, t_text_3);
+			t_next(t_text_3);
+			t_pop_region(t_old_region);
+			t_if_index_1 = 1;
 		}
 		else if ($state.light === "green") {
-			t_if_creators_1[2] = (t_before) => {
-				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
-				const t_root_3 = t_root(t_fragment_3, true);
-				const t_text_4 = t_next(t_next(t_root_3), true);
-				t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
-				t_next(t_text_4);
-			};
-			$t_if_state_1.index = 2;
+			if (t_if_index_1 === 2) return;
+			if (t_if_region_1.depth === -2) return;
+			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
+				t_clear(t_if_region_1.nextRegion);
+			}
+			const t_new_region = t_region();
+			const t_old_region = t_push_region(t_new_region, true);
+			const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <span>GO</span> `);
+			const t_root_3 = t_root(t_fragment_3, true);
+			const t_text_4 = t_next(t_next(t_root_3), true);
+			t_add_fragment(t_fragment_3, t_if_parent_1, t_before, t_text_4);
+			t_next(t_text_4);
+			t_pop_region(t_old_region);
+			t_if_index_1 = 2;
 		}
 		else {
-			t_if_creators_1[3] = (_) => {};
-			$t_if_state_1.index = 3;
+			if (t_if_index_1 === 3) return;
+			if (t_if_region_1.depth === -2) return;
+			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
+				t_clear(t_if_region_1.nextRegion);
+			}
+			t_if_index_1 = 3;
 		}
-	});
-	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
-		const index = $t_if_state_1.index;
-		t_run_branch(t_if_region_1, () => t_if_creators_1[index](t_before));
 	});
 
 	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_button_1, true)), true)), true);

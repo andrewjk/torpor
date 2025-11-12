@@ -12,6 +12,7 @@ export default function runControl(
 	region: Region,
 	anchor: Node | null,
 	create: (anchor: Node | null) => void,
+	name?: string,
 ): void {
 	let first = true;
 
@@ -24,7 +25,7 @@ export default function runControl(
 		create(anchor);
 
 		popRegion(oldRegion);
-	});
+	}, name);
 
 	// If we're mounting, the anchor will be the one that is passed in, but if
 	// we're hydrating it will be after the active branch's HTML elements, so we

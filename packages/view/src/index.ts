@@ -5,6 +5,7 @@ import t_apply_props from "./render/applyProps";
 import t_class from "./render/buildClasses";
 import t_style from "./render/buildStyles";
 import clearLayoutSlot from "./render/clearLayoutSlot";
+import t_clear from "./render/clearRegion";
 import fillLayoutSlot from "./render/fillLayoutSlot";
 import t_fmt from "./render/formatText";
 import t_fragment from "./render/getFragment";
@@ -20,7 +21,6 @@ import t_skip from "./render/nodeSkip";
 import t_pop_region from "./render/popRegion";
 import t_push_region from "./render/pushRegion";
 import t_run_control from "./render/runControl";
-import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
@@ -54,6 +54,7 @@ export {
 	t_apply_props,
 	t_fmt,
 	t_class,
+	t_clear,
 	t_fragment,
 	t_style,
 	t_region,
@@ -65,7 +66,6 @@ export {
 	t_pop_region,
 	t_push_region,
 	t_run_control,
-	t_run_branch,
 	t_list_item,
 	t_run_list,
 	t_attribute,

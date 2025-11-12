@@ -140,6 +140,8 @@ const importsMap: Record<string, string> = {
 	'import { $batch } from "@torpor/view";': 'import $batch from "../../../../src/watch/$batch";',
 	'import { t_region } from "@torpor/view";':
 		'import t_region from "../../../../src/render/newRegion";',
+	'import { t_clear } from "@torpor/view";':
+		'import t_clear from "../../../../src/render/clearRegion";',
 	'import { t_push_region } from "@torpor/view";':
 		'import t_push_region from "../../../../src/render/pushRegion";',
 	'import { t_pop_region } from "@torpor/view";':
