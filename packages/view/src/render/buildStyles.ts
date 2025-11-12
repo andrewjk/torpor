@@ -8,7 +8,9 @@ export default function buildStyles(value: StyleValue): string {
 		if (value) {
 			if (Array.isArray(value)) {
 				for (let v of value) {
-					styles.push(v);
+					if (v) {
+						styles.push(v);
+					}
 				}
 			} else if (typeof value === "object") {
 				for (let [n, v] of Object.entries(value)) {

@@ -1,3 +1,8 @@
-type ClassValue = string | Record<string, string> | undefined | Array<ClassValue>;
+type ClassValue =
+	| string
+	| Record<string, string | null | undefined>
+	| Array<ClassValue>
+	| null
+	| undefined;
 
 export default ClassValue;
