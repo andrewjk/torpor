@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.12
+
+### Patch Changes
+
+- c612d9d: Edit: types for building classes and styles
+
 ## 0.4.11
 
 ### Patch Changes
