@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.13
+
+### Patch Changes
+
+- aa0c0e2: Feat: export class and style types
+
 ## 0.4.12
 
 ### Patch Changes

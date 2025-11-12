@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 0.3.4
+
+### Patch Changes
+
+- b8d978a: Feat: style property for UI components
+- Updated dependencies [aa0c0e2]
+  - @torpor/view@0.4.13
+
 ## 0.3.3
 
 ### Patch Changes
