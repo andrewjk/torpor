@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.11
+
+### Patch Changes
+
+- 195e93b: Fix: only include $peek if used
+
 ## 0.4.10
 
 ### Patch Changes
