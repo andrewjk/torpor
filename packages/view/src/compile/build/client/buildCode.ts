@@ -108,7 +108,7 @@ function buildTemplate(
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
-	/*if (/\$peek\b/.test(script))*/ imports.add("$peek");
+	if (/\$peek\b/.test(script)) imports.add("$peek");
 	if (/\$batch\b/.test(script)) imports.add("$batch");
 
 	let currentIndex = 0;
