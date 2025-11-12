@@ -25,7 +25,6 @@ export default function Colors(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	const colors = ["red", "green", "blue"];
 
@@ -82,5 +81,4 @@ export default function Colors(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
-	/**/ });
 }

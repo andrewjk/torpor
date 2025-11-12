@@ -19,7 +19,6 @@ export default function Parent(
 	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
-	$peek(() => { /**/
 
 	$context["ParentContext"] = "hi from the parent";
 
@@ -42,7 +41,6 @@ export default function Parent(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }
 
 function ChildA(
@@ -55,7 +53,6 @@ function ChildA(
 	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
-	$peek(() => { /**/
 
 	$context["ChildAContext"] = "hi!";
 
@@ -76,7 +73,6 @@ function ChildA(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
 	t_next(t_text_4);
 
-	/**/ });
 }
 
 function ChildB(
@@ -89,7 +85,6 @@ function ChildB(
 	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
-	$peek(() => { /**/
 
 	$context["ChildBContext"] = "hi!";
 
@@ -102,5 +97,4 @@ function ChildB(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }

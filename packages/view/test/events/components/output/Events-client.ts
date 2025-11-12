@@ -20,7 +20,6 @@ export default function Increment(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({ counter: 0 })
 
@@ -45,5 +44,4 @@ export default function Increment(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }

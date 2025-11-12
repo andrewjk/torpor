@@ -20,7 +20,6 @@ export default function IfNested(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -95,5 +94,4 @@ export default function IfNested(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
 	t_next(t_text_5);
 
-	/**/ });
 }

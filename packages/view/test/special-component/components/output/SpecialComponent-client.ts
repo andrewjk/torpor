@@ -22,7 +22,6 @@ export default function Component(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let components: Record<PropertyKey, any> = {
 		BigTitle,
@@ -74,7 +73,6 @@ export default function Component(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }
 
 function BigTitle(
@@ -86,7 +84,6 @@ function BigTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -102,7 +99,6 @@ function BigTitle(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }
 
 function SmallTitle(
@@ -114,7 +110,6 @@ function SmallTitle(
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -130,5 +125,4 @@ function SmallTitle(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }

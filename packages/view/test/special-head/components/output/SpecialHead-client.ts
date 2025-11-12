@@ -12,7 +12,6 @@ export default function Head(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	/* Head */
 	$run(() => {
@@ -21,5 +20,4 @@ export default function Head(
 		return () => document.title = t_old_title;
 	});
 
-	/**/ });
 }

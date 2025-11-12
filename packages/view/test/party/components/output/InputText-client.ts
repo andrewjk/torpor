@@ -20,7 +20,6 @@ export default function InputHello(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({
 		text: "Hello World"
@@ -44,5 +43,4 @@ export default function InputHello(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }

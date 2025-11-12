@@ -148,14 +148,6 @@ function buildTemplate(
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
 			}
-
-			// NOTE: We're isolating the user script by setting `context.activeTarget =
-			// null` and then setting it back at the end, but maybe it would be better to
-			// make it so that signals only affect effects that they are under e.g. so
-			// that creating a $state in a component doesn't affect any $runs outside
-			// the component?
-			b.append("$peek(() => { /**/");
-			b.append("");
 		} else if (chunk.script === "/* @render */") {
 			if (current.markup) {
 				// Add the interface
@@ -178,7 +170,6 @@ function buildTemplate(
 			// No styles in the client
 		} else if (chunk.script === "/* @end */") {
 			addPopDevBoundary(status, b);
-			b.append("/**/ });");
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {

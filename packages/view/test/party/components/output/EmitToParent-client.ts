@@ -21,7 +21,6 @@ export default function AnswerButtonApp(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({
 		isHappy: true
@@ -61,7 +60,6 @@ export default function AnswerButtonApp(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }
 
 function AnswerButton(
@@ -73,7 +71,6 @@ function AnswerButton(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -88,5 +85,4 @@ function AnswerButton(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }

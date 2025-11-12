@@ -27,7 +27,6 @@ export default function ForEscape(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let things = ["a", "b", "c", "d", "e"]
 
@@ -98,5 +97,4 @@ export default function ForEscape(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
-	/**/ });
 }

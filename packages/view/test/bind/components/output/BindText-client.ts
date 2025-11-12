@@ -20,7 +20,6 @@ export default function BindText(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({ name: "Alice", selected: 1 });
 
@@ -49,5 +48,4 @@ export default function BindText(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
-	/**/ });
 }

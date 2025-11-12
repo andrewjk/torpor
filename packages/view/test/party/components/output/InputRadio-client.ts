@@ -20,7 +20,6 @@ export default function PickPill(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({
 		picked: "red"
@@ -53,5 +52,4 @@ export default function PickPill(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }

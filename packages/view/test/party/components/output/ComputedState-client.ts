@@ -19,7 +19,6 @@ export default function DoubleCount(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let $state = $watch({
 		count: 10,
@@ -41,5 +40,4 @@ export default function DoubleCount(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }

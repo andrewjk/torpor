@@ -16,7 +16,6 @@ export default function Mount(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let inputElement: HTMLInputElement;
 
@@ -35,5 +34,4 @@ export default function Mount(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 
-	/**/ });
 }

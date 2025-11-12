@@ -21,7 +21,6 @@ export default function UserProfileContextApp(
 	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
-	$peek(() => { /**/
 
 	const $user = $watch({
 		id: 1,
@@ -50,7 +49,6 @@ export default function UserProfileContextApp(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);
 
-	/**/ });
 }
 
 function UserProfileContext(
@@ -63,7 +61,6 @@ function UserProfileContext(
 	$slots?: Record<string, SlotRender>
 ): void {
 	$context = Object.assign({}, $context);
-	$peek(() => { /**/
 
 	$context.user = $watch($context.user);
 
@@ -84,5 +81,4 @@ function UserProfileContext(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
-	/**/ });
 }

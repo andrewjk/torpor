@@ -26,7 +26,6 @@ export default function TrafficLight(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
@@ -104,5 +103,4 @@ export default function TrafficLight(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
 	t_next(t_text_5);
 
-	/**/ });
 }

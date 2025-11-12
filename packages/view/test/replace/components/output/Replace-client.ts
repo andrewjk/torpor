@@ -23,7 +23,6 @@ export default function Replace(
 	// @ts-ignore
 	$slots?: Record<string, SlotRender>
 ): void {
-	$peek(() => { /**/
 
 	let counter = 0;
 
@@ -57,5 +56,4 @@ export default function Replace(
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
 	t_next(t_text_3);
 
-	/**/ });
 }
