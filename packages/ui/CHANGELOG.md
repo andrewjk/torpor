@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 0.3.3
+
+### Patch Changes
+
+- 2fdad81: Fix: File input add accept, remove value
+
 ## 0.3.2
 
 ### Patch Changes
