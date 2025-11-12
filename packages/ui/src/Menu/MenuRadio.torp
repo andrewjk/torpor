@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import {
 	MenuButtonContextName,
 	MenuContextName,
@@ -10,8 +11,10 @@ import {
 interface MenuRadioProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The value of the item */
 	value?: string,
 	/** Whether this item is checked */
@@ -80,7 +83,8 @@ export default function MenuRadio($props: MenuRadioProps | undefined) {
 	@render {
 		<button
 			{$props?.id}
-			class={`torp-menu-radio ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu-radio", $props?.class]}
+			{$props?.style}
 			type="button"
 			{$props?.disabled}
 			role="menuitemradio"

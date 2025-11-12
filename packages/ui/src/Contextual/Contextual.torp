@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { ContextualContextName, type Point, type ContextualContext, type ContextualState } from "./ContextualTypes";
 
 interface ContextualProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether the contextual is modal. If true, an overlay should be supplied to obscure outside content, and only the context content will be visible to screen readers  */
 	modal?: boolean,
 	/** Whether the contextual is visible  */
@@ -117,7 +120,8 @@ export default function Contextual($props: ContextualProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-context ${$props?.class ?? ""}`.trim()}
+			class={["torp-context", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</div>

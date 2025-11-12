@@ -1,9 +1,12 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 
 interface MenuGroupProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** An ARIA label for describing the group to screen readers */
 	ariaLabel?: string,
 }
@@ -17,7 +20,8 @@ export default function MenuGroup($props: MenuGroupProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-menu-group ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu-group", $props?.class]}
+			{$props?.style}
 			role="group"
 			aria-label={$props?.ariaLabel}
 		>

@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { DialogContextName, type DialogContext } from "./DialogTypes";
 
 interface DialogButtonProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover */
 	value?: any,
 	/** "confirm" if the button should respond to the Enter key or "cancel" if the button should respond to the Escape key */
@@ -51,7 +54,8 @@ export default function DialogButton($props: DialogButtonProps | undefined) {
 		<button
 			type="button"
 			{$props?.id}
-			class={`torp-dialog-button ${$props?.class ?? ""}`.trim()}
+			class={["torp-dialog-button", $props?.class]}
+			{$props?.style}
 			disabled={$props?.disabled}
 			onclick={handleClick}
 			&ref={button}

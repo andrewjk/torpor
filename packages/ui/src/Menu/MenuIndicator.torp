@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { MenuButtonContextName, type MenuButtonContext } from "./MenuTypes";
 
 interface MenuIndicatorProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether this item is disabled */
 	disabled?: boolean,
 }
@@ -25,7 +28,8 @@ export default function MenuIndicator($props: MenuIndicatorProps | undefined) {
 		@if ($state.checked) {
 			<div
 				{$props?.id}
-				class={`torp-menu-indicator ${$props?.class ?? ""}`.trim()}
+				class={["torp-menu-indicator", $props?.class]}
+				{$props?.style}
 				aria-disabled={$props?.disabled ? "true" : undefined}
 				data-disabled={$props?.disabled ? "true" : undefined}
 			>

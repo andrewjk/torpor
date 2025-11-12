@@ -1,11 +1,13 @@
-
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
 interface NavMenuLinkProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The URL for the menu link */
 	href: string,
 	/** Whether the menu link should open in a new tab/window */
@@ -38,7 +40,8 @@ export default function NavMenuLink($props: NavMenuLinkProps | undefined) {
 	@render {
 		<a
 			{$props?.id}
-			class={`torp-nav-menu-link ${$props?.class ?? ""}`.trim()}
+			class={["torp-nav-menu-link", $props?.class]}
+			{$props?.style}
 			{$props?.href}
 			{$props?.disabled}
 			target={$props?.newWindow ? "_blank" : undefined}

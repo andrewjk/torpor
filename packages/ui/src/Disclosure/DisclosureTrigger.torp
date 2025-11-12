@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
 
 interface DisclosureTriggerProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -28,7 +31,8 @@ export default function DisclosureTrigger($props: DisclosureTriggerProps | undef
 		<button
 			type="button"
 			id={$props?.id ?? defaultId}
-			class={`torp-disclosure-trigger ${$props?.class ?? ""}`.trim()}
+			class={["torp-disclosure-trigger", $props?.class]}
+			{$props?.style}
 			disabled={$state.disabled}
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled}

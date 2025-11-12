@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
 interface NavMenuButtonProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether this button is disabled  */
 	disabled?: boolean,
 }
@@ -33,7 +36,8 @@ export default function NavMenuButton($props: NavMenuButtonProps | undefined) {
 	@render {
 		<button
 			{$props?.id}
-			class={`torp-nav-menu-button ${$props?.class ?? ""}`.trim()}
+			class={["torp-nav-menu-button", $props?.class]}
+			{$props?.style}
 			type="button"
 			{$props?.disabled}
 			role="menuitem"

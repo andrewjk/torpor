@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { FormContextName, type ValidationIssue, type FormContext } from "./FormTypes";
 import { StandardSchemaV1 } from "./StandardSchemaV1"
 
 interface FormProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The data to display in the form */
 	data?: any,
 	/** Where to post the form's data **/
@@ -129,7 +132,8 @@ export default function Form($props: FormProps | undefined) {
 	@render {
 		<form
 			{$props?.id}
-			class={`torp-form ${$props?.class ?? ""}`.trim()}
+			class={["torp-form", $props?.class]}
+			{$props?.style}
 			method={$props?.method ?? "POST"}
 			enctype={$props?.enctype ?? ($state.hasFile ? "multipart/form-data" : undefined)}
 			onsubmit={handleSubmit}

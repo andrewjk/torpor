@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { DisclosureContextName, type DisclosureContext, type DisclosureState } from "./DisclosureTypes";
 
 interface DisclosureProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether the disclosure is expanded and its content visible */
 	expanded?: boolean,
 	/** If set to true, the user cannot interact with this disclosure */
@@ -68,7 +71,8 @@ export default function Disclosure($props: DisclosureProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-disclosure-item ${$props?.class ?? ""}`.trim()}
+			class={["torp-disclosure-item", $props?.class]}
+			{$props?.style}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>

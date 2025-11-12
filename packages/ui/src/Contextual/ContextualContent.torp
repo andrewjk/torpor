@@ -1,4 +1,4 @@
-
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getScrollParent from "../utils/getScrollParent";
 import setContextPosition from "../utils/setContextPosition";
@@ -7,8 +7,10 @@ import { ContextualContextName, type ContextualContext } from "./ContextualTypes
 interface ContextualContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -98,7 +100,8 @@ export default function ContextualContent($props: ContextualContentProps | undef
 		@if ($state.visible) {
 			<div
 				{$props?.id}
-				class={`torp-popover-content-contextual ${$props?.class ?? ""}`.trim()}
+				class={["torp-popover-content-contextual", $props?.class]}
+				{$props?.style}
 				&ref={div}
 				onmount={show}
 			>

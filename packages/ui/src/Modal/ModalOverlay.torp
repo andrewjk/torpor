@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { disableScroll } from "../mount/disableScroll";
 import { ModalContextName, type ModalContext } from "./ModalTypes";
 
 interface ModalOverlayProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -27,7 +30,8 @@ export default function ModalOverlay($props: ModalOverlayProps | undefined) {
 		@if ($state.visible) {
 			<div
 				{$props?.id}
-				class={`torp-modal-overlay ${$props?.class ?? ""}`.trim()}
+				class={["torp-modal-overlay", $props?.class]}
+				{$props?.style}
 				tabindex="-1"
 				onmount={(el) => disableScroll(el)}
 			>

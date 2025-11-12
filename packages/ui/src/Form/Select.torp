@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
 
 interface SelectProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The name of the input's form data field */
 	name?: string,
 	/** The data value that this field is bound to */
@@ -80,7 +83,8 @@ export default function Select($props: SelectProps | undefined) {
 	@render {
 		<select
 			id={$props?.id ?? defaultId}
-			class={`torp-select ${$props?.class ?? ""}`.trim()}
+			class={["torp-select", $props?.class]}
+			{$props?.style}
 			{name}
 			&value={$state.value}
 			{$props?.placeholder}

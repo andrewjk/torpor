@@ -1,4 +1,4 @@
-import { type Animation } from "@torpor/view";
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { slide } from "../motion";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
@@ -6,8 +6,10 @@ import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
 interface DrawerContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -67,7 +69,8 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		@if ($state.visible) {
 			<div
 				{$props?.id}
-				class={`torp-drawer-content ${$props?.class ?? ""}`.trim()}
+				class={["torp-drawer-content", $props?.class]}
+				{$props?.style}
 				style="position: fixed;"
 				transition={(e) => slide(e, { side: $state.position })}
 				&ref={drawer}

@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import {
 	NavMenuContextName,
 	type NavMenuContext,
@@ -9,8 +10,10 @@ import {
 interface NavMenuProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** An ARIA label for describing the menu to screen readers  */
 	ariaLabel?: string | undefined,
 	/** The orientation of the menu, which affects keyboard navigation */
@@ -173,7 +176,8 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 	@render {
 		<nav
 			{$props?.id}
-			class={`torp-nav-menu ${$props?.class ?? ""}`.trim()}
+			class={["torp-nav-menu", $props?.class]}
+			{$props?.style}
 			tabindex="0"
 			role="menubar"
 			aria-label={$props?.ariaLabel}

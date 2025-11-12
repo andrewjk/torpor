@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { ReactiveDate } from "@torpor/view";
 import { areDatesEqual, dayNames, monthNames } from "../utils/dateUtils";
 import CalendarDay from "./CalendarDay.torp";
@@ -10,8 +11,10 @@ import ChevronRight from "../icons/ChevronRight.torp";
 interface CalendarProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 export default function Calendar($props: CalendarProps) {
@@ -219,7 +222,8 @@ export default function Calendar($props: CalendarProps) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-calendar ${$props?.class ?? ""}`.trim()}
+			class={["torp-calendar", $props?.class]}
+			{$props?.style}
 			&ref={container}
 		>
 			<div class={`torp-calendar-header ${$props?.class ?? ""}`.trim()}>
@@ -238,7 +242,8 @@ export default function Calendar($props: CalendarProps) {
 				</button>
 			</div>
 			<div
-				class={`torp-calendar-grid ${$props?.class ?? ""}`.trim()}
+				class={["torp-calendar-grid", $props?.class]}
+				{$props?.style}
 				tabindex={$props.selectable ? 0 : -1}
 				onfocus={handleFocus}
 				onkeydown={handleKey}

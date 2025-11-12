@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
 
 interface TabContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The index of this item */
 	index?: number,
 	/** The value for this item */
@@ -30,7 +33,8 @@ export default function TabContent($props: TabContentProps | undefined) {
 	@render {
 		<div
 			id={$props?.id ?? defaultId}
-			class={`torp-tab-content ${$props?.class ?? ""}`.trim()}
+			class={["torp-tab-content", $props?.class]}
+			{$props?.style}
 			role="tabpanel"
 			aria-labelledby={$state.headerId}
 			data-orientation={context.orientation}

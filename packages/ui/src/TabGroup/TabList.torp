@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
 
 interface TabListProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** An ARIA label for describing the tab list to screen readers */
 	ariaLabel?: string,
 }
@@ -43,7 +46,8 @@ export default function TabList($props: TabListProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-tab-list ${$props?.class ?? ""}`.trim()}
+			class={["torp-tab-list", $props?.class]}
+			{$props?.style}
 			role="tablist"
 			aria-label={$props?.ariaLabel}
 			aria-orientation={orientation}

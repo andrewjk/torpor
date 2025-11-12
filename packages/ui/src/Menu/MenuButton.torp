@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { MenuContextName, type MenuContext } from "./MenuTypes";
 
 interface MenuButtonProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The value that should be returned when this button is pressed and the Dialog was invoked by calling showContextual, showPrompt or showPopover */
 	value?: any,
 	/** Whether this button is disabled */
@@ -53,7 +56,8 @@ export default function MenuButton($props: MenuButtonProps | undefined) {
 	@render {
 		<button
 			{$props?.id}
-			class={`torp-menu-button ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu-button", $props?.class]}
+			{$props?.style}
 			type="button"
 			{$props?.disabled}
 			role="menuitem"

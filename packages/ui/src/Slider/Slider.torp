@@ -72,7 +72,8 @@ export default function Slider($props: any | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-slider ${$props?.class ?? ""}`.trim()}
+			class={["torp-slider", $props?.class]}
+			{$props?.style}
 			onmousemove={handleMouseMove}
 			onmouseup={handleMouseUp}
 		>

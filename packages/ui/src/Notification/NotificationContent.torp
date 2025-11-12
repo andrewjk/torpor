@@ -1,9 +1,12 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 
 interface NotificationContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -13,7 +16,8 @@ export default function NotificationContent($props: NotificationContentProps | u
 	@render {
 		<div 
 			{$props?.id}
-			class={`torp-notification-content ${$props?.class ?? ""}`.trim()}
+			class={["torp-notification-content", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</div>

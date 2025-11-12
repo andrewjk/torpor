@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
 
 interface FileProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The name of the input's form data field */
 	name?: string,
 	/** The type of files that this input accepts e.g. `image/*` */
@@ -81,7 +84,8 @@ export default function File($props: FileProps | undefined) {
 	@render {
 		<input
 			id={$props?.id ?? defaultId}
-			class={`torp-file ${$props?.class ?? ""}`.trim()}
+			class={["torp-file", $props?.class]}
+			{$props?.style}
 			type="file"
 			{name}
 			{$props?.accept}

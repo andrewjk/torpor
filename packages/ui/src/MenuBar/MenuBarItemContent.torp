@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import setPopoverPosition from "../utils/setPopoverPosition";
 import {
@@ -10,8 +11,10 @@ import {
 interface MenuBarItemContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Where the popout will be shown, relative to the popout button */
 	side?: "top" | "right" | "bottom" | "left",
 	/** How the popout will be aligned, relative to the popout button */
@@ -104,7 +107,8 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps | und
 		@if ($state.visible) {
 			<div
 				{$props?.id}
-				class={`torp-menu-bar-item-content ${$props?.class ?? ""}`.trim()}
+				class={["torp-menu-bar-item-content", $props?.class]}
+				{$props?.style}
 				&ref={div}
 				onmount={show}
 			>

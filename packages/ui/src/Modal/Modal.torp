@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { ModalContextName, type ModalContext, type ModalState } from "./ModalTypes";
 
 interface ModalProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether the modal is visible  */
 	visible?: boolean,
 	/** A function to be called when the user selects a response */
@@ -110,7 +113,8 @@ export default function Modal($props: ModalProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-modal ${$props?.class ?? ""}`.trim()}
+			class={["torp-modal", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</div>

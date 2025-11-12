@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { PopoverContextName, type Point, type PopoverContext, type PopoverState } from "./PopoverTypes";
 
 interface PopoverProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers  */
 	modal?: boolean,
 	/** Whether the popover is visible  */
@@ -117,7 +120,8 @@ export default function Popover($props: PopoverProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-popover ${$props?.class ?? ""}`.trim()}
+			class={["torp-popover", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</div>

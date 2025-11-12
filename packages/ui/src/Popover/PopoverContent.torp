@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getScrollParent from "../utils/getScrollParent";
 import setPopoverPosition from "../utils/setPopoverPosition";
@@ -6,8 +7,10 @@ import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 interface PopoverContentProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Where the popover will be shown, relative to the popover trigger */
 	side?: "top" | "right" | "bottom" | "left",
 	/** How the popover will be aligned, relative to the popover trigger */
@@ -102,7 +105,8 @@ export default function PopoverContent($props?: PopoverContentProps | undefined)
 		@if ($state.visible) {
 			<div
 				{$props?.id}
-				class={`torp-popover-content ${$props?.class ?? ""}`.trim()}
+				class={["torp-popover-content", $props?.class]}
+				{$props?.style}
 				&ref={div}
 				onmount={show}
 			>

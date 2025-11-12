@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
 
 interface TextAreaProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The name of the input's form data field */
 	name?: string,
 	/** The data value that this field is bound to */
@@ -84,7 +87,8 @@ export default function TextArea($props: TextAreaProps | undefined) {
 	@render {
 		<textarea
 			id={$props?.id ?? defaultId}
-			class={`torp-text-area ${$props?.class ?? ""}`.trim()}
+			class={["torp-text-area", $props?.class]}
+			{$props?.style}
 			{name}
 			&value={$state.value}
 			{$props?.rows}

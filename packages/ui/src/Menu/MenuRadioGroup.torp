@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import {
 	type MenuRadioGroupContext,
 	MenuRadioGroupContextName,
@@ -7,8 +8,10 @@ import {
 interface MenuRadioGroupProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** An ARIA label for describing the menu to screen readers */
 	ariaLabel?: string,
 	/** The value of the checked MenuRadio */
@@ -95,7 +98,8 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-menu-radio-group ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu-radio-group", $props?.class]}
+			{$props?.style}
 			role="group"
 			aria-label={$props?.ariaLabel}
 		>

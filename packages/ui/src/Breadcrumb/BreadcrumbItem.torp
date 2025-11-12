@@ -1,9 +1,12 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 
 interface BreadcrumbItemProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether this is the current page */
 	current?: boolean,
 }
@@ -16,7 +19,8 @@ export default function BreadcrumbItem($props: BreadcrumbItemProps | undefined) 
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-breadcrumb ${$props?.class ?? ""}`.trim()}
+			class={["torp-breadcrumb", $props?.class]}
+			{$props?.style}
 			aria-current={$props?.current ? "page" : undefined}
 			data-current={$props?.current ? "current" : undefined}
 		>

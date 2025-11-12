@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { AccordionItemContextName, type AccordionItemContext } from "./AccordionTypes";
 
 interface AccordionTriggerProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -49,7 +52,8 @@ export default function AccordionTrigger($props: AccordionTriggerProps | undefin
 		<button
 			type="button"
 			id={$props?.id ?? defaultId}
-			class={`torp-accordion-trigger ${$props?.class ?? ""}`.trim()}
+			class={["torp-accordion-trigger", $props?.class]}
+			{$props?.style}
 			disabled={$state.disabled || $state.parentDisabled}
 			aria-expanded={$state.expanded.toString()}
 			aria-disabled={$state.disabled ? "true" : undefined}

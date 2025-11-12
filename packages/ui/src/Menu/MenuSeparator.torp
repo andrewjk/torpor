@@ -1,9 +1,12 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 
 interface MenuSeparatorProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 }
 
 /**
@@ -13,7 +16,8 @@ export default function MenuSeparator($props: MenuSeparatorProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-menu-separator ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu-separator", $props?.class]}
+			{$props?.style}
 			role="separator"
 		>
 			<slot />

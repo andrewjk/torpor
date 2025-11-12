@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { AccordionContextName, AccordionItemContextName, type ItemState, type AccordionContext, type AccordionItemContext } from "./AccordionTypes";
 
 interface AccordionItemProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically */
 	index?: number,
 	/** A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index */
@@ -87,7 +90,8 @@ export default function AccordionItem($props: AccordionItemProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-accordion-item ${$props?.class ?? ""}`.trim()}
+			class={["torp-accordion-item", $props?.class]}
+			{$props?.style}
 			data-state={$state.expanded ? "open" : "closed"}
 			data-disabled={$state.disabled ? "true" : undefined}
 		>

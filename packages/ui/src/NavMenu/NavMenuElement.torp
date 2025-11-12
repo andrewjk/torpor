@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { NavMenuContextName, type NavMenuContext } from "./NavMenuTypes";
 
 interface NavMenuElementProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether this button is disabled  */
 	disabled?: boolean,
 	/** An element that can be focused via keyboard navigation */
@@ -35,7 +38,8 @@ export default function NavMenuElement($props: NavMenuElementProps | undefined) 
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-nav-menu-div ${$props?.class ?? ""}`.trim()}
+			class={["torp-nav-menu-div", $props?.class]}
+			{$props?.style}
 			type="div"
 			role="menuitem"
 			aria-disabled={$props?.disabled ? "true" : undefined}

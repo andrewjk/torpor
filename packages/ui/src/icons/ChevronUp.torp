@@ -4,7 +4,8 @@ export default function ChevronUp($props: IconProps | undefined) {
 	@render {
 		<svg
 			{$props?.id}
-			class={`torp-icon ${$props?.class ?? ""}`.trim()}
+			class={["torp-icon", $props?.class]}
+			{$props?.style}
 			viewBox="0 0 100 100"
 			stroke-linejoin="round"
 			stroke-width="12"

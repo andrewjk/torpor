@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { AccordionContextName, type AccordionContext, type ItemState } from "./AccordionTypes";
 
 interface AccordionProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
 	type?: "single" | "multiple",
 	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
@@ -218,7 +221,8 @@ export default function Accordion($props: AccordionProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-accordion ${$props?.class ?? ""}`.trim()}
+			class={["torp-accordion", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</div>

@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { ContextualContextName, type ContextualContext } from "./ContextualTypes";
 import hoverTrigger from "../mount/hoverTrigger";
 
 interface ContextualTriggerProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** Whether the popover is activated by click/press or by hover **/
 	activation?: "press" | "hover"
 }
@@ -55,7 +58,8 @@ export default function ContextualTrigger($props: ContextualTriggerProps | undef
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-popover-trigger-contextual ${$props?.class ?? ""}`.trim()}
+			class={["torp-popover-trigger-contextual", $props?.class]}
+			{$props?.style}
 			oncontextmenu={handleContextualMenu}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

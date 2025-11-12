@@ -1,11 +1,14 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { NavMenuGroupContextName, type NavMenuGroupContext } from "./NavMenuTypes";
 
 interface NavMenuGroupHeaderProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The type of HTML header to use */
 	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
 }
@@ -29,7 +32,8 @@ export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps | und
 		@// TODO: self={$props.as}
 		<h4
 			id={$props?.id ?? defaultId}
-			class={`torp-nav-menu-group-header ${$props?.class ?? ""}`.trim()}
+			class={["torp-nav-menu-group-header", $props?.class]}
+			{$props?.style}
 		>
 			<slot />
 		</h4>

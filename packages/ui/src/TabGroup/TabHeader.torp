@@ -1,10 +1,13 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from "./TabGroupTypes";
 
 interface TabHeaderProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** The type of HTML header to use */
 	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 	/** The index of this header's item */

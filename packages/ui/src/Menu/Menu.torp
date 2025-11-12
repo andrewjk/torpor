@@ -1,3 +1,4 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
 import { ContextualContextName } from "../Contextual/ContextualTypes";
 import { ModalContextName } from "../Modal/ModalTypes";
 import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
@@ -12,8 +13,10 @@ import {
 interface MenuProps {
 	/** An ID for the root element */
 	id?: string;
-	/** Class name(s) for the root element */
-	class?: string,
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
 	/** An ARIA label for describing the menu to screen readers */
 	ariaLabel?: string,
 }
@@ -158,7 +161,8 @@ export default function Menu($props: MenuProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-menu ${$props?.class ?? ""}`.trim()}
+			class={["torp-menu", $props?.class]}
+			{$props?.style}
 			tabindex="-1"
 			role="menu"
 			aria-label={$props?.ariaLabel}
