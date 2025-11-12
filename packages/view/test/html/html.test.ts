@@ -53,5 +53,6 @@ function check(container: HTMLElement, $state: Props) {
 
 	$state.html = "<ul><li>A list</li></ul>";
 
+	expect(queryByText(container, "I'm strong and emphasised")).toBeNull();
 	expect(queryByText(container, "A list")).not.toBeNull();
 }

@@ -5,7 +5,6 @@ import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
-import t_clear from "../../../../src/render/clearRegion";
 import t_event from "../../../../src/render/addEvent";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
@@ -14,6 +13,7 @@ import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
+import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
 export default function Await(
@@ -59,11 +59,7 @@ export default function Await(
 		let t_await_token_1 = 0;
 		let t_await_index_1 = -1;
 		t_run_control(t_await_region_1, t_await_anchor_1, (t_before) => {
-			if (t_await_index_1 === 0) return;
-			if (t_await_region_1.depth === -2) return;
-			if (t_await_region_1.nextRegion !== null && t_await_region_1.nextRegion.depth > t_await_region_1.depth) {
-				t_clear(t_await_region_1.nextRegion);
-			}
+			if (!t_run_branch(t_await_region_1, t_await_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_control_region = t_push_region(t_await_region_1);
 			const t_old_region = t_push_region(t_new_region, true);
@@ -80,11 +76,7 @@ export default function Await(
 				$state.guesser
 				.then((_number) => {
 					if (t_token === t_await_token_1) {
-						if (t_await_index_1 === 1) return;
-						if (t_await_region_1.depth === -2) return;
-						if (t_await_region_1.nextRegion !== null && t_await_region_1.nextRegion.depth > t_await_region_1.depth) {
-							t_clear(t_await_region_1.nextRegion);
-						}
+						if (!t_run_branch(t_await_region_1, t_await_index_1, 1)) return;
 						const t_new_region = t_region();
 						const t_old_control_region = t_push_region(t_await_region_1);
 						const t_old_region = t_push_region(t_new_region, true);
@@ -100,11 +92,7 @@ export default function Await(
 				})
 				.catch((ex) => {
 					if (t_token === t_await_token_1) {
-						if (t_await_index_1 === 2) return;
-						if (t_await_region_1.depth === -2) return;
-						if (t_await_region_1.nextRegion !== null && t_await_region_1.nextRegion.depth > t_await_region_1.depth) {
-							t_clear(t_await_region_1.nextRegion);
-						}
+						if (!t_run_branch(t_await_region_1, t_await_index_1, 2)) return;
 						const t_new_region = t_region();
 						const t_old_control_region = t_push_region(t_await_region_1);
 						const t_old_region = t_push_region(t_new_region, true);

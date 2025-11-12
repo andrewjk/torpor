@@ -5,7 +5,6 @@ import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
-import t_clear from "../../../../src/render/clearRegion";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
@@ -13,6 +12,7 @@ import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
+import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
 export default function Self(
@@ -39,11 +39,7 @@ export default function Self(
 	let t_if_index_1 = -1;
 	t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
 		if ($props.level < 3) {
-			if (t_if_index_1 === 0) return;
-			if (t_if_region_1.depth === -2) return;
-			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
-				t_clear(t_if_region_1.nextRegion);
-			}
+			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
@@ -66,11 +62,7 @@ export default function Self(
 			t_if_index_1 = 0;
 		}
 		else {
-			if (t_if_index_1 === 1) return;
-			if (t_if_region_1.depth === -2) return;
-			if (t_if_region_1.nextRegion !== null && t_if_region_1.nextRegion.depth > t_if_region_1.depth) {
-				t_clear(t_if_region_1.nextRegion);
-			}
+			if (!t_run_branch(t_if_region_1, t_if_index_1, 1)) return;
 			t_if_index_1 = 1;
 		}
 	});

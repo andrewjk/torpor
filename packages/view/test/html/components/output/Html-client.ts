@@ -5,6 +5,8 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
+import t_pop_region from "../../../../src/render/popRegion";
+import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
@@ -33,12 +35,14 @@ export default function Html(
 	const t_html_region_1 = t_region();
 	t_run_control(t_html_region_1, t_html_anchor_1, (t_before) => {
 		$props.html;
-		t_run_branch(t_html_region_1, () => {
-			let t_template_1 = document.createElement("template");
-			t_template_1.innerHTML = $props.html;
-			let t_fragment_1 = t_template_1.content.cloneNode(true) as DocumentFragment;
-			t_add_fragment(t_fragment_1, t_html_parent_1, t_before);
-		});
+		if (!t_run_branch(t_html_region_1, 0, -1)) return;
+		const t_new_region = t_region();
+		const t_old_region = t_push_region(t_new_region, true);
+		let t_template_1 = document.createElement("template");
+		t_template_1.innerHTML = $props.html;
+		let t_fragment_1 = t_template_1.content.cloneNode(true) as DocumentFragment;
+		t_add_fragment(t_fragment_1, t_html_parent_1, t_before);
+		t_pop_region(t_old_region);
 	});
 
 	const t_text_1 = t_next(t_html_parent_1, true);

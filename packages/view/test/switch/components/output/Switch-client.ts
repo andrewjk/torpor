@@ -2,13 +2,13 @@ import $peek from "../../../../src/watch/$peek";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
-import t_clear from "../../../../src/render/clearRegion";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
+import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 
 interface Props {
@@ -43,11 +43,7 @@ export default function Switch(
 	t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
 		switch ($props.value) {
 			case 1: {
-				if (t_switch_index_1 === 0) return;
-				if (t_switch_region_1.depth === -2) return;
-				if (t_switch_region_1.nextRegion !== null && t_switch_region_1.nextRegion.depth > t_switch_region_1.depth) {
-					t_clear(t_switch_region_1.nextRegion);
-				}
+				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
 				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p> A small value. </p> `);
@@ -60,11 +56,7 @@ export default function Switch(
 				break;
 			}
 			case 100: {
-				if (t_switch_index_1 === 1) return;
-				if (t_switch_region_1.depth === -2) return;
-				if (t_switch_region_1.nextRegion !== null && t_switch_region_1.nextRegion.depth > t_switch_region_1.depth) {
-					t_clear(t_switch_region_1.nextRegion);
-				}
+				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
 				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p> A large value. </p> `);
@@ -77,11 +69,7 @@ export default function Switch(
 				break;
 			}
 			default: {
-				if (t_switch_index_1 === 2) return;
-				if (t_switch_region_1.depth === -2) return;
-				if (t_switch_region_1.nextRegion !== null && t_switch_region_1.nextRegion.depth > t_switch_region_1.depth) {
-					t_clear(t_switch_region_1.nextRegion);
-				}
+				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
 				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p> Another value. </p> `);

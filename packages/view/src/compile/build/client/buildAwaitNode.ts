@@ -57,7 +57,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
-	status.imports.add("t_clear");
+	status.imports.add("t_run_branch");
 	status.imports.add("t_push_region");
 	status.imports.add("t_pop_region");
 
@@ -133,17 +133,7 @@ function buildAwaitBranch(
 	indexName: string,
 	index: number,
 ) {
-	b.append(`if (${indexName} === ${index}) return;`);
-
-	// HACK: This is bad -- it means that the parent region has been cleared,
-	// but that should have cleared the effect that runs this child region??
-	// TODO: Look into this further...
-	b.append(`if (${regionName}.depth === -2) return;`);
-
-	b.append(`
-		if (${regionName}.nextRegion !== null && ${regionName}.nextRegion.depth > ${regionName}.depth) {
-			t_clear(${regionName}.nextRegion);
-		}`);
+	b.append(`if (!t_run_branch(${regionName}, ${indexName}, ${index})) return;`);
 
 	if (node.children.length > 0) {
 		// NOTE: for await branches, we need to push the control region again,

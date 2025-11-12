@@ -18,6 +18,9 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
+	status.imports.add("t_run_branch");
+	status.imports.add("t_push_region");
+	status.imports.add("t_pop_region");
 
 	b.append("");
 	b.append(`
@@ -40,8 +43,13 @@ function buildHtmlBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${node.statement};`);
-	b.append(`t_run_branch(${regionName}, () => {`);
+	b.append(`${replaceForVarNames(node.statement, status)};`);
+	b.append(`if (!t_run_branch(${regionName}, 0, -1)) return;`);
+
+	b.append(`
+		const t_new_region = t_region(${status.options.dev === true ? `"html_branch"` : ""});
+		const t_old_region = t_push_region(t_new_region, true);
+	`);
 
 	const templateName = nextVarName("template", status);
 	const fragmentName = `t_fragment_${node.fragment!.number}`;
@@ -61,5 +69,5 @@ function buildHtmlBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`}${status.options.dev === true ? ', "html"' : ""});`);
+	b.append("t_pop_region(t_old_region);");
 }

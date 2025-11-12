@@ -19,6 +19,9 @@ export default function buildReplaceNode(node: ControlNode, status: BuildStatus,
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
+	status.imports.add("t_run_branch");
+	status.imports.add("t_push_region");
+	status.imports.add("t_pop_region");
 
 	b.append("");
 	b.append(`
@@ -42,7 +45,12 @@ function buildReplaceBranch(
 	status.imports.add("t_run_branch");
 
 	b.append(`${replaceForVarNames(node.statement, status)};`);
-	b.append(`t_run_branch(${regionName}, () => {`);
+	b.append(`if (!t_run_branch(${regionName}, 0, -1)) return;`);
+
+	b.append(`
+		const t_new_region = t_region(${status.options.dev === true ? `"replace_branch"` : ""});
+		const t_old_region = t_push_region(t_new_region, true);
+	`);
 
 	buildFragment(node, status, b, parentName, "t_before");
 
@@ -57,5 +65,5 @@ function buildReplaceBranch(
 
 	buildAddFragment(node, status, b, parentName, "t_before");
 
-	b.append(`}${status.options.dev === true ? ', "replace"' : ""});`);
+	b.append("t_pop_region(t_old_region);");
 }
