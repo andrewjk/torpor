@@ -1,4 +1,3 @@
-import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
 import type SlotRender from "../../../../src/types/SlotRender";

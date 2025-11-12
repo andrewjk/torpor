@@ -1,4 +1,3 @@
-import $peek from "../../../../src/watch/$peek";
 import $run from "../../../../src/watch/$run";
 import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
