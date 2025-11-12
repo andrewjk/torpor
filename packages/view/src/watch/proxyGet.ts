@@ -71,6 +71,10 @@ export default function proxyGet(
 			if (arrayWrapper[key] !== undefined) {
 				return arrayWrapper[key](data, target, key);
 			}
+		} else {
+			// If it's a non-existent property we still set up a subscription so
+			// that if its value is set to something it will re-run the effect
+			trackProxySignal(data, key);
 		}
 	} else if (signal.type === SIGNAL_TYPE) {
 		// If a property is being accessed in the course of setting up an
