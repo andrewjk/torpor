@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.4.10
+
+### Patch Changes
+
+- 3aa92de: Fix: run @if, @switch and @await without closures
+- 81a3512: Fix: shorter generated code
+
 ## 0.4.9
 
 ### Patch Changes
