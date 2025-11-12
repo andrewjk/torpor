@@ -1,4 +1,11 @@
-export default function buildClasses(value: unknown, styleHash?: string): string {
+export default function buildClasses(
+	value:
+		| string
+		| Record<string, string>
+		| Array<string | Record<string, string> | undefined>
+		| undefined,
+	styleHash?: string,
+): string {
 	if (typeof value === "string") {
 		if (styleHash !== undefined) {
 			value += " " + styleHash;
@@ -14,18 +21,26 @@ export default function buildClasses(value: unknown, styleHash?: string): string
 	}
 }
 
-function gatherNames(name: unknown, value: unknown, classes: string[]) {
+function gatherNames(
+	name: string,
+	value:
+		| string
+		| Record<string, string>
+		| Array<string | Record<string, string> | undefined>
+		| undefined,
+	classes: string[],
+) {
 	if (value) {
 		if (Array.isArray(value)) {
 			for (let v of value) {
-				gatherNames(v, v, classes);
+				gatherNames(v as string, v, classes);
 			}
 		} else if (typeof value === "object") {
 			for (let [n, v] of Object.entries(value)) {
 				gatherNames(n, v, classes);
 			}
 		} else {
-			classes.push(name as string);
+			classes.push(name);
 		}
 	}
 }

@@ -1,4 +1,6 @@
-export default function buildStyles(value: unknown): string {
+export default function buildStyles(
+	value: string | Record<string, string> | Array<string> | undefined,
+): string {
 	if (typeof value === "string") {
 		return value;
 	} else {
