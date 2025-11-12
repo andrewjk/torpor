@@ -1,11 +1,6 @@
-export default function buildClasses(
-	value:
-		| string
-		| Record<string, string>
-		| Array<string | Record<string, string> | undefined>
-		| undefined,
-	styleHash?: string,
-): string {
+import ClassValue from "../types/ClassValue";
+
+export default function buildClasses(value: ClassValue, styleHash?: string): string {
 	if (typeof value === "string") {
 		if (styleHash !== undefined) {
 			value += " " + styleHash;
@@ -21,15 +16,7 @@ export default function buildClasses(
 	}
 }
 
-function gatherNames(
-	name: string,
-	value:
-		| string
-		| Record<string, string>
-		| Array<string | Record<string, string> | undefined>
-		| undefined,
-	classes: string[],
-) {
+function gatherNames(name: string, value: ClassValue, classes: string[]) {
 	if (value) {
 		if (Array.isArray(value)) {
 			for (let v of value) {

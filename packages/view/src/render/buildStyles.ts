@@ -1,6 +1,6 @@
-export default function buildStyles(
-	value: string | Record<string, string> | Array<string> | undefined,
-): string {
+import type StyleValue from "../types/StyleValue";
+
+export default function buildStyles(value: StyleValue): string {
 	if (typeof value === "string") {
 		return value;
 	} else {

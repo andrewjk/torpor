@@ -25,9 +25,11 @@ import t_run_list from "./render/runList";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
 import type Animation from "./types/Animation";
+import type ClassValue from "./types/ClassValue";
 import type Component from "./types/Component";
 import type ListItem from "./types/ListItem";
 import type SlotRender from "./types/SlotRender";
+import type StyleValue from "./types/StyleValue";
 import $batch from "./watch/$batch";
 import $cache from "./watch/$cache";
 import $mount from "./watch/$mount";
@@ -72,4 +74,4 @@ export {
 	t_dynamic,
 };
 
-export type { Component, SlotRender, ListItem, Animation };
+export type { Component, SlotRender, ListItem, Animation, ClassValue, StyleValue };
