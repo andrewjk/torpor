@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.9
+
+### Patch Changes
+
+- b5fe877: Fix: add subscriptions for non-existent properties
+
 ## 0.4.8
 
 ### Patch Changes

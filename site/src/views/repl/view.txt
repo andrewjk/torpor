@@ -680,7 +680,7 @@ function proxyGet(target, key, receiver) {
 			}
 		} else if (data.isArray) {
 			if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
-		}
+		} else trackProxySignal(data, key);
 	} else if (signal.type === SIGNAL_TYPE) trackProxySignal(data, key);
 	else if (signal.type === COMPUTED_TYPE) {
 		if (signal.running) throw new Error("Cycle detected");
