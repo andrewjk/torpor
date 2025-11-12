@@ -9,9 +9,7 @@ interface FileProps {
 	/** The name of the input's form data field */
 	name?: string,
 	/** The type of files that this input accepts e.g. `image/*` */
-	accepts?: string,
-	/** The data value that this field is bound to */
-	value?: any,
+	accept?: string,
 	/** Text to display when the input value is empty */
 	placeholder?: string,
 	/** Whether the input should be readonly */
@@ -51,17 +49,11 @@ export default function File($props: FileProps | undefined) {
 	// Use the FieldContext's state, or create a new one
 	let $state = fieldContext?.state ?? $watch({
 		inputId: $props?.id ?? defaultId,
-		value: $props?.value,
+		// You can't use value with a file input
+		value: null,
 		errors: {} as Record<string, string>,
 		valid: false,
 		message: "",
-	});
-
-	// Binding
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
 	});
 
 	// Set the input ID now that we know it and it will get linked with the associated label
@@ -92,7 +84,7 @@ export default function File($props: FileProps | undefined) {
 			class={`torp-file ${$props?.class ?? ""}`.trim()}
 			type="file"
 			{name}
-			&value={$state.value}
+			{$props?.accept}
 			{$props?.placeholder}
 			{$props?.readonly}
 			{$props?.maxlength}
