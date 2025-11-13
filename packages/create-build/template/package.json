@@ -5,8 +5,8 @@
 	"type": "module",
 	"scripts": {
 		"dev": "tb --dev",
-		"build": "tsgo --noEmit && tb --build",
-		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware"
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && tb --build"
 	},
 	"keywords": [],
 	"author": "",

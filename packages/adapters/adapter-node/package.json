@@ -4,29 +4,29 @@
 	"description": "A @torpor/build adapter for running on Node",
 	"type": "module",
 	"exports": {
-		"types": "./dist/index.d.ts",
-		"import": "./dist/index.js"
+		"types": "./dist/index.d.mts",
+		"import": "./dist/index.mjs"
 	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && tsdown",
-		"build:watch": "tsdown --watch",
-		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware"
+		"build:watch": "tsdown --watch"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/build": "workspace:^",
-		"vite": "^7.1.12"
+		"vite": "^7.2.2"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@typescript/native-preview": "7.0.0-dev.20251103.1",
-		"oxlint-tsgolint": "^0.4.0",
-		"tsdown": "^0.15.12",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@typescript/native-preview": "7.0.0-dev.20251112.1",
+		"oxlint-tsgolint": "^0.6.0",
+		"tsdown": "^0.16.4",
 		"typescript": "^5.9.3"
 	}
 }

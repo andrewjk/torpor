@@ -1,7 +1,7 @@
 import { promises as fs, readFileSync } from "node:fs";
 
 async function run() {
-	const indexFile = "./dist/index.js";
+	const indexFile = "./dist/index.mjs";
 	let source = await fs.readFile(indexFile, "utf8");
 	source = source
 		.replace(/^export \{(.+)\};/gms, (_, capture) => {
@@ -19,13 +19,13 @@ async function run() {
 			);
 		})
 		// HACK: Why are these imported?
-		.replaceAll(/^import \{.+} from ".\/(.+?).js";/gms, (_, capture) => {
-			const importedFile = `./dist/${capture}.js`;
+		.replaceAll(/^import \{.+} from ".\/(.+?).mjs";/gm, (_, capture) => {
+			const importedFile = `./dist/${capture}.mjs`;
 			let importedSource = readFileSync(importedFile, "utf8");
-			return importedSource.replace(/^export \{(.+)\};/gms, "");
+			return importedSource.replace(/^export \{(.+)\};/gm, "");
 		})
-		.replaceAll(/^import ".\/(.+?).js";/gms, "")
-		.replaceAll(/^\/\/.+?$/gms, "")
+		.replaceAll(/^import ".\/(.+?).mjs";/gm, "")
+		.replaceAll(/^\/\/.+?$/gm, "")
 		.replaceAll(/^\/\*.+?^\*\//gms, "")
 		.replaceAll(/\n+/g, "\n");
 

@@ -1,9 +1,4 @@
-import { type Options, defineConfig } from "tsdown";
-
-type Config =
-	| Options
-	| Options[]
-	| ((overrideOptions: Options) => Options | Options[] | Promise<Options | Options[]>);
+import { type UserConfig, defineConfig } from "tsdown";
 
 export default defineConfig({
 	entry: [
@@ -16,10 +11,8 @@ export default defineConfig({
 		"src/test.ts",
 		"src/bin/index.ts",
 	],
-	format: "esm",
-	dts: true,
-	sourcemap: true,
 	// Put this in here to stop issues with bundling Vite from bin/index.ts
 	// I'm not sure if this will cause further issues down the line?
 	external: ["vite"],
-}) satisfies Config as Config;
+	onSuccess: "npm run build:fix",
+}) satisfies UserConfig as UserConfig;

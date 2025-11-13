@@ -1,5 +1,5 @@
 import torpor from "@torpor/unplugin/vite";
-import { type UserConfigFnObject, defineConfig } from "vitest/config";
+import { type ViteUserConfigFnObject, defineConfig } from "vitest/config";
 
 export default defineConfig(({ mode }) => ({
 	plugins: [torpor()],
@@ -9,4 +9,4 @@ export default defineConfig(({ mode }) => ({
 	test: {
 		environment: "jsdom",
 	},
-})) satisfies UserConfigFnObject as UserConfigFnObject;
+})) satisfies ViteUserConfigFnObject as ViteUserConfigFnObject;

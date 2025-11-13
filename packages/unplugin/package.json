@@ -9,40 +9,40 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		},
 		"./astro": {
-			"types": "./dist/astro.d.ts",
-			"import": "./dist/astro.js"
+			"types": "./dist/astro.d.mts",
+			"import": "./dist/astro.mjs"
 		},
 		"./rspack": {
-			"types": "./dist/rspack.d.ts",
-			"import": "./dist/rspack.js"
+			"types": "./dist/rspack.d.mts",
+			"import": "./dist/rspack.mjs"
 		},
 		"./vite": {
-			"types": "./dist/vite.d.ts",
-			"import": "./dist/vite.js"
+			"types": "./dist/vite.d.mts",
+			"import": "./dist/vite.mjs"
 		},
 		"./webpack": {
-			"types": "./dist/webpack.d.ts",
-			"import": "./dist/webpack.js"
+			"types": "./dist/webpack.d.mts",
+			"import": "./dist/webpack.mjs"
 		},
 		"./rollup": {
-			"types": "./dist/rollup.d.ts",
-			"import": "./dist/rollup.js"
+			"types": "./dist/rollup.d.mts",
+			"import": "./dist/rollup.mjs"
 		},
 		"./esbuild": {
-			"types": "./dist/esbuild.d.ts",
-			"import": "./dist/esbuild.js"
+			"types": "./dist/esbuild.d.mts",
+			"import": "./dist/esbuild.mjs"
 		},
 		"./nuxt": {
-			"types": "./dist/nuxt.d.ts",
-			"import": "./dist/nuxt.js"
+			"types": "./dist/nuxt.d.mts",
+			"import": "./dist/nuxt.mjs"
 		},
 		"./types": {
-			"types": "./dist/types.d.ts",
-			"import": "./dist/types.js"
+			"types": "./dist/types.d.mts",
+			"import": "./dist/types.mjs"
 		},
 		"./*": "./*"
 	},
@@ -61,9 +61,9 @@
 		"access": "public"
 	},
 	"scripts": {
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && tsdown",
 		"build:watch": "tsdown --watch src",
-		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"lint": "eslint .",
 		"play": "npm -C playground run dev",
 		"prepublishOnly": "npm run build",
@@ -104,25 +104,25 @@
 	},
 	"devDependencies": {
 		"@antfu/eslint-config": "^6.2.0",
-		"@nuxt/kit": "^4.2.0",
-		"@nuxt/schema": "^4.2.0",
-		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@types/node": "^24.10.0",
-		"@typescript/native-preview": "7.0.0-dev.20251103.1",
+		"@nuxt/kit": "^4.2.1",
+		"@nuxt/schema": "^4.2.1",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@types/node": "^24.10.1",
+		"@typescript/native-preview": "7.0.0-dev.20251112.1",
 		"bumpp": "^10.3.1",
 		"chalk": "^5.6.2",
 		"eslint": "^9.39.1",
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
-		"nodemon": "^3.1.10",
-		"oxlint-tsgolint": "^0.4.0",
+		"nodemon": "^3.1.11",
+		"oxlint-tsgolint": "^0.6.0",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.1.0",
-		"rollup": "^4.52.5",
-		"tsdown": "^0.15.12",
+		"rollup": "^4.53.2",
+		"tsdown": "^0.16.4",
 		"typescript": "^5.9.3",
-		"vite": "^7.1.12",
-		"vitest": "^4.0.6",
+		"vite": "^7.2.2",
+		"vitest": "^4.0.8",
 		"webpack": "^5.102.1"
 	}
 }

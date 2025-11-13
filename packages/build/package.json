@@ -5,32 +5,32 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"types": "./dist/index.d.ts",
-			"import": "./dist/index.js"
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
 		},
 		"./nav": {
-			"types": "./dist/nav.d.ts",
-			"import": "./dist/nav.js"
+			"types": "./dist/nav.d.mts",
+			"import": "./dist/nav.mjs"
 		},
 		"./response": {
-			"types": "./dist/response.d.ts",
-			"import": "./dist/response.js"
+			"types": "./dist/response.d.mts",
+			"import": "./dist/response.mjs"
 		},
 		"./run": {
-			"types": "./dist/run.d.ts",
-			"import": "./dist/run.js"
+			"types": "./dist/run.d.mts",
+			"import": "./dist/run.mjs"
 		},
 		"./server": {
-			"types": "./dist/server.d.ts",
-			"import": "./dist/server.js"
+			"types": "./dist/server.d.mts",
+			"import": "./dist/server.mjs"
 		},
 		"./state": {
-			"types": "./dist/state.d.ts",
-			"import": "./dist/state.js"
+			"types": "./dist/state.d.mts",
+			"import": "./dist/state.mjs"
 		},
 		"./test": {
-			"types": "./dist/test.d.ts",
-			"import": "./dist/test.js"
+			"types": "./dist/test.d.mts",
+			"import": "./dist/test.mjs"
 		},
 		"./manifest": {
 			"types": "./src/types/manifest.d.ts"
@@ -40,12 +40,13 @@
 		"access": "public"
 	},
 	"bin": {
-		"tb": "./dist/bin/index.js"
+		"tb": "./dist/bin/index.mjs"
 	},
 	"scripts": {
-		"build": "tsgo --noEmit && tsdown",
-		"build:watch": "tsdown --watch",
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && tsdown",
+		"build:fix": "esno scripts/postbuild.ts",
+		"build:watch": "tsdown --watch",
 		"test": "vitest"
 	},
 	"keywords": [],
@@ -56,15 +57,16 @@
 		"@torpor/view": "workspace:^",
 		"cookie": "^1.0.2",
 		"dotenv": "^17.2.3",
-		"vite": "^7.1.12",
+		"vite": "^7.2.2",
 		"vite-tsconfig-paths": "^5.1.4"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
-		"@typescript/native-preview": "7.0.0-dev.20251103.1",
-		"oxlint-tsgolint": "^0.4.0",
-		"tsdown": "^0.15.12",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@typescript/native-preview": "7.0.0-dev.20251112.1",
+		"esno": "^4.8.0",
+		"oxlint-tsgolint": "^0.6.0",
+		"tsdown": "^0.16.4",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.6"
+		"vitest": "^4.0.8"
 	}
 }

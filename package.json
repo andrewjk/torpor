@@ -3,11 +3,11 @@
 	"version": "0.0.1",
 	"description": "A full-stack JavaScript framework that aims for simplicity and completeness",
 	"type": "module",
-	"main": "index.js",
+	"main": "index.mjs",
 	"private": true,
 	"scripts": {
-		"build": "pnpm -r build",
 		"check": "pnpm -r check",
+		"build": "pnpm -r build",
 		"cs:add": "pnpm changeset add",
 		"cs:version": "pnpm -r build && pnpm changeset version",
 		"cs:publish": "pnpm changeset publish",
@@ -25,12 +25,12 @@
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/user-event": "^14.6.1",
-		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
 		"@types/jsdom": "^27.0.0",
-		"jsdom": "^27.1.0",
+		"jsdom": "^27.2.0",
 		"prettier": "^3.6.2",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.6"
+		"vitest": "^4.0.8"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",

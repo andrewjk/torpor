@@ -1,4 +1,24 @@
 
+const DEV_CONTEXT_SYMBOL = Symbol.for("t_dev_context");
+const noop = () => {};
+const devContext = globalThis[DEV_CONTEXT_SYMBOL] ??= {
+	enabled: false,
+	depth: 0,
+	index: -1,
+	boundaries: [],
+	format: () => "",
+	getDetails: () => "",
+	unmark: noop,
+	mark: noop,
+	onWatch: noop,
+	onRun: noop,
+	onRegionPushed: noop,
+	onRegionPopped: noop,
+	onRegionCleared: noop,
+	signalSet: noop,
+	effectRun: noop
+};
+var devContext_default = devContext;
 function buildClasses(value, styleHash) {
 	if (typeof value === "string") {
 		if (styleHash !== void 0) value += " " + styleHash;
@@ -20,8 +40,9 @@ function buildStyles(value) {
 	else {
 		let styles = [];
 		if (value) {
-			if (Array.isArray(value)) for (let v of value) styles.push(v);
-			else if (typeof value === "object") for (let [n, v] of Object.entries(value)) styles.push(`${n}: ${v}`);
+			if (Array.isArray(value)) {
+				for (let v of value) if (v) styles.push(v);
+			} else if (typeof value === "object") for (let [n, v] of Object.entries(value)) styles.push(`${n}: ${v}`);
 		}
 		return styles.join("; ");
 	}
