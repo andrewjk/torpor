@@ -16,8 +16,8 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 		content = content.replaceAll(/\s+/g, " ");
 	}
 
-	// TODO: Move all of this logic into parse, for text nodes and attribute values
-	// Or, we could do it based on the node's ranges...
+	// TODO: Should we be parsing out the spans here? Like we do with
+	// attributes? And should we merge this with the attributes logic?
 	let textContent = "";
 	let reactiveCount = 0;
 	let reactiveStart = 0;
@@ -90,10 +90,17 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 		}
 
 		status.imports.add("t_fmt");
-		let functionBody = `${node.varName}.textContent = `;
-		offsetChange += functionBody.length;
 		offsets.map((_, i) => (offsets[i] += offsetChange));
-		functionBody += `${textContent};`;
-		stashRunWithOffsets(fragment, functionBody, node.spans, offsets, lengths, status);
+
+		stashRunWithOffsets(
+			fragment,
+			`${node.varName}.textContent = `,
+			textContent,
+			";",
+			node.spans,
+			offsets,
+			lengths,
+			status,
+		);
 	}
 }

@@ -84,7 +84,7 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 				const text: TextNode = {
 					type: "text",
 					content: content + spaceContent,
-					spans: spans,
+					spans,
 				};
 				element.children.push(text);
 			}

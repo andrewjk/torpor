@@ -2,7 +2,7 @@ import { assert, expect, test } from "vitest";
 import { build } from "../../src/compile";
 import parse from "../../src/compile/parse";
 
-test("source maps", () => {
+test("parse source maps", () => {
 	const input = `
 export default function Source($props: { counter: number }) {
 const x = 5;

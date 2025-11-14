@@ -6,10 +6,12 @@ import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
+import addMappedTextWithOffsets from "./addMappedTextWithOffsets";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import getAttributeOffsets from "./getAttributeOffsets";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildComponentNode(
@@ -41,7 +43,9 @@ export default function buildComponentNode(
 			value: string;
 			// Text to be ignored in the mapping e.g. `)`
 			postText: string;
-			span: SourceSpan;
+			spans: SourceSpan[];
+			offsets: number[];
+			lengths: number[];
 		}[] = [];
 		let runs: string[] = [];
 		let bindingRuns: string[] = [];
@@ -49,35 +53,106 @@ export default function buildComponentNode(
 		for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
 			if (name === "self" && node.tagName === "@component") {
 				// Ignore this special attribute
-			} else if (name.startsWith("&") && value != null && fullyReactive) {
-				// It's a bound property
-				// Add two $runs -- one to update the props, and one to update the value
-				// The component author will need to make sure $props.x is updated
-				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
-				// e.g. Component($props: { text: Bindable<string> })
-				name = name.substring(1);
-				props.push({ name, preText: "", value, postText: "", span });
-				runs.push(`${propsName}["${name}"] = ${value};`);
-				bindingRuns.push(`${value} = ${propsName}["${name}"];`);
-			} else if (name === "class" && value != null) {
-				status.imports.add("t_class");
-				const params = [value];
-				if (node.scopeStyles) {
-					params.push(`"torp-${status.styleHash}"`);
-				}
-				props.push({ name, preText: "t_class(", value, postText: ")", span });
-				runs.push(`${propsName}["${name}"] = ${value};`);
-			} else if (name === "style" && value != null) {
-				status.imports.add("t_style");
-				props.push({ name, preText: "t_style(", value, postText: ")", span });
-				runs.push(`${propsName}["${name}"] = ${value};`);
-			} else if (value != null) {
-				props.push({ name, preText: "", value, postText: "", span });
-				if (reactive) {
+			} else if (value != null && fullyReactive) {
+				if (name.startsWith("&")) {
+					// It's a bound property
+					// Add two $runs -- one to update the props, and one to update the value
+					// The component author will need to make sure $props.x is updated
+					// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
+					// e.g. Component($props: { text: Bindable<string> })
+					name = name.substring(1);
+					props.push({
+						name,
+						preText: "",
+						value,
+						postText: "",
+						spans: [span],
+						offsets: [],
+						lengths: [],
+					});
+					runs.push(`${propsName}["${name}"] = ${value};`);
+					bindingRuns.push(`${value} = ${propsName}["${name}"];`);
+				} else if (name === "class") {
+					status.imports.add("t_class");
+					const params = [value];
+					if (node.scopeStyles) {
+						params.push(`"torp-${status.styleHash}"`);
+					}
+					value = params.join(", ");
+					props.push({
+						name,
+						preText: "t_class(",
+						value,
+						postText: ")",
+						spans: [span],
+						offsets: [],
+						lengths: [],
+					});
+					runs.push(`${propsName}["${name}"] = t_class(${value});`);
+				} else if (name === "style") {
+					status.imports.add("t_style");
+					props.push({
+						name,
+						preText: "t_style(",
+						value,
+						postText: ")",
+						spans: [span],
+						offsets: [],
+						lengths: [],
+					});
+					runs.push(`${propsName}["${name}"] = t_style(${value});`);
+				} else {
+					props.push({
+						name,
+						preText: "",
+						value,
+						postText: "",
+						spans: [span],
+						offsets: [],
+						lengths: [],
+					});
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
+			} else if (value != null && reactive) {
+				const { newValue, spans, offsets, lengths } = getAttributeOffsets(value, span);
+				value = newValue;
+				if (name === "class") {
+					status.imports.add("t_class");
+					const params = [value];
+					if (node.scopeStyles) {
+						params.push(`"torp-${status.styleHash}"`);
+					}
+					value = params.join(", ");
+					props.push({ name, preText: "t_class(", value, postText: ")", spans, offsets, lengths });
+					runs.push(`${propsName}["${name}"] = t_class(${value});`);
+				} else if (name === "style") {
+					status.imports.add("t_style");
+					props.push({ name, preText: "t_style(", value, postText: ")", spans, offsets, lengths });
+					runs.push(`${propsName}["${name}"] = t_style(${value});`);
+				} else {
+					props.push({ name, preText: "", value, postText: "", spans, offsets, lengths });
+					runs.push(`${propsName}["${name}"] = ${value};`);
+				}
+			} else if (value != null) {
+				props.push({
+					name,
+					preText: "",
+					value,
+					postText: "",
+					spans: [span],
+					offsets: [],
+					lengths: [],
+				});
 			} else {
-				props.push({ name, preText: "", value: "true", postText: "", span });
+				props.push({
+					name,
+					preText: "",
+					value: "true",
+					postText: "",
+					spans: [span],
+					offsets: [],
+					lengths: [],
+				});
 			}
 		}
 
@@ -85,7 +160,20 @@ export default function buildComponentNode(
 		b.append(`const ${propsName} = $watch({`);
 		for (let p of props) {
 			let value = replaceForVarNames(p.value, status);
-			addMappedText(`${p.name}: ` + p.preText, value, p.postText + ",", p.span, status, b);
+			if (p.spans.length === 1) {
+				addMappedText(`${p.name}: ` + p.preText, value, p.postText + ",", p.spans[0], status, b);
+			} else {
+				addMappedTextWithOffsets(
+					`${p.name}: ` + p.preText,
+					value,
+					p.postText + ",",
+					p.spans,
+					p.offsets,
+					p.lengths,
+					status,
+					b,
+				);
+			}
 		}
 		b.append("});");
 		// TODO: Map these things:

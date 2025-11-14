@@ -12,8 +12,10 @@ import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import getAttributeOffsets from "./getAttributeOffsets";
 import replaceForVarNames from "./replaceForVarNames";
 import stashRun from "./stashRun";
+import stashRunWithOffsets from "./stashRunWithOffsets";
 
 export default function buildElementNode(
 	node: ElementNode,
@@ -178,12 +180,12 @@ function buildElementAttributes(
 		}
 	}
 
-	for (let { name, value, reactive, span } of node.attributes) {
+	for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// Ignore this one, it should have been done already, above
-		} else if (value != null && reactive) {
+		} else if (value != null && fullyReactive) {
 			if (name === "&group") {
 				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === "&value" || name === "&checked") {
@@ -226,6 +228,68 @@ function buildElementAttributes(
 			} else {
 				status.imports.add("t_attribute");
 				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", span, status);
+			}
+		} else if (value != null && reactive) {
+			const { newValue, spans, offsets, lengths } = getAttributeOffsets(value, span);
+			value = newValue;
+			if (name === "class") {
+				status.imports.add("t_class");
+				const params = [value];
+				if (node.scopeStyles) {
+					params.push(`"torp-${status.styleHash}"`);
+				}
+				// SVGs have a different className
+				const propName = status.ns ? "className.baseVal" : "className";
+				stashRunWithOffsets(
+					fragment,
+					`${status.ns ? "// @ts-ignore\n" : ""}${varName}.${propName} = t_class(`,
+					params.join(", "),
+					");",
+					spans,
+					offsets,
+					lengths,
+					status,
+				);
+			} else if (name === "style") {
+				status.imports.add("t_style");
+				stashRunWithOffsets(
+					fragment,
+					`${varName}.setAttribute("style", t_style(`,
+					value,
+					"));",
+					spans,
+					offsets,
+					lengths,
+					status,
+				);
+			} else if (name.includes("-")) {
+				// Handle data-, aria- etc
+				status.imports.add("t_attribute");
+				stashRunWithOffsets(
+					fragment,
+					`t_attribute(${varName}, "${name}", `,
+					value,
+					");",
+					spans,
+					offsets,
+					lengths,
+					status,
+				);
+				// NOTE: dataset seems to be a tiny bit slower?
+				//const propName = name.substring(name.indexOf("-"));
+				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
+			} else {
+				status.imports.add("t_attribute");
+				stashRunWithOffsets(
+					fragment,
+					`t_attribute(${varName}, "${name}", `,
+					value,
+					");",
+					spans,
+					offsets,
+					lengths,
+					status,
+				);
 			}
 		}
 	}

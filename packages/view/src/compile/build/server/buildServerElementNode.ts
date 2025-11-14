@@ -105,7 +105,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			// TODO: Match braces, don't replace braces inside code
 			status.imports.add("t_attr");
 			attributes.push(
-				`${name}="${trimQuotes(value).replaceAll("${", "${t_attr(").replaceAll("}", ")}")}"`,
+				`${name}="${trimQuotes(value).replaceAll("{", "${t_attr(").replaceAll("}", ")}")}"`,
 			);
 		} else if (name === "class" && node.scopeStyles) {
 			value = value

@@ -2,7 +2,6 @@ import type Attribute from "../types/nodes/Attribute";
 import type ElementNode from "../types/nodes/ElementNode";
 import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
-import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
 import accept from "./utils/accept";
@@ -109,11 +108,6 @@ function parseAttribute(status: ParseStatus): Attribute {
 			value = value.substring(1, value.length - 1);
 			valueStart++;
 			valueEnd--;
-		} else if (reactive) {
-			// TODO: Ranges etc, like text nodes -- I think we would need to
-			// leave things reactive (or fully reactive) and check it when
-			// building instead
-			value = `\`${trimQuotes(value).replaceAll("{", "${")}\``;
 		}
 	} else if (name.startsWith("{") && name.endsWith("}")) {
 		// It's a shortcut attribute. It could be e.g. {width} or it could be
