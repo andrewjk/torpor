@@ -1,6 +1,6 @@
 type ClassValue =
 	| string
-	| Record<string, string | null | undefined>
+	| Record<string, boolean | null | undefined>
 	| Array<ClassValue>
 	| null
 	| undefined;

@@ -16,7 +16,7 @@ export default function buildClasses(value: ClassValue, styleHash?: string): str
 	}
 }
 
-function gatherNames(name: string, value: ClassValue, classes: string[]) {
+function gatherNames(name: string, value: unknown, classes: string[]) {
 	if (value) {
 		if (Array.isArray(value)) {
 			for (let v of value) {
