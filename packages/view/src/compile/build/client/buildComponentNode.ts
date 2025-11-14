@@ -34,7 +34,15 @@ export default function buildComponentNode(
 		status.imports.add("$watch");
 
 		// Gather props, runs and binding runs, and set them all at once
-		let props: { name: string; value: string; span: SourceSpan }[] = [];
+		let props: {
+			name: string;
+			// Text to be ignored in the mapping e.g. `t_class(`
+			preText: string;
+			value: string;
+			// Text to be ignored in the mapping e.g. `)`
+			postText: string;
+			span: SourceSpan;
+		}[] = [];
 		let runs: string[] = [];
 		let bindingRuns: string[] = [];
 
@@ -48,7 +56,7 @@ export default function buildComponentNode(
 				// TODO: Maybe allow adding a Bindable<T> type to the $props interface??
 				// e.g. Component($props: { text: Bindable<string> })
 				name = name.substring(1);
-				props.push({ name, value, span });
+				props.push({ name, preText: "", value, postText: "", span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 				bindingRuns.push(`${value} = ${propsName}["${name}"];`);
 			} else if (name === "class" && value != null) {
@@ -57,21 +65,19 @@ export default function buildComponentNode(
 				if (node.scopeStyles) {
 					params.push(`"torp-${status.styleHash}"`);
 				}
-				value = `t_class(${params.join(", ")})`;
-				props.push({ name, value, span });
+				props.push({ name, preText: "t_class(", value, postText: ")", span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (name === "style" && value != null) {
 				status.imports.add("t_style");
-				value = `t_style(${value})`;
-				props.push({ name, value, span });
+				props.push({ name, preText: "t_style(", value, postText: ")", span });
 				runs.push(`${propsName}["${name}"] = ${value};`);
 			} else if (value != null) {
-				props.push({ name, value, span });
+				props.push({ name, preText: "", value, postText: "", span });
 				if (reactive) {
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else {
-				props.push({ name, value: "true", span });
+				props.push({ name, preText: "", value: "true", postText: "", span });
 			}
 		}
 
@@ -79,7 +85,7 @@ export default function buildComponentNode(
 		b.append(`const ${propsName} = $watch({`);
 		for (let p of props) {
 			let value = replaceForVarNames(p.value, status);
-			addMappedText(`${p.name}: `, value, ",", p.span, status, b);
+			addMappedText(`${p.name}: ` + p.preText, value, p.postText + ",", p.span, status, b);
 		}
 		b.append("});");
 		// TODO: Map these things:

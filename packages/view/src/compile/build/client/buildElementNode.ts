@@ -178,7 +178,7 @@ function buildElementAttributes(
 		}
 	}
 
-	for (let { name, value, reactive, span: range } of node.attributes) {
+	for (let { name, value, reactive, span } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
@@ -194,7 +194,7 @@ function buildElementAttributes(
 				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
-				buildEventAttribute(varName, name, value, range, status, b);
+				buildEventAttribute(varName, name, value, span, status, b);
 			} else if (name.startsWith("transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
@@ -210,29 +210,22 @@ function buildElementAttributes(
 					`${status.ns ? "// @ts-ignore\n" : ""}${varName}.${propName} = t_class(`,
 					params.join(", "),
 					");",
-					range,
+					span,
 					status,
 				);
 			} else if (name === "style") {
 				status.imports.add("t_style");
-				stashRun(
-					fragment,
-					`${varName}.setAttribute("style", t_style(`,
-					value,
-					"));",
-					range,
-					status,
-				);
+				stashRun(fragment, `${varName}.setAttribute("style", t_style(`, value, "));", span, status);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");
-				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", range, status);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", span, status);
 				// NOTE: dataset seems to be a tiny bit slower?
 				//const propName = name.substring(name.indexOf("-"));
 				//buildRun("setDataAttribute", `${varName}.dataset.${propName} = ${value};`, status, b);
 			} else {
 				status.imports.add("t_attribute");
-				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", range, status);
+				stashRun(fragment, `t_attribute(${varName}, "${name}", `, value, ");", span, status);
 			}
 		}
 	}

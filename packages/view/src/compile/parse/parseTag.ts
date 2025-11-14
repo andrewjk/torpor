@@ -17,7 +17,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 
 	consumeSpace(status);
 
-	let tagStart = status.i;
+	let tagStart = status.i + 1;
 	let snailed = accept("@", status);
 	let tagName = consumeAlphaNumeric(status);
 	let tagEnd = status.i;
