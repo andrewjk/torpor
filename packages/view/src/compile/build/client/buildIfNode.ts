@@ -48,7 +48,7 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"if"` : ""});
 		let ${indexName} = -1;
-		t_run_control(${regionName}, ${anchorName}, (t_before) => {`);
+		t_run_control(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
 
 	let index = 0;
 	for (let branch of branches) {

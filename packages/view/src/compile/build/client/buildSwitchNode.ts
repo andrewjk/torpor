@@ -46,7 +46,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"switch"` : ""});
 		let ${indexName} = -1;
-		t_run_control(${regionName}, ${anchorName}, (t_before) => {`);
+		t_run_control(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
