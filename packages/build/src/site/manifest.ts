@@ -30,16 +30,19 @@ export default {
   routes: [
     ${site.routes
 			.map((r) => {
+				let endPoint: string;
 				if (serverRequest || !/server\.(ts|js)$/.test(r.file)) {
-					return `{ path: "${r.path}", type: ${r.type}, endPoint: ${serverRequest || !/server\.(ts|js)$/.test(r.file) ? `() => import(/* @vite-ignore */ "${path.join(site.root, r.file)}")` : "undefined"} }`;
+					endPoint = `() => import(/* @vite-ignore */ "${path.join(site.root, r.file)}")`;
 				} else {
 					// On the client, for a server route, we need to check
 					// whether there's a load function and set a dummy endPoint
 					// if so. The correct endpoint will be hit in clientEntry
 					// HACK: Should do this better than checking for `load:` in source...
 					const haveLoad = readFileSync(path.join(site.root, r.file)).includes("load:");
-					return `{ path: "${r.path}", type: ${r.type}, endPoint: ${haveLoad ? "() => load" : "undefined"} }`;
+					endPoint = haveLoad ? "() => load" : "undefined";
 				}
+				const sub = r.subFolder ? `"${r.subFolder}"` : "undefined";
+				return `{ path: "${r.path}", type: ${r.type}, endPoint: ${endPoint}, subFolder: ${sub} }`;
 			})
 			.join(",\n    ")}
   ],

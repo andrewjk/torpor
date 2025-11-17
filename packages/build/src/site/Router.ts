@@ -23,6 +23,7 @@ export default class Router {
 					path: r.path,
 					type: r.type,
 					endPoint: r.endPoint,
+					subFolder: r.subFolder,
 				}),
 			);
 		}
@@ -31,12 +32,13 @@ export default class Router {
 	}
 
 	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
-	addPage(path: string, type: number, endPoint: () => Promise<any>): this {
+	addPage(path: string, type: number, endPoint: () => Promise<any>, subFolder?: string): this {
 		this.routes.push(
 			new Route(path, {
 				path,
 				type,
 				endPoint,
+				subFolder,
 			}),
 		);
 		this.#sortRoutes();
@@ -53,7 +55,7 @@ export default class Router {
 	}
 	*/
 
-	match(path: string, query: URLSearchParams): Match | undefined {
+	match(path: string, query: URLSearchParams): RouteMatch | undefined {
 		for (let route of this.routes) {
 			let match = path.match(route.regex);
 			if (match) {
@@ -69,17 +71,15 @@ export default class Router {
 				};
 			}
 		}
-
-		console.log(`not found: '${path}'`);
 	}
 
 	#loadHandler(handler: RouteHandler, path: string) {
-		handler.layouts = this.#findLayouts(path);
+		handler.layouts = this.#findLayouts(path, handler);
 		handler.serverEndPoint = this.#findServer(path);
-		handler.serverHook = this.#findServerHook(path);
+		handler.serverHook = this.#findServerHook(handler);
 	}
 
-	#findLayouts(path: string): LayoutHandler[] | undefined {
+	#findLayouts(path: string, handler: RouteHandler): LayoutHandler[] | undefined {
 		let layouts: LayoutHandler[] = [];
 		let parts = path
 			// Strip the trailing`~/server` (so we don't look for `~/server/_layout`
@@ -96,7 +96,7 @@ export default class Router {
 			}
 			const layoutPath = basePath + "/_layout";
 			const layoutRoute = this.routes.find((r) => r.path === layoutPath);
-			if (layoutRoute) {
+			if (layoutRoute && layoutRoute.handler.subFolder === handler.subFolder) {
 				layouts.push({
 					path: layoutPath,
 					endPoint: layoutRoute.handler.endPoint,
@@ -113,12 +113,11 @@ export default class Router {
 		return serverRoute && serverRoute.handler.endPoint;
 	}
 
-	#findServerHook(path: string): (() => Promise<any>) | undefined {
+	#findServerHook(handler: RouteHandler): (() => Promise<any>) | undefined {
 		// TODO: Should this be a collection, like layouts?
 		let serverHookPath = "/_hook/~server";
-		// HACK: Generalise this
-		if (path.startsWith("/api/")) {
-			serverHookPath = "/api" + serverHookPath;
+		if (handler.subFolder !== undefined) {
+			serverHookPath = handler.subFolder + serverHookPath;
 		}
 		const serverHookRoute = this.routes.find((r) => r.path === serverHookPath);
 		return serverHookRoute && serverHookRoute.handler.endPoint;
@@ -158,7 +157,7 @@ class Route {
 	}
 }
 
-interface Match {
+interface RouteMatch {
 	handler: RouteHandler;
 	params?: Record<string, string>;
 	query: URLSearchParams;

@@ -48,6 +48,7 @@ export default async function runTest(
 			path: r.path,
 			type: r.type,
 			endPoint: () => import(/* @vite-ignore */ path.join(site.root, r.file)),
+			subFolder: r.subFolder,
 		})),
 	);
 

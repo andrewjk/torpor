@@ -3,6 +3,7 @@ import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import type Adapter from "../types/Adapter";
+import type Route from "../types/Route";
 import {
 	ERROR_ROUTE,
 	HOOK_ROUTE,
@@ -27,7 +28,7 @@ import defaultAdapter from "./defaultAdapter";
  */
 export default class Site {
 	root: string;
-	routes: { path: string; file: string; type: RouteType }[] = [];
+	routes: Route[] = [];
 	// Is default plugins a bad idea?
 	// HACK: Set loose because otherwise it uses a list of allowed extensions
 	// TODO: Should probably just do this ourselves and let the user pass in
@@ -56,17 +57,32 @@ export default class Site {
 	/**
 	 * Adds a folder of routes, based on the names of the files in the folder
 	 * @param folder The folder containing the routes
+	 * @param subFolder If a subFolder is set, all routes in the folder will be
+	 * placed under the subFolder, and only hooks, layouts etc will be used if
+	 * they have the same subFolder. This can be used to create e.g. an `api`
+	 * set of routes with their own hook for authorization from various clients
 	 */
-	async addRouteFolder(folder: string): Promise<void> {
+	async addRouteFolder(folder: string, subFolder?: string): Promise<void> {
 		const routeFolder = fpath.join(this.root, folder);
 		const routeFiles = await fs.readdir(routeFolder, { recursive: true });
+		if (subFolder !== undefined && !subFolder.startsWith("/")) {
+			subFolder = "/" + subFolder;
+		}
 		for (let file of routeFiles) {
 			// The file must start with `+` or `_` and end with `.js` or `.ts`
 			if (/^(\+|_).+(\.js|\.ts)$/.test(fpath.basename(file))) {
 				let routePath = this.#routePath(file);
+				if (subFolder !== undefined) {
+					routePath = subFolder + routePath;
+				}
 				let type = this.#routeType(file);
 				file = fpath.relative(this.root, fpath.resolve(routeFolder, file));
-				this.routes.push({ path: routePath, file, type });
+				this.routes.push({
+					path: routePath,
+					file,
+					type,
+					subFolder: subFolder,
+				});
 			}
 		}
 		this.#sortRoutes();
@@ -91,10 +107,19 @@ export default class Site {
 			| "_hook"
 			| "_hook.server"
 			| "_error",
+		subFolder?: string,
 	): void {
 		let routePath = this.#routePath(fpath.join(path, type ?? fpath.basename(file)));
 		let routeType = type ? this.#routeTypeFromString(type) : this.#routeType(file);
-		this.routes.push({ path: routePath, file, type: routeType });
+		if (subFolder !== undefined && !subFolder.startsWith("/")) {
+			subFolder = "/" + subFolder;
+		}
+		this.routes.push({
+			path: routePath,
+			file,
+			type: routeType,
+			subFolder: subFolder,
+		});
 		this.#sortRoutes();
 	}
 
