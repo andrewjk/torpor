@@ -8,6 +8,7 @@ export default async function loadData(
 	handler: RouteHandler,
 	params: Record<string, string>,
 	path: string,
+	query: URLSearchParams,
 	newLayoutStack: LayoutPath[],
 	clientEndPoint: PageEndPoint | undefined,
 	serverEndPoint: PageServerEndPoint | undefined,
@@ -36,6 +37,7 @@ export default async function loadData(
 				const layoutResponse = await loadClientAndServerData(
 					stackLayout.data,
 					document.location.origin + layoutPath,
+					query,
 					params,
 					layoutEndPoint,
 					layoutServerEndPoint,
@@ -51,6 +53,7 @@ export default async function loadData(
 	let endPointResponse = await loadClientAndServerData(
 		data,
 		document.location.origin + path,
+		query,
 		params,
 		clientEndPoint,
 		serverEndPoint,
@@ -64,6 +67,7 @@ export default async function loadData(
 async function loadClientAndServerData(
 	data: Record<string, any>,
 	location: string,
+	query: URLSearchParams,
 	params: Record<string, string>,
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
@@ -75,6 +79,9 @@ async function loadClientAndServerData(
 			Object.assign(data, prefetchedData[location]);
 		} else {
 			const clientUrl = new URL(document.location.href);
+			for (let [name, value] of query) {
+				clientUrl.searchParams.append(name, value);
+			}
 			const clientParams = buildClientParams(clientUrl, params, data);
 			const clientResponse = await clientEndPoint.load(clientParams);
 			if (clientResponse) {
@@ -90,19 +97,23 @@ async function loadClientAndServerData(
 			}
 		}
 	}
-	if (serverEndPoint?.load) {
-		const serverUrl = location.replace(/\/$/, "") + "/~server";
 
-		if (prefetchedData[serverUrl]) {
-			Object.assign(data, prefetchedData[serverUrl]);
+	if (serverEndPoint?.load) {
+		const serverLocation = location.replace(/\/$/, "") + "/~server";
+		if (prefetchedData[serverLocation]) {
+			Object.assign(data, prefetchedData[serverLocation]);
 		} else {
+			const serverUrl = new URL(serverLocation);
+			for (let [name, value] of query) {
+				serverUrl.searchParams.append(name, value);
+			}
 			const serverResponse = await fetch(serverUrl);
 			if (serverResponse) {
 				if (serverResponse.ok) {
 					if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
 						const serverData = await serverResponse.json();
 						Object.assign(data, serverData);
-						prefetchedData[serverUrl] = serverData;
+						prefetchedData[serverLocation] = serverData;
 					}
 				} else {
 					return serverResponse;

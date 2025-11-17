@@ -64,6 +64,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		handler,
 		params,
 		path,
+		query,
 		newLayoutStack,
 		clientEndPoint,
 		serverEndPoint,

@@ -72,7 +72,7 @@ async function maybePrefetch(e: MouseEvent | TouchEvent) {
 			// Just dummy this up
 			let newStack: LayoutPath[] = [];
 
-			await loadData(handler, params, path, newStack, clientEndPoint, serverEndPoint, true);
+			await loadData(handler, params, path, query, newStack, clientEndPoint, serverEndPoint, true);
 		}
 	}
 }
