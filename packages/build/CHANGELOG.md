@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.7
+
+### Patch Changes
+
+- a09c14e: Fix: bad bin script
+
 ## 0.4.6
 
 ### Patch Changes
