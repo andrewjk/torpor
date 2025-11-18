@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.8
+
+### Patch Changes
+
+- d813c86: Fix: pass search params to client side data cache
+
 ## 0.4.7
 
 ### Patch Changes
