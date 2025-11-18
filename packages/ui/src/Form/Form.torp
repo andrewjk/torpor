@@ -134,6 +134,7 @@ export default function Form($props: FormProps | undefined) {
 			{$props?.id}
 			class={["torp-form", $props?.class]}
 			{$props?.style}
+			{$props?.action}
 			method={$props?.method ?? "POST"}
 			enctype={$props?.enctype ?? ($state.hasFile ? "multipart/form-data" : undefined)}
 			onsubmit={handleSubmit}
