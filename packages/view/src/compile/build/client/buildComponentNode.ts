@@ -134,6 +134,9 @@ export default function buildComponentNode(
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else if (value != null) {
+				if (name === "class" && node.scopeStyles) {
+					value = `"${trimQuotes(value)} torp-${status.styleHash}"`;
+				}
 				props.push({
 					name,
 					preText: "",

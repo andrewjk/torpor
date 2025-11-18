@@ -43,12 +43,22 @@ export default function Class() {
 			Class nested
 		</div>
 
-		<Child class={{ "child-class": true }} />
+		<Child class={{ "child-class": true }}>
+			Child class 1
+		</Child>
+
+		<Child class="pink">
+			Child class 2
+		</Child>
 	}
 
 	@style {
 		div {
 			color: blue;
+		}
+
+		.pink {
+			color: pink;
 		}
 	}
 }
@@ -56,7 +66,9 @@ export default function Class() {
 function Child() {
 	@render {
 		<div class={$props.class}>
-			Child class
+			<slot>
+				Child class
+			</slot>
 		</div>
 	}
 }
@@ -93,40 +105,40 @@ test("class -- hydrated", async () => {
 
 function check(container: HTMLElement, state: Props) {
 	expect(queryByText(container, "From id")).not.toBeNull();
-	expect(queryByText(container, "From id")).toHaveClass("torp-1ljxz83", {
+	expect(queryByText(container, "From id")).toHaveClass("torp-1ouzs8a", {
 		exact: true,
 	});
 
 	expect(queryByText(container, "From string")).not.toBeNull();
-	expect(queryByText(container, "From string")).toHaveClass("divclass torp-1ljxz83", {
+	expect(queryByText(container, "From string")).toHaveClass("divclass torp-1ouzs8a", {
 		exact: true,
 	});
 
 	expect(queryByText(container, "From state")).not.toBeNull();
-	expect(queryByText(container, "From state")).toHaveClass("hello red blue torp-1ljxz83", {
+	expect(queryByText(container, "From state")).toHaveClass("hello red blue torp-1ouzs8a", {
 		exact: true,
 	});
 
 	expect(queryByText(container, "From state with scope")).not.toBeNull();
 	expect(queryByText(container, "From state with scope")).toHaveClass(
-		"hello red blue torp-1ljxz83",
+		"hello red blue torp-1ouzs8a",
 		{
 			exact: true,
 		},
 	);
 
 	expect(queryByText(container, "Class object")).not.toBeNull();
-	expect(queryByText(container, "Class object")).toHaveClass("foo baz torp-1ljxz83", {
+	expect(queryByText(container, "Class object")).toHaveClass("foo baz torp-1ouzs8a", {
 		exact: true,
 	});
 
 	expect(queryByText(container, "Class array")).not.toBeNull();
-	expect(queryByText(container, "Class array")).toHaveClass("foo baz torp-1ljxz83", {
+	expect(queryByText(container, "Class array")).toHaveClass("foo baz torp-1ouzs8a", {
 		exact: true,
 	});
 
 	expect(queryByText(container, "Class nested")).not.toBeNull();
-	expect(queryByText(container, "Class nested")).toHaveClass("foo bar baz qux torp-1ljxz83", {
+	expect(queryByText(container, "Class nested")).toHaveClass("foo bar baz qux torp-1ouzs8a", {
 		exact: true,
 	});
 
@@ -134,13 +146,20 @@ function check(container: HTMLElement, state: Props) {
 	state.green = true;
 	state.blue = false;
 
-	expect(queryByText(container, "From state")).toHaveClass("hello red green torp-1ljxz83", {
+	expect(queryByText(container, "From state")).toHaveClass("hello red green torp-1ouzs8a", {
 		exact: true,
 	});
 
 	// Components
-	expect(queryByText(container, "Child class")).not.toBeNull();
-	expect(queryByText(container, "Child class")).toHaveClass("child-class torp-1ljxz83", {
+	expect(queryByText(container, "Child class 1")).not.toBeNull();
+	expect(queryByText(container, "Child class 1")).toHaveClass("child-class torp-1ouzs8a", {
+		exact: true,
+	});
+
+	// Should get a bit fancier than this i.e. if a class is set on a component,
+	// ONLY that class gets the style hash added
+	expect(queryByText(container, "Child class 2")).not.toBeNull();
+	expect(queryByText(container, "Child class 2")).toHaveClass("pink torp-1ouzs8a", {
 		exact: true,
 	});
 }
