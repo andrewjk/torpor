@@ -40,7 +40,7 @@
 		"access": "public"
 	},
 	"bin": {
-		"tb": "./dist/bin/index.mjs"
+		"tb": "./dist/bin/index.js"
 	},
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
