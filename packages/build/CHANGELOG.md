@@ -1,5 +1,18 @@
 # @torpor/build
 
+## 0.4.6
+
+### Patch Changes
+
+- cf8d8db: Fix: pass search params to client side navigation
+- 64adf0b: Feat: `subFolder` option when adding routes
+- Updated dependencies [9bca98e]
+- Updated dependencies [7382b6d]
+- Updated dependencies [d68d347]
+- Updated dependencies [4e3d726]
+- Updated dependencies [adfa504]
+  - @torpor/view@0.4.14
+
 ## 0.4.5
 
 ### Patch Changes

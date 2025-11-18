@@ -1,5 +1,15 @@
 # @torpor/view
 
+## 0.4.14
+
+### Patch Changes
+
+- 9bca98e: Feat: mapping for interpolated attribute values
+- 7382b6d: Fix: allow null and undefined in classes and styles
+- d68d347: Fix: some mapping
+- 4e3d726: Fix: ifs and switches in @heads don't add elements
+- adfa504: Fix: ok I think those types are finally right
+
 ## 0.4.13
 
 ### Patch Changes
