@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.9
+
+### Patch Changes
+
+- 2e057c3: Fix: form and button actions
+
 ## 0.4.8
 
 ### Patch Changes
