@@ -75,8 +75,9 @@ async function loadClientAndServerData(
 	let prefetchedData = client.prefetchedData;
 
 	if (clientEndPoint?.load) {
-		if (prefetchedData[location]) {
-			Object.assign(data, prefetchedData[location]);
+		const clientKey = location + (query.size > 0 ? `?${query}` : "");
+		if (prefetchedData[clientKey]) {
+			Object.assign(data, prefetchedData[clientKey]);
 		} else {
 			const clientUrl = new URL(document.location.href);
 			for (let [name, value] of query) {
@@ -89,7 +90,7 @@ async function loadClientAndServerData(
 					if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
 						const clientData = await clientResponse.json();
 						Object.assign(data, clientData);
-						prefetchedData[location] = clientData;
+						prefetchedData[clientKey] = clientData;
 					}
 				} else {
 					return clientResponse;
@@ -100,8 +101,9 @@ async function loadClientAndServerData(
 
 	if (serverEndPoint?.load) {
 		const serverLocation = location.replace(/\/$/, "") + "/~server";
-		if (prefetchedData[serverLocation]) {
-			Object.assign(data, prefetchedData[serverLocation]);
+		const serverKey = serverLocation + (query.size > 0 ? `?${query}` : "");
+		if (prefetchedData[serverKey]) {
+			Object.assign(data, prefetchedData[serverKey]);
 		} else {
 			const serverUrl = new URL(serverLocation);
 			for (let [name, value] of query) {
@@ -113,7 +115,7 @@ async function loadClientAndServerData(
 					if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
 						const serverData = await serverResponse.json();
 						Object.assign(data, serverData);
-						prefetchedData[serverLocation] = serverData;
+						prefetchedData[serverKey] = serverData;
 					}
 				} else {
 					return serverResponse;
