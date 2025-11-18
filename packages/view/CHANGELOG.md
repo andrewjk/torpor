@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 0.4.15
+
+### Patch Changes
+
+- 1b19c1d: Fix: set style hash on component classes
+
 ## 0.4.14
 
 ### Patch Changes
