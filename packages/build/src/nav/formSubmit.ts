@@ -12,7 +12,14 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 
 	// Perform a POST fetch to the form's action location
 	const form = e.target as HTMLFormElement;
-	const action = (e.submitter as HTMLButtonElement)?.formAction ?? form.action;
+	const button = e.submitter as HTMLButtonElement;
+	// HACK: submit buttons have their formAction set to the current page if not
+	// set, so we can't just check whether it's empty and fallback to form action
+	//const action = button?.formAction ?? form.action;
+	let action = form.action || document.URL;
+	if (button && button.formAction && button.formAction !== document.URL) {
+		action = button.formAction;
+	}
 	const options = {
 		body: new FormData(form),
 		method: "POST",
