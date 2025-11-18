@@ -4,7 +4,7 @@
 	"author": "",
 	"icon": "logo.png",
 	"license": "ISC",
-	"version": "0.3.35",
+	"version": "0.3.36",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/andrewjk/torpor"
@@ -42,12 +42,12 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm clean-install && npm run compile",
+		"vscode:prepublish": "npm install && npm run compile",
 		"compile": "tsc -b",
 		"watch": "tsc -b -w",
 		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
 		"test": "vitest",
-		"postinstall": "cd client && npm clean-install && cd ../server && npm clean-install && cd ..",
+		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
 		"publish": "vsce publish",
 		"publish:patch": "vsce publish patch",
 		"publish:minor": "vsce publish minor",
