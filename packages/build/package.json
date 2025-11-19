@@ -38,7 +38,7 @@
 	},
 	"files": [
 		"dist",
-		"./src/types/manifest.d.ts"
+		"src"
 	],
 	"publishConfig": {
 		"access": "public"
