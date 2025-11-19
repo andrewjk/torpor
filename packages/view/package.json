@@ -25,6 +25,9 @@
 			"require": "./dist/dev.cjs"
 		}
 	},
+	"files": [
+		"dist"
+	],
 	"publishConfig": {
 		"access": "public"
 	},

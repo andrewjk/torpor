@@ -73,6 +73,9 @@
 			"import": "./dist/motion/index.js"
 		}
 	},
+	"files": [
+		"dist"
+	],
 	"publishConfig": {
 		"access": "public"
 	},

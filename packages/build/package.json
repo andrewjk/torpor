@@ -36,6 +36,10 @@
 			"types": "./src/types/manifest.d.ts"
 		}
 	},
+	"files": [
+		"dist",
+		"./src/types/manifest.d.ts"
+	],
 	"publishConfig": {
 		"access": "public"
 	},
