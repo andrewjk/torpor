@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 0.4.10
+
+### Patch Changes
+
+- 802cb4c: Chore: only publish files in the dist folder
+- Updated dependencies [802cb4c]
+  - @torpor/view@0.4.16
+
 ## 0.4.9
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 0.2.2
+
+### Patch Changes
+
+- 802cb4c: Chore: only publish files in the dist folder
+- Updated dependencies [802cb4c]
+  - @torpor/build@0.4.10
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 0.3.6
+
+### Patch Changes
+
+- 802cb4c: Chore: only publish files in the dist folder
+- Updated dependencies [802cb4c]
+  - @torpor/view@0.4.16
+
 ## 0.3.5
 
 ### Patch Changes

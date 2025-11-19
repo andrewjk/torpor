@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/view",
-	"version": "0.4.15",
+	"version": "0.4.16",
 	"description": "Torpor's view library, for writing and mounting components",
 	"type": "module",
 	"exports": {

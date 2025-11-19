@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/adapter-cloudflare",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "A @torpor/build adapter for deploying to Cloudflare Pages",
 	"type": "module",
 	"exports": {
