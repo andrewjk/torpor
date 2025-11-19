@@ -22,13 +22,13 @@ async function postbuild(site: Site): Promise<void> {
 	const cloudflareFolder = path.join(distFolder, "cloudflare");
 
 	const buildSrcFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/");
-	const adapterSrcFolder = path.resolve(
+	const adapterDistFolder = path.resolve(
 		site.root,
-		"./node_modules/@torpor/adapter-cloudflare/src/",
+		"./node_modules/@torpor/adapter-cloudflare/dist/",
 	);
 
 	// Compile _worker.ts
-	let workerFile = path.join(adapterSrcFolder, "_worker.ts");
+	let workerFile = path.join(adapterDistFolder, "_worker.ts");
 	let workerSource = await fs.readFile(workerFile, "utf-8");
 
 	// Find the client script file in /assets
