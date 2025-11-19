@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 0.2.3
+
+### Patch Changes
+
+- b9978f9: Fix: include \_worker.ts in dist files
+
 ## 0.2.2
 
 ### Patch Changes
