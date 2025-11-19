@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.11
+
+### Patch Changes
+
+- aa148ad: Chore: also publish files in the src folder
+
 ## 0.4.10
 
 ### Patch Changes
