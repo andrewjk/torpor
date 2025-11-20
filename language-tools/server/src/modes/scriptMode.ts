@@ -643,15 +643,15 @@ function importComponentFiles(
 			if (i === -1) {
 				return content;
 			}
-		} else if (
-			first.script[i] === "i" &&
-			/import\s+(.+?)\s+from\s+(.+?);*\s*$/ms.test(first.script.substring(i))
-		) {
-			const match = first.script.substring(i).match(/import\s+(.+?)\s+from\s+(.+?);*\s*$/ms)!;
+		} else if (first.script[i] === "i") {
+			const match = first.script.substring(i).match(/import\s+(.+?)\s+from\s+(.+?);*\s*$/ms);
+			if (match === null) continue;
+
 			const oldImport = match[0];
 			//const names = match[1];
 			const importedFile = match[2];
 
+			// Strip quotes
 			let importFile = importedFile;
 			if (
 				(importFile.startsWith("'") && importFile.endsWith("'")) ||
@@ -660,8 +660,8 @@ function importComponentFiles(
 				importFile = importFile.substring(1, importFile.length - 1);
 			}
 
+			// Just map import files that aren't components
 			if (!importFile.endsWith(".torp")) {
-				// No change, just straight map it
 				newMaps.push({
 					script: oldImport,
 					source: {
@@ -676,21 +676,25 @@ function importComponentFiles(
 				continue;
 			}
 
+			// Get the absolute path of the import file
+			let typeFile = importFile.startsWith(".") ? path.join(filepath, importFile) : importFile;
+
+			// Replace aliased paths from tsconfig.json
 			if (tsConfigPath && tsConfig.paths) {
 				// HACK: Get the longest match etc
-				const oldImportFile = importFile;
+				const oldTypeFile = typeFile;
 				for (let [srcGlob, paths] of Object.entries(tsConfig.paths)) {
 					for (let destGlob of paths) {
-						importFile = pathReplace(srcGlob, destGlob, importFile);
+						typeFile = pathReplace(srcGlob, destGlob, typeFile);
 					}
 				}
 				// The import may now be relative to the tsconfig file, so make it absolute
-				if (importFile !== oldImportFile && importFile.startsWith(".")) {
-					importFile = path.join(tsConfigPath, importFile);
+				if (typeFile !== oldTypeFile && typeFile.startsWith(".")) {
+					typeFile = path.join(tsConfigPath, typeFile);
 				}
 			}
 
-			const typeFile = importFile.startsWith(".") ? path.join(filepath, importFile) : importFile;
+			// Create the virtual file for the component
 			if (!virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
 				const typeSource = fs.readFileSync(typeFile, "utf8");
 				const { content } = transform(typeFile, typeSource);
@@ -699,6 +703,7 @@ function importComponentFiles(
 				env.createFile(key, content);
 			}
 
+			// Replace the import file with the virtual file
 			let oldLength = content.length;
 			let newValue = typeFile.replace(".torp", ".ts");
 			// HACK: We could concat this if we could be bothered
