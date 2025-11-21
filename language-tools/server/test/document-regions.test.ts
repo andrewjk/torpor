@@ -1,5 +1,5 @@
 import { assert, test } from "vitest";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import { type TextDocument } from "vscode-languageserver-textdocument";
 import { getDocumentRegions } from "../src/embeddedSupport";
 
 test("test document", () => {

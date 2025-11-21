@@ -12,12 +12,10 @@ import {
 } from "vscode-languageserver/node.js";
 //import { getSemanticTokensLegend } from "./getSemanticTokensLegend";
 import { LanguageModes, getLanguageModes } from "./languageModes";
-import {
-	getDocumentSymbols,
-	getImplementation,
-	getSelectionRanges,
-	getSemanticTokens,
-} from "./modes/scriptMode";
+import getDocumentSymbols from "./script/getDocumentSymbols";
+import getImplementation from "./script/getImplementation";
+import getSelectionRanges from "./script/getSelectionRanges";
+import getSemanticTokens from "./script/getSemanticTokens";
 
 // Create a connection for the server. The connection uses Node's IPC as a
 // transport. Also include all preview / proposed LSP features
