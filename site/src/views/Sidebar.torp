@@ -23,6 +23,7 @@ export default function Sidebar() {
 				<li><a href="/ui/accordion">Accordion</a></li>
 				<li><a href="/ui/breadcrumb">Breadcrumb</a></li>
 				<li><a href="/ui/calendar">Calendar</a></li>
+				<li><a href="/ui/chart">Chart</a></li>
 				<li><a href="/ui/contextual">Contextual</a></li>
 				<li><a href="/ui/dialog">Dialog</a></li>
 				<li><a href="/ui/disclosure">Disclosure</a></li>

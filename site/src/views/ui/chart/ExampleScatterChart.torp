@@ -1,0 +1,30 @@
+import { ScatterChart } from "@torpor/ui/Chart";
+
+export default function ExampleScatterChart() {
+	@render {
+		<ScatterChart
+			height={200}
+			width={400}
+			xLabel={"Things"}
+			yLabel={""}
+			series={[
+				{ name: "Item1", data: [ { x: 15, y: 40 }, { x: 23, y: 18 } ] },
+				{ name: "Item2", data: [ { x: 25, y: 45 } ] },
+				{ name: "Item3", data: [ { x: 45, y: 30 } ] },
+			]}
+			stepCount={2}
+			stepValue={0}
+			showXAxis={true}
+			showYAxis={true}
+			showHScatters={false}
+			showVScatters={false}
+		>
+		</ScatterChart>
+	}
+
+	@style {
+		svg line {
+			stroke: #222;
+		}
+	}
+}

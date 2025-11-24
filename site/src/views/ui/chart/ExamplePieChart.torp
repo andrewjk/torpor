@@ -1,0 +1,17 @@
+import { PieChart } from "@torpor/ui/Chart";
+
+export default function ExamplePieChart() {
+	@render {
+		<PieChart
+			size={200}
+			radius={50}
+			cutout={10}
+			data={[
+				{ name: "Item1", value: 35 },
+				{ name: "Item2", value: 25 },
+				{ name: "Item3", value: 45 },
+			]}
+		>
+		</PieChart>
+	}
+}

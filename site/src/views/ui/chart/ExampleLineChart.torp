@@ -1,0 +1,30 @@
+import { LineChart } from "@torpor/ui/Chart";
+
+export default function ExampleLineChart() {
+	@render {
+		<LineChart
+			height={200}
+			width={400}
+			xLabel={"Things"}
+			yLabel={""}
+			series={[
+				{ name: "Item1", data: [ 35, 40, 25 ] },
+				{ name: "Item2", data: [ 25, 45, 60 ] },
+				{ name: "Item3", data: [ 45, 30, 10 ] },
+			]}
+			stepCount={2}
+			stepValue={0}
+			showXAxis={true}
+			showYAxis={true}
+			showHLines={false}
+			showVLines={false}
+		>
+		</LineChart>
+	}
+
+	@style {
+		svg line {
+			stroke: #222;
+		}
+	}
+}

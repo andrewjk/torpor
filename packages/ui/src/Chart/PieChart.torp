@@ -1,0 +1,145 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { chartColors } from "../utils/chartColors";
+
+interface PieData {
+	name: string;
+	value: number;
+	color: string;
+}
+
+interface SegmentData {
+	name: string;
+	value: number;
+	color: string;
+	path: string;
+}
+
+interface PieChartProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	data: PieData[],
+	size?: number,
+	radius?: number,
+	cutout?: number,
+}
+
+export default function PieChart($props: PieChartProps) {
+	// Default values
+	$props.size ||= 200;
+	$props.radius ||= 50;
+
+	// NOTE: Take two pixels off the radius so that the stroke doesn't go outside the border
+	let $state = $watch({
+		get radius() {
+			return ($props.radius! / 100) * $props.size! - 2;
+		},
+		get cutout() {
+			return ($props.cutout! / 100) * $props.size! - 2;
+		},
+		get segments() {
+			return buildSegments($props.size!, $props.data, $props.radius!, $props.cutout!);
+		}
+	});
+
+	function buildSegments(
+		theSize: number,
+		theData: PieData[],
+		theRadiusSize: number,
+		theCutoutSize: number
+	): SegmentData[] {
+		const segments = [];
+		const x = theSize / 2;
+		const y = theSize / 2;
+		const totalValue = theData.reduce((a, b) => a + b.value, 0);
+
+		// Start at the top of the chart, at 180 + 360 so that we don't have to
+		// take wrapping angles into account
+		let startAngle = 540;
+		for (let i = 0; i < theData.length; i++) {
+			// Subtract the angle to go clockwise
+			const endAngle = startAngle - (theData[i].value / totalValue) * 360;
+			const largeArc = startAngle - endAngle > 180 ? 1 : 0;
+			segments.push({
+				name: theData[i].name,
+				value: theData[i].value,
+				color: theData[i].color,
+				path: buildPath(x, y, theRadiusSize, theCutoutSize, startAngle, endAngle, largeArc)
+			});
+			startAngle = endAngle;
+		}
+		return segments;
+	}
+
+	function buildPath(
+		x: number,
+		y: number,
+		theRadiusSize: number,
+		theCutoutSize: number,
+		startAngle: number,
+		endAngle: number,
+		largeArc: number
+	): string {
+		// HACK: Drawing an arc of 360 degrees doesn't work
+		if (startAngle - endAngle === 360) {
+			endAngle = 359.9999;
+		}
+
+		// Use some trig to find the points on the circumference at the start and end angles
+		const startx = x + theRadiusSize * Math.sin((Math.PI * startAngle) / 180);
+		const starty = x + theRadiusSize * Math.cos((Math.PI * startAngle) / 180);
+
+		const endx = x + theRadiusSize * Math.sin((Math.PI * endAngle) / 180);
+		const endy = y + theRadiusSize * Math.cos((Math.PI * endAngle) / 180);
+
+		if ($props.cutout) {
+			// Use some trig to find the points on the cutout at the start and end angles
+			const cutoutstartx = x + theCutoutSize * Math.sin((Math.PI * startAngle) / 180);
+			const cutoutstarty = x + theCutoutSize * Math.cos((Math.PI * startAngle) / 180);
+
+			const cutoutendx = x + theCutoutSize * Math.sin((Math.PI * endAngle) / 180);
+			const cutoutendy = y + theCutoutSize * Math.cos((Math.PI * endAngle) / 180);
+
+			// Build the path - move to the cutout start, line to the start angle on the circumference,
+			// arc to the end angle on the circumference, line to the cutout end, and then arc to the
+			// cutout start
+			const path = `
+M${cutoutstartx},${cutoutstarty}
+L${startx},${starty}
+A${theRadiusSize},${theRadiusSize} 0 ${largeArc} 1 ${endx},${endy}
+L${cutoutendx},${cutoutendy}
+A${theCutoutSize},${theCutoutSize} 0 ${largeArc} 0 ${cutoutstartx},${cutoutstarty}`.trim();
+			return path;
+		} else {
+			// Build the path - move to the origin, line to the start angle on the circumference,
+			// arc to the end angle on the circumference, and then close back to the start
+			const path = `M${x},${y} L${startx},${starty} A${theRadiusSize},${theRadiusSize} 0 ${largeArc} 1 ${endx},${endy} Z`;
+			return path;
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-pie-chart", $props?.class]}
+			{$props?.style}
+		>
+			<svg
+				version="1.1"
+				width={$props.size}
+				height={$props.size}
+			>
+				<g>
+					@for (let [i, segment] of $state.segments.entries()) {
+						<path d={segment.path} fill={segment.color || chartColors[i % chartColors.length]}>
+							<title>{`${segment.name}\n${segment.value}`}</title>
+						</path>
+					}
+				</g>
+			</svg>
+		</div>
+	}
+}

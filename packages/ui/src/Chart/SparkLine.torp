@@ -1,0 +1,71 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { calculateMaxValue } from "../utils/chartUtils";
+import { chartColors } from "../utils/chartColors";
+
+interface SparkLineProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	data: number[];
+	color?: string,
+	height?: number,
+	width?: number,
+}
+
+export default function SparkLine($props: SparkLineProps) {
+	const defaultHeight = 20;
+	const defaultWidth = 100;
+
+	let container: HTMLElement;
+
+	let $state = $watch({
+		get calculatedHeight() {
+			return $props.height || defaultHeight;
+		},
+		get calculatedWidth() { 
+			return $props.width || container?.clientWidth || defaultWidth;
+		},
+		get calculatedSeries() { 
+			return [{ name: "", color: $props.color ?? "", data: $props.data }];
+		},
+		get maxValue() { 
+			return calculateMaxValue($state.calculatedSeries);
+		},
+		get itemWidth() { 
+			return $state.calculatedWidth / $props.data.length;
+		},
+		get valueHeight() { 
+			return ($state.calculatedHeight - 4) / $state.maxValue;
+		},
+		get pointSeries() {
+			return $props.data.map((value, i) => {
+				const x = +(i * $state.itemWidth).toFixed(2);
+				const y = +($state.calculatedHeight - 2 - value * $state.valueHeight).toFixed(2);
+				return { x, y };
+			});
+		}
+	});
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-spark-line", $props?.class]}
+			{$props?.style}
+			&ref={container}
+		>
+			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
+				<g>
+					<polyline
+						points={$state.pointSeries.map((p) => `${p.x},${p.y}`).join(" ")}
+						stroke={$props.color || chartColors[0]}
+						stroke-width="2"
+						fill="none"
+					/>
+				</g>
+			</svg>
+		</div>
+	}
+}

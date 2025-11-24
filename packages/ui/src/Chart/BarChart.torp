@@ -1,0 +1,159 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import XAxis from "./XAxis.torp";
+import YAxis from "./YAxis.torp";
+import GridLines from "./GridLines.torp";
+import {
+	calculateMaxValue,
+	calculateStepValue,
+	calculateStepLabels,
+	calculateItemWidth,
+	calculateValueHeight,
+	calculateChartBottom,
+	calculateChartLeft
+} from "../utils/chartUtils";
+import { chartColors } from "../utils/chartColors";
+
+import type DataSeries from "./DataSeries";
+
+interface BarChartProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	series: DataSeries[],
+	height?: number,
+	width?: number,
+	xLabel?: string,
+	yLabel?: string,
+	maxValue?: number,
+	stepCount?: number,
+	stepValue?: number,
+	hideXAxis?: boolean,
+	hideYAxis?: boolean,
+	showHLines?: boolean,
+	showVLines?: boolean,
+}
+
+export default function BarChart($props: BarChartProps) {
+	const defaultHeight = 200;
+	const defaultWidth = 400;
+
+	let container: HTMLElement;
+	let measurer: SVGTextElement;
+
+	let $state = $watch({
+		textWidth: 0,
+		textHeight: 0,
+		get labels() {
+			return $props.series.map((s) => s.name);
+		},
+		get calculatedHeight() { 
+			return $props.height || defaultHeight;
+		},
+		get calculatedWidth() { 
+			return $props.width || container?.clientWidth || defaultWidth;
+		},
+		get maxValue () {
+			return $props.maxValue || calculateMaxValue($props.series);
+		},
+		get calculatedStepValue() {
+			return $props.stepValue || calculateStepValue($state.maxValue, $props.stepCount);
+		},
+		get stepLabels() {
+			return calculateStepLabels($props.stepCount || 2, $state.calculatedStepValue);
+		},
+		get itemWidth() {
+			return calculateItemWidth($state.calculatedWidth, $state.chartLeft, $state.labels);
+		},
+		get valueHeight() {
+			return calculateValueHeight($state.chartBottom, $state.textHeight, $state.calculatedStepValue, $props.stepCount || 2);
+		},
+		get chartBottom() {
+			return calculateChartBottom($props.xLabel ?? "", $state.calculatedHeight, $state.textHeight);
+		},
+		get chartLeft() {
+			return calculateChartLeft($state.stepLabels, $props.yLabel ?? "", $state.textHeight, $state.textWidth);
+		}
+	});
+
+	$mount(() => {
+		// HACK: Wait until the measurer is really available
+		setTimeout(() => {
+			const bbox = measurer.getBBox();
+			$state.textWidth = bbox.width;
+			$state.textHeight = bbox.height * 1.5;
+			measurer.remove();
+		}, 1);
+	});
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-bar-chart", $props?.class]}
+			{$props?.style}
+			&ref={container}
+		>
+			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight} xmlns="http://www.w3.org/2000/svg">
+				<g>
+				 	<text &ref={measurer} x="-999" y="-999">8</text>
+	
+					@if ($state.textWidth && $state.textHeight) {
+						<XAxis
+							showAxis={!$props.hideXAxis}
+							height={$state.calculatedHeight}
+							width={$state.calculatedWidth}
+							{$state.itemWidth}
+							{$state.textHeight}
+							xLabel={$props.xLabel ?? ""}
+							stepLabels={[]}
+							stepValue={0}
+							{$state.labels}
+							{$state.chartLeft}
+							{$state.chartBottom}
+						/>
+						<YAxis
+							showAxis={!$props.hideYAxis}
+							{$state.valueHeight}
+							{$state.textHeight}
+							yLabel={$props.yLabel ?? ""}
+							{$state.stepLabels}
+							stepValue={$state.calculatedStepValue}
+							{$state.chartLeft}
+							{$state.chartBottom}
+						/>
+						<GridLines
+							{$props.showHLines}
+							{$props.showVLines}
+							width={$state.calculatedWidth}
+							{$state.labels}
+							xStepValue={0}
+							xStepLabels={[]}
+							yStepValue={$state.calculatedStepValue}
+							yStepLabels={$state.stepLabels}
+							{$state.itemWidth}
+							{$state.valueHeight}
+							{$state.chartLeft}
+							{$state.chartBottom}
+							type="bar"
+						/>
+						@for (let [i, series] of $props.series.entries()) {
+							<rect
+								x={$state.chartLeft +
+									i * $state.itemWidth +
+									$state.itemWidth / 4}
+								y={$state.chartBottom - Math.max(1, series.data[0] * $state.valueHeight)}
+								width={Math.max(1, $state.itemWidth / 2)}
+								height={Math.max(1, series.data[0] * $state.valueHeight)}
+								fill={series.color || chartColors[i % chartColors.length]}
+							>
+								<title>{`${[series.name, series.data[0]].filter(Boolean).join("\n")}`}</title>
+							</rect>
+						}
+					}
+				</g>
+			</svg>
+		</div>
+	}
+}

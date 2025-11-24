@@ -1,0 +1,190 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../lib/copyCode";
+import ExampleBarChart from "./chart/ExampleBarChart.torp";
+import ExampleLineChart from "./chart/ExampleLineChart.torp";
+import ExamplePieChart from "./chart/ExamplePieChart.torp";
+import ExampleScatterChart from "./chart/ExampleScatterChart.torp";
+import ExampleSparkLine from "./chart/ExampleSparkLine.torp";
+
+import ExampleBarChartCode from "./chart/ExampleBarChart.torp?raw";
+import ExampleLineChartCode from "./chart/ExampleLineChart.torp?raw";
+import ExamplePieChartCode from "./chart/ExamplePieChart.torp?raw";
+import ExampleScatterChartCode from "./chart/ExampleScatterChart.torp?raw";
+import ExampleSparkLineCode from "./chart/ExampleSparkLine.torp?raw";
+
+export default function ChartPage() {
+	@head {
+		<title>Charts | Torpor</title>
+	}
+
+	@render {
+		<h1>Charts</h1>
+		<p>
+			Various simple charts.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Chart>
+	<ChartHeader>
+		<ChartTrigger />
+	</ChartHeader>
+	<ChartContent />
+</Chart>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Bar Chart
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Line Chart
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Pie Chart
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Scatter Chart
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Sparkline
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleBarChart />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleBarChartCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleLineChart />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleLineChartCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExamplePieChart />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExamplePieChartCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleScatterChart />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleScatterChartCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleSparkLine />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleSparkLineCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

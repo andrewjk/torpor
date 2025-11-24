@@ -1,0 +1,32 @@
+import { SparkLine } from "@torpor/ui/Chart";
+
+export default function ExampleSparkLine() {
+	@render {
+		<div class="example-spark-line">
+			Trend:
+			<SparkLine
+				height={20}
+				width={80}
+				xLabel={"Things"}
+				yLabel={""}
+				data={[ 35, 25, 45, 38, 29, 20, 18, 26, 35, 38, 45, 50 ]}
+				stepCount={2}
+				stepValue={0}
+				showXAxis={true}
+				showYAxis={true}
+				showHLines={false}
+				showVLines={false}
+			>
+			</SparkLine>
+		</div>
+	}
+
+	@style {
+		.example-spark-line {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 1rem;
+		}
+	}
+}

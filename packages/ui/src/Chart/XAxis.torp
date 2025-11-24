@@ -1,0 +1,60 @@
+interface XAxisProps {
+	showAxis: boolean,
+	height: number,
+	width: number,
+	itemWidth: number,
+	textHeight: number,
+	xLabel: string,
+	labels: string[] ,
+	stepLabels:number[] ,
+	stepValue: number,
+	chartLeft: number,
+	chartBottom: number,
+}
+
+export default function XAxis($props: XAxisProps) {
+	let $state = $watch({
+		chartLabelBottom: $props.xLabel ? $props.height - $props.textHeight : $props.height,
+	});
+
+	@render {
+		<svg>
+			@if ($props.showAxis) {
+				<line x1={$props.chartLeft} y1={$props.chartBottom} x2={$props.width} y2={$props.chartBottom} />
+			}
+			@if ($props.xLabel) {
+				<text
+					text-anchor="middle"
+					dominant-baseline="text-after-edge"
+					x={$props.width - ($props.width - $props.chartLeft) / 2}
+					y={$props.height}
+				>
+					{$props.xLabel}
+				</text>
+			}
+			@if ($props.stepLabels.length && $props.stepValue) {
+				@for (let [i, label] of $props.stepLabels.entries()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="text-after-edge"
+						x={$props.chartLeft + i * $props.stepValue * $props.itemWidth}
+						y={$state.chartLabelBottom}
+					>
+						{label}
+					</text>
+				}
+			} else {
+				@for (let [i, label] of $props.labels.entries()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="text-after-edge"
+						x={$props.chartLeft + $props.itemWidth * i + $props.itemWidth / 2}
+						y={$state.chartLabelBottom}
+					>
+						{label}
+					</text>
+				}
+			}
+		</svg>
+	}
+}

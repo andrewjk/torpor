@@ -1,0 +1,62 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface GridLinesProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	showHLines?: boolean,
+	showVLines?: boolean,
+	width: number;
+	labels: string[];
+	xStepValue: number;
+	xStepLabels: number[];
+	yStepValue: number;
+	yStepLabels: number[];
+	itemWidth: number;
+	valueHeight: number;
+	chartLeft: number;
+	chartBottom: number;
+	type: string;
+}
+
+export default function GridLines($props: GridLinesProps) {
+	@render {
+		<svg>
+			@if ($props.showHLines && $props.yStepLabels) {
+				@for (let [i, label] of $props.yStepLabels!.entries()) {
+					<line
+						x1={$props.chartLeft ?? 0}
+						y1={$props.chartBottom - i * $props.yStepValue * $props.valueHeight}
+						x2={$props.width ?? 0}
+						y2={$props.chartBottom - i * $props.yStepValue * $props.valueHeight}
+					/>
+				}
+			}
+
+			@if ($props.showVLines) {
+				@if ($props.xStepLabels.length && $props.xStepValue) {
+					@for (let [i, label] of $props.xStepLabels.entries()) {
+						<line
+							x1={$props.chartLeft + i * $props.xStepValue * $props.itemWidth}
+							y1={$props.chartBottom}
+							x2={$props.chartLeft + i * $props.xStepValue * $props.itemWidth}
+							y2={0}
+						/>
+					}
+				} else {
+					@for (let [i, label] of $props.labels.entries()) {
+						<line
+							x1={$props.chartLeft + i * $props.itemWidth + ($props.type === "bar" ? 0 : $props.itemWidth / 2)}
+							y1={$props.chartBottom}
+							x2={$props.chartLeft + i * $props.itemWidth + ($props.type === "bar" ? 0 : $props.itemWidth / 2)}
+							y2={0}
+						/>
+					}
+				}
+			}
+		</svg>
+	}
+}

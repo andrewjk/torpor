@@ -1,0 +1,41 @@
+interface YAxisProps {
+	showAxis: boolean,
+	valueHeight: number,
+	textHeight: number,
+	yLabel: string,
+	stepLabels: number[],
+	stepValue: number,
+	chartLeft: number,
+	chartBottom: number,
+}
+
+export default function YAxis($props: YAxisProps) {
+	@render {
+		<svg>
+			@if ($props.showAxis) {
+				<line x1={$props.chartLeft} y1={$props.chartBottom} x2={$props.chartLeft} y2={0} />
+			}
+			@if ($props.yLabel) {
+				<text
+					text-anchor="middle"
+					dominant-baseline="hanging"
+					x={0}
+					y={$props.chartBottom / 2}
+					transform={`rotate(-90, ${0}, ${$props.chartBottom / 2})`}
+				>
+					{$props.yLabel}
+				</text>
+			}
+			@for (let [i, label] of $props.stepLabels.entries()) {
+				<text
+					text-anchor="end"
+					dominant-baseline="middle"
+					x={$props.chartLeft - $props.textHeight / 4}
+					y={$props.chartBottom - i * $props.stepValue * $props.valueHeight}
+				>
+					{label}
+				</text>
+			}
+		</svg>
+	}
+}
