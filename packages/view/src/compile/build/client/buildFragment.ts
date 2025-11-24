@@ -360,6 +360,13 @@ function elementTypeName(node: ElementNode) {
 			return "HTMLImageElement";
 		case "textarea":
 			return "HTMLTextAreaElement";
+		case "svg":
+			return "SVGElement";
+		case "line":
+		case "text":
+		case "path":
+		case "rect":
+			return `SVG${node.tagName.substring(0, 1).toUpperCase() + node.tagName.substring(1)}Element`;
 	}
 	return "HTMLElement";
 }
