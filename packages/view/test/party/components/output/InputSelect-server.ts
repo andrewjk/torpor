@@ -28,7 +28,7 @@ export default function ColorSelect(
 	/* User interface */
 	t_body += ` <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
 	for (let color of colors) {
-		t_body += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ''} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ''}> ${t_fmt(color.text)} </option> `;
+		t_body += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ""} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ""}> ${t_fmt(color.text)} </option> `;
 	}
 	t_body += `<!]><!> </select> `;
 

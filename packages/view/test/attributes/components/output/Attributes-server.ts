@@ -12,7 +12,7 @@ export default function Attributes(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${$props.thing ? `thing="${t_attr($props.thing)}"` : ''} ${$props.dataThing ? `data-thing="${t_attr($props.dataThing)}"` : ''} caption="this attribute is for ${t_attr($props.description)}" ${$props.attr ? `attr="${t_attr($props.attr)}"` : ''}> Hello! </div> `;
+	t_body += ` <div ${$props.thing ? `thing="${t_attr($props.thing)}"` : ""} ${$props.dataThing ? `data-thing="${t_attr($props.dataThing)}"` : ""} caption="this attribute is for ${t_attr($props.description)}" ${$props.attr ? `attr="${t_attr($props.attr)}"` : ""}> Hello! </div> `;
 
 	return { body: t_body, head: t_head };
 }

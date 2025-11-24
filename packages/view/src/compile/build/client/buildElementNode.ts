@@ -216,8 +216,16 @@ function buildElementAttributes(
 					status,
 				);
 			} else if (name === "style") {
+				status.imports.add("t_attribute");
 				status.imports.add("t_style");
-				stashRun(fragment, `${varName}.setAttribute("style", t_style(`, value, "));", span, status);
+				stashRun(
+					fragment,
+					`t_attribute(${varName}, "style", t_style(`,
+					value,
+					") || null);",
+					span,
+					status,
+				);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");

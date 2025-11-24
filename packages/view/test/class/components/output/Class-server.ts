@@ -12,7 +12,7 @@ export default function Class(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div id="divid" class="torp-1ouzs8a"> From id </div> <div class="divclass torp-1ouzs8a"> From string </div> <a class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a")}"> From state </a> <div class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a")}"> From state with scope </div> <div class="${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ouzs8a")}"> Class object </div> <div class="${t_class([ "foo", false, true && "baz", undefined ], "torp-1ouzs8a")}"> Class array </div> <div class="${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-1ouzs8a")}"> Class nested </div> <![>`;
+	t_body += ` <div id="divid" class="torp-1ouzs8a"> From id </div> <div class="divclass torp-1ouzs8a"> From string </div> <a ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a")}"` : ""}> From state </a> <div ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-1ouzs8a")}"` : ""}> From state with scope </div> <div ${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ouzs8a") !== "" ? `class="${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-1ouzs8a")}"` : ""}> Class object </div> <div ${t_class([ "foo", false, true && "baz", undefined ], "torp-1ouzs8a") !== "" ? `class="${t_class([ "foo", false, true && "baz", undefined ], "torp-1ouzs8a")}"` : ""}> Class array </div> <div ${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-1ouzs8a") !== "" ? `class="${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-1ouzs8a")}"` : ""}> Class nested </div> <![>`;
 	const t_props_1 = {
 		class: t_class({ "child-class": true }, "torp-1ouzs8a"),
 	};
@@ -66,7 +66,7 @@ function Child(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div class="${t_class($props.class)}"> <![>`;
+	t_body += ` <div ${t_class($props.class) !== "" ? `class="${t_class($props.class)}"` : ""}> <![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	} else {

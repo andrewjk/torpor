@@ -28,7 +28,7 @@ export default function Shape(
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img"> <!> </svg> `);
 	const t_root_0 = t_root(t_fragment_0, true);
-	const t_svg_1 = t_next(t_root_0) as HTMLElement;
+	const t_svg_1 = t_next(t_root_0) as SVGElement;
 	let t_if_anchor_1 = t_anchor(t_next(t_child(t_svg_1))) as HTMLElement;
 
 	/* @if */

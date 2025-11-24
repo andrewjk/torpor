@@ -91,15 +91,20 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 					params.push(`"torp-${status.styleHash}"`);
 					needsClass = false;
 				}
-				attributes.push(`class="\${t_class(${params.join(", ")})}"`);
+				// Only set the attribute if the value is truthy
+				// HACK: don't call t_class twice -- maybe there should be a buildServerClasses?
+				value = params.join(", ");
+				attributes.push(`\${t_class(${value}) !== "" ? \`class="\${t_class(${value})}"\` : ""}`);
 			} else if (name === "style") {
+				// Only set the attribute if the value is truthy
+				// HACK: don't call t_style twice -- maybe there should be a buildServerStyles?
 				status.imports.add("t_style");
-				attributes.push(`style="\${t_style(${value})}"`);
+				attributes.push(`\${t_style(${value}) !== "" ? \`style="\${t_style(${value})}"\` : ""}`);
 			} else {
 				// Only set the attribute if the value is truthy
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
 				status.imports.add("t_attr");
-				attributes.push(`\${${value} ? \`${name}="\${t_attr(${value})}"\` : ''}`);
+				attributes.push(`\${${value} ? \`${name}="\${t_attr(${value})}"\` : ""}`);
 			}
 		} else if (value != null && reactive) {
 			// TODO: Match braces, don't replace braces inside code
