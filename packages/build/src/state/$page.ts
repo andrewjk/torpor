@@ -1,7 +1,7 @@
 import { $watch } from "@torpor/view";
 import type PageState from "../types/PageState";
 
-const PAGE_SYMBOL: unique symbol = Symbol.for("t_page");
+const PAGE_SYMBOL: unique symbol = Symbol.for("torp.Page");
 
 const $page: PageState =
 	// @ts-ignore

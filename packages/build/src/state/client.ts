@@ -1,6 +1,6 @@
 import type ClientState from "../types/ClientState";
 
-const CLIENT_SYMBOL: unique symbol = Symbol.for("t_client_state");
+const CLIENT_SYMBOL: unique symbol = Symbol.for("torp.Client");
 
 const client: ClientState =
 	// @ts-ignore
