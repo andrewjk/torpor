@@ -2,7 +2,7 @@ import {
 	NavMenu,
 	NavMenuLink,
 	NavMenuPopout,
-	NavMenuPopoutButton,
+	NavMenuPopoutTrigger,
 	NavMenuPopoutContent,
 	NavMenuSeparator
 } from "../../../src/NavMenu";
@@ -14,7 +14,7 @@ export default function NavMenuBasic($props: any) {
 			<NavMenuLink href="/page1">Page 1</NavMenuLink>
 			<NavMenuSeparator />
 			<NavMenuPopout>
-				<NavMenuPopoutButton>Subpages</NavMenuPopoutButton>
+				<NavMenuPopoutTrigger>Subpages</NavMenuPopoutTrigger>
 				<NavMenuPopoutContent>
 					<NavMenu ariaLabel="Sub site navigation" orientation="vertical">
 						<NavMenuLink href="/sub/page1">Subpage 1</NavMenuLink>

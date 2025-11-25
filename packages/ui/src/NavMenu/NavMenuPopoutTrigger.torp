@@ -6,7 +6,7 @@ import {
 	type NavMenuPopoutContext,
 } from "./NavMenuTypes";
 
-interface NavMenuPopoutButtonProps {
+interface NavMenuPopoutTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
@@ -23,7 +23,7 @@ interface NavMenuPopoutButtonProps {
  * A button that is placed in a NavMenu and signals a response by a user.
  *
  */
-export default function NavMenuPopoutButton($props: NavMenuPopoutButtonProps | undefined) {
+export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps | undefined) {
 	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
@@ -32,14 +32,14 @@ export default function NavMenuPopoutButton($props: NavMenuPopoutButtonProps | u
 	// Get stuff out of the NavMenuContext
 	const menuContext = $context[NavMenuContextName] as NavMenuContext;
 	if (!menuContext) {
-		throw new Error("NavMenuPopoutButton must be contained within a NavMenu");
+		throw new Error("NavMenuPopoutTrigger must be contained within a NavMenu");
 	}
 	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
 
 	// Get stuff out of the NavMenuPopoutContext
 	const popoutContext = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
 	if (!popoutContext) {
-		throw new Error("NavMenuPopoutButton must be contained within a NavMenuPopout");
+		throw new Error("NavMenuPopoutTrigger must be contained within a NavMenuPopout");
 	}
 	let $state = popoutContext.state;
 

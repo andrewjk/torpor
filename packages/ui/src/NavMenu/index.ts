@@ -5,8 +5,8 @@ import NavMenuGroup from "./NavMenuGroup.torp";
 import NavMenuGroupHeader from "./NavMenuGroupHeader.torp";
 import NavMenuLink from "./NavMenuLink.torp";
 import NavMenuPopout from "./NavMenuPopout.torp";
-import NavMenuPopoutButton from "./NavMenuPopoutButton.torp";
 import NavMenuPopoutContent from "./NavMenuPopoutContent.torp";
+import NavMenuPopoutTrigger from "./NavMenuPopoutTrigger.torp";
 import NavMenuSeparator from "./NavMenuSeparator.torp";
 
 export {
@@ -15,7 +15,7 @@ export {
 	NavMenuButton,
 	NavMenuElement,
 	NavMenuPopout,
-	NavMenuPopoutButton,
+	NavMenuPopoutTrigger,
 	NavMenuPopoutContent,
 	NavMenuGroup,
 	NavMenuGroupHeader,

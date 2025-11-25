@@ -2,7 +2,7 @@ import {
 	NavMenu,
 	NavMenuLink,
 	NavMenuPopout,
-	NavMenuPopoutButton,
+	NavMenuPopoutTrigger,
 	NavMenuPopoutContent,
 	NavMenuSeparator
 } from "@torpor/ui/NavMenu";
@@ -14,7 +14,7 @@ export default function ExampleBasic($props: any) {
 			<NavMenuLink class="example-navmenu-link" href="https://google.com" newWindow>Google</NavMenuLink>
 			<NavMenuSeparator class="example-navmenu-separator" />
 			<NavMenuPopout>
-				<NavMenuPopoutButton class="example-navmenu-link">Search ▼</NavMenuPopoutButton>
+				<NavMenuPopoutTrigger class="example-navmenu-link">Search ▼</NavMenuPopoutTrigger>
 				<NavMenuPopoutContent class="example-navmenu-link-content">
 					<NavMenu class="example-navmenu-sub-menu" orientation="vertical">
 						<NavMenuLink class="example-navmenu-link" href="https://www.google.com/" newWindow>

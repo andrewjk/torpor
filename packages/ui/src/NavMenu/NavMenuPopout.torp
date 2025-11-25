@@ -25,7 +25,7 @@ interface NavMenuPopoutProps {
  *
  * ```
  * <NavMenuPopout>
- * 	<NavMenuPopoutButton />
+ * 	<NavMenuPopoutTrigger />
  * 	<NavMenuPopoutContent />
  * </NavMenuPopout>
  * ```

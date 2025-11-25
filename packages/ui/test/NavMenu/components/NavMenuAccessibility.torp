@@ -2,7 +2,7 @@ import {
 	NavMenu,
 	NavMenuLink,
 	NavMenuPopout,
-	NavMenuPopoutButton,
+	NavMenuPopoutTrigger,
 	NavMenuPopoutContent,
 	NavMenuGroup,
 	NavMenuGroupHeader,
@@ -17,7 +17,7 @@ export default function NavMenuAccessibility($props: any) {
 			<NavMenuLink href="/disabled" disabled>Disabled</NavMenuLink>
 			<NavMenuSeparator>/</NavMenuSeparator>
 			<NavMenuPopout>
-				<NavMenuPopoutButton>Subpages</NavMenuPopoutButton>
+				<NavMenuPopoutTrigger>Subpages</NavMenuPopoutTrigger>
 				<NavMenuPopoutContent>
 					<NavMenu ariaLabel="Sub site navigation" orientation="vertical">
 						<NavMenuLink href="/sub/page1">Subpage 1</NavMenuLink>
