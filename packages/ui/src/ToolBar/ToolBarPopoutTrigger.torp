@@ -1,0 +1,138 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import {
+	ToolBarContextName,
+	ToolBarPopoutContextName,
+	type ToolBarContext,
+	type ToolBarPopoutContext,
+} from "./ToolBarTypes";
+
+interface ToolBarPopoutTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** The delay before showing the popout, in milliseconds */
+	hoverDelay?: number,
+	/** Whether this button is disabled */
+	disabled?: boolean,
+}
+
+/**
+ * A button that is placed in a ToolBar and signals a response by a user.
+ *
+ */
+export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps | undefined) {
+	let defaultHoverDelay = 500;
+
+	let button: HTMLButtonElement;
+	let interval: NodeJS.Timeout | undefined;
+
+	// Get stuff out of the ToolBarContext
+	const toolBarContext = $context[ToolBarContextName] as ToolBarContext;
+	if (!toolBarContext) {
+		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBar");
+	}
+	const { registerItem, handleItemKey, handleItemFocus } = toolBarContext;
+
+	// Get stuff out of the ToolBarPopoutContext
+	const popoutContext = $context[ToolBarPopoutContextName] as ToolBarPopoutContext;
+	if (!popoutContext) {
+		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBarPopout");
+	}
+	let $state = popoutContext.state;
+
+	// Register this item with the parent ToolBar and store the index
+	const { index } = registerItem(setFocused);
+
+	// TODO: $mount should be run AFTER the button has been set
+	//$mount(() => {
+	//	// Set the anchor element to the button when it exists
+	//	popoutContext.anchorElement = button;
+	//});
+
+	function setFocused() {
+		button.focus();
+	}
+
+	function handleClick() {
+		$state.visible = true;
+	}
+
+	function handlePopoutKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Right":
+			case "ArrowRight":
+				if (toolBarContext.orientation === "vertical") {
+					// TODO: This should be based on what side the menu shows on
+					e.preventDefault();
+					$state.visible = true;
+				}
+				break;
+			case "Down":
+			case "ArrowDown":
+				if (toolBarContext.orientation === "horizontal") {
+					e.preventDefault();
+					$state.visible = true;
+				}
+				break;
+			default:
+				handleItemKey(e);
+		}
+	}
+
+	function handleMouseEnter() {
+		if ($props?.disabled) return;
+
+		// Handle the hover after a delay
+		if (!interval) {
+			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+		}
+	}
+
+	function handleMouseLeave() {
+		if ($props?.disabled) return;
+
+		// Prevent short hovers or touches from firing the event
+		if (interval) {
+			clearTimeout(interval);
+			interval = undefined;
+		}
+	}
+
+	function handleMouseMove() {
+		if ($props?.disabled) return;
+
+		// Reset the interval on mouse move
+		if (interval) {
+			clearTimeout(interval);
+			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+		}
+	}
+
+	@render {
+		<button
+			{$props?.id}
+			class={["torp-tool-bar-popout-trigger", $props?.class]}
+			{$props?.style}
+			type="button"
+			{$props?.disabled}
+			role="menuitem"
+			aria-haspopup="true"
+			aria-expanded={$state.visible.toString()}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-disabled={$props?.disabled ? "true" : undefined}
+			onkeydown={handlePopoutKey}
+			onclick={handleClick}
+			onfocus={() => handleItemFocus(index)}
+			onmouseenter={handleMouseEnter}
+			onmouseleave={handleMouseLeave}
+			onmousemove={handleMouseMove}
+			&ref={button}
+			onmount={(el) => popoutContext.anchorElement = el }
+		>
+			<slot />
+		</button>
+	}
+}

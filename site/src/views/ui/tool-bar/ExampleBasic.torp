@@ -1,0 +1,108 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+	ToolBarSeparator,
+} from "@torpor/ui/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "@torpor/ui/Menu";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		bold: false,
+		italic: false,
+		underline: false,
+	});
+
+	@render {
+		<ToolBar class="example-tool-bar" ariaLabel="Site navigation">
+			<ToolBarButton
+				class="example-tool-bar-button"
+				style={{ fontWeight: $state.bold ? "bold" : undefined }}
+				onclick={() => $state.bold = !$state.bold}
+			>
+				Bold
+			</ToolBarButton>
+			<ToolBarButton
+				class="example-tool-bar-button"
+				style={{ fontStyle: $state.italic ? "italic" : undefined }}
+				onclick={() => $state.italic = !$state.italic}
+			>
+				Italic
+			</ToolBarButton>
+			<ToolBarButton
+				class="example-tool-bar-button"
+				style={{ textDecoration: $state.underline ? "underline" : undefined }}
+				onclick={() => $state.underline = !$state.underline}
+			>
+				Underline
+			</ToolBarButton>
+			<ToolBarSeparator class="example-tool-bar-separator" />
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger class="example-tool-bar-button">Search ▼</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent class="example-tool-bar-button-content">
+					<Menu class="example-tool-bar-sub-menu" orientation="vertical">
+						<MenuButton class="example-tool-bar-button">
+							Google
+						</MenuButton>
+						<MenuButton class="example-tool-bar-button">
+							Bing
+						</MenuButton>
+						<MenuButton class="example-tool-bar-button">
+							DuckDuckGo
+						</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+
+	@style {
+		.example-tool-bar {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.example-tool-bar-button {
+			all: unset;
+			cursor: default;
+			display: flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		.example-tool-bar-button:hover,
+		.example-tool-bar-button:focus,
+		.example-tool-bar-button:active {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		.example-tool-bar-button-content {
+			background: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			min-width: 100px;
+			padding: 5px;
+			position: absolute;
+			z-index: 200;
+		}
+
+		.example-tool-bar-sub-menu {
+			display: flex;
+			flex-direction: column;
+			gap: 5px;
+		}
+
+		.example-tool-bar-separator {
+			border-right: 1px solid gainsboro;
+		}
+	}
+}

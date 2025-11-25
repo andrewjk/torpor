@@ -36,6 +36,7 @@ export default function Sidebar() {
 				<li><a href="/ui/notification">Notification</a></li>
 				<li><a href="/ui/popover">Popover</a></li>
 				<li><a href="/ui/tab-group">TabGroup</a></li>
+				<li><a href="/ui/tool-bar">ToolBar</a></li>
 			</ul>
 			<h4>Build</h4>
 			<ul class="plain">

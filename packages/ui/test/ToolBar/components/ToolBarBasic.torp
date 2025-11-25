@@ -1,0 +1,28 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+
+export default function ToolBarBasic() {
+	@render {
+		<ToolBar ariaLabel="Site navigation">
+			<ToolBarButton href="/">Home</ToolBarButton>
+			<ToolBarButton href="/page1">Page 1</ToolBarButton>
+			<ToolBarSeparator />
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger>Subpages</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<ToolBar ariaLabel="Sub site navigation" orientation="vertical">
+						<ToolBarButton href="/sub/page1">Subpage 1</ToolBarButton>
+						<ToolBarButton href="/sub/page2">Subpage 2</ToolBarButton>
+						<ToolBarButton href="/sub/page3">Subpage 3</ToolBarButton>
+					</ToolBar>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+}

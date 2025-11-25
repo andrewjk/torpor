@@ -1,0 +1,191 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import {
+	ToolBarContextName,
+	type ToolBarContext,
+	type ItemState,
+	ToolBarPopoutContextName,
+	type ToolBarPopoutContext
+} from "./ToolBarTypes";
+
+interface ToolBarProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** An ARIA label for describing the menu to screen readers  */
+	ariaLabel?: string | undefined,
+	/** The orientation of the menu, which affects keyboard navigation */
+	orientation?: "horizontal" | "vertical",
+}
+
+/**
+ * A toolbar is a container for grouping a set of controls, such as buttons, menubuttons, or checkboxes.
+ *
+ * See [the WAI ARIA guidelines for ToolBars](https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/).
+ *
+ * The structure of a ToolBar is:
+ *
+ * ```
+ * <ToolBar>
+ *	 <ToolBarButton />
+ *	 <ToolBarSeparator /> (optional)
+ *	 <ToolBarPopout /> (optional)
+ *	 ...
+ * </ToolBar>
+ * ```
+ */
+export default function ToolBar($props: ToolBarProps | undefined) {
+	let orientation = $props?.orientation ?? "horizontal";
+
+	// A collection containing the state and some functions for each item
+	let itemStates: ItemState[] = [];
+	let focusIndex = -1;
+
+	// Check whether this is a menu in a popout
+	const popoutContext = $context[ToolBarPopoutContextName] as ToolBarPopoutContext;
+	const inPopout = !!popoutContext;
+	let popoutState = popoutContext?.state;
+
+	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
+	if (popoutContext) {
+		popoutContext.focusFirstElement = focusFirstElement;
+	}
+
+	// Set the context to pass down to items
+	let context: ToolBarContext = {
+		handleItemFocus,
+		handleItemKey,
+		registerItem,
+		orientation
+	};
+	$context[ToolBarContextName] = context;
+
+	// If the ToolBar is not in a popout, focus its first item. Otherwise the popout will call focusFirstElement, below
+	function handleFocus() {
+		if (!popoutContext && itemStates.length) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function focusFirstElement() {
+		if (itemStates.length) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function registerItem(setFocused: () => void) {
+		// Add the item's state to the array and return its index
+		const newItemState: ItemState = {
+			setFocused
+		};
+		itemStates.push(newItemState);
+		itemStates = itemStates;
+		return { index: itemStates.length - 1 };
+	}
+
+	function handleItemFocus(index: number) {
+		focusIndex = index;
+	}
+
+	function handleItemKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Esc":
+			case "Escape": {
+				if (inPopout) {
+					e.preventDefault();
+					//setPopoutVisible(false);
+					popoutState.visible = false;
+				}
+				break;
+			}
+			case "Right":
+			case "ArrowRight": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				if (orientation === "horizontal") {
+					e.preventDefault();
+					focusItem("previous");
+				}
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("next");
+				}
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				if (orientation === "vertical") {
+					e.preventDefault();
+					focusItem("previous");
+				} else {
+					// TODO: This should be based on what side the menu shows on
+					// And on the orientation
+					if (inPopout) {
+						e.preventDefault();
+						popoutState.visible = false;
+					}
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusItem("start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusItem("end");
+				break;
+			}
+		}
+	}
+
+	function focusItem(target: "start" | "previous" | "next" | "end") {
+		switch (target) {
+			case "start": {
+				focusIndex = 0;
+				break;
+			}
+			case "previous": {
+				focusIndex = Math.max(0, focusIndex - 1);
+				break;
+			}
+			case "next": {
+				focusIndex = Math.min(itemStates.length - 1, focusIndex + 1);
+				break;
+			}
+			case "end": {
+				focusIndex = itemStates.length - 1;
+				break;
+			}
+		}
+		itemStates[focusIndex]?.setFocused();
+	}
+
+	@render {
+		<nav
+			{$props?.id}
+			class={["torp-tool-bar", $props?.class]}
+			{$props?.style}
+			tabindex="0"
+			role="toolbar"
+			aria-label={$props?.ariaLabel}
+			aria-orientation={orientation}
+			onfocus={handleFocus}
+		>
+			<slot />
+		</nav>
+	}
+}

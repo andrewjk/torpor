@@ -1,0 +1,33 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "../../../src/Menu";
+
+export default function ToolBarAccessibility() {
+	@render {
+		<ToolBar ariaLabel="Site navigation">
+			<ToolBarButton>Home</ToolBarButton>
+			<ToolBarButton>Page</ToolBarButton>
+			<ToolBarButton disabled>Disabled</ToolBarButton>
+			<ToolBarSeparator>/</ToolBarSeparator>
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger>Subpages</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Sub site navigation">
+						<MenuButton>Subpage 1</MenuButton>
+						<MenuButton>Subpage 2</MenuButton>
+						<MenuButton>Subpage 3</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+}

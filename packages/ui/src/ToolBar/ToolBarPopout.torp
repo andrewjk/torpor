@@ -1,0 +1,97 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { ToolBarPopoutContextName, type ToolBarPopoutContext } from "./ToolBarTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
+
+interface ToolBarPopoutProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** Whether the popout is visible */
+	visible?: boolean,
+	/** Raised when the popout is opened or closed */
+	ontoggle?: (open: boolean) => void,
+	/** Raised when the popout has opened */
+	onopen?: () => void,
+	/** Raised when the popout has closed */
+	onclose?: (result: any) => void,
+}
+
+/**
+ * A popout that is attached to a menu button and can be used to show a submenu.
+ *
+ * The structure of a ToolBarPopout is:
+ *
+ * ```
+ * <ToolBarPopout>
+ * 	<ToolBarPopoutTrigger />
+ * 	<ToolBarPopoutContent />
+ * </ToolBarPopout>
+ * ```
+ */
+export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
+	let $state = $watch({
+		visible: false
+	});
+
+	// Sync props and state
+	$run(() => {
+		$state.visible = $props?.visible ?? false;
+	});
+	$run(() => {
+		if ($props !== undefined) {
+			$props.visible = $state.visible;
+		}
+	});
+
+	let result: any;
+
+	// Set the context to pass down to items
+	let context: ToolBarPopoutContext = {
+		state: $state,
+	};
+	$context[ToolBarPopoutContextName] = context;
+
+	// Set the context to pass down to items
+	let popoutContext: PopoutContext = {
+		handleButton: () => {},
+		state: $state,
+	};
+	$context[PopoutContextName] = popoutContext;
+
+	// Dispatch the toggle event when the popout is opened or closed
+	let firstToggle = true;
+	$run(() => {
+		const ontoggle = $props?.ontoggle;
+		const onopen = $props?.onopen;
+		const onclose = $props?.onclose;
+		const visible = $state.visible;
+		if (firstToggle) {
+			firstToggle = false;
+		} else {
+			if (ontoggle) ontoggle(visible);
+			if (visible) {
+				if (onopen) onopen()
+			} else {
+				if (onclose) onclose(result);
+			}
+		}
+	});
+
+	function handleMouseLeave() {
+		$state.visible = false;
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-tool-bar-popout", $props?.class]}
+			{$props?.style}
+			onmouseleave={handleMouseLeave}
+		>
+			<slot />
+		</div>
+	}
+}

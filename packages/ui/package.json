@@ -68,6 +68,10 @@
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js"
 		},
+		"./ToolBar": {
+			"types": "./dist/ToolBar/index.d.ts",
+			"import": "./dist/ToolBar/index.js"
+		},
 		"./icons": {
 			"types": "./dist/icons/index.d.ts",
 			"import": "./dist/icons/index.js"

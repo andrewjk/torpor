@@ -1,0 +1,66 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../lib/copyCode";
+import ExampleBasic from "./tool-bar/ExampleBasic.torp";
+
+import ExampleBasicCode from "./tool-bar/ExampleBasic.torp?raw";
+
+export default function ToolBarPage() {
+	@head {
+		<title>Tool Bar | Torpor</title>
+	}
+
+	@render {
+		<h1>Tool Bar</h1>
+		<p>
+			A toolbar is a container for grouping a set of controls, such as buttons,
+			menubuttons, or checkboxes.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/toolbar/">the WAI ARIA guidelines for Toolbars</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<ToolBar>
+	<ToolBarButton />
+	<ToolBarSeparator /> (optional)
+	<ToolBarPopout /> (optional)
+	...
+</ToolBar>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleBasic />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}
