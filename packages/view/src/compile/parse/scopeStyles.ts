@@ -51,7 +51,7 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 function collectStyleSelectors(block: StyleBlock, selectors: string[]) {
 	// HACK: We should be collecting the actual selectors and then checking
 	// attributes, parents, children, siblings etc
-	for (let s of block.selector.split(/[\s*,>+~]/)) {
+	for (let s of block.selector.split(/[\s*,>+~[\]]/)) {
 		selectors.push(s);
 	}
 }
