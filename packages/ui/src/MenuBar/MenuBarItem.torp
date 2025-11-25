@@ -5,7 +5,7 @@ import {
 	type MenuBarContext,
 	type MenuBarItemContext
 } from "./MenuBarTypes";
-import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface MenuBarItemProps {
 	/** An ID for the root element */
@@ -59,17 +59,14 @@ export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 	$context[MenuBarItemContextName] = context;
 
 	// Set the context to pass down to items
-	let popoverContext: PopoverContext = {
-		setVisible,
+	let popoutContext: PopoutContext = {
 		handleButton,
-		modal: false,
 		state: $state,
-		//anchorElement: anchor,
 	};
-	$context[PopoverContextName] = popoverContext;
+	$context[PopoutContextName] = popoutContext;
 
 	$mount(() => {
-		setVisible();
+		setVisible(false);
 	});
 
 	function setVisible(value: boolean) {
@@ -99,7 +96,7 @@ export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 		}
 	});
 
-	function handleButton(type: "confirm" | "cancel" | undefined, value?: any) {
+	function handleButton(_type: "confirm" | "cancel" | undefined, _value?: any) {
 		menubarContext.state.active = false;
 		setVisible(false);
 	}

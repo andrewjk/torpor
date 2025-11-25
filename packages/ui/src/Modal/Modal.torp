@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { ModalContextName, type ModalContext, type ModalState } from "./ModalTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface ModalProps {
 	/** An ID for the root element */
@@ -59,6 +60,10 @@ export default function Modal($props: ModalProps | undefined) {
 		state: $state,
 	};
 	$context[ModalContextName] = context;
+
+	// Set the context to pass down to items
+	let popoutContext: PopoutContext = context;
+	$context[PopoutContextName] = popoutContext;
 
 	// Dispatch the toggle event when the modal is opened or closed
 	let firstToggle = true;

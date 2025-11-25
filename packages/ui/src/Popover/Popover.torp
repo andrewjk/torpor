@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { PopoverContextName, type Point, type PopoverContext, type PopoverState } from "./PopoverTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface PopoverProps {
 	/** An ID for the root element */
@@ -62,10 +63,14 @@ export default function Popover($props: PopoverProps | undefined) {
 		handleButton,
 		handleClickOutside,
 		state: $state,
-		modal: $props?.modal,
+		//modal: $props?.modal,
 		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
 	};
 	$context[PopoverContextName] = context;
+
+	// Set the context to pass down to items
+	let popoutContext: PopoutContext = context;
+	$context[PopoutContextName] = popoutContext;
 
 	// Dispatch the toggle event when the popover is opened or closed
 	let firstToggle = true;

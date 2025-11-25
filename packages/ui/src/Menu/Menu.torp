@@ -1,7 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { ContextualContextName } from "../Contextual/ContextualTypes";
-import { ModalContextName } from "../Modal/ModalTypes";
-import { PopoverContextName, type PopoverContext } from "../Popover/PopoverTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 import {
 	MenuContextName,
 	type MenuContext,
@@ -46,21 +44,21 @@ export default function Menu($props: MenuProps | undefined) {
 
 	// Get stuff out of the PopoverContext
 	// HACK: share state in PopupState and extend in context/modal/popover
-	const popoverContext = $context[ContextualContextName] ?? $context[ModalContextName] ?? $context[PopoverContextName] as PopoverContext;
-	if (!popoverContext) {
-		throw new Error("Menu must be contained within a Context, Modal or Popover");
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
+	if (!popoutContext) {
+		throw new Error("Menu must be contained within a popout component");
 	}
-	const { setVisible, handleButton, visible } = popoverContext;
+	const { setVisible, handleButton, state } = popoutContext;
 
 	// Check whether this is a menu in a popout
-	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
-	const inPopout = !!popoutContext;
-	const setPopoutVisible = popoutContext?.setVisible;
+	const menuPopoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
+	const inPopout = !!menuPopoutContext;
+	const setPopoutVisible = menuPopoutContext?.setVisible;
 
 	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
-	popoverContext.focusFirstElement = focusFirstElement;
-	if (popoutContext) {
-		popoutContext.focusFirstElement = focusFirstElement;
+	popoutContext.focusFirstElement = focusFirstElement;
+	if (menuPopoutContext) {
+		menuPopoutContext.focusFirstElement = focusFirstElement;
 	}
 
 	// Set the context to pass down to items
@@ -69,7 +67,7 @@ export default function Menu($props: MenuProps | undefined) {
 		handleButton,
 		handleItemFocus,
 		handleItemKey,
-		visible,
+		state,
 		registerItem
 	};
 	$context[MenuContextName] = context;

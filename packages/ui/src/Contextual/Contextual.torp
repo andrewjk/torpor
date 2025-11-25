@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { ContextualContextName, type Point, type ContextualContext, type ContextualState } from "./ContextualTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface ContextualProps {
 	/** An ID for the root element */
@@ -62,10 +63,14 @@ export default function Contextual($props: ContextualProps | undefined) {
 		handleButton,
 		handleClickOutside,
 		state: $state,
-		modal: $props?.modal,
+		//modal: $props?.modal,
 		anchorElement: $props?.anchor ? $unwrap($props.anchor) : undefined,
 	};
 	$context[ContextualContextName] = context;
+
+	// Set the context to pass down to items
+	let popoutContext: PopoutContext = context;
+	$context[PopoutContextName] = popoutContext;
 
 	// Dispatch the toggle event when the contextual is opened or closed
 	let firstToggle = true;
