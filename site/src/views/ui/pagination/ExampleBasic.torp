@@ -1,0 +1,32 @@
+import {
+	Pagination,
+	PaginationItem,
+	buildPages,
+} from "@torpor/ui/Pagination";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		count: 15,
+		number: 1,
+	});
+
+	@render {
+		<Pagination class="example-pagination" {$state.count} &number={$state.number}>
+			@for (let page of buildPages($state.count, $state.number)) {
+				<PaginationItem class="example-pagination-item" {page} active={page == $state.number} />
+			}
+		</Pagination>
+	}
+
+	@style {
+		.example-pagination {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.example-pagination-item[data-state='active'] {
+			font-weight: bold;
+		}
+	}
+}

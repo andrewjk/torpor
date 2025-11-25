@@ -1,0 +1,145 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { PaginationContextName, type PaginationContext, type ItemState, type PageNumber } from "./PaginationTypes";
+
+interface PaginationProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** The total number of pages (or items if the page size is greater than 1) */
+	count: number,
+	/** The active page number */
+	number: number,
+}
+
+/**
+ * Buttons with page numbers that can be used to move between pages.
+ */
+export default function Pagination($props: PaginationProps) {
+	// TODO: Should we (by default) create PaginationItems?
+
+	// TODO: Do we actually need ItemStates when we're creating the item collection ourselves??
+	// A collection containing the active state and some functions for each item
+	let itemStates: ItemState[] = [];
+
+	// Put stuff into a PaginationContext
+	const context: PaginationContext = {
+		registerItem,
+		removeItem,
+		toggleItem,
+		handleItemKey
+	};
+	$context[PaginationContextName] = context;
+
+	function registerItem(
+		target: PageNumber,
+		setActive: (value: boolean) => void,
+		setFocused: () => void
+	) {
+		// Add the item's state to the array
+		const newItemState: ItemState = {
+			target,
+			active: false,
+			setActive,
+			setFocused
+		};
+		itemStates.push(newItemState);
+	}
+
+	function removeItem(target: PageNumber) {
+		// Remove the item
+		const index = itemStates.findIndex((i) => i.target === target);
+		if (index != -1) {
+			itemStates.splice(index, 1);
+		}
+	}
+
+	function toggleItem(target: PageNumber) {
+		switch (target) {
+			case "start": {
+				$props.number = 1;
+				break;
+			}
+			case "previous": {
+				$props.number = Math.max(1, $props.number - 1);
+				break;
+			}
+			case "next": {
+				$props.number = Math.min($props.count, $props.number + 1);
+				break;
+			}
+			case "end": {
+				$props.number = $props.count;
+				break;
+			}
+			case "startgap":
+			case "endgap": {
+				let input = prompt("Go to page:");
+				if (input) {
+					$props.number = parseInt(input);
+				}
+				break;
+			}
+			default: {
+				$props.number = target;
+			}
+		}
+
+		const item = itemStates.find((i) => i.target === target);
+		if (item) {
+			item.setFocused();
+		}
+	}
+
+	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
+		// Focus the first button so that its key events can be triggered by the user
+		const el = e.currentTarget.getElementsByTagName("button")[0];
+		if (el) {
+			el.focus();
+		}
+	}
+
+	function handleItemKey(e: KeyboardEvent) {
+		// TODO: Actually just change focus??
+		switch (e.key) {
+			case "Left":
+			case "ArrowLeft": {
+				toggleItem("previous");
+				e.preventDefault();
+				break;
+			}
+			case "Right":
+			case "ArrowRight": {
+				toggleItem("next");
+				e.preventDefault();
+				break;
+			}
+			case "Home": {
+				toggleItem("start");
+				e.preventDefault();
+				break;
+			}
+			case "End": {
+				toggleItem("end");
+				e.preventDefault();
+				break;
+			}
+		}
+	}
+
+	@render {
+		@if ($props.count > 0) {
+			<div
+				{$props?.id}
+				class={["torp-pagination", $props?.class]}
+				{$props?.style}
+				tabindex="0"
+				onfocus={handleFocus}
+			>
+				<slot />
+			</div>
+		}
+	}
+}

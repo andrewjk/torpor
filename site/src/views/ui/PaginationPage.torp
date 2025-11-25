@@ -1,0 +1,60 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../lib/copyCode";
+import ExampleBasic from "./pagination/ExampleBasic.torp";
+
+import ExampleBasicCode from "./pagination/ExampleBasic.torp?raw";
+
+export default function PaginationPage() {
+	@head {
+		<title>Tool Bar | Torpor</title>
+	}
+
+	@render {
+		<h1>Tool Bar</h1>
+		<p>
+			Buttons with page numbers that can be used to move between pages.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Pagination>
+	<PaginationItem />
+	...
+</Pagination>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<TabGroup>
+					<TabList ariaLabel="Preview and code tabs">
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Preview</TabTrigger>
+						</TabHeader>
+						<TabHeader>
+							<TabTrigger class="example-tab-header">Code</TabTrigger>
+						</TabHeader>
+					</TabList>
+					<TabContent>
+						<p class="example-preview">
+							<ExampleBasic />
+						</p>
+					</TabContent>
+					<TabContent>
+						<div class="example-code">
+							<button type="button" class="example-copy-button" onclick={copyCode}>
+								Copy to clipboard
+							</button>
+							<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						</div>
+					</TabContent>
+				</TabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

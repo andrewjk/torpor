@@ -21,6 +21,7 @@ export default defineConfig({
 		"src/Modal/index.ts",
 		"src/NavMenu/index.ts",
 		"src/Notification/index.ts",
+		"src/Pagination/index.ts",
 		"src/Popover/index.ts",
 		"src/TabGroup/index.ts",
 		"src/ToolBar/index.ts",
