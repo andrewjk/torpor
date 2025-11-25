@@ -14,7 +14,11 @@ export default function buildStyles(value: StyleValue): string {
 				}
 			} else if (typeof value === "object") {
 				for (let [n, v] of Object.entries(value)) {
-					styles.push(`${n}: ${v}`);
+					const key = n.replace(
+						/[A-Z]+(?![a-z])|[A-Z]/g,
+						(char, i) => (i > 0 ? "-" : "") + char.toLowerCase(),
+					);
+					styles.push(`${key}: ${v}`);
 				}
 			}
 		}
