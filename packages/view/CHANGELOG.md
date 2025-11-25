@@ -1,5 +1,12 @@
 # @torpor/view
 
+## 0.4.17
+
+### Patch Changes
+
+- 8527e96: Fix: declare svg elements with the right type
+- 6d51161: Fix: don't set empty styles and classes
+
 ## 0.4.16
 
 ### Patch Changes

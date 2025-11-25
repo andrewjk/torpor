@@ -1,5 +1,15 @@
 # @torpor/ui
 
+## 0.3.7
+
+### Patch Changes
+
+- 2c4ce30: Feat: basic UI charts
+- fba821a: Fix: add required prop for TextArea
+- Updated dependencies [8527e96]
+- Updated dependencies [6d51161]
+  - @torpor/view@0.4.17
+
 ## 0.3.6
 
 ### Patch Changes
