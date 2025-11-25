@@ -1,5 +1,4 @@
-// TODO: Should these be branded?
-const proxyDataSymbol: unique symbol = Symbol("_proxy_data");
-const proxyHandledSymbol: unique symbol = Symbol("_proxy_handled");
+const proxyDataSymbol: unique symbol = Symbol.for("torp.ProxyData");
+const proxyHandledSymbol: unique symbol = Symbol.for("torp.ProxyHandled");
 
 export { proxyDataSymbol, proxyHandledSymbol };

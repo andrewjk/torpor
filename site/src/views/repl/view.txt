@@ -53,7 +53,7 @@ function buildStyles(value) {
 function formatText(value) {
 	return value ?? "";
 }
-const CONTEXT_SYMBOL = Symbol.for("t_context");
+const CONTEXT_SYMBOL = Symbol.for("torp.Context");
 const context = globalThis[CONTEXT_SYMBOL] ??= {
 	activeTarget: null,
 	previousEffect: null,
@@ -663,8 +663,8 @@ function propagateSignal(proxy, key) {
 		}
 	}
 }
-const proxyDataSymbol = Symbol("_proxy_data");
-const proxyHandledSymbol = Symbol("_proxy_handled");
+const proxyDataSymbol = Symbol.for("torp.ProxyData");
+const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
 function trackProxySignal(data, key) {
 	let signal = data.signals.get(key);
 	if (signal === void 0) {

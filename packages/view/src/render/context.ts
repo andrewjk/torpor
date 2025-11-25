@@ -1,10 +1,7 @@
 import type Context from "../types/Context";
 import type Region from "../types/Region";
 
-// TODO: Possibly create this in mount/hydrate so we aren't always checking
-// whether it exists with `??=`
-
-const CONTEXT_SYMBOL: unique symbol = Symbol.for("t_context");
+const CONTEXT_SYMBOL: unique symbol = Symbol.for("torp.Context");
 
 const context: Context =
 	// @ts-ignore

@@ -1,5 +1,6 @@
 import type DevContext from "./types/DevContext";
 
+// TODO: Rename this next time we release the dev tools
 const DEV_CONTEXT_SYMBOL: unique symbol = Symbol.for("t_dev_context");
 
 const noop = () => {};
