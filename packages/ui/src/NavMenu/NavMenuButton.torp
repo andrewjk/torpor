@@ -10,6 +10,10 @@ interface NavMenuButtonProps {
 	style?: StyleValue,
 	/** Whether this button is disabled  */
 	disabled?: boolean,
+	/** Raised when the button is clicked */
+	onclick?: (e: MouseEvent) => void,
+	/** Raised when a key is pressed down */
+	onkeydown?: (e: KeyboardEvent) => void,
 }
 
 /**
@@ -43,9 +47,8 @@ export default function NavMenuButton($props: NavMenuButtonProps | undefined) {
 			role="menuitem"
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown
 			onkeydown={handleItemKey}
-			onclick
+			{$props?.onclick}
 			onfocus={() => handleItemFocus(index)}
 			&ref={button}
 		>

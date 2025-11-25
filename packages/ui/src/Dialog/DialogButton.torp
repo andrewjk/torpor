@@ -16,6 +16,8 @@ interface DialogButtonProps {
 	disabled?: boolean,
 	/** Raised when the button is clicked */
 	onclick?: (e: MouseEvent) => void,
+	/** Raised when a key is pressed down */
+	onkeydown?: (e: KeyboardEvent) => void,
 }
 
 /**
@@ -58,6 +60,7 @@ export default function DialogButton($props: DialogButtonProps | undefined) {
 			{$props?.style}
 			disabled={$props?.disabled}
 			onclick={handleClick}
+			{$props?.onkeydown}
 			&ref={button}
 		>
 			<slot />

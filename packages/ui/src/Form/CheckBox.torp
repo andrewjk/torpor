@@ -79,8 +79,7 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 	@render {
 		<input
 			id={$props?.id ?? defaultId}
-			class={`torp-check-box
-			 ${$props?.class ?? ""}`.trim()}
+			class={["torp-check-box", $props?.class]}
 			type="checkbox"
 			{name}
 			&checked={$state.value}

@@ -16,7 +16,8 @@ export default function NavMenuSeparator($props: NavMenuSeparatorProps | undefin
 	@render {
 		<div
 			{$props?.id}
-			class={`torp-nav-menu-separator ${$props?.class ?? ""}`.trim()} role="separator"
+			class={["torp-nav-menu-separator", $props?.class]}
+			role="separator"
 		>
 			<slot />
 		</div>
