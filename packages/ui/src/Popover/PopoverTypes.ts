@@ -1,4 +1,4 @@
-export const PopoverContextName = "Popover";
+export const PopoverContextName: unique symbol = Symbol.for("torp.Popover");
 
 /** The shared context for popover components (Contextual, Prompt and Popover) */
 export interface PopoverContext {

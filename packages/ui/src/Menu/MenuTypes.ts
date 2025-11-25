@@ -1,7 +1,7 @@
-export const MenuContextName = "Menu";
-export const MenuButtonContextName = "MenuButton";
-export const MenuRadioGroupContextName = "MenuRadioGroup";
-export const MenuPopoutContextName = "MenuPopout";
+export const MenuContextName: unique symbol = Symbol.for("torp.Menu");
+export const MenuButtonContextName: unique symbol = Symbol.for("torp.MenuButton");
+export const MenuRadioGroupContextName: unique symbol = Symbol.for("torp.MenuRadioGroup");
+export const MenuPopoutContextName: unique symbol = Symbol.for("torp.MenuPopout");
 
 export interface MenuContext {
 	setVisible: (value: boolean, result?: any) => void;

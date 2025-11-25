@@ -1,4 +1,4 @@
-export const CalendarContextName = "Calendar";
+export const CalendarContextName: unique symbol = Symbol.for("torp.Calendar");
 
 export interface CalendarContext {
 	// The registerDay function is called from each CalendarDay to register itself with this

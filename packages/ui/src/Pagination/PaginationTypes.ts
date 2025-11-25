@@ -1,4 +1,4 @@
-export const PaginationContextName = "Pagination";
+export const PaginationContextName: unique symbol = Symbol.for("torp.Pagination");
 
 export interface PaginationContext {
 	// The registerItem function is called from each SeriesItem to register itself and its

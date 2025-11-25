@@ -1,6 +1,6 @@
-export const NavMenuContextName = "NavMenu";
-export const NavMenuPopoutContextName = "NavMenuPopout";
-export const NavMenuGroupContextName = "NavMenuGroup";
+export const NavMenuContextName: unique symbol = Symbol.for("torp.NavMenu");
+export const NavMenuPopoutContextName: unique symbol = Symbol.for("torp.NavMenuPopout");
+export const NavMenuGroupContextName: unique symbol = Symbol.for("torp.NavMenuGroup");
 
 export interface NavMenuContext {
 	/** Called from a NavMenuLink or NavMenuButton when its button is focused */

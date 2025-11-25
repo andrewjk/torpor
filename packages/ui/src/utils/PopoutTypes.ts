@@ -1,4 +1,4 @@
-export const PopoutContextName = "Popout";
+export const PopoutContextName: unique symbol = Symbol.for("torp.Popout");
 
 /** The shared context for popout components */
 export interface PopoutContext {

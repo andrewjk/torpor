@@ -1,5 +1,5 @@
-export const MenuBarContextName = "MenuBar";
-export const MenuBarItemContextName = "MenuBarItem";
+export const MenuBarContextName: unique symbol = Symbol.for("torp.MenuBar");
+export const MenuBarItemContextName: unique symbol = Symbol.for("torp.MenuBarItem");
 
 export interface MenuBarContext {
 	/** Called from a MenuBarItem when it is shown, to hide others */

@@ -1,4 +1,4 @@
-export const ModalContextName = "Modal";
+export const ModalContextName: unique symbol = Symbol.for("torp.Modal");
 
 /** The shared context for modal components (Contextual, Prompt and Modal) */
 export interface ModalContext {

@@ -1,4 +1,4 @@
-export const DrawerContextName = "Drawer";
+export const DrawerContextName: unique symbol = Symbol.for("torp.Drawer");
 
 /** The shared context for drawer components (Contextual, Prompt and Drawer) */
 export interface DrawerContext {

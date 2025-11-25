@@ -1,4 +1,4 @@
-export const DisclosureContextName = "Disclosure";
+export const DisclosureContextName: unique symbol = Symbol.for("torp.Disclosure");
 
 export interface DisclosureContext {
 	/** The reactive state for a Disclosure */

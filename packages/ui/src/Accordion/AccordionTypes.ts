@@ -1,5 +1,5 @@
-export const AccordionContextName = "Accordion";
-export const AccordionItemContextName = "AccordionItem";
+export const AccordionContextName: unique symbol = Symbol.for("torp.Accordion");
+export const AccordionItemContextName: unique symbol = Symbol.for("torp.AccordionItem");
 
 export interface AccordionContext {
 	/** Called from an AccordionItem when it is added */

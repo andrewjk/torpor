@@ -1,4 +1,4 @@
-export const DialogContextName = "Dialog";
+export const DialogContextName: unique symbol = Symbol.for("torp.Dialog");
 
 export type HandleButtonPress = (type: "confirm" | "cancel" | undefined, value?: any) => void;
 

@@ -1,6 +1,6 @@
-export const ToolBarContextName = "ToolBar";
-export const ToolBarPopoutContextName = "ToolBarPopout";
-export const ToolBarGroupContextName = "ToolBarGroup";
+export const ToolBarContextName: unique symbol = Symbol.for("torp.ToolBar");
+export const ToolBarPopoutContextName: unique symbol = Symbol.for("torp.ToolBarPopout");
+export const ToolBarGroupContextName: unique symbol = Symbol.for("torp.ToolBarGroup");
 
 export interface ToolBarContext {
 	/** Called from a ToolBarLink or ToolBarButton when its button is focused */

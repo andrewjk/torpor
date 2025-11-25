@@ -1,5 +1,5 @@
-export const TabGroupContextName = "TabGroup";
-export const TabItemContextName = "TabItem";
+export const TabGroupContextName: unique symbol = Symbol.for("torp.TabGroup");
+export const TabItemContextName: unique symbol = Symbol.for("torp.TabItem");
 
 export interface TabGroupContext {
 	/** Called from a header when it is added */
