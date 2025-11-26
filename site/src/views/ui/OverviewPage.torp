@@ -10,7 +10,7 @@ export default function UI() {
 			Torpor comes with an accessible, unstyled component library.
 		</p>
 		<p>
-			TODO:
+			🚧 WARNING: WORK IN PROGRESS 🚧
 		</p>
 	}
 }

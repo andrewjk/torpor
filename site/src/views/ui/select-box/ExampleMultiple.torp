@@ -1,0 +1,74 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "@torpor/ui/ListBox";
+import {
+	SelectBox,
+	SelectBoxInput,
+	SelectBoxContent,
+} from "@torpor/ui/SelectBox";
+
+export default function ExampleMultiple() {
+	let items = [
+		{ id: 0, text: "Item 1" },
+		{ id: 1, text: "Item 2" },
+		{ id: 2, text: "Item 3" },
+	];
+
+	let $state = $watch({
+		value: [0],
+		get text() {
+			return items.filter(i => this.value.includes(i.id)).map(i => i.text).join(", ");
+		}
+	});
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<SelectBox class="example-select-box" &value={$state.value}>
+			<SelectBoxInput class="example-select-box-input" value={$state.text} />
+			<SelectBoxContent class="example-select-box-content">
+				<ListBox class="example-list-box" type="multiple">
+					@for (let item of items) {
+						@key = item.id;
+						<ListBoxItem class="example-list-box-item">
+							{item.text}
+						</ListBoxItem>
+					}
+				</ListBox>
+			</SelectBoxContent>
+		</SelectBox>
+	}
+
+	@style {
+		.example-list-box {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			width: 200px;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+
+		.example-list-box-item[data-state="active"] {
+			border: 2px solid lightblue;
+		}
+
+		.example-list-box-item:hover {
+			border: 2px solid blue;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+	}
+}

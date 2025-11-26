@@ -24,6 +24,7 @@ export default defineConfig({
 		"src/Notification/index.ts",
 		"src/Pagination/index.ts",
 		"src/Popover/index.ts",
+		"src/SelectBox/index.ts",
 		"src/TabGroup/index.ts",
 		"src/ToolBar/index.ts",
 		"src/icons/index.ts",

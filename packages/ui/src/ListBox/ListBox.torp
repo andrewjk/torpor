@@ -1,4 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import { PopoutContextName, type PopoutContext, type HandleButtonPress } from "../utils/PopoutTypes";
 import { ListBoxContextName, type ListBoxContext, type ItemState } from "./ListBoxTypes";
 
 // TODO: orientation
@@ -37,6 +39,7 @@ interface ListBoxProps {
  * ```
  */
 export default function ListBox($props: ListBoxProps | undefined) {
+	let defaultId = getId();
 	let type = $props?.type ?? "single";
 
 	let $state = $watch({
@@ -60,14 +63,42 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	// This is used to assign automatic indexes to items where needed
 	let nextIndex = 0;
 
+	// Maybe get stuff out of a popout context
+	let handleButton: HandleButtonPress | undefined = undefined;
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
+	if (popoutContext) {
+		handleButton = popoutContext.handleButton;
+
+		//popoutContext.handleClickOutside = handleClickOutside;
+		// Set the focusFirstElement method in the PopoutContext so that it can be
+		// called after everything has been shown
+		popoutContext.focusFirstElement = focusFirstElement;
+		popoutContext.focusLastElement = focusLastElement;
+
+		// Set the content ID so that it can be used with aria-controls in AccordionTrigger
+		popoutContext.state.contentId = $props?.id ?? defaultId;
+	}
+
 	// Set the context to pass down to items, with functions for each item to call
 	let context: ListBoxContext = {
 		registerItem,
 		removeItem,
 		toggleItem,
-		handleKey
+		handleKey,
 	};
 	$context[ListBoxContextName] = context;
+
+	function focusFirstElement() {
+		if (itemStates.length > 0) {
+			itemStates[0].setFocused();
+		}
+	}
+
+	function focusLastElement() {
+		if (itemStates.length > 0) {
+			itemStates.at(-1)!.setFocused();
+		}
+	}
 
 	$run(() => {
 		// Get the value to ensure that this effect will be subscribed
@@ -152,66 +183,73 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		itemStates.forEach((item, i) => (item.index = i));
 	}
 
-	function toggleItem(toggleValue: string) {
+	function toggleItem(value: string) {
 		switch (type) {
 			case "single": {
 				for (let item of itemStates) {
-					// The item is selected if it has the supplied value (i.e. if it was clicked) and if it
-					// wasn't already selected (i.e. we collapse it if it was selected and clicked)
-					if (item.value === toggleValue) {
+					if (item.value === value) {
 						$state.value = item.selected ? "" : item.value;
 						break;
 					}
 				}
+				// Pass this along to the containing popout if applicable, so
+				// that the popout can be closed
+				if (handleButton) {
+					handleButton("confirm", value)
+				}
 				break;
 			}
 			case "multiple": {
-				let value = [];
+				let newValue = [];
 				for (let item of itemStates) {
-					// The item is selected if it has the supplied value (i.e. if it was clicked) or if it
-					// was already selected
 					if (
-						(item.value === toggleValue && !item.selected) ||
-						(item.value !== toggleValue && item.selected)
+						(item.value === value && !item.selected) ||
+						(item.value !== value && item.selected)
 					) {
-						value.push(item.value);
+						newValue.push(item.value);
 					}
 				}
-				$state.value = value.sort();
+				$state.value = newValue.sort();
 				break;
 			}
 		}
 	}
 
-	function handleKey(headerIndex: number, e: KeyboardEvent) {
+	function handleKey(index: number, e: KeyboardEvent) {
 		switch (e.key) {
 			case "Up":
 			case "ArrowUp": {
-				if (headerIndex > 0) {
+				if (index > 0) {
 					e.preventDefault();
-					itemStates[headerIndex - 1].setFocused();
+					itemStates[index - 1].setFocused();
 				}
 				break;
 			}
 			case "Down":
 			case "ArrowDown": {
-				if (headerIndex < itemStates.length - 1) {
+				if (index < itemStates.length - 1) {
 					e.preventDefault();
-					itemStates[headerIndex + 1].setFocused();
+					itemStates[index + 1].setFocused();
 				}
 				break;
 			}
 			case "Home": {
-				if (headerIndex > 0) {
+				if (index > 0) {
 					e.preventDefault();
 					itemStates[0].setFocused();
 				}
 				break;
 			}
 			case "End": {
-				if (headerIndex < itemStates.length - 1) {
+				if (index < itemStates.length - 1) {
 					e.preventDefault();
 					itemStates[itemStates.length - 1].setFocused();
+				}
+				break;
+			}
+			case "Escape": {
+				if (handleButton) {
+					handleButton("cancel")
 				}
 				break;
 			}
@@ -220,7 +258,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	@render {
 		<div
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-list-box", $props?.class]}
 			{$props?.style}
 			role="listbox"

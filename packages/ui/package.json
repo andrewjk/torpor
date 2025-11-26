@@ -72,6 +72,10 @@
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js"
 		},
+		"./SelectBox": {
+			"types": "./dist/SelectBox/index.d.ts",
+			"import": "./dist/SelectBox/index.js"
+		},
 		"./TabGroup": {
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js"

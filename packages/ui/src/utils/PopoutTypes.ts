@@ -1,8 +1,11 @@
 export const PopoutContextName: unique symbol = Symbol.for("torp.Popout");
 
+// TODO: Use this type in more places
+export type HandleButtonPress = (type: "confirm" | "cancel" | undefined, value?: any) => void;
+
 /** The shared context for popout components */
 export interface PopoutContext {
-	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
+	handleButton: HandleButtonPress;
 	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
 	// There may be a more elegant way to accomplish this too
 	handleClickOutside?: (e: MouseEvent) => void;
@@ -17,11 +20,13 @@ export interface PopoutContext {
 	// 3. set focus (for accessibility)
 	// There may be a more elegant way to accomplish this!
 	focusFirstElement?: () => void;
+	focusLastElement?: () => void;
 }
 
 export interface PopoutState {
 	visible: boolean;
 	//position: Point;
+	contentId?: string;
 }
 
 export interface Point {

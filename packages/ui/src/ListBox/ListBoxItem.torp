@@ -26,8 +26,6 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 		index: -1,
 		value: "",
 		selected: false,
-		headerId: "",
-		contentId: "",
 		disabled: $props?.disabled ?? false,
 		parentDisabled: false,
 		setFocused
@@ -70,13 +68,23 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 
 	function handleClick() {
 		// Pass the value to the toggleItem method in the parent ListBox which will handle toggling
-		// the value of expanded for all items (e.g. to close other items if necessary)
+		// the value of expanded for all items (e.g. to unselect other items if necessary)
 		context.toggleItem($state.value);
 	}
 
 	function handleKey(e: KeyboardEvent) {
-		// Pass the key press up to the parent ListBox which will handle setting the focused button
-		context.handleKey($state.index, e);
+		// For testing
+		switch (e.key) {
+			case "Enter":
+				e.preventDefault();
+				context.toggleItem($state.value);
+				break;
+			default:
+				// Pass the key press up to the parent ListBox which will handle
+				// setting the focused button
+				context.handleKey($state.index, e);
+				break;
+		}
 	}
 
 	@render {

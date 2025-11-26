@@ -1,0 +1,69 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
+import ExampleBasic from "./select-box/ExampleBasic.torp";
+import ExampleMultiple from "./select-box/ExampleMultiple.torp";
+
+import ExampleBasicCode from "./select-box/ExampleBasic.torp?raw";
+import ExampleMultipleCode from "./select-box/ExampleMultiple.torp?raw";
+
+export default function SelectBoxPage() {
+	@head {
+		<title>SelectBox | Torpor</title>
+	}
+
+	@render {
+		<h1>SelectBox</h1>
+		<p>
+			A read-only input box for selecting a value from a popout ListBox or Dialog.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/combobox/">the WAI ARIA guidelines for ComboBoxes</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<SelectBox>
+	<SelectBoxInput />
+	<SelectBoxTrigger /> (optional)
+	<SelectBoxContent>
+		<ListBox>
+			<ListBoxItem />
+			<ListBoxSeparator /> (optional)
+		</ListBox>
+	</SelectBoxContent>
+</SelectBox>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Multiple
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleMultiple />
+					<fill name="code">
+						<pre><code>{ExampleMultipleCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

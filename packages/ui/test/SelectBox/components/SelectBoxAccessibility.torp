@@ -1,0 +1,31 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+import {
+	SelectBox,
+	SelectBoxInput,
+	SelectBoxContent,
+} from "../../../src/SelectBox/index";
+
+export default function SelectBoxAccessibility($props: any) {
+	@render {
+		<SelectBox &value={$props.value} type="multiple" ariaLabel="The accessible listbox">
+			<SelectBoxInput value={$props.value.join(", ")} />
+			<SelectBoxContent>
+				@// TODO: Shouldn't have to set type and value here:
+				<ListBox type="multiple" value={$props.value}>
+					<ListBoxItem>
+						Item 1
+					</ListBoxItem>
+					<ListBoxItem>
+						Item 2
+					</ListBoxItem>
+					<ListBoxItem>
+						Item 3
+					</ListBoxItem>
+				</ListBox>
+			</SelectBoxContent>
+		</SelectBox>
+	}
+}

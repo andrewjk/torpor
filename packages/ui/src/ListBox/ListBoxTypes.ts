@@ -16,8 +16,6 @@ export interface ItemState {
 	index: number;
 	value: any;
 	selected: boolean;
-	headerId: string;
-	contentId: string;
 	disabled: boolean;
 	parentDisabled: boolean;
 	/** Called in the ListBox when an item needs to be focused */
