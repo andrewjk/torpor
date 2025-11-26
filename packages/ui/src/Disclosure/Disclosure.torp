@@ -59,12 +59,12 @@ export default function Disclosure($props: DisclosureProps | undefined) {
 	// Dispatch the toggle event when the value of expanded changes
 	let firstToggle = true;
 	$run(() => {
-		const ev = $props?.ontoggle;
+		const ontoggle = $props?.ontoggle;
 		const expanded = $state.expanded;
 		if (firstToggle) {
 			firstToggle = false;
-		} else if (ev) {
-			ev(expanded);
+		} else if (ontoggle) {
+			ontoggle(expanded);
 		}
 	});
 

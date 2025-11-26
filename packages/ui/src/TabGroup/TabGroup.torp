@@ -90,12 +90,12 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 	// Dispatch the change event when the value changes
 	let firstChange = true;
 	$run(() => {
-		const ev = $props?.onchange;
+		const onchange = $props?.onchange;
 		const value = $props?.value;
 		if (firstChange) {
 			firstChange = false;
-		} else if (ev) {
-			ev(value!);
+		} else if (onchange) {
+			onchange(value!);
 		}
 	});
 
