@@ -11,11 +11,11 @@ interface AccordionProps {
 	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
 	type?: "single" | "multiple",
 	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
-	value?: string | string[],
+	value?: any | any[],
 	/** If set to true, the user cannot interact with any items in the Accordion */
 	disabled?: boolean,
 	/** Raised when the expanded item(s) have changed */
-	onchange?: (value: string | string[]) => void,
+	onchange?: (value: any | any[]) => void,
 }
 
 /**
@@ -41,9 +41,15 @@ export default function Accordion($props: AccordionProps | undefined) {
 	let type = $props?.type ?? "single";
 
 	let $state = $watch({
-		value: $props?.value ?? (type === "single" ? "" : [] as string[])
+		value: $props?.value ?? (type === "single" ? undefined : [])
 	});
 
+	// Update $state on $props change
+	$run(() => {
+		$state.value = $props?.value ?? (type === "single" ? undefined : [])
+	});
+
+	// Update $props on $state change
 	$run(() => {
 		if ($props !== undefined) {
 			$props.value = $state.value;
@@ -65,48 +71,43 @@ export default function Accordion($props: AccordionProps | undefined) {
 	$context[AccordionContextName] = context;
 
 	$run(() => {
-		// HACK: This should probably be done with setters?
-		let newValue = $state.value;
+		// Get the value to ensure that this effect will be subscribed
+		let value = $state.value;
 
-		// Get the value
+		// And set the expanded item(s)
 		switch (type) {
 			case "single": {
-				// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
-				newValue = newValue.toString();
 				for (let item of itemStates) {
-					item.expanded = item.value === newValue;
+					item.expanded = item.value === value;
 				}
 				break;
 			}
 			case "multiple": {
-				// Ensure the value passed in is an array
-				if (!Array.isArray(newValue)) {
-					newValue = [newValue];
+				if (!Array.isArray(value)) {
+					value = [value];
 				}
 				for (let item of itemStates) {
-					item.expanded = newValue.indexOf(item.value) !== -1;
+					item.expanded = value.indexOf(item.value) !== -1;
 				}
 				break;
 			}
 		}
-
-		// Set the value
-		$state.value = newValue;
 	})
 
 	$run(() => {
-		itemStates.forEach((s) => s.parentDisabled = $props?.disabled === true);
+		let disabled = $props?.disabled;
+		itemStates.forEach((s) => s.parentDisabled = disabled === true);
 	});
 
 	// Dispatch the change event when the value changes
 	let firstChange = true;
 	$run(() => {
-		const ev = $props?.onchange;
+		const onchange = $props?.onchange;
 		const value = $state.value;
 		if (firstChange) {
 			firstChange = false;
-		} else if (ev) {
-			ev(value);
+		} else if (onchange) {
+			onchange(value);
 		}
 	});
 
@@ -118,11 +119,11 @@ export default function Accordion($props: AccordionProps | undefined) {
 
 		// If a value wasn't set for the item, set it to the index
 		if (!itemState.value) {
-			itemState.value = itemState.index.toString();
+			itemState.value = itemState.index;
 		}
 
 		// If we have a value, set whether the item should be expanded
-		if ($state.value) {
+		if ($state.value !== undefined && $state.value !== null) {
 			switch (type) {
 				case "single": {
 					itemState.expanded = $state.value === itemState.value;
@@ -166,7 +167,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 				break;
 			}
 			case "multiple": {
-				let newValue = [];
+				let value = [];
 				for (let item of itemStates) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) or if it
 					// was already expanded
@@ -174,10 +175,10 @@ export default function Accordion($props: AccordionProps | undefined) {
 						(item.value === toggleValue && !item.expanded) ||
 						(item.value !== toggleValue && item.expanded)
 					) {
-						newValue.push(item.value);
+						value.push(item.value);
 					}
 				}
-				$state.value = newValue.sort();
+				$state.value = value.sort();
 				break;
 			}
 		}

@@ -7,14 +7,14 @@ export interface AccordionContext {
 	/** Called from an AccordionItem when it is removed */
 	removeItem: (index: number) => void;
 	/** Called from an AccordionItem when it is toggled */
-	toggleItem: (value: string) => void;
+	toggleItem: (value: any) => void;
 	/** Called from an AccordionHeader when it receives a keyboard event */
 	handleHeaderKey: (index: number, e: KeyboardEvent) => void;
 }
 
 export interface AccordionItemContext {
 	/** Raised when an AccordionItem is toggled */
-	toggleItem: (value: string) => void;
+	toggleItem: (value: any) => void;
 	/** Raised when an AccordionHeader receives a keyboard event */
 	handleHeaderKey: (index: number, e: KeyboardEvent) => void;
 	/** The reactive state for an AccordionItem */
@@ -25,7 +25,7 @@ export interface AccordionItemContext {
 
 export interface ItemState {
 	index: number;
-	value: string;
+	value: any;
 	expanded: boolean;
 	headerId: string;
 	contentId: string;

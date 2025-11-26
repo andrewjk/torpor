@@ -1,0 +1,75 @@
+import {
+	Accordion,
+	AccordionItem,
+	AccordionHeader,
+	AccordionTrigger,
+	AccordionContent
+} from "@torpor/ui/Accordion";
+import { grow } from "@torpor/ui/motion"
+
+export default function ExampleMultiple() {
+	let $state = $watch({ value: [0] });
+
+	@render {
+		<p>Value: [{$state.value}]</p>
+
+		<Accordion class="example-accordion" type="multiple" &value={$state.value}>
+			<AccordionItem class="example-accordion-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="example-accordion-trigger">Item 1</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="example-accordion-content" transition={grow}>The first item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="example-accordion-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="example-accordion-trigger">Item 2</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="example-accordion-content" transition={grow}>Another item</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem class="example-accordion-item">
+				<AccordionHeader as="h4">
+					<AccordionTrigger class="example-accordion-trigger">Item 3</AccordionTrigger>
+				</AccordionHeader>
+				<AccordionContent>
+					<div class="example-accordion-content" transition={grow}>The last item</div>
+				</AccordionContent>
+			</AccordionItem>
+		</Accordion>
+	}
+
+	@style {
+		.example-accordion {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			width: 200px;
+		}
+
+		.example-accordion-trigger {
+			all: unset;
+			cursor: default;
+			padding: 5px;
+			width: 100%;
+		}
+
+		.example-accordion-trigger:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+
+		.example-accordion-content {
+			padding: 5px;
+			width: 100%;
+		}
+
+		.example-accordion-item + .example-accordion-item {
+			border-top: 1px solid gainsboro;
+		}
+
+		.example-accordion-trigger[data-state="open"] {
+			border-bottom: 2px solid black;
+		}
+	}
+}
