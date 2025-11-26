@@ -8,7 +8,7 @@ import AccordionList from "./components/AccordionList.torp";
 describe("Accordion", () => {
 	it("Items in a for loop", async () => {
 		let $state = $watch({
-			value: "1",
+			value: 1,
 			items: [
 				{ id: 0, header: "Item 1", text: "Content 1" },
 				{ id: 1, header: "Item 2", text: "Content 2" },

@@ -8,7 +8,7 @@ describe("Accordion", () => {
 	it("Single item default value", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, AccordionSingle, { value: "1" });
+		mount(container, AccordionSingle, { value: 1 });
 
 		expect(queryByText(container, "Content 1")).not.toBeInTheDocument();
 		expect(queryByText(container, "Content 2")).toBeInTheDocument();

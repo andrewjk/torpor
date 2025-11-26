@@ -8,7 +8,7 @@ describe("Accordion", () => {
 	it("Accessibility", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, AccordionAccessibility, { value: ["1", "3"] });
+		mount(container, AccordionAccessibility, { value: [1, 3] });
 
 		// Tests from https://www.w3.org/WAI/ARIA/apg/patterns/accordion/
 
