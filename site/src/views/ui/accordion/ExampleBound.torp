@@ -7,8 +7,8 @@ import {
 } from "@torpor/ui/Accordion";
 import { grow } from "@torpor/ui/motion"
 
-export default function ExampleBound($props: any) {
-	let $state = $watch({ value: "0" });
+export default function ExampleBound() {
+	let $state = $watch({ value: 0 });
 
 	@render {
 		<p>Value: <input type="number" &value={$state.value} /></p>

@@ -1,7 +1,7 @@
 import { hoverPopover } from "@torpor/ui/Popover";
 import PopoverTooltip from "./PopoverTooltip.torp";
 
-export default function ExampleMount($props: any) {
+export default function ExampleMount() {
 	@render {
 		<p>
 			You can anchor a popover to an existing DOM element with the mount/clickPopover,

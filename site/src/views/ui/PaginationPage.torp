@@ -1,5 +1,7 @@
 import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
-import copyCode from "../../lib/copyCode";
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
 import ExampleBasic from "./pagination/ExampleBasic.torp";
 
 import ExampleBasicCode from "./pagination/ExampleBasic.torp?raw";
@@ -31,29 +33,12 @@ export default function PaginationPage() {
 				</TabHeader>
 			</TabList>
 			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleBasic />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleBasicCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
 			</TabContent>
 		</TabGroup>
 	}

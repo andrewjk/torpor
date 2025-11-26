@@ -1,7 +1,7 @@
 import { showPrompt } from "@torpor/ui/Modal";
 import ConfirmDialog from "./ConfirmDialog.torp";
 
-export default function ExampleConfirm($props: any) {
+export default function ExampleConfirm() {
 	async function show() {
 		const result = await showPrompt(ConfirmDialog, { text: "Press OK to continue..." });
 		if (result) {

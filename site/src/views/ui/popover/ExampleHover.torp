@@ -1,6 +1,6 @@
 import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 
-export default function ExampleHover($props: any) {
+export default function ExampleHover() {
 	@render {
 		<p>Hover over the panel below to trigger a tooltip.</p>
 

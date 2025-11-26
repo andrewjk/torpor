@@ -1,5 +1,7 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
-import copyCode from "../../lib/copyCode";
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
 import ExampleCSS from "./breadcrumb/ExampleCSS.torp";
 import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
 
@@ -43,54 +45,20 @@ export default function BreadcrumbPage() {
 				</TabHeader>
 			</TabList>
 			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleCSS />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleCSSCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
+				<ExampleTabGroup>
+					<ExampleCSS />
+					<fill name="code">
+						<pre><code>{ExampleCSSCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
 			</TabContent>
 			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleSeparators />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleSeparatorsCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
+				<ExampleTabGroup>
+					<ExampleSeparators />
+					<fill name="code">
+						<pre><code>{ExampleSeparatorsCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
 			</TabContent>
 		</TabGroup>
 	}

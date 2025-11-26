@@ -1,6 +1,6 @@
 import { Popover, PopoverContent } from "@torpor/ui/Popover";
 
-export default function ExampleVariable($props: any) {
+export default function ExampleVariable() {
 	let $state = $watch({
 		showPopover: false,
 	})

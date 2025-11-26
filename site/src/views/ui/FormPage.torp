@@ -1,10 +1,12 @@
 import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
-import copyCode from "../../lib/copyCode";
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
 import ExampleBasic from "./form/ExampleBasic.torp";
 
 import ExampleBasicCode from "./form/ExampleBasic.torp?raw";
 
-export default function FormPage($props) {
+export default function FormPage() {
 	@head {
 		<title>Form | Torpor</title>
 	}
@@ -34,29 +36,12 @@ export default function FormPage($props) {
 				</TabHeader>
 			</TabList>
 			<TabContent>
-				<TabGroup>
-					<TabList ariaLabel="Preview and code tabs">
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Preview</TabTrigger>
-						</TabHeader>
-						<TabHeader>
-							<TabTrigger class="example-tab-header">Code</TabTrigger>
-						</TabHeader>
-					</TabList>
-					<TabContent>
-						<p class="example-preview">
-							<ExampleBasic />
-						</p>
-					</TabContent>
-					<TabContent>
-						<div class="example-code">
-							<button type="button" class="example-copy-button" onclick={copyCode}>
-								Copy to clipboard
-							</button>
-							<pre><code>{ExampleBasicCode.trim()}</code></pre>
-						</div>
-					</TabContent>
-				</TabGroup>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
 			</TabContent>
 		</TabGroup>
 	}

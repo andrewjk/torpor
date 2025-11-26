@@ -50,8 +50,13 @@ function buildStyles(value) {
 		return styles.join("; ");
 	}
 }
+const proxyDataSymbol = Symbol.for("torp.ProxyData");
+const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
+function $unwrap(object) {
+	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
+}
 function formatText(value) {
-	return value ?? "";
+	return value === void 0 || value === null ? "" : String($unwrap(value));
 }
 const CONTEXT_SYMBOL = Symbol.for("torp.Context");
 const context = globalThis[CONTEXT_SYMBOL] ??= {
@@ -663,8 +668,6 @@ function propagateSignal(proxy, key) {
 		}
 	}
 }
-const proxyDataSymbol = Symbol.for("torp.ProxyData");
-const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
 function trackProxySignal(data, key) {
 	let signal = data.signals.get(key);
 	if (signal === void 0) {
@@ -925,9 +928,6 @@ function $peek(fn) {
 	const result = fn();
 	context_default.activeTarget = oldActiveTarget;
 	return result;
-}
-function $unwrap(object) {
-	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
 }
 let initialized = false;
 var ReactiveDate = class ReactiveDate extends Date {

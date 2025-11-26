@@ -1,7 +1,7 @@
 import { Contextual, ContextualTrigger, ContextualContent } from "@torpor/ui/Contextual";
 import { Menu, MenuCheck, MenuIndicator, MenuSeparator, MenuButton } from "@torpor/ui/Menu";
 
-export default function Example($props: any) {
+export default function Example() {
 	let $state = $watch({
 		bold: false,
 		italic: false,

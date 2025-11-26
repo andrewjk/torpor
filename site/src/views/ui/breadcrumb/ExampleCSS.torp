@@ -1,6 +1,6 @@
 import { Breadcrumb, BreadcrumbItem } from "@torpor/ui/Breadcrumb";
 
-export default function ExampleCSS($props: any) {
+export default function ExampleCSS() {
 	@render {
 		<p>
 			Below is an example Breadcrumb using CSS to style the separators.

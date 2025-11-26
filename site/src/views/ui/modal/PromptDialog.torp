@@ -1,7 +1,7 @@
 import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
-export default function PromptDialog($props: any) {
+export default function PromptDialog() {
 	$props.confirmText ||= "OK";
 	$props.cancelText ||= "Cancel";
 

@@ -7,7 +7,7 @@ import {
 	NavMenuSeparator
 } from "@torpor/ui/NavMenu";
 
-export default function ExampleBasic($props: any) {
+export default function ExampleBasic() {
 	@render {
 		<NavMenu class="example-navmenu" ariaLabel="Site navigation">
 			<NavMenuLink class="example-navmenu-link" href="/" newWindow>Home</NavMenuLink>

@@ -1,0 +1,30 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import copyCode from "../../lib/copyCode";
+
+export default function ExampleTabGroup() {
+	@render {
+		<TabGroup>
+			<TabList ariaLabel="Preview and code tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">Preview</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">Code</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<p class="example-preview">
+					<slot />
+				</p>
+			</TabContent>
+			<TabContent>
+				<div class="example-code">
+					<button type="button" class="example-copy-button" onclick={copyCode}>
+						Copy to clipboard
+					</button>
+					<slot name="code" />
+				</div>
+			</TabContent>
+		</TabGroup>
+	}
+}

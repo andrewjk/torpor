@@ -2,7 +2,7 @@
 import { showPrompt } from "@torpor/ui/Modal";
 import CustomDialog from "./CustomDialog.torp";
 
-export default function ExampleFunction($props: any) {
+export default function ExampleFunction() {
 	async function show() {
 		const result = await showPrompt(CustomDialog);
 		if (result) {

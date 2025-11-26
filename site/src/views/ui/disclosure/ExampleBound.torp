@@ -6,7 +6,7 @@ import {
 } from "@torpor/ui/Disclosure";
 import { grow } from "@torpor/ui/motion"
 
-export default function ExampleBound($props: any) {
+export default function ExampleBound() {
 	let $state = $watch({ expanded: false });
 
 	@render {

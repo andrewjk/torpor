@@ -1,7 +1,7 @@
 import { Disclosure, DisclosureHeader, DisclosureTrigger, DisclosureContent } from "@torpor/ui/Disclosure";
 import { grow } from "@torpor/ui/motion"
 
-export default function ExampleBasic($props: any) {
+export default function ExampleBasic() {
 	@render {
 		<Disclosure class="example-disclosure">
 			<DisclosureHeader as="h4">

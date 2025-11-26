@@ -1,7 +1,7 @@
 import { showModal } from "@torpor/ui/Modal";
 import InfoDialog from "./InfoDialog.torp";
 
-export default function ExampleInfo($props: any) {
+export default function ExampleInfo() {
 	async function show() {
 		await showModal(InfoDialog, { text: "Press OK to continue..." });
 	}

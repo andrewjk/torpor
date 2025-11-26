@@ -1,7 +1,7 @@
 import { showPrompt } from "@torpor/ui/Modal";
 import PromptDialog from "./PromptDialog.torp";
 
-export default function ExamplePrompt($props: any) {
+export default function ExamplePrompt() {
 	async function show() {
 		const result = await showPrompt(PromptDialog, { text: "What is your favorite color?" });
 		if (result) {

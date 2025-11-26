@@ -1,7 +1,7 @@
 import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
-export default function ExampleBasic($props: any) {
+export default function ExampleBasic() {
 	let $state = $watch({
 		showDialog: false
 	});

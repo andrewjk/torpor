@@ -2,7 +2,7 @@
 import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
-export default function ExampleDialog($props: any) {
+export default function ExampleDialog() {
 	function handleOption(color: string) {
 		alert(`You prefer ${color}?!`);
 	}
