@@ -1,0 +1,63 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
+import ExampleBasic from "./list-box/ExampleBasic.torp";
+import ExampleMultiple from "./list-box/ExampleMultiple.torp";
+
+import ExampleBasicCode from "./list-box/ExampleBasic.torp?raw";
+import ExampleMultipleCode from "./list-box/ExampleMultiple.torp?raw";
+
+export default function ListBoxPage() {
+	@head {
+		<title>ListBox | Torpor</title>
+	}
+
+	@render {
+		<h1>ListBox</h1>
+		<p>
+			A list of options that a user can select.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/listbox/">the WAI ARIA guidelines for ListBoxes</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<ListBox>
+	<ListBoxItem />
+	<ListBoxSeparator /> (optional)
+</ListBox>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Multiple
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleMultiple />
+					<fill name="code">
+						<pre><code>{ExampleMultipleCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

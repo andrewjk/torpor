@@ -40,6 +40,10 @@
 			"types": "./dist/Form/index.d.ts",
 			"import": "./dist/Form/index.js"
 		},
+		"./ListBox": {
+			"types": "./dist/ListBox/index.d.ts",
+			"import": "./dist/ListBox/index.js"
+		},
 		"./Menu": {
 			"types": "./dist/Menu/index.d.ts",
 			"import": "./dist/Menu/index.js"

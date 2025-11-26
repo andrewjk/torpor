@@ -1,0 +1,26 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+
+export default function ListBoxAccessibility($props: any) {
+	@render {
+		<ListBox value={$props.value} type="multiple" ariaLabel="The accessible listbox">
+			<ListBoxItem>
+				Role Content
+			</ListBoxItem>
+			<ListBoxItem>
+				Selected Content
+			</ListBoxItem>
+			<ListBoxItem>
+				Unselected Content
+			</ListBoxItem>
+			<ListBoxItem>
+				Region Content
+			</ListBoxItem>
+			<ListBoxItem disabled>
+				Disabled Content
+			</ListBoxItem>
+		</ListBox>
+	}
+}

@@ -1,0 +1,233 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { ListBoxContextName, type ListBoxContext, type ItemState } from "./ListBoxTypes";
+
+// TODO: orientation
+
+interface ListBoxProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** Whether a single ListBoxItem or multiple ListBoxItems can be selected at the same time */
+	type?: "single" | "multiple",
+	/** The value of the selected ListBoxItem, or an array of values if the type is "multiple" */
+	value?: any | any[],
+	/** If set to true, the user cannot interact with any items in the ListBox */
+	disabled?: boolean,
+	/** An ARIA label for describing the ListBox to screen readers  */
+	ariaLabel?: string | undefined,
+	/** Raised when the selected item(s) have changed */
+	onchange?: (value: any | any[]) => void,
+}
+
+/**
+ * A list of options that a user can select.
+ *
+ * See [the WAI ARIA guidelines for ListBoxes](https://www.w3.org/WAI/ARIA/apg/patterns/listbox/).
+ *
+ * The structure of an ListBox is:
+ *
+ * ```
+ * <ListBox>
+ * 	<ListBoxItem />
+ * 	<ListBoxSeparator /> (optional)
+ * </ListBox>
+ * ```
+ */
+export default function ListBox($props: ListBoxProps | undefined) {
+	let type = $props?.type ?? "single";
+
+	let $state = $watch({
+		value: $props?.value ?? (type === "single" ? undefined : [])
+	});
+
+	// Update $state on $props change
+	$run(() => {
+		$state.value = $props?.value ?? (type === "single" ? undefined : [])
+	});
+
+	// Update $props on $state change
+	$run(() => {
+		if ($props !== undefined) {
+			$props.value = $state.value;
+		}
+	});
+
+	let itemStates: ItemState[] = [];
+
+	// This is used to assign automatic indexes to items where needed
+	let nextIndex = 0;
+
+	// Set the context to pass down to items, with functions for each item to call
+	let context: ListBoxContext = {
+		registerItem,
+		removeItem,
+		toggleItem,
+		handleKey
+	};
+	$context[ListBoxContextName] = context;
+
+	$run(() => {
+		// Get the value to ensure that this effect will be subscribed
+		let value = $state.value;
+
+		// And set the expanded item(s)
+		switch (type) {
+			case "single": {
+				for (let item of itemStates) {
+					item.selected = item.value === value;
+				}
+				break;
+			}
+			case "multiple": {
+				if (!Array.isArray(value)) {
+					value = [value];
+				}
+				for (let item of itemStates) {
+					item.selected = value.indexOf(item.value) !== -1;
+				}
+				break;
+			}
+		}
+	})
+
+	$run(() => {
+		let disabled = $props?.disabled;
+		itemStates.forEach((s) => s.parentDisabled = disabled === true);
+	});
+
+	// Dispatch the change event when the value changes
+	let firstChange = true;
+	$run(() => {
+		const onchange = $props?.onchange;
+		const value = $state.value;
+		if (firstChange) {
+			firstChange = false;
+		} else if (onchange) {
+			onchange(value);
+		}
+	});
+
+	function registerItem(itemState: ItemState) {
+		// If an index wasn't set for the item, set it automatically
+		if (itemState.index === -1) {
+			itemState.index = nextIndex++;
+		}
+
+		// If a value wasn't set for the item, set it to the index
+		if (!itemState.value) {
+			itemState.value = itemState.index;
+		}
+
+		// If we have a value, set whether the item should be selected
+		if ($state.value !== undefined && $state.value !== null) {
+			switch (type) {
+				case "single": {
+					itemState.selected = $state.value === itemState.value;
+					break;
+				}
+				case "multiple": {
+					itemState.selected = $state.value.includes(itemState.value);
+					break;
+				}
+			}
+		}
+
+		// Set whether the ListBox itself is disabled
+		itemState.parentDisabled = $props?.disabled === true
+
+		// Add the item's state to the array
+		itemStates.splice(itemState.index, 0, itemState);
+	}
+
+	// TODO: I think this should be done by value
+	function removeItem(itemIndex: number) {
+		// Remove the item and re-index
+		let index = itemStates.findIndex((item) => item.index === itemIndex);
+		if (index !== -1) {
+			itemStates.splice(itemIndex, 1);
+		}
+		itemStates.forEach((item, i) => (item.index = i));
+	}
+
+	function toggleItem(toggleValue: string) {
+		switch (type) {
+			case "single": {
+				for (let item of itemStates) {
+					// The item is selected if it has the supplied value (i.e. if it was clicked) and if it
+					// wasn't already selected (i.e. we collapse it if it was selected and clicked)
+					if (item.value === toggleValue) {
+						$state.value = item.selected ? "" : item.value;
+						break;
+					}
+				}
+				break;
+			}
+			case "multiple": {
+				let value = [];
+				for (let item of itemStates) {
+					// The item is selected if it has the supplied value (i.e. if it was clicked) or if it
+					// was already selected
+					if (
+						(item.value === toggleValue && !item.selected) ||
+						(item.value !== toggleValue && item.selected)
+					) {
+						value.push(item.value);
+					}
+				}
+				$state.value = value.sort();
+				break;
+			}
+		}
+	}
+
+	function handleKey(headerIndex: number, e: KeyboardEvent) {
+		switch (e.key) {
+			case "Up":
+			case "ArrowUp": {
+				if (headerIndex > 0) {
+					e.preventDefault();
+					itemStates[headerIndex - 1].setFocused();
+				}
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				if (headerIndex < itemStates.length - 1) {
+					e.preventDefault();
+					itemStates[headerIndex + 1].setFocused();
+				}
+				break;
+			}
+			case "Home": {
+				if (headerIndex > 0) {
+					e.preventDefault();
+					itemStates[0].setFocused();
+				}
+				break;
+			}
+			case "End": {
+				if (headerIndex < itemStates.length - 1) {
+					e.preventDefault();
+					itemStates[itemStates.length - 1].setFocused();
+				}
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-list-box", $props?.class]}
+			{$props?.style}
+			role="listbox"
+			aria-label={$props?.ariaLabel}
+			aria-multiselectable={type === "multiple" ? "true" : undefined}
+		>
+			<slot />
+		</div>
+	}
+}

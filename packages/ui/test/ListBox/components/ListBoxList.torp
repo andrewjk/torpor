@@ -1,0 +1,17 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+
+export default function ListBoxList($props: any) {
+	@render {
+		<ListBox value={$props.value}>
+			@for (let item of $props.items) {
+				@key = item.id
+				<ListBoxItem>
+					{item.text}
+				</ListBoxItem>
+			}
+		</ListBox>
+	}
+}

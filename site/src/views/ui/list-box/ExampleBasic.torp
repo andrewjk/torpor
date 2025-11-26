@@ -1,0 +1,62 @@
+import {
+	ListBox,
+	ListBoxItem,
+	ListBoxSeparator,
+} from "@torpor/ui/ListBox";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 0 });
+
+	@render {
+		<p>Value: <input type="number" &value={$state.value} /></p>
+
+		<ListBox class="example-list-box" &value={$state.value}>
+			<ListBoxItem class="example-list-box-item">
+				Item 1
+			</ListBoxItem>
+			<ListBoxItem class="example-list-box-item">
+				Item 2
+			</ListBoxItem>
+			<ListBoxSeparator class="example-list-box-separator" />
+			<ListBoxItem class="example-list-box-item">
+				Item 3
+			</ListBoxItem>
+		</ListBox>
+	}
+
+	@style {
+		.example-list-box {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			width: 200px;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+
+		.example-list-box-item[data-state="active"] {
+			border: 2px solid lightblue;
+		}
+
+		.example-list-box-item:hover {
+			border: 2px solid blue;
+		}
+
+		.example-list-box-item:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+	}
+}

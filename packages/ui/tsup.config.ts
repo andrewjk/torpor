@@ -16,6 +16,7 @@ export default defineConfig({
 		"src/Disclosure/index.ts",
 		"src/Drawer/index.ts",
 		"src/Form/index.ts",
+		"src/ListBox/index.ts",
 		"src/Menu/index.ts",
 		"src/MenuBar/index.ts",
 		"src/Modal/index.ts",
