@@ -13,7 +13,13 @@ export default function YAxis($props: YAxisProps) {
 	@render {
 		<svg>
 			@if ($props.showAxis) {
-				<line x1={$props.chartLeft} y1={$props.chartBottom} x2={$props.chartLeft} y2={0} />
+				<line
+					x1={$props.chartLeft}
+					y1={$props.chartBottom}
+					x2={$props.chartLeft}
+					y2={0}
+					stroke="currentcolor"
+				/>
 			}
 			@if ($props.yLabel) {
 				<text

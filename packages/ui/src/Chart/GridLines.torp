@@ -32,6 +32,7 @@ export default function GridLines($props: GridLinesProps) {
 						y1={$props.chartBottom - i * $props.yStepValue * $props.valueHeight}
 						x2={$props.width ?? 0}
 						y2={$props.chartBottom - i * $props.yStepValue * $props.valueHeight}
+						stroke="currentcolor"
 					/>
 				}
 			}
@@ -44,6 +45,7 @@ export default function GridLines($props: GridLinesProps) {
 							y1={$props.chartBottom}
 							x2={$props.chartLeft + i * $props.xStepValue * $props.itemWidth}
 							y2={0}
+							stroke="currentcolor"
 						/>
 					}
 				} else {
@@ -53,6 +55,7 @@ export default function GridLines($props: GridLinesProps) {
 							y1={$props.chartBottom}
 							x2={$props.chartLeft + i * $props.itemWidth + ($props.type === "bar" ? 0 : $props.itemWidth / 2)}
 							y2={0}
+							stroke="currentcolor"
 						/>
 					}
 				}

@@ -20,7 +20,13 @@ export default function XAxis($props: XAxisProps) {
 	@render {
 		<svg>
 			@if ($props.showAxis) {
-				<line x1={$props.chartLeft} y1={$props.chartBottom} x2={$props.width} y2={$props.chartBottom} />
+				<line
+					x1={$props.chartLeft}
+					y1={$props.chartBottom}
+					x2={$props.width}
+					y2={$props.chartBottom}
+					stroke="currentcolor"
+				/>
 			}
 			@if ($props.xLabel) {
 				<text
