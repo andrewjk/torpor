@@ -1,9 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { trapFocus, type TrapFocusOptions } from "../mount/trapFocus";
-import { ModalContextName, type ModalContext } from "../Modal/ModalTypes";
-import { PopoverContextName } from "../Popover/PopoverTypes";
-import { DialogContextName, type DialogContext, type DialogState, type HandleButtonPress } from "./DialogTypes";
+import { PopoutContextName, type PopoutContext, type HandleButtonPress } from "../utils/PopoutTypes";
+import { DialogContextName, type DialogContext, type DialogState } from "./DialogTypes";
 
 interface DialogProps {
 	/** An ID for the root element */
@@ -48,20 +47,18 @@ export default function Dialog($props: DialogProps | undefined) {
 		focusableElements: []
 	};
 
-	// Maybe get stuff out of a Modal context
+	// Maybe get stuff out of a popout context
 	let modal = false;
-	let visible = true;
 	let handleButton: HandleButtonPress | undefined = undefined;
-	const modalContext = $context[ModalContextName] ?? $context[PopoverContextName] as ModalContext;
-	if (modalContext) {
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
+	if (popoutContext) {
 		modal = true;
-		visible = modalContext.state.visible;
-		handleButton = modalContext.handleButton;
+		handleButton = popoutContext.handleButton;
 
-		modalContext.handleClickOutside = handleClickOutside;
-		// Set the focusFirstElement method in the ModalContext so that it can be
+		popoutContext.handleClickOutside = handleClickOutside;
+		// Set the focusFirstElement method in the PopoutContext so that it can be
 		// called after everything has been shown
-		modalContext.focusFirstElement = focusFirstElement;
+		popoutContext.focusFirstElement = focusFirstElement;
 	}
 
 	// Set the IDs for using in the Dialog's ARIA attributes
@@ -69,14 +66,13 @@ export default function Dialog($props: DialogProps | undefined) {
 		dialogId: $props?.id ?? defaultId,
 		headerId: "",
 		bodyId: "",
-		visible
-	})
+	});
 
 	// Set the context to pass down to items
 	let context: DialogContext = {
 		handleButton,
 		state: $state,
-		anchorElement: modalContext ? modalContext.anchorElement : undefined
+		anchorElement: popoutContext ? popoutContext.anchorElement : undefined
 	};
 	$context[DialogContextName] = context;
 
@@ -91,7 +87,7 @@ export default function Dialog($props: DialogProps | undefined) {
 		// the Esc key
 		e.preventDefault();
 		if (!modal) {
-			modalContext.state.visible = false;
+			popoutContext.state.visible = false;
 		}
 	}
 

@@ -1,6 +1,6 @@
-export const DialogContextName: unique symbol = Symbol.for("torp.Dialog");
+import { type HandleButtonPress } from "../utils/PopoutTypes";
 
-export type HandleButtonPress = (type: "confirm" | "cancel" | undefined, value?: any) => void;
+export const DialogContextName: unique symbol = Symbol.for("torp.Dialog");
 
 export interface DialogContext {
 	handleButton?: HandleButtonPress;
