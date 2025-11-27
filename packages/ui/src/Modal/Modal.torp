@@ -88,11 +88,11 @@ export default function Modal($props: ModalProps | undefined) {
 		// Get the button's result
 		switch (type) {
 			case "confirm": {
-				result = value || true;
+				result = value ?? true;
 				break;
 			}
 			case "cancel": {
-				result = value || false;
+				result = value ?? false;
 				break;
 			}
 			default: {
