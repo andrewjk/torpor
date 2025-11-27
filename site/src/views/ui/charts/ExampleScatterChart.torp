@@ -1,4 +1,4 @@
-import { ScatterChart } from "@torpor/ui/Chart";
+import { ScatterChart } from "@torpor/ui/Charts";
 
 export default function ExampleScatterChart() {
 	@render {

@@ -1,16 +1,16 @@
-import { LineChart } from "@torpor/ui/Chart";
+import { BarChart } from "@torpor/ui/Charts";
 
-export default function ExampleLineChart() {
+export default function ExampleBarChart() {
 	@render {
-		<LineChart
+		<BarChart
 			height={200}
 			width={400}
 			xLabel={"Things"}
 			yLabel={""}
 			series={[
-				{ name: "Item1", data: [ 35, 40, 25 ] },
-				{ name: "Item2", data: [ 25, 45, 60 ] },
-				{ name: "Item3", data: [ 45, 30, 10 ] },
+				{ name: "Item1", data: [ 35, 83, 42, 67 ] },
+				{ name: "Item2", data: [ 25 ] },
+				{ name: "Item3", data: [ 45 ] },
 			]}
 			stepCount={2}
 			stepValue={0}
@@ -19,7 +19,7 @@ export default function ExampleLineChart() {
 			showHLines={false}
 			showVLines={false}
 		>
-		</LineChart>
+		</BarChart>
 	}
 
 	@style {

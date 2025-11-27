@@ -1,4 +1,4 @@
-import { SparkLine } from "@torpor/ui/Chart";
+import { SparkLine } from "@torpor/ui/Charts";
 
 export default function ExampleSparkLine() {
 	@render {

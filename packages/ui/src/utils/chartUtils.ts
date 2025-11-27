@@ -1,4 +1,4 @@
-import type DataSeries from "../Chart/DataSeries";
+import type DataSeries from "../Charts/DataSeries";
 
 export function calculateMaxValue(series: DataSeries[]): number {
 	// HACK: Yeah, nested reduces

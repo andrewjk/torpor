@@ -2,17 +2,17 @@ import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 
-import ExampleBarChart from "./chart/ExampleBarChart.torp";
-import ExampleLineChart from "./chart/ExampleLineChart.torp";
-import ExamplePieChart from "./chart/ExamplePieChart.torp";
-import ExampleScatterChart from "./chart/ExampleScatterChart.torp";
-import ExampleSparkLine from "./chart/ExampleSparkLine.torp";
+import ExampleBarChart from "./charts/ExampleBarChart.torp";
+import ExampleLineChart from "./charts/ExampleLineChart.torp";
+import ExamplePieChart from "./charts/ExamplePieChart.torp";
+import ExampleScatterChart from "./charts/ExampleScatterChart.torp";
+import ExampleSparkLine from "./charts/ExampleSparkLine.torp";
 
-import ExampleBarChartCode from "./chart/ExampleBarChart.torp?raw";
-import ExampleLineChartCode from "./chart/ExampleLineChart.torp?raw";
-import ExamplePieChartCode from "./chart/ExamplePieChart.torp?raw";
-import ExampleScatterChartCode from "./chart/ExampleScatterChart.torp?raw";
-import ExampleSparkLineCode from "./chart/ExampleSparkLine.torp?raw";
+import ExampleBarChartCode from "./charts/ExampleBarChart.torp?raw";
+import ExampleLineChartCode from "./charts/ExampleLineChart.torp?raw";
+import ExamplePieChartCode from "./charts/ExamplePieChart.torp?raw";
+import ExampleScatterChartCode from "./charts/ExampleScatterChart.torp?raw";
+import ExampleSparkLineCode from "./charts/ExampleSparkLine.torp?raw";
 
 export default function ChartPage() {
 	@head {

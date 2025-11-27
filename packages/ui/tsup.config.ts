@@ -10,7 +10,7 @@ export default defineConfig({
 		"src/Accordion/index.ts",
 		"src/Breadcrumb/index.ts",
 		"src/Calendar/index.ts",
-		"src/Chart/index.ts",
+		"src/Charts/index.ts",
 		"src/Contextual/index.ts",
 		"src/Dialog/index.ts",
 		"src/Disclosure/index.ts",

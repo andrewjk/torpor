@@ -1,4 +1,4 @@
-import { PieChart } from "@torpor/ui/Chart";
+import { PieChart } from "@torpor/ui/Charts";
 
 export default function ExamplePieChart() {
 	@render {
