@@ -47,6 +47,7 @@ export interface MenuPopoutContext {
 	};
 	anchorElement?: HTMLElement;
 	focusFirstElement?: () => void;
+	focusLastElement?: () => void;
 }
 
 export interface ItemState {

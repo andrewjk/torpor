@@ -51,6 +51,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
 	if (popoutContext) {
 		popoutContext.focusFirstElement = focusFirstElement;
+		popoutContext.focusLastElement = focusLastElement;
 	}
 
 	// Set the context to pass down to items
@@ -72,6 +73,12 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 	function focusFirstElement() {
 		if (itemStates.length) {
 			itemStates[0].setFocused();
+		}
+	}
+
+	function focusLastElement() {
+		if (itemStates.length > 0) {
+			itemStates.at(-1)!.setFocused();
 		}
 	}
 

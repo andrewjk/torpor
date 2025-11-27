@@ -59,6 +59,7 @@ export default function Menu($props: MenuProps | undefined) {
 	popoutContext.focusFirstElement = focusFirstElement;
 	if (menuPopoutContext) {
 		menuPopoutContext.focusFirstElement = focusFirstElement;
+		menuPopoutContext.focusLastElement = focusLastElement;
 	}
 
 	// Set the context to pass down to items
@@ -75,6 +76,12 @@ export default function Menu($props: MenuProps | undefined) {
 	function focusFirstElement() {
 		if (itemStates.length) {
 			itemStates[0].setFocused();
+		}
+	}
+
+	function focusLastElement() {
+		if (itemStates.length > 0) {
+			itemStates.at(-1)!.setFocused();
 		}
 	}
 

@@ -21,6 +21,7 @@ export interface ToolBarPopoutContext {
 	};
 	anchorElement?: HTMLElement;
 	focusFirstElement?: () => void;
+	focusLastElement?: () => void;
 }
 
 export interface ToolBarGroupContext {

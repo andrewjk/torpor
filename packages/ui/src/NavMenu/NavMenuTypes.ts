@@ -19,6 +19,7 @@ export interface NavMenuPopoutContext {
 	};
 	anchorElement?: HTMLElement;
 	focusFirstElement?: () => void;
+	focusLastElement?: () => void;
 }
 
 export interface NavMenuGroupContext {
