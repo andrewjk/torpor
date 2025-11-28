@@ -1,5 +1,32 @@
 # @torpor/ui
 
+## 0.4.0
+
+### Minor Changes
+
+- 1a776b9: !Edit: move Chart to Charts
+
+### Patch Changes
+
+- b89483c: Feat: UI Pagination component
+- 3094eaf: Edit: use a common PopoutContext for all components
+- 75903ac: Feat: UI SelectBox component
+- 8aa547e: Fix: make context names global symbols
+- 2f478fc: Feat: UI MessageSummary component for forms
+- 9cae0bb: Fix: allow returning falsy values from popouts
+- 8b8dd9b: Fix: stroke for gridlines
+- 4b294b1: !Edit: NavMenuPopoutButton => NavMenuPopoutTrigger
+- c3c0ea2: Fix: use popout context in dialogs
+- 9b93128: Feat: UI ListBox component
+- 0067a7a: Feat: UI ToolBar component
+- 7d6d519: Fix: multiple selectable Accordions
+- 33a8528: Fix: $props may be undefined
+- Updated dependencies [1eb56a9]
+- Updated dependencies [31b1261]
+- Updated dependencies [2be9d75]
+- Updated dependencies [efc50a3]
+  - @torpor/view@0.4.18
+
 ## 0.3.7
 
 ### Patch Changes

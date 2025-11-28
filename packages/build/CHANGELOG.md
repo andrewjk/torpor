@@ -1,5 +1,16 @@
 # @torpor/build
 
+## 0.4.12
+
+### Patch Changes
+
+- 5d85de7: Fix: make symbols prefixed
+- Updated dependencies [1eb56a9]
+- Updated dependencies [31b1261]
+- Updated dependencies [2be9d75]
+- Updated dependencies [efc50a3]
+  - @torpor/view@0.4.18
+
 ## 0.4.11
 
 ### Patch Changes

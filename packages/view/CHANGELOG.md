@@ -1,5 +1,14 @@
 # @torpor/view
 
+## 0.4.18
+
+### Patch Changes
+
+- 1eb56a9: Fix: make symbols global and prefixed
+- 31b1261: Fix: scope CSS classes with selectors
+- 2be9d75: Fix: handle Symbols and Proxies in text
+- efc50a3: Fix: kebab case style names
+
 ## 0.4.17
 
 ### Patch Changes
