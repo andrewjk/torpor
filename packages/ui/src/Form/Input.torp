@@ -71,7 +71,7 @@ export default function Input($props: InputProps | undefined) {
 	// NOTE: Adapted this from https://stackoverflow.com/a/57393751,
 	// not sure if it's still a good way to do things
 	function handleInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
-		$state.value = $props!.type?.match(/^(number|range)$/) ? +e.currentTarget.value : e.currentTarget.value;
+		$state.value = $props?.type?.match(/^(number|range)$/) ? +e.currentTarget.value : e.currentTarget.value;
 		if (formContext) {
 			formContext.validate();
 		}
