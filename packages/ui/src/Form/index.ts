@@ -6,8 +6,22 @@ import Hidden from "./Hidden.torp";
 import Input from "./Input.torp";
 import Label from "./Label.torp";
 import Message from "./Message.torp";
+import MessageSummary from "./MessageSummary.torp";
 import Option from "./Option.torp";
 import Select from "./Select.torp";
 import TextArea from "./TextArea.torp";
 
-export { CheckBox, Field, File, Form, Hidden, Input, Label, Message, Option, Select, TextArea };
+export {
+	CheckBox,
+	Field,
+	File,
+	Form,
+	Hidden,
+	Input,
+	Label,
+	Message,
+	MessageSummary,
+	Option,
+	Select,
+	TextArea,
+};
