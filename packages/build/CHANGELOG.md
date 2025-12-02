@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.13
+
+### Patch Changes
+
+- 91de86b: Fix: posting directly to a server endpoint action
+
 ## 0.4.12
 
 ### Patch Changes
