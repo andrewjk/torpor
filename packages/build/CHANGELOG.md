@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 0.4.14
+
+### Patch Changes
+
+- cc911b1: Fix: posting directly to a server endpoint action
+
 ## 0.4.13
 
 ### Patch Changes
