@@ -62,7 +62,13 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 			if (ev.request.method === "GET") {
 				return handleResponse(await loadView(ev, url, handler, params, template));
 			} else if (ev.request.method === "POST") {
-				return handleResponse(await runAction(ev, url, handler, params, query, template), true);
+				// The server end point comes from the sibling /+page.server.ts, if applicable
+				const serverEndPoint: PageServerEndPoint | undefined =
+					handler.serverEndPoint && (await handler.serverEndPoint()).default;
+				return handleResponse(
+					await runAction(ev, url, handler, serverEndPoint, params, query, template),
+					true,
+				);
 			}
 			break;
 		}
@@ -71,6 +77,13 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 			// It's a /+page.server.ts or /_layout.server.ts endpoint
 			if (ev.request.method === "GET") {
 				return await loadData(ev, url, handler, "load", params);
+			} else if (ev.request.method === "POST") {
+				const serverEndPoint: PageServerEndPoint | undefined =
+					handler.endPoint && (await handler.endPoint()).default;
+				return handleResponse(
+					await runAction(ev, url, handler, serverEndPoint, params, query, template),
+					true,
+				);
 			}
 			break;
 		}
@@ -283,13 +296,12 @@ async function runAction(
 	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
+	serverEndPoint: PageServerEndPoint | undefined,
 	params: Record<string, string>,
 	query: URLSearchParams,
 	template: string,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
-	const serverEndPoint: PageServerEndPoint | undefined =
-		handler.serverEndPoint && (await handler.serverEndPoint()).default;
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
