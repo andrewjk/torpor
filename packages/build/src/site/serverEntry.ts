@@ -36,7 +36,17 @@ export async function load(ev: ServerEvent, template: string): Promise<Response>
 
 	//console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
 
-	const route = router.match(path, query);
+	let route = router.match(path, query);
+	if (!route) {
+		// If the route wasn't found, the user may be posting a form to a
+		// +page.server.ts route that doesn't have a corresponding +page.ts
+		// route, which is allowed, so check for that as well
+		if (ev.request.method === "POST" && !path.endsWith("/~server")) {
+			const serverPath =
+				(path.endsWith("/") ? path.substring(0, path.length - 1) : path) + "/~server";
+			route = router.match(serverPath, query);
+		}
+	}
 	if (!route) {
 		return handleResponse(notFound());
 	}
