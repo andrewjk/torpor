@@ -326,7 +326,7 @@ async function runAction(
 
 			let result = await action(serverParams);
 
-			if (ev.request.headers.has("x-torpor-form-submit")) {
+			if (ev.request.headers.has("X-Torpor-Form-Submit")) {
 				// If the form was submitted from javascript, just return the
 				// response and it will be handled on the client
 				// TODO: Should we make the user return a response??
@@ -334,10 +334,10 @@ async function runAction(
 
 				// If it's a redirect, we need to stop the browser handling it
 				if (result.status >= 300 && result.status <= 399) {
-					const location = result.headers.get("location") ?? "";
+					const location = result.headers.get("Location") ?? "";
 					result = ok();
-					result.headers.set("x-torpor-form-redirect", "");
-					result.headers.set("location", location);
+					result.headers.set("X-Torpor-Form-Redirect", "");
+					result.headers.set("Location", location);
 				}
 
 				return result;

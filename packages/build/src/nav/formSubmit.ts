@@ -29,7 +29,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		// error response (if applicable) rather than the reloaded page that you
 		// would get if submitting a page without javascript
 		headers: {
-			"x-torpor-form-submit": "",
+			"X-Torpor-Form-Submit": "",
 		},
 	};
 	const response = await fetch(
@@ -38,9 +38,9 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		options,
 	);
 
-	if (response.status === 200 && response.headers.has("x-torpor-form-redirect")) {
+	if (response.status === 200 && response.headers.has("X-Torpor-Form-Redirect")) {
 		// TODO: Should do the correct type of redirect e.g. seeOther etc
-		const redirect = response.headers.get("location")!;
+		const redirect = response.headers.get("Location")!;
 		await load(redirect);
 		window.location.href = redirect;
 	} else if (
@@ -48,7 +48,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		(response.status >= 400 && response.status <= 499)
 	) {
 		// Put the response into `$page.form`, and it will be put into `$props` in reload
-		if (response.headers.get("content-type") === "application/json") {
+		if (response.headers.get("Content-Type") === "application/json") {
 			$page.form = await response.json();
 		}
 		await reload();

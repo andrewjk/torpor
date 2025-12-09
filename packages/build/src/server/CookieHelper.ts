@@ -14,7 +14,7 @@ export default class CookieHelper {
 			return parse(this.cookies.get(name)!)[name];
 		}
 		// Otherwise, return the value from the `cookie` header
-		const header = this.request.headers.get("cookie");
+		const header = this.request.headers.get("Cookie");
 		return parse(header ?? "")[name];
 	}
 
