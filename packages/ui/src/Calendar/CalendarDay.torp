@@ -1,6 +1,7 @@
+import { ReactiveDate } from "@torpor/view";
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { areDatesEqual } from "../utils/dateUtils";
-import { type CalendarContext, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
+import { type CalendarContext, CalendarContextName } from "./CalendarTypes";
 
 interface CalendarDayProps {
 	/** An ID for the root element */
@@ -9,70 +10,95 @@ interface CalendarDayProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** The date to display */
+	date: Date,
+	/** Whether the date is muted (i.e. not in the currently displayed month) */
+	muted?: boolean,
+	/** Whether the date is active */
+	active?: boolean,
+	onclick?: () => void,
+	onkeydown?: () => void,
 }
 
 export default function CalendarDay($props: CalendarDayProps) {
-	$props ??= $watch({});
-	$props.date ??= new Date();
-	$props.selectable ??= false;
-	$props.muted ??= false;
-	$props.active ??= false;
-	$props.events ??= [];
+	// Ensure the value is a reactive date
+	let reactiveDate = new ReactiveDate($unwrap($props.date ?? new Date()))
+	$props.date = reactiveDate;
 
-	// HACK: can't unwrap in @render
-	let date = $unwrap($props.date);
+	// Get stuff out of the Calendar context
+	const context = $context[CalendarContextName] as CalendarContext;
+	if (!context) {
+		throw new Error("CalendarDay must be contained within a Calendar");
+	}
+	const { registerDay, handleDay, selectable } = context;
 
 	// Register this item with the parent Calendar, which will handle toggling active for all days
-	const { registerDay } = $context[CalendarContextName] as CalendarContext;
-	registerDay($props.date, setActive);
+	registerDay(reactiveDate, setActive);
 
 	// This function is called by the parent Calendar to set this item's active value
 	function setActive(value: boolean) {
-		//if (active !== value) {
-		//	active = value;
-		//	dispatch("activeChange", value);
-		//}
+		$props.active = value;
 	}
 
 	function isToday() {
 		const today = new Date();
-		return areDatesEqual(date, today);
+		return areDatesEqual($props.date, today);
 	}
 
 	async function handleClick() {
-		//dispatch("click", date);
-		if ($props.onclick) $props.onclick($props.date);
+		handleDay(reactiveDate);
+		if ($props.onclick) {
+			$props.onclick();
+		}
 	}
 
 	async function handleKey() {
-		//dispatch("click", date);
-		if ($props.onkeydown) $props.onkeydown();
+		if ($props.onkeydown) {
+			$props.onkeydown();
+		}
+	}
+
+	function buildClass() {
+		return [
+			"torp-calendar-day",
+			$props?.class,
+			{
+				muted: $props.muted,
+				today: isToday(),
+				active: selectable && $props.active
+			}
+		];
 	}
 
 	@render {
-		<div 
-			{$props?.id}
-			class={[
-				`torp-calendar-day ${$props?.class ?? ""}`.trim(),
-				{
-					muted: $props.muted,
-					today: isToday(),
-					active: $props.selectable && $props.active
-				}
-			]}
-		>
-			@if ($props.selectable) {
-				<button type="button" tabindex="-1" onclick={handleClick} onkeydown={handleKey}>
-					<span>{date.getDate()}</span>
-				</button>
-			} else {
-				<span>{date.getDate()}</span>
+		@if (selectable) {
+			<button
+				{$props?.id}
+				class={buildClass()}
+				{$props?.style}
+				type="button"
+				tabindex="-1"
+				onclick={handleClick}
+				onkeydown={handleKey}
+			>
+				{$props.date.getDate()}
+			</button>
+		} else {
+			<span
+				{$props?.id}
+				class={buildClass()}
+				{$props?.style}
+			>
+				{$props.date.getDate()}
+			</span>
+		}
+		@// TODO:
+		@/*
+		<ul class={`torp-calendar-day-events ${$props?.class ?? ""}`.trim()}>
+			@for (ev of $props.events) {
+				<li title={ev.content} />
 			}
-			<ul class={`torp-calendar-day-events ${$props?.class ?? ""}`.trim()}>
-				@for (ev of $props.events) {
-					<li title={ev.content} />
-				}
-			</ul>
-		</div>
+		</ul>
+		*/
 	}
 }

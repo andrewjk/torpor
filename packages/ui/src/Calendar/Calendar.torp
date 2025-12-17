@@ -1,12 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { ReactiveDate } from "@torpor/view";
-import { areDatesEqual, dayNames, monthNames } from "../utils/dateUtils";
-import CalendarDay from "./CalendarDay.torp";
-import { type CalendarContext, type DayState, type CalendarEvent, CalendarContextName } from "./CalendarTypes";
-import ChevronLeft from "../icons/ChevronLeft.torp";
-import ChevronRight from "../icons/ChevronRight.torp";
-
-// TODO: Split this out into Calendar, CalendarHeader, CalendarPreviousTrigger, CalendarGrid etc
+import buildDays from "./buildDays";
+import { areDatesEqual } from "../utils/dateUtils";
+import { CalendarContextName, type CalendarContext, type CalendarState, type DayState, type TriggerType } from "./CalendarTypes";
 
 interface CalendarProps {
 	/** An ID for the root element */
@@ -15,17 +11,25 @@ interface CalendarProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** The starting index of the week, where 0 is Sunday */
+	startOfWeek?: number,
+	/** Whether a date can be selected. Set this to true for use in date pickers etc */
+	selectable?: boolean,
+	/** The selected date */
+	value?: Date,
+	// /** Events to show in the calendar */
+	// TODO: events?: CalendarEvent[],
+	onchange?: (value: Date) => void,
+	onchangedate?: (value: Date) => void,
+	onclose?: () => void,
 }
 
 export default function Calendar($props: CalendarProps) {
 	$props ??= $watch({});
-	$props.startOfWeek ??= 1;
-	$props.selectable ??= false;
-	$props.value ??= new Date();
-	$props.events ??= [];
 
 	// Ensure the value is a reactive date
-	$props.value = new ReactiveDate($unwrap($props.value));
+	let reactiveValue = new ReactiveDate($unwrap($props.value ?? new Date()))
+	$props.value = reactiveValue;
 
 	// A note on dates:
 	// * value is the selected value
@@ -33,22 +37,28 @@ export default function Calendar($props: CalendarProps) {
 	// * visibleDate is the date that is currently being displayed in the calendar (really only the month part is important here)
 
 	let $state = $watch({
-		activeDate: $props.value,
-		visibleDate: $props.value,
-		get days() {
+		activeDate: reactiveValue,
+		visibleDate: reactiveValue,
+		visibleStartDate: reactiveValue,
+		visibleEndDate: reactiveValue,
+		get days(): DayState[] {
 			return $cache(() => {
-				return buildDays($state.visibleDate, $props.startOfWeek)
+				return buildDays($state, $props.startOfWeek ?? 1)
 			});
 		},
-	});
+	} satisfies CalendarState);
 
-	let visibleStartDate = $props.value;
-	let visibleEndDate = $props.value;
 	let container: HTMLElement;
 	let refocus = false;
 
 	const context: CalendarContext = {
-		registerDay
+		selectable: $props.selectable === true,
+		startOfWeek: $props.startOfWeek ?? 1,
+		registerDay,
+		handleTrigger,
+		handleDay,
+		handleKey,
+		state: $state
 	};
 	$context[CalendarContextName] = context;
 
@@ -64,74 +74,35 @@ export default function Calendar($props: CalendarProps) {
 	});
 
 	function registerDay(date: ReactiveDate, setActive: (value: boolean) => void) {
-		const day = $state.days.find((day) => areDatesEqual(day.date, date));
+		const day = $state.days.find((d) => areDatesEqual(d.date, date));
 		if (day) {
 			day.setActive = setActive;
 		}
 	}
 
-	function buildDays(date: ReactiveDate, start: number): DayState[] {
-		const newDays = [];
-
-		// Set the first day to the start of the week before the first day of
-		// the month (e.g. Monday the 28th of the previous month)
-		visibleStartDate = new Date();
-		visibleStartDate.setFullYear(date.getFullYear(), date.getMonth(), 1);
-		visibleStartDate.setDate(
-			visibleStartDate.getDate() - ((visibleStartDate.getDay() + 7 - start) % 7)
-		);
-
-		// Set the last day to the end of the week after the last day of the
-		// month (e.g. Sunday the 6th of the next month)
-		visibleEndDate = new Date();
-		visibleEndDate.setFullYear(date.getFullYear(), date.getMonth() + 1, 0);
-		visibleEndDate.setDate(
-			visibleEndDate.getDate() + ((start - 1 - visibleEndDate.getDay() + 7) % 7)
-		);
-
-		const dayDiff =
-			Math.round((visibleEndDate.getTime() - visibleStartDate.getTime()) / (1000 * 60 * 60 * 24)) +
-			1;
-
-		for (let i = 0; i < dayDiff; i++) {
-			const dayDate = new ReactiveDate();
-			dayDate.setFullYear(
-				visibleStartDate.getFullYear(),
-				visibleStartDate.getMonth(),
-				visibleStartDate.getDate() + i
-			);
-			dayDate.setHours(0);
-			dayDate.setMinutes(0);
-			dayDate.setSeconds(0);
-			dayDate.setMilliseconds(0);
-			const newDay: DayState = {
-				date: dayDate,
-				muted: dayDate.getMonth() !== date.getMonth(),
-				active: areDatesEqual(dayDate, $state.activeDate)
-			};
-			newDays.push(newDay);
-		}
-
-		return newDays;
-	}
 
 	function setValue(date: Date) {
-		$state.value = new ReactiveDate(date);
+		// TODO: for date pickers etc
+		// $state.value = new ReactiveDate(date);
 
 		// Also set the active date so that the user knows where they are
 		setActiveDate(date);
 
-		if ($props.onchange) $props.onchange(value);
+		if ($props.onchange) {
+			$props.onchange(date);
+		}
 	}
 
 	function setActiveDate(date: Date) {
 		$state.activeDate = new ReactiveDate(date);
 
 		// If the selected date is outside the visible date range, move the date range
-		if (date < visibleStartDate || date > visibleEndDate) {
+		if (date < $state.visibleStartDate || date > $state.visibleEndDate) {
 			refocus = true;
 			$state.visibleDate = new ReactiveDate(date);
-			if ($props.onchangedate) $props.onchangedate(date);
+			if ($props.onchangedate) {
+				$props.onchangedate(date);
+			}
 		}
 
 		$state.days.forEach((day) => {
@@ -139,31 +110,24 @@ export default function Calendar($props: CalendarProps) {
 			if (day.setActive) {
 				day.setActive(active);
 			}
-			day.active = active;
+			day.state.active = active;
 		});
 	}
 
-	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
-		const el = e.currentTarget.getElementsByClassName("active")[0];
-		if (el && el.children[0] instanceof HTMLElement) {
-			el.children[0].focus();
-			e.preventDefault();
+
+	function handleTrigger(type: TriggerType) {
+		if (type === "previous") {
+			$state.visibleDate.setMonth($state.visibleDate.getMonth() - 1);
+		} else if (type === "next") {
+			$state.visibleDate.setMonth($state.visibleDate.getMonth() + 1);
+		}
+
+		if ($props.onchangedate) {
+			$props.onchangedate($state.visibleDate);
 		}
 	}
 
-	function handlePrevMonth(e: Event) {
-		e.preventDefault();
-		$state.visibleDate.setMonth($state.visibleDate.getMonth() - 1);
-		if ($props.onchangedate) $props.onchangedate(visibleDate);
-	}
-
-	function handleNextMonth(e: Event) {
-		e.preventDefault();
-		$state.visibleDate.setMonth($state.visibleDate.getMonth() + 1);
-		if ($props.onchangedate) $props.onchangedate(visibleDate);
-	}
-
-	async function handleDayClick(date: ReactiveDate) {
+	async function handleDay(date: ReactiveDate) {
 		if (!$props.selectable) return;
 
 		setValue(date);
@@ -181,7 +145,9 @@ export default function Calendar($props: CalendarProps) {
 			case "Esc":
 			case "Escape": {
 				e.preventDefault();
-				if ($props.onclose) $props.onclose();
+				if ($props.onclose) {
+					$props.onclose();
+				}
 				break;
 			}
 			case "Left":
@@ -226,45 +192,7 @@ export default function Calendar($props: CalendarProps) {
 			{$props?.style}
 			&ref={container}
 		>
-			<div class={`torp-calendar-header ${$props?.class ?? ""}`.trim()}>
-				<button class={`torp-calendar-previous-trigger ${$props?.class ?? ""}`.trim()} onclick={handlePrevMonth}>
-					<slot name="prev-button">
-						<ChevronLeft />
-					</slot>
-				</button>
-				<span class={`torp-calendar-month-name ${$props?.class ?? ""}`.trim()}>
-					{monthNames[$state.visibleDate.getMonth()] + " " + $state.visibleDate.getFullYear()}
-				</span>
-				<button class={`torp-calendar-next-trigger ${$props?.class ?? ""}`.trim()} onclick={handleNextMonth}>
-					<slot name="next-button">
-						<ChevronRight />
-					</slot>
-				</button>
-			</div>
-			<div
-				class={["torp-calendar-grid", $props?.class]}
-				{$props?.style}
-				tabindex={$props.selectable ? 0 : -1}
-				onfocus={handleFocus}
-				onkeydown={handleKey}
-			>
-				@for (let index of [0, 1, 2, 3, 4, 5, 6]) {
-					<span>
-						{dayNames[(Math.abs($props.startOfWeek) + index) % 7].substring(0, 2)}
-					</span>
-				}
-				@for (let day of $state.days) {
-					@key = day.date;
-					<CalendarDay
-						{day.date}
-						{day.muted}
-						{day.active}
-						{$props.selectable}
-						events={$props.events.filter((ev) => areDatesEqual(new Date(ev.date), day.date))}
-						onclick={handleDayClick}
-					/>
-				}
-			</div>
+			<slot />
 		</div>
 	}
 

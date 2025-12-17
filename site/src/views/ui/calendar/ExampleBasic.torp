@@ -1,10 +1,32 @@
 import {
-	Calendar
+	Calendar,
+	CalendarDay,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
 } from "@torpor/ui/Calendar";
 
 export default function ExampleBasic() {
 	@render {
-		<Calendar selectable />
+		<Calendar selectable>
+			<CalendarHeader>
+				<CalendarHeaderTrigger type="previous" />
+				<h4>{$sprops!.monthName} {$sprops!.year}</h4>
+				<CalendarHeaderTrigger type="next" />
+			</CalendarHeader>
+			<CalendarGridHeader>
+				@for (let day of $sprops!.days) {
+					<div>{day.dayName.substring(0, 2)}</div>
+				}
+			</CalendarGridHeader>
+			<CalendarGrid>
+				@for (let day of $sprops!.days) {
+					@key = day.date
+					<CalendarDay {day.date} {day.muted} {day.active} />
+				}
+			</CalendarGrid>
+		</Calendar>
 	}
 
 	@style {
@@ -13,9 +35,8 @@ export default function ExampleBasic() {
 		}
 
 		:global(
-			.torp-calendar-previous-trigger,
-			.torp-calendar-next-trigger,
-			.torp-calendar-day > button
+			.torp-calendar-trigger,
+			.torp-calendar-day
 		) {
 			all: unset;
 			cursor: default;
@@ -27,13 +48,11 @@ export default function ExampleBasic() {
 		}
 
 		:global(
-			.torp-calendar-previous-trigger:hover,
-			.torp-calendar-previous-trigger:focus,
-			.torp-calendar-next-trigger:hover,
-			.torp-calendar-next-trigger:focus,
-			.torp-calendar-day > button:hover,
-			.torp-calendar-day > button:focus,
-			.torp-calendar-day.active > button
+			.torp-calendar-trigger:hover,
+			.torp-calendar-trigger:focus,
+			.torp-calendar-day:hover,
+			.torp-calendar-day:focus,
+			.torp-calendar-day.active
 		) {
 			background-color: dodgerblue;
 			border-radius: 4px;
@@ -41,21 +60,15 @@ export default function ExampleBasic() {
 		}
 
 		:global(
-			.torp-calendar-day.today > button
+			.torp-calendar-day.today
 		) {
 			font-weight: bold;
 		}
 
 		:global(.torp-calendar-header) {
-			display: flex;
-			align-items: center;
-		}
-
-		:global(.torp-calendar-month-name) {
-			flex: 1 1 auto;
-		}
-
-		:global(.torp-calendar-grid) {
+			display: grid;
+			//align-items: center;
+			grid-template-columns: auto 1fr auto;
 		}
 
 		:global(.torp-calendar-day.muted) {
