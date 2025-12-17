@@ -4,6 +4,8 @@ import ArrowRight from "./ArrowRight.torp";
 import ArrowUp from "./ArrowUp.torp";
 import Bars from "./Bars.torp";
 import Check from "./Check.torp";
+import ChevronDoubleLeft from "./ChevronDoubleLeft.torp";
+import ChevronDoubleRight from "./ChevronDoubleRight.torp";
 import ChevronDown from "./ChevronDown.torp";
 import ChevronLeft from "./ChevronLeft.torp";
 import ChevronRight from "./ChevronRight.torp";
@@ -20,6 +22,8 @@ export {
 	ArrowUp,
 	Bars,
 	Check,
+	ChevronDoubleLeft,
+	ChevronDoubleRight,
 	ChevronDown,
 	ChevronLeft,
 	ChevronRight,

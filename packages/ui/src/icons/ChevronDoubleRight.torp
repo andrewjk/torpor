@@ -1,0 +1,19 @@
+import { type IconProps } from "./IconTypes";
+
+export default function ChevronDoubleRight($props: IconProps | undefined) {
+	@render {
+		<svg
+			{$props?.id}
+			class={["torp-icon", $props?.class]}
+			{$props?.style}
+			viewBox="0 0 100 100"
+			stroke-linejoin="round"
+			stroke-width="12"
+		>
+			<g>
+				<path d="M10,10 L50,50 L10,90" fill="none" />
+				<path d="M50,10 L90,50 L50,90" fill="none" />
+			</g>
+		</svg>
+	}
+}
