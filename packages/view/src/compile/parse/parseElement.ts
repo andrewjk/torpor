@@ -78,7 +78,7 @@ export default function parseElement(status: ParseStatus): ElementNode {
 	// HACK: For now, we just treat all tags starting with a capital as components
 	if (/[A-Z]/.test(element.tagName[0])) {
 		element.type = "component";
-		slottifyChildNodes(element);
+		slottifyChildNodes(element, status.source.substring(start, status.i));
 	}
 
 	if (isSpecialNode(element)) {
@@ -86,19 +86,19 @@ export default function parseElement(status: ParseStatus): ElementNode {
 			// If this is a <slot> element, add a <fill> node for its fallback
 			// content. Anchors will be created for <slot> nodes and fragments will
 			// be created for the <fill> content
-			slottifyChildNodes(element);
+			slottifyChildNodes(element, status.source.substring(start, status.i));
 
 			// Add it to the component's slots collection
 			current.slotProps ??= [];
 			current.slotProps.push(element.attributes.find((a) => a.name === "name")?.name ?? "default");
 		} else if (element.tagName === "fill") {
 			const fillSource = status.source.substring(start, status.i);
-			element.hasSlotProps = /\$sprops\b/.test(fillSource);
+			element.hasSlotProps = /\$slot\b/.test(fillSource);
 		} else if (element.tagName === "@component") {
 			const selfAttribute = element.attributes.find((a) => a.name === "self");
 			if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
 				element.type = "component";
-				slottifyChildNodes(element);
+				slottifyChildNodes(element, status.source.substring(start, status.i));
 
 				const selfValue = selfAttribute.value;
 				const replace: ControlNode = {

@@ -30,7 +30,7 @@ export default function buildServerSlotNode(
 	slotName = slotName ? trimQuotes(slotName) : "_";
 
 	// Slot props
-	const propsName = nextVarName("sprops", status);
+	const propsName = nextVarName("slot_props", status);
 	const slotAttributes = node.attributes.filter((a) => a.name !== "name");
 	const slotHasProps = slotAttributes.length;
 	if (slotHasProps) {

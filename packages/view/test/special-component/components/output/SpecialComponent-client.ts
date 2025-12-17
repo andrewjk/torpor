@@ -53,7 +53,7 @@ export default function Component(
 			$sparent: ParentNode,
 			$sanchor: Node | null,
 			// @ts-ignore
-			$sprops?: Record<PropertyKey, any>,
+			$slot?: Record<PropertyKey, any>,
 			// @ts-ignore
 			$context?: Record<PropertyKey, any>
 		) => {

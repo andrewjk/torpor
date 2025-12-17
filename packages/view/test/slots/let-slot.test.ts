@@ -10,9 +10,7 @@ const source = `
 export default function Let() {
 	@render {
 		<List items={$props.items}>
-			<fill>
-				{$sprops.item.text}
-			</fill>
+			{$slot.item.text}
 		</List>
 	}
 }

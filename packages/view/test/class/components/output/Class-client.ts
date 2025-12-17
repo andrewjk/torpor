@@ -40,7 +40,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -65,7 +65,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
@@ -87,7 +87,7 @@ export default function Class(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

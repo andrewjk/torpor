@@ -91,8 +91,8 @@ export default function buildServerComponentNode(
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				const slotParams = [
 					slot.hasSlotProps
-						? "$sprops: Record<PropertyKey, any>"
-						: "// @ts-ignore\n$sprops?: Record<PropertyKey, any>",
+						? "// @ts-ignore\n$slot: Record<PropertyKey, any>"
+						: "// @ts-ignore\n$slot?: Record<PropertyKey, any>",
 					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
 				b.append(

@@ -6,7 +6,7 @@ import isSpecialNode from "../utils/isSpecialNode";
  * Moves any child nodes that aren't already in a <fill> node into a default
  * <fill> node
  */
-export default function slottifyChildNodes(node: ElementNode): void {
+export default function slottifyChildNodes(node: ElementNode, source: string): void {
 	const nonFillNodes = node.children.filter((c) => !isFillNode(c));
 	// TODO: Not if it's only spaces??
 	if (nonFillNodes.length) {
@@ -20,6 +20,10 @@ export default function slottifyChildNodes(node: ElementNode): void {
 				attributes: [],
 				children: nonFillNodes,
 				span: { start: 0, end: 0 },
+				// HACK: We're checking all children, potentially including the
+				// fill nodes we filtered out, and child components which
+				// shouldn't affect the parent component
+				hasSlotProps: /\$slot\b/.test(source),
 			};
 			node.children.unshift(defaultFillNode);
 		}

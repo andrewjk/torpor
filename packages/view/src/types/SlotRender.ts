@@ -1,7 +1,7 @@
 type SlotRender = (
 	$sparent: ParentNode,
 	$sanchor: Node | null,
-	$sprops?: Record<PropertyKey, any>,
+	$slot?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 ) => void;
 

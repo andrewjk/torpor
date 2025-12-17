@@ -11,7 +11,7 @@ export default function ExampleBasic() {
 
 	@render {
 		<Pagination class="example-pagination" {$state.count} &number={$state.number}>
-			@for (let page of $sprops!.pages) {
+			@for (let page of $slot.pages) {
 				<PaginationItem class="example-pagination-item" {page} active={page == $state.number} />
 			}
 		</Pagination>

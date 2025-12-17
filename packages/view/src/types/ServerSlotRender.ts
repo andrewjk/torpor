@@ -1,5 +1,5 @@
 type ServerSlotRender = (
-	$sprops?: Record<PropertyKey, any>,
+	$slot?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 ) => string;
 

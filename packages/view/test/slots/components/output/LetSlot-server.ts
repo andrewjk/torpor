@@ -19,12 +19,13 @@ export default function Let(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	// @ts-ignore
 	t_slots_1["_"] = (
-		$sprops: Record<PropertyKey, any>,
+		// @ts-ignore
+		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += ` ${t_fmt($sprops.item.text)} `;
+		t_body += ` ${t_fmt($slot.item.text)} `;
 		return t_body;
 	}
 	const t_comp_1 = List(t_props_1, $context, t_slots_1);
@@ -48,10 +49,10 @@ function List(
 	t_body += ` <ul> <![>`;
 	for (let item of $props.items) {
 		t_body += `<!^> <li> <![>`;
-		const t_sprops_1: any = {};
-		t_sprops_1["item"] = item;
+		const t_slot_props_1: any = {};
+		t_slot_props_1["item"] = item;
 		if ($slots && $slots["_"]) {
-			t_body += $slots["_"](t_sprops_1, $context);
+			t_body += $slots["_"](t_slot_props_1, $context);
 		}
 		t_body += `<!]><!> </li> `;
 	}

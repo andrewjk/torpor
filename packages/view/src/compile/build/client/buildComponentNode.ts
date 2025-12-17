@@ -214,9 +214,15 @@ export default function buildComponentNode(
 				const slotParams = [
 					"$sparent: ParentNode",
 					"$sanchor: Node | null",
+					// HACK: The hasSlotProps value may have been set due to a
+					// child component, in which case $slot may have a not used
+					// error for THIS component, so just ignore that for now
+					// e.g. <Parent><Child>{$slot.content}</Child></Parent>
+					// would have a problem with the $slot param passed to
+					// the Parent component
 					slot.hasSlotProps
-						? "$sprops: Record<PropertyKey, any>"
-						: "// @ts-ignore\n$sprops?: Record<PropertyKey, any>",
+						? "// @ts-ignore\n$slot: Record<PropertyKey, any>"
+						: "// @ts-ignore\n$slot?: Record<PropertyKey, any>",
 					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
 				];
 				b.append(

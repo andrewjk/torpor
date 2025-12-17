@@ -16,7 +16,7 @@ export default function Basic(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
-		$sprops?: Record<PropertyKey, any>,
+		$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {

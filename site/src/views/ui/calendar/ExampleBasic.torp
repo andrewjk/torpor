@@ -12,16 +12,16 @@ export default function ExampleBasic() {
 		<Calendar selectable>
 			<CalendarHeader>
 				<CalendarHeaderTrigger type="previous" />
-				<h4>{$sprops!.monthName} {$sprops!.year}</h4>
+				<h4>{$slot.monthName} {$slot.year}</h4>
 				<CalendarHeaderTrigger type="next" />
 			</CalendarHeader>
 			<CalendarGridHeader>
-				@for (let day of $sprops!.days) {
+				@for (let day of $slot.days) {
 					<div>{day.dayName.substring(0, 2)}</div>
 				}
 			</CalendarGridHeader>
 			<CalendarGrid>
-				@for (let day of $sprops!.days) {
+				@for (let day of $slot.days) {
 					@key = day.date
 					<CalendarDay {day.date} {day.muted} {day.active} />
 				}

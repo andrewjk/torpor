@@ -44,14 +44,15 @@ export default function Let(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		$sprops: Record<PropertyKey, any>,
+		// @ts-ignore
+		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `#`);
 		const t_text_1 = t_root(t_fragment_2);
 		$run(() => {
-			t_text_1.textContent = ` ${t_fmt($sprops.item.text)} `;
+			t_text_1.textContent = ` ${t_fmt($slot.item.text)} `;
 		});
 		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
 		t_next(t_text_1);
@@ -109,14 +110,14 @@ function List(
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_slot_parent_1 = t_next(t_root_1) as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
-			const t_sprops_1 = $watch({
+			const t_slot_props_1 = $watch({
 				item: t_item_1.data.item,
 			});
 			$run(() => {
-				t_sprops_1["item"] = t_item_1.data.item;
+				t_slot_props_1["item"] = t_item_1.data.item;
 			});
 			if ($slots && $slots["_"]) {
-				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_sprops_1, $context)
+				$slots["_"](t_slot_parent_1, t_slot_anchor_1, t_slot_props_1, $context)
 			}
 			const t_text_1 = t_next(t_slot_parent_1, true);
 			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_1);
