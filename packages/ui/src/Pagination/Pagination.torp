@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import buildPages from "./buildPages";
 import { PaginationContextName, type PaginationContext, type ItemState, type PageNumber } from "./PaginationTypes";
 
 interface PaginationProps {
@@ -12,13 +13,21 @@ interface PaginationProps {
 	count: number,
 	/** The active page number */
 	number: number,
+	/** The number of items on each page **/
+	pageSize?: number,
+	/** The maximum number of pages to display (gaps will be indicated with ellipses) **/
+	maxPages?: number,
 }
 
 /**
  * Buttons with page numbers that can be used to move between pages.
  */
 export default function Pagination($props: PaginationProps) {
-	// TODO: Should we (by default) create PaginationItems?
+	let $state = $watch({
+		get pages() {
+			return buildPages($props.count, $props.number, $props.pageSize, $props.maxPages);
+		}
+	});
 
 	// TODO: Do we actually need ItemStates when we're creating the item collection ourselves??
 	// A collection containing the active state and some functions for each item
@@ -138,7 +147,7 @@ export default function Pagination($props: PaginationProps) {
 				tabindex="0"
 				onfocus={handleFocus}
 			>
-				<slot />
+				<slot {$state.pages} />
 			</div>
 		}
 	}

@@ -18,7 +18,7 @@ export default function buildPages(
 	const pageCount = Math.ceil(count / pageSize);
 
 	if (pageCount <= maxPages) {
-		// There"s no need for ellipses, just return the numbers
+		// There's no need for ellipses, just return the numbers
 		return Array.from({ length: pageCount })
 			.fill(0)
 			.map((_, i) => i + 1);

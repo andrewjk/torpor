@@ -1,7 +1,6 @@
 import {
 	Pagination,
 	PaginationItem,
-	buildPages,
 } from "@torpor/ui/Pagination";
 
 export default function ExampleBasic() {
@@ -12,7 +11,7 @@ export default function ExampleBasic() {
 
 	@render {
 		<Pagination class="example-pagination" {$state.count} &number={$state.number}>
-			@for (let page of buildPages($state.count, $state.number)) {
+			@for (let page of $sprops!.pages) {
 				<PaginationItem class="example-pagination-item" {page} active={page == $state.number} />
 			}
 		</Pagination>

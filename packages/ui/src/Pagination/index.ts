@@ -1,5 +1,5 @@
 import Pagination from "./Pagination.torp";
 import PaginationItem from "./PaginationItem.torp";
-import buildPages from "./buildPages";
+import PaginationTrigger from "./PaginationTrigger.torp";
 
-export { Pagination, PaginationItem, buildPages };
+export { Pagination, PaginationItem, PaginationTrigger };
