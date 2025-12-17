@@ -1,6 +1,7 @@
 import { $watch, mount } from "@torpor/view";
 import { browser } from "wxt/browser";
-import { type Boundary, type State } from "./Boundary";
+import type Boundary from "../../types/Boundary";
+import type State from "../../types/State";
 // @ts-ignore
 import Panel from "./Panel.torp";
 
@@ -87,7 +88,7 @@ if (globalThis[DEV_CONTEXT_SYMBOL]) {
 		oldBounds.set(b.id, b);
 	}
 
-	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
+	browser.devtools.inspectedWindow.eval(script, function (result: any, isException: boolean) {
 		if (isException) {
 			$state.error = JSON.stringify(isException, null, 2);
 			$state.warning = "";
@@ -141,7 +142,7 @@ if (globalThis[DEV_CONTEXT_SYMBOL]) {
 	globalThis[DEV_CONTEXT_SYMBOL].getDetails("${id}");
 }`;
 
-	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
+	browser.devtools.inspectedWindow.eval(script, function (result: any, isException: boolean) {
 		if (isException) {
 			$state.error = JSON.stringify(isException, null, 2);
 			$state.warning = "";
@@ -168,7 +169,7 @@ if (globalThis[DEV_CONTEXT_SYMBOL]) {
 	globalThis[DEV_CONTEXT_SYMBOL].mark("${id}");
 }`;
 
-	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
+	browser.devtools.inspectedWindow.eval(script, function (result: any, isException: boolean) {
 		if (isException) {
 			$state.error = JSON.stringify(isException, null, 2);
 			$state.warning = "";
@@ -182,7 +183,7 @@ if (globalThis[DEV_CONTEXT_SYMBOL]) {
 	globalThis[DEV_CONTEXT_SYMBOL].unmark();
 }`;
 
-	browser.devtools.inspectedWindow.eval(script, function (result: any, isException) {
+	browser.devtools.inspectedWindow.eval(script, function (result: any, isException: boolean) {
 		if (isException) {
 			$state.error = JSON.stringify(isException, null, 2);
 			$state.warning = "";

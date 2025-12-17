@@ -1,4 +1,4 @@
-export interface Boundary {
+export default interface Boundary {
 	type: string;
 	id: string;
 	name: string;
@@ -9,13 +9,4 @@ export interface Boundary {
 	onexpand: (id: string) => void;
 	onmark: (id: string) => void;
 	onunmark: () => void;
-}
-
-export interface State {
-	warning: string;
-	error: string;
-	boundaries: Boundary[];
-	events: string[];
-
-	reload: () => void;
 }
