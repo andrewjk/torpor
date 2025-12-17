@@ -38,7 +38,21 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		options,
 	);
 
-	if (response.status === 200 && response.headers.has("X-Torpor-Form-Redirect")) {
+	if (
+		response.status === 200 &&
+		response.headers.has("Content-Disposition") &&
+		/attachment;\s*filename="(.+?)"/.test(response.headers.get("Content-Disposition")!)
+	) {
+		// TODO: Is this enough to check to see if we have a file that should download?
+		// Download the file by creating a dummy <a> and clicking it
+		const downloadFileName =
+			response.headers.get("Content-Disposition")?.match(/attachment;\s*filename="(.+?)"/)![1] ??
+			"file";
+		const downloadLink = document.createElement("a");
+		downloadLink.href = window.URL.createObjectURL(await response.blob());
+		downloadLink.download = downloadFileName;
+		downloadLink.click();
+	} else if (response.status === 200 && response.headers.has("X-Torpor-Form-Redirect")) {
 		// TODO: Should do the correct type of redirect e.g. seeOther etc
 		const redirect = response.headers.get("Location")!;
 		await load(redirect);
