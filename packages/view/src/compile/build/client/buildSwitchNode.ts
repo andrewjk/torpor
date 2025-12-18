@@ -25,7 +25,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		const defaultBranch: ControlNode = {
 			type: "control",
 			operation: "@default",
-			statement: "default",
+			statement: "default:",
 			children: [],
 			span: { start: 0, end: 0 },
 		};
