@@ -38,6 +38,9 @@ export function transformDocument(
 
 		code = importComponentFiles(vts, filename, code, map, debug);
 
+		//console.log(code);
+		//console.log(map);
+
 		return {
 			ok: true,
 			errors: [],
