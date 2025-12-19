@@ -1,9 +1,31 @@
 import {
 	Calendar,
+	CalendarDay,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
 } from "../../../src/Calendar/index";
 
 export default function CalendarTest() {
 	@render {
-		<Calendar {$props.selectable} {$props.value} />
+		<Calendar {$props.selectable} {$props.value}>
+			<CalendarHeader>
+				<CalendarHeaderTrigger type="previous" />
+				<h4>{$slot.monthName} {$slot.year}</h4>
+				<CalendarHeaderTrigger type="next" />
+			</CalendarHeader>
+			<CalendarGridHeader>
+				@for (let day of $slot.days) {
+					<div>{day.dayName.substring(0, 2)}</div>
+				}
+			</CalendarGridHeader>
+			<CalendarGrid>
+				@for (let day of $slot.days) {
+					@key = day.date
+					<CalendarDay {day.date} {day.muted} {day.active} />
+				}
+			</CalendarGrid>
+		</Calendar>
 	}
 }

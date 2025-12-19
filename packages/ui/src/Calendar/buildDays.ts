@@ -44,9 +44,7 @@ export default function buildDays($state: CalendarState, startOfWeek: number): D
 		const newDay: DayState = {
 			date: dayDate,
 			muted: dayDate.getMonth() !== date.getMonth(),
-			state: {
-				active: areDatesEqual(dayDate, activeDate),
-			},
+			active: areDatesEqual(dayDate, activeDate),
 		};
 		newDays.push(newDay);
 	}

@@ -13,6 +13,6 @@ describe("Calendar", () => {
 		expect(queryByText(container, "September 2025")).toBeInTheDocument();
 
 		expect(queryByText(container, "15")).toBeInTheDocument();
-		expect(queryByText(container, "15")!.parentElement!.parentElement).toHaveClass("active");
+		expect(queryByText(container, "15")).toHaveClass("active");
 	});
 });

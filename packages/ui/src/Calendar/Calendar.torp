@@ -80,7 +80,6 @@ export default function Calendar($props: CalendarProps) {
 		}
 	}
 
-
 	function setValue(date: Date) {
 		// TODO: for date pickers etc
 		// $state.value = new ReactiveDate(date);
@@ -110,10 +109,8 @@ export default function Calendar($props: CalendarProps) {
 			if (day.setActive) {
 				day.setActive(active);
 			}
-			day.state.active = active;
 		});
 	}
-
 
 	function handleTrigger(type: TriggerType) {
 		if (type === "previous") {

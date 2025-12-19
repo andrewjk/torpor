@@ -25,9 +25,7 @@ export interface CalendarState {
 export interface DayState {
 	date: Date;
 	muted: boolean;
-	state: {
-		active: boolean;
-	};
+	active: boolean;
 	setActive?: (value: boolean) => void;
 }
 
