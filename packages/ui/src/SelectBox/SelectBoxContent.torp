@@ -33,7 +33,7 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 		}
 	});
 
-	function show() {
+	function show(_: HTMLElement) {
 		shown = true;
 
 		// HACK: Because this SelectBox could be shown with a click, we need to wait for another mousedown
@@ -65,17 +65,25 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 		}
 	}
 
+	// HACK: We need to keep the items in the document so that we can search through them
 	@render {
-		@if ($state.visible) {
-			<div
-				{$props?.id}
-				class={["torp-select-box-content", $props?.class]}
-				{$props?.style}
-				&ref={div}
-				onmount={show}
-			>
-				<slot />
-			</div>
+		@//if ($state.visible) {
+		<div
+			{$props?.id}
+			class={["torp-select-box-content", $props?.class, $state.visible ? undefined : "hidden"]}
+			{$props?.style}
+			aria-hidden={$state.visible ? undefined : "true"}
+			&ref={div}
+			onmount={show}
+		>
+			<slot />
+		</div>
+		@//}
+	}
+
+	@style {
+		.torp-select-box-content.hidden {
+			display: none;
 		}
 	}
 }

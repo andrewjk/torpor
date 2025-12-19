@@ -21,6 +21,8 @@ export interface PopoutContext {
 	// There may be a more elegant way to accomplish this!
 	focusFirstElement?: () => void;
 	focusLastElement?: () => void;
+	searchText?: string;
+	searchItems?: (searchText: string) => { setFocused: () => void } | undefined;
 }
 
 export interface PopoutState {

@@ -4,27 +4,25 @@ import {
 } from "../../../src/ListBox/index";
 import {
 	SelectBox,
-	SelectBoxInput,
 	SelectBoxTrigger,
 	SelectBoxContent,
 } from "../../../src/SelectBox/index";
 
-export default function ListBoxKeyboard($props: any) {
+export default function SelectBoxKeyboard($props: any) {
 	@render {
 		<SelectBox &value={$props.value}>
-			<SelectBoxInput value={$props.value} />
-			<SelectBoxTrigger>show</SelectBoxTrigger>
+			<SelectBoxTrigger />
 			<SelectBoxContent>
 				@// TODO: Shouldn't have to set value here:
 				<ListBox value={$props.value}>
 					<ListBoxItem>
-						Item 1
+						Cat
 					</ListBoxItem>
 					<ListBoxItem>
-						Item 2
+						Chinchilla
 					</ListBoxItem>
 					<ListBoxItem>
-						Item 3
+						Dog
 					</ListBoxItem>
 				</ListBox>
 			</SelectBoxContent>

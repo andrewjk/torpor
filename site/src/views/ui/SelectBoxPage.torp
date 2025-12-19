@@ -3,9 +3,11 @@ import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 
 import ExampleBasic from "./select-box/ExampleBasic.torp";
+import ExampleBound from "./select-box/ExampleBound.torp";
 import ExampleMultiple from "./select-box/ExampleMultiple.torp";
 
 import ExampleBasicCode from "./select-box/ExampleBasic.torp?raw";
+import ExampleBoundCode from "./select-box/ExampleBound.torp?raw";
 import ExampleMultipleCode from "./select-box/ExampleMultiple.torp?raw";
 
 export default function SelectBoxPage() {
@@ -24,8 +26,7 @@ export default function SelectBoxPage() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <SelectBox>
-	<SelectBoxInput />
-	<SelectBoxTrigger /> (optional)
+	<SelectBoxTrigger />
 	<SelectBoxContent>
 		<ListBox>
 			<ListBoxItem />
@@ -44,6 +45,11 @@ export default function SelectBoxPage() {
 				</TabHeader>
 				<TabHeader>
 					<TabTrigger class="example-tab-header">
+						Bound
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
 						Multiple
 					</TabTrigger>
 				</TabHeader>
@@ -53,6 +59,14 @@ export default function SelectBoxPage() {
 					<ExampleBasic />
 					<fill name="code">
 						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBound />
+					<fill name="code">
+						<pre><code>{ExampleBoundCode.trim()}</code></pre>
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

@@ -2,18 +2,25 @@ export const ListBoxContextName: unique symbol = Symbol.for("torp.ListBox");
 export const ListBoxItemContextName: unique symbol = Symbol.for("torp.ListBoxItem");
 
 export interface ListBoxContext {
-	/** Called from an ListBoxItem when it is added */
-	registerItem: (state: ItemState, setFocused: () => void) => void;
-	/** Called from an ListBoxItem when it is removed */
+	type: "single" | "multiple";
+	state: ListBoxState;
+	/** Called from a ListBoxItem when it is added */
+	registerItem: (state: ItemState) => void;
+	/** Called from a ListBoxItem when it is removed */
 	removeItem: (index: number) => void;
-	/** Called from an ListBoxItem when it is toggled */
+	/** Called from a ListBoxItem when it is toggled */
 	toggleItem: (value: string) => void;
-	/** Called from an ListBoxItem when it receives a keyboard event */
+	/** Called from a ListBoxItem when it receives a keyboard event */
 	handleKey: (index: number, e: KeyboardEvent) => void;
+}
+
+export interface ListBoxState {
+	value: any;
 }
 
 export interface ItemState {
 	index: number;
+	text: string;
 	value: any;
 	selected: boolean;
 	disabled: boolean;

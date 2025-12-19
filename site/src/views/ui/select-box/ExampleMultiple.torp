@@ -4,15 +4,15 @@ import {
 } from "@torpor/ui/ListBox";
 import {
 	SelectBox,
-	SelectBoxInput,
+	SelectBoxTrigger,
 	SelectBoxContent,
 } from "@torpor/ui/SelectBox";
 
 export default function ExampleMultiple() {
 	let items = [
-		{ id: 0, text: "Item 1" },
-		{ id: 1, text: "Item 2" },
-		{ id: 2, text: "Item 3" },
+		{ id: 0, text: "Cat" },
+		{ id: 1, text: "Chinchilla" },
+		{ id: 2, text: "Dog" },
 	];
 
 	let $state = $watch({
@@ -26,12 +26,14 @@ export default function ExampleMultiple() {
 		<p>Value: {$state.value}</p>
 
 		<SelectBox class="example-select-box" &value={$state.value}>
-			<SelectBoxInput class="example-select-box-input" value={$state.text} />
+			<SelectBoxTrigger class="example-select-box-trigger">
+				{$state.text || "-"}
+			</SelectBoxTrigger>
 			<SelectBoxContent class="example-select-box-content">
 				<ListBox class="example-list-box" type="multiple">
 					@for (let item of items) {
 						@key = item.id;
-						<ListBoxItem class="example-list-box-item">
+						<ListBoxItem class="example-list-box-item" value={item.id}>
 							{item.text}
 						</ListBoxItem>
 					}
@@ -41,12 +43,20 @@ export default function ExampleMultiple() {
 	}
 
 	@style {
+		.example-select-box {
+			width: 200px;
+		}
+
+		.example-select-box-trigger {
+			width: 100%;
+		}
+
 		.example-list-box {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			display: flex;
 			flex-direction: column;
-			width: 200px;
+			width: 100%;
 		}
 
 		.example-list-box-item {

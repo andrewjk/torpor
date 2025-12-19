@@ -4,20 +4,20 @@ import {
 } from "../../../src/ListBox/index";
 import {
 	SelectBox,
-	SelectBoxInput,
 	SelectBoxContent,
+	SelectBoxTrigger,
 } from "../../../src/SelectBox/index";
 
 export default function ListBoxList($props: any) {
 	@render {
-		<SelectBox &value={$props.value}>
-			<SelectBoxInput value={$props.value} />
+		<SelectBox &value={$props.value} name="hi">
+			<SelectBoxTrigger />
 			<SelectBoxContent>
 				@// TODO: Shouldn't have to set value here:
 				<ListBox value={$props.value}>
 					@for (let item of $props.items) {
 						@key = item.id
-						<ListBoxItem>
+						<ListBoxItem value={item.id}>
 							{item.text}
 						</ListBoxItem>
 					}

@@ -9,8 +9,14 @@ interface SelectBoxProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	///** The name of the input's form data field */
+	name?: string,
 	/** The data value selected by the user */
 	value?: any,
+	///** Text to display when the input value is empty */
+	placeholder?: string,
+	///** Whether the input's value is required */
+	//required?: boolean,
 	/** Whether the popout is visible  */
 	visible?: boolean,
 	/** A function to be called when the user selects a response */
@@ -32,8 +38,7 @@ interface SelectBoxProps {
  *
  * ```
  * <SelectBox>
- * 	<SelectBoxInput />
- * 	<SelectBoxTrigger /> (optional)
+ * 	<SelectBoxTrigger />
  * 	<SelectBoxContent />
  * </SelectBox>
  * ```
@@ -61,6 +66,7 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	let context: SelectBoxContext = {
 		handleButton,
 		handleClickOutside,
+		placeholder: $props?.placeholder,
 		state: $state,
 	};
 	$context[SelectBoxContextName] = context;
@@ -110,8 +116,13 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 			$state.value = result;
 		}
 
-		// Hide the popout
-		$state.visible = false;
+		// Hide the popout and focus the button
+		if (type === "confirm" || type === "cancel") {
+			$state.visible = false;
+			if (context.focusTrigger) {
+				context.focusTrigger();
+			}
+		}
 
 		// Call the callback
 		if ($props?.callback) {
@@ -132,5 +143,13 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 		>
 			<slot />
 		</div>
+
+		@if ($props?.name) {
+			<input
+				type="hidden"
+				{$props?.name}
+				{$props?.value}
+			/>
+		}
 	}
 }

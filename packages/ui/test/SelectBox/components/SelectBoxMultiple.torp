@@ -4,16 +4,19 @@ import {
 } from "../../../src/ListBox/index";
 import {
 	SelectBox,
-	SelectBoxInput,
+	SelectBoxTrigger,
 	SelectBoxContent,
 } from "../../../src/SelectBox/index";
 
-export default function ListBoxMultiple($props: any) {
+export default function SelectBoxMultiple($props: any) {
 	@render {
-		<SelectBox &value={$props.value} type="multiple">
-			<SelectBoxInput value={$props.value.join(", ")} />
+		<SelectBox &value={$props.value}>
+			@// TODO: Something funny here with slot fallbacks:
+			<SelectBoxTrigger>
+				{$props.value.join(", ")}
+			</SelectBoxTrigger>
 			<SelectBoxContent>
-				@// TODO: Shouldn't have to set type and value here:
+				@// TODO: Shouldn't have to set value here:
 				<ListBox type="multiple" value={$props.value}>
 					<ListBoxItem>
 						Item 1

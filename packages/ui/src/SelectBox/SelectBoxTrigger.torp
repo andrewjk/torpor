@@ -8,34 +8,118 @@ interface SelectBoxTriggerProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** An ARIA label for describing the trigger to screen readers when there is no associated label element */
+	ariaLabel?: string,
 }
 
 /**
- * The button that causes a SelectBox to appear or disappear.
+ * The input that causes a SelectBox to appear or disappear.
  */
 export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefined) {
+	let button: HTMLButtonElement;
+
 	// Get stuff out of the SelectBoxContext
 	const context = $context[SelectBoxContextName] as SelectBoxContext;
 	if (!context) {
 		throw new Error("SelectBoxTrigger must be contained within a SelectBox");
 	}
 	let $state = context.state;
+	context.focusTrigger = focusTrigger;
+
+	function focusTrigger() {
+		button.focus();
+	}
 
 	function handleClick() {
 		$state.visible = !$state.visible;
+		if (!$state.visible) {
+			context.searchText = "";
+		}
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Down":
+			case "ArrowDown": {
+				e.preventDefault();
+				$state.visible = true;
+				if (context.focusFirstElement) {
+					context.focusFirstElement();
+				}
+				break;
+			}
+			case "Up":
+			case "ArrowUp": {
+				e.preventDefault();
+				$state.visible = true;
+				if (context.focusLastElement) {
+					context.focusLastElement();
+				}
+				break;
+			}
+			case "Escape": {
+				if ($state.visible) {
+					e.preventDefault();
+					// NOTE: This may be too much of a departure from standards
+					if (context.searchText !== undefined && context.searchText !== "") {
+						context.searchText = "";
+					} else {
+						$state.visible = false;
+					}
+				}
+				break;
+			}
+			case "Backspace": {
+				if (context.searchText && context.searchItems) {
+					e.preventDefault();
+					const shorten = (str: string) => str.substring(0, str.length - 1);
+					context.searchText = shorten(context.searchText!);
+					if (context.searchText.length > 0) {
+						const found = context.searchItems(context.searchText);
+						if (found) {
+							found.setFocused();
+						}
+					}
+				}
+				break;
+			}
+			default: {
+				// TODO: Handle unicode
+				if (e.key.length === 1 && context.searchItems) {
+					e.preventDefault();
+					context.searchText ??= "";
+					context.searchText += e.key;
+					const found = context.searchItems(context.searchText);
+					if (found !== undefined) {
+						$state.visible = true;
+						found.setFocused();
+					}
+				}
+			}
+		}
 	}
 
 	@render {
 		<button
 			type="button"
+			role="combobox"
 			{$props?.id}
 			class={["torp-select-box-trigger", $props?.class]}
 			{$props?.style}
-			tabindex="-1"
+			aria-controls={$state.contentId}
+			aria-expanded={$state.visible ? "true" : "false"}
+			aria-label={$props?.ariaLabel}
 			onclick={handleClick}
-			&ref={context.anchorElement}
+			onkeydown={handleKey}
+			&ref={button}
 		>
-			<slot />
+			<slot>
+				@if ($state.value === undefined || $state.value === null || $state.value === "") {
+					<span>{context.placeholder || "-"}</span>
+				} else {
+					<span>{$state.value}</span>
+				}		
+			</slot>
 		</button>
 	}
 }

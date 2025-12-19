@@ -6,13 +6,18 @@ export interface SelectBoxContext {
 	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
 	// There may be a more elegant way to accomplish this too
 	handleClickOutside?: (e: MouseEvent) => void;
+	placeholder?: string;
 	state: SelectBoxState;
+	focusTrigger?: () => void;
 	focusFirstElement?: () => void;
 	focusLastElement?: () => void;
+	searchText?: string;
+	searchItems?: (searchText: string) => { setFocused: () => void } | undefined;
 }
 
 export interface SelectBoxState {
 	visible: boolean;
 	value: any;
+	name?: string;
 	contentId?: string;
 }

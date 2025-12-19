@@ -10,6 +10,8 @@ interface ListBoxItemProps {
 	style?: StyleValue,
 	/** The index of this item in the ListBox. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically */
 	index?: number,
+	/** The text for the item. If not set, this will come from it's text content */
+	text?: string;
 	/** A value for the item. Set this if you need more control over which item(s) are selected. If you don't set this, the value will be set to the item's initial index */
 	value?: string,
 	/** If set to true, the user cannot interact with this ListBoxItem */
@@ -24,7 +26,8 @@ interface ListBoxItemProps {
 export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	let $state: ItemState = $watch({
 		index: -1,
-		value: "",
+		text: $props?.text ?? "",
+		value: $props?.value,
 		selected: false,
 		disabled: $props?.disabled ?? false,
 		parentDisabled: false,
@@ -40,7 +43,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	}
 
 	// Register this item with the parent ListBox, which will handle toggling selected for all items
-	context.registerItem($state, setFocused);
+	context.registerItem($state);
 
 	// Remove the item from the parent ListBox when this item is destroyed
 	$run(() => {
@@ -73,17 +76,40 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	}
 
 	function handleKey(e: KeyboardEvent) {
-		// For testing
 		switch (e.key) {
-			case "Enter":
+			case "Enter": {
 				e.preventDefault();
 				context.toggleItem($state.value);
 				break;
-			default:
+			}
+			default: {
 				// Pass the key press up to the parent ListBox which will handle
 				// setting the focused button
 				context.handleKey($state.index, e);
 				break;
+			}
+		}
+	}
+
+	function handleMount(el: HTMLButtonElement) {
+		// If the item has no value, set it to the text content
+		if (!$state.text) {
+			$state.text = el.textContent.trim();
+		}
+		if ($state.value === undefined || $state.value === null) {
+			$state.value = $state.text;
+			if (context.state.value !== undefined && context.state.value !== null) {
+				switch (context.type) {
+					case "single": {
+						$state.selected = context.state.value === $state.value;
+						break;
+					}
+					case "multiple": {
+						$state.selected = context.state.value.includes($state.value);
+						break;
+					}
+				}
+			}
 		}
 	}
 
@@ -99,6 +125,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 			data-disabled={$state.disabled ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}
+			onmount={handleMount}
 			&ref={button}
 		>
 			<slot />

@@ -8,7 +8,7 @@ export default function ListBoxList($props: any) {
 		<ListBox value={$props.value}>
 			@for (let item of $props.items) {
 				@key = item.id
-				<ListBoxItem>
+				<ListBoxItem value={item.id}>
 					{item.text}
 				</ListBoxItem>
 			}

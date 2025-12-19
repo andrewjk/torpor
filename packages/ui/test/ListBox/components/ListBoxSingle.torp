@@ -6,13 +6,13 @@ import {
 export default function ListBoxSingle($props: any) {
 	@render {
 		<ListBox value={$props?.value}>
-			<ListBoxItem>
+			<ListBoxItem value={0}>
 				Content 1
 			</ListBoxItem>
-			<ListBoxItem>
+			<ListBoxItem value={1}>
 				Content 2
 			</ListBoxItem>
-			<ListBoxItem>
+			<ListBoxItem value={2}>
 				Content 3
 			</ListBoxItem>
 		</ListBox>

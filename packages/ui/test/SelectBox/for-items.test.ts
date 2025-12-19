@@ -23,7 +23,10 @@ describe("SelectBox", () => {
 		const input = container.getElementsByTagName("input")[0];
 		assert(input, "input not found");
 
-		await userEvent.click(input);
+		const button = container.getElementsByTagName("button")[0];
+		assert(button, "button not found");
+
+		await userEvent.click(button);
 
 		expect(queryByText(container, "Item 1")).toBeInTheDocument();
 		expect(queryByText(container, "Item 2")).toBeInTheDocument();
@@ -39,7 +42,7 @@ describe("SelectBox", () => {
 		// Clicking item 1 should select item 1
 		await userEvent.click(getByText(container, "Item 1"));
 
-		await userEvent.click(input);
+		await userEvent.click(button);
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
 		expect(input.value).toBe("0");
 
@@ -48,9 +51,9 @@ describe("SelectBox", () => {
 		// Clicking item 4 should select item 4
 		await userEvent.click(getByText(container, "Item 4"));
 
-		await userEvent.click(input);
+		await userEvent.click(button);
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "false");
 		expect(queryByText(container, "Item 4")).toHaveAttribute("aria-selected", "true");
-		expect(input.value).toBe("2");
+		expect(input.value).toBe("3");
 	});
 });

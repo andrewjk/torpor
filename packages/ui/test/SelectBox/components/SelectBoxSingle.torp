@@ -4,14 +4,14 @@ import {
 } from "../../../src/ListBox/index";
 import {
 	SelectBox,
-	SelectBoxInput,
+	SelectBoxTrigger,
 	SelectBoxContent,
 } from "../../../src/SelectBox/index";
 
-export default function ListBoxSingle($props: any) {
+export default function SelectBoxSingle($props: any) {
 	@render {
 		<SelectBox &value={$props.value}>
-			<SelectBoxInput value={$props.value} />
+			<SelectBoxTrigger />
 			<SelectBoxContent>
 				@// TODO: Shouldn't have to set value here:
 				<ListBox value={$props.value}>

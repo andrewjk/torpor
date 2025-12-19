@@ -11,10 +11,10 @@ describe("SelectBox", () => {
 		document.body.appendChild(container);
 		mount(container, SelectBoxMultiple, { value: [] });
 
-		const input = container.getElementsByTagName("input")[0];
-		assert(input, "input not found");
+		const button = container.getElementsByTagName("button")[0];
+		assert(button, "button not found");
 
-		await userEvent.click(input);
+		await userEvent.click(button);
 
 		expect(queryByText(container, "Item 1")).toBeInTheDocument();
 		expect(queryByText(container, "Item 2")).toBeInTheDocument();
@@ -23,18 +23,18 @@ describe("SelectBox", () => {
 		// Clicking item 1 should select item 1
 		await userEvent.click(getByText(container, "Item 1"));
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
-		// TODO: expect(input.value).toBe("0");
+		expect(button.textContent.trim()).toBe("Item 1");
 
 		// Clicking item 2 should select item 1 and item 2
 		await userEvent.click(getByText(container, "Item 2"));
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
 		expect(queryByText(container, "Item 2")).toHaveAttribute("aria-selected", "true");
-		// TODO: expect(input.value).toBe("0,1");
+		// TODO: expect(button.textContent.trim()).toBe("Item 1, Item2");
 
 		// Clicking item 2 again should select item 2
 		await userEvent.click(getByText(container, "Item 2"));
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
 		expect(queryByText(container, "Item 2")).toHaveAttribute("aria-selected", "false");
-		// TODO: expect(input.value).toBe("1");
+		// TODO: expect(button.textContent.trim()).toBe("Item 1");
 	});
 });

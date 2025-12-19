@@ -8,27 +8,35 @@ import {
 	SelectBoxContent,
 } from "@torpor/ui/SelectBox";
 
-export default function ExampleBasic() {
+export default function ExampleBound() {
+	let items = [
+		{ id: 0, text: "Cat" },
+		{ id: 1, text: "Chinchilla" },
+		{ id: 2, text: "Dog" },
+	];
+
 	let $state = $watch({
-		value: null,
+		value: 0,
+		get text() {
+			return items.find(i => i.id === this.value)?.text;
+		}
 	});
 
 	@render {
-		<p>Value: <input &value={$state.value} /></p>
+		<p>Value: <input type="number" &value={$state.value} /></p>
 
 		<SelectBox class="example-select-box" &value={$state.value}>
-			<SelectBoxTrigger class="example-select-box-trigger" value={$state.value} />
+			<SelectBoxTrigger class="example-select-box-trigger">
+				{$state.text || "-"}
+			</SelectBoxTrigger>
 			<SelectBoxContent class="example-select-box-content">
 				<ListBox class="example-list-box">
-					<ListBoxItem class="example-list-box-item">
-						Cat
-					</ListBoxItem>
-					<ListBoxItem class="example-list-box-item">
-						Chinchilla
-					</ListBoxItem>
-					<ListBoxItem class="example-list-box-item">
-						Dog
-					</ListBoxItem>
+					@for (let item of items) {
+						@key = item.id;
+						<ListBoxItem class="example-list-box-item" value={item.id}>
+							{item.text}
+						</ListBoxItem>
+					}
 				</ListBox>
 			</SelectBoxContent>
 		</SelectBox>
