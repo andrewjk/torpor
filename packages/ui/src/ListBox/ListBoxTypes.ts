@@ -19,10 +19,13 @@ export interface ListBoxState {
 }
 
 export interface ItemState {
+	id: string;
 	index: number;
 	text: string;
 	value: any;
 	selected: boolean;
+	/** For aria-activedescendant */
+	active: boolean;
 	disabled: boolean;
 	parentDisabled: boolean;
 	/** Called in the ListBox when an item needs to be focused */

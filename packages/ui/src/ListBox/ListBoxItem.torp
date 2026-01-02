@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { ListBoxContextName, type ItemState, type ListBoxContext } from "./ListBoxTypes";
 
 interface ListBoxItemProps {
@@ -24,15 +25,19 @@ interface ListBoxItemProps {
  * An item in an ListBox.
  */
 export default function ListBoxItem($props: ListBoxItemProps | undefined) {
+	let defaultId = getId();
+
 	let $state: ItemState = $watch({
+		id: $props?.id ?? defaultId,
 		index: -1,
 		text: $props?.text ?? "",
 		value: $props?.value,
 		selected: false,
+		active: false,
 		disabled: $props?.disabled ?? false,
 		parentDisabled: false,
-		setFocused
-	})
+		setFocused,
+	});
 
 	let button: HTMLButtonElement;
 
@@ -71,7 +76,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 
 	function handleClick() {
 		// Pass the value to the toggleItem method in the parent ListBox which will handle toggling
-		// the value of expanded for all items (e.g. to unselect other items if necessary)
+		// the value of selected for all items (e.g. to unselect other items if necessary)
 		context.toggleItem($state.value);
 	}
 
@@ -115,13 +120,13 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 
 	@render {
 		<button
-			{$props?.id}
+			{$state.id}
 			class={["torp-list-box-item", $props?.class]}
 			{$props?.style}
 			role="option"
 			aria-selected={$state.selected ? "true" : "false"}
 			aria-disabled={$state.disabled ? "true" : undefined}
-			data-state={$state.selected ? "active" : undefined}
+			data-state={$state.selected || $state.active ? "active" : undefined}
 			data-disabled={$state.disabled ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}

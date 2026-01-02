@@ -1,0 +1,88 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "@torpor/ui/ListBox";
+import {
+	ComboBox,
+	ComboBoxInput,
+	ComboBoxContent,
+} from "@torpor/ui/ComboBox";
+
+export default function ExampleBound() {
+	let items = [
+		{ id: 0, text: "Cat" },
+		{ id: 1, text: "Chinchilla" },
+		{ id: 2, text: "Dog" },
+	];
+
+	let $state = $watch({
+		value: 0,
+		get text() {
+			return items.find(i => i.id === this.value)?.text;
+		}
+	});
+
+	@render {
+		<p>Value: <input type="number" &value={$state.value} /></p>
+
+		<ComboBox class="example-select-box" &value={$state.value}>
+			<ComboBoxInput class="example-select-box-trigger">
+				{$state.text || "-"}
+			</ComboBoxInput>
+			<ComboBoxContent class="example-select-box-content">
+				<ListBox class="example-list-box">
+					@for (let item of items) {
+						@key = item.id;
+						<ListBoxItem class="example-list-box-item" value={item.id}>
+							{item.text}
+						</ListBoxItem>
+					}
+				</ListBox>
+			</ComboBoxContent>
+		</ComboBox>
+	}
+
+	@style {
+		.example-select-box {
+			width: 200px;
+		}
+
+		.example-select-box-trigger {
+			width: 100%;
+		}
+
+		.example-list-box {
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+
+		.example-list-box-item[data-state="active"] {
+			border: 2px solid lightblue;
+		}
+
+		.example-list-box-item:hover {
+			border: 2px solid blue;
+		}
+
+		.example-list-box-item:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+
+		.example-list-box-item {
+			all: unset;
+			border: 2px solid transparent;
+			cursor: default;
+			padding: 5px;
+		}
+	}
+}

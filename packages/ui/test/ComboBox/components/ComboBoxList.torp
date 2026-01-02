@@ -1,0 +1,28 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+import {
+	ComboBox,
+	ComboBoxContent,
+	ComboBoxInput,
+} from "../../../src/ComboBox/index";
+
+export default function ListBoxList($props: any) {
+	@render {
+		<ComboBox &value={$props.value} name="hi">
+			<ComboBoxInput />
+			<ComboBoxContent>
+				@// TODO: Shouldn't have to set value here:
+				<ListBox value={$props.value}>
+					@for (let item of $props.items) {
+						@key = item.id
+						<ListBoxItem value={item.id}>
+							{item.text}
+						</ListBoxItem>
+					}
+				</ListBox>
+			</ComboBoxContent>
+		</ComboBox>
+	}
+}

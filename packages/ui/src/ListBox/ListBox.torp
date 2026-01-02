@@ -77,6 +77,8 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		// called after everything has been shown
 		popoutContext.focusFirstElement = focusFirstElement;
 		popoutContext.focusLastElement = focusLastElement;
+		popoutContext.markElement = markElement;
+		popoutContext.selectMarkedElement = selectMarkedElement;
 		popoutContext.searchItems = searchItems;
 
 		// Set the content ID so that it can be used with aria-controls in AccordionTrigger
@@ -103,6 +105,20 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	function focusLastElement() {
 		if (itemStates.length > 0) {
 			itemStates.at(-1)!.setFocused();
+		}
+	}
+
+	function markElement(id: string) {
+		itemStates.forEach((i) => {
+			i.selected = false;
+			i.active = i.id === id;
+		});
+	}
+
+	function selectMarkedElement() {
+		const marked = itemStates.find((i) => i.active === true);
+		if (marked && handleButton) {
+			handleButton("confirm", marked.value);
 		}
 	}
 
@@ -196,11 +212,17 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	function toggleItem(value: string) {
 		switch (type) {
 			case "single": {
+				// Set the value
 				for (let item of itemStates) {
 					if (item.value === value) {
 						$state.value = item.selected ? "" : item.value;
 						break;
 					}
+				}
+				// Clear selected and active for all the items based on the value that was set
+				for (let item of itemStates) {
+					item.selected = $state.value === item.value;
+					item.active = false;
 				}
 				// Pass this along to the containing popout if applicable, so
 				// that the popout can be closed

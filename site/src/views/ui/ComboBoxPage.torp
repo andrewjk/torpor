@@ -1,0 +1,84 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
+import ExampleBasic from "./combo-box/ExampleBasic.torp";
+import ExampleBound from "./combo-box/ExampleBound.torp";
+import ExampleMultiple from "./combo-box/ExampleMultiple.torp";
+
+import ExampleBasicCode from "./combo-box/ExampleBasic.torp?raw";
+import ExampleBoundCode from "./combo-box/ExampleBound.torp?raw";
+import ExampleMultipleCode from "./combo-box/ExampleMultiple.torp?raw";
+
+export default function ComboBoxPage() {
+	@head {
+		<title>ComboBox | Torpor</title>
+	}
+
+	@render {
+		<h1>ComboBox</h1>
+		<p>
+			An editable input for selecting a value from a popout ListBox or Dialog.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/combobox/">the WAI ARIA guidelines for ComboBoxes</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<ComboBox>
+	<ComboBoxInput />
+	<ComboBoxTrigger /> (optional)
+	<ComboBoxContent>
+		<ListBox>
+			<ListBoxItem />
+			<ListBoxSeparator /> (optional)
+		</ListBox>
+	</ComboBoxContent>
+</ComboBox>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Bound
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Multiple
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBound />
+					<fill name="code">
+						<pre><code>{ExampleBoundCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleMultiple />
+					<fill name="code">
+						<pre><code>{ExampleMultipleCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

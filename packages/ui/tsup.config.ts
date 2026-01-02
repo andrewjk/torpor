@@ -11,6 +11,7 @@ export default defineConfig({
 		"src/Breadcrumb/index.ts",
 		"src/Calendar/index.ts",
 		"src/Charts/index.ts",
+		"src/ComboBox/index.ts",
 		"src/Contextual/index.ts",
 		"src/Dialog/index.ts",
 		"src/Disclosure/index.ts",

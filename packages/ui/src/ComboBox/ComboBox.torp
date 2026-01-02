@@ -1,8 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { SelectBoxContextName, type SelectBoxContext, type SelectBoxState } from "./SelectBoxTypes";
+import { ComboBoxContextName, type ComboBoxContext, type ComboBoxState } from "./ComboBoxTypes";
 import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
-interface SelectBoxProps {
+interface ComboBoxProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
@@ -15,8 +15,8 @@ interface SelectBoxProps {
 	value?: any,
 	/** Text to display when the input value is empty */
 	placeholder?: string,
-	///** Whether the input's value is required */
-	//required?: boolean,
+	/** Whether the input's value is required */
+	required?: boolean,
 	/** Whether the popout is visible  */
 	visible?: boolean,
 	/** A function to be called when the user selects a response */
@@ -34,17 +34,18 @@ interface SelectBoxProps {
  *
  * See [the WAI ARIA guidelines for ComboBoxes](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/).
  *
- * The structure of a SelectBox is:
+ * The structure of a ComboBox is:
  *
  * ```
- * <SelectBox>
- * 	<SelectBoxTrigger />
- * 	<SelectBoxContent />
- * </SelectBox>
+ * <ComboBox>
+ * 	<ComboBoxInput />
+ * 	<ComboBoxTrigger /> (optional)
+ * 	<ComboBoxContent />
+ * </ComboBox>
  * ```
  */
-export default function SelectBox($props: SelectBoxProps | undefined) {
-	let $state: SelectBoxState = $watch({
+export default function ComboBox($props: ComboBoxProps | undefined) {
+	let $state: ComboBoxState = $watch({
 		visible: false,
 		value: $props?.value,
 	});
@@ -63,13 +64,13 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	let result: any;
 
 	// Set the context to pass down to items
-	let context: SelectBoxContext = {
+	let context: ComboBoxContext = {
 		handleButton,
 		handleClickOutside,
 		placeholder: $props?.placeholder,
 		state: $state,
 	};
-	$context[SelectBoxContextName] = context;
+	$context[ComboBoxContextName] = context;
 
 	// Set the context to pass down to items
 	let popoutContext: PopoutContext = context;
@@ -114,15 +115,13 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 		// Update the value
 		if (type !== "cancel") {
 			$state.value = result;
-		}
-
-		// Hide the popout and focus the button
-		if (type === "confirm" || type === "cancel") {
-			$state.visible = false;
-			if (context.focusTrigger) {
-				context.focusTrigger();
+			if (context.focusInput) {
+				context.focusInput();
 			}
 		}
+
+		// Hide the popout
+		$state.visible = false;
 
 		// Call the callback
 		if ($props?.callback) {
@@ -138,18 +137,10 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	@render {
 		<div
 			{$props?.id}
-			class={["torp-select-box", $props?.class]}
+			class={["torp-combo-box", $props?.class]}
 			{$props?.style}
 		>
 			<slot />
 		</div>
-
-		@if ($props?.name) {
-			<input
-				type="hidden"
-				{$props?.name}
-				{$props?.value}
-			/>
-		}
 	}
 }

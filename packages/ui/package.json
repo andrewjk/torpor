@@ -20,6 +20,10 @@
 			"types": "./dist/Charts/index.d.ts",
 			"import": "./dist/Charts/index.js"
 		},
+		"./ComboBox": {
+			"types": "./dist/ComboBox/index.d.ts",
+			"import": "./dist/ComboBox/index.js"
+		},
 		"./Contextual": {
 			"types": "./dist/Contextual/index.d.ts",
 			"import": "./dist/Contextual/index.js"
