@@ -8,6 +8,7 @@ import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import isReactive from "../../utils/isReactive";
 import trimQuotes from "../../utils/trimQuotes";
+import voidTags from "../../utils/voidTags";
 import type BuildStatus from "./BuildStatus";
 
 /**
@@ -184,11 +185,15 @@ function buildElementFragmentText(
 	if (needsClass) {
 		currentFragment.text += ` class="torp-${status.styleHash}"`;
 	}
+
 	currentFragment.text += ">";
-	for (let child of node.children) {
-		buildNodeFragmentText(child, status, fragments, currentFragment);
+
+	if (!voidTags.includes(node.tagName)) {
+		for (let child of node.children) {
+			buildNodeFragmentText(child, status, fragments, currentFragment);
+		}
+		currentFragment.text += `</${node.tagName}>`;
 	}
-	currentFragment.text += `</${node.tagName}>`;
 }
 
 function buildSpecialFragmentText(
