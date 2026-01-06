@@ -1,0 +1,38 @@
+import {
+	TreeItemContextName,
+	type TreeItemContext,
+} from "./TreeTypes";
+
+export default function TreeItemChildren() {
+	const itemContext = $context[TreeItemContextName] as TreeItemContext;
+
+	if (!itemContext) {
+		throw new Error("TreeItemChildren must be contained within a TreeItem");
+	}
+
+	const { setHasChildren, state: $state } = itemContext;
+
+	$run(() => {
+		setHasChildren(true);
+		return () => {
+			setHasChildren(false);
+		};
+	});
+
+	// HACK: We need to keep the items in the document so that we can search through them
+	@render {
+		<div
+			id={$props?.id}
+			class={["torp-tree-item-children", $props?.class, $state.expanded ? undefined : "hidden"]}
+			{$props?.style}
+		>
+			<slot />
+		</div>
+	}
+
+	@style {
+		.torp-tree-item-children.hidden {
+			display: none;
+		}
+	}
+}

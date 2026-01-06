@@ -1,0 +1,111 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemContent,
+	TreeItemTrigger,
+	TreeItemLabel,
+	TreeItemChildren,
+} from "@torpor/ui/Tree";
+
+export default function ExampleBasic() {
+	let $state = $watch({
+		expanded: [] as string[],
+		value: "",
+	});
+
+	@render {
+		<div>
+			Expanded: {JSON.stringify($state.expanded)}
+			<br />
+			Selected: {JSON.stringify($state.value)}
+		</div>
+
+		<Tree
+			class="example-tree"
+			&expanded={$state.expanded}
+			&value={$state.value}
+		>
+			<TreeItem class="example-tree-item" value="folder-1">
+				<TreeItemContent class="example-tree-item-content">
+					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemLabel>Folder 1</TreeItemLabel>
+				</TreeItemContent>
+				<TreeItemChildren>
+					<TreeItem class="example-tree-item" value="file-1-1">
+						<TreeItemContent class="example-tree-item-content">
+							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemLabel>File 1.1</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+					<TreeItem class="example-tree-item" value="file-1-2">
+						<TreeItemContent class="example-tree-item-content">
+							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemLabel>File 1.2</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+				</TreeItemChildren>
+			</TreeItem>
+			<TreeItem class="example-tree-item" value="folder-2">
+				<TreeItemContent class="example-tree-item-content">
+					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemLabel>Folder 2</TreeItemLabel>
+				</TreeItemContent>
+				<TreeItemChildren>
+					<TreeItem class="example-tree-item" value="folder-2-1">
+						<TreeItemContent class="example-tree-item-content">
+							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemLabel>Subfolder 2.1</TreeItemLabel>
+						</TreeItemContent>
+						<TreeItemChildren>
+							<TreeItem class="example-tree-item" value="file-2-1-1">
+								<TreeItemContent class="example-tree-item-content">
+									<TreeItemTrigger class="example-tree-item-trigger"/>
+									<TreeItemLabel>File 2.1.1</TreeItemLabel>
+								</TreeItemContent>
+							</TreeItem>
+						</TreeItemChildren>
+					</TreeItem>
+					<TreeItem class="example-tree-item" value="file-2-2">
+						<TreeItemContent class="example-tree-item-content">
+							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemLabel>File 2.2</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+				</TreeItemChildren>
+			</TreeItem>
+			<TreeItem class="example-tree-item" value="file-3">
+				<TreeItemContent class="example-tree-item-content">
+					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemLabel>File 3</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+
+	@style {
+		.example-tree {
+			width: 100%;
+		}
+
+		.example-tree-item {
+			// HACK: Shouldn't need this!
+		}
+
+		.example-tree-item.spacer {
+			display: inline-block;
+			width: 2rem;
+		}
+
+		.example-tree-item-trigger {
+			all: unset;
+		}
+
+		.example-tree-item-content {
+			border: 2px solid transparent;
+		}
+
+		.example-tree-item-content[data-selected="selected"] {
+			border: 2px solid lightblue;
+		}
+	}
+}

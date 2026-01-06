@@ -1,0 +1,115 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import {
+	TreeContextName,
+	type TreeContext,
+	TreeItemContextName,
+	type TreeItemContext,
+	type ItemState,
+} from "./TreeTypes";
+
+interface TreeItemProps {
+	id?: string;
+	class?: ClassValue;
+	style?: StyleValue;
+	value?: string;
+	disabled?: boolean;
+	onExpand?: (expanded: boolean) => void;
+	onSelect?: (selected: boolean) => void;
+}
+
+export default function TreeItem($props: TreeItemProps | undefined) {
+	let defaultId = getId();
+
+	const parentContext = $context[TreeItemContextName] as TreeItemContext;
+	const level = parentContext? parentContext.state.level + 1 : 0;
+
+	let $state: ItemState = $watch({
+		id: $props?.id ?? defaultId,
+		index: -1,
+		value: $props?.value ?? "",
+		expanded: false,
+		selected: false,
+		disabled: $props?.disabled ?? false,
+		parentDisabled: false,
+		level,
+		hasChildren: false,
+		setFocused,
+	});
+
+	const context = $context[TreeContextName] as TreeContext;
+	if (!context) {
+		throw new Error("TreeItem must be contained within a Tree");
+	}
+
+	//$run(() => {
+	//	let parentLevel = $state.level;
+	//	$state.level = parentLevel + 1;
+	//});
+
+	context.registerItem($state, $state.level);
+
+	$run(() => {
+		return () => {
+			context.removeItem($state.index);
+		};
+	});
+
+	$run(() => {
+		const onExpand = $props?.onExpand;
+		const expanded = $state.expanded;
+		if (onExpand) {
+			onExpand(expanded);
+		}
+	});
+
+	$run(() => {
+		const onSelect = $props?.onSelect;
+		const selected = $state.selected;
+		if (onSelect) {
+			onSelect(selected);
+		}
+	});
+
+	let focusLabel: (() => void) | undefined;
+
+	function setFocused() {
+		focusLabel?.();
+	}
+
+	let itemContext: TreeItemContext = {
+		state: $state,
+		setHasChildren: (hasChildren) => {
+			$state.hasChildren = hasChildren;
+		},
+	};
+	$context[TreeItemContextName] = itemContext;
+
+	@render {
+		<div
+			{$state.id}
+			class={["torp-tree-item", $props?.class]}
+			{$props?.style}
+			role="treeitem"
+			aria-level={$state.level + 1}
+			aria-selected={$state.selected ? "true" : "false"}
+			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
+			data-selected={$state.selected ? "selected" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
+		>
+			@// HACK: May be better to do this with CSS?
+			@if ($state.level) {
+				<div style="display: flex">
+					<div class={["torp-tree-item", $props?.class, "spacer"]} />
+					<div>
+						<slot />
+					</div>
+				</div>
+			} else {
+				<div>
+					<slot />
+				</div>
+			}
+		</div>
+	}
+}

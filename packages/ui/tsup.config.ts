@@ -27,6 +27,7 @@ export default defineConfig({
 		"src/Popover/index.ts",
 		"src/SelectBox/index.ts",
 		"src/TabGroup/index.ts",
+		"src/Tree/index.ts",
 		"src/ToolBar/index.ts",
 		"src/icons/index.ts",
 		"src/motion/index.ts",

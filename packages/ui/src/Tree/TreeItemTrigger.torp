@@ -1,0 +1,56 @@
+import {
+	TreeContextName,
+	type TreeContext,
+	TreeItemContextName,
+	type TreeItemContext,
+} from "./TreeTypes";
+import ChevronDown from "../icons/ChevronDown.torp";
+import ChevronRight from "../icons/ChevronRight.torp";
+
+export default function TreeItemTrigger() {
+	const itemContext = $context[TreeItemContextName] as TreeItemContext;
+	const treeContext = $context[TreeContextName] as TreeContext;
+
+	if (!itemContext) {
+		throw new Error("TreeItemTrigger must be contained within a TreeItem");
+	}
+
+	if (!treeContext) {
+		throw new Error("TreeItemTrigger must be contained within a Tree");
+	}
+
+	const { state: $state } = itemContext;
+
+	function handleClick(e: MouseEvent) {
+		e.stopPropagation();
+		treeContext.toggleExpand($state.value);
+	}
+
+	@render {
+		@if ($state.hasChildren) {
+			<button
+				id={$props?.id}
+				class={["torp-tree-item-trigger", $props?.class]}
+				{$props?.style}
+				type="button"
+				disabled={$state.disabled || $state.parentDisabled}
+				aria-hidden="true"
+				tabindex="-1"
+				onclick={handleClick}
+			>
+				<slot {$state.expanded}>
+					@if ($state.expanded) {
+						<ChevronDown />
+					} else {
+						<ChevronRight />
+					}
+				</slot>
+			</button>
+		} else {
+			<span
+				id={$props?.id}
+				class={["torp-tree-item-trigger", $props?.class, "spacer"]}
+				{$props?.style} />
+		}
+	}
+}

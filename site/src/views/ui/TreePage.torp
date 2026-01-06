@@ -1,0 +1,67 @@
+import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+
+import ExampleBasic from "./tree/ExampleBasic.torp";
+import ExampleMultiple from "./tree/ExampleMultiple.torp";
+
+import ExampleBasicCode from "./tree/ExampleBasic.torp?raw";
+import ExampleMultipleCode from "./tree/ExampleMultiple.torp?raw";
+
+export default function TreePage() {
+	@head {
+		<title>Tree | Torpor</title>
+	}
+
+	@render {
+		<h1>Tree</h1>
+		<p>
+			A hierarchical list where items can contain other items, enabling users
+			to navigate through nested levels of data.
+		</p>
+		<p>
+			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/treeview/">the WAI ARIA guidelines for Trees</a>.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Tree>
+	<TreeItem>
+		Parent Item
+		<TreeItem>Child Item</TreeItem>
+	</TreeItem>
+	<TreeItem>Leaf Item</TreeItem>
+</Tree>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Basic
+					</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger class="example-tab-header">
+						Multiple
+					</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleMultiple />
+					<fill name="code">
+						<pre><code>{ExampleMultipleCode.trim()}</code></pre>
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

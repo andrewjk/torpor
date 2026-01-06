@@ -1,0 +1,388 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { TreeContextName, type TreeContext, type ItemState } from "./TreeTypes";
+
+interface TreeProps {
+	id?: string;
+	class?: ClassValue;
+	style?: StyleValue;
+	expanded?: string | string[];
+	type?: "single" | "multiple";
+	value?: string | string[];
+	disabled?: boolean;
+	ariaLabel?: string | undefined;
+	onExpandedChange?: (value: string | string[]) => void;
+	onSelectedChange?: (value: string | string[] | undefined) => void;
+}
+
+export default function Tree($props: TreeProps | undefined) {
+	let type = $props?.type ?? "single";
+
+	let $state = $watch({
+		expanded: $props?.expanded ?? [],
+		value: $props?.value ?? (type === "single" ? undefined : []),
+	});
+
+	$run(() => {
+		$state.expanded = $props?.expanded ?? [];
+		$state.value = $props?.value ?? (type === "single" ? undefined : []);
+	});
+
+	$run(() => {
+		if ($props !== undefined) {
+			$props.expanded = $state.expanded;
+			$props.value = $state.value;
+		}
+	});
+
+	let itemStates: ItemState[] = [];
+	let nextIndex = 0;
+
+	let context: TreeContext = {
+		type,
+		state: $state,
+		registerItem,
+		removeItem,
+		toggleExpand,
+		toggleSelect,
+		handleKey,
+		focusFirstItem,
+		focusLastItem,
+		findItem,
+		getNextVisibleItem,
+		getPreviousVisibleItem,
+		getParentItem,
+		getFirstChildItem,
+	};
+	$context[TreeContextName] = context;
+
+	$run(() => {
+		let expanded = $state.expanded;
+		if (!Array.isArray(expanded)) {
+			expanded = [expanded];
+		}
+		for (let item of itemStates) {
+			item.expanded = expanded.indexOf(item.value) !== -1;
+		}
+	});
+
+	$run(() => {
+		let value = $state.value;
+		switch (type) {
+			case "single": {
+				for (let item of itemStates) {
+					item.selected = item.value === value;
+				}
+				break;
+			}
+			case "multiple": {
+				if (value && !Array.isArray(value)) {
+					value = [value];
+				}
+				for (let item of itemStates) {
+					item.selected = value ? value.indexOf(item.value) !== -1 : false;
+				}
+				break;
+			}
+		}
+	});
+
+	$run(() => {
+		let disabled = $props?.disabled;
+		itemStates.forEach((s) => (s.parentDisabled = disabled === true));
+	});
+
+	let firstExpandedChange = true;
+	$run(() => {
+		const onExpandedChange = $props?.onExpandedChange;
+		const value = $state.expanded;
+		if (firstExpandedChange) {
+			firstExpandedChange = false;
+		} else if (onExpandedChange) {
+			onExpandedChange(value);
+		}
+	});
+
+	let firstSelectedChange = true;
+	$run(() => {
+		const onSelectedChange = $props?.onSelectedChange;
+		const value = $state.value;
+		if (firstSelectedChange) {
+			firstSelectedChange = false;
+		} else if (onSelectedChange) {
+			onSelectedChange(value);
+		}
+	});
+
+	function registerItem(itemState: ItemState, level: number) {
+		itemState.level = level;
+		if (itemState.index === -1) {
+			itemState.index = nextIndex++;
+		}
+
+		if ($state.expanded !== undefined && $state.expanded !== null) {
+			itemState.expanded = $state.expanded.includes(itemState.value);
+		}
+
+		if ($state.value !== undefined && $state.value !== null) {
+			switch (type) {
+				case "single": {
+					itemState.selected = $state.value === itemState.value;
+					break;
+				}
+				case "multiple": {
+					itemState.selected = $state.value.includes(itemState.value);
+					break;
+				}
+			}
+		}
+
+		itemState.parentDisabled = $props?.disabled === true;
+		itemStates.splice(itemState.index, 0, itemState);
+	}
+
+	function removeItem(itemIndex: number) {
+		let index = itemStates.findIndex((item) => item.index === itemIndex);
+		if (index !== -1) {
+			itemStates.splice(itemIndex, 1);
+		}
+		itemStates.forEach((item, i) => (item.index = i));
+	}
+
+	function toggleExpand(value: string) {
+		let newValue = [];
+		for (let item of itemStates) {
+			if (
+				(item.value === value && !item.expanded) ||
+				(item.value !== value && item.expanded)
+			) {
+				newValue.push(item.value);
+			}
+		}
+		$state.expanded = newValue.sort();
+	}
+
+	function toggleSelect(value: string) {
+		switch (type) {
+			case "single": {
+				for (let item of itemStates) {
+					if (item.value === value) {
+						$state.value = item.selected ? "" : item.value;
+						break;
+					}
+				}
+				for (let item of itemStates) {
+					item.selected = $state.value === item.value;
+				}
+				break;
+			}
+			case "multiple": {
+				let newValue = [];
+				for (let item of itemStates) {
+					if (
+						(item.value === value && !item.selected) ||
+						(item.value !== value && item.selected)
+					) {
+						newValue.push(item.value);
+					}
+				}
+				$state.value = newValue.sort();
+				break;
+			}
+		}
+	}
+
+	function handleKey(index: number, e: KeyboardEvent) {
+		switch (e.key) {
+			case "Up":
+			case "ArrowUp": {
+				e.preventDefault();
+				let previousItem = getPreviousVisibleItem(index);
+				if (previousItem) {
+					previousItem.setFocused();
+				}
+				break;
+			}
+			case "Down":
+			case "ArrowDown": {
+				e.preventDefault();
+				let nextItem = getNextVisibleItem(index);
+				if (nextItem) {
+					nextItem.setFocused();
+				}
+				break;
+			}
+			case "Left":
+			case "ArrowLeft": {
+				e.preventDefault();
+				let currentItem = findItem(index);
+				if (currentItem && currentItem.expanded) {
+					toggleExpand(currentItem.value);
+				} else {
+					let parentItem = getParentItem(index);
+					if (parentItem) {
+						parentItem.setFocused();
+					}
+				}
+				break;
+			}
+			case "Right":
+			case "ArrowRight": {
+				e.preventDefault();
+				let currentItem = findItem(index);
+				if (currentItem) {
+					if (currentItem.expanded) {
+						let firstChild = getFirstChildItem(index);
+						if (firstChild) {
+							firstChild.setFocused();
+						}
+					} else if (currentItem.hasChildren) {
+						toggleExpand(currentItem.value);
+					}
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusFirstItem();
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusLastItem();
+				break;
+			}
+			case "Enter":
+			case " ": {
+				e.preventDefault();
+				let currentItem = findItem(index);
+				if (currentItem) {
+					toggleSelect(currentItem.value);
+				}
+				break;
+			}
+		}
+	}
+
+	function focusFirstItem() {
+		for (let item of itemStates) {
+			if (!isItemVisible(item, itemStates)) {
+				continue;
+			}
+			item.setFocused();
+			break;
+		}
+	}
+
+	function focusLastItem() {
+		for (let i = itemStates.length - 1; i >= 0; i--) {
+			let item = itemStates[i];
+			if (!isItemVisible(item, itemStates)) {
+				continue;
+			}
+			item.setFocused();
+			break;
+		}
+	}
+
+	function findItem(index: number): ItemState | undefined {
+		return itemStates.find((item) => item.index === index);
+	}
+
+	function getNextVisibleItem(index: number): ItemState | undefined {
+		let currentItem = findItem(index);
+		if (!currentItem) {
+			return undefined;
+		}
+
+		if (currentItem.expanded && currentItem.hasChildren) {
+			let nextIndex = index + 1;
+			if (nextIndex < itemStates.length) {
+				return itemStates[nextIndex];
+			}
+		}
+
+		for (let i = index + 1; i < itemStates.length; i++) {
+			let item = itemStates[i];
+			if (isItemVisible(item, itemStates)) {
+				return item;
+			}
+		}
+
+		return undefined;
+	}
+
+	function getPreviousVisibleItem(index: number): ItemState | undefined {
+		for (let i = index - 1; i >= 0; i--) {
+			let item = itemStates[i];
+			if (isItemVisible(item, itemStates)) {
+				return item;
+			}
+		}
+		return undefined;
+	}
+
+	function getParentItem(index: number): ItemState | undefined {
+		let currentItem = findItem(index);
+		if (!currentItem) {
+			return undefined;
+		}
+
+		for (let i = index - 1; i >= 0; i--) {
+			let item = itemStates[i];
+			if (item.expanded && item.hasChildren && i < index) {
+				let nextIndex = i + 1;
+				while (nextIndex < itemStates.length) {
+					let sibling = itemStates[nextIndex];
+					if (sibling.level <= item.level) {
+						break;
+					}
+					if (nextIndex === index) {
+						return item;
+					}
+					nextIndex++;
+				}
+			}
+		}
+
+		return undefined;
+	}
+
+	function getFirstChildItem(index: number): ItemState | undefined {
+		let nextIndex = index + 1;
+		if (nextIndex < itemStates.length) {
+			let child = itemStates[nextIndex];
+			if (child.level > itemStates[index].level) {
+				return child;
+			}
+		}
+		return undefined;
+	}
+
+	function isItemVisible(item: ItemState, allItems: ItemState[]): boolean {
+		if (item.level === 0) {
+			return true;
+		}
+
+		for (let i = item.index - 1; i >= 0; i--) {
+			let parentItem = allItems[i];
+			if (parentItem.level < item.level) {
+				return parentItem.expanded;
+			}
+		}
+
+		return true;
+	}
+
+	@render {
+		<div
+			id={$props?.id}
+			class={["torp-tree", $props?.class]}
+			{$props?.style}
+			role="tree"
+			aria-label={$props?.ariaLabel}
+			aria-multiselectable={type === "multiple" ? "true" : undefined}
+		>
+			<slot />
+		</div>
+	}
+}

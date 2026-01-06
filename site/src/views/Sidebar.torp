@@ -41,6 +41,7 @@ export default function Sidebar() {
 				<li><a href="/ui/select-box">SelectBox</a></li>
 				<li><a href="/ui/tab-group">TabGroup</a></li>
 				<li><a href="/ui/tool-bar">ToolBar</a></li>
+				<li><a href="/ui/tree">Tree</a></li>
 			</ul>
 			<h4>Build</h4>
 			<ul class="plain">

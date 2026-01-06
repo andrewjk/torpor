@@ -1,0 +1,70 @@
+import {
+	TreeContextName,
+	type TreeContext,
+	TreeItemContextName,
+	type TreeItemContext,
+} from "./TreeTypes";
+
+export default function TreeItemLabel() {
+	const itemContext = $context[TreeItemContextName] as TreeItemContext;
+	const treeContext = $context[TreeContextName] as TreeContext;
+
+	if (!itemContext) {
+		throw new Error("TreeItemLabel must be contained within a TreeItem");
+	}
+
+	if (!treeContext) {
+		throw new Error("TreeItemLabel must be contained within a Tree");
+	}
+
+	const { state: $state } = itemContext;
+	let label: HTMLSpanElement;
+
+	$run(() => {
+		$state.setFocused = () => {
+			label.focus();
+		};
+	});
+
+	function handleSelectClick(e: MouseEvent) {
+		e.stopPropagation();
+		if (!$state.disabled && !$state.parentDisabled) {
+			treeContext.toggleSelect($state.value);
+		}
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "Enter":
+			case " ": {
+				e.preventDefault();
+				e.stopPropagation();
+				if (!$state.disabled && !$state.parentDisabled) {
+					treeContext.toggleSelect($state.value);
+				}
+				break;
+			}
+			default: {
+				treeContext.handleKey($state.index, e);
+				break;
+			}
+		}
+	}
+
+	@render {
+		<span
+			id={$props?.id}
+			class={["torp-tree-item-label", $props?.class]}
+			{$props?.style}
+			tabindex="0"
+			role="none"
+			data-selected={$state.selected ? "selected" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
+			onclick={handleSelectClick}
+			onkeydown={handleKey}
+			&ref={label}
+		>
+			<slot />
+		</span>
+	}
+}

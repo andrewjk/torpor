@@ -1,0 +1,36 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemContent,
+	TreeItemTrigger,
+	TreeItemLabel,
+} from "../../../src/Tree/index";
+
+export default function TreeSingle($props: any) {
+	@render {
+		<Tree
+			expanded={$props?.expanded}
+			value={$props?.value}
+			type={$props?.type}
+		>
+			<TreeItem value="item-1">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Folder 1</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+			<TreeItem value="item-2">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Folder 2</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+			<TreeItem value="item-3">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>File 3</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+}

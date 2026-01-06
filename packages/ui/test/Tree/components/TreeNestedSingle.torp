@@ -1,0 +1,35 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemContent,
+	TreeItemTrigger,
+	TreeItemLabel,
+} from "../../../src/Tree/index";
+
+export default function TreeNestedSingle($props: any) {
+	@render {
+		<Tree
+			expanded={$props?.expanded}
+			value={$props?.value}
+		>
+			<TreeItem value="folder-1">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Folder 1</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+			<TreeItem value="folder-1-1">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Nested File 1.1</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+			<TreeItem value="folder-2">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Folder 2</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+}
