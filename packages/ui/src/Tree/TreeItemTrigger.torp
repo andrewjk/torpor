@@ -7,6 +7,21 @@ import {
 import ChevronDown from "../icons/ChevronDown.torp";
 import ChevronRight from "../icons/ChevronRight.torp";
 
+/**
+ * A button for expanding or collapsing a TreeItem that has nested children.
+ * When the item has no children, this renders as a spacer for consistent indentation.
+ *
+ * The structure is:
+ *
+ * ```
+ * <TreeItem>
+ * 	<TreeItemContent>
+ * 		<TreeItemTrigger />
+ * 		<TreeItemLabel />
+ * 	</TreeItemContent>
+ * </TreeItem>
+ * ```
+ */
 export default function TreeItemTrigger() {
 	const itemContext = $context[TreeItemContextName] as TreeItemContext;
 	const treeContext = $context[TreeContextName] as TreeContext;

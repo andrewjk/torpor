@@ -3,6 +3,20 @@ import {
 	type TreeItemContext,
 } from "./TreeTypes";
 
+/**
+ * A container for nested TreeItems. This component must be a direct child of TreeItem.
+ *
+ * The structure is:
+ *
+ * ```
+ * <TreeItem>
+ * 	<TreeItemContent>...</TreeItemContent>
+ * 	<TreeItemChildren>
+ * 		<TreeItem />
+ * 	</TreeItemChildren>
+ * </TreeItem>
+ * ```
+ */
 export default function TreeItemChildren() {
 	const itemContext = $context[TreeItemContextName] as TreeItemContext;
 

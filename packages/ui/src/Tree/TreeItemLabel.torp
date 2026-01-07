@@ -5,6 +5,21 @@ import {
 	type TreeItemContext,
 } from "./TreeTypes";
 
+/**
+ * The interactive label for a TreeItem, which can be clicked or keyboard-navigated to select the item.
+ * This component handles keyboard navigation and focus management for the tree.
+ *
+ * The structure is:
+ *
+ * ```
+ * <TreeItem>
+ * 	<TreeItemContent>
+ * 		<TreeItemTrigger />
+ * 		<TreeItemLabel>Item text</TreeItemLabel>
+ * 	</TreeItemContent>
+ * </TreeItem>
+ * ```
+ */
 export default function TreeItemLabel() {
 	const itemContext = $context[TreeItemContextName] as TreeItemContext;
 	const treeContext = $context[TreeContextName] as TreeContext;

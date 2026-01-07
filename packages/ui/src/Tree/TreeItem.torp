@@ -9,15 +9,39 @@ import {
 } from "./TreeTypes";
 
 interface TreeItemProps {
+	/** An ID for the root element */
 	id?: string;
+	/** Classes for the root element */
 	class?: ClassValue;
+	/** Styles for the root element */
 	style?: StyleValue;
+	/** A value for the item */
 	value?: string;
+	/** If set to true, the user cannot interact with this TreeItem */
 	disabled?: boolean;
+	/** Raised when this item is expanded or collapsed */
 	onExpand?: (expanded: boolean) => void;
+	/** Raised when this item is selected or deselected */
 	onSelect?: (selected: boolean) => void;
 }
 
+/**
+ * An item in a Tree, which can contain nested TreeItems via TreeItemChildren.
+ *
+ * The structure of a TreeItem is:
+ *
+ * ```
+ * <TreeItem>
+ * 	<TreeItemContent>
+ * 		<TreeItemTrigger />
+ * 		<TreeItemLabel />
+ * 	</TreeItemContent>
+ * 	<TreeItemChildren>
+ * 		<TreeItem />
+ * 	</TreeItemChildren>
+ * </TreeItem>
+ * ```
+ */
 export default function TreeItem($props: TreeItemProps | undefined) {
 	let defaultId = getId();
 

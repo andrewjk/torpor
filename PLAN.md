@@ -18,7 +18,7 @@
   - [x] ToolBar
   - [ ] Toggle
   - [ ] DataGrid
-  - [ ] Tree
+  - [x] Tree
   - [ ] FocusGroup
   - [ ] DatePicker
   - [ ] TimePicker
@@ -40,7 +40,7 @@
 - [ ] Probably should name it better (`@torpor/launch`?)
 - [ ] Schema validation in routes?
 - [ ] And hooks (as pre and post)
-- [ ] Type-safety 
+- [ ] Type-safety
   - [ ] In app data
   - [ ] When calling endpoints
   - [ ] In forms

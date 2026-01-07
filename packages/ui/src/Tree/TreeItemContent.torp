@@ -5,11 +5,28 @@ import {
 } from "./TreeTypes";
 
 interface TreeItemContentProps {
+	/** An ID for the root element */
 	id?: string;
+	/** Classes for the root element */
 	class?: ClassValue;
+	/** Styles for the root element */
 	style?: StyleValue;
 }
 
+/**
+ * A wrapper for the content of a TreeItem, which should contain TreeItemTrigger and TreeItemLabel.
+ *
+ * The structure is:
+ *
+ * ```
+ * <TreeItem>
+ * 	<TreeItemContent>
+ * 		<TreeItemTrigger />
+ * 		<TreeItemLabel />
+ * 	</TreeItemContent>
+ * </TreeItem>
+ * ```
+ */
 export default function TreeItemContent($props: TreeItemContentProps | undefined) {
 	const itemContext = $context[TreeItemContextName] as TreeItemContext;
 

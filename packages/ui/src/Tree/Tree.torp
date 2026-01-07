@@ -2,18 +2,50 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import { TreeContextName, type TreeContext, type ItemState } from "./TreeTypes";
 
 interface TreeProps {
+	/** An ID for the root element */
 	id?: string;
+	/** Classes for the root element */
 	class?: ClassValue;
+	/** Styles for the root element */
 	style?: StyleValue;
+	/** The value(s) of the expanded TreeItem(s) */
 	expanded?: string | string[];
+	/** Whether a single TreeItem or multiple TreeItems can be selected at the same time */
 	type?: "single" | "multiple";
+	/** The value of the selected TreeItem, or an array of values if the type is "multiple" */
 	value?: string | string[];
+	/** If set to true, the user cannot interact with any items in the Tree */
 	disabled?: boolean;
+	/** The aria-label for the root element */
 	ariaLabel?: string | undefined;
+	/** Raised when the expanded item(s) have changed */
 	onExpandedChange?: (value: string | string[]) => void;
+	/** Raised when the selected item(s) have changed */
 	onSelectedChange?: (value: string | string[] | undefined) => void;
 }
 
+/**
+ * A hierarchical list of items that can be expanded and collapsed to reveal nested content,
+ * with support for selecting items.
+ *
+ * See [the WAI ARIA guidelines for Tree Views](https://www.w3.org/WAI/ARIA/apg/patterns/treeview/).
+ *
+ * The structure of a Tree is:
+ *
+ * ```
+ * <Tree>
+ * 	<TreeItem>
+ * 		<TreeItemContent>
+ * 			<TreeItemTrigger />
+ * 			<TreeItemLabel />
+ * 		</TreeItemContent>
+ * 		<TreeItemChildren>
+ * 			<TreeItem />
+ * 		</TreeItemChildren>
+ * 	</TreeItem>
+ * </Tree>
+ * ```
+ */
 export default function Tree($props: TreeProps | undefined) {
 	let type = $props?.type ?? "single";
 
