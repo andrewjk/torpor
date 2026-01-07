@@ -13,13 +13,11 @@ import isCommentNode from "./isCommentNode";
  * @returns The next node.
  */
 export default function nodeCheckHydrationBreak(node: ChildNode | null): ChildNode | null {
-	if (context.hydrationNode !== null) {
-		if (node !== null && isCommentNode(node) && node.data === HYDRATION_BREAK) {
-			let comment = node;
-			node = node.nextSibling;
-			comment.remove();
-		}
-		context.hydrationNode = node;
+	if (node !== null && isCommentNode(node) && node.data === HYDRATION_BREAK) {
+		let comment = node;
+		node = node.nextSibling;
+		comment.remove();
 	}
+	context.hydrationNode = node;
 	return node;
 }

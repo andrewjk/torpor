@@ -1,3 +1,4 @@
+import context from "./context";
 import nodeCheckHydrationBreak from "./nodeCheckHydrationBreak";
 
 /**
@@ -11,10 +12,16 @@ import nodeCheckHydrationBreak from "./nodeCheckHydrationBreak";
 export default function nodeSkip(node: ChildNode, count: number): ChildNode {
 	let nextNode = node;
 
-	for (let i = 0; i < count; i++) {
-		nextNode = nodeCheckHydrationBreak(nextNode.nextSibling)!;
+	// NOTE: We know these are not null as it is being called from generated code
+	if (context.hydrationNode !== null) {
+		for (let i = 0; i < count; i++) {
+			nextNode = nodeCheckHydrationBreak(nextNode.nextSibling)!;
+		}
+	} else {
+		for (let i = 0; i < count; i++) {
+			nextNode = nextNode.nextSibling!;
+		}
 	}
 
-	// NOTE: We know this is not null as it is being called from generated code
-	return nextNode!;
+	return nextNode;
 }
