@@ -1,9 +1,9 @@
 import $mount from "../../../../src/watch/$mount";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Mount(
 	$parent: ParentNode,
@@ -13,7 +13,7 @@ export default function Mount(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	let inputElement: HTMLInputElement;

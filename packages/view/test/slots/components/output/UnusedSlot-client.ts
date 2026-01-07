@@ -1,10 +1,10 @@
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Unused(
 	$parent: ParentNode,
@@ -14,7 +14,7 @@ export default function Unused(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
@@ -40,7 +40,7 @@ function Header(
 	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

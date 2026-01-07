@@ -8,8 +8,8 @@ export default function AnswerButtonApp(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
 
@@ -44,8 +44,8 @@ function AnswerButton(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
 

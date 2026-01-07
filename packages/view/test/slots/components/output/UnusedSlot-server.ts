@@ -6,8 +6,8 @@ export default function Unused(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
 
@@ -26,8 +26,8 @@ function Header(
 	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
 

@@ -1,6 +1,4 @@
 import $run from "../../../../src/watch/$run";
-import type ListItem from "../../../../src/types/ListItem";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
@@ -13,6 +11,8 @@ import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function ForIn(
 	$parent: ParentNode,
@@ -21,7 +21,7 @@ export default function ForIn(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

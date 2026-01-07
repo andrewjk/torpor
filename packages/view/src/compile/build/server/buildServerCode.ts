@@ -32,10 +32,14 @@ export default function buildServerCode(template: Template, options?: BuildOptio
 
 	// Add the gathered imports in alphabetical order
 	if (imports.size) {
+		const folder = options?.renderFolder ?? "@torpor/view/ssr";
+		const sortedImports = Array.from(imports)
+			.map((imp) => (importsMap[imp] ?? imp).replace("${folder}", folder))
+			.sort()
+			.reverse();
 		b.prepend("");
-		for (let imp of Array.from(imports).sort().reverse()) {
-			imp = importsMap[imp] || imp;
-			b.prepend(imp.replace("${folder}", options?.renderFolder || "@torpor/view/ssr"));
+		for (let imp of sortedImports) {
+			b.prepend(imp);
 		}
 	}
 
@@ -72,9 +76,9 @@ function buildServerTemplate(
 				`${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}?: Record<PropertyKey, any>`,
 				`${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, ServerSlotRender>`,
 			];
-			b.append(params.join(",\n"));
+			b.append(params.join(",\n") + ",");
 		} else if (chunk.script === ") /* @return_type */ {") {
-			b.append("): { body: string, head: string } {");
+			b.append("): { body: string; head: string } {");
 		} else if (chunk.script === "/* @start */") {
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {

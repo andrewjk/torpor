@@ -6,8 +6,8 @@ export default function Parent(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
@@ -33,8 +33,8 @@ function ChildA(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
@@ -52,8 +52,8 @@ function ChildB(
 	$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>
-): { body: string, head: string } {
+	$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";

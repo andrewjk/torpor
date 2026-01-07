@@ -71,12 +71,14 @@ export default function buildCode(
 
 	// Add the gathered imports in alphabetical order
 	if (imports.size) {
+		const folder = options?.renderFolder ?? "@torpor/view";
+		const sortedImports = Array.from(imports)
+			.map((imp) => (importsMap[imp] ?? imp).replace("${folder}", folder))
+			.sort()
+			.reverse();
 		b.prepend("");
-		for (let imp of Array.from(imports).sort().reverse()) {
-			let importStatement = importsMap[imp] ?? imp;
-			let folder = options?.renderFolder ?? "@torpor/view";
-			importStatement = importStatement.replace("${folder}", folder);
-			b.prepend(importStatement);
+		for (let imp of sortedImports) {
+			b.prepend(imp);
 		}
 	}
 
@@ -137,7 +139,7 @@ function buildTemplate(
 			}
 			b.append(`
 					${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}?: Record<PropertyKey, any>,
-					${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>`);
+					${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>,`);
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {

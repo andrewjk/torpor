@@ -9,7 +9,7 @@ export default function Head(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* Head */

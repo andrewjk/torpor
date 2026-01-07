@@ -1,5 +1,4 @@
 import $watch from "../../../../src/watch/$watch";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
@@ -11,6 +10,7 @@ import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Component(
 	$parent: ParentNode,
@@ -19,7 +19,7 @@ export default function Component(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	let components: Record<PropertyKey, any> = {
@@ -81,7 +81,7 @@ function BigTitle(
 	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
@@ -107,7 +107,7 @@ function SmallTitle(
 	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

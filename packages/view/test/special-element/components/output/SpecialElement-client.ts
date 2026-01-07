@@ -1,10 +1,10 @@
 import $run from "../../../../src/watch/$run";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_dynamic from "../../../../src/render/setDynamicElement";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function Element(
 	$parent: ParentNode,
@@ -13,7 +13,7 @@ export default function Element(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

@@ -1,6 +1,5 @@
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
-import type SlotRender from "../../../../src/types/SlotRender";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
@@ -9,6 +8,7 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
+import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function BindComponent(
 	$parent: ParentNode,
@@ -18,7 +18,7 @@ export default function BindComponent(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	let $state = $watch({ name: "Alice", selected: 1 });
@@ -59,7 +59,7 @@ function BindText(
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>
+	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
