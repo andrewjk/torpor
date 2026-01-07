@@ -156,8 +156,9 @@ function buildElementFragmentText(
 	fragments: Fragment[],
 	currentFragment: Fragment,
 ) {
+	const tagName = node.tagName === "@element" ? "el" : node.tagName;
 	let needsClass = node.scopeStyles;
-	currentFragment.text += `<${node.tagName}`;
+	currentFragment.text += `<${tagName}`;
 	let attributesText = node.attributes
 		.filter((a) => !a.name.startsWith("on"))
 		.map((a) => {
@@ -192,7 +193,7 @@ function buildElementFragmentText(
 		for (let child of node.children) {
 			buildNodeFragmentText(child, status, fragments, currentFragment);
 		}
-		currentFragment.text += `</${node.tagName}>`;
+		currentFragment.text += `</${tagName}>`;
 	}
 }
 
@@ -228,8 +229,7 @@ function buildSpecialFragmentText(
 			break;
 		}
 		case "@element": {
-			// HACK: Just treat it as a component node as that does what we need for now
-			buildComponentFragmentText(node, status, fragments, currentFragment);
+			buildElementFragmentText(node, status, fragments, currentFragment);
 			break;
 		}
 		case "@component": {

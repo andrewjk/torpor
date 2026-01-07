@@ -41,7 +41,7 @@ export default function buildNode(
 			break;
 		}
 		case "element": {
-			buildElementNode(node as ElementNode, status, b, parentName, root);
+			buildElementNode(node as ElementNode, status, b, parentName);
 			break;
 		}
 		case "text": {

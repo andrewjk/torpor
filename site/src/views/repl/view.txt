@@ -531,19 +531,20 @@ function isTextNode(node) {
 	return node.nodeType === 3;
 }
 function nodeCheckHydrationBreak(node) {
-	if (context_default.hydrationNode !== null) {
-		if (node !== null && isCommentNode(node) && node.data === HYDRATION_BREAK) {
-			let comment = node;
-			node = node.nextSibling;
-			comment.remove();
-		}
-		context_default.hydrationNode = node;
+	if (node !== null && isCommentNode(node) && node.data === HYDRATION_BREAK) {
+		let comment = node;
+		node = node.nextSibling;
+		comment.remove();
 	}
+	context_default.hydrationNode = node;
 	return node;
 }
 function nodeNext(node, text = false) {
-	if (context_default.hydrationNode !== null && text && isTextNode(node)) return node;
-	return nodeCheckHydrationBreak(node.nextSibling);
+	if (context_default.hydrationNode !== null) {
+		if (text && isTextNode(node)) return node;
+		return nodeCheckHydrationBreak(node.nextSibling);
+	}
+	return node.nextSibling;
 }
 function nodeAnchor(node) {
 	if (context_default.hydrationNode !== null) {
@@ -597,7 +598,8 @@ function nodeRoot(parent, text = false) {
 }
 function nodeSkip(node, count) {
 	let nextNode = node;
-	for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
+	if (context_default.hydrationNode !== null) for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
+	else for (let i = 0; i < count; i++) nextNode = nextNode.nextSibling;
 	return nextNode;
 }
 function runControl(region, anchor, create, name) {
@@ -890,6 +892,7 @@ function setAttribute(el, name, value) {
 function setDynamicElement(el, tag) {
 	if (context_default.hydrationNode !== null) return el;
 	let newElement = el.ownerDocument.createElement(tag);
+	newElement.replaceChildren(...el.childNodes.values());
 	el.replaceWith(newElement);
 	return newElement;
 }

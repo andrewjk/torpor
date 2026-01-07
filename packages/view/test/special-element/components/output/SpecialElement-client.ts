@@ -19,16 +19,12 @@ export default function Element(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <el> Hello! </el> `);
 	const t_root_0 = t_root(t_fragment_0, true);
 	let t_element_1 = t_next(t_root_0) as HTMLElement;
 	const t_text_1 = t_next(t_element_1, true);
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
-		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Hello! `);
-		let t_element_2 = t_root(t_fragment_1) as HTMLElement;
-		t_add_fragment(t_fragment_1, t_element_1, null, t_element_2);
-		t_next(t_element_2);
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);

@@ -22,7 +22,7 @@ export default function buildSpecialNode(
 			break;
 		}
 		case "@element": {
-			buildElementNode(node, status, b, parentName, root);
+			buildElementNode(node, status, b, parentName);
 			break;
 		}
 		case "@component": {
