@@ -61,4 +61,84 @@ describe("Accordion", () => {
 		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "End" }));
 		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
 	});
+
+	it("Enter key toggles accordion", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [0] });
+
+		const header1 = queryByText(container, "Header 2");
+
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
+
+		fireEvent(header1!, new KeyboardEvent("keydown", { key: "Enter" }));
+		expect(queryByText(container, "Content 2")).toBeInTheDocument();
+	});
+
+	it("Space key toggles accordion", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [0] });
+
+		const header1 = queryByText(container, "Header 2");
+
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
+
+		fireEvent(header1!, new KeyboardEvent("keydown", { key: " " }));
+		expect(queryByText(container, "Content 2")).toBeInTheDocument();
+	});
+
+	it("Enter key collapses expanded accordion", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [0, 1] });
+
+		const header1 = queryByText(container, "Header 2");
+
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).toBeInTheDocument();
+
+		fireEvent(header1!, new KeyboardEvent("keydown", { key: "Enter" }));
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
+	});
+
+	it("Space key collapses expanded accordion", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [0, 1] });
+
+		const header1 = queryByText(container, "Header 2");
+
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).toBeInTheDocument();
+
+		fireEvent(header1!, new KeyboardEvent("keydown", { key: " " }));
+		expect(queryByText(container, "Content 1")).toBeInTheDocument();
+		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
+	});
+
+	it("Disabled items are skipped during navigation", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [], disabled: true });
+
+		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
+	});
+
+	// NOTE: I don't know if we want this
+	it.skip("Focus wraps when using arrow keys", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionKeyboard, { value: [] });
+
+		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
+
+		fireEvent(getByText(container, "Header 3"), new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
+	});
 });

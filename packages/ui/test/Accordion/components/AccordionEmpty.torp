@@ -1,0 +1,9 @@
+import {
+	Accordion,
+} from "../../../src/Accordion/index";
+
+export default function AccordionEmpty() {
+	@render {
+		<Accordion />
+	}
+}

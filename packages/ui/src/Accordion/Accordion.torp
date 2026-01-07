@@ -148,7 +148,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 		// Remove the item and re-index
 		let index = itemStates.findIndex((item) => item.index === itemIndex);
 		if (index !== -1) {
-			itemStates.splice(itemIndex, 1);
+			itemStates.splice(index, 1);
 		}
 		itemStates.forEach((item, i) => (item.index = i));
 	}
@@ -160,7 +160,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
 					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
 					if (item.value === toggleValue) {
-						$state.value = item.expanded ? "" : item.value;
+						$state.value = item.expanded ? undefined : item.value;
 						break;
 					}
 				}
@@ -188,31 +188,43 @@ export default function Accordion($props: AccordionProps | undefined) {
 		switch (e.key) {
 			case "Up":
 			case "ArrowUp": {
-				if (headerIndex > 0) {
-					e.preventDefault();
-					itemStates[headerIndex - 1].setFocused();
+				for (let i = headerIndex - 1; i >= 0; i--) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}
 			case "Down":
 			case "ArrowDown": {
-				if (headerIndex < itemStates.length - 1) {
-					e.preventDefault();
-					itemStates[headerIndex + 1].setFocused();
+				for (let i = headerIndex + 1; i < itemStates.length; i++) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}
 			case "Home": {
-				if (headerIndex > 0) {
-					e.preventDefault();
-					itemStates[0].setFocused();
+				for (let i = 0; i < itemStates.length; i++) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}
 			case "End": {
-				if (headerIndex < itemStates.length - 1) {
-					e.preventDefault();
-					itemStates[itemStates.length - 1].setFocused();
+				for (let i = itemStates.length - 1; i >= 0; i--) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}

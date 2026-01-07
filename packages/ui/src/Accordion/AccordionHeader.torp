@@ -31,15 +31,15 @@ export default function AccordionHeader($props: AccordionHeaderProps | undefined
 	let $state = context.state
 
 	@render {
-		@// TODO: $props.as
-		<h4
+		<@element
+			self={$props?.as ?? "h4"}
 			{$props?.id}
 			class={["torp-accordion-header", $props?.class]}
 			{$props?.style}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled ? "true" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			<slot />
-		</h4>
+		</@element>
 	}
 }

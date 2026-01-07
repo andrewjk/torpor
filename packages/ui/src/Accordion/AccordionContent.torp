@@ -34,9 +34,11 @@ export default function AccordionContent($props: AccordionContentProps | undefin
 			class={["torp-accordion-content", $props?.class]}
 			{$props?.style}
 			role={$props?.ariaRegion ? "region" : undefined}
+			@// TODO: hidden={$state.expanded ? undefined : "until-found"}
 			aria-labelledby={$state.headerId}
+			aria-hidden={$state.expanded ? undefined : "true"}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled ? "true" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			@if ($state.expanded) {
 				<slot />

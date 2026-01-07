@@ -44,8 +44,18 @@ export default function AccordionTrigger($props: AccordionTriggerProps | undefin
 	}
 
 	function handleKey(e: KeyboardEvent) {
-		// Pass the key press up to the parent Accordion which will handle setting the focused button
-		context.handleHeaderKey($state.index, e);
+		switch (e.key) {
+			case "Enter":
+			case " ": {
+				e.preventDefault();
+				handleClick();
+				break;
+			}
+			default: {
+				// Pass the key press up to the parent Accordion which will handle setting the focused button
+				context.handleHeaderKey($state.index, e);
+			}
+		}
 	}
 
 	@render {
@@ -55,11 +65,11 @@ export default function AccordionTrigger($props: AccordionTriggerProps | undefin
 			class={["torp-accordion-trigger", $props?.class]}
 			{$props?.style}
 			disabled={$state.disabled || $state.parentDisabled}
-			aria-expanded={$state.expanded.toString()}
-			aria-disabled={$state.disabled ? "true" : undefined}
+			aria-expanded={$state.expanded ? "true" : "false"}
+			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			aria-controls={$state.contentId}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled ? "true" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			&ref={button}
 			onclick={handleClick}
 			onkeydown={handleKey}

@@ -8,7 +8,7 @@ import {
 
 export default function AccordionMultiple($props: any) {
 	@render {
-		<Accordion value={$props?.value} type="multiple">
+		<Accordion {$props?.value} {$props?.onchange} type="multiple">
 			<AccordionItem>
 				<AccordionHeader as="h4">
 					<AccordionTrigger>Header 1</AccordionTrigger>

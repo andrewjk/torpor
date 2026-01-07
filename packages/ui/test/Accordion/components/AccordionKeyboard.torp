@@ -15,7 +15,7 @@ export default function AccordionKeyboard($props: any) {
 				</AccordionHeader>
 				<AccordionContent>Content 1</AccordionContent>
 			</AccordionItem>
-			<AccordionItem>
+			<AccordionItem {$props.disabled}>
 				<AccordionHeader as="h4">
 					<AccordionTrigger>Header 2</AccordionTrigger>
 				</AccordionHeader>

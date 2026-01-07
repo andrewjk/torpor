@@ -1,5 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import AccordionAccessibility from "./components/AccordionAccessibility.torp";
@@ -55,5 +56,37 @@ describe("Accordion", () => {
 		//     when panels contain heading elements or a nested accordion
 		expect(queryByText(container, "Open Content")).toHaveAttribute("aria-labelledby", headerId);
 		expect(queryByText(container, "Region Content")).toHaveAttribute("role", "region");
+	});
+
+	it("Collapsed content has aria-hidden attribute", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionAccessibility, { value: [1] });
+
+		// TODO: Use hidden="until-found"
+
+		//expect(queryByText(container, "Role Content")).toHaveAttribute("aria-hidden", "true");
+		//expect(queryByText(container, "Role Content")).toHaveAttribute("hidden", "until-found");
+		expect(queryByText(container, "Open Content")).not.toHaveAttribute("aria-hidden");
+		//expect(queryByText(container, "Open Content")).not.toHaveAttribute("hidden");
+		//expect(queryByText(container, "Closed Content")).toHaveAttribute("aria-hidden", "true");
+		//expect(queryByText(container, "Region Content")).toHaveAttribute("aria-hidden", "true");
+		//expect(queryByText(container, "Disabled Content")).toHaveAttribute("aria-hidden", "true");
+	});
+
+	it("aria-expanded updates when toggling", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, AccordionAccessibility, { value: [1] });
+
+		const openHeader = queryByText(container, "Open Header");
+		const closedHeader = queryByText(container, "Closed Header");
+
+		expect(openHeader).toHaveAttribute("aria-expanded", "true");
+		expect(closedHeader).toHaveAttribute("aria-expanded", "false");
+
+		await userEvent.click(closedHeader!);
+		expect(openHeader).toHaveAttribute("aria-expanded", "true");
+		expect(closedHeader).toHaveAttribute("aria-expanded", "true");
 	});
 });

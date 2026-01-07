@@ -6,23 +6,23 @@ import {
 	AccordionContent,
 } from "../../../src/Accordion/index";
 
-export default function AccordionSingle($props: any) {
+export default function AccordionDisabled($props: any) {
 	@render {
-		<Accordion {$props?.value} {$props?.onchange}>
+		<Accordion disabled={$props.disabled} value={$props.value}>
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 1</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 1</AccordionContent>
 			</AccordionItem>
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 2</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 2</AccordionContent>
 			</AccordionItem>
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 3</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 3</AccordionContent>
