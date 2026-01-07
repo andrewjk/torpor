@@ -61,7 +61,7 @@ export default function ForEscape(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input></input> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input> `);
 			const t_root_1 = t_root(t_fragment_1, true);
 			const t_text_1 = t_child(t_next(t_root_1));
 			const t_div_1 = t_next(t_next(t_next(t_root_1), true)) as HTMLDivElement;
