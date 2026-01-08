@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleBasic from "./accordion/ExampleBasic.torp";
 import ExampleBound from "./accordion/ExampleBound.torp";
@@ -38,21 +39,15 @@ export default function AccordionPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Basic
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Bound
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Multiple
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Bound
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Multiple
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>

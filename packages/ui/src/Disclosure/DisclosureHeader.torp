@@ -8,8 +8,6 @@ interface DisclosureHeaderProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
-	/** The type of HTML header to use */
-	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
 }
 
 /**
@@ -31,8 +29,7 @@ export default function DisclosureHeader($props: DisclosureHeaderProps | undefin
 	let $state = context.state
 
 	@render {
-		@// TODO: $props.as
-		<h4
+		<div
 			{$props?.id}
 			class={["torp-disclosure-header", $props?.class]}
 			{$props?.style}
@@ -40,6 +37,6 @@ export default function DisclosureHeader($props: DisclosureHeaderProps | undefin
 			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
-		</h4>
+		</div>
 	}
 }

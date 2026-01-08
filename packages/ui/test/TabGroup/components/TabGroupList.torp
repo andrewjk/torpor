@@ -12,7 +12,7 @@ export default function TabGroupList() {
 			<TabList>
 			@for (let item of $props.items) {
 				@key = item.id
-				<TabHeader as="h4">
+				<TabHeader>
 					<TabTrigger>{item.header}</TabTrigger>
 				</TabHeader>
 			}

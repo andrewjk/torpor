@@ -10,13 +10,13 @@ export default function TabGroupKeyboard() {
 	@render {
 		<TabGroup value={$props?.value}>
 			<TabList>
-				<TabHeader as="h4">
+				<TabHeader>
 					<TabTrigger>Header 1</TabTrigger>
 				</TabHeader>
-				<TabHeader as="h4">
+				<TabHeader>
 					<TabTrigger>Header 2</TabTrigger>
 				</TabHeader>
-				<TabHeader as="h4">
+				<TabHeader>
 					<TabTrigger>Header 3</TabTrigger>
 				</TabHeader>
 			</TabList>

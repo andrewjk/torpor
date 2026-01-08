@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleBarChart from "./charts/ExampleBarChart.torp";
 import ExampleLineChart from "./charts/ExampleLineChart.torp";
@@ -36,31 +37,21 @@ export default function ChartPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Bar Chart
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Line Chart
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Pie Chart
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Scatter Chart
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Sparkline
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Bar Chart
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Line Chart
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Pie Chart
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Scatter Chart
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Sparkline
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>

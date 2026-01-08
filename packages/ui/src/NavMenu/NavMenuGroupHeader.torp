@@ -9,8 +9,6 @@ interface NavMenuGroupHeaderProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
-	/** The type of HTML header to use */
-	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
 }
 
 /**
@@ -29,13 +27,12 @@ export default function NavMenuGroupHeader($props: NavMenuGroupHeaderProps | und
 	$state.headerId = $props?.id ?? defaultId;
 
 	@render {
-		@// TODO: self={$props.as}
-		<h4
+		<div
 			id={$props?.id ?? defaultId}
 			class={["torp-nav-menu-group-header", $props?.class]}
 			{$props?.style}
 		>
 			<slot />
-		</h4>
+		</div>
 	}
 }

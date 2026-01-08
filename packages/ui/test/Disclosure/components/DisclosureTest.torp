@@ -8,7 +8,7 @@ import {
 export default function DisclosureAccessibility($props: { expanded: boolean }) {
 	@render {
 		<Disclosure {$props?.expanded}>
-			<DisclosureHeader as="h4">
+			<DisclosureHeader>
 				<DisclosureTrigger>Disclosure header</DisclosureTrigger>
 			</DisclosureHeader>
 			<DisclosureContent>Disclosure content</DisclosureContent>

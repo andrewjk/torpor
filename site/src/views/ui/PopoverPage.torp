@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleDialog from "./popover/ExampleDialog.torp";
 import ExampleHover from "./popover/ExampleHover.torp";
@@ -32,26 +33,18 @@ export default function PopoverPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Dialog
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Hover
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Function
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Variable
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Dialog
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Hover
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Function
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Variable
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>

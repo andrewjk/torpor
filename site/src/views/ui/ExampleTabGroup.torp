@@ -1,16 +1,17 @@
-import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
 import copyCode from "../../lib/copyCode";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 export default function ExampleTabGroup() {
 	@render {
 		<TabGroup>
 			<TabList ariaLabel="Preview and code tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">Preview</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">Code</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Preview
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Code
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<p class="example-preview">
@@ -26,5 +27,32 @@ export default function ExampleTabGroup() {
 				</div>
 			</TabContent>
 		</TabGroup>
+	}
+
+	@style {
+		.example-preview {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			//justify-content: center;
+			background: #f6f6f6;
+			border-radius: 4px;
+			height: 340px;
+			padding: 20px;
+		}
+
+		.example-code {
+			background: #f2f2f2;
+			border-radius: 4px;
+			height: 340px;
+			overflow: auto;
+		}
+
+		.example-copy-button {
+			position: relative;
+			left: 10px;
+			top: 10px;
+			margin-bottom: 10px;
+		}
 	}
 }

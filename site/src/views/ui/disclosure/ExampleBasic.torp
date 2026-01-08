@@ -4,8 +4,10 @@ import { grow } from "@torpor/ui/motion"
 export default function ExampleBasic() {
 	@render {
 		<Disclosure class="example-disclosure">
-			<DisclosureHeader as="h4">
-				<DisclosureTrigger class="example-disclosure-trigger">Click me</DisclosureTrigger>
+			<DisclosureHeader>
+				<h4 class="example-disclosure-header">
+					<DisclosureTrigger class="example-disclosure-trigger">Click me</DisclosureTrigger>
+				</h4>
 			</DisclosureHeader>
 			<DisclosureContent>
 				<div class="example-disclosure-content" transition={grow}>Here I am</div>
@@ -18,6 +20,10 @@ export default function ExampleBasic() {
 			border: 1px solid gainsboro;
 			border-radius: 4px;
 			width: 200px;
+		}
+
+		.example-disclosure-header {
+			margin-block: 0;
 		}
 
 		.example-disclosure-trigger {

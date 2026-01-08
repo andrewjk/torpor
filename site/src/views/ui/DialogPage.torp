@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleBasic from "./dialog/ExampleBasic.torp";
 import ExampleFunction from "./dialog/ExampleFunction.torp";
@@ -43,31 +44,21 @@ export default function DialogPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Basic
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Function
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Info
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Confirm
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Prompt
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Function
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Info
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Confirm
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Prompt
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>

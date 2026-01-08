@@ -8,8 +8,6 @@ interface AccordionHeaderProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
-	/** The type of HTML header to use */
-	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
 }
 
 /**
@@ -31,8 +29,7 @@ export default function AccordionHeader($props: AccordionHeaderProps | undefined
 	let $state = context.state
 
 	@render {
-		<@element
-			self={$props?.as ?? "h4"}
+		<div
 			{$props?.id}
 			class={["torp-accordion-header", $props?.class]}
 			{$props?.style}
@@ -40,6 +37,6 @@ export default function AccordionHeader($props: AccordionHeaderProps | undefined
 			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			<slot />
-		</@element>
+		</div>
 	}
 }

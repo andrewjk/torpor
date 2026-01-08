@@ -27,7 +27,7 @@ export default function NavMenuAccessibility($props: any) {
 				</NavMenuPopoutContent>
 			</NavMenuPopout>
 			<NavMenuGroup>
-				<NavMenuGroupHeader as="h4">Group header</NavMenuGroupHeader>
+				<NavMenuGroupHeader>Group header</NavMenuGroupHeader>
 				<NavMenuLink href="/grouped-page">Grouped page</NavMenuLink>
 			</NavMenuGroup>
 		</NavMenu>

@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleCSS from "./breadcrumb/ExampleCSS.torp";
 import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
@@ -33,16 +34,12 @@ export default function BreadcrumbPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						CSS
-					</TabTrigger>
-				</TabHeader>
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Separators
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					CSS
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Separators
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>

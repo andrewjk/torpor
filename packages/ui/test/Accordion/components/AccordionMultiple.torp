@@ -10,19 +10,19 @@ export default function AccordionMultiple($props: any) {
 	@render {
 		<Accordion {$props?.value} {$props?.onchange} type="multiple">
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 1</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 1</AccordionContent>
 			</AccordionItem>
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 2</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 2</AccordionContent>
 			</AccordionItem>
 			<AccordionItem>
-				<AccordionHeader as="h4">
+				<AccordionHeader>
 					<AccordionTrigger>Header 3</AccordionTrigger>
 				</AccordionHeader>
 				<AccordionContent>Content 3</AccordionContent>

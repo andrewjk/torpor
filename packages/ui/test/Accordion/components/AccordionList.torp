@@ -12,7 +12,7 @@ export default function AccordionList($props: any) {
 			@for (let item of $props.items) {
 				@key = item.id
 				<AccordionItem>
-					<AccordionHeader as="h4">
+					<AccordionHeader>
 						<AccordionTrigger>{item.header}</AccordionTrigger>
 					</AccordionHeader>
 					<AccordionContent>{item.text}</AccordionContent>

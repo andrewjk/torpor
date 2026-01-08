@@ -1,0 +1,28 @@
+import { TabTrigger, TabHeader } from "@torpor/ui/TabGroup"
+
+export default function ExampleTabGroup() {
+	@render {
+		<TabHeader>
+			<h4>
+				<TabTrigger class="example-tab-header">
+					<slot />
+				</TabTrigger>
+			</h4>
+		</TabHeader>
+	}
+
+	@style {
+		.example-tab-header {
+			all: unset;
+			box-sizing: border-box;
+			background: transparent;
+			border-bottom: 1px solid gainsboro;
+			cursor: default;
+			padding: 5px;
+		}
+
+		.example-tab-header[data-state="active"] {
+			border-bottom: 2px solid black;
+		}
+	}
+}

@@ -8,8 +8,6 @@ interface TabHeaderProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
-	/** The type of HTML header to use */
-	as?: "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
 	/** The index of this header's item */
 	index?: number,
 	/** The value for this header's item */
@@ -53,8 +51,7 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 	});
 
 	@render {
-		@// TODO: $props?.as
-		<h4
+		<div
 			{$props?.id}
 			class={[
 				"torp-tab-header",
@@ -63,10 +60,9 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 			]}
 			data-state={$state.active ? "active" : "inactive"}
 			data-disabled={$state.disabled ? "true" : undefined}
-			&ref={button}
 		>
 			<slot />
-		</h4>
+		</div>
 	}
 
 	@style {

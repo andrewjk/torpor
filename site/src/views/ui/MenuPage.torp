@@ -1,6 +1,7 @@
-import { TabGroup, TabList, TabTrigger, TabHeader, TabContent } from "@torpor/ui/TabGroup"
+import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
 
 import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
 
 import ExampleBasic from "./menu/ExampleBasic.torp";
 
@@ -35,11 +36,9 @@ export default function MenuPage() {
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
-				<TabHeader>
-					<TabTrigger class="example-tab-header">
-						Basic
-					</TabTrigger>
-				</TabHeader>
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>
