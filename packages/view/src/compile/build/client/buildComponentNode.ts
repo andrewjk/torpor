@@ -141,7 +141,9 @@ export default function buildComponentNode(
 					name,
 					preText: "",
 					value,
-					postText: "",
+					// Set non-reactive props with `as const` so that typescript
+					// won't complain when passing e.g. strings to string unions
+					postText: " as const",
 					spans: [span],
 					offsets: [],
 					lengths: [],
