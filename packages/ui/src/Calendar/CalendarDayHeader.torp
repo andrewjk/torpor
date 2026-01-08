@@ -1,0 +1,36 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface CalendarDayHeaderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+	/** The day to display */
+	dayName: string,
+	/** The short day to display */
+	shortDayName: string,
+	/** An ARIA label for describing the day header to screen readers  */
+	ariaLabel?: string | undefined,
+}
+
+/**
+ * The calendar grid header.
+ */
+export default function CalendarDayHeader($props: CalendarDayHeaderProps | undefined) {
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-calendar-day-header", $props?.class]}
+			{$props?.style}
+			role="columnheader"
+			aria-label={$props?.ariaLabel ?? $props?.dayName}
+			abbr={$props?.shortDayName}
+		>
+			<slot>
+				{$props?.shortDayName}
+			</slot>
+		</div>
+	}
+}

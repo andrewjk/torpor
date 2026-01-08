@@ -39,6 +39,8 @@ export default function CalendarHeader($props: CalendarHeaderProps | undefined) 
 			{$props?.id}
 			class={["torp-calendar-header", $props?.class]}
 			{$props?.style}
+			aria-live="polite"
+			aria-atomic="true"
 		>
 			<slot {$state.monthNumber} {$state.monthName} {$state.year} />
 		</div>

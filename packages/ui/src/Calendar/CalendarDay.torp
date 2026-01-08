@@ -3,6 +3,15 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import { areDatesEqual } from "../utils/dateUtils";
 import { type CalendarContext, CalendarContextName } from "./CalendarTypes";
 
+// TODO: Internationalization?? On the server and/or the client...
+const formatDate = (date: Date): string => {
+	return new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric"
+	}).format(date);
+};
+
 interface CalendarDayProps {
 	/** An ID for the root element */
 	id?: string;
@@ -16,6 +25,8 @@ interface CalendarDayProps {
 	muted?: boolean,
 	/** Whether the date is active */
 	active?: boolean,
+	/** An ARIA label for describing the day to screen readers  */
+	ariaLabel?: string | undefined,
 	onclick?: () => void,
 	onkeydown?: () => void,
 }
@@ -80,16 +91,26 @@ export default function CalendarDay($props: CalendarDayProps) {
 				tabindex="-1"
 				onclick={handleClick}
 				onkeydown={handleKey}
+				aria-label={$props?.ariaLabel ?? formatDate($props.date)}
+				aria-current={isToday() ? "date" : undefined}
+				aria-selected={$props.active ? "true" : "false"}
+				aria-disabled={$props.muted ? "true" : undefined}
 			>
-				{$props.date.getDate()}
+				<slot>
+					{$props.date.getDate()}
+				</slot>
 			</button>
 		} else {
 			<span
 				{$props?.id}
 				class={buildClass()}
 				{$props?.style}
+				aria-label={$props?.ariaLabel ?? formatDate($props.date)}
+				aria-current={isToday() ? "date" : undefined}
 			>
-				{$props.date.getDate()}
+				<slot>
+					{$props.date.getDate()}
+				</slot>
 			</span>
 		}
 		@// TODO:

@@ -24,6 +24,25 @@ interface CalendarProps {
 	onclose?: () => void,
 }
 
+/**
+ * A basic calendar.
+ *
+ * The structure of a Calendar is:
+ *
+ * ```
+ * <Calendar>
+ * 	<CalendarGrid>
+ * 		<CalendarHeader />
+ * 		<CalendarGridHeader>
+ * 			<CalendarDayHeader />
+ * 		</CalendarGridHeader>
+ * 		<CalendarGrid>
+ * 			<CalendarDay />
+ * 		</CalendarGrid>
+ * 	</CalendarGrid>
+ * </Calendar>
+ * ```
+ */
 export default function Calendar($props: CalendarProps) {
 	$props ??= $watch({});
 
@@ -92,11 +111,11 @@ export default function Calendar($props: CalendarProps) {
 		}
 	}
 
-	function setActiveDate(date: Date) {
+	function setActiveDate(date: Date, moveRange = false) {
 		$state.activeDate = new ReactiveDate(date);
 
 		// If the selected date is outside the visible date range, move the date range
-		if (date < $state.visibleStartDate || date > $state.visibleEndDate) {
+		if (moveRange || date < $state.visibleStartDate || date > $state.visibleEndDate) {
 			refocus = true;
 			$state.visibleDate = new ReactiveDate(date);
 			if ($props.onchangedate) {
@@ -150,33 +169,65 @@ export default function Calendar($props: CalendarProps) {
 			case "Left":
 			case "ArrowLeft": {
 				e.preventDefault();
-				// Move to the date one day before
-				const newDate = new Date($state.activeDate.getTime() - 1 * 86400000)
+				const newDate = new Date($state.activeDate);
+				newDate.setDate(newDate.getDate() - 1);
 				setActiveDate(newDate);
 				break;
 			}
 			case "Up":
 			case "ArrowUp": {
 				e.preventDefault();
-				// Move to the date seven days before
-				const newDate = new Date($state.activeDate.getTime() - 7 * 86400000)
+				const newDate = new Date($state.activeDate);
+				newDate.setDate(newDate.getDate() - 7);
 				setActiveDate(newDate);
 				break;
 			}
 			case "Right":
 			case "ArrowRight": {
 				e.preventDefault();
-				// Move to the date one day after
-				const newDate = new Date($state.activeDate.getTime() + 1 * 86400000)
+				const newDate = new Date($state.activeDate);
+				newDate.setDate(newDate.getDate() + 1);
 				setActiveDate(newDate);
 				break;
 			}
 			case "Down":
 			case "ArrowDown": {
 				e.preventDefault();
-				// Move to the date seven days after
-				const newDate = new Date($state.activeDate.getTime() + 7 * 86400000)
+				const newDate = new Date($state.activeDate);
+				newDate.setDate(newDate.getDate() + 7);
 				setActiveDate(newDate);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				const newDate = new Date($state.activeDate);
+				const dayOfWeek = newDate.getDay();
+				const daysToSubtract = (dayOfWeek - context.startOfWeek + 7) % 7;
+				newDate.setDate(newDate.getDate() - daysToSubtract);
+				setActiveDate(newDate);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				const newDate = new Date($state.activeDate);
+				const dayOfWeek = newDate.getDay();
+				const daysToAdd = (context.startOfWeek - 1 - dayOfWeek + 7) % 7;
+				newDate.setDate(newDate.getDate() + daysToAdd);
+				setActiveDate(newDate);
+				break;
+			}
+			case "PageUp": {
+				e.preventDefault();
+				const newDate = new Date($state.activeDate);
+				newDate.setMonth(newDate.getMonth() - 1);
+				setActiveDate(newDate, true);
+				break;
+			}
+			case "PageDown": {
+				e.preventDefault();
+				const newDate = new Date($state.activeDate);
+				newDate.setMonth(newDate.getMonth() + 1);
+				setActiveDate(newDate, true);
 				break;
 			}
 		}
@@ -188,6 +239,9 @@ export default function Calendar($props: CalendarProps) {
 			class={["torp-calendar", $props?.class]}
 			{$props?.style}
 			&ref={container}
+			role="grid"
+			aria-label="Calendar"
+			aria-readonly={!$props.selectable}
 		>
 			<slot />
 		</div>

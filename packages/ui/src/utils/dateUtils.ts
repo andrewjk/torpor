@@ -25,7 +25,7 @@ const dayNames: string[] = [
 	"Saturday",
 	"Sunday",
 ];
-const shortDayNames: string[] = dayNames.map((n) => n.substring(0, 3).toLowerCase());
+const shortDayNames: string[] = dayNames.map((n) => n.substring(0, 2));
 
 export { monthNames, shortMonthNames, dayNames, shortDayNames };
 

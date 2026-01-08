@@ -1,6 +1,7 @@
 import {
 	Calendar,
 	CalendarDay,
+	CalendarDayHeader,
 	CalendarGrid,
 	CalendarGridHeader,
 	CalendarHeader,
@@ -9,21 +10,39 @@ import {
 
 export default function CalendarTest() {
 	@render {
-		<Calendar {$props.selectable} {$props.value}>
+		<Calendar
+			{$props.selectable}
+			{$props.value}
+			{$props.startOfWeek}
+			{$props.onchange}
+			{$props.onchangedate}
+			{$props.onclose}
+		>
 			<CalendarHeader>
-				<CalendarHeaderTrigger type="previous" />
+				<CalendarHeaderTrigger
+					type="previous"
+					ariaLabel={$props.prevMonthLabel}
+				/>
 				<h4>{$slot.monthName} {$slot.year}</h4>
-				<CalendarHeaderTrigger type="next" />
+				<CalendarHeaderTrigger
+					type="next"
+					ariaLabel={$props.nextMonthLabel}
+				/>
 			</CalendarHeader>
 			<CalendarGridHeader>
 				@for (let day of $slot.days) {
-					<div>{day.dayName.substring(0, 2)}</div>
+					<CalendarDayHeader {day.dayName} {day.shortDayName} />
 				}
 			</CalendarGridHeader>
-			<CalendarGrid>
+			<CalendarGrid ariaLabel={$props.calendarGridLabel}>
 				@for (let day of $slot.days) {
 					@key = day.date
-					<CalendarDay {day.date} {day.muted} {day.active} />
+					<CalendarDay
+						{day.date}
+						{day.muted}
+						{day.active}
+						ariaLabel={$props.dayLabel}
+					/>
 				}
 			</CalendarGrid>
 		</Calendar>

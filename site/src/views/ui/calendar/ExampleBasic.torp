@@ -1,6 +1,7 @@
 import {
 	Calendar,
 	CalendarDay,
+	CalendarDayHeader,
 	CalendarGrid,
 	CalendarGridHeader,
 	CalendarHeader,
@@ -17,7 +18,7 @@ export default function ExampleBasic() {
 			</CalendarHeader>
 			<CalendarGridHeader>
 				@for (let day of $slot.days) {
-					<div>{day.dayName.substring(0, 2)}</div>
+					<CalendarDayHeader {day.dayName} {day.shortDayName} />
 				}
 			</CalendarGridHeader>
 			<CalendarGrid>

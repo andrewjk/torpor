@@ -14,6 +14,8 @@ interface CalendarTriggerProps {
 	type: TriggerType;
 	/** Whether this item is disabled */
 	disabled?: boolean;
+	/** An ARIA label for describing the button to screen readers  */
+	ariaLabel?: string | undefined,
 };
 
 export default function CalendarHeaderTrigger($props: CalendarTriggerProps) {
@@ -38,6 +40,7 @@ export default function CalendarHeaderTrigger($props: CalendarTriggerProps) {
 			{$props?.disabled}
 			data-type={$props.type}
 			onclick={handleClick}
+			aria-label={$props?.ariaLabel ?? ($props.type === "previous" ? "Previous month" : "Next month")}
 		>
 			<slot>
 				@if ($props.type === "previous") {

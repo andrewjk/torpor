@@ -19,7 +19,17 @@ export default function CalendarPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<Calendar />
+<Calendar>
+	<CalendarGrid>
+		<CalendarHeader />
+		<CalendarGridHeader>
+			<CalendarDayHeader />
+		</CalendarGridHeader>
+		<CalendarGrid>
+			<CalendarDay />
+		</CalendarGrid>
+	</CalendarGrid>
+</Calendar>
 `.trim()}</code></pre>
 		<h2>Demo</h2>
 		<TabGroup>

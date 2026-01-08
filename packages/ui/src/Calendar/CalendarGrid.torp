@@ -8,6 +8,8 @@ interface CalendarGridProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** An ARIA label for describing the grid to screen readers  */
+	ariaLabel?: string | undefined,
 }
 
 /**
@@ -38,6 +40,9 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 			tabindex={selectable ? 0 : -1}
 			onfocus={handleFocus}
 			onkeydown={handleKey}
+			role="grid"
+			aria-label={$props?.ariaLabel}
+			aria-colcount="7"
 		>
 			<slot {$state.days} />
 		</div>
