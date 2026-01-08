@@ -10,6 +10,9 @@ export default function setDynamicElement(el: HTMLElement, tag: string): HTMLEle
 
 	// Replace the old element with the new element
 	let newElement = el.ownerDocument.createElement(tag);
+	for (const attr of el.attributes) {
+		newElement.setAttributeNS(null, attr.name, attr.value);
+	}
 	newElement.replaceChildren(...el.childNodes.values());
 	el.replaceWith(newElement);
 

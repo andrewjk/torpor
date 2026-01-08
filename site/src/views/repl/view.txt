@@ -892,6 +892,7 @@ function setAttribute(el, name, value) {
 function setDynamicElement(el, tag) {
 	if (context_default.hydrationNode !== null) return el;
 	let newElement = el.ownerDocument.createElement(tag);
+	for (const attr of el.attributes) newElement.setAttributeNS(null, attr.name, attr.value);
 	newElement.replaceChildren(...el.childNodes.values());
 	el.replaceWith(newElement);
 	return newElement;
