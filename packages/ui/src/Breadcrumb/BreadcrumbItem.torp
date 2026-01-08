@@ -17,7 +17,7 @@ interface BreadcrumbItemProps {
  */
 export default function BreadcrumbItem($props: BreadcrumbItemProps | undefined) {
 	@render {
-		<div
+		<li
 			{$props?.id}
 			class={["torp-breadcrumb", $props?.class]}
 			{$props?.style}
@@ -25,6 +25,6 @@ export default function BreadcrumbItem($props: BreadcrumbItemProps | undefined) 
 			data-current={$props?.current ? "current" : undefined}
 		>
 			<slot />
-		</div>
+		</li>
 	}
 }

@@ -25,10 +25,12 @@ export default function BreadcrumbPage() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <Breadcrumb>
-    <BreadcrumbItem />
-    <BreadcrumbSeparator /> (optional)
-    <BreadcrumbItem />
-	...
+	<BreadcrumbList>
+		<BreadcrumbItem />
+		<BreadcrumbSeparator /> (optional)
+		<BreadcrumbItem />
+		...
+	</BreadcrumbList>
 </Breadcrumb>
 `.trim()}</code></pre>
 		<h2>Demo</h2>

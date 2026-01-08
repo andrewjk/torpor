@@ -1,0 +1,7 @@
+import { Breadcrumb, BreadcrumbItem } from "../../../src/Breadcrumb/index";
+
+export default function EmptyBreadcrumb() {
+	@render {
+		<Breadcrumb ariaLabel="Empty Breadcrumb" />
+	}
+}

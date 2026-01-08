@@ -1,0 +1,9 @@
+import { Breadcrumb, BreadcrumbItem } from "../../../src/Breadcrumb/index";
+
+export default function SingleItemBreadcrumb() {
+	@render {
+		<Breadcrumb ariaLabel="Single Item Breadcrumb">
+			<BreadcrumbItem current>Home</BreadcrumbItem>
+		</Breadcrumb>
+	}
+}

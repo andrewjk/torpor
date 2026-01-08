@@ -1,0 +1,12 @@
+import { Breadcrumb, BreadcrumbItem } from "../../../src/Breadcrumb/index";
+
+export default function NonLinkBreadcrumb() {
+	@render {
+		<Breadcrumb ariaLabel="Breadcrumb">
+			<BreadcrumbItem>
+				<span>Home</span>
+			</BreadcrumbItem>
+			<BreadcrumbItem current>Current</BreadcrumbItem>
+		</Breadcrumb>
+	}
+}

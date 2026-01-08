@@ -1,0 +1,11 @@
+import { Breadcrumb, BreadcrumbItem } from "../../../src/Breadcrumb/index";
+
+export default function BreadcrumbMultipleCurrent() {
+	@render {
+		<Breadcrumb ariaLabel="Breadcrumb">
+			<BreadcrumbItem current>Home</BreadcrumbItem>
+			<BreadcrumbItem current>Invalid</BreadcrumbItem>
+			<BreadcrumbItem>Page</BreadcrumbItem>
+		</Breadcrumb>
+	}
+}

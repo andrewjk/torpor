@@ -1,0 +1,25 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface BreadcrumbListProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue,
+	/** Styles for the root element */
+	style?: StyleValue,
+}
+
+/**
+ * The list that contains the breadcrumbs.
+ */
+export default function BreadcrumbList($props: BreadcrumbListProps | undefined) {
+	@render {
+		<ol
+			{$props?.id}
+			class={["torp-breadcrumb-list", $props?.class]}
+			{$props?.style}
+		>
+			<slot />
+		</ol>
+	}
+}

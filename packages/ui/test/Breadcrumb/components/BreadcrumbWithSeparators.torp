@@ -1,0 +1,19 @@
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "../../../src/Breadcrumb/index";
+
+export default function BreadcrumbWithSeparators() {
+	@render {
+		<Breadcrumb ariaLabel="Breadcrumb">
+			<BreadcrumbList>
+				<BreadcrumbItem>
+					<a href="#home">Home</a>
+				</BreadcrumbItem>
+				<BreadcrumbSeparator id="sep-1">/</BreadcrumbSeparator>
+				<BreadcrumbItem>
+					<a href="#about">About</a>
+				</BreadcrumbItem>
+				<BreadcrumbSeparator class="custom-separator">→</BreadcrumbSeparator>
+				<BreadcrumbItem current>Contact</BreadcrumbItem>
+			</BreadcrumbList>
+		</Breadcrumb>
+	}
+}

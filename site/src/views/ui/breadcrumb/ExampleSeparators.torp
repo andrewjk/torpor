@@ -1,26 +1,29 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbSeparator } from "@torpor/ui/Breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@torpor/ui/Breadcrumb";
 
 export default function ExampleSeparators() {
 	@render {
 		<p>Below is an example breadcrumb using separator components.</p>
 
 		<Breadcrumb class="example-breadcrumb" ariaLabel="Breadcrumb">
-			<BreadcrumbItem class="example-breadcrumb-item">
-				<a href="/">Torpor</a>
-			</BreadcrumbItem>
-			<BreadcrumbSeparator>»</BreadcrumbSeparator>
-			<BreadcrumbItem class="example-breadcrumb-item">
-				<a href="/ui/overview">UI</a>
-			</BreadcrumbItem>
-			<BreadcrumbSeparator>»</BreadcrumbSeparator>
-			<BreadcrumbItem class="example-breadcrumb-item" current>
-				Breadcrumb
-			</BreadcrumbItem>
+			<BreadcrumbList class="example-breadcrumb-list">
+				<BreadcrumbItem class="example-breadcrumb-item">
+					<a href="/">Torpor</a>
+				</BreadcrumbItem>
+				<BreadcrumbSeparator>»</BreadcrumbSeparator>
+				<BreadcrumbItem class="example-breadcrumb-item">
+					<a href="/ui/overview">UI</a>
+				</BreadcrumbItem>
+				<BreadcrumbSeparator>»</BreadcrumbSeparator>
+				<BreadcrumbItem class="example-breadcrumb-item" current>
+					Breadcrumb
+				</BreadcrumbItem>
+			</BreadcrumbList>
 		</Breadcrumb>
 	}
 
 	@style {
-		.example-breadcrumb {
+		.example-breadcrumb-list {
+			list-style-type: none;
 			display: flex;
 			gap: 8px;
 		}

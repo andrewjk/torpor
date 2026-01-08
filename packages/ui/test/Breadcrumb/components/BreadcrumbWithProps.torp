@@ -1,0 +1,19 @@
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList } from "../../../src/Breadcrumb/index";
+
+export default function BreadcrumbWithProps() {
+	@render {
+		<Breadcrumb id="breadcrumb-nav" class="custom-breadcrumb" ariaLabel="Breadcrumb" style="color: red;">
+			<BreadcrumbList id="breadcrumb-list" class="custom-list">
+				<BreadcrumbItem id="item-1" class="custom-item">
+					<a href="#home">Home</a>
+				</BreadcrumbItem>
+				<BreadcrumbItem id="item-2" class="custom-item" style="font-size: 14px;">
+					<a href="#about">About</a>
+				</BreadcrumbItem>
+				<BreadcrumbItem id="item-3" current class="current-item">
+					Contact
+				</BreadcrumbItem>
+			</BreadcrumbList>
+		</Breadcrumb>
+	}
+}

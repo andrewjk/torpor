@@ -7,7 +7,7 @@ interface BreadcrumbProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
-	/** An ARIA label for describing the popover to screen readers  */
+	/** An ARIA label for describing the breadcrumb to screen readers  */
 	ariaLabel?: string | undefined,
 }
 
@@ -21,11 +21,13 @@ interface BreadcrumbProps {
  *
  * ```
  * <Breadcrumb>
- * 	<BreadcrumbItem />
- * 	<BreadcrumbSeparator /> (optional)
- * 	<BreadcrumbItem>
- * 		...
- * 	</BreadcrumbItem>
+ * 	<BreadcrumbList>
+ * 		<BreadcrumbItem />
+ * 		<BreadcrumbSeparator /> (optional)
+ * 		<BreadcrumbItem>
+ * 			...
+ * 		</BreadcrumbItem>
+ * 	</BreadcrumbList>
  * </Breadcrumb>
  * ```
  *

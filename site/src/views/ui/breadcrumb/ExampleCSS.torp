@@ -1,4 +1,4 @@
-import { Breadcrumb, BreadcrumbItem } from "@torpor/ui/Breadcrumb";
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList } from "@torpor/ui/Breadcrumb";
 
 export default function ExampleCSS() {
 	@render {
@@ -7,20 +7,23 @@ export default function ExampleCSS() {
 		</p>
 
 		<Breadcrumb class="example-breadcrumb" ariaLabel="Breadcrumb">
-			<BreadcrumbItem class="example-breadcrumb-item">
-				<a href="/">Torpor</a>
-			</BreadcrumbItem>
-			<BreadcrumbItem class="example-breadcrumb-item">
-				<a href="/ui/overview">UI</a>
-			</BreadcrumbItem>
-			<BreadcrumbItem class="example-breadcrumb-item" current>
-				Breadcrumb
-			</BreadcrumbItem>
+			<BreadcrumbList class="example-breadcrumb-list">
+				<BreadcrumbItem class="example-breadcrumb-item">
+					<a href="/">Torpor</a>
+				</BreadcrumbItem>
+				<BreadcrumbItem class="example-breadcrumb-item">
+					<a href="/ui/overview">UI</a>
+				</BreadcrumbItem>
+				<BreadcrumbItem class="example-breadcrumb-item" current>
+					Breadcrumb
+				</BreadcrumbItem>
+			</BreadcrumbList>
 		</Breadcrumb>
 	}
 
 	@style {
-		.example-breadcrumb {
+		.example-breadcrumb-list {
+			list-style-type: none;
 			display: flex;
 		}
 
