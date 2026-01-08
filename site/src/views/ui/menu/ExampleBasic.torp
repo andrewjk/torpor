@@ -138,6 +138,7 @@ export default function ExampleBasic() {
 
 		.example-menu-button {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: flex;
 			align-items: center;

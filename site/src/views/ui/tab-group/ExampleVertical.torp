@@ -37,6 +37,7 @@ export default function ExampleVertical(props: any) {
 
 		.example-tab-trigger {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			border-right: 2px solid gainsboro;
 			padding: 5px 10px;

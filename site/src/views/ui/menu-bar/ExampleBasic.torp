@@ -41,6 +41,7 @@ export default function ExampleBasic() {
 
 		.example-menu-bar-item-button {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: flex;
 			align-items: center;

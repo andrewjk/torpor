@@ -34,6 +34,7 @@ export default function ExampleBound() {
 	@style {
 		.example-tab-trigger {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			border-bottom: 2px solid gainsboro;
 			padding: 5px 10px;

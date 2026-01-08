@@ -69,6 +69,7 @@ export default function ExampleBasic() {
 
 		.example-tool-bar-button {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: flex;
 			align-items: center;

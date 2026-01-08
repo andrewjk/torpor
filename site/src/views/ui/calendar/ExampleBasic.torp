@@ -39,6 +39,7 @@ export default function ExampleBasic() {
 			.torp-calendar-day
 		) {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: inline-flex;
 			align-items: center;

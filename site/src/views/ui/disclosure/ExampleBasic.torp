@@ -28,6 +28,7 @@ export default function ExampleBasic() {
 
 		.example-disclosure-trigger {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			padding: 5px;
 			width: 100%;

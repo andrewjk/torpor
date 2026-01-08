@@ -76,6 +76,7 @@ export default function Example() {
 
 		.example-contextual-menu-button {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: flex;
 			align-items: center;

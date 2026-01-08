@@ -35,6 +35,7 @@ export default function ExampleBasic() {
 
 		.example-list-box-item {
 			all: unset;
+			box-sizing: border-box;
 			border: 2px solid transparent;
 			cursor: default;
 			padding: 5px;
@@ -54,6 +55,7 @@ export default function ExampleBasic() {
 
 		.example-list-box-item {
 			all: unset;
+			box-sizing: border-box;
 			border: 2px solid transparent;
 			cursor: default;
 			padding: 5px;

@@ -40,6 +40,7 @@ export default function ExampleBasic() {
 
 		.example-navmenu-link {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			display: flex;
 			align-items: center;

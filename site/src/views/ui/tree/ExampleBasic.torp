@@ -98,6 +98,7 @@ export default function ExampleBasic() {
 
 		.example-tree-item-trigger {
 			all: unset;
+			box-sizing: border-box;
 		}
 
 		.example-tree-item-content {

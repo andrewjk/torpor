@@ -60,6 +60,7 @@ export default function ExampleMultiple() {
 
 		.example-accordion-trigger {
 			all: unset;
+			box-sizing: border-box;
 			cursor: default;
 			padding: 5px;
 			width: 100%;
