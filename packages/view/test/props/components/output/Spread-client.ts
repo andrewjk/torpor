@@ -9,7 +9,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function ParentChild(
+export default function Reactive(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
@@ -20,6 +20,8 @@ export default function ParentChild(
 	$slots?: Record<string, SlotRender>,
 ): void {
 
+	let $state = $watch({ name: "Jim" })
+
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
@@ -29,7 +31,10 @@ export default function ParentChild(
 
 	/* @component */
 	let t_props_1 = $watch({
-		name: "Anna" as const,
+		...$state,
+	});
+	$run(() => {
+		t_props_1 = { ...t_props_1, ...$state };
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
@@ -42,7 +47,7 @@ export default function ParentChild(
 function Child(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { name: string },
+	$props: Record<PropertyKey, any>,
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -52,12 +57,12 @@ function Child(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <h2>#</h2> `);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> `);
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_text_1 = t_child(t_next(t_root_0));
 	const t_text_2 = t_next(t_next(t_root_0), true);
 	$run(() => {
-		t_text_1.textContent = `Hello, ${t_fmt($props.name)}`;
+		t_text_1.textContent = ` ${t_fmt($props.name)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);

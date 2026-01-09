@@ -110,13 +110,18 @@ function parseAttribute(status: ParseStatus): Attribute {
 			valueEnd--;
 		}
 	} else if (name.startsWith("{") && name.endsWith("}")) {
-		// It's a shortcut attribute. It could be e.g. {width} or it could be
-		// {$state.width}, but in either case we set the value of the width
-		// property
 		value = name.substring(1, name.length - 1);
 		valueStart++;
 		valueEnd = valueStart + name.length;
-		name = value.split(".").at(-1)!;
+		if (value.startsWith("...")) {
+			// It's a spread attribute, just set the name to the value
+			name = value;
+		} else {
+			// It's a shortcut attribute. It could be e.g. {width} or it could be
+			// {$state.width}, but in either case we set the value of the width
+			// property
+			name = value.split(".").at(-1)!;
+		}
 		// Handle definite assignment assertions e.g. {$state.width!}
 		if (name.endsWith("!")) {
 			name = name.substring(0, name.length - 1);

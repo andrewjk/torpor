@@ -40,7 +40,9 @@ export default function buildServerComponentNode(
 				name = name.substring(1);
 			}
 
-			if (name === "class" && value != null) {
+			if (name.startsWith("...")) {
+				props.push({ name: "", value: value! });
+			} else if (name === "class" && value != null) {
 				status.imports.add("t_class");
 				const params = [value];
 				if (node.scopeStyles) {
@@ -60,7 +62,7 @@ export default function buildServerComponentNode(
 		// Set the props that we gathered
 		b.append(`const ${propsName} = {`);
 		for (let p of props) {
-			b.append(`${p.name}: ${p.value},`);
+			b.append(p.name ? `${p.name}: ${p.value},` : `${p.value},`);
 		}
 		b.append("};");
 

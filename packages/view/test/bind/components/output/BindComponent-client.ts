@@ -31,7 +31,7 @@ export default function BindComponent(
 	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({
+	let t_props_1 = $watch({
 		name: $state.name,
 	});
 	$run(() => {

@@ -28,8 +28,8 @@ export default function Component(
 	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({
-		name: "Amy",
+	let t_props_1 = $watch({
+		name: "Amy" as const,
 	});
 	Header(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 

@@ -28,8 +28,8 @@ export default function UserProfileApp(
 	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({
-		name: "John",
+	let t_props_1 = $watch({
+		name: "John" as const,
 		age: 20,
 		favoriteColors: ["green", "blue", "red"],
 		isAvailable: true,

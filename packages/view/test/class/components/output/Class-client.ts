@@ -32,8 +32,8 @@ export default function Class(
 	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_div_4, true))) as HTMLElement;
 
 	/* @component */
-	const t_props_1 = $watch({
-		class: "hey torp-16s1yph",
+	let t_props_1 = $watch({
+		class: "hey torp-16s1yph" as const,
 	});
 	const t_slots_1: Record<string, SlotRender> = {};
 	t_slots_1["_"] = (
@@ -54,7 +54,7 @@ export default function Class(
 	let t_comp_anchor_2 = t_anchor(t_next(t_next(t_comp_anchor_1, true))) as HTMLElement;
 
 	/* @component */
-	const t_props_2 = $watch({
+	let t_props_2 = $watch({
 		class: t_class({ "child-class": true }, "torp-16s1yph"),
 	});
 	$run(() => {
@@ -79,8 +79,8 @@ export default function Class(
 	let t_comp_anchor_3 = t_anchor(t_next(t_next(t_comp_anchor_2, true))) as HTMLElement;
 
 	/* @component */
-	const t_props_3 = $watch({
-		class: "pink torp-16s1yph",
+	let t_props_3 = $watch({
+		class: "pink torp-16s1yph" as const,
 	});
 	const t_slots_3: Record<string, SlotRender> = {};
 	t_slots_3["_"] = (

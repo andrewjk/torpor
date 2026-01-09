@@ -39,13 +39,13 @@ export default function buildComponentNode(
 		let props: {
 			name: string;
 			// Text to be ignored in the mapping e.g. `t_class(`
-			preText: string;
+			preText?: string;
 			value: string;
 			// Text to be ignored in the mapping e.g. `)`
-			postText: string;
+			postText?: string;
 			spans: SourceSpan[];
-			offsets: number[];
-			lengths: number[];
+			offsets?: number[];
+			lengths?: number[];
 		}[] = [];
 		let runs: string[] = [];
 		let bindingRuns: string[] = [];
@@ -63,15 +63,22 @@ export default function buildComponentNode(
 					name = name.substring(1);
 					props.push({
 						name,
-						preText: "",
 						value,
-						postText: "",
 						spans: [span],
-						offsets: [],
-						lengths: [],
 					});
 					runs.push(`${propsName}["${name}"] = ${value};`);
 					bindingRuns.push(`${value} = ${propsName}["${name}"];`);
+				} else if (name.startsWith("...")) {
+					// It's a spread property
+					name = "";
+					props.push({
+						name,
+						value,
+						spans: [span],
+					});
+					// TODO: this needs some work (should be at the end, should
+					// take into account other props, etc)
+					runs.push(`${propsName} = { ...${propsName}, ${value} };`);
 				} else if (name === "class") {
 					status.imports.add("t_class");
 					const params = [value];
@@ -85,8 +92,6 @@ export default function buildComponentNode(
 						value,
 						postText: ")",
 						spans: [span],
-						offsets: [],
-						lengths: [],
 					});
 					runs.push(`${propsName}["${name}"] = t_class(${value});`);
 				} else if (name === "style") {
@@ -97,19 +102,13 @@ export default function buildComponentNode(
 						value,
 						postText: ")",
 						spans: [span],
-						offsets: [],
-						lengths: [],
 					});
 					runs.push(`${propsName}["${name}"] = t_style(${value});`);
 				} else {
 					props.push({
 						name,
-						preText: "",
 						value,
-						postText: "",
 						spans: [span],
-						offsets: [],
-						lengths: [],
 					});
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
@@ -130,7 +129,7 @@ export default function buildComponentNode(
 					props.push({ name, preText: "t_style(", value, postText: ")", spans, offsets, lengths });
 					runs.push(`${propsName}["${name}"] = t_style(${value});`);
 				} else {
-					props.push({ name, preText: "", value, postText: "", spans, offsets, lengths });
+					props.push({ name, value, spans, offsets, lengths });
 					runs.push(`${propsName}["${name}"] = ${value};`);
 				}
 			} else if (value != null) {
@@ -139,42 +138,44 @@ export default function buildComponentNode(
 				}
 				props.push({
 					name,
-					preText: "",
 					value,
 					// Set non-reactive props with `as const` so that typescript
 					// won't complain when passing e.g. strings to string unions
 					postText: " as const",
 					spans: [span],
-					offsets: [],
-					lengths: [],
 				});
 			} else {
 				props.push({
 					name,
-					preText: "",
 					value: "true",
-					postText: "",
 					spans: [span],
-					offsets: [],
-					lengths: [],
 				});
 			}
 		}
 
 		// Set the props, runs and binding runs that we gathered
-		b.append(`const ${propsName} = $watch({`);
+		b.append(`let ${propsName} = $watch({`);
 		for (let p of props) {
 			let value = replaceForVarNames(p.value, status);
+			p.preText ??= "";
+			p.postText ??= "";
 			if (p.spans.length === 1) {
-				addMappedText(`${p.name}: ` + p.preText, value, p.postText + ",", p.spans[0], status, b);
+				addMappedText(
+					p.name ? `${p.name}: ` + p.preText : p.preText,
+					value,
+					p.postText + ",",
+					p.spans[0],
+					status,
+					b,
+				);
 			} else {
 				addMappedTextWithOffsets(
-					`${p.name}: ` + p.preText,
+					p.name ? `${p.name}: ` + p.preText : p.preText,
 					value,
 					p.postText + ",",
 					p.spans,
-					p.offsets,
-					p.lengths,
+					p.offsets!,
+					p.lengths!,
 					status,
 					b,
 				);
