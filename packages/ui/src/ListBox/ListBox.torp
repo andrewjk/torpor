@@ -20,6 +20,10 @@ interface ListBoxProps {
 	disabled?: boolean,
 	/** An ARIA label for describing the ListBox to screen readers  */
 	ariaLabel?: string | undefined,
+	/** An ID of an element that labels the ListBox */
+	ariaLabelledBy?: string | undefined,
+	/** The orientation of the ListBox */
+	orientation?: "vertical" | "horizontal",
 	/** Raised when the selected item(s) have changed */
 	onchange?: (value: any | any[]) => void,
 }
@@ -215,7 +219,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 				// Set the value
 				for (let item of itemStates) {
 					if (item.value === value) {
-						$state.value = item.selected ? "" : item.value;
+						$state.value = item.selected ? undefined : item.value;
 						break;
 					}
 				}
@@ -361,7 +365,10 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			{$props?.style}
 			role="listbox"
 			aria-label={$props?.ariaLabel}
+			aria-labelledby={$props?.ariaLabelledBy}
 			aria-multiselectable={type === "multiple" ? "true" : undefined}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			aria-orientation={$props?.orientation}
 		>
 			<slot />
 		</div>

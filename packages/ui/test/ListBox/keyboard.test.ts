@@ -63,5 +63,60 @@ describe("ListBox", () => {
 		// End: When focus is on an accordion header, moves focus to the last accordion header
 		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "End" }));
 		expect(document.activeElement).toBe(queryByText(container, "Content 3"));
+
+		// Enter: Selects the focused item in single-select mode
+		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "Enter" }));
+		expect(queryByText(container, "Content 1")).toHaveAttribute("aria-selected", "true");
+
+		// Type-ahead: Typing 'c' focuses Content 1
+		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "c" }));
+		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
+
+		// Type-ahead: Typing 'o' after 'c' focuses Content 1 (starts with 'co')
+		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "o" }));
+		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
+
+		// Type-ahead: Backspace removes last character and refocuses
+		fireEvent(
+			getByText(container, "Content 2"),
+			new KeyboardEvent("keydown", { key: "Backspace" }),
+		);
+		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
+	});
+
+	it("Type-ahead search is case-insensitive", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxKeyboard, { value: [1, 2] });
+
+		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "C" }));
+		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
+	});
+
+	it("Type-ahead search is case-insensitive", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxKeyboard, { value: [1, 2] });
+
+		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "C" }));
+		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
+	});
+
+	it("Arrow keys at boundaries don't move focus", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxKeyboard, { value: [1, 2] });
+
+		const item1 = getByText(container, "Content 1");
+		item1.focus();
+
+		item1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		expect(document.activeElement).toBe(item1);
+
+		const item3 = getByText(container, "Content 3");
+		item3.focus();
+
+		item3.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		expect(document.activeElement).toBe(item3);
 	});
 });

@@ -7,6 +7,8 @@ interface ListBoxSeparatorProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** The orientation of the separator */
+	orientation?: "vertical" | "horizontal",
 }
 
 /**
@@ -19,6 +21,7 @@ export default function ListBoxSeparator($props: ListBoxSeparatorProps | undefin
 			class={["torp-list-box-separator", $props?.class]}
 			{$props?.style}
 			role="separator"
+			aria-orientation={$props?.orientation ?? "horizontal"}
 		>
 			<slot />
 		</div>

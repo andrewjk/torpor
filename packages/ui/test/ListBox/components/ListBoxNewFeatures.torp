@@ -1,0 +1,27 @@
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+
+export default function ListBoxNewFeatures($props: any) {
+	@render {
+		<ListBox
+			value={$props.value}
+			type={$props.type}
+			ariaLabel={$props.ariaLabel}
+			ariaLabelledBy={$props.ariaLabelledBy}
+			disabled={$props.disabled}
+			orientation={$props.orientation}
+		>
+			<ListBoxItem value={0}>
+				Content 1
+			</ListBoxItem>
+			<ListBoxItem value={1}>
+				Content 2
+			</ListBoxItem>
+			<ListBoxItem value={2}>
+				Content 3
+			</ListBoxItem>
+		</ListBox>
+	}
+}

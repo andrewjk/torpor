@@ -125,9 +125,9 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 			{$props?.style}
 			role="option"
 			aria-selected={$state.selected ? "true" : "false"}
-			aria-disabled={$state.disabled ? "true" : undefined}
+			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			data-state={$state.selected || $state.active ? "active" : undefined}
-			data-disabled={$state.disabled ? "true" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}
 			onmount={handleMount}

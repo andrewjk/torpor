@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import ListBoxAccessibility from "./components/ListBoxAccessibility.torp";
+import ListBoxNewFeatures from "./components/ListBoxNewFeatures.torp";
 
 describe("ListBox", () => {
 	it("Accessibility", async () => {
@@ -53,5 +54,59 @@ describe("ListBox", () => {
 		expect(queryByText(container, "Unselected Content")).toHaveAttribute("aria-selected", "false");
 
 		expect(queryByText(container, "Disabled Content")).toHaveAttribute("aria-disabled", "true");
+	});
+
+	it("aria-labelledby is set when provided", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "multiple", ariaLabelledBy: "label-id" });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).toHaveAttribute("aria-labelledby", "label-id");
+	});
+
+	it("aria-disabled is set on ListBox when disabled prop is true", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "multiple", disabled: true });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).toHaveAttribute("aria-disabled", "true");
+	});
+
+	it("aria-disabled is not set on ListBox when disabled prop is false", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "multiple", disabled: false });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).not.toHaveAttribute("aria-disabled");
+	});
+
+	it("aria-orientation is set to horizontal when provided", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "multiple", orientation: "horizontal" });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).toHaveAttribute("aria-orientation", "horizontal");
+	});
+
+	it("aria-multiselectable is false for single-select ListBox", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "single" });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).not.toHaveAttribute("aria-multiselectable");
+	});
+
+	it("aria-multiselectable is true for multi-select ListBox", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ListBoxNewFeatures, { type: "multiple" });
+
+		const listbox = container.querySelector('[role="listbox"]');
+		expect(listbox).toHaveAttribute("aria-multiselectable", "true");
 	});
 });

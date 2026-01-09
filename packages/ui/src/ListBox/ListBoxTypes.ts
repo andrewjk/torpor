@@ -24,7 +24,7 @@ export interface ItemState {
 	text: string;
 	value: any;
 	selected: boolean;
-	/** For aria-activedescendant */
+	/** Used for styling when item has keyboard focus */
 	active: boolean;
 	disabled: boolean;
 	parentDisabled: boolean;
