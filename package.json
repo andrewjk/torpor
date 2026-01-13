@@ -36,6 +36,7 @@
 		"packages/adapters/adapter-cloudflare",
 		"packages/adapters/adapter-node",
 		"packages/build",
+		"packages/check",
 		"packages/create-build",
 		"packages/ui",
 		"packages/unplugin",

@@ -1,0 +1,46 @@
+{
+	"name": "@torpor/check",
+	"version": "0.0.1",
+	"description": "Checks Torpor files for errors",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"torp-check": "./dist/bin/index.js"
+	},
+	"scripts": {
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && tsdown",
+		"build:fix": "tsx scripts/postbuild.ts",
+		"build:watch": "tsdown --watch",
+		"test": "vitest"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@torpor/view": "workspace:^",
+		"@typescript/vfs": "^1.6.2",
+		"chalk": "^5.6.2",
+		"fast-glob": "^3.3.3"
+	},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@typescript/native-preview": "7.0.0-dev.20251112.1",
+		"oxlint-tsgolint": "^0.6.0",
+		"tsdown": "^0.16.4",
+		"tsx": "^4.20.6",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.8"
+	}
+}

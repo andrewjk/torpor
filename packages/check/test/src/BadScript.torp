@@ -1,0 +1,10 @@
+
+export default function BadScript() {
+	const name = y;
+
+	@render {
+		<div>
+			Hi, {name}!
+		</div>
+	}
+}
