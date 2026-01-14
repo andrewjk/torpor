@@ -38,6 +38,7 @@
 		"packages/build",
 		"packages/check",
 		"packages/create-build",
+		"packages/prettier",
 		"packages/ui",
 		"packages/unplugin",
 		"packages/view"
