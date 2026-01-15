@@ -15,7 +15,8 @@ export default function buildServerSpecialNode(
 			buildServerSlotNode(node, status, b);
 			break;
 		}
-		case "fill": {
+		case "fill":
+		case "filldef": {
 			// HACK:
 			break;
 		}

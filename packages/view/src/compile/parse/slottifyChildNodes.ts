@@ -1,5 +1,6 @@
 import type ElementNode from "../types/nodes/ElementNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
+import isSpaceNode from "../utils/isSpaceNode";
 import isSpecialNode from "../utils/isSpecialNode";
 
 /**
@@ -7,8 +8,24 @@ import isSpecialNode from "../utils/isSpecialNode";
  * <fill> node
  */
 export default function slottifyChildNodes(node: ElementNode, source: string): void {
-	const nonFillNodes = node.children.filter((c) => !isFillNode(c));
-	// TODO: Not if it's only spaces??
+	// Gather nodes that are not in <fill> nodes, and not the spaces surrounding fill nodes
+	let nonFillNodes: TemplateNode[] = [];
+	for (let child of node.children) {
+		if (isFillNode(child)) {
+			if (nonFillNodes.find((n) => !isSpaceNode(n)) === undefined) {
+				nonFillNodes = [];
+			} else {
+				break;
+			}
+		} else {
+			nonFillNodes.push(child);
+		}
+	}
+	if (nonFillNodes.find((n) => !isSpaceNode(n)) === undefined) {
+		nonFillNodes = [];
+	}
+
+	// If we found any non-fill node nodes, move them into a default fill node
 	if (nonFillNodes.length) {
 		let defaultFillNode = node.children.find(
 			(n) => isFillNode(n) && !n.attributes.find((a) => a.name === "name"),
@@ -16,7 +33,7 @@ export default function slottifyChildNodes(node: ElementNode, source: string): v
 		if (!defaultFillNode) {
 			defaultFillNode = {
 				type: "special",
-				tagName: "fill",
+				tagName: "filldef",
 				attributes: [],
 				children: nonFillNodes,
 				span: { start: 0, end: 0 },
@@ -27,10 +44,10 @@ export default function slottifyChildNodes(node: ElementNode, source: string): v
 			};
 			node.children.unshift(defaultFillNode);
 		}
+		node.children = node.children.filter((c) => isFillNode(c) || !nonFillNodes.includes(c));
 	}
-	node.children = node.children.filter((c) => isFillNode(c));
 }
 
 function isFillNode(n: TemplateNode): n is ElementNode {
-	return isSpecialNode(n) && n.tagName === "fill";
+	return isSpecialNode(n) && (n.tagName === "fill" || n.tagName === "filldef");
 }

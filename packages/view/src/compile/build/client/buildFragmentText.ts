@@ -212,7 +212,8 @@ function buildSpecialFragmentText(
 			}
 			break;
 		}
-		case "fill": {
+		case "fill":
+		case "filldef": {
 			// Add a new fragment for filled slot content
 			node.fragment = {
 				number: fragments.length,

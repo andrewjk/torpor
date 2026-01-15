@@ -48,7 +48,7 @@ export default function parseTag(status: ParseStatus): ElementNode {
 		selfClosed = true;
 	}
 
-	let special = ["slot", "fill", "@component", "@element"].includes(tagName);
+	let special = ["slot", "fill", "filldef", "@component", "@element"].includes(tagName);
 
 	return {
 		type: special ? "special" : "element",

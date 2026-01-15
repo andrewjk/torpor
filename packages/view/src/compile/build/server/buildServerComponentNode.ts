@@ -88,7 +88,7 @@ export default function buildServerComponentNode(
 	if (componentHasSlots) {
 		b.append(`const ${slotsName}: Record<string, ServerSlotRender> = {};`);
 		for (let slot of node.children) {
-			if (isSpecialNode(slot) && slot.tagName === "fill") {
+			if (isSpecialNode(slot) && (slot.tagName === "fill" || slot.tagName === "filldef")) {
 				const nameAttribute = slot.attributes.find((a) => a.name === "name");
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				const slotParams = [

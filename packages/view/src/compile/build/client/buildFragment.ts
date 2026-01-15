@@ -556,10 +556,15 @@ function declareSpecialFragmentVars(
 
 	switch (node.tagName) {
 		case "slot":
-		case "fill": {
+		case "fill":
+		case "filldef": {
 			for (let [i, child] of node.children.entries()) {
 				// Don't build the fill node twice
-				if (node.tagName === "slot" && isSpecialNode(child) && child.tagName === "fill") {
+				if (
+					node.tagName === "slot" &&
+					isSpecialNode(child) &&
+					(child.tagName === "fill" || child.tagName === "filldef")
+				) {
 					continue;
 				}
 				declareFragmentVars(
