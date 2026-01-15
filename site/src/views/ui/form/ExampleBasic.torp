@@ -1,16 +1,16 @@
 import { $page } from "@torpor/build/state";
-import { Form, Field, Label, Input, Message } from "@torpor/ui/Form";
+import { Field, Form, Input, Label, Message } from "@torpor/ui/Form";
 import * as z from "zod";
 
 export default function ExampleBasic($props: any) {
 	const schema = z.object({
-		text: z.string().trim().min(1, { message: 'Required' }),
+		text: z.string().trim().min(1, { message: "Required" }),
 	});
 
 	let $state = $watch({
 		data: {
 			text: $props?.form?.text ?? "",
-		}
+		},
 	});
 
 	@render {

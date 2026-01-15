@@ -1,14 +1,11 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./notification/ExampleBasic.torp";
-import ExampleFunction from "./notification/ExampleFunction.torp";
-import ExampleQueue from "./notification/ExampleQueue.torp";
-
 import ExampleBasicCode from "./notification/ExampleBasic.torp?raw";
+import ExampleFunction from "./notification/ExampleFunction.torp";
 import ExampleFunctionCode from "./notification/ExampleFunction.torp?raw";
+import ExampleQueue from "./notification/ExampleQueue.torp";
 import ExampleQueueCode from "./notification/ExampleQueue.torp?raw";
 
 export default function NotificationPage() {

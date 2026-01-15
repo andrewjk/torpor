@@ -1,4 +1,4 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@torpor/ui/Popover";
 
 export default function ExampleHover() {
 	@render {

@@ -1,10 +1,7 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./form/ExampleBasic.torp";
-
 import ExampleBasicCode from "./form/ExampleBasic.torp?raw";
 
 export default function FormPage() {

@@ -1,6 +1,5 @@
-
-import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
+import { Dialog, DialogBody, DialogButton, DialogFooter, DialogHeader } from "@torpor/ui/Dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@torpor/ui/Popover";
 
 export default function ExampleDialog() {
 	function handleOption(color: string) {

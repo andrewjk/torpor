@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./disclosure/ExampleBasic.torp";
-import ExampleBound from "./disclosure/ExampleBound.torp";
-
 import ExampleBasicCode from "./disclosure/ExampleBasic.torp?raw";
+import ExampleBound from "./disclosure/ExampleBound.torp";
 import ExampleBoundCode from "./disclosure/ExampleBound.torp?raw";
 
 export default function DisclosurePage() {

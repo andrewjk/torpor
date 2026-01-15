@@ -1,9 +1,9 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter, DialogHeader } from "@torpor/ui/Dialog";
 import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ExampleBasic() {
 	let $state = $watch({
-		showDialog: false
+		showDialog: false,
 	});
 
 	function handleOption(color: string) {

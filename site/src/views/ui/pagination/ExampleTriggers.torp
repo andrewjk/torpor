@@ -1,8 +1,4 @@
-import {
-	Pagination,
-	PaginationItem,
-	PaginationTrigger,
-} from "@torpor/ui/Pagination";
+import { Pagination, PaginationItem, PaginationTrigger } from "@torpor/ui/Pagination";
 
 export default function ExampleTriggers() {
 	let $state = $watch({
@@ -12,13 +8,29 @@ export default function ExampleTriggers() {
 
 	@render {
 		<Pagination class="example-pagination" {$state.count} &number={$state.number}>
-			<PaginationTrigger class="example-pagination-trigger" page="start" disabled={$state.number < 2} />
-			<PaginationTrigger class="example-pagination-trigger" page="previous" disabled={$state.number < 2} />
+			<PaginationTrigger
+				class="example-pagination-trigger"
+				page="start"
+				disabled={$state.number < 2}
+			/>
+			<PaginationTrigger
+				class="example-pagination-trigger"
+				page="previous"
+				disabled={$state.number < 2}
+			/>
 			@for (let page of $slot.pages) {
 				<PaginationItem class="example-pagination-item" {page} active={page == $state.number} />
 			}
-			<PaginationTrigger class="example-pagination-trigger" page="next" disabled={$state.number > $state.count - 1} />
-			<PaginationTrigger class="example-pagination-trigger" page="end" disabled={$state.number > $state.count - 1} />
+			<PaginationTrigger
+				class="example-pagination-trigger"
+				page="next"
+				disabled={$state.number > $state.count - 1}
+			/>
+			<PaginationTrigger
+				class="example-pagination-trigger"
+				page="end"
+				disabled={$state.number > $state.count - 1}
+			/>
 		</Pagination>
 	}
 

@@ -1,12 +1,5 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "@torpor/ui/ListBox";
-import {
-	ComboBox,
-	ComboBoxInput,
-	ComboBoxContent,
-} from "@torpor/ui/ComboBox";
+import { ComboBox, ComboBoxContent, ComboBoxInput } from "@torpor/ui/ComboBox";
+import { ListBox, ListBoxItem } from "@torpor/ui/ListBox";
 
 export default function ExampleBound() {
 	let items = [
@@ -18,8 +11,8 @@ export default function ExampleBound() {
 	let $state = $watch({
 		value: 0,
 		get text() {
-			return items.find(i => i.id === this.value)?.text;
-		}
+			return items.find((i) => i.id === this.value)?.text;
+		},
 	});
 
 	@render {

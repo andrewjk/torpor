@@ -1,4 +1,4 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import copyCode from "../../lib/copyCode";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 

@@ -1,4 +1,4 @@
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
 
 export default function StylesPage() {
 	@head {
@@ -31,7 +31,8 @@ export default function Component() {
 		</p>
 
 		<h2>Playground</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Component() {
 	@render {
 		<p class="extravagant">Hello!</p>
@@ -44,6 +45,7 @@ export default function Component() {
 		}
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

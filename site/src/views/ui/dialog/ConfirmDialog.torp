@@ -1,5 +1,5 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter, DialogHeader } from "@torpor/ui/Dialog";
 import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function ConfirmDialog($props: any) {
 	$props.confirmText ||= "OK";
@@ -9,7 +9,7 @@ export default function ConfirmDialog($props: any) {
 		<Modal visible {$props.callback}>
 			<ModalOverlay class="confirm-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="confirm-dialog-content" callback={$props.callback}>
+				<Dialog class="confirm-dialog-content" {$props.callback}>
 					@if ($props.header) {
 						<DialogHeader>
 							<h4>{$props.header}</h4>

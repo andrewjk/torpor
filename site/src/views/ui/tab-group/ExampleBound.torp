@@ -1,5 +1,4 @@
-
-import { TabGroup, TabList, TabHeader, TabTrigger, TabContent } from "@torpor/ui/TabGroup";
+import { TabContent, TabGroup, TabHeader, TabList, TabTrigger } from "@torpor/ui/TabGroup";
 import buildItems from "../../../lib/buildItems";
 
 export default function ExampleBound() {

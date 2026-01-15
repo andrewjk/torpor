@@ -1,4 +1,9 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "@torpor/ui/Breadcrumb";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbList,
+	BreadcrumbSeparator,
+} from "@torpor/ui/Breadcrumb";
 
 export default function ExampleSeparators() {
 	@render {

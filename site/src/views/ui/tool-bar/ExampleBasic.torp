@@ -1,15 +1,12 @@
+import { Menu, MenuButton } from "@torpor/ui/Menu";
 import {
 	ToolBar,
 	ToolBarButton,
 	ToolBarPopout,
-	ToolBarPopoutTrigger,
 	ToolBarPopoutContent,
+	ToolBarPopoutTrigger,
 	ToolBarSeparator,
 } from "@torpor/ui/ToolBar";
-import {
-	Menu,
-	MenuButton,
-} from "@torpor/ui/Menu";
 
 export default function ExampleBasic() {
 	let $state = $watch({

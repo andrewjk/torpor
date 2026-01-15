@@ -1,4 +1,4 @@
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
 
 export default function PartyPage() {
 	@head {
@@ -12,7 +12,8 @@ export default function PartyPage() {
 		</p>
 
 		<h2>Declare state</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Name() {
 	let $state = $watch({
 		name: "John"
@@ -22,10 +23,12 @@ export default function Name() {
 		<h1>Hello {$state.name}</h1>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Update state</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function NameUpdate() {
 	let $state = $watch({
 		name: "John"
@@ -36,10 +39,12 @@ export default function NameUpdate() {
 		<p>Hello {$state.name}</p>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Computed state</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function DoubleCount() {
 	let $state = $watch({
 		count: 10,
@@ -52,19 +57,23 @@ export default function DoubleCount() {
 		<div>{$state.doubleCount}</div>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Minimal template</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function HelloWorld() {
 	@render {
 		<p>Hello world</p>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Styling</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function CssStyle() {
 	@render {
 		<h1 class="title">I am red</h1>
@@ -77,10 +86,12 @@ export default function CssStyle() {
 		}
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Loop</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Colors() {
 	const colors = ["red", "green", "blue"];
 
@@ -93,10 +104,12 @@ export default function Colors() {
 		</ul>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Event click</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Counter() {
 	let $state = $watch({
 		count: 0
@@ -111,10 +124,12 @@ export default function Counter() {
 		<button onclick={incrementCount}>+1</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Dom ref</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function InputFocused() {
 	let inputElement: HTMLInputElement;
 
@@ -126,10 +141,12 @@ export default function InputFocused() {
 		<input &ref={inputElement} />
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Conditional</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function TrafficLight() {
 	const TRAFFIC_LIGHTS = ["red", "orange", "green"];
 	let $state = $watch({
@@ -158,20 +175,20 @@ export default function TrafficLight() {
 		</p>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>On mount</h2>
 		<Repl input={`
 `.trimStart()} />
-			@// <PageTitle />
 
 		<h2>On unmount</h2>
 		<Repl input={`
 `.trimStart()} />
-			@// <Time />
 
 		<h2>Props</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function UserProfileApp() {
 	@render {
 		<UserProfile
@@ -196,10 +213,12 @@ function UserProfile($props: {
 		<p>I am {$props.isAvailable ? "available" : "not available"}</p>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Emit to parent</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function AnswerButtonApp() {
 	let $state = $watch({
 		isHappy: true
@@ -226,10 +245,12 @@ function AnswerButton($props: any) {
 		<button onclick={$props.onNo}>NO</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Slot fallback</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function FunnyButtonApp() {
 	@render {
 		<FunnyButton />
@@ -258,10 +279,12 @@ function FunnyButton() {
 		</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Context</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function UserProfileContextApp() {
 	const $user = $watch({
 		id: 1,
@@ -290,10 +313,12 @@ function UserProfileContext() {
 		</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Input text</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function InputHello() {
 	let $state = $watch({
 		text: "Hello World"
@@ -304,10 +329,12 @@ export default function InputHello() {
 		<input &value={$state.text} />
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Checkbox</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function IsAvailable() {
 	let $state = $watch({
 		isAvailable: false
@@ -320,10 +347,12 @@ export default function IsAvailable() {
 		<label for="is-available">Is available</label>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Radio</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function PickPill() {
 	let $state = $watch({
 		picked: "red"
@@ -339,10 +368,12 @@ export default function PickPill() {
 		<label for="red-pill">Red pill</label>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 
 		<h2>Select</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function ColorSelect() {
 	let $state = $watch({
 		selectedColorId: 2
@@ -367,6 +398,7 @@ export default function ColorSelect() {
 		</select>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

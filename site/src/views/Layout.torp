@@ -1,5 +1,4 @@
-
-import Sidebar from "./Sidebar.torp"
+import Sidebar from "./Sidebar.torp";
 
 export default function Layout() {
 	@render {

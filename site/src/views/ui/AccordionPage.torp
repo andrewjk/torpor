@@ -1,14 +1,11 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./accordion/ExampleBasic.torp";
-import ExampleBound from "./accordion/ExampleBound.torp";
-import ExampleMultiple from "./accordion/ExampleMultiple.torp";
-
 import ExampleBasicCode from "./accordion/ExampleBasic.torp?raw";
+import ExampleBound from "./accordion/ExampleBound.torp";
 import ExampleBoundCode from "./accordion/ExampleBound.torp?raw";
+import ExampleMultiple from "./accordion/ExampleMultiple.torp";
 import ExampleMultipleCode from "./accordion/ExampleMultiple.torp?raw";
 
 export default function AccordionPage() {

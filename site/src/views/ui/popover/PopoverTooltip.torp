@@ -7,7 +7,7 @@ interface Props {
 
 export default function PopoverTooltip($props: Props) {
 	@render {
-		<Popover anchor={$props.anchor} position={$props.position} visible>
+		<Popover {$props.anchor} {$props.position} visible>
 			<PopoverContent class="popover-tooltip-content" side="top">
 				{$props.text}
 			</PopoverContent>

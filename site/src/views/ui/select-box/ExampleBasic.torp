@@ -1,12 +1,5 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "@torpor/ui/ListBox";
-import {
-	SelectBox,
-	SelectBoxTrigger,
-	SelectBoxContent,
-} from "@torpor/ui/SelectBox";
+import { ListBox, ListBoxItem } from "@torpor/ui/ListBox";
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "@torpor/ui/SelectBox";
 
 export default function ExampleBasic() {
 	let $state = $watch({
@@ -17,7 +10,7 @@ export default function ExampleBasic() {
 		<p>Value: <input &value={$state.value} /></p>
 
 		<SelectBox class="example-select-box" &value={$state.value}>
-			<SelectBoxTrigger class="example-select-box-trigger" value={$state.value} />
+			<SelectBoxTrigger class="example-select-box-trigger" {$state.value} />
 			<SelectBoxContent class="example-select-box-content">
 				<ListBox class="example-list-box">
 					<ListBoxItem class="example-list-box-item">

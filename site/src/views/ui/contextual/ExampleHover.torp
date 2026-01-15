@@ -1,5 +1,5 @@
-import { Contextual, ContextualTrigger, ContextualContent } from "@torpor/ui/Contextual";
-import { Menu, MenuCheck, MenuIndicator, MenuSeparator, MenuButton } from "@torpor/ui/Menu";
+import { Contextual, ContextualContent, ContextualTrigger } from "@torpor/ui/Contextual";
+import { Menu, MenuButton, MenuCheck, MenuIndicator, MenuSeparator } from "@torpor/ui/Menu";
 
 export default function Example() {
 	let $state = $watch({

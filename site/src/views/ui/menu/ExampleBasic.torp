@@ -1,16 +1,16 @@
-import { Popover, PopoverTrigger, PopoverContent } from "@torpor/ui/Popover";
 import {
 	Menu,
 	MenuButton,
-	MenuRadioGroup,
 	MenuCheck,
-	MenuRadio,
 	MenuIndicator,
 	MenuPopout,
-	MenuPopoutTrigger,
 	MenuPopoutContent,
-	MenuSeparator
+	MenuPopoutTrigger,
+	MenuRadio,
+	MenuRadioGroup,
+	MenuSeparator,
 } from "@torpor/ui/Menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@torpor/ui/Popover";
 
 export default function ExampleBasic() {
 	let $state = $watch({

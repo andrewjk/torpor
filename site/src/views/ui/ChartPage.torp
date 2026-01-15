@@ -1,18 +1,15 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBarChart from "./charts/ExampleBarChart.torp";
-import ExampleLineChart from "./charts/ExampleLineChart.torp";
-import ExamplePieChart from "./charts/ExamplePieChart.torp";
-import ExampleScatterChart from "./charts/ExampleScatterChart.torp";
-import ExampleSparkLine from "./charts/ExampleSparkLine.torp";
-
 import ExampleBarChartCode from "./charts/ExampleBarChart.torp?raw";
+import ExampleLineChart from "./charts/ExampleLineChart.torp";
 import ExampleLineChartCode from "./charts/ExampleLineChart.torp?raw";
+import ExamplePieChart from "./charts/ExamplePieChart.torp";
 import ExamplePieChartCode from "./charts/ExamplePieChart.torp?raw";
+import ExampleScatterChart from "./charts/ExampleScatterChart.torp";
 import ExampleScatterChartCode from "./charts/ExampleScatterChart.torp?raw";
+import ExampleSparkLine from "./charts/ExampleSparkLine.torp";
 import ExampleSparkLineCode from "./charts/ExampleSparkLine.torp?raw";
 
 export default function ChartPage() {

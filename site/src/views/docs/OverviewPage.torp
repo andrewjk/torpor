@@ -1,5 +1,5 @@
-import Demo from "./Demo.torp?raw"
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
+import Demo from "./Demo.torp?raw";
 
 export default function OverviewPage() {
 	@head {
@@ -23,12 +23,12 @@ export default function OverviewPage() {
 				In-markup JavaScript logic with <code>&commat;if</code>, <code>&commat;for</code>,
 				<code>&commat;switch</code> and <code>&commat;await</code> keywords
 			</li>
-				<ul>
-					<li>
-						And <code>&commat;replace</code>, <code>&commat;const</code>, <code>&commat;console</code>,
-						<code>&commat;debugger</code>, <code>&commat;function</code> and <code>&commat;html</code>
-					</li>
-				</ul>
+			<ul>
+				<li>
+					And <code>&commat;replace</code>, <code>&commat;const</code>, <code>&commat;console</code>,
+					<code>&commat;debugger</code>, <code>&commat;function</code> and <code>&commat;html</code>
+				</li>
+			</ul>
 			<li>Runtime reactivity via proxies that can be used in any JavaScript file</li>
 			<li>Scoped styles, two-way binding, child components and more</li>
 			<li>An accessible, unstyled component library</li>
@@ -77,9 +77,9 @@ export default function Component($props: { name: string }) {
 }
 `.trim()}</code></pre>
 
-
 		<h2>Playground</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function App() {
 	@render {
 		<Component name="Torpor" />
@@ -118,6 +118,7 @@ function Component($props: { name: string }) {
 		}
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

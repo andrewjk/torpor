@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./pagination/ExampleBasic.torp";
-import ExampleTriggers from "./pagination/ExampleTriggers.torp";
-
 import ExampleBasicCode from "./pagination/ExampleBasic.torp?raw";
+import ExampleTriggers from "./pagination/ExampleTriggers.torp";
 import ExampleTriggersCode from "./pagination/ExampleTriggers.torp?raw";
 
 export default function PaginationPage() {

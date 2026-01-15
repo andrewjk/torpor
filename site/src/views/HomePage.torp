@@ -1,5 +1,5 @@
-import Counter from "./Counter.torp";
 import torporLogo from "@/assets/torpor.svg";
+import Counter from "./Counter.torp";
 
 /**
  * The home component
@@ -49,7 +49,7 @@ export default function HomePage() {
 					<p>More to come...</p>
 				</div>
 			</div>
-			
+
 			<h2>A counter</h2>
 			<p>
 				Below is an example <code>Counter</code> component, which maintains a

@@ -1,8 +1,4 @@
-import {
-	ListBox,
-	ListBoxItem,
-	ListBoxSeparator,
-} from "@torpor/ui/ListBox";
+import { ListBox, ListBoxItem, ListBoxSeparator } from "@torpor/ui/ListBox";
 
 export default function ExampleMultiple() {
 	let $state = $watch({ value: [0] });

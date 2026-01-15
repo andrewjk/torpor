@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./list-box/ExampleBasic.torp";
-import ExampleMultiple from "./list-box/ExampleMultiple.torp";
-
 import ExampleBasicCode from "./list-box/ExampleBasic.torp?raw";
+import ExampleMultiple from "./list-box/ExampleMultiple.torp";
 import ExampleMultipleCode from "./list-box/ExampleMultiple.torp?raw";
 
 export default function ListBoxPage() {

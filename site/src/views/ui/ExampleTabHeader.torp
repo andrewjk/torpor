@@ -1,4 +1,4 @@
-import { TabTrigger, TabHeader } from "@torpor/ui/TabGroup"
+import { TabHeader, TabTrigger } from "@torpor/ui/TabGroup";
 
 export default function ExampleTabGroup() {
 	@render {

@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./contextual/ExampleBasic.torp";
-import ExampleHover from "./contextual/ExampleHover.torp";
-
 import ExampleBasicCode from "./contextual/ExampleBasic.torp?raw";
+import ExampleHover from "./contextual/ExampleHover.torp";
 import ExampleHoverCode from "./contextual/ExampleHover.torp?raw";
 
 export default function ContextualPage() {

@@ -1,4 +1,4 @@
-import { Notification, NotificationContent, NotificationClose } from "@torpor/ui/Notification";
+import { Notification, NotificationClose, NotificationContent } from "@torpor/ui/Notification";
 
 export default function CustomNotification() {
 	@render {

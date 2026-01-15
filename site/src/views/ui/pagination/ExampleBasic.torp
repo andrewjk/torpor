@@ -1,7 +1,4 @@
-import {
-	Pagination,
-	PaginationItem,
-} from "@torpor/ui/Pagination";
+import { Pagination, PaginationItem } from "@torpor/ui/Pagination";
 
 export default function ExampleBasic() {
 	let $state = $watch({

@@ -1,4 +1,4 @@
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
 
 export default function ReactivityPage() {
 	@head {
@@ -30,7 +30,7 @@ export default function ReactivityPage() {
 		<p>
 			The whole process is repeated many times, for as long as your components are in use.
 		</p>
-		
+
 		<h2>Signals and effects</h2>
 		<p>
 			In Torpor, signals are created by using the <code>$watch</code> function to convert
@@ -109,7 +109,8 @@ let $state = $watch({
 		</p>
 
 		<h2>Playground</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Component() {
 	let $state = $watch({
 		count: 1,
@@ -136,6 +137,7 @@ export default function Component() {
 		</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

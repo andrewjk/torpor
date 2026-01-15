@@ -1,19 +1,19 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter, DialogHeader } from "@torpor/ui/Dialog";
 import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
-import { Dialog, DialogHeader, DialogBody, DialogFooter, DialogButton } from "@torpor/ui/Dialog";
 
 export default function PromptDialog($props: any) {
 	$props.confirmText ||= "OK";
 	$props.cancelText ||= "Cancel";
 
 	let $state = $watch({
-		value: ""
+		value: "",
 	});
 
 	@render {
 		<Modal visible {$props.callback}>
 			<ModalOverlay class="prompt-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="prompt-dialog-content" callback={$props.callback}>
+				<Dialog class="prompt-dialog-content" {$props.callback}>
 					@if ($props.header) {
 						<DialogHeader>
 							<h4>{$props.header}</h4>
@@ -28,7 +28,7 @@ export default function PromptDialog($props: any) {
 						</DialogBody>
 					}
 					<DialogFooter class="prompt-dialog-footer">
-						<DialogButton type="confirm" value={$state.value} disabled={!$state.value}>
+						<DialogButton type="confirm" {$state.value} disabled={!$state.value}>
 							{$props.confirmText}
 						</DialogButton>
 						<DialogButton type="cancel">

@@ -8,7 +8,8 @@
 		"dev": "tb --dev",
 		"check": "torp-check && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && tb --build",
-		"build:cf": "tsx buildcf.ts"
+		"build:cf": "tsx buildcf.ts",
+		"format": "prettier --write ."
 	},
 	"keywords": [],
 	"author": "",
@@ -25,6 +26,8 @@
 	},
 	"devDependencies": {
 		"@torpor/check": "workspace:^",
+		"@torpor/prettier": "workspace:^",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
 		"@typescript/native-preview": "7.0.0-dev.20251112.1",
 		"oxlint-tsgolint": "^0.6.0",
 		"tsx": "^4.20.6",

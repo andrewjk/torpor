@@ -1,16 +1,13 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleDialog from "./popover/ExampleDialog.torp";
-import ExampleHover from "./popover/ExampleHover.torp";
-import ExampleFunction from "./popover/ExampleFunction.torp";
-import ExampleVariable from "./popover/ExampleVariable.torp";
-
 import ExampleDialogCode from "./popover/ExampleDialog.torp?raw";
-import ExampleHoverCode from "./popover/ExampleHover.torp?raw";
+import ExampleFunction from "./popover/ExampleFunction.torp";
 import ExampleFunctionCode from "./popover/ExampleFunction.torp?raw";
+import ExampleHover from "./popover/ExampleHover.torp";
+import ExampleHoverCode from "./popover/ExampleHover.torp?raw";
+import ExampleVariable from "./popover/ExampleVariable.torp";
 import ExampleVariableCode from "./popover/ExampleVariable.torp?raw";
 
 export default function PopoverPage() {

@@ -1,7 +1,7 @@
 export default function Counter() {
 	let $state = $watch({
-		count: 0
-	})
+		count: 0,
+	});
 
 	@render {
 		<p>

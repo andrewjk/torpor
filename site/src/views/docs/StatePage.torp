@@ -1,4 +1,4 @@
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
 
 export default function StatePage() {
 	@head {
@@ -139,9 +139,10 @@ export default function Component($props: { name: string }) {
 	}
 }
 `.trim()}</code></pre>
-		
+
 		<h2>Playground</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Component() {
 	let $state = $watch({
 		count: 1,
@@ -162,6 +163,7 @@ export default function Component() {
 		</button>
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

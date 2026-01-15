@@ -1,14 +1,11 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./select-box/ExampleBasic.torp";
-import ExampleBound from "./select-box/ExampleBound.torp";
-import ExampleMultiple from "./select-box/ExampleMultiple.torp";
-
 import ExampleBasicCode from "./select-box/ExampleBasic.torp?raw";
+import ExampleBound from "./select-box/ExampleBound.torp";
 import ExampleBoundCode from "./select-box/ExampleBound.torp?raw";
+import ExampleMultiple from "./select-box/ExampleMultiple.torp";
 import ExampleMultipleCode from "./select-box/ExampleMultiple.torp?raw";
 
 export default function SelectBoxPage() {

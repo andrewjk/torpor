@@ -1,5 +1,11 @@
-import { Accordion, AccordionItem, AccordionHeader, AccordionTrigger, AccordionContent } from "@torpor/ui/Accordion";
-import { grow } from "@torpor/ui/motion"
+import {
+	Accordion,
+	AccordionContent,
+	AccordionHeader,
+	AccordionItem,
+	AccordionTrigger,
+} from "@torpor/ui/Accordion";
+import { grow } from "@torpor/ui/motion";
 
 export default function ExampleBasic() {
 	@render {

@@ -1,5 +1,10 @@
-import { Disclosure, DisclosureHeader, DisclosureTrigger, DisclosureContent } from "@torpor/ui/Disclosure";
-import { grow } from "@torpor/ui/motion"
+import {
+	Disclosure,
+	DisclosureContent,
+	DisclosureHeader,
+	DisclosureTrigger,
+} from "@torpor/ui/Disclosure";
+import { grow } from "@torpor/ui/motion";
 
 export default function ExampleBasic() {
 	@render {

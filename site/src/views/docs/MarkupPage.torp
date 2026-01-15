@@ -1,4 +1,4 @@
-import Repl from "../repl/Repl.torp"
+import Repl from "../repl/Repl.torp";
 
 export default function MarkupPage() {
 	@head {
@@ -80,7 +80,7 @@ export default function Component() {
 	}
 }
 `.trim()}</code></pre>
-		
+
 		<h2>For loops</h2>
 		<p>
 			Use a <code>&commat;for</code> loop to show multiple elements:
@@ -249,7 +249,8 @@ export default function Component() {
 		</p>
 
 		<h2>Playground</h2>
-		<Repl input={`
+		<Repl
+			input={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -267,6 +268,7 @@ export default function Component() {
 		}
 	}
 }
-`.trimStart()} />
+`.trimStart()}
+		/>
 	}
 }

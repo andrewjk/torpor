@@ -1,12 +1,5 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "@torpor/ui/ListBox";
-import {
-	SelectBox,
-	SelectBoxTrigger,
-	SelectBoxContent,
-} from "@torpor/ui/SelectBox";
+import { ListBox, ListBoxItem } from "@torpor/ui/ListBox";
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "@torpor/ui/SelectBox";
 
 export default function ExampleMultiple() {
 	let items = [
@@ -18,8 +11,11 @@ export default function ExampleMultiple() {
 	let $state = $watch({
 		value: [0],
 		get text() {
-			return items.filter(i => this.value.includes(i.id)).map(i => i.text).join(", ");
-		}
+			return items
+				.filter((i) => this.value.includes(i.id))
+				.map((i) => i.text)
+				.join(", ");
+		},
 	});
 
 	@render {

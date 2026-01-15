@@ -1,10 +1,10 @@
 import {
 	Tree,
 	TreeItem,
-	TreeItemContent,
-	TreeItemTrigger,
-	TreeItemLabel,
 	TreeItemChildren,
+	TreeItemContent,
+	TreeItemLabel,
+	TreeItemTrigger,
 } from "@torpor/ui/Tree";
 
 export default function ExampleMultiple() {
@@ -20,27 +20,22 @@ export default function ExampleMultiple() {
 			Selected: {JSON.stringify($state.value)}
 		</div>
 
-		<Tree
-			class="example-tree"
-			&expanded={$state.expanded}
-			&value={$state.value}
-			type="multiple"
-		>
+		<Tree class="example-tree" &expanded={$state.expanded} &value={$state.value} type="multiple">
 			<TreeItem class="example-tree-item" value="folder-1">
 				<TreeItemContent class="example-tree-item-content">
-					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemTrigger class="example-tree-item-trigger" />
 					<TreeItemLabel>Documents</TreeItemLabel>
 				</TreeItemContent>
 				<TreeItemChildren>
 					<TreeItem class="example-tree-item" value="file-1-1">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>Resume.doc</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>
 					<TreeItem class="example-tree-item" value="file-1-2">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>Cover Letter.doc</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>
@@ -48,19 +43,19 @@ export default function ExampleMultiple() {
 			</TreeItem>
 			<TreeItem class="example-tree-item" value="folder-2">
 				<TreeItemContent class="example-tree-item-content">
-					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemTrigger class="example-tree-item-trigger" />
 					<TreeItemLabel>Pictures</TreeItemLabel>
 				</TreeItemContent>
 				<TreeItemChildren>
 					<TreeItem class="example-tree-item" value="file-2-1">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>vacation.jpg</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>
 					<TreeItem class="example-tree-item" value="file-2-2">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>family.jpg</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>
@@ -68,19 +63,19 @@ export default function ExampleMultiple() {
 			</TreeItem>
 			<TreeItem class="example-tree-item" value="folder-3">
 				<TreeItemContent class="example-tree-item-content">
-					<TreeItemTrigger class="example-tree-item-trigger"/>
+					<TreeItemTrigger class="example-tree-item-trigger" />
 					<TreeItemLabel>Projects</TreeItemLabel>
 				</TreeItemContent>
 				<TreeItemChildren>
 					<TreeItem class="example-tree-item" value="file-3-1">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>Website</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>
 					<TreeItem class="example-tree-item" value="file-3-2">
 						<TreeItemContent class="example-tree-item-content">
-							<TreeItemTrigger class="example-tree-item-trigger"/>
+							<TreeItemTrigger class="example-tree-item-trigger" />
 							<TreeItemLabel>App</TreeItemLabel>
 						</TreeItemContent>
 					</TreeItem>

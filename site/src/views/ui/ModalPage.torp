@@ -1,18 +1,15 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./modal/ExampleBasic.torp";
-import ExampleFunction from "./modal/ExampleFunction.torp";
-import ExampleInfo from "./modal/ExampleInfo.torp";
-import ExampleConfirm from "./modal/ExampleConfirm.torp";
-import ExamplePrompt from "./modal/ExamplePrompt.torp";
-
 import ExampleBasicCode from "./modal/ExampleBasic.torp?raw";
-import ExampleFunctionCode from "./modal/ExampleFunction.torp?raw";
-import ExampleInfoCode from "./modal/ExampleInfo.torp?raw";
+import ExampleConfirm from "./modal/ExampleConfirm.torp";
 import ExampleConfirmCode from "./modal/ExampleConfirm.torp?raw";
+import ExampleFunction from "./modal/ExampleFunction.torp";
+import ExampleFunctionCode from "./modal/ExampleFunction.torp?raw";
+import ExampleInfo from "./modal/ExampleInfo.torp";
+import ExampleInfoCode from "./modal/ExampleInfo.torp?raw";
+import ExamplePrompt from "./modal/ExamplePrompt.torp";
 import ExamplePromptCode from "./modal/ExamplePrompt.torp?raw";
 
 export default function ModalPage() {

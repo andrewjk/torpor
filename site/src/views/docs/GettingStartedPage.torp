@@ -1,4 +1,3 @@
-
 export default function GettingStartedPage() {
 	@head {
 		<title>Getting Started | Torpor</title>

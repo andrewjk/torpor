@@ -1,18 +1,15 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./dialog/ExampleBasic.torp";
-import ExampleFunction from "./dialog/ExampleFunction.torp";
-import ExampleInfo from "./dialog/ExampleInfo.torp";
-import ExampleConfirm from "./dialog/ExampleConfirm.torp";
-import ExamplePrompt from "./dialog/ExamplePrompt.torp";
-
 import ExampleBasicCode from "./dialog/ExampleBasic.torp?raw";
-import ExampleFunctionCode from "./dialog/ExampleFunction.torp?raw";
-import ExampleInfoCode from "./dialog/ExampleInfo.torp?raw";
+import ExampleConfirm from "./dialog/ExampleConfirm.torp";
 import ExampleConfirmCode from "./dialog/ExampleConfirm.torp?raw";
+import ExampleFunction from "./dialog/ExampleFunction.torp";
+import ExampleFunctionCode from "./dialog/ExampleFunction.torp?raw";
+import ExampleInfo from "./dialog/ExampleInfo.torp";
+import ExampleInfoCode from "./dialog/ExampleInfo.torp?raw";
+import ExamplePrompt from "./dialog/ExamplePrompt.torp";
 import ExamplePromptCode from "./dialog/ExamplePrompt.torp?raw";
 
 export default function DialogPage() {

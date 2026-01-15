@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup"
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleBasic from "./tree/ExampleBasic.torp";
-import ExampleMultiple from "./tree/ExampleMultiple.torp";
-
 import ExampleBasicCode from "./tree/ExampleBasic.torp?raw";
+import ExampleMultiple from "./tree/ExampleMultiple.torp";
 import ExampleMultipleCode from "./tree/ExampleMultiple.torp?raw";
 
 export default function TreePage() {

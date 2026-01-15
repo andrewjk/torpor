@@ -1,11 +1,11 @@
 import {
 	Accordion,
-	AccordionItem,
+	AccordionContent,
 	AccordionHeader,
+	AccordionItem,
 	AccordionTrigger,
-	AccordionContent
 } from "@torpor/ui/Accordion";
-import { grow } from "@torpor/ui/motion"
+import { grow } from "@torpor/ui/motion";
 
 export default function ExampleMultiple() {
 	let $state = $watch({ value: [0] });

@@ -1,12 +1,9 @@
-import { TabGroup, TabList, TabContent } from "@torpor/ui/TabGroup";
-
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
-
 import ExampleCSS from "./breadcrumb/ExampleCSS.torp";
-import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
-
 import ExampleCSSCode from "./breadcrumb/ExampleCSS.torp?raw";
+import ExampleSeparators from "./breadcrumb/ExampleSeparators.torp";
 import ExampleSeparatorsCode from "./breadcrumb/ExampleSeparators.torp?raw";
 
 export default function BreadcrumbPage() {
@@ -21,7 +18,7 @@ export default function BreadcrumbPage() {
 		</p>
 		<p>
 			See <a href="https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/">the WAI ARIA guidelines for Breadcrumbs</a>.
- 		</p>
+		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
 <Breadcrumb>
