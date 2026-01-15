@@ -604,7 +604,7 @@ function nodeSkip(node, count) {
 }
 function runControl(region, anchor, create, name) {
 	let first = true;
-	$run(function runControl$1() {
+	$run(function runControl() {
 		const oldRegion = pushRegion(region, first);
 		first = false;
 		create(anchor);
@@ -874,7 +874,7 @@ function transferListItemData(oldItem, newItem, update) {
 function runList(region, parent, anchor, buildItems, create, update) {
 	let first = true;
 	let listItems = [];
-	$run(function runList$1() {
+	$run(function runList() {
 		const oldRegion = pushRegion(region, first);
 		first = false;
 		const newItems = buildItems();

@@ -30,7 +30,8 @@ export default async function nodeMessageToRequest(
 	// Convert body to Buffer if applicable
 	const body =
 		req.method !== "GET" && req.method !== "HEAD"
-			? (Readable.toWeb(req) as ReadableStream) // await readableToBuffer(req)
+			? // @ts-ignore
+				(Readable.toWeb(req) as ReadableStream) // await readableToBuffer(req)
 			: null;
 
 	return new Request(url, {

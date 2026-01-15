@@ -15,7 +15,6 @@ interface HiddenProps {
  */
 export default function Hidden($props: HiddenProps | undefined) {
 	@render {
-	<div>
 		<input
 			{$props?.id}
 			type="hidden"

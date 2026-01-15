@@ -62,8 +62,11 @@ async function run() {
 			await fs.rename(join(distFolder, file), newFilePath);
 
 			const parsed = parse(await fs.readFile(newFilePath, "utf8"));
-			// HACK: by this point we should be certain there's no errors
-			typeDefs.push(buildType(parsed.template!));
+			if (parsed.template) {
+				typeDefs.push(buildType(parsed.template));
+			} else {
+				console.log(chalk.magenta.inverse(" ERR! "), `  in ${newFileName}`);
+			}
 		}
 
 		// Move all *.ts files into this folder

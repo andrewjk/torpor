@@ -6,7 +6,7 @@ export default defineConfig({
 		"src/_worker.ts",
 		{
 			from: "src/_worker.ts",
-			to: "dist/_worker.ts",
+			to: "dist",
 		},
 	],
 }) satisfies UserConfig as UserConfig;
