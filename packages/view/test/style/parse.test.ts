@@ -2,6 +2,36 @@ import { assert, expect, test } from "vitest";
 import buildStyles from "../../src/compile/build/client/buildStyles";
 import parse from "../../src/compile/parse";
 import { att, el, root, text, trimParsed } from "../helpers";
+import type BlockNode from "../../src/compile/types/styles/BlockNode";
+import type StyleNode from "../../src/compile/types/styles/StyleNode";
+import type AttributeNode from "../../src/compile/types/styles/AttributeNode";
+import type CommentNode from "../../src/compile/types/styles/CommentNode";
+
+function block(selector: string, children: StyleNode[]) {
+	return {
+		type: "block" as const,
+		selector,
+		children,
+		gapBefore: false
+	} satisfies BlockNode
+}
+
+function attr(name: string, value: string) {
+	return {
+		type: "attribute",
+		name,
+		value,
+		gapBefore: false
+	} satisfies AttributeNode
+}
+
+function comment(content: string) {
+	return {
+		type: "comment",
+		content,
+		gapBefore: false
+	} satisfies CommentNode
+}
 
 test("simple style", () => {
 	const input = `
@@ -36,17 +66,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: "h1",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block("h1", [ attr("color", "blue")]),
 		],
 		hash: "1wvcb3a",
 	});
@@ -76,17 +97,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: ".h1, p",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block(".h1, p", [ attr("color", "blue") ])
 		],
 		hash: "5fqf2e",
 	});
@@ -119,21 +131,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: ".h1, p",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-					{
-						name: "background-color",
-						value: "green",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block(".h1, p", [ attr("color", "blue"), attr("background-color", "green") ])
 		],
 		hash: "bv7ypa",
 	});
@@ -166,17 +165,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: ".h1.blah p > .child + .next",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block(".h1.blah p > .child + .next", [ attr("color", "blue")]),
 		],
 		hash: "1hfc9nc",
 	};
@@ -218,17 +208,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: ":global(.h1.blah p > .child + .next)",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block(":global(.h1.blah p > .child + .next)", [ attr("color", "blue")]),
 		],
 		hash: "wbexfk",
 	};
@@ -270,17 +251,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: ":global(.h1.blah) p > .child + :global(.next)",
-				attributes: [
-					{
-						name: "color",
-						value: "blue",
-					},
-				],
-				children: [],
-			},
+		children: [
+			block(":global(.h1.blah) p > .child + :global(.next)", [ attr("color", "blue")]),
 		],
 		hash: "1cfcedi",
 	};
@@ -323,23 +295,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: "@media screen and (min-width: 480px)",
-				attributes: [],
-				children: [
-					{
-						selector: "button",
-						attributes: [
-							{
-								name: "color",
-								value: "green",
-							},
-						],
-						children: [],
-					},
-				],
-			},
+		children: [
+			block("@media screen and (min-width: 480px)", [ block("button", [attr("color", "green")])]),
 		],
 		hash: "c2o17j",
 	});
@@ -379,19 +336,18 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: "button",
-				attributes: [
-					{
-						name: "color",
-						value: "green",
-					},
-				],
-				children: [],
-			},
+		children: [
+			comment(`/*
+		p {
+			color: blue
+		}
+		*/`),
+			block("button", [attr("color", "green")]),
+			comment("//span: {"),
+			comment("//	color: purple;"),
+			comment("//}")
 		],
-		hash: "z7n1b7",
+		hash: "qktc5q",
 	});
 });
 
@@ -421,17 +377,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		blocks: [
-			{
-				selector: "p",
-				attributes: [
-					{
-						name: "color",
-						value: '"blue"',
-					},
-				],
-				children: [],
-			},
+		children: [
+			block("p", [ attr("color", '"blue"')]),
 		],
 		hash: "7qpvk6",
 	});
@@ -464,17 +411,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: "p::before",
-				attributes: [
-					{
-						name: "content",
-						value: '"~"',
-					},
-				],
-				children: [],
-			},
+		children: [
+			block("p::before", [ attr("content", '"~"')]),
 		],
 		hash: "5cr73h",
 	};
@@ -516,17 +454,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: "p:hover",
-				attributes: [
-					{
-						name: "color",
-						value: '"blue"',
-					},
-				],
-				children: [],
-			},
+		children: [
+			block("p:hover", [ attr("color", '"blue"')]),
 		],
 		hash: "1pq0u26",
 	};
@@ -570,17 +499,8 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	let styleObject = {
 		global: false,
-		blocks: [
-			{
-				selector: "p:hover,\n\t\tp:active,\n\t\tp:focused",
-				attributes: [
-					{
-						name: "color",
-						value: '"blue"',
-					},
-				],
-				children: [],
-			},
+		children: [
+			block("p:hover,\n\t\tp:active,\n\t\tp:focused", [ attr("color", '"blue"')]),
 		],
 		hash: "1ib1oex",
 	};

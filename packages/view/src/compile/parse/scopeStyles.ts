@@ -1,5 +1,5 @@
 import type TemplateNode from "../types/nodes/TemplateNode";
-import type StyleBlock from "../types/styles/StyleBlock";
+import type BlockNode from "../types/styles/BlockNode";
 import isComponentNode from "../utils/isComponentNode";
 import isElementNode from "../utils/isElementNode";
 import isParentNode from "../utils/isParentNode";
@@ -10,8 +10,10 @@ export default function scopeStyles(status: ParseStatus): void {
 	let selectors: string[] = [];
 	for (let component of status.components) {
 		if (component.style && component.markup) {
-			for (let block of component.style.blocks) {
-				collectStyleSelectors(block, selectors);
+			for (let block of component.style.children) {
+				if (block.type === "block") {
+					collectStyleSelectors(block as BlockNode, selectors);
+				}
 			}
 			scopeStylesOnNode(component.markup, selectors);
 		}
@@ -48,7 +50,7 @@ function scopeStylesOnNode(node: TemplateNode, selectors: string[]) {
 	}
 }
 
-function collectStyleSelectors(block: StyleBlock, selectors: string[]) {
+function collectStyleSelectors(block: BlockNode, selectors: string[]) {
 	// HACK: We should be collecting the actual selectors and then checking
 	// attributes, parents, children, siblings etc
 	for (let s of block.selector.split(/[\s*,>+~[\]]/)) {

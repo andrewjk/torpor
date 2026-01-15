@@ -1,19 +1,41 @@
-import type Attribute from "../../types/styles/Attribute";
+import type AttributeNode from "../../types/styles/AttributeNode";
+import type BlockNode from "../../types/styles/BlockNode";
 import type Style from "../../types/styles/Style";
-import type StyleBlock from "../../types/styles/StyleBlock";
+import type StyleNode from "../../types/styles/StyleNode";
 import Builder from "../../utils/Builder";
 
 export default function buildStyles(style: Style, styleHash: string): string {
 	const b = new Builder();
 
-	for (let block of style.blocks) {
-		buildStyleBlock(block, b, styleHash);
+	for (let block of style.children) {
+		buildStyleNode(block, b, styleHash);
 	}
 
 	return b.toString();
 }
 
-function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
+function buildStyleNode(node: StyleNode, b: Builder, styleHash: string) {
+	switch (node.type) {
+		case "block": {
+			buildBlockNode(node as BlockNode, b, styleHash);
+			break;
+		}
+		case "attribute": {
+			buildAttributeNode(node as AttributeNode, b);
+			break;
+		}
+		case "comment": {
+			// Don't include comments
+			break;
+		}
+		default: {
+			// eslint-disable-next-line restrict-template-expressions
+			throw new Error(`Invalid style node type: ${node.type}`);
+		}
+	}
+}
+
+function buildBlockNode(block: BlockNode, b: Builder, styleHash: string) {
 	// TODO: This should probably be done while parsing
 	// And handle attribute selectors
 	if (block.selector.startsWith("@")) {
@@ -46,11 +68,8 @@ function buildStyleBlock(block: StyleBlock, b: Builder, styleHash: string) {
 		}
 		b.append(`${selectors.join(" ").replaceAll(" ,", ",")} {`);
 	}
-	for (let attribute of block.attributes) {
-		buildStyleAttribute(attribute, b);
-	}
 	for (let child of block.children) {
-		buildStyleBlock(child, b, styleHash);
+		buildStyleNode(child, b, styleHash);
 	}
 	b.append(`}`);
 }
@@ -80,6 +99,6 @@ function addSelector(
 	}
 }
 
-function buildStyleAttribute(attribute: Attribute, b: Builder) {
+function buildAttributeNode(attribute: AttributeNode, b: Builder) {
 	b.append(`${attribute.name}: ${attribute.value};`);
 }

@@ -1,7 +1,7 @@
-import type StyleBlock from "./StyleBlock";
+import type StyleNode from "./StyleNode";
 
 export default interface Style {
 	global: boolean;
-	blocks: StyleBlock[];
+	children: StyleNode[];
 	hash: string;
 }

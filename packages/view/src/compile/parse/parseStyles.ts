@@ -1,5 +1,7 @@
-import type Attribute from "../types/styles/Attribute";
-import type StyleBlock from "../types/styles/StyleBlock";
+import type AttributeNode from "../types/styles/AttributeNode";
+import type BlockNode from "../types/styles/BlockNode";
+import CommentNode from "../types/styles/CommentNode";
+import type StyleNode from "../types/styles/StyleNode";
 import hash from "../utils/hash";
 import type ParseStatus from "./ParseStatus";
 import accept from "./utils/accept";
@@ -14,7 +16,7 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 
 	current.style = {
 		global: false,
-		blocks: [],
+		children: [],
 		hash: hash(source),
 	};
 
@@ -34,9 +36,9 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 		if (isSpaceChar(styleStatus.source, styleStatus.i)) {
 			consumeSpace(styleStatus);
 		} else {
-			const block = parseStyleBlock(styleStatus);
-			if (block) {
-				current.style.blocks.push(block);
+			const node = parseStyleNode(styleStatus);
+			if (node) {
+				current.style.children.push(node);
 			} else {
 				break;
 			}
@@ -46,13 +48,38 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 	status.errors = status.errors.concat(styleStatus.errors);
 }
 
-function parseStyleBlock(status: ParseStatus): StyleBlock | undefined {
+function parseStyleNode(status: ParseStatus): StyleNode | undefined {
+	const gapBefore = /\n\s*\n\s*$/.test(status.source.slice(0, status.i));
+
+	if (accept("//", status)) {
+		const start = status.i - 2;
+		status.i = status.source.indexOf("\n", status.i);
+		if (status.i === -1) status.i = status.source.length;
+		const comment: CommentNode = {
+			type: "comment",
+			content: status.source.substring(start, status.i),
+			gapBefore,
+		};
+		return comment;
+	} else if (accept("/*", status)) {
+		const start = status.i - 2;
+		status.i = status.source.indexOf("*/", status.i) + 2;
+		if (status.i === -1) status.i = status.source.length;
+		const comment: CommentNode = {
+			type: "comment",
+			content: status.source.substring(start, status.i),
+			gapBefore,
+		};
+		return comment;
+	}
+
 	const selector = consumeUntil("{", status).trim();
 	if (expect("{", status)) {
-		const block: StyleBlock = {
+		const block: BlockNode = {
+			type: "block",
 			selector,
-			attributes: [],
 			children: [],
+			gapBefore,
 		};
 		consumeSpace(status);
 		while (status.source[status.i] !== "}") {
@@ -63,9 +90,9 @@ function parseStyleBlock(status: ParseStatus): StyleBlock | undefined {
 			if (nextOpenBrace === -1) nextOpenBrace = status.source.length;
 			if (nextColon < nextOpenBrace) {
 				const attribute = parseStyleAttribute(status);
-				block.attributes.push(attribute);
+				block.children.push(attribute);
 			} else if (nextOpenBrace < nextColon) {
-				const child = parseStyleBlock(status);
+				const child = parseStyleNode(status);
 				if (child) {
 					block.children.push(child);
 				} else {
@@ -82,13 +109,16 @@ function parseStyleBlock(status: ParseStatus): StyleBlock | undefined {
 	}
 }
 
-function parseStyleAttribute(status: ParseStatus): Attribute {
+function parseStyleAttribute(status: ParseStatus): AttributeNode {
+	const gapBefore = /\n\s*\n\s*$/.test(status.source.slice(0, status.i));
 	const name = consumeUntil(":", status).trim();
 	accept(":", status);
 	const value = consumeUntil(";", status).trim();
 	accept(";", status);
 	return {
+		type: "attribute",
 		name,
 		value,
+		gapBefore,
 	};
 }

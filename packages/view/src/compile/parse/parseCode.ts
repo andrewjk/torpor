@@ -333,17 +333,20 @@ function parseComponentStyle(status: ParseStatus) {
 	let start = -1;
 	let end = status.source.length;
 	let level = 0;
-	// HACK: strip the comments out of styles only
 	let styleSource = "";
 	for (; status.i < status.source.length; status.i++) {
 		const char = status.source[status.i];
 		const nextChar = status.source[status.i + 1];
 		if (char === "/" && nextChar === "/") {
 			// Skip one-line comments
+			let start = status.i;
 			status.i = status.source.indexOf("\n", status.i);
+			styleSource += status.source.substring(start, status.i + 1);
 		} else if (char === "/" && nextChar === "*") {
 			// Skip block comments
+			let start = status.i;
 			status.i = status.source.indexOf("*/", status.i) + 1;
+			styleSource += status.source.substring(start, status.i + 1);
 		} else if (char === '"' || char === "'") {
 			// Skip string contents
 			let start = status.i;
