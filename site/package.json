@@ -21,17 +21,17 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"sucrase": "^3.35.0",
-		"zod": "^4.1.12"
+		"sucrase": "^3.35.1",
+		"zod": "^4.3.5"
 	},
 	"devDependencies": {
 		"@torpor/check": "workspace:^",
 		"@torpor/prettier": "workspace:^",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@typescript/native-preview": "7.0.0-dev.20251112.1",
-		"oxlint-tsgolint": "^0.6.0",
-		"tsx": "^4.20.6",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@typescript/native-preview": "7.0.0-dev.20260114.1",
+		"oxlint-tsgolint": "^0.11.0",
+		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
-		"wrangler": "^4.47.0"
+		"wrangler": "^4.59.1"
 	}
 }

@@ -19,18 +19,18 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@changesets/cli": "^2.29.7"
+		"@changesets/cli": "^2.29.8"
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/user-event": "^14.6.1",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/jsdom": "^27.0.0",
-		"jsdom": "^27.2.0",
-		"prettier": "^3.6.2",
+		"jsdom": "^27.4.0",
+		"prettier": "^3.8.0",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.8"
+		"vitest": "^4.0.17"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",
@@ -43,5 +43,5 @@
 		"packages/unplugin",
 		"packages/view"
 	],
-	"packageManager": "pnpm@10.20.0"
+	"packageManager": "pnpm@10.28.0"
 }

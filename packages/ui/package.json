@@ -125,18 +125,18 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/user-event": "^14.6.1",
 		"@torpor/check": "workspace:^",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/jsdom": "^27.0.0",
-		"@types/node": "^24.10.1",
-		"@typescript/native-preview": "7.0.0-dev.20251112.1",
+		"@types/node": "^25.0.8",
+		"@typescript/native-preview": "7.0.0-dev.20260114.1",
 		"chalk": "^5.6.2",
 		"esno": "^4.8.0",
 		"fast-glob": "^3.3.3",
-		"jsdom": "^27.2.0",
-		"oxlint-tsgolint": "^0.6.0",
+		"jsdom": "^27.4.0",
+		"oxlint-tsgolint": "^0.11.0",
 		"tsup": "^8.5.1",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.8",
-		"zod": "^4.1.12"
+		"vitest": "^4.0.17",
+		"zod": "^4.3.5"
 	}
 }

@@ -27,14 +27,14 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"prettier": "^3.6.2"
+		"prettier": "^3.8.0"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@typescript/native-preview": "7.0.0-dev.20251112.1",
-		"oxlint-tsgolint": "^0.6.0",
-		"tsdown": "^0.16.4",
-		"tsx": "^4.20.6",
-		"vitest": "^4.0.8"
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@typescript/native-preview": "7.0.0-dev.20260114.1",
+		"oxlint-tsgolint": "^0.11.0",
+		"tsdown": "0.20.0-beta.3",
+		"tsx": "^4.21.0",
+		"vitest": "^4.0.17"
 	}
 }

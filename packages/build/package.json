@@ -59,18 +59,18 @@
 	"dependencies": {
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"cookie": "^1.0.2",
+		"cookie": "^1.1.1",
 		"dotenv": "^17.2.3",
-		"vite": "^7.2.2",
-		"vite-tsconfig-paths": "^5.1.4"
+		"vite": "^7.3.1",
+		"vite-tsconfig-paths": "^6.0.4"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^6.0.0",
-		"@typescript/native-preview": "7.0.0-dev.20251112.1",
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@typescript/native-preview": "7.0.0-dev.20260114.1",
 		"esno": "^4.8.0",
-		"oxlint-tsgolint": "^0.6.0",
-		"tsdown": "^0.16.4",
+		"oxlint-tsgolint": "^0.11.0",
+		"tsdown": "0.20.0-beta.3",
 		"typescript": "^5.9.3",
-		"vitest": "^4.0.8"
+		"vitest": "^4.0.17"
 	}
 }
