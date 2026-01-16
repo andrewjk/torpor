@@ -39,6 +39,7 @@
 		"packages/check",
 		"packages/create-build",
 		"packages/prettier",
+		"packages/shiki",
 		"packages/textmate",
 		"packages/ui",
 		"packages/unplugin",
