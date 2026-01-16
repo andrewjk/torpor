@@ -1,4 +1,5 @@
 import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleCSS from "./breadcrumb/ExampleCSS.torp";
@@ -44,7 +45,7 @@ export default function BreadcrumbPage() {
 				<ExampleTabGroup>
 					<ExampleCSS />
 					<fill name="code">
-						<pre><code>{ExampleCSSCode.trim()}</code></pre>
+						<CodePreview code={ExampleCSSCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -52,7 +53,7 @@ export default function BreadcrumbPage() {
 				<ExampleTabGroup>
 					<ExampleSeparators />
 					<fill name="code">
-						<pre><code>{ExampleSeparatorsCode.trim()}</code></pre>
+						<CodePreview code={ExampleSeparatorsCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

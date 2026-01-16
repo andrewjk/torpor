@@ -1,4 +1,5 @@
 import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./contextual/ExampleBasic.torp";
@@ -37,7 +38,7 @@ export default function ContextualPage() {
 				<ExampleTabGroup>
 					<ExampleBasic />
 					<fill name="code">
-						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						<CodePreview code={ExampleBasicCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -45,7 +46,7 @@ export default function ContextualPage() {
 				<ExampleTabGroup>
 					<ExampleHover />
 					<fill name="code">
-						<pre><code>{ExampleHoverCode.trim()}</code></pre>
+						<CodePreview code={ExampleHoverCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

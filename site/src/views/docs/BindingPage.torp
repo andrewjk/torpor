@@ -1,3 +1,4 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function BindingPage() {
@@ -13,7 +14,8 @@ export default function BindingPage() {
 		<p>
 			Consider the following component:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ name: "Torpor" })
 
@@ -26,7 +28,8 @@ export default function Component() {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`.trim()}
+		/>
 		<p>
 			The component contains an input and a welcome message which changes when the value
 			of $state.name is changed. $state.name has an initial value which is shown in the
@@ -34,7 +37,8 @@ export default function Component() {
 			update $state.name when the input value is changed, you can use the special
 			<code>&value</code> attribute:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ name: "Torpor" })
 
@@ -48,7 +52,8 @@ export default function Component() {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Torpor will create an onchange event for the input that sets $state.name.
 		</p>
@@ -64,7 +69,8 @@ export default function Component() {
 			Another use for binding is for storing a DOM element in a variable, which is
 			done by adding a <code>&ref</code> attribute:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let para
 
@@ -84,7 +90,8 @@ export default function Component() {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Note that the DOM element will not be available until after the component has been
 			mounted and all its elements added to the DOM, and so you should only access it

@@ -1,3 +1,4 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function ComponentsPage() {
@@ -17,11 +18,11 @@ export default function ComponentsPage() {
 		<p>
 			The component function should look something like this:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 export default function Component() {
 // ...
 }
-`.trim()}</code></pre>
+`} />
 		<p>
 			The function's name must start with an uppercase letter to be considered a
 			component.
@@ -32,11 +33,11 @@ export default function Component() {
 			functions for components in a Torpor file. For example, a child component that is
 			used only in the current file can be declared like this:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 function ChildComponent() {
 // ...
 }
-`.trim()}</code></pre>
+`} />
 
 		<h2>Markup</h2>
 		<p>
@@ -45,17 +46,18 @@ function ChildComponent() {
 			contain multiple root elements, but each root element must be either a tag or control
 			statement:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 export default function Component() {
 	@render {
 		<p>Hello!</p>
 	}
 }
-`.trim()}</code></pre>
+`} />
 		<p>
 			You can include dynamic content in text and attributes using braces:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	const className = "extravagant"
 	const name = "Torpor"
@@ -66,7 +68,8 @@ export default function Component() {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			See the <a href="/docs/markup">Markup</a> section for more on what you can do in
 			the @render block.
@@ -79,7 +82,8 @@ export default function Component() {
 			the <code>$watch</code> function to make it reactive and update the UI when it is
 			changed:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({
 		count: 1
@@ -94,7 +98,8 @@ export default function Component() {
 		</button>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			The $watch function is automatically imported into component files if used (along
 			with a few other functions). By convention, reactive objects should start with a
@@ -105,7 +110,8 @@ export default function Component() {
 			A component function can accept a <code>$props</code> component containing the
 			properties that were passed to the component:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
@@ -113,7 +119,8 @@ export default function Component($props: { name: string }) {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			See the <a href="/docs/state">State</a> section for more on how to manage component
 			state.
@@ -124,7 +131,8 @@ export default function Component($props: { name: string }) {
 			The CSS for styling a component's elements is declared with a <code>&commat;style</code>
 			block. There can only be one @style block per component:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	@render {
 		<p class="extravagant">Hello!</p>
@@ -137,7 +145,8 @@ export default function Component() {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			The styles in the style block are scoped to the elements in the component so that
 			they don't affect elements in other components.

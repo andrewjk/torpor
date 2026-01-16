@@ -1,4 +1,5 @@
 import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBarChart from "./charts/ExampleBarChart.torp";
@@ -54,7 +55,7 @@ export default function ChartPage() {
 				<ExampleTabGroup>
 					<ExampleBarChart />
 					<fill name="code">
-						<pre><code>{ExampleBarChartCode.trim()}</code></pre>
+						<CodePreview code={ExampleBarChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -62,7 +63,7 @@ export default function ChartPage() {
 				<ExampleTabGroup>
 					<ExampleLineChart />
 					<fill name="code">
-						<pre><code>{ExampleLineChartCode.trim()}</code></pre>
+						<CodePreview code={ExampleLineChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -70,7 +71,7 @@ export default function ChartPage() {
 				<ExampleTabGroup>
 					<ExamplePieChart />
 					<fill name="code">
-						<pre><code>{ExamplePieChartCode.trim()}</code></pre>
+						<CodePreview code={ExamplePieChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -78,7 +79,7 @@ export default function ChartPage() {
 				<ExampleTabGroup>
 					<ExampleScatterChart />
 					<fill name="code">
-						<pre><code>{ExampleScatterChartCode.trim()}</code></pre>
+						<CodePreview code={ExampleScatterChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -86,7 +87,7 @@ export default function ChartPage() {
 				<ExampleTabGroup>
 					<ExampleSparkLine />
 					<fill name="code">
-						<pre><code>{ExampleSparkLineCode.trim()}</code></pre>
+						<CodePreview code={ExampleSparkLineCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

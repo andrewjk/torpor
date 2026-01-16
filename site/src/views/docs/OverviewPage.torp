@@ -1,5 +1,5 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
-import Demo from "./Demo.torp?raw";
 
 export default function OverviewPage() {
 	@head {
@@ -36,7 +36,8 @@ export default function OverviewPage() {
 		</ul>
 
 		<h2>A simple component</h2>
-		<pre><code>{`
+		<CodePreview
+			code={`
 /**
  * Components are functions that are declared in a \`.torp\` file
  */
@@ -75,7 +76,8 @@ export default function Component($props: { name: string }) {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>Playground</h2>
 		<Repl

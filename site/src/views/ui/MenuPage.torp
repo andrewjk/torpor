@@ -1,4 +1,5 @@
 import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./menu/ExampleBasic.torp";
@@ -41,7 +42,7 @@ export default function MenuPage() {
 				<ExampleTabGroup>
 					<ExampleBasic />
 					<fill name="code">
-						<pre><code>{ExampleBasicCode.trim()}</code></pre>
+						<CodePreview code={ExampleBasicCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

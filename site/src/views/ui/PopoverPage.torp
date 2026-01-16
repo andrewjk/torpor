@@ -1,4 +1,5 @@
 import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleDialog from "./popover/ExampleDialog.torp";
@@ -47,7 +48,7 @@ export default function PopoverPage() {
 				<ExampleTabGroup>
 					<ExampleDialog />
 					<fill name="code">
-						<pre><code>{ExampleDialogCode.trim()}</code></pre>
+						<CodePreview code={ExampleDialogCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -55,7 +56,7 @@ export default function PopoverPage() {
 				<ExampleTabGroup>
 					<ExampleHover />
 					<fill name="code">
-						<pre><code>{ExampleHoverCode.trim()}</code></pre>
+						<CodePreview code={ExampleHoverCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -63,7 +64,7 @@ export default function PopoverPage() {
 				<ExampleTabGroup>
 					<ExampleFunction />
 					<fill name="code">
-						<pre><code>{ExampleFunctionCode.trim()}</code></pre>
+						<CodePreview code={ExampleFunctionCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -71,7 +72,7 @@ export default function PopoverPage() {
 				<ExampleTabGroup>
 					<ExampleVariable />
 					<fill name="code">
-						<pre><code>{ExampleVariableCode.trim()}</code></pre>
+						<CodePreview code={ExampleVariableCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

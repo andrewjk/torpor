@@ -1,3 +1,4 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function StatePage() {
@@ -13,7 +14,8 @@ export default function StatePage() {
 			<code>$watch</code> function to make it reactive and update the UI when it is
 			changed:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({
 		count: 1
@@ -28,7 +30,8 @@ export default function Component() {
 		</button>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			The $watch function is automatically imported into component files if used (along
 			with a few other functions). By convention, reactive objects should start with a
@@ -42,7 +45,8 @@ export default function Component() {
 		<p>
 			Dependent state can be created using object properties:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({
 		count: 1,
@@ -60,7 +64,8 @@ export default function Component() {
 		</button>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>The $run function</h2>
 		<p>
@@ -68,7 +73,8 @@ export default function Component() {
 			<code>$run</code>. Calling $run sets up a function that is run on component
 			initialization and when any reactive values accessed within it are changed:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({
 		count: 1,
@@ -89,7 +95,8 @@ export default function Component() {
 		</button>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Behind the scenes, $run is called in the @render block to set up reactive text,
 			attributes and statements.
@@ -130,7 +137,8 @@ export default function Component() {
 			A component function can accept a <code>$props</code> component containing the properties that
 			were passed to the component:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
@@ -138,7 +146,8 @@ export default function Component($props: { name: string }) {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>Playground</h2>
 		<Repl

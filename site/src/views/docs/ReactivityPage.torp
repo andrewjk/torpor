@@ -1,3 +1,4 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function ReactivityPage() {
@@ -36,11 +37,11 @@ export default function ReactivityPage() {
 			In Torpor, signals are created by using the <code>$watch</code> function to convert
 			an object into a reactive Proxy object that we use to intercept property accesses:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 let $state = $watch({
 	count: 1
 })
-`.trim()}</code></pre>
+`} />
 		<p>
 			Each property accessor is essentially a signal that re-runs dependent effects when
 			changed.
@@ -48,11 +49,11 @@ let $state = $watch({
 		<p>
 			Effects are created by using the <code>$run</code> function:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 $run(() => {
 	console.log($state.count);
 })
-`.trim()}</code></pre>
+`} />
 		<p>
 			When the property of a reactive object is accessed, a subscription from the property
 			to the effect is created. When that property is subsequently updated, all of the
@@ -66,7 +67,8 @@ $run(() => {
 		<p>
 			You can use property getters to return a calculated value:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 let $state = $watch({
 	count: 1,
 	get isPrime() {
@@ -77,14 +79,16 @@ let $state = $watch({
 		return true;
 	}
 })
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			However, if you are accessing this property's value in multiple effects, it will
 			be run over and over again, slowing down your application. To ensure that it's only
 			run when its dependencies change, you can wrap the getter's implementation in a
 			<code>$cache</code> function:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 let $state = $watch({
 	count: 1,
 	get isPrime() {
@@ -97,7 +101,8 @@ let $state = $watch({
 		});
 	}
 })
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Conceptually, cached signals sit somewhere between signals and effects, both
 			pushing (when their value changes) and pulling (when they need to be re-run).

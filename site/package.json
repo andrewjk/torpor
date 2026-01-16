@@ -18,6 +18,7 @@
 		"@torpor/adapter-cloudflare": "workspace:^",
 		"@torpor/adapter-node": "workspace:^",
 		"@torpor/build": "workspace:^",
+		"@torpor/shiki": "workspace:^",
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
@@ -30,6 +31,7 @@
 		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@typescript/native-preview": "7.0.0-dev.20260114.1",
 		"oxlint-tsgolint": "^0.11.0",
+		"shiki-codegen": "^3.21.0",
 		"tsx": "^4.21.0",
 		"typescript": "^5.9.3",
 		"wrangler": "^4.59.1"

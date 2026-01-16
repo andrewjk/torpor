@@ -1,0 +1,25 @@
+import { codeToHtml } from "@torpor/shiki";
+
+/**
+ * Displays a colorized code preview.
+ */
+export default function CodePreview() {
+	@head {
+		<title>Torpor</title>
+	}
+
+	async function formatCode(code: string) {
+		return (await codeToHtml(code, {
+			lang: "torpor",
+			theme: "light-plus",
+		})).replace(/background-color:\s*#[a-f\d]{6};\s*/i, "");
+	}
+
+	@render {
+		@await (formatCode($props.code)) {
+			<pre><code>{$props.code}</code></pre>
+		} then (formatted) {
+			@html(formatted)
+		}
+	}
+}

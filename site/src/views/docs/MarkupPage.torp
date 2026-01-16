@@ -1,3 +1,4 @@
+import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function MarkupPage() {
@@ -13,19 +14,20 @@ export default function MarkupPage() {
 			contain multiple root elements, but each root element must be either a tag or control
 			statement:
 		</p>
-		<pre><code>{`
+		<CodePreview code={`
 export default function Component() {
 	@render {
 		<p>Hello!</p>
 	}
 }
-`.trim()}</code></pre>
+`} />
 
 		<h2>Dynamic content</h2>
 		<p>
 			You can include dynamic content in text and attributes using braces:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	const className = "extravagant"
 	const name = "Torpor"
@@ -36,12 +38,14 @@ export default function Component() {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Use this shortcut syntax to set the value of an attribute to a value of the same
 			name:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	const id = "main"
 
@@ -51,7 +55,8 @@ export default function Component() {
 		</p>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			You can also use e.g. <code>{`<p {$state.id}>Hello</p>`}</code> to get the
 			property value from the property of an object.
@@ -61,7 +66,8 @@ export default function Component() {
 		<p>
 			Use an <code>&commat;if</code> statement to show certain markup when a condition is met:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -79,13 +85,15 @@ export default function Component() {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>For loops</h2>
 		<p>
 			Use a <code>&commat;for</code> loop to show multiple elements:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({
 		stock: [
@@ -106,7 +114,8 @@ export default function Component() {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Note the use of the (optional) @key statement to store a unique value for each
 			loop item. If set, when the list is updated (e.g. when sorting), the @key value
@@ -118,7 +127,8 @@ export default function Component() {
 		<p>
 			Use a <code>&commat;switch</code> statement to show one of many options:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -148,7 +158,8 @@ export default function Component() {
 		}
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Note that the switch statement differs from the JavaScript switch statement in that
 			each case statement must be surrounded by braces and no fallthroughs are allowed
@@ -159,7 +170,8 @@ export default function Component() {
 		<p>
 			Use an <code>&commat;await</code> statement to show the result of an asynchronous function:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -169,13 +181,15 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>Replace statements</h2>
 		<p>
 			Use a <code>&commat;replace</code> statement to re-render markup when a value is changed:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -185,7 +199,8 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			This can be used to re-run component $mount statements and to re-play transition
 			animations.
@@ -197,7 +212,8 @@ export default function Component() {
 			<code>&commat;console</code> keyword can be used to log information within markup, and the
 			<code>&commat;debugger</code> keyword can be used to break code execution during markup rendering:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -207,7 +223,8 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>Function declarations</h2>
 		<p>
@@ -216,7 +233,8 @@ export default function Component() {
 			out of an onclick attribute, but still keeping it next to the button it is called
 			from:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -226,13 +244,15 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 
 		<h2>HTML rendering</h2>
 		<p>
 			Use a <code>&commat;html</code> statement to render plain HTML within markup, e.g. from a database:
 		</p>
-		<pre><code>{`
+		<CodePreview
+			code={`
 export default function Component() {
 	let $state = $watch({ counter: 0 })
 
@@ -242,7 +262,8 @@ export default function Component() {
 		</div>
 	}
 }
-`.trim()}</code></pre>
+`}
+		/>
 		<p>
 			Note that when rendering HTML you should ensure that it is properly escaped to
 			prevent script injection and other attacks.
@@ -256,7 +277,7 @@ export default function Component() {
 
 	@render {
 		<button onclick={() => $state.counter--}>Decrement</button>
-		{$state.counter}
+		<span>{$state.counter}</span>
 		<button onclick={() => $state.counter++}>Increment</button>
 
 		@if ($state.counter < 0) {

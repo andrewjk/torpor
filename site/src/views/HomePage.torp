@@ -1,4 +1,5 @@
 import torporLogo from "@/assets/torpor.svg";
+import CodePreview from "./CodePreview.torp";
 import Counter from "./Counter.torp";
 
 /**
@@ -59,7 +60,8 @@ export default function HomePage() {
 			<div class="hstack spaced full-width collapse">
 				<div class="demo-card grow">
 					<h3>Code</h3>
-					<pre><code>{`
+					<CodePreview
+						code={`
 export default function Counter() {
 	let $state = $watch({
 		count: 0
@@ -76,8 +78,8 @@ export default function Counter() {
 			Reset
 		</button>
 	}
-}
-`.trim()}</code></pre>
+}`.trim()}
+					/>
 				</div>
 				<div class="demo-card grow">
 					<h3>Component</h3>
