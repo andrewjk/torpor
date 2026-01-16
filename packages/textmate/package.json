@@ -1,0 +1,39 @@
+{
+	"name": "@torpor/textmate",
+	"version": "0.0.1",
+	"description": "A TextMate grammar for Torpor",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs"
+		},
+		"./grammar.json": {
+			"import": "./dist/grammar.json"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsx scripts/prebuild.ts && tsgo --noEmit && tsdown",
+		"build:prep": "tsx scripts/prebuild.ts",
+		"build:watch": "tsdown --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {},
+	"devDependencies": {
+		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
+		"@typescript/native-preview": "7.0.0-dev.20260114.1",
+		"oxlint-tsgolint": "^0.11.0",
+		"tsdown": "0.20.0-beta.3",
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3"
+	}
+}
