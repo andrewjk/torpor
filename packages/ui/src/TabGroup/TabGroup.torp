@@ -106,16 +106,14 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		}
 	});
 
-	function registerHeader(index: number | undefined, value: string | undefined, setFocused: () => void): ItemState {
+	function registerHeader(index: number | undefined, value: string | undefined, disabled: boolean | undefined): ItemState {
 		// If an index wasn't set for the header, set it automatically
 		if (!index) {
 			index = nextHeaderIndex++;
 		}
 
 		// Get or add the ItemState at this index
-		const itemState = getItemState(index, value);
-
-		itemState.setFocused = setFocused;
+		const itemState = getItemState(index, value, disabled);
 
 		return itemState;
 	}
@@ -132,7 +130,7 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		return itemState;
 	}
 
-	function getItemState(index: number, value: string | undefined): ItemState {
+	function getItemState(index: number, value: string | undefined, disabled?: boolean): ItemState {
 		// If we already have an item at this index, just return it
 		if (itemStates.length > index) {
 			return itemStates[index];
@@ -152,8 +150,8 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 			active: value === $state.value,
 			headerId: "",
 			contentId: "",
-			disabled: false,
-			parentDisabled: false,
+			disabled: $props?.disabled ?? disabled ?? false,
+			parentDisabled: $props?.disabled ?? false,
 			get dataState() {
 				return this.active ? "active" : "inactive";
 			},
@@ -188,49 +186,71 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 
 	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case "Left":
 			case "ArrowLeft": {
-				if (orientation === "horizontal" && headerIndex > 0) {
-					e.preventDefault();
-					itemStates[headerIndex - 1].setFocused();
+				if (orientation === "horizontal") {
+					for (let i = headerIndex - 1; i >= 0; i--) {
+						if (!itemStates[i].disabled) {
+							e.preventDefault();
+							itemStates[i].setFocused();
+							break;
+						}
+					}
 				}
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
-				if (orientation === "vertical" && headerIndex > 0) {
-					e.preventDefault();
-					itemStates[headerIndex - 1].setFocused();
+				if (orientation === "vertical") {
+					for (let i = headerIndex - 1; i >= 0; i--) {
+						if (!itemStates[i].disabled) {
+							e.preventDefault();
+							itemStates[i].setFocused();
+							break;
+						}
+					}
 				}
 				break;
 			}
-			case "Right":
 			case "ArrowRight": {
-				if (orientation === "horizontal" && headerIndex < itemStates.length - 1) {
-					e.preventDefault();
-					itemStates[headerIndex + 1].setFocused();
+				if (orientation === "horizontal") {
+					for (let i = headerIndex + 1; i < itemStates.length; i++) {
+						if (!itemStates[i].disabled) {
+							e.preventDefault();
+							itemStates[i].setFocused();
+							break;
+						}
+					}
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
-				if (orientation === "vertical" && headerIndex < itemStates.length - 1) {
-					e.preventDefault();
-					itemStates[headerIndex + 1].setFocused();
+				if (orientation === "vertical") {
+					for (let i = headerIndex + 1; i < itemStates.length; i++) {
+						if (!itemStates[i].disabled) {
+							e.preventDefault();
+							itemStates[i].setFocused();
+							break;
+						}
+					}
 				}
 				break;
 			}
 			case "Home": {
-				if (headerIndex > 0) {
-					e.preventDefault();
-					itemStates[0].setFocused();
+				for (let i = 0; i < itemStates.length; i++) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}
 			case "End": {
-				if (headerIndex < itemStates.length - 1) {
-					e.preventDefault();
-					itemStates[itemStates.length - 1].setFocused();
+				for (let i = itemStates.length - 1; i >= 0; i--) {
+					if (!itemStates[i].disabled) {
+						e.preventDefault();
+						itemStates[i].setFocused();
+						break;
+					}
 				}
 				break;
 			}

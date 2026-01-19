@@ -12,6 +12,8 @@ interface TabHeaderProps {
 	index?: number,
 	/** The value for this header's item */
 	value?: string,
+	/** If set to true, the user cannot interact with this header */
+	disabled?: boolean,
 }
 
 /**
@@ -26,13 +28,11 @@ interface TabHeaderProps {
  * ```
  */
 export default function TabHeader($props: TabHeaderProps | undefined) {
-	let button: HTMLButtonElement;
-
 	const context = $context[TabGroupContextName] as TabGroupContext;
 	if (!context) {
 		throw new Error("TabHeader must be contained within a TabGroup");
 	}
-	let $state = context.registerHeader($props?.index, $props?.value);
+	let $state = context.registerHeader($props?.index, $props?.value, $props?.disabled);
 
 	const itemContext: TabItemContext = {
 		triggerItem: context.triggerItem,

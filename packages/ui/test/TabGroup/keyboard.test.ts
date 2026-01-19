@@ -2,7 +2,9 @@ import { fireEvent, getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
+import TabGroupDisabled from "./components/TabGroupDisabled.torp";
 import TabGroupKeyboard from "./components/TabGroupKeyboard.torp";
+import TabGroupVertical from "./components/TabGroupVertical.torp";
 
 describe("TabGroup", () => {
 	it("Keyboard", async () => {
@@ -68,5 +70,29 @@ describe("TabGroup", () => {
 		// header
 		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "End" }));
 		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
+	});
+
+	it("Disabled items are skipped during navigation", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TabGroupDisabled);
+
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "ArrowRight" }),
+		);
+		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
+	});
+
+	it("Vertical orientation - Arrow Up and Arrow Down", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TabGroupVertical);
+
+		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		expect(document.activeElement).toBe(queryByText(container, "Header 2"));
+
+		fireEvent(getByText(container, "Header 2"), new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 	});
 });

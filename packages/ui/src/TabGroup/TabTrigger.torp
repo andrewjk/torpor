@@ -58,10 +58,10 @@ export default function TabTrigger($props: TabTriggerProps | undefined) {
 			class={["torp-tab-trigger", $props?.class]}
 			{$props?.style}
 			role="tab"
-			tabindex="-1"
+			tabindex={$state.active ? "0" : "-1"}
 			disabled={$state.disabled || $state.parentDisabled}
-			aria-selected={$state.active.toString()}
-			aria-disabled={$state.disabled}
+			aria-selected={$state.active ? "true" : "false"}
+			aria-disabled={$state.disabled || $state.parentDisabled}
 			aria-controls={$state.contentId}
 			data-state={$state.active ? "active" : "inactive"}
 			data-disabled={$state.disabled}

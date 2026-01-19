@@ -1,8 +1,10 @@
-import { queryByText } from "@testing-library/dom";
+import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vitest";
 import TabGroupAccessibility from "./components/TabGroupAccessibility.torp";
+import TabGroupVertical from "./components/TabGroupVertical.torp";
 
 describe("TabGroup", () => {
 	it("Accessibility", async () => {
@@ -63,5 +65,54 @@ describe("TabGroup", () => {
 			"aria-orientation",
 			"horizontal",
 		);
+
+		// TabList should not have tabindex attribute
+		expect(queryByText(container, "Header 1")?.parentElement?.parentElement).not.toHaveAttribute(
+			"tabindex",
+		);
+
+		// Active tab has tabindex="0", inactive tabs have tabindex="-1"
+		expect(queryByText(container, "Header 1")).toHaveAttribute("tabindex", "0");
+		expect(queryByText(container, "Header 2")).toHaveAttribute("tabindex", "-1");
+		expect(queryByText(container, "Header 3")).toHaveAttribute("tabindex", "-1");
+	});
+
+	it("aria-selected updates dynamically", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TabGroupAccessibility, { value: "0" });
+
+		expect(queryByText(container, "Header 1")).toHaveAttribute("aria-selected", "true");
+		expect(queryByText(container, "Header 2")).toHaveAttribute("aria-selected", "false");
+
+		await userEvent.click(getByText(container, "Header 2"));
+
+		expect(queryByText(container, "Header 1")).toHaveAttribute("aria-selected", "false");
+		expect(queryByText(container, "Header 2")).toHaveAttribute("aria-selected", "true");
+	});
+
+	it("Vertical orientation", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TabGroupVertical);
+
+		expect(queryByText(container, "Header 1")?.parentElement?.parentElement).toHaveAttribute(
+			"aria-orientation",
+			"vertical",
+		);
+	});
+
+	it("tabindex changes when tab is activated", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TabGroupAccessibility, { value: "0" });
+
+		expect(queryByText(container, "Header 1")).toHaveAttribute("tabindex", "0");
+		expect(queryByText(container, "Header 2")).toHaveAttribute("tabindex", "-1");
+
+		await userEvent.click(getByText(container, "Header 2"));
+
+		expect(queryByText(container, "Header 1")).toHaveAttribute("tabindex", "-1");
+		expect(queryByText(container, "Header 2")).toHaveAttribute("tabindex", "0");
 	});
 });

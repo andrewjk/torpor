@@ -1,0 +1,28 @@
+import {
+	TabGroup,
+	TabList,
+	TabHeader,
+	TabTrigger,
+	TabContent,
+} from "../../../src/TabGroup/index";
+
+export default function TabGroupCallbacks() {
+	@render {
+		<TabGroup onchange={$props?.onchange} activation={$props?.activation}>
+			<TabList ariaLabel="Callback tabs">
+				<TabHeader>
+					<TabTrigger>Header 1</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger>Header 2</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger>Header 3</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>Content 1</TabContent>
+			<TabContent>Content 2</TabContent>
+			<TabContent>Content 3</TabContent>
+		</TabGroup>
+	}
+}

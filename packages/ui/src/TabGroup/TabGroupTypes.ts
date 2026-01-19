@@ -6,7 +6,7 @@ export interface TabGroupContext {
 	registerHeader: (
 		index: number | undefined,
 		value: string | undefined,
-		setFocused: () => void,
+		disabled: boolean | undefined,
 	) => ItemState;
 	/** Called from an item when it is added */
 	registerItem: (index: number | undefined, value: string | undefined) => ItemState;

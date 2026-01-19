@@ -34,15 +34,6 @@ export default function TabList($props: TabListProps | undefined) {
 	// TODO: const { orientation } = context;
 	const orientation = context.orientation;
 
-	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
-		// TODO: Should this be the first button?
-		const el = e.currentTarget.childNodes[0];
-		if (el instanceof HTMLElement) {
-			el.focus();
-			e.preventDefault();
-		}
-	}
-
 	@render {
 		<div
 			{$props?.id}
@@ -52,8 +43,6 @@ export default function TabList($props: TabListProps | undefined) {
 			aria-label={$props?.ariaLabel}
 			aria-orientation={orientation}
 			data-orientation={orientation}
-			tabindex="0"
-			onfocus={handleFocus}
 		>
 			<slot />
 		</div>

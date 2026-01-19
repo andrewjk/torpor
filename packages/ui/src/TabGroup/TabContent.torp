@@ -39,7 +39,7 @@ export default function TabContent($props: TabContentProps | undefined) {
 			aria-labelledby={$state.headerId}
 			data-orientation={context.orientation}
 			data-state={$state.active ? "active" : "inactive"}
-			data-disabled={$state.disabled ? "true" : undefined}
+			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			@if ($state.active) {
 				<slot />
