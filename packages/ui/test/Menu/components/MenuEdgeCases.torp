@@ -1,0 +1,29 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent,
+} from "../../../src/Menu";
+
+export default function MenuEdgeCases() {
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton disabled>Disabled item 1</MenuButton>
+					<MenuButton disabled>Disabled item 2</MenuButton>
+					<MenuPopout>
+						<MenuPopoutTrigger>Popout with delay</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A submenu">
+								<MenuButton>Submenu item</MenuButton>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

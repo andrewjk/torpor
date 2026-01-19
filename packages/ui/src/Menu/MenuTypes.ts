@@ -1,11 +1,8 @@
 export const MenuContextName: unique symbol = Symbol.for("torp.Menu");
 export const MenuButtonContextName: unique symbol = Symbol.for("torp.MenuButton");
 export const MenuRadioGroupContextName: unique symbol = Symbol.for("torp.MenuRadioGroup");
-export const MenuPopoutContextName: unique symbol = Symbol.for("torp.MenuPopout");
 
 export interface MenuContext {
-	setVisible: (value: boolean, result?: any) => void;
-
 	/** Called from a MenuButton to close the Menu and return a result */
 	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
 
@@ -15,13 +12,19 @@ export interface MenuContext {
 	/** Called from a MenuButton when a key is pressed */
 	handleItemKey: (e: KeyboardEvent) => void;
 
+	/** Called from a MenuButton when a submenu is shown */
+	handlePopout: (index: number) => void;
+
 	state: MenuState;
 
 	/** The element that caused this Menu to be shown */
 	anchorElement?: HTMLElement;
 
 	/** Called from each MenuButton/Check/Radio to register itself with this Menu */
-	registerItem: (setFocused: () => void) => { index: number };
+	registerItem: (
+		setFocused: () => void,
+		setVisible?: (visible: boolean) => void,
+	) => { index: number };
 }
 
 export interface MenuState {
@@ -36,26 +39,17 @@ export interface MenuButtonContext {
 }
 
 export interface MenuRadioGroupContext {
-	registerItemInGroup: (value: string, setChecked: (value: boolean) => void) => void;
+	registerItemInGroup: (itemState: RadioGroupItemState) => void;
 	toggleItem: (value: string) => void;
 }
 
-export interface MenuPopoutContext {
-	setVisible: (value: boolean) => void;
-	state: {
-		visible: boolean;
-	};
-	anchorElement?: HTMLElement;
-	focusFirstElement?: () => void;
-	focusLastElement?: () => void;
-}
-
 export interface ItemState {
+	index: number;
 	setFocused: () => void;
+	setVisible?: (visible: boolean) => void;
 }
 
 export interface RadioGroupItemState {
 	value: string;
 	checked: boolean;
-	setChecked: (value: boolean) => void;
 }

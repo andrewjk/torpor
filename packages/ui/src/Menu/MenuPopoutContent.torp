@@ -1,18 +1,18 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import setPopoverPosition from "../utils/setPopoverPosition";
-import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface MenuPopoutContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Where the popout will be shown, relative to the popout button */
-	side?: "top" | "right" | "bottom" | "left",
+	side?: "top" | "right" | "bottom" | "left";
 	/** How the popout will be aligned, relative to the popout button */
-	alignment?: "start" | "center" | "end",
+	alignment?: "start" | "center" | "end";
 }
 
 /**
@@ -22,8 +22,8 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 	let div: HTMLDivElement;
 	let shown = false;
 
-	// Get stuff out of the MenuPopoutContext
-	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
+	// Get stuff out of the PopoutContext
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	if (!popoutContext) {
 		throw new Error("MenuPopoutContent must be contained within a MenuPopout");
 	}
@@ -42,9 +42,7 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 		setPosition();
 		addEventListener("resize", setPosition);
 		addEventListener("scroll", setPosition);
-		if (popoutContext.focusFirstElement) {
-			popoutContext.focusFirstElement();
-		}
+		popoutContext.focusFirstElement?.();
 	}
 
 	function hide() {

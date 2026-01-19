@@ -1,0 +1,39 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent
+} from "../../../src/Menu";
+
+export default function MenuNested() {
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Level 1 item 1</MenuButton>
+					<MenuPopout>
+						<MenuPopoutTrigger>Level 1 popout</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="Level 2 menu">
+								<MenuButton>Level 2 item 1</MenuButton>
+								<MenuButton>Level 2 item 2</MenuButton>
+								<MenuPopout>
+									<MenuPopoutTrigger>Level 2 popout</MenuPopoutTrigger>
+									<MenuPopoutContent>
+										<Menu ariaLabel="Level 3 menu">
+											<MenuButton>Level 3 item 1</MenuButton>
+											<MenuButton>Level 3 item 2</MenuButton>
+										</Menu>
+									</MenuPopoutContent>
+								</MenuPopout>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+					<MenuButton>Level 1 item 2</MenuButton>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

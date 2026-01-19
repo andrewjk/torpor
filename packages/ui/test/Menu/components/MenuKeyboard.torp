@@ -1,0 +1,31 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent
+} from "../../../src/Menu";
+
+export default function MenuKeyboard() {
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton value="item1">Item 1</MenuButton>
+					<MenuButton value="item2">Item 2</MenuButton>
+					<MenuPopout>
+						<MenuPopoutTrigger>Popout trigger</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A submenu">
+								<MenuButton>Submenu item 1</MenuButton>
+								<MenuButton>Submenu item 2</MenuButton>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+					<MenuButton value="item3">Item 3</MenuButton>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

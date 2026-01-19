@@ -21,16 +21,18 @@ export interface PopoutContext {
 	// There may be a more elegant way to accomplish this!
 	focusFirstElement?: () => void;
 	focusLastElement?: () => void;
+
 	markElement?: (id: string) => void;
 	selectMarkedElement?: () => void;
 	searchText?: string;
-	searchItems?: (searchText: string) => { setFocused: () => void } | undefined;
+	searchItems?: (searchText: string) => { id: string; setFocused: () => void } | undefined;
 }
 
 export interface PopoutState {
 	visible: boolean;
-	//position: Point;
 	contentId?: string;
+	triggerId?: string;
+	childRole?: string;
 }
 
 export interface Point {

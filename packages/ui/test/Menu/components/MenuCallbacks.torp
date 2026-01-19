@@ -1,0 +1,61 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuCheck,
+	MenuRadioGroup,
+	MenuRadio,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent
+} from "../../../src/Menu";
+
+export default function MenuCallbacks($state: any) {
+	function handleCallback(value: string) {
+		$state.callbackValue = value;
+	}
+
+	function handleButtonClick(value: string) {
+		$state.buttonClickedValue = value;
+	}
+
+	function handlePopoutToggle(open: boolean) {
+		$state.popoutToggled = true;
+		$state.popoutToggledValue = open;
+	}
+
+	function handlePopoutOpen() {
+		$state.popoutOpened = true;
+	}
+
+	function handlePopoutClose(result: string) {
+		$state.popoutClosed = true;
+		$state.popoutResult = result;
+	}
+
+	@render {
+		<Modal visible callback={(value: string) => handleCallback(value)}>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton value="button-value-1" onclick={() => handleButtonClick("button-value-1")}>
+						Button 1
+					</MenuButton>
+					<MenuCheck &checked={$state.checkChecked}>
+						Check item
+					</MenuCheck>
+					<MenuPopout ontoggle={handlePopoutToggle} onopen={handlePopoutOpen} onclose={handlePopoutClose}>
+						<MenuPopoutTrigger>Popout trigger</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A submenu">
+								<MenuRadioGroup ariaLabel="Options" &value={$state.radioValue}>
+									<MenuRadio value="radio-1">Radio 1</MenuRadio>
+									<MenuRadio value="radio-2">Radio 2</MenuRadio>
+								</MenuRadioGroup>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

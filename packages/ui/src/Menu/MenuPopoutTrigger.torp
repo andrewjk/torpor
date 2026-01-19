@@ -1,28 +1,30 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 import {
 	MenuContextName,
-	MenuPopoutContextName,
 	type MenuContext,
-	type MenuPopoutContext
 } from "./MenuTypes";
 
 interface MenuPopoutTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The delay before showing the popout, in milliseconds */
-	hoverDelay?: number,
+	hoverDelay?: number;
 	/** Whether this button is disabled */
-	disabled?: boolean,
+	disabled?: boolean;
 }
 
 /**
  * A button that is placed in a Menu or MenuGroup and signals a response by a user.
  */
 export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undefined) {
+	let defaultId = getId();
+
 	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
@@ -33,39 +35,40 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 	if (!menuContext) {
 		throw new Error("MenuPopoutTrigger must be contained within a Menu");
 	}
-	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
+	const { registerItem, handleItemKey, handleItemFocus, handlePopout } = menuContext;
 
-	// Get stuff out of the MenuPopoutContext
-	const popoutContext = $context[MenuPopoutContextName] as MenuPopoutContext;
+	// Get stuff out of the PopoutContext
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	if (!popoutContext) {
 		throw new Error("MenuPopoutTrigger must be contained within a MenuPopout");
 	}
-	const { state: $state, setVisible } = popoutContext;
+	const { state: $state } = popoutContext;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent Menu and store the index
-	const { index } = registerItem(setFocused);
-
-	// TODO: This is getting called before @render
-	//$mount(() => {
-	//	// Set the anchor element to the button when it exists
-	//	popoutContext.anchorElement = button;
-	//});
+	const { index } = registerItem(setFocused, setVisible);
 
 	function setFocused() {
 		button.focus();
 	}
 
+	function setVisible(visible: boolean) {
+		$state.visible = visible;
+	}
+
 	function handleClick() {
-		setVisible(true);
+		handlePopout(index);
+		$state.visible = !$state.visible;
 	}
 
 	function handlePopoutKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Right":
 			case "ArrowRight":
 				// TODO: This should be based on what side the menu shows on
 				e.preventDefault();
-				setVisible(true);
+				$state.visible = true;
 				break;
 			default:
 				handleItemKey(e);
@@ -77,7 +80,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 
 		// Handle the hover after a delay
 		if (!interval) {
-			interval = setTimeout(() => setVisible(true), $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
@@ -97,20 +100,21 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 		// Reset the interval on mouse move
 		if (interval) {
 			clearTimeout(interval);
-			interval = setTimeout(() => setVisible(true), $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
 	@render {
 		<button
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-menu-popout-trigger", $props?.class]}
 			{$props?.style}
 			type="button"
 			{$props?.disabled}
 			role="menuitem"
+			tabindex="-1"
 			aria-haspopup="true"
-			aria-expanded={($state.visible ?? false).toString()}
+			aria-expanded={$state.visible ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}

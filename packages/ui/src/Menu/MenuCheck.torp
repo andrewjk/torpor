@@ -10,15 +10,15 @@ interface MenuCheckProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether this item is checked */
-	checked?: boolean,
+	checked?: boolean;
 	/** Whether this item is disabled */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when the checkbox is clicked */
-	onclick?: (e: MouseEvent) => void,
+	onclick?: (e: MouseEvent) => void;
 }
 
 /**
@@ -74,7 +74,8 @@ export default function MenuCheck($props: MenuCheckProps | undefined) {
 			type="button"
 			{$props?.disabled}
 			role="menuitemcheckbox"
-			aria-checked={$props?.checked ? "true" : "false"}
+			tabindex="-1"
+			aria-checked={$state.checked ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-state={$props?.checked ? "checked" : "unchecked"}
 			data-disabled={$props?.disabled ? "true" : undefined}

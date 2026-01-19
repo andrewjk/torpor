@@ -9,15 +9,15 @@ interface MenuRadioGroupProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** An ARIA label for describing the menu to screen readers */
-	ariaLabel?: string,
+	ariaLabel?: string;
 	/** The value of the checked MenuRadio */
-	value?: string | undefined,
+	value?: string | undefined;
 	/** Raised when the checked item has changed */
-	onchange?: (value: any) => void,
+	onchange?: (value: any) => void;
 }
 
 /**
@@ -49,15 +49,9 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 		setValue($props?.value);
 	});
 
-	function registerItemInGroup(itemValue: string, setChecked: (value: boolean) => void) {
-		// Add the item's state to the array
-		const newItemState: RadioGroupItemState = {
-			value: itemValue,
-			checked: false,
-			setChecked
-		};
-		itemStates.push(newItemState);
-		itemStates = itemStates;
+	function registerItemInGroup(item: RadioGroupItemState) {
+		itemStates.push(item);
+		item.checked = item.value === $state.value
 	}
 
 	function setValue(newValue?: string) {
@@ -70,7 +64,6 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 		newValue = newValue?.toString();
 		for (let item of itemStates) {
 			item.checked = item.value === newValue;
-			item.setChecked(item.checked);
 		}
 
 		// Set the value
@@ -78,7 +71,7 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 			$state.value = newValue;
 
 			if ($props?.onchange) {
-				$props?.onchange($props?.value);
+				$props?.onchange($state.value);
 			}
 		}
 	}
@@ -86,9 +79,8 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	function toggleItem(toggleValue: string) {
 		let newValue = "";
 		for (let item of itemStates) {
-			const checked = item.value === toggleValue;
-			item.setChecked(checked);
-			if (checked) {
+			item.checked = item.value === toggleValue;
+			if (item.checked) {
 				newValue = item.value;
 			}
 		}

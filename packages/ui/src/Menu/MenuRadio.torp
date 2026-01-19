@@ -5,30 +5,32 @@ import {
 	MenuRadioGroupContextName,
 	type MenuButtonContext,
 	type MenuContext,
-	type MenuRadioGroupContext
+	type MenuRadioGroupContext,
+	type RadioGroupItemState,
 } from "./MenuTypes";
 
 interface MenuRadioProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The value of the item */
-	value?: string,
+	value: string;
 	/** Whether this item is checked */
-	checked?: boolean,
+	checked?: boolean;
 	/** Whether this item is disabled */
-	disabled?: boolean,
+	disabled?: boolean;
 }
 
 /**
  * A button that is placed in a Menu or MenuGroup to allow the user to select
  * from a number of options.
  */
-export default function MenuRadio($props: MenuRadioProps | undefined) {
-	let $state = $watch({
+export default function MenuRadio($props: MenuRadioProps) {
+	let $state: RadioGroupItemState = $watch({
+		value: $props.value,
 		checked: $props?.checked ?? false,
 	});
 
@@ -58,7 +60,7 @@ export default function MenuRadio($props: MenuRadioProps | undefined) {
 	const { index } = registerItem(setFocused);
 
 	// Register this item with the parent MenuRadioGroup
-	registerItemInGroup($props?.value ?? "", setChecked);
+	registerItemInGroup($state);
 
 	// Set the context to pass down to items
 	let context: MenuButtonContext = {
@@ -68,10 +70,6 @@ export default function MenuRadio($props: MenuRadioProps | undefined) {
 
 	function setFocused() {
 		button.focus();
-	}
-
-	function setChecked(value: boolean) {
-		$state.checked = value;
 	}
 
 	function handleClick() {
@@ -88,7 +86,8 @@ export default function MenuRadio($props: MenuRadioProps | undefined) {
 			type="button"
 			{$props?.disabled}
 			role="menuitemradio"
-			aria-checked={$props?.checked}
+			tabindex="-1"
+			aria-checked={$props?.checked ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-state={$props?.checked ? "checked" : "unchecked"}
 			data-disabled={$props?.disabled ? "true" : undefined}

@@ -1,21 +1,22 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { MenuPopoutContextName, type MenuPopoutContext } from "./MenuTypes";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
+import { MenuContextName, type MenuContext } from "./MenuTypes";
 
 interface MenuPopoutProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether the popout is visible */
-	visible?: boolean,
+	visible?: boolean;
 	/** Raised when the popout is opened or closed */
-	ontoggle?: (open: boolean) => void,
+	ontoggle?: (open: boolean) => void;
 	/** Raised when the popout has opened */
-	onopen?: () => void,
+	onopen?: () => void;
 	/** Raised when the popout has closed */
-	onclose?: (result: any) => void,
+	onclose?: (result: any) => void;
 }
 
 /**
@@ -32,21 +33,26 @@ interface MenuPopoutProps {
  */
 export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	let $state = $watch({
-		visible: $props?.visible ?? false
+		visible: $props?.visible ?? false,
+		// Set this so that child menus know that they are in a submenu
+		childRole: "menu"
 	});
 
 	let result: any;
 
+	// Get stuff out of the MenuContext
+	const menuContext = $context[MenuContextName] as MenuContext;
+	if (!menuContext) {
+		throw new Error("MenuPopout must be contained within a Menu");
+	}
+	const { handleButton } = menuContext;
+
 	// Set the context to pass down to items
-	let context: MenuPopoutContext = {
-		setVisible,
+	let context: PopoutContext = {
+		handleButton,
 		state: $state
 	};
-	$context[MenuPopoutContextName] = context;
-
-	function setVisible(value: boolean) {
-		$state.visible = value;
-	}
+	$context[PopoutContextName] = context;
 
 	let firstToggle = true;
 	$run(() => {
@@ -67,7 +73,7 @@ export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	});
 
 	function handleMouseLeave() {
-		setVisible(false);
+		$state.visible = false;
 	}
 
 	@render {

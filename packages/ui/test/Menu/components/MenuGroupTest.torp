@@ -1,0 +1,25 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuGroup
+} from "../../../src/Menu";
+
+export default function MenuGroupTest() {
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Item 1</MenuButton>
+					<MenuGroup ariaLabel="Actions">
+						<MenuButton>Action 1</MenuButton>
+						<MenuButton>Action 2</MenuButton>
+					</MenuGroup>
+					<MenuGroup>
+						<MenuButton>Other 1</MenuButton>
+					</MenuGroup>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

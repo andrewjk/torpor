@@ -2,10 +2,13 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import MenuAccessibility from "./components/MenuAccessibility.torp";
 
 describe("Menu", () => {
+	beforeEach(() => {
+		document.body.innerHTML = "";
+	});
 	it("Accessibility", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -39,6 +42,10 @@ describe("Menu", () => {
 		await userEvent.click(getByText(container, "Check popout button"));
 		expect(queryByText(container, "Check popout button")).toHaveAttribute("aria-expanded", "true");
 
+		// Submenu should have aria-labelledby pointing to trigger
+		const submenu = queryByText(container, "Checked 1")?.closest('[role="menu"]') as HTMLElement;
+		expect(submenu).toHaveAttribute("aria-labelledby");
+
 		// One of the following approaches is used to enable scripts to move focus among items in a
 		// menu as described in Keyboard Navigation Inside Components:
 		//   * The menu container has tabindex set to -1 or 0 and aria-activedescendant set to the ID
@@ -47,7 +54,12 @@ describe("Menu", () => {
 		//     has tabindex set to 0
 
 		// When a menuitemcheckbox or menuitemradio is checked, aria-checked is set to true
-		// NOTE: We don't (currently?) have checkboxes or radios in Menus
+		const checkItem1 = queryByText(container, "Checked 1")?.closest(
+			'[role="menuitemcheckbox"]',
+		) as HTMLElement;
+		expect(checkItem1).toHaveAttribute("aria-checked", "false");
+		await userEvent.click(checkItem1);
+		expect(checkItem1).toHaveAttribute("aria-checked", "true");
 
 		// When a menu item is disabled, aria-disabled is set to true
 		expect(queryByText(container, "Menu button")).not.toHaveAttribute("aria-disabled");
@@ -59,7 +71,7 @@ describe("Menu", () => {
 		expect(queryByText(container, "---")).toHaveAttribute("role", "separator");
 
 		// All separators should have aria-orientation consistent with the separator's orientation
-		// NOTE: What does this mean? None of the example separators have aria-orientation set
+		expect(queryByText(container, "---")).toHaveAttribute("aria-orientation", "vertical");
 
 		// An element with role menu either has:
 		//   * aria-labelledby set to a value that refers to the menuitem or button that controls its

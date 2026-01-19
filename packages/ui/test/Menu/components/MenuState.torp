@@ -1,0 +1,55 @@
+import { Modal, ModalContent } from "../../../src/Modal";
+import {
+	Menu,
+	MenuButton,
+	MenuCheck,
+	MenuRadioGroup,
+	MenuRadio,
+	MenuPopout,
+	MenuPopoutTrigger,
+	MenuPopoutContent
+} from "../../../src/Menu";
+
+export default function MenuState() {
+	let $state = $watch({
+		check1Checked: true,
+		check2Checked: false,
+		radioValue: "option2",
+		popoutVisible: false
+	});
+
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Regular button</MenuButton>
+					<MenuCheck checked={$state.check1Checked}>
+						Check 1 (controlled)
+					</MenuCheck>
+					<MenuCheck checked={$state.check2Checked}>
+						Check 2 (controlled)
+					</MenuCheck>
+					<MenuRadioGroup ariaLabel="Options" value={$state.radioValue}>
+						<MenuRadio value="option1">
+							Option 1
+						</MenuRadio>
+						<MenuRadio value="option2">
+							Option 2
+						</MenuRadio>
+						<MenuRadio value="option3">
+							Option 3
+						</MenuRadio>
+					</MenuRadioGroup>
+					<MenuPopout visible={$state.popoutVisible}>
+						<MenuPopoutTrigger>Popout (controlled)</MenuPopoutTrigger>
+						<MenuPopoutContent>
+							<Menu ariaLabel="A submenu">
+								<MenuButton>Submenu item</MenuButton>
+							</Menu>
+						</MenuPopoutContent>
+					</MenuPopout>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}
