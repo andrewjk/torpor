@@ -80,30 +80,22 @@ export default function buildComponentNode(
 					// take into account other props, etc)
 					runs.push(`${propsName} = { ...${propsName}, ${value} };`);
 				} else if (name === "class") {
-					status.imports.add("t_class");
-					const params = [value];
 					if (node.scopeStyles) {
-						params.push(`"torp-${status.styleHash}"`);
+						value = `[${value}, "torp-${status.styleHash}"]`;
 					}
-					value = params.join(", ");
 					props.push({
 						name,
-						preText: "t_class(",
 						value,
-						postText: ")",
 						spans: [span],
 					});
-					runs.push(`${propsName}["${name}"] = t_class(${value});`);
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				} else if (name === "style") {
-					status.imports.add("t_style");
 					props.push({
 						name,
-						preText: "t_style(",
 						value,
-						postText: ")",
 						spans: [span],
 					});
-					runs.push(`${propsName}["${name}"] = t_style(${value});`);
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				} else {
 					props.push({
 						name,
@@ -116,18 +108,14 @@ export default function buildComponentNode(
 				const { newValue, spans, offsets, lengths } = getAttributeOffsets(value, span);
 				value = newValue;
 				if (name === "class") {
-					status.imports.add("t_class");
-					const params = [value];
 					if (node.scopeStyles) {
-						params.push(`"torp-${status.styleHash}"`);
+						value = `[${value}, "torp-${status.styleHash}"]`;
 					}
-					value = params.join(", ");
-					props.push({ name, preText: "t_class(", value, postText: ")", spans, offsets, lengths });
-					runs.push(`${propsName}["${name}"] = t_class(${value});`);
+					props.push({ name, value, spans, offsets, lengths });
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				} else if (name === "style") {
-					status.imports.add("t_style");
-					props.push({ name, preText: "t_style(", value, postText: ")", spans, offsets, lengths });
-					runs.push(`${propsName}["${name}"] = t_style(${value});`);
+					props.push({ name, value, spans, offsets, lengths });
+					runs.push(`${propsName}["${name}"] = ${value};`);
 				} else {
 					props.push({ name, value, spans, offsets, lengths });
 					runs.push(`${propsName}["${name}"] = ${value};`);

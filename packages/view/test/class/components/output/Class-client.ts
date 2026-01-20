@@ -55,10 +55,10 @@ export default function Class(
 
 	/* @component */
 	let t_props_2 = $watch({
-		class: t_class({ "child-class": true }, "torp-16s1yph"),
+		class: [{ "child-class": true }, "torp-16s1yph"],
 	});
 	$run(() => {
-		t_props_2["class"] = t_class({ "child-class": true }, "torp-16s1yph");
+		t_props_2["class"] = [{ "child-class": true }, "torp-16s1yph"];
 	});
 	const t_slots_2: Record<string, SlotRender> = {};
 	t_slots_2["_"] = (

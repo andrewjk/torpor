@@ -43,15 +43,12 @@ export default function buildServerComponentNode(
 			if (name.startsWith("...")) {
 				props.push({ name: "", value: value! });
 			} else if (name === "class" && value != null) {
-				status.imports.add("t_class");
-				const params = [value];
 				if (node.scopeStyles) {
-					params.push(`"torp-${status.styleHash}"`);
+					value = `[${value}, "torp-${status.styleHash}"]`;
 				}
-				props.push({ name, value: `t_class(${params.join(", ")})` });
+				props.push({ name, value });
 			} else if (name === "style" && value != null) {
-				status.imports.add("t_style");
-				props.push({ name, value: `t_style(${value})` });
+				props.push({ name, value });
 			} else if (value != null) {
 				props.push({ name, value });
 			} else {

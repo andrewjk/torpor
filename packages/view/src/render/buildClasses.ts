@@ -8,7 +8,7 @@ export default function buildClasses(value: ClassValue, styleHash?: string): str
 		return value;
 	} else {
 		let classes: string[] = [];
-		gatherNames("", value, classes);
+		gatherClasses("", value, classes);
 		if (styleHash !== undefined) {
 			classes.push(styleHash);
 		}
@@ -16,15 +16,15 @@ export default function buildClasses(value: ClassValue, styleHash?: string): str
 	}
 }
 
-function gatherNames(name: string, value: unknown, classes: string[]) {
+function gatherClasses(name: string, value: unknown, classes: string[]) {
 	if (value) {
 		if (Array.isArray(value)) {
 			for (let v of value) {
-				gatherNames(v as string, v, classes);
+				gatherClasses(v as string, v, classes);
 			}
 		} else if (typeof value === "object") {
 			for (let [n, v] of Object.entries(value)) {
-				gatherNames(n, v, classes);
+				gatherClasses(n, v, classes);
 			}
 		} else {
 			classes.push(name);

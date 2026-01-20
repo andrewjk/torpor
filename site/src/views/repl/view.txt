@@ -25,30 +25,31 @@ function buildClasses(value, styleHash) {
 		return value;
 	} else {
 		let classes = [];
-		gatherNames("", value, classes);
+		gatherClasses("", value, classes);
 		if (styleHash !== void 0) classes.push(styleHash);
 		return classes.join(" ");
 	}
 }
-function gatherNames(name, value, classes) {
-	if (value) if (Array.isArray(value)) for (let v of value) gatherNames(v, v, classes);
-	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) gatherNames(n, v, classes);
+function gatherClasses(name, value, classes) {
+	if (value) if (Array.isArray(value)) for (let v of value) gatherClasses(v, v, classes);
+	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) gatherClasses(n, v, classes);
 	else classes.push(name);
 }
 function buildStyles(value) {
 	if (typeof value === "string") return value;
 	else {
 		let styles = [];
-		if (value) {
-			if (Array.isArray(value)) {
-				for (let v of value) if (v) styles.push(v);
-			} else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
-				const key = n.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
-				styles.push(`${key}: ${v}`);
-			}
-		}
+		gatherStyles(value, styles);
 		return styles.join("; ");
 	}
+}
+function gatherStyles(value, styles) {
+	if (value) if (Array.isArray(value)) for (let v of value) gatherStyles(v, styles);
+	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
+		const key = n.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
+		styles.push(`${key}: ${v}`);
+	}
+	else styles.push(String(value));
 }
 const proxyDataSymbol = Symbol.for("torp.ProxyData");
 const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");

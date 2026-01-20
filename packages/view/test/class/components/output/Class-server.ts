@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_class from "../../../../src/render/buildClasses";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Class(
 	$props: Record<PropertyKey, any>,
@@ -14,7 +14,7 @@ export default function Class(
 	/* User interface */
 	t_body += ` <div id="divid" class="torp-16s1yph"> From id </div> <div class="divclass torp-16s1yph"> From string </div> <a ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}"` : ""}> From state </a> <div ${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph") !== "" ? `class="${t_class({ hello: true, red: $props.red, green: $props.green, blue: $props.blue }, "torp-16s1yph")}"` : ""}> From state with scope </div> <div ${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-16s1yph") !== "" ? `class="${t_class({ foo: true, bar: false, baz: 5, qux: null }, "torp-16s1yph")}"` : ""}> Class object </div> <div ${t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph") !== "" ? `class="${t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph")}"` : ""}> Class array </div> <div ${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph") !== "" ? `class="${t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph")}"` : ""}> Class nested </div> <![>`;
 	const t_props_1 = {
-		class: t_class("hey", "torp-16s1yph"),
+		class: ["hey", "torp-16s1yph"],
 	};
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
@@ -32,7 +32,7 @@ export default function Class(
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <![>`;
 	const t_props_2 = {
-		class: t_class({ "child-class": true }, "torp-16s1yph"),
+		class: [{ "child-class": true }, "torp-16s1yph"],
 	};
 	const t_slots_2: Record<string, ServerSlotRender> = {};
 	t_slots_2["_"] = (
@@ -50,7 +50,7 @@ export default function Class(
 	t_head += t_comp_2.head;
 	t_body += `<!]><!> <![>`;
 	const t_props_3 = {
-		class: t_class("pink", "torp-16s1yph"),
+		class: ["pink", "torp-16s1yph"],
 	};
 	const t_slots_3: Record<string, ServerSlotRender> = {};
 	t_slots_3["_"] = (

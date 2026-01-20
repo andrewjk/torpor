@@ -1,7 +1,7 @@
 type StyleValue =
 	| string
 	| Record<string, string | null | undefined>
-	| Array<string | null | undefined>
+	| Array<StyleValue>
 	| null
 	| undefined;
 

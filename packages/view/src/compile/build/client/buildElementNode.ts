@@ -208,14 +208,7 @@ function buildElementAttributes(
 			} else if (name === "style") {
 				status.imports.add("t_attribute");
 				status.imports.add("t_style");
-				stashRun(
-					fragment,
-					`t_attribute(${varName}, "style", t_style(`,
-					value,
-					") || null);",
-					span,
-					status,
-				);
+				stashRun(fragment, `${varName}.style.cssText += t_style(`, value, ");", span, status);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");
@@ -252,9 +245,9 @@ function buildElementAttributes(
 				status.imports.add("t_style");
 				stashRunWithOffsets(
 					fragment,
-					`${varName}.setAttribute("style", t_style(`,
+					`${varName}.style.cssText += t_style(`,
 					value,
-					"));",
+					");",
 					spans,
 					offsets,
 					lengths,
