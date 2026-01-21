@@ -1,12 +1,12 @@
 interface YAxisProps {
-	showAxis: boolean,
-	valueHeight: number,
-	textHeight: number,
-	yLabel: string,
-	stepLabels: number[],
-	stepValue: number,
-	chartLeft: number,
-	chartBottom: number,
+	showAxis: boolean;
+	valueHeight: number;
+	textHeight: number;
+	yLabel: string;
+	stepLabels: number[];
+	stepValue: number;
+	chartLeft: number;
+	chartBottom: number;
 }
 
 export default function YAxis($props: YAxisProps) {

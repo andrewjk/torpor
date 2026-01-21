@@ -1,29 +1,34 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
 
 interface SelectProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The name of the input's form data field */
-	name?: string,
+	name?: string;
 	/** The data value that this field is bound to */
-	value?: any,
+	value?: any;
 	/** Text to display when the input value is empty */
-	placeholder?: string,
+	placeholder?: string;
 	/** Whether the input should be readonly */
-	readonly?: boolean,
+	readonly?: boolean;
 	/** An ARIA label for describing the input to screen readers when there is no associated label element */
-	ariaLabel?: string,
+	ariaLabel?: string;
 	/** Raised on change */
-	onchange?: (e: Event) => void,
+	onchange?: (e: Event) => void;
 	/** Raised on input */
-	oninput?: (e: Event) => void,
-};
+	oninput?: (e: Event) => void;
+}
 
 /**
  * A select in a form.
@@ -31,7 +36,7 @@ interface SelectProps {
 export default function Select($props: SelectProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name
+	let name = $props?.name;
 
 	let blurred = false;
 
@@ -43,13 +48,15 @@ export default function Select($props: SelectProps | undefined) {
 	}
 
 	// Use the FieldContext's state, or create a new one
-	let $state = fieldContext?.state ?? $watch({
-		inputId: $props?.id ?? defaultId,
-		value: $props?.value,
-		errors: {} as Record<string, string>,
-		valid: false,
-		message: "",
-	});
+	let $state =
+		fieldContext?.state ??
+		$watch({
+			inputId: $props?.id ?? defaultId,
+			value: $props?.value,
+			errors: {} as Record<string, string>,
+			valid: false,
+			message: "",
+		});
 
 	// Binding
 	$run(() => {
@@ -91,7 +98,7 @@ export default function Select($props: SelectProps | undefined) {
 			{$props?.readonly}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
-			onchange={$props?.onchange}
+			{$props?.onchange}
 			oninput={handleInput}
 			onblur={handleBlur}
 		>

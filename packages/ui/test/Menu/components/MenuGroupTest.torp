@@ -1,9 +1,5 @@
+import { Menu, MenuButton, MenuGroup } from "../../../src/Menu";
 import { Modal, ModalContent } from "../../../src/Modal";
-import {
-	Menu,
-	MenuButton,
-	MenuGroup
-} from "../../../src/Menu";
 
 export default function MenuGroupTest() {
 	@render {

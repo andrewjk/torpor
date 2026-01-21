@@ -1,16 +1,16 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+import { type DisclosureContext, DisclosureContextName } from "./DisclosureTypes";
 
 interface DisclosureContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether this content should act as a region. Set this when the content contains heading elements or a nested Disclosure */
-	ariaRegion?: boolean,
+	ariaRegion?: boolean;
 }
 
 /**
@@ -23,7 +23,7 @@ export default function DisclosureContent($props: DisclosureContentProps | undef
 	if (!context) {
 		throw new Error("DisclosureContent must be contained within a Disclosure");
 	}
-	let $state = context.state
+	let $state = context.state;
 
 	// Set the content ID so that it can be used with aria-controls in DisclosureTrigger
 	$state.contentId = $props?.id ?? defaultId;

@@ -1,14 +1,14 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
+import { type DrawerContext, DrawerContextName } from "./DrawerTypes";
 
 interface DrawerTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**

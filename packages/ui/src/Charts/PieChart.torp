@@ -18,13 +18,13 @@ interface PieChartProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
-	data: PieData[],
-	size?: number,
-	radius?: number,
-	cutout?: number,
+	style?: StyleValue;
+	data: PieData[];
+	size?: number;
+	radius?: number;
+	cutout?: number;
 }
 
 export default function PieChart($props: PieChartProps) {
@@ -42,14 +42,14 @@ export default function PieChart($props: PieChartProps) {
 		},
 		get segments() {
 			return buildSegments($props.size!, $props.data, $props.radius!, $props.cutout!);
-		}
+		},
 	});
 
 	function buildSegments(
 		theSize: number,
 		theData: PieData[],
 		theRadiusSize: number,
-		theCutoutSize: number
+		theCutoutSize: number,
 	): SegmentData[] {
 		const segments = [];
 		const x = theSize / 2;
@@ -67,7 +67,7 @@ export default function PieChart($props: PieChartProps) {
 				name: theData[i].name,
 				value: theData[i].value,
 				color: theData[i].color,
-				path: buildPath(x, y, theRadiusSize, theCutoutSize, startAngle, endAngle, largeArc)
+				path: buildPath(x, y, theRadiusSize, theCutoutSize, startAngle, endAngle, largeArc),
 			});
 			startAngle = endAngle;
 		}
@@ -81,7 +81,7 @@ export default function PieChart($props: PieChartProps) {
 		theCutoutSize: number,
 		startAngle: number,
 		endAngle: number,
-		largeArc: number
+		largeArc: number,
 	): string {
 		// HACK: Drawing an arc of 360 degrees doesn't work
 		if (startAngle - endAngle === 360) {
@@ -122,16 +122,8 @@ A${theCutoutSize},${theCutoutSize} 0 ${largeArc} 0 ${cutoutstartx},${cutoutstart
 	}
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-pie-chart", $props?.class]}
-			{$props?.style}
-		>
-			<svg
-				version="1.1"
-				width={$props.size}
-				height={$props.size}
-			>
+		<div {$props?.id} class={["torp-pie-chart", $props?.class]} {$props?.style}>
+			<svg version="1.1" width={$props.size} height={$props.size}>
 				<g>
 					@for (let [i, segment] of $state.segments.entries()) {
 						<path d={segment.path} fill={segment.color || chartColors[i % chartColors.length]}>

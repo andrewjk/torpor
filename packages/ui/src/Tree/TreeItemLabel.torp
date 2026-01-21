@@ -1,8 +1,8 @@
 import {
-	TreeContextName,
 	type TreeContext,
-	TreeItemContextName,
+	TreeContextName,
 	type TreeItemContext,
+	TreeItemContextName,
 } from "./TreeTypes";
 
 /**
@@ -68,7 +68,7 @@ export default function TreeItemLabel() {
 
 	@render {
 		<span
-			id={$props?.id}
+			{$props?.id}
 			class={["torp-tree-item-label", $props?.class]}
 			{$props?.style}
 			tabindex="0"

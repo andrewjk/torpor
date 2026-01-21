@@ -1,14 +1,11 @@
+import { Menu, MenuButton } from "../../../src/Menu";
 import {
 	ToolBar,
 	ToolBarButton,
 	ToolBarPopout,
+	ToolBarPopoutContent,
 	ToolBarPopoutTrigger,
-	ToolBarPopoutContent
 } from "../../../src/ToolBar";
-import {
-	Menu,
-	MenuButton,
-} from "../../../src/Menu";
 
 export default function ToolBarFocus() {
 	@render {
@@ -27,5 +24,5 @@ export default function ToolBarFocus() {
 			</ToolBarPopout>
 			<ToolBarButton>Button 3</ToolBarButton>
 		</ToolBar>
-	} 
+	}
 }

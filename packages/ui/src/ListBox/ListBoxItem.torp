@@ -1,24 +1,24 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { ListBoxContextName, type ItemState, type ListBoxContext } from "./ListBoxTypes";
+import { type ItemState, type ListBoxContext, ListBoxContextName } from "./ListBoxTypes";
 
 interface ListBoxItemProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The index of this item in the ListBox. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically */
-	index?: number,
+	index?: number;
 	/** The text for the item. If not set, this will come from it's text content */
 	text?: string;
 	/** A value for the item. Set this if you need more control over which item(s) are selected. If you don't set this, the value will be set to the item's initial index */
-	value?: string,
+	value?: string;
 	/** If set to true, the user cannot interact with this ListBoxItem */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when this item is opened or closed */
-	ontoggle?: (open: boolean) => void,
+	ontoggle?: (open: boolean) => void;
 }
 
 /**
@@ -54,7 +54,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	$run(() => {
 		return () => {
 			context.removeItem($state.index);
-		}
+		};
 	});
 
 	// Dispatch the toggle event when the value of selected changes

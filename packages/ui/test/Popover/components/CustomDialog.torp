@@ -1,10 +1,5 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter } from "../../../src/Dialog/index";
 import { Popover, PopoverContent } from "../../../src/Popover/index";
-import {
-	Dialog,
-	DialogBody,
-	DialogFooter,
-	DialogButton
-} from "../../../src/Dialog/index";
 
 export default function CustomDialog() {
 	@render {

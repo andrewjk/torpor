@@ -1,27 +1,33 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { ReactiveDate } from "@torpor/view";
-import buildDays from "./buildDays";
 import { areDatesEqual } from "../utils/dateUtils";
-import { CalendarContextName, type CalendarContext, type CalendarState, type DayState, type TriggerType } from "./CalendarTypes";
+import {
+	type CalendarContext,
+	CalendarContextName,
+	type CalendarState,
+	type DayState,
+	type TriggerType,
+} from "./CalendarTypes";
+import buildDays from "./buildDays";
 
 interface CalendarProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The starting index of the week, where 0 is Sunday */
-	startOfWeek?: number,
+	startOfWeek?: number;
 	/** Whether a date can be selected. Set this to true for use in date pickers etc */
-	selectable?: boolean,
+	selectable?: boolean;
 	/** The selected date */
-	value?: Date,
+	value?: Date;
 	// /** Events to show in the calendar */
 	// TODO: events?: CalendarEvent[],
-	onchange?: (value: Date) => void,
-	onchangedate?: (value: Date) => void,
-	onclose?: () => void,
+	onchange?: (value: Date) => void;
+	onchangedate?: (value: Date) => void;
+	onclose?: () => void;
 }
 
 /**
@@ -47,7 +53,7 @@ export default function Calendar($props: CalendarProps) {
 	$props ??= $watch({});
 
 	// Ensure the value is a reactive date
-	let reactiveValue = new ReactiveDate($unwrap($props.value ?? new Date()))
+	let reactiveValue = new ReactiveDate($unwrap($props.value ?? new Date()));
 	$props.value = reactiveValue;
 
 	// A note on dates:
@@ -62,7 +68,7 @@ export default function Calendar($props: CalendarProps) {
 		visibleEndDate: reactiveValue,
 		get days(): DayState[] {
 			return $cache(() => {
-				return buildDays($state, $props.startOfWeek ?? 1)
+				return buildDays($state, $props.startOfWeek ?? 1);
 			});
 		},
 	} satisfies CalendarState);
@@ -77,7 +83,7 @@ export default function Calendar($props: CalendarProps) {
 		handleTrigger,
 		handleDay,
 		handleKey,
-		state: $state
+		state: $state,
 	};
 	$context[CalendarContextName] = context;
 

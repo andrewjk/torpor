@@ -1,12 +1,8 @@
-import {
-	ListBox,
-	ListBoxItem,
-	ListBoxSeparator,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem, ListBoxSeparator } from "../../../src/ListBox/index";
 
 export default function ListBoxWithSeparator($props: any) {
 	@render {
-		<ListBox value={$props.value}>
+		<ListBox {$props.value}>
 			<ListBoxItem value={0}>
 				Content 1
 			</ListBoxItem>

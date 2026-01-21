@@ -1,14 +1,14 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
-import { SelectBoxContextName, type SelectBoxContext } from "./SelectBoxTypes";
+import { type SelectBoxContext, SelectBoxContextName } from "./SelectBoxTypes";
 
 interface SelectBoxContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -55,11 +55,7 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 	}
 
 	function handleDocumentClick(e: MouseEvent) {
-		if (
-			closeOnClick &&
-			div &&
-			!div.contains(e.target as HTMLElement)
-		) {
+		if (closeOnClick && div && !div.contains(e.target as HTMLElement)) {
 			e.preventDefault();
 			context.handleClickOutside!(e);
 		}
@@ -67,7 +63,6 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 
 	// HACK: We need to keep the items in the document so that we can search through them
 	@render {
-		@//if ($state.visible) {
 		<div
 			{$props?.id}
 			class={["torp-select-box-content", $props?.class, $state.visible ? undefined : "hidden"]}
@@ -78,7 +73,6 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 		>
 			<slot />
 		</div>
-		@//}
 	}
 
 	@style {

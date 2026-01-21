@@ -1,22 +1,19 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import getId from "../utils/getId";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
-import {
-	ToolBarContextName,
-	type ToolBarContext,
-} from "./ToolBarTypes";
+import { type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarPopoutTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The delay before showing the popout, in milliseconds */
-	hoverDelay?: number,
+	hoverDelay?: number;
 	/** Whether this button is disabled */
-	disabled?: boolean,
+	disabled?: boolean;
 }
 
 /**
@@ -95,7 +92,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 
 		// Handle the hover after a delay
 		if (!interval) {
-			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
@@ -115,7 +112,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 		// Reset the interval on mouse move
 		if (interval) {
 			clearTimeout(interval);
-			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 

@@ -2,7 +2,7 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import {
 	type MenuRadioGroupContext,
 	MenuRadioGroupContextName,
-	type RadioGroupItemState
+	type RadioGroupItemState,
 } from "./MenuTypes";
 
 interface MenuRadioGroupProps {
@@ -28,7 +28,7 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	let itemStates: RadioGroupItemState[] = [];
 
 	let $state = $watch({
-		value: $props?.value
+		value: $props?.value,
 	});
 
 	$run(() => {
@@ -40,7 +40,7 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	// Set the context to pass down to items
 	let context: MenuRadioGroupContext = {
 		registerItemInGroup,
-		toggleItem
+		toggleItem,
 	};
 	$context[MenuRadioGroupContextName] = context;
 
@@ -51,7 +51,7 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 
 	function registerItemInGroup(item: RadioGroupItemState) {
 		itemStates.push(item);
-		item.checked = item.value === $state.value
+		item.checked = item.value === $state.value;
 	}
 
 	function setValue(newValue?: string) {

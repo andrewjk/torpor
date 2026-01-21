@@ -1,29 +1,29 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { FormContextName, type ValidationIssue, type FormContext } from "./FormTypes";
-import { StandardSchemaV1 } from "./StandardSchemaV1"
+import { type FormContext, FormContextName, type ValidationIssue } from "./FormTypes";
+import { StandardSchemaV1 } from "./StandardSchemaV1";
 
 interface FormProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The data to display in the form */
-	data?: any,
+	data?: any;
 	/** Where to post the form's data **/
-	action?: string,
+	action?: string;
 	/** The action to use when submitting the form, which defaults to POST */
-	method?: string,
+	method?: string;
 	/**
 	 * The form's encoding type e.g. `multipart/form-data` where there are file
 	 * inputs. This will be automatically set unless overridden
 	 */
-	enctype?: string,
+	enctype?: string;
 	/** The schema validator to use for this form */
-	schema?: StandardSchemaV1,
-	onsubmit?: (e: SubmitEvent) => boolean | void | Promise<boolean | void>,
-};
+	schema?: StandardSchemaV1;
+	onsubmit?: (e: SubmitEvent) => boolean | void | Promise<boolean | void>;
+}
 
 /**
  * A form for submitting values.
@@ -35,7 +35,7 @@ export default function Form($props: FormProps | undefined) {
 		issues: [] as ValidationIssue[],
 		get valid() {
 			return this.issues.length === 0;
-		}
+		},
 	});
 
 	let submitted = false;
@@ -46,9 +46,9 @@ export default function Form($props: FormProps | undefined) {
 	let context: FormContext = {
 		schema: $props?.schema,
 		state: $state,
-		validate: handleValidate
+		validate: handleValidate,
 	};
-	
+
 	$context[FormContextName] = context;
 
 	async function validate() {
@@ -63,10 +63,10 @@ export default function Form($props: FormProps | undefined) {
 				for (let issue of result.issues) {
 					if (issue.path) {
 						// TODO: arrays with `[0]` etc
-						issues.push({ 
+						issues.push({
 							// @ts-ignore
 							path: issue.path.map((p) => p.key ?? p).join("."),
-							message: issue.message
+							message: issue.message,
 						});
 					}
 				}
@@ -97,7 +97,7 @@ export default function Form($props: FormProps | undefined) {
 			}
 			proceed = userSubmit !== false && !e.defaultPrevented;
 		}
-		
+
 		// If the user handled the submit, don't continue
 		if (!proceed) {
 			e.preventDefault();
@@ -138,7 +138,6 @@ export default function Form($props: FormProps | undefined) {
 			method={$props?.method ?? "POST"}
 			enctype={$props?.enctype ?? ($state.hasFile ? "multipart/form-data" : undefined)}
 			onsubmit={handleSubmit}
-			@// Set novalidate only if JS is enabled (to override HTML validation)
 			onmount={(e) => e.novalidate = true }
 		>
 			<slot />

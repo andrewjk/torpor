@@ -2,22 +2,22 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getScrollParent from "../utils/getScrollParent";
 import setContextPosition from "../utils/setContextPosition";
-import { ContextualContextName, type ContextualContext } from "./ContextualTypes";
+import { type ContextualContext, ContextualContextName } from "./ContextualTypes";
 
 interface ContextualContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
  * The content that is displayed for a Contextual when it is open, displayed at the
  * position that the user right-clicked.
  */
-export default function ContextualContent($props: ContextualContentProps | undefined) {	
+export default function ContextualContent($props: ContextualContentProps | undefined) {
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -47,7 +47,7 @@ export default function ContextualContent($props: ContextualContentProps | undef
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
 		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement)
+		const scrollParent = getScrollParent(anchorElement);
 		scrollParent.addEventListener("resize", setPosition);
 		scrollParent.addEventListener("scroll", setPosition);
 		if (context.focusFirstElement) {
@@ -63,7 +63,7 @@ export default function ContextualContent($props: ContextualContentProps | undef
 
 		// Stop listening for window resize and focus the anchor element per WAI guidelines
 		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement)
+		const scrollParent = getScrollParent(anchorElement);
 		scrollParent.removeEventListener("resize", setPosition);
 		scrollParent.removeEventListener("scroll", setPosition);
 		if (anchorElement.focus) {

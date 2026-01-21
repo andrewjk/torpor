@@ -1,18 +1,18 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { calculateMaxValue } from "../utils/chartUtils";
 import { chartColors } from "../utils/chartColors";
+import { calculateMaxValue } from "../utils/chartUtils";
 
 interface SparkLineProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	data: number[];
-	color?: string,
-	height?: number,
-	width?: number,
+	color?: string;
+	height?: number;
+	width?: number;
 }
 
 export default function SparkLine($props: SparkLineProps) {
@@ -25,19 +25,19 @@ export default function SparkLine($props: SparkLineProps) {
 		get calculatedHeight() {
 			return $props.height || defaultHeight;
 		},
-		get calculatedWidth() { 
+		get calculatedWidth() {
 			return $props.width || container?.clientWidth || defaultWidth;
 		},
-		get calculatedSeries() { 
+		get calculatedSeries() {
 			return [{ name: "", color: $props.color ?? "", data: $props.data }];
 		},
-		get maxValue() { 
+		get maxValue() {
 			return calculateMaxValue($state.calculatedSeries);
 		},
-		get itemWidth() { 
+		get itemWidth() {
 			return $state.calculatedWidth / $props.data.length;
 		},
-		get valueHeight() { 
+		get valueHeight() {
 			return ($state.calculatedHeight - 4) / $state.maxValue;
 		},
 		get pointSeries() {
@@ -46,16 +46,11 @@ export default function SparkLine($props: SparkLineProps) {
 				const y = +($state.calculatedHeight - 2 - value * $state.valueHeight).toFixed(2);
 				return { x, y };
 			});
-		}
+		},
 	});
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-spark-line", $props?.class]}
-			{$props?.style}
-			&ref={container}
-		>
+		<div {$props?.id} class={["torp-spark-line", $props?.class]} {$props?.style} &ref={container}>
 			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
 				<g>
 					<polyline

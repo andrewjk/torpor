@@ -1,13 +1,13 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { FieldContextName, type FieldContext } from "./FormTypes";
+import { type FieldContext, FieldContextName } from "./FormTypes";
 
 interface MessageProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -24,7 +24,7 @@ export default function Message($props: MessageProps | undefined) {
 
 	@render {
 		@if ($state.message) {
-			<div 
+			<div
 				{$props?.id}
 				class={["torp-message", $props?.class]}
 				{$props?.style}

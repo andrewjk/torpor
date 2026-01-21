@@ -1,15 +1,15 @@
 interface XAxisProps {
-	showAxis: boolean,
-	height: number,
-	width: number,
-	itemWidth: number,
-	textHeight: number,
-	xLabel: string,
-	labels: string[] ,
-	stepLabels:number[] ,
-	stepValue: number,
-	chartLeft: number,
-	chartBottom: number,
+	showAxis: boolean;
+	height: number;
+	width: number;
+	itemWidth: number;
+	textHeight: number;
+	xLabel: string;
+	labels: string[];
+	stepLabels: number[];
+	stepValue: number;
+	chartLeft: number;
+	chartBottom: number;
 }
 
 export default function XAxis($props: XAxisProps) {

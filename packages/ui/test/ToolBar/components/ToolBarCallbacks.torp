@@ -1,14 +1,11 @@
+import { Menu, MenuButton } from "../../../src/Menu";
 import {
 	ToolBar,
 	ToolBarButton,
 	ToolBarPopout,
-	ToolBarPopoutTrigger,
 	ToolBarPopoutContent,
+	ToolBarPopoutTrigger,
 } from "../../../src/ToolBar";
-import {
-	Menu,
-	MenuButton,
-} from "../../../src/Menu";
 
 export default function ToolBarCallbacks() {
 	@render {
@@ -16,11 +13,7 @@ export default function ToolBarCallbacks() {
 			<ToolBarButton>
 				Button
 			</ToolBarButton>
-			<ToolBarPopout
-				{$props?.ontoggle}
-				{$props?.onopen}
-				{$props?.onclose}
-			>
+			<ToolBarPopout {$props?.ontoggle} {$props?.onopen} {$props?.onclose}>
 				<ToolBarPopoutTrigger>Popout</ToolBarPopoutTrigger>
 				<ToolBarPopoutContent>
 					<Menu ariaLabel="Popout menu">

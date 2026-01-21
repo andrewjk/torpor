@@ -1,11 +1,8 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ListBoxCallbacks($props: any) {
 	@render {
-		<ListBox value={$props.value} onchange={$props.onchange} type={$props.type}>
+		<ListBox {$props.value} {$props.onchange} {$props.type}>
 			<ListBoxItem value={0} ontoggle={$props.onToggle0}>
 				Content 1
 			</ListBoxItem>

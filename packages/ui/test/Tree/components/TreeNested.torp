@@ -1,18 +1,15 @@
 import {
 	Tree,
 	TreeItem,
-	TreeItemContent,
-	TreeItemTrigger,
-	TreeItemLabel,
 	TreeItemChildren,
+	TreeItemContent,
+	TreeItemLabel,
+	TreeItemTrigger,
 } from "../../../src/Tree/index";
 
 export default function TreeNested($props: any) {
 	@render {
-		<Tree
-			expanded={$props?.expanded}
-			value={$props?.value}
-		>
+		<Tree {$props?.expanded} {$props?.value}>
 			<TreeItem value="folder-1">
 				<TreeItemContent>
 					<TreeItemTrigger />

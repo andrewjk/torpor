@@ -1,10 +1,5 @@
-import {
-	MenuBar,
-	MenuBarItem,
-	MenuBarItemTrigger,
-	MenuBarItemContent
-} from "../../../src/MenuBar";
 import { Menu, MenuButton, MenuSeparator } from "../../../src/Menu";
+import { MenuBar, MenuBarItem, MenuBarItemContent, MenuBarItemTrigger } from "../../../src/MenuBar";
 
 export default function MenuBarBasic() {
 	@render {

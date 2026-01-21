@@ -1,4 +1,9 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "../../../src/Breadcrumb/index";
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbList,
+	BreadcrumbSeparator,
+} from "../../../src/Breadcrumb/index";
 
 export default function BreadcrumbWithSeparators() {
 	@render {

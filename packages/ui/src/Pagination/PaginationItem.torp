@@ -1,20 +1,20 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PaginationContextName, type PaginationContext, type PageNumber } from "./PaginationTypes";
+import { type PageNumber, type PaginationContext, PaginationContextName } from "./PaginationTypes";
 
 interface PaginationItemProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The page for the button */
 	page: PageNumber;
 	/** Whether this is the active item */
 	active?: boolean;
 	/** Raised when this item is made active */
-	ontoggle?: (active: boolean) => void,
-};
+	ontoggle?: (active: boolean) => void;
+}
 
 export default function PaginationItem($props: PaginationItemProps) {
 	let button: HTMLButtonElement;
@@ -36,7 +36,7 @@ export default function PaginationItem($props: PaginationItemProps) {
 
 			/** Raised when this item is made active */
 			//dispatch("toggle", value);
-		 	if ($props?.ontoggle) {
+			if ($props?.ontoggle) {
 				$props.ontoggle(value);
 			}
 		}

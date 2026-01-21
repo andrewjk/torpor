@@ -1,10 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import getId from "../utils/getId";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
-import {
-	MenuContextName,
-	type MenuContext,
-} from "./MenuTypes";
+import { type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuPopoutTriggerProps {
 	/** An ID for the root element */
@@ -80,7 +77,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 
 		// Handle the hover after a delay
 		if (!interval) {
-			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 
@@ -100,7 +97,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 		// Reset the interval on mouse move
 		if (interval) {
 			clearTimeout(interval);
-			interval = setTimeout(() => $state.visible = true, $props?.hoverDelay ?? defaultHoverDelay);
+			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
 		}
 	}
 

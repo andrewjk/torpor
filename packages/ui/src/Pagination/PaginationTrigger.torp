@@ -1,22 +1,22 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PaginationContextName, type PaginationContext, type PageNumber } from "./PaginationTypes";
-import ChevronLeft from "../icons/ChevronLeft.torp";
 import ChevronDoubleLeft from "../icons/ChevronDoubleLeft.torp";
-import ChevronRight from "../icons/ChevronRight.torp";
 import ChevronDoubleRight from "../icons/ChevronDoubleRight.torp";
+import ChevronLeft from "../icons/ChevronLeft.torp";
+import ChevronRight from "../icons/ChevronRight.torp";
+import { type PageNumber, type PaginationContext, PaginationContextName } from "./PaginationTypes";
 
 interface PaginationTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The page for the button */
 	page: PageNumber;
 	/** Whether this item is disabled */
 	disabled?: boolean;
-};
+}
 
 export default function PaginationTrigger($props: PaginationTriggerProps) {
 	let button: HTMLButtonElement;

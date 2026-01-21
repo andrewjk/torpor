@@ -1,8 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import {
-	TreeItemContextName,
-	type TreeItemContext,
-} from "./TreeTypes";
+import { type TreeItemContext, TreeItemContextName } from "./TreeTypes";
 
 interface TreeItemContentProps {
 	/** An ID for the root element */
@@ -35,10 +32,10 @@ export default function TreeItemContent($props: TreeItemContentProps | undefined
 	}
 
 	const { state: $state } = itemContext;
-	
+
 	@render {
 		<div
-			id={$props?.id}
+			{$props?.id}
 			class={["torp-tree-item-content", $props?.class]}
 			{$props?.style}
 			data-selected={$state.selected ? "selected" : undefined}

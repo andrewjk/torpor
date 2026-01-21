@@ -1,11 +1,11 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import {
-	TreeContextName,
-	type TreeContext,
-	TreeItemContextName,
-	type TreeItemContext,
 	type ItemState,
+	type TreeContext,
+	TreeContextName,
+	type TreeItemContext,
+	TreeItemContextName,
 } from "./TreeTypes";
 
 interface TreeItemProps {
@@ -46,7 +46,7 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 	let defaultId = getId();
 
 	const parentContext = $context[TreeItemContextName] as TreeItemContext;
-	const level = parentContext? parentContext.state.level + 1 : 0;
+	const level = parentContext ? parentContext.state.level + 1 : 0;
 
 	let $state: ItemState = $watch({
 		id: $props?.id ?? defaultId,

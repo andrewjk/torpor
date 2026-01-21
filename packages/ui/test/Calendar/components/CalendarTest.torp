@@ -19,15 +19,9 @@ export default function CalendarTest() {
 			{$props.onclose}
 		>
 			<CalendarHeader>
-				<CalendarHeaderTrigger
-					type="previous"
-					ariaLabel={$props.prevMonthLabel}
-				/>
+				<CalendarHeaderTrigger type="previous" ariaLabel={$props.prevMonthLabel} />
 				<h4>{$slot.monthName} {$slot.year}</h4>
-				<CalendarHeaderTrigger
-					type="next"
-					ariaLabel={$props.nextMonthLabel}
-				/>
+				<CalendarHeaderTrigger type="next" ariaLabel={$props.nextMonthLabel} />
 			</CalendarHeader>
 			<CalendarGridHeader>
 				@for (let day of $slot.days) {
@@ -37,12 +31,7 @@ export default function CalendarTest() {
 			<CalendarGrid ariaLabel={$props.calendarGridLabel}>
 				@for (let day of $slot.days) {
 					@key = day.date
-					<CalendarDay
-						{day.date}
-						{day.muted}
-						{day.active}
-						ariaLabel={$props.dayLabel}
-					/>
+					<CalendarDay {day.date} {day.muted} {day.active} ariaLabel={$props.dayLabel} />
 				}
 			</CalendarGrid>
 		</Calendar>

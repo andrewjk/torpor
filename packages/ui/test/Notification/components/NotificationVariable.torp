@@ -1,12 +1,12 @@
 import {
 	Notification,
+	NotificationClose,
 	NotificationContent,
-	NotificationClose
 } from "../../../src/Notification/index";
 
 export default function NotificationVariable() {
 	let $state = $watch({
-		showNotification: false
+		showNotification: false,
 	});
 
 	@render {

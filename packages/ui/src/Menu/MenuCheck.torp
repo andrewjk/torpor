@@ -1,9 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import {
-	MenuButtonContextName,
-	MenuContextName,
 	type MenuButtonContext,
-	type MenuContext
+	MenuButtonContextName,
+	type MenuContext,
+	MenuContextName,
 } from "./MenuTypes";
 
 interface MenuCheckProps {
@@ -28,7 +28,7 @@ interface MenuCheckProps {
  */
 export default function MenuCheck($props: MenuCheckProps | undefined) {
 	let $state = $watch({
-		checked: $props?.checked ?? false
+		checked: $props?.checked ?? false,
 	});
 
 	$run(() => {
@@ -51,7 +51,7 @@ export default function MenuCheck($props: MenuCheckProps | undefined) {
 
 	// Set the context to pass down to items
 	let context: MenuButtonContext = {
-		state: $state
+		state: $state,
 	};
 	$context[MenuButtonContextName] = context;
 

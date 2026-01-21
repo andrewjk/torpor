@@ -2,9 +2,9 @@ import {
 	NavMenu,
 	NavMenuLink,
 	NavMenuPopout,
-	NavMenuPopoutTrigger,
 	NavMenuPopoutContent,
-	NavMenuSeparator
+	NavMenuPopoutTrigger,
+	NavMenuSeparator,
 } from "../../../src/NavMenu";
 
 export default function NavMenuBasic($props: any) {

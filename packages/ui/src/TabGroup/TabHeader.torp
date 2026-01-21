@@ -1,26 +1,31 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { TabGroupContextName, TabItemContextName, type TabGroupContext, type TabItemContext } from "./TabGroupTypes";
+import {
+	type TabGroupContext,
+	TabGroupContextName,
+	type TabItemContext,
+	TabItemContextName,
+} from "./TabGroupTypes";
 
 interface TabHeaderProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The index of this header's item */
-	index?: number,
+	index?: number;
 	/** The value for this header's item */
-	value?: string,
+	value?: string;
 	/** If set to true, the user cannot interact with this header */
-	disabled?: boolean,
+	disabled?: boolean;
 }
 
 /**
  * The header for a tab item, which contains the TabTrigger.
  *
  * The structure of a TabHeader is:
- * 
+ *
  * ```
  * <TabHeader>
  * 	<TabTrigger />
@@ -39,7 +44,7 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 		handleHeaderKey: context.handleHeaderKey,
 		state: $state,
 		orientation: context.orientation,
-		activation: context.activation
+		activation: context.activation,
 	};
 	$context[TabItemContextName] = itemContext;
 
@@ -47,7 +52,7 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 	$run(() => {
 		return () => {
 			context.removeItem($state.index);
-		}
+		};
 	});
 
 	@render {

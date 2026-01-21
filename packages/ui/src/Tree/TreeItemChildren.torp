@@ -1,7 +1,4 @@
-import {
-	TreeItemContextName,
-	type TreeItemContext,
-} from "./TreeTypes";
+import { type TreeItemContext, TreeItemContextName } from "./TreeTypes";
 
 /**
  * A container for nested TreeItems. This component must be a direct child of TreeItem.
@@ -36,7 +33,7 @@ export default function TreeItemChildren() {
 	// HACK: We need to keep the items in the document so that we can search through them
 	@render {
 		<div
-			id={$props?.id}
+			{$props?.id}
 			class={["torp-tree-item-children", $props?.class, $state.expanded ? undefined : "hidden"]}
 			{$props?.style}
 		>

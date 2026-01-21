@@ -111,7 +111,8 @@
 		"build": "tsgo --noEmit && tsup",
 		"build:fix": "esno scripts/postbuild.ts",
 		"check": "torp-check && pnpm dlx oxlint --type-aware",
-		"test": "vitest"
+		"test": "vitest",
+		"format": "prettier --write ."
 	},
 	"keywords": [],
 	"author": "",
@@ -125,6 +126,7 @@
 		"@testing-library/jest-dom": "^6.9.1",
 		"@testing-library/user-event": "^14.6.1",
 		"@torpor/check": "workspace:^",
+		"@torpor/prettier": "workspace:^",
 		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/jsdom": "^27.0.0",
 		"@types/node": "^25.0.8",
@@ -134,6 +136,7 @@
 		"fast-glob": "^3.3.3",
 		"jsdom": "^27.4.0",
 		"oxlint-tsgolint": "^0.11.0",
+		"prettier": "^3.8.0",
 		"tsup": "^8.5.1",
 		"typescript": "^5.9.3",
 		"vitest": "^4.0.17",

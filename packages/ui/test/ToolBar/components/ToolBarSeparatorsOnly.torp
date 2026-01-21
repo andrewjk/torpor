@@ -1,7 +1,4 @@
-import {
-	ToolBar,
-	ToolBarSeparator
-} from "../../../src/ToolBar";
+import { ToolBar, ToolBarSeparator } from "../../../src/ToolBar";
 
 export default function ToolBarSeparatorsOnly() {
 	@render {

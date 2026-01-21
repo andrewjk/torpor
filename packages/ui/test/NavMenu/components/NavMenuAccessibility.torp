@@ -1,12 +1,12 @@
 import {
 	NavMenu,
-	NavMenuLink,
-	NavMenuPopout,
-	NavMenuPopoutTrigger,
-	NavMenuPopoutContent,
 	NavMenuGroup,
 	NavMenuGroupHeader,
-	NavMenuSeparator
+	NavMenuLink,
+	NavMenuPopout,
+	NavMenuPopoutContent,
+	NavMenuPopoutTrigger,
+	NavMenuSeparator,
 } from "../../../src/NavMenu";
 
 export default function NavMenuAccessibility($props: any) {

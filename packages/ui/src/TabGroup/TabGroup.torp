@@ -1,23 +1,23 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { TabGroupContextName, type TabGroupContext, type ItemState } from "./TabGroupTypes";
+import { type ItemState, type TabGroupContext, TabGroupContextName } from "./TabGroupTypes";
 
 interface TabGroupProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The orientation of the tab buttons, which affects keyboard navigation */
-	orientation?: "horizontal" | "vertical",
+	orientation?: "horizontal" | "vertical";
 	/** How tabs are activated; if automatic they are shown on focus, if manual they must be clicked */
-	activation?: "automatic" | "manual",
+	activation?: "automatic" | "manual";
 	/** The value of the active TabContent */
-	value?: string,
+	value?: string;
 	/** If set to true, the user cannot interact with any items in the TabGroup */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when the active item has changed */
-	onchange?: (value: string | string[]) => void
+	onchange?: (value: string | string[]) => void;
 }
 
 /**
@@ -44,7 +44,7 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 	let activation = $props?.activation ?? "automatic";
 
 	let $state = $watch({
-		value: ""
+		value: "",
 	});
 
 	// Sync props and state
@@ -84,7 +84,7 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 	});
 
 	$run(() => {
-		itemStates.forEach((s) => s.parentDisabled = $props?.disabled === true);
+		itemStates.forEach((s) => (s.parentDisabled = $props?.disabled === true));
 	});
 
 	// Dispatch the change event when the value changes
@@ -106,7 +106,11 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		}
 	});
 
-	function registerHeader(index: number | undefined, value: string | undefined, disabled: boolean | undefined): ItemState {
+	function registerHeader(
+		index: number | undefined,
+		value: string | undefined,
+		disabled: boolean | undefined,
+	): ItemState {
 		// If an index wasn't set for the header, set it automatically
 		if (!index) {
 			index = nextHeaderIndex++;
@@ -157,7 +161,7 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 			},
 			setFocused: () => {},
 			orientation,
-			activation
+			activation,
 		});
 		itemStates.splice(index, 0, newItemState);
 

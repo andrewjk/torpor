@@ -1,16 +1,16 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PopoverContextName, type PopoverContext } from "./PopoverTypes";
 import hoverTrigger from "../mount/hoverTrigger";
+import { type PopoverContext, PopoverContextName } from "./PopoverTypes";
 
 interface PopoverTriggerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether the popover is activated by click/press or by hover **/
-	activation?: "press" | "hover"
+	activation?: "press" | "hover";
 }
 
 /**
@@ -43,7 +43,7 @@ export default function PopoverTrigger($props: PopoverTriggerProps | undefined) 
 			$state.position = { x, y };
 			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
 		}
-		$state.visible = !$state.visible
+		$state.visible = !$state.visible;
 	}
 
 	@render {

@@ -1,5 +1,5 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter } from "../../../src/Dialog/index";
 import { Modal, ModalContent, showPrompt } from "../../../src/Modal/index";
-import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function DialogFunction($props: any) {
 	let $state = $watch({ color: "" });
@@ -19,7 +19,7 @@ export default function DialogFunction($props: any) {
 
 function CustomDialog($props: any) {
 	@render {
-		<Modal visible callback={$props.callback}>
+		<Modal visible {$props.callback}>
 			<ModalContent>
 				<Dialog>
 					<DialogBody>

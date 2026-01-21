@@ -4,9 +4,9 @@ interface NotificationContainerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -15,11 +15,7 @@ interface NotificationContainerProps {
  */
 export default function NotificationContainer($props: NotificationContainerProps | undefined) {
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-notification-container", $props?.class]}
-			{$props?.style}
-		>
+		<div {$props?.id} class={["torp-notification-container", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
 	}

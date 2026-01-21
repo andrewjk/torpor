@@ -1,12 +1,5 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
-import {
-	ComboBox,
-	ComboBoxInput,
-	ComboBoxContent,
-} from "../../../src/ComboBox/index";
+import { ComboBox, ComboBoxContent, ComboBoxInput } from "../../../src/ComboBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ComboBoxAccessibility($props: any) {
 	@render {
@@ -14,7 +7,7 @@ export default function ComboBoxAccessibility($props: any) {
 			<ComboBoxInput value={$props.value.join(", ")} />
 			<ComboBoxContent>
 				@// TODO: Shouldn't have to set type and value here:
-				<ListBox type="multiple" value={$props.value}>
+				<ListBox type="multiple" {$props.value}>
 					<ListBoxItem>
 						Item 1
 					</ListBoxItem>

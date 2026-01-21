@@ -1,31 +1,36 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
 
 interface FileProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The name of the input's form data field */
-	name?: string,
+	name?: string;
 	/** The type of files that this input accepts e.g. `image/*` */
-	accept?: string,
+	accept?: string;
 	/** Text to display when the input value is empty */
-	placeholder?: string,
+	placeholder?: string;
 	/** Whether the input should be readonly */
-	readonly?: boolean,
+	readonly?: boolean;
 	/** The maximum number of characters allowed for the input value */
-	maxlength?: number,
+	maxlength?: number;
 	/** An ARIA label for describing the input to screen readers when there is no associated label element */
-	ariaLabel?: string,
+	ariaLabel?: string;
 	/** Raised on change */
-	onchange?: (e: Event) => void,
+	onchange?: (e: Event) => void;
 	/** Raised on input */
-	oninput?: (e: Event) => void,
-};
+	oninput?: (e: Event) => void;
+}
 
 /**
  * A file input in a form.
@@ -33,7 +38,7 @@ interface FileProps {
 export default function File($props: FileProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name
+	let name = $props?.name;
 
 	let blurred = false;
 
@@ -50,14 +55,16 @@ export default function File($props: FileProps | undefined) {
 	}
 
 	// Use the FieldContext's state, or create a new one
-	let $state = fieldContext?.state ?? $watch({
-		inputId: $props?.id ?? defaultId,
-		// You can't use value with a file input
-		value: null,
-		errors: {} as Record<string, string>,
-		valid: false,
-		message: "",
-	});
+	let $state =
+		fieldContext?.state ??
+		$watch({
+			inputId: $props?.id ?? defaultId,
+			// You can't use value with a file input
+			value: null,
+			errors: {} as Record<string, string>,
+			valid: false,
+			message: "",
+		});
 
 	// Set the input ID now that we know it and it will get linked with the associated label
 	$state.inputId = $props?.id ?? defaultId;
@@ -94,7 +101,7 @@ export default function File($props: FileProps | undefined) {
 			{$props?.maxlength}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
-			onchange={$props?.onchange}
+			{$props?.onchange}
 			oninput={handleInput}
 			onblur={handleBlur}
 		/>

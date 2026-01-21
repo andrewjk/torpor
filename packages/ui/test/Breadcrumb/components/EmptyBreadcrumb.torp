@@ -1,4 +1,4 @@
-import { Breadcrumb, BreadcrumbItem } from "../../../src/Breadcrumb/index";
+import { Breadcrumb } from "../../../src/Breadcrumb/index";
 
 export default function EmptyBreadcrumb() {
 	@render {

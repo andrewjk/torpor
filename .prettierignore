@@ -1,2 +1,4 @@
 pnpm-lock.yaml
-packages/view/test/
+packages/view/test/**/*-client.ts
+packages/view/test/**/*-server.ts
+packages/view/test/**/*-types.ts

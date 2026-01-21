@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { MenuButtonContextName, type MenuButtonContext } from "./MenuTypes";
+import { type MenuButtonContext, MenuButtonContextName } from "./MenuTypes";
 
 interface MenuIndicatorProps {
 	/** An ID for the root element */
@@ -13,7 +13,7 @@ interface MenuIndicatorProps {
 /**
  * An indicator for a MenuCheck or MenuRadio component, which is displayed
  * when the value of checked is true.
- */ 
+ */
 export default function MenuIndicator($props: MenuIndicatorProps | undefined) {
 	// Get stuff out of the MenuButtonContext
 	const context = $context[MenuButtonContextName] as MenuButtonContext;
@@ -24,11 +24,7 @@ export default function MenuIndicator($props: MenuIndicatorProps | undefined) {
 
 	@render {
 		@if ($state.checked) {
-			<div
-				{$props?.id}
-				class={["torp-menu-indicator", $props?.class]}
-				{$props?.style}
-			>
+			<div {$props?.id} class={["torp-menu-indicator", $props?.class]} {$props?.style}>
 				<slot />
 			</div>
 		}

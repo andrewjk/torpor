@@ -1,13 +1,13 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { FormContextName, type FormContext } from "./FormTypes";
+import { type FormContext, FormContextName } from "./FormTypes";
 
 interface MessageSummaryProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -23,11 +23,7 @@ export default function MessageSummary($props: MessageSummaryProps | undefined) 
 
 	@render {
 		@if ($state.issues.length > 0) {
-			<ul 
-				{$props?.id}
-				class={["torp-message-summary", $props?.class]}
-				{$props?.style}
-			>
+			<ul {$props?.id} class={["torp-message-summary", $props?.class]} {$props?.style}>
 				<slot />
 				@for (let issue of $state.issues) {
 					<li>{issue.message}</li>

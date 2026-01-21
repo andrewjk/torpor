@@ -1,4 +1,4 @@
-import { Drawer, DrawerTrigger, DrawerContent } from "../../../src/Drawer";
+import { Drawer, DrawerContent, DrawerTrigger } from "../../../src/Drawer";
 
 export default function DrawerNoOverlay() {
 	@render {

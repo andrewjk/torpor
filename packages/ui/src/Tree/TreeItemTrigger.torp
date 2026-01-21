@@ -1,11 +1,11 @@
-import {
-	TreeContextName,
-	type TreeContext,
-	TreeItemContextName,
-	type TreeItemContext,
-} from "./TreeTypes";
 import ChevronDown from "../icons/ChevronDown.torp";
 import ChevronRight from "../icons/ChevronRight.torp";
+import {
+	type TreeContext,
+	TreeContextName,
+	type TreeItemContext,
+	TreeItemContextName,
+} from "./TreeTypes";
 
 /**
  * A button for expanding or collapsing a TreeItem that has nested children.
@@ -44,7 +44,7 @@ export default function TreeItemTrigger() {
 	@render {
 		@if ($state.hasChildren) {
 			<button
-				id={$props?.id}
+				{$props?.id}
 				class={["torp-tree-item-trigger", $props?.class]}
 				{$props?.style}
 				type="button"
@@ -62,10 +62,7 @@ export default function TreeItemTrigger() {
 				</slot>
 			</button>
 		} else {
-			<span
-				id={$props?.id}
-				class={["torp-tree-item-trigger", $props?.class, "spacer"]}
-				{$props?.style} />
+			<span {$props?.id} class={["torp-tree-item-trigger", $props?.class, "spacer"]} {$props?.style} />
 		}
 	}
 }

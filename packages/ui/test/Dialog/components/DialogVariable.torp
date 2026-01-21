@@ -1,10 +1,10 @@
+import { Dialog, DialogBody, DialogButton, DialogFooter } from "../../../src/Dialog/index";
 import { Modal, ModalContent } from "../../../src/Modal/index";
-import { Dialog, DialogBody, DialogFooter, DialogButton } from "../../../src/Dialog/index";
 
 export default function DialogVariable($props: any) {
 	let $state = $watch({
 		color: "",
-		showModal: false
+		showModal: false,
 	});
 
 	@render {

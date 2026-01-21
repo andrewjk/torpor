@@ -1,9 +1,9 @@
 import {
 	Dialog,
-	DialogHeader,
 	DialogBody,
+	DialogButton,
 	DialogFooter,
-	DialogButton
+	DialogHeader,
 } from "../../../src/Dialog/index";
 
 export default function DialogAccessibility($props: any) {
@@ -13,9 +13,9 @@ export default function DialogAccessibility($props: any) {
 	let color = "";
 
 	@render {
-		<Dialog alert={$props.alert}>
+		<Dialog {$props.alert}>
 			<DialogHeader>Color preference</DialogHeader>
-			<DialogBody ariaAnnounce={$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
+			<DialogBody {$props.ariaAnnounce}>Which color do you prefer?</DialogBody>
 			<DialogFooter>
 				<DialogButton value="blue" onclick={() => (color = "blue")}>Blue</DialogButton>
 				<DialogButton value="red" onclick={() => (color = "red")}>Red</DialogButton>

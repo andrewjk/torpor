@@ -1,6 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
-import { MenuContextName, type MenuContext } from "./MenuTypes";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import { type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuPopoutProps {
 	/** An ID for the root element */
@@ -35,7 +35,7 @@ export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	let $state = $watch({
 		visible: $props?.visible ?? false,
 		// Set this so that child menus know that they are in a submenu
-		childRole: "menu"
+		childRole: "menu",
 	});
 
 	let result: any;
@@ -50,7 +50,7 @@ export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	// Set the context to pass down to items
 	let context: PopoutContext = {
 		handleButton,
-		state: $state
+		state: $state,
 	};
 	$context[PopoutContextName] = context;
 
@@ -65,7 +65,7 @@ export default function MenuPopout($props: MenuPopoutProps | undefined) {
 		} else {
 			if (ontoggle) ontoggle(visible);
 			if (visible) {
-				if (onopen) onopen()
+				if (onopen) onopen();
 			} else {
 				if (onclose) onclose(result);
 			}

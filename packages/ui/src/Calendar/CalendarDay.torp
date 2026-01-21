@@ -8,7 +8,7 @@ const formatDate = (date: Date): string => {
 	return new Intl.DateTimeFormat("en-US", {
 		year: "numeric",
 		month: "long",
-		day: "numeric"
+		day: "numeric",
 	}).format(date);
 };
 
@@ -16,24 +16,24 @@ interface CalendarDayProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The date to display */
-	date: Date,
+	date: Date;
 	/** Whether the date is muted (i.e. not in the currently displayed month) */
-	muted?: boolean,
+	muted?: boolean;
 	/** Whether the date is active */
-	active?: boolean,
+	active?: boolean;
 	/** An ARIA label for describing the day to screen readers  */
-	ariaLabel?: string | undefined,
-	onclick?: () => void,
-	onkeydown?: () => void,
+	ariaLabel?: string | undefined;
+	onclick?: () => void;
+	onkeydown?: () => void;
 }
 
 export default function CalendarDay($props: CalendarDayProps) {
 	// Ensure the value is a reactive date
-	let reactiveDate = new ReactiveDate($unwrap($props.date ?? new Date()))
+	let reactiveDate = new ReactiveDate($unwrap($props.date ?? new Date()));
 	$props.date = reactiveDate;
 
 	// Get stuff out of the Calendar context
@@ -76,8 +76,8 @@ export default function CalendarDay($props: CalendarDayProps) {
 			{
 				muted: $props.muted,
 				today: isToday(),
-				active: selectable && $props.active
-			}
+				active: selectable && $props.active,
+			},
 		];
 	}
 

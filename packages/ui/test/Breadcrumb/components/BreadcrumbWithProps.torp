@@ -2,7 +2,12 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbList } from "../../../src/Breadcr
 
 export default function BreadcrumbWithProps() {
 	@render {
-		<Breadcrumb id="breadcrumb-nav" class="custom-breadcrumb" ariaLabel="Breadcrumb" style="color: red;">
+		<Breadcrumb
+			id="breadcrumb-nav"
+			class="custom-breadcrumb"
+			ariaLabel="Breadcrumb"
+			style="color: red;"
+		>
 			<BreadcrumbList id="breadcrumb-list" class="custom-list">
 				<BreadcrumbItem id="item-1" class="custom-item">
 					<a href="#home">Home</a>

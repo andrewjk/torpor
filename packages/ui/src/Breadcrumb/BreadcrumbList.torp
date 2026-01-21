@@ -4,9 +4,9 @@ interface BreadcrumbListProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -14,11 +14,7 @@ interface BreadcrumbListProps {
  */
 export default function BreadcrumbList($props: BreadcrumbListProps | undefined) {
 	@render {
-		<ol
-			{$props?.id}
-			class={["torp-breadcrumb-list", $props?.class]}
-			{$props?.style}
-		>
+		<ol {$props?.id} class={["torp-breadcrumb-list", $props?.class]} {$props?.style}>
 			<slot />
 		</ol>
 	}

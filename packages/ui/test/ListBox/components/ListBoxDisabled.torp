@@ -1,11 +1,8 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ListBoxDisabled($props: any) {
 	@render {
-		<ListBox value={$props.value} disabled={$props.disabled}>
+		<ListBox {$props.value} {$props.disabled}>
 			<ListBoxItem value={0}>
 				Content 1
 			</ListBoxItem>

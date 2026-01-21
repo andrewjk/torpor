@@ -1,28 +1,34 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { AccordionContextName, AccordionItemContextName, type ItemState, type AccordionContext, type AccordionItemContext } from "./AccordionTypes";
+import {
+	type AccordionContext,
+	AccordionContextName,
+	type AccordionItemContext,
+	AccordionItemContextName,
+	type ItemState,
+} from "./AccordionTypes";
 
 interface AccordionItemProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The index of this item in the Accordion. Set this if you will be inserting, removing or sorting items. If you don't set this, it will be set automatically */
-	index?: number,
+	index?: number;
 	/** A value for the item. Set this if you need more control over which item(s) are expanded. If you don't set this, the value will be set to the item's initial index */
-	value?: any,
+	value?: any;
 	/** If set to true, the user cannot interact with this AccordionItem */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when this item is opened or closed */
-	ontoggle?: (open: boolean) => void,
+	ontoggle?: (open: boolean) => void;
 }
 
 /**
  * An item in an Accordion, which must consist of an AccordionTrigger and an AccordionContent.
- * 
+ *
  * The structure of an AccordionItem is:
- * 
+ *
  * ```
  * <AccordionItem>
  * 	<AccordionHeader>
@@ -41,8 +47,8 @@ export default function AccordionItem($props: AccordionItemProps | undefined) {
 		contentId: "",
 		disabled: $props?.disabled ?? false,
 		parentDisabled: false,
-		setFocused
-	})
+		setFocused,
+	});
 
 	// Get stuff out of the AccordionContext
 	const context = $context[AccordionContextName] as AccordionContext;
@@ -65,7 +71,7 @@ export default function AccordionItem($props: AccordionItemProps | undefined) {
 	$run(() => {
 		return () => {
 			context.removeItem($state.index);
-		}
+		};
 	});
 
 	// Dispatch the toggle event when the value of expanded changes

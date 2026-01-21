@@ -1,23 +1,23 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import {
-	NavMenuContextName,
-	type NavMenuContext,
 	type ItemState,
+	type NavMenuContext,
+	NavMenuContextName,
+	type NavMenuPopoutContext,
 	NavMenuPopoutContextName,
-	type NavMenuPopoutContext
 } from "./NavMenuTypes";
 
 interface NavMenuProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** An ARIA label for describing the menu to screen readers  */
-	ariaLabel?: string | undefined,
+	ariaLabel?: string | undefined;
 	/** The orientation of the menu, which affects keyboard navigation */
-	orientation?: "horizontal" | "vertical",
+	orientation?: "horizontal" | "vertical";
 }
 
 /**
@@ -58,7 +58,7 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 	let context: NavMenuContext = {
 		handleItemFocus,
 		handleItemKey,
-		registerItem
+		registerItem,
 	};
 	$context[NavMenuContextName] = context;
 
@@ -84,7 +84,7 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 	function registerItem(setFocused: () => void) {
 		// Add the item's state to the array and return its index
 		const newItemState: ItemState = {
-			setFocused
+			setFocused,
 		};
 		itemStates.push(newItemState);
 		itemStates = itemStates;

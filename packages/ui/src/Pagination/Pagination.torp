@@ -1,22 +1,27 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import {
+	type ItemState,
+	type PageNumber,
+	type PaginationContext,
+	PaginationContextName,
+} from "./PaginationTypes";
 import buildPages from "./buildPages";
-import { PaginationContextName, type PaginationContext, type ItemState, type PageNumber } from "./PaginationTypes";
 
 interface PaginationProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The total number of pages (or items if the page size is greater than 1) */
-	count: number,
+	count: number;
 	/** The active page number */
-	number: number,
+	number: number;
 	/** The number of items on each page **/
-	pageSize?: number,
+	pageSize?: number;
 	/** The maximum number of pages to display (gaps will be indicated with ellipses) **/
-	maxPages?: number,
+	maxPages?: number;
 }
 
 /**
@@ -26,7 +31,7 @@ export default function Pagination($props: PaginationProps) {
 	let $state = $watch({
 		get pages() {
 			return buildPages($props.count, $props.number, $props.pageSize, $props.maxPages);
-		}
+		},
 	});
 
 	// TODO: Do we actually need ItemStates when we're creating the item collection ourselves??
@@ -38,21 +43,21 @@ export default function Pagination($props: PaginationProps) {
 		registerItem,
 		removeItem,
 		toggleItem,
-		handleItemKey
+		handleItemKey,
 	};
 	$context[PaginationContextName] = context;
 
 	function registerItem(
 		target: PageNumber,
 		setActive: (value: boolean) => void,
-		setFocused: () => void
+		setFocused: () => void,
 	) {
 		// Add the item's state to the array
 		const newItemState: ItemState = {
 			target,
 			active: false,
 			setActive,
-			setFocused
+			setFocused,
 		};
 		itemStates.push(newItemState);
 	}

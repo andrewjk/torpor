@@ -1,17 +1,17 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { ToolBarContextName, type ToolBarContext } from "./ToolBarTypes";
+import { type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarElementProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether this button is disabled  */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** An element that can be focused via keyboard navigation */
-	element?: HTMLElement,
+	element?: HTMLElement;
 }
 
 /**

@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { MenuContextName, type MenuContext } from "./MenuTypes";
+import { type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuButtonProps {
 	/** An ID for the root element */

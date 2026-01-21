@@ -1,14 +1,14 @@
-import { Modal, ModalContent } from "../../../src/Modal";
 import {
 	Menu,
 	MenuButton,
 	MenuCheck,
-	MenuRadioGroup,
-	MenuRadio,
 	MenuPopout,
+	MenuPopoutContent,
 	MenuPopoutTrigger,
-	MenuPopoutContent
+	MenuRadio,
+	MenuRadioGroup,
 } from "../../../src/Menu";
+import { Modal, ModalContent } from "../../../src/Modal";
 
 export default function MenuCallbacks($state: any) {
 	function handleCallback(value: string) {
@@ -43,7 +43,11 @@ export default function MenuCallbacks($state: any) {
 					<MenuCheck &checked={$state.checkChecked}>
 						Check item
 					</MenuCheck>
-					<MenuPopout ontoggle={handlePopoutToggle} onopen={handlePopoutOpen} onclose={handlePopoutClose}>
+					<MenuPopout
+						ontoggle={handlePopoutToggle}
+						onopen={handlePopoutOpen}
+						onclose={handlePopoutClose}
+					>
 						<MenuPopoutTrigger>Popout trigger</MenuPopoutTrigger>
 						<MenuPopoutContent>
 							<Menu ariaLabel="A submenu">

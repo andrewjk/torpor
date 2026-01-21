@@ -2,9 +2,9 @@ import {
 	ToolBar,
 	ToolBarButton,
 	ToolBarPopout,
-	ToolBarPopoutTrigger,
 	ToolBarPopoutContent,
-	ToolBarSeparator
+	ToolBarPopoutTrigger,
+	ToolBarSeparator,
 } from "../../../src/ToolBar";
 
 export default function ToolBarBasic() {

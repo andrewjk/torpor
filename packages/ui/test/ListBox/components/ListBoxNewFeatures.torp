@@ -1,17 +1,14 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ListBoxNewFeatures($props: any) {
 	@render {
 		<ListBox
-			value={$props.value}
-			type={$props.type}
-			ariaLabel={$props.ariaLabel}
-			ariaLabelledBy={$props.ariaLabelledBy}
-			disabled={$props.disabled}
-			orientation={$props.orientation}
+			{$props.value}
+			{$props.type}
+			{$props.ariaLabel}
+			{$props.ariaLabelledBy}
+			{$props.disabled}
+			{$props.orientation}
 		>
 			<ListBoxItem value={0}>
 				Content 1

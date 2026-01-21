@@ -1,30 +1,35 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PopoverContextName, type Point, type PopoverContext, type PopoverState } from "./PopoverTypes";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import {
+	type Point,
+	type PopoverContext,
+	PopoverContextName,
+	type PopoverState,
+} from "./PopoverTypes";
 
 interface PopoverProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers  */
-	modal?: boolean,
+	modal?: boolean;
 	/** Whether the popover is visible  */
-	visible?: boolean,
+	visible?: boolean;
 	/** The element to anchor this popover to, as an alternative to supplying a PopoverTrigger  */
-	anchor?: HTMLElement,
+	anchor?: HTMLElement;
 	/** The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual  */
-	position?: Point,
+	position?: Point;
 	/** A function to be called when the user selects a response */
-	callback?: ((value: any) => void),
+	callback?: (value: any) => void;
 	/** Raised when the popover is opened or closed */
-	ontoggle?: (open: boolean) => void,
+	ontoggle?: (open: boolean) => void;
 	/** Raised when the popover has opened */
-	onopen?: () => void,
+	onopen?: () => void;
 	/** Raised when the popover has closed */
-	onclose?: (result: any) => void,
+	onclose?: (result: any) => void;
 }
 
 /**
@@ -42,8 +47,8 @@ interface PopoverProps {
 export default function Popover($props: PopoverProps | undefined) {
 	let $state: PopoverState = $watch({
 		visible: false,
-		position: { x: 0, y: 0 }
-	})
+		position: { x: 0, y: 0 },
+	});
 
 	// Sync props and state
 	$run(() => {
@@ -84,7 +89,7 @@ export default function Popover($props: PopoverProps | undefined) {
 		} else {
 			if (ontoggle) ontoggle(visible);
 			if (visible) {
-				if (onopen) onopen()
+				if (onopen) onopen();
 			} else {
 				if (onclose) onclose(result);
 			}
@@ -123,11 +128,7 @@ export default function Popover($props: PopoverProps | undefined) {
 	}
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-popover", $props?.class]}
-			{$props?.style}
-		>
+		<div {$props?.id} class={["torp-popover", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
 	}

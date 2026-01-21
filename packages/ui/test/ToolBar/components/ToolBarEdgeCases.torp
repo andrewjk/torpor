@@ -1,9 +1,4 @@
-import {
-	ToolBar,
-	ToolBarButton,
-	ToolBarSeparator,
-	ToolBarElement
-} from "../../../src/ToolBar";
+import { ToolBar, ToolBarButton, ToolBarElement, ToolBarSeparator } from "../../../src/ToolBar";
 
 export default function ToolBarEdgeCases() {
 	@render {

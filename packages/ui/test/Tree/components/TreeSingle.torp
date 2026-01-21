@@ -2,17 +2,13 @@ import {
 	Tree,
 	TreeItem,
 	TreeItemContent,
-	TreeItemTrigger,
 	TreeItemLabel,
+	TreeItemTrigger,
 } from "../../../src/Tree/index";
 
 export default function TreeSingle($props: any) {
 	@render {
-		<Tree
-			expanded={$props?.expanded}
-			value={$props?.value}
-			type={$props?.type}
-		>
+		<Tree {$props?.expanded} {$props?.value} {$props?.type}>
 			<TreeItem value="item-1">
 				<TreeItemContent>
 					<TreeItemTrigger />

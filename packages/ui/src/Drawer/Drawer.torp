@@ -1,27 +1,27 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { DrawerContextName, type DrawerContext, type DrawerState } from "./DrawerTypes";
+import { type DrawerContext, DrawerContextName, type DrawerState } from "./DrawerTypes";
 
 interface DrawerProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether the drawer is modal. If true, an overlay should be supplied to obscure outside content, and only the drawer content will be visible to screen readers  */
-	modal?: boolean,
+	modal?: boolean;
 	/** Whether the drawer is visible  */
-	visible?: boolean,
+	visible?: boolean;
 	/** Which side of the window to show the drawer from */
-	position?: "left" | "right" | "top" | "bottom",
+	position?: "left" | "right" | "top" | "bottom";
 	/** A function to be called when the user selects a response */
-	callback?: ((value: any) => void),
+	callback?: (value: any) => void;
 	/** Raised when the drawer is opened or closed */
-	ontoggle?: (open: boolean) => void,
+	ontoggle?: (open: boolean) => void;
 	/** Raised when the drawer has opened */
-	onopen?: () => void,
+	onopen?: () => void;
 	/** Raised when the drawer has closed */
-	onclose?: (result: any) => void,
+	onclose?: (result: any) => void;
 }
 
 /**
@@ -114,11 +114,7 @@ export default function Drawer($props: DrawerProps | undefined) {
 	}
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-drawer", $props?.class]}
-			{$props?.style}
-		>
+		<div {$props?.id} class={["torp-drawer", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
 	}

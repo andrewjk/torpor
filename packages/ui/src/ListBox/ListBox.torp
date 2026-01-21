@@ -1,7 +1,11 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import {
+	type HandleButtonPress,
+	type PopoutContext,
+	PopoutContextName,
+} from "../utils/PopoutTypes";
 import getId from "../utils/getId";
-import { PopoutContextName, type PopoutContext, type HandleButtonPress } from "../utils/PopoutTypes";
-import { ListBoxContextName, type ListBoxContext, type ItemState } from "./ListBoxTypes";
+import { type ItemState, type ListBoxContext, ListBoxContextName } from "./ListBoxTypes";
 
 // TODO: orientation
 
@@ -9,23 +13,23 @@ interface ListBoxProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether a single ListBoxItem or multiple ListBoxItems can be selected at the same time */
-	type?: "single" | "multiple",
+	type?: "single" | "multiple";
 	/** The value of the selected ListBoxItem, or an array of values if the type is "multiple" */
-	value?: any | any[],
+	value?: any | any[];
 	/** If set to true, the user cannot interact with any items in the ListBox */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** An ARIA label for describing the ListBox to screen readers  */
-	ariaLabel?: string | undefined,
+	ariaLabel?: string | undefined;
 	/** An ID of an element that labels the ListBox */
-	ariaLabelledBy?: string | undefined,
+	ariaLabelledBy?: string | undefined;
 	/** The orientation of the ListBox */
-	orientation?: "vertical" | "horizontal",
+	orientation?: "vertical" | "horizontal";
 	/** Raised when the selected item(s) have changed */
-	onchange?: (value: any | any[]) => void,
+	onchange?: (value: any | any[]) => void;
 }
 
 /**
@@ -50,12 +54,12 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	let searchText: string | undefined;
 
 	let $state = $watch({
-		value: $props?.value ?? (type === "single" ? undefined : [])
+		value: $props?.value ?? (type === "single" ? undefined : []),
 	});
 
 	// Update $state on $props change
 	$run(() => {
-		$state.value = $props?.value ?? (type === "single" ? undefined : [])
+		$state.value = $props?.value ?? (type === "single" ? undefined : []);
 	});
 
 	// Update $props on $state change
@@ -157,11 +161,11 @@ export default function ListBox($props: ListBoxProps | undefined) {
 				break;
 			}
 		}
-	})
+	});
 
 	$run(() => {
 		let disabled = $props?.disabled;
-		itemStates.forEach((s) => s.parentDisabled = disabled === true);
+		itemStates.forEach((s) => (s.parentDisabled = disabled === true));
 	});
 
 	// Dispatch the change event when the value changes
@@ -197,7 +201,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		}
 
 		// Set whether the ListBox itself is disabled
-		itemState.parentDisabled = $props?.disabled === true
+		itemState.parentDisabled = $props?.disabled === true;
 
 		// Add the item's state to the array
 		itemStates.splice(itemState.index, 0, itemState);
@@ -231,17 +235,14 @@ export default function ListBox($props: ListBoxProps | undefined) {
 				// Pass this along to the containing popout if applicable, so
 				// that the popout can be closed
 				if (handleButton) {
-					handleButton("confirm", value)
+					handleButton("confirm", value);
 				}
 				break;
 			}
 			case "multiple": {
 				let newValue = [];
 				for (let item of itemStates) {
-					if (
-						(item.value === value && !item.selected) ||
-						(item.value !== value && item.selected)
-					) {
+					if ((item.value === value && !item.selected) || (item.value !== value && item.selected)) {
 						newValue.push(item.value);
 					}
 				}
@@ -249,7 +250,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 				// Pass this along to the containing popout if applicable, so
 				// that the popout can be updated
 				if (handleButton) {
-					handleButton(undefined, $state.value)
+					handleButton(undefined, $state.value);
 				}
 				break;
 			}
@@ -310,7 +311,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			}
 			case "Escape": {
 				if (handleButton) {
-					handleButton("cancel")
+					handleButton("cancel");
 					if (popoutContext) {
 						popoutContext.searchText = undefined;
 					} else {

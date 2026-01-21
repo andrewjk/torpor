@@ -1,14 +1,14 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { monthNames } from "../utils/dateUtils";
-import { CalendarContextName, type CalendarContext } from "./CalendarTypes";
+import { type CalendarContext, CalendarContextName } from "./CalendarTypes";
 
 interface CalendarHeaderProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -31,7 +31,7 @@ export default function CalendarHeader($props: CalendarHeaderProps | undefined) 
 		},
 		get year() {
 			return $calState.visibleDate.getFullYear();
-		}
+		},
 	});
 
 	@render {

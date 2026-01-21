@@ -1,14 +1,14 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { dayNames, shortDayNames } from "../utils/dateUtils";
-import { CalendarContextName, type CalendarContext } from "./CalendarTypes";
+import { type CalendarContext, CalendarContextName } from "./CalendarTypes";
 
 interface CalendarGridHeaderProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
@@ -25,16 +25,11 @@ export default function CalendarGridHeader($props: CalendarGridHeaderProps | und
 	const days = [0, 1, 2, 3, 4, 5, 6].map((i) => ({
 		dayNumber: (startOfWeek + i) % 7,
 		dayName: dayNames[(startOfWeek + i) % 7],
-		shortDayName: shortDayNames[(startOfWeek + i) % 7]
+		shortDayName: shortDayNames[(startOfWeek + i) % 7],
 	}));
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-calendar-grid-header", $props?.class]}
-			{$props?.style}
-			role="row"
-		>
+		<div {$props?.id} class={["torp-calendar-grid-header", $props?.class]} {$props?.style} role="row">
 			<slot {days} />
 		</div>
 	}

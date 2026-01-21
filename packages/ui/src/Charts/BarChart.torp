@@ -1,39 +1,38 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { chartColors } from "../utils/chartColors";
+import {
+	calculateChartBottom,
+	calculateChartLeft,
+	calculateItemWidth,
+	calculateMaxValue,
+	calculateStepLabels,
+	calculateStepValue,
+	calculateValueHeight,
+} from "../utils/chartUtils";
+import type DataSeries from "./DataSeries";
+import GridLines from "./GridLines.torp";
 import XAxis from "./XAxis.torp";
 import YAxis from "./YAxis.torp";
-import GridLines from "./GridLines.torp";
-import {
-	calculateMaxValue,
-	calculateStepValue,
-	calculateStepLabels,
-	calculateItemWidth,
-	calculateValueHeight,
-	calculateChartBottom,
-	calculateChartLeft
-} from "../utils/chartUtils";
-import { chartColors } from "../utils/chartColors";
-
-import type DataSeries from "./DataSeries";
 
 interface BarChartProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
-	series: DataSeries[],
-	height?: number,
-	width?: number,
-	xLabel?: string,
-	yLabel?: string,
-	maxValue?: number,
-	stepCount?: number,
-	stepValue?: number,
-	hideXAxis?: boolean,
-	hideYAxis?: boolean,
-	showHLines?: boolean,
-	showVLines?: boolean,
+	style?: StyleValue;
+	series: DataSeries[];
+	height?: number;
+	width?: number;
+	xLabel?: string;
+	yLabel?: string;
+	maxValue?: number;
+	stepCount?: number;
+	stepValue?: number;
+	hideXAxis?: boolean;
+	hideYAxis?: boolean;
+	showHLines?: boolean;
+	showVLines?: boolean;
 }
 
 export default function BarChart($props: BarChartProps) {
@@ -49,13 +48,13 @@ export default function BarChart($props: BarChartProps) {
 		get labels() {
 			return $props.series.map((s) => s.name);
 		},
-		get calculatedHeight() { 
+		get calculatedHeight() {
 			return $props.height || defaultHeight;
 		},
-		get calculatedWidth() { 
+		get calculatedWidth() {
 			return $props.width || container?.clientWidth || defaultWidth;
 		},
-		get maxValue () {
+		get maxValue() {
 			return $props.maxValue || calculateMaxValue($props.series);
 		},
 		get calculatedStepValue() {
@@ -68,14 +67,24 @@ export default function BarChart($props: BarChartProps) {
 			return calculateItemWidth($state.calculatedWidth, $state.chartLeft, $state.labels);
 		},
 		get valueHeight() {
-			return calculateValueHeight($state.chartBottom, $state.textHeight, $state.calculatedStepValue, $props.stepCount || 2);
+			return calculateValueHeight(
+				$state.chartBottom,
+				$state.textHeight,
+				$state.calculatedStepValue,
+				$props.stepCount || 2,
+			);
 		},
 		get chartBottom() {
 			return calculateChartBottom($props.xLabel ?? "", $state.calculatedHeight, $state.textHeight);
 		},
 		get chartLeft() {
-			return calculateChartLeft($state.stepLabels, $props.yLabel ?? "", $state.textHeight, $state.textWidth);
-		}
+			return calculateChartLeft(
+				$state.stepLabels,
+				$props.yLabel ?? "",
+				$state.textHeight,
+				$state.textWidth,
+			);
+		},
 	});
 
 	$mount(() => {
@@ -89,16 +98,16 @@ export default function BarChart($props: BarChartProps) {
 	});
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-bar-chart", $props?.class]}
-			{$props?.style}
-			&ref={container}
-		>
-			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight} xmlns="http://www.w3.org/2000/svg">
+		<div {$props?.id} class={["torp-bar-chart", $props?.class]} {$props?.style} &ref={container}>
+			<svg
+				version="1.1"
+				width={$state.calculatedWidth}
+				height={$state.calculatedHeight}
+				xmlns="http://www.w3.org/2000/svg"
+			>
 				<g>
-				 	<text &ref={measurer} x="-999" y="-999">8</text>
-	
+					<text &ref={measurer} x="-999" y="-999">8</text>
+
 					@if ($state.textWidth && $state.textHeight) {
 						<XAxis
 							showAxis={!$props.hideXAxis}

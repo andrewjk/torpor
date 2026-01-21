@@ -1,21 +1,21 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { AccordionContextName, type AccordionContext, type ItemState } from "./AccordionTypes";
+import { type AccordionContext, AccordionContextName, type ItemState } from "./AccordionTypes";
 
 interface AccordionProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
-	type?: "single" | "multiple",
+	type?: "single" | "multiple";
 	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
-	value?: any | any[],
+	value?: any | any[];
 	/** If set to true, the user cannot interact with any items in the Accordion */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when the expanded item(s) have changed */
-	onchange?: (value: any | any[]) => void,
+	onchange?: (value: any | any[]) => void;
 }
 
 /**
@@ -41,12 +41,12 @@ export default function Accordion($props: AccordionProps | undefined) {
 	let type = $props?.type ?? "single";
 
 	let $state = $watch({
-		value: $props?.value ?? (type === "single" ? undefined : [])
+		value: $props?.value ?? (type === "single" ? undefined : []),
 	});
 
 	// Update $state on $props change
 	$run(() => {
-		$state.value = $props?.value ?? (type === "single" ? undefined : [])
+		$state.value = $props?.value ?? (type === "single" ? undefined : []);
 	});
 
 	// Update $props on $state change
@@ -66,7 +66,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 		registerItem,
 		removeItem,
 		toggleItem,
-		handleHeaderKey
+		handleHeaderKey,
 	};
 	$context[AccordionContextName] = context;
 
@@ -92,11 +92,11 @@ export default function Accordion($props: AccordionProps | undefined) {
 				break;
 			}
 		}
-	})
+	});
 
 	$run(() => {
 		let disabled = $props?.disabled;
-		itemStates.forEach((s) => s.parentDisabled = disabled === true);
+		itemStates.forEach((s) => (s.parentDisabled = disabled === true));
 	});
 
 	// Dispatch the change event when the value changes
@@ -137,7 +137,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 		}
 
 		// Set whether the Accordion itself is disabled
-		itemState.parentDisabled = $props?.disabled === true
+		itemState.parentDisabled = $props?.disabled === true;
 
 		// Add the item's state to the array
 		itemStates.splice(itemState.index, 0, itemState);
@@ -232,11 +232,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 	}
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-accordion", $props?.class]}
-			{$props?.style}
-		>
+		<div {$props?.id} class={["torp-accordion", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
 	}

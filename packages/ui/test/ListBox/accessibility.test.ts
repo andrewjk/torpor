@@ -36,10 +36,10 @@ describe("ListBox", () => {
 			"The accessible listbox",
 		);
 
-		//  If the listbox supports selection of more than one option, the
-		//  element with role listbox has aria-multiselectable set to true.
-		//  Otherwise, aria-multiselectable is either set to false or the
-		//  default value of false is implied
+		// If the listbox supports selection of more than one option, the
+		// element with role listbox has aria-multiselectable set to true.
+		// Otherwise, aria-multiselectable is either set to false or the default
+		// value of false is implied
 		expect(queryByText(container, "Role Content")?.parentElement).toHaveAttribute(
 			"aria-multiselectable",
 			"true",

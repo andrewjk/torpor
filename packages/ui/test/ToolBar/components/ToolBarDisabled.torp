@@ -1,7 +1,4 @@
-import {
-	ToolBar,
-	ToolBarButton,
-} from "../../../src/ToolBar";
+import { ToolBar, ToolBarButton } from "../../../src/ToolBar";
 
 export default function ToolBarDisabled() {
 	@render {

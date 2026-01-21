@@ -1,10 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
-import {
-	MenuContextName,
-	type MenuContext,
-	type ItemState,
-} from "./MenuTypes";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import { type ItemState, type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuProps {
 	/** An ID for the root element */
@@ -61,7 +57,7 @@ export default function Menu($props: MenuProps | undefined) {
 		handleItemKey,
 		handlePopout,
 		state,
-		registerItem
+		registerItem,
 	};
 	$context[MenuContextName] = context;
 

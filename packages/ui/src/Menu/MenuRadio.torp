@@ -1,11 +1,11 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import {
-	MenuButtonContextName,
-	MenuContextName,
-	MenuRadioGroupContextName,
 	type MenuButtonContext,
+	MenuButtonContextName,
 	type MenuContext,
+	MenuContextName,
 	type MenuRadioGroupContext,
+	MenuRadioGroupContextName,
 	type RadioGroupItemState,
 } from "./MenuTypes";
 
@@ -64,7 +64,7 @@ export default function MenuRadio($props: MenuRadioProps) {
 
 	// Set the context to pass down to items
 	let context: MenuButtonContext = {
-		state: $state
+		state: $state,
 	};
 	$context[MenuButtonContextName] = context;
 

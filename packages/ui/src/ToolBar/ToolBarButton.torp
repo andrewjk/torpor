@@ -1,19 +1,19 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { ToolBarContextName, type ToolBarContext } from "./ToolBarTypes";
+import { type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarButtonProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether this button is disabled  */
-	disabled?: boolean,
+	disabled?: boolean;
 	/** Raised when the button is clicked */
-	onclick?: (e: MouseEvent) => void,
+	onclick?: (e: MouseEvent) => void;
 	/** Raised when a key is pressed down */
-	onkeydown?: (e: KeyboardEvent) => void,
+	onkeydown?: (e: KeyboardEvent) => void;
 }
 
 /**

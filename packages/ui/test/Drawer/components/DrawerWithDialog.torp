@@ -1,11 +1,11 @@
-import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
 import {
 	Dialog,
-	DialogHeader,
 	DialogBody,
+	DialogButton,
 	DialogFooter,
-	DialogButton
+	DialogHeader,
 } from "../../../src/Dialog/index";
+import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from "../../../src/Drawer";
 
 export default function DrawerWithDialog() {
 	@render {

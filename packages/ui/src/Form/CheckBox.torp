@@ -1,25 +1,30 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { FormContextName, FieldContextName, type FormContext, type FieldContext } from "./FormTypes";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
 
 interface CheckBoxProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The name of the checkbox's form data field */
-	name?: string,
+	name?: string;
 	/** Whether the checkbox is checked */
-	checked?: boolean,
+	checked?: boolean;
 	/** An ARIA label for describing the checkbox to screen readers when there is no associated label element */
-	ariaLabel?: string,
+	ariaLabel?: string;
 	/** Raised on change */
-	onchange?: (e: Event) => void,
+	onchange?: (e: Event) => void;
 	/** Raised on input */
-	oninput?: (e: Event) => void,
-};
+	oninput?: (e: Event) => void;
+}
 
 /**
  * A checkbox input in a form.
@@ -27,7 +32,7 @@ interface CheckBoxProps {
 export default function CheckBox($props: CheckBoxProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name
+	let name = $props?.name;
 
 	let blurred = false;
 
@@ -39,13 +44,15 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 	}
 
 	// Use the FieldContext's state, or create a new one
-	let $state = fieldContext?.state ?? $watch({
-		inputId: $props?.id ?? defaultId,
-		value: $props?.checked,
-		errors: {} as Record<string, string>,
-		valid: false,
-		message: "",
-	});
+	let $state =
+		fieldContext?.state ??
+		$watch({
+			inputId: $props?.id ?? defaultId,
+			value: $props?.checked,
+			errors: {} as Record<string, string>,
+			valid: false,
+			message: "",
+		});
 
 	// Binding
 	$run(() => {
@@ -85,7 +92,7 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 			&checked={$state.value}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
-			onchange={$props?.onchange}
+			{$props?.onchange}
 			oninput={handleInput}
 			onblur={handleBlur}
 		/>

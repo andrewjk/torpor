@@ -4,11 +4,11 @@ interface BreadcrumbItemProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether this is the current page */
-	current?: boolean,
+	current?: boolean;
 }
 
 /**

@@ -1,20 +1,20 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { DisclosureContextName, type DisclosureContext } from "./DisclosureTypes";
+import { type DisclosureContext, DisclosureContextName } from "./DisclosureTypes";
 
 interface DisclosureHeaderProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**
  * The header for a Disclosure, which contains the DisclosureTrigger.
  *
  * The structure of a DisclosureHeader is:
- * 
+ *
  * ```
  * <DisclosureHeader>
  * 	<DisclosureTrigger />
@@ -26,7 +26,7 @@ export default function DisclosureHeader($props: DisclosureHeaderProps | undefin
 	if (!context) {
 		throw new Error("DisclosureHeader must be contained within a Disclosure");
 	}
-	let $state = context.state
+	let $state = context.state;
 
 	@render {
 		<div

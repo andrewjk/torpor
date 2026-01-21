@@ -1,14 +1,14 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
-import { ComboBoxContextName, type ComboBoxContext } from "./ComboBoxTypes";
+import { type ComboBoxContext, ComboBoxContextName } from "./ComboBoxTypes";
 
 interface ComboBoxContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 }
 
 /**

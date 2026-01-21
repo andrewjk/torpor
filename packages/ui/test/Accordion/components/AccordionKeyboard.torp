@@ -1,14 +1,14 @@
 import {
 	Accordion,
-	AccordionItem,
-	AccordionHeader,
-	AccordionTrigger,
 	AccordionContent,
+	AccordionHeader,
+	AccordionItem,
+	AccordionTrigger,
 } from "../../../src/Accordion/index";
 
 export default function AccordionKeyboard($props: any) {
 	@render {
-		<Accordion value={$props.value} type="multiple">
+		<Accordion {$props.value} type="multiple">
 			<AccordionItem>
 				<AccordionHeader>
 					<AccordionTrigger>Header 1</AccordionTrigger>

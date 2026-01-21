@@ -1,11 +1,8 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ListBoxAccessibility($props: any) {
 	@render {
-		<ListBox value={$props.value} type="multiple" ariaLabel="The accessible listbox">
+		<ListBox {$props.value} type="multiple" ariaLabel="The accessible listbox">
 			<ListBoxItem value={0}>
 				Role Content
 			</ListBoxItem>

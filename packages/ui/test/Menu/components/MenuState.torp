@@ -1,21 +1,21 @@
-import { Modal, ModalContent } from "../../../src/Modal";
 import {
 	Menu,
 	MenuButton,
 	MenuCheck,
-	MenuRadioGroup,
-	MenuRadio,
 	MenuPopout,
+	MenuPopoutContent,
 	MenuPopoutTrigger,
-	MenuPopoutContent
+	MenuRadio,
+	MenuRadioGroup,
 } from "../../../src/Menu";
+import { Modal, ModalContent } from "../../../src/Modal";
 
 export default function MenuState() {
 	let $state = $watch({
 		check1Checked: true,
 		check2Checked: false,
 		radioValue: "option2",
-		popoutVisible: false
+		popoutVisible: false,
 	});
 
 	@render {

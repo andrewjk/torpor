@@ -1,15 +1,12 @@
+import { Menu, MenuButton } from "../../../src/Menu";
 import {
 	ToolBar,
 	ToolBarButton,
 	ToolBarPopout,
-	ToolBarPopoutTrigger,
 	ToolBarPopoutContent,
-	ToolBarSeparator
+	ToolBarPopoutTrigger,
+	ToolBarSeparator,
 } from "../../../src/ToolBar";
-import {
-	Menu,
-	MenuButton,
-} from "../../../src/Menu";
 
 export default function ToolBarPopoutTest() {
 	let visible1 = false;

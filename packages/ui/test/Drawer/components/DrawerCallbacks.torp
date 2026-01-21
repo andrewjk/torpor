@@ -1,12 +1,8 @@
-import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from "../../../src/Drawer";
 
 export default function DrawerCallbacks() {
 	@render {
-		<Drawer
-			{$props?.ontoggle}
-			{$props?.onopen}
-			{$props?.onclose}
-		>
+		<Drawer {$props?.ontoggle} {$props?.onopen} {$props?.onclose}>
 			<DrawerTrigger>Open Drawer</DrawerTrigger>
 			<DrawerOverlay />
 			<DrawerContent ariaLabel="Callback Drawer">

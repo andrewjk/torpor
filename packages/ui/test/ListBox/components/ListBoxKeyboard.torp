@@ -1,11 +1,8 @@
-import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ListBoxKeyboard($props: any) {
 	@render {
-		<ListBox value={$props.value} type="multiple">
+		<ListBox {$props.value} type="multiple">
 			<ListBoxItem>
 				Content 1
 			</ListBoxItem>

@@ -1,27 +1,27 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import {
-	FormContextName,
-	FieldContextName,
-	type ValidationIssue,
-	type FormContext,
 	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+	type ValidationIssue,
 } from "./FormTypes";
-import { StandardSchemaV1 } from "./StandardSchemaV1"
+import { StandardSchemaV1 } from "./StandardSchemaV1";
 
 interface FieldProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The name of the data that this field contains */
-	name: string,
+	name: string;
 	/** The data value that this field is bound to */
-	value?: any,
+	value?: any;
 	/** The schema validator to use for this form */
-	schema?: StandardSchemaV1,
-};
+	schema?: StandardSchemaV1;
+}
 
 /**
  * A field in a form which automatically links up a Label and/or an input
@@ -36,7 +36,10 @@ export default function Field($props: FieldProps) {
 			return this.issues.find((i) => i.path === $props.name) === undefined;
 		},
 		get message() {
-			return this.issues.filter((i) => i.path === $props.name).map((i) => i.message).join("\n");
+			return this.issues
+				.filter((i) => i.path === $props.name)
+				.map((i) => i.message)
+				.join("\n");
 		},
 	});
 
@@ -57,7 +60,7 @@ export default function Field($props: FieldProps) {
 	let context: FieldContext = {
 		name: $props.name,
 		state: $state,
-		validate: handleValidate
+		validate: handleValidate,
 	};
 	$context[FieldContextName] = context;
 

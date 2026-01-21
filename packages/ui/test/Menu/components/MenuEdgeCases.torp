@@ -1,11 +1,11 @@
-import { Modal, ModalContent } from "../../../src/Modal";
 import {
 	Menu,
 	MenuButton,
 	MenuPopout,
-	MenuPopoutTrigger,
 	MenuPopoutContent,
+	MenuPopoutTrigger,
 } from "../../../src/Menu";
+import { Modal, ModalContent } from "../../../src/Modal";
 
 export default function MenuEdgeCases() {
 	@render {

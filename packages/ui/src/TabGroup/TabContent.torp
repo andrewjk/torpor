@@ -1,18 +1,18 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import { TabGroupContextName, type TabGroupContext } from "./TabGroupTypes";
+import { type TabGroupContext, TabGroupContextName } from "./TabGroupTypes";
 
 interface TabContentProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** The index of this item */
-	index?: number,
+	index?: number;
 	/** The value for this item */
-	value?: string,
+	value?: string;
 }
 
 /**

@@ -1,8 +1,8 @@
 import {
 	Disclosure,
+	DisclosureContent,
 	DisclosureHeader,
 	DisclosureTrigger,
-	DisclosureContent
 } from "../../../src/Disclosure/index";
 
 export default function DisclosureAccessibility($props: { expanded: boolean }) {

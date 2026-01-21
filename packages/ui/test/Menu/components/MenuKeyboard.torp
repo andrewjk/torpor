@@ -1,11 +1,11 @@
-import { Modal, ModalContent } from "../../../src/Modal";
 import {
 	Menu,
 	MenuButton,
 	MenuPopout,
+	MenuPopoutContent,
 	MenuPopoutTrigger,
-	MenuPopoutContent
 } from "../../../src/Menu";
+import { Modal, ModalContent } from "../../../src/Modal";
 
 export default function MenuKeyboard() {
 	@render {

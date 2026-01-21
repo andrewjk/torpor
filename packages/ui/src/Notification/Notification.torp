@@ -1,19 +1,19 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { NotificationContextName, type NotificationContext } from "./NotificationTypes";
+import { type NotificationContext, NotificationContextName } from "./NotificationTypes";
 
 interface NotificationProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
+	style?: StyleValue;
 	/** Whether the notification is visible */
-	visible?: boolean,
+	visible?: boolean;
 	/** The duration, in milliseconds, to keep the notification visible */
-	duration?: number,
+	duration?: number;
 	/** Raised when the notification has closed, either after the duration has elapsed, or when the user has pressed the close button */
-	onclose?: () => void,
+	onclose?: () => void;
 }
 
 /**
@@ -26,7 +26,7 @@ export default function Notification($props: NotificationProps | undefined) {
 	let defaultDuration = 5000;
 
 	let $state = $watch({
-		visible: false
+		visible: false,
 	});
 
 	$run(() => {
@@ -40,7 +40,7 @@ export default function Notification($props: NotificationProps | undefined) {
 
 	// Set the context to pass down to items
 	let context: NotificationContext = {
-		closeNotification
+		closeNotification,
 	};
 	$context[NotificationContextName] = context;
 
@@ -58,12 +58,7 @@ export default function Notification($props: NotificationProps | undefined) {
 
 	@render {
 		@if ($state.visible) {
-			<div 
-				{$props?.id}
-				class={["torp-notification", $props?.class]}
-				{$props?.style}
-				role="alert"
-			>
+			<div {$props?.id} class={["torp-notification", $props?.class]} {$props?.style} role="alert">
 				<slot />
 			</div>
 		}

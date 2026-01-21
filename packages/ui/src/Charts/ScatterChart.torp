@@ -1,15 +1,15 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { chartColors } from "../utils/chartColors";
+import {
+	calculateChartBottom,
+	calculateChartLeft,
+	calculateStepLabels,
+	calculateStepValue,
+	calculateValueHeight,
+} from "../utils/chartUtils";
+import GridLines from "./GridLines.torp";
 import XAxis from "./XAxis.torp";
 import YAxis from "./YAxis.torp";
-import GridLines from "./GridLines.torp";
-import {
-	calculateStepValue,
-	calculateStepLabels,
-	calculateValueHeight,
-	calculateChartBottom,
-	calculateChartLeft
-} from "../utils/chartUtils";
-import { chartColors } from "../utils/chartColors";
 
 interface Pair {
 	x: number;
@@ -27,22 +27,22 @@ interface ScatterChartProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
-	class?: ClassValue,
+	class?: ClassValue;
 	/** Styles for the root element */
-	style?: StyleValue,
-	series: DataSeries[],
-	height?: number,
-	width?: number,
-	xLabel?: string,
-	yLabel?: string,
-	xStepCount?: number,
-	xStepValue?: number,
-	yStepCount?: number,
-	yStepValue?: number,
-	hideXAxis?: boolean,
-	hideYAxis?: boolean,
-	showHLines?: boolean,
-	showVLines?: boolean,
+	style?: StyleValue;
+	series: DataSeries[];
+	height?: number;
+	width?: number;
+	xLabel?: string;
+	yLabel?: string;
+	xStepCount?: number;
+	xStepValue?: number;
+	yStepCount?: number;
+	yStepValue?: number;
+	hideXAxis?: boolean;
+	hideYAxis?: boolean;
+	showHLines?: boolean;
+	showVLines?: boolean;
 }
 
 export default function ScatterChart($props: ScatterChartProps) {
@@ -84,17 +84,27 @@ export default function ScatterChart($props: ScatterChartProps) {
 				$state.calculatedWidth - $state.chartLeft,
 				$state.textHeight,
 				$state.calculatedXStepValue,
-				$props.xStepCount || 2
+				$props.xStepCount || 2,
 			);
 		},
 		get valueHeight() {
-			return calculateValueHeight($state.chartBottom, $state.textHeight, $state.calculatedYStepValue, $props.yStepCount || 2);
+			return calculateValueHeight(
+				$state.chartBottom,
+				$state.textHeight,
+				$state.calculatedYStepValue,
+				$props.yStepCount || 2,
+			);
 		},
 		get chartBottom() {
 			return calculateChartBottom($props.xLabel ?? "", $state.calculatedHeight, $state.textHeight);
 		},
 		get chartLeft() {
-			return calculateChartLeft($state.yStepLabels, $props.yLabel ?? "", $state.textHeight, $state.textWidth);
+			return calculateChartLeft(
+				$state.yStepLabels,
+				$props.yLabel ?? "",
+				$state.textHeight,
+				$state.textWidth,
+			);
 		},
 		get pointSeries() {
 			return buildPointSeries(
@@ -102,7 +112,7 @@ export default function ScatterChart($props: ScatterChartProps) {
 				$state.chartLeft,
 				$state.chartBottom,
 				$state.itemWidth,
-				$state.valueHeight
+				$state.valueHeight,
 			);
 		},
 	});
@@ -122,7 +132,7 @@ export default function ScatterChart($props: ScatterChartProps) {
 		return series.reduce((a, b) => {
 			return Math.max(
 				a,
-				b.data.reduce((c, d) => Math.max(c, field === "x" ? d.x : d.y), 0)
+				b.data.reduce((c, d) => Math.max(c, field === "x" ? d.x : d.y), 0),
 			);
 		}, 0);
 	}
@@ -132,7 +142,7 @@ export default function ScatterChart($props: ScatterChartProps) {
 		theChartLeft: number,
 		theChartBottom: number,
 		theItemWidth: number,
-		theValueHeight: number
+		theValueHeight: number,
 	) {
 		return theSeries.map((series) => {
 			return series.data.map((item) => {
@@ -144,15 +154,10 @@ export default function ScatterChart($props: ScatterChartProps) {
 	}
 
 	@render {
-		<div
-			{$props?.id}
-			class={["torp-scatter-chart", $props?.class]}
-			{$props?.style}
-			&ref={container}
-		>
+		<div {$props?.id} class={["torp-scatter-chart", $props?.class]} {$props?.style} &ref={container}>
 			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
 				<g>
-				 	<text &ref={measurer} x="-999" y="-999">8</text>
+					<text &ref={measurer} x="-999" y="-999">8</text>
 
 					@if ($state.textWidth && $state.textHeight) {
 						<XAxis
@@ -203,7 +208,7 @@ export default function ScatterChart($props: ScatterChartProps) {
 								>
 									<title>{
 										`${[series.name, series.data[j].label, series.data[j].x].filter(Boolean).join("\n")}, ${series.data[j].y}`
-									}</title>
+										}</title>
 								</circle>
 							}
 						}
