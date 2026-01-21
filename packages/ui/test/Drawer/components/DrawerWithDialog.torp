@@ -1,0 +1,27 @@
+import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+import {
+	Dialog,
+	DialogHeader,
+	DialogBody,
+	DialogFooter,
+	DialogButton
+} from "../../../src/Dialog/index";
+
+export default function DrawerWithDialog() {
+	@render {
+		<Drawer modal={true}>
+			<DrawerTrigger>Open Drawer</DrawerTrigger>
+			<DrawerOverlay />
+			<DrawerContent>
+				<Dialog>
+					<DialogHeader>Color preference</DialogHeader>
+					<DialogBody>Drawer content for accessibility testing.</DialogBody>
+					<DialogFooter>
+						<DialogButton value="blue">Blue</DialogButton>
+						<DialogButton value="red">Red</DialogButton>
+					</DialogFooter>
+				</Dialog>
+			</DrawerContent>
+		</Drawer>
+	}
+}

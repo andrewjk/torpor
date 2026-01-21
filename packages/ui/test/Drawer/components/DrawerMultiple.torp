@@ -1,0 +1,24 @@
+import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+
+export default function DrawerMultiple() {
+	@render {
+		<div>
+			<Drawer>
+				<DrawerTrigger id="drawer1-trigger">Open Drawer 1</DrawerTrigger>
+				<DrawerOverlay />
+				<DrawerContent ariaLabel="Drawer 1">
+					<h2>Drawer 1</h2>
+					<p>Content for drawer 1</p>
+				</DrawerContent>
+			</Drawer>
+			<Drawer>
+				<DrawerTrigger id="drawer2-trigger">Open Drawer 2</DrawerTrigger>
+				<DrawerOverlay />
+				<DrawerContent ariaLabel="Drawer 2">
+					<h2>Drawer 2</h2>
+					<p>Content for drawer 2</p>
+				</DrawerContent>
+			</Drawer>
+		</div>
+	}
+}

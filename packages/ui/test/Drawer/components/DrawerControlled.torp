@@ -1,0 +1,13 @@
+import { Drawer, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+
+export default function DrawerControlled() {
+	@render {
+		<Drawer visible={true} modal={true}>
+			<DrawerOverlay />
+			<DrawerContent ariaLabel="Controlled Drawer">
+				<h2>Controlled Drawer</h2>
+				<p>This drawer is controlled externally.</p>
+			</DrawerContent>
+		</Drawer>
+	}
+}

@@ -21,4 +21,6 @@ export interface DrawerState {
 	visible: boolean;
 	modal: boolean;
 	position: "left" | "right" | "top" | "bottom";
+	triggerId?: string;
+	contentId?: string;
 }

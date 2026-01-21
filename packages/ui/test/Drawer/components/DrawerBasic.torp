@@ -1,0 +1,14 @@
+import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+
+export default function DrawerBasic() {
+	@render {
+		<Drawer>
+			<DrawerTrigger>Open Drawer</DrawerTrigger>
+			<DrawerOverlay />
+			<DrawerContent ariaLabel="Test Drawer">
+				<h2>Drawer Content</h2>
+				<p>This is a basic drawer.</p>
+			</DrawerContent>
+		</Drawer>
+	}
+}

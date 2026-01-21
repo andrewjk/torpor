@@ -1,0 +1,15 @@
+import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+
+export default function DrawerAccessibility() {
+	@render {
+		<Drawer modal={true}>
+			<DrawerTrigger>Open Drawer</DrawerTrigger>
+			<DrawerOverlay />
+			<DrawerContent ariaLabel="Test Drawer">
+				<h2>Drawer Header</h2>
+				<p>Drawer content for accessibility testing.</p>
+				<button>Action Button</button>
+			</DrawerContent>
+		</Drawer>
+	}
+}

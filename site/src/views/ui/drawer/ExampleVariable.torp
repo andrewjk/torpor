@@ -1,4 +1,5 @@
 import { Drawer, DrawerContent, DrawerOverlay } from "@torpor/ui/Drawer";
+import { slide } from "@torpor/ui/motion";
 
 export default function ExampleVariable() {
 	let $state = $watch({
@@ -16,8 +17,10 @@ export default function ExampleVariable() {
 
 		<Drawer &visible={$state.visible}>
 			<DrawerOverlay class="example-drawer-overlay" />
-			<DrawerContent class="example-drawer-content">
-				<p>Here I am</p>
+			<DrawerContent>
+				<div class="example-drawer-content" transition={(e) => slide(e, { side: "left" })}>
+					<p>Here I am</p>
+				</div>
 			</DrawerContent>
 		</Drawer>
 	}

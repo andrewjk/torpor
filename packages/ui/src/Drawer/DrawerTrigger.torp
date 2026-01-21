@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
 
 interface DrawerTriggerProps {
@@ -14,12 +15,16 @@ interface DrawerTriggerProps {
  * The button that causes a Drawer to appear or disappear.
  */
 export default function DrawerTrigger($props: DrawerTriggerProps | undefined) {
+	const defaultId = getId();
+
 	// Get stuff out of the DrawerContext
 	const context = $context[DrawerContextName] as DrawerContext;
 	if (!context) {
 		throw new Error("DrawerTrigger must be contained within a Drawer");
 	}
 	let $state = context.state;
+
+	$state.triggerId = $props?.id ?? defaultId;
 
 	function handleClick() {
 		$state.visible = !$state.visible;
@@ -28,10 +33,13 @@ export default function DrawerTrigger($props: DrawerTriggerProps | undefined) {
 	@render {
 		<button
 			type="button"
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-drawer-trigger", $props?.class]}
 			{$props?.style}
 			onclick={handleClick}
+			aria-expanded={$state.visible ? "true" : "false"}
+			aria-haspopup="dialog"
+			aria-controls={$state.contentId}
 		>
 			<slot />
 		</button>

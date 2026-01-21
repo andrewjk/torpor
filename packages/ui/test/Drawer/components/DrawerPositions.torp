@@ -1,0 +1,29 @@
+import { Drawer, DrawerTrigger, DrawerContent, DrawerOverlay } from "../../../src/Drawer";
+
+export default function DrawerPositions() {
+	@render {
+		<div>
+			<Drawer position="right">
+				<DrawerTrigger id="right-trigger">Right Drawer</DrawerTrigger>
+				<DrawerOverlay />
+				<DrawerContent ariaLabel="Right Drawer">
+					<p>Right positioned</p>
+				</DrawerContent>
+			</Drawer>
+			<Drawer position="top">
+				<DrawerTrigger id="top-trigger">Top Drawer</DrawerTrigger>
+				<DrawerOverlay />
+				<DrawerContent ariaLabel="Top Drawer">
+					<p>Top positioned</p>
+				</DrawerContent>
+			</Drawer>
+			<Drawer position="bottom">
+				<DrawerTrigger id="bottom-trigger">Bottom Drawer</DrawerTrigger>
+				<DrawerOverlay />
+				<DrawerContent ariaLabel="Bottom Drawer">
+					<p>Bottom positioned</p>
+				</DrawerContent>
+			</Drawer>
+		</div>
+	}
+}

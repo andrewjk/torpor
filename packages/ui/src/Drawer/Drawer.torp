@@ -27,8 +27,6 @@ interface DrawerProps {
 /**
  * A drawer that can be used to show rich content or obtain information from a user.
  *
- * See [the WAI ARIA guidelines for Dialogs](https://www.w3.org/WAI/ARIA/apg/patterns/dialogmodal/).
- *
  * The structure of a Drawer is:
  *
  * ```
@@ -77,7 +75,7 @@ export default function Drawer($props: DrawerProps | undefined) {
 		} else {
 			if (ontoggle) ontoggle(visible);
 			if (visible) {
-				if (onopen) onopen()
+				if (onopen) onopen();
 			} else {
 				if (onclose) onclose(result);
 			}

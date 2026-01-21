@@ -1,4 +1,5 @@
 import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from "@torpor/ui/Drawer";
+import { slide } from "@torpor/ui/motion";
 
 export default function ExampleDialog() {
 	@render {
@@ -9,8 +10,10 @@ export default function ExampleDialog() {
 		<Drawer>
 			<DrawerTrigger>Show a drawer</DrawerTrigger>
 			<DrawerOverlay class="example-drawer-overlay" />
-			<DrawerContent class="example-drawer-content">
-				<p>Here I am</p>
+			<DrawerContent>
+				<div class="example-drawer-content" transition={(e) => slide(e, { side: "left" })}>
+					<p>Here I am</p>
+				</div>
 			</DrawerContent>
 		</Drawer>
 	}

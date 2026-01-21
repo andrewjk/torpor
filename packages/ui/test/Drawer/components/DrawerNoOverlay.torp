@@ -1,0 +1,13 @@
+import { Drawer, DrawerTrigger, DrawerContent } from "../../../src/Drawer";
+
+export default function DrawerNoOverlay() {
+	@render {
+		<Drawer>
+			<DrawerTrigger>Open Drawer</DrawerTrigger>
+			<DrawerContent ariaLabel="No Overlay Drawer">
+				<h2>Non-Modal Drawer</h2>
+				<p>This drawer has no overlay.</p>
+			</DrawerContent>
+		</Drawer>
+	}
+}

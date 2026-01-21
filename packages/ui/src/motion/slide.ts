@@ -6,8 +6,8 @@ interface Options extends KeyframeAnimationOptions {
 }
 
 export default function slide(el: HTMLElement, options?: Options): Animation {
-	let position = options?.side ?? "left";
-	switch (position) {
+	el.style.position = "fixed";
+	switch (options?.side ?? "left") {
 		case "left": {
 			el.style.left = "0px";
 			const width = measure(el, (el) => el.offsetWidth);

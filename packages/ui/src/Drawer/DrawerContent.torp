@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { slide } from "../motion";
+import getId from "../utils/getId";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import { DrawerContextName, type DrawerContext } from "./DrawerTypes";
 
@@ -10,12 +10,16 @@ interface DrawerContentProps {
 	class?: ClassValue,
 	/** Styles for the root element */
 	style?: StyleValue,
+	/** An ARIA label for describing the drawer to screen readers */
+	ariaLabel?: string,
 }
 
 /**
  * The content that is displayed for a Drawer when it is open.
  */
 export default function DrawerContent($props: DrawerContentProps | undefined) {
+	const defaultId = getId();
+
 	let drawer: HTMLElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -26,6 +30,8 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		throw new Error("DrawerContent must be contained within a Drawer");
 	}
 	let $state = context.state;
+
+	$state.contentId = $props?.id ?? defaultId;
 
 	$run(() => {
 		if (!$state.visible) {
@@ -41,6 +47,7 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		closeOnClick = false;
 		addDocumentEvent("mousedown", handleDocumentMouseDown);
 		addDocumentEvent("click", handleDocumentClick);
+		addDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function hide() {
@@ -48,6 +55,7 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 
 		removeDocumentEvent("mousedown", handleDocumentMouseDown);
 		removeDocumentEvent("click", handleDocumentClick);
+		removeDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function handleDocumentMouseDown() {
@@ -65,15 +73,23 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		}
 	}
 
+	function handleDocumentKeyDown(e: KeyboardEvent) {
+		if (e.key === "Escape") {
+			e.preventDefault();
+			$state.visible = false;
+		}
+	}
+
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-drawer-content", $props?.class]}
 				{$props?.style}
-				style="position: fixed;"
-				transition={(e) => slide(e, { side: $state.position })}
 				&ref={drawer}
+				aria-modal={$state.modal}
+				aria-label={$props?.ariaLabel}
+				aria-labelledby={$props?.ariaLabel ? undefined : $state.triggerId}
 				onmount={show}
 			>
 				<slot />
