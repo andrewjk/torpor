@@ -1,3 +1,4 @@
+import type CommentNode from "../types/nodes/CommentNode";
 import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
 import isSpecialNode from "../utils/isSpecialNode";
@@ -46,13 +47,36 @@ export default function parseElement(status: ParseStatus): ElementNode {
 				break;
 			} else if (accept("<!--", status)) {
 				// It's a comment, swallow it
+				const start = status.i;
 				status.i = status.source.indexOf("-->", status.i) + 3;
+				const text: CommentNode = {
+					type: "comment",
+					commentType: "html",
+					content: status.source.substring(start, status.i - 3),
+				};
+				element.children.push(text);
 			} else if (accept("@//", status)) {
 				// Swallow one-line comments
+				// Swallow one-line comments
+				const start = status.i;
 				status.i = status.source.indexOf("\n", status.i) + 1;
+				const text: CommentNode = {
+					type: "comment",
+					commentType: "line",
+					content: status.source.substring(start, status.i - 1),
+				};
+				element.children.push(text);
 			} else if (accept("@/*", status)) {
 				// Swallow block comments
+				// Swallow block comments
+				const start = status.i;
 				status.i = status.source.indexOf("*/", status.i) + 2;
+				const text: CommentNode = {
+					type: "comment",
+					commentType: "block",
+					content: status.source.substring(start, status.i - 2),
+				};
+				element.children.push(text);
 			} else if (accept("</", status, false)) {
 				// It's a close tag, so we're done here
 				if (checkCloseTag(status, element)) {

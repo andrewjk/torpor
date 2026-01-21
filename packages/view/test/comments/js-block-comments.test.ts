@@ -1,6 +1,6 @@
 import { assert, expect, test } from "vitest";
 import parse from "../../src/compile/parse";
-import { el, root, text, trimParsed } from "../helpers";
+import { cmt, el, root, text, trimParsed } from "../helpers";
 
 test("multi line js comments", () => {
 	const input = `
@@ -37,6 +37,16 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].name).toBe("Test");
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].markup).toEqual(
-		root([el("section", [], [el("p", [], [text("The content")])])]),
+		root([
+			cmt("block", "* A comment outside"),
+			el(
+				"section",
+				[],
+				[
+					cmt("block", "A comment at the top\n\t\t\twith multiple lines"),
+					el("p", [], [cmt("block", "A comment in text"), text("The content")]),
+				],
+			),
+		]),
 	);
 });

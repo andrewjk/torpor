@@ -1,5 +1,6 @@
 import type ParseResult from "../src/compile/types/ParseResult";
 import type Attribute from "../src/compile/types/nodes/Attribute";
+import type CommentNode from "../src/compile/types/nodes/CommentNode";
 import type ControlNode from "../src/compile/types/nodes/ControlNode";
 import type ElementNode from "../src/compile/types/nodes/ElementNode";
 import type OperationType from "../src/compile/types/nodes/OperationType";
@@ -70,6 +71,14 @@ export function root(children?: TemplateNode[]): RootNode {
 	return {
 		type: "root",
 		children: children || [],
+	};
+}
+
+export function cmt(type: "html" | "line" | "block", content: string): CommentNode {
+	return {
+		type: "comment",
+		commentType: type,
+		content,
 	};
 }
 
@@ -158,6 +167,9 @@ function trimElement(el: RootNode | ElementNode | ControlNode) {
 					delete a.span,
 			);
 			trimElement(child as ElementNode);
+		} else if (child.type === "comment") {
+			const textChild = child as CommentNode;
+			textChild.content = textChild.content.trim();
 		} else if (child.type === "control") {
 			trimElement(child as ControlNode);
 		}

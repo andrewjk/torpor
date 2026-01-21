@@ -42,6 +42,10 @@ export default function buildServerNode(
 			buildServerSpecialNode(node as ElementNode, status, b);
 			break;
 		}
+		case "comment": {
+			// Don't output comments!
+			break;
+		}
 		default: {
 			// eslint-disable-next-line restrict-template-expressions
 			throw new Error(`Invalid node type: ${node.type}`);
