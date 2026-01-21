@@ -29,8 +29,8 @@ export default function InputFocused(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <input> `);
 	const t_root_0 = t_root(t_fragment_0, true);
 	const t_input_1 = t_next(t_root_0) as HTMLInputElement;
-	const t_text_1 = t_next(t_input_1, true);
 	inputElement = t_input_1;
+	const t_text_1 = t_next(t_input_1, true);
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
 	t_next(t_text_1);
 

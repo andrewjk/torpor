@@ -411,6 +411,19 @@ function declareElementFragmentVars(
 					b.append(`const ${node.varName} = ${varPath} as ${elementTypeName(node)};`);
 					printDebug(node.varName, status, b);
 				}
+
+				// Do &ref first, just in case any other attributes or
+				// components depend on it being set e.g. if you have a `style`
+				// attribute that depends on the element's size, or you are
+				// passing the element to a component as an anchor
+				const refAttribute = node.attributes.find((a) => a.name === "&ref");
+				if (refAttribute) {
+					let { value, fullyReactive } = refAttribute;
+					if (value != null && fullyReactive) {
+						// Bind the DOM element to a user-defined variable
+						b.append(`${value} = ${node.varName};`);
+					}
+				}
 			}
 		}
 	}

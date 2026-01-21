@@ -159,17 +159,6 @@ function buildElementAttributes(
 
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
-	// Do &ref first, just in case any other attributes depend on it being set
-	// e.g. if you have a `style` attribute that depends on the element's size
-	const refAttribute = node.attributes.find((a) => a.name === "&ref");
-	if (refAttribute) {
-		let { value, fullyReactive } = refAttribute;
-		if (value != null && fullyReactive) {
-			// Bind the DOM element to a user-defined variable
-			b.append(`${value} = ${varName};`);
-		}
-	}
-
 	for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
