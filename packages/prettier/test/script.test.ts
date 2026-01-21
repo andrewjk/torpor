@@ -602,6 +602,29 @@ export default function Counter() {
 	expect(result).toBe(expected);
 });
 
+test("comments", async () => {
+	const code = `
+export default function Counter() {
+	@render {
+		@// a comment...
+		<p>hi</p>
+		@/* another comment... */
+	}
+}
+`;
+	const expected = `
+export default function Counter() {
+	@render {
+		@// a comment...
+		<p>hi</p>
+		@/* another comment... */
+	}
+}
+`.trimStart();
+	const result = await prettierFormat(code);
+	expect(result).toBe(expected);
+});
+
 async function prettierFormat(code: string) {
 	return await prettier.format(code, {
 		parser: "torpor-parser",

@@ -211,6 +211,10 @@ function formatRenderNode(
 			formatTextNode(node, state, options);
 			break;
 		}
+		case "comment": {
+			formatCommentNode(node, state, options);
+			break;
+		}
 		default: {
 			throw new Error("Unknown node type: " + node.type);
 		}
@@ -416,6 +420,21 @@ function formatTextNode(node: any, state: FormatState, _options: Record<Property
 	}
 
 	state.output += text;
+}
+
+function formatCommentNode(node: any, state: FormatState, _options: Record<PropertyKey, any>) {
+	const indent = "\t".repeat(state.indent);
+	switch (node.commentType) {
+		case "html":
+			state.output += `${indent}<!--${node.content}-->`;
+			break;
+		case "line":
+			state.output += `${indent}@//${node.content}\n`;
+			break;
+		case "block":
+			state.output += `${indent}@/*${node.content}*/`;
+			break;
+	}
 }
 
 function formatStyleChunk(content: string, _options: object) {
