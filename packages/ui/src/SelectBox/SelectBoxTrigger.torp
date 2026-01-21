@@ -39,7 +39,6 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 
 	function handleKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Down":
 			case "ArrowDown": {
 				e.preventDefault();
 				$state.visible = true;
@@ -48,7 +47,6 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 				}
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
 				e.preventDefault();
 				$state.visible = true;

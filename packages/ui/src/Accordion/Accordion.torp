@@ -186,7 +186,6 @@ export default function Accordion($props: AccordionProps | undefined) {
 
 	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case "Up":
 			case "ArrowUp": {
 				for (let i = headerIndex - 1; i >= 0; i--) {
 					if (!itemStates[i].disabled) {
@@ -197,7 +196,6 @@ export default function Accordion($props: AccordionProps | undefined) {
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				for (let i = headerIndex + 1; i < itemStates.length; i++) {
 					if (!itemStates[i].disabled) {

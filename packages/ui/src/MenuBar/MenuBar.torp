@@ -79,7 +79,6 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 
 	function handleButtonKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Right":
 			case "ArrowRight": {
 				if (orientation === "horizontal") {
 					e.preventDefault();
@@ -87,7 +86,6 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 				}
 				break;
 			}
-			case "Left":
 			case "ArrowLeft": {
 				if (orientation === "horizontal") {
 					e.preventDefault();
@@ -95,7 +93,6 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				if (orientation === "vertical") {
 					e.preventDefault();
@@ -103,7 +100,6 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 				}
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
 				if (orientation === "vertical") {
 					e.preventDefault();

@@ -259,7 +259,6 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	function handleKey(index: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case "Up":
 			case "ArrowUp": {
 				if (index > 0) {
 					e.preventDefault();
@@ -272,7 +271,6 @@ export default function ListBox($props: ListBoxProps | undefined) {
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				if (index < itemStates.length - 1) {
 					e.preventDefault();

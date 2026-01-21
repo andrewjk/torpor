@@ -164,7 +164,6 @@ export default function Calendar($props: CalendarProps) {
 				setValue($state.activeDate);
 				break;
 			}
-			case "Esc":
 			case "Escape": {
 				e.preventDefault();
 				if ($props.onclose) {
@@ -172,7 +171,6 @@ export default function Calendar($props: CalendarProps) {
 				}
 				break;
 			}
-			case "Left":
 			case "ArrowLeft": {
 				e.preventDefault();
 				const newDate = new Date($state.activeDate);
@@ -180,7 +178,6 @@ export default function Calendar($props: CalendarProps) {
 				setActiveDate(newDate);
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
 				e.preventDefault();
 				const newDate = new Date($state.activeDate);
@@ -188,7 +185,6 @@ export default function Calendar($props: CalendarProps) {
 				setActiveDate(newDate);
 				break;
 			}
-			case "Right":
 			case "ArrowRight": {
 				e.preventDefault();
 				const newDate = new Date($state.activeDate);
@@ -196,7 +192,6 @@ export default function Calendar($props: CalendarProps) {
 				setActiveDate(newDate);
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				e.preventDefault();
 				const newDate = new Date($state.activeDate);

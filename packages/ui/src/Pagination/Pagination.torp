@@ -118,13 +118,11 @@ export default function Pagination($props: PaginationProps) {
 	function handleItemKey(e: KeyboardEvent) {
 		// TODO: Actually just change focus??
 		switch (e.key) {
-			case "Left":
 			case "ArrowLeft": {
 				toggleItem("previous");
 				e.preventDefault();
 				break;
 			}
-			case "Right":
 			case "ArrowRight": {
 				toggleItem("next");
 				e.preventDefault();

@@ -58,7 +58,6 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 
 	function handleKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Down":
 			case "ArrowDown":
 				// TODO: This should be based on what side the menu shows on
 				e.preventDefault();

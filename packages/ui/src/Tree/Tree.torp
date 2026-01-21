@@ -219,7 +219,6 @@ export default function Tree($props: TreeProps | undefined) {
 
 	function handleKey(index: number, e: KeyboardEvent) {
 		switch (e.key) {
-			case "Up":
 			case "ArrowUp": {
 				e.preventDefault();
 				let previousItem = getPreviousVisibleItem(index);
@@ -228,7 +227,6 @@ export default function Tree($props: TreeProps | undefined) {
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				e.preventDefault();
 				let nextItem = getNextVisibleItem(index);
@@ -237,7 +235,6 @@ export default function Tree($props: TreeProps | undefined) {
 				}
 				break;
 			}
-			case "Left":
 			case "ArrowLeft": {
 				e.preventDefault();
 				let currentItem = findItem(index);
@@ -251,7 +248,6 @@ export default function Tree($props: TreeProps | undefined) {
 				}
 				break;
 			}
-			case "Right":
 			case "ArrowRight": {
 				e.preventDefault();
 				let currentItem = findItem(index);

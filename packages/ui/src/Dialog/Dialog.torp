@@ -97,7 +97,6 @@ export default function Dialog($props: DialogProps | undefined) {
 
 	function handleKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Esc":
 			case "Escape": {
 				if (context.cancelButton) {
 					context.cancelButton.click();
