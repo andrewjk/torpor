@@ -1,5 +1,4 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { ToolBarPopoutContextName, type ToolBarPopoutContext } from "./ToolBarTypes";
 import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface ToolBarPopoutProps {
@@ -47,15 +46,10 @@ export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
 	});
 
 	let result: any;
-
-	// Set the context to pass down to items
-	let context: ToolBarPopoutContext = {
-		state: $state,
-	};
-	$context[ToolBarPopoutContextName] = context;
-
+	
 	// Set the context to pass down to items
 	let popoutContext: PopoutContext = {
+		// TODO:
 		handleButton: () => {},
 		state: $state,
 	};
@@ -73,7 +67,7 @@ export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
 		} else {
 			if (ontoggle) ontoggle(visible);
 			if (visible) {
-				if (onopen) onopen()
+				if (onopen) onopen();
 			} else {
 				if (onclose) onclose(result);
 			}

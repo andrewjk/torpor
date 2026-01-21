@@ -1,0 +1,9 @@
+import {
+	ToolBar,
+} from "../../../src/ToolBar";
+
+export default function ToolBarEmpty() {
+	@render {
+		<ToolBar ariaLabel="Empty toolbar" />
+	}
+}

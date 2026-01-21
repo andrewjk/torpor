@@ -1,0 +1,51 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "../../../src/Menu";
+
+export default function ToolBarPopoutTest() {
+	let visible1 = false;
+	let visible2 = false;
+
+	@render {
+		<ToolBar ariaLabel="Popout test toolbar">
+			<ToolBarButton>Button 1</ToolBarButton>
+			<ToolBarPopout visible={visible1} ontoggle={(open) => visible1 = open}>
+				<ToolBarPopoutTrigger hoverDelay={100}>Popout 1</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Popout menu 1">
+						<MenuButton>Item 1.1</MenuButton>
+						<MenuButton>Item 1.2</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+			<ToolBarButton>Button 2</ToolBarButton>
+			<ToolBarPopout visible={visible2} ontoggle={(open) => visible2 = open}>
+				<ToolBarPopoutTrigger>Popout 2</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Popout menu 2">
+						<MenuButton>Item 2.1</MenuButton>
+						<MenuButton>Item 2.2</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+			<ToolBarSeparator />
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger disabled>Disabled Popout</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Disabled menu">
+						<MenuButton>Disabled Item</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+}

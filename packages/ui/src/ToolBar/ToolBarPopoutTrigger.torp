@@ -1,9 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 import {
 	ToolBarContextName,
-	ToolBarPopoutContextName,
 	type ToolBarContext,
-	type ToolBarPopoutContext,
 } from "./ToolBarTypes";
 
 interface ToolBarPopoutTriggerProps {
@@ -24,6 +24,8 @@ interface ToolBarPopoutTriggerProps {
  *
  */
 export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps | undefined) {
+	let defaultId = getId();
+
 	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
@@ -34,17 +36,20 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 	if (!toolBarContext) {
 		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBar");
 	}
-	const { registerItem, handleItemKey, handleItemFocus } = toolBarContext;
+	const { registerItem, handleItemKey, handleItemFocus, handlePopout } = toolBarContext;
 
-	// Get stuff out of the ToolBarPopoutContext
-	const popoutContext = $context[ToolBarPopoutContextName] as ToolBarPopoutContext;
+	// Get stuff out of the PopoutContext
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	if (!popoutContext) {
 		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBarPopout");
 	}
-	let $state = popoutContext.state;
+	const { state: $state } = popoutContext;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent ToolBar and store the index
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem(setFocused, setVisible);
 
 	// TODO: $mount should be run AFTER the button has been set
 	//$mount(() => {
@@ -56,13 +61,17 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 		button.focus();
 	}
 
+	function setVisible(visible: boolean) {
+		$state.visible = visible;
+	}
+
 	function handleClick() {
-		$state.visible = true;
+		handlePopout(index);
+		$state.visible = !$state.visible;
 	}
 
 	function handlePopoutKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Right":
 			case "ArrowRight":
 				if (toolBarContext.orientation === "vertical") {
 					// TODO: This should be based on what side the menu shows on
@@ -70,7 +79,6 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 					$state.visible = true;
 				}
 				break;
-			case "Down":
 			case "ArrowDown":
 				if (toolBarContext.orientation === "horizontal") {
 					e.preventDefault();
@@ -118,8 +126,8 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 			{$props?.style}
 			type="button"
 			{$props?.disabled}
-			role="menuitem"
-			aria-haspopup="true"
+			aria-haspopup="menu"
+			aria-controls={popoutContext.contentId}
 			aria-expanded={$state.visible.toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-disabled={$props?.disabled ? "true" : undefined}

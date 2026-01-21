@@ -1,0 +1,34 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+} from "../../../src/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "../../../src/Menu";
+
+export default function ToolBarCallbacks() {
+	@render {
+		<ToolBar ariaLabel="Callbacks test toolbar">
+			<ToolBarButton>
+				Button
+			</ToolBarButton>
+			<ToolBarPopout
+				{$props?.ontoggle}
+				{$props?.onopen}
+				{$props?.onclose}
+			>
+				<ToolBarPopoutTrigger>Popout</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Popout menu">
+						<MenuButton>Item 1</MenuButton>
+						<MenuButton>Item 2</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+}

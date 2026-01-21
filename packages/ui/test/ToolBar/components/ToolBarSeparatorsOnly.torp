@@ -1,0 +1,14 @@
+import {
+	ToolBar,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+
+export default function ToolBarSeparatorsOnly() {
+	@render {
+		<ToolBar ariaLabel="Separators toolbar">
+			<ToolBarSeparator />
+			<ToolBarSeparator />
+			<ToolBarSeparator />
+		</ToolBar>
+	}
+}

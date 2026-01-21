@@ -1,0 +1,19 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarSeparator,
+	ToolBarElement
+} from "../../../src/ToolBar";
+
+export default function ToolBarEdgeCases() {
+	@render {
+		<ToolBar ariaLabel="Edge cases toolbar">
+			<ToolBarButton>Button</ToolBarButton>
+			<ToolBarSeparator />
+			<ToolBarSeparator />
+			<ToolBarButton disabled>Disabled</ToolBarButton>
+			<ToolBarElement>Element</ToolBarElement>
+			<ToolBarButton>Another Button</ToolBarButton>
+		</ToolBar>
+	}
+}

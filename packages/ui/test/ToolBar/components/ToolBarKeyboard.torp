@@ -1,0 +1,34 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "../../../src/Menu";
+
+export default function ToolBarKeyboard() {
+	@render {
+		<ToolBar ariaLabel="Keyboard test toolbar">
+			<ToolBarButton>Button 1</ToolBarButton>
+			<ToolBarButton>Button 2</ToolBarButton>
+			<ToolBarButton>Button 3</ToolBarButton>
+			<ToolBarSeparator />
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger>Popout 1</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Popout menu 1">
+						<MenuButton>Item 1.1</MenuButton>
+						<MenuButton>Item 1.2</MenuButton>
+						<MenuButton>Item 1.3</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+			<ToolBarButton>Button 4</ToolBarButton>
+		</ToolBar>
+	}
+}

@@ -9,19 +9,16 @@ export interface ToolBarContext {
 	/** Called from a ToolBarLink or ToolBarButton when a key is pressed */
 	handleItemKey: (e: KeyboardEvent) => void;
 
+	/** Called from a MenuButton when a submenu is shown */
+	handlePopout: (index: number) => void;
+
 	/** Called from each ToolBarLink or ToolBarButton to register itself with this ToolBar */
-	registerItem: (setFocused: () => void) => { index: number };
+	registerItem: (
+		setFocused: () => void,
+		setVisible?: (visible: boolean) => void,
+	) => { index: number };
 
 	orientation: "horizontal" | "vertical";
-}
-
-export interface ToolBarPopoutContext {
-	state: {
-		visible: boolean;
-	};
-	anchorElement?: HTMLElement;
-	focusFirstElement?: () => void;
-	focusLastElement?: () => void;
 }
 
 export interface ToolBarGroupContext {
@@ -31,5 +28,7 @@ export interface ToolBarGroupContext {
 }
 
 export interface ItemState {
+	index: number;
 	setFocused: () => void;
+	setVisible?: (visible: boolean) => void;
 }

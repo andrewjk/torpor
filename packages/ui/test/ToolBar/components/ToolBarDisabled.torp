@@ -1,0 +1,13 @@
+import {
+	ToolBar,
+	ToolBarButton,
+} from "../../../src/ToolBar";
+
+export default function ToolBarDisabled() {
+	@render {
+		<ToolBar ariaLabel="Test toolbar">
+			<ToolBarButton disabled>Disabled</ToolBarButton>
+			<ToolBarButton>Enabled</ToolBarButton>
+		</ToolBar>
+	}
+}

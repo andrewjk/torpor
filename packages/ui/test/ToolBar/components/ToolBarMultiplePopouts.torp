@@ -1,0 +1,36 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarPopout,
+	ToolBarPopoutTrigger,
+	ToolBarPopoutContent
+} from "../../../src/ToolBar";
+import {
+	Menu,
+	MenuButton,
+} from "../../../src/Menu";
+
+export default function ToolBarMultiplePopouts() {
+	@render {
+		<ToolBar ariaLabel="Test toolbar">
+			<ToolBarButton>Button 1</ToolBarButton>
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger>Popout 1</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Menu 1">
+						<MenuButton>Item 1.1</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+			<ToolBarButton>Button 2</ToolBarButton>
+			<ToolBarPopout>
+				<ToolBarPopoutTrigger>Popout 2</ToolBarPopoutTrigger>
+				<ToolBarPopoutContent>
+					<Menu ariaLabel="Menu 2">
+						<MenuButton>Item 2.1</MenuButton>
+					</Menu>
+				</ToolBarPopoutContent>
+			</ToolBarPopout>
+		</ToolBar>
+	}
+}

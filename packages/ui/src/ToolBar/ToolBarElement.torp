@@ -40,13 +40,10 @@ export default function ToolBarElement($props: ToolBarElementProps | undefined) 
 			{$props?.id}
 			class={["torp-tool-bar-div", $props?.class]}
 			{$props?.style}
-			type="div"
-			role="menuitem"
+			tabindex="0"
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown
 			onkeydown={handleItemKey}
-			onclick
 			onfocus={() => handleItemFocus(index)}
 		>
 			<slot />

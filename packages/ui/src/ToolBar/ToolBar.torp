@@ -1,10 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 import {
 	ToolBarContextName,
 	type ToolBarContext,
 	type ItemState,
-	ToolBarPopoutContextName,
-	type ToolBarPopoutContext
 } from "./ToolBarTypes";
 
 interface ToolBarProps {
@@ -44,7 +43,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 	let focusIndex = -1;
 
 	// Check whether this is a menu in a popout
-	const popoutContext = $context[ToolBarPopoutContextName] as ToolBarPopoutContext;
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	const inPopout = !!popoutContext;
 	let popoutState = popoutContext?.state;
 
@@ -59,6 +58,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 		handleItemFocus,
 		handleItemKey,
 		registerItem,
+		handlePopout,
 		orientation
 	};
 	$context[ToolBarContextName] = context;
@@ -82,14 +82,15 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 		}
 	}
 
-	function registerItem(setFocused: () => void) {
+	function registerItem(setFocused: () => void, setVisible?: (visible: boolean) => void) {
 		// Add the item's state to the array and return its index
-		const newItemState: ItemState = {
-			setFocused
+		const item: ItemState = {
+			index: itemStates.length,
+			setFocused,
+			setVisible,
 		};
-		itemStates.push(newItemState);
-		itemStates = itemStates;
-		return { index: itemStates.length - 1 };
+		itemStates.push(item);
+		return { index: item.index };
 	}
 
 	function handleItemFocus(index: number) {
@@ -98,7 +99,6 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 
 	function handleItemKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Esc":
 			case "Escape": {
 				if (inPopout) {
 					e.preventDefault();
@@ -107,7 +107,6 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 				}
 				break;
 			}
-			case "Right":
 			case "ArrowRight": {
 				if (orientation === "horizontal") {
 					e.preventDefault();
@@ -115,7 +114,6 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 				}
 				break;
 			}
-			case "Left":
 			case "ArrowLeft": {
 				if (orientation === "horizontal") {
 					e.preventDefault();
@@ -123,7 +121,6 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 				}
 				break;
 			}
-			case "Down":
 			case "ArrowDown": {
 				if (orientation === "vertical") {
 					e.preventDefault();
@@ -131,7 +128,6 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 				}
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
 				if (orientation === "vertical") {
 					e.preventDefault();
@@ -181,6 +177,15 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 		itemStates[focusIndex]?.setFocused();
 	}
 
+	function handlePopout(index: number) {
+		// Hide all other popouts
+		for (let item of itemStates) {
+			if (item.index !== index) {
+				item.setVisible?.(false);
+			}
+		}
+	}
+
 	@render {
 		<nav
 			{$props?.id}
@@ -189,7 +194,7 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 			tabindex="0"
 			role="toolbar"
 			aria-label={$props?.ariaLabel}
-			aria-orientation={orientation}
+			aria-orientation={orientation === "vertical" ? "vertical" : undefined}
 			onfocus={handleFocus}
 		>
 			<slot />

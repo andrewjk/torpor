@@ -1,0 +1,15 @@
+import {
+	ToolBar,
+	ToolBarButton,
+	ToolBarSeparator
+} from "../../../src/ToolBar";
+
+export default function ToolBarSep() {
+	@render {
+		<ToolBar ariaLabel="Test toolbar">
+			<ToolBarButton>Button 1</ToolBarButton>
+			<ToolBarSeparator />
+			<ToolBarButton>Button 2</ToolBarButton>
+		</ToolBar>
+	}
+}
