@@ -63,6 +63,7 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 
 	// HACK: We need to keep the items in the document so that we can search through them
 	@render {
+		@//if ($state.visible) {
 		<div
 			{$props?.id}
 			class={["torp-select-box-content", $props?.class, $state.visible ? undefined : "hidden"]}
@@ -73,6 +74,7 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 		>
 			<slot />
 		</div>
+		@//}
 	}
 
 	@style {
