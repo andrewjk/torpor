@@ -18,6 +18,7 @@ function gatherStyles(value: unknown, styles: string[]) {
 			}
 		} else if (typeof value === "object") {
 			for (let [n, v] of Object.entries(value)) {
+				if (v === null || v === undefined) continue;
 				const key = n.replace(
 					/[A-Z]+(?![a-z])|[A-Z]/g,
 					(char, i) => (i > 0 ? "-" : "") + char.toLowerCase(),
