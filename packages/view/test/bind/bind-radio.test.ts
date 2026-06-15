@@ -12,15 +12,15 @@ export default function BindRadio() {
 
 	@render {
 		<label>
-			<input type="radio" name="color" value="red" &value={$state.color} />
+			<input type="radio" name="color" value="red" &group={$state.color} />
 			Red
 		</label>
 		<label>
-			<input type="radio" name="color" value="green" &value={$state.color} />
+			<input type="radio" name="color" value="green" &group={$state.color} />
 			Green
 		</label>
 		<label>
-			<input type="radio" name="color" value="blue" &value={$state.color} />
+			<input type="radio" name="color" value="blue" &group={$state.color} />
 			Blue
 		</label>
 		<p>Selected: {$state.color}</p>

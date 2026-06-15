@@ -1,4 +1,3 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
@@ -28,8 +27,10 @@ test("onmount multiple elements -- mounted", async () => {
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
-	expect(queryByText(container, "Input: set by onmount")).not.toBeNull();
-	expect(queryByText(container, "Select: C")).not.toBeNull();
+	const input = container.getElementsByTagName("input")[0];
+	expect(input.value).toBe("set by onmount");
+	const select = container.getElementsByTagName("select")[0];
+	expect(select.value).toBe("C");
 });
 
 test("onmount multiple elements -- hydrated", async () => {
@@ -38,5 +39,6 @@ test("onmount multiple elements -- hydrated", async () => {
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	expect(queryByText(container, "Input: set by onmount")).not.toBeNull();
+	const input = container.getElementsByTagName("input")[0];
+	expect(input.value).toBe("set by onmount");
 });

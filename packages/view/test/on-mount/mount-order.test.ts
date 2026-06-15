@@ -7,27 +7,31 @@ import mountComponent from "../mountComponent";
 
 const source = `
 export default function MountOrder() {
-	let order: string[] = [];
+	let $state = $watch({ order: "" });
 
 	$mount(() => {
-		order.push("first");
+		(window as any).__mountLog.push("first");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	$mount(() => {
-		order.push("second");
+		(window as any).__mountLog.push("second");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	$mount(() => {
-		order.push("third");
+		(window as any).__mountLog.push("third");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	@render {
-		<p>Mount order: {order.join(", ")}</p>
+		<p>Mount order: {$state.order}</p>
 	}
 }
 `;
 
 test("mount order -- mounted", async () => {
+	(window as any).__mountLog = [];
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
@@ -36,6 +40,7 @@ test("mount order -- mounted", async () => {
 });
 
 test("mount order -- hydrated", async () => {
+	(window as any).__mountLog = [];
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");

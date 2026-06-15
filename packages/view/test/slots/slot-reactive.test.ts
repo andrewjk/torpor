@@ -7,14 +7,11 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function SlotReactive() {
-	let $state = $watch({ label: "Hello" });
-
+export default function SlotReactive($props: { label: string }) {
 	@render {
 		<Labeled>
-			<p>{$state.label}</p>
+			<p>{$props.label}</p>
 		</Labeled>
-		<button onclick={() => $state.label = "Updated"}>Update</button>
 	}
 }
 

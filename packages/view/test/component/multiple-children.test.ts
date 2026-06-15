@@ -7,17 +7,14 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function MultipleChildren() {
-	let $state = $watch({ text: "hello" });
-
+export default function MultipleChildren($props: { text: string }) {
 	@render {
 		<Card>
 			<h1>Title</h1>
 			<p>Body text</p>
 			<footer>Footer</footer>
 		</Card>
-		<button onclick={() => $state.text = "world"}>Change</button>
-		<p>{$state.text}</p>
+		<p>{$props.text}</p>
 	}
 }
 

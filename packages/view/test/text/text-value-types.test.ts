@@ -1,10 +1,14 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { afterEach, expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
+
+afterEach(() => {
+	document.body.innerHTML = "";
+});
 
 const source = `
 export default function TextValues($props: { str: string; num: number; bool: boolean; nullVal: null; undefVal: undefined; zero: number; negNum: number; nan: number }) {

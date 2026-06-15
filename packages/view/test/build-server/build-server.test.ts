@@ -1,6 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import fs from "node:fs";
+import path from "node:path";
 import { transform } from "sucrase";
 import { expect, test } from "vitest";
 import build from "../../src/compile/build";
@@ -11,11 +12,8 @@ test("build for the server and render to HTML", () => {
 	// each test is run in hydration mode
 	const state = { counter: 8 };
 
-	let path = "./test/build-server/components/IfNested.torp";
-	if (!fs.existsSync(path)) {
-		path = "./view/test/build-server/components/IfNested.torp";
-	}
-	const source = fs.readFileSync(path).toString();
+	const torpPath = path.join(__dirname, "components", "IfNested.torp");
+	const source = fs.readFileSync(torpPath).toString();
 
 	const parsed = parse(source);
 	expect(parsed.errors).toEqual([]);

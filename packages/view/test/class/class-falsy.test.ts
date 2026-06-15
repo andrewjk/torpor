@@ -7,11 +7,9 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function ClassFalsy() {
-	let $state = $watch({ a: true, b: false, c: 1, d: 0, e: "yes", f: "" });
-
+export default function ClassFalsy($props: { a: boolean; b: boolean; c: number; d: number; e: string; f: string }) {
 	@render {
-		<p class={{ a: $state.a, b: $state.b, c: $state.c, d: $state.d, e: $state.e, f: $state.f }}>
+		<p class={{ a: $props.a, b: $props.b, c: $props.c, d: $props.d, e: $props.e, f: $props.f }}>
 			Falsy values
 		</p>
 	}

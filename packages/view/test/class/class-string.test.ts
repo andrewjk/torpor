@@ -7,14 +7,12 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function ClassString() {
-	let $state = $watch({ size: "large", color: "red" });
-
+export default function ClassString($props: { size: string; color: string }) {
 	@render {
-		<p class={"box " + $state.size + " " + $state.color}>
+		<p class={"box " + $props.size + " " + $props.color}>
 			Concatenated
 		</p>
-		<p class={["tag", $state.size, $state.color].join(" ")}>
+		<p class={["tag", $props.size, $props.color].join(" ")}>
 			Joined
 		</p>
 	}

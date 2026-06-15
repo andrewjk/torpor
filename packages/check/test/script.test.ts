@@ -1,9 +1,13 @@
+import path from "node:path";
 import { expect, test } from "vitest";
 import check from "../src/check";
 import checkFile from "../src/checkFile";
 
+const testFolder = path.join(__dirname, "..", "test");
+const srcFolder = path.join(testFolder, "src");
+
 test("check folder", () => {
-	const errors = check("test").filter(
+	const errors = check(testFolder).filter(
 		(e) =>
 			e.message !== "Cannot find module '@torpor/view' or its corresponding type declarations.",
 	);
@@ -11,7 +15,7 @@ test("check folder", () => {
 });
 
 test("check file", () => {
-	const errors = checkFile("test/src/BadScript.torp").filter(
+	const errors = checkFile(path.join(srcFolder, "BadScript.torp")).filter(
 		(e) =>
 			e.message !== "Cannot find module '@torpor/view' or its corresponding type declarations.",
 	);
@@ -20,7 +24,7 @@ test("check file", () => {
 });
 
 test("check ts file", () => {
-	const errors = checkFile("test/src/bad.ts").filter(
+	const errors = checkFile(path.join(srcFolder, "bad.ts")).filter(
 		(e) =>
 			e.message !== "Cannot find module '@torpor/view' or its corresponding type declarations.",
 	);
