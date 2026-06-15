@@ -27,14 +27,6 @@ export default function runCleanups(effect: Effect): void {
 
 		const nextEffect: Effect = effectToClean.nextEffect!;
 
-		// If it's a child effect that has been triggered, clean it up
-		// and remove it from the list of effects to run (it may get
-		// re-created with the parent)
-		if (i !== 0 && effect.nextEffectToRun === effectToClean) {
-			effect.nextEffectToRun = effectToClean.nextEffectToRun;
-			effectToClean.nextEffect = effectToClean.nextEffectToRun = null;
-		}
-
 		effectToClean = nextEffect;
 	}
 }
