@@ -41,12 +41,19 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	let $state = context.state;
 	context.focusInput = focusInput;
 
+	// Fall back to context values (set by the parent ComboBox) when props
+	// are not explicitly provided to this input
+	let name = $props?.name !== undefined ? $props.name : context.name;
+	let placeholder = $props?.placeholder !== undefined ? $props.placeholder : context.placeholder;
+	let required = $props?.required !== undefined ? $props.required : context.required;
+	let ariaLabel = $props?.ariaLabel !== undefined ? $props.ariaLabel : context.ariaLabel;
+
 	function focusInput() {
 		input.focus();
 	}
 
 	function handleClick() {
-		//$state.visible = !$state.visible;
+		$state.visible = true;
 	}
 
 	function handleInput(e: InputEvent) {
@@ -69,7 +76,6 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 
 	function handleKey(e: KeyboardEvent) {
 		switch (e.key) {
-			case "Down":
 			case "ArrowDown": {
 				e.preventDefault();
 				$state.visible = true;
@@ -78,7 +84,6 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 				}
 				break;
 			}
-			case "Up":
 			case "ArrowUp": {
 				e.preventDefault();
 				$state.visible = true;
@@ -100,12 +105,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			case "Escape": {
 				if ($state.visible) {
 					e.preventDefault();
-					// NOTE: This may be too much of a departure from standards
-					if (context.searchText !== undefined && context.searchText !== "") {
-						context.searchText = "";
-					} else {
-						$state.visible = false;
-					}
+					$state.visible = false;
 				}
 				break;
 			}
@@ -118,16 +118,16 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			{$props?.id}
 			class={["torp-combo-box-input", $props?.class]}
 			{$props?.style}
-			{$props?.name}
-			&value={$state.value}
-			{$props?.placeholder}
-			{$props?.required}
+			{name}
+			&value={Array.isArray($state.value) ? $state.value.join(", ") : $state.value}
+			{placeholder}
+			{required}
 			aria-readonly
 			aria-controls={$state.contentId}
 			aria-activedescendant={$state.activeDescendant}
 			aria-expanded={$state.visible ? "true" : "false"}
-			aria-label={$props?.ariaLabel}
-			onchange={$props?.onchange}
+			aria-label={ariaLabel}
+			{$props?.onchange}
 			onclick={handleClick}
 			oninput={handleInput}
 			onkeydown={handleKey}

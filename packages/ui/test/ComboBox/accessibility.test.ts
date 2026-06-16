@@ -1,4 +1,4 @@
-import { queryByText } from "@testing-library/dom";
+import { fireEvent, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
@@ -13,10 +13,10 @@ describe("ComboBox", () => {
 
 		// Tests from https://www.w3.org/WAI/ARIA/apg/patterns/combobox/
 
-		const button = container.getElementsByTagName("button")[0];
+		const button = container.querySelector('input[role="combobox"]');
 		assert(button, "button not found");
 
-		const list = button.nextElementSibling;
+		const list = container.querySelector('.torp-combo-box-content');
 		expect(list).toHaveAttribute("aria-hidden", "true");
 
 		// The element that serves as an input and displays the combobox value has role combobox
@@ -45,10 +45,10 @@ describe("ComboBox", () => {
 		// combobox has aria-expanded set to false. When the popup element is
 		// visible, aria-expanded is set to true. Note that elements with role
 		// combobox have a default value for aria-expanded of false
-		// HACK: await userEvent.click(button); // hide
+		fireEvent(button, new KeyboardEvent("keydown", { key: "Escape" }));
 		expect(list).toHaveAttribute("aria-hidden", "true");
 		expect(button).toHaveAttribute("aria-expanded", "false");
-		await userEvent.click(button); // show
+		await userEvent.click(button);
 		expect(list).not.toHaveAttribute("aria-hidden");
 		expect(button).toHaveAttribute("aria-expanded", "true");
 
@@ -88,5 +88,115 @@ describe("ComboBox", () => {
 		//   string", appears inline after the input cursor in the combobox. The
 		//   inline completion string is visually highlighted and has a selected
 		//   state.
+	});
+
+	it("aria-label is set correctly", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, {
+			value: [1, 3],
+			ariaLabel: "Test label",
+		});
+
+		const button = container.querySelector('input[role="combobox"]');
+		assert(button, "button not found");
+
+		expect(button).toHaveAttribute("aria-label", "Test label");
+	});
+
+	it("aria-activedescendant updates when focus moves", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [1, 3] });
+
+		const button = container.querySelector('input[role="combobox"]');
+		assert(button, "button not found");
+
+		const item1 = queryByText(container, "Item 1");
+		assert(item1, "Item 1 not found");
+
+		await userEvent.click(button);
+
+		item1.focus();
+
+		expect(button).toHaveAttribute("aria-activedescendant", item1.id);
+	});
+
+	it("aria-selected updates on selection", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [] });
+
+		const item1 = queryByText(container, "Item 1");
+		const item2 = queryByText(container, "Item 2");
+		assert(item1, "Item 1 not found");
+		assert(item2, "Item 2 not found");
+
+		await userEvent.click(container.querySelector('input[role="combobox"]'));
+
+		expect(item1).toHaveAttribute("aria-selected", "false");
+		expect(item2).toHaveAttribute("aria-selected", "false");
+
+		await userEvent.click(item1);
+
+		await userEvent.click(container.querySelector('input[role="combobox"]'));
+
+		expect(item1).toHaveAttribute("aria-selected", "true");
+		expect(item2).toHaveAttribute("aria-selected", "false");
+	});
+
+	it("aria-multiselectable for multiple type", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [] });
+
+		const listbox = queryByText(container, "Item 1")?.parentElement;
+		assert(listbox, "listbox not found");
+
+		expect(listbox).toHaveAttribute("aria-multiselectable", "true");
+	});
+
+	it("aria-readonly attribute is present", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [] });
+
+		const button = container.querySelector('input[role="combobox"]');
+		assert(button, "button not found");
+
+		expect(button).toHaveAttribute("aria-readonly");
+	});
+
+	it("aria-expanded toggles correctly", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [] });
+
+		const button = container.querySelector('input[role="combobox"]');
+		assert(button, "button not found");
+
+		expect(button).toHaveAttribute("aria-expanded", "false");
+
+		await userEvent.click(button);
+		expect(button).toHaveAttribute("aria-expanded", "true");
+
+		await userEvent.click(document.body);
+		expect(button).toHaveAttribute("aria-expanded", "false");
+	});
+
+	it("aria-controls refers to listbox when visible", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ComboBoxAccessibility, { value: [] });
+
+		const button = container.querySelector('input[role="combobox"]');
+		assert(button, "button not found");
+
+		await userEvent.click(button);
+
+		const listbox = queryByText(container, "Item 1")?.parentElement;
+		assert(listbox, "listbox not found");
+
+		expect(button).toHaveAttribute("aria-controls", listbox.id);
 	});
 });

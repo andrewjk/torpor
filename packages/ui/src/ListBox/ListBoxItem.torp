@@ -80,6 +80,12 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 		context.toggleItem($state.value);
 	}
 
+	function handleFocus() {
+		if (context.setActiveDescendant) {
+			context.setActiveDescendant($state.id);
+		}
+	}
+
 	function handleKey(e: KeyboardEvent) {
 		switch (e.key) {
 			case "Enter": {
@@ -130,6 +136,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}
+			onfocus={handleFocus}
 			onmount={handleMount}
 			&ref={button}
 		>

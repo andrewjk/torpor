@@ -1,23 +1,20 @@
 import {
-	ListBox,
-	ListBoxItem,
-} from "../../../src/ListBox/index";
-import {
 	ComboBox,
-	ComboBoxInput,
 	ComboBoxContent,
+	ComboBoxInput,
+	ComboBoxTrigger,
 } from "../../../src/ComboBox/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ComboBoxMultiple($props: any) {
 	@render {
-		<ComboBox &value={$props.value}>
-			@// TODO: Something funny here with slot fallbacks:
+		<ComboBox &value={$props.value} {...$props}>
 			<ComboBoxInput>
 				{$props.value.join(", ")}
 			</ComboBoxInput>
+			<ComboBoxTrigger />
 			<ComboBoxContent>
-				@// TODO: Shouldn't have to set value here:
-				<ListBox type="multiple" value={$props.value}>
+				<ListBox type="multiple" {$props.value}>
 					<ListBoxItem>
 						Item 1
 					</ListBoxItem>

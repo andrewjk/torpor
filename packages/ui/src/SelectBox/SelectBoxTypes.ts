@@ -12,7 +12,7 @@ export interface SelectBoxContext {
 	focusFirstElement?: () => void;
 	focusLastElement?: () => void;
 	searchText?: string;
-	searchItems?: (searchText: string) => { setFocused: () => void } | undefined;
+	searchItems?: (searchText: string) => { id: string; setFocused: () => void } | undefined;
 }
 
 export interface SelectBoxState {

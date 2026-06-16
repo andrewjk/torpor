@@ -11,10 +11,10 @@ describe("ComboBox", () => {
 		document.body.appendChild(container);
 		mount(container, ComboBoxSingle, {});
 
-		const button = container.getElementsByTagName("button")[0];
-		assert(button, "button not found");
+		const input = container.getElementsByTagName("input")[0];
+		assert(input, "input not found");
 
-		await userEvent.click(button);
+		await userEvent.click(input);
 		expect(queryByText(container, "Item 1")).toBeInTheDocument();
 		expect(queryByText(container, "Item 2")).toBeInTheDocument();
 		expect(queryByText(container, "Item 3")).toBeInTheDocument();
@@ -25,16 +25,16 @@ describe("ComboBox", () => {
 
 		// Clicking item 1 should select item 1
 		await userEvent.click(getByText(container, "Item 1"));
-		expect(button.textContent.trim()).toBe("Item 1");
+		expect(input.value).toBe("Item 1");
 
-		await userEvent.click(button); // show
+		await userEvent.click(input); // show
 		expect(queryAllByText(container, "Item 1").at(-1)).toHaveAttribute("aria-selected", "true");
 
 		// Clicking item 2 should unselect item 1 and select item 2
 		await userEvent.click(getByText(container, "Item 2"));
-		expect(button.textContent.trim()).toBe("Item 2");
+		expect(input.value).toBe("Item 2");
 
-		await userEvent.click(button); // show
+		await userEvent.click(input); // show
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "false");
 		expect(queryAllByText(container, "Item 2").at(-1)).toHaveAttribute("aria-selected", "true");
 	});

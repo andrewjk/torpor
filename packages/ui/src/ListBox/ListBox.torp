@@ -101,6 +101,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		removeItem,
 		toggleItem,
 		handleKey,
+		setActiveDescendant: popoutContext ? (id) => { popoutContext.state.activeDescendant = id; } : undefined,
 	};
 	$context[ListBoxContextName] = context;
 

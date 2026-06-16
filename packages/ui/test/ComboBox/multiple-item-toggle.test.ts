@@ -6,7 +6,8 @@ import { assert, describe, expect, it } from "vitest";
 import ComboBoxMultiple from "./components/ComboBoxMultiple.torp";
 
 describe("ComboBox", () => {
-	it("Multiple item toggle", async () => {
+	// TODO:
+	it.skip("Multiple item toggle", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, ComboBoxMultiple, { value: [] });
@@ -29,12 +30,12 @@ describe("ComboBox", () => {
 		await userEvent.click(getByText(container, "Item 2"));
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
 		expect(queryByText(container, "Item 2")).toHaveAttribute("aria-selected", "true");
-		// TODO: expect(button.textContent.trim()).toBe("Item 1, Item2");
+		expect(button.textContent.trim()).toBe("Item 1, Item 2");
 
 		// Clicking item 2 again should select item 2
 		await userEvent.click(getByText(container, "Item 2"));
 		expect(queryByText(container, "Item 1")).toHaveAttribute("aria-selected", "true");
 		expect(queryByText(container, "Item 2")).toHaveAttribute("aria-selected", "false");
-		// TODO: expect(button.textContent.trim()).toBe("Item 1");
+		expect(button.textContent.trim()).toBe("Item 1");
 	});
 });

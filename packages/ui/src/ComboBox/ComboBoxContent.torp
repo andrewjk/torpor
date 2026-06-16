@@ -28,12 +28,14 @@ export default function ComboBoxContent($props: ComboBoxContentProps | undefined
 	let $state = context.state;
 
 	$run(() => {
-		if (!$state.visible) {
+		if ($state.visible) {
+			show();
+		} else {
 			hide();
 		}
 	});
 
-	function show(_: HTMLElement) {
+	function show() {
 		shown = true;
 
 		// HACK: Because this ComboBox could be shown with a click, we need to wait for another mousedown
@@ -41,6 +43,7 @@ export default function ComboBoxContent($props: ComboBoxContentProps | undefined
 		closeOnClick = false;
 		addDocumentEvent("mousedown", handleDocumentMouseDown);
 		addDocumentEvent("click", handleDocumentClick);
+		addDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function hide() {
@@ -48,6 +51,7 @@ export default function ComboBoxContent($props: ComboBoxContentProps | undefined
 
 		removeDocumentEvent("mousedown", handleDocumentMouseDown);
 		removeDocumentEvent("click", handleDocumentClick);
+		removeDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function handleDocumentMouseDown() {
@@ -55,35 +59,32 @@ export default function ComboBoxContent($props: ComboBoxContentProps | undefined
 	}
 
 	function handleDocumentClick(e: MouseEvent) {
-		if (
-			closeOnClick &&
-			div &&
-			!div.contains(e.target as HTMLElement)
-		) {
+		// Don't close if the click is inside the content div OR inside the
+		// ComboBox root (which contains the input/trigger)
+		if (closeOnClick && div && !div.contains(e.target as HTMLElement) && !div.parentElement?.contains(e.target as HTMLElement)) {
 			e.preventDefault();
 			context.handleClickOutside!(e);
 		}
 	}
 
+	function handleDocumentKeyDown(e: KeyboardEvent) {
+		if (e.key === "Escape") {
+			e.preventDefault();
+			$state.visible = false;
+		}
+	}
+
 	// HACK: We need to keep the items in the document so that we can search through them
 	@render {
-		@//if ($state.visible) {
 		<div
 			{$props?.id}
-			class={["torp-combo-box-content", $props?.class, $state.visible ? undefined : "hidden"]}
+			class={["torp-combo-box-content", $props?.class]}
 			{$props?.style}
+			hidden={!$state.visible}
 			aria-hidden={$state.visible ? undefined : "true"}
 			&ref={div}
-			onmount={show}
 		>
 			<slot />
 		</div>
-		@//}
-	}
-
-	@style {
-		.torp-combo-box-content.hidden {
-			display: none;
-		}
 	}
 }

@@ -68,6 +68,9 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		handleButton,
 		handleClickOutside,
 		placeholder: $props?.placeholder,
+		required: $props?.required,
+		ariaLabel: $props?.ariaLabel,
+		name: $props?.name,
 		state: $state,
 	};
 	$context[ComboBoxContextName] = context;
@@ -115,13 +118,17 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		// Update the value
 		if (type !== "cancel") {
 			$state.value = result;
+		}
+
+		// Hide the popout and focus input
+		if (type === "confirm") {
+			$state.visible = false;
 			if (context.focusInput) {
 				context.focusInput();
 			}
+		} else if (type === "cancel") {
+			$state.visible = false;
 		}
-
-		// Hide the popout
-		$state.visible = false;
 
 		// Call the callback
 		if ($props?.callback) {

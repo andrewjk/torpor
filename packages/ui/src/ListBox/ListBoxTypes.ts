@@ -12,6 +12,8 @@ export interface ListBoxContext {
 	toggleItem: (value: string) => void;
 	/** Called from a ListBoxItem when it receives a keyboard event */
 	handleKey: (index: number, e: KeyboardEvent) => void;
+	/** Called from a ListBoxItem when it receives focus */
+	setActiveDescendant?: (id: string) => void;
 }
 
 export interface ListBoxState {

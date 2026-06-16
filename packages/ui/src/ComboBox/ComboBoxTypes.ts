@@ -7,6 +7,9 @@ export interface ComboBoxContext {
 	// There may be a more elegant way to accomplish this too
 	handleClickOutside?: (e: MouseEvent) => void;
 	placeholder?: string;
+	required?: boolean;
+	ariaLabel?: string;
+	name?: string;
 	state: ComboBoxState;
 	focusInput?: () => void;
 	focusFirstElement?: () => void;
@@ -14,7 +17,7 @@ export interface ComboBoxContext {
 	markElement?: (id: string) => void;
 	selectMarkedElement?: () => void;
 	searchText?: string;
-	searchItems?: (searchText: string) => { id: string } | undefined;
+	searchItems?: (searchText: string) => { id: string; setFocused: () => void } | undefined;
 }
 
 export interface ComboBoxState {

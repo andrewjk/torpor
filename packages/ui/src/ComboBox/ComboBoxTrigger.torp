@@ -31,7 +31,8 @@ export default function ComboBoxTrigger($props: ComboBoxTriggerProps | undefined
 			{$props?.id}
 			class={["torp-combo-box-trigger", $props?.class]}
 			{$props?.style}
-			tabindex="-1"
+			aria-haspopup="listbox"
+			aria-expanded={$state.visible ? "true" : "false"}
 			onclick={handleClick}
 			&ref={context.anchorElement}
 		>
