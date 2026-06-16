@@ -1,5 +1,6 @@
 import * as prettier from "prettier";
 import { expect, test } from "vitest";
+import * as torporPlugin from "../src/index.ts";
 
 test("add spacing", async () => {
 	const code = `
@@ -628,7 +629,7 @@ export default function Counter() {
 async function prettierFormat(code: string) {
 	return await prettier.format(code, {
 		parser: "torpor-parser",
-		plugins: ["./src/index.ts"],
+		plugins: [torporPlugin],
 		printWidth: 100,
 		useTabs: true,
 	});
