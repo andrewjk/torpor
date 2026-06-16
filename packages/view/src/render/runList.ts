@@ -23,6 +23,11 @@ export default function runList(
 
 	// Run the list in an effect
 	$run(function runList() {
+		// If this region has been cleared (e.g. a parent @if switched to a
+		// different branch), skip the update — the list will be re-created
+		// when the parent branch re-renders
+		if (region.depth === -2) return;
+
 		const oldRegion = pushRegion(region, first);
 		first = false;
 

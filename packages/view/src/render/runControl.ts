@@ -18,6 +18,10 @@ export default function runControl(
 
 	// Run the control statement in an effect
 	$run(function runControl() {
+		// If this region has been cleared (e.g. a parent @if switched to a
+		// different branch), skip the update
+		if (region.depth === -2) return;
+
 		const oldRegion = pushRegion(region, first);
 		first = false;
 
