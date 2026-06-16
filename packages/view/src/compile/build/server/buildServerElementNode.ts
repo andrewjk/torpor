@@ -62,6 +62,15 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			//);
 		} else if (value != null && fullyReactive) {
 			if (name === "&value" || name === "&checked" || name === "&group") {
+				// <select multiple> doesn't use a value attribute; the client
+				// sets option.selected during hydration
+				if (
+					name === "&value" &&
+					node.tagName === "select" &&
+					node.attributes.some((a) => a.name === "multiple")
+				) {
+					continue;
+				}
 				let defaultValue = "";
 				let typeAttribute = node.attributes.find((a) => a.name === "type");
 				if (typeAttribute && typeAttribute.value) {

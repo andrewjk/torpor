@@ -337,6 +337,21 @@ function buildBindAttribute(
 		}
 	} else if (node.tagName === "select") {
 		eventName = "change";
+		// <select multiple> binds an array of selected option values
+		let multipleAttribute = node.attributes.find((a) => a.name === "multiple");
+		if (multipleAttribute) {
+			buildRun(
+				"setBinding",
+				`Array.from(${varName}.options).forEach((opt) => opt.selected = Array.isArray(${value}) && ${value}.includes(opt.value));`,
+				status,
+				b,
+			);
+			status.imports.add("t_event");
+			b.append(
+				`t_event(${varName}, "change", (e) => ${value} = Array.from(e.target.selectedOptions).map((opt) => opt.value));`,
+			);
+			return;
+		}
 	}
 	let set = `${value} || ${defaultValue}`;
 	const propName = name.substring(1);
