@@ -1,0 +1,22 @@
+import {
+	Pagination,
+	PaginationItem,
+} from "../../../src/Pagination/index";
+
+export default function PaginationWithTriggers() {
+	let $state = $watch({ number: 5 });
+
+	@render {
+		<Pagination count={20} &number={$state.number}>
+			<PaginationItem page="start">«</PaginationItem>
+			<PaginationItem page="previous">‹</PaginationItem>
+			@for (let page of $slot.pages) {
+				<PaginationItem page={page} active={$state.number === page}>
+					{page}
+				</PaginationItem>
+			}
+			<PaginationItem page="next">›</PaginationItem>
+			<PaginationItem page="end">»</PaginationItem>
+		</Pagination>
+	}
+}

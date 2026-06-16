@@ -1,4 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import ChevronDoubleLeft from "../icons/ChevronDoubleLeft.torp";
+import ChevronDoubleRight from "../icons/ChevronDoubleRight.torp";
+import ChevronLeft from "../icons/ChevronLeft.torp";
+import ChevronRight from "../icons/ChevronRight.torp";
 import { type PageNumber, type PaginationContext, PaginationContextName } from "./PaginationTypes";
 
 interface PaginationItemProps {
@@ -24,10 +28,28 @@ export default function PaginationItem($props: PaginationItemProps) {
 	if (!context) {
 		throw new Error("PaginationItem must be contained within a Pagination");
 	}
-	const { registerItem, /*removeItem,*/ toggleItem, handleItemKey } = context;
+	const { registerItem, removeItem, toggleItem, handleItemKey } = context;
 
 	// Register this item with the parent Pagination, which will handle setting this item's focus on keyboard events
 	registerItem($props.page, setActive, setFocused);
+
+	$run(() => {
+		return () => {
+			removeItem($props.page);
+		};
+	});
+
+	// Call ontoggle when the active state changes
+	let prevActive = $props.active ?? false;
+	$run(() => {
+		const active = $props.active ?? false;
+		if (active !== prevActive) {
+			prevActive = active;
+			if ($props?.ontoggle) {
+				$props.ontoggle(active);
+			}
+		}
+	});
 
 	// This function is called by the parent Pagination to set this item's active value
 	function setActive(value: boolean) {
@@ -64,6 +86,9 @@ export default function PaginationItem($props: PaginationItemProps) {
 				{$props?.id}
 				class={["torp-pagination-item", $props?.class]}
 				{$props?.style}
+				role="button"
+				aria-current="page"
+				aria-label={`Page ${$props.page}`}
 				data-state={$props.active ? "active" : "inactive"}
 			>
 				{$props.page}
@@ -73,6 +98,14 @@ export default function PaginationItem($props: PaginationItemProps) {
 				type="button"
 				{$props?.id}
 				class={["torp-pagination-item", $props?.class]}
+				aria-label={
+					$props.page === "start" ? "First page" :
+					$props.page === "previous" ? "Previous page" :
+					$props.page === "next" ? "Next page" :
+					$props.page === "end" ? "Last page" :
+					$props.page === "startgap" || $props.page === "endgap" ? "More pages" :
+					`Page ${$props.page}`
+				}
 				data-type={$props.page}
 				data-state={$props.active ? "active" : "inactive"}
 				&ref={button}
@@ -81,13 +114,13 @@ export default function PaginationItem($props: PaginationItemProps) {
 			>
 				<slot>
 					@if ($props.page === "start") {
-						<span>&lt;&lt;</span>
+						<ChevronDoubleLeft />
 					} else if ($props.page === "previous") {
-						<span>&lt;</span>
+						<ChevronLeft />
 					} else if ($props.page === "next") {
-						<span>&gt;</span>
+						<ChevronRight />
 					} else if ($props.page === "end") {
-						<span>&gt;&gt;</span>
+						<ChevronDoubleRight />
 					} else if ($props.page === "startgap" || $props.page === "endgap") {
 						<span>…</span>
 					} else {
