@@ -43,13 +43,7 @@ export default function runEffect(effect: Effect): void {
 	} finally {
 		// Set the active target back to what it was previously
 		context.activeTarget = oldActiveTarget;
-		// Merge this effect's extent (including descendants) back into the
-		// outer scope's extent. The outer scope's extent is oldExtent, and
-		// context.extent currently holds this effect's extent (1 + descendants).
-		// We add oldExtent to merge them, so that the parent effect's extent
-		// (set to context.extent after we return) includes this effect and its
-		// descendants.
-		context.extent += oldExtent;
+		context.extent += oldExtent - 1;
 
 		batchEnd();
 	}
