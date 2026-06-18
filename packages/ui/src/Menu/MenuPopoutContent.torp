@@ -1,6 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
 import setPopoverPosition from "../utils/setPopoverPosition";
-import { PopoutContextName, type PopoutContext } from "../utils/PopoutTypes";
 
 interface MenuPopoutContentProps {
 	/** An ID for the root element */
@@ -19,8 +21,11 @@ interface MenuPopoutContentProps {
  * The content that is displayed for a MenuPopout when it is open.
  */
 export default function MenuPopoutContent($props: MenuPopoutContentProps | undefined) {
+	const defaultId = getId();
+
 	let div: HTMLDivElement;
 	let shown = false;
+	let closeOnClick = false;
 
 	// Get stuff out of the PopoutContext
 	const popoutContext = $context[PopoutContextName] as PopoutContext;
@@ -28,6 +33,8 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 		throw new Error("MenuPopoutContent must be contained within a MenuPopout");
 	}
 	let $state = popoutContext.state;
+
+	$state.contentId = $props?.id ?? defaultId;
 
 	$run(() => {
 		if (!$state.visible) {
@@ -43,6 +50,13 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 		addEventListener("resize", setPosition);
 		addEventListener("scroll", setPosition);
 		popoutContext.focusFirstElement?.();
+
+		// HACK: Because this Menu could be shown with a click, we need to wait for another mousedown
+		// before we close on click. Otherwise the click immediately bubbles to the document
+		closeOnClick = false;
+		addDocumentEvent("mousedown", handleDocumentMouseDown);
+		addDocumentEvent("click", handleDocumentClick);
+		addDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function hide() {
@@ -54,6 +68,10 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 		if (popoutContext.anchorElement?.focus) {
 			popoutContext.anchorElement.focus();
 		}
+
+		removeDocumentEvent("mousedown", handleDocumentMouseDown);
+		removeDocumentEvent("click", handleDocumentClick);
+		removeDocumentEvent("keydown", handleDocumentKeyDown);
 	}
 
 	function setPosition() {
@@ -64,6 +82,25 @@ export default function MenuPopoutContent($props: MenuPopoutContentProps | undef
 		let side = $props?.side ?? "right";
 		let alignment = $props?.alignment ?? "start";
 		setPopoverPosition(popoutContext.anchorElement, div, side, alignment);
+	}
+
+	function handleDocumentMouseDown() {
+		closeOnClick = true;
+	}
+
+	function handleDocumentClick(e: MouseEvent) {
+		if (closeOnClick && div && !div.contains(e.target as HTMLElement)) {
+			e.preventDefault();
+			//context.handleClickOutside!(e);
+			$state.visible = false;
+		}
+	}
+
+	function handleDocumentKeyDown(e: KeyboardEvent) {
+		if (e.key === "Escape" && div && div.contains(e.target as HTMLElement)) {
+			e.preventDefault();
+			$state.visible = false;
+		}
 	}
 
 	@render {
