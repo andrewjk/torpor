@@ -11,45 +11,36 @@ import replaceForVarNames from "./replaceForVarNames";
 export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const htmlAnchorName = node.varName!;
 	const htmlParentName = node.parentName || htmlAnchorName + ".parentNode";
-	const htmlRegionName = nextVarName("html_region", status);
 
 	// HACK: I'm not actually sure we need this here (or in @replace, where I copied it from)
 	node = node.children[0] as ControlNode;
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_control");
-	status.imports.add("t_run_branch");
-	status.imports.add("t_push_region");
-	status.imports.add("t_pop_region");
+
+	const firstNodeVar = nextVarName("html_first", status);
+	const lastNodeVar = nextVarName("html_last", status);
 
 	b.append("");
-	b.append(`
-	/* @html */
-	const ${htmlRegionName} = t_region(${status.options.dev === true ? `"html"` : ""});
-	t_run_control(${htmlRegionName}, ${htmlAnchorName}, (t_before) => {`);
+	b.append(`/* @html */`);
+	b.append(`let ${firstNodeVar}: ChildNode | null = null;`);
+	b.append(`let ${lastNodeVar}: ChildNode | null = null;`);
+	b.append(`t_run_control(t_region(), ${htmlAnchorName}, (t_before) => {`);
 
-	buildHtmlBranch(node, status, b, htmlParentName, htmlRegionName);
-
-	b.append(`}${status.options.dev === true ? ', "html"' : ""});`);
-	b.append("");
-}
-
-function buildHtmlBranch(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	regionName: string,
-) {
-	status.imports.add("t_run_branch");
-
+	// Read the html expression (for reactivity tracking)
 	b.append(`${replaceForVarNames(node.statement, status)};`);
-	b.append(`if (!t_run_branch(${regionName}, 0, -1)) return;`);
 
-	b.append(`
-		const t_new_region = t_region(${status.options.dev === true ? `"html_branch"` : ""});
-		const t_old_region = t_push_region(t_new_region, true);
-	`);
+	// Clear previously rendered content
+	b.append(`if (${firstNodeVar} !== null && ${lastNodeVar} !== null) {`);
+	b.append(`let t_node: ChildNode | null = ${lastNodeVar};`);
+	b.append(`while (t_node !== null && t_node !== ${firstNodeVar}) {`);
+	b.append(`const t_prev = t_node.previousSibling;`);
+	b.append(`t_node.remove();`);
+	b.append(`t_node = t_prev;`);
+	b.append(`}`);
+	b.append(`if (${firstNodeVar}) ${firstNodeVar}.remove();`);
+	b.append(`${firstNodeVar} = ${lastNodeVar} = null;`);
+	b.append(`}`);
 
 	const templateName = nextVarName("template", status);
 	const fragmentName = `t_fragment_${node.fragment!.number}`;
@@ -66,8 +57,25 @@ function buildHtmlBranch(
 		b,
 	);
 	b.append(`let ${fragmentName} = ${templateName}.content.cloneNode(true) as DocumentFragment;`);
+	b.append(`${firstNodeVar} = ${fragmentName}.firstChild;`);
+	b.append(`${lastNodeVar} = ${fragmentName}.lastChild;`);
 
-	buildAddFragment(node, status, b, parentName, "t_before");
+	buildAddFragment(node, status, b, htmlParentName, "t_before");
 
-	b.append("t_pop_region(t_old_region);");
+	// During hydration the fragment isn't inserted, so adopt the existing
+	// server-rendered nodes from the DOM instead
+	b.append(`if (${firstNodeVar} !== null && ${firstNodeVar}.parentNode !== ${htmlParentName}) {`);
+	b.append(`${lastNodeVar} = ${htmlAnchorName}.previousSibling as ChildNode | null;`);
+	b.append(`if (${lastNodeVar} !== null) {`);
+	b.append(`${firstNodeVar} = ${lastNodeVar};`);
+	b.append(`let t_scan: ChildNode | null = ${lastNodeVar};`);
+	b.append(`while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== ${htmlAnchorName} && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {`);
+	b.append(`t_scan = t_scan.previousSibling;`);
+	b.append(`}`);
+	b.append(`${firstNodeVar} = t_scan;`);
+	b.append(`}`);
+	b.append(`}`);
+
+	b.append(`}${status.options.dev === true ? ', "html"' : ""});`);
+	b.append("");
 }
