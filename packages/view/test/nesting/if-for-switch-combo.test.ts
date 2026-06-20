@@ -87,14 +87,14 @@ function check(container: HTMLElement, state: Props) {
 	expect(ems[0]).toHaveTextContent("[low] Clean up");
 
 	state.filter = "done";
-	expect(queryByText(container, "Fix bug")).toBeNull();
-	expect(queryByText(container, "Clean up")).toBeNull();
-	expect(queryByText(container, "Write docs")).not.toBeNull();
+	expect(queryByText(container, "[HIGH] Fix bug")).toBeNull();
+	expect(queryByText(container, "[low] Clean up")).toBeNull();
+	expect(queryByText(container, "[med] Write docs")).not.toBeNull();
 
 	state.filter = "pending";
-	expect(queryByText(container, "Write docs")).toBeNull();
-	expect(queryByText(container, "Fix bug")).not.toBeNull();
-	expect(queryByText(container, "Clean up")).not.toBeNull();
+	expect(queryByText(container, "[med] Write docs")).toBeNull();
+	expect(queryByText(container, "[HIGH] Fix bug")).not.toBeNull();
+	expect(queryByText(container, "[low] Clean up")).not.toBeNull();
 
 	state.filter = "all";
 	state.todos = [];
@@ -102,5 +102,5 @@ function check(container: HTMLElement, state: Props) {
 
 	state.todos = [{ text: "New task", done: false, priority: "high" }];
 	expect(queryByText(container, "No todos")).toBeNull();
-	expect(queryByText(container, "New task")).not.toBeNull();
+	expect(queryByText(container, "[HIGH] New task")).not.toBeNull();
 }
