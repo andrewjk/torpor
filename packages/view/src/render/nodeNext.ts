@@ -18,7 +18,16 @@ export default function nodeNext(node: ChildNode, text = false): ChildNode {
 			return node;
 		}
 
-		return nodeCheckHydrationBreak(node.nextSibling)!;
+		let next = nodeCheckHydrationBreak(node.nextSibling);
+
+		// When seeking non-text nodes during hydration, skip past whitespace-only
+		// text nodes and any trailing break markers, so callers land on the
+		// expected element node rather than an intervening text node
+		while (!text && next !== null && isTextNode(next) && next.textContent?.trim() === "") {
+			next = nodeCheckHydrationBreak(next.nextSibling);
+		}
+
+		return next!;
 	}
 
 	// NOTE: We know this is not null as it is being called from generated code
