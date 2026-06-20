@@ -17,10 +17,11 @@ export default function clearRegion(region: Region): void {
 			animations ??= [];
 			animations.push(...childRegion.animations);
 		}
+		const nextChild = childRegion.nextRegion;
 		releaseRegion(childRegion);
 		// HACK: see runControlBranch
 		childRegion.depth = -2;
-		childRegion = childRegion.nextRegion;
+		childRegion = nextChild;
 	}
 	region.nextRegion = childRegion;
 
@@ -63,6 +64,7 @@ function clearNodes(region: Region) {
 }
 
 function releaseRegion(region: Region) {
+	(region as any).generation = -1;
 	region.startNode = null;
 	region.endNode = null;
 	region.previousRegion = null;
