@@ -2,6 +2,7 @@ import $run from "../../../../src/watch/$run";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
 import t_dynamic from "../../../../src/render/setDynamicElement";
+import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
@@ -27,6 +28,9 @@ export default function SpecialElementAttrs(
 	const t_text_2 = t_next(t_element_1, true);
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
+	});
+	$run(() => {
+		t_text_1.textContent = ` ${t_fmt($props.content)} `;
 	});
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
 	t_next(t_text_2);

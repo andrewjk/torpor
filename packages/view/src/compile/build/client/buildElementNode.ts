@@ -69,23 +69,13 @@ function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Buil
 
 		b.append("$run(() => {");
 		b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
-
-		let parentName = node.varName;
-
-		buildFragment(node, status, b, parentName!, "null");
-
-		status.fragmentStack.push({
-			fragment: node.fragment,
-			path: "",
-		});
-		for (let child of node.children) {
-			buildNode(child, status, b, parentName!, "null");
-		}
-		status.fragmentStack.pop();
-
-		buildAddFragment(node, status, b, parentName!, "null");
-
 		b.append(`}${status.options.dev === true ? `, "setDynamic"` : ""});`);
+
+		// Process children with the existing fragment stack (parent's fragment),
+		// so text content effects are properly stashed and emitted by the parent
+		for (let child of node.children) {
+			buildNode(child, status, b, node.varName, "null");
+		}
 	}
 }
 
