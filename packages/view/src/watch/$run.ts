@@ -1,4 +1,5 @@
 import devContext from "../dev/devContext";
+import context from "../render/context";
 import type Cleanup from "../types/Cleanup";
 import type Effect from "../types/Effect";
 import { EFFECT_TYPE } from "../types/constants";
@@ -23,6 +24,13 @@ export default function $run(fn: () => Cleanup | void, name?: string): Effect {
 		didError: false,
 		name,
 	};
+
+	// Track the effect on the current active region, so it can be
+	// cleaned up when the region is cleared
+	const region = context.activeRegion;
+	if (region !== null) {
+		region.effects.push(effect);
+	}
 
 	// DEV:
 	devContext.onRun(effect);

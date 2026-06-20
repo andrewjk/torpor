@@ -9,5 +9,6 @@ export default function newRegion(name?: string): Region {
 		depth: -1,
 		animations: null,
 		name,
+		effects: [],
 	};
 }

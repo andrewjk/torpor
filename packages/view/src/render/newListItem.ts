@@ -15,5 +15,6 @@ export default function newListItem(
 		name,
 		data,
 		key,
+		effects: [],
 	};
 }

@@ -70,4 +70,13 @@ function releaseRegion(region: Region) {
 	region.previousRegion = null;
 	region.nextRegion = null;
 	region.animations = null;
+
+	// Clean up effects owned by this region
+	for (const effect of region.effects) {
+		if (typeof effect.cleanup === "function") {
+			effect.cleanup();
+			effect.cleanup = undefined;
+		}
+	}
+	region.effects.length = 0;
 }

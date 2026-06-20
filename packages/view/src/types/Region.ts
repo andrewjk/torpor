@@ -1,3 +1,5 @@
+import type Effect from "./Effect";
+
 export default interface Region {
 	startNode: ChildNode | null;
 	endNode: ChildNode | null;
@@ -16,4 +18,9 @@ export default interface Region {
 	 * The name of the region, for debugging.
 	 */
 	name?: string;
+
+	/**
+	 * Effects that are owned by this region.
+	 */
+	effects: Effect[];
 }
