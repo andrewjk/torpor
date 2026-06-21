@@ -27,6 +27,22 @@ export default function nodeNext(node: ChildNode, text = false): ChildNode {
 			next = nodeCheckHydrationBreak(next.nextSibling);
 		}
 
+		// Descend through auto-inserted <tbody> elements. The HTML parser
+		// wraps <tr> elements in <tbody> automatically, which shifts the
+		// hydration cursor one level deeper than the fragment template expects.
+		// Only do this when navigating from a text node (root → element pattern
+		// in generated code), not from comment nodes (e.g. inside nodeAnchor)
+		if (
+			!text &&
+			next !== null &&
+			next.nodeName === "TBODY" &&
+			next.firstChild &&
+			isTextNode(node)
+		) {
+			next = next.firstChild;
+			context.hydrationNode = next;
+		}
+
 		return next!;
 	}
 
