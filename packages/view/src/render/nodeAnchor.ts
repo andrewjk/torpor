@@ -20,12 +20,19 @@ import nodeNext from "./nodeNext";
 export default function nodeAnchor(node: ChildNode): ChildNode {
 	if (context.hydrationNode !== null) {
 		if (isCommentNode(node) && node.data === HYDRATION_START) {
+			// Save the parent before removing the node, so we know when to
+			// stop walking up the tree during document-order traversal
+			const startParent = node.parentNode;
+
 			// Skip and remove the start node, setting the hydration node in
 			// nodeNext
 			let currentNode = nodeNext(node);
 			node.remove();
 
-			// Go through siblings until we get to the end
+			// Go through nodes in document order until we get to the end.
+			// We use document order (descending into child elements) rather
+			// than just siblings, because the HTML parser may move hydration
+			// markers into auto-inserted elements (e.g. <tbody> inside <table>)
 			let level = 1;
 			while (currentNode !== null) {
 				if (isCommentNode(currentNode)) {
@@ -53,7 +60,31 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 						}
 					}
 				}
-				currentNode = currentNode.nextSibling!;
+				// Document-order traversal: descend into children first,
+				// then try siblings. When siblings are exhausted, walk up
+				// to ancestors (but not past startParent) and try their siblings
+				if (currentNode.firstChild) {
+					currentNode = currentNode.firstChild;
+				} else if (currentNode.nextSibling) {
+					currentNode = currentNode.nextSibling;
+				} else {
+					// No children and no next sibling: walk up to find an
+					// ancestor that has a next sibling
+					let parent: Node | null = currentNode.parentNode;
+					while (
+						parent !== null &&
+						parent.nextSibling === null &&
+						parent !== startParent
+					) {
+						parent = parent.parentNode;
+					}
+					// Don't go past startParent
+					if (parent === null || parent === startParent) {
+						currentNode = null;
+					} else {
+						currentNode = parent.nextSibling;
+					}
+				}
 			}
 
 			if (currentNode === null) {
