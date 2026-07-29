@@ -27,6 +27,7 @@ import type ListItem from "../types/ListItem";
 import type Region from "../types/Region";
 import $watch from "../watch/$watch";
 import clearRegion from "./clearRegion";
+import context from "./context";
 import moveRegion from "./moveRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
@@ -114,10 +115,12 @@ export default function runListItems(
 			if (oldIndex === undefined && newIndex === undefined) {
 				// Replace
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
+				const savedPrevious = context.previousRegion;
 				const oldRegion = pushRegion(newStartItem, true);
 				newStartItem.data = $watch(newStartItem.data, { shallow: true });
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
+				context.previousRegion = savedPrevious;
 				newStartItem.previousRegion = oldStartItem.previousRegion;
 				newStartItem.nextRegion = oldStartItem;
 				oldStartItem.previousRegion = newStartItem;
@@ -187,6 +190,7 @@ function transferListItemData(
 ) {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
+	newItem.depth = oldItem.depth;
 
 	// Manually transfer the new data's props to the old ones (to run effects)
 	// and then set the new data to the old one
