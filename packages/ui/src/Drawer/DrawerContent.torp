@@ -3,6 +3,8 @@ import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
 import { type DrawerContext, DrawerContextName } from "./DrawerTypes";
 
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 interface DrawerContentProps {
 	/** An ID for the root element */
 	id?: string;
@@ -42,6 +44,14 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 	function show() {
 		shown = true;
 
+		// Focus the first focusable element in the drawer for accessibility
+		if (drawer) {
+			const firstFocusable = drawer.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+			if (firstFocusable) {
+				firstFocusable.focus();
+			}
+		}
+
 		// HACK: Because this Drawer could be shown with a click, we need to wait for another mousedown
 		// before we close on click. Otherwise the click immediately bubbles to the document
 		closeOnClick = false;
@@ -56,6 +66,9 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		removeDocumentEvent("mousedown", handleDocumentMouseDown);
 		removeDocumentEvent("click", handleDocumentClick);
 		removeDocumentEvent("keydown", handleDocumentKeyDown);
+		if (context.focusTrigger) {
+			context.focusTrigger();
+		}
 	}
 
 	function handleDocumentMouseDown() {
@@ -69,11 +82,39 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 		}
 	}
 
+	function trapFocus(e: KeyboardEvent) {
+		if (e.key !== "Tab") return;
+
+		if (!drawer) return;
+
+		const focusableElements = drawer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
+		if (focusableElements.length === 0) {
+			e.preventDefault();
+			return;
+		}
+
+		const firstElement = focusableElements[0];
+		const lastElement = focusableElements[focusableElements.length - 1];
+
+		if (e.shiftKey) {
+			if (document.activeElement === firstElement) {
+				e.preventDefault();
+				lastElement.focus();
+			}
+		} else {
+			if (document.activeElement === lastElement) {
+				e.preventDefault();
+				firstElement.focus();
+			}
+		}
+	}
+
 	function handleDocumentKeyDown(e: KeyboardEvent) {
 		if (e.key === "Escape") {
 			e.preventDefault();
 			$state.visible = false;
 		}
+		trapFocus(e);
 	}
 
 	@render {

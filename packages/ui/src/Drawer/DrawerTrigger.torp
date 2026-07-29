@@ -24,7 +24,10 @@ export default function DrawerTrigger($props: DrawerTriggerProps | undefined) {
 	}
 	let $state = context.state;
 
+	let button: HTMLButtonElement;
+
 	$state.triggerId = $props?.id ?? defaultId;
+	context.focusTrigger = () => button.focus();
 
 	function handleClick() {
 		$state.visible = !$state.visible;
@@ -40,6 +43,7 @@ export default function DrawerTrigger($props: DrawerTriggerProps | undefined) {
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-haspopup="dialog"
 			aria-controls={$state.contentId}
+			&ref={button}
 		>
 			<slot />
 		</button>

@@ -15,6 +15,7 @@ export interface DrawerContext {
 	// 3. set focus (for accessibility)
 	// There may be a more elegant way to accomplish this!
 	focusFirstElement?: () => void;
+	focusTrigger?: () => void;
 }
 
 export interface DrawerState {
