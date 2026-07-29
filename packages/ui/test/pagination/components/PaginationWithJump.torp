@@ -1,0 +1,30 @@
+import {
+	Pagination,
+	PaginationItem,
+} from "../../../src/Pagination/index";
+
+export default function PaginationWithJump() {
+	let $state = $watch({ number: 5, jumpedTo: 0 });
+
+	function handleJump(targetPage: number, jumpTo: (page: number) => void) {
+		jumpTo(targetPage + 10);
+		$state.jumpedTo = targetPage + 10;
+	}
+
+	@render {
+		<div>
+			<Pagination count={100} number={$state.number} maxPages={7} onjump={handleJump}>
+				<PaginationItem page="start" active={$state.number === 1}>«</PaginationItem>
+				<PaginationItem page="previous" active={$state.number === 1}>‹</PaginationItem>
+				@for (let page of $slot.pages) {
+					<PaginationItem page={page} active={$state.number === page}>
+						{page}
+					</PaginationItem>
+				}
+				<PaginationItem page="next" active={$state.number === 100}>›</PaginationItem>
+				<PaginationItem page="end" active={$state.number === 100}>»</PaginationItem>
+			</Pagination>
+			<div id="jumped-to">{$state.jumpedTo}</div>
+		</div>
+	}
+}

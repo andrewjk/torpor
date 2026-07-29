@@ -44,12 +44,16 @@ export default function buildPages(
 		// Replace numbers at the start and end with ellipses if necessary
 		if (numbers[0] !== 1) {
 			numbers[0] = 1;
+			//if (numbers.length > 1) {
 			numbers[1] = "startgap";
+			//}
 		}
 		const l = numbers.length;
 		if (numbers[l - 1] !== pageCount) {
 			numbers[l - 1] = pageCount;
+			//if (l > 2) {
 			numbers[l - 2] = "endgap";
+			//}
 		}
 
 		return numbers;

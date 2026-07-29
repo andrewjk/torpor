@@ -22,6 +22,10 @@ interface PaginationProps {
 	pageSize?: number;
 	/** The maximum number of pages to display (gaps will be indicated with ellipses) **/
 	maxPages?: number;
+	/** Accessible label for the pagination navigation */
+	"aria-label"?: string;
+	/** Called when a user wants to jump to a specific page (e.g., via ellipsis) */
+	onjump?: (targetPage: number, jumpTo: (page: number) => void) => void;
 }
 
 /**
@@ -34,8 +38,6 @@ export default function Pagination($props: PaginationProps) {
 		},
 	});
 
-	// TODO: Do we actually need ItemStates when we're creating the item collection ourselves??
-	// A collection containing the active state and some functions for each item
 	let itemStates: ItemState[] = [];
 
 	// Put stuff into a PaginationContext
@@ -44,6 +46,9 @@ export default function Pagination($props: PaginationProps) {
 		removeItem,
 		toggleItem,
 		handleItemKey,
+		jumpToPage: (page: number) => {
+			$props.number = Math.max(1, Math.min($props.count, page));
+		},
 	};
 	$context[PaginationContextName] = context;
 
@@ -90,9 +95,8 @@ export default function Pagination($props: PaginationProps) {
 			}
 			case "startgap":
 			case "endgap": {
-				let input = prompt("Go to page:");
-				if (input) {
-					$props.number = parseInt(input);
+				if ($props.onjump) {
+					$props.onjump($props.number, context.jumpToPage);
 				}
 				break;
 			}
@@ -116,7 +120,6 @@ export default function Pagination($props: PaginationProps) {
 	}
 
 	function handleItemKey(e: KeyboardEvent) {
-		// TODO: Actually just change focus??
 		switch (e.key) {
 			case "ArrowLeft": {
 				toggleItem("previous");
@@ -147,6 +150,8 @@ export default function Pagination($props: PaginationProps) {
 				{$props?.id}
 				class={["torp-pagination", $props?.class]}
 				{$props?.style}
+				role="navigation"
+				aria-label={$props["aria-label"] ?? "Pagination"}
 				tabindex="0"
 				onfocus={handleFocus}
 			>

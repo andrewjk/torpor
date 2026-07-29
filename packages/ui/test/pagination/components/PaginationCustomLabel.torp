@@ -1,0 +1,18 @@
+import {
+	Pagination,
+	PaginationItem,
+} from "../../../src/Pagination/index";
+
+export default function PaginationCustomLabel() {
+	let $state = $watch({ number: 1 });
+
+	@render {
+		<Pagination count={10} number={$state.number} ariaLabel="Custom Pagination">
+			@for (let page of $slot.pages) {
+				<PaginationItem page={page} active={$state.number === page}>
+					{page}
+				</PaginationItem>
+			}
+		</Pagination>
+	}
+}

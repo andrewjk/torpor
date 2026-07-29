@@ -13,6 +13,7 @@ export interface PaginationContext {
 	removeItem: (target: PageNumber) => void;
 	toggleItem: (target: PageNumber) => void;
 	handleItemKey: (e: KeyboardEvent) => void;
+	jumpToPage: (page: number) => void;
 }
 
 export interface ItemState {

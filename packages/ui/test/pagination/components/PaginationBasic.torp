@@ -1,0 +1,18 @@
+import {
+	Pagination,
+	PaginationItem,
+} from "../../../src/Pagination/index";
+
+export default function PaginationBasic() {
+	let $state = $watch({ number: 1 });
+
+	@render {
+		<Pagination count={10} number={$state.number} maxPages={10}>
+			@for (let page of $slot.pages) {
+				<PaginationItem page={page} active={$state.number === page}>
+					{page}
+				</PaginationItem>
+			}
+		</Pagination>
+	}
+}

@@ -26,10 +26,16 @@ export default function PaginationTrigger($props: PaginationTriggerProps) {
 	if (!context) {
 		throw new Error("PaginationTrigger must be contained within a Pagination");
 	}
-	const { registerItem, /*removeItem,*/ toggleItem, handleItemKey } = context;
+	const { registerItem, removeItem, toggleItem, handleItemKey } = context;
 
 	// Register this item with the parent Pagination, which will handle setting this item's focus on keyboard events
 	registerItem($props.page, () => {}, setFocused);
+
+	$run(() => {
+		return () => {
+			removeItem($props.page);
+		};
+	});
 
 	// This function is called by the parent Pagination to focus this item's button
 	function setFocused() {
@@ -53,6 +59,13 @@ export default function PaginationTrigger($props: PaginationTriggerProps) {
 			{$props?.id}
 			class={["torp-pagination-trigger", $props?.class]}
 			{$props?.disabled}
+			aria-label={
+				$props.page === "start" ? "First page" :
+				$props.page === "previous" ? "Previous page" :
+				$props.page === "next" ? "Next page" :
+				$props.page === "end" ? "Last page" : ""
+			}
+			aria-disabled={$props.disabled ? "true" : undefined}
 			data-type={$props.page}
 			&ref={button}
 			onclick={handleClick}
