@@ -42,20 +42,15 @@ export default function addFragment(
 			context.mountEffects.length = 0;
 		}
 
-		// Set the active region for each event so it will get attached to the
-		// right one and set it back afterwards
+		// Add event listeners directly to elements. These are not tied to
+		// region lifecycle — when an element is removed from the DOM, its
+		// listeners are garbage collected. This avoids a bug where event
+		// listeners on sibling items were incorrectly cleaned up during
+		// @for keyed list reconciliation.
 		if (context.stashedEvents.length > 0) {
-			const events = [...context.stashedEvents];
-			$run(function addFragmentEvents() {
-				for (let event of events) {
-					event.el.addEventListener(event.type, event.listener);
-				}
-				return () => {
-					for (let event of events) {
-						event.el.removeEventListener(event.type, event.listener);
-					}
-				};
-			});
+			for (let event of context.stashedEvents) {
+				event.el.addEventListener(event.type, event.listener);
+			}
 			context.stashedEvents.length = 0;
 		}
 
