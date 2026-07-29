@@ -1,0 +1,1202 @@
+{
+  "suite": "portal-swarm",
+  "iterations": 20,
+  "targets": [
+    {
+      "name": "octane-tsrx",
+      "ops": {
+        "mount_closed": {
+          "score": 3.225000023841858,
+          "median": 3.200000047683716,
+          "min": 3.0999999046325684,
+          "mean": 3.250000023841858,
+          "p95": 3.4000000953674316,
+          "sd": 0.07608860092035301,
+          "rme": 1.0956969807337247,
+          "scoreRme": 1.2001972428267256,
+          "warmupRatio": 1.0193798448179685,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 1.487500011920929,
+          "median": 1.5,
+          "min": 1.2999999523162842,
+          "mean": 1.4550000429153442,
+          "p95": 1.6000001430511475,
+          "sd": 0.09986827682627256,
+          "rme": 3.2123198457753923,
+          "scoreRme": 6.329425179122647,
+          "warmupRatio": 0.9411765271581399,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.0012499988079071045,
+          "median": 0,
+          "min": 0,
+          "mean": 0.0035000002384185797,
+          "p95": 0.010000014305114746,
+          "sd": 0.0048936051826515455,
+          "rme": 65.43574992639896,
+          "scoreRme": 236.50000000000003,
+          "warmupRatio": 4.0000047683761295,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.002499997615814209,
+          "median": 0,
+          "min": 0,
+          "mean": 0.0035000002384185797,
+          "p95": 0.010000014305114746,
+          "sd": 0.0048936051826515455,
+          "rme": 65.43574992639896,
+          "scoreRme": 154.82559312243663,
+          "warmupRatio": 1.5000023841880648,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.0012499988079071045,
+          "median": 0,
+          "min": 0,
+          "mean": 0.005,
+          "p95": 0.020000004768371583,
+          "sd": 0.006069770200143812,
+          "rme": 56.814144993506545,
+          "scoreRme": 236.50000000000003,
+          "warmupRatio": 2.0000023841880648,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 1.7074999928474426,
+          "median": 1.7400000095367432,
+          "min": 1.6199999809265138,
+          "mean": 1.7399999999999998,
+          "p95": 1.8799999713897706,
+          "sd": 0.06743418260214212,
+          "rme": 1.8137819673991986,
+          "scoreRme": 2.8643708802159407,
+          "warmupRatio": 1.0439238759564051,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 1.8349999904632568,
+          "median": 1.8799999713897706,
+          "min": 1.7599999904632568,
+          "mean": 1.8689999914169313,
+          "p95": 1.9800000190734863,
+          "sd": 0.06340346821079366,
+          "rme": 1.5876616182890428,
+          "scoreRme": 2.656987613808958,
+          "warmupRatio": 1.0490463204815021,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.001562500149011612,
+          "median": 0.0025,
+          "min": 0.0010000002384185792,
+          "mean": 0.002325000047683716,
+          "p95": 0.0035000002384185792,
+          "sd": 0.0007826237792980999,
+          "rme": 15.753762859567733,
+          "scoreRme": 26.516939692178255,
+          "warmupRatio": 1,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2622,
+            "elements": 1411,
+            "text": 603,
+            "comments": 608,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600,
+              "/for": 4,
+              "for": 4
+            },
+            "commentParents": {
+              "li.item": 600,
+              "ul.list": 6,
+              "div.targets": 2
+            }
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 2822,
+            "elements": 1611,
+            "text": 603,
+            "comments": 608,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600,
+              "/for": 4,
+              "for": 4
+            },
+            "commentParents": {
+              "li.item": 600,
+              "ul.list": 6,
+              "div.targets": 2
+            }
+          },
+          "openBody": {
+            "root": "body",
+            "total": 7025,
+            "elements": 3412,
+            "text": 1805,
+            "comments": 1808,
+            "emptyText": 0,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600,
+              "/portal": 600,
+              "portal": 600,
+              "/for": 4,
+              "for": 4
+            },
+            "commentParents": {
+              "body": 1200,
+              "li.item": 600,
+              "ul.list": 6,
+              "div.targets": 2
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "react",
+      "ops": {
+        "mount_closed": {
+          "score": 3.9249999821186066,
+          "median": 3.8999998569488525,
+          "min": 3.700000047683716,
+          "mean": 3.8799999713897706,
+          "p95": 4.1000001430511475,
+          "sd": 0.10052494947424447,
+          "rme": 1.2125408301291032,
+          "scoreRme": 2.4817583265155765,
+          "warmupRatio": 0.9745222792102529,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 1.4000000357627869,
+          "median": 1.5,
+          "min": 1.2999999523162842,
+          "mean": 1.4699999928474425,
+          "p95": 1.6999998092651367,
+          "sd": 0.09787204339346602,
+          "rme": 3.11598640064975,
+          "scoreRme": 4.514804249502751,
+          "warmupRatio": 1.09821421082835,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.32125000357627864,
+          "median": 0.3200000047683716,
+          "min": 0.26000001430511477,
+          "mean": 0.3275000011920929,
+          "p95": 0.38999998569488525,
+          "sd": 0.039851695005752016,
+          "rme": 5.694947469795267,
+          "scoreRme": 11.340066585584642,
+          "warmupRatio": 1.0194552527017047,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.31124999821186067,
+          "median": 0.3200000047683716,
+          "min": 0.25,
+          "mean": 0.31099999904632564,
+          "p95": 0.3700000047683716,
+          "sd": 0.034473486558372866,
+          "rme": 5.187750152658182,
+          "scoreRme": 9.354438511614942,
+          "warmupRatio": 0.9919678790998337,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.17375000715255737,
+          "median": 0.17000000476837157,
+          "min": 0.15,
+          "mean": 0.17050000429153442,
+          "p95": 0.19000000953674318,
+          "sd": 0.012763025804729723,
+          "rme": 3.5033496462847453,
+          "scoreRme": 6.775304971846852,
+          "warmupRatio": 0.9640287613067863,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 1.8549999952316287,
+          "median": 1.8800000190734862,
+          "min": 1.7799999713897705,
+          "mean": 1.874000000953674,
+          "p95": 2.0199999809265137,
+          "sd": 0.06620541869878804,
+          "rme": 1.6534009400911325,
+          "scoreRme": 2.7994652793008363,
+          "warmupRatio": 1.0256064735669816,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 1.9000000059604645,
+          "median": 1.9400000095367431,
+          "min": 1.7800000190734864,
+          "mean": 1.9180000066757201,
+          "p95": 2.040000009536743,
+          "sd": 0.06802476482765203,
+          "rme": 1.6598646472925156,
+          "scoreRme": 3.259486209343601,
+          "warmupRatio": 1.0289473689576596,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.005374999940395355,
+          "median": 0.005499999523162841,
+          "min": 0.004500000476837158,
+          "mean": 0.005549999952316283,
+          "p95": 0.006999999284744263,
+          "sd": 0.0007236601254230678,
+          "rme": 6.102332875452314,
+          "scoreRme": 6.8946128601534316,
+          "warmupRatio": 0.9302325684551034,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2014,
+            "elements": 1411,
+            "text": 603,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 2214,
+            "elements": 1611,
+            "text": 603,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openBody": {
+            "root": "body",
+            "total": 5217,
+            "elements": 3412,
+            "text": 1805,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          }
+        }
+      }
+    },
+    {
+      "name": "solid",
+      "ops": {
+        "mount_closed": {
+          "score": 4.250000029802322,
+          "median": 4.200000047683716,
+          "min": 4.099999904632568,
+          "mean": 4.225000011920929,
+          "p95": 4.400000095367432,
+          "sd": 0.0716350460721703,
+          "rme": 0.7935111992005075,
+          "scoreRme": 1.8214776257541425,
+          "warmupRatio": 0.9882352843829093,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 1.0875000357627869,
+          "median": 1.1000001430511475,
+          "min": 0.9000000953674316,
+          "mean": 1.1400000214576722,
+          "p95": 1.3999998569488525,
+          "sd": 0.11424809083070643,
+          "rme": 4.690275166559167,
+          "scoreRme": 4.9275030552191215,
+          "warmupRatio": 1.0689655314160862,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.002500000596046448,
+          "median": 0,
+          "min": 0,
+          "mean": 0.003999999761581422,
+          "p95": 0.010000014305114746,
+          "sd": 0.005026246599918265,
+          "rme": 58.80822310927984,
+          "scoreRme": 154.82559312258329,
+          "warmupRatio": 2,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.0012500017881393432,
+          "median": 0.009999990463256836,
+          "min": 0,
+          "mean": 0.005500003099441528,
+          "p95": 0.020000004768371583,
+          "sd": 0.0060480560307391235,
+          "rme": 51.46442231373547,
+          "scoreRme": 236.50000000000003,
+          "warmupRatio": 2,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.002500000596046448,
+          "median": 0,
+          "min": 0,
+          "mean": 0.005,
+          "p95": 0.020000004768371583,
+          "sd": 0.006882472745412922,
+          "rme": 64.4211875537697,
+          "scoreRme": 154.82559312258326,
+          "warmupRatio": 0.9999988079073886,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 1.3099999964237214,
+          "median": 1.3200000286102296,
+          "min": 1.2599999904632568,
+          "mean": 1.334999992847443,
+          "p95": 1.4,
+          "sd": 0.03546681296890352,
+          "rme": 1.2433549619323094,
+          "scoreRme": 1.929993142231969,
+          "warmupRatio": 1.032442744540193,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 1.3375000000000001,
+          "median": 1.359999990463257,
+          "min": 1.3199999809265137,
+          "mean": 1.3650000071525579,
+          "p95": 1.4200000286102294,
+          "sd": 0.03363895470471503,
+          "rme": 1.1533578316037212,
+          "scoreRme": 1.0434234769255784,
+          "warmupRatio": 1.0317757062822857,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.0011249998211860658,
+          "median": 0.0014999997615814209,
+          "min": 0.0004999995231628418,
+          "mean": 0.0012999998331069949,
+          "p95": 0.0020000004768371583,
+          "sd": 0.0003402786785717659,
+          "rme": 12.250270303622667,
+          "scoreRme": 26.27778374456886,
+          "warmupRatio": 0.944444356141253,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2618,
+            "elements": 1411,
+            "text": 1203,
+            "comments": 4,
+            "emptyText": 600,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 4
+            },
+            "commentParents": {
+              "div.app": 4
+            }
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 2618,
+            "elements": 1411,
+            "text": 1203,
+            "comments": 4,
+            "emptyText": 600,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 4
+            },
+            "commentParents": {
+              "div.app": 4
+            }
+          },
+          "openBody": {
+            "root": "body",
+            "total": 5621,
+            "elements": 3212,
+            "text": 2405,
+            "comments": 4,
+            "emptyText": 600,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 4
+            },
+            "commentParents": {
+              "div.app": 4
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "ripple",
+      "ops": {
+        "mount_closed": {
+          "score": 2.3000000715255737,
+          "median": 2.299999952316284,
+          "min": 2.200000047683716,
+          "mean": 2.2800000429153444,
+          "p95": 2.4000000953674316,
+          "sd": 0.05231483925649832,
+          "rme": 1.073851604972905,
+          "scoreRme": 1.9432307912817681,
+          "warmupRatio": 0.983695629357391,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 3.5125000178813934,
+          "median": 3.700000047683716,
+          "min": 2.799999952316284,
+          "mean": 3.5050000071525576,
+          "p95": 4,
+          "sd": 0.41482398709098983,
+          "rme": 5.538983465479519,
+          "scoreRme": 10.371521129272878,
+          "warmupRatio": 0.9644128115690672,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.03125000298023224,
+          "median": 0.030000019073486327,
+          "min": 0.019999980926513672,
+          "mean": 0.033500000238418585,
+          "p95": 0.05,
+          "sd": 0.006708204175688301,
+          "rme": 9.371642064092176,
+          "scoreRme": 9.46000618639236,
+          "warmupRatio": 0.9599998512268206,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.031249997019767762,
+          "median": 0.039999985694885255,
+          "min": 0.019999980926513672,
+          "mean": 0.037499998807907116,
+          "p95": 0.05,
+          "sd": 0.008506965673607937,
+          "rme": 10.616898293511333,
+          "scoreRme": 17.147718164018357,
+          "warmupRatio": 0.9999999999999999,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.031250002980232235,
+          "median": 0.039999985694885255,
+          "min": 0.02999999523162842,
+          "mean": 0.03650000333786012,
+          "p95": 0.05,
+          "sd": 0.007451598170032616,
+          "rme": 9.554561357207987,
+          "scoreRme": 9.460006186392361,
+          "warmupRatio": 0.9999999046325775,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 2.3124999940395354,
+          "median": 2.459999990463257,
+          "min": 2.240000009536743,
+          "mean": 2.4259999990463257,
+          "p95": 2.6800000190734865,
+          "sd": 0.13612688167275058,
+          "rme": 2.6260762390468257,
+          "scoreRme": 3.13882162493725,
+          "warmupRatio": 1.090810814653373,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 2.3850000083446496,
+          "median": 2.459999990463257,
+          "min": 2.359999990463257,
+          "mean": 2.485,
+          "p95": 2.719999980926514,
+          "sd": 0.11367080376117465,
+          "rme": 2.1408033136856495,
+          "scoreRme": 0.7257876042662553,
+          "warmupRatio": 1.0870020906335331,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.0018125000596046449,
+          "median": 0.0020000004768371583,
+          "min": 0.0014999997615814209,
+          "mean": 0.0020250000357627867,
+          "p95": 0.0029999995231628418,
+          "sd": 0.00044352055960090265,
+          "rme": 10.250450478706643,
+          "scoreRme": 11.937961022639962,
+          "warmupRatio": 0.9310344685839137,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2619,
+            "elements": 1411,
+            "text": 608,
+            "comments": 600,
+            "emptyText": 5,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600
+            },
+            "commentParents": {
+              "li.item": 600
+            }
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 2619,
+            "elements": 1411,
+            "text": 608,
+            "comments": 600,
+            "emptyText": 5,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600
+            },
+            "commentParents": {
+              "li.item": 600
+            }
+          },
+          "openBody": {
+            "root": "body",
+            "total": 6222,
+            "elements": 3212,
+            "text": 2410,
+            "comments": 600,
+            "emptyText": 605,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 600
+            },
+            "commentParents": {
+              "li.item": 600
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "vue-vapor",
+      "ops": {
+        "mount_closed": {
+          "score": 4.150000035762787,
+          "median": 4.200000047683716,
+          "min": 4,
+          "mean": 4.170000004768371,
+          "p95": 4.400000095367432,
+          "sd": 0.10809354207853478,
+          "rme": 1.2131595556348085,
+          "scoreRme": 2.638030167622346,
+          "warmupRatio": 1.009036135882905,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 2.162499964237213,
+          "median": 2.200000047683716,
+          "min": 2.0999999046325684,
+          "mean": 2.1799999833106996,
+          "p95": 2.299999952316284,
+          "sd": 0.06155869541757665,
+          "rme": 1.3215607985709916,
+          "scoreRme": 2.001158650581742,
+          "warmupRatio": 1.011560724151932,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.0025000035762786864,
+          "median": 0,
+          "min": 0,
+          "mean": 0.004500001668930054,
+          "p95": 0.010000014305114746,
+          "sd": 0.005104179748350432,
+          "rme": 53.084473672029844,
+          "scoreRme": 154.8255931224366,
+          "warmupRatio": 2.49999761581762,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.0037499994039535524,
+          "median": 0,
+          "min": 0,
+          "mean": 0.005000001192092896,
+          "p95": 0.020000004768371583,
+          "sd": 0.006069771233819658,
+          "rme": 56.81414112335229,
+          "scoreRme": 115.40018362628066,
+          "warmupRatio": 1.0000007947287233,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.0012499988079071045,
+          "median": 0,
+          "min": 0,
+          "mean": 0.002499997615814209,
+          "p95": 0.009999990463256836,
+          "sd": 0.004442612346383859,
+          "rme": 83.1673867001141,
+          "scoreRme": 236.50000000000003,
+          "warmupRatio": 1,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 2.2175000071525575,
+          "median": 2.240000009536743,
+          "min": 2.0599999904632567,
+          "mean": 2.2440000009536747,
+          "p95": 2.3800000190734862,
+          "sd": 0.07583916441409672,
+          "rme": 1.5817029226039523,
+          "scoreRme": 1.1709146777035246,
+          "warmupRatio": 1.0394588445532533,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 2.2600000023841855,
+          "median": 2.280000019073486,
+          "min": 2.140000009536743,
+          "mean": 2.2900000023841853,
+          "p95": 2.4800000190734863,
+          "sd": 0.07718739966193848,
+          "rme": 1.5774847086527333,
+          "scoreRme": 1.118713251600269,
+          "warmupRatio": 1.0409292040241196,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.0020624998211860655,
+          "median": 0.0025,
+          "min": 0.0014999997615814209,
+          "mean": 0.0024249999523162846,
+          "p95": 0.003999999761581421,
+          "sd": 0.0005910518046383496,
+          "rme": 11.406910756407008,
+          "scoreRme": 12.990691426316037,
+          "warmupRatio": 1,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2618,
+            "elements": 1411,
+            "text": 1207,
+            "comments": 0,
+            "emptyText": 604,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 3818,
+            "elements": 1411,
+            "text": 2407,
+            "comments": 0,
+            "emptyText": 1804,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openBody": {
+            "root": "body",
+            "total": 8021,
+            "elements": 3212,
+            "text": 4809,
+            "comments": 0,
+            "emptyText": 3004,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          }
+        }
+      }
+    },
+    {
+      "name": "preact",
+      "ops": {
+        "mount_closed": {
+          "score": 2.987500011920929,
+          "median": 3,
+          "min": 2.8999998569488525,
+          "mean": 2.990000009536743,
+          "p95": 3.1000001430511475,
+          "sd": 0.06407234478626334,
+          "rme": 1.0028908257404565,
+          "scoreRme": 1.7936943763366484,
+          "warmupRatio": 0.9916317972014368,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 3.387499988079071,
+          "median": 3.3999998569488525,
+          "min": 3.1000001430511475,
+          "mean": 3.3700000047683716,
+          "p95": 3.700000047683716,
+          "sd": 0.17198527150730292,
+          "rme": 2.3884468718505905,
+          "scoreRme": 4.262564168741465,
+          "warmupRatio": 1.0036900421919948,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.4962500065565109,
+          "median": 0.5099999904632568,
+          "min": 0.4600000143051147,
+          "mean": 0.5050000047683716,
+          "p95": 0.5400000095367432,
+          "sd": 0.023508113562568753,
+          "rme": 2.178615696510101,
+          "scoreRme": 2.3722097627558334,
+          "warmupRatio": 1.0528967163342207,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.4999999970197678,
+          "median": 0.5,
+          "min": 0.47000000476837156,
+          "mean": 0.5054999995231628,
+          "p95": 0.5599999904632569,
+          "sd": 0.025644328798523734,
+          "rme": 2.3742388522451265,
+          "scoreRme": 3.5755434564617334,
+          "warmupRatio": 1.0250000061094762,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.2512500017881394,
+          "median": 0.25999999046325684,
+          "min": 0.18999998569488524,
+          "mean": 0.25,
+          "p95": 0.3,
+          "sd": 0.029019049139566405,
+          "rme": 5.432470788926916,
+          "scoreRme": 10.439069974566923,
+          "warmupRatio": 0.9502487447113629,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 3.464999997615814,
+          "median": 3.5200000286102293,
+          "min": 3.3,
+          "mean": 3.5339999961853024,
+          "p95": 3.8,
+          "sd": 0.15121960101254053,
+          "rme": 2.0026072018689587,
+          "scoreRme": 3.311247099039493,
+          "warmupRatio": 1.0324675324898727,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 3.4800000071525576,
+          "median": 3.5200000286102293,
+          "min": 3.3,
+          "mean": 3.512000007629395,
+          "p95": 3.8199999809265135,
+          "sd": 0.1478833119498186,
+          "rme": 1.9706926220661742,
+          "scoreRme": 3.24909867219779,
+          "warmupRatio": 1.021551724093635,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.0013749998807907106,
+          "median": 0.0014999997615814209,
+          "min": 0.0010000002384185792,
+          "mean": 0.0015249998569488528,
+          "p95": 0.0020000004768371583,
+          "sd": 0.00034316621699805505,
+          "rme": 10.531469024193102,
+          "scoreRme": 21.499981360000376,
+          "warmupRatio": 1.0000000000000002,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 2014,
+            "elements": 1411,
+            "text": 603,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 2214,
+            "elements": 1611,
+            "text": 603,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 0,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          },
+          "openBody": {
+            "root": "body",
+            "total": 5217,
+            "elements": 3412,
+            "text": 1805,
+            "comments": 0,
+            "emptyText": 0,
+            "whitespaceText": 2,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {},
+            "commentParents": {}
+          }
+        }
+      }
+    },
+    {
+      "name": "svelte",
+      "ops": {
+        "mount_closed": {
+          "score": 4.2125000059604645,
+          "median": 4.200000047683716,
+          "min": 4.099999904632568,
+          "mean": 4.2699999690055845,
+          "p95": 4.599999904632568,
+          "sd": 0.14179305071585488,
+          "rme": 1.5541083906443327,
+          "scoreRme": 2.235020864273184,
+          "warmupRatio": 1.0178041443728494,
+          "samples": 20
+        },
+        "open_all": {
+          "score": 2.7500000596046448,
+          "median": 2.799999952316284,
+          "min": 2.5,
+          "mean": 2.7899999976158143,
+          "p95": 3,
+          "sd": 0.14473202595161563,
+          "rme": 2.427809849433876,
+          "scoreRme": 5.3903346823794465,
+          "warmupRatio": 1.0409090510084618,
+          "samples": 20
+        },
+        "rerender_open_A": {
+          "score": 0.012499997019767763,
+          "median": 0.019999980926513672,
+          "min": 0,
+          "mean": 0.015499998331069947,
+          "p95": 0.020000004768371583,
+          "sd": 0.006048053541013799,
+          "rme": 18.26157394789739,
+          "scoreRme": 47.29997422361081,
+          "warmupRatio": 1.3000005006791353,
+          "samples": 20
+        },
+        "rerender_open_B": {
+          "score": 0.011249998211860658,
+          "median": 0.020000004768371583,
+          "min": 0,
+          "mean": 0.015000000000000003,
+          "p95": 0.02999999523162842,
+          "sd": 0.00688247456864667,
+          "rme": 21.47373487318892,
+          "scoreRme": 47.63254360877123,
+          "warmupRatio": 1.0000002649095743,
+          "samples": 20
+        },
+        "rerender_open_B_stable": {
+          "score": 0.004999998211860657,
+          "median": 0.009999990463256836,
+          "min": 0,
+          "mean": 0.011499998569488525,
+          "p95": 0.030000019073486327,
+          "sd": 0.008750942638365233,
+          "rme": 35.613223173997376,
+          "scoreRme": 89.38859786677752,
+          "warmupRatio": 3.500001490116652,
+          "samples": 20
+        },
+        "open_close_cycle": {
+          "score": 2.635000002384186,
+          "median": 2.7,
+          "min": 2.4799999713897707,
+          "mean": 2.671000001430512,
+          "p95": 2.8199999809265135,
+          "sd": 0.11247924038044382,
+          "rme": 1.9708461212148076,
+          "scoreRme": 3.302107028521876,
+          "warmupRatio": 1.0294117637744558,
+          "samples": 20
+        },
+        "open_close_distinct": {
+          "score": 2.7525000035762788,
+          "median": 2.780000019073486,
+          "min": 2.6599999904632567,
+          "mean": 2.7870000028610225,
+          "p95": 2.9399999618530273,
+          "sd": 0.06626104142763496,
+          "rme": 1.1126934173120422,
+          "scoreRme": 1.2551447255155077,
+          "warmupRatio": 1.0236148924871555,
+          "samples": 20
+        },
+        "dispatch_through_portal": {
+          "score": 0.001812500208616257,
+          "median": 0.0025,
+          "min": 0.0010000002384185792,
+          "mean": 0.002150000035762787,
+          "p95": 0.0030000007152557375,
+          "sd": 0.0005642880836401018,
+          "rme": 12.28334478925532,
+          "scoreRme": 27.396659679224776,
+          "warmupRatio": 0.931034474253797,
+          "samples": 20
+        }
+      },
+      "meta": {
+        "gates": "pass",
+        "items": 200,
+        "sections": 3,
+        "portalsAtOpenAll": 600,
+        "hitsPerDispatchSample": 200,
+        "dom": {
+          "closedMain": {
+            "root": "#main",
+            "total": 3228,
+            "elements": 1411,
+            "text": 1214,
+            "comments": 603,
+            "emptyText": 5,
+            "whitespaceText": 606,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 603
+            },
+            "commentParents": {
+              "li.item": 600,
+              "div.app": 3
+            }
+          },
+          "openMain": {
+            "root": "#main",
+            "total": 4828,
+            "elements": 1611,
+            "text": 1814,
+            "comments": 1403,
+            "emptyText": 605,
+            "whitespaceText": 606,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 1403
+            },
+            "commentParents": {
+              "li.item": 1200,
+              "span.anchor": 200,
+              "div.app": 3
+            }
+          },
+          "openBody": {
+            "root": "body",
+            "total": 8431,
+            "elements": 3412,
+            "text": 3616,
+            "comments": 1403,
+            "emptyText": 605,
+            "whitespaceText": 1208,
+            "hydrationMarkersPhysical": 0,
+            "hydrationMarkersLogical": 0,
+            "hydrationMarkersCounted": 0,
+            "hydrationMarkerMaxMultiplicity": 0,
+            "leadingHydrationStartsPhysical": 0,
+            "leadingHydrationStartsLogical": 0,
+            "commentsByData": {
+              "": 1403
+            },
+            "commentParents": {
+              "li.item": 1200,
+              "span.anchor": 200,
+              "div.app": 3
+            }
+          }
+        }
+      }
+    }
+  ],
+  "harnessExit": 0
+}
