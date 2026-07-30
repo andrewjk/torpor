@@ -27,11 +27,11 @@ export default function IsAvailable(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div>#</div> <input id="is-available" type="checkbox"> <label for="is-available">Is available</label> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	const t_input_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLInputElement;
-	const t_text_2 = t_next(t_next(t_next(t_input_1, true)), true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div>#</div> <input id="is-available" type="checkbox"> <label for="is-available">Is available</label>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_text_1 = t_child(t_root_0);
+	const t_input_1 = t_next(t_next(t_root_0, true)) as HTMLInputElement;
+	const t_label_1 = t_next(t_next(t_input_1, true)) as HTMLElement;
 	$run(() => {
 		t_input_1.checked = $state.isAvailable || false;
 	});
@@ -39,7 +39,7 @@ export default function IsAvailable(
 	$run(() => {
 		t_text_1.textContent = t_fmt($state.isAvailable ? "Available" : "Not available");
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_label_1);
+	t_next(t_label_1);
 
 }

@@ -1,7 +1,7 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function BindText(
 	// @ts-ignore
@@ -17,7 +17,7 @@ export default function BindText(
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
-	t_body += ` <input value="${t_attr($state.name) || ""}"> <select value="${t_attr($state.selected) || ""}"> <option value="0">First</option> <option value="1">Second</option> <option value="2">Third</option> </select> <p>Hello, ${t_fmt($state.name)}</p> <p>You have selected, ${t_fmt($state.selected)}</p> `;
+	t_body += `<input value="${t_attr($state.name) || ""}"> <select value="${t_attr($state.selected) || ""}"><option value="0">First</option> <option value="1">Second</option> <option value="2">Third</option></select> <p>Hello, ${t_fmt($state.name)}</p> <p>You have selected, ${t_fmt($state.selected)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

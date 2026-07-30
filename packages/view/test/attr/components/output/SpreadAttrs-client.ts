@@ -19,15 +19,13 @@ export default function SpreadAttrs(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div data-state=""> <p>Content</p> </div> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
-	const t_text_1 = t_next(t_div_1, true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div data-state=""><p>Content</p></div>`);
+	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	$run(() => {
 		t_attribute(t_div_1, "aria-expanded", $props.collapsed ? "false" : "true");
 		t_attribute(t_div_1, "data-state", $props.collapsed ? "collapsed" : "expanded");
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
+	t_next(t_div_1);
 
 }

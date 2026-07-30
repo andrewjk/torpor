@@ -17,9 +17,9 @@ export default function AwaitResolved(
 	});
 
 	/* User interface */
-	t_body += ` <![>`;
-	t_body += ` <p>Loading...</p> `;
-	t_body += `<!]><!> `;
+	t_body += `<![>`;
+	t_body += `<p>Loading...</p>`;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

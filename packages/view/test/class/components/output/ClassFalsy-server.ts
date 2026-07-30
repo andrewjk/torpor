@@ -1,10 +1,8 @@
-import $watch from "../../../../src/ssr/$serverWatch";
 import t_class from "../../../../src/render/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ClassFalsy(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	$props: { a: boolean; b: boolean; c: number; d: number; e: string; f: string },
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -13,10 +11,8 @@ export default function ClassFalsy(
 	let t_body = "";
 	let t_head = "";
 
-	let $state = $watch({ a: true, b: false, c: 1, d: 0, e: "yes", f: "" });
-
 	/* User interface */
-	t_body += ` <p ${t_class({ a: $state.a, b: $state.b, c: $state.c, d: $state.d, e: $state.e, f: $state.f }) !== "" ? `class="${t_class({ a: $state.a, b: $state.b, c: $state.c, d: $state.d, e: $state.e, f: $state.f })}"` : ""}> Falsy values </p> `;
+	t_body += `<p ${t_class({ a: $props.a, b: $props.b, c: $props.c, d: $props.d, e: $props.e, f: $props.f }) !== "" ? `class="${t_class({ a: $props.a, b: $props.b, c: $props.c, d: $props.d, e: $props.e, f: $props.f })}"` : ""}> Falsy values </p>`;
 
 	return { body: t_body, head: t_head };
 }

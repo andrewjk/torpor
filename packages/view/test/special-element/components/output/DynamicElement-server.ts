@@ -1,7 +1,6 @@
-import t_attr from "../../../../src/render/formatAttributeText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function DynamicTagWithAttr(
+export default function DynamicTag(
 	$props: { tag: string },
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
@@ -12,7 +11,7 @@ export default function DynamicTagWithAttr(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <${$props.tag} id="target" ${$props.tag ? `data-role="${t_attr($props.tag)}"` : ""}> Content </${$props.tag}> `;
+	t_body += `<${$props.tag} id="target"> Content </${$props.tag}>`;
 
 	return { body: t_body, head: t_head };
 }

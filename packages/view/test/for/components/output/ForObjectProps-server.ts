@@ -12,15 +12,15 @@ export default function ForObjectProps(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <li> <span>${t_fmt(item.name)}</span> <![>`;
+		t_body += `<!^><li><span>${t_fmt(item.name)}</span> <![>`;
 		if (item.active) {
-			t_body += `<!^> <strong>*</strong> `;
+			t_body += `<!^><strong>*</strong>`;
 		}
-		t_body += `<!]><!> </li> `;
+		t_body += `<!]><!></li>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

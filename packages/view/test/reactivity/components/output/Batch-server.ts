@@ -12,7 +12,7 @@ export default function BatchTest(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>A: ${t_fmt($props.a)}</p> <p>B: ${t_fmt($props.b)}</p> <p>C: ${t_fmt($props.c)}</p> <p>Sum: ${t_fmt($props.a + $props.b + $props.c)}</p> `;
+	t_body += `<p>A: ${t_fmt($props.a)}</p> <p>B: ${t_fmt($props.b)}</p> <p>C: ${t_fmt($props.c)}</p> <p>Sum: ${t_fmt($props.a + $props.b + $props.c)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

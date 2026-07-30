@@ -1,6 +1,6 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function NewlineText(
+export default function PreHydrate(
 	// @ts-ignore
 	$props?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -12,9 +12,9 @@ export default function NewlineText(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <pre>line1
+	t_body += `<pre>line1
 line2
-line3</pre> `;
+line3</pre>`;
 
 	return { body: t_body, head: t_head };
 }

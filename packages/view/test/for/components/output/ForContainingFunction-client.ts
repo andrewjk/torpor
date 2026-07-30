@@ -29,16 +29,15 @@ export default function ForContainingIf(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <section> <!> </section> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section><!></section>`);
+	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_for_parent_1,
+		t_section_1,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItem[] = [];
@@ -58,9 +57,8 @@ export default function ForContainingIf(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <button>#</button> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_button_1 = t_next(t_root_1) as HTMLButtonElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<button>#</button> `);
+			const t_button_1 = t_root(t_fragment_1) as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
 			t_event(t_button_1, "click", doit);
 
@@ -72,7 +70,7 @@ export default function ForContainingIf(
 			$run(() => {
 				t_text_1.textContent = `do it ${t_fmt(t_item_1.data.i)}`;
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_button_1);
+			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_button_1);
 			t_next(t_button_1);
 			t_pop_region(t_old_region_1);
 		},
@@ -81,8 +79,7 @@ export default function ForContainingIf(
 		}
 	);
 
-	const t_text_2 = t_next(t_for_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
+	t_next(t_section_1);
 
 }

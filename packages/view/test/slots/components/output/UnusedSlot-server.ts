@@ -12,11 +12,11 @@ export default function Unused(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_comp_1 = Header(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -32,13 +32,13 @@ function Header(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <h2> <![>`;
+	t_body += `<h2><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	} else {
 		t_body += ` Default header... `;
 	}
-	t_body += `<!]><!> </h2> `;
+	t_body += `<!]><!></h2>`;
 
 	return { body: t_body, head: t_head };
 }

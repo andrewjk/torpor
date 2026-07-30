@@ -12,7 +12,7 @@ export default function StyleToggle(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${t_style({ color: $props.active ? "green" : "red" }) !== "" ? `style="${t_style({ color: $props.active ? "green" : "red" })}"` : ""}> Toggle style </div> `;
+	t_body += `<div ${t_style({ color: $props.active ? "green" : "red" }) !== "" ? `style="${t_style({ color: $props.active ? "green" : "red" })}"` : ""}> Toggle style </div>`;
 
 	return { body: t_body, head: t_head };
 }

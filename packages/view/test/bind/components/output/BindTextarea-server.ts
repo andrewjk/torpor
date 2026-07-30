@@ -17,7 +17,7 @@ export default function BindTextarea(
 	let $state = $watch({ message: "Initial text" });
 
 	/* User interface */
-	t_body += ` <textarea value="${t_attr($state.message) || ""}"></textarea> <p>Preview: ${t_fmt($state.message)}</p> `;
+	t_body += `<textarea value="${t_attr($state.message) || ""}"></textarea> <p>Preview: ${t_fmt($state.message)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

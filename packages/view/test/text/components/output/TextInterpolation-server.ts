@@ -12,7 +12,7 @@ export default function TextInterpolation(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>Hello, ${t_fmt($props.name)}!</p> <p>Count: ${t_fmt($props.count)}</p> <p>Active: ${t_fmt($props.active)}</p> `;
+	t_body += `<p>Hello, ${t_fmt($props.name)}!</p> <p>Count: ${t_fmt($props.count)}</p> <p>Active: ${t_fmt($props.active)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

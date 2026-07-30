@@ -26,7 +26,7 @@ export default function EventsMultiple(
 	}
 
 	/* User interface */
-	t_body += ` <button id="single">Single Click</button> <button id="double">Double Click</button> <p>Count: ${t_fmt($state.count)}</p> <p>Last: ${t_fmt($state.lastAction)}</p> `;
+	t_body += `<button id="single">Single Click</button> <button id="double">Double Click</button> <p>Count: ${t_fmt($state.count)}</p> <p>Last: ${t_fmt($state.lastAction)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

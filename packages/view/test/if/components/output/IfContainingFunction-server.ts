@@ -11,17 +11,16 @@ export default function IfContainingIf(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.condition) {
-		t_body += `<!^> <button>do it</button> `;
+		t_body += `<!^><button>do it</button> `;
 
 		function doit() {
 			// it just needs to exist...
 		};
 
-		t_body += ` `;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

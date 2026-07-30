@@ -11,7 +11,7 @@ export default function Element(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <${$props.tag}> Hello! </${$props.tag}> `;
+	t_body += `<${$props.tag}> Hello! </${$props.tag}>`;
 
 	return { body: t_body, head: t_head };
 }

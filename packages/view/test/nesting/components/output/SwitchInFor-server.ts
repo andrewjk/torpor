@@ -12,26 +12,26 @@ export default function SwitchInFor(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <li> <![>`;
+		t_body += `<!^><li><![>`;
 		switch (item.type) {
 			case "admin": {
-				t_body += `<!^> <strong>${t_fmt(item.name)} (admin)</strong> `;
+				t_body += `<!^><strong>${t_fmt(item.name)} (admin)</strong>`;
 				break;
 			}
 			case "user": {
-				t_body += `<!^> <span>${t_fmt(item.name)} (user)</span> `;
+				t_body += `<!^><span>${t_fmt(item.name)} (user)</span>`;
 				break;
 			}
 			default: {
-				t_body += `<!^> <em>${t_fmt(item.name)} (unknown)</em> `;
+				t_body += `<!^><em>${t_fmt(item.name)} (unknown)</em>`;
 				break;
 			}
 		}
-		t_body += `<!]><!> </li> `;
+		t_body += `<!]><!></li>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

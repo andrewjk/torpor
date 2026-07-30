@@ -12,7 +12,7 @@ export default function ComputedGetter(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>Count: ${t_fmt($props.count)}</p> <p>Doubled: ${t_fmt($props.count * 2)}</p> <p>Quadrupled: ${t_fmt($props.count * 4)}</p> `;
+	t_body += `<p>Count: ${t_fmt($props.count)}</p> <p>Doubled: ${t_fmt($props.count * 2)}</p> <p>Quadrupled: ${t_fmt($props.count * 4)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

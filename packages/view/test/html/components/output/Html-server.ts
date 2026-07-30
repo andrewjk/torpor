@@ -11,7 +11,7 @@ export default function Html(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p> <![>${$props.html}<!]><!> </p> `;
+	t_body += `<p><![>${$props.html}<!]><!></p>`;
 
 	return { body: t_body, head: t_head };
 }

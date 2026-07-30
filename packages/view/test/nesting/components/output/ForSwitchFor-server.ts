@@ -12,34 +12,34 @@ export default function ForSwitchFor(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	for (let row of $props.matrix) {
-		t_body += `<!^> <div class="row"> <![>`;
+		t_body += `<!^><div class="row"><![>`;
 		switch ($props.operation) {
 			case "sum": {
-				t_body += `<!^> <p>${t_fmt(row.reduce((a, b) => a + b, 0))}</p> `;
+				t_body += `<!^><p>${t_fmt(row.reduce((a, b) => a + b, 0))}</p>`;
 				break;
 			}
 			case "max": {
-				t_body += `<!^> <p>${t_fmt(Math.max(...row))}</p> `;
+				t_body += `<!^><p>${t_fmt(Math.max(...row))}</p>`;
 				break;
 			}
 			case "items": {
-				t_body += `<!^> <![>`;
+				t_body += `<!^><![>`;
 				for (let cell of row) {
-					t_body += `<!^> <span>${t_fmt(cell)} </span> `;
+					t_body += `<!^><span>${t_fmt(cell)} </span>`;
 				}
-				t_body += `<!]><!> `;
+				t_body += `<!]><!>`;
 				break;
 			}
 			default: {
-				t_body += `<!^> <p>Unknown op</p> `;
+				t_body += `<!^><p>Unknown op</p>`;
 				break;
 			}
 		}
-		t_body += `<!]><!> > </div> `;
+		t_body += `<!]><!> > </div>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

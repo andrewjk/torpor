@@ -23,16 +23,15 @@ export default function Ref(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <button> hi </button> <p>#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_button_1 = t_next(t_root_0) as HTMLButtonElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button> hi </button> <p>#</p>`);
+	const t_button_1 = t_root(t_fragment_0) as HTMLButtonElement;
 	button = t_button_1;
-	const t_text_1 = t_child(t_next(t_next(t_button_1, true)));
-	const t_text_2 = t_next(t_next(t_next(t_button_1, true)), true);
+	const t_p_1 = t_next(t_next(t_button_1, true)) as HTMLElement;
+	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = ` the button's text is '${t_fmt(button?.textContent)}' `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

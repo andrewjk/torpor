@@ -11,14 +11,14 @@ export default function If(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.counter > 5) {
-		t_body += `<!^> <p>It's big</p> `;
+		t_body += `<!^><p>It's big</p>`;
 	}
 	else {
-		t_body += `<!^> <p>It's small</p> `;
+		t_body += `<!^><p>It's small</p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

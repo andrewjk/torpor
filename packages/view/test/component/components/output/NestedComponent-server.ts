@@ -12,7 +12,7 @@ export default function NestedComponent(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <h1>${t_fmt($props.parentName)}</h1> <![>`;
+	t_body += `<h1>${t_fmt($props.parentName)}</h1> <![>`;
 	const t_props_1 = {
 		name: $props.parentName,
 	};
@@ -24,20 +24,20 @@ export default function NestedComponent(
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += ` <![>`;
+		t_body += `<![>`;
 		const t_props_2 = {
 			name: $props.parentName,
 		};
 		const t_comp_1 = Child(t_props_2, $context);
 		t_body += t_comp_1.body;
 		t_head += t_comp_1.head;
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 		return t_body;
 	}
 	const t_comp_2 = Parent(t_props_1, $context, t_slots_1);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -52,11 +52,11 @@ function Parent(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div> <p>Parent: ${t_fmt($props.name)}</p> <![>`;
+	t_body += `<div><p>Parent: ${t_fmt($props.name)}</p> <![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </div> `;
+	t_body += `<!]><!></div>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -72,7 +72,7 @@ function Child(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>Child: ${t_fmt($props.name)}</p> `;
+	t_body += `<p>Child: ${t_fmt($props.name)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

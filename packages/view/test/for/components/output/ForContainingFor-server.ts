@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ForContainingFor(
 	// @ts-ignore
@@ -13,15 +13,15 @@ export default function ForContainingFor(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <section> <![>`;
+	t_body += `<section><![>`;
 	for (let i = 0; i < 5; i++) {
-		t_body += `<!^> <![>`;
+		t_body += `<!^><![>`;
 		for (let j = 0; j < 2; j++) {
-			t_body += `<!^> <p> ${t_fmt(i)}-${t_fmt(j)} </p> `;
+			t_body += `<!^><p> ${t_fmt(i)}-${t_fmt(j)} </p>`;
 		}
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 	}
-	t_body += `<!]><!> </section> `;
+	t_body += `<!]><!></section>`;
 
 	return { body: t_body, head: t_head };
 }

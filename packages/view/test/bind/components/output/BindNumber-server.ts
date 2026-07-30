@@ -12,7 +12,7 @@ export default function NumberInput(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <input type="number" value="${$props.value || 0}"> <p>Value: ${t_fmt($props.value)}</p> `;
+	t_body += `<input type="number" value="${$props.value || 0}"> <p>Value: ${t_fmt($props.value)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

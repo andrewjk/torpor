@@ -12,7 +12,7 @@ export default function DeepAccess(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>Name: ${t_fmt($props.user.profile.name)}</p> <p>City: ${t_fmt($props.user.profile.address.city)}</p> `;
+	t_body += `<p>Name: ${t_fmt($props.user.profile.name)}</p> <p>City: ${t_fmt($props.user.profile.address.city)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

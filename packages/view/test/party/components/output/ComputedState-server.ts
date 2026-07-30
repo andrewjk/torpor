@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function DoubleCount(
 	// @ts-ignore
@@ -21,7 +21,7 @@ export default function DoubleCount(
 	});
 
 	/* User interface */
-	t_body += ` <div>${t_fmt($state.doubleCount)}</div> `;
+	t_body += `<div>${t_fmt($state.doubleCount)}</div>`;
 
 	return { body: t_body, head: t_head };
 }

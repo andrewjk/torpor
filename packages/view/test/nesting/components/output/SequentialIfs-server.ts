@@ -11,19 +11,19 @@ export default function SeqIfs(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.a) {
-		t_body += `<!^> <p>A on</p> `;
+		t_body += `<!^><p>A on</p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.b) {
-		t_body += `<!^> <p>B on</p> `;
+		t_body += `<!^><p>B on</p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.c) {
-		t_body += `<!^> <p>C on</p> `;
+		t_body += `<!^><p>C on</p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

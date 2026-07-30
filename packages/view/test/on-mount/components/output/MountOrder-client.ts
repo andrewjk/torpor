@@ -1,5 +1,6 @@
 import $mount from "../../../../src/watch/$mount";
 import $run from "../../../../src/watch/$run";
+import $watch from "../../../../src/watch/$watch";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
@@ -19,31 +20,33 @@ export default function MountOrder(
 	$slots?: Record<string, SlotRender>,
 ): void {
 
-	let order: string[] = [];
+	let $state = $watch({ order: "" });
 
 	$mount(() => {
-		order.push("first");
+		(window as any).__mountLog.push("first");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	$mount(() => {
-		order.push("second");
+		(window as any).__mountLog.push("second");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	$mount(() => {
-		order.push("third");
+		(window as any).__mountLog.push("third");
+		$state.order = (window as any).__mountLog.join(", ");
 	});
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	const t_text_2 = t_next(t_next(t_root_0), true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p>`);
+	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
+	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_text_1.textContent = `Mount order: ${t_fmt(order.join(", "))}`;
+		t_text_1.textContent = `Mount order: ${t_fmt($state.order)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

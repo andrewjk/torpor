@@ -1,10 +1,8 @@
-import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/render/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function SlotReactive(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	$props: { label: string },
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -13,10 +11,8 @@ export default function SlotReactive(
 	let t_body = "";
 	let t_head = "";
 
-	let $state = $watch({ label: "Hello" });
-
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -25,13 +21,13 @@ export default function SlotReactive(
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += ` <p>${t_fmt($state.label)}</p> `;
+		t_body += `<p>${t_fmt($props.label)}</p>`;
 		return t_body;
 	}
 	const t_comp_1 = Labeled(undefined, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> <button>Update</button> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -47,11 +43,11 @@ function Labeled(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div> <strong>Label:</strong> <![>`;
+	t_body += `<div><strong>Label:</strong> <![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </div> `;
+	t_body += `<!]><!></div>`;
 
 	return { body: t_body, head: t_head };
 }

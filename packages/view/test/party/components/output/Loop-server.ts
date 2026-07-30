@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Colors(
 	// @ts-ignore
@@ -15,11 +15,11 @@ export default function Colors(
 	const colors = ["red", "green", "blue"];
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let color of colors) {
-		t_body += `<!^>  <li>${t_fmt(color)}</li> `;
+		t_body += `<!^> <li>${t_fmt(color)}</li>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

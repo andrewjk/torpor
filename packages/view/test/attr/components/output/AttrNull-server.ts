@@ -12,7 +12,7 @@ export default function AttrNull(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${$props.title ? `title="${t_attr($props.title)}"` : ""} ${$props.label ? `aria-label="${t_attr($props.label)}"` : ""} ${$props.count ? `data-count="${t_attr($props.count)}"` : ""}> Content </div> `;
+	t_body += `<div ${$props.title ? `title="${t_attr($props.title)}"` : ""} ${$props.label ? `aria-label="${t_attr($props.label)}"` : ""} ${$props.count ? `data-count="${t_attr($props.count)}"` : ""}> Content </div>`;
 
 	return { body: t_body, head: t_head };
 }

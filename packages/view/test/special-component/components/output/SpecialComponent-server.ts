@@ -16,7 +16,7 @@ export default function Component(
 	};
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	components[$props.self];
 	t_body += `<![>`;
 	const t_props_1 = {
@@ -37,7 +37,7 @@ export default function Component(
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!>`;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -53,11 +53,11 @@ function BigTitle(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <h2> <![>`;
+	t_body += `<h2><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </h2> `;
+	t_body += `<!]><!></h2>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -73,11 +73,11 @@ function SmallTitle(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <h6> <![>`;
+	t_body += `<h6><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </h6> `;
+	t_body += `<!]><!></h6>`;
 
 	return { body: t_body, head: t_head };
 }

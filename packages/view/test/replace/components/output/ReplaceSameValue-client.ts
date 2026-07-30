@@ -28,9 +28,8 @@ export default function ReplaceSame(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_replace_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	let t_replace_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @replace */
 	const t_replace_region_1 = t_region();
@@ -39,20 +38,17 @@ export default function ReplaceSame(
 		if (!t_run_branch(t_replace_region_1, 0, -1)) return;
 		const t_new_region = t_region();
 		const t_old_region = t_push_region(t_new_region, true);
-		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
-		const t_root_1 = t_root(t_fragment_1, true);
-		const t_text_1 = t_child(t_next(t_root_1));
-		const t_text_2 = t_next(t_next(t_root_1), true);
+		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>#</p>`);
+		const t_p_1 = t_root(t_fragment_1) as HTMLElement;
+		const t_text_1 = t_child(t_p_1);
 		$run(() => {
 			t_text_1.textContent = `Render count: ${t_fmt(counter++)}`;
 		});
-		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);
-		t_next(t_text_2);
+		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_p_1);
+		t_next(t_p_1);
 		t_pop_region(t_old_region);
 	});
 
-	const t_text_3 = t_next(t_replace_anchor_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

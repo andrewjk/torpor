@@ -23,9 +23,8 @@ export default function SwitchComponent(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_switch_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	let t_switch_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @switch */
 	const t_switch_region_1 = t_region();
@@ -36,11 +35,10 @@ export default function SwitchComponent(
 				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
-				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <div id="a">Mode A</div> `);
-				const t_root_1 = t_root(t_fragment_1, true);
-				const t_text_1 = t_next(t_next(t_root_1), true);
-				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_1);
-				t_next(t_text_1);
+				const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<div id="a">Mode A</div>`);
+				const t_div_1 = t_root(t_fragment_1) as HTMLDivElement;
+				t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_div_1);
+				t_next(t_div_1);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 0;
 				break;
@@ -49,11 +47,10 @@ export default function SwitchComponent(
 				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
-				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <div id="b">Mode B</div> `);
-				const t_root_2 = t_root(t_fragment_2, true);
-				const t_text_2 = t_next(t_next(t_root_2), true);
-				t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_text_2);
-				t_next(t_text_2);
+				const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<div id="b">Mode B</div>`);
+				const t_div_2 = t_root(t_fragment_2) as HTMLDivElement;
+				t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_div_2);
+				t_next(t_div_2);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 1;
 				break;
@@ -62,11 +59,10 @@ export default function SwitchComponent(
 				if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
 				const t_new_region = t_region();
 				const t_old_region = t_push_region(t_new_region, true);
-				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <div id="default">Default</div> `);
-				const t_root_3 = t_root(t_fragment_3, true);
-				const t_text_3 = t_next(t_next(t_root_3), true);
-				t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_text_3);
-				t_next(t_text_3);
+				const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<div id="default">Default</div>`);
+				const t_div_3 = t_root(t_fragment_3) as HTMLDivElement;
+				t_add_fragment(t_fragment_3, t_fragment_0, t_before, t_div_3);
+				t_next(t_div_3);
 				t_pop_region(t_old_region);
 				t_switch_index_1 = 2;
 				break;
@@ -74,8 +70,6 @@ export default function SwitchComponent(
 		}
 	});
 
-	const t_text_4 = t_next(t_switch_anchor_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_4);
-	t_next(t_text_4);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

@@ -20,7 +20,7 @@ export default function InputFocused(
 	});
 
 	/* User interface */
-	t_body += ` <input> `;
+	t_body += `<input>`;
 
 	return { body: t_body, head: t_head };
 }

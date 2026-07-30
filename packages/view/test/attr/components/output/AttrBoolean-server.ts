@@ -12,7 +12,7 @@ export default function AttrBoolean(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <button ${$props.disabled ? `disabled="${t_attr($props.disabled)}"` : ""}>Click</button> <input type="checkbox" ${$props.checked ? `checked="${t_attr($props.checked)}"` : ""}> <input type="text" ${$props.readonly ? `readonly="${t_attr($props.readonly)}"` : ""}> `;
+	t_body += `<button ${$props.disabled ? `disabled="${t_attr($props.disabled)}"` : ""}>Click</button> <input type="checkbox" ${$props.checked ? `checked="${t_attr($props.checked)}"` : ""}> <input type="text" ${$props.readonly ? `readonly="${t_attr($props.readonly)}"` : ""}>`;
 
 	return { body: t_body, head: t_head };
 }

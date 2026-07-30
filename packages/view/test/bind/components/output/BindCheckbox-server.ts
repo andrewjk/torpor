@@ -16,7 +16,7 @@ export default function BindCheckbox(
 	let $state = $watch({ agreed: false });
 
 	/* User interface */
-	t_body += ` <label> <input type="checkbox" value="${$state.agreed || false}"> I agree </label> <p>Agreed: ${t_fmt($state.agreed)}</p> `;
+	t_body += `<label><input type="checkbox" value="${$state.agreed || false}"> I agree </label> <p>Agreed: ${t_fmt($state.agreed)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

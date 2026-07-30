@@ -30,9 +30,8 @@ export default function Component(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_replace_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	let t_replace_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @replace */
 	const t_replace_region_1 = t_region();
@@ -68,9 +67,7 @@ export default function Component(
 		t_pop_region(t_old_region);
 	});
 
-	const t_text_2 = t_next(t_replace_anchor_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }
 
@@ -87,16 +84,14 @@ function BigTitle(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <h2> <!> </h2> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_slot_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h2><!></h2>`);
+	const t_h2_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_slot_anchor_1 = t_anchor(t_child(t_h2_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
+		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, $context)
 	}
-	const t_text_1 = t_next(t_slot_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h2_1);
+	t_next(t_h2_1);
 
 }
 
@@ -113,15 +108,13 @@ function SmallTitle(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <h6> <!> </h6> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_slot_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h6><!></h6>`);
+	const t_h6_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_slot_anchor_1 = t_anchor(t_child(t_h6_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
+		$slots["_"](t_h6_1, t_slot_anchor_1, undefined, $context)
 	}
-	const t_text_1 = t_next(t_slot_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_h6_1);
+	t_next(t_h6_1);
 
 }

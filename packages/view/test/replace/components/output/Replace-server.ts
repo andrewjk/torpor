@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Replace(
 	$props: { name: string},
@@ -14,10 +14,10 @@ export default function Replace(
 	let counter = 0;
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	$props.name;
-	t_body += ` <p>The replace count is ${t_fmt(counter++)}.</p> `;
-	t_body += `<!]><!> `;
+	t_body += `<p>The replace count is ${t_fmt(counter++)}.</p>`;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

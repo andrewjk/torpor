@@ -1,7 +1,7 @@
 import $run from "../../../../src/ssr/$serverRun";
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function PageTitle(
 	// @ts-ignore
@@ -23,7 +23,7 @@ export default function PageTitle(
 	});
 
 	/* User interface */
-	t_body += ` <p>Page title: ${t_fmt($state.pageTitle)}</p> `;
+	t_body += `<p>Page title: ${t_fmt($state.pageTitle)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

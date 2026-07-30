@@ -20,7 +20,7 @@ export default function EventsKeyboard(
 	}
 
 	/* User interface */
-	t_body += ` <input id="keyinput"> <p>Last key: ${t_fmt($state.lastKey)}</p> `;
+	t_body += `<input id="keyinput"> <p>Last key: ${t_fmt($state.lastKey)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

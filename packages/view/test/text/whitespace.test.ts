@@ -107,3 +107,74 @@ line3</pre>
 	expect(pre?.textContent).toContain("line2");
 	expect(pre?.textContent).toContain("line3");
 });
+
+test("leading and trailing whitespace nodes are trimmed (Svelte 5-style)", async () => {
+	const wsSource = `
+	export default function WhitespaceTrim() {
+		@render {
+			<div>
+				<span>A</span>
+				<span>B</span>
+			</div>
+		}
+	}
+	`;
+
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, wsSource, "client");
+	mountComponent(container, component);
+
+	let div = container.querySelector("div");
+	// Expect: span, single-space text, span — no leading/trailing whitespace nodes
+	expect(div?.childNodes.length).toBe(3);
+	expect(div?.childNodes[0].nodeType).toBe(1);
+	expect(div?.childNodes[1].nodeType).toBe(3);
+	expect(div?.childNodes[1].textContent).toBe(" ");
+	expect(div?.childNodes[2].nodeType).toBe(1);
+});
+
+test("whitespace trimmed identically on server and client (hydration)", async () => {
+	const wsSource = `
+	export default function WhitespaceHydrate() {
+		@render {
+			<ul>
+				<li>A</li>
+				<li>B</li>
+			</ul>
+		}
+	}
+	`;
+
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(import.meta.filename, wsSource, "client");
+	const serverComponent = await importComponent(import.meta.filename, wsSource, "server");
+	hydrateComponent(container, clientComponent, serverComponent);
+
+	let ul = container.querySelector("ul");
+	expect(ul?.childNodes.length).toBe(3);
+	expect(ul?.childNodes[0].nodeType).toBe(1);
+	expect(ul?.childNodes[1].nodeType).toBe(3);
+	expect(ul?.childNodes[1].textContent).toBe(" ");
+	expect(ul?.childNodes[2].nodeType).toBe(1);
+});
+
+test("whitespace preserved inside <pre> during hydration", async () => {
+	const preSource = `
+	export default function PreHydrate() {
+		@render {
+			<pre>line1
+line2
+line3</pre>
+		}
+	}
+	`;
+
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(import.meta.filename, preSource, "client");
+	const serverComponent = await importComponent(import.meta.filename, preSource, "server");
+	hydrateComponent(container, clientComponent, serverComponent);
+
+	let pre = container.querySelector("pre");
+	// Newlines inside <pre> are preserved verbatim
+	expect(pre?.textContent).toBe("line1\nline2\nline3");
+});

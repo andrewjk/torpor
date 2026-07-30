@@ -16,7 +16,7 @@ export default function RefMultiple(
 	let divEl: HTMLDivElement;
 
 	/* User interface */
-	t_body += ` <input value="typed"> <div>Content</div> <p>Input value: ${t_fmt(inputEl?.value)}</p> <p>Div text: ${t_fmt(divEl?.textContent)}</p> `;
+	t_body += `<input value="typed"> <div>Content</div> <p>Input value: ${t_fmt(inputEl?.value)}</p> <p>Div text: ${t_fmt(divEl?.textContent)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

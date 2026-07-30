@@ -12,7 +12,7 @@ export default function VoidElements(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div> <input type="text" placeholder="type here"> <br> <hr> <img src="test.jpg" alt="test"> <p>After void elements</p> </div> `;
+	t_body += `<div><input type="text" placeholder="type here"> <br> <hr> <img src="test.jpg" alt="test"> <p>After void elements</p></div>`;
 
 	return { body: t_body, head: t_head };
 }

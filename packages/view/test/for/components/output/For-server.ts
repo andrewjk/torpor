@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function For(
 	// @ts-ignore
@@ -13,11 +13,11 @@ export default function For(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <section> <![>`;
+	t_body += `<section><![>`;
 	for (let i = 0; i < 5; i++) {
-		t_body += `<!^> <p> ${t_fmt(i)} </p> `;
+		t_body += `<!^><p> ${t_fmt(i)} </p>`;
 	}
-	t_body += `<!]><!> </section> `;
+	t_body += `<!]><!></section>`;
 
 	return { body: t_body, head: t_head };
 }

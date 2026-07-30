@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function TrafficLight(
 	// @ts-ignore
@@ -26,17 +26,17 @@ export default function TrafficLight(
 	}
 
 	/* User interface */
-	t_body += ` <button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
+	t_body += `<button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 	if ($state.light === "red") {
-		t_body += `<!^> <span>STOP</span> `;
+		t_body += `<!^><span>STOP</span>`;
 	}
 	else if ($state.light === "orange") {
-		t_body += `<!^> <span>SLOW DOWN</span> `;
+		t_body += `<!^><span>SLOW DOWN</span>`;
 	}
 	else if ($state.light === "green") {
-		t_body += `<!^> <span>GO</span> `;
+		t_body += `<!^><span>GO</span>`;
 	}
-	t_body += `<!]><!> </p> `;
+	t_body += `<!]><!></p>`;
 
 	return { body: t_body, head: t_head };
 }

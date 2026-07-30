@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Increment(
 	// @ts-ignore
@@ -20,7 +20,7 @@ export default function Increment(
 	}
 
 	/* User interface */
-	t_body += ` <button id="increment"> Increment </button> <button id="increment5"> Increment </button> <p> The count is ${t_fmt($state.counter)}. </p> `;
+	t_body += `<button id="increment"> Increment </button> <button id="increment5"> Increment </button> <p> The count is ${t_fmt($state.counter)}. </p>`;
 
 	return { body: t_body, head: t_head };
 }

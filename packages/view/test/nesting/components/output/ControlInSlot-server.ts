@@ -12,7 +12,7 @@ export default function ControlInSlot(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -21,21 +21,21 @@ export default function ControlInSlot(
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += ` <![>`;
+		t_body += `<![>`;
 		for (let item of $props.items) {
-			t_body += `<!^> <![>`;
+			t_body += `<!^><![>`;
 			if (item.visible) {
-				t_body += `<!^> <p>${t_fmt(item.name)}</p> `;
+				t_body += `<!^><p>${t_fmt(item.name)}</p>`;
 			}
-			t_body += `<!]><!> `;
+			t_body += `<!]><!>`;
 		}
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 		return t_body;
 	}
 	const t_comp_1 = Card(undefined, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -51,11 +51,11 @@ function Card(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div class="card"> <h2>Card title</h2> <![>`;
+	t_body += `<div class="card"><h2>Card title</h2> <![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </div> `;
+	t_body += `<!]><!></div>`;
 
 	return { body: t_body, head: t_head };
 }

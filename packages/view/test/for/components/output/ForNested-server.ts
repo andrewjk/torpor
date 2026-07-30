@@ -12,15 +12,15 @@ export default function ForNested(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <table> <![>`;
+	t_body += `<table><![>`;
 	for (let row of $props.matrix) {
-		t_body += `<!^> <tr> <![>`;
+		t_body += `<!^><tr><![>`;
 		for (let cell of row) {
-			t_body += `<!^> <td>${t_fmt(cell)}</td> `;
+			t_body += `<!^><td>${t_fmt(cell)}</td>`;
 		}
-		t_body += `<!]><!> </tr> `;
+		t_body += `<!]><!></tr>`;
 	}
-	t_body += `<!]><!> </table> `;
+	t_body += `<!]><!></table>`;
 
 	return { body: t_body, head: t_head };
 }

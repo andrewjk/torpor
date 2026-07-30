@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ArrayIndexes(
 	$props: Record<PropertyKey, any>,
@@ -12,11 +12,11 @@ export default function ArrayIndexes(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <section> <p>^</p> <![>`;
+	t_body += `<section><p>^</p> <![>`;
 	for (let i = 0; i < $props.items.length; i++) {
-		t_body += `<!^>  <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span> `;
+		t_body += `<!^> <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span>`;
 	}
-	t_body += `<!]><!> <p>$</p> </section> `;
+	t_body += `<!]><!> <p>$</p></section>`;
 
 	return { body: t_body, head: t_head };
 }

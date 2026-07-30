@@ -27,10 +27,10 @@ export default function ReactiveNewProp(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <ul> <!> </ul> <p>#</p> <p>#</p> <p>#</p> <p>#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<ul><!></ul> <p>#</p> <p>#</p> <p>#</p> <p>#</p>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_for_parent_1 = t_root_0 as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_for_parent_1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
@@ -56,15 +56,14 @@ export default function ReactiveNewProp(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>#</li> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_1 = t_child(t_next(t_root_1));
-			const t_text_2 = t_next(t_next(t_root_1), true);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<li>#</li>`);
+			const t_li_1 = t_root(t_fragment_1) as HTMLElement;
+			const t_text_1 = t_child(t_li_1);
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.item);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_li_1);
+			t_next(t_li_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -72,18 +71,18 @@ export default function ReactiveNewProp(
 		}
 	);
 
-	const t_text_3 = t_child(t_next(t_next(t_for_parent_1, true)));
-	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)));
-	const t_text_5 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)), true)));
-	const t_text_6 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)), true)), true)));
-	const t_text_7 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)), true)), true)), true);
+	const t_text_2 = t_child(t_next(t_next(t_for_parent_1, true)));
+	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)));
+	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)), true)));
+	const t_p_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_for_parent_1, true)), true)), true)), true)) as HTMLElement;
+	const t_text_5 = t_child(t_p_1);
 	$run(() => {
-		t_text_3.textContent = `Count: ${t_fmt($props.items.length)}`;
-		t_text_4.textContent = `First: ${t_fmt($props.items[0])}`;
-		t_text_5.textContent = `Last: ${t_fmt($props.items[$props.items.length - 1])}`;
-		t_text_6.textContent = `New: ${t_fmt($props.newItem)}`;
+		t_text_2.textContent = `Count: ${t_fmt($props.items.length)}`;
+		t_text_3.textContent = `First: ${t_fmt($props.items[0])}`;
+		t_text_4.textContent = `Last: ${t_fmt($props.items[$props.items.length - 1])}`;
+		t_text_5.textContent = `New: ${t_fmt($props.newItem)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_7);
-	t_next(t_text_7);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

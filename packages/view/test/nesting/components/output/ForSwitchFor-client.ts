@@ -29,9 +29,8 @@ export default function ForSwitchFor(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_for_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	let t_for_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
@@ -57,10 +56,9 @@ export default function ForSwitchFor(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <div class="row"> <!> > </div> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_switch_parent_1 = t_next(t_root_1) as HTMLElement;
-			let t_switch_anchor_1 = t_anchor(t_next(t_child(t_switch_parent_1))) as HTMLElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<div class="row"><!> > </div>`);
+			const t_div_1 = t_root(t_fragment_1) as HTMLDivElement;
+			let t_switch_anchor_1 = t_anchor(t_child(t_div_1)) as HTMLElement;
 
 			/* @switch */
 			const t_switch_region_1 = t_region();
@@ -71,15 +69,14 @@ export default function ForSwitchFor(
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
-						const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>#</p> `);
-						const t_root_2 = t_root(t_fragment_2, true);
-						const t_text_1 = t_child(t_next(t_root_2));
-						const t_text_2 = t_next(t_next(t_root_2), true);
+						const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>#</p>`);
+						const t_p_1 = t_root(t_fragment_2) as HTMLElement;
+						const t_text_1 = t_child(t_p_1);
 						$run(() => {
 							t_text_1.textContent = t_fmt(t_item_1.data.row.reduce((a, b) => a + b, 0));
 						});
-						t_add_fragment(t_fragment_2, t_switch_parent_1, t_before, t_text_2);
-						t_next(t_text_2);
+						t_add_fragment(t_fragment_2, t_div_1, t_before, t_p_1);
+						t_next(t_p_1);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 0;
 						break;
@@ -88,15 +85,14 @@ export default function ForSwitchFor(
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 1)) return;
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
-						const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p>#</p> `);
-						const t_root_3 = t_root(t_fragment_3, true);
-						const t_text_3 = t_child(t_next(t_root_3));
-						const t_text_4 = t_next(t_next(t_root_3), true);
+						const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<p>#</p>`);
+						const t_p_2 = t_root(t_fragment_3) as HTMLElement;
+						const t_text_2 = t_child(t_p_2);
 						$run(() => {
-							t_text_3.textContent = t_fmt(Math.max(...row));
+							t_text_2.textContent = t_fmt(Math.max(...t_item_1.data.row));
 						});
-						t_add_fragment(t_fragment_3, t_switch_parent_1, t_before, t_text_4);
-						t_next(t_text_4);
+						t_add_fragment(t_fragment_3, t_div_1, t_before, t_p_2);
+						t_next(t_p_2);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 1;
 						break;
@@ -105,9 +101,8 @@ export default function ForSwitchFor(
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 2)) return;
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
-						const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, ` <!> `);
-						const t_root_4 = t_root(t_fragment_4, true);
-						let t_for_anchor_2 = t_anchor(t_next(t_root_4)) as HTMLElement;
+						const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, `<!>`);
+						let t_for_anchor_2 = t_anchor(t_root(t_fragment_4)) as HTMLElement;
 
 						/* @for */
 						let t_for_region_2 = t_region();
@@ -133,15 +128,14 @@ export default function ForSwitchFor(
 							},
 							(t_item_2, t_before_2) => {
 								let t_old_region_2 = t_push_region(t_item_2);
-								const t_fragment_5 = t_fragment($parent.ownerDocument!, t_fragments, 5, ` <span>#</span> `);
-								const t_root_5 = t_root(t_fragment_5, true);
-								const t_text_5 = t_child(t_next(t_root_5));
-								const t_text_6 = t_next(t_next(t_root_5), true);
+								const t_fragment_5 = t_fragment($parent.ownerDocument!, t_fragments, 5, `<span>#</span>`);
+								const t_span_1 = t_root(t_fragment_5) as HTMLSpanElement;
+								const t_text_3 = t_child(t_span_1);
 								$run(() => {
-									t_text_5.textContent = `${t_fmt(t_item_2.data.cell)} `;
+									t_text_3.textContent = `${t_fmt(t_item_2.data.cell)} `;
 								});
-								t_add_fragment(t_fragment_5, t_fragment_4, t_before_2, t_text_6);
-								t_next(t_text_6);
+								t_add_fragment(t_fragment_5, t_fragment_4, t_before_2, t_span_1);
+								t_next(t_span_1);
 								t_pop_region(t_old_region_2);
 							},
 							(t_old_item, t_new_item) => {
@@ -149,9 +143,7 @@ export default function ForSwitchFor(
 							}
 						);
 
-						const t_text_7 = t_next(t_for_anchor_2, true);
-						t_add_fragment(t_fragment_4, t_switch_parent_1, t_before, t_text_7);
-						t_next(t_text_7);
+						t_add_fragment(t_fragment_4, t_div_1, t_before);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 2;
 						break;
@@ -160,11 +152,10 @@ export default function ForSwitchFor(
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 3)) return;
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
-						const t_fragment_6 = t_fragment($parent.ownerDocument!, t_fragments, 6, ` <p>Unknown op</p> `);
-						const t_root_6 = t_root(t_fragment_6, true);
-						const t_text_8 = t_next(t_next(t_root_6), true);
-						t_add_fragment(t_fragment_6, t_switch_parent_1, t_before, t_text_8);
-						t_next(t_text_8);
+						const t_fragment_6 = t_fragment($parent.ownerDocument!, t_fragments, 6, `<p>Unknown op</p>`);
+						const t_p_3 = t_root(t_fragment_6) as HTMLElement;
+						t_add_fragment(t_fragment_6, t_div_1, t_before, t_p_3);
+						t_next(t_p_3);
 						t_pop_region(t_old_region);
 						t_switch_index_1 = 3;
 						break;
@@ -172,9 +163,8 @@ export default function ForSwitchFor(
 				}
 			});
 
-			const t_text_9 = t_next(t_switch_parent_1, true);
-			t_add_fragment(t_fragment_1, t_fragment_0, t_before_1, t_text_9);
-			t_next(t_text_9);
+			t_add_fragment(t_fragment_1, t_fragment_0, t_before_1, t_div_1);
+			t_next(t_div_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -182,8 +172,6 @@ export default function ForSwitchFor(
 		}
 	);
 
-	const t_text_10 = t_next(t_for_anchor_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_10);
-	t_next(t_text_10);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

@@ -1,7 +1,7 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ColorSelect(
 	// @ts-ignore
@@ -26,11 +26,11 @@ export default function ColorSelect(
 	];
 
 	/* User interface */
-	t_body += ` <div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"> <![>`;
+	t_body += `<div>Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}</div> <select value="${t_attr($state.selectedColorId) || ""}"><![>`;
 	for (let color of colors) {
-		t_body += `<!^> <option ${color.id ? `value="${t_attr(color.id)}"` : ""} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ""}> ${t_fmt(color.text)} </option> `;
+		t_body += `<!^><option ${color.id ? `value="${t_attr(color.id)}"` : ""} ${color.isDisabled ? `disabled="${t_attr(color.isDisabled)}"` : ""}> ${t_fmt(color.text)} </option>`;
 	}
-	t_body += `<!]><!> </select> `;
+	t_body += `<!]><!></select>`;
 
 	return { body: t_body, head: t_head };
 }

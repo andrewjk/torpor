@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Text(
 	$props: {
@@ -15,7 +15,7 @@ export default function Text(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p> ${t_fmt($props.value)} </p>  <p>${t_fmt($props.empty)}</p> `;
+	t_body += `<p> ${t_fmt($props.value)} </p>  <p>${t_fmt($props.empty)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

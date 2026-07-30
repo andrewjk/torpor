@@ -12,11 +12,11 @@ export default function ForEmpty(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <li>${t_fmt(item)}</li> `;
+		t_body += `<!^><li>${t_fmt(item)}</li>`;
 	}
-	t_body += `<!]><!> </ul> <p class="count">Count: ${t_fmt($props.items.length)}</p> `;
+	t_body += `<!]><!></ul> <p class="count">Count: ${t_fmt($props.items.length)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -3,11 +3,8 @@ import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fragment from "../../../../src/render/getFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
-import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
 import type SlotRender from "../../../../src/types/SlotRender";
 
@@ -24,27 +21,45 @@ export default function Html(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p> <!> </p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_html_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_html_anchor_1 = t_anchor(t_next(t_child(t_html_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p><!></p>`);
+	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_html_anchor_1 = t_anchor(t_child(t_p_1)) as HTMLElement;
 
 	/* @html */
-	const t_html_region_1 = t_region();
-	t_run_control(t_html_region_1, t_html_anchor_1, (t_before) => {
+	let t_html_first_1: ChildNode | null = null;
+	let t_html_last_1: ChildNode | null = null;
+	t_run_control(t_region(), t_html_anchor_1, (t_before) => {
 		$props.html;
-		if (!t_run_branch(t_html_region_1, 0, -1)) return;
-		const t_new_region = t_region();
-		const t_old_region = t_push_region(t_new_region, true);
+		if (t_html_first_1 !== null && t_html_last_1 !== null) {
+			let t_node: ChildNode | null = t_html_last_1;
+			while (t_node !== null && t_node !== t_html_first_1) {
+				const t_prev = t_node.previousSibling;
+				t_node.remove();
+				t_node = t_prev;
+			}
+			if (t_html_first_1) t_html_first_1.remove();
+			t_html_first_1 = t_html_last_1 = null;
+		}
 		let t_template_1 = document.createElement("template");
 		t_template_1.innerHTML = $props.html;
 		let t_fragment_1 = t_template_1.content.cloneNode(true) as DocumentFragment;
-		t_add_fragment(t_fragment_1, t_html_parent_1, t_before);
-		t_pop_region(t_old_region);
+		t_html_first_1 = t_fragment_1.firstChild;
+		t_html_last_1 = t_fragment_1.lastChild;
+		t_add_fragment(t_fragment_1, t_p_1, t_before);
+		if (t_html_first_1 !== null && t_html_first_1.parentNode !== t_p_1) {
+			t_html_last_1 = t_html_anchor_1.previousSibling as ChildNode | null;
+			if (t_html_last_1 !== null) {
+				t_html_first_1 = t_html_last_1;
+				let t_scan: ChildNode | null = t_html_last_1;
+				while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== t_html_anchor_1 && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {
+					t_scan = t_scan.previousSibling;
+				}
+				t_html_first_1 = t_scan;
+			}
+		}
 	});
 
-	const t_text_1 = t_next(t_html_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

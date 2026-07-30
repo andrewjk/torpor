@@ -12,7 +12,7 @@ export default function Named(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
 		// @ts-ignore
@@ -21,7 +21,7 @@ export default function Named(
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
-		t_body += `  <p> The article's body </p> `;
+		t_body += `<p> The article's body </p>`;
 		return t_body;
 	}
 	t_slots_1["header"] = (
@@ -37,7 +37,7 @@ export default function Named(
 	const t_comp_1 = Article(undefined, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -53,11 +53,11 @@ function Article(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <section> <h2> <![>`;
+	t_body += `<section><h2><![>`;
 	if ($slots && $slots["header"]) {
 		t_body += $slots["header"](undefined, $context);
 	}
-	t_body += `<!]><!> </h2> <![>`;
+	t_body += `<!]><!></h2> <![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
@@ -65,7 +65,7 @@ function Article(
 	if ($slots && $slots["footer"]) {
 		t_body += $slots["footer"](undefined, $context);
 	}
-	t_body += `<!]><!> </section> `;
+	t_body += `<!]><!></section>`;
 
 	return { body: t_body, head: t_head };
 }

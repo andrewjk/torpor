@@ -23,9 +23,8 @@ export default function DeepNesting(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_if_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!> <!>`);
+	let t_if_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @if */
 	const t_if_region_1 = t_region();
@@ -35,9 +34,9 @@ export default function DeepNesting(
 			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>L1</p> <!> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			let t_if_anchor_2 = t_anchor(t_next(t_next(t_next(t_root_1), true))) as HTMLElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>L1</p> <!>`);
+			const t_root_1 = t_root(t_fragment_1);
+			let t_if_anchor_2 = t_anchor(t_next(t_next(t_root_1, true))) as HTMLElement;
 
 			/* @if */
 			const t_if_region_2 = t_region();
@@ -47,9 +46,9 @@ export default function DeepNesting(
 					if (!t_run_branch(t_if_region_2, t_if_index_2, 0)) return;
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
-					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>L2</p> <!> `);
-					const t_root_2 = t_root(t_fragment_2, true);
-					let t_if_anchor_3 = t_anchor(t_next(t_next(t_next(t_root_2), true))) as HTMLElement;
+					const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>L2</p> <!>`);
+					const t_root_2 = t_root(t_fragment_2);
+					let t_if_anchor_3 = t_anchor(t_next(t_next(t_root_2, true))) as HTMLElement;
 
 					/* @if */
 					const t_if_region_3 = t_region();
@@ -59,9 +58,9 @@ export default function DeepNesting(
 							if (!t_run_branch(t_if_region_3, t_if_index_3, 0)) return;
 							const t_new_region = t_region();
 							const t_old_region = t_push_region(t_new_region, true);
-							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, ` <p>L3</p> <!> `);
-							const t_root_3 = t_root(t_fragment_3, true);
-							let t_if_anchor_4 = t_anchor(t_next(t_next(t_next(t_root_3), true))) as HTMLElement;
+							const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<p>L3</p> <!>`);
+							const t_root_3 = t_root(t_fragment_3);
+							let t_if_anchor_4 = t_anchor(t_next(t_next(t_root_3, true))) as HTMLElement;
 
 							/* @if */
 							const t_if_region_4 = t_region();
@@ -71,11 +70,10 @@ export default function DeepNesting(
 									if (!t_run_branch(t_if_region_4, t_if_index_4, 0)) return;
 									const t_new_region = t_region();
 									const t_old_region = t_push_region(t_new_region, true);
-									const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, ` <p>L4</p> `);
-									const t_root_4 = t_root(t_fragment_4, true);
-									const t_text_1 = t_next(t_next(t_root_4), true);
-									t_add_fragment(t_fragment_4, t_fragment_3, t_before, t_text_1);
-									t_next(t_text_1);
+									const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, `<p>L4</p>`);
+									const t_p_1 = t_root(t_fragment_4) as HTMLElement;
+									t_add_fragment(t_fragment_4, t_fragment_3, t_before, t_p_1);
+									t_next(t_p_1);
 									t_pop_region(t_old_region);
 									t_if_index_4 = 0;
 								}
@@ -85,9 +83,7 @@ export default function DeepNesting(
 								}
 							});
 
-							const t_text_2 = t_next(t_if_anchor_4, true);
-							t_add_fragment(t_fragment_3, t_fragment_2, t_before, t_text_2);
-							t_next(t_text_2);
+							t_add_fragment(t_fragment_3, t_fragment_2, t_before);
 							t_pop_region(t_old_region);
 							t_if_index_3 = 0;
 						}
@@ -97,9 +93,7 @@ export default function DeepNesting(
 						}
 					});
 
-					const t_text_3 = t_next(t_if_anchor_3, true);
-					t_add_fragment(t_fragment_2, t_fragment_1, t_before, t_text_3);
-					t_next(t_text_3);
+					t_add_fragment(t_fragment_2, t_fragment_1, t_before);
 					t_pop_region(t_old_region);
 					t_if_index_2 = 0;
 				}
@@ -109,9 +103,7 @@ export default function DeepNesting(
 				}
 			});
 
-			const t_text_4 = t_next(t_if_anchor_2, true);
-			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_4);
-			t_next(t_text_4);
+			t_add_fragment(t_fragment_1, t_fragment_0, t_before);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -131,11 +123,10 @@ export default function DeepNesting(
 			if (!t_run_branch(t_if_region_5, t_if_index_5, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
-			const t_fragment_5 = t_fragment($parent.ownerDocument!, t_fragments, 5, ` <p>On flag</p> `);
-			const t_root_5 = t_root(t_fragment_5, true);
-			const t_text_5 = t_next(t_next(t_root_5), true);
-			t_add_fragment(t_fragment_5, t_fragment_0, t_before, t_text_5);
-			t_next(t_text_5);
+			const t_fragment_5 = t_fragment($parent.ownerDocument!, t_fragments, 5, `<p>On flag</p>`);
+			const t_p_2 = t_root(t_fragment_5) as HTMLElement;
+			t_add_fragment(t_fragment_5, t_fragment_0, t_before, t_p_2);
+			t_next(t_p_2);
 			t_pop_region(t_old_region);
 			t_if_index_5 = 0;
 		}
@@ -145,8 +136,6 @@ export default function DeepNesting(
 		}
 	});
 
-	const t_text_6 = t_next(t_if_anchor_5, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_6);
-	t_next(t_text_6);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

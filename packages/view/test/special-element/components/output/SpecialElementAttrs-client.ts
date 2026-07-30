@@ -21,18 +21,17 @@ export default function SpecialElementAttrs(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <el id="dynamic" class="custom" data-value="test">#</el> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_element_1 = t_next(t_root_0) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<el id="dynamic" class="custom" data-value="test">#</el>`);
+	const t_root_0 = t_root(t_fragment_0);
+	let t_element_1 = t_root_0 as HTMLElement;
 	const t_text_1 = t_child(t_element_1);
-	const t_text_2 = t_next(t_element_1, true);
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 	});
 	$run(() => {
 		t_text_1.textContent = ` ${t_fmt($props.content)} `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
+	t_next(t_element_1);
 
 }

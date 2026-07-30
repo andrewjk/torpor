@@ -19,16 +19,14 @@ export default function AttrNull(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div data-count=""> Content </div> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_div_1 = t_next(t_root_0) as HTMLDivElement;
-	const t_text_1 = t_next(t_div_1, true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div data-count=""> Content </div>`);
+	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
 	$run(() => {
 		t_attribute(t_div_1, "title", $props.title);
 		t_attribute(t_div_1, "aria-label", $props.label);
 		t_attribute(t_div_1, "data-count", $props.count);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
+	t_next(t_div_1);
 
 }

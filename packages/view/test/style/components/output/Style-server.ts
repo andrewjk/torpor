@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_style from "../../../../src/render/buildStyles";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Style(
 	$props: Record<PropertyKey, any>,
@@ -12,7 +12,7 @@ export default function Style(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${t_style({ color: $props.color }) !== "" ? `style="${t_style({ color: $props.color })}"` : ""}> Hello! </div> `;
+	t_body += `<div ${t_style({ color: $props.color }) !== "" ? `style="${t_style({ color: $props.color })}"` : ""}> Hello! </div>`;
 
 	return { body: t_body, head: t_head };
 }

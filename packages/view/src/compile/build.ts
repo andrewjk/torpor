@@ -5,6 +5,7 @@ import buildServerCode from "./build/server/buildServerCode";
 import type BuildOptions from "./types/BuildOptions";
 import type BuildResult from "./types/BuildResult";
 import type SourceMapping from "./types/SourceMapping";
+import trimWhitespace from "./utils/trimWhitespace";
 
 /**
  * Builds a component template into code and styles for rendering
@@ -14,6 +15,16 @@ import type SourceMapping from "./types/SourceMapping";
  * @returns The component's code and styles
  */
 export default function build(template: Template, options?: BuildOptions): BuildResult {
+	// Trim whitespace text nodes (Svelte 5-style) unless explicitly disabled.
+	// The pass mutates the tree in place but is idempotent, so it is safe even
+	// when build is called twice (client + server) on the same template.
+	if (!options?.preserveWhitespace) {
+		for (const component of template.components) {
+			if (component.markup) trimWhitespace(component.markup);
+			if (component.head) trimWhitespace(component.head);
+		}
+	}
+
 	let map: SourceMapping[] = [];
 	let code = options?.server
 		? buildServerCode(template, options)

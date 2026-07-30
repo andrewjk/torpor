@@ -17,7 +17,7 @@ export default function BindRadio(
 	let $state = $watch({ color: "red" });
 
 	/* User interface */
-	t_body += ` <label> <input type="radio" name="color" value="red" value="${t_attr($state.color) || ""}"> Red </label> <label> <input type="radio" name="color" value="green" value="${t_attr($state.color) || ""}"> Green </label> <label> <input type="radio" name="color" value="blue" value="${t_attr($state.color) || ""}"> Blue </label> <p>Selected: ${t_fmt($state.color)}</p> `;
+	t_body += `<label><input type="radio" name="color" value="red" group="${t_attr($state.color) || ""}"> Red </label> <label><input type="radio" name="color" value="green" group="${t_attr($state.color) || ""}"> Green </label> <label><input type="radio" name="color" value="blue" group="${t_attr($state.color) || ""}"> Blue </label> <p>Selected: ${t_fmt($state.color)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

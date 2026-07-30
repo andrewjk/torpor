@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function AnswerButtonApp(
 	// @ts-ignore
@@ -26,7 +26,7 @@ export default function AnswerButtonApp(
 	}
 
 	/* User interface */
-	t_body += ` <p>Are you happy?</p> <![>`;
+	t_body += `<p>Are you happy?</p> <![>`;
 	const t_props_1 = {
 		onYes: onAnswerYes,
 		onNo: onAnswerNo,
@@ -34,7 +34,7 @@ export default function AnswerButtonApp(
 	const t_comp_1 = AnswerButton(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p> `;
+	t_body += `<!]><!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -50,7 +50,7 @@ function AnswerButton(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <button>YES</button> <button>NO</button> `;
+	t_body += `<button>YES</button> <button>NO</button>`;
 
 	return { body: t_body, head: t_head };
 }

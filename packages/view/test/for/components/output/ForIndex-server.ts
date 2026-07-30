@@ -12,11 +12,11 @@ export default function ForIndex(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let i = 0; i < $props.list.length; i++) {
-		t_body += `<!^> <li>Item ${t_fmt(i)}: ${t_fmt($props.list[i])}</li> `;
+		t_body += `<!^><li>Item ${t_fmt(i)}: ${t_fmt($props.list[i])}</li>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

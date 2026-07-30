@@ -11,26 +11,26 @@ export default function SwitchString(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch ($props.status) {
 		case "loading": {
-			t_body += `<!^> <p>Loading...</p> `;
+			t_body += `<!^><p>Loading...</p>`;
 			break;
 		}
 		case "success": {
-			t_body += `<!^> <p>Loaded!</p> `;
+			t_body += `<!^><p>Loaded!</p>`;
 			break;
 		}
 		case "error": {
-			t_body += `<!^> <p>Error occurred</p> `;
+			t_body += `<!^><p>Error occurred</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^> <p>Idle</p> `;
+			t_body += `<!^><p>Idle</p>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

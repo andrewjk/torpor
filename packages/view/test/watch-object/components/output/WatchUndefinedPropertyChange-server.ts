@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Watched(
 	$props: Record<PropertyKey, any>,
@@ -12,7 +12,7 @@ export default function Watched(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p> ${t_fmt($props.text)} </p> `;
+	t_body += `<p> ${t_fmt($props.text)} </p>`;
 
 	return { body: t_body, head: t_head };
 }

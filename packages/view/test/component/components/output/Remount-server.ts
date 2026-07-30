@@ -11,22 +11,22 @@ export default function SwitchComponent(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch ($props.mode) {
 		case "a": {
-			t_body += `<!^> <div id="a">Mode A</div> `;
+			t_body += `<!^><div id="a">Mode A</div>`;
 			break;
 		}
 		case "b": {
-			t_body += `<!^> <div id="b">Mode B</div> `;
+			t_body += `<!^><div id="b">Mode B</div>`;
 			break;
 		}
 		default: {
-			t_body += `<!^> <div id="default">Default</div> `;
+			t_body += `<!^><div id="default">Default</div>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

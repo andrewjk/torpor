@@ -12,18 +12,18 @@ export default function ForWithIfElse(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <nav> <![>`;
+	t_body += `<nav><![>`;
 	for (let tab of $props.tabs) {
-		t_body += `<!^> <![>`;
+		t_body += `<!^><![>`;
 		if (tab === $props.activeTab) {
-			t_body += `<!^> <button class="active">${t_fmt(tab)}</button> `;
+			t_body += `<!^><button class="active">${t_fmt(tab)}</button>`;
 		}
 		else {
-			t_body += `<!^> <button>${t_fmt(tab)}</button> `;
+			t_body += `<!^><button>${t_fmt(tab)}</button>`;
 		}
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 	}
-	t_body += `<!]><!> </nav> <p>Active: ${t_fmt($props.activeTab)}</p> `;
+	t_body += `<!]><!></nav> <p>Active: ${t_fmt($props.activeTab)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -22,10 +22,10 @@ export default function NestedComponent(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <h1>#</h1> <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h1>#</h1> <!>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_text_1 = t_child(t_root_0);
+	let t_comp_anchor_1 = t_anchor(t_next(t_next(t_root_0, true))) as HTMLElement;
 
 	/* @component */
 	let t_props_1 = $watch({
@@ -43,9 +43,9 @@ export default function NestedComponent(
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
-		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <!> `);
-		const t_root_2 = t_root(t_fragment_2, true);
-		let t_comp_anchor_2 = t_anchor(t_next(t_root_2)) as HTMLElement;
+		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<!>`);
+		const t_root_2 = t_root(t_fragment_2);
+		let t_comp_anchor_2 = t_anchor(t_root_2) as HTMLElement;
 
 		/* @component */
 		let t_props_2 = $watch({
@@ -56,18 +56,14 @@ export default function NestedComponent(
 		});
 		Child(t_fragment_2, t_comp_anchor_2, t_props_2, $context);
 
-		const t_text_2 = t_next(t_comp_anchor_2, true);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_2);
-		t_next(t_text_2);
+		t_add_fragment(t_fragment_2, $sparent, $sanchor);
 	}
 	Parent(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
-	const t_text_3 = t_next(t_comp_anchor_1, true);
 	$run(() => {
 		t_text_1.textContent = t_fmt($props.parentName);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }
 
@@ -83,20 +79,18 @@ function Parent(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <div> <p>#</p> <!> </div> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_child(t_next(t_root_0))));
-	const t_slot_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_slot_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_slot_parent_1)), true))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<div><p>#</p> <!></div>`);
+	const t_div_1 = t_root(t_fragment_0) as HTMLDivElement;
+	const t_text_1 = t_child(t_child(t_div_1));
+	let t_slot_anchor_1 = t_anchor(t_next(t_next(t_child(t_div_1), true))) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
+		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	}
-	const t_text_2 = t_next(t_slot_parent_1, true);
 	$run(() => {
 		t_text_1.textContent = `Parent: ${t_fmt($props.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_1);
+	t_next(t_div_1);
 
 }
 
@@ -113,14 +107,13 @@ function Child(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	const t_text_2 = t_next(t_next(t_root_0), true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p>`);
+	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
+	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = `Child: ${t_fmt($props.name)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

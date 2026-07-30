@@ -1,7 +1,7 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function InputHello(
 	// @ts-ignore
@@ -19,7 +19,7 @@ export default function InputHello(
 	});
 
 	/* User interface */
-	t_body += ` <p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}"> `;
+	t_body += `<p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}">`;
 
 	return { body: t_body, head: t_head };
 }

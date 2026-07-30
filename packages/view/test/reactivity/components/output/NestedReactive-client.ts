@@ -27,11 +27,11 @@ export default function NestedReactive(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <ul> <!> </ul> <p>#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	const t_for_parent_1 = t_next(t_next(t_next(t_root_0), true)) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_next(t_next(t_next(t_root_0), true))))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p> <ul><!></ul> <p>#</p>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_text_1 = t_child(t_root_0);
+	const t_for_parent_1 = t_next(t_next(t_root_0, true)) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_next(t_next(t_root_0, true)))) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
@@ -57,15 +57,14 @@ export default function NestedReactive(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>#</li> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_2 = t_child(t_next(t_root_1));
-			const t_text_3 = t_next(t_next(t_root_1), true);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<li>#</li>`);
+			const t_li_1 = t_root(t_fragment_1) as HTMLElement;
+			const t_text_2 = t_child(t_li_1);
 			$run(() => {
 				t_text_2.textContent = t_fmt(t_item_1.data.tag);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_3);
-			t_next(t_text_3);
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_li_1);
+			t_next(t_li_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -73,13 +72,13 @@ export default function NestedReactive(
 		}
 	);
 
-	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
-	const t_text_5 = t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true);
+	const t_p_1 = t_next(t_next(t_next(t_next(t_root_0, true)), true)) as HTMLElement;
+	const t_text_3 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = `Name: ${t_fmt($props.user.name)}`;
-		t_text_4.textContent = `Tag count: ${t_fmt($props.user.tags.length)}`;
+		t_text_3.textContent = `Tag count: ${t_fmt($props.user.tags.length)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
-	t_next(t_text_5);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

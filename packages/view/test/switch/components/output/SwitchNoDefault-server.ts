@@ -19,18 +19,18 @@ export default function Switch(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch ($props.value) {
 		case 1: {
-			t_body += `<!^> <p> A small value. </p> `;
+			t_body += `<!^><p> A small value. </p>`;
 			break;
 		}
 		case 100: {
-			t_body += `<!^> <p> A large value. </p> `;
+			t_body += `<!^><p> A large value. </p>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

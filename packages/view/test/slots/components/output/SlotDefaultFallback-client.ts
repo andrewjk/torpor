@@ -28,9 +28,9 @@ export default function SlotDefault(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_comp_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!> <!>`);
+	const t_root_0 = t_root(t_fragment_0);
+	let t_comp_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @component */
 	const t_slots_1: Record<string, SlotRender> = {};
@@ -42,11 +42,10 @@ export default function SlotDefault(
 		// @ts-ignore
 		$context?: Record<PropertyKey, any>
 	) => {
-		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>Default content</p> `);
-		const t_root_2 = t_root(t_fragment_2, true);
-		const t_text_1 = t_next(t_next(t_root_2), true);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
-		t_next(t_text_1);
+		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>Default content</p>`);
+		const t_p_1 = t_root(t_fragment_2) as HTMLElement;
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_p_1);
+		t_next(t_p_1);
 	}
 	List(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
@@ -61,9 +60,7 @@ export default function SlotDefault(
 	});
 	ListWithItems(t_fragment_0, t_comp_anchor_2, t_props_1, $context);
 
-	const t_text_2 = t_next(t_comp_anchor_2, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }
 
@@ -80,22 +77,19 @@ function List(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <ul> <!> </ul> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_slot_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_slot_anchor_1 = t_anchor(t_next(t_child(t_slot_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<ul><!></ul>`);
+	const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_slot_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
-		$slots["_"](t_slot_parent_1, t_slot_anchor_1, undefined, $context)
+		$slots["_"](t_ul_1, t_slot_anchor_1, undefined, $context)
 	} else {
-		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>Empty list</li> `);
-		const t_root_1 = t_root(t_fragment_1, true);
-		const t_text_1 = t_next(t_next(t_root_1), true);
-		t_add_fragment(t_fragment_1, t_slot_parent_1, t_slot_anchor_1, t_text_1);
-		t_next(t_text_1);
+		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<li>Empty list</li>`);
+		const t_li_1 = t_root(t_fragment_1) as HTMLElement;
+		t_add_fragment(t_fragment_1, t_ul_1, t_slot_anchor_1, t_li_1);
+		t_next(t_li_1);
 	}
-	const t_text_2 = t_next(t_slot_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_2);
-	t_next(t_text_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_ul_1);
+	t_next(t_ul_1);
 
 }
 
@@ -112,16 +106,15 @@ function ListWithItems(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <ul> <!> </ul> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<ul><!></ul>`);
+	const t_ul_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_for_parent_1,
+		t_ul_1,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItem[] = [];
@@ -141,15 +134,14 @@ function ListWithItems(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <li>#</li> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_1 = t_child(t_next(t_root_1));
-			const t_text_2 = t_next(t_next(t_root_1), true);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<li>#</li>`);
+			const t_li_1 = t_root(t_fragment_1) as HTMLElement;
+			const t_text_1 = t_child(t_li_1);
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.item);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_ul_1, t_before_1, t_li_1);
+			t_next(t_li_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -157,8 +149,7 @@ function ListWithItems(
 		}
 	);
 
-	const t_text_3 = t_next(t_for_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_ul_1);
+	t_next(t_ul_1);
 
 }

@@ -12,17 +12,17 @@ export default function ReplaceInIf(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.show) {
-		t_body += `<!^> <![>`;
+		t_body += `<!^><![>`;
 		$props.counter;
-		t_body += ` <p>Replaced: ${t_fmt($props.counter)}</p> `;
-		t_body += `<!]><!> `;
+		t_body += `<p>Replaced: ${t_fmt($props.counter)}</p>`;
+		t_body += `<!]><!>`;
 	}
 	else {
-		t_body += `<!^> <p>Hidden</p> `;
+		t_body += `<!^><p>Hidden</p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

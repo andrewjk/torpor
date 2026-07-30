@@ -28,16 +28,15 @@ export default function ForAfterFor(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <section> <!> <!> </section> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section><!> <!></section>`);
+	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_for_parent_1,
+		t_section_1,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItem[] = [];
@@ -57,15 +56,14 @@ export default function ForAfterFor(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_1 = t_child(t_next(t_root_1));
-			const t_text_2 = t_next(t_next(t_root_1), true);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>#</p>`);
+			const t_p_1 = t_root(t_fragment_1) as HTMLElement;
+			const t_text_1 = t_child(t_p_1);
 			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)} `;
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_p_1);
+			t_next(t_p_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -73,14 +71,13 @@ export default function ForAfterFor(
 		}
 	);
 
-	const t_for_parent_2 = t_for_parent_1 as HTMLElement;
 	let t_for_anchor_2 = t_anchor(t_next(t_next(t_for_anchor_1, true))) as HTMLElement;
 
 	/* @for */
 	let t_for_region_2 = t_region();
 	t_run_list(
 		t_for_region_2,
-		t_for_parent_2,
+		t_section_1,
 		t_for_anchor_2,
 		() => {
 			let t_new_items_2: ListItem[] = [];
@@ -100,15 +97,14 @@ export default function ForAfterFor(
 		},
 		(t_item_2, t_before_2) => {
 			let t_old_region_2 = t_push_region(t_item_2);
-			const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` <p>#</p> `);
-			const t_root_2 = t_root(t_fragment_2, true);
-			const t_text_3 = t_child(t_next(t_root_2));
-			const t_text_4 = t_next(t_next(t_root_2), true);
+			const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<p>#</p>`);
+			const t_p_2 = t_root(t_fragment_2) as HTMLElement;
+			const t_text_2 = t_child(t_p_2);
 			$run(() => {
-				t_text_3.textContent = ` ${t_fmt(t_item_2.data.i)} `;
+				t_text_2.textContent = ` ${t_fmt(t_item_2.data.i)} `;
 			});
-			t_add_fragment(t_fragment_2, t_for_parent_2, t_before_2, t_text_4);
-			t_next(t_text_4);
+			t_add_fragment(t_fragment_2, t_section_1, t_before_2, t_p_2);
+			t_next(t_p_2);
 			t_pop_region(t_old_region_2);
 		},
 		(t_old_item, t_new_item) => {
@@ -116,8 +112,7 @@ export default function ForAfterFor(
 		}
 	);
 
-	const t_text_5 = t_next(t_for_parent_2, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_5);
-	t_next(t_text_5);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
+	t_next(t_section_1);
 
 }

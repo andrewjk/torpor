@@ -12,7 +12,7 @@ export default function StyleMultiple(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div id="multi" ${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background }) !== "" ? `style="${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background })}"` : ""}> Multi style </div> `;
+	t_body += `<div id="multi" ${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background }) !== "" ? `style="${t_style({ color: $props.color, fontSize: $props.fontSize + "px", background: $props.background })}"` : ""}> Multi style </div>`;
 
 	return { body: t_body, head: t_head };
 }

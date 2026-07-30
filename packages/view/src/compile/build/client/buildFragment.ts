@@ -120,7 +120,12 @@ function maybeAddRootNodeDeclaration(
 		status.imports.add("t_root");
 		const rootName = `t_root_${fragment.number}`;
 		const params = [fragmentName];
-		if (firstNode.type === "text") {
+		// The text flag must reflect the first node that actually renders to the
+		// DOM, because non-rendering nodes (e.g. @key, @const, comments) produce
+		// no fragment output. Trimming leading whitespace can otherwise leave
+		// such a node as the first child and produce a mismatched flag.
+		const firstRendering = firstRenderingChild(node.children);
+		if (firstRendering && isTextNode(firstRendering)) {
 			params.push("true");
 		}
 		const rootPath = `t_root(${params.join(", ")})`;
@@ -131,6 +136,29 @@ function maybeAddRootNodeDeclaration(
 
 		printDebug(rootName, status, b);
 	}
+}
+
+/** Control operations that produce no DOM output within a fragment. */
+const NON_RENDERING_OPERATIONS = new Set([
+	"@key",
+	"@const",
+	"@console",
+	"@debugger",
+	"@function",
+	"@async function",
+]);
+
+/**
+ * Returns the first child that actually renders to the DOM, skipping comments
+ * and no-output control nodes like @key/@const.
+ */
+function firstRenderingChild(children: TemplateNode[]): TemplateNode | undefined {
+	for (const child of children) {
+		if (child.type === "comment") continue;
+		if (isControlNode(child) && NON_RENDERING_OPERATIONS.has(child.operation)) continue;
+		return child;
+	}
+	return undefined;
 }
 
 function declareFragmentVars(

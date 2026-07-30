@@ -12,18 +12,18 @@ export default function IfContainingFor(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.show) {
-		t_body += `<!^> <ul> <![>`;
+		t_body += `<!^><ul><![>`;
 		for (let item of $props.items) {
-			t_body += `<!^> <li>${t_fmt(item)}</li> `;
+			t_body += `<!^><li>${t_fmt(item)}</li>`;
 		}
-		t_body += `<!]><!> </ul> `;
+		t_body += `<!]><!></ul>`;
 	}
 	else {
-		t_body += `<!^> <p>Nothing to show</p> `;
+		t_body += `<!^><p>Nothing to show</p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -16,14 +16,14 @@ export default function Reactive(
 	let $state = $watch({ name: "Jim" })
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_props_1 = {
 		...$state,
 	};
 	const t_comp_1 = Child(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -39,7 +39,7 @@ function Child(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p> ${t_fmt($props.name)} </p> `;
+	t_body += `<p> ${t_fmt($props.name)} </p>`;
 
 	return { body: t_body, head: t_head };
 }

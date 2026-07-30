@@ -15,7 +15,7 @@ export default function Ref(
 	let button: HTMLButtonElement;
 
 	/* User interface */
-	t_body += ` <button> hi </button> <p> the button's text is '${t_fmt(button?.textContent)}' </p> `;
+	t_body += `<button> hi </button> <p> the button's text is '${t_fmt(button?.textContent)}' </p>`;
 
 	return { body: t_body, head: t_head };
 }

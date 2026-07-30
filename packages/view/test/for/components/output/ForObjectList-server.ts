@@ -12,11 +12,11 @@ export default function ForObject(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let fruit of $props.fruits) {
-		t_body += `<!^> <li>${t_fmt(fruit.name)} is ${t_fmt(fruit.color)}</li> `;
+		t_body += `<!^><li>${t_fmt(fruit.name)} is ${t_fmt(fruit.color)}</li>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

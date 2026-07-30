@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function NameUpdate(
 	// @ts-ignore
@@ -19,7 +19,7 @@ export default function NameUpdate(
 	$state.name = "Jane"
 
 	/* User interface */
-	t_body += ` <h1>Hello ${t_fmt($state.name)}</h1> `;
+	t_body += `<h1>Hello ${t_fmt($state.name)}</h1>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -1,7 +1,7 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function BindComponent(
 	// @ts-ignore
@@ -17,14 +17,14 @@ export default function BindComponent(
 	let $state = $watch({ name: "Alice", selected: 1 });
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_props_1 = {
 		name: $state.name,
 	};
 	const t_comp_1 = BindText(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p> `;
+	t_body += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -40,7 +40,7 @@ function BindText(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <input value="${t_attr($props.name) || ""}"> `;
+	t_body += `<input value="${t_attr($props.name) || ""}">`;
 
 	return { body: t_body, head: t_head };
 }

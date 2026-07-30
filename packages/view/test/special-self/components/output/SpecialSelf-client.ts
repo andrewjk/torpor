@@ -27,10 +27,10 @@ export default function Self(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p>#</p> <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	let t_if_anchor_1 = t_anchor(t_next(t_next(t_next(t_root_0), true))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p> <!>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_text_1 = t_child(t_root_0);
+	let t_if_anchor_1 = t_anchor(t_next(t_next(t_root_0, true))) as HTMLElement;
 
 	/* @if */
 	const t_if_region_1 = t_region();
@@ -40,9 +40,9 @@ export default function Self(
 			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <!> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			let t_comp_anchor_1 = t_anchor(t_next(t_root_1)) as HTMLElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<!>`);
+			const t_root_1 = t_root(t_fragment_1);
+			let t_comp_anchor_1 = t_anchor(t_root_1) as HTMLElement;
 
 			/* @component */
 			let t_props_1 = $watch({
@@ -53,9 +53,7 @@ export default function Self(
 			});
 			Self(t_fragment_1, t_comp_anchor_1, t_props_1, $context);
 
-			const t_text_2 = t_next(t_comp_anchor_1, true);
-			t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_fragment_0, t_before);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 0;
 		}
@@ -65,11 +63,9 @@ export default function Self(
 		}
 	});
 
-	const t_text_3 = t_next(t_if_anchor_1, true);
 	$run(() => {
 		t_text_1.textContent = `Level ${t_fmt($props.level)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

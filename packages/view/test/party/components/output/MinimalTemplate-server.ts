@@ -12,7 +12,7 @@ export default function HelloWorld(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <h1>Hello world</h1> `;
+	t_body += `<h1>Hello world</h1>`;
 
 	return { body: t_body, head: t_head };
 }

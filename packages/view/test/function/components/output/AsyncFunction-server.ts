@@ -12,13 +12,7 @@ export default function AsyncFunctionTest(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <button id="btn">Click</button> <p>Status: idle</p> `;
-
-	async function fetchData() {
-		window.__asyncResult = "fetched"
-	};
-
-	t_body += ` `;
+	t_body += `<button id="btn">Click</button> <p>Status: idle</p>`;
 
 	return { body: t_body, head: t_head };
 }

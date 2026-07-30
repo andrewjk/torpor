@@ -27,16 +27,15 @@ export default function ArrayEntries(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <section> <p>^</p> <!> <p>$</p> </section> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_next(t_next(t_child(t_for_parent_1)), true))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section><p>^</p> <!> <p>$</p></section>`);
+	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_next(t_next(t_child(t_section_1), true))) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_for_parent_1,
+		t_section_1,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItem[] = [];
@@ -57,15 +56,15 @@ export default function ArrayEntries(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>#</span> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>#</span>`);
 			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_1 = t_child(t_next(t_root_1));
-			const t_text_2 = t_next(t_next(t_root_1), true);
+			const t_span_1 = t_next(t_root_1) as HTMLSpanElement;
+			const t_text_1 = t_child(t_span_1);
 			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item_1.data.i > 0 ? ", " : "")} ${t_fmt(t_item_1.data.item.text)} `;
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_span_1);
+			t_next(t_span_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -74,8 +73,7 @@ export default function ArrayEntries(
 		}
 	);
 
-	const t_text_3 = t_next(t_for_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
+	t_next(t_section_1);
 
 }

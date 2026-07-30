@@ -12,7 +12,7 @@ export default function StyleCustomProp(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" }) !== "" ? `style="${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" })}"` : ""}> Colored text </div> `;
+	t_body += `<div ${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" }) !== "" ? `style="${t_style({ "--my-color": $props.styleVar, color: "var(--my-color)" })}"` : ""}> Colored text </div>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -11,30 +11,30 @@ export default function SwitchExpr(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch (Math.floor($props.score / 10)) {
 		case 0: {
-			t_body += `<!^> <p>F</p> `;
+			t_body += `<!^><p>F</p>`;
 			break;
 		}
 		case 1: {
-			t_body += `<!^> <p>D</p> `;
+			t_body += `<!^><p>D</p>`;
 			break;
 		}
 		case 2: {
-			t_body += `<!^> <p>C</p> `;
+			t_body += `<!^><p>C</p>`;
 			break;
 		}
 		case 3: {
-			t_body += `<!^> <p>B</p> `;
+			t_body += `<!^><p>B</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^> <p>A</p> `;
+			t_body += `<!^><p>A</p>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

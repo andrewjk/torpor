@@ -24,9 +24,8 @@ export default function IfContainingIf(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <!> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_if_anchor_1 = t_anchor(t_next(t_root_0)) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
+	let t_if_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
 
 	/* @if */
 	const t_if_region_1 = t_region();
@@ -36,9 +35,8 @@ export default function IfContainingIf(
 			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <button>do it</button> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_button_1 = t_next(t_root_1) as HTMLButtonElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<button>do it</button> `);
+			const t_button_1 = t_root(t_fragment_1) as HTMLButtonElement;
 			t_event(t_button_1, "click", doit);
 
 			/* @function */
@@ -57,8 +55,6 @@ export default function IfContainingIf(
 		}
 	});
 
-	const t_text_1 = t_next(t_if_anchor_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor);
 
 }

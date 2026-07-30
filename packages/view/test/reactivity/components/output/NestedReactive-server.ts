@@ -12,11 +12,11 @@ export default function NestedReactive(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <p>Name: ${t_fmt($props.user.name)}</p> <ul> <![>`;
+	t_body += `<p>Name: ${t_fmt($props.user.name)}</p> <ul><![>`;
 	for (let tag of $props.user.tags) {
-		t_body += `<!^> <li>${t_fmt(tag)}</li> `;
+		t_body += `<!^><li>${t_fmt(tag)}</li>`;
 	}
-	t_body += `<!]><!> </ul> <p>Tag count: ${t_fmt($props.user.tags.length)}</p> `;
+	t_body += `<!]><!></ul> <p>Tag count: ${t_fmt($props.user.tags.length)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

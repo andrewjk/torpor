@@ -32,16 +32,15 @@ export default function ForEscape(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <section> <!> </section> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_for_parent_1 = t_next(t_root_0) as HTMLElement;
-	let t_for_anchor_1 = t_anchor(t_next(t_child(t_for_parent_1))) as HTMLElement;
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section><!></section>`);
+	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
 	let t_for_region_1 = t_region();
 	t_run_list(
 		t_for_region_1,
-		t_for_parent_1,
+		t_section_1,
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItem[] = [];
@@ -61,14 +60,13 @@ export default function ForEscape(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input> `);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_text_1 = t_child(t_next(t_root_1));
-			const t_div_1 = t_next(t_next(t_next(t_root_1), true)) as HTMLDivElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input>`);
+			const t_root_1 = t_root(t_fragment_1);
+			const t_text_1 = t_child(t_root_1);
+			const t_div_1 = t_next(t_next(t_root_1, true)) as HTMLDivElement;
 			const t_div_2 = t_next(t_next(t_div_1, true)) as HTMLDivElement;
 			const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
-			const t_text_2 = t_next(t_input_1, true);
 			$run(() => {
 				t_input_1.value = t_item_1.data.i || "";
 			});
@@ -83,8 +81,8 @@ export default function ForEscape(
 				t_attribute(t_div_3, "name", things[t_item_1.data.i]);
 				t_attribute(t_input_1, "name", `${t_item_1.data.i}`);
 			});
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_text_2);
-			t_next(t_text_2);
+			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1);
+			t_next(t_input_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -92,8 +90,7 @@ export default function ForEscape(
 		}
 	);
 
-	const t_text_3 = t_next(t_for_parent_1, true);
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_3);
-	t_next(t_text_3);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
+	t_next(t_section_1);
 
 }

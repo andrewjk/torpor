@@ -6,7 +6,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_root from "../../../../src/render/nodeRoot";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function DynamicTagWithAttr(
+export default function DynamicTag(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { tag: string },
@@ -19,14 +19,13 @@ export default function DynamicTagWithAttr(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <el id="target" data-role=""> Content </el> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	let t_element_1 = t_next(t_root_0) as HTMLElement;
-	const t_text_1 = t_next(t_element_1, true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<el id="target"> Content </el>`);
+	const t_root_0 = t_root(t_fragment_0);
+	let t_element_1 = t_root_0 as HTMLElement;
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_1);
-	t_next(t_text_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
+	t_next(t_element_1);
 
 }

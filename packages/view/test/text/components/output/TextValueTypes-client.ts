@@ -20,17 +20,17 @@ export default function TextValues(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, ` <p id="str">#</p> <p id="num">#</p> <p id="bool">#</p> <p id="null">#</p> <p id="undef">#</p> <p id="zero">#</p> <p id="neg">#</p> <p id="nan">#</p> `);
-	const t_root_0 = t_root(t_fragment_0, true);
-	const t_text_1 = t_child(t_next(t_root_0));
-	const t_text_2 = t_child(t_next(t_next(t_next(t_root_0), true)));
-	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)));
-	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)));
-	const t_text_5 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true)));
-	const t_text_6 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true)), true)));
-	const t_text_7 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true)), true)), true)));
-	const t_text_8 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true)), true)), true)), true)));
-	const t_text_9 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0), true)), true)), true)), true)), true)), true)), true)), true);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p id="str">#</p> <p id="num">#</p> <p id="bool">#</p> <p id="null">#</p> <p id="undef">#</p> <p id="zero">#</p> <p id="neg">#</p> <p id="nan">#</p>`);
+	const t_root_0 = t_root(t_fragment_0);
+	const t_text_1 = t_child(t_root_0);
+	const t_text_2 = t_child(t_next(t_next(t_root_0, true)));
+	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_root_0, true)), true)));
+	const t_text_4 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)));
+	const t_text_5 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)), true)));
+	const t_text_6 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)), true)), true)));
+	const t_text_7 = t_child(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)), true)), true)), true)));
+	const t_p_1 = t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_next(t_root_0, true)), true)), true)), true)), true)), true)), true)) as HTMLElement;
+	const t_text_8 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = t_fmt($props.str);
 		t_text_2.textContent = t_fmt($props.num);
@@ -41,7 +41,7 @@ export default function TextValues(
 		t_text_7.textContent = t_fmt($props.negNum);
 		t_text_8.textContent = t_fmt($props.nan);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_text_9);
-	t_next(t_text_9);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_next(t_p_1);
 
 }

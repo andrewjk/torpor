@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Const(
 	// @ts-ignore
@@ -13,9 +13,8 @@ export default function Const(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` `;
 	const name = "Boris";
-	t_body += ` <p> Hello, ${t_fmt(name)}! </p> `;
+	t_body += ` <p> Hello, ${t_fmt(name)}! </p>`;
 
 	return { body: t_body, head: t_head };
 }

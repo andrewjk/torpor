@@ -11,11 +11,11 @@ export default function IfFalse(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.counter > 7) {
-		t_body += `<!^> <p> It's true! </p> `;
+		t_body += `<!^><p> It's true! </p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -1,10 +1,8 @@
-import $watch from "../../../../src/ssr/$serverWatch";
 import t_class from "../../../../src/render/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ClassString(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	$props: { size: string; color: string },
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -13,10 +11,8 @@ export default function ClassString(
 	let t_body = "";
 	let t_head = "";
 
-	let $state = $watch({ size: "large", color: "red" });
-
 	/* User interface */
-	t_body += ` <p ${t_class("box " + $state.size + " " + $state.color) !== "" ? `class="${t_class("box " + $state.size + " " + $state.color)}"` : ""}> Concatenated </p> <p ${t_class(["tag", $state.size, $state.color].join(" ")) !== "" ? `class="${t_class(["tag", $state.size, $state.color].join(" "))}"` : ""}> Joined </p> `;
+	t_body += `<p ${t_class("box " + $props.size + " " + $props.color) !== "" ? `class="${t_class("box " + $props.size + " " + $props.color)}"` : ""}> Concatenated </p> <p ${t_class(["tag", $props.size, $props.color].join(" ")) !== "" ? `class="${t_class(["tag", $props.size, $props.color].join(" "))}"` : ""}> Joined </p>`;
 
 	return { body: t_body, head: t_head };
 }

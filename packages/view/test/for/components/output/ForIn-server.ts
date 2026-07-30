@@ -1,5 +1,5 @@
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ForIn(
 	$props: Record<PropertyKey, any>,
@@ -12,11 +12,11 @@ export default function ForIn(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <section> <![>`;
+	t_body += `<section><![>`;
 	for (let key in $props.item) {
-		t_body += `<!^> <p> ${t_fmt($props.item[key])} </p> `;
+		t_body += `<!^><p> ${t_fmt($props.item[key])} </p>`;
 	}
-	t_body += `<!]><!> </section> `;
+	t_body += `<!]><!></section>`;
 
 	return { body: t_body, head: t_head };
 }

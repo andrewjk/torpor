@@ -12,7 +12,7 @@ export default function SpreadAttrs(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${$props.collapsed ? "false" : "true" ? `aria-expanded="${t_attr($props.collapsed ? "false" : "true")}"` : ""} ${$props.collapsed ? "collapsed" : "expanded" ? `data-state="${t_attr($props.collapsed ? "collapsed" : "expanded")}"` : ""}> <p>Content</p> </div> `;
+	t_body += `<div ${$props.collapsed ? "false" : "true" ? `aria-expanded="${t_attr($props.collapsed ? "false" : "true")}"` : ""} ${$props.collapsed ? "collapsed" : "expanded" ? `data-state="${t_attr($props.collapsed ? "collapsed" : "expanded")}"` : ""}><p>Content</p></div>`;
 
 	return { body: t_body, head: t_head };
 }

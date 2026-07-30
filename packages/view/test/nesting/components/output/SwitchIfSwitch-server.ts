@@ -11,40 +11,40 @@ export default function SwitchInsideIfInsideSwitch(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch ($props.level) {
 		case "top": {
-			t_body += `<!^> <![>`;
+			t_body += `<!^><![>`;
 			if ($props.kind === "a") {
-				t_body += `<!^> <![>`;
+				t_body += `<!^><![>`;
 				switch ($props.kind) {
 					case "a": {
-						t_body += `<!^> <p>Top A1</p> `;
+						t_body += `<!^><p>Top A1</p>`;
 						break;
 					}
 					default: {
-						t_body += `<!^> <p>Top A-default</p> `;
+						t_body += `<!^><p>Top A-default</p>`;
 						break;
 					}
 				}
-				t_body += `<!]><!> `;
+				t_body += `<!]><!>`;
 			}
 			else {
-				t_body += `<!^> <p>Top other</p> `;
+				t_body += `<!^><p>Top other</p>`;
 			}
-			t_body += `<!]><!> `;
+			t_body += `<!]><!>`;
 			break;
 		}
 		case "bottom": {
-			t_body += `<!^> <p>Bottom</p> `;
+			t_body += `<!^><p>Bottom</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^> <p>Fallback</p> `;
+			t_body += `<!^><p>Fallback</p>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

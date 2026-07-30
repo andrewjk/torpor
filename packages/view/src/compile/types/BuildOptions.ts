@@ -22,4 +22,12 @@ export default interface BuildOptions {
 	 * For internal testing and benchmarking
 	 */
 	renderFolder?: string;
+	/**
+	 * Whether to preserve all whitespace text nodes from the template.
+	 * When false (the default), whitespace is trimmed Svelte 5-style:
+	 * pure-whitespace nodes at the start/end of a container are removed,
+	 * and pure-whitespace nodes between siblings are collapsed to a single
+	 * space. Whitespace inside `pre`, `textarea`, and `code` is always kept.
+	 */
+	preserveWhitespace?: boolean;
 }

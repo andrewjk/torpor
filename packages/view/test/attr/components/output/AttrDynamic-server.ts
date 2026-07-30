@@ -12,7 +12,7 @@ export default function AttrDynamic(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div ${$props.id ? `id="${t_attr($props.id)}"` : ""} ${$props.title ? `title="${t_attr($props.title)}"` : ""} ${$props.dataValue ? `data-value="${t_attr($props.dataValue)}"` : ""}> Content </div> `;
+	t_body += `<div ${$props.id ? `id="${t_attr($props.id)}"` : ""} ${$props.title ? `title="${t_attr($props.title)}"` : ""} ${$props.dataValue ? `data-value="${t_attr($props.dataValue)}"` : ""}> Content </div>`;
 
 	return { body: t_body, head: t_head };
 }

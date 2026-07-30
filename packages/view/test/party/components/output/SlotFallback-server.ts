@@ -12,7 +12,7 @@ export default function FunnyButtonApp(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_comp_1 = FunnyButton(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
@@ -31,7 +31,7 @@ export default function FunnyButtonApp(
 	const t_comp_2 = FunnyButton(undefined, $context, t_slots_1);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -47,7 +47,7 @@ function FunnyButton(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <button style="
+	t_body += `<button style="
 				background: rgba(0, 0, 0, 0.4);
 				color: #fff;
 				padding: 10px 20px;
@@ -57,13 +57,13 @@ function FunnyButton(
 				box-shadow: 4px 4px rgba(0, 0, 0, 0.4);
 				transition: transform 0.2s cubic-bezier(0.34, 1.65, 0.88, 0.925) 0s;
 				outline: 0;
-			"> <![>`;
+			"><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	} else {
-		t_body += ` <span>No content found</span> `;
+		t_body += `<span>No content found</span>`;
 	}
-	t_body += `<!]><!> </button> `;
+	t_body += `<!]><!></button>`;
 
 	return { body: t_body, head: t_head };
 }

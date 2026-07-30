@@ -25,7 +25,7 @@ export default function MountCleanupReturn(
 	})
 
 	/* User interface */
-	t_body += ` <p>Mounted: ${t_fmt($state.mounted)}</p> `;
+	t_body += `<p>Mounted: ${t_fmt($state.mounted)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

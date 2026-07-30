@@ -1,6 +1,6 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 import t_fmt from "../../../../src/render/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function IsAvailable(
 	// @ts-ignore
@@ -18,7 +18,7 @@ export default function IsAvailable(
 	});
 
 	/* User interface */
-	t_body += ` <div>${t_fmt($state.isAvailable ? "Available" : "Not available")}</div> <input id="is-available" type="checkbox" checked="${$state.isAvailable || false}"> <label for="is-available">Is available</label> `;
+	t_body += `<div>${t_fmt($state.isAvailable ? "Available" : "Not available")}</div> <input id="is-available" type="checkbox" checked="${$state.isAvailable || false}"> <label for="is-available">Is available</label>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -14,10 +14,10 @@ export default function ReplaceSame(
 	let counter = 0;
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	$props.name;
-	t_body += ` <p>Render count: ${t_fmt(counter++)}</p> `;
-	t_body += `<!]><!> `;
+	t_body += `<p>Render count: ${t_fmt(counter++)}</p>`;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

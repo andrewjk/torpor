@@ -12,19 +12,19 @@ export default function CleanupIfInsideFor(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <ul> <![>`;
+	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <![>`;
+		t_body += `<!^><![>`;
 		if ($props.show) {
-			t_body += `<!^> <![>`;
+			t_body += `<!^><![>`;
 			const t_comp_1 = CleanupTracker(undefined, $context);
 			t_body += t_comp_1.body;
 			t_head += t_comp_1.head;
-			t_body += `<!]><!> `;
+			t_body += `<!]><!>`;
 		}
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 	}
-	t_body += `<!]><!> </ul> `;
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -48,7 +48,7 @@ function CleanupTracker(
 	});
 
 	/* User interface */
-	t_body += ` <p>Tracked</p> `;
+	t_body += `<p>Tracked</p>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -32,9 +32,9 @@ export default function Await(
 		}
 
 		/* User interface */
-		t_body += ` <![>`;
-		t_body += ` <p>Hmm...</p> `;
-		t_body += `<!]><!> <button> Guess again </button> `;
+		t_body += `<![>`;
+		t_body += `<p>Hmm...</p>`;
+		t_body += `<!]><!> <button> Guess again </button>`;
 
 		return { body: t_body, head: t_head };
 	}

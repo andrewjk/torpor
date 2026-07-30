@@ -16,7 +16,7 @@ export default function OnMountMultiple(
 	let selectEl: HTMLSelectElement;
 
 	/* User interface */
-	t_body += ` <input> <select> <option>A</option> <option>B</option> <option>C</option> </select> <p>Input: ${t_fmt(inputEl?.value)}</p> <p>Select: ${t_fmt(selectEl?.value)}</p> `;
+	t_body += `<input> <select><option>A</option> <option>B</option> <option>C</option></select> <p>Input: ${t_fmt(inputEl?.value)}</p> <p>Select: ${t_fmt(selectEl?.value)}</p>`;
 
 	return { body: t_body, head: t_head };
 }

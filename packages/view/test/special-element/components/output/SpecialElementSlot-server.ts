@@ -11,7 +11,7 @@ export default function Element(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	const t_props_1 = {
 		tag: $props.tag,
 	};
@@ -29,7 +29,7 @@ export default function Element(
 	const t_comp_1 = Child(t_props_1, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }
@@ -44,11 +44,11 @@ function Child(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <${$props.tag}> <![>`;
+	t_body += `<${$props.tag}><![>`;
 	if ($slots && $slots["_"]) {
 		t_body += $slots["_"](undefined, $context);
 	}
-	t_body += `<!]><!> </${$props.tag}> `;
+	t_body += `<!]><!></${$props.tag}>`;
 
 	return { body: t_body, head: t_head };
 }

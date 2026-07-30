@@ -11,7 +11,7 @@ export default function HtmlUpdate(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <div id="target"> <![>${$props.html}<!]><!> </div> `;
+	t_body += `<div id="target"><![>${$props.html}<!]><!></div>`;
 
 	return { body: t_body, head: t_head };
 }

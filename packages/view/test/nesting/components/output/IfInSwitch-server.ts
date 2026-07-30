@@ -11,29 +11,29 @@ export default function IfInSwitch(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	switch ($props.status) {
 		case "active": {
-			t_body += `<!^> <![>`;
+			t_body += `<!^><![>`;
 			if ($props.show) {
-				t_body += `<!^> <p>Active and visible</p> `;
+				t_body += `<!^><p>Active and visible</p>`;
 			}
 			else {
-				t_body += `<!^> <p>Active but hidden</p> `;
+				t_body += `<!^><p>Active but hidden</p>`;
 			}
-			t_body += `<!]><!> `;
+			t_body += `<!]><!>`;
 			break;
 		}
 		case "inactive": {
-			t_body += `<!^> <p>Inactive</p> `;
+			t_body += `<!^><p>Inactive</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^> <p>Unknown status</p> `;
+			t_body += `<!^><p>Unknown status</p>`;
 			break;
 		}
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

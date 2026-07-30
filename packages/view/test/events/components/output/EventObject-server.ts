@@ -16,7 +16,7 @@ export default function EventObject(
 	let $state = $watch({ type: "", target: "", currentTarget: "" });
 
 	/* User interface */
-	t_body += ` <button id="btn"> Click me </button> <p>Type: ${t_fmt($state.type)}</p> <p>Target: ${t_fmt($state.target)}</p> <p>Current: ${t_fmt($state.currentTarget)}</p> `;
+	t_body += `<button id="btn"> Click me </button> <p>Type: ${t_fmt($state.type)}</p> <p>Target: ${t_fmt($state.target)}</p> <p>Current: ${t_fmt($state.currentTarget)}</p>`;
 
 	return { body: t_body, head: t_head };
 }
