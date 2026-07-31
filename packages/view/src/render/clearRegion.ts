@@ -56,9 +56,19 @@ function clearNodes(region: Region) {
 		while (currentNode !== region.startNode) {
 			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
-			currentNode = previousNode!;
+			if (previousNode === null) {
+				// The region's node chain is no longer connected to the start
+				// node — this happens when a child region already removed the
+				// boundary node (common once template whitespace, which
+				// previously provided stable boundary nodes, is trimmed).
+				// Everything that still needs clearing has been cleared.
+				break;
+			}
+			currentNode = previousNode;
 		}
-		currentNode.remove();
+		if (currentNode === region.startNode) {
+			currentNode.remove();
+		}
 	}
 	releaseRegion(region);
 }

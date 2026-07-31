@@ -44,18 +44,8 @@ export default function Component() {
 }`;
 
 	const html = buildHtml(source);
-	const expected = `
-<p>
-<input value="some &quot;text&quot;">
-<input value="some &quot;text&quot;">
-<input value="some &quot;text&quot;">
-<input value="some &quot;text&quot;">
-<input value="some &quot;text&quot; extra">
-<input value="some &quot;text&quot; extra">
-</p>
-`
-		.trim()
-		.replace(/\s+/g, " ");
+	const expected =
+		'<p><input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot; extra"> <input value="some &quot;text&quot; extra"></p>';
 
 	expect(html).toBe(expected);
 });
