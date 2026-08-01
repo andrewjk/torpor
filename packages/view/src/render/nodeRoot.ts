@@ -6,7 +6,19 @@ import isTextNode from "./isTextNode";
 /**
  * Gets the first child in a fragment.
  *
- * When hydrating, also sets the active range's start node, while we have it.
+ * When hydrating, also sets the active region's start node, while we have it.
+ *
+ * If the hydration cursor is on a control-start marker (`<![>`), the node is
+ * left in place for `nodeAnchor` (called next as `t_anchor(t_root(...))`) to
+ * walk — it consumes the matched `<![>...<!]>` pair, removes the markers and
+ * sets the region's start node to the first node inside the block.
+ *
+ * For non-text fragments, leading branch-break markers (`<!^>`), empty anchor
+ * comments left by preceding siblings, and residual whitespace-only text nodes
+ * are skipped (break markers removed) so the region's start node lands on real
+ * content. This replaces the per-sibling `t_next` calls that the codegen used
+ * to emit when leading whitespace separated siblings; with whitespace trimmed
+ * those calls are gone, so the advancement happens here.
  *
  * @param parent The parent of the fragment.
  * @param text Whether we require a text node.
@@ -15,52 +27,53 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 	if (context.hydrationNode !== null) {
 		let rootNode: ChildNode | null = context.hydrationNode;
 
-		if (text) {
-			// If the root node we need is a text node, and the hydration node is
-			// not a text node but the previous node is, use the previous node.
-			// This is caused by text nodes being merged in HTML
-			if (
-				!isTextNode(rootNode) &&
-				rootNode.previousSibling !== null &&
-				isTextNode(rootNode.previousSibling)
-			) {
-				rootNode = rootNode.previousSibling;
-				context.hydrationNode = rootNode;
-			}
+		// If the root node we need is a text node, and the hydration node is
+		// not a text node but the previous node is, use the previous node. This
+		// is caused by text nodes being merged in HTML
+		if (
+			text &&
+			!isTextNode(rootNode) &&
+			rootNode.previousSibling !== null &&
+			isTextNode(rootNode.previousSibling)
+		) {
+			rootNode = rootNode.previousSibling;
+			context.hydrationNode = rootNode;
+		}
 
-			// HACK: If the root node is a hydration start comment node, get the
-			// next one instead
-			if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
-				rootNode = rootNode.nextSibling;
-				context.hydrationNode = rootNode;
-			}
-		} else {
-			// HACK: If the root node is a hydration start comment node, get the
-			// next one instead
-			if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
-				rootNode = rootNode.nextSibling;
-				context.hydrationNode = rootNode;
-			}
-
-			// Skip branch-break markers (removing them, since they exist only to
-			// separate text nodes during hydration) and whitespace-only text
-			// nodes, advancing the cursor so the returned node — which doubles
-			// as the fragment's end node — and the region's start node both land
-			// on real content. This keeps region boundaries stable even when
-			// template whitespace has been trimmed.
-			while (rootNode !== null && isSkippableRoot(rootNode)) {
-				const next = rootNode.nextSibling;
+		// For non-text fragments, skip leading branch-break markers (removing
+		// them), empty anchor comments from preceding siblings, and whitespace
+		// text nodes. Stop at a control-start marker (nodeAnchor walks it) or
+		// real content. Text fragments opt out because their leading text node
+		// is the value the caller expects.
+		if (!text) {
+			while (rootNode !== null && isSkippable(rootNode)) {
+				const next: ChildNode | null = rootNode.nextSibling;
 				if (isCommentNode(rootNode) && rootNode.data === HYDRATION_BREAK) {
 					rootNode.remove();
 				}
 				rootNode = next;
+				context.hydrationNode = rootNode;
 			}
-			context.hydrationNode = rootNode;
+			// Descend through auto-inserted <tbody> elements. The HTML parser
+			// wraps <tr> elements in <tbody>, which can leave the cursor on the
+			// <tbody> rather than its first <tr> when entering a @for inside a
+			// table.
+			while (
+				rootNode !== null &&
+				(rootNode as HTMLElement).nodeName === "TBODY" &&
+				rootNode.firstChild !== null
+			) {
+				rootNode = rootNode.firstChild as ChildNode;
+				context.hydrationNode = rootNode;
+			}
 		}
 
-		// If hydrating, set the active region's start node
+		// If hydrating, set the active region's start node. Control-start
+		// markers are left for nodeAnchor to walk — it sets the start node to
+		// the first inner node.
 		const region = context.activeRegion;
-		if (region.startNode === null) {
+		const isControlStart = rootNode !== null && isCommentNode(rootNode) && rootNode.data === HYDRATION_START;
+		if (region.startNode === null && !isControlStart) {
 			region.startNode = rootNode;
 		}
 
@@ -72,15 +85,12 @@ export default function nodeRoot(parent: Node, text = false): ChildNode {
 	}
 }
 
-function isSkippableRoot(node: ChildNode): boolean {
+function isSkippable(node: ChildNode): boolean {
 	if (isTextNode(node) && (node.textContent ?? "").trim() === "") return true;
 	if (isCommentNode(node)) {
-		const data = node.data;
-		// Skip branch-break markers, block-start markers and empty `<!>`
-		// anchor comments so the boundary lands on real content. End `]`
-		// markers are NOT skipped — they mark the close of a block and skipping
-		// them can run past the end of an empty block (landing on null).
-		return data === HYDRATION_BREAK || data === HYDRATION_START || data === "";
+		// Skip branch-break markers and empty anchor comments. Control-start
+		// (`[`) and control-end (`]`) markers are NOT skipped.
+		return node.data === HYDRATION_BREAK || node.data === "";
 	}
 	return false;
 }

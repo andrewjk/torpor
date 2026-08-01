@@ -41,12 +41,14 @@ export default function runControl(
 		create(anchor);
 
 		popRegion(oldRegion);
-	}, name);
 
-	// If we're mounting, the anchor will be the one that is passed in, but if
-	// we're hydrating it will be after the active branch's HTML elements, so we
-	// need to update it after the branches have been hydrated
-	if (context.hydrationNode) {
-		anchor = context.hydrationNode.nextSibling;
-	}
+		// While hydrating, reset the cursor to the control's anchor after its
+		// content has been hydrated. The branches leave the cursor deep inside
+		// (at the last nested node), but the parent fragment needs a stable
+		// end node — the anchor persists until the parent clears it, so it is
+		// safe to capture.
+		if (context.hydrationNode !== null && anchor !== null) {
+			context.hydrationNode = anchor as ChildNode;
+		}
+	}, name);
 }

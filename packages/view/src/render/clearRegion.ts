@@ -48,25 +48,41 @@ export default function clearRegion(region: Region): void {
 function clearNodes(region: Region) {
 	// Clear the nodes for this region
 	if (region.startNode !== null && region.endNode !== null) {
+		// The stop boundary is normally the region's own start node. But when
+		// an inner control (e.g. an @if inside a @for item) has re-rendered and
+		// replaced the nodes the start node originally pointed at, the start
+		// node becomes detached from the DOM. In that case fall back to the
+		// preceding sibling region's end node (walking past any deeper child
+		// regions that link this region to its sibling), so we only clear this
+		// region's content instead of walking past it into a previous sibling.
+		let stop: Node | null = region.startNode;
+		const startDetached = region.startNode.parentNode === null;
+		let fallback = false;
+		if (startDetached) {
+			let prev: Region | null = region.previousRegion;
+			while (prev !== null && prev.depth > region.depth) {
+				prev = prev.previousRegion;
+			}
+			if (prev !== null && prev.endNode !== null && prev.endNode.parentNode !== null) {
+				stop = prev.endNode;
+				fallback = true;
+			}
+		}
 		let currentNode = region.endNode;
-		// DEBUG:
-		//if (region.startNode.parentNode !== currentNode.parentNode) {
-		//	throw new Error("region nodes have different parents");
-		//}
-		while (currentNode !== region.startNode) {
+		while (currentNode !== null && currentNode !== stop) {
 			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
 			if (previousNode === null) {
-				// The region's node chain is no longer connected to the start
-				// node — this happens when a child region already removed the
-				// boundary node (common once template whitespace, which
-				// previously provided stable boundary nodes, is trimmed).
-				// Everything that still needs clearing has been cleared.
+				// The region's node chain is no longer connected — everything
+				// that still needs clearing has been cleared.
 				break;
 			}
 			currentNode = previousNode;
 		}
-		if (currentNode === region.startNode) {
+		// When clearing against the region's own start node, remove it too.
+		// When using the fallback (previous sibling's end node), leave it — it
+		// belongs to the sibling.
+		if (!fallback && currentNode === region.startNode) {
 			currentNode.remove();
 		}
 	}

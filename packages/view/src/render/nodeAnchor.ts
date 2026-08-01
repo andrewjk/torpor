@@ -25,8 +25,11 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 			const startParent = node.parentNode;
 
 			// Skip and remove the start node, setting the hydration node in
-			// nodeNext
-			let currentNode = nodeNext(node);
+			// nodeNext. The node returned here is the first node inside the
+			// block (after any leading branch-break marker), which becomes the
+			// active region's start node.
+			let currentNode: ChildNode | null = nodeNext(node);
+			const firstInside: ChildNode | null = currentNode;
 			node.remove();
 
 			// Go through nodes in document order until we get to the end.
@@ -52,6 +55,15 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 							// nodes
 							if (context.hydrationNode === currentNode) {
 								context.hydrationNode = endNode;
+							}
+
+							// Set the active region's start node to the first
+							// node inside the block. This mirrors mounting,
+							// where the start node is the fragment's first
+							// child — the actual content — rather than a marker.
+							const region = context.activeRegion;
+							if (region.startNode === null && firstInside !== null) {
+								region.startNode = firstInside;
 							}
 
 							// NOTE: We know this is not null as it is being
