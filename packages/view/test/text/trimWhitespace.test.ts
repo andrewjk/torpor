@@ -35,6 +35,32 @@ test("collapses whitespace between siblings to a single space", () => {
 	expect((tree.children[1] as any).content).toBe(" ");
 });
 
+test("removes inter-child whitespace inside table and list containers", () => {
+	const tree = root([
+		el("tr", [], [
+			text("\n\t"),
+			el("td", [], [text("A")]),
+			text("\n\t"),
+			el("td", [], [text("B")]),
+			text("\n"),
+		]),
+		el("ul", [], [
+			text("\n"),
+			el("li", [], [text("x")]),
+			text("\n"),
+			el("li", [], [text("y")]),
+			text("\n"),
+		]),
+	]);
+
+	trimWhitespace(tree);
+
+	const tr = tree.children[0] as any;
+	expect(tr.children).toEqual([el("td", [], [text("A")]), el("td", [], [text("B")])]);
+	const ul = tree.children[1] as any;
+	expect(ul.children).toEqual([el("li", [], [text("x")]), el("li", [], [text("y")])]);
+});
+
 test("removes whitespace-only children entirely when only whitespace is present", () => {
 	const tree = root([text("\n\t\t")]);
 

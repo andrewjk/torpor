@@ -151,11 +151,10 @@ test("whitespace trimmed identically on server and client (hydration)", async ()
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	let ul = container.querySelector("ul");
-	expect(ul?.childNodes.length).toBe(3);
+	// Inter-child whitespace inside <ul> is insignificant — removed entirely
+	expect(ul?.childNodes.length).toBe(2);
 	expect(ul?.childNodes[0].nodeType).toBe(1);
-	expect(ul?.childNodes[1].nodeType).toBe(3);
-	expect(ul?.childNodes[1].textContent).toBe(" ");
-	expect(ul?.childNodes[2].nodeType).toBe(1);
+	expect(ul?.childNodes[1].nodeType).toBe(1);
 });
 
 test("whitespace preserved inside <pre> during hydration", async () => {
