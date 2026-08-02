@@ -100,12 +100,55 @@ export default function runListItems(
 			// at the end or deletion from the front
 			if (oldKeyToIndex === undefined || newKeyToIndex === undefined) {
 				oldKeyToIndex = new Map();
-				for (let i = oldStartIndex; i < oldEndIndex; i++) {
-					oldKeyToIndex.set(oldItems[i].key, i);
+				for (let i = oldStartIndex; i <= oldEndIndex; i++) {
+					oldKeyToIndex.set(oldItems[i]!.key, i);
 				}
 				newKeyToIndex = new Map();
-				for (let i = newStartIndex; i < newEndIndex; i++) {
-					newKeyToIndex.set(newItems[i].key, i);
+				let anyOverlap = false;
+				for (let i = newStartIndex; i <= newEndIndex; i++) {
+					const key = newItems[i]!.key;
+					newKeyToIndex.set(key, i);
+					if (!anyOverlap && oldKeyToIndex.has(key)) {
+						anyOverlap = true;
+					}
+				}
+
+				// Fast path: no keys overlap between the remaining old and new
+				// ranges. Every old item must be cleared and every new item
+				// created. Batch the clears (reverse order so each region's
+				// DOM nodes are still attached when clearRegion walks them —
+				// clearing forwards detaches the next item's startNode) and
+				// the creates (tight loop, no per-item region-chain rewiring
+				// like the Replace branch's savedPrevious save/restore) instead
+				// of interleaving them through the while loop. Helps the
+				// common "replace all" / "rebuild from scratch" case where
+				// every key is new (e.g. `run`, `replace` in js-framework-bench).
+				if (!anyOverlap) {
+					const lastOld = oldItems[oldEndIndex];
+					let before: Node | null = lastOld?.endNode?.nextSibling ?? anchor;
+
+					for (let i = oldEndIndex; i >= oldStartIndex; i--) {
+						const old = oldItems[i];
+						if (old !== null) {
+							clearRegion(old);
+						}
+					}
+
+					for (let i = newStartIndex; i <= newEndIndex; i++) {
+						const newItem = newItems[i]!;
+						const pushedRegion = pushRegion(newItem, true);
+						newItem.data = $watch(newItem.data, { shallow: true });
+						create(newItem, before);
+						popRegion(pushedRegion);
+						before = newItem.endNode!.nextSibling;
+					}
+
+					if (newItems.length > 0) {
+						region.nextRegion = newItems[0]!;
+					} else if (oldItems.length > 0) {
+						region.nextRegion = oldItems[oldItems.length - 1]!.nextRegion;
+					}
+					return;
 				}
 			}
 
