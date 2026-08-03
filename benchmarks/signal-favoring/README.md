@@ -20,7 +20,6 @@ the cascade actually costs** in absolute terms. Often less than you'd expect.
 ```
 benchmarks/signal-favoring/
 ├── octane-tsrx/       # Vite app, dev :5190 — octane authored in .tsrx
-├── octane-jsx/        # Vite app, dev :5194 — same app authored in React-style .tsx
 ├── solid/             # Vite app, dev :5191 (Solid 2.0 beta)
 ├── react/             # Vite app, dev :5192 (React 19)
 ├── ripple/            # Vite app, dev :5193
@@ -52,7 +51,6 @@ Each stateful component owns its own counter via the framework's native primitiv
 | framework        | primitive                | what a `setN(v+1)` triggers                                            |
 | ---------------- | ------------------------ | ---------------------------------------------------------------------- |
 | **octane-tsrx**  | `useState` (React-shape) | re-render of `CN`, cascade through `CN+1 .. C100`                      |
-| **octane-jsx**   | `useState` (React-shape) | re-render of `CN`, cascade through `CN+1 .. C100`                      |
 | **react**        | `useState`               | re-render of `CN`, cascade through `CN+1 .. C100`                      |
 | **solid**      | `createSignal`           | re-evaluate the `{v()}` text expression in `CN`; descendants untouched |
 | **ripple**     | `track()`                | re-evaluate the `{v}` text expression in `CN`; descendants untouched   |
@@ -62,7 +60,7 @@ Each stateful component owns its own counter via the framework's native primitiv
 
 Generator-driven so the chain length, stateful spacing, and per-component shape
 stay consistent across frameworks. Edit `gen.mjs` and re-run `node gen.mjs` to
-regenerate the component fixtures (octane-tsrx, octane-jsx, ripple, react,
+regenerate the component fixtures (octane-tsrx, ripple, react,
 solid, preact, and the Svelte SFC chain).
 The vue-vapor chain is the same shape spread over 100 SFC files (Vue is one
 component per SFC), with the stateful links registering their bump closures in

@@ -36,7 +36,6 @@ Ripple's version puts the leaf probe in a reactive text expression, keys its
 ```
 benchmarks/memo-wall/
 ├── octane-tsrx/   # Vite app, dev :5206 — octane authored in .tsrx
-├── octane-jsx/    # Vite app, dev :5207 — same app authored in React-style .tsx
 ├── react/         # Vite app, dev :5208 (React 19, production mode)
 ├── react-compiler/ # :5226; same React source + official React Compiler 1.0.0
 ├── solid/         # Vite app, dev :5182 (Solid 2.0 — no wall; fine-grained probes)

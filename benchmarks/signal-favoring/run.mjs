@@ -24,7 +24,6 @@
 //
 // Usage:
 //   pnpm --filter octane-tsrx-signal-bench dev  # :5190 (.tsrx)
-//   pnpm --filter octane-jsx-signal-bench dev   # :5194 (.tsx / JSX)
 //   pnpm --filter solid-signal-bench dev        # :5191
 //   pnpm --filter react-signal-bench dev        # :5192
 //   pnpm --filter ripple-signal-bench dev       # :5193
@@ -44,7 +43,6 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5190/' },
-			{ name: 'octane-jsx', url: 'http://localhost:5194/' },
 			{ name: 'solid', url: 'http://localhost:5191/' },
 			{ name: 'react', url: 'http://localhost:5192/' },
 			{ name: 'ripple', url: 'http://localhost:5193/' },
@@ -398,7 +396,7 @@ const OPS = [
 	'unmount',
 ];
 
-const DIALECT_PAIR_NAMES = ['octane-tsrx', 'octane-jsx'];
+const DIALECT_PAIR_NAMES = ['octane-tsrx'];
 
 (async () => {
 	const all = {};

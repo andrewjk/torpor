@@ -25,7 +25,6 @@
 //
 // Servers must be running first (production preview recommended):
 //   pnpm --filter octane-tsrx-dbmon-bench preview   # :5196
-//   pnpm --filter octane-jsx-dbmon-bench  preview   # :5197
 //   pnpm --filter react-dbmon-bench       preview   # :5198
 //   pnpm --filter ripple-dbmon-bench      preview   # :5199
 //   pnpm --filter solid-dbmon-bench       preview   # :5200
@@ -46,7 +45,6 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5196/' },
-			{ name: 'octane-jsx', url: 'http://localhost:5197/' },
 			{ name: 'ripple', url: 'http://localhost:5199/' },
 			{ name: 'solid', url: 'http://localhost:5200/' },
 			{ name: 'react', url: 'http://localhost:5198/' },

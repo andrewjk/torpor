@@ -47,9 +47,7 @@ cleanup+refire dispatch.
 ```
 benchmarks/effectful-list/
 ├── octane-tsrx/   # Vite app, dev :5201 — octane authored in .tsrx (@for + class)
-├── octane-jsx/    # Vite app, dev :5202 — same app in React-style .tsx (map + className)
 ├── react/         # Vite app, dev :5203 — React 19, production mode; Row hook code
-│                  #   IDENTICAL to octane-jsx's (only the import source differs)
 ├── solid/         # Vite app, dev :5204 — Solid 2.0: createStore + reconcile + <For>
 ├── ripple/        # Vite app, dev :5205 — ripple: track + keyed @for + effect()
 ├── vue-vapor/     # Vite app, dev :5221 — Vue 3.6 Vapor: keyed v-for + onMounted/

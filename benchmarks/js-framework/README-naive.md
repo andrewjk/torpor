@@ -15,7 +15,6 @@ first-class, regression-guarded number.
 | fixture             | port | package                   | authoring shape                                                                 |
 | ------------------- | ---- | ------------------------- | ------------------------------------------------------------------------------- |
 | `octane-tsrx-naive` | 5213 | `octane-tsrx-naive-jsbench` | `.tsrx`, but React-dev style: cross-module `<Row/>` per row, `<tr {...spread}>`, member-callee handlers via an imported `actions` object, value-dependent inline style object on a cell |
-| `octane-jsx-naive`  | 5214 | `octane-jsx-naive-jsbench`  | same app in `.tsx` — JS control flow only (`items.map`, ternaries) + the same Row |
 | `octane-ts`         | 5215 | `octane-ts-jsbench`         | PURE plain-`.ts` `createElement` — zero compiler involvement for the tree; the shape every `@octanejs/*` binding produces |
 
 (The dbmon counterpart — the exact dbmon workload in plain-`.ts` `createElement`
@@ -60,12 +59,10 @@ existing harnesses drive them unchanged via the `TARGETS` env:
 # servers (dev shown; swap for build && preview for production numbers)
 pnpm --filter octane-tsrx-jsbench dev &        # :5176 (tuned baseline)
 pnpm --filter octane-tsrx-naive-jsbench dev &  # :5213
-pnpm --filter octane-jsx-naive-jsbench dev &   # :5214
 pnpm --filter octane-ts-jsbench dev &          # :5215
 
 TARGETS='[{"name":"octane-tsrx","url":"http://localhost:5176/","ready":"#run"},
           {"name":"octane-tsrx-naive","url":"http://localhost:5213/","ready":"#run"},
-          {"name":"octane-jsx-naive","url":"http://localhost:5214/","ready":"#run"},
           {"name":"octane-ts","url":"http://localhost:5215/","ready":"#run"}]' \
   node run.mjs
 ```
@@ -93,7 +90,7 @@ out of `packages/octane/src/runtime.ts`):
   comment anchors (`componentSlot`'s `<!--comp-->` pair + the keyed item's
   markers) inside `<tbody>`, while the tuned single-root fast path is
   marker-free per item (only the list's own `<!--for-->` pair). Fires for
-  `octane-tsrx-naive` / `octane-jsx-naive`.
+  `octane-tsrx-naive`.
 
 Either signature passing (with the tuned twin clean on both) proves the de-opt;
 the script reports which one fired. It ALSO asserts the rendered rows are

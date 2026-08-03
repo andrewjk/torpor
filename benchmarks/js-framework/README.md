@@ -16,7 +16,6 @@ auto-callback transform and stable event-bundle optimization pay off.
 ```
 benchmarks/js-framework/
 ├── octane-tsrx/    # Vite app, dev server on :5176 — octane authored in .tsrx
-├── octane-jsx/     # Vite app, dev server on :5177 — same app authored in React-style .tsx
 ├── react/          # Vite app, dev server on :5175 — canonical keyed react-hooks
 ├── ripple/         # Vite app, dev server on :5178 — keyed ripple (ported to current syntax)
 ├── solid/          # Vite app, dev server on :5179 — Solid 2.0 (keyed <For>, production build)
@@ -30,7 +29,7 @@ benchmarks/js-framework/
 └── README.md           # this file
 ```
 
-Both harnesses compare octane-tsrx / octane-jsx / react / preact / ripple /
+Both harnesses compare octane-tsrx / react / preact / ripple /
 solid / svelte / vue-vapor, with octane-tsrx as the ratio baseline.
 
 The octane app is authored **twice** over the same octane core — once in `.tsrx`
@@ -40,10 +39,6 @@ and expose the same button + table contract:
 - **`octane-tsrx`** — `@for (const row of items; key row.id)` compiles to octane's
   keyed `forBlock` fast path: a compiled per-item body, targeted per-row updates,
   host node identity preserved across re-renders.
-- **`octane-jsx`** — `items.map((row) => <tr key={row.id}>…)` now lowers to the
-  **same** `forBlock` fast path (the compiler recognizes a keyed JSX `.map` and
-  compiles it like `@for`), so the jsx/tsrx ratio is ~1.0 — the React-JSX
-  backwards-compat path carries no list-reconciliation penalty here.
 - **`react`** — the canonical [keyed react-hooks][rh] implementation, the
   reference VDOM baseline. `dispatch` is wrapped in `flushSync` so React commits
   inside the discrete click (the harness times only the synchronous click; React
@@ -182,7 +177,7 @@ Two methodology points, both visible in the harness source:
   **not** octane and **not** a fixture defect; the fixtures are left faithful and
   the gate correctly flags them. `append100` is the only insert op ripple renders
   correctly, because there are no survivors *after* the inserted run. octane-tsrx,
-  octane-jsx, and react pass all 14 ops.
+  and react pass all 14 ops.
 
 Run it against the same eight targets as `run.mjs`:
 
@@ -245,7 +240,7 @@ octane's compiler optimizes (both dialects compile to the same output):
   code size and `optimize` flags are NOT what you'd ship — useful for iteration,
   not for absolute scoring.
 - For "publishable" numbers, build first
-  (`pnpm --filter octane-tsrx-jsbench build`, likewise `octane-jsx-jsbench`),
+  (`pnpm --filter octane-tsrx-jsbench build`),
   then `pnpm --filter octane-tsrx-jsbench preview` to serve the production output,
   then run the harness against that.
 - Chromium is the default browser; results on Firefox / WebKit differ.

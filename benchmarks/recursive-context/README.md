@@ -12,7 +12,6 @@ parent chain.
 ```
 benchmarks/recursive-context/
 ├── octane-tsrx/       # Vite app, dev :5185 — octane authored in .tsrx
-├── octane-jsx/        # Vite app, dev :5188 — same app authored in React-style .tsx
 ├── solid/             # Vite app, dev :5187 (Solid 2.0 beta)
 ├── react/             # Vite app, dev :5186 (React 19)
 ├── ripple/            # Vite app, dev :5184

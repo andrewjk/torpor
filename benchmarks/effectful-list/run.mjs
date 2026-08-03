@@ -42,7 +42,6 @@
 //
 // Servers must be running first (production preview recommended):
 //   pnpm --filter octane-tsrx-effectful-list-bench preview   # :5201
-//   pnpm --filter octane-jsx-effectful-list-bench  preview   # :5202
 //   pnpm --filter react-effectful-list-bench       preview   # :5203
 //   pnpm --filter solid-effectful-list-bench       preview   # :5204
 //   pnpm --filter ripple-effectful-list-bench      preview   # :5205
@@ -65,7 +64,6 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5201/' },
-			{ name: 'octane-jsx', url: 'http://localhost:5202/' },
 			{ name: 'react', url: 'http://localhost:5203/' },
 			{ name: 'solid', url: 'http://localhost:5204/' },
 			{ name: 'ripple', url: 'http://localhost:5205/' },

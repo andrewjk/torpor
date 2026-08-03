@@ -1,7 +1,7 @@
 # News SSR + hydration benchmark
 
 A large "news site" document (header + a feed of article cards, lorem ipsum) that
-measures, per target (**octane-tsrx**, **octane-jsx**, **React 19**, **Preact**,
+measures, per target (**octane-tsrx**, **React 19**, **Preact**,
 **Ripple**, **Solid 2.0**, **Svelte 5**, **Vue 3.6 Vapor**):
 
 - **SSR render time** — the built `renderApp()` → HTML string, in Node, warm.
@@ -34,8 +34,6 @@ authored twice to compare its two dialects over one core:
 
 - **octane-tsrx** — `octane/compiler` over `.tsrx` directive syntax (single
   runtime, `render()` + `hydrateRoot()`); the `@for` feed adopts each item range.
-- **octane-jsx** — the SAME app authored in React-style `.tsx` (`.map(...key)`
-  feed), compiled by the same `octane/compiler` — the JSX backwards-compat path.
 - **ripple** (original) — `@tsrx/ripple` + `ripple` (`ripple/server` `render()` →
   `{ head, body, css }` + `ripple` `hydrate()`). State via `track`. There's no
   transform-only Ripple vite plugin (the published one is the metaframework), so
@@ -71,7 +69,6 @@ hydration was extended beyond single leaf templates.
 pnpm install
 node benchmarks/news/gen.mjs 50              # regenerate the dataset into every target (default 50)
 node benchmarks/news/run.mjs octane-tsrx     # builds (prod) + benches; `run.mjs 20` also works
-node benchmarks/news/run.mjs octane-jsx 20   # same app authored in React-style .tsx (JSX)
 node benchmarks/news/run.mjs ripple 20       # original Ripple, 20 iterations (+5 warmup)
 node benchmarks/news/run.mjs solid 20        # Solid 2.0
 node benchmarks/news/run.mjs react 20        # React 19
@@ -82,10 +79,10 @@ node benchmarks/news/run.mjs react 20 --no-build   # reuse the existing dist/ (s
 ```
 
 `run.mjs [target] [iterations] [--no-build]` — `target` ∈
-`{octane-tsrx, octane-jsx, react, preact, ripple, solid, svelte, vue-vapor}` (default `octane-tsrx`; a bare
+`{octane-tsrx, react, preact, ripple, solid, svelte, vue-vapor}` (default `octane-tsrx`; a bare
 number is treated as iterations for back-compat). Each run rebuilds the target's
 production client + SSR bundles unless `--no-build` is passed. Build output goes to
-`<target>/dist/` (git-ignored). `octane-tsrx` and `octane-jsx` are the same app
+`<target>/dist/` (git-ignored). `octane-tsrx` are the same app
 over the same octane core authored in the two dialects (`.tsrx` directive syntax
 vs React-style `.tsx`); running both is a like-for-like read on the JSX
 backwards-compat path's SSR + hydration cost.

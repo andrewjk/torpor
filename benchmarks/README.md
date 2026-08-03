@@ -52,19 +52,19 @@ and **codegen-size** / **bundle-size** / **three-bundle-size** /
 
 ## Regression modes
 
-| flag | what it does | fails the run? |
-| --- | --- | --- |
-| `--record` | write current numbers to `baselines/local/<suite>.json` | no |
-| `--compare` | diff current numbers vs `baselines/local/<suite>.json` | on any regression |
-| `--ratios` | check `baselines/ratios.json` guards | on any breach |
-| `--quick` | reduced iterations / seconds per suite | — |
-| `--baseline-dir=<dir>` | override the absolute-baseline dir | — |
-| `--results-dir=<dir>` | override where per-suite JSON is written | — |
+| flag                   | what it does                                            | fails the run?    |
+| ---------------------- | ------------------------------------------------------- | ----------------- |
+| `--record`             | write current numbers to `baselines/local/<suite>.json` | no                |
+| `--compare`            | diff current numbers vs `baselines/local/<suite>.json`  | on any regression |
+| `--ratios`             | check `baselines/ratios.json` guards                    | on any breach     |
+| `--quick`              | reduced iterations / seconds per suite                  | —                 |
+| `--baseline-dir=<dir>` | override the absolute-baseline dir                      | —                 |
+| `--results-dir=<dir>`  | override where per-suite JSON is written                | —                 |
 
 **What fails CI vs what is local-only:**
 
 - **CI enforces `--ratios` only.** Ratio guards compare two targets measured on
-  the *same machine in the same run*. That cancels shared variation; byte/count
+  the _same machine in the same run_. That cancels shared variation; byte/count
   ratios are deterministic for a fixed toolchain, while timing guards retain
   explicit noise headroom. `.github/workflows/bench.yml` runs
   `node benchmarks/bench.mjs --quick --ratios` on manual dispatch + a weekly
@@ -90,25 +90,27 @@ after printing its normal tables:
 
 ```json
 {
-  "suite": "js-framework",
-  "iterations": 8,
-  "targets": [
-    { "name": "octane-tsrx",
-      "ops": {
-        "run": {
-          "score": 1.58,
-          "median": 1.6,
-          "min": 1.5,
-          "mean": 1.62,
-          "p95": 1.8,
-          "sd": 0.1,
-          "rme": 4.2,
-          "warmupRatio": 1.08,
-          "samples": 8
-        }
-      },
-      "meta": { "…": "correctness counters / bytes go here" } }
-  ]
+	"suite": "js-framework",
+	"iterations": 8,
+	"targets": [
+		{
+			"name": "octane-tsrx",
+			"ops": {
+				"run": {
+					"score": 1.58,
+					"median": 1.6,
+					"min": 1.5,
+					"mean": 1.62,
+					"p95": 1.8,
+					"sd": 0.1,
+					"rme": 4.2,
+					"warmupRatio": 1.08,
+					"samples": 8
+				}
+			},
+			"meta": { "…": "correctness counters / bytes go here" }
+		}
+	]
 }
 ```
 
@@ -163,52 +165,52 @@ internally, get their own baseline and guard namespace.
 
 ## Suites
 
-| manifest name | dir | servers | notes |
-| --- | --- | --- | --- |
-| `js-framework` | js-framework | Octane + reference frameworks | krausest ops incl. `add` |
-| `js-framework-reorder` | js-framework | same fixtures | keyed reorder matrix (LIS vs lastPlacedIndex) |
-| `todomvc` | todomvc | Octane + reference frameworks | Speedometer-style TodoMVC interactions |
-| `weather-app` | weather-app | octane-tsrx, react, preact, solid, svelte, vue | upstream weather UI: cold ready, keyed forecast churn, async search/error/recovery |
-| `weather-app-lighthouse` | weather-app | octane-tsrx, react, preact, solid, svelte, vue | desktop Lighthouse categories plus FCP/LCP/Speed Index/TBT/CLS |
-| `chat-stream` | chat-stream | Octane + reference frameworks | deterministic token streaming + conversation switches |
-| `dbmon` | dbmon | Octane + reference frameworks | per-cell update churn |
-| `recursive-context` | recursive-context | Octane + reference frameworks | context fan-out |
-| `signal-favoring` | signal-favoring | Octane + reference frameworks | cascade vs targeted |
-| `news` | news | none (builds) | SSR + hydration, per-target |
-| `hydration-interactivity` | hydration-interactivity | none (builds) | real pre-hydration typing, controlled inputs, native event replay, and 1×/6× Chromium CPU throttling across Octane, React, Preact, Solid 2, Svelte, and Vue Vapor |
-| `hydration-stress` | hydration-stress | none (builds) | withheld-chunk hydration, keyboard and pointer Send delivery, DOM adoption, and explicit replay/drop diagnostics at 6× CPU throttling |
-| `lifecycle-memory` | lifecycle-memory | none (builds) | 1,000+ effectful mount/update/unmount cycles, real listener/subscription/timer cleanup, post-teardown event probes, and explicitly collected Chromium heap across all six frameworks |
-| `controlled-form` | controlled-form | none (builds) | 512 controlled fields, real typing, DOM identity, focus and caret, validation cancellation, complete submit/reset, and native select/checkbox/radio correctness |
-| `external-store-fanout` | external-store-fanout | none (builds) | 512 subscribers, narrow and broad writes, rapid-write tearing checks, snapshots, notifications, renders, and exact subscription cleanup |
-| `external-store-integrations` | external-store-integrations | none (builds) | real Zustand stores, Jotai atoms, and TanStack Query caches with selector fan-out, query invalidation, and six-framework cleanup gates |
-| `store-selector-fanout` | store-selector-fanout | none (builds) | 512 subscribers reading one store through a `with-selector`-shaped selector, 20 unrelated parent re-renders with the store untouched, and deterministic selector-invocation counts beside render and snapshot counts |
-| `scheduler-responsiveness` | scheduler-responsiveness | none (builds) | real controlled typing during eight 512-subscriber store updates at 6× CPU throttling, with focus, caret, frame, and notification gates |
-| `suspense-recovery` | suspense-recovery | none (builds) | six-framework visible async pending, rejection, retry, cancellation, and stale-response correctness |
-| `event-delegation` | event-delegation | none (builds) | 128 real native input events, 512 event-bearing hosts, capture/bubble accounting, and every controlled output |
-| `application-composition` | application-composition | none (builds) | lifecycle resources, large forms, store fan-out, async recovery, form submission, and navigation teardown in one app |
-| `scaling-curves` | scaling-curves | none (builds) | independently correctness-gated controlled updates at 8, 32, 96, 256, and 512 components |
-| `effectful-list` | effectful-list | Octane + reference frameworks | effect/ref cleanup churn |
-| `list-clear` | list-clear | Octane-only | keyed-list bulk clear by parent shape — the only coverage of the shared-parent path |
-| `memo-wall` | memo-wall | Octane + reference frameworks | memo bail + context walk |
-| `portal-swarm` | portal-swarm | Octane + reference frameworks | portal render/dispatch |
-| `ssr-throughput` | ssr-throughput | none (Node-only) | comparative news SSR + Octane-only stress fixtures |
-| `streaming-ssr` | streaming-ssr | none (Node-only) | streaming targets incl. Preact; Svelte N/A |
-| `ssr-http` | ssr-http | none (boots its own node:http hosts) | raw streaming API over real HTTP: fresh-process import cost, cold spawn→listen→first-byte, warm shell/total/throughput (octane vs React Fizz, streaming-ssr fixtures) |
-| `streaming-backpressure` | streaming-backpressure | none (builds) | real one-byte Node Writable pressure, delayed drains, three concurrent destinations, and public-stream abort across supported renderers |
-| `ssr-workerd` | ssr-workerd | none (boots workerd via miniflare) | streaming SSR inside the real Cloudflare Workers runtime: cold isolate→first-byte, warm shell/total, worker-script bytes (octane vs Fizz edge, plus the vite-plugin + adapter-cloudflare deployment shape) |
-| `tanstack-start` | tanstack-start | none (boots its own production servers) | the real Start app pair, correctness-gated: cold TTFB + warm per-route TTFB/stream/throughput across react, octane-minimal, octane-nitro |
-| `dbmon-deopt` | dbmon | octane-tsrx + octane-deopt | tuned vs plain-.ts cliff |
-| `js-framework-deopt` | js-framework | octane-tsrx + naive triplet | tuned vs naive-authoring cliff |
-| `async-waterfall` | async-waterfall | octane-tsrx, react, preact, solid, svelte, ripple | 10-level nested async: `use()` waterfall vs parallel-by-model signals (init + transition update) |
-| `async-composition` | async-composition | octane-tsrx, react | dashboard composition: adjacent async panels, nested children, imported custom hook, and one true dependency |
-| `lynx-list` | lynx-list | none (Node-only) | deterministic 1,000-row native-list physical allocation, reuse, and teardown through a fake Element PAPI |
-| `lynx-render` | lynx-render | none (Node-only) | dual-thread Lynx render CPU: empty startup, create 1,000 and 10,000 keyed rows through the real background root, transport, and main receiver over a cheap fake Element PAPI, plus a gate that a native tap reaches its background handler via the engine `publishEvent` receiver |
-| `lynx-bundle-size` | lynx-bundle-size | none (builds) | semantic-checksummed production Rspeedy artifact bytes for background preview and dual-thread IFR modes; source/build evidence only |
-| `codegen-size` | codegen-size | none (Node-only) | compiled-output bytes: fixed corpus through octane/compiler, raw/min/gzip, `compiled` vs `source` |
-| `compiler-throughput` | compiler-throughput | none (Node-only) | six real production compiler pipelines, cold/warm/incremental transformations, 10/100/1,000 components, and heap diagnostics |
-| `bundle-size` | bundle-size | none (builds) | shipped JS bytes: production builds of js-framework, TodoMVC, chat-stream, and weather-app, normalized minify, raw/gzip/brotli |
-| `three-renderer` | three | Octane Three, R3F, plain Three | 1,000-object lifecycle, reconstruction/disposal, frame subscribers, and raycast events |
-| `three-bundle-size` | three | none (builds, then checks in Chromium) | minimal/full-catalogue shipped JS bytes for Octane Three, R3F, and plain Three |
+| manifest name                 | dir                         | servers                                           | notes                                                                                                                                                                                                                                                                             |
+| ----------------------------- | --------------------------- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `js-framework`                | js-framework                | Octane + reference frameworks                     | krausest ops incl. `add`                                                                                                                                                                                                                                                          |
+| `js-framework-reorder`        | js-framework                | same fixtures                                     | keyed reorder matrix (LIS vs lastPlacedIndex)                                                                                                                                                                                                                                     |
+| `todomvc`                     | todomvc                     | Octane + reference frameworks                     | Speedometer-style TodoMVC interactions                                                                                                                                                                                                                                            |
+| `weather-app`                 | weather-app                 | octane-tsrx, react, preact, solid, svelte, vue    | upstream weather UI: cold ready, keyed forecast churn, async search/error/recovery                                                                                                                                                                                                |
+| `weather-app-lighthouse`      | weather-app                 | octane-tsrx, react, preact, solid, svelte, vue    | desktop Lighthouse categories plus FCP/LCP/Speed Index/TBT/CLS                                                                                                                                                                                                                    |
+| `chat-stream`                 | chat-stream                 | Octane + reference frameworks                     | deterministic token streaming + conversation switches                                                                                                                                                                                                                             |
+| `dbmon`                       | dbmon                       | Octane + reference frameworks                     | per-cell update churn                                                                                                                                                                                                                                                             |
+| `recursive-context`           | recursive-context           | Octane + reference frameworks                     | context fan-out                                                                                                                                                                                                                                                                   |
+| `signal-favoring`             | signal-favoring             | Octane + reference frameworks                     | cascade vs targeted                                                                                                                                                                                                                                                               |
+| `news`                        | news                        | none (builds)                                     | SSR + hydration, per-target                                                                                                                                                                                                                                                       |
+| `hydration-interactivity`     | hydration-interactivity     | none (builds)                                     | real pre-hydration typing, controlled inputs, native event replay, and 1×/6× Chromium CPU throttling across Octane, React, Preact, Solid 2, Svelte, and Vue Vapor                                                                                                                 |
+| `hydration-stress`            | hydration-stress            | none (builds)                                     | withheld-chunk hydration, keyboard and pointer Send delivery, DOM adoption, and explicit replay/drop diagnostics at 6× CPU throttling                                                                                                                                             |
+| `lifecycle-memory`            | lifecycle-memory            | none (builds)                                     | 1,000+ effectful mount/update/unmount cycles, real listener/subscription/timer cleanup, post-teardown event probes, and explicitly collected Chromium heap across all six frameworks                                                                                              |
+| `controlled-form`             | controlled-form             | none (builds)                                     | 512 controlled fields, real typing, DOM identity, focus and caret, validation cancellation, complete submit/reset, and native select/checkbox/radio correctness                                                                                                                   |
+| `external-store-fanout`       | external-store-fanout       | none (builds)                                     | 512 subscribers, narrow and broad writes, rapid-write tearing checks, snapshots, notifications, renders, and exact subscription cleanup                                                                                                                                           |
+| `external-store-integrations` | external-store-integrations | none (builds)                                     | real Zustand stores, Jotai atoms, and TanStack Query caches with selector fan-out, query invalidation, and six-framework cleanup gates                                                                                                                                            |
+| `store-selector-fanout`       | store-selector-fanout       | none (builds)                                     | 512 subscribers reading one store through a `with-selector`-shaped selector, 20 unrelated parent re-renders with the store untouched, and deterministic selector-invocation counts beside render and snapshot counts                                                              |
+| `scheduler-responsiveness`    | scheduler-responsiveness    | none (builds)                                     | real controlled typing during eight 512-subscriber store updates at 6× CPU throttling, with focus, caret, frame, and notification gates                                                                                                                                           |
+| `suspense-recovery`           | suspense-recovery           | none (builds)                                     | six-framework visible async pending, rejection, retry, cancellation, and stale-response correctness                                                                                                                                                                               |
+| `event-delegation`            | event-delegation            | none (builds)                                     | 128 real native input events, 512 event-bearing hosts, capture/bubble accounting, and every controlled output                                                                                                                                                                     |
+| `application-composition`     | application-composition     | none (builds)                                     | lifecycle resources, large forms, store fan-out, async recovery, form submission, and navigation teardown in one app                                                                                                                                                              |
+| `scaling-curves`              | scaling-curves              | none (builds)                                     | independently correctness-gated controlled updates at 8, 32, 96, 256, and 512 components                                                                                                                                                                                          |
+| `effectful-list`              | effectful-list              | Octane + reference frameworks                     | effect/ref cleanup churn                                                                                                                                                                                                                                                          |
+| `list-clear`                  | list-clear                  | Octane-only                                       | keyed-list bulk clear by parent shape — the only coverage of the shared-parent path                                                                                                                                                                                               |
+| `memo-wall`                   | memo-wall                   | Octane + reference frameworks                     | memo bail + context walk                                                                                                                                                                                                                                                          |
+| `portal-swarm`                | portal-swarm                | Octane + reference frameworks                     | portal render/dispatch                                                                                                                                                                                                                                                            |
+| `ssr-throughput`              | ssr-throughput              | none (Node-only)                                  | comparative news SSR + Octane-only stress fixtures                                                                                                                                                                                                                                |
+| `streaming-ssr`               | streaming-ssr               | none (Node-only)                                  | streaming targets incl. Preact; Svelte N/A                                                                                                                                                                                                                                        |
+| `ssr-http`                    | ssr-http                    | none (boots its own node:http hosts)              | raw streaming API over real HTTP: fresh-process import cost, cold spawn→listen→first-byte, warm shell/total/throughput (octane vs React Fizz, streaming-ssr fixtures)                                                                                                             |
+| `streaming-backpressure`      | streaming-backpressure      | none (builds)                                     | real one-byte Node Writable pressure, delayed drains, three concurrent destinations, and public-stream abort across supported renderers                                                                                                                                           |
+| `ssr-workerd`                 | ssr-workerd                 | none (boots workerd via miniflare)                | streaming SSR inside the real Cloudflare Workers runtime: cold isolate→first-byte, warm shell/total, worker-script bytes (octane vs Fizz edge, plus the vite-plugin + adapter-cloudflare deployment shape)                                                                        |
+| `tanstack-start`              | tanstack-start              | none (boots its own production servers)           | the real Start app pair, correctness-gated: cold TTFB + warm per-route TTFB/stream/throughput across react, octane-minimal, octane-nitro                                                                                                                                          |
+| `dbmon-deopt`                 | dbmon                       | octane-tsrx + octane-deopt                        | tuned vs plain-.ts cliff                                                                                                                                                                                                                                                          |
+| `js-framework-deopt`          | js-framework                | octane-tsrx + naive triplet                       | tuned vs naive-authoring cliff                                                                                                                                                                                                                                                    |
+| `async-waterfall`             | async-waterfall             | octane-tsrx, react, preact, solid, svelte, ripple | 10-level nested async: `use()` waterfall vs parallel-by-model signals (init + transition update)                                                                                                                                                                                  |
+| `async-composition`           | async-composition           | octane-tsrx, react                                | dashboard composition: adjacent async panels, nested children, imported custom hook, and one true dependency                                                                                                                                                                      |
+| `lynx-list`                   | lynx-list                   | none (Node-only)                                  | deterministic 1,000-row native-list physical allocation, reuse, and teardown through a fake Element PAPI                                                                                                                                                                          |
+| `lynx-render`                 | lynx-render                 | none (Node-only)                                  | dual-thread Lynx render CPU: empty startup, create 1,000 and 10,000 keyed rows through the real background root, transport, and main receiver over a cheap fake Element PAPI, plus a gate that a native tap reaches its background handler via the engine `publishEvent` receiver |
+| `lynx-bundle-size`            | lynx-bundle-size            | none (builds)                                     | semantic-checksummed production Rspeedy artifact bytes for background preview and dual-thread IFR modes; source/build evidence only                                                                                                                                               |
+| `codegen-size`                | codegen-size                | none (Node-only)                                  | compiled-output bytes: fixed corpus through octane/compiler, raw/min/gzip, `compiled` vs `source`                                                                                                                                                                                 |
+| `compiler-throughput`         | compiler-throughput         | none (Node-only)                                  | six real production compiler pipelines, cold/warm/incremental transformations, 10/100/1,000 components, and heap diagnostics                                                                                                                                                      |
+| `bundle-size`                 | bundle-size                 | none (builds)                                     | shipped JS bytes: production builds of js-framework, TodoMVC, chat-stream, and weather-app, normalized minify, raw/gzip/brotli                                                                                                                                                    |
+| `three-renderer`              | three                       | Octane Three, R3F, plain Three                    | 1,000-object lifecycle, reconstruction/disposal, frame subscribers, and raycast events                                                                                                                                                                                            |
+| `three-bundle-size`           | three                       | none (builds, then checks in Chromium)            | minimal/full-catalogue shipped JS bytes for Octane Three, R3F, and plain Three                                                                                                                                                                                                    |
 
 The size suites measure **bytes, not milliseconds** (deterministic —
 `median === min`, and ratio guards on them are exact, hardware-independent
@@ -224,16 +226,16 @@ background-rendered preview graph; its semantic checks remain source/build
 evidence rather than native execution.
 
 `bundle-size` classifies every build's emitted JavaScript into an `app` bucket
-(modules under the app's own src/) and a `framework` bucket (node_modules + the
+(modules under the app's own src/) and a `framework` bucket (node*modules + the
 Octane workspace runtime + virtual helpers) and reports both, plus totals:
-`app_*` / `fw_*` / `js_*` ×
+`app*_`/`fw\__`/`js*\*`×
 raw/gzip/brotli. The harness models each emitted JavaScript file as an
 independently compressed response and sums those modeled transfer sizes; it
 does not inspect a server's content encoding. A bundler's default single chunk
-can be slightly smaller through cross-module compression. The `app_*` ops are
-the primary scaling ratchet as applications grow; `fw_*` tracks the one-time
+can be slightly smaller through cross-module compression. The`app*_`ops are
+the primary scaling ratchet as applications grow;`fw\__`tracks the one-time
 runtime cost separately. App-shaped
-sets use `todo_*`, `chat_*`, and `weather_*` operation prefixes; weather's shared
+sets use`todo*\*`, `chat*_`, and `weather\__` operation prefixes; weather's shared
 service and formatting modules count as app code in both framework builds.
 
 ## Adding a suite

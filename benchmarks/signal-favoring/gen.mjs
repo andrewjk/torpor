@@ -225,7 +225,6 @@ function genSvelteApp() {
 
 const targets = [
 	{ rel: 'octane-tsrx/src/App.tsrx', content: genRippleNew() },
-	{ rel: 'octane-jsx/src/App.tsx', content: genOctaneJsx() },
 	{ rel: 'ripple/src/App.tsrx', content: genRipple() },
 	{ rel: 'react/src/App.jsx', content: genReact() },
 	{ rel: 'solid/src/App.jsx', content: genSolid() },

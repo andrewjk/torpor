@@ -37,7 +37,6 @@
 //
 // Usage (same servers as run.mjs):
 //   pnpm --filter octane-tsrx-jsbench dev   # :5176
-//   pnpm --filter octane-jsx-jsbench dev    # :5177
 //   pnpm --filter react-jsbench dev         # :5175
 //   pnpm --filter ripple-jsbench dev        # :5178
 //   pnpm --filter solid-jsbench dev         # :5179
@@ -59,13 +58,13 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5176/', ready: '#run' },
-			{ name: 'octane-jsx', url: 'http://localhost:5177/', ready: '#run' },
 			{ name: 'react', url: 'http://localhost:5175/', ready: '#run' },
 			{ name: 'ripple', url: 'http://localhost:5178/', ready: '#run' },
 			{ name: 'solid', url: 'http://localhost:5179/', ready: '#run' },
 			{ name: 'vue-vapor', url: 'http://localhost:5180/', ready: '#run' },
 			{ name: 'preact', url: 'http://localhost:5260/', ready: '#run' },
 			{ name: 'svelte', url: 'http://localhost:5271/', ready: '#run' },
+			{ name: 'torpor', url: 'http://localhost:5283/', ready: '#run' },
 		];
 
 // ── Fixture-shared shuffle machinery, replayed for the identity gate ───────

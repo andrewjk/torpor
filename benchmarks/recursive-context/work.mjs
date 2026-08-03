@@ -9,7 +9,6 @@ import { collectPreciseCalls } from '../lib/precise-work.mjs';
 
 const TARGETS = [
 	{ name: 'octane-tsrx', url: 'http://localhost:5185/' },
-	{ name: 'octane-jsx', url: 'http://localhost:5188/' },
 ];
 
 const METRICS = [
@@ -123,87 +122,6 @@ const GATES = {
 			maxFullSlotCalls: 0,
 			maxSlotCalls: 0,
 			max: { unmountBlock: 4099, unmountScope: 6146 },
-		},
-	},
-	'octane-jsx': {
-		mount: {
-			maxFullSlotCalls: 2048,
-			maxSlotCalls: 3074,
-			max: {
-				renderBlock: 7168,
-				componentSlot: 2048,
-				childSlot: 4096,
-				createElement: 5121,
-				hostElementBody: 1023,
-				deoptItemBody: 2046,
-				reconcileKeyed: 1023,
-				updateSurvivor: 0,
-			},
-		},
-		update_root: {
-			maxFullSlotCalls: 2048,
-			maxSlotCalls: 3074,
-			max: {
-				renderBlock: 7168,
-				componentSlot: 2048,
-				childSlot: 4096,
-				createElement: 5121,
-				hostElementBody: 1023,
-				deoptItemBody: 2046,
-				reconcileKeyed: 1023,
-				updateSurvivor: 2046,
-			},
-			exact: { setText: 1024 },
-		},
-		update_partial: {
-			maxFullSlotCalls: 64,
-			maxSlotCalls: 95,
-			max: {
-				renderBlock: 221,
-				componentSlot: 64,
-				childSlot: 125,
-				createElement: 158,
-				hostElementBody: 31,
-				deoptItemBody: 62,
-				reconcileKeyed: 31,
-				updateSurvivor: 62,
-			},
-			exact: { setText: 32 },
-		},
-		partial_unmount: {
-			maxFullSlotCalls: 0,
-			maxSlotCalls: 0,
-			max: {
-				renderBlock: 1,
-				componentSlot: 0,
-				childSlot: 1,
-				createElement: 0,
-				hostElementBody: 0,
-				deoptItemBody: 0,
-				reconcileKeyed: 0,
-				updateSurvivor: 0,
-				unmountBlock: 220,
-				unmountScope: 220,
-			},
-		},
-		partial_remount: {
-			maxFullSlotCalls: 64,
-			maxSlotCalls: 95,
-			max: {
-				renderBlock: 221,
-				componentSlot: 64,
-				childSlot: 125,
-				createElement: 158,
-				hostElementBody: 31,
-				deoptItemBody: 62,
-				reconcileKeyed: 31,
-				updateSurvivor: 0,
-			},
-		},
-		unmount: {
-			maxFullSlotCalls: 0,
-			maxSlotCalls: 0,
-			max: { unmountBlock: 7168, unmountScope: 7168 },
 		},
 	},
 };

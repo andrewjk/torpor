@@ -16,7 +16,6 @@ text/class diffing and mount-vs-update normalization.
 ```
 benchmarks/dbmon/
 ├── octane-tsrx/   # Vite app, dev :5196 — octane authored in .tsrx
-├── octane-jsx/    # Vite app, dev :5197 — same app authored in React-style .tsx
 ├── react/         # Vite app, dev :5198 (React 19, production mode)
 ├── ripple/        # Vite app, dev :5199 (Ripple — track + @for)
 ├── solid/         # Vite app, dev :5200 (Solid 2.0 — createStore + reconcile + <For>)

@@ -49,7 +49,7 @@ const SETS = [
 	{
 		root: JS_FRAMEWORK,
 		prefix: '',
-		targets: ['octane-tsrx', 'octane-jsx', 'react', 'preact', 'ripple', 'solid', 'svelte'],
+		targets: ['octane-tsrx', 'react', 'preact', 'ripple', 'solid', 'svelte'],
 	},
 	{
 		root: TODOMVC,

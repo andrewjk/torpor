@@ -9,7 +9,6 @@ import { collectPreciseCalls } from '../lib/precise-work.mjs';
 
 const TARGETS = [
 	{ name: 'octane-tsrx', url: 'http://localhost:5190/' },
-	{ name: 'octane-jsx', url: 'http://localhost:5194/' },
 ];
 
 const METRICS = [
@@ -71,42 +70,6 @@ const GATES = {
 			maxFullSlotCalls: 0,
 			maxSlotCalls: 0,
 			max: { unmountBlock: 19, unmountScope: 101 },
-		},
-	},
-	'octane-jsx': {
-		mount: {
-			maxFullSlotCalls: 101,
-			maxSlotCalls: 101,
-			max: { renderBlock: 201, componentSlot: 101, childSlot: 109, createElement: 200 },
-		},
-		bump_shallow: {
-			maxFullSlotCalls: 100,
-			maxSlotCalls: 100,
-			max: { renderBlock: 200, componentSlot: 100, childSlot: 99, createElement: 199 },
-			exact: { setText: 1 },
-		},
-		bump_middle: {
-			maxFullSlotCalls: 50,
-			maxSlotCalls: 50,
-			max: { renderBlock: 100, componentSlot: 50, childSlot: 49, createElement: 99 },
-			exact: { setText: 1 },
-		},
-		bump_deep: {
-			maxFullSlotCalls: 10,
-			maxSlotCalls: 10,
-			max: { renderBlock: 20, componentSlot: 10, childSlot: 9, createElement: 19 },
-			exact: { setText: 1 },
-		},
-		bump_batched: {
-			maxFullSlotCalls: 100,
-			maxSlotCalls: 100,
-			max: { renderBlock: 200, componentSlot: 100, childSlot: 99, createElement: 199 },
-			exact: { setText: 10 },
-		},
-		unmount: {
-			maxFullSlotCalls: 0,
-			maxSlotCalls: 0,
-			max: { unmountBlock: 201, unmountScope: 201 },
 		},
 	},
 };

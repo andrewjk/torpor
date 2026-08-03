@@ -6,7 +6,6 @@
 //
 // Usage:
 //   pnpm --filter octane-tsrx-jsbench dev   # .tsrx variant on 5176
-//   pnpm --filter octane-jsx-jsbench dev    # .tsx (JSX) variant on 5177
 //   node benchmarks/js-framework/run.mjs [iterations]   # default 8
 //   BENCH_JSON=results/js-framework.json node run.mjs   # + machine-readable copy
 //
@@ -39,13 +38,13 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5176/', ready: '#run' },
-			{ name: 'octane-jsx', url: 'http://localhost:5177/', ready: '#run' },
 			{ name: 'react', url: 'http://localhost:5175/', ready: '#run' },
 			{ name: 'ripple', url: 'http://localhost:5178/', ready: '#run' },
 			{ name: 'solid', url: 'http://localhost:5179/', ready: '#run' },
 			{ name: 'vue-vapor', url: 'http://localhost:5180/', ready: '#run' },
 			{ name: 'preact', url: 'http://localhost:5260/', ready: '#run' },
 			{ name: 'svelte', url: 'http://localhost:5271/', ready: '#run' },
+			{ name: 'torpor', url: 'http://localhost:5283/', ready: '#run' },
 		];
 
 const OPS = [

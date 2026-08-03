@@ -37,7 +37,6 @@ const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5185/' },
-			{ name: 'octane-jsx', url: 'http://localhost:5188/' },
 			{ name: 'solid', url: 'http://localhost:5187/' },
 			{ name: 'react', url: 'http://localhost:5186/' },
 			{ name: 'ripple', url: 'http://localhost:5184/' },
@@ -356,7 +355,7 @@ const OPS = [
 	'unmount',
 ];
 
-const DIALECT_PAIR_NAMES = ['octane-tsrx', 'octane-jsx'];
+const DIALECT_PAIR_NAMES = ['octane-tsrx'];
 
 (async () => {
 	const all = {};

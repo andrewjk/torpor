@@ -57,12 +57,6 @@
             "minGz": 1600
           },
           {
-            "file": "benchmarks/js-framework/octane-jsx/src/Main.tsx",
-            "source": 11974,
-            "compiled": 14201,
-            "minGz": 2787
-          },
-          {
             "file": "benchmarks/js-framework/octane-tsrx-naive/src/Main.tsrx",
             "source": 9487,
             "compiled": 10049,

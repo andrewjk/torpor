@@ -1,0 +1,291 @@
+export default function Main() {
+	var $state = $watch({
+		data: [],
+		selected: null,
+	});
+
+	var nextId = 1;
+
+	var ADJECTIVES = [
+		"pretty", "large", "big", "small", "tall", "short", "long",
+		"handsome", "plain", "quaint", "clean", "elegant", "easy",
+		"angry", "crazy", "helpful", "mushy", "odd", "unsightly",
+		"adorable", "important", "inexpensive", "cheap", "expensive", "fancy",
+	];
+	var COLOURS = [
+		"red", "yellow", "blue", "green", "pink", "brown", "purple",
+		"brown", "white", "black", "orange",
+	];
+	var NOUNS = [
+		"table", "chair", "house", "bbq", "desk", "car", "pony",
+		"cookie", "sandwich", "burger", "pizza", "mouse", "keyboard",
+	];
+
+	function random(max) {
+		return (Math.random() * max) | 0;
+	}
+
+	function buildData(count) {
+		var data = new Array(count);
+		for (var i = 0; i < count; i++) {
+			data[i] = {
+				id: nextId++,
+				label:
+					ADJECTIVES[random(ADJECTIVES.length)] +
+					" " +
+					COLOURS[random(COLOURS.length)] +
+					" " +
+					NOUNS[random(NOUNS.length)],
+			};
+		}
+		return data;
+	}
+
+	// ── Deterministic shuffle ────────────────────────────────────────────────
+	function mulberry32(seed) {
+		return function () {
+			seed |= 0;
+			seed = (seed + 0x6d2b79f5) | 0;
+			var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	}
+	var SHUFFLE_SEED = 42;
+	var shuffleSeeds = mulberry32(SHUFFLE_SEED);
+	function nextShuffleSeed() {
+		return (shuffleSeeds() * 4294967296) >>> 0;
+	}
+	function shuffleWithSeed(d, seed) {
+		var rand = mulberry32(seed);
+		var out = d.slice();
+		for (var i = out.length - 1; i > 0; i--) {
+			var j = (rand() * (i + 1)) | 0;
+			var tmp = out[i];
+			out[i] = out[j];
+			out[j] = tmp;
+		}
+		return out;
+	}
+
+	// ── Ops ──────────────────────────────────────────────────────────────────
+	function run() {
+		$state.data = buildData(1000);
+	}
+	function runLots() {
+		$state.data = buildData(10000);
+	}
+	function add() {
+		$state.data = $state.data.concat(buildData(1000));
+	}
+	function update() {
+		var out = $state.data.slice();
+		for (var i = 0; i < out.length; i += 10) {
+			var r = out[i];
+			out[i] = { id: r.id, label: r.label + " !!!" };
+		}
+		$state.data = out;
+	}
+	function clear() {
+		$state.data = [];
+	}
+	function swapRows() {
+		var d = $state.data;
+		if (d.length <= 998) return;
+		var out = d.slice();
+		var tmp = out[1];
+		out[1] = out[998];
+		out[998] = tmp;
+		$state.data = out;
+	}
+	function remove(row) {
+		var out = $state.data.slice();
+		out.splice(out.indexOf(row), 1);
+		$state.data = out;
+	}
+
+	// ── Keyed-reorder matrix ─────────────────────────────────────────────────
+	function reverseRows() {
+		$state.data = $state.data.toReversed();
+	}
+	function shuffleRows() {
+		var seed = nextShuffleSeed();
+		$state.data = shuffleWithSeed($state.data, seed);
+	}
+	function rotateForward() {
+		var d = $state.data;
+		if (d.length === 0) return;
+		$state.data = [d[d.length - 1]].concat(d.slice(0, -1));
+	}
+	function rotateBackward() {
+		var d = $state.data;
+		if (d.length === 0) return;
+		$state.data = d.slice(1).concat(d[0]);
+	}
+	function prepend100() {
+		$state.data = buildData(100).concat($state.data);
+	}
+	function append100() {
+		$state.data = $state.data.concat(buildData(100));
+	}
+	function insertMid100() {
+		var d = $state.data;
+		var mid = d.length >> 1;
+		$state.data = d.slice(0, mid).concat(buildData(100), d.slice(mid));
+	}
+	function removeFirst() {
+		$state.data = $state.data.slice(1);
+	}
+	function removeEvery10() {
+		$state.data = $state.data.filter(function (_, i) {
+			return i % 10 !== 0;
+		});
+	}
+	function displace(k) {
+		return function () {
+			var d = $state.data;
+			$state.data = d.slice(k).concat(d.slice(0, k));
+		};
+	}
+	function select(row) {
+		$state.selected = row.id;
+	}
+
+	@render {
+		<div class="container">
+			<div class="jumbotron">
+				<div class="row">
+					<div class="col-md-6">
+						<h1>Torpor keyed</h1>
+					</div>
+					<div class="col-md-6">
+						<div class="row">
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="run" onclick={run}>
+									Create 1,000 rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="runlots" onclick={runLots}>
+									Create 10,000 rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="add" onclick={add}>
+									Append 1,000 rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="update" onclick={update}>
+									Update every 10th row
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="clear" onclick={clear}>
+									Clear
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="swaprows" onclick={swapRows}>
+									Swap Rows
+								</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="reverse" onclick={reverseRows}>
+									Reverse rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="shuffle" onclick={shuffleRows}>
+									Shuffle rows (seeded)
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="rotatef" onclick={rotateForward}>
+									Rotate last to front
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="rotateb" onclick={rotateBackward}>
+									Rotate first to end
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="prepend100" onclick={prepend100}>
+									Prepend 100 rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="append100" onclick={append100}>
+									Append 100 rows
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="insertmid100" onclick={insertMid100}>
+									Insert 100 rows at middle
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="removefirst" onclick={removeFirst}>
+									Remove first row
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="removeevery10" onclick={removeEvery10}>
+									Remove every 10th row
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="displace3" onclick={displace(3)}>
+									Displace first 3 to end
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="displace4" onclick={displace(4)}>
+									Displace first 4 to end
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="displace5" onclick={displace(5)}>
+									Displace first 5 to end
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="displace6" onclick={displace(6)}>
+									Displace first 6 to end
+								</button>
+							</div>
+							<div class="col-sm-6 smallpad">
+								<button type="button" class="btn btn-primary btn-block" id="displace8" onclick={displace(8)}>
+									Displace first 8 to end
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<table class="table table-hover table-striped test-data">
+				<tbody>
+					@for (let row of $state.data) {
+						@key = row.id
+						<tr class={{ danger: $state.selected === row.id }}>
+							<td class="col-md-1">{row.id}</td>
+							<td class="col-md-4">
+								<a onclick={() => select(row)}>{row.label}</a>
+							</td>
+							<td class="col-md-1">
+								<a onclick={() => remove(row)}>
+									<span class="glyphicon glyphicon-remove" aria-hidden="true" />
+								</a>
+							</td>
+							<td class="col-md-6" />
+						</tr>
+					}
+				</tbody>
+			</table>
+			<span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true" />
+		</div>
+	}
+}

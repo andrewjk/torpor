@@ -10,7 +10,7 @@
     "preview": "vite preview --port 5176 --strictPort"
   },
   "dependencies": {
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default",

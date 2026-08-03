@@ -8,7 +8,6 @@
     "gen": "node gen.mjs",
     "bench": "node run.mjs",
     "bench:octane-tsrx": "node run.mjs octane-tsrx",
-    "bench:octane-jsx": "node run.mjs octane-jsx",
     "bench:ripple": "node run.mjs ripple",
     "bench:solid": "node run.mjs solid",
     "bench:react": "node run.mjs react",

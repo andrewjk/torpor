@@ -36,6 +36,7 @@ import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildHtmlReport } from './lib/html-report.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(__dirname, '..');
@@ -74,12 +75,12 @@ const SUITES = [
 		servers: [
 			{ filter: 'react-jsbench', port: 5175 },
 			{ filter: 'octane-tsrx-jsbench', port: 5176 },
-			{ filter: 'octane-jsx-jsbench', port: 5177 },
 			{ filter: 'ripple-jsbench', port: 5178 },
 			{ filter: 'solid-jsbench', port: 5179 },
 			{ filter: 'vue-vapor-jsbench', port: 5180 },
 			{ filter: 'preact-jsbench', port: 5260 },
 			{ filter: 'svelte-jsbench', port: 5271 },
+			{ filter: 'torpor-jsbench', port: 5283 },
 		],
 		iter: { normal: 8, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -90,12 +91,12 @@ const SUITES = [
 		servers: [
 			{ filter: 'react-jsbench', port: 5175 },
 			{ filter: 'octane-tsrx-jsbench', port: 5176 },
-			{ filter: 'octane-jsx-jsbench', port: 5177 },
 			{ filter: 'ripple-jsbench', port: 5178 },
 			{ filter: 'solid-jsbench', port: 5179 },
 			{ filter: 'vue-vapor-jsbench', port: 5180 },
 			{ filter: 'preact-jsbench', port: 5260 },
 			{ filter: 'svelte-jsbench', port: 5271 },
+			{ filter: 'torpor-jsbench', port: 5283 },
 		],
 		iter: { normal: 8, quick: 3 },
 		runs: [{ script: 'run-reorder.mjs', args: (n) => [String(n)] }],
@@ -111,6 +112,7 @@ const SUITES = [
 			{ filter: 'vue-vapor-todomvc', port: 5244 },
 			{ filter: 'preact-todomvc', port: 5261 },
 			{ filter: 'svelte-todomvc', port: 5272 },
+			{ filter: 'torpor-todomvc', port: 5283 },
 		],
 		iter: { normal: 8, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -125,6 +127,7 @@ const SUITES = [
 			{ filter: 'solid-weather-app-bench', port: 5295 },
 			{ filter: 'svelte-weather-app-bench', port: 5296 },
 			{ filter: 'vue-weather-app-bench', port: 5297 },
+			{ filter: 'torpor-weather-app-bench', port: 5283 },
 		],
 		iter: { normal: 8, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -139,6 +142,7 @@ const SUITES = [
 			{ filter: 'solid-weather-app-bench', port: 5295 },
 			{ filter: 'svelte-weather-app-bench', port: 5296 },
 			{ filter: 'vue-weather-app-bench', port: 5297 },
+			{ filter: 'torpor-weather-app-bench', port: 5283 },
 		],
 		iter: { normal: 5, quick: 3 },
 		runs: [{ script: 'lighthouse.mjs', args: (n) => [String(n)] }],
@@ -154,6 +158,7 @@ const SUITES = [
 			{ filter: 'vue-vapor-chat-stream', port: 5254 },
 			{ filter: 'preact-chat-stream', port: 5262 },
 			{ filter: 'svelte-chat-stream', port: 5273 },
+			{ filter: 'torpor-chat-stream', port: 5283 },
 		],
 		iter: { normal: 8, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -163,13 +168,13 @@ const SUITES = [
 		cwd: 'dbmon',
 		servers: [
 			{ filter: 'octane-tsrx-dbmon-bench', port: 5196 },
-			{ filter: 'octane-jsx-dbmon-bench', port: 5197 },
 			{ filter: 'react-dbmon-bench', port: 5198 },
 			{ filter: 'ripple-dbmon-bench', port: 5199 },
 			{ filter: 'solid-dbmon-bench', port: 5200 },
 			{ filter: 'vue-vapor-dbmon-bench', port: 5220 },
 			{ filter: 'preact-dbmon-bench', port: 5263 },
 			{ filter: 'svelte-dbmon-bench', port: 5274 },
+			{ filter: 'torpor-dbmon-bench', port: 5283 },
 		],
 		iter: { normal: 30, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -182,10 +187,10 @@ const SUITES = [
 			{ filter: 'octane-tsrx-recursive-bench', port: 5185 },
 			{ filter: 'react-recursive-bench', port: 5186 },
 			{ filter: 'solid-recursive-bench', port: 5187 },
-			{ filter: 'octane-jsx-recursive-bench', port: 5188 },
 			{ filter: 'vue-vapor-recursive-bench', port: 5189 },
 			{ filter: 'preact-recursive-bench', port: 5264 },
 			{ filter: 'svelte-recursive-bench', port: 5275 },
+			{ filter: 'torpor-recursive-bench', port: 5283 },
 		],
 		iter: { normal: 20, quick: 3 },
 		runs: [
@@ -201,10 +206,10 @@ const SUITES = [
 			{ filter: 'solid-signal-bench', port: 5191 },
 			{ filter: 'react-signal-bench', port: 5192 },
 			{ filter: 'ripple-signal-bench', port: 5193 },
-			{ filter: 'octane-jsx-signal-bench', port: 5194 },
 			{ filter: 'vue-vapor-signal-bench', port: 5183 },
 			{ filter: 'preact-signal-bench', port: 5265 },
 			{ filter: 'svelte-signal-bench', port: 5276 },
+			{ filter: 'torpor-signal-bench', port: 5283 },
 		],
 		iter: { normal: 20, quick: 3 },
 		runs: [
@@ -222,13 +227,13 @@ const SUITES = [
 		iter: { normal: 20, quick: 3 },
 		runs: [
 			'octane-tsrx',
-			'octane-jsx',
 			'react',
 			'preact',
 			'ripple',
 			'solid',
 			'svelte',
 			'vue-vapor',
+			'torpor',
 		].map((target) => ({
 			label: target,
 			script: 'run.mjs',
@@ -244,7 +249,7 @@ const SUITES = [
 		cwd: 'hydration-interactivity',
 		servers: [],
 		iter: { normal: 5, quick: 2 },
-		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor'].map((target) => ({
+		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor', 'torpor'].map((target) => ({
 			label: target,
 			script: 'run.mjs',
 			args: (n) => [target, String(n)],
@@ -255,7 +260,7 @@ const SUITES = [
 		cwd: 'hydration-stress',
 		servers: [],
 		iter: { normal: 5, quick: 2 },
-		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor'].map((target) => ({
+		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor', 'torpor'].map((target) => ({
 			label: target,
 			script: 'run.mjs',
 			args: (n) => [target, String(n)],
@@ -276,7 +281,7 @@ const SUITES = [
 		cwd: name,
 		servers: [],
 		iter: name === 'lifecycle-memory' ? { normal: 84, quick: 2 } : { normal: 8, quick: 2 },
-		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor'].map((target) => ({
+		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor', 'torpor'].map((target) => ({
 			label: target,
 			script: 'run.mjs',
 			args: (n) => [target, String(n)],
@@ -291,7 +296,7 @@ const SUITES = [
 		cwd: 'store-selector-fanout',
 		servers: [],
 		iter: { normal: 8, quick: 2 },
-		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor'].map((target) => ({
+		runs: ['octane-tsrx', 'react', 'preact', 'solid', 'svelte', 'vue-vapor', 'torpor'].map((target) => ({
 			label: target,
 			script: 'run.mjs',
 			args: (n) => [target, String(n)],
@@ -302,13 +307,13 @@ const SUITES = [
 		cwd: 'effectful-list',
 		servers: [
 			{ filter: 'octane-tsrx-effectful-list-bench', port: 5201 },
-			{ filter: 'octane-jsx-effectful-list-bench', port: 5202 },
 			{ filter: 'react-effectful-list-bench', port: 5203 },
 			{ filter: 'solid-effectful-list-bench', port: 5204 },
 			{ filter: 'ripple-effectful-list-bench', port: 5205 },
 			{ filter: 'vue-vapor-effectful-list-bench', port: 5221 },
 			{ filter: 'preact-effectful-list-bench', port: 5266 },
 			{ filter: 'svelte-effectful-list-bench', port: 5277 },
+			{ filter: 'torpor-effectful-list-bench', port: 5283 },
 		],
 		iter: { normal: 30, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -328,7 +333,6 @@ const SUITES = [
 		cwd: 'memo-wall',
 		servers: [
 			{ filter: 'octane-tsrx-memowall-bench', port: 5206 },
-			{ filter: 'octane-jsx-memowall-bench', port: 5207 },
 			{ filter: 'react-memowall-bench', port: 5208 },
 			{ filter: 'react-compiler-memowall-bench', port: 5226 },
 			{ filter: 'solid-memowall-bench', port: 5182 },
@@ -336,6 +340,7 @@ const SUITES = [
 			{ filter: 'vue-vapor-memowall-bench', port: 5223 },
 			{ filter: 'preact-memowall-bench', port: 5267 },
 			{ filter: 'svelte-memowall-bench', port: 5278 },
+			{ filter: 'torpor-memowall-bench', port: 5283 },
 		],
 		iter: { normal: 20, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -351,6 +356,7 @@ const SUITES = [
 			{ filter: 'vue-vapor-portal-swarm-bench', port: 5181 },
 			{ filter: 'preact-portal-swarm-bench', port: 5268 },
 			{ filter: 'svelte-portal-swarm-bench', port: 5279 },
+			{ filter: 'torpor-portal-swarm-bench', port: 5283 },
 		],
 		iter: { normal: 20, quick: 3 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -468,7 +474,6 @@ const SUITES = [
 		servers: [
 			{ filter: 'octane-tsrx-jsbench', port: 5176 },
 			{ filter: 'octane-tsrx-naive-jsbench', port: 5213 },
-			{ filter: 'octane-jsx-naive-jsbench', port: 5214 },
 			{ filter: 'octane-ts-jsbench', port: 5215 },
 		],
 		iter: { normal: 8, quick: 3 },
@@ -480,7 +485,6 @@ const SUITES = [
 					TARGETS: JSON.stringify([
 						{ name: 'octane-tsrx', url: url(5176), ready: '#run' },
 						{ name: 'octane-tsrx-naive', url: url(5213), ready: '#run' },
-						{ name: 'octane-jsx-naive', url: url(5214), ready: '#run' },
 						{ name: 'octane-ts', url: url(5215), ready: '#run' },
 					]),
 				}),
@@ -504,6 +508,7 @@ const SUITES = [
 			{ filter: 'ripple-async-bench', port: 5219 },
 			{ filter: 'preact-async-bench', port: 5269 },
 			{ filter: 'svelte-async-bench', port: 5280 },
+			{ filter: 'torpor-async-bench', port: 5283 },
 		],
 		iter: { normal: 10, quick: 2 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
@@ -862,6 +867,12 @@ async function runSuite(suite) {
 		const resultPath = path.join(RESULTS_DIR, `${suite.name}.json`);
 		fs.writeFileSync(resultPath, JSON.stringify(merged, null, '\t') + '\n');
 		console.error(`  → wrote ${path.relative(REPO, resultPath)}`);
+		const htmlPath = path.join(RESULTS_DIR, `${suite.name}.html`);
+		const html = buildHtmlReport(merged);
+		if (html) {
+			fs.writeFileSync(htmlPath, html);
+			console.error(`  → wrote ${path.relative(REPO, htmlPath)}`);
+		}
 		if (merged.targets.length === 0) {
 			throw new Error('no targets produced numbers (harness wrote no parseable BENCH_JSON)');
 		}

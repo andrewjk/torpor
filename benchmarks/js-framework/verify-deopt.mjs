@@ -1,5 +1,5 @@
 // De-opt authoring-cliff verifier — the correctness gate for the naive fixtures
-// (octane-tsrx-naive :5213, octane-jsx-naive :5214, octane-ts :5215, and dbmon's
+// (octane-tsrx-naive :5213, octane-ts :5215, and dbmon's
 // octane-deopt :5209). For each naive fixture and its tuned twin it asserts BOTH:
 //
 //  1. DE-OPT PROOF — a DOM-observable artifact showing the naive rows are NOT on
@@ -18,7 +18,7 @@
 //         The tuned fixtures' single-root `@for`/keyed-`.map` fast path is
 //         marker-free per item (only the list's own `<!--for-->` pair — see
 //         mountItem's singleRoot branch in runtime.ts). Fires for
-//         octane-tsrx-naive / octane-jsx-naive.
+//         octane-tsrx-naive.
 //
 //  2. EQUIVALENCE — the rendered rows are byte-identical tuned-vs-naive after
 //     stripping comment nodes and three documented non-semantic normalizations:
@@ -49,12 +49,6 @@ const DEFAULT_PAIRS = [
 		name: 'octane-tsrx-naive vs octane-tsrx',
 		tuned: 'http://localhost:5176/',
 		naive: 'http://localhost:5213/',
-	},
-	{
-		kind: 'jsf',
-		name: 'octane-jsx-naive vs octane-jsx',
-		tuned: 'http://localhost:5177/',
-		naive: 'http://localhost:5214/',
 	},
 	{
 		kind: 'jsf',

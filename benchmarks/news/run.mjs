@@ -32,7 +32,6 @@ import { summarizeSamples, timingStatForJson } from '../lib/stats.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TARGET_PORTS = {
 	'octane-tsrx': 5191,
-	'octane-jsx': 5195,
 	solid: 5192,
 	react: 5193,
 	preact: 5270,

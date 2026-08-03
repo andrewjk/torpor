@@ -56,7 +56,6 @@ const out =
 // doesn't exist yet, so adding a new target is just creating its folder).
 const TARGETS = [
 	'octane-tsrx',
-	'octane-jsx',
 	'solid',
 	'react',
 	'preact',
