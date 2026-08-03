@@ -10,6 +10,10 @@ export default function addEvent(
 	// NOTE: We don't need to do this for hydration, but it's simpler to do it
 	// the same way in both processes
 	if (listener !== undefined && listener !== null) {
-		context.stashedEvents.push({ region: context.activeRegion, el, type, listener });
+		// NOTE: `region` is intentionally omitted — it was stashed historically
+		// but never read by `addFragment` (the consumer). Dropping it removes
+		// one property write per `addEvent` call (2 per list item in the
+		// js-framework-bench row template, ~2000 writes per 1k-row create).
+		context.stashedEvents.push({ el, type, listener });
 	}
 }

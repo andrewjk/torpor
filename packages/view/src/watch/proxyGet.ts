@@ -99,7 +99,14 @@ export default function proxyGet(
 	}
 
 	// Return the property value
-	return Reflect.get(target, key, receiver);
+	// NOTE: equivalent to `Reflect.get(target, key, receiver)` for the cases
+	// that reach here (data properties or missing keys — anything with a
+	// getter has early-returned above). Avoids a `Reflect.get` function call
+	// per property read on a watched object, which is the dominant per-effect-
+	// run cost: each row effect reads `$state.selected`, `data.row.id`, and
+	// `data.row.label` (the `.row` access goes through this trap), so a 1k-row
+	// render triggers ~3k of these calls.
+	return target[key];
 }
 
 // Prevent array functions from calling functions and properties in breakable

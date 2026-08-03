@@ -25,12 +25,19 @@
  */
 import type ListItem from "../types/ListItem";
 import type Region from "../types/Region";
+import type WatchOptions from "../types/WatchOptions";
 import $watch from "../watch/$watch";
 import clearRegion from "./clearRegion";
 import context from "./context";
 import moveRegion from "./moveRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
+
+// Hoisted options object — `$watch` only reads `options?.shallow`, so a single
+// shared constant can serve every per-item `$watch(data, { shallow: true })`
+// call in the create paths below. Removes one object allocation per created
+// list item (i.e. one per row in `run`/`add`/`runlots`).
+const SHALLOW_WATCH_OPTIONS: WatchOptions = { shallow: true };
 
 /**
  * @param region The list's region
@@ -137,7 +144,7 @@ export default function runListItems(
 					for (let i = newStartIndex; i <= newEndIndex; i++) {
 						const newItem = newItems[i]!;
 						const pushedRegion = pushRegion(newItem, true);
-						newItem.data = $watch(newItem.data, { shallow: true });
+						newItem.data = $watch(newItem.data, SHALLOW_WATCH_OPTIONS);
 						create(newItem, before);
 						popRegion(pushedRegion);
 						before = newItem.endNode!.nextSibling;
@@ -160,7 +167,7 @@ export default function runListItems(
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
 				const savedPrevious = context.previousRegion;
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				context.previousRegion = savedPrevious;
@@ -174,7 +181,7 @@ export default function runListItems(
 				// Insert
 				//console.log("insert", newStartItem.key);
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				newStartItem = newItems[++newStartIndex];
@@ -205,7 +212,7 @@ export default function runListItems(
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, { shallow: true });
+				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
 				create(newStartItem, before);
 				popRegion(oldRegion);
 				before = newStartItem.endNode!.nextSibling;

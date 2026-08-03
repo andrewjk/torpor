@@ -76,7 +76,6 @@ export default interface Context {
 	 * DOM
 	 */
 	stashedEvents: {
-		region: Region;
 		el: Element;
 		type: string;
 		listener: (this: Element, ev: any) => any;
