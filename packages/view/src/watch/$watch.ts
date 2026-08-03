@@ -5,6 +5,17 @@ import proxyGet from "./proxyGet";
 import proxySet from "./proxySet";
 import { proxyDataSymbol } from "./symbols";
 
+// The Proxy handler is stateless — every trap looks up state via the
+// `proxyDataSymbol` property on the target itself — so a single shared
+// handler can serve every $watch'd object. Avoiding a fresh `{ get, set }`
+// allocation per $watch() call removes N object allocations per N-item list
+// render (the per-row `$watch(data, { shallow: true })` in runListItems is
+// called once for every keyed list item).
+const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
+	get: proxyGet,
+	set: proxySet,
+};
+
 /**
  * Watches an object and runs effects when its properties are changed
  *
@@ -35,12 +46,7 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 	// @ts-ignore
 	object[proxyDataSymbol] = data;
 
-	const handler: ProxyHandler<T> = {
-		get: proxyGet,
-		set: proxySet,
-	};
-
-	const proxy = new Proxy(object, handler) as T;
+	const proxy = new Proxy(object, sharedHandler) as T;
 
 	// DEV:
 	devContext.onWatch(data);
