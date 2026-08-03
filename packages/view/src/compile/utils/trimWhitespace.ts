@@ -4,7 +4,9 @@ import type ElementNode from "../types/nodes/ElementNode";
 import type RootNode from "../types/nodes/RootNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import type TextNode from "../types/nodes/TextNode";
+import isControlNode from "./isControlNode";
 import isTextNode from "./isTextNode";
+import { NON_RENDERING_OPERATIONS } from "./nonRenderingOperations";
 
 /**
  * Tag names whose contents should keep all whitespace untouched, matching
@@ -42,6 +44,12 @@ type ContainerNode = RootNode | ElementNode | ControlNode;
  *   insignificant — see WHITESPACE_INSIGNIFICANT_TAGS)
  * - whitespace inside `pre`, `textarea`, and `code` is preserved
  *
+ * Whitespace adjacent to non-rendering control nodes (e.g. `@key`, `@const`)
+ * is treated as leading/trailing whitespace of the container and removed,
+ * because those nodes produce no DOM output — without this rule, every row
+ * of `@for { @key = ...; <tr>...</tr> }` would emit a phantom leading
+ * whitespace text node.
+ *
  * Mixed text nodes (containing non-whitespace content) are left untouched;
  * their internal whitespace continues to be collapsed at build time. The
  * walk mutates the tree in place and is idempotent.
@@ -52,7 +60,11 @@ export default function trimWhitespace(node: ContainerNode): void {
 	trimChildren(node.children, false, undefined);
 }
 
-function trimChildren(children: TemplateNode[], preserveAll: boolean, parentTag: string | undefined): void {
+function trimChildren(
+	children: TemplateNode[],
+	preserveAll: boolean,
+	parentTag: string | undefined,
+): void {
 	// Recurse depth-first so descendant containers are normalized before we
 	// reason about siblings at this level
 	for (const child of children) {
@@ -66,15 +78,7 @@ function trimChildren(children: TemplateNode[], preserveAll: boolean, parentTag:
 
 	if (preserveAll) return;
 
-	// Remove pure-whitespace text nodes at the start of the container
-	while (children.length && isWhitespaceText(children[0])) {
-		children.shift();
-	}
-	// Remove pure-whitespace text nodes at the end of the container
-	while (children.length && isWhitespaceText(children[children.length - 1])) {
-		children.pop();
-	}
-	// Inside table/list containers, all remaining inter-child whitespace is
+	// Inside table/list containers, all inter-child whitespace is
 	// insignificant — remove it rather than collapsing to a space
 	if (parentTag !== undefined && WHITESPACE_INSIGNIFICANT_TAGS.has(parentTag)) {
 		for (let i = children.length - 1; i >= 0; i--) {
@@ -84,12 +88,52 @@ function trimChildren(children: TemplateNode[], preserveAll: boolean, parentTag:
 		}
 		return;
 	}
-	// Collapse remaining pure-whitespace nodes (between siblings) to one space
+
+	// Compute leading/trailing masks that treat non-rendering control nodes
+	// (e.g. @key, @const) as invisible, so that whitespace adjacent to them
+	// is removed as if it were at the container edge. A whitespace text node
+	// is "effectively leading" if no rendering sibling precedes it, and
+	// "effectively trailing" if no rendering sibling follows it.
+	const len = children.length;
+	const hasRenderingBefore = new Array<boolean>(len);
+	const hasRenderingAfter = new Array<boolean>(len);
+	let seenBefore = false;
+	let seenAfter = false;
+	for (let i = 0; i < len; i++) {
+		hasRenderingBefore[i] = seenBefore;
+		if (isRenderingSibling(children[i])) seenBefore = true;
+		const j = len - 1 - i;
+		hasRenderingAfter[j] = seenAfter;
+		if (isRenderingSibling(children[j])) seenAfter = true;
+	}
+
+	// Remove pure-whitespace nodes at the effectively-leading or
+	// effectively-trailing edges of the container
+	for (let i = len - 1; i >= 0; i--) {
+		if (isWhitespaceText(children[i]) && (!hasRenderingBefore[i] || !hasRenderingAfter[i])) {
+			children.splice(i, 1);
+		}
+	}
+
+	// Collapse remaining pure-whitespace nodes (between rendering siblings) to one space
 	for (const child of children) {
 		if (isTextNode(child) && child.content !== "" && isSpace(child.content)) {
 			child.content = " ";
 		}
 	}
+}
+
+/**
+ * Returns true if `node` is a "rendering sibling" — i.e. a node that produces
+ * visible DOM output and therefore acts as a boundary between leading,
+ * inter-sibling, and trailing whitespace. Whitespace text nodes themselves
+ * (the subject of the trim) and non-rendering control nodes (e.g. @key,
+ * @const) are not rendering siblings.
+ */
+function isRenderingSibling(node: TemplateNode): boolean {
+	if (isWhitespaceText(node)) return false;
+	if (isControlNode(node) && NON_RENDERING_OPERATIONS.has(node.operation)) return false;
+	return true;
 }
 
 function getChildren(node: TemplateNode): TemplateNode[] | undefined {

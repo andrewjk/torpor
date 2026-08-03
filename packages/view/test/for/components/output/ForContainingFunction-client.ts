@@ -57,7 +57,7 @@ export default function ForContainingIf(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<button>#</button> `);
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<button>#</button>`);
 			const t_button_1 = t_root(t_fragment_1) as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
 			t_event(t_button_1, "click", doit);

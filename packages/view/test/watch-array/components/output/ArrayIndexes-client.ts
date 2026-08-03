@@ -56,9 +56,9 @@ export default function ArrayIndexes(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` <span>#</span>`);
-			const t_root_1 = t_root(t_fragment_1, true);
-			const t_span_1 = t_next(t_root_1) as HTMLSpanElement;
+			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<span>#</span>`);
+			const t_root_1 = t_root(t_fragment_1);
+			const t_span_1 = t_root_1 as HTMLSpanElement;
 			const t_text_1 = t_child(t_span_1);
 			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item_1.data.i > 0 ? ", " : "")} ${t_fmt($props.items[t_item_1.data.i].text)} `;

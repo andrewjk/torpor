@@ -13,7 +13,7 @@ export default function IfContainingIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.condition) {
-		t_body += `<!^><button>do it</button> `;
+		t_body += `<!^><button>do it</button>`;
 
 		function doit() {
 			// it just needs to exist...

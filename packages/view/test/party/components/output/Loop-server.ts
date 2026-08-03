@@ -17,7 +17,7 @@ export default function Colors(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let color of colors) {
-		t_body += `<!^> <li>${t_fmt(color)}</li>`;
+		t_body += `<!^><li>${t_fmt(color)}</li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

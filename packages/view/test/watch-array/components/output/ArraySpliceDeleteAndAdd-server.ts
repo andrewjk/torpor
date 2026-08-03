@@ -14,7 +14,7 @@ export default function Array(
 	/* User interface */
 	t_body += `<section><p>^</p> <![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <p> ${t_fmt(item.text)} </p>`;
+		t_body += `<!^><p> ${t_fmt(item.text)} </p>`;
 	}
 	t_body += `<!]><!> <p>$</p></section>`;
 

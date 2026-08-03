@@ -11,6 +11,7 @@ import isElementNode from "../../utils/isElementNode";
 import isReactive from "../../utils/isReactive";
 import isSpecialNode from "../../utils/isSpecialNode";
 import isTextNode from "../../utils/isTextNode";
+import { NON_RENDERING_OPERATIONS } from "../../utils/nonRenderingOperations";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -137,16 +138,6 @@ function maybeAddRootNodeDeclaration(
 		printDebug(rootName, status, b);
 	}
 }
-
-/** Control operations that produce no DOM output within a fragment. */
-const NON_RENDERING_OPERATIONS = new Set([
-	"@key",
-	"@const",
-	"@console",
-	"@debugger",
-	"@function",
-	"@async function",
-]);
 
 /**
  * Returns the first child that actually renders to the DOM, skipping comments

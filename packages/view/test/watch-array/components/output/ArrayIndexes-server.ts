@@ -14,7 +14,7 @@ export default function ArrayIndexes(
 	/* User interface */
 	t_body += `<section><p>^</p> <![>`;
 	for (let i = 0; i < $props.items.length; i++) {
-		t_body += `<!^> <span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span>`;
+		t_body += `<!^><span> ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} </span>`;
 	}
 	t_body += `<!]><!> <p>$</p></section>`;
 

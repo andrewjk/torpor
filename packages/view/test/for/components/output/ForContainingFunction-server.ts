@@ -15,7 +15,7 @@ export default function ForContainingIf(
 	/* User interface */
 	t_body += `<section><![>`;
 	for (let i = 0; i < 5; i++) {
-		t_body += `<!^><button>do it ${t_fmt(i)}</button> `;
+		t_body += `<!^><button>do it ${t_fmt(i)}</button>`;
 
 		function doit() {
 			// it just needs to exist...

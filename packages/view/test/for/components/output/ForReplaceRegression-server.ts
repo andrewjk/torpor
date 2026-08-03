@@ -14,7 +14,7 @@ export default function ForReplace(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let item of $props.items) {
-		t_body += `<!^> <li>${t_fmt(item.name)}</li>`;
+		t_body += `<!^><li>${t_fmt(item.name)}</li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

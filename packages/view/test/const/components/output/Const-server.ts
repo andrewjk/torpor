@@ -14,7 +14,7 @@ export default function Const(
 
 	/* User interface */
 	const name = "Boris";
-	t_body += ` <p> Hello, ${t_fmt(name)}! </p>`;
+	t_body += `<p> Hello, ${t_fmt(name)}! </p>`;
 
 	return { body: t_body, head: t_head };
 }

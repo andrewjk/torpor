@@ -37,20 +37,22 @@ test("collapses whitespace between siblings to a single space", () => {
 
 test("removes inter-child whitespace inside table and list containers", () => {
 	const tree = root([
-		el("tr", [], [
-			text("\n\t"),
-			el("td", [], [text("A")]),
-			text("\n\t"),
-			el("td", [], [text("B")]),
-			text("\n"),
-		]),
-		el("ul", [], [
-			text("\n"),
-			el("li", [], [text("x")]),
-			text("\n"),
-			el("li", [], [text("y")]),
-			text("\n"),
-		]),
+		el(
+			"tr",
+			[],
+			[
+				text("\n\t"),
+				el("td", [], [text("A")]),
+				text("\n\t"),
+				el("td", [], [text("B")]),
+				text("\n"),
+			],
+		),
+		el(
+			"ul",
+			[],
+			[text("\n"), el("li", [], [text("x")]), text("\n"), el("li", [], [text("y")]), text("\n")],
+		),
 	]);
 
 	trimWhitespace(tree);
@@ -119,6 +121,75 @@ test("trims inside control block bodies", () => {
 
 	const forBody = (tree.children[0] as any).children[0].children;
 	expect(forBody).toEqual([el("li", [], [text("x")])]);
+});
+
+test("removes whitespace adjacent to non-rendering control nodes (e.g. @key)", () => {
+	// Models the js-framework-benchmark row template:
+	//   @for (let row of rows) {
+	//     @key = row.id
+	//     <tr>...</tr>
+	//   }
+	// Without treating @key as invisible, the whitespace between @key and
+	// <tr> would collapse to a single space and be emitted as a phantom
+	// leading text node on every row.
+	const tree = root([
+		control("@for group", "", [
+			control("@for", "(row of rows)", [
+				text("\n\t"),
+				control("@key", "key = row.id"),
+				text("\n\t"),
+				el("tr", [], [el("td", [], [text("x")])]),
+				text("\n"),
+			]),
+		]),
+	]);
+
+	trimWhitespace(tree);
+
+	const forBody = (tree.children[0] as any).children[0].children;
+	expect(forBody).toEqual([
+		control("@key", "key = row.id"),
+		el("tr", [], [el("td", [], [text("x")])]),
+	]);
+});
+
+test("removes whitespace adjacent to @const at the start of a container", () => {
+	const tree = root([
+		text("\n"),
+		control("@const", 'name = "Boris"'),
+		text("\n"),
+		el("p", [], [text("Hello!")]),
+		text("\n"),
+	]);
+
+	trimWhitespace(tree);
+
+	expect(tree.children).toEqual([
+		control("@const", 'name = "Boris"'),
+		el("p", [], [text("Hello!")]),
+	]);
+});
+
+test("still collapses whitespace between rendering siblings when a non-rendering node is elsewhere", () => {
+	// @const at the very start shouldn't make the inter-sibling whitespace
+	// between two <span>s disappear — only the whitespace that becomes
+	// leading/trailing once non-rendering nodes are ignored.
+	const tree = root([
+		control("@const", "x = 1"),
+		text("\n"),
+		el("span", [], [text("a")]),
+		text("\n"),
+		el("span", [], [text("b")]),
+	]);
+
+	trimWhitespace(tree);
+
+	expect(tree.children).toEqual([
+		control("@const", "x = 1"),
+		el("span", [], [text("a")]),
+		text(" "),
+		el("span", [], [text("b")]),
+	]);
 });
 
 test("is idempotent", () => {
