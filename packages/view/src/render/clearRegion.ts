@@ -97,11 +97,57 @@ function releaseRegion(region: Region) {
 	region.nextRegion = null;
 	region.animations = null;
 
-	// Clean up effects owned by this region
+	// Clean up effects owned by this region. For each effect we both run its
+	// optional cleanup function AND detach every source subscription from the
+	// source signal's `firstTarget` list. Without the detach, the destroyed
+	// effect stays in `signal.firstTarget` forever — every subsequent change
+	// to any of its sources re-queues the (no-longer-reachable-via-DOM)
+	// effect, which re-runs, re-subscribes, and leaks indefinitely. This is
+	// the dominant cost in long-lived sessions where list items are
+	// repeatedly created and cleared (e.g. js-framework-bench iterations).
 	for (const effect of region.effects) {
 		if (typeof effect.cleanup === "function") {
 			effect.cleanup();
 			effect.cleanup = undefined;
+		}
+
+		// Detach every source subscription from its signal's target list.
+		// `clearSources` only removes subscriptions marked inactive, but a
+		// freshly-destroyed effect's subscriptions are still active (they
+		// were never marked inactive because the effect was never re-run),
+		// so we walk and unlink explicitly.
+		let sub = effect.firstSource;
+		effect.firstSource = null;
+		while (sub !== null) {
+			const nextSource = sub.nextSource;
+
+			// Unlink this subscription from the signal's target list (the
+			// doubly-linked `previousTarget`/`nextTarget` chain).
+			const prev = sub.previousTarget;
+			const next = sub.nextTarget;
+			if (prev === null) {
+				// We're the head of the signal's target list — promote the
+				// next target, but only if we still are the head. A popular
+				// signal may have had new subscriptions prepended since this
+				// sub was created, in which case `firstTarget` no longer
+				// points at us and the head has already moved on.
+				if (sub.source.firstTarget === sub) {
+					sub.source.firstTarget = next;
+				}
+			} else {
+				prev.nextTarget = next;
+			}
+			if (next !== null) {
+				next.previousTarget = prev;
+			}
+
+			// Clear pointers so this subscription is no longer reachable
+			// from either list, even transitively.
+			sub.previousTarget = null;
+			sub.nextTarget = null;
+			sub.nextSource = null;
+
+			sub = nextSource;
 		}
 	}
 	region.effects.length = 0;
