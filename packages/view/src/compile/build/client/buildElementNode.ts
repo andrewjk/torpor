@@ -7,8 +7,6 @@ import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
-import buildAddFragment from "./buildAddFragment";
-import buildFragment from "./buildFragment";
 import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
@@ -74,7 +72,7 @@ function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Buil
 		// Process children with the existing fragment stack (parent's fragment),
 		// so text content effects are properly stashed and emitted by the parent
 		for (let child of node.children) {
-			buildNode(child, status, b, node.varName, "null");
+			buildNode(child, status, b, node.varName!, "null");
 		}
 	}
 }
