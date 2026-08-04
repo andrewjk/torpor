@@ -1,4 +1,5 @@
 import $run from "../watch/$run";
+import { attachDelegatedEvent, isDelegatedEventType } from "./delegatedEvents";
 
 export default function applyProps(
 	el: Element,
@@ -10,7 +11,11 @@ export default function applyProps(
 			if (!propNamesUsed.includes(name)) {
 				if (name.startsWith("on")) {
 					const eventName = name.substring(2);
-					el.addEventListener(eventName, value);
+					if (isDelegatedEventType(eventName)) {
+						attachDelegatedEvent(el, eventName, value);
+					} else {
+						el.addEventListener(eventName, value);
+					}
 				} else {
 					$run(function setAttribute() {
 						el.setAttribute(name, value);

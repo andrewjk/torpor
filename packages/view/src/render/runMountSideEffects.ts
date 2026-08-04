@@ -2,6 +2,7 @@ import type Region from "../types/Region";
 import $run from "../watch/$run";
 import animate from "./animate";
 import context from "./context";
+import { attachDelegatedEvent, isDelegatedEventType } from "./delegatedEvents";
 import isFragmentNode from "./isFragmentNode";
 
 /**
@@ -30,14 +31,22 @@ export default function runMountSideEffects(
 		context.mountEffects.length = 0;
 	}
 
-	// Add event listeners directly to elements. These are not tied to
-	// region lifecycle — when an element is removed from the DOM, its
-	// listeners are garbage collected. This avoids a bug where event
-	// listeners on sibling items were incorrectly cleaned up during
-	// @for keyed list reconciliation.
+	// Attach event listeners. For bubbling event types (the majority —
+	// `click`, `input`, `change`, `keydown`, …) we delegate: a single
+	// listener per type lives on `document`, and each element's handler is
+	// stored as a property. This avoids N `addEventListener` calls per N-row
+	// list (js-framework-bench `runlots` goes from 20000 calls to 2) and the
+	// matching browser-side `Listener` allocations. Non-bubbling types
+	// (`focus`, `blur`, `scroll`, …) fall back to direct `addEventListener`
+	// on the element. Listeners are not tied to region lifecycle — when an
+	// element is removed from the DOM, its handler property is GC'd with it.
 	if (context.stashedEvents.length > 0) {
 		for (let event of context.stashedEvents) {
-			event.el.addEventListener(event.type, event.listener);
+			if (isDelegatedEventType(event.type)) {
+				attachDelegatedEvent(event.el, event.type, event.listener);
+			} else {
+				event.el.addEventListener(event.type, event.listener);
+			}
 		}
 		context.stashedEvents.length = 0;
 	}
