@@ -6,16 +6,7 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-interface Props {
-	list: string[];
-}
-
 const source = `
-export default class SelfClosing {
-}
-`;
-
-const source2 = `
 export default function ForIndex($props: { list: string[] }) {
 	@render {
 		<ul>
@@ -31,7 +22,7 @@ test("for loop with index access -- mounted", async () => {
 	let $state = $watch({ list: ["alpha", "beta", "gamma"] });
 
 	const container = document.createElement("div");
-	const component = await importComponent(import.meta.filename, source2, "client");
+	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
 	expect(queryByText(container, "Item 0: alpha")).not.toBeNull();
@@ -48,8 +39,8 @@ test("for loop with index access -- hydrated", async () => {
 	let $state = $watch({ list: ["alpha", "beta"] });
 
 	const container = document.createElement("div");
-	const clientComponent = await importComponent(import.meta.filename, source2, "client");
-	const serverComponent = await importComponent(import.meta.filename, source2, "server");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Item 0: alpha")).not.toBeNull();

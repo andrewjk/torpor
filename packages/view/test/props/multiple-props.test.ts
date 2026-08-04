@@ -1,6 +1,5 @@
-import { getByText, queryByText } from "@testing-library/dom";
+import {  queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import userEvent from "@testing-library/user-event";
 import { expect, test } from "vitest";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";

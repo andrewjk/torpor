@@ -10,7 +10,7 @@ import type OperationType from "../types/nodes/OperationType";
  * a `@for { @key = ...; <tr>...</tr> }` would emit a leading whitespace
  * text node, since the whitespace sits between the @key and the <tr>).
  */
-export const NON_RENDERING_OPERATIONS = new Set<OperationType>([
+export const NON_RENDERING_OPERATIONS: Set<OperationType> = new Set<OperationType>([
 	"@key",
 	"@const",
 	"@console",

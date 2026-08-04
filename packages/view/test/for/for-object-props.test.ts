@@ -6,10 +6,6 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-interface Props {
-	items: { id: number; name: string; active: boolean }[];
-}
-
 const source = `
 export default function ForObjectProps($props: { items: { id: number; name: string; active: boolean }[] }) {
 	@render {

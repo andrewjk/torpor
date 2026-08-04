@@ -1,4 +1,4 @@
-import { queryByRole, queryByText } from "@testing-library/dom";
+import { queryByRole } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";

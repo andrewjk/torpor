@@ -1,4 +1,3 @@
-import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { afterEach, expect, test } from "vitest";
 import $watch from "../../src/watch/$watch";

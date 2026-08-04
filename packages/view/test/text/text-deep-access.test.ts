@@ -6,10 +6,6 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-interface Props {
-	user: { profile: { name: string; address: { city: string } } };
-}
-
 const source = `
 export default function DeepAccess($props: { user: { profile: { name: string; address: { city: string } } } }) {
 	@render {

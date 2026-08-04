@@ -129,9 +129,6 @@ test("key-match update preserves DOM nodes across replace cycles", async () => {
 
 	// Capture DOM node references
 	const lis = container.querySelectorAll("li");
-	const firstRef = lis[0];
-	const midRef = lis[50];
-	const lastRef = lis[lis.length - 1];
 
 	// Same-size replace with all-new keys
 	$state.items = buildData(100);

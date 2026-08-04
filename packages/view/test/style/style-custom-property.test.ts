@@ -6,11 +6,6 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-interface Props {
-	styleVar: string;
-	customProp: string;
-}
-
 const source = `
 export default function StyleCustomProp($props: { styleVar: string; customProp: string }) {
 	@render {

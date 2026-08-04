@@ -57,7 +57,7 @@ test("single-root for renders initial list -- mounted", async () => {
 
 	// Stashed event listeners are attached during `addElement` via the shared
 	// `runMountSideEffects` path — verify they actually fire.
-	await fireEvent.click(container.querySelector(".select")!);
+	fireEvent.click(container.querySelector(".select")!);
 	expect(selected).toEqual([1]);
 });
 
@@ -137,7 +137,7 @@ test("single-root for renders initial list -- hydrated", async () => {
 			{ id: 1, label: "a" },
 			{ id: 2, label: "b" },
 		],
-		onSelect: () => {},
+		onSelect: (_row: { id: 0 }) => {},
 	});
 
 	const container = document.createElement("div");
@@ -153,6 +153,6 @@ test("single-root for renders initial list -- hydrated", async () => {
 	// Stashed events should be wired up after hydration too.
 	const selected: number[] = [];
 	$state.onSelect = (row: { id: number }) => selected.push(row.id);
-	await fireEvent.click(container.querySelector(".select")!);
+	fireEvent.click(container.querySelector(".select")!);
 	expect(selected).toEqual([1]);
 });

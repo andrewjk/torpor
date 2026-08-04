@@ -30,7 +30,6 @@ test("nested reactive objects maintain reactivity at all levels", () => {
 		},
 	});
 
-	let observed: string[] = [];
 	let $derived = $watch({
 		get computed() {
 			return $state.level1.level2.level3.value;

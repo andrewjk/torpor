@@ -6,10 +6,6 @@ import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
-interface Props {
-	user: { name: string; tags: string[] };
-}
-
 const source = `
 export default function NestedReactive($props: { user: { name: string; tags: string[] } }) {
 	@render {
