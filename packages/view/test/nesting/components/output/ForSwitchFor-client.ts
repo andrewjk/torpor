@@ -132,7 +132,6 @@ export default function ForSwitchFor(
 								return t_new_items_2;
 							},
 							(t_item_2, t_before_2) => {
-								let t_old_region_2 = t_push_region(t_item_2);
 								const t_fragment_5 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 5, `<span>#</span>`);
 								const t_span_1 = t_root_el(t_fragment_5) as HTMLSpanElement;
 								const t_text_3 = t_child(t_span_1);
@@ -141,7 +140,6 @@ export default function ForSwitchFor(
 								});
 								t_add_element(t_span_1, t_fragment_4, t_before_2);
 								t_next(t_span_1);
-								t_pop_region(t_old_region_2);
 							},
 							(t_old_item, t_new_item) => {
 								let t_changed = false;

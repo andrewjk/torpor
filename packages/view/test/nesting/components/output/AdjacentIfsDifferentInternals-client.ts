@@ -95,7 +95,6 @@ export default function AdjacentIfsFor(
 					return t_new_items_1;
 				},
 				(t_item_1, t_before_1) => {
-					let t_old_region_1 = t_push_region(t_item_1);
 					const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<li>#</li>`);
 					const t_li_1 = t_root_el(t_fragment_3) as HTMLElement;
 					const t_text_1 = t_child(t_li_1);
@@ -104,7 +103,6 @@ export default function AdjacentIfsFor(
 					});
 					t_add_element(t_li_1, t_ul_1, t_before_1);
 					t_next(t_li_1);
-					t_pop_region(t_old_region_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;

@@ -7,8 +7,6 @@ import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_list_item from "../../../../src/render/newListItem";
 import t_next from "../../../../src/render/nodeNext";
-import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -58,7 +56,6 @@ export default function ForContainingIf(
 			return t_new_items_1;
 		},
 		(t_item_1, t_before_1) => {
-			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<button>#</button>`);
 			const t_button_1 = t_root_el(t_fragment_1) as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
@@ -74,7 +71,6 @@ export default function ForContainingIf(
 			});
 			t_add_element(t_button_1, t_section_1, t_before_1);
 			t_next(t_button_1);
-			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed = false;

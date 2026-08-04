@@ -1,6 +1,7 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
+import isForBodyLeafSafe from "../../utils/isForBodyLeafSafe";
 import isForBodyNoProxySafe from "../../utils/isForBodyNoProxySafe";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
@@ -79,11 +80,27 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// then compares each forVar's reference and re-runs the item's effects
 	// manually (via t_rerun_region_effects) when one has actually changed.
 	// Skips a Proxy + ProxyData + signals Map allocation per created row, and
-	// a proxyGet trap per property read during every row-effect run.
+	// a proxyGet trap per property read during every row effect run.
 	const noWatch = isForBodyNoProxySafe(node.children, forVarNames);
 	if (noWatch) {
 		status.imports.add("t_rerun_region_effects");
 	}
+
+	// Detect "leaf-row safe" @for body: when the body has no nested control
+	// statements (`@if`/`@for`/`@await`/…), the create callback can skip its
+	// `pushRegion(item)` / `popRegion(oldRegion)` calls. `runListItems` has
+	// already pushed the item onto the active region before calling
+	// `create()`, and a leaf body never creates descendant regions that
+	// would shift `context.activeRegion` away from the item — so the
+	// push/pop in the callback is purely redundant. Saves two function calls
+	// per row plus the `devContext.onRegionPushed`/`onRegionPopped`
+	// invocations (~20000 calls saved on a 10k-row `runlots`).
+	//
+	// Every no-proxy-safe body is also leaf-safe (`isForBodyNoProxySafe`
+	// gates on the same nested-control check), but the converse is not true
+	// — a body that writes to a for-var can still be leaf-safe — so this is
+	// an independent check.
+	const leafRow = isForBodyLeafSafe(node.children);
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_list");
@@ -133,7 +150,7 @@ ${status.options.dev === true ? `function createListItem(${itemName}, ${beforeNa
 		...status.forVarNames,
 		...forVarNames.map((v) => [v, `${itemName}.data.${v}`]),
 	];
-	buildForItem(node, status, b, parentName, beforeName, itemName);
+	buildForItem(node, status, b, parentName, beforeName, itemName, leafRow);
 	status.forVarNames = oldForVarNames;
 
 	b.append(`},
@@ -172,11 +189,23 @@ function buildForItem(
 	parentName: string,
 	beforeName: string,
 	itemName: string,
+	leafRow: boolean,
 ) {
 	const oldRegionName = nextVarName("old_region", status);
 
-	status.imports.add("t_push_region");
-	b.append(`let ${oldRegionName} = t_push_region(${itemName});`);
+	// Leaf-row specialization: skip the per-item `pushRegion(item)` /
+	// `popRegion(oldRegion)` calls. `runListItems` has already pushed the
+	// item onto the active region (via `pushRegion(item, true)`) before
+	// calling `create()`, and the leaf body never creates descendant regions
+	// that would shift `context.activeRegion` away from the item — so the
+	// push/pop here is purely redundant. The effect created by the body's
+	// `$run` still lands on the right region (`context.activeRegion.effects`
+	// === `item.effects`), and the chain bookkeeping in `runListItems`
+	// (which uses `context.previousRegion` to link siblings) is unaffected.
+	if (!leafRow) {
+		status.imports.add("t_push_region");
+		b.append(`let ${oldRegionName} = t_push_region(${itemName});`);
+	}
 
 	buildFragment(node, status, b, parentName, beforeName);
 
@@ -194,16 +223,8 @@ function buildForItem(
 
 	buildAddFragment(node, status, b, parentName, beforeName);
 
-	// If we wanted to return the fragment instead:
-	//b.append(`t_item.startNode = t_fragment_1.firstChild;`);
-	//b.append(`t_item.endNode = t_fragment_1.lastChild;`);
-	//for (let ev of node.fragment!.events) {
-	//  b.append(`${ev.varName}.addEventListener("${ev.eventName}", ${ev.handler});`);
-	//}
-
-	status.imports.add("t_pop_region");
-	b.append(`t_pop_region(${oldRegionName});`);
-
-	// If we wanted to return the fragment instead:
-	//b.append(`return t_fragment_${node.fragment!.number};`);
+	if (!leafRow) {
+		status.imports.add("t_pop_region");
+		b.append(`t_pop_region(${oldRegionName});`);
+	}
 }

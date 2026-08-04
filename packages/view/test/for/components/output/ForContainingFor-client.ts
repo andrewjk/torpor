@@ -87,7 +87,6 @@ export default function ForContainingFor(
 					return t_new_items_2;
 				},
 				(t_item_2, t_before_2) => {
-					let t_old_region_2 = t_push_region(t_item_2);
 					const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>#</p>`);
 					const t_p_1 = t_root_el(t_fragment_2) as HTMLElement;
 					const t_text_1 = t_child(t_p_1);
@@ -96,7 +95,6 @@ export default function ForContainingFor(
 					});
 					t_add_element(t_p_1, t_fragment_1, t_before_2);
 					t_next(t_p_1);
-					t_pop_region(t_old_region_2);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;

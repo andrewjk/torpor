@@ -85,7 +85,6 @@ export default function ForNested3(
 					return t_new_items_2;
 				},
 				(t_item_2, t_before_2) => {
-					let t_old_region_2 = t_push_region(t_item_2);
 					const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<td>#</td>`);
 					const t_td_1 = t_root_el(t_fragment_2) as HTMLElement;
 					const t_text_1 = t_child(t_td_1);
@@ -95,7 +94,6 @@ export default function ForNested3(
 					});
 					t_add_element(t_td_1, t_tr_1, t_before_2);
 					t_next(t_td_1);
-					t_pop_region(t_old_region_2);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;

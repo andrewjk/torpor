@@ -10,8 +10,6 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_list_item from "../../../../src/render/newListItem";
 import t_next from "../../../../src/render/nodeNext";
-import t_pop_region from "../../../../src/render/popRegion";
-import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
@@ -63,7 +61,6 @@ export default function ForEscape(
 			return t_new_items_1;
 		},
 		(t_item_1, t_before_1) => {
-			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<p>#</p> <div data-testid=""></div> <div data-testid=""></div> <div data-testid=""></div> <input>`);
 			const t_root_1 = t_root(t_fragment_1);
 			const t_text_1 = t_child(t_root_1);
@@ -87,7 +84,6 @@ export default function ForEscape(
 			});
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1);
 			t_next(t_input_1);
-			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
 			t_old_item.data.i = t_new_item.data.i;

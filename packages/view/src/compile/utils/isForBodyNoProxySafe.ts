@@ -1,8 +1,8 @@
 import type ElementNode from "../types/nodes/ElementNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
+import hasNestedControl from "./hasNestedControl";
 import isControlNode from "./isControlNode";
 import isTextNode from "./isTextNode";
-import { NON_RENDERING_OPERATIONS } from "./nonRenderingOperations";
 
 /**
  * Returns true if the body of a `@for` loop never writes to any of its loop
@@ -76,42 +76,8 @@ export default function isForBodyNoProxySafe(
 	return true;
 }
 
-/**
- * Returns true if any descendant of the `@for` body is a control node that
- * creates its own region and effects (`@if`, `@for`, `@await`, `@switch`,
- * `@replace`, `@html`). Used to gate the no-proxy specialization: those
- * descendant effects live on regions chained off the original item, but
- * after keyed reconciliation that chain is orphaned (the live item is a
- * different object), so the manual re-run walk couldn't reach them.
- *
- * Operations that produce no DOM and no region (`@key`, `@const`,
- * `@console`, `@debugger`, `@function`) are fine — same category as `@key`.
- */
-function hasNestedControl(children: TemplateNode[]): boolean {
-	for (const child of children) {
-		if (isControlNode(child)) {
-			if (!NON_RENDERING_OPERATIONS.has(child.operation)) {
-				return true;
-			}
-			// A non-rendering control node (e.g. `@key`) wraps the actual
-			// body content; keep descending so we still detect a real
-			// control statement nested under it.
-			if (hasNestedControl(child.children)) return true;
-			continue;
-		}
-		if (isElementLike(child)) {
-			if (hasNestedControl(child.children)) return true;
-		}
-	}
-	return false;
-}
-
 function isElementLike(node: TemplateNode): node is ElementNode {
-	return (
-		node.type === "element" ||
-		node.type === "component" ||
-		node.type === "special"
-	);
+	return node.type === "element" || node.type === "component" || node.type === "special";
 }
 
 function collectExpressionStrings(node: TemplateNode, out: string[]): void {
