@@ -1,10 +1,10 @@
 import type SlotRender from "../../../../src/types/SlotRender";
 
-declare function DynamicTag(
+declare function ForNoProxy(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props: { tag: string },
+	$props: { items: Array<{ id: number, label: string }> },
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;
-export default DynamicTag;
+export default ForNoProxy;

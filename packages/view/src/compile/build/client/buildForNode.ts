@@ -1,6 +1,7 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
+import isForBodyNoProxySafe from "../../utils/isForBodyNoProxySafe";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -72,6 +73,18 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		}
 	}
 
+	// Detect "no-proxy safe" @for body: when none of the for-vars are ever
+	// written inside the body, the per-item data bag doesn't need to be
+	// wrapped in a shallow `$watch` Proxy. The compiler-emitted updateListItem
+	// then compares each forVar's reference and re-runs the item's effects
+	// manually (via t_rerun_region_effects) when one has actually changed.
+	// Skips a Proxy + ProxyData + signals Map allocation per created row, and
+	// a proxyGet trap per property read during every row-effect run.
+	const noWatch = isForBodyNoProxySafe(node.children, forVarNames);
+	if (noWatch) {
+		status.imports.add("t_rerun_region_effects");
+	}
+
 	status.imports.add("t_region");
 	status.imports.add("t_run_list");
 	status.imports.add("t_list_item");
@@ -105,15 +118,15 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	}
 	b.append(");");
 	b.append(`
-			${newItemName}.previousRegion = ${previousItemName};
-			${previousItemName}.nextRegion = ${newItemName};
-			${previousItemName} = ${newItemName};
-			${listItemsName}.push(${newItemName});
-		}
-		${regionName}.nextRegion = ${nextItemName};
-		return ${listItemsName};
-	},
-	${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
+		${newItemName}.previousRegion = ${previousItemName};
+		${previousItemName}.nextRegion = ${newItemName};
+		${previousItemName} = ${newItemName};
+		${listItemsName}.push(${newItemName});
+	}
+	${regionName}.nextRegion = ${nextItemName};
+	return ${listItemsName};
+},
+${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
 
 	let oldForVarNames = status.forVarNames;
 	status.forVarNames = [
@@ -124,12 +137,28 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	status.forVarNames = oldForVarNames;
 
 	b.append(`},
-	${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item) {" : "(t_old_item, t_new_item) => {"}`);
-	for (let varName of forVarNames) {
-		b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);
+${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item) {" : "(t_old_item, t_new_item) => {"}`);
+	if (noWatch) {
+		// Compare each forVar's reference. Only when one has actually changed
+		// do we copy it across and re-run the item's effects. Unchanged rows
+		// (the common case during a partial `update`) cost only the
+		// reference-equality check — no allocation, no effect re-run.
+		b.append(`let t_changed = false;`);
+		for (let varName of forVarNames) {
+			b.append(
+				`if (t_old_item.data.${varName} !== t_new_item.data.${varName}) {
+					t_old_item.data.${varName} = t_new_item.data.${varName};
+					t_changed = true;
+				}`,
+			);
+		}
+		b.append(`if (t_changed) t_rerun_region_effects(t_old_item);`);
+	} else {
+		for (let varName of forVarNames) {
+			b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);
+		}
 	}
-	b.append(`}
-		);`);
+	b.append(`}${noWatch ? ",\ntrue" : ""}\n);`);
 
 	addPopDevBoundary(status, b);
 

@@ -21,7 +21,7 @@ export default function SelectBind(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<select><option value="a">Option A</option> <option value="b">Option B</option> <option value="c">Option C</option></select> <p>#</p>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<select><option value="a">Option A</option><option value="b">Option B</option><option value="c">Option C</option></select> <p>#</p>`);
 	const t_select_1 = t_root(t_fragment_0) as HTMLSelectElement;
 	const t_p_1 = t_next(t_next(t_select_1, true)) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);

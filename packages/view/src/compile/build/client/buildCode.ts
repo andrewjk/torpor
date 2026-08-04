@@ -21,6 +21,7 @@ const importsMap: Record<string, string> = {
 	t_region: 'import { t_region } from "${folder}";',
 	t_push_region: 'import { t_push_region } from "${folder}";',
 	t_pop_region: 'import { t_pop_region } from "${folder}";',
+	t_rerun_region_effects: 'import { t_rerun_region_effects } from "${folder}";',
 	t_run_control: 'import { t_run_control } from "${folder}";',
 	t_run_branch: 'import { t_run_branch } from "${folder}";',
 	t_list_item: 'import { t_list_item } from "${folder}";',

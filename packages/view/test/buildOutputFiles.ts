@@ -144,6 +144,8 @@ const importsMap: Record<string, string> = {
 		'import t_push_region from "../../../../src/render/pushRegion";',
 	'import { t_pop_region } from "@torpor/view";':
 		'import t_pop_region from "../../../../src/render/popRegion";',
+	'import { t_rerun_region_effects } from "@torpor/view";':
+		'import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";',
 	'import { t_run_control } from "@torpor/view";':
 		'import t_run_control from "../../../../src/render/runControl";',
 	'import { t_run_branch } from "@torpor/view";':

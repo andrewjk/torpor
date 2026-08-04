@@ -9,6 +9,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
+import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_list from "../../../../src/render/runList";
 import type ListItem from "../../../../src/types/ListItem";
@@ -67,8 +68,14 @@ export default function ForAfterFor(
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
-			t_old_item.data.i = t_new_item.data.i;
-		}
+			let t_changed = false;
+			if (t_old_item.data.i !== t_new_item.data.i) {
+				t_old_item.data.i = t_new_item.data.i;
+				t_changed = true;
+			}
+			if (t_changed) t_rerun_region_effects(t_old_item);
+		},
+		true
 	);
 
 	let t_for_anchor_2 = t_anchor(t_next(t_next(t_for_anchor_1, true))) as HTMLElement;
@@ -108,8 +115,14 @@ export default function ForAfterFor(
 			t_pop_region(t_old_region_2);
 		},
 		(t_old_item, t_new_item) => {
-			t_old_item.data.i = t_new_item.data.i;
-		}
+			let t_changed = false;
+			if (t_old_item.data.i !== t_new_item.data.i) {
+				t_old_item.data.i = t_new_item.data.i;
+				t_changed = true;
+			}
+			if (t_changed) t_rerun_region_effects(t_old_item);
+		},
+		true
 	);
 
 	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);

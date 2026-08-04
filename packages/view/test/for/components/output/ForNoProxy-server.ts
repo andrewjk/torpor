@@ -1,7 +1,8 @@
+import t_fmt from "../../../../src/render/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function MultiSelectBind(
-	$props: { values: string[] },
+export default function ForNoProxy(
+	$props: { items: Array<{ id: number, label: string }> },
 	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	// @ts-ignore
@@ -11,7 +12,11 @@ export default function MultiSelectBind(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<select multiple><option value="a">A</option><option value="b">B</option><option value="c">C</option></select>`;
+	t_body += `<ul><![>`;
+	for (let row of $props.items) {
+		t_body += `<!^><li>${t_fmt(row.label)}</li>`;
+	}
+	t_body += `<!]><!></ul>`;
 
 	return { body: t_body, head: t_head };
 }

@@ -46,6 +46,10 @@ const SHALLOW_WATCH_OPTIONS: WatchOptions = { shallow: true };
  * @param oldItems The list of current items
  * @param newItems The list of future items
  * @param create A function that creates the DOM elements for a new item
+ * @param noWatch When true, skip the per-item shallow `$watch` wrap. The
+ *   compiler guarantees the `@for` body never writes to its loop variables,
+ *   and emits an `update` callback that re-runs item effects manually when a
+ *   loop variable's reference actually changes.
  */
 export default function runListItems(
 	region: Region,
@@ -55,6 +59,7 @@ export default function runListItems(
 	newItems: ListItem[],
 	create: (item: ListItem, before: Node | null) => void,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
+	noWatch?: boolean,
 ): void {
 	let oldStartIndex = 0;
 	let oldEndIndex = oldItems.length - 1;
@@ -79,25 +84,25 @@ export default function runListItems(
 		} else if (newEndItem === null) {
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldStartItem.key === newStartItem.key) {
-			transferListItemData(oldStartItem, newStartItem, update);
+			transferListItemData(oldStartItem, newStartItem, update, noWatch);
 			oldStartItem = oldItems[++oldStartIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else if (oldEndItem.key === newEndItem.key) {
-			transferListItemData(oldEndItem, newEndItem, update);
+			transferListItemData(oldEndItem, newEndItem, update, noWatch);
 			oldEndItem = oldItems[--oldEndIndex];
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldStartItem.key === newEndItem.key) {
 			// Move to the end
 			//console.log("move", oldStartItem.key, "to the end");
 			moveRegion(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
-			transferListItemData(oldStartItem, newEndItem, update);
+			transferListItemData(oldStartItem, newEndItem, update, noWatch);
 			oldStartItem = oldItems[++oldStartIndex];
 			newEndItem = newItems[--newEndIndex];
 		} else if (oldEndItem.key === newStartItem.key) {
 			// Move to the start
 			//console.log("move", oldEndItem.key, "to the start");
 			moveRegion(parent, oldEndItem, oldStartItem!.startNode);
-			transferListItemData(oldEndItem, newStartItem, update);
+			transferListItemData(oldEndItem, newStartItem, update, noWatch);
 			oldEndItem = oldItems[--oldEndIndex];
 			newStartItem = newItems[++newStartIndex];
 		} else {
@@ -141,14 +146,16 @@ export default function runListItems(
 						}
 					}
 
-					for (let i = newStartIndex; i <= newEndIndex; i++) {
-						const newItem = newItems[i]!;
-						const pushedRegion = pushRegion(newItem, true);
+				for (let i = newStartIndex; i <= newEndIndex; i++) {
+					const newItem = newItems[i]!;
+					const pushedRegion = pushRegion(newItem, true);
+					if (noWatch !== true) {
 						newItem.data = $watch(newItem.data, SHALLOW_WATCH_OPTIONS);
-						create(newItem, before);
-						popRegion(pushedRegion);
-						before = newItem.endNode!.nextSibling;
 					}
+					create(newItem, before);
+					popRegion(pushedRegion);
+					before = newItem.endNode!.nextSibling;
+				}
 
 					if (newItems.length > 0) {
 						region.nextRegion = newItems[0]!;
@@ -167,7 +174,9 @@ export default function runListItems(
 				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
 				const savedPrevious = context.previousRegion;
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				if (noWatch !== true) {
+					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				}
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				context.previousRegion = savedPrevious;
@@ -181,7 +190,9 @@ export default function runListItems(
 				// Insert
 				//console.log("insert", newStartItem.key);
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				if (noWatch !== true) {
+					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				}
 				create(newStartItem, oldStartItem.startNode);
 				popRegion(oldRegion);
 				newStartItem = newItems[++newStartIndex];
@@ -193,9 +204,9 @@ export default function runListItems(
 			} else {
 				// Move
 				//console.log("move", newStartItem.key, "before", oldStartItem.key);
-				const oldData = oldItems[oldIndex];
-				moveRegion(parent, oldData, oldStartItem.startNode);
-				transferListItemData(oldData, newStartItem, update);
+			const oldData = oldItems[oldIndex];
+			moveRegion(parent, oldData, oldStartItem.startNode);
+			transferListItemData(oldData, newStartItem, update, noWatch);
 				// @ts-ignore TODO: Set key null instead?
 				oldItems[oldIndex] = null;
 				newStartItem = newItems[++newStartIndex];
@@ -212,7 +223,9 @@ export default function runListItems(
 			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
 				//console.log("create", newStartItem.key);
 				const oldRegion = pushRegion(newStartItem, true);
-				newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				if (noWatch !== true) {
+					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+				}
 				create(newStartItem, before);
 				popRegion(oldRegion);
 				before = newStartItem.endNode!.nextSibling;
@@ -237,6 +250,7 @@ function transferListItemData(
 	oldItem: ListItem,
 	newItem: ListItem,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
+	noWatch?: boolean,
 ) {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
@@ -246,6 +260,23 @@ function transferListItemData(
 	// and then set the new data to the old one
 	update(oldItem, newItem);
 	newItem.data = oldItem.data;
+
+	// In no-proxy mode, the compiler-emitted `updateListItem` re-runs item
+	// effects directly via `t_rerun_region_effects(oldItem)` instead of
+	// relying on Proxy signal propagation. For that to keep working on
+	// subsequent reconciliations, the effects must live on whichever item is
+	// currently in `listItems` (otherwise they get stranded on an orphaned
+	// original item and future updates never see them). Move them now, while
+	// both references are still handy. In proxy mode this is a no-op for
+	// correctness — the signal's `firstTarget` chain owns the live
+	// subscription regardless of which `.effects` array indexes it — but we
+	// restrict it to no-proxy mode to avoid any behavioural surprise.
+	if (noWatch === true && oldItem.effects.length > 0) {
+		for (let effect of oldItem.effects) {
+			newItem.effects.push(effect);
+		}
+		oldItem.effects.length = 0;
+	}
 
 	// HACK: This is just for dev tools, so we have the right `name [id]`
 	newItem.name = oldItem.name;

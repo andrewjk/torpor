@@ -9,6 +9,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
+import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_run_branch from "../../../../src/render/runControlBranch";
 import t_run_control from "../../../../src/render/runControl";
@@ -139,8 +140,14 @@ export default function ForSwitchFor(
 								t_pop_region(t_old_region_2);
 							},
 							(t_old_item, t_new_item) => {
-								t_old_item.data.cell = t_new_item.data.cell;
-							}
+								let t_changed = false;
+								if (t_old_item.data.cell !== t_new_item.data.cell) {
+									t_old_item.data.cell = t_new_item.data.cell;
+									t_changed = true;
+								}
+								if (t_changed) t_rerun_region_effects(t_old_item);
+							},
+							true
 						);
 
 						t_add_fragment(t_fragment_4, t_div_1, t_before);

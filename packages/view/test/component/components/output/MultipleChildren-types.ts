@@ -3,7 +3,7 @@ import type SlotRender from "../../../../src/types/SlotRender";
 declare function MultipleChildren(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	$props: { text: string },
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void;

@@ -25,7 +25,7 @@ export default function OnMountMultiple(
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<input> <select><option>A</option> <option>B</option> <option>C</option></select> <p>#</p> <p>#</p>`);
+	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<input> <select><option>A</option><option>B</option><option>C</option></select> <p>#</p> <p>#</p>`);
 	const t_input_1 = t_root(t_fragment_0) as HTMLInputElement;
 	inputEl = t_input_1;
 	const t_select_1 = t_next(t_next(t_input_1, true)) as HTMLSelectElement;

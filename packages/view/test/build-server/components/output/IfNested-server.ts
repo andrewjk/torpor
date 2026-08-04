@@ -11,21 +11,21 @@ export default function IfNested(
 	let t_head = "";
 
 	/* User interface */
-	t_body += ` <![>`;
+	t_body += `<![>`;
 	if ($props.counter > 5) {
-		t_body += `<!^> <![>`;
+		t_body += `<!^><![>`;
 		if ($props.counter > 10) {
-			t_body += `<!^> <p> It's both true! </p> `;
+			t_body += `<!^><p> It's both true! </p>`;
 		}
 		else {
-			t_body += `<!^> <p> The second is not true! </p> `;
+			t_body += `<!^><p> The second is not true! </p>`;
 		}
-		t_body += `<!]><!> `;
+		t_body += `<!]><!>`;
 	}
 	else {
-		t_body += `<!^> <p> The first is not true! </p> `;
+		t_body += `<!^><p> The first is not true! </p>`;
 	}
-	t_body += `<!]><!> `;
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

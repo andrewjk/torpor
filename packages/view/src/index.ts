@@ -19,6 +19,7 @@ import t_root from "./render/nodeRoot";
 import t_skip from "./render/nodeSkip";
 import t_pop_region from "./render/popRegion";
 import t_push_region from "./render/pushRegion";
+import t_rerun_region_effects from "./render/rerunRegionEffects";
 import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
@@ -66,6 +67,7 @@ export {
 	t_skip,
 	t_pop_region,
 	t_push_region,
+	t_rerun_region_effects,
 	t_run_control,
 	t_run_branch,
 	t_list_item,

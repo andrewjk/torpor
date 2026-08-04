@@ -9,6 +9,12 @@ import runListItems from "./runListItems";
 /**
  * Runs a `for` control statement
  * @param create A function that creates the control statement's branches
+ * @param noWatch When true, the compiler has determined the `@for` body never
+ *   writes to its loop variables, so each item's `data` bag can be left
+ *   unwrapped (skipping the per-item shallow `$watch` Proxy + ProxyData +
+ *   signals Map allocations). The compiler-emitted `update` callback is then
+ *   responsible for re-running item effects when a loop variable's reference
+ *   actually changes (via `t_rerun_region_effects`).
  */
 export default function runList(
 	region: Region,
@@ -17,6 +23,7 @@ export default function runList(
 	buildItems: () => ListItem[],
 	create: (item: ListItem, anchor: Node | null) => void,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
+	noWatch?: boolean,
 ): void {
 	let first = true;
 	let listItems: ListItem[] = [];
@@ -41,7 +48,7 @@ export default function runList(
 		context.activeTarget = null;
 
 		// Run the function that updates the list's items
-		runListItems(region, parent, anchor, listItems, newItems, create, update);
+		runListItems(region, parent, anchor, listItems, newItems, create, update, noWatch);
 
 		listItems = newItems;
 
