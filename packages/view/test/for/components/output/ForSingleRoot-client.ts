@@ -1,0 +1,91 @@
+import $run from "../../../../src/watch/$run";
+import t_add_element from "../../../../src/render/addElement";
+import t_anchor from "../../../../src/render/nodeAnchor";
+import t_child from "../../../../src/render/nodeChild";
+import t_event from "../../../../src/render/addEvent";
+import t_fmt from "../../../../src/render/formatText";
+import t_fragment_el from "../../../../src/render/getElementFragment";
+import t_list_item from "../../../../src/render/newListItem";
+import t_next from "../../../../src/render/nodeNext";
+import t_pop_region from "../../../../src/render/popRegion";
+import t_push_region from "../../../../src/render/pushRegion";
+import t_region from "../../../../src/render/newRegion";
+import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
+import t_root_el from "../../../../src/render/nodeRootElement";
+import t_run_list from "../../../../src/render/runList";
+import type ListItem from "../../../../src/types/ListItem";
+import type SlotRender from "../../../../src/types/SlotRender";
+
+export default function ForSingleRoot(
+	$parent: ParentNode,
+	$anchor: Node | null,
+	$props: { items: Array<{ id: number, label: string }>, onSelect: (row: { id: number }) => void },
+	// @ts-ignore
+	$context?: Record<PropertyKey, any>,
+	// @ts-ignore
+	$slots?: Record<string, SlotRender>,
+): void {
+
+	/* User interface */
+	const t_fragments: DocumentFragment[] = [];
+	const t_fragment_els: Element[] = [];
+
+	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
+	const t_ul_1 = t_root_el(t_fragment_0) as HTMLElement;
+	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
+
+	/* @for */
+	let t_for_region_1 = t_region();
+	t_run_list(
+		t_for_region_1,
+		t_ul_1,
+		t_for_anchor_1,
+		() => {
+			let t_new_items_1: ListItem[] = [];
+			let t_previous_item_1 = t_for_region_1;
+			let t_next_item_1 = t_for_region_1.nextRegion;
+			for (let row of $props.items) {
+				let t_new_item_1 = t_list_item(
+					{ row },
+					row.id,
+				);
+				t_new_item_1.previousRegion = t_previous_item_1;
+				t_previous_item_1.nextRegion = t_new_item_1;
+				t_previous_item_1 = t_new_item_1;
+				t_new_items_1.push(t_new_item_1);
+			}
+			t_for_region_1.nextRegion = t_next_item_1;
+			return t_new_items_1;
+		},
+		(t_item_1, t_before_1) => {
+			let t_old_region_1 = t_push_region(t_item_1);
+			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><span class="label">#</span> <button class="select">select</button></li>`);
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_li_1 = t_root_1 as HTMLElement;
+			const t_text_1 = t_child(t_child(t_li_1));
+			const t_button_1 = t_next(t_next(t_child(t_li_1), true)) as HTMLButtonElement;
+			/* @const */
+			const suffix = "!";
+			t_event(t_button_1, "click", () => $props.onSelect(t_item_1.data.row));
+			$run(() => {
+				t_text_1.textContent = `${t_fmt(t_item_1.data.row.label)}${t_fmt(suffix)}`;
+			});
+			t_add_element(t_li_1, t_ul_1, t_before_1);
+			t_next(t_li_1);
+			t_pop_region(t_old_region_1);
+		},
+		(t_old_item, t_new_item) => {
+			let t_changed = false;
+			if (t_old_item.data.row !== t_new_item.data.row) {
+				t_old_item.data.row = t_new_item.data.row;
+				t_changed = true;
+			}
+			if (t_changed) t_rerun_region_effects(t_old_item);
+		},
+		true
+	);
+
+	t_add_element(t_ul_1, $parent, $anchor);
+	t_next(t_ul_1);
+
+}

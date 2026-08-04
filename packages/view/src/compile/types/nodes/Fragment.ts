@@ -17,4 +17,14 @@ export default interface Fragment {
 	}[];
 	animations: string[];
 	endVarName?: string;
+	/**
+	 * Set during `buildFragmentText` when the fragment has exactly one
+	 * rendering root child and that child is an `Element`. The compiler then
+	 * emits the `t_fragment_el` / `t_root_el` / `t_add_element` path, which
+	 * clones the cached template's `firstElementChild` directly into the
+	 * parent — skipping the per-instance `DocumentFragment` wrapper that
+	 * `getFragment` produces. Wins on per-row allocation in bulk-create paths
+	 * (e.g. `@for` rows in the js-framework-bench `run`/`add`/`runlots` ops).
+	 */
+	singleRootElement?: boolean;
 }

@@ -1,5 +1,6 @@
 import t_animate from "./render/addAnimation";
 import t_event from "./render/addEvent";
+import t_add_element from "./render/addElement";
 import t_add_fragment from "./render/addFragment";
 import t_apply_props from "./render/applyProps";
 import t_class from "./render/buildClasses";
@@ -8,6 +9,7 @@ import clearLayoutSlot from "./render/clearLayoutSlot";
 import fillLayoutSlot from "./render/fillLayoutSlot";
 import t_fmt from "./render/formatText";
 import t_fragment from "./render/getFragment";
+import t_fragment_el from "./render/getElementFragment";
 import hydrate from "./render/hydrate";
 import mount from "./render/mount";
 import t_list_item from "./render/newListItem";
@@ -15,6 +17,7 @@ import t_region from "./render/newRegion";
 import t_anchor from "./render/nodeAnchor";
 import t_child from "./render/nodeChild";
 import t_next from "./render/nodeNext";
+import t_root_el from "./render/nodeRootElement";
 import t_root from "./render/nodeRoot";
 import t_skip from "./render/nodeSkip";
 import t_pop_region from "./render/popRegion";
@@ -53,17 +56,20 @@ export { ReactiveDate };
 export {
 	t_animate,
 	t_event,
+	t_add_element,
 	t_add_fragment,
 	t_apply_props,
 	t_fmt,
 	t_class,
 	t_fragment,
+	t_fragment_el,
 	t_style,
 	t_region,
 	t_anchor,
 	t_child,
 	t_next,
 	t_root,
+	t_root_el,
 	t_skip,
 	t_pop_region,
 	t_push_region,

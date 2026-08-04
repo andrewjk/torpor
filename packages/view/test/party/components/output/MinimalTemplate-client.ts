@@ -1,7 +1,7 @@
-import t_add_fragment from "../../../../src/render/addFragment";
-import t_fragment from "../../../../src/render/getFragment";
+import t_add_element from "../../../../src/render/addElement";
+import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
-import t_root from "../../../../src/render/nodeRoot";
+import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function HelloWorld(
@@ -17,10 +17,11 @@ export default function HelloWorld(
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
+	const t_fragment_els: Element[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<h1>Hello world</h1>`);
-	const t_h1_1 = t_root(t_fragment_0) as HTMLElement;
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_h1_1);
+	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<h1>Hello world</h1>`);
+	const t_h1_1 = t_root_el(t_fragment_0) as HTMLElement;
+	t_add_element(t_h1_1, $parent, $anchor);
 	t_next(t_h1_1);
 
 }

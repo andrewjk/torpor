@@ -6,6 +6,7 @@ import type RootNode from "../../types/nodes/RootNode";
 import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
+import getSingleElementRoot from "../../utils/getSingleElementRoot";
 import isReactive from "../../utils/isReactive";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
@@ -24,6 +25,13 @@ export default function buildFragmentText(
 
 	if (fragments.length) {
 		b.append(`const t_fragments: DocumentFragment[] = [];`);
+		// The single-root-element cache stores the cached `firstElementChild`
+		// directly (no DocumentFragment wrapper). Only emitted when at least
+		// one fragment in this component takes the `t_fragment_el` codegen
+		// path; the cost of one extra empty array per component is negligible.
+		if (fragments.some((f) => f.singleRootElement)) {
+			b.append(`const t_fragment_els: Element[] = [];`);
+		}
 	}
 }
 
@@ -76,6 +84,7 @@ function buildRootFragmentText(node: RootNode, status: BuildStatus, fragments: F
 		effects: [],
 		events: [],
 		animations: [],
+		singleRootElement: getSingleElementRoot(node.children) !== undefined,
 	};
 	fragments.push(node.fragment);
 	for (let child of node.children) {
@@ -114,6 +123,7 @@ function buildControlFragmentText(
 				effects: [],
 				events: [],
 				animations: [],
+				singleRootElement: getSingleElementRoot(node.children) !== undefined,
 			};
 			fragments.push(node.fragment);
 			for (let child of node.children) {
@@ -141,6 +151,7 @@ function buildComponentFragmentText(
 			effects: [],
 			events: [],
 			animations: [],
+			singleRootElement: getSingleElementRoot(node.children) !== undefined,
 		};
 		fragments.push(node.fragment);
 		for (let child of node.children) {
@@ -222,6 +233,7 @@ function buildSpecialFragmentText(
 				effects: [],
 				events: [],
 				animations: [],
+				singleRootElement: getSingleElementRoot(node.children) !== undefined,
 			};
 			fragments.push(node.fragment);
 			for (let child of node.children) {

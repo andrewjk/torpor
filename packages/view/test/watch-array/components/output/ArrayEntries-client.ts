@@ -1,16 +1,16 @@
 import $run from "../../../../src/watch/$run";
-import t_add_fragment from "../../../../src/render/addFragment";
+import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
-import t_fragment from "../../../../src/render/getFragment";
+import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_list_item from "../../../../src/render/newListItem";
 import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
-import t_root from "../../../../src/render/nodeRoot";
+import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
 import type ListItem from "../../../../src/types/ListItem";
 import type SlotRender from "../../../../src/types/SlotRender";
@@ -27,9 +27,10 @@ export default function ArrayEntries(
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
+	const t_fragment_els: Element[] = [];
 
-	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<section><p>^</p> <!> <p>$</p></section>`);
-	const t_section_1 = t_root(t_fragment_0) as HTMLElement;
+	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><p>^</p> <!> <p>$</p></section>`);
+	const t_section_1 = t_root_el(t_fragment_0) as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_next(t_next(t_child(t_section_1), true))) as HTMLElement;
 
 	/* @for */
@@ -57,14 +58,14 @@ export default function ArrayEntries(
 		},
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
-			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<span>#</span>`);
-			const t_root_1 = t_root(t_fragment_1);
+			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<span>#</span>`);
+			const t_root_1 = t_root_el(t_fragment_1);
 			const t_span_1 = t_root_1 as HTMLSpanElement;
 			const t_text_1 = t_child(t_span_1);
 			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item_1.data.i > 0 ? ", " : "")} ${t_fmt(t_item_1.data.item.text)} `;
 			});
-			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_span_1);
+			t_add_element(t_span_1, t_section_1, t_before_1);
 			t_next(t_span_1);
 			t_pop_region(t_old_region_1);
 		},
@@ -83,7 +84,7 @@ export default function ArrayEntries(
 		true
 	);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_section_1);
+	t_add_element(t_section_1, $parent, $anchor);
 	t_next(t_section_1);
 
 }

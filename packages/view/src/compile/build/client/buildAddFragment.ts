@@ -15,7 +15,6 @@ export default function buildAddFragment(
 	if (node.fragment) {
 		const fragment = node.fragment;
 		const fragmentName = `t_fragment_${fragment.number}`;
-		status.imports.add("t_add_fragment");
 		if (fragment.effects.length > 0) {
 			status.imports.add("$run");
 			b.append("$run(() => {");
@@ -37,15 +36,30 @@ export default function buildAddFragment(
 			}
 			b.append(`}${status.options.dev === true ? `, "setAttributes"` : ""});`);
 		}
-		let params = [fragmentName, parentName, anchorName];
-		if (fragment.endVarName) {
-			params.push(fragment.endVarName);
-		}
-		b.append(`t_add_fragment(${params.join(", ")});`);
-		// TODO: Don't need to do this if the last thing we hydrated was the end node
-		if (fragment.endVarName) {
-			status.imports.add("t_next");
-			b.append(`t_next(${fragment.endVarName});`);
+		if (fragment.singleRootElement) {
+			// Single-root-element fast path: the cloned element is both the
+			// fragment and the end node, so `t_add_element(node, parent,
+			// before)` replaces `t_add_fragment(fragment, parent, before,
+			// endNode)`. Saves the `firstChild` / `lastChild` reads and the
+			// `DocumentFragment`-aware branches inside `t_add_fragment`.
+			status.imports.add("t_add_element");
+			b.append(`t_add_element(${fragment.endVarName ?? fragmentName}, ${parentName}, ${anchorName});`);
+			if (fragment.endVarName) {
+				status.imports.add("t_next");
+				b.append(`t_next(${fragment.endVarName});`);
+			}
+		} else {
+			status.imports.add("t_add_fragment");
+			let params = [fragmentName, parentName, anchorName];
+			if (fragment.endVarName) {
+				params.push(fragment.endVarName);
+			}
+			b.append(`t_add_fragment(${params.join(", ")});`);
+			// TODO: Don't need to do this if the last thing we hydrated was the end node
+			if (fragment.endVarName) {
+				status.imports.add("t_next");
+				b.append(`t_next(${fragment.endVarName});`);
+			}
 		}
 	}
 }

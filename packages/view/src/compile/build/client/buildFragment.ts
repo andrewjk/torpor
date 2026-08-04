@@ -72,11 +72,24 @@ export default function buildFragment(
 			b.append(`]);`);
 		} else {
 			// Text, then declarations
-			status.imports.add("t_fragment");
 			const fragmentText = fragment.text.replaceAll("`", "\\`").replaceAll(/\s+/g, " ");
-			b.append(
-				`const ${fragmentName} = t_fragment($parent.ownerDocument!, t_fragments, ${fragment.number}, \`${fragmentText}\`${fragment.ns ? ", true" : ""});`,
-			);
+			if (fragment.singleRootElement) {
+				// Single-root-element fast path: clone the cached template's
+				// `firstElementChild` directly (skipping the per-instance
+				// `DocumentFragment` wrapper that `t_fragment` produces).
+				// Saves one allocation per created list-item / branch render,
+				// which dominates the cost of bulk-row creates (`run`/`add`/
+				// `runlots`) in the js-framework-bench.
+				status.imports.add("t_fragment_el");
+				b.append(
+					`const ${fragmentName} = t_fragment_el($parent.ownerDocument!, t_fragment_els, ${fragment.number}, \`${fragmentText}\`${fragment.ns ? ", true" : ""});`,
+				);
+			} else {
+				status.imports.add("t_fragment");
+				b.append(
+					`const ${fragmentName} = t_fragment($parent.ownerDocument!, t_fragments, ${fragment.number}, \`${fragmentText}\`${fragment.ns ? ", true" : ""});`,
+				);
+			}
 			let fragmentPath = { parent: null, type: "fragment", children: [] };
 			let varPaths = new Map<string, string>();
 			maybeAddRootNodeDeclaration(node, fragment, fragmentName, status, b, varPaths);
@@ -118,22 +131,32 @@ function maybeAddRootNodeDeclaration(
 	) {
 		// It's going to be declared later on
 	} else {
-		status.imports.add("t_root");
 		const rootName = `t_root_${fragment.number}`;
-		const params = [fragmentName];
 		// The text flag must reflect the first node that actually renders to the
 		// DOM, because non-rendering nodes (e.g. @key, @const, comments) produce
 		// no fragment output. Trimming leading whitespace can otherwise leave
 		// such a node as the first child and produce a mismatched flag.
 		const firstRendering = firstRenderingChild(node.children);
-		if (firstRendering && isTextNode(firstRendering)) {
+		const isTextRoot = !!(firstRendering && isTextNode(firstRendering));
+
+		// For single-root-element fragments built via `t_fragment_el`, the
+		// cloned element IS the root — there's no DocumentFragment to call
+		// `firstChild` on. Use `t_root_el`, which passes the element straight
+		// through in the non-hydrating case and performs the same hydration
+		// cursor walk as `t_root` when hydrating. Text roots can't take this
+		// path (text-root fragments aren't marked `singleRootElement`).
+		const rootFn = fragment.singleRootElement ? "t_root_el" : "t_root";
+		status.imports.add(rootFn);
+		const params = [fragmentName];
+		if (!fragment.singleRootElement && isTextRoot) {
 			params.push("true");
 		}
-		const rootPath = `t_root(${params.join(", ")})`;
+		const rootPath = `${rootFn}(${params.join(", ")})`;
 		b.append(`const ${rootName} = ${rootPath};`);
-		// HACK: pretend we don't have the text param, so that subsequent t_root
-		// uses will be shortened, even if we don't know they are text nodes
-		varPaths.set(`t_root(${fragmentName})`, rootName);
+		// Register the root access for shortening so subsequent
+		// `declareFragmentVars` traversals reuse `rootName` instead of
+		// re-emitting the (matching) root function call.
+		varPaths.set(`${rootFn}(${fragmentName})`, rootName);
 
 		printDebug(rootName, status, b);
 	}
@@ -736,7 +759,13 @@ function getFragmentVarPath(
 		node = node.parent;
 	}
 	let varName = `t_fragment_${fragment.number}`;
-	let varPath = getFragmentVarPathPart(node, varName, status, true);
+	// Single-root-element fragments clone the cached template's
+	// `firstElementChild` directly, so the root access goes through
+	// `t_root_el` (which passes the cloned element through in the
+	// non-hydrating case and walks the hydration cursor when hydrating)
+	// rather than `t_root` (which reads `fragment.firstChild`).
+	const rootFn = fragment.singleRootElement ? "t_root_el" : "t_root";
+	let varPath = getFragmentVarPathPart(node, varName, status, true, rootFn);
 
 	// Check for parts of the path that have already been run to shorten our
 	// traversal
@@ -795,10 +824,11 @@ function getFragmentVarPathPart(
 	varPath: string,
 	status: BuildStatus,
 	root = false,
+	rootFn = "t_root",
 ): string {
 	if (root) {
-		status.imports.add("t_root");
-		varPath = `t_root(${varPath})`;
+		status.imports.add(rootFn);
+		varPath = `${rootFn}(${varPath})`;
 	} else {
 		status.imports.add("t_child");
 		varPath = `t_child(${varPath})`;
@@ -816,6 +846,8 @@ function getFragmentVarPathPart(
 		}
 
 		if (i === path.children.length - 1 && child.children.length) {
+			// Nested levels always use `t_child`, never the single-root
+			// `t_root_el` — that's only for the top of the path.
 			varPath = getFragmentVarPathPart(child, varPath, status);
 		}
 	}

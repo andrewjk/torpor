@@ -156,6 +156,8 @@ const importsMap: Record<string, string> = {
 		'import t_run_list from "../../../../src/render/runList";',
 	'import { t_add_fragment } from "@torpor/view";':
 		'import t_add_fragment from "../../../../src/render/addFragment";',
+	'import { t_add_element } from "@torpor/view";':
+		'import t_add_element from "../../../../src/render/addElement";',
 	'import { t_apply_props } from "@torpor/view";':
 		'import t_apply_props from "../../../../src/render/applyProps";',
 	'import { t_attribute } from "@torpor/view";':
@@ -169,11 +171,15 @@ const importsMap: Record<string, string> = {
 	'import { t_fmt } from "@torpor/view";': 'import t_fmt from "../../../../src/render/formatText";',
 	'import { t_fragment } from "@torpor/view";':
 		'import t_fragment from "../../../../src/render/getFragment";',
+	'import { t_fragment_el } from "@torpor/view";':
+		'import t_fragment_el from "../../../../src/render/getElementFragment";',
 	'import { t_event } from "@torpor/view";':
 		'import t_event from "../../../../src/render/addEvent";',
 	'import { t_animate } from "@torpor/view";':
 		'import t_animate from "../../../../src/render/addAnimation";',
 	'import { t_root } from "@torpor/view";': 'import t_root from "../../../../src/render/nodeRoot";',
+	'import { t_root_el } from "@torpor/view";':
+		'import t_root_el from "../../../../src/render/nodeRootElement";',
 	'import { t_anchor } from "@torpor/view";':
 		'import t_anchor from "../../../../src/render/nodeAnchor";',
 	'import { t_child } from "@torpor/view";':
