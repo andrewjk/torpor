@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
-import manifest from "../src/site/manifest";
+import manifest, { hasLoadExport } from "../src/site/manifest";
 import Site from "../src/site/Site";
 import { PAGE_ROUTE } from "../src/types/RouteType";
 
@@ -17,8 +17,9 @@ beforeAll(async () => {
 	await fs.mkdir(path.join(tmpRoot, "src/routes/inline"), { recursive: true });
 	await fs.writeFile(path.join(tmpRoot, "src/routes/+page.ts"), "");
 	await fs.writeFile(path.join(tmpRoot, "src/routes/about/+page.ts"), "");
-	// NOTE: This file has a `load:` shorthand — the plugin reads it on the
-	// client and greps for `load:` to detect whether to emit a stub
+	// NOTE: This file exports `load` as a property — the plugin reads it on
+	// the client and checks for a `load` export/property to detect whether to
+	// emit a stub
 	await fs.writeFile(
 		path.join(tmpRoot, "src/routes/about/+page.server.ts"),
 		"export default { load: async () => undefined };",
@@ -76,11 +77,11 @@ describe("manifest plugin", () => {
 		expect(code).toContain("const load = { default: { load: true } };");
 	});
 
-	test("client build: server.ts files are checked for `load:` and stubbed when found", () => {
+	test("client build: server.ts files with a `load` export are stubbed", () => {
 		const site = buildSite();
 		const plugin = manifest(site, false);
 		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
-		// Our /about/+page.server.ts has `export const load = ...`
+		// Our /about/+page.server.ts exports `load`
 		expect(code).toContain(`path: "/about/~server", type: 1, endPoint: () => load`);
 	});
 
@@ -149,5 +150,37 @@ describe("manifest plugin", () => {
 		const plugin = manifest(site, false);
 		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
 		expect(code).toContain(`type: ${PAGE_ROUTE}`);
+	});
+});
+
+describe("hasLoadExport", () => {
+	test("detects `load` as a property on the default export", () => {
+		expect(hasLoadExport("export default { load: async () => undefined };")).toBe(true);
+	});
+
+	test("detects `load` as a method on the default export", () => {
+		expect(hasLoadExport("export default { load() { return 1; } };")).toBe(true);
+	});
+
+	test("detects `export const load`", () => {
+		expect(hasLoadExport("export const load = async () => undefined;")).toBe(true);
+	});
+
+	test("detects `export function load`", () => {
+		expect(hasLoadExport("export function load() { return 1; }")).toBe(true);
+	});
+
+	test("detects `export async function load`", () => {
+		expect(hasLoadExport("export async function load() { return 1; }")).toBe(true);
+	});
+
+	test("returns false when there is no load export", () => {
+		expect(hasLoadExport("export default { actions: {} };")).toBe(false);
+	});
+
+	test("does not match `load:` appearing in a comment", () => {
+		expect(hasLoadExport("// this calls load: somewhere\nexport default { actions: {} };")).toBe(
+			false,
+		);
 	});
 });

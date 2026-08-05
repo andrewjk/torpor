@@ -5,6 +5,13 @@ import Site from "./Site";
 
 const moduleId = "@torpor/build/manifest";
 
+const LOAD_EXPORT_RE =
+	/[{,]\s*load\s*[:(]|\bexport\s+(?:async\s+)?(?:function|const|let|var)\s+load\b|\bexport\s*\{[^}]*\bload\b/;
+
+export function hasLoadExport(source: string): boolean {
+	return LOAD_EXPORT_RE.test(source);
+}
+
 /**
  * A Vite plugin that provides information about the app to both clientEntry and
  * serverEntry.
@@ -66,8 +73,7 @@ export default {
 					// On the client, for a server route, we need to check
 					// whether there's a load function and set a dummy endPoint
 					// if so. The correct endpoint will be hit in clientEntry
-					// HACK: Should do this better than checking for `load:` in source...
-					const haveLoad = readFileSync(path.join(site.root, r.file)).includes("load:");
+					const haveLoad = hasLoadExport(readFileSync(path.join(site.root, r.file), "utf8"));
 					endPoint = haveLoad ? "() => load" : "undefined";
 				}
 				const sub = r.subFolder ? `"${r.subFolder}"` : "undefined";
