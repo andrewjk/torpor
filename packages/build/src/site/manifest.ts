@@ -32,7 +32,13 @@ export default {
 			.map((r) => {
 				let endPoint: string;
 				if (serverRequest || !/server\.(ts|js)$/.test(r.file)) {
-					endPoint = `() => import(/* @vite-ignore */ "${path.join(site.root, r.file)}")`;
+					const filePath = path.join(site.root, r.file);
+					const importExpr = `() => import(/* @vite-ignore */ "${filePath}")`;
+					// A .torp file's default export is a component, so wrap it
+					// as a PageEndPoint ({ component }) for the entries
+					endPoint = r.file.endsWith(".torp")
+						? `${importExpr}.then((m) => ({ default: { component: m.default } }))`
+						: importExpr;
 				} else {
 					// On the client, for a server route, we need to check
 					// whether there's a load function and set a dummy endPoint

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
-import { transformWithEsbuild } from "vite";
+import { createServer as createViteServer } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 import Site from "../site/Site";
 import runBuild from "./runBuild";
 import runDev from "./runDev";
@@ -11,33 +12,34 @@ export default async function run(
 	mode: "dev" | "build" | "preview",
 ): Promise<void> {
 	// Look for and load a site.config.js/ts file in the working directory
-	let configFile = "";
-	let deleteConfigFile = false;
 	const jsConfigFile = path.join(folder, "site.config.js");
 	const tsConfigFile = path.join(folder, "site.config.ts");
+	let configFile = "";
 	if (fs.existsSync(jsConfigFile)) {
-		// If it's JS, we can just import it straight up
 		configFile = jsConfigFile;
 	} else if (fs.existsSync(tsConfigFile)) {
-		// If it's TS, we need to convert it to JS
-		// TODO: Put the generated file somewhere better (dist?)
-		configFile = path.join(folder, "site.config.temp.js");
-		let source = fs.readFileSync(tsConfigFile, "utf-8");
-		let transformed = await transformWithEsbuild(source, tsConfigFile, {
-			loader: "ts",
-		});
-		fs.writeFileSync(configFile, transformed.code);
-		deleteConfigFile = true;
+		configFile = tsConfigFile;
 	} else {
 		throw new Error("site.config file not found");
 	}
 
-	const site = (await import(configFile)).default as Site;
+	// Use a temporary Vite server to load the config, so that local TS imports
+	// (e.g. a routes.ts file) and path aliases are resolved correctly
+	const vite = await createViteServer({
+		server: { middlewareMode: true },
+		appType: "custom",
+		plugins: [tsconfigPaths({ loose: true })],
+		optimizeDeps: { noDiscovery: true },
+	});
+	let site: Site;
+	try {
+		site = (await vite.ssrLoadModule(configFile)).default as Site;
+	} finally {
+		await vite.close();
+	}
+
 	if (!site || !site.root || !site.routes) {
 		throw new Error("Invalid site in config file");
-	}
-	if (deleteConfigFile) {
-		fs.rmSync(configFile);
 	}
 
 	switch (mode) {

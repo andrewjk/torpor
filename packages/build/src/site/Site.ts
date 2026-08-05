@@ -189,9 +189,54 @@ export default class Site {
 		}
 	}
 
-	// TODO: You could make your site in a single file, like e.g. Hono...
-	//addPage(path: string, endPoint: PageEndPoint, serverEndPoint?: PageServerEndPoint) {}
-	//addEndPoint(path: string, endPoint: ServerEndPoint) {}
+	/**
+	 * Adds a route in code, without needing the standard file naming
+	 * conventions (+page.ts, +page.server.ts, etc). This is useful for small
+	 * sites with one or two pages.
+	 *
+	 * The `page` file can be a `.torp` component file (used directly as the
+	 * page component) or a `.ts`/`.js` endpoint file (exporting a
+	 * `PageEndPoint` with `component`, `load`, etc).
+	 *
+	 * The optional `server` file should be a `.ts`/`.js` file exporting a
+	 * `PageServerEndPoint` (with `load`, `actions`). It should end with
+	 * `server.ts`/`server.js` so that it is excluded from the client build.
+	 *
+	 * @param path The route path, e.g. `/` or `/about`
+	 * @param options File paths for the page and optional server endpoint
+	 * @param subFolder An optional subFolder for grouping routes
+	 */
+	addRoute(
+		path: string,
+		options: {
+			page: string;
+			server?: string;
+		},
+		subFolder?: string,
+	): void {
+		let normalizedSubFolder = subFolder;
+		if (normalizedSubFolder !== undefined && !normalizedSubFolder.startsWith("/")) {
+			normalizedSubFolder = "/" + normalizedSubFolder;
+		}
+		let pageFile = fpath.relative(this.root, fpath.resolve(this.root, options.page));
+		this.routes.push({
+			path,
+			file: pageFile,
+			type: PAGE_ROUTE,
+			subFolder: normalizedSubFolder,
+		});
+		if (options.server) {
+			let serverFile = fpath.relative(this.root, fpath.resolve(this.root, options.server));
+			let serverPath = path.replace(/\/$/, "") + "/~server";
+			this.routes.push({
+				path: serverPath,
+				file: serverFile,
+				type: PAGE_SERVER_ROUTE,
+				subFolder: normalizedSubFolder,
+			});
+		}
+		this.#sortRoutes();
+	}
 
 	#sortRoutes() {
 		this.routes = this.routes.sort((a, b) => {

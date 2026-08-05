@@ -47,7 +47,15 @@ export default async function runTest(
 		site.routes.map((r) => ({
 			path: r.path,
 			type: r.type,
-			endPoint: () => import(/* @vite-ignore */ path.join(site.root, r.file)),
+			endPoint: async () => {
+				const mod = await import(/* @vite-ignore */ path.join(site.root, r.file));
+				// A .torp file's default export is a component, so wrap it as
+				// a PageEndPoint ({ component }) for the entries
+				if (r.file.endsWith(".torp")) {
+					return { default: { component: mod.default } };
+				}
+				return mod;
+			},
 			subFolder: r.subFolder,
 		})),
 	);

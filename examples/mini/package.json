@@ -1,0 +1,34 @@
+{
+  "name": "@torpor/mini",
+	"version": "0.0.1",
+	"description": "A mini site built with torpor/build",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "tb --dev",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && tb --build",
+		"test": "vitest"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@torpor/adapter-node": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/ui": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "catalog:",
+		"@testing-library/jest-dom": "^7.0.0",
+		"@testing-library/user-event": "^14.6.3",
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"happy-dom": "^20.11.1",
+		"oxlint-tsgolint": "^7.0.2001",
+		"typescript": "^7.0.2",
+		"vite-tsconfig-paths": "^6.1.1",
+		"vitest": "^4.1.10"
+	}
+}
