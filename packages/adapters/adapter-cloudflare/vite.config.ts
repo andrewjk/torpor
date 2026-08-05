@@ -9,6 +9,7 @@ export default defineConfig({
 				from: "src/_worker.ts",
 				to: "dist",
 			},
+			"src/_worker.dev.ts",
 		],
 	},
 }) satisfies UserConfig as UserConfig;

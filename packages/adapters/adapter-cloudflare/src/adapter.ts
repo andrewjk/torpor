@@ -1,13 +1,35 @@
 import { type Adapter, Site } from "@torpor/build";
+import { spawn } from "node:child_process";
+import { createRequire } from "node:module";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
+import cloudflareDev from "./cloudflareDev";
 import prepareTemplate from "./prepareTemplate";
 
 export default {
 	postbuild,
-	serve: (/* server: Server, site: Site*/) => {
-		console.log("TODO: Cloudflare dev server");
+	dev: (site: Site) => cloudflareDev(site),
+	serve: (_server, site: Site) => {
+		// Preview the built Cloudflare worker (from postbuild) with `wrangler dev`
+		// rather than a Node server, so preview matches production (workerd).
+		const configPath = path.join(site.root, "dist", "wrangler.toml");
+		const args = ["dev", "--config", configPath];
+
+		// Resolve the wrangler bin from the consuming site's node_modules; fall
+		// back to `wrangler` on PATH (e.g. when run via a package manager).
+		let child;
+		try {
+			const require = createRequire(path.join(site.root, "package.json"));
+			const wranglerBin = require.resolve("wrangler/bin/wrangler.js");
+			child = spawn(process.execPath, [wranglerBin, ...args], {
+				stdio: "inherit",
+				cwd: site.root,
+			});
+		} catch {
+			child = spawn("wrangler", args, { stdio: "inherit", cwd: site.root });
+		}
+		child.on("exit", (code) => process.exit(code ?? 0));
 	},
 } satisfies Adapter as Adapter;
 

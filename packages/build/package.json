@@ -8,6 +8,10 @@
 			"types": "./dist/index.d.mts",
 			"import": "./dist/index.mjs"
 		},
+		"./dev": {
+			"types": "./src/dev.ts",
+			"import": "./src/dev.ts"
+		},
 		"./nav": {
 			"types": "./dist/nav.d.mts",
 			"import": "./dist/nav.mjs"
