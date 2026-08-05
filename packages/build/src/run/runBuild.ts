@@ -34,6 +34,10 @@ export default async function runBuild(site: Site): Promise<void> {
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name
 	const clientConfig = structuredClone(site.viteConfig ?? {});
+	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
+	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
+	clientConfig.resolve ??= {};
+	clientConfig.resolve.tsconfigPaths ??= true;
 	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
@@ -52,6 +56,10 @@ export default async function runBuild(site: Site): Promise<void> {
 	// Build the server assets, including the server entry script and the route
 	// files
 	const serverConfig = structuredClone(site.viteConfig ?? {});
+	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
+	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
+	serverConfig.resolve ??= {};
+	serverConfig.resolve.tsconfigPaths ??= true;
 	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;

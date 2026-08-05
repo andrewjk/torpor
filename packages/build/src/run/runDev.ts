@@ -20,6 +20,10 @@ export default async function runDev(site: Site): Promise<void> {
 	const config = structuredClone(site.viteConfig ?? {});
 	config.server = { middlewareMode: true };
 	config.appType = "custom";
+	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
+	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
+	config.resolve ??= {};
+	config.resolve.tsconfigPaths ??= true;
 	config.plugins = [manifest(site, true), torpor({ dev: true }), ...site.plugins];
 
 	// HACK: To be able to import `.torp` files from barrel files in
