@@ -20,7 +20,7 @@ export default function connectMiddleware(
 		const req = requestToNodeMessage(ev.request);
 		const { res, onReadable } = nodeMessageToNodeResponse(req);
 
-		return new Promise<void>(async (resolve, reject) => {
+		await new Promise<void>((resolve, reject) => {
 			onReadable(({ readable, headers, status }) => {
 				const responseBody: ReadableStream | null = statusCodesWithoutBody.includes(status)
 					? null
@@ -32,26 +32,26 @@ export default function connectMiddleware(
 				resolve();
 			});
 
-			const cnext = async (error?: unknown) => {
+			const cnext = (error?: unknown) => {
 				if (error) {
 					// eslint-disable-next-line no-base-to-string
 					reject(error instanceof Error ? error : new Error(String(error)));
 				} else {
 					// TODO: Can we nest the next functions less? This is a bit weird
-					await next();
-					resolve();
+					Promise.resolve(next()).then(resolve, reject);
 				}
 			};
 
-			try {
-				const handled = await handler(req, res, cnext);
-				if (handled === false) {
-					res.destroy();
-					resolve();
-				}
-			} catch (e) {
-				await cnext(e);
-			}
+			Promise.resolve(handler(req, res, cnext))
+				.then((handled) => {
+					if (handled === false) {
+						res.destroy();
+						resolve();
+					}
+				})
+				.catch((e: unknown) => {
+					cnext(e);
+				});
 		});
 	};
 }

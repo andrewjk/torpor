@@ -17,14 +17,6 @@ A cleaner approach would be to parse the module's exports (via vite's own
 SSR module loading during dev / via rollup's module info during build), but
 that's a bigger refactor than the current task.
 
-### `connectMiddleware` async-promise-executor warning
-
-`src/server/connect/connectMiddleware.ts:23` still triggers an
-`eslint(no-async-promise-executor)` warning. The async executor is intentional
-(it's the simplest way to `await` the connect handler), but should be
-refactored to remove the anti-pattern. Pre-existing; not introduced in this
-pass.
-
 ### `tsconfig.json` skips lib check
 
 `packages/build/tsconfig.json` has `"skipLibCheck": true` with a TODO comment
