@@ -42,6 +42,26 @@ describe("pathToRegex", () => {
 		expect("/posts/5/6".match(re)).toBeNull();
 	});
 
+	test("captures a splat param across segments", () => {
+		const re = pathToRegex("/files/[...path]");
+		const match = "/files/a/b/c".match(re);
+		expect(match).not.toBeNull();
+		expect(match?.groups?.path).toBe("a/b/c");
+	});
+
+	test("captures a splat param with a single segment", () => {
+		const re = pathToRegex("/files/[...path]");
+		const match = "/files/readme.md".match(re);
+		expect(match).not.toBeNull();
+		expect(match?.groups?.path).toBe("readme.md");
+	});
+
+	test("does not match a splat route without a trailing segment", () => {
+		const re = pathToRegex("/files/[...path]");
+		expect("/files".match(re)).toBeNull();
+		expect("/files/".match(re)).toBeNull();
+	});
+
 	test("treats trailing slash as optional", () => {
 		const re = pathToRegex("/posts");
 		expect("/posts".match(re)).not.toBeNull();

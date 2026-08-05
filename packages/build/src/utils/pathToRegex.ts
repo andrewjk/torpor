@@ -2,9 +2,11 @@ export default function pathToRegex(path: string): RegExp {
 	const pattern =
 		path
 			.split("/")
-			// Replace `[slug]` with a grouped match so we can pull out params
+			// Replace `[slug]` (and `[...splat]`) with named capture groups
 			.map((p) => {
-				return p.replace(/\[([^/]+?)\]/, "(?<$1>[^\\/]+?)");
+				return p.replace(/\[(\.\.\.)?([^/]+?)\]/, (_, splat, name) =>
+					splat ? `(?<${name as string}>.+)` : `(?<${name as string}>[^\\/]+?)`,
+				);
 			})
 			.join("\\/")
 			// Replace globs with regex syntax
