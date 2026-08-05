@@ -21,14 +21,14 @@
 		"@torpor/view": "workspace:^"
 	},
 	"devDependencies": {
-		"@testing-library/dom": "^10.4.1",
-		"@testing-library/jest-dom": "^6.9.1",
-		"@testing-library/user-event": "^14.6.1",
-		"@typescript/native-preview": "7.0.0-dev.20260114.1",
-		"happy-dom": "^20.3.0",
-		"oxlint-tsgolint": "^0.11.0",
-		"typescript": "^5.9.3",
-		"vite-tsconfig-paths": "^6.0.4",
-		"vitest": "^4.0.17"
+		"@testing-library/dom": "catalog:",
+		"@testing-library/jest-dom": "^7.0.0",
+		"@testing-library/user-event": "^14.6.3",
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"happy-dom": "^20.11.1",
+		"oxlint-tsgolint": "^7.0.2001",
+		"typescript": "^7.0.2",
+		"vite-tsconfig-paths": "^6.1.1",
+		"vitest": "^4.1.10"
 	}
 }

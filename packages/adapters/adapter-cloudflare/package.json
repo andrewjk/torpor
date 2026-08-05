@@ -23,13 +23,13 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/build": "workspace:^",
-		"vite": "^7.3.1"
+		"vite": "^8.2.0"
 	},
 	"devDependencies": {
 		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
-		"@typescript/native-preview": "7.0.0-dev.20260114.1",
-		"oxlint-tsgolint": "^0.11.0",
-		"tsdown": "0.20.0-beta.3",
-		"typescript": "^5.9.3"
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"oxlint-tsgolint": "^7.0.2001",
+		"tsdown": "0.22.14",
+		"typescript": "^7.0.2"
 	}
 }
