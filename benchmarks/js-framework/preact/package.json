@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "js-framework-benchmark fixture for Preact (keyed hooks implementation).",
   "scripts": {
-    "dev": "vite --host --port 5260 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5260 --strictPort"
+    "dev": "vp dev --host --port 5260 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5260 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"
@@ -15,6 +15,7 @@
   "devDependencies": {
     "@preact/preset-vite": "catalog:default",
     "vite": "catalog:default",
-    "terser": "catalog:default"
+    "terser": "catalog:default",
+    "vite-plus": "catalog:"
   }
 }

@@ -12,8 +12,8 @@
 //     react-dom/server upstream) is opt-IN here via BENCH_REDACT=true — the
 //     react flavor benchmarks stock React; the redact flavor re-enables the
 //     alias map. Upstream default is redact ON (DISABLE_REDACT opt-out).
-import { defineConfig } from 'vite';
-import type { PluginOption } from 'vite';
+import { defineConfig } from 'vite-plus';
+import type { PluginOption } from 'vite-plus';
 import { redact } from '@tanstack/redact/vite';
 import contentCollections from '@content-collections/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';

@@ -1,8 +1,8 @@
 import torpor from '@torpor/unplugin/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
-	plugins: [torpor()],
+	plugins: lazyPlugins(() => [torpor()]),
 	mode: 'production',
 	define: { 'process.env.NODE_ENV': JSON.stringify('production') },
 	build: {

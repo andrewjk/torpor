@@ -1,8 +1,8 @@
 import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 
 export default defineConfig({
-	plugins: [svelte()],
+	plugins: lazyPlugins(() => [svelte()]),
 	mode: 'production',
 	build: {
 		target: 'esnext',

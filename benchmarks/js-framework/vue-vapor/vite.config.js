@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import vue from '@vitejs/plugin-vue';
 
 // Vue Vapor (3.6) fixture — the app code is the official krausest vue-vapor
@@ -21,7 +21,7 @@ import vue from '@vitejs/plugin-vue';
 // vapor runtime (per-binding renderEffects + keyed v-for reconciler) is what
 // gets measured.
 export default defineConfig({
-	plugins: [vue()],
+	plugins: lazyPlugins(() => [vue()]),
 	mode: 'production',
 	resolve: {
 		alias: { vue: new URL('./src/vue-shim.js', import.meta.url).pathname },

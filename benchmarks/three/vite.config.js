@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import react from '@vitejs/plugin-react';
 import { octane } from 'octane/compiler/vite';
 import { threeRenderers } from '@octanejs/three/config';

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import vue from '@vitejs/plugin-vue';
 
 // Vue Vapor (3.6) fixture. Two deliberate choices, same rationale as the solid

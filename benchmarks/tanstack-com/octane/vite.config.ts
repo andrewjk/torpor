@@ -3,7 +3,7 @@
 // nitro emits the production .output node server, tailwind matches the
 // upstream styling pipeline. Content determinism knobs (TANSTACK_DOCS_LOCAL,
 // BENCH_PARTNER_SEED) are honored by the shared server utils this app ports.
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import contentCollections from '@content-collections/vite';
 import { nitro } from 'nitro/vite';
 import { tanstackStart } from '@octanejs/tanstack-start/plugin/vite';

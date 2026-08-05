@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { nitro } from 'nitro/vite';
 import { tanstackStart } from '@octanejs/tanstack-start/plugin/vite';
 

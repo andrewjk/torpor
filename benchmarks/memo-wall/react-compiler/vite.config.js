@@ -1,6 +1,6 @@
 import babel from '@rolldown/plugin-babel';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 
 // The same source as the vanilla React target, transformed with the official
 // production React Compiler preset. Keeping this as a separate app makes the

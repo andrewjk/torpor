@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { compile } from '@tsrx/ripple';
 
 // Minimal `.tsrx` → original Ripple transform (NOT the @ripple-ts/vite-plugin

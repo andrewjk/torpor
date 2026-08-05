@@ -5,15 +5,16 @@
   "version": "0.0.1",
   "description": "js-framework-benchmark fixture for octane authored in .tsrx (directive syntax) - drives 1000-row create/update/swap/select/remove against the production-built renderer for apples-to-apples perf measurement.",
   "scripts": {
-    "dev": "vite --host --port 5176 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5176 --strictPort"
+    "dev": "vp dev --host --port 5176 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5176 --strictPort"
   },
   "dependencies": {
     "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default",
-    "terser": "catalog:default"
+    "terser": "catalog:default",
+    "vite-plus": "catalog:"
   }
 }

@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "js-framework-benchmark fixture for React 19 (canonical keyed react-hooks impl) - the reference React column for the 1000-row create/update/swap/select/remove ops.",
   "scripts": {
-    "dev": "vite --host --port 5175 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5175 --strictPort"
+    "dev": "vp dev --host --port 5175 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5175 --strictPort"
   },
   "dependencies": {
     "react": "catalog:default",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@vitejs/plugin-react": "catalog:default",
     "vite": "catalog:default",
-    "terser": "catalog:default"
+    "terser": "catalog:default",
+    "vite-plus": "catalog:"
   }
 }

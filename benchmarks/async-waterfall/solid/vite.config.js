@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import solid from 'vite-plugin-solid';
 
 // Force Solid 2.0-beta's production bundle — same rationale as the other Solid

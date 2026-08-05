@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import { octane } from 'octane/compiler/vite';
 
 // Mirrors the inferno-next bench's terser flags so build output is comparable
@@ -6,7 +6,7 @@ import { octane } from 'octane/compiler/vite';
 // reduce_vars off (preserves V8 hidden-class shape — see the
 // feedback_inferno_next_perf memory).
 export default defineConfig({
-	plugins: [octane()],
+	plugins: lazyPlugins(() => [octane()]),
 	optimizeDeps: {
 		// Both workspace packages export raw .ts source; pre-bundling would
 		// snapshot stale output for every edit.

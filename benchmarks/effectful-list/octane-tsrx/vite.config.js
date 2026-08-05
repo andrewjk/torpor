@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { octane } from 'octane/compiler/vite';
 
 // Same shape as benchmarks/js-framework/octane-tsrx (terser flags mirror the

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import vue from '@vitejs/plugin-vue';
 
 // Same setup as the js-framework vue-vapor fixture: the vapor runtime only

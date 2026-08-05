@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { ripple } from '@ripple-ts/vite-plugin';
 
 export default defineConfig({

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import tsrxSolid from '@tsrx/vite-plugin-solid';
 import solidPlugin from 'vite-plugin-solid';
 

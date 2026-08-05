@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import solid from 'vite-plugin-solid';
 
 // Same prod-mode setup as the recursive-context bench: Solid 2.0-beta's dev

@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { octane } from 'octane/compiler/vite';
 
 export default defineConfig({

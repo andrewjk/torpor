@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import tsrxReact from '@tsrx/vite-plugin-react';
 
 // `.tsrx` → (tsrxReact) React TSX → Vite/esbuild's automatic JSX runtime. Unlike

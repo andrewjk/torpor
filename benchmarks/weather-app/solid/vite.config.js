@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import solid from 'vite-plugin-solid';
 
 // Solid 2's development runtime currently crashes in this workspace, so the

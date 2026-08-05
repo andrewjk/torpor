@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import solid from 'vite-plugin-solid';
 
 // Solid 2.0-beta's dev bundle (@solidjs/web/dist/dev.js) crashes with

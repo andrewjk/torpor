@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import solid from 'vite-plugin-solid';
 
 // Force Solid 2.0-beta's production bundle (its dev bundle crashes) — same
@@ -8,7 +8,7 @@ import solid from 'vite-plugin-solid';
 // that Solid's production runtime (fine-grained keyed <For> reconciler) is what
 // gets measured.
 export default defineConfig({
-	plugins: [solid({ dev: false, hot: false })],
+	plugins: lazyPlugins(() => [solid({ dev: false, hot: false })]),
 	mode: 'production',
 	define: { 'process.env.NODE_ENV': JSON.stringify('production') },
 	resolve: {

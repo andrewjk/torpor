@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import tsrxReact from '@tsrx/vite-plugin-react';
 
 // Worker-bundle fixture build (module Worker for workerd) — React target.

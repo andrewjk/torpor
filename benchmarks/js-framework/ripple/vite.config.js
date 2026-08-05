@@ -1,8 +1,8 @@
-import { defineConfig } from 'vite';
+import { defineConfig, lazyPlugins } from 'vite-plus';
 import { ripple } from '@ripple-ts/vite-plugin';
 
 export default defineConfig({
-	plugins: [ripple({ excludeRippleExternalModules: true })],
+	plugins: lazyPlugins(() => [ripple({ excludeRippleExternalModules: true })]),
 	optimizeDeps: { exclude: ['ripple'] },
 	build: {
 		target: 'esnext',

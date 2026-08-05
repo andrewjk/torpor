@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import { octane } from '@octanejs/vite-plugin';
 
 export default defineConfig({

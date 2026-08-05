@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vite-plus';
 import tsrxReact from '@tsrx/vite-plugin-react';
 
 // SSR-only fixture build (no client bundle, no dev server — this suite is
