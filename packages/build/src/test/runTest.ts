@@ -253,7 +253,7 @@ async function loadView(
 	try {
 		let { body, head } = component($props, undefined, slots);
 		styles += head;
-		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD", styles);
+		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD%", styles);
 	} catch (error) {
 		// TODO: Show a proper Error component
 		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";

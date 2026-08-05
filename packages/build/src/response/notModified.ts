@@ -29,6 +29,6 @@ import transfer from "./transfer";
  *
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
  */
-export default function notModified(location: string): Response {
-	return transfer(304, location);
+export default function notModified(): Response {
+	return transfer(304, "");
 }

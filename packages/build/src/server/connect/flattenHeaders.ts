@@ -11,7 +11,7 @@ export default function flattenHeaders(
 		} else if (Array.isArray(value)) {
 			for (const v of value) {
 				if (v !== undefined && v !== null) {
-					value.forEach((v) => flatHeaders.append(key, v));
+					flatHeaders.append(key, String(v));
 				}
 			}
 		} else {
@@ -19,26 +19,4 @@ export default function flattenHeaders(
 		}
 	}
 	return flatHeaders;
-
-	/*
-            const flatHeaders: [string, string][] = [];
-
-	for (const [key, value] of Object.entries(headers)) {
-		if (value === undefined || value === null) {
-			continue;
-		}
-
-		if (Array.isArray(value)) {
-			for (const v of value) {
-				if (v != null) {
-					flatHeaders.push([key, String(v)]);
-				}
-			}
-		} else {
-			flatHeaders.push([key, String(value)]);
-		}
-	}
-
-	return flatHeaders;
-    */
 }

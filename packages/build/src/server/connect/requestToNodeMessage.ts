@@ -8,15 +8,18 @@ const DUMMY_BASE_URL = "http://localhost";
 /**
  * Creates an IncomingMessage object from a web Request.
  *
+ * The request body is intentionally not forwarded: this is only used to wrap
+ * Connect-style middlewares (e.g. Vite's dev middleware), which don't read
+ * the body. The actual route handler later reads `ev.request.body` directly,
+ * and forwarding the body here would consume it and break the handler.
+ *
  * @param {Request} request - The web Request object.
  * @returns {IncomingMessage} An IncomingMessage-like object compatible with Node.js HTTP module.
  */
 export default function requestToNodeMessage(request: Request): IncomingMessage {
 	const parsedUrl = new URL(request.url, DUMMY_BASE_URL);
 	const pathAndQuery = (parsedUrl.pathname || "") + (parsedUrl.search || "");
-	// HACK: Using Readable.fromWeb locks request.body so that the request cannot be used again
-	// As we're only using this for Vite middlewares, it's safe to discard the body for now?
-	const body = /*request.body ? Readable.fromWeb(request.body as any) :*/ Readable.from([]);
+	const body = Readable.from([]);
 
 	return Object.assign(body, {
 		url: pathAndQuery,

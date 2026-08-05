@@ -1,9 +1,8 @@
 import { IncomingMessage, ServerResponse } from "node:http";
+import { Readable } from "node:stream";
 import type MiddlewareFunction from "../types/MiddlewareFunction";
-import bufferToArrayBuffer from "./bufferToArrayBuffer";
 import flattenHeaders from "./flattenHeaders";
 import nodeMessageToNodeResponse from "./nodeMessageToNodeResponse";
-import readableToBuffer from "./readableToBuffer";
 import requestToNodeMessage from "./requestToNodeMessage";
 
 // From https://github.com/vikejs/vike-node/blob/main/packages/vike-node/src/runtime/adapters/connectToWeb.ts
@@ -22,13 +21,10 @@ export default function connectMiddleware(
 		const { res, onReadable } = nodeMessageToNodeResponse(req);
 
 		return new Promise<void>(async (resolve, reject) => {
-			onReadable(async ({ readable, headers, status }) => {
-				const responseBody = statusCodesWithoutBody.includes(status)
+			onReadable(({ readable, headers, status }) => {
+				const responseBody: ReadableStream | null = statusCodesWithoutBody.includes(status)
 					? null
-					: //(Readable.toWeb(readable) as ReadableStream);
-						// HACK: Chunked bodies are not being
-						// read correctly somewhere...
-						bufferToArrayBuffer(await readableToBuffer(readable));
+					: (Readable.toWeb(readable) as unknown as ReadableStream);
 				ev.response = new Response(responseBody, {
 					status,
 					headers: flattenHeaders(headers),

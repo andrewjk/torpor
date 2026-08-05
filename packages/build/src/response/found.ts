@@ -25,6 +25,6 @@ import transfer from "./transfer";
  *
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/302
  */
-export default function permRedirect(location: string): Response {
-	return transfer(308, location);
+export default function found(location: string): Response {
+	return transfer(302, location);
 }

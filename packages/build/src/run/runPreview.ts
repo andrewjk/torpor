@@ -43,8 +43,7 @@ export default async function runPreview(site: Site): Promise<void> {
 			const url = new URL(ev.request.url);
 			const file = path.join(site.root, "dist", "client", url.pathname);
 			if (existsSync(file)) {
-				// TODO: Stream the data?
-				const body = bufferToArrayBuffer(await fs.readFile(file));
+				const body = await fs.readFile(file);
 				return new Response(body, {
 					status: 200,
 					headers: {
@@ -81,13 +80,4 @@ export default async function runPreview(site: Site): Promise<void> {
 
 	// Serve the site
 	site.adapter.serve(server, site);
-}
-
-// From https://stackoverflow.com/a/79345620
-// No idea why it is needed
-function bufferToArrayBuffer(buffer: Buffer): ArrayBuffer {
-	return buffer.buffer.slice(
-		buffer.byteOffset,
-		buffer.byteOffset + buffer.byteLength,
-	) as ArrayBuffer;
 }

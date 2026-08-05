@@ -15,10 +15,13 @@ export default function prepareTemplate(
 
 	// Put %COMPONENT_BODY% inside <div id="app"></div>
 	// This is where the component's HTML will go
-	let bodyStart = regexIndexOf(result, /<div\s+id=("app"|'app'|app)\s+/);
-	bodyStart = result.indexOf(">", bodyStart) + 1;
+	let divMatchStart = regexIndexOf(result, /<div\s+id=("app"|'app'|app)[\s>]/);
+	if (divMatchStart === -1) {
+		throw new Error(`Couldn't find <div id="app"></div>`);
+	}
+	let bodyStart = result.indexOf(">", divMatchStart) + 1;
 	let bodyEnd = result.indexOf("</div>", bodyStart);
-	if (bodyStart === -1 || bodyEnd === -1) {
+	if (bodyEnd === -1) {
 		throw new Error(`Couldn't find <div id="app"></div>`);
 	}
 	result = result.substring(0, bodyStart) + "%COMPONENT_BODY%" + result.substring(bodyEnd);

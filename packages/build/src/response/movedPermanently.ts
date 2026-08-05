@@ -20,6 +20,6 @@ import transfer from "./transfer";
  *
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/301
  */
-export default function permRedirect(location: string): Response {
-	return transfer(308, location);
+export default function movedPermanently(location: string): Response {
+	return transfer(301, location);
 }
