@@ -53,7 +53,6 @@
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && vp pack",
-		"build:fix": "esno scripts/postbuild.ts",
 		"build:watch": "vp pack --watch",
 		"test": "vp test"
 	},
