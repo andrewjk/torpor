@@ -5,13 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## packages/build
 
-### `tsconfig.json` skips lib check
-
-`packages/build/tsconfig.json` has `"skipLibCheck": true` with a TODO comment
-("We should be using the tsconfig from the site"). Means cross-package type
-drift won't be caught at typecheck time. Left alone because it predates this
-task.
-
 ### Dead/duplicated code paths elsewhere
 
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
