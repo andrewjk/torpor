@@ -28,6 +28,7 @@
 		"@testing-library/user-event": "^14.6.3",
 		"@types/jsdom": "^28.0.3",
 		"jsdom": "^30.0.1",
+		"oxlint-tsgolint": "^7.0.2001",
 		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
