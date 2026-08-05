@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { beforeAll, bench } from "vitest";
+import { beforeAll, bench } from "vite-plus/test";
 import importComponentFromFile from "../importComponentFromFile";
 import mountComponent from "../mountComponent";
 

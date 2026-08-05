@@ -2,7 +2,7 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 import MenuKeyboard from "./components/MenuKeyboard.torp";
 
 describe("Menu keyboard navigation", () => {

@@ -1,4 +1,4 @@
-import { assert, expect, test } from "vitest";
+import { assert, expect, test } from "vite-plus/test";
 import parse from "../../src/compile/parse";
 import { trimParsed } from "../helpers";
 

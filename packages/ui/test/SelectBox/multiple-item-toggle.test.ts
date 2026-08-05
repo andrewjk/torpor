@@ -2,7 +2,7 @@ import { getByText, getAllByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { $watch, mount } from "@torpor/view";
-import { assert, describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vite-plus/test";
 import SelectBoxMultiple from "./components/SelectBoxMultiple.torp";
 
 describe("SelectBox", () => {

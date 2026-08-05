@@ -1,7 +1,7 @@
 import { type Template, build, parse } from "@torpor/view/compile";
 import { type UnpluginFactory, type UnpluginInstance } from "unplugin";
 import { createUnplugin } from "unplugin";
-import { transformWithEsbuild } from "vite";
+import { transformWithOxc } from "vite";
 import type Options from "./types";
 
 const styles = new Map<string, string>();
@@ -99,9 +99,7 @@ function transform(template: Template, id: string, options?: Options) {
 	//printTransformed(transformed);
 
 	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
-	return transformWithEsbuild(transformed, id, {
-		loader: "ts",
-	});
+	return transformWithOxc(transformed, id);
 }
 
 /*

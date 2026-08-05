@@ -1,7 +1,7 @@
 import { getByRole, getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import MenuState from "./components/MenuState.torp";
 
 describe("Menu state", () => {

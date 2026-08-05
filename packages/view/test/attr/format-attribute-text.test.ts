@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import formatAttributeText from "../../src/render/formatAttributeText";
 
 test("formatAttributeText with string", () => {
@@ -54,5 +54,5 @@ test("formatAttributeText with multiple quotes", () => {
 });
 
 test("formatAttributeText with quote in URL", () => {
-	expect(formatAttributeText('javascript:void("test")')).toBe('javascript:void(&quot;test&quot;)');
+	expect(formatAttributeText('javascript:void("test")')).toBe("javascript:void(&quot;test&quot;)");
 });

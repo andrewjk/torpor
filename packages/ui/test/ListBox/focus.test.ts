@@ -1,7 +1,7 @@
 import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import ListBoxFocus from "./components/ListBoxFocus.torp";
 
 describe("ListBox", () => {

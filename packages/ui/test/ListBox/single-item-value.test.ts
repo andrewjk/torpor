@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import ListBoxSingle from "./components/ListBoxSingle.torp";
 
 describe("ListBox", () => {

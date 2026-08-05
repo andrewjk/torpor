@@ -2,7 +2,7 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import ToolBarBasic from "./components/ToolBarBasic.torp";
 import ToolBarDisabled from "./components/ToolBarDisabled.torp";
 import ToolBarMultiplePopouts from "./components/ToolBarMultiplePopouts.torp";

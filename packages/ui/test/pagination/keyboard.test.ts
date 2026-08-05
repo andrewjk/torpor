@@ -2,7 +2,7 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import PaginationWithTriggers from "./components/PaginationWithTriggers.torp";
 
 describe("Pagination - Keyboard", () => {

@@ -2,7 +2,7 @@ import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { $watch, mount } from "@torpor/view";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import MenuCallbacks from "./components/MenuCallbacks.torp";
 
 describe("Menu callbacks", () => {

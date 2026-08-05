@@ -1,7 +1,7 @@
 import { getByRole, getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vite-plus/test";
 import MenuGroupTest from "./components/MenuGroupTest.torp";
 
 describe("MenuGroup", () => {

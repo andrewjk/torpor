@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import buildHtml from "../buildHtml";
 
 test("build server element node", () => {

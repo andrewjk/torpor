@@ -1,4 +1,4 @@
-import { type ViteUserConfigFnObject, defineConfig } from "vitest/config";
+import { type ViteUserConfigFnObject, defineConfig } from "vite-plus";
 import torpor from "../unplugin/dist/vite.mjs";
 
 export default defineConfig(({ mode }) => ({

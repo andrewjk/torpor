@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -19,7 +19,7 @@ export default function DynamicTag($props: { tag: string }) {
 test("dynamic element renders correct tag -- mounted", async () => {
 	let $state = $watch({ tag: "div" });
 
-	let source2 = source.replace('"target"', '"target2"')
+	let source2 = source.replace('"target"', '"target2"');
 
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source2, "client");
@@ -42,7 +42,7 @@ test("dynamic element renders correct tag -- mounted", async () => {
 test("dynamic element renders correct tag -- hydrated", async () => {
 	let $state = $watch({ tag: "div" });
 
-	let source3 = source.replace('"target"', '"target3"')
+	let source3 = source.replace('"target"', '"target3"');
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source3, "client");

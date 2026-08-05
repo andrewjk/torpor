@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import ToolBarDisabledOnly from "./components/ToolBarDisabledOnly.torp";
 import ToolBarEmpty from "./components/ToolBarEmpty.torp";
 import ToolBarSeparatorsOnly from "./components/ToolBarSeparatorsOnly.torp";

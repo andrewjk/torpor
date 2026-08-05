@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { afterAll, describe, expect, test, vi } from "vitest";
+import { afterAll, describe, expect, test, vi } from "vite-plus/test";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 

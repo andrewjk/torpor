@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import { proxyDataSymbol } from "../../src/watch/symbols";
 

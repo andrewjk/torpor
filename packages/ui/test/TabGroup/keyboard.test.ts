@@ -1,7 +1,7 @@
 import { fireEvent, getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import TabGroupDisabled from "./components/TabGroupDisabled.torp";
 import TabGroupKeyboard from "./components/TabGroupKeyboard.torp";
 import TabGroupVertical from "./components/TabGroupVertical.torp";

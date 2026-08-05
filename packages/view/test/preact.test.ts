@@ -1,5 +1,5 @@
 // eslint-disable no-unused-expressions
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import context from "../src/render/context";
 import $batch from "../src/watch/$batch";
 import $cache from "../src/watch/$cache";

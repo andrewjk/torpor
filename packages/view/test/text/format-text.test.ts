@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import formatText from "../../src/render/formatText";
 import $watch from "../../src/watch/$watch";
 
@@ -59,7 +59,12 @@ test("formatText with array", () => {
 });
 
 test("formatText with nested array", () => {
-	expect(formatText([[1, 2], [3, 4]])).toBe("1,2,3,4");
+	expect(
+		formatText([
+			[1, 2],
+			[3, 4],
+		]),
+	).toBe("1,2,3,4");
 });
 
 test("formatText with symbol", () => {
@@ -76,9 +81,7 @@ test("formatText with BigInt", () => {
 });
 
 test("formatText with special characters", () => {
-	expect(formatText("<script>alert('xss')</script>")).toBe(
-		"<script>alert('xss')</script>",
-	);
+	expect(formatText("<script>alert('xss')</script>")).toBe("<script>alert('xss')</script>");
 });
 
 test("formatText with unicode", () => {

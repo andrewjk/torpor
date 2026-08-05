@@ -33,12 +33,12 @@
 	},
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
-		"build": "tsgo --noEmit && tsdown && tsx ./scripts/copyToRepl.ts",
-		"build:watch": "tsdown --watch",
-		"test": "vitest",
+		"build": "tsgo --noEmit && vp pack && tsx ./scripts/copyToRepl.ts",
+		"build:watch": "vp pack --watch",
+		"test": "vp test",
 		"test:build": "tsx ./scripts/buildTestOutput.ts",
 		"bench": "tsx ./bench/bench.ts",
-		"format": "prettier --write ."
+		"format": "vp fmt ."
 	},
 	"keywords": [],
 	"author": "",
@@ -47,18 +47,16 @@
 		"@testing-library/dom": "catalog:",
 		"@testing-library/jest-dom": "catalog:",
 		"@testing-library/user-event": "^14.6.3",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/jsdom": "^28.0.3",
 		"@types/node": "^26.1.2",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"fast-glob": "^3.3.3",
 		"jsdom": "^30.0.1",
-		"oxlint-tsgolint": "^7.0.2001",
 		"sucrase": "catalog:",
 		"tinybench": "^6.1.2",
-		"tsdown": "0.22.14",
 		"tsx": "^4.23.5",
 		"typescript": "catalog:",
-		"vitest": "catalog:"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	}
 }

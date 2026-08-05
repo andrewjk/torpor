@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import buildStyles from "../../src/render/buildStyles";
 
 test("buildStyles with string", () => {

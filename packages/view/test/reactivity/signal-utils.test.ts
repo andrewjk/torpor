@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $run from "../../src/watch/$run";
 import $watch from "../../src/watch/$watch";
 
@@ -134,7 +134,10 @@ test("array copyWithin", () => {
 
 test("array flat", () => {
 	let $state = $watch({
-		nested: [[1, 2], [3, 4]],
+		nested: [
+			[1, 2],
+			[3, 4],
+		],
 	});
 
 	let flat = $state.nested.flat();

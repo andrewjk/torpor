@@ -9,7 +9,7 @@
 		"check": "torp-check && pnpm dlx oxlint --type-aware",
 		"build": "tsgo --noEmit && tb --build",
 		"build:cf": "tsx buildcf.ts",
-		"format": "prettier --write ."
+		"format": "vp fmt ."
 	},
 	"keywords": [],
 	"author": "",
@@ -28,12 +28,12 @@
 	"devDependencies": {
 		"@torpor/check": "workspace:^",
 		"@torpor/prettier": "workspace:^",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"oxlint-tsgolint": "^7.0.2001",
 		"shiki-codegen": "^4.4.1",
 		"tsx": "^4.23.5",
 		"typescript": "^7.0.2",
+		"vite": "catalog:",
+		"vite-plus": "catalog:",
 		"wrangler": "^4.118.0"
 	}
 }

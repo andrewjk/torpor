@@ -1,7 +1,7 @@
 import { queryAllByText, queryByText, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import PaginationBasic from "./components/PaginationBasic.torp";
 import PaginationWithEllipsis from "./components/PaginationWithEllipsis.torp";
 import PaginationWithTriggers from "./components/PaginationWithTriggers.torp";

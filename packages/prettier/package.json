@@ -18,23 +18,21 @@
 	},
 	"scripts": {
 		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
-		"build": "tsgo --noEmit && tsdown",
-		"build:watch": "tsdown --watch",
-		"test": "vitest"
+		"build": "tsgo --noEmit && vp pack",
+		"build:watch": "vp pack --watch",
+		"test": "vp test"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"prettier": "^3.9.6"
+		"prettier": "catalog:"
 	},
 	"devDependencies": {
-		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"oxlint-tsgolint": "^7.0.2001",
-		"tsdown": "0.22.14",
 		"tsx": "^4.23.5",
-		"vitest": "^4.1.10"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	}
 }

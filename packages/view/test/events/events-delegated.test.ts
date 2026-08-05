@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
-import { afterEach, expect, test, vi } from "vitest";
+import { afterEach, expect, test, vi } from "vite-plus/test";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";

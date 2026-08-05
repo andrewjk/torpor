@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -79,7 +79,6 @@ test("array splice removes and adds reactively -- mounted", async () => {
 	expect(queryByText(container, "b")).toBeNull();
 	expect(queryByText(container, "c")).toBeNull();
 });
-
 
 test("array splice removes and adds reactively -- hydrated", async () => {
 	let $state = $watch({ items: ["a", "b", "c", "d"], newItem: "" });

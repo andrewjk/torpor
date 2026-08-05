@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { node } from "@torpor/adapter-node";
 import { Site } from "@torpor/build";
 import { runTest } from "@torpor/build/test";
-import { beforeAll, expect, test } from "vitest";
+import { beforeAll, expect, test } from "vite-plus/test";
 
 const site: Site = new Site();
 site.adapter = node;

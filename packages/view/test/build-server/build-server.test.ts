@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import fs from "node:fs";
 import path from "node:path";
 import { transform } from "sucrase";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
 

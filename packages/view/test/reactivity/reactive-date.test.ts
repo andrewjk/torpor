@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import ReactiveDate from "../../src/wrappers/ReactiveDate";
 
 test("ReactiveDate creates a valid Date", () => {

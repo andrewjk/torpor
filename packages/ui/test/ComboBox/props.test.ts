@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { $watch, mount } from "@torpor/view";
-import { assert, describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vite-plus/test";
 import ComboBoxSingle from "./components/ComboBoxSingle.torp";
 
 describe("ComboBox", () => {
@@ -112,8 +112,10 @@ describe("ComboBox", () => {
 			const container = document.createElement("div");
 			document.body.appendChild(container);
 			mount(container, ComboBoxSingle, { value: null, visible });
-			const content = container.querySelector('.torp-combo-box-content')!;
-			return visible ? !content.hasAttribute("aria-hidden") : content.getAttribute("aria-hidden") === "true";
+			const content = container.querySelector(".torp-combo-box-content")!;
+			return visible
+				? !content.hasAttribute("aria-hidden")
+				: content.getAttribute("aria-hidden") === "true";
 		};
 		expect(verify(false)).toBe(true);
 		expect(verify(true)).toBe(true);

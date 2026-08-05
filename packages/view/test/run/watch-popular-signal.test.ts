@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $run from "../../src/watch/$run";
 import $watch from "../../src/watch/$watch";
 

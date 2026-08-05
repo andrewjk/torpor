@@ -1,5 +1,5 @@
 import * as prettier from "prettier";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import * as torporPlugin from "../src/index.ts";
 
 test("add spacing", async () => {

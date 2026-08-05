@@ -2,7 +2,7 @@ import { fireEvent } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -92,9 +92,7 @@ test("leaf-row for createListItem omits per-item pushRegion/popRegion", async ()
 	// the no-proxy `updateListItem` (the third arrow-function argument)
 	// keeps its `t_rerun_region_effects` call.
 	const tempDir = path.join(path.dirname(import.meta.filename), "components", "temp");
-	const compiledName = fs
-		.readdirSync(tempDir)
-		.find((f) => f.startsWith("ForLeafRow-client-"));
+	const compiledName = fs.readdirSync(tempDir).find((f) => f.startsWith("ForLeafRow-client-"));
 	expect(compiledName).toBeDefined();
 	const compiled = fs.readFileSync(path.join(tempDir, compiledName!), "utf8");
 

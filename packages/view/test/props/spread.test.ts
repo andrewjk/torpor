@@ -1,6 +1,6 @@
-import {  queryByText } from "@testing-library/dom";
+import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";

@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
@@ -21,7 +21,11 @@ test("style kebab-case -- mounted", async () => {
 	mountComponent(container, component);
 
 	const el = queryByText(container, "Kebab case")!;
-	expect(el).toHaveStyle({ "margin-left": "10px", "margin-right": "20px", "background-color": "rgb(0, 128, 0)" });
+	expect(el).toHaveStyle({
+		"margin-left": "10px",
+		"margin-right": "20px",
+		"background-color": "rgb(0, 128, 0)",
+	});
 });
 
 test("style kebab-case -- hydrated", async () => {
@@ -31,5 +35,9 @@ test("style kebab-case -- hydrated", async () => {
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	const el = queryByText(container, "Kebab case")!;
-	expect(el).toHaveStyle({ "margin-left": "10px", "margin-right": "20px", "background-color": "rgb(0, 128, 0)" });
+	expect(el).toHaveStyle({
+		"margin-left": "10px",
+		"margin-right": "20px",
+		"background-color": "rgb(0, 128, 0)",
+	});
 });

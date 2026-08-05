@@ -7,7 +7,7 @@ import {
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import Form from "./components/FormTest.torp";
 
 test("Form", async () => {

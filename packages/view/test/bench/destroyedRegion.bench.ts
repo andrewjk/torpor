@@ -1,4 +1,4 @@
-import { bench } from "vitest";
+import { bench } from "vite-plus/test";
 import clearRegion from "../../src/render/clearRegion";
 import context from "../../src/render/context";
 import newRegion from "../../src/render/newRegion";

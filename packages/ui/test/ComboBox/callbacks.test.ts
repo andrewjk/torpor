@@ -2,7 +2,7 @@ import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { assert, describe, expect, it, vi } from "vitest";
+import { assert, describe, expect, it, vi } from "vite-plus/test";
 import ComboBoxMultiple from "./components/ComboBoxMultiple.torp";
 import ComboBoxSingle from "./components/ComboBoxSingle.torp";
 

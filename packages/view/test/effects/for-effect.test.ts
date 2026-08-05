@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import type ProxyData from "../../src/types/ProxyData";
 import $watch from "../../src/watch/$watch";
 import { proxyDataSymbol } from "../../src/watch/symbols";

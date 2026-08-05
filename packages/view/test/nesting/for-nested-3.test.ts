@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -30,7 +30,14 @@ export default function ForNested3($props: { matrix: number[][]; highlight: numb
 `;
 
 test("for nested 3 levels -- mounted", async () => {
-	let $state = $watch({ matrix: [[1, 2], [3, 4], [5, 6]], highlight: 3 });
+	let $state = $watch({
+		matrix: [
+			[1, 2],
+			[3, 4],
+			[5, 6],
+		],
+		highlight: 3,
+	});
 
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
@@ -40,7 +47,14 @@ test("for nested 3 levels -- mounted", async () => {
 });
 
 test("for nested 3 levels -- hydrated", async () => {
-	let $state = $watch({ matrix: [[1, 2], [3, 4], [5, 6]], highlight: 3 });
+	let $state = $watch({
+		matrix: [
+			[1, 2],
+			[3, 4],
+			[5, 6],
+		],
+		highlight: 3,
+	});
 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");

@@ -1,7 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { assert, describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vite-plus/test";
 import DialogAccessibility from "./components/DialogAccessibility.torp";
 
 describe("Dialog", () => {

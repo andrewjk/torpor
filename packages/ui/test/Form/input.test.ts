@@ -2,7 +2,7 @@ import { getByPlaceholderText, queryByPlaceholderText } from "@testing-library/d
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import Input from "./components/InputTest.torp";
 
 test("Input", async () => {

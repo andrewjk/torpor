@@ -1,4 +1,4 @@
-import { assert, test } from "vitest";
+import { assert, test } from "vite-plus/test";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { getDocumentRegions } from "../src/embeddedSupport";
 

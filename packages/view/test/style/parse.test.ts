@@ -1,4 +1,4 @@
-import { assert, expect, test } from "vitest";
+import { assert, expect, test } from "vite-plus/test";
 import buildStyles from "../../src/compile/build/client/buildStyles";
 import parse from "../../src/compile/parse";
 import { att, el, root, text, trimParsed } from "../helpers";
@@ -12,8 +12,8 @@ function block(selector: string, children: StyleNode[]) {
 		type: "block" as const,
 		selector,
 		children,
-		gapBefore: false
-	} satisfies BlockNode
+		gapBefore: false,
+	} satisfies BlockNode;
 }
 
 function attr(name: string, value: string) {
@@ -21,16 +21,16 @@ function attr(name: string, value: string) {
 		type: "attribute",
 		name,
 		value,
-		gapBefore: false
-	} satisfies AttributeNode
+		gapBefore: false,
+	} satisfies AttributeNode;
 }
 
 function comment(content: string) {
 	return {
 		type: "comment",
 		content,
-		gapBefore: false
-	} satisfies CommentNode
+		gapBefore: false,
+	} satisfies CommentNode;
 }
 
 test("simple style", () => {
@@ -66,9 +66,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		children: [
-			block("h1", [ attr("color", "blue")]),
-		],
+		children: [block("h1", [attr("color", "blue")])],
 		hash: "1wvcb3a",
 	});
 });
@@ -97,9 +95,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		children: [
-			block(".h1, p", [ attr("color", "blue") ])
-		],
+		children: [block(".h1, p", [attr("color", "blue")])],
 		hash: "5fqf2e",
 	});
 });
@@ -131,9 +127,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		children: [
-			block(".h1, p", [ attr("color", "blue"), attr("background-color", "green") ])
-		],
+		children: [block(".h1, p", [attr("color", "blue"), attr("background-color", "green")])],
 		hash: "bv7ypa",
 	});
 });
@@ -165,9 +159,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		children: [
-			block(".h1.blah p > .child + .next", [ attr("color", "blue")]),
-		],
+		children: [block(".h1.blah p > .child + .next", [attr("color", "blue")])],
 		hash: "1hfc9nc",
 	};
 	expect(output.template.components[0].style).toEqual(styleObject);
@@ -208,9 +200,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		children: [
-			block(":global(.h1.blah p > .child + .next)", [ attr("color", "blue")]),
-		],
+		children: [block(":global(.h1.blah p > .child + .next)", [attr("color", "blue")])],
 		hash: "wbexfk",
 	};
 	expect(output.template.components[0].style).toEqual(styleObject);
@@ -251,9 +241,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		children: [
-			block(":global(.h1.blah) p > .child + :global(.next)", [ attr("color", "blue")]),
-		],
+		children: [block(":global(.h1.blah) p > .child + :global(.next)", [attr("color", "blue")])],
 		hash: "1cfcedi",
 	};
 	expect(output.template.components[0].style).toEqual(styleObject);
@@ -296,7 +284,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].style).toEqual({
 		global: false,
 		children: [
-			block("@media screen and (min-width: 480px)", [ block("button", [attr("color", "green")])]),
+			block("@media screen and (min-width: 480px)", [block("button", [attr("color", "green")])]),
 		],
 		hash: "c2o17j",
 	});
@@ -345,7 +333,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 			block("button", [attr("color", "green")]),
 			comment("//span: {"),
 			comment("//	color: purple;"),
-			comment("//}")
+			comment("//}"),
 		],
 		hash: "qktc5q",
 	});
@@ -377,9 +365,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	expect(output.template.components[0].default).toBe(true);
 	expect(output.template.components[0].style).toEqual({
 		global: false,
-		children: [
-			block("p", [ attr("color", '"blue"')]),
-		],
+		children: [block("p", [attr("color", '"blue"')])],
 		hash: "7qpvk6",
 	});
 });
@@ -411,9 +397,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		children: [
-			block("p::before", [ attr("content", '"~"')]),
-		],
+		children: [block("p::before", [attr("content", '"~"')])],
 		hash: "5cr73h",
 	};
 	expect(output.template.components[0].style).toEqual(styleObject);
@@ -454,9 +438,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	const styleObject = {
 		global: false,
-		children: [
-			block("p:hover", [ attr("color", '"blue"')]),
-		],
+		children: [block("p:hover", [attr("color", '"blue"')])],
 		hash: "1pq0u26",
 	};
 	expect(output.template.components[0].style).toEqual(styleObject);
@@ -499,9 +481,7 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 
 	let styleObject = {
 		global: false,
-		children: [
-			block("p:hover,\n\t\tp:active,\n\t\tp:focused", [ attr("color", '"blue"')]),
-		],
+		children: [block("p:hover,\n\t\tp:active,\n\t\tp:focused", [attr("color", '"blue"')])],
 		hash: "1ib1oex",
 	};
 

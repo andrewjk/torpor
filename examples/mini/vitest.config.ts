@@ -1,12 +1,11 @@
 import torpor from "@torpor/unplugin/vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import { type ViteUserConfigFnObject, defineConfig } from "vitest/config";
+import { type ViteUserConfigFnObject, defineConfig } from "vite-plus";
 
 export default defineConfig(({ mode }) => ({
-	// TODO: Make tsconfigPaths not required
-	plugins: [torpor({ test: true }), tsconfigPaths()],
+	plugins: [torpor({ test: true })],
 	resolve: {
 		conditions: mode === "test" ? ["browser"] : [],
+		tsconfigPaths: true
 	},
 	test: {
 		environment: "happy-dom",

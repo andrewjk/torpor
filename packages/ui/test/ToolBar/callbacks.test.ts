@@ -2,7 +2,7 @@ import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import ToolBarCallbacks from "./components/ToolBarCallbacks.torp";
 
 describe("ToolBar", () => {

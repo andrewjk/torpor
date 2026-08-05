@@ -2,7 +2,7 @@ import { fireEvent, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
-import { assert, describe, expect, it } from "vitest";
+import { assert, describe, expect, it } from "vite-plus/test";
 import ComboBoxAccessibility from "./components/ComboBoxAccessibility.torp";
 
 describe("ComboBox", () => {
@@ -16,7 +16,7 @@ describe("ComboBox", () => {
 		const button = container.querySelector('input[role="combobox"]');
 		assert(button, "button not found");
 
-		const list = container.querySelector('.torp-combo-box-content');
+		const list = container.querySelector(".torp-combo-box-content");
 		expect(list).toHaveAttribute("aria-hidden", "true");
 
 		// The element that serves as an input and displays the combobox value has role combobox

@@ -11,9 +11,10 @@
 		"cs:add": "pnpm changeset add",
 		"cs:version": "pnpm -r build && pnpm changeset version",
 		"cs:publish": "pnpm changeset publish",
-		"test": "vitest run",
-		"test:watch": "vitest",
-		"format": "prettier --write ."
+		"test": "vp test run",
+		"test:watch": "vp test",
+		"format": "vp fmt .",
+		"prepare": "vp config"
 	},
 	"keywords": [],
 	"author": "",
@@ -25,12 +26,11 @@
 		"@testing-library/dom": "catalog:",
 		"@testing-library/jest-dom": "^7.0.0",
 		"@testing-library/user-event": "^14.6.3",
-		"@trivago/prettier-plugin-sort-imports": "^6.0.2",
 		"@types/jsdom": "^28.0.3",
 		"jsdom": "^30.0.1",
-		"prettier": "^3.9.6",
 		"typescript": "^7.0.2",
-		"vitest": "^4.1.10"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	},
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",

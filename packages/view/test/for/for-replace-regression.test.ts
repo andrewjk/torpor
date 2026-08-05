@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";

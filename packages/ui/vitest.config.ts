@@ -1,5 +1,5 @@
 import torpor from "@torpor/unplugin/vite";
-import { type ViteUserConfigFnObject, defineConfig } from "vitest/config";
+import { type ViteUserConfigFnObject, defineConfig } from "vite-plus";
 
 export default defineConfig(({ mode }) => ({
 	plugins: [torpor()],

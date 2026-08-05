@@ -1,6 +1,6 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
@@ -41,7 +41,10 @@ export default function ForSwitchFor($props: { matrix: number[][]; operation: st
 
 test("for switch for -- mounted", async () => {
 	let $state = $watch({
-		matrix: [[1, 2, 3], [4, 5, 6]],
+		matrix: [
+			[1, 2, 3],
+			[4, 5, 6],
+		],
 		operation: "sum",
 	});
 
@@ -54,7 +57,10 @@ test("for switch for -- mounted", async () => {
 
 test("for switch for -- hydrated", async () => {
 	let $state = $watch({
-		matrix: [[1, 2, 3], [4, 5, 6]],
+		matrix: [
+			[1, 2, 3],
+			[4, 5, 6],
+		],
 		operation: "sum",
 	});
 

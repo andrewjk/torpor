@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import clearRegion from "../../src/render/clearRegion";
 import context from "../../src/render/context";
 import newRegion from "../../src/render/newRegion";
