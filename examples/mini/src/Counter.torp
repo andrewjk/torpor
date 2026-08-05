@@ -1,4 +1,4 @@
-export default function Counter() {
+export default function Counter($props: any) {
 	let $state = $watch({
 		count: 0,
 	});
@@ -13,5 +13,18 @@ export default function Counter() {
 		<button onclick={() => $state.count = 0}>
 			Reset
 		</button>
+
+		<form method="POST" action="?set">
+			<input type="number" name="count" />
+			<button type="submit">
+				Set via server
+			</button>
+		</form>
+
+		@if ($props?.form?.message) {
+			<p style="color: green">
+				{$props.form.message}
+			</p>
+		}
 	}
 }

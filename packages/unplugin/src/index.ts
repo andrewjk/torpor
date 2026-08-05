@@ -99,7 +99,7 @@ function transform(template: Template, id: string, options?: Options) {
 	//printTransformed(transformed);
 
 	// TODO: Compile typescript only if script lang="ts" or config.lang="ts"
-	return transformWithOxc(transformed, id);
+	return transformWithOxc(transformed, id.replace(/\.torp.*$/, ".ts"));
 }
 
 /*

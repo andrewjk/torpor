@@ -28,9 +28,9 @@ export default async function runDev(site: Site): Promise<void> {
 	config.optimizeDeps ??= {};
 	config.optimizeDeps.extensions ??= [];
 	config.optimizeDeps.extensions.push(".torp");
-	config.optimizeDeps.esbuildOptions ??= {};
-	config.optimizeDeps.esbuildOptions.plugins ??= [];
-	config.optimizeDeps.esbuildOptions.plugins.push(estorpor());
+	config.optimizeDeps.rolldownOptions ??= {};
+	config.optimizeDeps.rolldownOptions.plugins ??= [estorpor()];
+	// TODO: config.optimizeDeps.rolldownOptions.plugins.push(estorpor());
 
 	const vite = await createViteServer(config);
 

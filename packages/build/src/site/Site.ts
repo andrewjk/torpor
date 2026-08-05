@@ -1,8 +1,8 @@
 import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import type Adapter from "../types/Adapter";
+import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type Route from "../types/Route";
 import {
 	ERROR_ROUTE,
@@ -30,10 +30,7 @@ export default class Site {
 	root: string;
 	routes: Route[] = [];
 	// Is default plugins a bad idea?
-	// HACK: Set loose because otherwise it uses a list of allowed extensions
-	// TODO: Should probably just do this ourselves and let the user pass in
-	// tsconfigPaths themselves if they want to do something funky
-	plugins: Plugin[] = [tsconfigPaths({ loose: true })];
+	plugins: Plugin[] = [];
 	// Is default adapter a bad idea?
 	adapter: Adapter = defaultAdapter;
 	/**
@@ -49,6 +46,16 @@ export default class Site {
 	 * overridden or incompatible, so experimentation may be required
 	 */
 	viteConfig?: UserConfig;
+	/**
+	 * The path to the site.config file. Set automatically by the CLI; used by
+	 * the manifest plugin to import inline endpoints for server builds.
+	 */
+	configFile?: string;
+	/**
+	 * Inline endpoints keyed by `"path:type"`. Populated by `addRoute` when
+	 * the user passes an inline endpoint object instead of a file path.
+	 */
+	inlineEndPoints: Record<string, PageServerEndPoint> = {};
 
 	constructor() {
 		this.root = process.cwd();
@@ -198,9 +205,10 @@ export default class Site {
 	 * page component) or a `.ts`/`.js` endpoint file (exporting a
 	 * `PageEndPoint` with `component`, `load`, etc).
 	 *
-	 * The optional `server` file should be a `.ts`/`.js` file exporting a
-	 * `PageServerEndPoint` (with `load`, `actions`). It should end with
-	 * `server.ts`/`server.js` so that it is excluded from the client build.
+	 * The optional `server` can be a file path (a `.ts`/`.js` file exporting a
+	 * `PageServerEndPoint`, which should end with `server.ts`/`server.js` so it
+	 * is excluded from the client build) or an inline `PageServerEndPoint`
+	 * object. Inline server code is kept out of the client bundle automatically.
 	 *
 	 * @param path The route path, e.g. `/` or `/about`
 	 * @param options File paths for the page and optional server endpoint
@@ -210,7 +218,7 @@ export default class Site {
 		path: string,
 		options: {
 			page: string;
-			server?: string;
+			server?: string | PageServerEndPoint;
 		},
 		subFolder?: string,
 	): void {
@@ -226,14 +234,25 @@ export default class Site {
 			subFolder: normalizedSubFolder,
 		});
 		if (options.server) {
-			let serverFile = fpath.relative(this.root, fpath.resolve(this.root, options.server));
 			let serverPath = path.replace(/\/$/, "") + "/~server";
-			this.routes.push({
-				path: serverPath,
-				file: serverFile,
-				type: PAGE_SERVER_ROUTE,
-				subFolder: normalizedSubFolder,
-			});
+			if (typeof options.server === "string") {
+				let serverFile = fpath.relative(this.root, fpath.resolve(this.root, options.server));
+				this.routes.push({
+					path: serverPath,
+					file: serverFile,
+					type: PAGE_SERVER_ROUTE,
+					subFolder: normalizedSubFolder,
+				});
+			} else {
+				let key = `${serverPath}:${PAGE_SERVER_ROUTE}`;
+				this.inlineEndPoints[key] = options.server;
+				this.routes.push({
+					path: serverPath,
+					endPoint: options.server,
+					type: PAGE_SERVER_ROUTE,
+					subFolder: normalizedSubFolder,
+				});
+			}
 		}
 		this.#sortRoutes();
 	}

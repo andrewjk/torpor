@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createServer as createViteServer } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 import Site from "../site/Site";
 import runBuild from "./runBuild";
 import runDev from "./runDev";
@@ -28,12 +27,13 @@ export default async function run(
 	const vite = await createViteServer({
 		server: { middlewareMode: true },
 		appType: "custom",
-		plugins: [tsconfigPaths({ loose: true })],
+		resolve: { tsconfigPaths: true },
 		optimizeDeps: { noDiscovery: true },
 	});
 	let site: Site;
 	try {
 		site = (await vite.ssrLoadModule(configFile)).default as Site;
+		site.configFile = configFile;
 	} finally {
 		await vite.close();
 	}

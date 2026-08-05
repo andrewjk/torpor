@@ -1,4 +1,4 @@
-import { assert, expect, test } from "vitest";
+import { assert, expect, test } from "vite-plus/test";
 import Router from "../src/site/Router";
 import { HOOK_SERVER_ROUTE, LAYOUT_ROUTE, PAGE_ROUTE } from "../src/types/RouteType";
 

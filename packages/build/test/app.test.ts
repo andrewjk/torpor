@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { expect, test } from "vite-plus/test";
 import Server from "../src/server/Server";
 
 test("app router methods", () => {

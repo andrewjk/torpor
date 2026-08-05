@@ -42,8 +42,8 @@ export default async function runBuild(site: Site): Promise<void> {
 		siteHtml,
 		clientScript,
 		...site.routes
-			.filter((r) => !/server\.(ts|js)$/.test(r.file))
-			.map((r) => path.resolve(site.root, r.file)),
+			.filter((r) => r.file && !/server\.(ts|js)$/.test(r.file))
+			.map((r) => path.resolve(site.root, r.file!)),
 		...site.inputs.filter((f) => !/server\.(ts|js)$/.test(f)),
 	];
 	clientConfig.build.ssrManifest = true;
@@ -58,7 +58,7 @@ export default async function runBuild(site: Site): Promise<void> {
 	serverConfig.build.rollupOptions ??= {};
 	serverConfig.build.rollupOptions.input = [
 		serverScript,
-		...site.routes.map((r) => path.resolve(site.root, r.file)),
+		...site.routes.filter((r) => r.file).map((r) => path.resolve(site.root, r.file!)),
 		...site.inputs,
 	];
 	serverConfig.build.ssr = serverScript;

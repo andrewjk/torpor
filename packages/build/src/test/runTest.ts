@@ -48,13 +48,17 @@ export default async function runTest(
 			path: r.path,
 			type: r.type,
 			endPoint: async () => {
-				const mod = await import(/* @vite-ignore */ path.join(site.root, r.file));
-				// A .torp file's default export is a component, so wrap it as
-				// a PageEndPoint ({ component }) for the entries
-				if (r.file.endsWith(".torp")) {
-					return { default: { component: mod.default } };
+				if (r.file) {
+					const mod = await import(/* @vite-ignore */ path.join(site.root, r.file));
+					// A .torp file's default export is a component, so wrap it as
+					// a PageEndPoint ({ component }) for the entries
+					if (r.file.endsWith(".torp")) {
+						return { default: { component: mod.default } };
+					}
+					return mod;
 				}
-				return mod;
+				// Inline endpoint (no file) — return directly from memory
+				return { default: r.endPoint };
 			},
 			subFolder: r.subFolder,
 		})),
