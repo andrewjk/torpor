@@ -32,6 +32,7 @@ import type Animation from "./types/Animation";
 import type ClassValue from "./types/ClassValue";
 import type Component from "./types/Component";
 import type ListItem from "./types/ListItem";
+import type ListItemSpec from "./types/ListItemSpec";
 import type SlotRender from "./types/SlotRender";
 import type StyleValue from "./types/StyleValue";
 import $batch from "./watch/$batch";
@@ -82,4 +83,4 @@ export {
 	t_dynamic,
 };
 
-export type { Component, SlotRender, ListItem, Animation, ClassValue, StyleValue };
+export type { Component, SlotRender, ListItem, ListItemSpec, Animation, ClassValue, StyleValue };

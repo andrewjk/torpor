@@ -55,9 +55,6 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 
 	const regionName = nextVarName("for_region", status);
 	const listItemsName = nextVarName("new_items", status);
-	const previousItemName = nextVarName("previous_item", status);
-	const nextItemName = nextVarName("next_item", status);
-	const newItemName = nextVarName("new_item", status);
 	const itemName = nextVarName("item", status);
 	const beforeName = nextVarName("before", status);
 
@@ -104,8 +101,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 
 	status.imports.add("t_region");
 	status.imports.add("t_run_list");
-	status.imports.add("t_list_item");
-	status.imports.add("ListItem");
+	status.imports.add("ListItemSpec");
 
 	b.append("");
 	b.append("/* @for */");
@@ -117,33 +113,25 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		${parentName},
 		${anchorName},
 		${status.options.dev === true ? "function createNewItems() {" : "() => {"}
-			let ${listItemsName}: ListItem[] = [];
-			let ${previousItemName} = ${regionName};
-			let ${nextItemName} = ${regionName}.nextRegion;`);
+			let ${listItemsName}: ListItemSpec[] = [];`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
 
-	b.append(`let ${newItemName} = t_list_item(`);
-	// TODO: Should map these
-	b.append(`{ ${forVarNames.join(", ")} },`);
+	// Push a lightweight {key, data} spec per row. The reconciler reuses old
+	// ListItems for survivors and only mounts fresh ones for genuinely new
+	// keys, so a survivor costs only this 2-field allocation per update — no
+	// full ListItem, no effects migration, no per-row chain re-link.
+	b.append(`${listItemsName}.push({ data: { ${forVarNames.join(", ")} }, key: `);
 	if (key !== undefined) {
-		addMappedText("", `${keyStatement || "undefined"}`, ",", key.span, status, b);
+		addMappedText("", `${keyStatement || "undefined"}`, " });", key.span, status, b);
+	} else {
+		b.append(`undefined });`);
 	}
-	if (status.options.dev === true) {
-		b.append(`"for item"`);
-	}
-	b.append(");");
-	b.append(`
-		${newItemName}.previousRegion = ${previousItemName};
-		${previousItemName}.nextRegion = ${newItemName};
-		${previousItemName} = ${newItemName};
-		${listItemsName}.push(${newItemName});
-	}
-	${regionName}.nextRegion = ${nextItemName};
-	return ${listItemsName};
-},
-${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
+	b.append(`}`);
+	b.append(`return ${listItemsName};`);
+	b.append(`},
+		${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
 
 	let oldForVarNames = status.forVarNames;
 	status.forVarNames = [

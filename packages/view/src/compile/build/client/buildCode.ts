@@ -50,6 +50,7 @@ const importsMap: Record<string, string> = {
 	t_cmt: 'import { t_cmt } from "${folder}";',
 	t_print: 'import { t_print } from "${folder}";',
 	ListItem: 'import { type ListItem } from "${folder}";',
+	ListItemSpec: 'import { type ListItemSpec } from "${folder}";',
 	SlotRender: 'import { type SlotRender } from "${folder}";',
 	// HACK: this one's a bit different
 	devContext: 'import { devContext } from "${folder}/dev";',

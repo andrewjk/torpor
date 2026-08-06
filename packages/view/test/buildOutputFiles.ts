@@ -195,6 +195,8 @@ const importsMap: Record<string, string> = {
 		'import t_cmt from "../../../../src/render/createComment";',
 	'import { type ListItem } from "@torpor/view";':
 		'import type ListItem from "../../../../src/types/ListItem";',
+	'import { type ListItemSpec } from "@torpor/view";':
+		'import type ListItemSpec from "../../../../src/types/ListItemSpec";',
 	'import { type SlotRender } from "@torpor/view";':
 		'import type SlotRender from "../../../../src/types/SlotRender";',
 	'import { $watch } from "@torpor/view/ssr";':

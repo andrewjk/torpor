@@ -1,4 +1,5 @@
 import type ListItem from "../types/ListItem";
+import type ListItemSpec from "../types/ListItemSpec";
 import type Region from "../types/Region";
 import $run from "../watch/$run";
 import context from "./context";
@@ -8,6 +9,8 @@ import runListItems from "./runListItems";
 
 /**
  * Runs a `for` control statement
+ * @param buildItems A function that returns the current list of lightweight
+ *   `{key, data}` specs (one per row of the source data)
  * @param create A function that creates the control statement's branches
  * @param noWatch When true, the compiler has determined the `@for` body never
  *   writes to its loop variables, so each item's `data` bag can be left
@@ -20,9 +23,9 @@ export default function runList(
 	region: Region,
 	parent: ParentNode,
 	anchor: Node | null,
-	buildItems: () => ListItem[],
+	buildItems: () => ListItemSpec[],
 	create: (item: ListItem, anchor: Node | null) => void,
-	update: (oldItem: ListItem, newItem: ListItem) => void,
+	update: (oldItem: ListItem, newSpec: ListItemSpec) => void,
 	noWatch?: boolean,
 ): void {
 	let first = true;
@@ -38,8 +41,8 @@ export default function runList(
 		const oldRegion = pushRegion(region, first);
 		first = false;
 
-		// Build the array of items with keys and data
-		const newItems = buildItems();
+		// Build the array of lightweight {key, data} specs for the new data
+		const newSpecs = buildItems();
 
 		// Do NOT re-run the list for properties accessed while updating its
 		// items. E.g. we want to re-run the list for `@for (item of $items)`
@@ -47,10 +50,10 @@ export default function runList(
 		// runListItems, below)
 		context.activeTarget = null;
 
-		// Run the function that updates the list's items
-		runListItems(region, parent, anchor, listItems, newItems, create, update, noWatch);
-
-		listItems = newItems;
+		// Reconcile: reuse old ListItems for survivors, mount fresh ones for
+		// new keys, clear dropped ones. Returns the new live list, which we
+		// keep for the next run.
+		listItems = runListItems(region, parent, anchor, listItems, newSpecs, create, update, noWatch);
 
 		popRegion(oldRegion);
 	});

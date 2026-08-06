@@ -6,7 +6,6 @@ import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";
 import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
-import t_list_item from "../../../../src/render/newListItem";
 import t_next from "../../../../src/render/nodeNext";
 import t_pop_region from "../../../../src/render/popRegion";
 import t_push_region from "../../../../src/render/pushRegion";
@@ -15,7 +14,7 @@ import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
-import type ListItem from "../../../../src/types/ListItem";
+import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function ForContainingFor(
@@ -44,19 +43,11 @@ export default function ForContainingFor(
 		t_section_1,
 		t_for_anchor_1,
 		() => {
-			let t_new_items_1: ListItem[] = [];
-			let t_previous_item_1 = t_for_region_1;
-			let t_next_item_1 = t_for_region_1.nextRegion;
+			let t_new_items_1: ListItemSpec[] = [];
 			for (let i = 0; i < 5; i++) {
-				let t_new_item_1 = t_list_item(
-					{ i },
-				);
-				t_new_item_1.previousRegion = t_previous_item_1;
-				t_previous_item_1.nextRegion = t_new_item_1;
-				t_previous_item_1 = t_new_item_1;
-				t_new_items_1.push(t_new_item_1);
+				t_new_items_1.push({ data: { i }, key:
+				undefined });
 			}
-			t_for_region_1.nextRegion = t_next_item_1;
 			return t_new_items_1;
 		},
 		(t_item_1, t_before_1) => {
@@ -71,19 +62,11 @@ export default function ForContainingFor(
 				t_fragment_1,
 				t_for_anchor_2,
 				() => {
-					let t_new_items_2: ListItem[] = [];
-					let t_previous_item_2 = t_for_region_2;
-					let t_next_item_2 = t_for_region_2.nextRegion;
+					let t_new_items_2: ListItemSpec[] = [];
 					for (let j = 0; j < 2; j++) {
-						let t_new_item_2 = t_list_item(
-							{ j },
-						);
-						t_new_item_2.previousRegion = t_previous_item_2;
-						t_previous_item_2.nextRegion = t_new_item_2;
-						t_previous_item_2 = t_new_item_2;
-						t_new_items_2.push(t_new_item_2);
+						t_new_items_2.push({ data: { j }, key:
+						undefined });
 					}
-					t_for_region_2.nextRegion = t_next_item_2;
 					return t_new_items_2;
 				},
 				(t_item_2, t_before_2) => {
