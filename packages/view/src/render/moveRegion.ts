@@ -1,6 +1,6 @@
 import type Region from "../types/Region";
 
-export default function moveRegion(parent: Node, region: Region, before: ChildNode | null): void {
+export default function moveRegion(parent: Node, region: Region, before: Node | null): void {
 	parent = before?.parentNode ?? parent;
 	const endNode = region.endNode ?? region.startNode;
 	let currentNode = region.startNode;

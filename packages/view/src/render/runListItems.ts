@@ -1,37 +1,27 @@
-// Adapted from https://github.com/snabbdom/snabbdom
-// With changes from https://github.com/luwes/js-diff-benchmark
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2015 Simon Friis Vindum
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
+// Keyed list reconciliation. Replaces the original snabbdom-derived 4-way
+// head/tail heuristic with a prefix/suffix sync + longest-increasing-
+// subsequence (LIS) pass, which produces the *minimal* move set. The snabbdom
+// greedy Move branch did ~(N−k) DOM moves for a `displace_k` (shift first k to
+// end); LIS does exactly k. Operations (`moveRegion` / `create` / `clearRegion`
+// / `transferListItemData`) and the region-chain invariants are unchanged —
+// only the scheduling of which items to move/mount/clear/patch is smarter.
+//
+// The sibling region chain (`previousRegion`/`nextRegion`) is pre-linked by the
+// compiler-emitted `buildItems` callback in new-array order, so `runListItems`
+// never needs to relink it. Mounts in the LIS pass run right-to-left (for
+// anchor correctness — each item's right neighbour has already been placed),
+// which means we can't use `pushRegion(item, true)` there (it re-links the
+// chain based on `context.previousRegion` and would reverse it). `mountItem`
+// below establishes just the active region + depth that `create()` needs for
+// effect/event attachment, leaving the chain untouched.
 import type ListItem from "../types/ListItem";
 import type Region from "../types/Region";
 import type WatchOptions from "../types/WatchOptions";
 import $watch from "../watch/$watch";
 import clearRegion from "./clearRegion";
 import context from "./context";
+import getSequence from "./getSequence";
 import moveRegion from "./moveRegion";
-import popRegion from "./popRegion";
-import pushRegion from "./pushRegion";
 
 // Hoisted options object — `$watch` only reads `options?.shallow`, so a single
 // shared constant can serve every per-item `$watch(data, { shallow: true })`
@@ -40,12 +30,39 @@ import pushRegion from "./pushRegion";
 const SHALLOW_WATCH_OPTIONS: WatchOptions = { shallow: true };
 
 /**
+ * Mounts a new list item: establishes it as the active region (so the
+ * compiler-emitted `create` callback attaches effects/events to the right
+ * region), sets its depth, optionally wraps its data in a shallow watch, then
+ * runs `create`. The sibling chain is left as `buildItems` linked it.
+ */
+function mountItem(
+	newItem: ListItem,
+	region: Region,
+	before: Node | null,
+	create: (item: ListItem, before: Node | null) => void,
+	noWatch?: boolean,
+): void {
+	const savedActiveRegion = context.activeRegion;
+	newItem.depth = region.depth + 1;
+	context.activeRegion = newItem;
+	if (noWatch !== true) {
+		newItem.data = $watch(newItem.data, SHALLOW_WATCH_OPTIONS);
+	}
+	create(newItem, before);
+	context.activeRegion = savedActiveRegion;
+}
+
+/**
+ * Reconciles an old keyed list against a new keyed list, producing the minimal
+ * set of DOM moves / mounts / clears / patches.
+ *
  * @param region The list's region
  * @param parent The parent DOM element
- * @param anchor The DOM element to create new items before
+ * @param anchor The DOM node to create new items before (the list's trailing anchor)
  * @param oldItems The list of current items
  * @param newItems The list of future items
  * @param create A function that creates the DOM elements for a new item
+ * @param update A function that syncs a matched item's data (re-runs effects if changed)
  * @param noWatch When true, skip the per-item shallow `$watch` wrap. The
  *   compiler guarantees the `@for` body never writes to its loop variables,
  *   and emits an `update` callback that re-runs item effects manually when a
@@ -61,188 +78,141 @@ export default function runListItems(
 	update: (oldItem: ListItem, newItem: ListItem) => void,
 	noWatch?: boolean,
 ): void {
-	let oldStartIndex = 0;
-	let oldEndIndex = oldItems.length - 1;
-	let oldStartItem = oldItems[0];
-	let oldEndItem = oldItems[oldEndIndex];
+	let oldStart = 0;
+	let oldEnd = oldItems.length - 1;
+	let newStart = 0;
+	let newEnd = newItems.length - 1;
 
-	let newStartIndex = 0;
-	let newEndIndex = newItems.length - 1;
-	let newStartItem = newItems[0];
-	let newEndItem = newItems[newEndIndex];
-
-	let oldKeyToIndex: Map<any, number> | undefined;
-	let newKeyToIndex: Map<any, number> | undefined;
-
-	while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-		if (oldStartItem === null) {
-			oldStartItem = oldItems[++oldStartIndex];
-		} else if (oldEndItem === null) {
-			oldEndItem = oldItems[--oldEndIndex];
-		} else if (newStartItem === null) {
-			newStartItem = newItems[++newStartIndex];
-		} else if (newEndItem === null) {
-			newEndItem = newItems[--newEndIndex];
-		} else if (oldStartItem.key === newStartItem.key) {
-			transferListItemData(oldStartItem, newStartItem, update, noWatch);
-			oldStartItem = oldItems[++oldStartIndex];
-			newStartItem = newItems[++newStartIndex];
-		} else if (oldEndItem.key === newEndItem.key) {
-			transferListItemData(oldEndItem, newEndItem, update, noWatch);
-			oldEndItem = oldItems[--oldEndIndex];
-			newEndItem = newItems[--newEndIndex];
-		} else if (oldStartItem.key === newEndItem.key) {
-			// Move to the end
-			//console.log("move", oldStartItem.key, "to the end");
-			moveRegion(parent, oldStartItem, oldEndItem.endNode!.nextSibling!);
-			transferListItemData(oldStartItem, newEndItem, update, noWatch);
-			oldStartItem = oldItems[++oldStartIndex];
-			newEndItem = newItems[--newEndIndex];
-		} else if (oldEndItem.key === newStartItem.key) {
-			// Move to the start
-			//console.log("move", oldEndItem.key, "to the start");
-			moveRegion(parent, oldEndItem, oldStartItem!.startNode);
-			transferListItemData(oldEndItem, newStartItem, update, noWatch);
-			oldEndItem = oldItems[--oldEndIndex];
-			newStartItem = newItems[++newStartIndex];
+	// 1. Fast path: peel off matching heads/tails and boundary rotations
+	//    (head→tail / tail→head) one item at a time, without building a
+	//    keymap. This handles append / prepend / swap / rotate and the
+	//    common-prefix/suffix portions of any change in O(1) per item.
+	//    rotateb/rotatef land here entirely (no keymap, no LIS). When no
+	//    boundary key matches, break and fall through to the LIS pass for
+	//    the messy middle (displace/shuffle).
+	while (oldStart <= oldEnd && newStart <= newEnd) {
+		if (oldItems[oldStart]!.key === newItems[newStart]!.key) {
+			// common head — patch in place
+			transferListItemData(oldItems[oldStart]!, newItems[newStart]!, update, noWatch);
+			oldStart++;
+			newStart++;
+		} else if (oldItems[oldEnd]!.key === newItems[newEnd]!.key) {
+			// common tail — patch in place
+			transferListItemData(oldItems[oldEnd]!, newItems[newEnd]!, update, noWatch);
+			oldEnd--;
+			newEnd--;
+		} else if (oldItems[oldStart]!.key === newItems[newEnd]!.key) {
+			// rotated head → tail: move the old head to just past the old tail
+			moveRegion(parent, oldItems[oldStart]!, oldItems[oldEnd]!.endNode?.nextSibling ?? anchor);
+			transferListItemData(oldItems[oldStart]!, newItems[newEnd]!, update, noWatch);
+			oldStart++;
+			newEnd--;
+		} else if (oldItems[oldEnd]!.key === newItems[newStart]!.key) {
+			// rotated tail → head: move the old tail to just before the old head
+			moveRegion(parent, oldItems[oldEnd]!, oldItems[oldStart]!.startNode);
+			transferListItemData(oldItems[oldEnd]!, newItems[newStart]!, update, noWatch);
+			oldEnd--;
+			newStart++;
 		} else {
-			// Lazily build maps of keys to indexes here
-			// They are relevant only if there has been a move, or a mid-list
-			// insertion or deletion, and not if there has been an insertion
-			// at the end or deletion from the front
-			if (oldKeyToIndex === undefined || newKeyToIndex === undefined) {
-				oldKeyToIndex = new Map();
-				for (let i = oldStartIndex; i <= oldEndIndex; i++) {
-					oldKeyToIndex.set(oldItems[i]!.key, i);
-				}
-				newKeyToIndex = new Map();
-				let anyOverlap = false;
-				for (let i = newStartIndex; i <= newEndIndex; i++) {
-					const key = newItems[i]!.key;
-					newKeyToIndex.set(key, i);
-					if (!anyOverlap && oldKeyToIndex.has(key)) {
-						anyOverlap = true;
-					}
-				}
+			break;
+		}
+	}
 
-				// Fast path: no keys overlap between the remaining old and new
-				// ranges. Every old item must be cleared and every new item
-				// created. Batch the clears (reverse order so each region's
-				// DOM nodes are still attached when clearRegion walks them —
-				// clearing forwards detaches the next item's startNode) and
-				// the creates (tight loop, no per-item region-chain rewiring
-				// like the Replace branch's savedPrevious save/restore) instead
-				// of interleaving them through the while loop. Helps the
-				// common "replace all" / "rebuild from scratch" case where
-				// every key is new (e.g. `run`, `replace` in js-framework-bench).
-				if (!anyOverlap) {
-					const lastOld = oldItems[oldEndIndex];
-					let before: Node | null = lastOld?.endNode?.nextSibling ?? anchor;
+	// 2. Old middle exhausted → mount remaining new middle (common: append,
+	//    fresh create, or prefix-only change). Insert before the first suffix
+	//    node (or the list anchor if there's no suffix).
+	if (oldStart > oldEnd) {
+		const before = newEnd + 1 < newItems.length ? newItems[newEnd + 1]!.startNode : anchor;
+		for (let i = newStart; i <= newEnd; i++) {
+			mountItem(newItems[i]!, region, before, create, noWatch);
+		}
+	}
+	// 3. New middle exhausted → clear remaining old middle (common: truncate).
+	else if (newStart > newEnd) {
+		for (let i = oldStart; i <= oldEnd; i++) {
+			clearRegion(oldItems[i]!);
+		}
+	}
+	// 4. Messy middle — LIS-based reconciliation (moves + mounts + clears).
+	else {
+		// 4a. Build newKey → newIndex for the new middle.
+		const newKeyToIndex = new Map<unknown, number>();
+		for (let i = newStart; i <= newEnd; i++) {
+			newKeyToIndex.set(newItems[i]!.key, i);
+		}
 
-					for (let i = oldEndIndex; i >= oldStartIndex; i--) {
-						const old = oldItems[i];
-						if (old !== null) {
-							clearRegion(old);
-						}
-					}
-
-				for (let i = newStartIndex; i <= newEndIndex; i++) {
-					const newItem = newItems[i]!;
-					const pushedRegion = pushRegion(newItem, true);
-					if (noWatch !== true) {
-						newItem.data = $watch(newItem.data, SHALLOW_WATCH_OPTIONS);
-					}
-					create(newItem, before);
-					popRegion(pushedRegion);
-					before = newItem.endNode!.nextSibling;
-				}
-
-					if (newItems.length > 0) {
-						region.nextRegion = newItems[0]!;
-					} else if (oldItems.length > 0) {
-						region.nextRegion = oldItems[oldItems.length - 1]!.nextRegion;
-					}
-					return;
+		// 4b. No-overlap fast path: every old middle key is absent from the new
+		//    middle → full replacement. Batch-clear the old middle (reverse, so
+		//    each region's DOM is still attached when clearRegion walks it) and
+		//    batch-mount the new middle. Avoids the keymap/LIS allocation for
+		//    the common "replace all" / "rebuild from scratch" case (e.g. `run`,
+		//    `runlots`).
+		let anyOverlap = false;
+		for (let i = oldStart; i <= oldEnd; i++) {
+			if (newKeyToIndex.has(oldItems[i]!.key)) {
+				anyOverlap = true;
+				break;
+			}
+		}
+		if (!anyOverlap) {
+			const lastOld = oldItems[oldEnd];
+			let before = (lastOld?.endNode?.nextSibling ?? anchor) as Node | null;
+			for (let i = oldEnd; i >= oldStart; i--) {
+				clearRegion(oldItems[i]!);
+			}
+			for (let i = newStart; i <= newEnd; i++) {
+				mountItem(newItems[i]!, region, before, create, noWatch);
+				before = newItems[i]!.endNode!.nextSibling;
+			}
+		} else {
+			// 4c. Walk the old middle: patch matches into their new positions and
+			//    clear the rest. `newIndexToOld[i] = oldIndex + 1` (0 marks a new
+			//    slot that has no matching old item and must be mounted).
+			const newMidLen = newEnd - newStart + 1;
+			const newIndexToOld = new Array<number>(newMidLen).fill(0);
+			for (let i = oldStart; i <= oldEnd; i++) {
+				const oldItem = oldItems[i]!;
+				const newIdx = newKeyToIndex.get(oldItem.key);
+				if (newIdx !== undefined) {
+					newIndexToOld[newIdx - newStart] = i + 1;
+					transferListItemData(oldItem, newItems[newIdx]!, update, noWatch);
+				} else {
+					clearRegion(oldItem);
 				}
 			}
 
-			let oldIndex = oldKeyToIndex.get(newStartItem.key);
-			let newIndex = newKeyToIndex.get(oldStartItem.key);
+			// 4d. LIS of `newIndexToOld` → indices of items already in correct
+			//    relative order (they stay; everything else moves or mounts).
+			const seq = getSequence(newIndexToOld);
 
-			if (oldIndex === undefined && newIndex === undefined) {
-				// Replace
-				//console.log("replace", oldStartItem.key, "with", newStartItem.key);
-				const savedPrevious = context.previousRegion;
-				const oldRegion = pushRegion(newStartItem, true);
-				if (noWatch !== true) {
-					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
+			// 4e. Move/mount right-to-left. The right neighbour (newIdx+1) was
+			//    placed in the previous iteration (or is a patched suffix item),
+			//    so its `startNode` is the correct insertion anchor.
+			let j = seq.length - 1;
+			for (let i = newMidLen - 1; i >= 0; i--) {
+				const newIdx = newStart + i;
+				const newItem = newItems[newIdx]!;
+				const before = newIdx + 1 < newItems.length ? newItems[newIdx + 1]!.startNode : anchor;
+				if (newIndexToOld[i] === 0) {
+					// No matching old item → mount.
+					mountItem(newItem, region, before, create, noWatch);
+				} else if (j < 0 || i !== seq[j]) {
+					// Not in the LIS → move to its new position.
+					moveRegion(parent, newItem, before);
+				} else {
+					// In the LIS → already in correct relative order.
+					j--;
 				}
-				create(newStartItem, oldStartItem.startNode);
-				popRegion(oldRegion);
-				context.previousRegion = savedPrevious;
-				newStartItem.previousRegion = oldStartItem.previousRegion;
-				newStartItem.nextRegion = oldStartItem;
-				oldStartItem.previousRegion = newStartItem;
-				clearRegion(oldStartItem);
-				oldStartItem = oldItems[++oldStartIndex];
-				newStartItem = newItems[++newStartIndex];
-			} else if (oldIndex === undefined) {
-				// Insert
-				//console.log("insert", newStartItem.key);
-				const oldRegion = pushRegion(newStartItem, true);
-				if (noWatch !== true) {
-					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
-				}
-				create(newStartItem, oldStartItem.startNode);
-				popRegion(oldRegion);
-				newStartItem = newItems[++newStartIndex];
-			} else if (newIndex === undefined) {
-				// Delete
-				//console.log("delete", oldStartItem.key);
-				clearRegion(oldStartItem);
-				oldStartItem = oldItems[++oldStartIndex];
-			} else {
-				// Move
-				//console.log("move", newStartItem.key, "before", oldStartItem.key);
-			const oldData = oldItems[oldIndex];
-			moveRegion(parent, oldData, oldStartItem.startNode);
-			transferListItemData(oldData, newStartItem, update, noWatch);
-				// @ts-ignore TODO: Set key null instead?
-				oldItems[oldIndex] = null;
-				newStartItem = newItems[++newStartIndex];
 			}
 		}
 	}
 
-	if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) {
-		if (oldStartIndex > oldEndIndex) {
-			// The old list is exhausted; process new list additions
-			// HACK: I think it would be better to move anchors to the end?
-			let before =
-				oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
-			for (newStartIndex; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-				//console.log("create", newStartItem.key);
-				const oldRegion = pushRegion(newStartItem, true);
-				if (noWatch !== true) {
-					newStartItem.data = $watch(newStartItem.data, SHALLOW_WATCH_OPTIONS);
-				}
-				create(newStartItem, before);
-				popRegion(oldRegion);
-				before = newStartItem.endNode!.nextSibling;
-			}
-		} else {
-			// The new list is exhausted; process old list removals
-			for (oldEndIndex; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) {
-				//console.log("clear", oldStartItem.key);
-				clearRegion(oldStartItem);
-			}
-		}
-	}
-
+	// Connect the list region to the (possibly new) first child. When the new
+	// list is empty, restore the old tail's next link.
 	if (newItems.length > 0) {
-		region.nextRegion = newItems[0];
+		region.nextRegion = newItems[0]!;
 	} else if (oldItems.length > 0) {
-		region.nextRegion = oldItems[oldItems.length - 1].nextRegion;
+		region.nextRegion = oldItems[oldItems.length - 1]!.nextRegion;
 	}
 }
 
@@ -251,7 +221,7 @@ function transferListItemData(
 	newItem: ListItem,
 	update: (oldItem: ListItem, newItem: ListItem) => void,
 	noWatch?: boolean,
-) {
+): void {
 	newItem.startNode = oldItem.startNode;
 	newItem.endNode = oldItem.endNode;
 	newItem.depth = oldItem.depth;
