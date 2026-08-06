@@ -15,15 +15,17 @@ beforeAll(() => {
 	addRoutes(site);
 });
 
-test("renders the counter page", async () => {
+test("renders the counter page wrapped in the layout", async () => {
 	const response = await runTest(site, "/");
 	const html = await response.text();
 
 	const div = document.createElement("div");
 	div.innerHTML = html;
 
-	const title = queryByText(div, "The count is 0.");
-	expect(title).not.toBeNull();
+	// Layout header
+	expect(queryByText(div, "Mini Site")).not.toBeNull();
+	// Page content
+	expect(queryByText(div, "The count is 0.")).not.toBeNull();
 });
 
 test("server action returns a response", async () => {
@@ -39,4 +41,24 @@ test("server action returns a response", async () => {
 
 	const json = await response.json();
 	expect(json.message).toBe("Server received count: 42");
+});
+
+test("+server endpoint returns JSON", async () => {
+	const response = await runTest(site, "/api/time");
+	expect(response.status).toBe(200);
+	expect(response.headers.get("Content-Type")).toContain("application/json");
+
+	const json = await response.json();
+	expect(typeof json.time).toBe("number");
+});
+
+test("error page renders with status and message", async () => {
+	const response = await runTest(site, "/_error?status=404&message=Not+found");
+	const html = await response.text();
+
+	const div = document.createElement("div");
+	div.innerHTML = html;
+
+	expect(queryByText(div, "Error 404")).not.toBeNull();
+	expect(queryByText(div, "Not found")).not.toBeNull();
 });

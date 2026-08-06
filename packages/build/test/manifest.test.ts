@@ -37,11 +37,11 @@ function buildSite(): Site {
 	site.addRoute("/", { page: "src/routes/+page.ts" });
 	site.addRoute("/about", {
 		page: "src/routes/about/+page.ts",
-		server: "src/routes/about/+page.server.ts",
+		pageServer: "src/routes/about/+page.server.ts",
 	});
 	site.addRoute("/inline", {
 		page: "src/routes/inline/+page.ts",
-		server: { load: async () => undefined },
+		pageServer: { load: async () => undefined },
 	});
 	return site;
 }

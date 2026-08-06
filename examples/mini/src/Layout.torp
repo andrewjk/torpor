@@ -1,0 +1,24 @@
+export default function Layout() {
+	@render {
+		<main>
+			<header>
+				<h1>Mini Site</h1>
+				<nav>
+					<a href="/">Home</a>
+				</nav>
+			</header>
+			<slot />
+		</main>
+	}
+
+	@style {
+		header {
+			border-bottom: 1px solid #ccc;
+			padding: 0.5rem 0;
+		}
+
+		nav a {
+			margin-right: 1rem;
+		}
+	}
+}

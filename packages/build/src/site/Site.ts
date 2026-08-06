@@ -2,8 +2,11 @@ import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
+import type { InlineEndPoint } from "../types/Route";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type Route from "../types/Route";
+import type ServerEndPoint from "../types/ServerEndPoint";
+import type ServerHook from "../types/ServerHook";
 import {
 	ERROR_ROUTE,
 	HOOK_ROUTE,
@@ -55,7 +58,7 @@ export default class Site {
 	 * Inline endpoints keyed by `"path:type"`. Populated by `addRoute` when
 	 * the user passes an inline endpoint object instead of a file path.
 	 */
-	inlineEndPoints: Record<string, PageServerEndPoint> = {};
+	inlineEndPoints: Record<string, InlineEndPoint> = {};
 
 	constructor() {
 		this.root = process.cwd();
@@ -201,24 +204,56 @@ export default class Site {
 	 * conventions (+page.ts, +page.server.ts, etc). This is useful for small
 	 * sites with one or two pages.
 	 *
-	 * The `page` file can be a `.torp` component file (used directly as the
-	 * page component) or a `.ts`/`.js` endpoint file (exporting a
-	 * `PageEndPoint` with `component`, `load`, etc).
+	 * Any combination of options may be provided; each maps to the
+	 * corresponding file-route type:
 	 *
-	 * The optional `server` can be a file path (a `.ts`/`.js` file exporting a
-	 * `PageServerEndPoint`, which should end with `server.ts`/`server.js` so it
-	 * is excluded from the client build) or an inline `PageServerEndPoint`
-	 * object. Inline server code is kept out of the client bundle automatically.
+	 * - `page` — a `+page` (`.torp` component or `.ts`/`.js` `PageEndPoint`)
+	 * - `pageServer` — a `+page.server` (`PageServerEndPoint`, file or inline)
+	 * - `server` — a `+server` HTTP endpoint (`ServerEndPoint`, file or inline)
+	 * - `layout` — a `_layout` (`.torp` component or `.ts`/`.js` `PageEndPoint`)
+	 * - `layoutServer` — a `_layout.server` (`PageServerEndPoint`, file or inline)
+	 * - `hookServer` — a `_hook.server` (`ServerHook`, file or inline)
+	 * - `error` — an `_error` page (`.torp` component or `.ts`/`.js` `PageEndPoint`)
+	 *
+	 * Options that need a component (`page`, `layout`, `error`) must be file
+	 * paths so the component is included in the client bundle. Server-only
+	 * options (`pageServer`, `server`, `layoutServer`, `hookServer`) accept
+	 * either a file path or an inline object; inline server code is kept out
+	 * of the client bundle automatically.
+	 *
+	 * @example
+	 * // A page with an inline server action
+	 * site.addRoute("/", {
+	 *   page: "./src/Counter.torp",
+	 *   pageServer: { actions: { set: async ({ request }) => ok() } },
+	 * });
+	 * @example
+	 * // A JSON API endpoint
+	 * site.addRoute("/api/time", {
+	 *   server: { get: async () => ok({ time: Date.now() }) },
+	 * });
+	 * @example
+	 * // A root layout, server hook, and error page
+	 * site.addRoute("/", {
+	 *   layout: "./src/Layout.torp",
+	 *   hookServer: { handle: async (event) => {} },
+	 *   error: "./src/ErrorPage.torp",
+	 * });
 	 *
 	 * @param path The route path, e.g. `/` or `/about`
-	 * @param options File paths for the page and optional server endpoint
+	 * @param options File paths and/or inline endpoints for the route
 	 * @param subFolder An optional subFolder for grouping routes
 	 */
 	addRoute(
 		path: string,
 		options: {
-			page: string;
-			server?: string | PageServerEndPoint;
+			page?: string;
+			pageServer?: string | PageServerEndPoint;
+			server?: string | ServerEndPoint;
+			layout?: string;
+			layoutServer?: string | PageServerEndPoint;
+			hookServer?: string | ServerHook;
+			error?: string;
 		},
 		subFolder?: string,
 	): void {
@@ -226,35 +261,71 @@ export default class Site {
 		if (normalizedSubFolder !== undefined && !normalizedSubFolder.startsWith("/")) {
 			normalizedSubFolder = "/" + normalizedSubFolder;
 		}
-		let pageFile = fpath.relative(this.root, fpath.resolve(this.root, options.page));
-		this.routes.push({
-			path,
-			file: pageFile,
-			type: PAGE_ROUTE,
-			subFolder: normalizedSubFolder,
-		});
-		if (options.server) {
-			let serverPath = path.replace(/\/$/, "") + "/~server";
-			if (typeof options.server === "string") {
-				let serverFile = fpath.relative(this.root, fpath.resolve(this.root, options.server));
-				this.routes.push({
-					path: serverPath,
-					file: serverFile,
-					type: PAGE_SERVER_ROUTE,
-					subFolder: normalizedSubFolder,
-				});
-			} else {
-				let key = `${serverPath}:${PAGE_SERVER_ROUTE}`;
-				this.inlineEndPoints[key] = options.server;
-				this.routes.push({
-					path: serverPath,
-					endPoint: options.server,
-					type: PAGE_SERVER_ROUTE,
-					subFolder: normalizedSubFolder,
-				});
-			}
+
+		// The base path with any trailing slash stripped, so that we can
+		// append "/_layout", "/~server" etc. For the root "/" this is "".
+		let base = path.replace(/\/$/, "");
+
+		if (options.page !== undefined) {
+			this.#pushRoute(path, PAGE_ROUTE, options.page, normalizedSubFolder);
 		}
+		if (options.pageServer !== undefined) {
+			this.#pushRoute(
+				`${base}/~server`,
+				PAGE_SERVER_ROUTE,
+				options.pageServer,
+				normalizedSubFolder,
+			);
+		}
+		if (options.server !== undefined) {
+			this.#pushRoute(path, SERVER_ROUTE, options.server, normalizedSubFolder);
+		}
+		if (options.layout !== undefined) {
+			this.#pushRoute(`${base}/_layout`, LAYOUT_ROUTE, options.layout, normalizedSubFolder);
+		}
+		if (options.layoutServer !== undefined) {
+			this.#pushRoute(
+				`${base}/_layout/~server`,
+				LAYOUT_SERVER_ROUTE,
+				options.layoutServer,
+				normalizedSubFolder,
+			);
+		}
+		if (options.hookServer !== undefined) {
+			this.#pushRoute(
+				`${base}/_hook/~server`,
+				HOOK_SERVER_ROUTE,
+				options.hookServer,
+				normalizedSubFolder,
+			);
+		}
+		if (options.error !== undefined) {
+			this.#pushRoute(`${base}/_error`, ERROR_ROUTE, options.error, normalizedSubFolder);
+		}
+
 		this.#sortRoutes();
+	}
+
+	/**
+	 * Pushes a single route entry, handling both file-path and inline-endpoint
+	 * targets. File paths are resolved relative to the site root; inline
+	 * endpoints are also stored in `inlineEndPoints` keyed by `"path:type"`
+	 * so the manifest plugin can resolve them at build time.
+	 */
+	#pushRoute(
+		routePath: string,
+		type: RouteType,
+		target: string | InlineEndPoint,
+		subFolder?: string,
+	): void {
+		if (typeof target === "string") {
+			let file = fpath.relative(this.root, fpath.resolve(this.root, target));
+			this.routes.push({ path: routePath, file, type, subFolder });
+		} else {
+			let key = `${routePath}:${type}`;
+			this.inlineEndPoints[key] = target;
+			this.routes.push({ path: routePath, endPoint: target, type, subFolder });
+		}
 	}
 
 	#sortRoutes() {

@@ -11,6 +11,7 @@ import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
 import {
+	ERROR_ROUTE,
 	HOOK_ROUTE,
 	HOOK_SERVER_ROUTE,
 	LAYOUT_ROUTE,
@@ -85,6 +86,12 @@ async function load(router: Router, ev: ServerEvent, template: string): Promise<
 	// Update $page before building the components
 	// TODO: Find somewhere better to put this
 	$page.url = url;
+	if (path.endsWith("/_error")) {
+		$page.status = parseInt(query.get("status") ?? "404");
+		$page.error = { message: query.get("message") ?? "" };
+	} else {
+		$page.status = 200;
+	}
 
 	const handler = route.handler;
 	const params = route.params || {};
@@ -115,6 +122,9 @@ async function load(router: Router, ev: ServerEvent, template: string): Promise<
 			// It's a /+server.ts endpoint
 			const functionName = ev.request.method.toLowerCase().replace("delete", "del");
 			return await loadData(ev, url, handler, functionName, params);
+		}
+		case ERROR_ROUTE: {
+			return await loadView(ev, url, handler, params, template);
 		}
 		case HOOK_ROUTE:
 		case HOOK_SERVER_ROUTE: {

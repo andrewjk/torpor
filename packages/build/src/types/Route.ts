@@ -1,5 +1,13 @@
+import type PageEndPoint from "./PageEndPoint";
 import type PageServerEndPoint from "./PageServerEndPoint";
+import type ServerEndPoint from "./ServerEndPoint";
+import type ServerHook from "./ServerHook";
 import { type RouteType } from "./RouteType";
+
+/**
+ * Any endpoint shape that can be stored inline on a Route.
+ */
+export type InlineEndPoint = PageServerEndPoint | ServerEndPoint | ServerHook | PageEndPoint;
 
 /**
  * A route that is added to the Site.
@@ -13,9 +21,10 @@ export default interface Route {
 	file?: string;
 	/**
 	 * For inline routes (defined in code rather than by file), the endpoint
-	 * object itself.
+	 * object itself. The shape depends on the route type
+	 * (`PageServerEndPoint`, `ServerEndPoint`, `ServerHook`, etc.).
 	 */
-	endPoint?: PageServerEndPoint;
+	endPoint?: InlineEndPoint;
 	type: RouteType;
 	subFolder?: string;
 }
