@@ -211,6 +211,16 @@ export default function runListItems(
 	// list is empty, restore the old tail's next link.
 	if (newItems.length > 0) {
 		region.nextRegion = newItems[0]!;
+		// The list region was pushed as a sibling (via `pushRegion(region, …)`
+		// in `runList`), which set `context.previousRegion = region`. The items
+		// are now the chain's tail at this depth, so the NEXT sibling region
+		// pushed after us (e.g. a following `@if`/`@for`) must link after the
+		// last item — otherwise it would link after the list region itself,
+		// adopt the first item as its `nextRegion`, and `runControlBranch` would
+		// `clearRegion` that item on its first branch run. `mountItem`
+		// deliberately doesn't touch the chain (see comment above), so restore
+		// the tail pointer here, once, covering every reconciliation path.
+		context.previousRegion = newItems[newItems.length - 1]!;
 	} else if (oldItems.length > 0) {
 		region.nextRegion = oldItems[oldItems.length - 1]!.nextRegion;
 	}
