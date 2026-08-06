@@ -9,7 +9,7 @@ const source = `
 export default function CssStyle() {
 	@render {
 		<h1 class="title">I am red</h1>
-		<button style="font-size: 10rem;">I am a button</button>
+		<button style="font-size: 160px;">I am a button</button>
 	}
 
 	@style {
@@ -39,5 +39,5 @@ test("minimal template -- hydrated", async () => {
 
 function check(container: HTMLElement) {
 	expect(queryByText(container, "I am red")).toHaveClass("title");
-	expect(queryByText(container, "I am a button")).toHaveStyle("font-size: 10rem");
+	expect(queryByText(container, "I am a button")).toHaveStyle("font-size: 160px");
 }
