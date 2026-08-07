@@ -17,10 +17,8 @@ export default function IfInSwitch(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { show: boolean; status: string },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

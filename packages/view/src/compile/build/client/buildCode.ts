@@ -3,6 +3,7 @@ import type TemplateComponent from "../../../types/TemplateComponent";
 import type BuildOptions from "../../types/BuildOptions";
 import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
+import markupRendersComponent from "../../utils/markupRendersComponent";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
 import addPopDevBoundary from "./addPopDevBoundary";
@@ -139,12 +140,16 @@ function buildTemplate(
 				addMappedText("", current.params, ",", chunk.span, status, b);
 			} else {
 				b.append(
-					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props?: Record<PropertyKey, any>"},`,
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "_$props?: Record<PropertyKey, any>"},`,
 				);
 			}
 			b.append(`
-					${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}?: Record<PropertyKey, any>,
-					${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, SlotRender>,`);
+				${
+					current.contextProps?.length || (current.markup && markupRendersComponent(current.markup))
+						? "$context"
+						: "_$context"
+				}?: Record<PropertyKey, any>,
+				${current.slotProps?.length ? "$slots" : "_$slots"}?: Record<string, SlotRender>,`);
 		} else if (chunk.script === ") /* @return_type */ {") {
 			b.append("): void {");
 		} else if (chunk.script === "/* @start */") {

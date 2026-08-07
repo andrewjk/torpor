@@ -16,10 +16,8 @@ export default function Class(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
@@ -42,9 +40,9 @@ export default function Class(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
+		_$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
-		$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Class filtered `);
@@ -68,9 +66,9 @@ export default function Class(
 	t_slots_2["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
+		_$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
-		$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, ` Child class 1 `);
@@ -91,9 +89,9 @@ export default function Class(
 	t_slots_3["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
+		_$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
-		$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_6 = t_fragment($parent.ownerDocument!, t_fragments, 6, ` Child class 2 `);
@@ -120,7 +118,6 @@ function Child(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void {

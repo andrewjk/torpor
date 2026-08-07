@@ -20,11 +20,11 @@ export default function Bench(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	_$props?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
+	_$context?: Record<PropertyKey, any>,
 	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	let rowId = 1;
@@ -139,7 +139,8 @@ export default function Bench(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div id="main" class="container"><div class="jumbotron"><div class="row"><div class="col-md-6"><h1>Torpor (keyed)</h1></div> <div class="col-md-6"><div class="row"><div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="create">Create 1,000 rows</button></div> <div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="createlots"> Create 10,000 rows </button></div> <div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="append"> Append 1,000 rows </button></div> <div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="update"> Update every 10th row </button></div> <div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="clear">Clear</button></div> <div class="col-sm-6 smallpad"><button type="button" class="btn btn-primary btn-block" id="swaprows">Swap Rows</button></div></div></div></div></div> <table class="table table-hover table-striped test-data"><tbody><!></tbody></table> <span class="preloadicon glyphicon glyphicon-remove" aria-hidden="true"></span></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	const t_button_1 = t_child(t_child(t_child(t_next(t_next(t_child(t_child(t_child(t_div_1))), true))))) as HTMLButtonElement;
 	const t_button_2 = t_child(t_next(t_next(t_child(t_child(t_next(t_next(t_child(t_child(t_child(t_div_1))), true)))), true))) as HTMLButtonElement;
 	const t_button_3 = t_child(t_next(t_next(t_next(t_next(t_child(t_child(t_next(t_next(t_child(t_child(t_child(t_div_1))), true)))), true)), true))) as HTMLButtonElement;

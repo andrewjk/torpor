@@ -23,10 +23,8 @@ export default function ForFollowedByIf(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { items: string[], show: boolean },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

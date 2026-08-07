@@ -27,9 +27,9 @@ test("replace with smaller list removes all old items", async () => {
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
-	function buildData(count: number) {
-		const data = new Array(count);
-		for (let i = 0; i < count; i++) {
+	function buildData(length: number) {
+		const data: { id: number; name: string }[] = Array.from({ length });
+		for (let i = 0; i < length; i++) {
 			data[i] = { id: nextId++, name: `Item ${nextId - 1}` };
 		}
 		return data;
@@ -66,9 +66,9 @@ test("replace same-size then shrink does not leak items", async () => {
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
-	function buildData(count: number) {
-		const data = new Array(count);
-		for (let i = 0; i < count; i++) {
+	function buildData(length: number) {
+		const data: { id: number; name: string }[] = Array.from({ length });
+		for (let i = 0; i < length; i++) {
 			data[i] = { id: nextId++, name: `Item ${nextId - 1}` };
 		}
 		return data;
@@ -117,9 +117,9 @@ test("key-match update preserves DOM nodes across replace cycles", async () => {
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
-	function buildData(count: number) {
-		const data = new Array(count);
-		for (let i = 0; i < count; i++) {
+	function buildData(length: number) {
+		const data: { id: number; name: string }[] = Array.from({ length });
+		for (let i = 0; i < length; i++) {
 			data[i] = { id: nextId++, name: `Item ${nextId - 1}` };
 		}
 		return data;
@@ -153,9 +153,9 @@ test("region chain handles large shrink", async () => {
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
 
-	function buildData(count: number) {
-		const data = new Array(count);
-		for (let i = 0; i < count; i++) {
+	function buildData(length: number) {
+		const data: { id: number; name: string }[] = Array.from({ length });
+		for (let i = 0; i < length; i++) {
 			data[i] = { id: nextId++, name: `Item ${nextId - 1}` };
 		}
 		return data;

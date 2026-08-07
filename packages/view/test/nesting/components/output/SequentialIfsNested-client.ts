@@ -17,10 +17,8 @@ export default function SeqIfsNested(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { a: boolean; b: boolean; c: boolean },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

@@ -125,4 +125,3 @@ function collectExpressionStrings(node: TemplateNode, out: string[]): void {
 		}
 	}
 }
-

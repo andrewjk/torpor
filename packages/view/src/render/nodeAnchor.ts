@@ -83,11 +83,7 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 					// No children and no next sibling: walk up to find an
 					// ancestor that has a next sibling
 					let parent: Node | null = currentNode.parentNode;
-					while (
-						parent !== null &&
-						parent.nextSibling === null &&
-						parent !== startParent
-					) {
+					while (parent !== null && parent.nextSibling === null && parent !== startParent) {
 						parent = parent.parentNode;
 					}
 					// Don't go past startParent

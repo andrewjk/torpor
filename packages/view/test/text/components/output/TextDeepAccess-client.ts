@@ -11,10 +11,8 @@ export default function DeepAccess(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { user: { profile: { name: string; address: { city: string } } } },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

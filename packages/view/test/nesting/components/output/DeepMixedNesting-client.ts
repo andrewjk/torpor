@@ -17,10 +17,8 @@ export default function DeepMixed(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { a: boolean; b: boolean; c: boolean; d: boolean; e: boolean },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

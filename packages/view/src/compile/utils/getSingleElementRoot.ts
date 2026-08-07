@@ -23,9 +23,7 @@ import { NON_RENDERING_OPERATIONS } from "./nonRenderingOperations";
  * (`<tr>...</tr><tr>...</tr>`) are excluded because no single element
  * represents the whole fragment.
  */
-export default function getSingleElementRoot(
-	children: TemplateNode[],
-): ElementNode | undefined {
+export default function getSingleElementRoot(children: TemplateNode[]): ElementNode | undefined {
 	let renderingRoot: ElementNode | undefined;
 	for (const child of children) {
 		if (child.type === "comment") continue;

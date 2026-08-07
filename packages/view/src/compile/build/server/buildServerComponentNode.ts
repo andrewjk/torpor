@@ -90,9 +90,9 @@ export default function buildServerComponentNode(
 				const slotName = nameAttribute?.value ? trimQuotes(nameAttribute.value) : "_";
 				const slotParams = [
 					slot.hasSlotProps
-						? "// @ts-ignore\n$slot: Record<PropertyKey, any>"
-						: "// @ts-ignore\n$slot?: Record<PropertyKey, any>",
-					"// @ts-ignore\n$context?: Record<PropertyKey, any>",
+						? "$slot: Record<PropertyKey, any>"
+						: "_$slot?: Record<PropertyKey, any>",
+					"// @ts-ignore\n// eslint-disable-next-line no-unused-vars\n$context?: Record<PropertyKey, any>",
 				];
 				b.append(
 					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`,

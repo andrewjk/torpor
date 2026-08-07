@@ -3,10 +3,8 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function IfForSwitchCombo(
 	$props: { todos: { text: string; done: boolean; priority: string }[]; filter: string; sort: string },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";

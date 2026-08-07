@@ -3,10 +3,8 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Let(
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
@@ -19,9 +17,9 @@ export default function Let(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	// @ts-ignore
 	t_slots_1["_"] = (
-		// @ts-ignore
 		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
@@ -38,7 +36,6 @@ export default function Let(
 
 function List(
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {

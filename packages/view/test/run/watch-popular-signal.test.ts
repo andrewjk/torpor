@@ -17,7 +17,7 @@ test("many effects subscribed to one signal all update when it changes", () => {
 	});
 
 	// Subscribe 1000 effects, each reading the shared `selected` signal
-	const labels: string[] = new Array(1000).fill("");
+	const labels = Array.from({ length: 1000 }).fill("") as string[];
 	for (let i = 0; i < 1000; i++) {
 		const idx = i;
 		const item = $state.items[i]!;

@@ -3,10 +3,8 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ControlInSlot(
 	$props: { items: { name: string; visible: boolean }[] },
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
@@ -15,9 +13,9 @@ export default function ControlInSlot(
 	t_body += `<![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = (
+		_$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
-		$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
@@ -41,9 +39,7 @@ export default function ControlInSlot(
 }
 
 function Card(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {

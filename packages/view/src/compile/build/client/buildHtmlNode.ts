@@ -69,7 +69,9 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append(`if (${lastNodeVar} !== null) {`);
 	b.append(`${firstNodeVar} = ${lastNodeVar};`);
 	b.append(`let t_scan: ChildNode | null = ${lastNodeVar};`);
-	b.append(`while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== ${htmlAnchorName} && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {`);
+	b.append(
+		`while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== ${htmlAnchorName} && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {`,
+	);
 	b.append(`t_scan = t_scan.previousSibling;`);
 	b.append(`}`);
 	b.append(`${firstNodeVar} = t_scan;`);

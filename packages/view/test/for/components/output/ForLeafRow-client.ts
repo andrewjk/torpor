@@ -17,10 +17,8 @@ export default function ForLeafRow(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { items: Array<{ id: number, label: string }>, onSelect: (row: { id: number }) => void },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

@@ -1,6 +1,7 @@
 import type Template from "../../../types/Template";
 import type BuildOptions from "../../types/BuildOptions";
 import Builder from "../../utils/Builder";
+import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
@@ -72,9 +73,13 @@ function buildServerTemplate(
 			// TODO: Support other params, like the user setting $context
 			let params = [
 				current.params ??
-					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "// @ts-ignore\n$props?: Record<PropertyKey, any>"}`,
-				`${current.contextProps?.length ? "$context" : "// @ts-ignore\n$context"}?: Record<PropertyKey, any>`,
-				`${current.slotProps?.length ? "$slots" : "// @ts-ignore\n$slots"}?: Record<string, ServerSlotRender>`,
+					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "_$props?: Record<PropertyKey, any>"}`,
+				`${
+					current.contextProps?.length || (current.markup && markupRendersComponent(current.markup))
+						? "$context"
+						: "_$context"
+				}?: Record<PropertyKey, any>`,
+				`${current.slotProps?.length ? "$slots" : "_$slots"}?: Record<string, ServerSlotRender>`,
 			];
 			b.append(params.join(",\n") + ",");
 		} else if (chunk.script === ") /* @return_type */ {") {

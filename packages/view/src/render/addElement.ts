@@ -20,11 +20,7 @@ import runMountSideEffects from "./runMountSideEffects";
  * @param parent The intended parent element.
  * @param before The sibling to insert before (or `null` to append).
  */
-export default function addElement(
-	node: Element,
-	parent: ParentNode,
-	before: Node | null,
-): void {
+export default function addElement(node: Element, parent: ParentNode, before: Node | null): void {
 	const activeRegion = context.activeRegion;
 	const hydrationNode = context.hydrationNode;
 

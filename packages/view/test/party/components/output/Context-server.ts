@@ -3,11 +3,9 @@ import t_fmt from "../../../../src/render/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function UserProfileContextApp(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";
@@ -33,11 +31,9 @@ export default function UserProfileContextApp(
 }
 
 function UserProfileContext(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	$context = Object.assign({}, $context);
 	let t_body = "";

@@ -22,10 +22,8 @@ export default function IfForSwitchCombo(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { todos: { text: string; done: boolean; priority: string }[]; filter: string; sort: string },
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

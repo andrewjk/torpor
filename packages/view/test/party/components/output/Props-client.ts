@@ -12,12 +12,9 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function UserProfileApp(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
@@ -54,10 +51,8 @@ function UserProfile(
 		favoriteColors: string[],
 		isAvailable: boolean
 	},
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */

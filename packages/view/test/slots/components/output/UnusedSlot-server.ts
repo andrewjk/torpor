@@ -1,12 +1,9 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Unused(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, ServerSlotRender>,
+	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	let t_body = "";
 	let t_head = "";
@@ -22,9 +19,7 @@ export default function Unused(
 }
 
 function Header(
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
+	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {

@@ -19,12 +19,9 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function ForEscape(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$props?: Record<PropertyKey, any>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	let things = ["a", "b", "c", "d", "e"]

@@ -20,10 +20,8 @@ export default function Let(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
@@ -48,6 +46,7 @@ export default function Let(
 		// @ts-ignore
 		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
+		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `#`);
@@ -70,13 +69,11 @@ function List(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: Record<PropertyKey, any>,
-	// @ts-ignore
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ): void {
 
 	/* User interface */
-	const t_fragments: DocumentFragment[] = [];
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);

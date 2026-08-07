@@ -20,7 +20,7 @@ export default function runControl(
 	// runControl calls for the same region) can detect they're no longer
 	// current and skip execution. The generation is incremented each time
 	// runControl is called with this region.
-	const gen = (region as any).generation = ((region as any).generation ?? 0) + 1;
+	const gen = ((region as any).generation = ((region as any).generation ?? 0) + 1);
 
 	// Run the control statement in an effect
 	$run(function runControl() {

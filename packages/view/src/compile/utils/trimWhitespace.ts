@@ -94,22 +94,22 @@ function trimChildren(
 	// is removed as if it were at the container edge. A whitespace text node
 	// is "effectively leading" if no rendering sibling precedes it, and
 	// "effectively trailing" if no rendering sibling follows it.
-	const len = children.length;
-	const hasRenderingBefore = new Array<boolean>(len);
-	const hasRenderingAfter = new Array<boolean>(len);
+	const length = children.length;
+	const hasRenderingBefore: boolean[] = Array.from({ length });
+	const hasRenderingAfter: boolean[] = Array.from({ length });
 	let seenBefore = false;
 	let seenAfter = false;
-	for (let i = 0; i < len; i++) {
+	for (let i = 0; i < length; i++) {
 		hasRenderingBefore[i] = seenBefore;
 		if (isRenderingSibling(children[i])) seenBefore = true;
-		const j = len - 1 - i;
+		const j = length - 1 - i;
 		hasRenderingAfter[j] = seenAfter;
 		if (isRenderingSibling(children[j])) seenAfter = true;
 	}
 
 	// Remove pure-whitespace nodes at the effectively-leading or
 	// effectively-trailing edges of the container
-	for (let i = len - 1; i >= 0; i--) {
+	for (let i = length - 1; i >= 0; i--) {
 		if (isWhitespaceText(children[i]) && (!hasRenderingBefore[i] || !hasRenderingAfter[i])) {
 			children.splice(i, 1);
 		}

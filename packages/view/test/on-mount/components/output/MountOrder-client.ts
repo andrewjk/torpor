@@ -12,12 +12,9 @@ import type SlotRender from "../../../../src/types/SlotRender";
 export default function MountOrder(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	// @ts-ignore
-	$props?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$context?: Record<PropertyKey, any>,
-	// @ts-ignore
-	$slots?: Record<string, SlotRender>,
+	_$props?: Record<PropertyKey, any>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, SlotRender>,
 ): void {
 
 	let $state = $watch({ order: "" });
@@ -38,7 +35,6 @@ export default function MountOrder(
 	});
 
 	/* User interface */
-	const t_fragments: DocumentFragment[] = [];
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p>#</p>`);

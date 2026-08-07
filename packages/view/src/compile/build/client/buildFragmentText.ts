@@ -24,7 +24,13 @@ export default function buildFragmentText(
 	buildNodeFragmentText(node, status, fragments);
 
 	if (fragments.length) {
-		b.append(`const t_fragments: DocumentFragment[] = [];`);
+		// `t_fragments` is only referenced by the `t_fragment` codegen path
+		// (multi-root fragments). Single-root-element fragments take the
+		// `t_fragment_el` path and never touch `t_fragments`, so declaring it
+		// there would leave it unused.
+		if (fragments.some((f) => !f.singleRootElement)) {
+			b.append(`const t_fragments: DocumentFragment[] = [];`);
+		}
 		// The single-root-element cache stores the cached `firstElementChild`
 		// directly (no DocumentFragment wrapper). Only emitted when at least
 		// one fragment in this component takes the `t_fragment_el` codegen

@@ -32,14 +32,14 @@ const pageSource = `
 export default function Page($props: any) {
 	let $state = $watch({ count: 0 });
 	@render {
-		<p>The count is {\$props.count}.</p>
-		<button onclick={() => \$state.count++}>Increment</button>
+		<p>The count is {$props.count}.</p>
+		<button onclick={() => $state.count++}>Increment</button>
 		<form>
 			<input type="number" name="count" />
 			<button type="submit">Set via server</button>
 		</form>
-		@if (\$props?.form?.message) {
-			<p style="color: green">{\$props.form.message}</p>
+		@if ($props?.form?.message) {
+			<p style="color: green">{$props.form.message}</p>
 		}
 	}
 }
@@ -54,7 +54,7 @@ const SSR_HTML =
 	"<![>" + // slot hydration start
 	"<p>The count is 0.</p> " +
 	"<button>Increment</button> " +
-	"<form><input type=\"number\" name=\"count\"><button type=\"submit\">Set via server</button></form> " +
+	'<form><input type="number" name="count"><button type="submit">Set via server</button></form> ' +
 	"<![><!]><!>" + // trailing @if (false branch): markers consumed, anchor remains
 	"<!]>" + // slot hydration end
 	"<!>" + // slot anchor

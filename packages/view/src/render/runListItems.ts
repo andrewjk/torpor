@@ -98,7 +98,7 @@ export default function runListItems(
 	update: (oldItem: ListItem, newSpec: ListItemSpec) => void,
 	noWatch?: boolean,
 ): ListItem[] {
-	const newItems: ListItem[] = new Array(newSpecs.length);
+	const newItems: ListItem[] = Array.from({ length: newSpecs.length });
 
 	// Capture the region that follows the entire list BEFORE reconciliation —
 	// `clearRegion` during the messy middle releases old items and nulls their
@@ -212,7 +212,7 @@ export default function runListItems(
 			//     + 1` (0 marks a new slot that has no matching old item and
 			//     must be mounted).
 			const newMidLen = newEnd - newStart + 1;
-			const newIndexToOld = new Array<number>(newMidLen).fill(0);
+			const newIndexToOld = Array.from({ length: newMidLen }).fill(0) as number[];
 			for (let i = oldStart; i <= oldEnd; i++) {
 				const oldItem = oldItems[i]!;
 				const newIdx = newKeyToIndex.get(oldItem.key);
@@ -235,8 +235,7 @@ export default function runListItems(
 			let j = seq.length - 1;
 			for (let i = newMidLen - 1; i >= 0; i--) {
 				const newIdx = newStart + i;
-				const before =
-					newIdx + 1 < newSpecs.length ? newItems[newIdx + 1]!.startNode : anchor;
+				const before = newIdx + 1 < newSpecs.length ? newItems[newIdx + 1]!.startNode : anchor;
 				if (newIndexToOld[i] === 0) {
 					// No matching old item → mount.
 					newItems[newIdx] = mountSpec(newSpecs[newIdx]!, region, before, create, noWatch);
