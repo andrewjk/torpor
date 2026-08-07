@@ -24,7 +24,7 @@ describe("ListBox", () => {
 		const item1 = getByText(container, "Content 1");
 		item1.focus();
 
-		item1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		item1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 
 		expect(document.activeElement).toBe(getByText(container, "Content 2"));
 	});

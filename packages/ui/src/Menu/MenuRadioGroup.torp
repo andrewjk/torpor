@@ -31,9 +31,35 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 		value: $props?.value,
 	});
 
+	// Update $state on $props change
+	$run(() => {
+		$state.value = $props?.value;
+	});
+
+	// Update $props on $state change
 	$run(() => {
 		if ($props !== undefined) {
 			$props.value = $state.value;
+		}
+	});
+
+	// Sync the checked state of all items from the group value
+	$run(() => {
+		let value = $state.value;
+		for (let item of itemStates) {
+			item.checked = item.value === value;
+		}
+	});
+
+	// Dispatch the change event when the value changes
+	let firstChange = true;
+	$run(() => {
+		const onchange = $props?.onchange;
+		const value = $state.value;
+		if (firstChange) {
+			firstChange = false;
+		} else if (onchange) {
+			onchange(value);
 		}
 	});
 
@@ -44,47 +70,13 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	};
 	$context[MenuRadioGroupContextName] = context;
 
-	$mount(() => {
-		// Set the initial checked item
-		setValue($props?.value);
-	});
-
 	function registerItemInGroup(item: RadioGroupItemState) {
 		itemStates.push(item);
 		item.checked = item.value === $state.value;
 	}
 
-	function setValue(newValue?: string) {
-		// No point doing this if there aren't any items yet (e.g. from the initial setValue() call)
-		if (!itemStates.length) {
-			return;
-		}
-
-		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
-		newValue = newValue?.toString();
-		for (let item of itemStates) {
-			item.checked = item.value === newValue;
-		}
-
-		// Set the value
-		if ($state.value !== newValue) {
-			$state.value = newValue;
-
-			if ($props?.onchange) {
-				$props?.onchange($state.value);
-			}
-		}
-	}
-
 	function toggleItem(toggleValue: string) {
-		let newValue = "";
-		for (let item of itemStates) {
-			item.checked = item.value === toggleValue;
-			if (item.checked) {
-				newValue = item.value;
-			}
-		}
-		$state.value = newValue;
+		$state.value = toggleValue;
 	}
 
 	@render {

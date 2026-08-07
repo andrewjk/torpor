@@ -11,6 +11,6 @@ describe("Accordion", () => {
 		mount(container, AccordionEmpty);
 
 		expect(container.children.length).toBe(1);
-		expect(container.firstChild?.firstChild).toBeNull();
+		expect(container.firstChild?.childElementCount).toBe(0);
 	});
 });

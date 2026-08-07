@@ -56,7 +56,7 @@ describe("ComboBox", () => {
 		await userEvent.keyboard("ca");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Backspace" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Backspace", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
 		await userEvent.keyboard("t");
@@ -114,7 +114,7 @@ describe("ComboBox", () => {
 		await userEvent.keyboard("ca");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 
 		expect(document.activeElement).toBe(queryAllByText(container, "Chinchilla").at(-1));
 	});
@@ -130,7 +130,7 @@ describe("ComboBox", () => {
 		button.focus();
 
 		await userEvent.keyboard("ca");
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Enter" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 
 		expect(button.textContent.trim()).toBe("Cat");
 	});
@@ -147,7 +147,7 @@ describe("ComboBox", () => {
 
 		await userEvent.keyboard("ca");
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 
 		await userEvent.keyboard("d");
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
@@ -167,7 +167,7 @@ describe("ComboBox", () => {
 		input.focus();
 
 		await userEvent.keyboard("ca");
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 
 		expect(list).toHaveAttribute("aria-hidden", "true");
 	});

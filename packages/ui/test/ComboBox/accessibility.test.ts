@@ -45,7 +45,7 @@ describe("ComboBox", () => {
 		// combobox has aria-expanded set to false. When the popup element is
 		// visible, aria-expanded is set to true. Note that elements with role
 		// combobox have a default value for aria-expanded of false
-		fireEvent(button, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(button, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 		expect(list).toHaveAttribute("aria-hidden", "true");
 		expect(button).toHaveAttribute("aria-expanded", "false");
 		await userEvent.click(button);

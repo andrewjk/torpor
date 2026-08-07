@@ -422,7 +422,7 @@ function parseComponentEnd(status: ParseStatus) {
 }
 
 function getPropsUsage(source: string): string[] | undefined {
-	const propsMatches = source.matchAll(/\$props\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
+	const propsMatches = source.matchAll(/\$props\??\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const props: string[] = [];
 	for (let match of propsMatches) {
 		const name = trimQuotes(match[1] || match[2]);
@@ -434,7 +434,7 @@ function getPropsUsage(source: string): string[] | undefined {
 }
 
 function getContextUsage(source: string): string[] | undefined {
-	const contextsMatches = source.matchAll(/\$context\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
+	const contextsMatches = source.matchAll(/\$context\??\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const contexts: string[] = [];
 	for (let match of contextsMatches) {
 		const name = trimQuotes(match[1] || match[2]);

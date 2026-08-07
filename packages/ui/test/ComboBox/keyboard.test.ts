@@ -35,25 +35,25 @@ describe("ComboBox", () => {
 		//   ^^^ see below, after testing autocomplete
 		// - Otherwise, places focus on the first focusable element in the
 		//   popup
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(getList()).not.toHaveAttribute("aria-hidden");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
 		// Up Arrow (Optional): If the popup is available, places focus on the
 		// last focusable element in the popup
-		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 		expect(getList()).toHaveAttribute("aria-hidden", "true");
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
 		// Escape: Dismisses the popup if it is visible. Optionally, if the
 		// popup is hidden before Escape is pressed, clears the combobox
 		// NOTE: I don't think we can clear the combobox because we don't know
 		// what the cleared value would be in all cases?
-		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 		await userEvent.click(input); // show
 		expect(getList()).not.toHaveAttribute("aria-hidden");
-		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 		expect(getList()).toHaveAttribute("aria-hidden", "true");
 		expect(document.activeElement).toBe(input);
 
@@ -64,12 +64,12 @@ describe("ComboBox", () => {
 		// messaging application, the default action may be to add the accepted
 		// value to a list of message recipients and then clear the combobox so
 		// the user can add another recipient
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(getList()).not.toHaveAttribute("aria-hidden");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Chinchilla"));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Enter" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 		expect(input.value).toBe("Chinchilla");
 		expect(getList()).toHaveAttribute("aria-hidden", "true");
 		expect(document.activeElement).toBe(input);
@@ -90,7 +90,7 @@ describe("ComboBox", () => {
 		// - Closes the popup
 
 		// When focus is in a listbox popup:
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(getList()).not.toHaveAttribute("aria-hidden");
 		queryByText(container, "Cat")!.focus();
 
@@ -98,7 +98,7 @@ describe("ComboBox", () => {
 		// popup, placing the accepted value in the combobox, and if the
 		// combobox is editable, placing the input cursor at the end of the
 		// value
-		fireEvent(queryByText(container, "Cat")!, new KeyboardEvent("keydown", { key: "Enter" }));
+		fireEvent(queryByText(container, "Cat")!, new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
 		expect(input.value).toBe("Cat");
 		expect(getList()).toHaveAttribute("aria-hidden", "true");
 		expect(document.activeElement).toBe(input);
@@ -109,7 +109,7 @@ describe("ComboBox", () => {
 		await userEvent.click(input); // show
 		expect(getList()).not.toHaveAttribute("aria-hidden");
 		queryByText(container, "Dog")!.focus();
-		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "Escape" }));
+		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
 		expect(input.value).toBe("Cat");
 		expect(getList()).toHaveAttribute("aria-hidden", "true");
 
@@ -123,24 +123,24 @@ describe("ComboBox", () => {
 		await userEvent.click(input);
 		expect(queryByText(container, "Dog")).toBeInTheDocument();
 		queryByText(container, "Cat")!.focus();
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(document.activeElement).toBe(queryAllByText(container, "Chinchilla").at(-1));
 		fireEvent(
 			queryAllByText(container, "Chinchilla").at(-1)!,
-			new KeyboardEvent("keydown", { key: "ArrowDown" }),
+			new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }),
 		);
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
-		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
 		// Up Arrow: Moves focus to and selects the previous option. If focus is
 		// on the first option, either returns focus to the combobox or does
 		// nothing
-		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
 		expect(document.activeElement).toBe(queryAllByText(container, "Chinchilla").at(-1));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
 		// NOTE: N/A:
@@ -158,13 +158,13 @@ describe("ComboBox", () => {
 		// End (Optional): Either moves focus to the last option or, if the
 		// combobox is editable, returns focus to the combobox and places the
 		// cursor after the last character
-		fireEvent(queryByText(container, "Cat")!, new KeyboardEvent("keydown", { key: "End" }));
+		fireEvent(queryByText(container, "Cat")!, new KeyboardEvent("keydown", { key: "End", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
 		// Home (Optional): Either moves focus to and selects the first option
 		// or, if the combobox is editable, returns focus to the combobox and
 		// places the cursor on the first character
-		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "Home" }));
+		fireEvent(queryByText(container, "Dog")!, new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
 		// TODO:
@@ -194,7 +194,7 @@ describe("ComboBox", () => {
 
 		input.focus();
 
-		fireEvent(input, new KeyboardEvent("keydown", { key: "Tab" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
 
 		expect(document.activeElement).not.toBe(input);
 	});
@@ -214,10 +214,10 @@ describe("ComboBox", () => {
 
 		input.focus();
 
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(input).toHaveAttribute("aria-activedescendant", catItem?.id);
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(input).toHaveAttribute("aria-activedescendant", chinchillaItem?.id);
 	});
 
@@ -234,10 +234,10 @@ describe("ComboBox", () => {
 
 		queryByText(container, "Cat")!.focus();
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "d" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "d", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "c" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "c", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Chinchilla"));
 	});
 
@@ -251,15 +251,15 @@ describe("ComboBox", () => {
 
 		input.focus();
 
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "End" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "End", bubbles: true }));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Home" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "End" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "End", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 	});
 
@@ -278,7 +278,7 @@ describe("ComboBox", () => {
 
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: " " }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: " ", bubbles: true }));
 
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 	});
@@ -293,12 +293,12 @@ describe("ComboBox", () => {
 
 		input.focus();
 
-		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowUp" }));
+		fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
-		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown" }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		fireEvent(document.activeElement!, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 	});
 });
