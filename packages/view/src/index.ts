@@ -12,6 +12,7 @@ import t_fragment from "./render/getFragment";
 import t_fragment_el from "./render/getElementFragment";
 import hydrate from "./render/hydrate";
 import mount from "./render/mount";
+import unmount from "./render/unmount";
 import t_list_item from "./render/newListItem";
 import t_region from "./render/newRegion";
 import t_anchor from "./render/nodeAnchor";
@@ -45,7 +46,7 @@ import $watch from "./watch/$watch";
 import ReactiveDate from "./wrappers/ReactiveDate";
 
 // Mount and hydrate
-export { mount, hydrate, fillLayoutSlot, clearLayoutSlot };
+export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
 export { $watch, $cache, $run, $mount, $unwrap, $peek, $batch };

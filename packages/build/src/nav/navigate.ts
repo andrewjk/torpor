@@ -1,6 +1,6 @@
 import { clearLayoutSlot, fillLayoutSlot, hydrate } from "@torpor/view";
 import { type Component, type SlotRender } from "@torpor/view";
-import { mount } from "@torpor/view";
+import { mount, unmount } from "@torpor/view";
 import $page from "../state/$page";
 import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
@@ -160,6 +160,13 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		} else if (withHydration) {
 			hydrate(parent, component, $props, slots);
 		} else {
+			// The layout chain changed (or there was no previous layout to
+			// reuse): tear down the previous UI entirely — disposing its
+			// region tree and clearing `#app` — so `mount` starts fresh.
+			// Without this, `mount` throws because `#app` still holds the
+			// previous render's children, and it would reuse a stale root
+			// region.
+			unmount(parent);
 			mount(parent, component, $props, slots);
 		}
 	} catch (error) {
