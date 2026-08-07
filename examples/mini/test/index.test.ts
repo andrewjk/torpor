@@ -4,11 +4,13 @@ import { node } from "@torpor/adapter-node";
 import { Site } from "@torpor/build";
 import { runTest } from "@torpor/build/test";
 import { ServerEvent } from "@torpor/build/server";
+import path from "node:path";
 import { beforeAll, expect, test } from "vite-plus/test";
 
 import addRoutes from "../src/routes";
 
 const site: Site = new Site();
+site.root = path.join(import.meta.dirname, "..");
 site.adapter = node;
 
 beforeAll(() => {

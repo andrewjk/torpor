@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { buildFiles2 } from "./buildOutputFiles";
 
@@ -19,16 +18,12 @@ export default async function importComponent(
 	//let componentName = component.substring(start, end).trim();
 
 	let componentPath = path.join(path.dirname(testFile), "components", componentName);
-	await buildFiles2(componentPath, source);
+	const built = await buildFiles2(componentPath, source);
 
-	const destFolder = path.join(path.dirname(componentPath), "temp");
-	let destFile = fs
-		.readdirSync(destFolder)
-		.find((f) => f.startsWith(`${path.basename(componentPath, ".torp")}-${suffix}-`));
+	const destFile = built[suffix];
 	if (!destFile) {
 		throw new Error("Component file not found");
 	}
-	destFile = path.join(destFolder, destFile);
 
 	return (await import(destFile)).default;
 }

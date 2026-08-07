@@ -3,9 +3,11 @@ import "@testing-library/jest-dom/vitest";
 import { node } from "@torpor/adapter-node";
 import { Site } from "@torpor/build";
 import { runTest } from "@torpor/build/test";
+import path from "node:path";
 import { beforeAll, expect, test } from "vite-plus/test";
 
 const site: Site = new Site();
+site.root = path.join(import.meta.dirname, "..");
 site.adapter = node;
 
 beforeAll(async () => {

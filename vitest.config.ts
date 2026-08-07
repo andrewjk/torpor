@@ -1,13 +1,7 @@
 import { type ViteUserConfigFnObject, defineConfig } from "vite-plus";
-import torpor from "./packages/unplugin/dist/vite.mjs";
 
-export default defineConfig(({ mode }) => ({
-	plugins: [torpor()],
-	resolve: {
-		conditions: mode === "test" ? ["browser"] : [],
-	},
+export default defineConfig(() => ({
 	test: {
-		environment: "jsdom",
-		setupFiles: "./vitest.setup.ts",
+		projects: ["packages/*", "packages/adapters/*", "examples/*"],
 	},
 })) satisfies ViteUserConfigFnObject as ViteUserConfigFnObject;

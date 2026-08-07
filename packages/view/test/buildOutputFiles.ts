@@ -1,6 +1,6 @@
 import fg from "fast-glob";
 import crypto from "node:crypto";
-import { existsSync, promises as fs, unlinkSync } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import build from "../src/compile/build";
 import buildType from "../src/compile/buildType";
@@ -16,75 +16,70 @@ export default async function buildOutputFiles(componentPath: string): Promise<v
 	//console.log("Done\n");
 }
 
-export async function buildFiles(file: string): Promise<void> {
+export async function buildFiles(file: string): Promise<Record<string, string>> {
 	//console.log(`Building files for ${file.substring(path.resolve("./test").length)}`);
 
 	const source = await fs.readFile(file, "utf8");
-	await buildFiles2(file, source);
+	return buildFiles2(file, source);
 }
 
-export async function buildFiles2(file: string, source: string): Promise<void> {
+export async function buildFiles2(
+	file: string,
+	source: string,
+): Promise<Record<string, string>> {
 	const parsed = parse(source);
+	const result: Record<string, string> = {};
 	if (parsed.ok && parsed.template) {
 		let serverCode = formatCode(build(parsed.template, { server: true }).code, "server");
 		let clientCode = formatCode(build(parsed.template).code, "client");
 		//let clientMap = formatMap(source, build(parsed.template, { mapped: true }));
 		let typesCode = formatCode(buildType(parsed.template), "types");
-		await maybeWriteFile(file, clientCode, "client");
-		await maybeWriteFile(file, serverCode, "server");
+		result.client = await maybeWriteFile(file, clientCode, "client");
+		result.server = await maybeWriteFile(file, serverCode, "server");
 		//await maybeWriteFile(file, clientMap, "map");
-		await maybeWriteFile(file, typesCode, "types");
+		result.types = await maybeWriteFile(file, typesCode, "types");
 	} else {
 		// Just log the message and continue with output/testing
 		console.log("PARSE FAILED for " + file);
 		console.log(parsed.errors.map((e) => e.message).join("\n"));
 	}
+	return result;
 }
 
-async function maybeWriteFile(file: string, code: string, suffix: string) {
+async function maybeWriteFile(file: string, code: string, suffix: string): Promise<string> {
 	//const hash = await hashFileContents(code);
 	const hash = hashFileCode(code);
 
-	// If the hashed file doesn't exist, update it and the output file
-	let outputFile = file
+	// Cache key: a content-hashed file in /temp/. We must NOT delete sibling
+	// hash files here — a single test file can compile several distinct
+	// components that share the same derived name (e.g. several inline sources
+	// in one .test.ts), and evicting siblings would throw out their caches and
+	// force a rebuild on every run.
+	const tempFile = file
 		.replace("/components/", "/components/temp/")
 		.replace(".torp", `-${suffix}-${hash}.ts`);
-	if (!existsSync(outputFile)) {
+	if (!existsSync(tempFile)) {
 		console.log(`Building files for ${file}`);
 
-		if (!existsSync(path.dirname(file))) {
-			await fs.mkdir(path.dirname(file));
+		const tempDir = path.dirname(tempFile);
+		if (!existsSync(tempDir)) {
+			await fs.mkdir(tempDir, { recursive: true });
 		}
 
-		let outputFolder = path.dirname(outputFile);
-		if (!existsSync(outputFolder)) {
-			await fs.mkdir(outputFolder);
-		}
+		// Create the hashed cache file
+		await fs.writeFile(tempFile, code);
 
-		// Delete old files
-		const glob = `${path.basename(file, ".torp")}-${suffix}-*.ts`;
-		const oldFiles = await fg(glob, {
-			absolute: true,
-			cwd: path.resolve(outputFolder),
-		});
-		oldFiles.forEach((f) => {
-			if (existsSync(f)) {
-				unlinkSync(f);
-			}
-		});
-
-		// Create the new hash file
-		await fs.writeFile(outputFile, code);
-
-		// Create the new output file
-		outputFile = file
+		// Create the importable output file
+		const outputFile = file
 			.replace("/components/", "/components/output/")
 			.replace(".torp", `-${suffix}.ts`);
 		if (!existsSync(path.dirname(outputFile))) {
-			await fs.mkdir(path.dirname(outputFile));
+			await fs.mkdir(path.dirname(outputFile), { recursive: true });
 		}
 		await fs.writeFile(outputFile, code);
 	}
+
+	return tempFile;
 }
 
 function hashFileCode(code: string) {
