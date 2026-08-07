@@ -4,8 +4,8 @@ import type ServerSlotRender from "./ServerSlotRender";
  * A component that generates HTML
  */
 type ServerComponent = (
-	$props?: Record<string, any>,
-	$context?: Record<string, any>,
+	$props?: Record<PropertyKey, any>,
+	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
 ) => { body: string; head: string };
 

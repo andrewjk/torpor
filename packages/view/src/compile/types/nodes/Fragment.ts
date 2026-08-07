@@ -34,4 +34,13 @@ export default interface Fragment {
 	 * (e.g. `@for` rows in the js-framework-bench `run`/`add`/`runlots` ops).
 	 */
 	singleRootElement?: boolean;
+	/**
+	 * `false` when the fragment is never rendered through the
+	 * `buildFragment` cache path (which is what references the `t_fragments`
+	 * / `t_fragment_els` arrays). Currently only `@html` branches, which build
+	 * their content at runtime from an innerHTML string and only use the
+	 * fragment's `number` for naming. Excludes such fragments from the
+	 * decision to declare `t_fragments`, avoiding an unused declaration.
+	 */
+	usesFragmentCache?: boolean;
 }

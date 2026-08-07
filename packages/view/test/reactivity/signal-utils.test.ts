@@ -36,6 +36,7 @@ test("multiple rapid sets to same value", () => {
 		},
 	});
 
+	// oxlint-disable-next-line no-unused-expressions
 	$derived.computed;
 	expect(readCount).toBe(1);
 
@@ -43,6 +44,7 @@ test("multiple rapid sets to same value", () => {
 	$state.value = 2;
 	$state.value = 3;
 
+	// oxlint-disable-next-line no-unused-expressions
 	$derived.computed;
 	expect($derived.computed).toBe(3);
 });
@@ -73,10 +75,12 @@ test("setting different value triggers", () => {
 		},
 	});
 
+	// oxlint-disable-next-line no-unused-expressions
 	$derived.computed;
 	expect(runCount).toBe(1);
 
 	$state.value = 10;
+	// oxlint-disable-next-line no-unused-expressions
 	$derived.computed;
 	expect(runCount).toBe(2);
 });

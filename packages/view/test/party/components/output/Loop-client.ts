@@ -23,7 +23,6 @@ export default function Colors(
 	const colors = ["red", "green", "blue"];
 
 	/* User interface */
-	const t_fragments: DocumentFragment[] = [];
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);

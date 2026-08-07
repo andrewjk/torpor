@@ -82,9 +82,9 @@ export default function ForFollowedByIf(
 			if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
-			const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p>after</p>`);
-			const t_root_3 = t_root_el(t_fragment_3);
-			const t_p_1 = t_root_3 as HTMLElement;
+			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>after</p>`);
+			const t_root_2 = t_root_el(t_fragment_2);
+			const t_p_1 = t_root_2 as HTMLElement;
 			t_add_element(t_p_1, t_fragment_0, t_before);
 			t_next(t_p_1);
 			t_pop_region(t_old_region);

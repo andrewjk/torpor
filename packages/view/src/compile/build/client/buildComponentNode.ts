@@ -212,7 +212,7 @@ export default function buildComponentNode(
 					// would have a problem with the $slot param passed to
 					// the Parent component
 					slot.hasSlotProps
-						? "// @ts-ignore\n$slot: Record<PropertyKey, any>"
+						? "$slot: Record<PropertyKey, any>"
 						: "_$slot?: Record<PropertyKey, any>",
 					"// @ts-ignore\n// eslint-disable-next-line no-unused-vars\n$context?: Record<PropertyKey, any>",
 				];

@@ -8,6 +8,7 @@ import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import getSingleElementRoot from "../../utils/getSingleElementRoot";
 import isReactive from "../../utils/isReactive";
+import { NON_RENDERING_OPERATIONS } from "../../utils/nonRenderingOperations";
 import trimQuotes from "../../utils/trimQuotes";
 import voidTags from "../../utils/voidTags";
 import type BuildStatus from "./BuildStatus";
@@ -28,7 +29,7 @@ export default function buildFragmentText(
 		// (multi-root fragments). Single-root-element fragments take the
 		// `t_fragment_el` path and never touch `t_fragments`, so declaring it
 		// there would leave it unused.
-		if (fragments.some((f) => !f.singleRootElement)) {
+		if (fragments.some((f) => !f.singleRootElement && f.usesFragmentCache !== false)) {
 			b.append(`const t_fragments: DocumentFragment[] = [];`);
 		}
 		// The single-root-element cache stores the cached `firstElementChild`
@@ -121,6 +122,17 @@ function buildControlFragmentText(
 			break;
 		}
 		default: {
+			// Non-rendering nodes (@const, @key, @function, ...) produce no DOM,
+			// so they must not spawn their own fragment. Spawning one here would
+			// leave an empty multi-root fragment that forces the `t_fragments`
+			// cache to be declared even when every rendering fragment is a
+			// single-root element (leaving `t_fragments` unused).
+			if (NON_RENDERING_OPERATIONS.has(node.operation)) {
+				for (let child of node.children) {
+					buildNodeFragmentText(child, status, fragments, currentFragment);
+				}
+				break;
+			}
 			// Add a new fragment if it's a control branch and it has children
 			node.fragment = {
 				number: fragments.length,
@@ -130,6 +142,11 @@ function buildControlFragmentText(
 				events: [],
 				animations: [],
 				singleRootElement: getSingleElementRoot(node.children) !== undefined,
+				// `@html` builds its content at runtime from an innerHTML string
+				// (see buildHtmlNode) and only uses this fragment's `number` for
+				// naming — it never goes through the `buildFragment` cache path, so
+				// it must not force an unused `t_fragments` declaration.
+				usesFragmentCache: node.operation !== "@html",
 			};
 			fragments.push(node.fragment);
 			for (let child of node.children) {

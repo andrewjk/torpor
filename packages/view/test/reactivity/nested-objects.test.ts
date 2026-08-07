@@ -93,7 +93,7 @@ test("reactive object with array sort", () => {
 		numbers: [3, 1, 4, 1, 5, 9, 2, 6],
 	});
 
-	$state.numbers.sort();
+	$state.numbers.sort((a, b) => a - b);
 	expect($state.numbers.length).toBe(8);
 	expect($state.numbers[0]).toBe(1);
 	expect($state.numbers[1]).toBe(1);

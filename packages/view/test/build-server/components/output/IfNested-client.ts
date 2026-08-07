@@ -17,9 +17,7 @@ export default function IfNested(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { counter: number },
-	// @ts-ignore
 	_$context?: Record<PropertyKey, any>,
-	// @ts-ignore
 	_$slots?: Record<string, SlotRender>,
 ): void {
 

@@ -1,6 +1,5 @@
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
-import t_attribute from "../../../../src/render/setAttribute";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";

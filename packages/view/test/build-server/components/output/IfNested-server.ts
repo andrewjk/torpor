@@ -2,9 +2,7 @@ import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function IfNested(
 	$props: { counter: number },
-	// @ts-ignore
 	_$context?: Record<PropertyKey, any>,
-	// @ts-ignore
 	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
 	let t_body = "";

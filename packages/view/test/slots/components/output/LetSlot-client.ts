@@ -43,7 +43,6 @@ export default function Let(
 	t_slots_1["_"] = (
 		$sparent: ParentNode,
 		$sanchor: Node | null,
-		// @ts-ignore
 		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
 		// eslint-disable-next-line no-unused-vars

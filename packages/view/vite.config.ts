@@ -6,6 +6,7 @@ export default defineConfig({
 		format: ["esm", "cjs"],
 	},
 	lint: {
+		// TODO: Why doesn't this work? Why do we need .oxlintrc.json?
 		ignorePatterns: ["test/**/output"],
 		options: {
 			typeAware: true,
@@ -20,5 +21,9 @@ export default defineConfig({
 		rules: {
 			"vite-plus/prefer-vite-plus-imports": "error",
 		},
+	},
+	fmt: {
+		// TODO: Why doesn't this work?
+		ignorePatterns: ["test/**/output"],
 	},
 }) satisfies UserConfig as UserConfig;

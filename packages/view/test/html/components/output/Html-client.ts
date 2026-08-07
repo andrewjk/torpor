@@ -18,7 +18,6 @@ export default function Html(
 ): void {
 
 	/* User interface */
-	const t_fragments: DocumentFragment[] = [];
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p><!></p>`);

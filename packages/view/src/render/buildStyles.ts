@@ -26,6 +26,7 @@ function gatherStyles(value: unknown, styles: string[]) {
 				styles.push(`${key}: ${v}`);
 			}
 		} else {
+			// oxlint-disable-next-line typescript/no-base-to-string
 			styles.push(String(value));
 		}
 	}

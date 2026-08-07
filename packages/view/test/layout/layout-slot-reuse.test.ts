@@ -1,11 +1,13 @@
 import { queryAllByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import { clearLayoutSlot, fillLayoutSlot, hydrate } from "@torpor/view";
 import { expect, test } from "vite-plus/test";
-import type Component from "../src/types/Component";
-import type Region from "../src/types/Region";
-import type SlotRender from "../src/types/SlotRender";
+import type Region from "../../src/types/Region";
+import type SlotRender from "../../src/types/SlotRender";
 import importComponent from "../importComponent";
+import Component from "../../src/types/Component";
+import fillLayoutSlot from "../../src/render/fillLayoutSlot";
+import clearLayoutSlot from "../../src/render/clearLayoutSlot";
+import hydrate from "../../src/render/hydrate";
 
 // A layout with a <header> (its own child) followed by <slot/>. This mirrors
 // examples/mini/src/Layout.torp, and is the shape that broke client-side

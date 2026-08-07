@@ -183,7 +183,6 @@ function buildElementAttributes(
 					status,
 				);
 			} else if (name === "style") {
-				status.imports.add("t_attribute");
 				status.imports.add("t_style");
 				stashRun(fragment, `${varName}.style.cssText += t_style(`, value, ");", span, status);
 			} else if (name.includes("-")) {
