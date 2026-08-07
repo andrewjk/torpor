@@ -51,16 +51,18 @@ export default function Let(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `#`);
-		const t_text_1 = t_root(t_fragment_2);
+		const t_root_2 = t_root(t_fragment_2, true);
+		const t_text_1 = t_root_2;
 		$run(() => {
 			t_text_1.textContent = ` ${t_fmt($slot.item.text)} `;
 		});
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
 		t_next(t_text_1);
 	}
 	List(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -78,7 +80,8 @@ function List(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
-	const t_ul_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_ul_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 
 	/* @for */
@@ -97,7 +100,8 @@ function List(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><!></li>`);
-			const t_li_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_li_1 = t_root_1 as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
 			const t_slot_props_1 = $watch({
 				item: t_item_1.data.item,

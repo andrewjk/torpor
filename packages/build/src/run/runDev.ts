@@ -21,6 +21,10 @@ export default async function runDev(site: Site): Promise<void> {
 	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
 	config.resolve ??= {};
 	config.resolve.tsconfigPaths ??= true;
+	// Resolve `@torpor/view` (runtime, compiler, SSR) from source in dev mode
+	// so changes to the compiler take effect without rebuilding dist.
+	config.resolve.conditions ??= [];
+	config.resolve.conditions.push("development");
 	// vite-plus' `tsconfigPaths` isn't honored by the SSR module-runner's
 	// externalization path (it hardcodes tsconfigPaths:false), so dev SSR can't
 	// resolve path aliases. Mirror tsconfig `compilerOptions.paths` as Vite

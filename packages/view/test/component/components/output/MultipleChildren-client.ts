@@ -41,7 +41,7 @@ export default function MultipleChildren(
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<h1>Title</h1> <p>Body text</p> <footer>Footer</footer>`);
 		const t_root_2 = t_root(t_fragment_2);
 		const t_footer_1 = t_next(t_next(t_next(t_next(t_root_2, true)), true)) as HTMLElement;
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_footer_1);
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_footer_1, t_root_2);
 		t_next(t_footer_1);
 	}
 	Card(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
@@ -51,7 +51,7 @@ export default function MultipleChildren(
 	$run(() => {
 		t_text_1.textContent = t_fmt($props.text);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }
@@ -71,7 +71,8 @@ function Card(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div class="card"><!></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	let t_slot_anchor_1 = t_anchor(t_child(t_div_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)

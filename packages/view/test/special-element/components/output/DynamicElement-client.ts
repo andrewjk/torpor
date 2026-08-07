@@ -25,7 +25,7 @@ export default function DynamicTag(
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1, t_root_0);
 	t_next(t_element_1);
 
 }

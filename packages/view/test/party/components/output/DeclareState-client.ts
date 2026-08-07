@@ -28,7 +28,8 @@ export default function Name(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<h1>#</h1>`);
-	const t_h1_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_h1_1 = t_root_0 as HTMLElement;
 	const t_text_1 = t_child(t_h1_1);
 	$run(() => {
 		t_text_1.textContent = `Hello ${t_fmt($state.name)}`;

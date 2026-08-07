@@ -31,7 +31,7 @@ export default function SpecialElementAttrs(
 	$run(() => {
 		t_text_1.textContent = ` ${t_fmt($props.content)} `;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1, t_root_0);
 	t_next(t_element_1);
 
 }

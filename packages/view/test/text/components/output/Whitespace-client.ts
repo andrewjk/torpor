@@ -20,7 +20,8 @@ export default function PreHydrate(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<pre>line1 line2 line3</pre>`);
-	const t_pre_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_pre_1 = t_root_0 as HTMLElement;
 	t_add_element(t_pre_1, $parent, $anchor);
 	t_next(t_pre_1);
 

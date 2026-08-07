@@ -66,7 +66,8 @@ export default function ColorSelect(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<option>#</option>`);
-			const t_option_1 = t_root_el(t_fragment_1) as HTMLOptionElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_option_1 = t_root_1 as HTMLOptionElement;
 			const t_text_2 = t_child(t_option_1);
 			$run(() => {
 				t_attribute(t_option_1, "value", t_item_1.data.color.id);
@@ -94,7 +95,7 @@ export default function ColorSelect(
 	$run(() => {
 		t_text_1.textContent = `Selected: ${t_fmt(colors[$state.selectedColorId - 1].text)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_select_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_select_1, t_root_0);
 	t_next(t_select_1);
 
 }

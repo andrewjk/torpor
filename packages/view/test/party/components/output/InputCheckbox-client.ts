@@ -39,7 +39,7 @@ export default function IsAvailable(
 	$run(() => {
 		t_text_1.textContent = t_fmt($state.isAvailable ? "Available" : "Not available");
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_label_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_label_1, t_root_0);
 	t_next(t_label_1);
 
 }

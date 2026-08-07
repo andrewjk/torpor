@@ -20,7 +20,8 @@ export default function Console(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	/* @console */
 	console.log("@console is logging here");
 	t_add_element(t_div_1, $parent, $anchor);

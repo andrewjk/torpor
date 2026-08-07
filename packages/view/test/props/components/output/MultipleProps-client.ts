@@ -48,7 +48,8 @@ export default function MultipleProps(
 	});
 	Card(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -67,7 +68,8 @@ function Card(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div><h2>#</h2> <h3>#</h3> <p>#</p> <!></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	const t_text_1 = t_child(t_child(t_div_1));
 	const t_text_2 = t_child(t_next(t_next(t_child(t_div_1), true)));
 	const t_text_3 = t_child(t_next(t_next(t_next(t_next(t_child(t_div_1), true)), true)));
@@ -82,7 +84,8 @@ function Card(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<span>Active</span>`);
-			const t_span_1 = t_root_el(t_fragment_1) as HTMLSpanElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_span_1 = t_root_1 as HTMLSpanElement;
 			t_add_element(t_span_1, t_div_1, t_before);
 			t_next(t_span_1);
 			t_pop_region(t_old_region);
@@ -93,7 +96,8 @@ function Card(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<span>Inactive</span>`);
-			const t_span_2 = t_root_el(t_fragment_2) as HTMLSpanElement;
+			const t_root_2 = t_root_el(t_fragment_2);
+			const t_span_2 = t_root_2 as HTMLSpanElement;
 			t_add_element(t_span_2, t_div_1, t_before);
 			t_next(t_span_2);
 			t_pop_region(t_old_region);

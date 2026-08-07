@@ -20,7 +20,8 @@ export default function AttrBoolean(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<button>Click</button> <input type="checkbox"> <input type="text">`);
-	const t_button_1 = t_root(t_fragment_0) as HTMLButtonElement;
+	const t_root_0 = t_root(t_fragment_0);
+	const t_button_1 = t_root_0 as HTMLButtonElement;
 	const t_input_1 = t_next(t_next(t_button_1, true)) as HTMLInputElement;
 	const t_input_2 = t_next(t_next(t_input_1, true)) as HTMLInputElement;
 	$run(() => {
@@ -28,7 +29,7 @@ export default function AttrBoolean(
 		t_attribute(t_input_1, "checked", $props.checked);
 		t_attribute(t_input_2, "readonly", $props.readonly);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_input_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_input_2, t_root_0);
 	t_next(t_input_2);
 
 }

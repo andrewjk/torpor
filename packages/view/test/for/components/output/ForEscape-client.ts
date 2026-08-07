@@ -34,7 +34,8 @@ export default function ForEscape(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><!></section>`);
-	const t_section_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_section_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
@@ -73,7 +74,7 @@ export default function ForEscape(
 				t_attribute(t_div_3, "name", things[t_item_1.data.i]);
 				t_attribute(t_input_1, "name", `${t_item_1.data.i}`);
 			});
-			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1);
+			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1, t_root_1);
 			t_next(t_input_1);
 		},
 		(t_old_item, t_new_item) => {

@@ -54,7 +54,8 @@ export default function ForWithIfElse(
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, `<!>`);
-			let t_if_anchor_1 = t_anchor(t_root(t_fragment_1)) as HTMLElement;
+			const t_root_1 = t_root(t_fragment_1);
+			let t_if_anchor_1 = t_anchor(t_root_1) as HTMLElement;
 
 			/* @if */
 			const t_if_region_1 = t_region();
@@ -65,7 +66,8 @@ export default function ForWithIfElse(
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
 					const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<button class="active">#</button>`);
-					const t_button_1 = t_root_el(t_fragment_2) as HTMLButtonElement;
+					const t_root_2 = t_root_el(t_fragment_2);
+					const t_button_1 = t_root_2 as HTMLButtonElement;
 					const t_text_1 = t_child(t_button_1);
 					$run(() => {
 						t_text_1.textContent = t_fmt(t_item_1.data.tab);
@@ -80,7 +82,8 @@ export default function ForWithIfElse(
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
 					const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<button>#</button>`);
-					const t_button_2 = t_root_el(t_fragment_3) as HTMLButtonElement;
+					const t_root_3 = t_root_el(t_fragment_3);
+					const t_button_2 = t_root_3 as HTMLButtonElement;
 					const t_text_2 = t_child(t_button_2);
 					$run(() => {
 						t_text_2.textContent = t_fmt(t_item_1.data.tab);
@@ -92,7 +95,8 @@ export default function ForWithIfElse(
 				}
 			});
 
-			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1);
+			t_add_fragment(t_fragment_1, t_for_parent_1, t_before_1, t_if_anchor_1, t_root_1);
+			t_next(t_if_anchor_1);
 			t_pop_region(t_old_region_1);
 		},
 		(t_old_item, t_new_item) => {
@@ -105,7 +109,7 @@ export default function ForWithIfElse(
 	$run(() => {
 		t_text_3.textContent = `Active: ${t_fmt($props.activeTab)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }

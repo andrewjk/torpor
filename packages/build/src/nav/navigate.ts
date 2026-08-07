@@ -98,6 +98,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	// TODO: There's probably a nicer way to do this with reducers or something
 	let component = clientEndPoint.component as Component;
 	let slots: Record<string, SlotRender> | undefined = undefined;
+	let reused = false;
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
@@ -119,12 +120,11 @@ export default async function navigate(url: URL, withHydration = false): Promise
 				?.default;
 			if (layoutEndPoint?.component) {
 				if (layoutStack[i].reuse) {
-					// Set the parent to add the new content to (from the old
-					// content), clear the range under this point, and set the
-					// component to the slot function within this layout
-					parent = layoutStack[i].slotRegion.startNode.parentNode as HTMLElement;
-					clearLayoutSlot(layoutStack[i].slotRegion);
-					component = slotFunctions[i + 1];
+					// Reuse this layout — clear and refill its slot (done in
+					// the try block below so a failure doesn't leave the slot
+					// half-cleared)
+					component = slotFunctions[i + 1] as Component;
+					reused = true;
 					break;
 				} else if (i === 0) {
 					component = layoutEndPoint.component as Component;
@@ -145,16 +145,27 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		}
 	}
 
-	if (withHydration) {
-		hydrate(parent, component, $props, slots);
-	} else {
-		try {
+	try {
+		if (reused) {
+			// The layout is being reused — clear the old slot content, then
+			// call the slot function directly to fill it with the new page.
+			// We must not go through `mount` here: the slot's container still
+			// holds the layout's own children (e.g. a header), which `mount`
+			// refuses to mount into. Both the clear and the fill are inside
+			// the try so that a failure doesn't leave the slot half-cleared.
+			const slotRegion = layoutStack[layoutStack.length - 1].slotRegion;
+			parent = slotRegion.startNode!.parentNode as HTMLElement;
+			clearLayoutSlot(slotRegion);
+			component(parent, null);
+		} else if (withHydration) {
+			hydrate(parent, component, $props, slots);
+		} else {
 			mount(parent, component, $props, slots);
-		} catch (error) {
-			// TODO: Show a proper Error component
-			parent.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
-			console.log(error);
 		}
+	} catch (error) {
+		// TODO: Show a proper Error component
+		parent.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+		console.log(error);
 	}
 
 	// Reset prefetched data on each navigation

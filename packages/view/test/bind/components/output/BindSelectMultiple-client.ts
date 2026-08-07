@@ -21,7 +21,8 @@ export default function MultiSelectBind(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<select multiple><option value="a">A</option><option value="b">B</option><option value="c">C</option></select>`);
-	const t_select_1 = t_root_el(t_fragment_0) as HTMLSelectElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_select_1 = t_root_0 as HTMLSelectElement;
 	$run(() => {
 		Array.from(t_select_1.options).forEach((opt) => opt.selected = Array.isArray($props.values) && $props.values.includes(opt.value));
 	});

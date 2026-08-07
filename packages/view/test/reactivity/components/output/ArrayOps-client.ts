@@ -50,7 +50,8 @@ export default function ReactiveNewProp(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li>#</li>`);
-			const t_li_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.item);
@@ -80,7 +81,7 @@ export default function ReactiveNewProp(
 		t_text_4.textContent = `Last: ${t_fmt($props.items[$props.items.length - 1])}`;
 		t_text_5.textContent = `New: ${t_fmt($props.newItem)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }

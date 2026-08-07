@@ -40,7 +40,8 @@ export default function UserProfileApp(
 	});
 	UserProfile(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -75,7 +76,7 @@ function UserProfile(
 		t_text_3.textContent = `My favourite colors are ${t_fmt($props.favoriteColors.join(", "))}!`;
 		t_text_4.textContent = `I am ${t_fmt($props.isAvailable ? "available" : "not available")}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }

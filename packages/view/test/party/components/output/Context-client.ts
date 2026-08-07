@@ -44,7 +44,8 @@ export default function UserProfileContextApp(
 	$run(() => {
 		t_text_1.textContent = `Welcome back, ${t_fmt($user.username)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -74,7 +75,7 @@ function UserProfileContext(
 		t_text_1.textContent = `Username: ${t_fmt($context.user.username)}`;
 		t_text_2.textContent = `Email: ${t_fmt($context.user.email)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_button_1, t_root_0);
 	t_next(t_button_1);
 
 }

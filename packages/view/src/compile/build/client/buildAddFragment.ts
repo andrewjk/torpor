@@ -43,7 +43,9 @@ export default function buildAddFragment(
 			// endNode)`. Saves the `firstChild` / `lastChild` reads and the
 			// `DocumentFragment`-aware branches inside `t_add_fragment`.
 			status.imports.add("t_add_element");
-			b.append(`t_add_element(${fragment.endVarName ?? fragmentName}, ${parentName}, ${anchorName});`);
+			b.append(
+				`t_add_element(${fragment.endVarName ?? fragmentName}, ${parentName}, ${anchorName});`,
+			);
 			if (fragment.endVarName) {
 				status.imports.add("t_next");
 				b.append(`t_next(${fragment.endVarName});`);
@@ -53,6 +55,14 @@ export default function buildAddFragment(
 			let params = [fragmentName, parentName, anchorName];
 			if (fragment.endVarName) {
 				params.push(fragment.endVarName);
+			}
+			// Pass the root node so `addFragment` can restore the active
+			// region's `startNode` during hydration. Child component rendering
+			// (via `addElement`) overwrites `startNode` before `addFragment`
+			// runs; without this, the region's bounds are wrong and slot
+			// reuse clears the wrong parent.
+			if (fragment.endVarName && fragment.rootVarName) {
+				params.push(fragment.rootVarName);
 			}
 			b.append(`t_add_fragment(${params.join(", ")});`);
 			// TODO: Don't need to do this if the last thing we hydrated was the end node

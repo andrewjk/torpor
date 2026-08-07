@@ -32,7 +32,7 @@ export default function Text(
 		t_text_1.textContent = ` ${t_fmt($props.value)} `;
 		t_text_2.textContent = t_fmt($props.empty);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }

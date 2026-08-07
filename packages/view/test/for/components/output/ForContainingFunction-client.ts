@@ -29,7 +29,8 @@ export default function ForContainingIf(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><!></section>`);
-	const t_section_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_section_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
@@ -48,7 +49,8 @@ export default function ForContainingIf(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<button>#</button>`);
-			const t_button_1 = t_root_el(t_fragment_1) as HTMLButtonElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_button_1 = t_root_1 as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
 			t_event(t_button_1, "click", doit);
 

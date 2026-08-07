@@ -45,7 +45,8 @@ export default function SlotDefault(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>Default content</p>`);
-		const t_p_1 = t_root_el(t_fragment_2) as HTMLElement;
+		const t_root_2 = t_root_el(t_fragment_2);
+		const t_p_1 = t_root_2 as HTMLElement;
 		t_add_element(t_p_1, $sparent, $sanchor);
 		t_next(t_p_1);
 	}
@@ -62,7 +63,8 @@ export default function SlotDefault(
 	});
 	ListWithItems(t_fragment_0, t_comp_anchor_2, t_props_1, $context);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_2, t_root_0);
+	t_next(t_comp_anchor_2);
 
 }
 
@@ -81,13 +83,15 @@ function List(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
-	const t_ul_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_ul_1 = t_root_0 as HTMLElement;
 	let t_slot_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_ul_1, t_slot_anchor_1, undefined, $context)
 	} else {
 		const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li>Empty list</li>`);
-		const t_li_1 = t_root_el(t_fragment_1) as HTMLElement;
+		const t_root_1 = t_root_el(t_fragment_1);
+		const t_li_1 = t_root_1 as HTMLElement;
 		t_add_element(t_li_1, t_ul_1, t_slot_anchor_1);
 		t_next(t_li_1);
 	}
@@ -111,7 +115,8 @@ function ListWithItems(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
-	const t_ul_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_ul_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 
 	/* @for */
@@ -130,7 +135,8 @@ function ListWithItems(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li>#</li>`);
-			const t_li_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.item);

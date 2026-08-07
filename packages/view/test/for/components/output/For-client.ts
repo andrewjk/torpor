@@ -28,7 +28,8 @@ export default function For(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><!></section>`);
-	const t_section_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_section_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_section_1)) as HTMLElement;
 
 	/* @for */
@@ -47,7 +48,8 @@ export default function For(
 		},
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<p>#</p>`);
-			const t_p_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_p_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_p_1);
 			$run(() => {
 				t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)} `;

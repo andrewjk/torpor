@@ -33,7 +33,8 @@ export default function IfForSwitchCombo(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<!>`);
-	let t_if_anchor_1 = t_anchor(t_root(t_fragment_0)) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0);
+	let t_if_anchor_1 = t_anchor(t_root_0) as HTMLElement;
 
 	/* @if */
 	const t_if_region_1 = t_region();
@@ -44,7 +45,8 @@ export default function IfForSwitchCombo(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<p>No todos</p>`);
-			const t_p_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_p_1 = t_root_1 as HTMLElement;
 			t_add_element(t_p_1, t_fragment_0, t_before);
 			t_next(t_p_1);
 			t_pop_region(t_old_region);
@@ -55,7 +57,8 @@ export default function IfForSwitchCombo(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<!>`);
-			let t_for_anchor_1 = t_anchor(t_root(t_fragment_2)) as HTMLElement;
+			const t_root_2 = t_root(t_fragment_2);
+			let t_for_anchor_1 = t_anchor(t_root_2) as HTMLElement;
 
 			/* @for */
 			let t_for_region_1 = t_region();
@@ -74,7 +77,8 @@ export default function IfForSwitchCombo(
 				(t_item_1, t_before_1) => {
 					let t_old_region_1 = t_push_region(t_item_1);
 					const t_fragment_3 = t_fragment($parent.ownerDocument!, t_fragments, 3, `<!>`);
-					let t_if_anchor_2 = t_anchor(t_root(t_fragment_3)) as HTMLElement;
+					const t_root_3 = t_root(t_fragment_3);
+					let t_if_anchor_2 = t_anchor(t_root_3) as HTMLElement;
 
 					/* @if */
 					const t_if_region_2 = t_region();
@@ -85,7 +89,8 @@ export default function IfForSwitchCombo(
 							const t_new_region = t_region();
 							const t_old_region = t_push_region(t_new_region, true);
 							const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<li><!></li>`);
-							const t_li_1 = t_root_el(t_fragment_4) as HTMLElement;
+							const t_root_4 = t_root_el(t_fragment_4);
+							const t_li_1 = t_root_4 as HTMLElement;
 							let t_switch_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
 
 							/* @switch */
@@ -98,7 +103,8 @@ export default function IfForSwitchCombo(
 										const t_new_region = t_region();
 										const t_old_region = t_push_region(t_new_region, true);
 										const t_fragment_5 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 5, `<strong>#</strong>`);
-										const t_strong_1 = t_root_el(t_fragment_5) as HTMLElement;
+										const t_root_5 = t_root_el(t_fragment_5);
+										const t_strong_1 = t_root_5 as HTMLElement;
 										const t_text_1 = t_child(t_strong_1);
 										$run(() => {
 											t_text_1.textContent = `[HIGH] ${t_fmt(t_item_1.data.todo.text)}`;
@@ -114,7 +120,8 @@ export default function IfForSwitchCombo(
 										const t_new_region = t_region();
 										const t_old_region = t_push_region(t_new_region, true);
 										const t_fragment_6 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 6, `<em>#</em>`);
-										const t_em_1 = t_root_el(t_fragment_6) as HTMLElement;
+										const t_root_6 = t_root_el(t_fragment_6);
+										const t_em_1 = t_root_6 as HTMLElement;
 										const t_text_2 = t_child(t_em_1);
 										$run(() => {
 											t_text_2.textContent = `[low] ${t_fmt(t_item_1.data.todo.text)}`;
@@ -130,7 +137,8 @@ export default function IfForSwitchCombo(
 										const t_new_region = t_region();
 										const t_old_region = t_push_region(t_new_region, true);
 										const t_fragment_7 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 7, `<span>#</span>`);
-										const t_span_1 = t_root_el(t_fragment_7) as HTMLSpanElement;
+										const t_root_7 = t_root_el(t_fragment_7);
+										const t_span_1 = t_root_7 as HTMLSpanElement;
 										const t_text_3 = t_child(t_span_1);
 										$run(() => {
 											t_text_3.textContent = `[med] ${t_fmt(t_item_1.data.todo.text)}`;
@@ -155,7 +163,8 @@ export default function IfForSwitchCombo(
 						}
 					});
 
-					t_add_fragment(t_fragment_3, t_fragment_2, t_before_1);
+					t_add_fragment(t_fragment_3, t_fragment_2, t_before_1, t_if_anchor_2, t_root_3);
+					t_next(t_if_anchor_2);
 					t_pop_region(t_old_region_1);
 				},
 				(t_old_item, t_new_item) => {
@@ -163,12 +172,14 @@ export default function IfForSwitchCombo(
 				}
 			);
 
-			t_add_fragment(t_fragment_2, t_fragment_0, t_before);
+			t_add_fragment(t_fragment_2, t_fragment_0, t_before, t_for_anchor_1, t_root_2);
+			t_next(t_for_anchor_1);
 			t_pop_region(t_old_region);
 			t_if_index_1 = 1;
 		}
 	});
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_if_anchor_1, t_root_0);
+	t_next(t_if_anchor_1);
 
 }

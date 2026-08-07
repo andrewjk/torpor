@@ -6,6 +6,7 @@ export default function addFragment(
 	parent: ParentNode,
 	before: Node | null,
 	endNode?: ChildNode,
+	startNode?: ChildNode,
 ): void {
 	//console.log(`adding fragment '${fragment.textContent}' to `, parent);
 	//console.log("before", before);
@@ -13,8 +14,14 @@ export default function addFragment(
 	const activeRegion = context.activeRegion;
 	const hydrationNode = context.hydrationNode;
 
-	// Set the active region's end node to the last node in the fragment
+	// Set the active region's start/end nodes to the first and last nodes in
+	// the fragment. During hydration, child component rendering (via
+	// `addElement`) may have overwritten these — the `startNode` parameter
+	// (the root node) restores the correct bounds.
 	if (hydrationNode !== null) {
+		if (startNode !== undefined) {
+			activeRegion.startNode = startNode;
+		}
 		activeRegion.endNode = endNode ?? hydrationNode;
 	} else {
 		activeRegion.startNode = fragment.firstChild;

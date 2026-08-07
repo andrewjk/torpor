@@ -20,13 +20,14 @@ export default function ClassString(
 	const t_fragments: DocumentFragment[] = [];
 
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p> Concatenated </p> <p> Joined </p>`);
-	const t_p_1 = t_root(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root(t_fragment_0);
+	const t_p_1 = t_root_0 as HTMLElement;
 	const t_p_2 = t_next(t_next(t_p_1, true)) as HTMLElement;
 	$run(() => {
 		t_p_1.className = t_class("box " + $props.size + " " + $props.color);
 		t_p_2.className = t_class(["tag", $props.size, $props.color].join(" "));
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_2);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_2, t_root_0);
 	t_next(t_p_2);
 
 }

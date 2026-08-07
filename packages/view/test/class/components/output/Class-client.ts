@@ -48,8 +48,9 @@ export default function Class(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Class filtered `);
-		const t_text_1 = t_root(t_fragment_2);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
+		const t_root_2 = t_root(t_fragment_2, true);
+		const t_text_1 = t_root_2;
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
 		t_next(t_text_1);
 	}
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
@@ -73,8 +74,9 @@ export default function Class(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_4 = t_fragment($parent.ownerDocument!, t_fragments, 4, ` Child class 1 `);
-		const t_text_2 = t_root(t_fragment_4);
-		t_add_fragment(t_fragment_4, $sparent, $sanchor, t_text_2);
+		const t_root_4 = t_root(t_fragment_4, true);
+		const t_text_2 = t_root_4;
+		t_add_fragment(t_fragment_4, $sparent, $sanchor, t_text_2, t_root_4);
 		t_next(t_text_2);
 	}
 	Child(t_fragment_0, t_comp_anchor_2, t_props_2, $context, t_slots_2);
@@ -95,8 +97,9 @@ export default function Class(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_6 = t_fragment($parent.ownerDocument!, t_fragments, 6, ` Child class 2 `);
-		const t_text_3 = t_root(t_fragment_6);
-		t_add_fragment(t_fragment_6, $sparent, $sanchor, t_text_3);
+		const t_root_6 = t_root(t_fragment_6, true);
+		const t_text_3 = t_root_6;
+		t_add_fragment(t_fragment_6, $sparent, $sanchor, t_text_3, t_root_6);
 		t_next(t_text_3);
 	}
 	Child(t_fragment_0, t_comp_anchor_3, t_props_3, $context, t_slots_3);
@@ -108,8 +111,8 @@ export default function Class(
 		t_div_3.className = t_class([ "foo", false, true && "baz", undefined ], "torp-16s1yph");
 		t_div_4.className = t_class([ "foo", 0, { bar: true }, "", [1 && "baz", ["qux"]] ], "torp-16s1yph");
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_div_4);
-	t_next(t_div_4);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_3, t_root_0);
+	t_next(t_comp_anchor_3);
 
 }
 
@@ -127,14 +130,16 @@ function Child(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div data-state="active"><!></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	let t_slot_anchor_1 = t_anchor(t_child(t_div_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_div_1, t_slot_anchor_1, undefined, $context)
 	} else {
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Child class `);
-		const t_text_1 = t_root(t_fragment_1);
-		t_add_fragment(t_fragment_1, t_div_1, t_slot_anchor_1, t_text_1);
+		const t_root_1 = t_root(t_fragment_1, true);
+		const t_text_1 = t_root_1;
+		t_add_fragment(t_fragment_1, t_div_1, t_slot_anchor_1, t_text_1, t_root_1);
 		t_next(t_text_1);
 	}
 	$run(() => {

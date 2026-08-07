@@ -26,7 +26,8 @@ export default function SvgDynamic(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<svg viewBox="0 0 100 100" role="img"><!></svg>`);
-	const t_svg_1 = t_root_el(t_fragment_0) as SVGElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_svg_1 = t_root_0 as SVGElement;
 	let t_if_anchor_1 = t_anchor(t_child(t_svg_1)) as HTMLElement;
 
 	/* @if */
@@ -38,7 +39,8 @@ export default function SvgDynamic(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<circle cx="50" cy="50" r="40" fill="blue"></circle>`, true);
-			const t_circle_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_circle_1 = t_root_1 as HTMLElement;
 			t_add_element(t_circle_1, t_svg_1, t_before);
 			t_next(t_circle_1);
 			t_pop_region(t_old_region);
@@ -49,7 +51,8 @@ export default function SvgDynamic(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<rect x="10" y="10" width="80" height="80" fill="green"></rect>`, true);
-			const t_rect_1 = t_root_el(t_fragment_2) as SVGRectElement;
+			const t_root_2 = t_root_el(t_fragment_2);
+			const t_rect_1 = t_root_2 as SVGRectElement;
 			t_add_element(t_rect_1, t_svg_1, t_before);
 			t_next(t_rect_1);
 			t_pop_region(t_old_region);
@@ -60,7 +63,8 @@ export default function SvgDynamic(
 			const t_new_region = t_region();
 			const t_old_region = t_push_region(t_new_region, true);
 			const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<polygon points="50,10 90,90 10,90" fill="red"></polygon>`, true);
-			const t_polygon_1 = t_root_el(t_fragment_3) as HTMLElement;
+			const t_root_3 = t_root_el(t_fragment_3);
+			const t_polygon_1 = t_root_3 as HTMLElement;
 			t_add_element(t_polygon_1, t_svg_1, t_before);
 			t_next(t_polygon_1);
 			t_pop_region(t_old_region);

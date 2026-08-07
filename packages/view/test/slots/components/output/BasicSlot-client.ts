@@ -38,13 +38,15 @@ export default function Basic(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Basic stuff `);
-		const t_text_1 = t_root(t_fragment_2);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
+		const t_root_2 = t_root(t_fragment_2, true);
+		const t_text_1 = t_root_2;
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
 		t_next(t_text_1);
 	}
 	Header(t_fragment_0, t_comp_anchor_1, undefined, $context, t_slots_1);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -63,14 +65,16 @@ function Header(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<h2><!></h2>`);
-	const t_h2_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_h2_1 = t_root_0 as HTMLElement;
 	let t_slot_anchor_1 = t_anchor(t_child(t_h2_1)) as HTMLElement;
 	if ($slots && $slots["_"]) {
 		$slots["_"](t_h2_1, t_slot_anchor_1, undefined, $context)
 	} else {
 		const t_fragment_1 = t_fragment($parent.ownerDocument!, t_fragments, 1, ` Default header... `);
-		const t_text_1 = t_root(t_fragment_1);
-		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1, t_text_1);
+		const t_root_1 = t_root(t_fragment_1, true);
+		const t_text_1 = t_root_1;
+		t_add_fragment(t_fragment_1, t_h2_1, t_slot_anchor_1, t_text_1, t_root_1);
 		t_next(t_text_1);
 	}
 	t_add_element(t_h2_1, $parent, $anchor);

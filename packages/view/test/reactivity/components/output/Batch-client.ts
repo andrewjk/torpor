@@ -33,7 +33,7 @@ export default function BatchTest(
 		t_text_3.textContent = `C: ${t_fmt($props.c)}`;
 		t_text_4.textContent = `Sum: ${t_fmt($props.a + $props.b + $props.c)}`;
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_p_1, t_root_0);
 	t_next(t_p_1);
 
 }

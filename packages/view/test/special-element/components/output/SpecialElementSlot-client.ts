@@ -43,13 +43,15 @@ export default function Element(
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, ` Hello! `);
-		const t_text_1 = t_root(t_fragment_2);
-		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1);
+		const t_root_2 = t_root(t_fragment_2, true);
+		const t_text_1 = t_root_2;
+		t_add_fragment(t_fragment_2, $sparent, $sanchor, t_text_1, t_root_2);
 		t_next(t_text_1);
 	}
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context, t_slots_1);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -75,7 +77,7 @@ function Child(
 	$run(() => {
 		t_element_1 = t_dynamic(t_element_1, $props.tag);
 	});
-	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_element_1, t_root_0);
 	t_next(t_element_1);
 
 }

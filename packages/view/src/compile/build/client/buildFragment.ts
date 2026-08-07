@@ -7,7 +7,6 @@ import type TemplateNode from "../../types/nodes/TemplateNode";
 import type TextNode from "../../types/nodes/TextNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
-import isElementNode from "../../utils/isElementNode";
 import isReactive from "../../utils/isReactive";
 import isSpecialNode from "../../utils/isSpecialNode";
 import isTextNode from "../../utils/isTextNode";
@@ -119,47 +118,34 @@ function maybeAddRootNodeDeclaration(
 ) {
 	if (!node.children.length) return;
 
-	// We need to store the root node of the fragment for subsequent updates of the fragment
-	// But not if the node would be declared anyway
-	let firstNode = node.children[0];
-	let firstNodeIsLastNode = node.children.length === 1;
-	if (
-		(isControlNode(firstNode) && firstNode.operation.endsWith(" group")) ||
-		(isElementNode(firstNode) &&
-			elementNodeNeedsDeclaration(firstNode, true, firstNodeIsLastNode)) ||
-		(isTextNode(firstNode) && textNodeNeedsDeclaration(firstNode, true, firstNodeIsLastNode))
-	) {
-		// It's going to be declared later on
-	} else {
-		const rootName = `t_root_${fragment.number}`;
-		// The text flag must reflect the first node that actually renders to the
-		// DOM, because non-rendering nodes (e.g. @key, @const, comments) produce
-		// no fragment output. Trimming leading whitespace can otherwise leave
-		// such a node as the first child and produce a mismatched flag.
-		const firstRendering = firstRenderingChild(node.children);
-		const isTextRoot = !!(firstRendering && isTextNode(firstRendering));
+	// Always create a root variable. We need it both for subsequent node
+	// traversal AND to pass to `t_add_fragment` so it can restore the active
+	// region's `startNode` during hydration (child component rendering via
+	// `addElement` overwrites it before `addFragment` runs).
+	const rootName = `t_root_${fragment.number}`;
+	const firstRendering = firstRenderingChild(node.children);
+	const isTextRoot = !!(firstRendering && isTextNode(firstRendering));
 
-		// For single-root-element fragments built via `t_fragment_el`, the
-		// cloned element IS the root — there's no DocumentFragment to call
-		// `firstChild` on. Use `t_root_el`, which passes the element straight
-		// through in the non-hydrating case and performs the same hydration
-		// cursor walk as `t_root` when hydrating. Text roots can't take this
-		// path (text-root fragments aren't marked `singleRootElement`).
-		const rootFn = fragment.singleRootElement ? "t_root_el" : "t_root";
-		status.imports.add(rootFn);
-		const params = [fragmentName];
-		if (!fragment.singleRootElement && isTextRoot) {
-			params.push("true");
-		}
-		const rootPath = `${rootFn}(${params.join(", ")})`;
-		b.append(`const ${rootName} = ${rootPath};`);
-		// Register the root access for shortening so subsequent
-		// `declareFragmentVars` traversals reuse `rootName` instead of
-		// re-emitting the (matching) root function call.
-		varPaths.set(`${rootFn}(${fragmentName})`, rootName);
-
-		printDebug(rootName, status, b);
+	const rootFn = fragment.singleRootElement ? "t_root_el" : "t_root";
+	status.imports.add(rootFn);
+	const params = [fragmentName];
+	if (!fragment.singleRootElement && isTextRoot) {
+		params.push("true");
 	}
+	const rootPath = `${rootFn}(${params.join(", ")})`;
+	b.append(`const ${rootName} = ${rootPath};`);
+	// Register the root access for shortening so subsequent
+	// `declareFragmentVars` traversals reuse `rootName` instead of
+	// re-emitting the (matching) root function call.
+	varPaths.set(`${rootFn}(${fragmentName})`, rootName);
+	// Track the root variable for `t_add_fragment` (only needed for
+	// multi-root fragments — single-root uses `t_add_element` which already
+	// sets both start/end correctly).
+	if (!fragment.singleRootElement) {
+		fragment.rootVarName = rootName;
+	}
+
+	printDebug(rootName, status, b);
 }
 
 /**
@@ -727,6 +713,15 @@ function declareParentAndAnchorFragmentVars(
 		path.children.push(anchorPath);
 
 		node.varName = nextVarName(`${name}_anchor`, status);
+		// A top-level control node or component is the last node in its
+		// fragment (its anchor comment is emitted after the preceding
+		// elements). Track it as the fragment's end node so that region
+		// clearing covers the whole fragment — mirroring what
+		// `declareElementFragmentVars` / `declareTextFragmentVars` do for
+		// element and text children.
+		if (topLevel) {
+			fragment.endVarName = node.varName;
+		}
 		const anchorVarPath = getFragmentVarPath(fragment, status, node.varName, anchorPath, varPaths);
 		if (status.options.useCreateElement === true) {
 			b.append(`let ${node.varName};`);

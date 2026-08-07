@@ -23,7 +23,8 @@ export default function StyleKebab(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div> Kebab case </div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	$run(() => {
 		t_div_1.style.cssText += t_style({ marginLeft: "10px", marginRight: "20px", backgroundColor: "green" });
 	});

@@ -21,7 +21,8 @@ export default function ClassFalsy(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p> Falsy values </p>`);
-	const t_p_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_p_1 = t_root_0 as HTMLElement;
 	$run(() => {
 		t_p_1.className = t_class({ a: $props.a, b: $props.b, c: $props.c, d: $props.d, e: $props.e, f: $props.f });
 	});

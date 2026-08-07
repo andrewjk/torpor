@@ -21,7 +21,8 @@ export default function AttrNull(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div data-count=""> Content </div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	$run(() => {
 		t_attribute(t_div_1, "title", $props.title);
 		t_attribute(t_div_1, "aria-label", $props.label);

@@ -30,7 +30,8 @@ export default function SwitchInFor(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<ul><!></ul>`);
-	const t_ul_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_ul_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_child(t_ul_1)) as HTMLElement;
 
 	/* @for */
@@ -50,7 +51,8 @@ export default function SwitchInFor(
 		(t_item_1, t_before_1) => {
 			let t_old_region_1 = t_push_region(t_item_1);
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><!></li>`);
-			const t_li_1 = t_root_el(t_fragment_1) as HTMLElement;
+			const t_root_1 = t_root_el(t_fragment_1);
+			const t_li_1 = t_root_1 as HTMLElement;
 			let t_switch_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
 
 			/* @switch */
@@ -63,7 +65,8 @@ export default function SwitchInFor(
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
 						const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<strong>#</strong>`);
-						const t_strong_1 = t_root_el(t_fragment_2) as HTMLElement;
+						const t_root_2 = t_root_el(t_fragment_2);
+						const t_strong_1 = t_root_2 as HTMLElement;
 						const t_text_1 = t_child(t_strong_1);
 						$run(() => {
 							t_text_1.textContent = `${t_fmt(t_item_1.data.item.name)} (admin)`;
@@ -79,7 +82,8 @@ export default function SwitchInFor(
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
 						const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<span>#</span>`);
-						const t_span_1 = t_root_el(t_fragment_3) as HTMLSpanElement;
+						const t_root_3 = t_root_el(t_fragment_3);
+						const t_span_1 = t_root_3 as HTMLSpanElement;
 						const t_text_2 = t_child(t_span_1);
 						$run(() => {
 							t_text_2.textContent = `${t_fmt(t_item_1.data.item.name)} (user)`;
@@ -95,7 +99,8 @@ export default function SwitchInFor(
 						const t_new_region = t_region();
 						const t_old_region = t_push_region(t_new_region, true);
 						const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<em>#</em>`);
-						const t_em_1 = t_root_el(t_fragment_4) as HTMLElement;
+						const t_root_4 = t_root_el(t_fragment_4);
+						const t_em_1 = t_root_4 as HTMLElement;
 						const t_text_3 = t_child(t_em_1);
 						$run(() => {
 							t_text_3.textContent = `${t_fmt(t_item_1.data.item.name)} (unknown)`;

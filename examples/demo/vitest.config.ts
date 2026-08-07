@@ -5,7 +5,7 @@ export default defineConfig(({ mode }) => ({
 	plugins: [torpor({ test: true })],
 	resolve: {
 		conditions: mode === "test" ? ["browser"] : [],
-		tsconfigPaths: true
+		tsconfigPaths: true,
 	},
 	test: {
 		environment: "happy-dom",

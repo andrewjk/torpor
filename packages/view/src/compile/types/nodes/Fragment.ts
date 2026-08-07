@@ -18,6 +18,13 @@ export default interface Fragment {
 	animations: string[];
 	endVarName?: string;
 	/**
+	 * The variable name holding the fragment's first DOM node (the root).
+	 * Used to restore the active region's `startNode` during hydration —
+	 * child component rendering (via `addElement`) can overwrite it before
+	 * `addFragment` runs.
+	 */
+	rootVarName?: string;
+	/**
 	 * Set during `buildFragmentText` when the fragment has exactly one
 	 * rendering root child and that child is an `Element`. The compiler then
 	 * emits the `t_fragment_el` / `t_root_el` / `t_add_element` path, which

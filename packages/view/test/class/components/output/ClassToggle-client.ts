@@ -21,7 +21,8 @@ export default function ClassToggle(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p> Toggle class </p>`);
-	const t_p_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_p_1 = t_root_0 as HTMLElement;
 	$run(() => {
 		t_p_1.className = t_class({ active: $props.active, emphasis: $props.emphasis, base: true });
 	});

@@ -21,7 +21,8 @@ export default function OnMount(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<input>`);
-	const t_input_1 = t_root_el(t_fragment_0) as HTMLInputElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_input_1 = t_root_0 as HTMLInputElement;
 	// @ts-ignore
 	$mount(() => {
 		return ((node) => node.value = "hi")(t_input_1);

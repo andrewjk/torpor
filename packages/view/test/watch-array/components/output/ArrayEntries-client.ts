@@ -27,7 +27,8 @@ export default function ArrayEntries(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<section><p>^</p> <!> <p>$</p></section>`);
-	const t_section_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_section_1 = t_root_0 as HTMLElement;
 	let t_for_anchor_1 = t_anchor(t_next(t_next(t_child(t_section_1), true))) as HTMLElement;
 
 	/* @for */

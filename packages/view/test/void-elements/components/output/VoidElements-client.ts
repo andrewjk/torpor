@@ -20,7 +20,8 @@ export default function VoidElements(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<div><input type="text" placeholder="type here"> <br> <hr> <img src="test.jpg" alt="test"> <p>After void elements</p></div>`);
-	const t_div_1 = t_root_el(t_fragment_0) as HTMLDivElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_div_1 = t_root_0 as HTMLDivElement;
 	t_add_element(t_div_1, $parent, $anchor);
 	t_next(t_div_1);
 

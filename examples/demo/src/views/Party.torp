@@ -22,6 +22,10 @@ import ColorSelect from "./PartyComponents/ColorSelect.torp";
 
 export default function Party() {
 	@render {
+		<h1>Party</h1>
+
+		<Nav />
+
 		<p>
 			Examples from <a href="https://component-party.dev">Component Party</a>.
 		</p>

@@ -181,21 +181,26 @@ export default function setDevMode(): void {
 	devContext.onRegionCleared = (region: Region) => {
 		let nextRegion: Region | null = region;
 		while (true) {
-			let match = nextRegion.name!.match(/.+?\[(.+?)\]/);
-			if (match !== null && match.length > 0) {
-				const id = match[1];
-				let i = devContext.boundaries.findIndex((b) => b.id === id);
-				if (i !== -1) {
-					let depth = devContext.boundaries[i].depth;
-					let start = i;
-					let end = devContext.boundaries.length;
-					for (i++; i < devContext.boundaries.length; i++) {
-						if (devContext.boundaries[i].depth <= depth) {
-							end = i;
-							break;
+			// Some regions (e.g. @if branch content created via t_region()
+			// without a label) have no name — skip the boundary lookup for
+			// those but keep walking the chain.
+			if (nextRegion.name) {
+				let match = nextRegion.name.match(/.+?\[(.+?)\]/);
+				if (match !== null && match.length > 0) {
+					const id = match[1];
+					let i = devContext.boundaries.findIndex((b) => b.id === id);
+					if (i !== -1) {
+						let depth = devContext.boundaries[i].depth;
+						let start = i;
+						let end = devContext.boundaries.length;
+						for (i++; i < devContext.boundaries.length; i++) {
+							if (devContext.boundaries[i].depth <= depth) {
+								end = i;
+								break;
+							}
 						}
+						devContext.boundaries.splice(start, end - start);
 					}
-					devContext.boundaries.splice(start, end - start);
 				}
 			}
 			nextRegion = nextRegion.nextRegion;

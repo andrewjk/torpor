@@ -41,7 +41,8 @@ export default function Reactive(
 	});
 	Child(t_fragment_0, t_comp_anchor_1, t_props_1, $context);
 
-	t_add_fragment(t_fragment_0, $parent, $anchor);
+	t_add_fragment(t_fragment_0, $parent, $anchor, t_comp_anchor_1, t_root_0);
+	t_next(t_comp_anchor_1);
 
 }
 
@@ -60,7 +61,8 @@ function Child(
 	const t_fragment_els: Element[] = [];
 
 	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p>#</p>`);
-	const t_p_1 = t_root_el(t_fragment_0) as HTMLElement;
+	const t_root_0 = t_root_el(t_fragment_0);
+	const t_p_1 = t_root_0 as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
 		t_text_1.textContent = ` ${t_fmt($props.name)} `;
