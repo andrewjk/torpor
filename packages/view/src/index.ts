@@ -43,13 +43,14 @@ import $peek from "./watch/$peek";
 import $run from "./watch/$run";
 import $unwrap from "./watch/$unwrap";
 import $watch from "./watch/$watch";
+import $watchEffect from "./watch/$watchEffect";
 import ReactiveDate from "./wrappers/ReactiveDate";
 
 // Mount and hydrate
 export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
-export { $watch, $cache, $run, $mount, $unwrap, $peek, $batch };
+export { $watch, $watchEffect, $cache, $run, $mount, $unwrap, $peek, $batch };
 
 // Wrapped objects for using in reactive objects
 export { ReactiveDate };

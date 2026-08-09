@@ -100,15 +100,8 @@ export default function Accordion($props: AccordionProps | undefined) {
 	});
 
 	// Dispatch the change event when the value changes
-	let firstChange = true;
-	$run(() => {
-		const onchange = $props?.onchange;
-		const value = $state.value;
-		if (firstChange) {
-			firstChange = false;
-		} else if (onchange) {
-			onchange(value);
-		}
+	$watchEffect(() => $state.value, (value) => {
+		$props?.onchange?.(value);
 	});
 
 	function registerItem(itemState: ItemState) {

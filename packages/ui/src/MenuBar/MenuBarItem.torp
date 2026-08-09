@@ -78,21 +78,12 @@ export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 		}
 	}
 
-	let firstToggle = true;
-	$run(() => {
-		const ontoggle = $props?.ontoggle;
-		const onopen = $props?.onopen;
-		const onclose = $props?.onclose;
-		const visible = $state.visible;
-		if (firstToggle) {
-			firstToggle = false;
+	$watchEffect(() => $state.visible, (visible) => {
+		$props?.ontoggle?.(visible);
+		if (visible) {
+			$props?.onopen?.();
 		} else {
-			if (ontoggle) ontoggle(visible);
-			if (visible) {
-				if (onopen) onopen();
-			} else {
-				if (onclose) onclose(result);
-			}
+			$props?.onclose?.(result);
 		}
 	});
 

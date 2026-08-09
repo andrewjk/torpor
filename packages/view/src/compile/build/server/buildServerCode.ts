@@ -8,6 +8,7 @@ import buildServerNode from "./buildServerNode";
 
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
+	$watchEffect: 'import { $watchEffect } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
@@ -58,6 +59,7 @@ function buildServerTemplate(
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
+	if (/\$watchEffect\b/.test(script)) imports.add("$watchEffect");
 	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
