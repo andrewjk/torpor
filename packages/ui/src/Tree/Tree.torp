@@ -168,7 +168,7 @@ export default function Tree($props: TreeProps | undefined) {
 	function removeItem(itemIndex: number) {
 		let index = itemStates.findIndex((item) => item.index === itemIndex);
 		if (index !== -1) {
-			itemStates.splice(itemIndex, 1);
+			itemStates.splice(index, 1);
 		}
 		itemStates.forEach((item, i) => (item.index = i));
 	}

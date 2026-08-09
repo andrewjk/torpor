@@ -156,12 +156,10 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		return newItemState;
 	}
 
-	// TODO: I think this should be done by value
 	function removeItem(itemIndex: number) {
-		// Remove the item and re-index
 		let index = itemStates.findIndex((item) => item.index === itemIndex);
 		if (index !== -1) {
-			itemStates.splice(itemIndex, 1);
+			itemStates.splice(index, 1);
 		}
 		itemStates.forEach((item, i) => (item.index = i));
 	}
