@@ -1,5 +1,6 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type AccordionContext, AccordionContextName, type ItemState } from "./AccordionTypes";
+import { createItemGroup } from "../utils/createItemGroup";
 
 interface AccordionProps {
 	/** An ID for the root element */
@@ -49,128 +50,34 @@ export default function Accordion($props: AccordionProps | undefined) {
 		$state.value = $props?.value ?? (type === "single" ? undefined : []);
 	});
 
-	let itemStates: ItemState[] = [];
-
-	// This is used to assign automatic indexes to items where needed
-	let nextIndex = 0;
-
-	// Set the context to pass down to items, with functions for each item to call
-	let context: AccordionContext = {
-		registerItem,
-		removeItem,
-		toggleItem,
-		handleHeaderKey,
-	};
-	$context[AccordionContextName] = context;
-
-	$run(() => {
-		// Get the value to ensure that this effect will be subscribed
-		let value = $state.value;
-
-		// And set the expanded item(s)
-		switch (type) {
-			case "single": {
-				for (let item of itemStates) {
-					item.expanded = item.value === value;
-				}
-				break;
-			}
-			case "multiple": {
-				if (!Array.isArray(value)) {
-					value = [value];
-				}
-				for (let item of itemStates) {
-					item.expanded = value.indexOf(item.value) !== -1;
-				}
-				break;
-			}
-		}
-	});
-
-	$run(() => {
-		let disabled = $props?.disabled;
-		itemStates.forEach((s) => (s.parentDisabled = disabled === true));
-	});
-
 	// Dispatch the change event when the value changes
 	$watchEffect(() => $state.value, (value) => {
 		$props?.onchange?.(value);
 	});
 
-	function registerItem(itemState: ItemState) {
-		// If an index wasn't set for the item, set it automatically
-		if (itemState.index === -1) {
-			itemState.index = nextIndex++;
-		}
-
-		// If a value wasn't set for the item, set it to the index
-		if (!itemState.value) {
-			itemState.value = itemState.index;
-		}
-
-		// If we have a value, set whether the item should be expanded
-		if ($state.value !== undefined && $state.value !== null) {
-			switch (type) {
-				case "single": {
-					itemState.expanded = $state.value === itemState.value;
-					break;
-				}
-				case "multiple": {
-					itemState.expanded = $state.value.includes(itemState.value);
-					break;
-				}
+	const group = createItemGroup<ItemState>({
+		state: $state,
+		type,
+		selectedProperty: "expanded",
+		disabled: () => $props?.disabled,
+		onRegister: (item) => {
+			if (!item.value) {
+				item.value = item.index;
 			}
-		}
+		},
+	});
 
-		// Set whether the Accordion itself is disabled
-		itemState.parentDisabled = $props?.disabled === true;
-
-		// Add the item's state to the array
-		itemStates.splice(itemState.index, 0, itemState);
-	}
-
-	// TODO: I think this should be done by value
-	function removeItem(itemIndex: number) {
-		// Remove the item and re-index
-		let index = itemStates.findIndex((item) => item.index === itemIndex);
-		if (index !== -1) {
-			itemStates.splice(index, 1);
-		}
-		itemStates.forEach((item, i) => (item.index = i));
-	}
-
-	function toggleItem(toggleValue: string) {
-		switch (type) {
-			case "single": {
-				for (let item of itemStates) {
-					// The item is expanded if it has the supplied value (i.e. if it was clicked) and if it
-					// wasn't already expanded (i.e. we collapse it if it was expanded and clicked)
-					if (item.value === toggleValue) {
-						$state.value = item.expanded ? undefined : item.value;
-						break;
-					}
-				}
-				break;
-			}
-			case "multiple": {
-				let value = [];
-				for (let item of itemStates) {
-					// The item is expanded if it has the supplied value (i.e. if it was clicked) or if it
-					// was already expanded
-					if (
-						(item.value === toggleValue && !item.expanded) ||
-						(item.value !== toggleValue && item.expanded)
-					) {
-						value.push(item.value);
-					}
-				}
-				$state.value = value.sort();
-				break;
-			}
-		}
-	}
+	// Set the context to pass down to items, with functions for each item to call
+	let context: AccordionContext = {
+		registerItem: (state: ItemState, _setFocused: () => void) => group.registerItem(state),
+		removeItem: group.removeItem,
+		toggleItem: group.toggleItem,
+		handleHeaderKey,
+	};
+	$context[AccordionContextName] = context;
 
 	function handleHeaderKey(headerIndex: number, e: KeyboardEvent) {
+		const itemStates = group.itemStates;
 		switch (e.key) {
 			case "ArrowUp": {
 				for (let i = headerIndex - 1; i >= 0; i--) {

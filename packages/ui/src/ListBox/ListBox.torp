@@ -4,6 +4,7 @@ import {
 	type PopoutContext,
 	PopoutContextName,
 } from "../utils/PopoutTypes";
+import { createItemGroup } from "../utils/createItemGroup";
 import getId from "../utils/getId";
 import { type ItemState, type ListBoxContext, ListBoxContextName } from "./ListBoxTypes";
 
@@ -62,11 +63,6 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		$state.value = $props?.value ?? (type === "single" ? undefined : []);
 	});
 
-	let itemStates: ItemState[] = [];
-
-	// This is used to assign automatic indexes to items where needed
-	let nextIndex = 0;
-
 	// Maybe get stuff out of a popout context
 	let handleButton: HandleButtonPress | undefined = undefined;
 	const popoutContext = $context[PopoutContextName] as PopoutContext;
@@ -86,39 +82,65 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		popoutContext.state.contentId = $props?.id ?? defaultId;
 	}
 
+	const group = createItemGroup<ItemState>({
+		state: $state,
+		type,
+		selectedProperty: "selected",
+		disabled: () => $props?.disabled,
+		onToggle: () => {
+			// Clear the keyboard focus marker
+			for (let item of group.itemStates) {
+				item.active = false;
+			}
+			// Pass this along to the containing popout if applicable
+			if (handleButton) {
+				if (type === "single") {
+					handleButton("confirm", $state.value);
+				} else {
+					handleButton(undefined, $state.value);
+				}
+			}
+		},
+	});
+
 	// Set the context to pass down to items, with functions for each item to call
 	let context: ListBoxContext = {
 		type,
 		state: $state,
-		registerItem,
-		removeItem,
-		toggleItem,
+		registerItem: group.registerItem,
+		removeItem: group.removeItem,
+		toggleItem: group.toggleItem,
 		handleKey,
 		setActiveDescendant: popoutContext ? (id) => { popoutContext.state.activeDescendant = id; } : undefined,
 	};
 	$context[ListBoxContextName] = context;
 
+	// Dispatch the change event when the value changes
+	$watchEffect(() => $state.value, (value) => {
+		$props?.onchange?.(value);
+	});
+
 	function focusFirstElement() {
-		if (itemStates.length > 0) {
-			itemStates[0].setFocused();
+		if (group.itemStates.length > 0) {
+			group.itemStates[0].setFocused();
 		}
 	}
 
 	function focusLastElement() {
-		if (itemStates.length > 0) {
-			itemStates.at(-1)!.setFocused();
+		if (group.itemStates.length > 0) {
+			group.itemStates.at(-1)!.setFocused();
 		}
 	}
 
 	function markElement(id: string) {
-		itemStates.forEach((i) => {
+		group.itemStates.forEach((i) => {
 			i.selected = false;
 			i.active = i.id === id;
 		});
 	}
 
 	function selectMarkedElement() {
-		const marked = itemStates.find((i) => i.active === true);
+		const marked = group.itemStates.find((i) => i.active === true);
 		if (marked && handleButton) {
 			handleButton("confirm", marked.value);
 		}
@@ -126,125 +148,15 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	function searchItems(searchText: string) {
 		const normalizedSearchText = searchText.toLocaleLowerCase();
-		for (let item of itemStates) {
+		for (let item of group.itemStates) {
 			if (item.text.toLocaleLowerCase().includes(normalizedSearchText)) {
 				return item;
 			}
 		}
 	}
 
-	$run(() => {
-		// Get the value to ensure that this effect will be subscribed
-		let value = $state.value;
-
-		// And set the expanded item(s)
-		switch (type) {
-			case "single": {
-				for (let item of itemStates) {
-					item.selected = item.value === value;
-				}
-				break;
-			}
-			case "multiple": {
-				if (!Array.isArray(value)) {
-					value = [value];
-				}
-				for (let item of itemStates) {
-					item.selected = value.indexOf(item.value) !== -1;
-				}
-				break;
-			}
-		}
-	});
-
-	$run(() => {
-		let disabled = $props?.disabled;
-		itemStates.forEach((s) => (s.parentDisabled = disabled === true));
-	});
-
-	// Dispatch the change event when the value changes
-	$watchEffect(() => $state.value, (value) => {
-		$props?.onchange?.(value);
-	});
-
-	function registerItem(itemState: ItemState) {
-		// If an index wasn't set for the item, set it automatically
-		if (itemState.index === -1) {
-			itemState.index = nextIndex++;
-		}
-
-		// If we have a value, set whether the item should be selected
-		if ($state.value !== undefined && $state.value !== null) {
-			switch (type) {
-				case "single": {
-					itemState.selected = $state.value === itemState.value;
-					break;
-				}
-				case "multiple": {
-					itemState.selected = $state.value.includes(itemState.value);
-					break;
-				}
-			}
-		}
-
-		// Set whether the ListBox itself is disabled
-		itemState.parentDisabled = $props?.disabled === true;
-
-		// Add the item's state to the array
-		itemStates.splice(itemState.index, 0, itemState);
-	}
-
-	// TODO: I think this should be done by value
-	function removeItem(itemIndex: number) {
-		// Remove the item and re-index
-		let index = itemStates.findIndex((item) => item.index === itemIndex);
-		if (index !== -1) {
-			itemStates.splice(itemIndex, 1);
-		}
-		itemStates.forEach((item, i) => (item.index = i));
-	}
-
-	function toggleItem(value: string) {
-		switch (type) {
-			case "single": {
-				// Set the value
-				for (let item of itemStates) {
-					if (item.value === value) {
-						$state.value = item.selected ? undefined : item.value;
-						break;
-					}
-				}
-				// Clear selected and active for all the items based on the value that was set
-				for (let item of itemStates) {
-					item.selected = $state.value === item.value;
-					item.active = false;
-				}
-				// Pass this along to the containing popout if applicable, so
-				// that the popout can be closed
-				if (handleButton) {
-					handleButton("confirm", value);
-				}
-				break;
-			}
-			case "multiple": {
-				let newValue = [];
-				for (let item of itemStates) {
-					if ((item.value === value && !item.selected) || (item.value !== value && item.selected)) {
-						newValue.push(item.value);
-					}
-				}
-				$state.value = newValue.sort();
-				// Pass this along to the containing popout if applicable, so
-				// that the popout can be updated
-				if (handleButton) {
-					handleButton(undefined, $state.value);
-				}
-				break;
-			}
-		}
-	}
-
 	function handleKey(index: number, e: KeyboardEvent) {
+		const itemStates = group.itemStates;
 		switch (e.key) {
 			case "ArrowUp": {
 				if (index > 0) {
