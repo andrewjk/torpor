@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import {
 	type Point,
@@ -17,7 +17,7 @@ interface PopoverProps {
 	/** Whether the popover is modal. If true, an overlay should be supplied to obscure outside content, and only the popover content will be visible to screen readers  */
 	modal?: boolean;
 	/** Whether the popover is visible  */
-	visible?: boolean;
+	visible: Bindable<boolean | undefined>;
 	/** The element to anchor this popover to, as an alternative to supplying a PopoverTrigger  */
 	anchor?: HTMLElement;
 	/** The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual  */
@@ -54,11 +54,6 @@ export default function Popover($props: PopoverProps | undefined) {
 	$run(() => {
 		$state.visible = $props?.visible ?? false;
 		$state.position = $props?.position ?? { x: 0, y: 0 };
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.visible = $state.visible;
-		}
 	});
 
 	let result: any;

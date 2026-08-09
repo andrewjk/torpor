@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type SelectBoxContext, SelectBoxContextName, type SelectBoxState } from "./SelectBoxTypes";
 
@@ -12,13 +12,13 @@ interface SelectBoxProps {
 	/** The name of the input's form data field */
 	name?: string;
 	/** The data value selected by the user */
-	value?: any;
+	value: Bindable<any>;
 	/** Text to display when the input value is empty */
 	placeholder?: string;
 	///** Whether the input's value is required */
 	//required?: boolean,
 	/** Whether the popout is visible  */
-	visible?: boolean;
+	visible: Bindable<boolean | undefined>;
 	/** A function to be called when the user selects a response */
 	callback?: (value: any) => void;
 	/** Raised when the popout is opened or closed */
@@ -52,12 +52,6 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	// Sync props and state
 	$run(() => {
 		$state.visible = $props?.visible ?? false;
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.visible = $state.visible;
-			$props.value = $state.value;
-		}
 	});
 
 	let result: any;

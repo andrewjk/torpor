@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import {
 	type MenuButtonContext,
 	MenuButtonContextName,
@@ -14,7 +14,7 @@ interface MenuCheckProps {
 	/** Styles for the root element */
 	style?: StyleValue;
 	/** Whether this item is checked */
-	checked?: boolean;
+	checked: Bindable<boolean | undefined>;
 	/** Whether this item is disabled */
 	disabled?: boolean;
 	/** Raised when the checkbox is clicked */
@@ -29,12 +29,6 @@ interface MenuCheckProps {
 export default function MenuCheck($props: MenuCheckProps | undefined) {
 	let $state = $watch({
 		checked: $props?.checked ?? false,
-	});
-
-	$run(() => {
-		if ($props !== undefined) {
-			$props.checked = $state.checked;
-		}
 	});
 
 	let button: HTMLButtonElement;

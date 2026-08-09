@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import {
 	type FieldContext,
 	FieldContextName,
@@ -18,7 +18,7 @@ interface FieldProps {
 	/** The name of the data that this field contains */
 	name: string;
 	/** The data value that this field is bound to */
-	value?: any;
+	value: Bindable<any>;
 	/** The schema validator to use for this form */
 	schema?: StandardSchemaV1;
 }
@@ -41,11 +41,6 @@ export default function Field($props: FieldProps) {
 				.map((i) => i.message)
 				.join("\n");
 		},
-	});
-
-	// Binding
-	$run(() => {
-		$props.value = $state.value;
 	});
 
 	// Get stuff out of the FormContext, if applicable

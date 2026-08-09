@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type NavMenuPopoutContext, NavMenuPopoutContextName } from "./NavMenuTypes";
 
 interface NavMenuPopoutProps {
@@ -9,7 +9,7 @@ interface NavMenuPopoutProps {
 	/** Styles for the root element */
 	style?: StyleValue;
 	/** Whether the popout is visible */
-	visible?: boolean;
+	visible: Bindable<boolean | undefined>;
 	/** Raised when the popout is opened or closed */
 	ontoggle?: (open: boolean) => void;
 	/** Raised when the popout has opened */
@@ -38,11 +38,6 @@ export default function NavMenuPopout($props: NavMenuPopoutProps | undefined) {
 	// Sync props and state
 	$run(() => {
 		$state.visible = $props?.visible ?? false;
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.visible = $state.visible;
-		}
 	});
 
 	let result: any;

@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type ModalContext, ModalContextName, type ModalState } from "./ModalTypes";
 
@@ -10,7 +10,7 @@ interface ModalProps {
 	/** Styles for the root element */
 	style?: StyleValue;
 	/** Whether the modal is visible  */
-	visible?: boolean;
+	visible: Bindable<boolean | undefined>;
 	/** A function to be called when the user selects a response */
 	callback?: (value: any) => void;
 	/** Raised when the modal is opened or closed */
@@ -44,11 +44,6 @@ export default function Modal($props: ModalProps | undefined) {
 	// Sync props and state
 	$run(() => {
 		$state.visible = $props?.visible ?? false;
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.visible = $state.visible;
-		}
 	});
 
 	let result: any;

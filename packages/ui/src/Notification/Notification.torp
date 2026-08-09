@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type NotificationContext, NotificationContextName } from "./NotificationTypes";
 
 interface NotificationProps {
@@ -9,7 +9,7 @@ interface NotificationProps {
 	/** Styles for the root element */
 	style?: StyleValue;
 	/** Whether the notification is visible */
-	visible?: boolean;
+	visible: Bindable<boolean | undefined>;
 	/** The duration, in milliseconds, to keep the notification visible */
 	duration?: number;
 	/** Raised when the notification has closed, either after the duration has elapsed, or when the user has pressed the close button */
@@ -31,11 +31,6 @@ export default function Notification($props: NotificationProps | undefined) {
 
 	$run(() => {
 		$state.visible = $props?.visible ?? true;
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.visible = $state.visible;
-		}
 	});
 
 	// Set the context to pass down to items

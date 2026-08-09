@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type AccordionContext, AccordionContextName, type ItemState } from "./AccordionTypes";
 
 interface AccordionProps {
@@ -11,7 +11,7 @@ interface AccordionProps {
 	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
 	type?: "single" | "multiple";
 	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
-	value?: any | any[];
+	value: Bindable<any | any[]>;
 	/** If set to true, the user cannot interact with any items in the Accordion */
 	disabled?: boolean;
 	/** Raised when the expanded item(s) have changed */
@@ -47,13 +47,6 @@ export default function Accordion($props: AccordionProps | undefined) {
 	// Update $state on $props change
 	$run(() => {
 		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
-
-	// Update $props on $state change
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
 	});
 
 	let itemStates: ItemState[] = [];

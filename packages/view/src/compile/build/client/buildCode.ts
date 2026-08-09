@@ -163,6 +163,19 @@ function buildTemplate(
 				b.append(`$context = Object.assign({}, $context);`);
 			}
 		} else if (chunk.script === "/* @render */") {
+			// Auto-generate write-back effects for Bindable<T> props so that
+			// component authors don't need to manually sync $state→$props
+			if (current.bindableProps?.length) {
+				imports.add("$run");
+				b.append("/* Bindable write-backs */");
+				for (let prop of current.bindableProps) {
+					b.append(
+						`$run(() => { if ($props !== undefined) { $props["${prop}"] = $state["${prop}"]; } }, "bind:${prop}");`,
+					);
+				}
+				b.append("");
+			}
+
 			if (current.markup) {
 				// Add the interface
 				b.append("");

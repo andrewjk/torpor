@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import {
 	type MenuRadioGroupContext,
 	MenuRadioGroupContextName,
@@ -15,7 +15,7 @@ interface MenuRadioGroupProps {
 	/** An ARIA label for describing the menu to screen readers */
 	ariaLabel?: string;
 	/** The value of the checked MenuRadio */
-	value?: string | undefined;
+	value: Bindable<string | undefined>;
 	/** Raised when the checked item has changed */
 	onchange?: (value: any) => void;
 }
@@ -34,13 +34,6 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	// Update $state on $props change
 	$run(() => {
 		$state.value = $props?.value;
-	});
-
-	// Update $props on $state change
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
 	});
 
 	// Sync the checked state of all items from the group value

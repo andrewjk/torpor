@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type ItemState, type TabGroupContext, TabGroupContextName } from "./TabGroupTypes";
 
 interface TabGroupProps {
@@ -13,7 +13,7 @@ interface TabGroupProps {
 	/** How tabs are activated; if automatic they are shown on focus, if manual they must be clicked */
 	activation?: "automatic" | "manual";
 	/** The value of the active TabContent */
-	value?: string;
+	value: Bindable<string | undefined>;
 	/** If set to true, the user cannot interact with any items in the TabGroup */
 	disabled?: boolean;
 	/** Raised when the active item has changed */
@@ -50,11 +50,6 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 	// Sync props and state
 	$run(() => {
 		$state.value = $props?.value ?? "";
-	});
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
 	});
 
 	let itemStates: ItemState[] = [];

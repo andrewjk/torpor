@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type ItemState, type TreeContext, TreeContextName } from "./TreeTypes";
 
 interface TreeProps {
@@ -9,11 +9,11 @@ interface TreeProps {
 	/** Styles for the root element */
 	style?: StyleValue;
 	/** The value(s) of the expanded TreeItem(s) */
-	expanded?: string | string[];
+	expanded: Bindable<string | string[] | undefined>;
 	/** Whether a single TreeItem or multiple TreeItems can be selected at the same time */
 	type?: "single" | "multiple";
 	/** The value of the selected TreeItem, or an array of values if the type is "multiple" */
-	value?: string | string[];
+	value: Bindable<string | string[] | undefined>;
 	/** If set to true, the user cannot interact with any items in the Tree */
 	disabled?: boolean;
 	/** The aria-label for the root element */
@@ -57,13 +57,6 @@ export default function Tree($props: TreeProps | undefined) {
 	$run(() => {
 		$state.expanded = $props?.expanded ?? [];
 		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
-
-	$run(() => {
-		if ($props !== undefined) {
-			$props.expanded = $state.expanded;
-			$props.value = $state.value;
-		}
 	});
 
 	let itemStates: ItemState[] = [];

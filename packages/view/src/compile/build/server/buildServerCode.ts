@@ -96,6 +96,18 @@ function buildServerTemplate(
 			b.append(`let t_body = "";`);
 			b.append(`let t_head = "";`);
 		} else if (chunk.script === "/* @render */") {
+			// Auto-generate write-back effects for Bindable<T> props
+			if (current.bindableProps?.length) {
+				imports.add("$run");
+				b.append("/* Bindable write-backs */");
+				for (let prop of current.bindableProps) {
+					b.append(
+						`$run(() => { if ($props !== undefined) { $props["${prop}"] = $state["${prop}"]; } }, "bind:${prop}");`,
+					);
+				}
+				b.append("");
+			}
+
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {
 			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";

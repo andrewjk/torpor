@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import {
 	type FieldContext,
@@ -17,7 +17,7 @@ interface TextAreaProps {
 	/** The name of the input's form data field */
 	name?: string;
 	/** The data value that this field is bound to */
-	value?: any;
+	value: Bindable<any>;
 	/** The number of rows to show in the input */
 	rows?: number;
 	/** Text to display when the input's value is empty */
@@ -63,13 +63,6 @@ export default function TextArea($props: TextAreaProps | undefined) {
 			valid: false,
 			message: "",
 		});
-
-	// Binding
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
-	});
 
 	// Set the input ID now that we know it and it will get linked with the associated label
 	$state.inputId = $props?.id ?? defaultId;

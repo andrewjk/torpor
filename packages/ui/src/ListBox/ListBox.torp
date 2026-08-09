@@ -1,4 +1,4 @@
-import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import {
 	type HandleButtonPress,
 	type PopoutContext,
@@ -19,7 +19,7 @@ interface ListBoxProps {
 	/** Whether a single ListBoxItem or multiple ListBoxItems can be selected at the same time */
 	type?: "single" | "multiple";
 	/** The value of the selected ListBoxItem, or an array of values if the type is "multiple" */
-	value?: any | any[];
+	value: Bindable<any | any[]>;
 	/** If set to true, the user cannot interact with any items in the ListBox */
 	disabled?: boolean;
 	/** An ARIA label for describing the ListBox to screen readers  */
@@ -60,13 +60,6 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	// Update $state on $props change
 	$run(() => {
 		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
-
-	// Update $props on $state change
-	$run(() => {
-		if ($props !== undefined) {
-			$props.value = $state.value;
-		}
 	});
 
 	let itemStates: ItemState[] = [];
