@@ -38,7 +38,7 @@ export default function ForSingleRoot(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $props.items) {
-				t_new_items_1.push({ data: { row }, key:
+				t_new_items_1.push({ data: row, key:
 				row.id });
 			}
 			return t_new_items_1;
@@ -51,17 +51,17 @@ export default function ForSingleRoot(
 			const t_button_1 = t_next(t_next(t_child(t_li_1), true)) as HTMLButtonElement;
 			/* @const */
 			const suffix = "!";
-			t_event(t_button_1, "click", () => $props.onSelect(t_item_1.data.row));
+			t_event(t_button_1, "click", () => $props.onSelect(t_item_1.data));
 			$run(() => {
-				t_text_1.textContent = `${t_fmt(t_item_1.data.row.label)}${t_fmt(suffix)}`;
+				t_text_1.textContent = `${t_fmt(t_item_1.data.label)}${t_fmt(suffix)}`;
 			});
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed = false;
-			if (t_old_item.data.row !== t_new_item.data.row) {
-				t_old_item.data.row = t_new_item.data.row;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
 				t_changed = true;
 			}
 			if (t_changed) t_rerun_region_effects(t_old_item);

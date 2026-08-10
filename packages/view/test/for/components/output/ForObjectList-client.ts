@@ -37,7 +37,7 @@ export default function ForObject(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let fruit of $props.fruits) {
-				t_new_items_1.push({ data: { fruit }, key:
+				t_new_items_1.push({ data: fruit, key:
 				undefined });
 			}
 			return t_new_items_1;
@@ -48,15 +48,15 @@ export default function ForObject(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
-				t_text_1.textContent = `${t_fmt(t_item_1.data.fruit.name)} is ${t_fmt(t_item_1.data.fruit.color)}`;
+				t_text_1.textContent = `${t_fmt(t_item_1.data.name)} is ${t_fmt(t_item_1.data.color)}`;
 			});
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed = false;
-			if (t_old_item.data.fruit !== t_new_item.data.fruit) {
-				t_old_item.data.fruit = t_new_item.data.fruit;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
 				t_changed = true;
 			}
 			if (t_changed) t_rerun_region_effects(t_old_item);

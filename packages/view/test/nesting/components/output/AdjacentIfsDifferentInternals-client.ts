@@ -81,7 +81,7 @@ export default function AdjacentIfsFor(
 				() => {
 					let t_new_items_1: ListItemSpec[] = [];
 					for (let i = 0; i < 3; i++) {
-						t_new_items_1.push({ data: { i }, key:
+						t_new_items_1.push({ data: i, key:
 						undefined });
 					}
 					return t_new_items_1;
@@ -92,15 +92,15 @@ export default function AdjacentIfsFor(
 					const t_li_1 = t_root_3 as HTMLElement;
 					const t_text_1 = t_child(t_li_1);
 					$run(() => {
-						t_text_1.textContent = `B${t_fmt(t_item_1.data.i)}`;
+						t_text_1.textContent = `B${t_fmt(t_item_1.data)}`;
 					});
 					t_add_element(t_li_1, t_ul_1, t_before_1);
 					t_next(t_li_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;
-					if (t_old_item.data.i !== t_new_item.data.i) {
-						t_old_item.data.i = t_new_item.data.i;
+					if (t_old_item.data !== t_new_item.data) {
+						t_old_item.data = t_new_item.data;
 						t_changed = true;
 					}
 					if (t_changed) t_rerun_region_effects(t_old_item);

@@ -63,7 +63,7 @@ export default function ForContainingFor(
 				() => {
 					let t_new_items_2: ListItemSpec[] = [];
 					for (let j = 0; j < 2; j++) {
-						t_new_items_2.push({ data: { j }, key:
+						t_new_items_2.push({ data: j, key:
 						undefined });
 					}
 					return t_new_items_2;
@@ -74,15 +74,15 @@ export default function ForContainingFor(
 					const t_p_1 = t_root_2 as HTMLElement;
 					const t_text_1 = t_child(t_p_1);
 					$run(() => {
-						t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)}-${t_fmt(t_item_2.data.j)} `;
+						t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)}-${t_fmt(t_item_2.data)} `;
 					});
 					t_add_element(t_p_1, t_fragment_1, t_before_2);
 					t_next(t_p_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;
-					if (t_old_item.data.j !== t_new_item.data.j) {
-						t_old_item.data.j = t_new_item.data.j;
+					if (t_old_item.data !== t_new_item.data) {
+						t_old_item.data = t_new_item.data;
 						t_changed = true;
 					}
 					if (t_changed) t_rerun_region_effects(t_old_item);

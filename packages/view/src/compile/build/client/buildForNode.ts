@@ -83,6 +83,18 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		status.imports.add("t_rerun_region_effects");
 	}
 
+	// Single-loop-var specialization of the no-proxy path: when the body
+	// binds exactly one loop variable, the per-row spec can store it
+	// directly (`data: row`) instead of wrapping it (`data: { row }`). This
+	// drops one object allocation per row on EVERY list update — a
+	// `removeFirst` click on a 1000-row list allocates 999 `{ row }`
+	// wrappers today, all to be GC'd moments later — and turns the
+	// `updateListItem` per-field compare into a single reference check. The
+	// body's loop-var access flips from `item.data.<var>.x` to
+	// `item.data.x` (the substitution below maps `<var>` → `item.data`
+	// rather than `item.data.<var>`).
+	const singleVar = noWatch && forVarNames.length === 1;
+
 	// Detect "leaf-row safe" @for body: when the body has no nested control
 	// statements (`@if`/`@for`/`@await`/…), the create callback can skip its
 	// `pushRegion(item)` / `popRegion(oldRegion)` calls. `runListItems` has
@@ -121,8 +133,15 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// Push a lightweight {key, data} spec per row. The reconciler reuses old
 	// ListItems for survivors and only mounts fresh ones for genuinely new
 	// keys, so a survivor costs only this 2-field allocation per update — no
-	// full ListItem, no effects migration, no per-row chain re-link.
-	b.append(`${listItemsName}.push({ data: { ${forVarNames.join(", ")} }, key: `);
+	// full ListItem, no effects migration, no per-row chain re-link. When the
+	// body is no-proxy safe and binds a single loop var, store it directly
+	// (`data: row`) rather than wrapping it (`data: { row }`) so we skip the
+	// per-row wrapper-object allocation entirely.
+	if (singleVar) {
+		b.append(`${listItemsName}.push({ data: ${forVarNames[0]}, key: `);
+	} else {
+		b.append(`${listItemsName}.push({ data: { ${forVarNames.join(", ")} }, key: `);
+	}
 	if (key !== undefined) {
 		addMappedText("", `${keyStatement || "undefined"}`, " });", key.span, status, b);
 	} else {
@@ -136,7 +155,12 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	let oldForVarNames = status.forVarNames;
 	status.forVarNames = [
 		...status.forVarNames,
-		...forVarNames.map((v) => [v, `${itemName}.data.${v}`]),
+		// singleVar stores the loop var directly as `data`, so the body
+		// reads it as `item.data.<x>`; otherwise it's wrapped as
+		// `data: { <var> }` and the body reads `item.data.<var>.<x>`.
+		...(singleVar
+			? forVarNames.map((v) => [v, `${itemName}.data`])
+			: forVarNames.map((v) => [v, `${itemName}.data.${v}`])),
 	];
 	buildForItem(node, status, b, parentName, beforeName, itemName, leafRow);
 	status.forVarNames = oldForVarNames;
@@ -148,14 +172,25 @@ ${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item)
 		// do we copy it across and re-run the item's effects. Unchanged rows
 		// (the common case during a partial `update`) cost only the
 		// reference-equality check — no allocation, no effect re-run.
+		// singleVar collapses this to a single `data` reference check (the
+		// loop var IS the data bag, no per-field walk).
 		b.append(`let t_changed = false;`);
-		for (let varName of forVarNames) {
+		if (singleVar) {
 			b.append(
-				`if (t_old_item.data.${varName} !== t_new_item.data.${varName}) {
-					t_old_item.data.${varName} = t_new_item.data.${varName};
+				`if (t_old_item.data !== t_new_item.data) {
+					t_old_item.data = t_new_item.data;
 					t_changed = true;
 				}`,
 			);
+		} else {
+			for (let varName of forVarNames) {
+				b.append(
+					`if (t_old_item.data.${varName} !== t_new_item.data.${varName}) {
+						t_old_item.data.${varName} = t_new_item.data.${varName};
+						t_changed = true;
+					}`,
+				);
+			}
 		}
 		b.append(`if (t_changed) t_rerun_region_effects(t_old_item);`);
 	} else {

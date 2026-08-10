@@ -917,10 +917,34 @@ function proxyGet(target, key, receiver) {
 	return target[key];
 }
 const arrayWrapper = {
-	[Symbol.iterator]: function(data, target, key) {
+	[Symbol.iterator]: function(data, target, _key) {
 		trackProxySignal(data, "length");
 		context.activeTarget = null;
-		return target[key];
+		return function arrayIterator() {
+			let index = 0;
+			return {
+				next() {
+					if (index >= target.length) return {
+						value: void 0,
+						done: true
+					};
+					let value = target[index];
+					if (data.shallow !== true && value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) {
+						value = $watch(value);
+						target[index] = value;
+					}
+					trackProxySignal(data, String(index));
+					index++;
+					return {
+						value,
+						done: false
+					};
+				},
+				[Symbol.iterator]() {
+					return this;
+				}
+			};
+		};
 	},
 	pop: arrayHandle,
 	push: arrayHandle,
@@ -928,8 +952,35 @@ const arrayWrapper = {
 	shift: arrayHandle,
 	sort: arrayHandle,
 	splice: arrayHandle,
-	unshift: arrayHandle
+	unshift: arrayHandle,
+	slice: readHandle,
+	concat: readHandle,
+	filter: readHandle,
+	map: readHandle,
+	toReversed: readHandle,
+	toSorted: readHandle,
+	toSpliced: readHandle,
+	indexOf: readHandle,
+	lastIndexOf: readHandle,
+	includes: readHandle,
+	find: readHandle,
+	findIndex: readHandle,
+	some: readHandle,
+	every: readHandle,
+	join: readHandle,
+	forEach: readHandle,
+	reduce: readHandle,
+	reduceRight: readHandle,
+	flat: readHandle,
+	flatMap: readHandle,
+	at: readHandle
 };
+function readHandle(data, target, key) {
+	return function(...args) {
+		trackProxySignal(data, "length");
+		return target[key].apply(target, args);
+	};
+}
 function arrayHandle(data, target, key) {
 	return function(...args) {
 		const result = target[key].apply(target, args);
@@ -1163,9 +1214,9 @@ function $batch(fn) {
 		batchEnd();
 	}
 }
-function $bind(state, props, keys) {
+function $bind(state, props, ...keys) {
 	if (props === void 0) return;
-	for (let key of keys) {
+	for (let key of keys.flat()) {
 		$run(() => {
 			const v = props[key];
 			if (v !== void 0) state[key] = v;

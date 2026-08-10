@@ -60,7 +60,7 @@ export default function ForNested(
 				() => {
 					let t_new_items_2: ListItemSpec[] = [];
 					for (let cell of t_item_1.data.row) {
-						t_new_items_2.push({ data: { cell }, key:
+						t_new_items_2.push({ data: cell, key:
 						undefined });
 					}
 					return t_new_items_2;
@@ -71,15 +71,15 @@ export default function ForNested(
 					const t_td_1 = t_root_2 as HTMLElement;
 					const t_text_1 = t_child(t_td_1);
 					$run(() => {
-						t_text_1.textContent = t_fmt(t_item_2.data.cell);
+						t_text_1.textContent = t_fmt(t_item_2.data);
 					});
 					t_add_element(t_td_1, t_tr_1, t_before_2);
 					t_next(t_td_1);
 				},
 				(t_old_item, t_new_item) => {
 					let t_changed = false;
-					if (t_old_item.data.cell !== t_new_item.data.cell) {
-						t_old_item.data.cell = t_new_item.data.cell;
+					if (t_old_item.data !== t_new_item.data) {
+						t_old_item.data = t_new_item.data;
 						t_changed = true;
 					}
 					if (t_changed) t_rerun_region_effects(t_old_item);

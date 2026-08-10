@@ -89,7 +89,7 @@ function List(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let item of $props.items) {
-				t_new_items_1.push({ data: { item }, key:
+				t_new_items_1.push({ data: item, key:
 				undefined });
 			}
 			return t_new_items_1;
@@ -100,10 +100,10 @@ function List(
 			const t_li_1 = t_root_1 as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
 			const t_slot_props_1 = $watch({
-				item: t_item_1.data.item,
+				item: t_item_1.data,
 			});
 			$run(() => {
-				t_slot_props_1["item"] = t_item_1.data.item;
+				t_slot_props_1["item"] = t_item_1.data;
 			});
 			if ($slots && $slots["_"]) {
 				$slots["_"](t_li_1, t_slot_anchor_1, t_slot_props_1, $context)
@@ -113,8 +113,8 @@ function List(
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed = false;
-			if (t_old_item.data.item !== t_new_item.data.item) {
-				t_old_item.data.item = t_new_item.data.item;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
 				t_changed = true;
 			}
 			if (t_changed) t_rerun_region_effects(t_old_item);

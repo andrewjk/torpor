@@ -42,7 +42,7 @@ export default function NestedReactive(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let tag of $props.user.tags) {
-				t_new_items_1.push({ data: { tag }, key:
+				t_new_items_1.push({ data: tag, key:
 				undefined });
 			}
 			return t_new_items_1;
@@ -53,15 +53,15 @@ export default function NestedReactive(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_2 = t_child(t_li_1);
 			$run(() => {
-				t_text_2.textContent = t_fmt(t_item_1.data.tag);
+				t_text_2.textContent = t_fmt(t_item_1.data);
 			});
 			t_add_element(t_li_1, t_for_parent_1, t_before_1);
 			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
 			let t_changed = false;
-			if (t_old_item.data.tag !== t_new_item.data.tag) {
-				t_old_item.data.tag = t_new_item.data.tag;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
 				t_changed = true;
 			}
 			if (t_changed) t_rerun_region_effects(t_old_item);
