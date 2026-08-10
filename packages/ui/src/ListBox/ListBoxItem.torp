@@ -58,8 +58,9 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	});
 
 	// Dispatch the toggle event when the value of selected changes
-	$watchEffect(() => $state.selected, (selected) => {
-		$props?.ontoggle?.(selected);
+	$handle((first) => {
+		const selected = $state.selected;
+		if (!first) $props?.ontoggle?.(selected);
 	});
 
 	// This function is called by the parent ListBox to focus this item's button

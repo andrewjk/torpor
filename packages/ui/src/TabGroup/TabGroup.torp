@@ -83,8 +83,9 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 	});
 
 	// Dispatch the change event when the value changes
-	$watchEffect(() => $props?.value, (value) => {
-		$props?.onchange?.(value!);
+	$handle((first) => {
+		const value = $props?.value;
+		if (!first) $props?.onchange?.(value!);
 	});
 
 	// On mount, if no value was set, show the first tab content

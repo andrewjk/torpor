@@ -116,8 +116,9 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	$context[ListBoxContextName] = context;
 
 	// Dispatch the change event when the value changes
-	$watchEffect(() => $state.value, (value) => {
-		$props?.onchange?.(value);
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
 	});
 
 	function focusFirstElement() {

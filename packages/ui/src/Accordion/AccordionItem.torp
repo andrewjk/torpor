@@ -75,8 +75,9 @@ export default function AccordionItem($props: AccordionItemProps | undefined) {
 	});
 
 	// Dispatch the toggle event when the value of expanded changes
-	$watchEffect(() => $state.expanded, (expanded) => {
-		$props?.ontoggle?.(expanded);
+	$handle((first) => {
+		const expanded = $state.expanded;
+		if (!first) $props?.ontoggle?.(expanded);
 	});
 
 	// Called from the parent Accordion; pass the focus command along to the AccordionButton

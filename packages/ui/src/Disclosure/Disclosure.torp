@@ -63,8 +63,9 @@ export default function Disclosure($props: DisclosureProps | undefined) {
 	$context[DisclosureContextName] = itemContext;
 
 	// Dispatch the toggle event when the value of expanded changes
-	$watchEffect(() => $state.expanded, (expanded) => {
-		$props?.ontoggle?.(expanded);
+	$handle((first) => {
+		const expanded = $state.expanded;
+		if (!first) $props?.ontoggle?.(expanded);
 	});
 
 	@render {

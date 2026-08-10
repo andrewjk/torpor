@@ -51,8 +51,9 @@ export default function Accordion($props: AccordionProps | undefined) {
 	});
 
 	// Dispatch the change event when the value changes
-	$watchEffect(() => $state.value, (value) => {
-		$props?.onchange?.(value);
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
 	});
 
 	const group = createItemGroup<ItemState>({

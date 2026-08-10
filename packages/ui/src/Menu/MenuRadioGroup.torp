@@ -45,8 +45,9 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 	});
 
 	// Dispatch the change event when the value changes
-	$watchEffect(() => $state.value, (value) => {
-		$props?.onchange?.(value);
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
 	});
 
 	// Set the context to pass down to items

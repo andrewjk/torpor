@@ -49,7 +49,9 @@ export default function NavMenuPopout($props: NavMenuPopoutProps | undefined) {
 	$context[NavMenuPopoutContextName] = context;
 
 	// Dispatch the toggle event when the popout is opened or closed
-	$watchEffect(() => $state.visible, (visible) => {
+	$handle((first) => {
+		const visible = $state.visible;
+		if (first) return;
 		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
