@@ -112,13 +112,59 @@ export default function proxyGet(
 // Prevent array functions from calling functions and properties in breakable
 // ways (e.g. calling splice sets length before adding items)
 const arrayWrapper: Record<PropertyKey, any> = {
-	[Symbol.iterator]: function (data: ProxyData, target: any, key: PropertyKey) {
+	// Iterating a watched array (`for…of`, spread, `Array.from`) must NOT walk
+	// the proxy per element. The old path returned `Array.prototype[Symbol.iterator]`
+	// unchanged, so for-of invoked it with the PROXY as `this` and every element
+	// read `proxy[i]` hit the `get` trap (descriptor lookup, deep-wrap checks,
+	// per-index signal creation, Map ops) — a 1k-row list cost ~100x the raw
+	// iteration. Lists re-iterate their source array on EVERY run (the
+	// compiler-emitted `buildItems`), making this the dominant cost of pure
+	// bookkeeping ops (rotate/remove).
+	//
+	// Instead we iterate the RAW target directly and lazily `$watch`-wrap each
+	// element, writing the proxy back (`target[i] = proxy`) exactly like the
+	// `get` trap does on first access. That keeps a SINGLE proxy instance per
+	// element, so in-place mutation (`$state.data[i].label = …`) still reaches
+	// the row effects that subscribed through `item.data.row`, while skipping
+	// the per-element trap entirely. `data.shallow` arrays are left unwrapped,
+	// matching the `get` trap's deep-only behaviour.
+	[Symbol.iterator]: function (data: ProxyData, target: any, _key: PropertyKey) {
 		trackProxySignal(data, "length");
 		// HACK: This prevents lists being re-run on every random property
 		// access by disabling the active effect before properties get
 		// accessed. I'm not sure if this is the best way to achieve this...
 		context.activeTarget = null;
-		return target[key];
+		return function arrayIterator() {
+			let index = 0;
+			return {
+				next() {
+					if (index >= target.length) return { value: undefined, done: true };
+					let value = target[index];
+					if (
+						data.shallow !== true &&
+						value !== undefined &&
+						value !== null &&
+						typeof value === "object" &&
+						value[proxyDataSymbol] === undefined &&
+						// But not if it's a Promise (i.e. has a `then` method)
+						value.then === undefined
+					) {
+						value = $watch(value);
+						target[index] = value;
+					}
+					// Mirror the `get` trap's per-index signal creation (a plain
+					// index is never subscribed during iteration — activeTarget is
+					// null — but keeping the signal means a later direct `arr[i]`
+					// read inside an effect reuses it, exactly as before).
+					trackProxySignal(data, String(index));
+					index++;
+					return { value, done: false };
+				},
+				[Symbol.iterator]() {
+					return this;
+				},
+			};
+		};
 	},
 	pop: arrayHandle,
 	push: arrayHandle,
@@ -127,7 +173,49 @@ const arrayWrapper: Record<PropertyKey, any> = {
 	sort: arrayHandle,
 	splice: arrayHandle,
 	unshift: arrayHandle,
+	// Read-only methods must also run on the raw target. `slice`/`filter`/`concat`
+	// etc. called on the proxy walk every element through the `get` trap — the
+	// same ~100x penalty — for nothing, since their results are either assigned
+	// back into `$state.data` (re-wrapped by `$watch` in the `set` trap) or read
+	// transiently. Running them on the raw array keeps the elements' proxy
+	// identity unchanged (wrapped elements stay wrapped; raw elements stay raw
+	// until the next iteration wraps them).
+	slice: readHandle,
+	concat: readHandle,
+	filter: readHandle,
+	map: readHandle,
+	toReversed: readHandle,
+	toSorted: readHandle,
+	toSpliced: readHandle,
+	indexOf: readHandle,
+	lastIndexOf: readHandle,
+	includes: readHandle,
+	find: readHandle,
+	findIndex: readHandle,
+	some: readHandle,
+	every: readHandle,
+	join: readHandle,
+	forEach: readHandle,
+	reduce: readHandle,
+	reduceRight: readHandle,
+	flat: readHandle,
+	flatMap: readHandle,
+	at: readHandle,
 };
+
+function readHandle(data: ProxyData, target: any, key: PropertyKey): Function {
+	// Call the function on the target (so proxy properties don't get
+	// intercepted). Read-only, so no `length` propagation — but an effect that
+	// READS the array through one of these (`items.join("")`, `items.slice(1)`)
+	// must still subscribe to `length` so it re-runs on push/splice/index-set
+	// (every array mutation propagates `length`). When no effect is active this
+	// is a cheap no-op.
+	return function (...args: any[]) {
+		trackProxySignal(data, "length");
+		const func = target[key];
+		return func.apply(target, args);
+	};
+}
 
 function arrayHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 	// Call the function on the target (so proxy properties don't get

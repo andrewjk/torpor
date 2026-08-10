@@ -2,7 +2,7 @@
 
 Benchmark: `TARGETS='[{"name":"torpor","url":"http://localhost:5283/","ready":"#run"},{"name":"solid","url":"http://localhost:5179/","ready":"#run"}]' node benchmarks/js-framework/run.mjs 25`
 
-Current standing (Round 12): torpor is competitive with solid on most ops; the remaining gap is `runlots` (~26ms vs ~20ms) and `add` (~3.7ms vs ~2.2ms), both dominated by per-row DOM-clone + region/effect bookkeeping cost.
+Current standing (Round 13): torpor is competitive with solid on most ops; the remaining gap is `runlots` (~26ms vs ~20ms) and `add` (~3.7ms vs ~2.2ms), both dominated by per-row DOM-clone + region/effect bookkeeping cost. On the keyed-reorder matrix, R13's raw-target array iteration closed most of the gap to octane on the zero-mount ops (`rotatef` 4.1x → 1.9x, `rotateb` 4.5x → 2.1x, `reverse` now winning) — see below.
 
 ## Things to explore in the future
 
@@ -20,6 +20,12 @@ Current standing (Round 12): torpor is competitive with solid on most ops; the r
 ## Things that were done
 
 Listed newest-first. Improvements are vs the prior round unless noted.
+
+- **R13 — raw-target array iteration** — iterating a `$watch`'d array (`for…of` in the compiler-emitted `buildItems`) used to invoke `Array.prototype[Symbol.iterator]` with the **Proxy as `this`**, so every element read `proxy[i]` hit the `get` trap (descriptor lookup, deep-wrap checks, per-index signal creation, Map ops). A 1k-row list iterated at ~82µs vs ~0.7µs over the raw copy — ~120x — and lists re-iterate their source array on EVERY run, so this was the dominant cost of the pure-bookkeeping reorder ops (rotate/remove: zero mounts). `readHandle`-backed array methods (`slice`/`concat`/`filter`/…) called on the proxy paid the same penalty.
+
+  The fix (`packages/view/src/watch/proxyGet.ts`): the array iterator now walks the **raw target**, lazily `$watch`-wraps each element and writes the proxy back (`target[i] = proxy`), keeping a single proxy instance per element so in-place mutation reactivity (`$state.data[i].label = …`) still reaches row effects; per-index signal creation is preserved so direct `arr[i]` reads reuse the signal. The 21 read-only array methods run on the raw target via a `readHandle` that still tracks `length` (every array mutation propagates it), so effects that READ an array (`items.join("")`) re-run on push/splice/index-set.
+
+  Measured (torpor vs octane-tsrx, `run-reorder.mjs` ×6, before → after): **`rotatef` 4.1x → 1.9x, `rotateb` 4.5x → 2.1x, `removefirst` 10.2x → 6.8x** slower than octane; `removeevery10` ~1.6x (unchanged, within noise); **`reverse` flipped from 1.29x slower to 0.86x — torpor now wins**; `displace_*` improved ~2–5x. Main suite (`run.mjs`) unchanged — `run` at parity, `select` 0.5x. Full `@torpor/view` suite: 755 pass. The residual `removefirst` gap is octane's O(1) pointer patch on pure removals vs torpor's full 1000-item end-of-pass relink + per-row `{data:{row}}` spec allocation each run — the next lever is compiler-side (`{data: row}` when `noWatch` binds one loop var; incremental relink).
 
 - **Survivor-reuse list reconciliation** — the keyed-list reconciler (`runListItems`) no longer throws away the old `ListItem` for every survivor on each update. Previously the compiler-emitted `buildItems` allocated a full `ListItem` (an 11-field object + effects array) per row of the *new* data on every run, then `transferListItemData` ran once per survivor to copy `startNode`/`endNode`/`depth`/`name`/data/effects *back* off the throwaway item — so a single remove from a 1000-row list paid ~999 `ListItem` allocations + ~999 field-shuffles for one `clearRegion`. Competitors (Solid `<For>`, vue-vapor keyed `v-for`) reconcile against the raw data array and only do work proportional to the actual change.
 
