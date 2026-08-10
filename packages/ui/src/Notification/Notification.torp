@@ -26,12 +26,10 @@ export default function Notification($props: NotificationProps | undefined) {
 	let defaultDuration = 5000;
 
 	let $state = $watch({
-		visible: false,
+		visible: $props?.visible ?? true,
 	});
 
-	$run(() => {
-		$state.visible = $props?.visible ?? true;
-	});
+	$bind($state, $props, "visible");
 
 	// Set the context to pass down to items
 	let context: NotificationContext = {

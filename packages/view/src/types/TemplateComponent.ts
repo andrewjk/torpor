@@ -18,8 +18,6 @@ export default interface TemplateComponent {
 	style?: Style;
 	/** The type or interface that is used for the $props param */
 	propsType?: string;
-	/** Prop names declared as Bindable<T> in the props interface */
-	bindableProps?: string[];
 	/** $props that are used in the component's function */
 	props?: string[];
 	/** $context props that are used in the component's function */

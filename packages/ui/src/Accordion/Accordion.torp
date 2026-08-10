@@ -45,10 +45,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 		value: $props?.value ?? (type === "single" ? undefined : []),
 	});
 
-	// Update $state on $props change
-	$run(() => {
-		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
+	$bind($state, $props, "value");
 
 	// Dispatch the change event when the value changes
 	$handle((first) => {

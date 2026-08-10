@@ -43,10 +43,7 @@ export default function Drawer($props: DrawerProps | undefined) {
 		position: $props?.position ?? "left",
 	});
 
-	// Sync props and state
-	$run(() => {
-		$state.visible = $props?.visible ?? false;
-	});
+	$bind($state, $props, "visible");
 
 	let result: any;
 

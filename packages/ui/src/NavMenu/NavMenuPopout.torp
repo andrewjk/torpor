@@ -35,10 +35,7 @@ export default function NavMenuPopout($props: NavMenuPopoutProps | undefined) {
 		visible: false,
 	});
 
-	// Sync props and state
-	$run(() => {
-		$state.visible = $props?.visible ?? false;
-	});
+	$bind($state, $props, "visible");
 
 	let result: any;
 

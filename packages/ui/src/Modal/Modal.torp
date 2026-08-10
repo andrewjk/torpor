@@ -41,10 +41,7 @@ export default function Modal($props: ModalProps | undefined) {
 		visible: false,
 	});
 
-	// Sync props and state
-	$run(() => {
-		$state.visible = $props?.visible ?? false;
-	});
+	$bind($state, $props, "visible");
 
 	let result: any;
 

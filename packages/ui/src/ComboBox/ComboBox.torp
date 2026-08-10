@@ -50,10 +50,7 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		value: $props?.value,
 	});
 
-	// Sync props and state
-	$run(() => {
-		$state.visible = $props?.visible ?? false;
-	});
+	$bind($state, $props, "visible", "value");
 
 	let result: any;
 

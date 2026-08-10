@@ -47,10 +47,7 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		value: "",
 	});
 
-	// Sync props and state
-	$run(() => {
-		$state.value = $props?.value ?? "";
-	});
+	$bind($state, $props, "value");
 
 	let itemStates: ItemState[] = [];
 

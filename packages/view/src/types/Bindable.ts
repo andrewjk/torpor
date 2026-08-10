@@ -1,13 +1,11 @@
 /**
- * Marks a component prop as supporting two-way binding via the `&` prefix.
+ * Type-level marker that documents a component prop as supporting two-way
+ * binding via the `&` prefix at the call site.
  *
- * When a prop is typed `Bindable<T>`, the compiler automatically generates a
- * write-back effect that syncs `$state[propName]` → `$props[propName]`
- * whenever the component's internal state changes, so that `&prop={expr}`
- * on the call site works without any manual `$props.x = $state.x` boilerplate.
- *
- * The component author is still responsible for the forward sync
- * (`$state.x = $props.x`) when initial or external values need to flow in.
+ * `Bindable<T>` is structurally just `T` — it has no runtime effect. It tells
+ * component authors and consumers "this prop is intended to be bound with
+ * `&prop={expr}`." Inside the component, use `$bind($state, $props, [...])`
+ * to wire up the actual two-way sync.
  *
  * Example:
  * ```ts

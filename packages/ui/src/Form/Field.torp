@@ -43,6 +43,8 @@ export default function Field($props: FieldProps) {
 		},
 	});
 
+	$bind($state, $props, "value");
+
 	// Get stuff out of the FormContext, if applicable
 	const formContext = $context[FormContextName] as FormContext;
 	if (formContext) {

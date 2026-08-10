@@ -204,13 +204,6 @@ function parseComponentStart(status: ParseStatus) {
 				const propsType = parseInlineScript(status2);
 				if (propsType) {
 					current.propsType = `${status.source.substring(propsTypeStart, bracesStart)}{${propsType}}`;
-
-					// Detect Bindable<T> fields so the compiler can auto-generate
-					// the state→props write-back for them
-					const bindableMatches = propsType.matchAll(
-						/(\w+)\s*\??\s*:\s*Bindable</g,
-					);
-					current.bindableProps = Array.from(bindableMatches, (m) => m[1]);
 				}
 			}
 		}

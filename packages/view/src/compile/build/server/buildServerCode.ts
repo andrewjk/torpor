@@ -8,6 +8,7 @@ import buildServerNode from "./buildServerNode";
 
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
+	$bind: 'import { $bind } from "${folder}";',
 	$handle: 'import { $handle } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
@@ -59,6 +60,7 @@ function buildServerTemplate(
 
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
+	if (/\$bind\b/.test(script)) imports.add("$bind");
 	if (/\$handle\b/.test(script)) imports.add("$handle");
 	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$run\b/.test(script)) imports.add("$run");
@@ -96,18 +98,6 @@ function buildServerTemplate(
 			b.append(`let t_body = "";`);
 			b.append(`let t_head = "";`);
 		} else if (chunk.script === "/* @render */") {
-			// Auto-generate write-back effects for Bindable<T> props
-			if (current.bindableProps?.length) {
-				imports.add("$run");
-				b.append("/* Bindable write-backs */");
-				for (let prop of current.bindableProps) {
-					b.append(
-						`$run(() => { if ($props !== undefined) { $props["${prop}"] = $state["${prop}"]; } }, "bind:${prop}");`,
-					);
-				}
-				b.append("");
-			}
-
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {
 			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";

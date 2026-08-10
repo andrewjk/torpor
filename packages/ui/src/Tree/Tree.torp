@@ -54,10 +54,7 @@ export default function Tree($props: TreeProps | undefined) {
 		value: $props?.value ?? (type === "single" ? undefined : []),
 	});
 
-	$run(() => {
-		$state.expanded = $props?.expanded ?? [];
-		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
+	$bind($state, $props, "expanded", "value");
 
 	let itemStates: ItemState[] = [];
 	let nextIndex = 0;

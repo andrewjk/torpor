@@ -31,6 +31,8 @@ export default function MenuCheck($props: MenuCheckProps | undefined) {
 		checked: $props?.checked ?? false,
 	});
 
+	$bind($state, $props, "checked");
+
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the MenuContext

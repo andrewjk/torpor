@@ -58,10 +58,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		value: $props?.value ?? (type === "single" ? undefined : []),
 	});
 
-	// Update $state on $props change
-	$run(() => {
-		$state.value = $props?.value ?? (type === "single" ? undefined : []);
-	});
+	$bind($state, $props, "value");
 
 	// Maybe get stuff out of a popout context
 	let handleButton: HandleButtonPress | undefined = undefined;

@@ -61,6 +61,8 @@ export default function Select($props: SelectProps | undefined) {
 	// Set the input ID now that we know it and it will get linked with the associated label
 	$state.inputId = $props?.id ?? defaultId;
 
+	$bind($state, $props, "value");
+
 	function handleInput(e: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		if (formContext) {
 			formContext.validate();

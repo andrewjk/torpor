@@ -50,9 +50,8 @@ export default function Popover($props: PopoverProps | undefined) {
 		position: { x: 0, y: 0 },
 	});
 
-	// Sync props and state
+	$bind($state, $props, "visible");
 	$run(() => {
-		$state.visible = $props?.visible ?? false;
 		$state.position = $props?.position ?? { x: 0, y: 0 };
 	});
 
