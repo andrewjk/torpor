@@ -18,7 +18,6 @@ const devContext = globalThis[DEV_CONTEXT_SYMBOL] ??= {
 	signalSet: noop,
 	effectRun: noop
 };
-var devContext_default = devContext;
 function buildClasses(value, styleHash) {
 	if (typeof value === "string") {
 		if (styleHash !== void 0) value += " " + styleHash;
@@ -32,7 +31,7 @@ function buildClasses(value, styleHash) {
 }
 function gatherClasses(name, value, classes) {
 	if (value) if (Array.isArray(value)) for (let v of value) gatherClasses(v, v, classes);
-	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) gatherClasses(n, v, classes);
+	else if (typeof value === "object") for (const n in value) gatherClasses(n, value[n], classes);
 	else classes.push(name);
 }
 function buildStyles(value) {
@@ -46,6 +45,7 @@ function buildStyles(value) {
 function gatherStyles(value, styles) {
 	if (value) if (Array.isArray(value)) for (let v of value) gatherStyles(v, styles);
 	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
+		if (v === null || v === void 0) continue;
 		const key = n.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
 		styles.push(`${key}: ${v}`);
 	}
@@ -57,7 +57,9 @@ function $unwrap(object) {
 	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
 }
 function formatText(value) {
-	return value === void 0 || value === null ? "" : String($unwrap(value));
+	if (value === void 0 || value === null) return "";
+	if (typeof value === "string") return value;
+	return String($unwrap(value));
 }
 const CONTEXT_SYMBOL = Symbol.for("torp.Context");
 const context = globalThis[CONTEXT_SYMBOL] ??= {
@@ -77,26 +79,21 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	stashedAnimations: [],
 	hydrationNode: null
 };
-var context_default = context;
 function addAnimation(el, entry, exit) {
-	context_default.stashedAnimations.push({
-		region: context_default.activeRegion,
+	context.stashedAnimations.push({
+		region: context.activeRegion,
 		el,
 		in: entry,
 		out: exit
 	});
 }
 function addEvent(el, type, listener) {
-	if (listener !== void 0 && listener !== null) context_default.stashedEvents.push({
-		region: context_default.activeRegion,
+	if (listener !== void 0 && listener !== null) context.stashedEvents.push({
 		el,
 		type,
 		listener
 	});
 }
-const SIGNAL_TYPE = 0;
-const COMPUTED_TYPE = 1;
-const EFFECT_TYPE = 2;
 function clearSources(target) {
 	let previousSub = null;
 	for (let clearSub = target.firstSource; clearSub !== null; clearSub = clearSub.nextSource) if (target.didError || !clearSub.active) {
@@ -114,51 +111,40 @@ function deactivateSources(target) {
 	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) sourceSub.active = false;
 }
 function trackSignal(signal) {
-	const target = context_default.activeTarget;
+	const target = context.activeTarget;
 	if (target !== null) {
-		let sub = null;
-		let lastSub = null;
-		for (let nextSub = signal.firstTarget; nextSub !== null; nextSub = nextSub.nextTarget) {
-			lastSub = nextSub;
-			if (nextSub.target === target) {
-				sub = nextSub;
-				break;
-			}
+		for (let existingSub = target.firstSource; existingSub !== null; existingSub = existingSub.nextSource) if (existingSub.source === signal) {
+			existingSub.active = true;
+			return;
 		}
-		if (sub === null) {
-			sub = {
-				source: signal,
-				target,
-				previousTarget: lastSub,
-				nextTarget: null,
-				nextSource: null,
-				active: true,
-				recalc: false
-			};
-			if (lastSub === null) signal.firstTarget = sub;
-			else lastSub.nextTarget = sub;
-			if (target.firstSource === null) target.firstSource = sub;
-			else {
-				let lastEffectSub = target.firstSource;
-				for (let nextSub = lastEffectSub.nextSource; nextSub !== null; nextSub = nextSub.nextSource) lastEffectSub = nextSub;
-				lastEffectSub.nextSource = sub;
-			}
-		} else sub.active = true;
+		const oldFirstTarget = signal.firstTarget;
+		const sub = {
+			source: signal,
+			target,
+			previousTarget: null,
+			nextTarget: oldFirstTarget,
+			nextSource: target.firstSource,
+			active: true,
+			recalc: false
+		};
+		if (oldFirstTarget !== null) oldFirstTarget.previousTarget = sub;
+		signal.firstTarget = sub;
+		target.firstSource = sub;
 	}
 }
 function runComputed(computed) {
-	const oldActiveTarget = context_default.activeTarget;
+	const oldActiveTarget = context.activeTarget;
 	computed.running = true;
 	computed.didError = false;
 	try {
-		context_default.activeTarget = computed;
+		context.activeTarget = computed;
 		computed.value = computed.run();
 	} catch (err) {
 		computed.didError = true;
 		computed.value = err;
 		throw err;
 	} finally {
-		context_default.activeTarget = oldActiveTarget;
+		context.activeTarget = oldActiveTarget;
 		computed.running = false;
 	}
 	trackSignal(computed);
@@ -183,15 +169,15 @@ function checkComputed(computed) {
 }
 function checkSources(target) {
 	let haveComputed = false;
-	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc) if (sourceSub.source.type === SIGNAL_TYPE) return true;
+	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc) if (sourceSub.source.type === 0) return true;
 	else if (sourceSub.source.recalc) haveComputed = true;
 	else return true;
 	if (haveComputed) {
-		for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc && sourceSub.source.type === COMPUTED_TYPE && sourceSub.source.recalc) {
-			const oldActiveTarget = context_default.activeTarget;
-			context_default.activeTarget = target;
+		for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc && sourceSub.source.type === 1 && sourceSub.source.recalc) {
+			const oldActiveTarget = context.activeTarget;
+			context.activeTarget = target;
 			const recalc = checkComputed(sourceSub.source);
-			context_default.activeTarget = oldActiveTarget;
+			context.activeTarget = oldActiveTarget;
 			if (recalc) return true;
 		}
 	}
@@ -200,9 +186,10 @@ function checkSources(target) {
 function runCleanups(effect) {
 	let effectToClean = effect;
 	for (let i = 0; i < effect.extent; i++) {
+		if (effectToClean === null) break;
 		if (typeof effectToClean.cleanup === "function") {
-			const oldActiveTarget = context_default.activeTarget;
-			context_default.activeTarget = null;
+			const oldActiveTarget = context.activeTarget;
+			context.activeTarget = null;
 			try {
 				effectToClean.cleanup();
 			} catch (err) {
@@ -211,15 +198,10 @@ function runCleanups(effect) {
 				throw err;
 			} finally {
 				effectToClean.cleanup = void 0;
-				context_default.activeTarget = oldActiveTarget;
+				context.activeTarget = oldActiveTarget;
 			}
 		}
-		const nextEffect = effectToClean.nextEffect;
-		if (i !== 0 && effect.nextEffectToRun === effectToClean) {
-			effect.nextEffectToRun = effectToClean.nextEffectToRun;
-			effectToClean.nextEffect = effectToClean.nextEffectToRun = null;
-		}
-		effectToClean = nextEffect;
+		effectToClean = effectToClean.nextEffect;
 	}
 }
 function checkEffect(effect) {
@@ -230,18 +212,12 @@ function checkEffect(effect) {
 		clearSources(effect);
 	}
 }
-function clearTargets(source) {
-	let previousSub = null;
-	for (let clearSub = source.firstTarget; clearSub !== null; clearSub = clearSub.nextTarget) if (!clearSub.active) if (previousSub === null) source.firstTarget = clearSub.nextTarget;
-	else previousSub.nextTarget = clearSub.nextTarget;
-	else previousSub = clearSub;
-}
 function triggerEffects() {
 	let didError = false;
 	let error;
-	let effect = context_default.firstEffectToRun;
+	let effect = context.firstEffectToRun;
 	while (effect !== null) {
-		context_default.batchOperation++;
+		context.batchOperation++;
 		try {
 			checkEffect(effect);
 		} catch (err) {
@@ -252,17 +228,16 @@ function triggerEffects() {
 		}
 		effect = effect.nextEffectToRun;
 	}
-	effect = context_default.firstEffectToRun;
-	context_default.firstEffectToRun = null;
+	effect = context.firstEffectToRun;
+	context.firstEffectToRun = null;
 	while (effect !== null) {
 		let nextEffect = effect.nextEffectToRun;
 		effect.nextEffectToRun = null;
 		effect = nextEffect;
 	}
-	let signal = context_default.firstSignalToUpdate;
-	context_default.firstSignalToUpdate = null;
+	let signal = context.firstSignalToUpdate;
+	context.firstSignalToUpdate = null;
 	while (signal !== null) {
-		clearTargets(signal);
 		const nextSignal = signal.nextSignalToUpdate;
 		signal.nextSignalToUpdate = null;
 		signal = nextSignal;
@@ -270,47 +245,47 @@ function triggerEffects() {
 	if (didError) throw error;
 }
 function batchEnd() {
-	if (context_default.batch > 1) {
-		context_default.batch--;
+	if (context.batch > 1) {
+		context.batch--;
 		return;
 	}
 	try {
 		triggerEffects();
 	} finally {
-		context_default.batch = 0;
-		context_default.batchOperation = 0;
-		context_default.previousEffect = null;
+		context.batch = 0;
+		context.batchOperation = 0;
+		context.previousEffect = null;
 	}
 }
 function batchStart() {
-	context_default.batch++;
+	context.batch++;
 }
 function runEffect(effect) {
-	devContext_default.effectRun(effect);
-	const oldActiveTarget = context_default.activeTarget;
-	const oldExtent = context_default.extent;
+	devContext.effectRun(effect);
+	const oldActiveTarget = context.activeTarget;
+	const oldExtent = context.extent;
 	effect.didError = false;
 	batchStart();
 	try {
-		if (context_default.previousEffect !== null) context_default.previousEffect.nextEffect = effect;
-		context_default.activeTarget = effect;
-		context_default.previousEffect = effect;
-		context_default.extent = 1;
+		if (context.previousEffect !== null) context.previousEffect.nextEffect = effect;
+		context.activeTarget = effect;
+		context.previousEffect = effect;
+		context.extent = 1;
 		effect.cleanup = effect.run();
-		effect.extent = context_default.extent;
+		effect.extent = context.extent;
 	} catch (err) {
 		effect.didError = true;
 		clearSources(effect);
 		throw err;
 	} finally {
-		context_default.activeTarget = oldActiveTarget;
-		context_default.extent += oldExtent - 1;
+		context.activeTarget = oldActiveTarget;
+		context.extent += oldExtent - 1;
 		batchEnd();
 	}
 }
 function $run(fn, name) {
 	let effect = {
-		type: EFFECT_TYPE,
+		type: 2,
 		run: fn,
 		cleanup: void 0,
 		firstSource: null,
@@ -320,7 +295,9 @@ function $run(fn, name) {
 		didError: false,
 		name
 	};
-	devContext_default.onRun(effect);
+	const region = context.activeRegion;
+	if (region !== null) region.effects.push(effect);
+	devContext.onRun(effect);
 	runEffect(effect);
 	return effect;
 }
@@ -335,64 +312,160 @@ async function animate(el, enter, keyframes, options) {
 	setTimeout(() => {
 		animation.timeline = el.ownerDocument.timeline;
 	}, 1);
-	const activeRegion = context_default.activeRegion;
+	const activeRegion = context.activeRegion;
 	activeRegion.animations ??= /* @__PURE__ */ new Set();
 	activeRegion.animations.add(animation);
 	await animation.finished;
 }
+const DELEGATED_EVENT_TYPES = /* @__PURE__ */ new Set([
+	"auxclick",
+	"beforeinput",
+	"change",
+	"click",
+	"compositionend",
+	"compositionstart",
+	"compositionupdate",
+	"contextmenu",
+	"dblclick",
+	"drag",
+	"dragend",
+	"dragenter",
+	"dragleave",
+	"dragover",
+	"dragstart",
+	"drop",
+	"focusin",
+	"focusout",
+	"input",
+	"keydown",
+	"keypress",
+	"keyup",
+	"mousedown",
+	"mousemove",
+	"mouseout",
+	"mouseover",
+	"mouseup",
+	"pointerdown",
+	"pointermove",
+	"pointerout",
+	"pointerover",
+	"pointerup",
+	"reset",
+	"submit",
+	"touchend",
+	"touchmove",
+	"touchstart",
+	"wheel"
+]);
+function isDelegatedEventType(type) {
+	return DELEGATED_EVENT_TYPES.has(type);
+}
+const DELEGATE_PREFIX = "torp.$$";
+const DELEGATE_REGISTERED = Symbol.for("torp.delegated.registered");
+function delegatedHandler(event) {
+	let node = event.target;
+	const stopAt = event.currentTarget;
+	const key = DELEGATE_PREFIX + event.type;
+	while (node != null && node !== stopAt) {
+		const handler = node[key];
+		if (handler !== void 0) {
+			Object.defineProperty(event, "currentTarget", {
+				configurable: true,
+				value: node,
+				writable: false
+			});
+			try {
+				handler.call(node, event);
+			} finally {
+				delete event.currentTarget;
+			}
+			return;
+		}
+		node = node.parentNode;
+	}
+}
+function ensureDelegatedListener(type) {
+	if (typeof document === "undefined") return;
+	let registered = document[DELEGATE_REGISTERED];
+	if (!registered) {
+		registered = /* @__PURE__ */ new Set();
+		document[DELEGATE_REGISTERED] = registered;
+	}
+	if (registered.has(type)) return;
+	registered.add(type);
+	document.addEventListener(type, delegatedHandler);
+}
+function attachDelegatedEvent(el, type, listener) {
+	const key = DELEGATE_PREFIX + type;
+	if (listener === void 0 || listener === null) {
+		el[key] = void 0;
+		return;
+	}
+	ensureDelegatedListener(type);
+	el[key] = listener;
+}
 function isFragmentNode(node) {
 	return node.nodeType === 11;
 }
-function addFragment(fragment, parent, before, endNode) {
-	const activeRegion = context_default.activeRegion;
-	const hydrationNode = context_default.hydrationNode;
-	if (hydrationNode !== null) activeRegion.endNode = endNode ?? hydrationNode;
-	else {
+function runMountSideEffects(parent, activeRegion, hydrationNode) {
+	if (isFragmentNode(parent)) return;
+	if (hydrationNode === null) {
+		for (let effect of context.mountEffects) $run(effect);
+		context.mountEffects.length = 0;
+	}
+	if (context.stashedEvents.length > 0) {
+		for (let event of context.stashedEvents) if (isDelegatedEventType(event.type)) attachDelegatedEvent(event.el, event.type, event.listener);
+		else event.el.addEventListener(event.type, event.listener);
+		context.stashedEvents.length = 0;
+	}
+	for (let animation of context.stashedAnimations) {
+		context.activeRegion = animation.region;
+		$run(function runMountSideEffectsAnimation() {
+			if (animation.in !== void 0) animate(animation.el, true, animation.in.keyframes, animation.in.options);
+			if (animation.out !== void 0) return () => {
+				animate(animation.el, false, animation.out.keyframes, animation.out.options);
+			};
+		});
+	}
+	context.stashedAnimations.length = 0;
+	context.activeRegion = activeRegion;
+}
+function addElement(node, parent, before) {
+	const activeRegion = context.activeRegion;
+	const hydrationNode = context.hydrationNode;
+	activeRegion.startNode = node;
+	activeRegion.endNode = node;
+	parent = before?.parentNode ?? parent;
+	if (hydrationNode === null) parent.insertBefore(node, before);
+	runMountSideEffects(parent, activeRegion, hydrationNode);
+}
+function addFragment(fragment, parent, before, endNode, startNode) {
+	const activeRegion = context.activeRegion;
+	const hydrationNode = context.hydrationNode;
+	if (hydrationNode !== null) {
+		if (startNode !== void 0) activeRegion.startNode = startNode;
+		activeRegion.endNode = endNode ?? hydrationNode;
+	} else {
 		activeRegion.startNode = fragment.firstChild;
 		activeRegion.endNode = fragment.lastChild;
 	}
 	parent = before?.parentNode ?? parent;
 	if (hydrationNode === null) parent.insertBefore(fragment, before);
-	if (!isFragmentNode(parent)) {
-		if (hydrationNode === null) {
-			for (let effect of context_default.mountEffects) $run(effect);
-			context_default.mountEffects.length = 0;
-		}
-		if (context_default.stashedEvents.length > 0) {
-			const events = [...context_default.stashedEvents];
-			$run(function addFragmentEvents() {
-				for (let event of events) event.el.addEventListener(event.type, event.listener);
-				return () => {
-					for (let event of events) event.el.removeEventListener(event.type, event.listener);
-				};
-			});
-			context_default.stashedEvents.length = 0;
-		}
-		for (let animation of context_default.stashedAnimations) {
-			context_default.activeRegion = animation.region;
-			$run(function addFragmentAnimation() {
-				if (animation.in !== void 0) animate(animation.el, true, animation.in.keyframes, animation.in.options);
-				if (animation.out !== void 0) return () => {
-					animate(animation.el, false, animation.out.keyframes, animation.out.options);
-				};
-			});
-		}
-		context_default.stashedAnimations.length = 0;
-		context_default.activeRegion = activeRegion;
-	}
+	runMountSideEffects(parent, activeRegion, hydrationNode);
 }
 function applyProps(el, props, propNamesUsed) {
 	if (props !== void 0) {
 		for (let [name, value] of Object.entries(props)) if (!propNamesUsed.includes(name)) if (name.startsWith("on")) {
 			const eventName = name.substring(2);
-			el.addEventListener(eventName, value);
-		} else $run(function setAttribute$1() {
+			if (isDelegatedEventType(eventName)) attachDelegatedEvent(el, eventName, value);
+			else el.addEventListener(eventName, value);
+		} else $run(function setAttribute() {
 			el.setAttribute(name, value);
 		});
 	}
 }
 function clearRegion(region) {
-	devContext_default.onRegionCleared(region);
+	devContext.onRegionCleared(region);
 	let animations = region.animations !== null ? Array.from(region.animations) : void 0;
 	let childRegion = region.nextRegion;
 	while (childRegion !== null && childRegion.depth > region.depth) {
@@ -400,9 +473,10 @@ function clearRegion(region) {
 			animations ??= [];
 			animations.push(...childRegion.animations);
 		}
+		const nextChild = childRegion.nextRegion;
 		releaseRegion(childRegion);
 		childRegion.depth = -2;
-		childRegion = childRegion.nextRegion;
+		childRegion = nextChild;
 	}
 	region.nextRegion = childRegion;
 	if (region.previousRegion !== null) region.previousRegion.nextRegion = region.nextRegion;
@@ -417,25 +491,60 @@ function clearRegion(region) {
 }
 function clearNodes(region) {
 	if (region.startNode !== null && region.endNode !== null) {
+		let stop = region.startNode;
+		const startDetached = region.startNode.parentNode === null;
+		let fallback = false;
+		if (startDetached) {
+			let prev = region.previousRegion;
+			while (prev !== null && prev.depth > region.depth) prev = prev.previousRegion;
+			if (prev !== null && prev.endNode !== null && prev.endNode.parentNode !== null) {
+				stop = prev.endNode;
+				fallback = true;
+			}
+		}
 		let currentNode = region.endNode;
-		while (currentNode !== region.startNode) {
+		while (currentNode !== null && currentNode !== stop) {
 			let previousNode = currentNode.previousSibling;
 			currentNode.remove();
+			if (previousNode === null) break;
 			currentNode = previousNode;
 		}
-		currentNode.remove();
+		if (!fallback && currentNode === region.startNode) currentNode.remove();
 	}
 	releaseRegion(region);
 }
 function releaseRegion(region) {
+	region.generation = -1;
 	region.startNode = null;
 	region.endNode = null;
 	region.previousRegion = null;
 	region.nextRegion = null;
 	region.animations = null;
+	for (const effect of region.effects) {
+		if (typeof effect.cleanup === "function") {
+			effect.cleanup();
+			effect.cleanup = void 0;
+		}
+		let sub = effect.firstSource;
+		effect.firstSource = null;
+		while (sub !== null) {
+			const nextSource = sub.nextSource;
+			const prev = sub.previousTarget;
+			const next = sub.nextTarget;
+			if (prev === null) {
+				if (sub.source.firstTarget === sub) sub.source.firstTarget = next;
+			} else prev.nextTarget = next;
+			if (next !== null) next.previousTarget = prev;
+			sub.previousTarget = null;
+			sub.nextTarget = null;
+			sub.nextSource = null;
+			sub = nextSource;
+		}
+	}
+	region.effects.length = 0;
 }
 function clearLayoutSlot(region) {
-	context_default.previousRegion = region.previousRegion;
+	context.previousRegion = region.previousRegion;
 	clearRegion(region);
 }
 function newRegion(name) {
@@ -446,30 +555,31 @@ function newRegion(name) {
 		nextRegion: null,
 		depth: -1,
 		animations: null,
-		name
+		name,
+		effects: []
 	};
 }
 function popRegion(oldRegion) {
-	context_default.activeRegion = oldRegion;
-	devContext_default.onRegionPopped();
+	context.activeRegion = oldRegion;
+	devContext.onRegionPopped();
 }
 function pushRegion(region, toParent = false) {
-	const activeRegion = context_default.activeRegion;
+	const activeRegion = context.activeRegion;
 	if (toParent) {
-		const previousRegion = context_default.previousRegion;
+		const previousRegion = context.previousRegion;
 		region.previousRegion = previousRegion;
 		const nextRegion = previousRegion.nextRegion;
 		previousRegion.nextRegion = region;
 		region.nextRegion = nextRegion;
 		region.depth = activeRegion.depth + 1;
 	}
-	context_default.activeRegion = region;
-	context_default.previousRegion = region;
-	devContext_default.onRegionPushed(region, toParent);
+	context.activeRegion = region;
+	context.previousRegion = region;
+	devContext.onRegionPushed(region, toParent);
 	return activeRegion;
 }
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
-	const region = newRegion(devContext_default.enabled ? "Layout slot" : void 0);
+	const region = newRegion(devContext.enabled ? "Layout slot" : void 0);
 	const oldRegion = pushRegion(region, true);
 	component(parent, anchor, $props, $context, { _: slot });
 	popRegion(oldRegion);
@@ -489,25 +599,46 @@ function getFragment(document, array, index, html, ns) {
 	}
 	return array[index].cloneNode(true);
 }
+function getElementFragment(document, array, index, html, ns) {
+	if (array[index] === void 0) if (ns === true) {
+		const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
+		template.innerHTML = html;
+		array[index] = template.firstElementChild;
+	} else {
+		const template = document.createElement("template");
+		template.innerHTML = html;
+		array[index] = template.content.firstElementChild;
+	}
+	return array[index].cloneNode(true);
+}
 function hydrate(parent, component, props, slots) {
-	context_default.hydrationNode = parent.firstChild;
-	context_default.rootRegion = newRegion(devContext_default.enabled ? "Root" : void 0);
-	context_default.previousRegion = context_default.rootRegion;
-	pushRegion(context_default.rootRegion);
+	context.hydrationNode = parent.firstChild;
+	context.rootRegion = newRegion(devContext.enabled ? "Root" : void 0);
+	context.previousRegion = context.rootRegion;
+	pushRegion(context.rootRegion);
 	component(parent, null, props, void 0, slots);
-	context_default.hydrationNode = null;
-	for (let effect of context_default.mountEffects) $run(effect);
-	context_default.mountEffects.length = 0;
+	context.hydrationNode = null;
+	for (let effect of context.mountEffects) $run(effect);
+	context.mountEffects.length = 0;
 }
 function mount(parent, component, props, slots) {
 	if (parent.childElementCount > 0) throw new Error("The parent node must have no child elements");
 	while (parent.firstChild !== null) parent.firstChild.remove();
-	if (context_default.rootRegion === null) {
-		context_default.rootRegion = newRegion(devContext_default.enabled ? "Root" : void 0);
-		context_default.previousRegion = context_default.rootRegion;
-		pushRegion(context_default.rootRegion);
+	if (context.rootRegion === null) {
+		context.rootRegion = newRegion(devContext.enabled ? "Root" : void 0);
+		context.previousRegion = context.rootRegion;
+		pushRegion(context.rootRegion);
 	}
 	component(parent, null, props, void 0, slots);
+}
+function unmount(parent) {
+	if (context.rootRegion !== null) {
+		clearRegion(context.rootRegion);
+		context.rootRegion = null;
+		context.previousRegion = null;
+		context.activeRegion = null;
+	}
+	while (parent.firstChild !== null) parent.firstChild.remove();
 }
 function newListItem(data, key, name) {
 	return {
@@ -519,12 +650,10 @@ function newListItem(data, key, name) {
 		animations: null,
 		name,
 		data,
-		key
+		key,
+		effects: []
 	};
 }
-const HYDRATION_START = "[";
-const HYDRATION_END = "]";
-const HYDRATION_BREAK = "^";
 function isCommentNode(node) {
 	return node.nodeType === 8;
 }
@@ -532,41 +661,58 @@ function isTextNode(node) {
 	return node.nodeType === 3;
 }
 function nodeCheckHydrationBreak(node) {
-	if (node !== null && isCommentNode(node) && node.data === HYDRATION_BREAK) {
+	if (node !== null && isCommentNode(node) && node.data === "^") {
 		let comment = node;
 		node = node.nextSibling;
 		comment.remove();
 	}
-	context_default.hydrationNode = node;
+	context.hydrationNode = node;
 	return node;
 }
 function nodeNext(node, text = false) {
-	if (context_default.hydrationNode !== null) {
+	if (context.hydrationNode !== null) {
 		if (text && isTextNode(node)) return node;
-		return nodeCheckHydrationBreak(node.nextSibling);
+		let next = nodeCheckHydrationBreak(node.nextSibling);
+		while (!text && next !== null && isTextNode(next) && next.textContent?.trim() === "") next = nodeCheckHydrationBreak(next.nextSibling);
+		if (!text && next !== null && next.nodeName === "TBODY" && next.firstChild && isTextNode(node)) {
+			next = next.firstChild;
+			context.hydrationNode = next;
+		}
+		return next;
 	}
 	return node.nextSibling;
 }
 function nodeAnchor(node) {
-	if (context_default.hydrationNode !== null) {
-		if (isCommentNode(node) && node.data === HYDRATION_START) {
+	if (context.hydrationNode !== null) {
+		if (isCommentNode(node) && node.data === "[") {
+			const startParent = node.parentNode;
 			let currentNode = nodeNext(node);
+			const firstInside = currentNode;
 			node.remove();
 			let level = 1;
 			while (currentNode !== null) {
 				if (isCommentNode(currentNode)) {
-					if (currentNode.data === HYDRATION_START) level += 1;
-					else if (currentNode.data === HYDRATION_END) {
+					if (currentNode.data === "[") level += 1;
+					else if (currentNode.data === "]") {
 						level -= 1;
 						if (level === 0) {
 							const endNode = currentNode.nextSibling;
 							currentNode.remove();
-							if (context_default.hydrationNode === currentNode) context_default.hydrationNode = endNode;
+							if (context.hydrationNode === currentNode) context.hydrationNode = endNode;
+							const region = context.activeRegion;
+							if (region.startNode === null && firstInside !== null) region.startNode = firstInside;
 							return endNode;
 						}
 					}
 				}
-				currentNode = currentNode.nextSibling;
+				if (currentNode.firstChild) currentNode = currentNode.firstChild;
+				else if (currentNode.nextSibling) currentNode = currentNode.nextSibling;
+				else {
+					let parent = currentNode.parentNode;
+					while (parent !== null && parent.nextSibling === null && parent !== startParent) parent = parent.parentNode;
+					if (parent === null || parent === startParent) currentNode = null;
+					else currentNode = parent.nextSibling;
+				}
 			}
 			if (currentNode === null) throw new Error("End hydration comment not found");
 		}
@@ -575,47 +721,97 @@ function nodeAnchor(node) {
 }
 function nodeChild(parent) {
 	let childNode = parent.firstChild;
-	if (context_default.hydrationNode !== null) {
+	if (context.hydrationNode !== null) {
 		if (childNode === null) childNode = parent.appendChild(parent.ownerDocument.createTextNode(""));
-		context_default.hydrationNode = childNode;
+		context.hydrationNode = childNode;
 	}
 	return childNode;
 }
+function walkHydrationRoot() {
+	let rootNode = context.hydrationNode;
+	while (rootNode !== null && isSkippable(rootNode)) {
+		const next = rootNode.nextSibling;
+		if (isCommentNode(rootNode) && rootNode.data === "^") rootNode.remove();
+		rootNode = next;
+		context.hydrationNode = rootNode;
+	}
+	while (rootNode !== null && rootNode.nodeName === "TBODY" && rootNode.firstChild !== null) {
+		rootNode = rootNode.firstChild;
+		context.hydrationNode = rootNode;
+	}
+	const region = context.activeRegion;
+	const isControlStart = rootNode !== null && isCommentNode(rootNode) && rootNode.data === "[";
+	if (region.startNode === null && !isControlStart) region.startNode = rootNode;
+	return rootNode;
+}
+function isSkippable(node) {
+	if (isTextNode(node) && (node.textContent ?? "").trim() === "") return true;
+	if (isCommentNode(node)) return node.data === "^" || node.data === "";
+	return false;
+}
+function nodeRootElement(node) {
+	if (context.hydrationNode !== null) return walkHydrationRoot();
+	return node;
+}
 function nodeRoot(parent, text = false) {
-	if (context_default.hydrationNode !== null) {
-		let rootNode = context_default.hydrationNode;
+	if (context.hydrationNode !== null) {
+		let rootNode = context.hydrationNode;
 		if (text && !isTextNode(rootNode) && rootNode.previousSibling !== null && isTextNode(rootNode.previousSibling)) {
 			rootNode = rootNode.previousSibling;
-			context_default.hydrationNode = rootNode;
+			context.hydrationNode = rootNode;
 		}
-		if (isCommentNode(rootNode) && rootNode.data === HYDRATION_START) {
-			rootNode = rootNode.nextSibling;
-			context_default.hydrationNode = rootNode;
-		}
-		const region = context_default.activeRegion;
-		if (region.startNode === null) region.startNode = rootNode;
+		if (!text) return walkHydrationRoot();
+		const region = context.activeRegion;
+		const isControlStart = rootNode !== null && isCommentNode(rootNode) && rootNode.data === "[";
+		if (region.startNode === null && !isControlStart) region.startNode = rootNode;
 		return rootNode;
 	} else return parent.firstChild;
 }
 function nodeSkip(node, count) {
 	let nextNode = node;
-	if (context_default.hydrationNode !== null) for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
+	if (context.hydrationNode !== null) for (let i = 0; i < count; i++) nextNode = nodeCheckHydrationBreak(nextNode.nextSibling);
 	else for (let i = 0; i < count; i++) nextNode = nextNode.nextSibling;
 	return nextNode;
 }
+function rerunRegionEffects(region) {
+	rerunEffectsOnRegion(region);
+	let child = region.nextRegion;
+	while (child !== null && child.depth > region.depth) {
+		rerunEffectsOnRegion(child);
+		child = child.nextRegion;
+	}
+}
+function rerunEffectsOnRegion(region) {
+	for (let effect of region.effects) {
+		runCleanups(effect);
+		deactivateSources(effect);
+		runEffect(effect);
+		clearSources(effect);
+	}
+}
 function runControl(region, anchor, create, name) {
 	let first = true;
+	const gen = region.generation = (region.generation ?? 0) + 1;
 	$run(function runControl() {
+		if (region.generation !== gen) return;
+		if (region.depth === -2) region.recreate = true;
 		const oldRegion = pushRegion(region, first);
 		first = false;
 		create(anchor);
 		popRegion(oldRegion);
+		if (context.hydrationNode !== null && anchor !== null) context.hydrationNode = anchor;
 	}, name);
-	if (context_default.hydrationNode) anchor = context_default.hydrationNode.nextSibling;
 }
 function runControlBranch(region, oldIndex, index) {
-	if (oldIndex === index) return false;
-	if (region.depth === -2) return false;
+	const recreate = region.recreate;
+	if (recreate) region.recreate = false;
+	if (oldIndex === index) {
+		if (recreate) {
+			if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
+			return true;
+		}
+		return false;
+	}
 	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
 }
@@ -624,13 +820,13 @@ function propagateSignal(proxy, key) {
 	if (signal !== void 0 && signal.firstTarget !== null) {
 		batchStart();
 		try {
-			if (context_default.firstSignalToUpdate === null) context_default.firstSignalToUpdate = signal;
+			if (context.firstSignalToUpdate === null) context.firstSignalToUpdate = signal;
 			else if (signal.nextSignalToUpdate === null) {
-				let lastSignal = context_default.firstSignalToUpdate;
+				let lastSignal = context.firstSignalToUpdate;
 				while (lastSignal.nextSignalToUpdate !== null) lastSignal = lastSignal.nextSignalToUpdate;
 				lastSignal.nextSignalToUpdate = signal;
 			}
-			let lastEffect = context_default.firstEffectToRun;
+			let lastEffect = context.firstEffectToRun;
 			if (lastEffect !== null) while (lastEffect.nextEffectToRun !== null) lastEffect = lastEffect.nextEffectToRun;
 			let targetSub = signal.firstTarget;
 			let computed;
@@ -638,9 +834,9 @@ function propagateSignal(proxy, key) {
 				targetSub.active = false;
 				targetSub.recalc = true;
 				const target = targetSub.target;
-				if (target.type === EFFECT_TYPE) {
+				if (target.type === 2) {
 					if (lastEffect === null) {
-						context_default.firstEffectToRun = target;
+						context.firstEffectToRun = target;
 						lastEffect = target;
 					} else if (target.nextEffectToRun === null && lastEffect !== target) {
 						lastEffect.nextEffectToRun = target;
@@ -657,7 +853,7 @@ function propagateSignal(proxy, key) {
 				}
 				while (targetSub.nextTarget === null && computed !== void 0) {
 					targetSub = computed.rollback;
-					if (targetSub.source.type !== COMPUTED_TYPE) {
+					if (targetSub.source.type !== 1) {
 						computed = void 0;
 						continue outer;
 					}
@@ -675,7 +871,7 @@ function trackProxySignal(data, key) {
 	let signal = data.signals.get(key);
 	if (signal === void 0) {
 		signal = {
-			type: SIGNAL_TYPE,
+			type: 0,
 			firstTarget: null,
 			nextSignalToUpdate: null
 		};
@@ -697,33 +893,33 @@ function proxyGet(target, key, receiver) {
 				}
 				trackProxySignal(data, key);
 			} else if (propDescriptor.get) {
-				const oldRegisterComputed = context_default.registerComputed;
+				const oldRegisterComputed = context.registerComputed;
 				try {
-					context_default.registerComputed = (computed) => {
+					context.registerComputed = (computed) => {
 						data.signals.set(key, computed);
 					};
 					return Reflect.get(target, key, receiver);
 				} finally {
-					context_default.registerComputed = oldRegisterComputed;
+					context.registerComputed = oldRegisterComputed;
 				}
 			}
 		} else if (data.isArray) {
 			if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
 		} else trackProxySignal(data, key);
-	} else if (signal.type === SIGNAL_TYPE) trackProxySignal(data, key);
-	else if (signal.type === COMPUTED_TYPE) {
+	} else if (signal.type === 0) trackProxySignal(data, key);
+	else if (signal.type === 1) {
 		if (signal.running) throw new Error("Cycle detected");
 		else if (signal.recalc) checkComputed(signal);
 		else if (signal.didError) throw signal.value;
 		else trackSignal(signal);
 		return signal.value;
 	}
-	return Reflect.get(target, key, receiver);
+	return target[key];
 }
 const arrayWrapper = {
 	[Symbol.iterator]: function(data, target, key) {
 		trackProxySignal(data, "length");
-		context_default.activeTarget = null;
+		context.activeTarget = null;
 		return target[key];
 	},
 	pop: arrayHandle,
@@ -744,9 +940,9 @@ function arrayHandle(data, target, key) {
 function proxySet(target, key, value, receiver) {
 	const oldValue = target[key];
 	if (value !== oldValue) {
-		if (context_default.batchOperation > 100) throw new Error("Cycle detected");
+		if (context.batchOperation > 100) throw new Error("Cycle detected");
 		let data = target[proxyDataSymbol];
-		devContext_default.signalSet(data, key);
+		devContext.signalSet(data, key);
 		if (oldValue && oldValue[proxyDataSymbol] !== void 0) value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
 		Reflect.set(target, key, value, receiver);
 		propagateSignal(data, key);
@@ -754,6 +950,10 @@ function proxySet(target, key, value, receiver) {
 	}
 	return true;
 }
+const sharedHandler = {
+	get: proxyGet,
+	set: proxySet
+};
 function $watch(object, options) {
 	if (object === void 0 || object === null || object[proxyDataSymbol] !== void 0) return object;
 	const data = {
@@ -763,13 +963,48 @@ function $watch(object, options) {
 		signals: /* @__PURE__ */ new Map()
 	};
 	object[proxyDataSymbol] = data;
-	const handler = {
-		get: proxyGet,
-		set: proxySet
-	};
-	const proxy = new Proxy(object, handler);
-	devContext_default.onWatch(data);
+	const proxy = new Proxy(object, sharedHandler);
+	devContext.onWatch(data);
 	return proxy;
+}
+function getSequence(arr) {
+	const p = arr.slice();
+	const result = [0];
+	let i;
+	let j;
+	let u;
+	let v;
+	let c;
+	const len = arr.length;
+	for (i = 0; i < len; i++) {
+		const arrI = arr[i];
+		if (arrI !== 0) {
+			j = result[result.length - 1];
+			if (arr[j] < arrI) {
+				p[i] = j;
+				result.push(i);
+				continue;
+			}
+			u = 0;
+			v = result.length - 1;
+			while (u < v) {
+				c = u + v >> 1;
+				if (arr[result[c]] < arrI) u = c + 1;
+				else v = c;
+			}
+			if (arrI < arr[result[u]]) {
+				if (u > 0) p[i] = result[u - 1];
+				result[u] = i;
+			}
+		}
+	}
+	u = result.length;
+	v = result[u - 1];
+	while (u-- > 0) {
+		result[u] = v;
+		v = p[v];
+	}
+	return result;
 }
 function moveRegion(parent, region, before) {
 	parent = before?.parentNode ?? parent;
@@ -782,116 +1017,137 @@ function moveRegion(parent, region, before) {
 		currentNode = nextNode;
 	}
 }
-function runListItems(region, parent, anchor, oldItems, newItems, create, update) {
-	let oldStartIndex = 0;
-	let oldEndIndex = oldItems.length - 1;
-	let oldStartItem = oldItems[0];
-	let oldEndItem = oldItems[oldEndIndex];
-	let newStartIndex = 0;
-	let newEndIndex = newItems.length - 1;
-	let newStartItem = newItems[0];
-	let newEndItem = newItems[newEndIndex];
-	let oldKeyToIndex;
-	let newKeyToIndex;
-	while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) if (oldStartItem === null) oldStartItem = oldItems[++oldStartIndex];
-	else if (oldEndItem === null) oldEndItem = oldItems[--oldEndIndex];
-	else if (newStartItem === null) newStartItem = newItems[++newStartIndex];
-	else if (newEndItem === null) newEndItem = newItems[--newEndIndex];
-	else if (oldStartItem.key === newStartItem.key) {
-		transferListItemData(oldStartItem, newStartItem, update);
-		oldStartItem = oldItems[++oldStartIndex];
-		newStartItem = newItems[++newStartIndex];
-	} else if (oldEndItem.key === newEndItem.key) {
-		transferListItemData(oldEndItem, newEndItem, update);
-		oldEndItem = oldItems[--oldEndIndex];
-		newEndItem = newItems[--newEndIndex];
-	} else if (oldStartItem.key === newEndItem.key) {
-		moveRegion(parent, oldStartItem, oldEndItem.endNode.nextSibling);
-		transferListItemData(oldStartItem, newEndItem, update);
-		oldStartItem = oldItems[++oldStartIndex];
-		newEndItem = newItems[--newEndIndex];
-	} else if (oldEndItem.key === newStartItem.key) {
-		moveRegion(parent, oldEndItem, oldStartItem.startNode);
-		transferListItemData(oldEndItem, newStartItem, update);
-		oldEndItem = oldItems[--oldEndIndex];
-		newStartItem = newItems[++newStartIndex];
-	} else {
-		if (oldKeyToIndex === void 0 || newKeyToIndex === void 0) {
-			oldKeyToIndex = /* @__PURE__ */ new Map();
-			for (let i = oldStartIndex; i < oldEndIndex; i++) oldKeyToIndex.set(oldItems[i].key, i);
-			newKeyToIndex = /* @__PURE__ */ new Map();
-			for (let i = newStartIndex; i < newEndIndex; i++) newKeyToIndex.set(newItems[i].key, i);
+const SHALLOW_WATCH_OPTIONS = { shallow: true };
+function mountSpec(spec, region, before, create, noWatch) {
+	const item = newListItem(spec.data, spec.key);
+	const savedActiveRegion = context.activeRegion;
+	item.depth = region.depth + 1;
+	context.activeRegion = item;
+	if (noWatch !== true) item.data = $watch(item.data, SHALLOW_WATCH_OPTIONS);
+	create(item, before);
+	context.activeRegion = savedActiveRegion;
+	return item;
+}
+function runListItems(region, parent, anchor, oldItems, newSpecs, create, update, noWatch) {
+	const newItems = Array.from({ length: newSpecs.length });
+	const nextSibling = oldItems.length > 0 ? oldItems[oldItems.length - 1].nextRegion : region.nextRegion;
+	let oldStart = 0;
+	let oldEnd = oldItems.length - 1;
+	let newStart = 0;
+	let newEnd = newSpecs.length - 1;
+	while (oldStart <= oldEnd && newStart <= newEnd) if (oldItems[oldStart].key === newSpecs[newStart].key) {
+		const item = oldItems[oldStart];
+		update(item, newSpecs[newStart]);
+		newItems[newStart] = item;
+		oldStart++;
+		newStart++;
+	} else if (oldItems[oldEnd].key === newSpecs[newEnd].key) {
+		const item = oldItems[oldEnd];
+		update(item, newSpecs[newEnd]);
+		newItems[newEnd] = item;
+		oldEnd--;
+		newEnd--;
+	} else if (oldItems[oldStart].key === newSpecs[newEnd].key) {
+		const item = oldItems[oldStart];
+		moveRegion(parent, item, oldItems[oldEnd].endNode?.nextSibling ?? anchor);
+		update(item, newSpecs[newEnd]);
+		newItems[newEnd] = item;
+		oldStart++;
+		newEnd--;
+	} else if (oldItems[oldEnd].key === newSpecs[newStart].key) {
+		const item = oldItems[oldEnd];
+		moveRegion(parent, item, oldItems[oldStart].startNode);
+		update(item, newSpecs[newStart]);
+		newItems[newStart] = item;
+		oldEnd--;
+		newStart++;
+	} else break;
+	if (oldStart > oldEnd) {
+		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1].startNode : anchor;
+		for (let i = newStart; i <= newEnd; i++) newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
+	} else if (newStart > newEnd) for (let i = oldStart; i <= oldEnd; i++) clearRegion(oldItems[i]);
+	else {
+		const newKeyToIndex = /* @__PURE__ */ new Map();
+		for (let i = newStart; i <= newEnd; i++) newKeyToIndex.set(newSpecs[i].key, i);
+		let anyOverlap = false;
+		for (let i = oldStart; i <= oldEnd; i++) if (newKeyToIndex.has(oldItems[i].key)) {
+			anyOverlap = true;
+			break;
 		}
-		let oldIndex = oldKeyToIndex.get(newStartItem.key);
-		let newIndex = newKeyToIndex.get(oldStartItem.key);
-		if (oldIndex === void 0 && newIndex === void 0) {
-			const oldRegion = pushRegion(newStartItem, true);
-			newStartItem.data = $watch(newStartItem.data, { shallow: true });
-			create(newStartItem, oldStartItem.startNode);
-			popRegion(oldRegion);
-			newStartItem.previousRegion = oldStartItem.previousRegion;
-			newStartItem.nextRegion = oldStartItem;
-			oldStartItem.previousRegion = newStartItem;
-			clearRegion(oldStartItem);
-			oldStartItem = oldItems[++oldStartIndex];
-			newStartItem = newItems[++newStartIndex];
-		} else if (oldIndex === void 0) {
-			const oldRegion = pushRegion(newStartItem, true);
-			newStartItem.data = $watch(newStartItem.data, { shallow: true });
-			create(newStartItem, oldStartItem.startNode);
-			popRegion(oldRegion);
-			newStartItem = newItems[++newStartIndex];
-		} else if (newIndex === void 0) {
-			clearRegion(oldStartItem);
-			oldStartItem = oldItems[++oldStartIndex];
+		if (!anyOverlap) {
+			let before = oldItems[oldEnd]?.endNode?.nextSibling ?? anchor;
+			for (let i = oldEnd; i >= oldStart; i--) clearRegion(oldItems[i]);
+			for (let i = newStart; i <= newEnd; i++) {
+				newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
+				before = newItems[i].endNode.nextSibling;
+			}
 		} else {
-			const oldData = oldItems[oldIndex];
-			moveRegion(parent, oldData, oldStartItem.startNode);
-			transferListItemData(oldData, newStartItem, update);
-			oldItems[oldIndex] = null;
-			newStartItem = newItems[++newStartIndex];
+			const newMidLen = newEnd - newStart + 1;
+			const newIndexToOld = Array.from({ length: newMidLen }).fill(0);
+			for (let i = oldStart; i <= oldEnd; i++) {
+				const oldItem = oldItems[i];
+				const newIdx = newKeyToIndex.get(oldItem.key);
+				if (newIdx !== void 0) {
+					newIndexToOld[newIdx - newStart] = i + 1;
+					update(oldItem, newSpecs[newIdx]);
+					newItems[newIdx] = oldItem;
+				} else clearRegion(oldItem);
+			}
+			const seq = getSequence(newIndexToOld);
+			let j = seq.length - 1;
+			for (let i = newMidLen - 1; i >= 0; i--) {
+				const newIdx = newStart + i;
+				const before = newIdx + 1 < newSpecs.length ? newItems[newIdx + 1].startNode : anchor;
+				if (newIndexToOld[i] === 0) newItems[newIdx] = mountSpec(newSpecs[newIdx], region, before, create, noWatch);
+				else if (j < 0 || i !== seq[j]) moveRegion(parent, newItems[newIdx], before);
+				else j--;
+			}
 		}
 	}
-	if (oldStartIndex <= oldEndIndex || newStartIndex <= newEndIndex) if (oldStartIndex > oldEndIndex) {
-		let before = oldStartItem?.startNode ?? oldItems[oldItems.length - 1]?.endNode?.nextSibling ?? anchor;
-		for (; newStartIndex <= newEndIndex; newStartItem = newItems[++newStartIndex]) {
-			const oldRegion = pushRegion(newStartItem, true);
-			newStartItem.data = $watch(newStartItem.data, { shallow: true });
-			create(newStartItem, before);
-			popRegion(oldRegion);
-			before = newStartItem.endNode.nextSibling;
+	if (newItems.length > 0) {
+		let prevTail = region;
+		for (let i = 0; i < newItems.length; i++) {
+			const item = newItems[i];
+			item.previousRegion = prevTail;
+			prevTail.nextRegion = item;
+			let last = item;
+			let next = item.nextRegion;
+			while (next !== null && next.depth > item.depth) {
+				last = next;
+				next = next.nextRegion;
+			}
+			prevTail = last;
 		}
-	} else for (; oldEndIndex >= oldStartIndex; oldStartItem = oldItems[oldEndIndex--]) clearRegion(oldStartItem);
-	if (newItems.length > 0) region.nextRegion = newItems[0];
-	else if (oldItems.length > 0) region.nextRegion = oldItems[oldItems.length - 1].nextRegion;
+		prevTail.nextRegion = nextSibling;
+		if (nextSibling !== null) nextSibling.previousRegion = prevTail;
+		region.nextRegion = newItems[0];
+		context.previousRegion = prevTail;
+	} else {
+		region.nextRegion = nextSibling;
+		if (nextSibling !== null) nextSibling.previousRegion = region;
+		context.previousRegion = region;
+	}
+	return newItems;
 }
-function transferListItemData(oldItem, newItem, update) {
-	newItem.startNode = oldItem.startNode;
-	newItem.endNode = oldItem.endNode;
-	update(oldItem, newItem);
-	newItem.data = oldItem.data;
-	newItem.name = oldItem.name;
-}
-function runList(region, parent, anchor, buildItems, create, update) {
+function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 	let first = true;
 	let listItems = [];
 	$run(function runList() {
+		if (region.depth === -2) return;
 		const oldRegion = pushRegion(region, first);
 		first = false;
-		const newItems = buildItems();
-		context_default.activeTarget = null;
-		runListItems(region, parent, anchor, listItems, newItems, create, update);
-		listItems = newItems;
+		const newSpecs = buildItems();
+		context.activeTarget = null;
+		listItems = runListItems(region, parent, anchor, listItems, newSpecs, create, update, noWatch);
 		popRegion(oldRegion);
 	});
-	if (context_default.hydrationNode !== null) anchor = context_default.hydrationNode.nextSibling;
 }
 function setAttribute(el, name, value) {
 	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
 	else el.setAttribute(name, value);
 }
 function setDynamicElement(el, tag) {
-	if (context_default.hydrationNode !== null) return el;
+	if (context.hydrationNode !== null) return el;
 	let newElement = el.ownerDocument.createElement(tag);
 	for (const attr of el.attributes) newElement.setAttributeNS(null, attr.name, attr.value);
 	newElement.replaceChildren(...el.childNodes.values());
@@ -899,7 +1155,7 @@ function setDynamicElement(el, tag) {
 	return newElement;
 }
 function $batch(fn) {
-	if (context_default.batch > 0) return fn();
+	if (context.batch > 0) return fn();
 	batchStart();
 	try {
 		return fn();
@@ -907,10 +1163,25 @@ function $batch(fn) {
 		batchEnd();
 	}
 }
+function $bind(state, props, keys) {
+	if (props === void 0) return;
+	for (let key of keys) {
+		$run(() => {
+			const v = props[key];
+			if (v !== void 0) state[key] = v;
+		}, `bind:forward:${key}`);
+		let firstBackward = true;
+		$run(() => {
+			const value = state[key];
+			if (!firstBackward) props[key] = value;
+			firstBackward = false;
+		}, `bind:backward:${key}`);
+	}
+}
 function $cache(fn) {
-	if (context_default.registerComputed === null) throw new Error("$cache must be used in a getter");
+	if (context.registerComputed === null) throw new Error("$cache must be used in a getter");
 	let computed = {
-		type: COMPUTED_TYPE,
+		type: 1,
 		value: null,
 		run: fn,
 		firstSource: null,
@@ -920,18 +1191,26 @@ function $cache(fn) {
 		didError: false,
 		rollback: null
 	};
-	context_default.registerComputed(computed);
+	context.registerComputed(computed);
 	runComputed(computed);
 	return computed.value;
 }
+function $handle(fn) {
+	let firstRun = true;
+	$run(() => {
+		const first = firstRun;
+		firstRun = false;
+		return fn(first);
+	});
+}
 function $mount(fn) {
-	context_default.mountEffects.push(fn);
+	context.mountEffects.push(fn);
 }
 function $peek(fn) {
-	const oldActiveTarget = context_default.activeTarget;
-	context_default.activeTarget = null;
+	const oldActiveTarget = context.activeTarget;
+	context.activeTarget = null;
 	const result = fn();
-	context_default.activeTarget = oldActiveTarget;
+	context.activeTarget = oldActiveTarget;
 	return result;
 }
 let initialized = false;
@@ -968,6 +1247,7 @@ var ReactiveDate = class ReactiveDate extends Date {
 		}
 	}
 };
+let t_add_element = addElement;
 let t_add_fragment = addFragment;
 let t_anchor = nodeAnchor;
 let t_animate = addAnimation;
@@ -979,12 +1259,15 @@ let t_dynamic = setDynamicElement;
 let t_event = addEvent;
 let t_fmt = formatText;
 let t_fragment = getFragment;
+let t_fragment_el = getElementFragment;
 let t_list_item = newListItem;
 let t_next = nodeNext;
 let t_pop_region = popRegion;
 let t_push_region = pushRegion;
 let t_region = newRegion;
+let t_rerun_region_effects = rerunRegionEffects;
 let t_root = nodeRoot;
+let t_root_el = nodeRootElement;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
