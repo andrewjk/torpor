@@ -221,14 +221,16 @@ async function runTarget(t) {
 		console.log(row.join('| '));
 	}
 
-	// Pairwise ratio: when more than one target was driven, treat the FIRST
-	// target as the baseline and report every other target as a ratio of it.
-	// Single-target runs skip this block (nothing to compare against).
+	// Pairwise ratio: when more than one target was driven, treat TORPOR as the
+	// baseline (falling back to the first target when torpor isn't present) and
+	// report every other target as a ratio of it. Single-target runs skip this
+	// block (nothing to compare against).
 	if (TARGETS.length > 1) {
-		const baselineName = TARGETS[0].name;
+		const baselineName = TARGETS.find((t) => t.name === 'torpor')?.name ?? TARGETS[0].name;
 		const baseline = all[baselineName];
 		console.log();
-		for (const t of TARGETS.slice(1)) {
+		for (const t of TARGETS) {
+			if (t.name === baselineName) continue;
 			const r = all[t.name];
 			console.log(`${t.name} / ${baselineName} ratio (score; <1 means ${t.name} faster):`);
 			for (const op of OPS) {

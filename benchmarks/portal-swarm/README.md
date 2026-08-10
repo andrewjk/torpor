@@ -144,7 +144,7 @@ BENCH_JSON=out.json pnpm bench   # also write machine-readable results
 
 Swap `build && … preview` for `dev` to measure the unminified dev build. Set
 `TARGETS='[{"name":"octane-tsrx","url":"http://localhost:5210/"}]'` to run a
-single adapter. The FIRST target in `TARGETS` is the ratio baseline.
+single adapter. TORPOR is the ratio baseline when present, else the FIRST target in `TARGETS`.
 
 ## Caveats / bias notes
 

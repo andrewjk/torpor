@@ -327,13 +327,14 @@ function writeBenchJson(all, failed) {
 		console.log(row.join('| '));
 	}
 
-	// Pairwise ratio block — FIRST target (octane-tsrx) is the baseline. Ops
-	// where either side failed its gate are skipped (no comparable number).
+	// Pairwise ratio block — TORPOR is the baseline when present, else the FIRST
+	// target. Ops where either side failed its gate are skipped (no comparable number).
 	if (TARGETS.length > 1) {
-		const baselineName = TARGETS[0].name;
+		const baselineName = TARGETS.find((t) => t.name === 'torpor')?.name ?? TARGETS[0].name;
 		const baseline = all[baselineName].ops;
 		console.log();
-		for (const t of TARGETS.slice(1)) {
+		for (const t of TARGETS) {
+			if (t.name === baselineName) continue;
 			const r = all[t.name].ops;
 			console.log(`${t.name} / ${baselineName} ratio (score; <1 means ${t.name} faster):`);
 			for (const op of OPS) {

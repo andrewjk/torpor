@@ -368,12 +368,13 @@ async function runTarget(t, failures) {
 		console.log(row.join('| '));
 	}
 
-	// Pairwise ratio: the FIRST target is the baseline (js-framework convention).
+	// Pairwise ratio: TORPOR is the baseline when present, else the FIRST target.
 	if (TARGETS.length > 1) {
-		const baselineName = TARGETS[0].name;
+		const baselineName = TARGETS.find((t) => t.name === 'torpor')?.name ?? TARGETS[0].name;
 		const baseline = all[baselineName].results;
 		console.log();
-		for (const t of TARGETS.slice(1)) {
+		for (const t of TARGETS) {
+			if (t.name === baselineName) continue;
 			const r = all[t.name].results;
 			console.log(`${t.name} / ${baselineName} ratio (score; <1 means ${t.name} faster):`);
 			for (const op of OPS) {

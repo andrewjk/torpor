@@ -5,9 +5,14 @@
 // per-op green→red heatmap (green = fastest in that row, red = slowest). Timing
 // ops (those carrying a `score`) are coloured; deterministic count ops (only
 // `median`) are shown plain. The baseline column (torpor) is labelled so the
-// ratio framing from the console matches at a glance.
+// ratio framing from the console matches at a glance, and the total row is a
+// weighted geometric mean of each target's per-op scores relative to a REFERENCE
+// framework — octane-tsrx (falling back to torpor), weighted by the reference's
+// own per-op time, so the reference reads exactly 1 (faster overall < 1, slower > 1).
 
 export const HTML_BASELINE = "torpor";
+// Reference framework for the timing total row's weighted geometric mean.
+export const TOTAL_REFERENCE = "octane-tsrx";
 
 function escapeHtml(s) {
 	return String(s)
@@ -71,10 +76,34 @@ export function buildHtmlReport(result) {
 		})
 		.join("");
 
-	// Total row: sum of each target's timing scores (missing ops skipped, not
-	// zeroed). Heatmap shades the totals across targets — green = lowest sum
-	// (fastest overall), red = highest.
+	// Total row: a weighted geometric mean of each target's per-op scores
+	// relative to a REFERENCE framework (octane-tsrx, falling back to torpor, then
+	// to the plain sum when neither is present). ratio = target.score /
+	// reference.score, weighted by the reference's own score so long-running ops
+	// dominate; the reference itself therefore reads exactly 1, a target faster
+	// overall lands < 1, slower > 1. Missing/zero scores are skipped, not zeroed.
+	// Heatmap shades the totals across targets — green = lowest (fastest overall),
+	// red = highest.
+	const referenceTarget =
+		targets.find((t) => t.name === TOTAL_REFERENCE) ??
+		targets.find((t) => t.name === HTML_BASELINE) ??
+		null;
 	const totalsByTarget = targets.map((t) => {
+		if (referenceTarget) {
+			let weightedLogSum = 0;
+			let weightSum = 0;
+			let counted = 0;
+			for (const op of timingOps) {
+				const s = t.ops?.[op]?.score;
+				const base = referenceTarget.ops?.[op]?.score;
+				if (typeof s === "number" && s > 0 && typeof base === "number" && base > 0) {
+					weightedLogSum += base * Math.log(s / base);
+					weightSum += base;
+					counted++;
+				}
+			}
+			return { value: weightSum > 0 ? Math.exp(weightedLogSum / weightSum) : NaN, counted };
+		}
 		let sum = 0;
 		let counted = 0;
 		for (const op of timingOps) {
@@ -84,17 +113,19 @@ export function buildHtmlReport(result) {
 				counted++;
 			}
 		}
-		return { sum, counted };
+		return { value: sum, counted };
 	});
-	const totalNums = totalsByTarget.map((x) => x.sum);
+	const totalNums = totalsByTarget.map((x) => x.value).filter((v) => Number.isFinite(v));
 	const totalMin = totalNums.length ? Math.min(...totalNums) : 0;
 	const totalMax = totalNums.length ? Math.max(...totalNums) : 0;
 	const totalCells = totalsByTarget
 		.map((x) => {
-			if (x.counted === 0) return '<td class="na">—</td>';
-			const bg = heatmapColor(x.sum, totalMin, totalMax);
-			const tip = `sum of ${x.counted} timing op(s)`;
-			return `<td style="background:${bg}" class="total" title="${tip}">${fmtNum(x.sum)}</td>`;
+			if (x.counted === 0 || !Number.isFinite(x.value)) return '<td class="na">—</td>';
+			const bg = heatmapColor(x.value, totalMin, totalMax);
+			const tip = referenceTarget
+				? `${referenceTarget.name}-time-weighted geomean of ${x.counted} timing op(s) vs ${referenceTarget.name}`
+				: `sum of ${x.counted} timing op(s)`;
+			return `<td style="background:${bg}" class="total" title="${tip}">${fmtNum(x.value)}</td>`;
 		})
 		.join("");
 	const totalRow =
@@ -129,7 +160,10 @@ export function buildHtmlReport(result) {
 		: "";
 
 	const baselineNote = names.includes(HTML_BASELINE)
-		? `<br>baseline: <strong>${escapeHtml(HTML_BASELINE)}</strong>`
+		? `<br>ratio baseline: <strong>${escapeHtml(HTML_BASELINE)}</strong>` +
+			(referenceTarget && referenceTarget.name !== HTML_BASELINE
+				? ` · total vs <strong>${escapeHtml(referenceTarget.name)}</strong>`
+				: "")
 		: "";
 	const suiteName = escapeHtml(result.suite || "benchmark");
 

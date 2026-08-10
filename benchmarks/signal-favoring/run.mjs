@@ -495,6 +495,7 @@ const DIALECT_PAIR_NAMES = ['octane-tsrx'];
 
 	if (successfulTargets.length > 1) {
 		const baselineName =
+			successfulTargets.find((target) => target.name === 'torpor')?.name ??
 			successfulTargets.find((target) => target.name === 'vue-vapor')?.name ??
 			successfulTargets.at(-1).name;
 		const baseline = all[baselineName];

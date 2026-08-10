@@ -170,7 +170,7 @@ node benchmarks/bench.mjs memo-wall
 
 Swap `build && … preview` for `dev` to measure the unminified dev build. Set
 `TARGETS='[{"name":"octane-tsrx","url":"http://localhost:5206/"}]'` to run a
-single target (the first target is the ratio baseline). Set
+single target (torpor is the ratio baseline when present, else the first target). Set
 `BENCH_JSON=/path/out.json` to also write machine-readable results (on a gate
 failure the file still gets written, with a top-level `failed` field, and the
 process exits 1).

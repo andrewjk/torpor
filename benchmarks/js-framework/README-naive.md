@@ -67,8 +67,9 @@ TARGETS='[{"name":"octane-tsrx","url":"http://localhost:5176/","ready":"#run"},
   node run.mjs
 ```
 
-The first target is the ratio baseline, so putting the tuned fixture first
-makes every printed ratio a naive/tuned cliff number directly.
+Torpor is the ratio baseline when present; none of these three deopt targets is
+torpor, so the first target becomes the baseline — putting the tuned fixture
+first makes every printed ratio a naive/tuned cliff number directly.
 
 The naive fixtures also carry the keyed-reorder buttons (mirroring the tuned
 set), so `run-reorder.mjs` can drive them the same way — but the canonical

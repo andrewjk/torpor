@@ -3,7 +3,7 @@
 // prepend100 / append100 / insertmid100 / removefirst / removeevery10 /
 // displace{3,4,5,6,8}) and times each permutation op via Playwright. Same
 // methodology as ./run.mjs (synchronous in-page clicks, window.gc() before
-// every timed sample, median+min tables, first target = ratio baseline), with
+// every timed sample, median+min tables, torpor = ratio baseline), with
 // two additions:
 //
 //   1. INNER-LOOP TIMING. Most reorder ops are far below performance.now()'s
@@ -355,13 +355,15 @@ function writeBenchJson(payload) {
 		console.log(row.join('| '));
 	}
 
-	// Pairwise ratio: FIRST target (octane-tsrx by default) is the baseline.
-	// Ops where either side failed its gate are shown as GATE FAIL, not a ratio.
+	// Pairwise ratio: TORPOR (by default) is the baseline; falls back to the
+	// first target when torpor isn't among the driven targets. Ops where either
+	// side failed its gate are shown as GATE FAIL, not a ratio.
 	if (TARGETS.length > 1) {
-		const baselineName = TARGETS[0].name;
+		const baselineName = TARGETS.find((t) => t.name === 'torpor')?.name ?? TARGETS[0].name;
 		const baseline = all[baselineName].results;
 		console.log();
-		for (const t of TARGETS.slice(1)) {
+		for (const t of TARGETS) {
+			if (t.name === baselineName) continue;
 			const r = all[t.name].results;
 			console.log(`${t.name} / ${baselineName} ratio (score; <1 means ${t.name} faster):`);
 			for (const op of OPS) {

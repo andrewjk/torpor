@@ -30,7 +30,8 @@ benchmarks/js-framework/
 ```
 
 Both harnesses compare octane-tsrx / react / preact / ripple /
-solid / svelte / vue-vapor, with octane-tsrx as the ratio baseline.
+solid / svelte / vue-vapor / torpor, with **torpor as the ratio baseline**
+(falling back to the first driven target when torpor isn't among `TARGETS`).
 
 The octane app is authored **twice** over the same octane core — once in `.tsrx`
 (directive syntax) and once in React-style `.tsx` (JSX). Both emit the same DOM
@@ -205,11 +206,11 @@ TARGETS='[
 ]' node run.mjs
 ```
 
-The harness prints a side-by-side table, then a pairwise ratio block treating the
-FIRST target as the baseline:
+The harness prints a side-by-side table, then a pairwise ratio block treating
+TORPOR as the baseline when it's among the driven targets, else the FIRST one:
 
 ```
-inferno-next / octane ratio (median; <1 means inferno-next faster):
+inferno-next / torpor ratio (median; <1 means inferno-next faster):
   run      1.07x  -- slower
   update   0.92x  ++ faster
   …
