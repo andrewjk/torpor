@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Preact reference weather-app benchmark fixture.",
   "scripts": {
-    "dev": "vite --host --port 5294 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5294 --strictPort"
+    "dev": "vp dev --host --port 5294 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5294 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "description": "News-site SSR and hydration benchmark fixture for Preact.",
   "scripts": {
-    "dev": "vite --host --port 5270 --strictPort"
+    "dev": "vp dev --host --port 5270 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default",

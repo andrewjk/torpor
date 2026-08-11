@@ -1,0 +1,44 @@
+import { fetchData, LEVELS } from "./data.js";
+
+// One async component per nesting level: `@await` suspends THIS level, so
+// level N+1 doesn't mount (nor start its fetch) until level N's promise
+// resolved — the classic waterfall this suite exists to measure. Updates bump
+// the version and cascade the same way.
+
+function Level($props) {
+	let $state = $watch({ data: fetchData($props.level, $props.version) });
+
+	// Re-fetch when the version prop changes (the fetch is cached per
+	// (level, version), so this reuses the promise once the new version is
+	// being fetched).
+	$run(() => {
+		$state.data = fetchData($props.level, $props.version);
+	});
+
+	@render {
+		@await ($state.data) {
+			<div class="level" data-level={$props.level}>
+				<span class="val">loading…</span>
+			</div>
+		} then (data) {
+			<div class="level" data-level={$props.level}>
+				<span class="val">{data}</span>
+				@if ($props.level < LEVELS - 1) {
+					<Level level={$props.level + 1} version={$props.version} />
+				}
+			</div>
+		}
+	}
+}
+
+export default function Main() {
+	let $state = $watch({ version: 0 });
+
+	window.__bump = () => {
+		$state.version = $state.version + 1;
+	};
+
+	@render {
+		<Level level={0} version={$state.version} />
+	}
+}

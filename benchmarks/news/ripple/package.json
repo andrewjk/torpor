@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "description": "news-site SSR+hydration bench fixture for the original Ripple framework (authored in .tsrx, compiled via @tsrx/ripple).",
   "scripts": {
-    "dev": "vite --host --port 5194 --strictPort"
+    "dev": "vp dev --host --port 5194 --strictPort"
   },
   "dependencies": {
     "ripple": "catalog:default"

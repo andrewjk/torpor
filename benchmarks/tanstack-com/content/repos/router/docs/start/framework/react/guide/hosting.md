@@ -276,7 +276,7 @@ Follow the [`Nitro`](#nitro) deployment instructions. Use the `node` command to 
 Ensure `build` and `start` npm scripts are present in your `package.json` file:
 
 ```json
-    "build": "vite build",
+    "build": "vp build",
     "start": "node .output/server/index.mjs"
 ```
 

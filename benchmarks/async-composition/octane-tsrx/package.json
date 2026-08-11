@@ -5,12 +5,12 @@
   "version": "0.0.1",
   "description": "Compiled Octane fixture for the async-composition benchmark.",
   "scripts": {
-    "dev": "vite --host --port 5282 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5282 --strictPort"
+    "dev": "vp dev --host --port 5282 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5282 --strictPort"
   },
   "dependencies": {
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default"

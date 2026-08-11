@@ -5,7 +5,7 @@
   "version": "0.0.1",
   "description": "React 19 column of the Tauri desktop-shell benchmark - the same cold start, IPC-streamed log tail, and synchronous keyed churn.",
   "scripts": {
-    "build": "vite build"
+    "build": "vp build"
   },
   "dependencies": {
     "@benchmarks/tauri-shell-harness": "workspace:*",

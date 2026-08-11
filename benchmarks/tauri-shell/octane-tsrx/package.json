@@ -5,12 +5,12 @@
   "version": "0.0.1",
   "description": "Octane column of the Tauri desktop-shell benchmark - cold start, IPC-streamed log tail, and synchronous keyed churn inside the real webview.",
   "scripts": {
-    "build": "vite build"
+    "build": "vp build"
   },
   "dependencies": {
     "@benchmarks/tauri-shell-harness": "workspace:*",
     "@tauri-apps/api": "catalog:default",
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "terser": "catalog:default",

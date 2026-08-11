@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Streaming-chat fixture for Vue Vapor (3.6 vapor mode) - the Vue column for the deterministic token-stream ops.",
   "scripts": {
-    "dev": "vite --host --port 5254 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5254 --strictPort"
+    "dev": "vp dev --host --port 5254 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5254 --strictPort"
   },
   "dependencies": {
     "vue": "catalog:default",

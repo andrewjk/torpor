@@ -1,0 +1,117 @@
+import { initialConversations, nextReply, userMessage, segText } from "./data.js";
+
+export default function ChatApp() {
+	let $state = $watch({
+		convs: initialConversations(),
+		active: 0,
+		draft: "",
+		streamingId: null,
+	});
+
+	function send() {
+		const text = $state.draft.trim();
+		if (text === "") return;
+		const reply = nextReply();
+		$state.convs = $state.convs.map((c, i) =>
+			i === $state.active
+				? { ...c, messages: [...c.messages, userMessage(text), reply] }
+				: c,
+		);
+		$state.streamingId = reply.id;
+		$state.draft = "";
+	}
+
+	// Token arrival is a network event, not user input. Commit synchronously —
+	// torpor's proxy writes flush effects synchronously, so the harness's timed
+	// window captures the render. Returns the remaining token count.
+	window.__pump = (k) => {
+		if ($state.streamingId === null) return 0;
+		const messages = $state.convs[$state.active].messages;
+		const idx = messages.findIndex((m) => m.id === $state.streamingId);
+		if (idx === -1) return 0;
+		const msg = messages[idx];
+		const done = Math.min(msg.total, msg.done + k);
+		$state.convs = $state.convs.map((c, i) =>
+			i === $state.active
+				? {
+						...c,
+						messages: c.messages.map((m) =>
+							m.id === $state.streamingId ? { ...m, done } : m,
+						),
+					}
+				: c,
+		);
+		if (done === msg.total) $state.streamingId = null;
+		return msg.total - done;
+	};
+	window.__reset = () => {
+		$state.convs = initialConversations();
+		$state.active = 0;
+		$state.draft = "";
+		$state.streamingId = null;
+	};
+
+	@render {
+		<div class="chatapp">
+			<header class="topbar">
+				<h1>chat</h1>
+				<nav class="tabs">
+					@for (let c of $state.convs) {
+						@key = c.id
+						<button
+							class={{ "conv-tab": true, active: c.id === $state.active }}
+							data-conv={"" + c.id}
+							onclick={() => ($state.active = c.id)}
+						>
+							{c.title}
+						</button>
+					}
+				</nav>
+			</header>
+			<main class="messages">
+				@for (let m of $state.convs[$state.active].messages) {
+					@key = m.id
+					<Message m={m} streamingId={$state.streamingId} />
+				}
+			</main>
+			<footer class="composer">
+				<input
+					class="prompt"
+					placeholder="Message…"
+					&value={$state.draft}
+					onkeydown={(e) => {
+						if (e.key === "Enter") send();
+					}}
+				/>
+				<button class="send" onclick={send}>Send</button>
+			</footer>
+		</div>
+	}
+}
+
+function Message($props) {
+	@render {
+		<div
+			class={"message " + $props.m.role + ($props.m.id === $props.streamingId ? " streaming" : "")}
+		>
+			<div class="bubble">
+				@for (let s of $props.m.segments) {
+					@key = s.id
+					<Segment seg={s} done={$props.m.done} />
+				}
+			</div>
+		</div>
+	}
+}
+
+function Segment($props) {
+	@render {
+		@if ($props.seg.type === "code") {
+			<pre class="code">
+				<code>{segText($props.seg, $props.done)}</code>
+			</pre>
+		} else {
+			<p class="text">{segText($props.seg, $props.done)}</p>
+		}
+	}
+}

@@ -8,7 +8,7 @@
     "bench": "node run.mjs"
   },
   "dependencies": {
-    "octane": "workspace:*",
+    "octane": "catalog:default",
     "playwright": "catalog:default"
   }
 }

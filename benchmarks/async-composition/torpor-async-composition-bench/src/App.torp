@@ -1,0 +1,148 @@
+import { loadResource } from "./data.js";
+
+// Dashboard with 8 versioned resources. Independent resources fetch eagerly at
+// mount (wave 0); `owner` depends on `project.ownerId`, so it starts after
+// project resolves (wave 1). Each resource is its own component that awaits
+// and renders the exact `[data-resource]` element the harness signature reads.
+
+function ProjectHeader($props) {
+	let $state = $watch({ data: loadResource("project", $props.version) });
+
+	$run(() => {
+		$state.data = loadResource("project", $props.version);
+	});
+
+	@render {
+		<header data-panel="project">
+			@await ($state.data) {
+				<h1 data-resource="project">…</h1>
+				<p data-resource="viewer">…</p>
+				<div class="project-meta">
+					<strong data-resource="badge">…</strong>
+					<span data-resource="owner">…</span>
+				</div>
+			} then (project) {
+				<h1 data-resource="project">{project.label}</h1>
+				<Viewer version={$props.version} />
+				<div class="project-meta">
+					<Badge version={$props.version} />
+					<Owner version={$props.version} ownerId={project.ownerId} />
+				</div>
+			}
+		</header>
+	}
+}
+
+function Viewer($props) {
+	let $state = $watch({ data: loadResource("viewer", $props.version) });
+
+	$run(() => {
+		$state.data = loadResource("viewer", $props.version);
+	});
+
+	@render {
+		@await ($state.data) {
+			<p data-resource="viewer">…</p>
+		} then (data) {
+			<p data-resource="viewer">{data.label}</p>
+		}
+	}
+}
+
+function Badge($props) {
+	let $state = $watch({ data: loadResource("badge", $props.version) });
+
+	$run(() => {
+		$state.data = loadResource("badge", $props.version);
+	});
+
+	@render {
+		@await ($state.data) {
+			<strong data-resource="badge">…</strong>
+		} then (data) {
+			<strong data-resource="badge">{data.label}</strong>
+		}
+	}
+}
+
+function Owner($props) {
+	let $state = $watch({
+		data: $props.ownerId === "owner-" + $props.version
+			? loadResource("owner", $props.version, $props.ownerId)
+			: null,
+	});
+
+	$run(() => {
+		if ($props.ownerId === "owner-" + $props.version) {
+			$state.data = loadResource("owner", $props.version, $props.ownerId);
+		}
+	});
+
+	@render {
+		@await ($state.data) {
+			<span data-resource="owner">…</span>
+		} then (data) {
+			<span data-resource="owner">{data.label}</span>
+		}
+	}
+}
+
+function ResourceCell($props) {
+	let $state = $watch({ data: loadResource($props.name, $props.version) });
+
+	$run(() => {
+		$state.data = loadResource($props.name, $props.version);
+	});
+
+	@render {
+		@await ($state.data) {
+			<span data-resource={$props.name}>…</span>
+		} then (data) {
+			<span data-resource={$props.name}>{data.label}</span>
+		}
+	}
+}
+
+function ActivityPanel($props) {
+	@render {
+		<section data-panel="activity">
+			<ResourceCell name="activity" version={$props.version} />
+			<div>
+				<ResourceCell name="activity-summary" version={$props.version} />
+			</div>
+		</section>
+	}
+}
+
+function InsightsPanel($props) {
+	@render {
+		<section data-panel="insights">
+			<ResourceCell name="insights" version={$props.version} />
+			<div>
+				<ResourceCell name="insights-chart" version={$props.version} />
+			</div>
+		</section>
+	}
+}
+
+function Dashboard($props) {
+	@render {
+		<main data-dashboard-version={$props.version}>
+			<ProjectHeader version={$props.version} />
+			<ActivityPanel version={$props.version} />
+			<InsightsPanel version={$props.version} />
+		</main>
+	}
+}
+
+export default function App() {
+	let $state = $watch({ version: 0 });
+
+	window.__bump = () => {
+		$state.version = $state.version + 1;
+	};
+
+	@render {
+		<Dashboard version={$state.version} />
+	}
+}

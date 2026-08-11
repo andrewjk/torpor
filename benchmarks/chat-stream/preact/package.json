@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Streaming-chat fixture for Preact - the Preact column for the deterministic token-stream ops.",
   "scripts": {
-    "dev": "vite --host --port 5262 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5262 --strictPort"
+    "dev": "vp dev --host --port 5262 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5262 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

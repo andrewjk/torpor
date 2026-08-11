@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "memo-wall fixture for Preact - two 1000-row memo(Row) walls with exact render-count gates.",
   "scripts": {
-    "dev": "vite --host --port 5267 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5267 --strictPort"
+    "dev": "vp dev --host --port 5267 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5267 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

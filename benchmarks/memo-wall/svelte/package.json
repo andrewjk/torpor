@@ -5,10 +5,10 @@
   "version": "0.0.1",
   "description": "memo-wall fixture for Svelte 5 - fine-grained creation and leaf-effect probes for two 1000-row walls.",
   "scripts": {
-    "dev": "vite --host --port 5278 --strictPort",
-    "build": "vite build",
+    "dev": "vp dev --host --port 5278 --strictPort",
+    "build": "vp build",
     "check": "svelte-check --workspace .",
-    "preview": "vite preview --port 5278 --strictPort"
+    "preview": "vp preview --port 5278 --strictPort"
   },
   "dependencies": {
     "svelte": "catalog:default"

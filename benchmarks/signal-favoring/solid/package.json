@@ -5,9 +5,9 @@
   "version": "0.0.0",
   "description": "signal-favoring bench fixture for Solid 2.0 - 100-component chain with signal counters every 10 levels.",
   "scripts": {
-    "dev": "vite --host --port 5191 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5191 --strictPort"
+    "dev": "vp dev --host --port 5191 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5191 --strictPort"
   },
   "dependencies": {
     "solid-js": "catalog:default",

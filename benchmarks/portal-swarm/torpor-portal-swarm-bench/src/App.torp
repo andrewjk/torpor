@@ -1,0 +1,93 @@
+import { ITEMS, sharedTarget, targetFor, hit } from "./data.js";
+import { bindA, bindB, bindBS } from "./ops.js";
+
+// portal-swarm for Torpor: a 200-item list where every item conditionally
+// portals a 3-element tooltip into a foreign target. Torpor has no
+// createPortal primitive, so we hand-roll it (the standard userland pattern,
+// same as the Solid column): a `$mount` builds the tooltip DOM, appends it to
+// the target, and returns a cleanup that removes it. The tooltip lives outside
+// #main, so its button gets a DIRECT native listener (delegated events are
+// document-level, but the delegatedHandler walks from event.target up through
+// parentNode — content appended to document.body still reaches the document
+// listener, so both work; a direct listener is simplest and matches Solid).
+//
+// Sections A / B / BS are structurally identical for Torpor (fine-grained: no
+// value-position descriptor path), kept so the DOM + window contract matches.
+
+function Tip($props) {
+	$mount(() => {
+		const el = document.createElement("div");
+		el.className = $props.cls;
+		const label = document.createElement("span");
+		label.className = "tip-label";
+		label.textContent = $props.item.label;
+		const btn = document.createElement("button");
+		btn.className = "tip-btn";
+		btn.textContent = "hit";
+		btn.addEventListener("click", hit);
+		el.append(label, btn);
+		const target = $props.distinct ? targetFor($props.item.id) : sharedTarget();
+		target.appendChild(el);
+		return () => {
+			if (el.parentNode) el.parentNode.removeChild(el);
+		};
+	});
+
+	@render {
+		<span class="anchor"></span>
+	}
+}
+
+function Section($props) {
+	let $state = $watch({
+		open: false,
+		tick: 0,
+		distinct: false,
+	});
+
+	$props.bind(
+		(fn) => ($state.open = typeof fn === "function" ? fn($state.open) : fn),
+		(fn) => ($state.tick = typeof fn === "function" ? fn($state.tick) : fn),
+		(fn) => ($state.distinct = typeof fn === "function" ? fn($state.distinct) : fn),
+	);
+
+	@render {
+		<section class={$props.secClass}>
+			<h3 class="tick">{$props.prefix + $state.tick}</h3>
+			<ul class="list">
+				@for (let item of ITEMS) {
+					@key = item.id
+					<li class="item">
+						<span class="label">{item.label}</span>
+						@if ($state.open) {
+							<Tip item={item} cls={$props.tipClass} distinct={$state.distinct} />
+						}
+					</li>
+				}
+			</ul>
+		</section>
+	}
+}
+
+// 200 container divs for distinct-target mode — rendered by the fixture itself.
+function Targets() {
+	@render {
+		<div class="targets">
+			@for (let item of ITEMS) {
+				@key = item.id
+				<div class="pt" id={"pt-" + item.id}></div>
+			}
+		</div>
+	}
+}
+
+export default function App() {
+	@render {
+		<div class="app">
+			<Section secClass="secA" tipClass="tip tipA" prefix="A:" bind={bindA} />
+			<Section secClass="secB" tipClass="tip tipB" prefix="B:" bind={bindB} />
+			<Section secClass="secBS" tipClass="tip tipBS" prefix="BS:" bind={bindBS} />
+			<Targets />
+		</div>
+	}
+}

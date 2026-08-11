@@ -1,0 +1,20 @@
+{
+  "name": "torpor-dbmon-bench",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "dbmon bench fixture for Torpor - keyed @for over 1000 rows, per-cell text+class churn on every tick. Matches the shared state/key contract in ../README.md.",
+  "scripts": {
+    "dev": "vp dev --host --port 5283 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5283 --strictPort"
+  },
+  "dependencies": {
+    "@torpor/view": "workspace:*"
+  },
+  "devDependencies": {
+    "@torpor/unplugin": "workspace:*",
+    "vite": "catalog:default",
+    "vite-plus": "catalog:"
+  }
+}

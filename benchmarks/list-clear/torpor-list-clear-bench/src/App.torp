@@ -1,0 +1,59 @@
+import { registerGroup, SHARED_SMALL, SHARED_LARGE, OWNED_LARGE } from "./ops.js";
+
+const indices = (n) => Array.from({ length: n }, (_, i) => i);
+const SMALL_IDS = indices(SHARED_SMALL.groups);
+const LARGE_IDS = indices(SHARED_LARGE.groups);
+const OWNED_IDS = indices(OWNED_LARGE.groups);
+
+function SharedList($props) {
+	let $state = $watch({ items: [] });
+	registerGroup($props.kind, (next) => ($state.items = next));
+	@render {
+		<ul class="shared">
+			<li class="lead">lead</li>
+			@for (let item of $state.items) {
+				@key = item.id
+				<li class="row">{item.label}</li>
+			}
+			<li class="tail">tail</li>
+		</ul>
+	}
+}
+
+function OwnedList($props) {
+	let $state = $watch({ items: [] });
+	registerGroup($props.kind, (next) => ($state.items = next));
+	@render {
+		<ul class="owned">
+			@for (let item of $state.items) {
+				@key = item.id
+				<li class="row">{item.label}</li>
+			}
+		</ul>
+	}
+}
+
+export default function App() {
+	@render {
+		<div>
+			<div id="shared-small">
+				@for (let i of SMALL_IDS) {
+					@key = i
+					<SharedList kind="sharedSmall" />
+				}
+			</div>
+			<div id="shared-large">
+				@for (let i of LARGE_IDS) {
+					@key = i
+					<SharedList kind="sharedLarge" />
+				}
+			</div>
+			<div id="owned">
+				@for (let i of OWNED_IDS) {
+					@key = i
+					<OwnedList kind="owned" />
+				}
+			</div>
+		</div>
+	}
+}

@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "async-waterfall fixture for Svelte 5 - nested stable await blocks that start independent work in parallel.",
   "scripts": {
-    "dev": "vite --host --port 5280 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5280 --strictPort"
+    "dev": "vp dev --host --port 5280 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5280 --strictPort"
   },
   "dependencies": {
     "svelte": "catalog:default"

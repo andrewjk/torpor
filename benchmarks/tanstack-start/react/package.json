@@ -6,7 +6,7 @@
   "description": "React flavor of the Start benchmark app — pinned to the corresponding TanStack release family for the Octane flavor.",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build": "vp build",
     "typecheck": "tsc --noEmit",
     "start": "node serve.mjs"
   },

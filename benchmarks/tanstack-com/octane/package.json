@@ -6,7 +6,7 @@
   "description": "tanstack.com shell ported to Octane on @octanejs/tanstack-start (Phase 2c of the tanstack-com benchmark).",
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build": "vp build",
     "typecheck": "tsrx-tsc --noEmit -p tsconfig.json",
     "start": "node .output/server/index.mjs"
   },
@@ -21,7 +21,7 @@
     "@octanejs/tanstack-pacer": "workspace:*",
     "@octanejs/tanstack-store": "workspace:*",
     "@octanejs/zustand": "workspace:*",
-    "octane": "workspace:*",
+    "octane": "catalog:default",
     "@octanejs/tanstack-router-ssr-query": "workspace:*",
     "@octanejs/visx": "workspace:*",
     "@tanstack/create": "^0.68.4",

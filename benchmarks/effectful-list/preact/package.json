@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "effectful-list benchmark fixture for Preact.",
   "scripts": {
-    "dev": "vite --host --port 5266 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5266 --strictPort"
+    "dev": "vp dev --host --port 5266 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5266 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "portal-swarm benchmark fixture for Preact.",
   "scripts": {
-    "dev": "vite --host --port 5268 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5268 --strictPort"
+    "dev": "vp dev --host --port 5268 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5268 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

@@ -324,7 +324,10 @@ const SUITES = [
 		// straddle the strategy boundary, so moving it moves one of them.
 		name: 'list-clear',
 		cwd: 'list-clear',
-		servers: [{ filter: 'octane-tsrx-list-clear-bench', port: 5298 }],
+		servers: [
+			{ filter: 'octane-tsrx-list-clear-bench', port: 5298 },
+			{ filter: 'torpor-list-clear-bench', port: 5283 },
+		],
 		iter: { normal: 20, quick: 4 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],
 	},

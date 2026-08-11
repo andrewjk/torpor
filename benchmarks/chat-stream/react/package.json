@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Streaming-chat fixture for React 19 - the React column for the deterministic token-stream ops.",
   "scripts": {
-    "dev": "vite --host --port 5251 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5251 --strictPort"
+    "dev": "vp dev --host --port 5251 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5251 --strictPort"
   },
   "dependencies": {
     "react": "catalog:default",

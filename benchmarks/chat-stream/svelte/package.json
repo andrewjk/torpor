@@ -5,10 +5,10 @@
   "version": "0.0.1",
   "description": "Streaming-chat fixture for Svelte 5 - the Svelte column for the deterministic token-stream ops.",
   "scripts": {
-    "dev": "vite --host --port 5273 --strictPort",
-    "build": "vite build",
+    "dev": "vp dev --host --port 5273 --strictPort",
+    "build": "vp build",
     "check": "svelte-check --workspace .",
-    "preview": "vite preview --port 5273 --strictPort"
+    "preview": "vp preview --port 5273 --strictPort"
   },
   "dependencies": {
     "svelte": "catalog:default"

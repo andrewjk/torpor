@@ -46,7 +46,8 @@ const YIELD_MS = 5;
 
 const TARGETS = process.env.TARGETS
 	? JSON.parse(process.env.TARGETS)
-	: [{ name: 'octane-tsrx', url: 'http://localhost:5298/' }];
+	: [{ name: 'octane-tsrx', url: 'http://localhost:5298/' },
+			{ name: "torpor", url: "http://localhost:5283/" }];
 
 // Each op CONSUMES its populated lists, so the fill re-runs (untimed) before
 // every sample. `container` holds the lists the op clears; after it, `li.row`

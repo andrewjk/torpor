@@ -5,10 +5,10 @@
   "version": "0.0.1",
   "description": "portal-swarm benchmark fixture for Svelte 5.",
   "scripts": {
-    "dev": "vite --host --port 5279 --strictPort",
-    "build": "vite build",
+    "dev": "vp dev --host --port 5279 --strictPort",
+    "build": "vp build",
     "check": "svelte-check --tsconfig ./jsconfig.json",
-    "preview": "vite preview --port 5279 --strictPort"
+    "preview": "vp preview --port 5279 --strictPort"
   },
   "dependencies": {
     "svelte": "catalog:default"

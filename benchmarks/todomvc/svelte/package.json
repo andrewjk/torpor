@@ -5,10 +5,10 @@
   "version": "0.0.1",
   "description": "TodoMVC fixture for Svelte 5 - the Svelte column for the app-shaped scripted ops and app-code bundle size.",
   "scripts": {
-    "dev": "vite --host --port 5272 --strictPort",
-    "build": "vite build",
+    "dev": "vp dev --host --port 5272 --strictPort",
+    "build": "vp build",
     "check": "svelte-check --workspace .",
-    "preview": "vite preview --port 5272 --strictPort"
+    "preview": "vp preview --port 5272 --strictPort"
   },
   "dependencies": {
     "svelte": "catalog:default"

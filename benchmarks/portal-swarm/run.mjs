@@ -83,7 +83,8 @@ const TARGETS = process.env.TARGETS
 			{ name: 'vue-vapor', url: BASE_URLS['vue-vapor'] },
 			{ name: 'preact', url: BASE_URLS.preact },
 			{ name: 'svelte', url: BASE_URLS.svelte },
-		];
+		
+			{ name: "torpor", url: "http://localhost:5283/" }];
 
 const OPS = [
 	'mount_closed',

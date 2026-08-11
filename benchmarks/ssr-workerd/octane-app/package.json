@@ -7,7 +7,7 @@
   "dependencies": {
     "@octanejs/adapter-cloudflare": "workspace:*",
     "@octanejs/vite-plugin": "workspace:*",
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default"

@@ -1,0 +1,46 @@
+import { fx, rowRef } from "./fx.js";
+
+// Cross-module Row — deliberately its OWN module and NOT memo'd, matching the
+// octane/React shape. Torpor's mapping:
+//   * $mount (returns cleanup)  — runs once per keyed-row lifetime; cleanup on
+//     unmount. Counts row creations/destructions (useEffect([item.id])).
+//   * onmount={rowRef}          — the shared module-level callback ref on the
+//     row root (returns a cleanup).
+//   * Layout effect             — initial measure on the cell's onmount (refs
+//     attached), re-measure whenever the row updates (via a $run the keyed
+//     reconciler re-runs). The probe read is $peek'd so the $run is driven
+//     ONLY by the reconciler's rerun — exactly one layout pass per update —
+//     matching useLayoutEffect([item.value]).
+
+export default function Row($props) {
+	let cell = null;
+
+	$mount(() => {
+		fx.mounts++;
+		return () => {
+			fx.cleanups++;
+		};
+	});
+
+	function measure() {
+		if ($props.item.probe) {
+			fx.h += cell.offsetHeight;
+			fx.layouts++;
+		}
+	}
+
+	// Non-reactive so only the keyed reconciler's rerunEffectsOnRegion fires
+	// it (once per item update), never the signal system.
+	$run(() => {
+		if (cell === null) return;
+		$peek(measure);
+	}, "layout");
+
+	@render {
+		<tr onmount={rowRef}>
+			<td class="col-id" &ref={cell} onmount={() => $peek(measure)}>{$props.item.id}</td>
+			<td class="col-label">{$props.item.label}</td>
+			<td class="col-value">{$props.item.value}</td>
+		</tr>
+	}
+}

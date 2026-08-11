@@ -5,12 +5,12 @@
   "version": "0.0.1",
   "description": "async-waterfall fixture for octane (.tsrx) - 10 nested levels of use(fetch) under Suspense, init + transition-driven update; measures the nested-use waterfall.",
   "scripts": {
-    "dev": "vite --host --port 5216 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5216 --strictPort"
+    "dev": "vp dev --host --port 5216 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5216 --strictPort"
   },
   "dependencies": {
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default"

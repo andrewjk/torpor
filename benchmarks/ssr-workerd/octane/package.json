@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "description": "ssr-workerd bench fixture: the streaming-ssr octane page behind a module Worker calling renderToReadableStream. Worker-only: no client build, no dev server.",
   "dependencies": {
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default"

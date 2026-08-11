@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "React 19 reference weather-app benchmark fixture.",
   "scripts": {
-    "dev": "vite --host --port 5293 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5293 --strictPort"
+    "dev": "vp dev --host --port 5293 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5293 --strictPort"
   },
   "dependencies": {
     "react": "catalog:default",

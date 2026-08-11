@@ -5,7 +5,7 @@
   "version": "0.0.0",
   "description": "streaming-ssr bench fixture for octane renderToPipeableStream, authored in .tsrx (sync shell + 10 use(promise) @try boundaries). SSR-only: no client build, no dev server.",
   "dependencies": {
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   },
   "devDependencies": {
     "vite": "catalog:default"

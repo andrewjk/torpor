@@ -1,0 +1,20 @@
+{
+  "name": "torpor-todomvc",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "TodoMVC fixture for Torpor - keyed @for, inline editing, filters. Matches the shared DOM contract in ../README.md.",
+  "scripts": {
+    "dev": "vp dev --host --port 5283 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5283 --strictPort"
+  },
+  "dependencies": {
+    "@torpor/view": "workspace:*"
+  },
+  "devDependencies": {
+    "@torpor/unplugin": "workspace:*",
+    "vite": "catalog:default",
+    "vite-plus": "catalog:"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "torpor-portal-swarm-bench",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "portal-swarm bench fixture for Torpor - 200-item list with hand-rolled portal tooltips (mount into foreign target, cleanup on close). Matches the shared DOM/window contract in ../README.md.",
+  "scripts": {
+    "dev": "vp dev --host --port 5283 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5283 --strictPort"
+  },
+  "dependencies": {
+    "@torpor/view": "workspace:*"
+  },
+  "devDependencies": {
+    "@torpor/unplugin": "workspace:*",
+    "vite": "catalog:default",
+    "vite-plus": "catalog:"
+  }
+}

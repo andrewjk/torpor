@@ -5,9 +5,9 @@
   "version": "0.0.0",
   "description": "signal-favoring bench fixture for React 19 - 100-component chain; setState re-renders the owning component and cascades through descendants.",
   "scripts": {
-    "dev": "vite --host --port 5192 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5192 --strictPort"
+    "dev": "vp dev --host --port 5192 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5192 --strictPort"
   },
   "dependencies": {
     "react": "catalog:default",

@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Vue 3 weather-app benchmark fixture.",
   "scripts": {
-    "dev": "vite --host --port 5297 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5297 --strictPort"
+    "dev": "vp dev --host --port 5297 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5297 --strictPort"
   },
   "dependencies": {
     "vue": "catalog:default"

@@ -5,9 +5,9 @@
   "version": "0.0.0",
   "description": "recursive-context benchmark fixture for Preact.",
   "scripts": {
-    "dev": "vite --host --port 5264 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5264 --strictPort"
+    "dev": "vp dev --host --port 5264 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5264 --strictPort"
   },
   "dependencies": {
     "preact": "catalog:default"

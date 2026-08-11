@@ -1,0 +1,110 @@
+import { bindWallA, bindWallB, initialItemsA, initialItemsB, selectRow } from "./ops.js";
+
+// Two 1000-row memo walls over the same Row/Inner/Leaf chain. Torpor is
+// fine-grained: there is no memo wall to absorb a parent re-render (a tick
+// bump updates one header text node; nothing else re-runs). Row/Inner/Leaf
+// bodies run once at creation — the `$mount` probes count CREATIONS, and the
+// Leaf probe lives in a reactive read of the wall's theme (re-runs when the
+// theme changes — the fine-grained analog of a Leaf re-render). The keyed
+// `@for` keys by ROW-OBJECT IDENTITY (like solid/ripple), so one_change_*
+// recreates exactly one row while the other 999 survive by identity.
+
+const THEME_A = "themeA";
+const THEME_B = "themeB";
+
+export default function App() {
+	let $state = $watch({
+		itemsA: initialItemsA(),
+		itemsB: initialItemsB(),
+		tickA: 0,
+		tickB: 0,
+		themeA: "t0",
+		themeB: "t0",
+	});
+
+	bindWallA({
+		setItems: (next) => ($state.itemsA = next),
+		setTick: (v) => ($state.tickA = v),
+		setTheme: (v) => ($state.themeA = v),
+	});
+	bindWallB({
+		setItems: (next) => ($state.itemsB = next),
+		setTick: (v) => ($state.tickB = v),
+		setTheme: (v) => ($state.themeB = v),
+	});
+
+	// Store the reactive proxy in context (not the primitive value) so leaf
+	// reads of `.themeA`/`.themeB` subscribe individually.
+	$context[THEME_A] = $state;
+	$context[THEME_B] = $state;
+
+	@render {
+		<div class="walls">
+			<section class="wall" id="wall-a">
+				<h2>
+					{"wall A (keyed @for) tick "}
+					<span class="tick">{$state.tickA}</span>
+				</h2>
+				<div class="rows">
+					@for (let it of $state.itemsA) {
+						@key = it
+						<Row id={it.id} label={it.label} value={it.value} wall="A" onSelect={selectRow} />
+					}
+				</div>
+			</section>
+			<section class="wall" id="wall-b">
+				<h2>
+					{"wall B (keyed @for) tick "}
+					<span class="tick">{$state.tickB}</span>
+				</h2>
+				<div class="rows">
+					@for (let it of $state.itemsB) {
+						@key = it
+						<Row id={it.id} label={it.label} value={it.value} wall="B" onSelect={selectRow} />
+					}
+				</div>
+			</section>
+		</div>
+	}
+}
+
+function Row($props) {
+	$mount(() => {
+		window.__renders["row" + $props.wall]++;
+	});
+
+	@render {
+		<div class="item">
+			<span class="id" onclick={$props.onSelect}>{$props.id}</span>
+			<span class="label">{$props.label}</span>
+			<Inner value={$props.value} wall={$props.wall} />
+		</div>
+	}
+}
+
+function Inner($props) {
+	$mount(() => {
+		window.__renders["inner" + $props.wall]++;
+	});
+
+	@render {
+		<span class="inner">{$props.value}<Leaf wall={$props.wall} /></span>
+	}
+}
+
+function Leaf($props) {
+	// The probe lives in a reactive read of the wall's theme so a theme bump
+	// re-runs it (the fine-grained Leaf "re-render"); the initial run counts
+	// the mount. The template reads the same context value for the text.
+	const ctxKey = $props.wall === "A" ? THEME_A : THEME_B;
+	const themeKey = $props.wall === "A" ? "themeA" : "themeB";
+
+	$run(() => {
+		$context[ctxKey][themeKey];
+		window.__renders["leaf" + $props.wall]++;
+	});
+
+	@render {
+		<span class="leaf">{$context[ctxKey][themeKey]}</span>
+	}
+}

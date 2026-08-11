@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "jsdom": "catalog:default",
-    "octane": "workspace:*",
+    "octane": "catalog:default",
     "react": "catalog:default",
     "react-dom": "catalog:default",
     "vite": "catalog:default"

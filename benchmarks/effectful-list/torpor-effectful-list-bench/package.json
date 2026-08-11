@@ -1,0 +1,20 @@
+{
+  "name": "torpor-effectful-list-bench",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "effectful-list bench fixture for Torpor - keyed 1k-row table with $mount/cleanup + ref + value-read effects. Matches the __fx lifecycle contract in ../README.md.",
+  "scripts": {
+    "dev": "vp dev --host --port 5283 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5283 --strictPort"
+  },
+  "dependencies": {
+    "@torpor/view": "workspace:*"
+  },
+  "devDependencies": {
+    "@torpor/unplugin": "workspace:*",
+    "vite": "catalog:default",
+    "vite-plus": "catalog:"
+  }
+}

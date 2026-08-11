@@ -5,9 +5,9 @@
   "version": "0.0.1",
   "description": "Streaming-chat fixture for Ripple - the Ripple column for the deterministic token-stream ops.",
   "scripts": {
-    "dev": "vite --host --port 5253 --strictPort",
-    "build": "vite build",
-    "preview": "vite preview --port 5253 --strictPort"
+    "dev": "vp dev --host --port 5253 --strictPort",
+    "build": "vp build",
+    "preview": "vp preview --port 5253 --strictPort"
   },
   "dependencies": {
     "ripple": "catalog:default"

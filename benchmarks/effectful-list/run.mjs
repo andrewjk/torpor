@@ -70,7 +70,8 @@ const TARGETS = process.env.TARGETS
 			{ name: 'vue-vapor', url: 'http://localhost:5221/' },
 			{ name: 'preact', url: 'http://localhost:5266/' },
 			{ name: 'svelte', url: 'http://localhost:5277/' },
-		];
+		
+			{ name: "torpor", url: "http://localhost:5283/" }];
 
 // perSamplePre: the op consumes its pre-state (empty / fresh 1k), so the pre
 // step re-runs (untimed) before EVERY sample. inner: timed-window inner-loop

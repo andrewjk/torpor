@@ -69,7 +69,8 @@ const TARGETS = process.env.TARGETS
 			{ name: 'vue-vapor', url: 'http://localhost:5223/' },
 			{ name: 'preact', url: 'http://localhost:5267/' },
 			{ name: 'svelte', url: 'http://localhost:5278/' },
-		];
+		
+			{ name: "torpor", url: "http://localhost:5283/" }];
 
 const Z = { rowA: 0, innerA: 0, leafA: 0, rowB: 0, innerB: 0, leafB: 0 };
 

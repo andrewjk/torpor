@@ -100,7 +100,7 @@ We'll then update our `package.json` to use your build tool's CLI and set `"type
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build"
+    "build": "vp build"
   }
 }
 ```

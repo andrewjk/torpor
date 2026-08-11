@@ -9,6 +9,6 @@
   },
   "dependencies": {
     "esbuild": "catalog:default",
-    "octane": "workspace:*"
+    "octane": "catalog:default"
   }
 }
