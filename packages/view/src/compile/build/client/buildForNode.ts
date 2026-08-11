@@ -153,6 +153,12 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
 
 	let oldForVarNames = status.forVarNames;
+	// The bit base for this loop's for-vars in `forVarMask`. Outer for-loops
+	// (if any) occupy lower bit positions in `status.forVarNames`; this
+	// loop's vars start at `oldForVarNames.length`. Captured before the body
+	// is built so `forVarsReadIn` and `t_changed_mask` use the same index
+	// space.
+	const forVarBitBase = oldForVarNames.length;
 	status.forVarNames = [
 		...status.forVarNames,
 		// singleVar stores the loop var directly as `data`, so the body
@@ -174,25 +180,35 @@ ${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item)
 		// reference-equality check — no allocation, no effect re-run.
 		// singleVar collapses this to a single `data` reference check (the
 		// loop var IS the data bag, no per-field walk).
-		b.append(`let t_changed = false;`);
+		//
+		// We OR the changed for-var positions into `t_changed_mask` (a
+		// bitmask). Bit positions are offset by `forVarBitBase` to match
+		// the indices `forVarsReadIn` used when annotating effects (which
+		// iterates over the full `status.forVarNames`, including outer
+		// loops). `t_rerun_region_effects` then uses each effect's
+		// `forVarMask & changedMask` to skip unrelated effects.
+		b.append(`let t_changed_mask = 0;`);
 		if (singleVar) {
+			const bit = 1 << forVarBitBase;
 			b.append(
 				`if (t_old_item.data !== t_new_item.data) {
 					t_old_item.data = t_new_item.data;
-					t_changed = true;
+					t_changed_mask = ${bit};
 				}`,
 			);
 		} else {
-			for (let varName of forVarNames) {
+			for (let i = 0; i < forVarNames.length; i++) {
+				const varName = forVarNames[i];
+				const bit = 1 << (forVarBitBase + i);
 				b.append(
 					`if (t_old_item.data.${varName} !== t_new_item.data.${varName}) {
 						t_old_item.data.${varName} = t_new_item.data.${varName};
-						t_changed = true;
+						t_changed_mask |= ${bit};
 					}`,
 				);
 			}
 		}
-		b.append(`if (t_changed) t_rerun_region_effects(t_old_item);`);
+		b.append(`if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);`);
 	} else {
 		for (let varName of forVarNames) {
 			b.append(`t_old_item.data.${varName} = t_new_item.data.${varName};`);

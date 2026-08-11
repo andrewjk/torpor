@@ -106,7 +106,7 @@ export default function IfForSwitchCombo(
 										const t_text_1 = t_child(t_strong_1);
 										$run(() => {
 											t_text_1.textContent = `[HIGH] ${t_fmt(t_item_1.data.todo.text)}`;
-										});
+										}, undefined, { forVarMask: 1 });
 										t_add_element(t_strong_1, t_li_1, t_before);
 										t_next(t_strong_1);
 										t_pop_region(t_old_region);
@@ -123,7 +123,7 @@ export default function IfForSwitchCombo(
 										const t_text_2 = t_child(t_em_1);
 										$run(() => {
 											t_text_2.textContent = `[low] ${t_fmt(t_item_1.data.todo.text)}`;
-										});
+										}, undefined, { forVarMask: 1 });
 										t_add_element(t_em_1, t_li_1, t_before);
 										t_next(t_em_1);
 										t_pop_region(t_old_region);
@@ -140,7 +140,7 @@ export default function IfForSwitchCombo(
 										const t_text_3 = t_child(t_span_1);
 										$run(() => {
 											t_text_3.textContent = `[med] ${t_fmt(t_item_1.data.todo.text)}`;
-										});
+										}, undefined, { forVarMask: 1 });
 										t_add_element(t_span_1, t_li_1, t_before);
 										t_next(t_span_1);
 										t_pop_region(t_old_region);

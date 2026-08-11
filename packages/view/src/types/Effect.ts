@@ -51,4 +51,31 @@ export default interface Effect {
 	 * The name of the effect, for debugging.
 	 */
 	name?: string;
+
+	/**
+	 * True when this effect wraps a `$mount`/`onmount` callback (created by
+	 * `runMountSideEffects`). Mount effects run once per region mount and must
+	 * NOT be force re-run by the keyed-list reconciler's
+	 * `rerunEffectsOnRegion` — doing so fires `onmount` on every item update.
+	 * Their reactive re-runs (if any) are still driven by the normal signal
+	 * path (`checkEffect`).
+	 */
+	isMountEffect?: boolean;
+
+	/**
+	 * When set, a bitmask of the `@for` loop-variable positions that this
+	 * effect's body reads (computed at compile time by scanning for
+	 * substituted data-bag paths). Bit N corresponds to the Nth for-var.
+	 * Used by `rerunRegionEffects` on the no-proxy keyed-list path to skip
+	 * effects that don't depend on any of the changed for-vars via a single
+	 * bitwise AND.
+	 *
+	 * - `undefined`: dependency info not available — re-run unconditionally
+	 *   (backward-compatible behaviour for effects emitted outside the
+	 *   for-body builders, e.g. mount-time animations).
+	 * - `0`: the effect reads no for-vars at all — skip on any field change
+	 *   (it has its own signal subscriptions for other reactive state).
+	 * - `> 0`: re-run only when `(forVarMask & changedMask) !== 0`.
+	 */
+	forVarMask?: number;
 }

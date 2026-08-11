@@ -67,7 +67,7 @@ export default function SwitchInFor(
 						const t_text_1 = t_child(t_strong_1);
 						$run(() => {
 							t_text_1.textContent = `${t_fmt(t_item_1.data.item.name)} (admin)`;
-						});
+						}, undefined, { forVarMask: 1 });
 						t_add_element(t_strong_1, t_li_1, t_before);
 						t_next(t_strong_1);
 						t_pop_region(t_old_region);
@@ -84,7 +84,7 @@ export default function SwitchInFor(
 						const t_text_2 = t_child(t_span_1);
 						$run(() => {
 							t_text_2.textContent = `${t_fmt(t_item_1.data.item.name)} (user)`;
-						});
+						}, undefined, { forVarMask: 1 });
 						t_add_element(t_span_1, t_li_1, t_before);
 						t_next(t_span_1);
 						t_pop_region(t_old_region);
@@ -101,7 +101,7 @@ export default function SwitchInFor(
 						const t_text_3 = t_child(t_em_1);
 						$run(() => {
 							t_text_3.textContent = `${t_fmt(t_item_1.data.item.name)} (unknown)`;
-						});
+						}, undefined, { forVarMask: 1 });
 						t_add_element(t_em_1, t_li_1, t_before);
 						t_next(t_em_1);
 						t_pop_region(t_old_region);

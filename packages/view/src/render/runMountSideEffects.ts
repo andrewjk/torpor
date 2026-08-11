@@ -26,7 +26,7 @@ export default function runMountSideEffects(
 	// run at the end when everything is hooked up)
 	if (hydrationNode === null) {
 		for (let effect of context.mountEffects) {
-			$run(effect);
+			$run(effect, undefined, { isMountEffect: true });
 		}
 		context.mountEffects.length = 0;
 	}

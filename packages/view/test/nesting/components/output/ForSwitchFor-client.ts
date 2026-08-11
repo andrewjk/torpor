@@ -71,7 +71,7 @@ export default function ForSwitchFor(
 						const t_text_1 = t_child(t_p_1);
 						$run(() => {
 							t_text_1.textContent = t_fmt(t_item_1.data.row.reduce((a, b) => a + b, 0));
-						});
+						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_1, t_div_1, t_before);
 						t_next(t_p_1);
 						t_pop_region(t_old_region);
@@ -88,7 +88,7 @@ export default function ForSwitchFor(
 						const t_text_2 = t_child(t_p_2);
 						$run(() => {
 							t_text_2.textContent = t_fmt(Math.max(...t_item_1.data.row));
-						});
+						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_2, t_div_1, t_before);
 						t_next(t_p_2);
 						t_pop_region(t_old_region);
@@ -124,17 +124,17 @@ export default function ForSwitchFor(
 								const t_text_3 = t_child(t_span_1);
 								$run(() => {
 									t_text_3.textContent = `${t_fmt(t_item_2.data)} `;
-								});
+								}, undefined, { forVarMask: 2 });
 								t_add_element(t_span_1, t_fragment_4, t_before_2);
 								t_next(t_span_1);
 							},
 							(t_old_item, t_new_item) => {
-								let t_changed = false;
+								let t_changed_mask = 0;
 								if (t_old_item.data !== t_new_item.data) {
 									t_old_item.data = t_new_item.data;
-									t_changed = true;
+									t_changed_mask = 2;
 								}
-								if (t_changed) t_rerun_region_effects(t_old_item);
+								if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);
 							},
 							true
 						);

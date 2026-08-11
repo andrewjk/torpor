@@ -9,6 +9,7 @@ export default interface Fragment {
 		spans: SourceSpan[];
 		offsets: number[];
 		lengths: number[];
+		forVarMask?: number;
 	}[];
 	events: {
 		varName: string;

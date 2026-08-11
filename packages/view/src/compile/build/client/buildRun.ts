@@ -1,4 +1,5 @@
 import Builder from "../../utils/Builder";
+import forVarsReadIn from "../../utils/forVarsReadIn";
 import type BuildStatus from "./BuildStatus";
 import addPopDevBoundary from "./addPopDevBoundary";
 import addPushDevBoundary from "./addPushDevBoundary";
@@ -14,10 +15,22 @@ export default function buildRun(
 
 	addPushDevBoundary("run", functionName, status, b);
 
+	let forVarMask =
+		status.forVarNames.length > 0 ? forVarsReadIn(functionBody, status.forVarNames) : undefined;
+	let trailing = "";
+	if (status.options.dev === true) {
+		trailing = `, "${functionName}"`;
+		if (forVarMask !== undefined) {
+			trailing += `, { forVarMask: ${forVarMask} }`;
+		}
+	} else if (forVarMask !== undefined) {
+		trailing = `, undefined, { forVarMask: ${forVarMask} }`;
+	}
+
 	status.imports.add("$run");
 	b.append("$run(() => {");
 	b.append(functionBody);
-	b.append(`}${status.options.dev === true ? `, "${functionName}"` : ""});`);
+	b.append(`}${trailing});`);
 
 	addPopDevBoundary(status, b);
 }

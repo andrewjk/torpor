@@ -1,5 +1,6 @@
 import type SourceSpan from "../../types/SourceSpan";
 import type Fragment from "../../types/nodes/Fragment";
+import forVarsReadIn from "../../utils/forVarsReadIn";
 import type BuildStatus from "./BuildStatus";
 import replaceForVarNames from "./replaceForVarNames";
 
@@ -13,10 +14,13 @@ export default function stashRun(
 ): void {
 	value = replaceForVarNames(value, status);
 	let functionBody = functionStart + value + functionEnd;
+	let forVarMask =
+		status.forVarNames.length > 0 ? forVarsReadIn(value, status.forVarNames) : undefined;
 	fragment.effects.push({
 		functionBody,
 		spans: [span],
 		offsets: [functionStart.length],
 		lengths: [value.length],
+		forVarMask,
 	});
 }

@@ -69,7 +69,7 @@ export default function ForContainingIf(
 					const t_text_1 = t_child(t_p_1);
 					$run(() => {
 						t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)} `;
-					});
+					}, undefined, { forVarMask: 1 });
 					t_add_element(t_p_1, t_fragment_1, t_before);
 					t_next(t_p_1);
 					t_pop_region(t_old_region);

@@ -72,17 +72,17 @@ export default function ForNested(
 					const t_text_1 = t_child(t_td_1);
 					$run(() => {
 						t_text_1.textContent = t_fmt(t_item_2.data);
-					});
+					}, undefined, { forVarMask: 2 });
 					t_add_element(t_td_1, t_tr_1, t_before_2);
 					t_next(t_td_1);
 				},
 				(t_old_item, t_new_item) => {
-					let t_changed = false;
+					let t_changed_mask = 0;
 					if (t_old_item.data !== t_new_item.data) {
 						t_old_item.data = t_new_item.data;
-						t_changed = true;
+						t_changed_mask = 2;
 					}
-					if (t_changed) t_rerun_region_effects(t_old_item);
+					if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);
 				},
 				true
 			);

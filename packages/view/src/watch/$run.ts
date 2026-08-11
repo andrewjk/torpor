@@ -11,8 +11,14 @@ import runEffect from "./runEffect";
  * Runs and re-runs a function that depends on a watched object
  *
  * @param fn The function to run, which may return a cleanup function.
+ * @param options Internal fields to set on the constructed Effect (e.g.
+ *   `isMountEffect`, `forVarDeps`). Not part of the public API.
  */
-export default function $run(fn: () => Cleanup | void, name?: string): Effect {
+export default function $run(
+	fn: () => Cleanup | void,
+	name?: string,
+	options?: Pick<Effect, "isMountEffect" | "forVarMask">,
+): Effect {
 	let effect: Effect = {
 		type: EFFECT_TYPE,
 		run: fn,
@@ -23,6 +29,8 @@ export default function $run(fn: () => Cleanup | void, name?: string): Effect {
 		nextEffectToRun: null,
 		didError: false,
 		name,
+		isMountEffect: options?.isMountEffect,
+		forVarMask: options?.forVarMask,
 	};
 
 	// Track the effect on the current active region, so it can be

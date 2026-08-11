@@ -104,7 +104,7 @@ function List(
 			});
 			$run(() => {
 				t_slot_props_1["item"] = t_item_1.data;
-			});
+			}, undefined, { forVarMask: 1 });
 			if ($slots && $slots["_"]) {
 				$slots["_"](t_li_1, t_slot_anchor_1, t_slot_props_1, $context)
 			}
@@ -112,12 +112,12 @@ function List(
 			t_next(t_li_1);
 		},
 		(t_old_item, t_new_item) => {
-			let t_changed = false;
+			let t_changed_mask = 0;
 			if (t_old_item.data !== t_new_item.data) {
 				t_old_item.data = t_new_item.data;
-				t_changed = true;
+				t_changed_mask = 1;
 			}
-			if (t_changed) t_rerun_region_effects(t_old_item);
+			if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);
 		},
 		true
 	);

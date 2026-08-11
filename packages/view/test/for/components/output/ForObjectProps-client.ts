@@ -77,7 +77,7 @@ export default function ForObjectProps(
 
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.item.name);
-			});
+			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);
 			t_pop_region(t_old_region_1);

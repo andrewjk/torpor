@@ -17,6 +17,20 @@ export default function buildAddFragment(
 		const fragmentName = `t_fragment_${fragment.number}`;
 		if (fragment.effects.length > 0) {
 			status.imports.add("$run");
+			// Union the forVarMask of every stashed effect in this fragment —
+			// they all share a single `$run`, so the run's forVarMask is the
+			// bitwise OR of its constituents'.
+			let forVarMask: number | undefined;
+			for (let effect of fragment.effects) {
+				if (effect.forVarMask !== undefined) {
+					if (forVarMask === undefined) forVarMask = 0;
+					forVarMask |= effect.forVarMask;
+				}
+			}
+			let trailing = "";
+			if (forVarMask !== undefined) {
+				trailing = `, undefined, { forVarMask: ${forVarMask} }`;
+			}
 			b.append("$run(() => {");
 			if (status.options.mapped === true) {
 				for (let effect of fragment.effects) {
@@ -34,7 +48,7 @@ export default function buildAddFragment(
 			} else {
 				b.append(fragment.effects.map((e) => e.functionBody).join("\n"));
 			}
-			b.append(`}${status.options.dev === true ? `, "setAttributes"` : ""});`);
+			b.append(`}${status.options.dev === true ? `, "setAttributes"${trailing}` : trailing});`);
 		}
 		if (fragment.singleRootElement) {
 			// Single-root-element fast path: the cloned element is both the

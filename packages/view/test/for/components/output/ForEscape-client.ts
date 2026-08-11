@@ -59,7 +59,7 @@ export default function ForEscape(
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
 			$run(() => {
 				t_input_1.value = t_item_1.data.i || "";
-			});
+			}, undefined, { forVarMask: 1 });
 			t_event(t_input_1, "input", (e) => t_item_1.data.i = e.target.value);
 			$run(() => {
 				t_text_1.textContent = t_fmt(t_item_1.data.i);
@@ -70,7 +70,7 @@ export default function ForEscape(
 				t_attribute(t_div_3, "data-testid", `input3-${t_item_1.data.i}`);
 				t_attribute(t_div_3, "name", things[t_item_1.data.i]);
 				t_attribute(t_input_1, "name", `${t_item_1.data.i}`);
-			});
+			}, undefined, { forVarMask: 1 });
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1, t_root_1);
 			t_next(t_input_1);
 		},

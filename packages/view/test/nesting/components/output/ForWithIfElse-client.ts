@@ -69,7 +69,7 @@ export default function ForWithIfElse(
 					const t_text_1 = t_child(t_button_1);
 					$run(() => {
 						t_text_1.textContent = t_fmt(t_item_1.data.tab);
-					});
+					}, undefined, { forVarMask: 1 });
 					t_add_element(t_button_1, t_fragment_1, t_before);
 					t_next(t_button_1);
 					t_pop_region(t_old_region);
@@ -85,7 +85,7 @@ export default function ForWithIfElse(
 					const t_text_2 = t_child(t_button_2);
 					$run(() => {
 						t_text_2.textContent = t_fmt(t_item_1.data.tab);
-					});
+					}, undefined, { forVarMask: 1 });
 					t_add_element(t_button_2, t_fragment_1, t_before);
 					t_next(t_button_2);
 					t_pop_region(t_old_region);
