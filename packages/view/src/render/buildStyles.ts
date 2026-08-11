@@ -1,5 +1,7 @@
 import type StyleValue from "../types/StyleValue";
 
+const CAMEL_TO_DASH = /[A-Z]+(?![a-z])|[A-Z]/g;
+
 export default function buildStyles(value: StyleValue): string {
 	if (typeof value === "string") {
 		return value;
@@ -19,10 +21,7 @@ function gatherStyles(value: unknown, styles: string[]) {
 		} else if (typeof value === "object") {
 			for (let [n, v] of Object.entries(value)) {
 				if (v === null || v === undefined) continue;
-				const key = n.replace(
-					/[A-Z]+(?![a-z])|[A-Z]/g,
-					(char, i) => (i > 0 ? "-" : "") + char.toLowerCase(),
-				);
+				const key = n.replace(CAMEL_TO_DASH, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
 				styles.push(`${key}: ${v}`);
 			}
 		} else {

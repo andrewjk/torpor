@@ -115,6 +115,16 @@ export default function runListItems(
 	let newStart = 0;
 	let newEnd = newSpecs.length - 1;
 
+	// Whether any item was mounted or moved during reconciliation. Mounts
+	// produce items with null chain pointers (from `newListItem`); moves leave
+	// an item's chain pointers pointing at its OLD neighbours. Both invalidate
+	// the incremental relink fast path below. Pure updates and pure clears do
+	// NOT set this: `update` only re-runs effects within an item's own subtree
+	// (nested @if/@for push/pop and clearRegion splices preserve the sibling
+	// links), and `clearRegion` splices the cleared item out and re-links its
+	// neighbours, so the survivor chain stays correct without a relink.
+	let chainNeedsRelink = false;
+
 	// 1. Fast path: peel off matching heads/tails and boundary rotations
 	//    (head→tail / tail→head) one item at a time, without building a
 	//    keymap. This handles append / prepend / swap / rotate and the
@@ -143,6 +153,7 @@ export default function runListItems(
 			// rotated head → tail: move the old head to just past the old tail
 			const item = oldItems[oldStart]!;
 			moveRegion(parent, item, oldItems[oldEnd]!.endNode?.nextSibling ?? anchor);
+			chainNeedsRelink = true;
 			update(item, newSpecs[newEnd]!);
 			newItems[newEnd] = item;
 			oldStart++;
@@ -151,6 +162,7 @@ export default function runListItems(
 			// rotated tail → head: move the old tail to just before the old head
 			const item = oldItems[oldEnd]!;
 			moveRegion(parent, item, oldItems[oldStart]!.startNode);
+			chainNeedsRelink = true;
 			update(item, newSpecs[newStart]!);
 			newItems[newStart] = item;
 			oldEnd--;
@@ -168,6 +180,7 @@ export default function runListItems(
 		for (let i = newStart; i <= newEnd; i++) {
 			newItems[i] = mountSpec(newSpecs[i]!, region, before, create, noWatch);
 		}
+		chainNeedsRelink = true;
 	}
 	// 3. New middle exhausted → clear remaining old middle (common: truncate / remove).
 	else if (newStart > newEnd) {
@@ -206,6 +219,7 @@ export default function runListItems(
 				newItems[i] = mountSpec(newSpecs[i]!, region, before, create, noWatch);
 				before = newItems[i]!.endNode!.nextSibling;
 			}
+			chainNeedsRelink = true;
 		} else {
 			// 4c. Walk the old middle: reuse matches into their new positions
 			//     (via update) and clear the rest. `newIndexToOld[i] = oldIndex
@@ -239,9 +253,11 @@ export default function runListItems(
 				if (newIndexToOld[i] === 0) {
 					// No matching old item → mount.
 					newItems[newIdx] = mountSpec(newSpecs[newIdx]!, region, before, create, noWatch);
+					chainNeedsRelink = true;
 				} else if (j < 0 || i !== seq[j]) {
 					// Not in the LIS → move to its new position.
 					moveRegion(parent, newItems[newIdx]!, before);
+					chainNeedsRelink = true;
 				} else {
 					// In the LIS → already in correct relative order.
 					j--;
@@ -266,6 +282,33 @@ export default function runListItems(
 	//    it's deeper than the item), not through the item itself — otherwise
 	//    the item→child link gets overwritten and `clearRegion` can no longer
 	//    walk the subtree to run cleanups on removal.
+	//
+	//    FAST PATH (incremental end-of-pass relink): when NO item was mounted
+	//    or moved (`chainNeedsRelink === false`), the survivor chain is already
+	//    correct. `clearRegion` splices each cleared item out and re-links its
+	//    neighbours; `update` only re-runs effects within an item's own subtree
+	//    (a nested @if/@for branch switch pushes/clears CHILD regions, which
+	//    `pushRegion`/`clearRegion` keep spliced correctly into the chain, so
+	//    the item's sibling links — and its tail link to the next sibling — are
+	//    preserved). So the head link (`region.nextRegion`), every inter-item
+	//    link, and the tail link (`lastDescendant → nextSibling`) are all still
+	//    valid. The only write still required is publishing
+	//    `context.previousRegion` for whatever region gets pushed after us,
+	//    which the full relink would overwrite anyway. This turns a 1000-row
+	//    `removefirst`/`removeevery10` (pure-removal shapes) from a 1000-item
+	//    relink walk into an O(1) tail-fixup — matching octane's one-pointer
+	//    patch on the same shapes.
+	if (!chainNeedsRelink && newItems.length > 0) {
+		let lastRegion: Region = newItems[newItems.length - 1]!;
+		let next: Region | null = lastRegion.nextRegion;
+		while (next !== null && next.depth > lastRegion.depth) {
+			lastRegion = next;
+			next = next.nextRegion;
+		}
+		context.previousRegion = lastRegion;
+		return newItems;
+	}
+
 	if (newItems.length > 0) {
 		let prevTail: Region = region;
 		for (let i = 0; i < newItems.length; i++) {

@@ -87,4 +87,13 @@ export {
 	t_dynamic,
 };
 
-export type { Component, SlotRender, ListItem, ListItemSpec, Animation, ClassValue, StyleValue, Bindable };
+export type {
+	Component,
+	SlotRender,
+	ListItem,
+	ListItemSpec,
+	Animation,
+	ClassValue,
+	StyleValue,
+	Bindable,
+};

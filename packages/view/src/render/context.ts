@@ -14,7 +14,9 @@ const context: Context =
 		registerComputed: null,
 
 		firstEffectToRun: null,
+		lastEffectToRun: null,
 		firstSignalToUpdate: null,
+		lastSignalToUpdate: null,
 
 		// These will definitely be set, in mount or render
 		activeRegion: null as unknown as Region,

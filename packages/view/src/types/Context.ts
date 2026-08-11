@@ -51,6 +51,16 @@ export default interface Context {
 	firstSignalToUpdate: ProxySignal | null;
 
 	/**
+	 * The last signal queued for update, so we can append in O(1).
+	 */
+	lastSignalToUpdate: ProxySignal | null;
+
+	/**
+	 * The last effect queued to run, so we can append in O(1).
+	 */
+	lastEffectToRun: Effect | null;
+
+	/**
 	 * The region that is currently being created.
 	 */
 	activeRegion: Region;

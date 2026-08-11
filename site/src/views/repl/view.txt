@@ -1086,6 +1086,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 	let oldEnd = oldItems.length - 1;
 	let newStart = 0;
 	let newEnd = newSpecs.length - 1;
+	let chainNeedsRelink = false;
 	while (oldStart <= oldEnd && newStart <= newEnd) if (oldItems[oldStart].key === newSpecs[newStart].key) {
 		const item = oldItems[oldStart];
 		update(item, newSpecs[newStart]);
@@ -1101,6 +1102,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 	} else if (oldItems[oldStart].key === newSpecs[newEnd].key) {
 		const item = oldItems[oldStart];
 		moveRegion(parent, item, oldItems[oldEnd].endNode?.nextSibling ?? anchor);
+		chainNeedsRelink = true;
 		update(item, newSpecs[newEnd]);
 		newItems[newEnd] = item;
 		oldStart++;
@@ -1108,6 +1110,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 	} else if (oldItems[oldEnd].key === newSpecs[newStart].key) {
 		const item = oldItems[oldEnd];
 		moveRegion(parent, item, oldItems[oldStart].startNode);
+		chainNeedsRelink = true;
 		update(item, newSpecs[newStart]);
 		newItems[newStart] = item;
 		oldEnd--;
@@ -1116,6 +1119,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 	if (oldStart > oldEnd) {
 		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1].startNode : anchor;
 		for (let i = newStart; i <= newEnd; i++) newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
+		chainNeedsRelink = true;
 	} else if (newStart > newEnd) for (let i = oldStart; i <= oldEnd; i++) clearRegion(oldItems[i]);
 	else {
 		const newKeyToIndex = /* @__PURE__ */ new Map();
@@ -1132,6 +1136,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 				newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
 				before = newItems[i].endNode.nextSibling;
 			}
+			chainNeedsRelink = true;
 		} else {
 			const newMidLen = newEnd - newStart + 1;
 			const newIndexToOld = Array.from({ length: newMidLen }).fill(0);
@@ -1149,11 +1154,25 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 			for (let i = newMidLen - 1; i >= 0; i--) {
 				const newIdx = newStart + i;
 				const before = newIdx + 1 < newSpecs.length ? newItems[newIdx + 1].startNode : anchor;
-				if (newIndexToOld[i] === 0) newItems[newIdx] = mountSpec(newSpecs[newIdx], region, before, create, noWatch);
-				else if (j < 0 || i !== seq[j]) moveRegion(parent, newItems[newIdx], before);
-				else j--;
+				if (newIndexToOld[i] === 0) {
+					newItems[newIdx] = mountSpec(newSpecs[newIdx], region, before, create, noWatch);
+					chainNeedsRelink = true;
+				} else if (j < 0 || i !== seq[j]) {
+					moveRegion(parent, newItems[newIdx], before);
+					chainNeedsRelink = true;
+				} else j--;
 			}
 		}
+	}
+	if (!chainNeedsRelink && newItems.length > 0) {
+		let lastRegion = newItems[newItems.length - 1];
+		let next = lastRegion.nextRegion;
+		while (next !== null && next.depth > lastRegion.depth) {
+			lastRegion = next;
+			next = next.nextRegion;
+		}
+		context.previousRegion = lastRegion;
+		return newItems;
 	}
 	if (newItems.length > 0) {
 		let prevTail = region;

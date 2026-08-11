@@ -42,7 +42,7 @@ export default function proxySet(
 		// If an item in an array is being set directly, trigger the length to
 		// cause any lists to be re-run and data re-bound
 		// TODO: Can we update the single item's data directly somehow?
-		if (data.isArray && !isNaN(+String(key))) {
+		if (data.isArray && typeof key !== "symbol" && !isNaN(+key)) {
 			propagateSignal(data, "length");
 		}
 	}

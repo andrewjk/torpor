@@ -23,24 +23,15 @@ export default function propagateSignal(proxy: ProxyData, key: PropertyKey): voi
 		batchStart();
 
 		try {
-			// Add the signal to the context for updating after triggering
-			if (context.firstSignalToUpdate === null) {
+			// Add the signal to the context for updating after triggering.
+			// Append via a tail pointer so this stays O(1), rather than walking
+			// the whole chain on every write (which made batched mutations O(N²)).
+			if (context.lastSignalToUpdate === null) {
 				context.firstSignalToUpdate = signal;
+				context.lastSignalToUpdate = signal;
 			} else if (signal.nextSignalToUpdate === null) {
-				let lastSignal = context.firstSignalToUpdate;
-				while (lastSignal.nextSignalToUpdate !== null) {
-					lastSignal = lastSignal.nextSignalToUpdate;
-				}
-				lastSignal.nextSignalToUpdate = signal;
-			}
-
-			// Cache the last effect in the chain, so we don't have to keep
-			// looping in cases where there are lots of them for this signal
-			let lastEffect = context.firstEffectToRun;
-			if (lastEffect !== null) {
-				while (lastEffect.nextEffectToRun !== null) {
-					lastEffect = lastEffect.nextEffectToRun;
-				}
+				context.lastSignalToUpdate.nextSignalToUpdate = signal;
+				context.lastSignalToUpdate = signal;
 			}
 
 			// De-activate all targets, so they can be re-used/updated/deleted,
@@ -54,13 +45,15 @@ export default function propagateSignal(proxy: ProxyData, key: PropertyKey): voi
 
 				const target = targetSub.target;
 				if (target.type === EFFECT_TYPE) {
-					// Add the effect to the context for running after triggering
-					if (lastEffect === null) {
-						context.firstEffectToRun = target;
-						lastEffect = target;
-					} else if (target.nextEffectToRun === null && lastEffect !== target) {
-						lastEffect.nextEffectToRun = target;
-						lastEffect = target;
+					// Add the effect to the context for running after triggering,
+					// appending via the tail pointer for O(1)
+					if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
+						if (context.lastEffectToRun === null) {
+							context.firstEffectToRun = target;
+						} else {
+							context.lastEffectToRun.nextEffectToRun = target;
+						}
+						context.lastEffectToRun = target;
 					}
 				} else if (/*target.type === COMPUTED_TYPE*/ !target.recalc) {
 					// This may need to be re-computed in the pull phase

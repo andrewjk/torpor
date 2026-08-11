@@ -23,10 +23,7 @@ export async function buildFiles(file: string): Promise<Record<string, string>> 
 	return buildFiles2(file, source);
 }
 
-export async function buildFiles2(
-	file: string,
-	source: string,
-): Promise<Record<string, string>> {
+export async function buildFiles2(file: string, source: string): Promise<Record<string, string>> {
 	const parsed = parse(source);
 	const result: Record<string, string> = {};
 	if (parsed.ok && parsed.template) {

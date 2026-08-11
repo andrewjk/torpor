@@ -35,6 +35,7 @@ export default function triggerEffects(): void {
 	// Clear the effects
 	effect = context.firstEffectToRun;
 	context.firstEffectToRun = null;
+	context.lastEffectToRun = null;
 	while (effect !== null) {
 		let nextEffect = effect.nextEffectToRun;
 		effect.nextEffectToRun = null;
@@ -45,6 +46,7 @@ export default function triggerEffects(): void {
 	// during the batch
 	let signal: ProxySignal | null = context.firstSignalToUpdate;
 	context.firstSignalToUpdate = null;
+	context.lastSignalToUpdate = null;
 	while (signal !== null) {
 		clearTargets(signal);
 
