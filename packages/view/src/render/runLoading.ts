@@ -83,7 +83,21 @@ export default function runLoading(
 			context.loadingBoundary = boundary;
 			boundary.suspended = false;
 
+			// During hydration, the server rendered fallback (not content).
+			// Temporarily disable hydration so the speculative content render
+			// creates fresh nodes instead of reusing the server's fallback
+			// nodes (which would be destroyed when content is cleared on
+			// suspend, leaving nothing for fallback to hydrate against).
+			const savedHydration = context.hydrationNode;
+			if (savedHydration !== null) {
+				context.hydrationNode = null;
+			}
+
 			renderBranch(0, renderContent);
+
+			if (savedHydration !== null) {
+				context.hydrationNode = savedHydration;
+			}
 
 			context.loadingBoundary = oldBoundary;
 

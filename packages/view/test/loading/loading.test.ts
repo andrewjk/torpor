@@ -71,10 +71,7 @@ test("@loading without fallback shows nothing while suspended", async () => {
 	await waitFor(() => expect(queryByText(container, "Value: quick")).not.toBeNull());
 });
 
-// TODO: @loading hydration — server renders fallback, client must hydrate
-// against it before attempting content. Needs hydration-aware handling in
-// runLoading (like runControl's hydration cursor reset).
-test.skip("@loading hydrated shows fallback then content", async () => {
+test("@loading hydrated shows fallback then content", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");

@@ -117,14 +117,6 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
 
 ### Not yet implemented
 
-- **`@loading` hydration.** The server renders the fallback branch; the
-  client's `runLoading` immediately attempts a speculative content render
-  (creating elements from templates rather than hydrating against the
-  server DOM), causing `insertBefore` errors. Needs hydration-aware
-  handling: start from fallback matching the server output, then attempt
-  content on resolve. `runControl`'s hydration cursor reset
-  (`runControl.ts:50-52`) is the pattern to follow. Test is
-  `test/loading/loading.test.ts` (currently `test.skip`).
 - **`$pending` query — basic version implemented.** Returns `true` whenever a
   read computed is in-flight, without the "quiet on bare refresh" semantics
   (ASYNC.md §7.4 open question: how to distinguish first-load from refresh).
