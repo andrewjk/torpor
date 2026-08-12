@@ -58,17 +58,26 @@ describe("TabGroup", () => {
 		// Left Arrow: If focus is on a tab header, moves focus to the previous
 		// tab header. If focus is on the first tab header, either does nothing
 		// or moves focus to the last tab header
-		fireEvent(getByText(container, "Header 2"), new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 2"),
+			new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 
 		// Home: When focus is on a tab header, moves focus to the first tab
 		// header
-		fireEvent(getByText(container, "Header 3"), new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 3"),
+			new KeyboardEvent("keydown", { key: "Home", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 
 		// End: When focus is on a tab header, moves focus to the last tab
 		// header
-		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "End", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
 	});
 
@@ -89,10 +98,16 @@ describe("TabGroup", () => {
 		document.body.appendChild(container);
 		mount(container, TabGroupVertical);
 
-		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 2"));
 
-		fireEvent(getByText(container, "Header 2"), new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 2"),
+			new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 	});
 });

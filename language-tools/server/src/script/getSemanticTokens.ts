@@ -28,7 +28,7 @@ export default function getSemanticTokens(
 		);
 
 		let sourceSpans = [] as number[];
-		for (let i = 0; i < spans.length; ) {
+		for (let i = 0; i < spans.length;) {
 			const start = spans[i++];
 			const length = spans[i++];
 			const tokenType = spans[i++];

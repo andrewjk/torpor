@@ -44,21 +44,33 @@ describe("Accordion", () => {
 		// Down Arrow: If focus is on an accordion header, moves focus to the next accordion header.
 		// If focus is on the last accordion header, either does nothing or moves focus to the first
 		// accordion header
-		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 2"));
 
 		// Up Arrow: If focus is on an accordion header, moves focus to the previous accordion header.
 		// If focus is on the first accordion header, either does nothing or moves focus to the last
 		// accordion header
-		fireEvent(getByText(container, "Header 2"), new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 2"),
+			new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 
 		// Home: When focus is on an accordion header, moves focus to the first accordion header
-		fireEvent(getByText(container, "Header 3"), new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 3"),
+			new KeyboardEvent("keydown", { key: "Home", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 1"));
 
 		// End: When focus is on an accordion header, moves focus to the last accordion header
-		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "End", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
 	});
 
@@ -125,7 +137,10 @@ describe("Accordion", () => {
 		document.body.appendChild(container);
 		mount(container, AccordionKeyboard, { value: [], disabled: true });
 
-		fireEvent(getByText(container, "Header 1"), new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+		fireEvent(
+			getByText(container, "Header 1"),
+			new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Header 3"));
 	});
 

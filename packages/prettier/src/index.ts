@@ -2,7 +2,7 @@ import { parse as parseTorp } from "@torpor/view/compile";
 // Import from the specific module path to avoid the "browser" export condition
 // resolving to the standalone build (which lacks parser plugins)
 //import * as prettier from "prettier/index.mjs";
-import prettier from "prettier"
+import prettier from "prettier";
 
 export const languages: prettier.SupportLanguage[] = [
 	{

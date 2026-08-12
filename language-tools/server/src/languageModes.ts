@@ -1,7 +1,5 @@
 import { getCSSLanguageService } from "vscode-css-languageservice";
-import {
-	getLanguageService as getHTMLLanguageService,
-} from "vscode-html-languageservice";
+import { getLanguageService as getHTMLLanguageService } from "vscode-html-languageservice";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { getCSSMode } from "./modes/cssMode";
 import { getDocumentRegions, DocumentRegions } from "./embeddedSupport";
@@ -18,14 +16,18 @@ import {
 	Position,
 	Range,
 	Definition,
- } from 'vscode-languageserver';
+} from "vscode-languageserver";
 
 export * from "vscode-html-languageservice";
 
 export interface LanguageMode {
 	getId(): string;
 	doValidation?: (document: TextDocument) => Diagnostic[];
-	doComplete?: (document: TextDocument, position: Position, context?: CompletionContext) => CompletionList;
+	doComplete?: (
+		document: TextDocument,
+		position: Position,
+		context?: CompletionContext,
+	) => CompletionList;
 	doCodeAction?: (document: TextDocument, range: Range, context: CodeActionContext) => CodeAction[];
 	doHover?: (document: TextDocument, position: Position) => Hover | null;
 	doDefinition?: (document: TextDocument, position: Position) => Definition | null;
@@ -52,8 +54,8 @@ export function getLanguageModes(): LanguageModes {
 	const htmlLanguageService = getHTMLLanguageService();
 	const cssLanguageService = getCSSLanguageService();
 
-	const documentRegions = getLanguageModelCache<DocumentRegions>(10, 60, document =>
-		getDocumentRegions( document)
+	const documentRegions = getLanguageModelCache<DocumentRegions>(10, 60, (document) =>
+		getDocumentRegions(document),
 	);
 
 	let modelCaches: LanguageModelCache<any>[] = [];
@@ -65,10 +67,7 @@ export function getLanguageModes(): LanguageModes {
 	modes["css"] = getCSSMode(cssLanguageService, documentRegions);
 
 	return {
-		getModeAtPosition(
-			document: TextDocument,
-			position: Position
-		): LanguageMode | undefined {
+		getModeAtPosition(document: TextDocument, position: Position): LanguageMode | undefined {
 			const languageId = documentRegions.get(document).getLanguageAtPosition(position);
 			if (languageId) {
 				return modes[languageId];
@@ -79,12 +78,12 @@ export function getLanguageModes(): LanguageModes {
 			return documentRegions
 				.get(document)
 				.getLanguageRanges(range)
-				.map(r => {
+				.map((r) => {
 					return <LanguageModeRange>{
 						start: r.start,
 						end: r.end,
 						mode: r.languageId && modes[r.languageId],
-						attributeValue: r.attributeValue
+						attributeValue: r.attributeValue,
 					};
 				});
 		},
@@ -112,18 +111,18 @@ export function getLanguageModes(): LanguageModes {
 			return modes[languageId];
 		},
 		onDocumentRemoved(document: TextDocument) {
-			modelCaches.forEach(mc => mc.onDocumentRemoved(document));
+			modelCaches.forEach((mc) => mc.onDocumentRemoved(document));
 			for (const mode in modes) {
 				modes[mode].onDocumentRemoved(document);
 			}
 		},
 		dispose(): void {
-			modelCaches.forEach(mc => mc.dispose());
+			modelCaches.forEach((mc) => mc.dispose());
 			modelCaches = [];
 			for (const mode in modes) {
 				modes[mode].dispose();
 			}
 			modes = {};
-		}
+		},
 	};
 }

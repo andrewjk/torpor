@@ -6,6 +6,6 @@
 
 	"assets": {
 		"directory": "./dist/cloudflare",
-		"binding": "ASSETS"
-	}
+		"binding": "ASSETS",
+	},
 }

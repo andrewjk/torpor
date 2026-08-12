@@ -53,27 +53,45 @@ describe("ListBox", () => {
 		// Up Arrow: If focus is on an accordion header, moves focus to the previous accordion header.
 		// If focus is on the first accordion header, either does nothing or moves focus to the last
 		// accordion header
-		fireEvent(getByText(container, "Content 2"), new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 2"),
+			new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 
 		// Home: When focus is on an accordion header, moves focus to the first accordion header
-		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "Home", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 3"),
+			new KeyboardEvent("keydown", { key: "Home", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 
 		// End: When focus is on an accordion header, moves focus to the last accordion header
-		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 1"),
+			new KeyboardEvent("keydown", { key: "End", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 3"));
 
 		// Enter: Selects the focused item in single-select mode
-		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 1"),
+			new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+		);
 		expect(queryByText(container, "Content 1")).toHaveAttribute("aria-selected", "true");
 
 		// Type-ahead: Typing 'c' focuses Content 1
-		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "c", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 3"),
+			new KeyboardEvent("keydown", { key: "c", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 
 		// Type-ahead: Typing 'o' after 'c' focuses Content 1 (starts with 'co')
-		fireEvent(getByText(container, "Content 1"), new KeyboardEvent("keydown", { key: "o", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 1"),
+			new KeyboardEvent("keydown", { key: "o", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 
 		// Type-ahead: Backspace removes last character and refocuses
@@ -89,7 +107,10 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxKeyboard, { value: [1, 2] });
 
-		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "C", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 3"),
+			new KeyboardEvent("keydown", { key: "C", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 	});
 
@@ -98,7 +119,10 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxKeyboard, { value: [1, 2] });
 
-		fireEvent(getByText(container, "Content 3"), new KeyboardEvent("keydown", { key: "C", bubbles: true }));
+		fireEvent(
+			getByText(container, "Content 3"),
+			new KeyboardEvent("keydown", { key: "C", bubbles: true }),
+		);
 		expect(document.activeElement).toBe(queryByText(container, "Content 1"));
 	});
 
