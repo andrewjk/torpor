@@ -183,6 +183,6 @@ test("$cache throws when it returns a Promise", () => {
 				return $cache(() => Promise.resolve(42));
 			},
 		});
-		$state.bad;
+			void $state.bad;
 	}).toThrow("$cache returned a Promise");
 });
