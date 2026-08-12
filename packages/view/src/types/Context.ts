@@ -86,6 +86,21 @@ export default interface Context {
 	loadingBoundary: LoadingBoundary | null;
 
 	/**
+	 * When `true`, `suspendRead` suppresses taint propagation and boundary
+	 * notification — it only tracks the signal for subscription and records
+	 * that a suspend was encountered in `suspendPeekHit`. Used by `$pending`
+	 * to check whether a computation is suspended without itself suspending.
+	 */
+	suspendPeek: boolean;
+
+	/**
+	 * Set by `suspendRead` when a suspended computed is read in peek mode.
+	 * `$pending` resets this before running its tracking function and checks
+	 * it after.
+	 */
+	suspendPeekHit: boolean;
+
+	/**
 	 * Functions that were run via $mount, which should be collected and flushed
 	 * when the component has been mounted in the DOM
 	 */

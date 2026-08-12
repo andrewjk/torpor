@@ -18,6 +18,12 @@ import trackSignal from "./trackSignal";
  */
 function suspendRead(signal: Computed): undefined {
 	trackSignal(signal);
+	// In peek mode (used by $pending), track the signal for subscription but
+	// don't taint the reader or notify the boundary — just record the hit
+	if (context.suspendPeek) {
+		context.suspendPeekHit = true;
+		return undefined;
+	}
 	if (context.activeTarget !== null) {
 		context.activeTarget.didSuspend = true;
 	}

@@ -25,6 +25,9 @@ const context: Context =
 
 		loadingBoundary: null,
 
+		suspendPeek: false,
+		suspendPeekHit: false,
+
 		mountEffects: [],
 		stashedEvents: [],
 		stashedAnimations: [],

@@ -17,6 +17,7 @@ const importsMap: Record<string, string> = {
 	$handle: 'import { $handle } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
 	$await: 'import { $await } from "${folder}";',
+	$pending: 'import { $pending } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
 	$unwrap: 'import { $unwrap } from "${folder}";',
@@ -122,6 +123,7 @@ function buildTemplate(
 	if (/\$handle\b/.test(script)) imports.add("$handle");
 	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$await\b/.test(script)) imports.add("$await");
+	if (/\$pending\b/.test(script)) imports.add("$pending");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
