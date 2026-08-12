@@ -26,6 +26,7 @@ const controlOperations = [
 	"@default",
 	"@await",
 	"@then",
+	"@try",
 	"@catch",
 	"@replace",
 	"@html",
@@ -201,6 +202,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 	// * for into a for group
 	// * switch into a switch group (cases will have the correct parent)
 	// * await/then/catch into an await group
+	// * try/catch into a try group
 	// * replace into a replace group
 	// * html into a html group
 	if (node.operation === "@if") {
@@ -249,7 +251,7 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			span: { start: 0, end: 0 },
 		};
 		parentNode.children.push(awaitGroup);
-	} else if (node.operation === "@then" || node.operation === "@catch") {
+	} else if (node.operation === "@then") {
 		for (let i = parentNode.children.length - 1; i >= 0; i--) {
 			const lastChild = parentNode.children[i];
 			// TODO: Break if it's an element, do more checking
@@ -258,6 +260,31 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 				break;
 			}
 		}
+	} else if (node.operation === "@catch") {
+		// `@catch` is shared by `@await` (its existing `catch` branch) and
+		// `@try`. Attach to whichever matching group is most recent in the
+		// parent's children; once `@await` is deprecated the collision
+		// resolves.
+		for (let i = parentNode.children.length - 1; i >= 0; i--) {
+			const lastChild = parentNode.children[i];
+			// TODO: Break if it's an element, do more checking
+			if (
+				isControlNode(lastChild) &&
+				(lastChild.operation === "@await group" || lastChild.operation === "@try group")
+			) {
+				lastChild.children.push(node);
+				break;
+			}
+		}
+	} else if (node.operation === "@try") {
+		const tryGroup: ControlNode = {
+			type: "control",
+			operation: "@try group",
+			statement: "",
+			children: [node],
+			span: { start: 0, end: 0 },
+		};
+		parentNode.children.push(tryGroup);
 	} else if (node.operation === "@replace") {
 		const replaceGroup: ControlNode = {
 			type: "control",

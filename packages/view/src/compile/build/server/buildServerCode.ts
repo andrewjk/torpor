@@ -79,7 +79,9 @@ function buildServerTemplate(
 				current.params ??
 					`${current.props?.length ? "$props: Record<PropertyKey, any>" : "_$props?: Record<PropertyKey, any>"}`,
 				`${
-					current.contextProps?.length || (current.markup && markupRendersComponent(current.markup))
+					current.contextProps?.length ||
+					(current.markup && markupRendersComponent(current.markup)) ||
+					(current.error && markupRendersComponent(current.error))
 						? "$context"
 						: "_$context"
 				}?: Record<PropertyKey, any>`,
@@ -98,12 +100,6 @@ function buildServerTemplate(
 			b.append(`let t_body = "";`);
 			b.append(`let t_head = "";`);
 		} else if (chunk.script === "/* @render */") {
-			//let userScript = script.substring(marker, i);
-			//if (/[^\s]/.test(userScript)) {
-			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
-			//	b.append(userScript);
-			//}
-
 			if (current.markup) {
 				const status: BuildServerStatus = {
 					imports,
@@ -118,12 +114,43 @@ function buildServerTemplate(
 				b.append("");
 				b.append("/* User interface */");
 
+				// An @error block wraps the render in an implicit try/catch so
+				// that render-time errors render the error content instead
+				if (current.error) {
+					b.append(`const t_try_body = t_body;`);
+					b.append("try {");
+				}
+
 				buildServerNode(current.markup, status, b);
 
 				if (status.output) {
 					b.append(`t_body += \`${status.output}\`;`);
 					status.output = "";
 				}
+			}
+		} else if (chunk.script === "/* @error */") {
+			if (current.markup && current.error) {
+				const status: BuildServerStatus = {
+					imports,
+					output: "",
+					styleHash: current.style?.hash || "",
+					varNames: {},
+					preserveWhitespace: false,
+					options,
+				};
+
+				b.append(`} catch (${current.errorVar}) {`);
+				b.append("t_body = t_try_body;");
+
+				b.append("/* User interface error */");
+				buildServerNode(current.error, status, b);
+
+				if (status.output) {
+					b.append(`t_body += \`${status.output}\`;`);
+					status.output = "";
+				}
+
+				b.append("}");
 			}
 		} else if (chunk.script === "/* @head */") {
 			//let userScript = script.substring(marker, i);

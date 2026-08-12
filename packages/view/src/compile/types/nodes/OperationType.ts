@@ -12,6 +12,8 @@ type OperationType =
 	| "@await group"
 	| "@await"
 	| "@then"
+	| "@try group"
+	| "@try"
 	| "@catch"
 	| "@replace group"
 	| "@replace"

@@ -7,7 +7,7 @@ import isSpaceNode from "../utils/isSpaceNode";
 import trimQuotes from "../utils/trimQuotes";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
-import parseMarkup from "./parseMarkup";
+import parseMarkup, { parseMarkupInto } from "./parseMarkup";
 import parseStyleElement from "./parseStyles";
 import scopeStyles from "./scopeStyles";
 import accept from "./utils/accept";
@@ -82,6 +82,8 @@ export default function parseCode(source: string): ParseResult {
 			}
 		} else if (accept("@render", status, false)) {
 			parseComponentRender(status);
+		} else if (accept("@error", status, false)) {
+			parseComponentError(status);
 		} else if (accept("@head", status, false)) {
 			parseComponentHead(status);
 		} else if (accept("@style", status, false)) {
@@ -270,6 +272,51 @@ function parseComponentRender(status: ParseStatus) {
 	consumeSpace(status);
 	if (accept("{", status)) {
 		parseMarkup(status, status.source);
+		accept("}", status);
+	}
+
+	status.marker = status.i;
+}
+
+function parseComponentError(status: ParseStatus) {
+	const current = status.components.at(-1);
+	if (!current) return;
+
+	if (current.error) {
+		addError(status, `Multiple @error sections`, status.i, status.i + "@error".length);
+	}
+
+	if (!current.markup) {
+		addError(status, `@error must come after @render`, status.i, status.i + "@error".length);
+	}
+
+	status.script.push({
+		script: status.source.substring(status.marker, status.i),
+		span: { start: status.marker, end: status.i },
+	});
+	status.script.push({
+		script: "/* @error */",
+		span: { start: 0, end: 0 },
+	});
+
+	accept("@error", status);
+	consumeSpace(status);
+
+	// Parse the error variable e.g. `@error (err)`
+	let errorVar = "";
+	if (accept("(", status)) {
+		let start = status.i;
+		while (status.i < status.source.length && status.source[status.i] !== ")") {
+			status.i += 1;
+		}
+		errorVar = status.source.substring(start, status.i).trim();
+		accept(")", status);
+		consumeSpace(status);
+	}
+	current.errorVar = errorVar || "err";
+
+	if (accept("{", status)) {
+		parseMarkupInto(status, status.source, (root) => (current.error ??= root));
 		accept("}", status);
 	}
 

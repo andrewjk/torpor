@@ -21,6 +21,7 @@ export default function build(template: Template, options?: BuildOptions): Build
 	if (!options?.preserveWhitespace) {
 		for (const component of template.components) {
 			if (component.markup) trimWhitespace(component.markup);
+			if (component.error) trimWhitespace(component.error);
 			if (component.head) trimWhitespace(component.head);
 		}
 	}

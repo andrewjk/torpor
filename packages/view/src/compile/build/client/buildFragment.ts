@@ -313,6 +313,7 @@ function declareControlFragmentVars(
 		case "@switch group":
 		case "@for group":
 		case "@await group":
+		case "@try group":
 		case "@replace group":
 		case "@html group": {
 			const operation = node.operation.substring(1).replace(" group", "");

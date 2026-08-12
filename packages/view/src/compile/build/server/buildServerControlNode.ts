@@ -8,6 +8,7 @@ import buildServerIfNode from "./buildServerIfNode";
 import buildServerReplaceNode from "./buildServerReplaceNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
+import buildServerTryNode from "./buildServerTryNode";
 
 export default function buildServerControlNode(
 	node: ControlNode,
@@ -49,8 +50,13 @@ export default function buildServerControlNode(
 		}
 		case "@await":
 		case "@then":
+		case "@try":
 		case "@catch": {
-			// These get handled with @await group, above
+			// These get handled with @await group or @try group, above
+			break;
+		}
+		case "@try group": {
+			buildServerTryNode(node, status, b);
 			break;
 		}
 		case "@replace group": {

@@ -48,6 +48,8 @@ const importsMap: Record<string, string> = {
 	t_next: 'import { t_next } from "${folder}";',
 	t_skip: 'import { t_skip } from "${folder}";',
 	t_frg: 'import { t_frg } from "${folder}";',
+	t_save_hydration: 'import { t_save_hydration } from "${folder}";',
+	t_restore_hydration: 'import { t_restore_hydration } from "${folder}";',
 	t_elm: 'import { t_elm } from "${folder}";',
 	t_txt: 'import { t_txt } from "${folder}";',
 	t_cmt: 'import { t_cmt } from "${folder}";',
@@ -149,7 +151,9 @@ function buildTemplate(
 			}
 			b.append(`
 				${
-					current.contextProps?.length || (current.markup && markupRendersComponent(current.markup))
+					current.contextProps?.length ||
+					(current.markup && markupRendersComponent(current.markup)) ||
+					(current.error && markupRendersComponent(current.error))
 						? "$context"
 						: "_$context"
 				}?: Record<PropertyKey, any>,
@@ -169,9 +173,26 @@ function buildTemplate(
 				// Add the interface
 				b.append("");
 				b.append("/* User interface */");
+
+				// An @error block wraps the render in an implicit try/catch so
+				// that render-time errors render the error content instead
+				if (current.error) {
+					b.append("try {");
+				}
+
 				buildFragmentText(current.markup, status, b);
 				b.append("");
 				buildNode(current.markup, status, b, "$parent", "$anchor", true);
+			}
+		} else if (chunk.script === "/* @error */") {
+			if (current.markup && current.error) {
+				b.append(`} catch (${current.errorVar}) {`);
+				b.append("");
+				b.append("/* User interface error */");
+				buildFragmentText(current.error, status, b);
+				b.append("");
+				buildNode(current.error, status, b, "$parent", "$anchor", true);
+				b.append("}");
 			}
 		} else if (chunk.script === "/* @head */") {
 			if (current.head) {

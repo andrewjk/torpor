@@ -1,4 +1,5 @@
 import type CommentNode from "../types/nodes/CommentNode";
+import type RootNode from "../types/nodes/RootNode";
 import type TextNode from "../types/nodes/TextNode";
 import type ParseStatus from "./ParseStatus";
 import parseControl from "./parseControl";
@@ -10,6 +11,26 @@ import isSpaceChar from "./utils/isSpaceChar";
 export default function parseMarkup(status: ParseStatus, source: string): void {
 	const current = status.components.at(-1);
 	if (!current) return;
+
+	parseMarkupInto(status, source, (root) => (current.markup ??= root));
+}
+
+/**
+ * Parses markup into a root node, letting callers choose where the resulting
+ * RootNode is stored (e.g. a component's `markup` or its `error` block).
+ *
+ * @param status The parse status
+ * @param source The full source code
+ * @param setRoot Called with a fresh root node the first time content is
+ *   parsed; subsequent content is appended to the same node.
+ */
+export function parseMarkupInto(
+	status: ParseStatus,
+	source: string,
+	setRoot: (root: RootNode) => void,
+): void {
+	let root: RootNode | null = null;
+	const getRoot = () => (root ??= { type: "root", children: [] });
 
 	while (status.i < source.length) {
 		if (accept("}", status, false)) {
@@ -24,8 +45,8 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 				commentType: "html",
 				content: status.source.substring(start, status.i - 3),
 			};
-			current.markup ??= { type: "root", children: [] };
-			current.markup.children.push(text);
+			setRoot(getRoot());
+			getRoot().children.push(text);
 		} else if (accept("@//", status)) {
 			// Swallow one-line comments
 			const start = status.i;
@@ -35,8 +56,8 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 				commentType: "line",
 				content: status.source.substring(start, status.i - 1),
 			};
-			current.markup ??= { type: "root", children: [] };
-			current.markup.children.push(text);
+			setRoot(getRoot());
+			getRoot().children.push(text);
 		} else if (accept("@/*", status)) {
 			// Swallow block comments
 			const start = status.i;
@@ -46,26 +67,26 @@ export default function parseMarkup(status: ParseStatus, source: string): void {
 				commentType: "block",
 				content: status.source.substring(start, status.i - 2),
 			};
-			current.markup ??= { type: "root", children: [] };
-			current.markup.children.push(text);
+			setRoot(getRoot());
+			getRoot().children.push(text);
 		} else if (isSpaceChar(status.source, status.i)) {
-			current.markup ??= { type: "root", children: [] };
+			setRoot(getRoot());
 			const space = consumeSpace(status);
 			const text: TextNode = {
 				type: "text",
 				content: space,
 				spans: [],
 			};
-			current.markup.children.push(text);
+			getRoot().children.push(text);
 		} else if (accept("<", status, false)) {
 			// Parse the element
-			current.markup ??= { type: "root", children: [] };
+			setRoot(getRoot());
 			const element = parseElement(status);
-			current.markup.children.push(element);
+			getRoot().children.push(element);
 		} else if (accept("@", status, false)) {
 			// Parse the control
-			current.markup ??= { type: "root", children: [] };
-			parseControl(status, current.markup);
+			setRoot(getRoot());
+			parseControl(status, getRoot());
 		} else {
 			status.i += 1;
 		}

@@ -178,6 +178,10 @@ const importsMap: Record<string, string> = {
 		'import t_child from "../../../../src/render/nodeChild";',
 	'import { t_next } from "@torpor/view";': 'import t_next from "../../../../src/render/nodeNext";',
 	'import { t_skip } from "@torpor/view";': 'import t_skip from "../../../../src/render/nodeSkip";',
+	'import { t_save_hydration } from "@torpor/view";':
+		'import t_save_hydration from "../../../../src/render/saveHydration";',
+	'import { t_restore_hydration } from "@torpor/view";':
+		'import t_restore_hydration from "../../../../src/render/restoreHydration";',
 	'import { t_frg } from "@torpor/view";':
 		'import t_frg from "../../../../src/render/createFragment";',
 	'import { t_elm } from "@torpor/view";':

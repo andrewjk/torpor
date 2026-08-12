@@ -110,6 +110,7 @@ function buildControlFragmentText(
 		case "@switch group":
 		case "@for group":
 		case "@await group":
+		case "@try group":
 		case "@replace group":
 		case "@html group": {
 			// Add a placeholder if it's a branching control node

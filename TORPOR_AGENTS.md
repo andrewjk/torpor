@@ -257,6 +257,56 @@ resolves/rejects:
 Reassigning the awaited value (e.g. `$state.guesser = guessNumber(100)`)
 restarts the whole cycle.
 
+### `@try` / `catch` — error boundary
+
+Catches **sync render errors** thrown while rendering the `@try` subtree:
+component render errors, getter / computed errors, `@const` / `@if` condition
+throws, and errors that bubble up from child components. The `catch` branch
+renders in place of the failed content:
+
+```torp
+@try {
+	@const user = fetchUser($props.id)
+	<p>Hello, {user.name}!</p>
+} catch (err) {
+	<p class="error">Couldn't load user: {err.message}</p>
+}
+```
+
+- `@catch` is shared with `@await`; it attaches to whichever of `@try` or
+  `@await` is most recent in the same parent.
+- A `@try` without a `catch` renders its content and lets errors bubble up to
+  the nearest boundary.
+- If a tracked dependency is read _directly_ by the `@try` control (e.g. via a
+  `@const`), flipping it re-runs the try branch: if it now succeeds the
+  content renders again, otherwise the catch re-renders.
+
+### `@error` — component-level error block
+
+A top-level block, sibling of `@render`, that catches render-time errors for
+the whole component — the component-level equivalent of wrapping `@render`'s
+content in `@try { … } catch (err) { … }`:
+
+```torp
+function Profile($props) {
+	@render {
+		<ProfileHeader user={$props.user} />
+		<ProfileBody user={$props.user} />
+	}
+
+	@error (err) {
+		<ErrorView error={err} />
+	}
+}
+```
+
+- Catches errors thrown while rendering the `@render` output (sync throws,
+  errors bubbling up from child components). It does **not** catch errors from
+  the component's setup phase (the code before `@render`).
+- The error variable (`err` above) is bound to the caught error.
+- Without `@error`, render errors propagate up to the nearest `@try`/`@error`
+  in an ancestor, and out of the app if none exists.
+
 ---
 
 ## Attributes & bindings

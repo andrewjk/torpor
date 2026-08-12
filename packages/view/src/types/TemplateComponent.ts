@@ -14,6 +14,10 @@ export default interface TemplateComponent {
 	/** Params declared by the user in the component's function */
 	params?: string;
 	markup?: RootNode;
+	/** The markup of the component's top-level `@error` block, if any */
+	error?: RootNode;
+	/** The variable name bound to the error in the `@error` block */
+	errorVar?: string;
 	head?: RootNode;
 	style?: Style;
 	/** The type or interface that is used for the $props param */

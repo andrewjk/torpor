@@ -117,3 +117,48 @@ messages:[...c.messages, {id:2}]}))`; then
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
   default plugins are a good idea. Not a HACK to remove; flagged for the
   framework's design discussion.
+
+## Error boundaries (`@try`/`@catch` and `@error`) — Stage A gaps
+
+Stage A (ASYNC.md §7.7) shipped `@try`/`@catch` and the top-level `@error`
+block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
+/ `buildServerTryNode`, `@error` in `parseCode.ts`/`buildCode.ts`/
+`buildServerCode.ts`, hydration snapshot/restore helpers
+(`render/saveHydration.ts`, `render/restoreHydration.ts`).
+
+### Not yet implemented (Stage B / follow-up)
+
+- **Effect-rerun error routing.** The compiled `try/catch` only catches errors
+  thrown synchronously while building the boundary's subtree (initial render,
+  child component renders, direct `@const` reads). A `$run` effect created
+  inside the boundary that throws on a *later* re-run (e.g. a text
+  interpolation getter that throws after a state change) still propagates out
+  of `triggerEffects.ts:58-60` and breaks the app. Routing effect errors to the
+  nearest boundary region needs a runtime hook (e.g. `Region.onError`, walked
+  from the effect's owning region in `triggerEffects`) — deliberately deferred,
+  it touches reactivity.
+- **Recovery outside direct reads.** Recovery (catch → try) currently works
+  only when the erroring expression is read *directly* by the boundary's
+  control effect — i.e. via `@const` or a nested control condition. Reads
+  wrapped in `$run` effects (text/attribute interpolation) are tracked by the
+  nested effect, not the boundary, so once the catch branch renders it stays.
+- **Top-level `@error` recovery.** Same as above but structural: the `@error`
+  try/catch wraps only the *initial* `@render` build; a later re-render error
+  (from a nested control re-running after a prop change) is not caught, and a
+  later recovery can't clear the already-rendered error content. Needs the
+  same boundary machinery.
+- **Partial render on mid-build throw.** If a `@try`/`@error` subtree throws
+  *after* some DOM was added (throw after `t_add_element`/`t_add_fragment`),
+  the partial content isn't cleared before the catch branch renders. The
+  common case (throw during compute, before fragment insert) is clean because
+  `buildRootNode` inserts only at the end.
+- **Server `t_try_body` snapshot** discards any `t_head` appended before the
+  throw (`buildServerCode.ts` / `buildServerTryNode.ts` restore only `t_body`).
+  An erroring render that had already appended `<head>` tags leaves them.
+- **`@catch` without a preceding `@try`/`@await`** is silently dropped by the
+  parser (matches pre-existing `@then` behavior); no error is raised.
+- **Hydration dual-branch walk.** When the server renders the catch branch and
+  the client's try branch throws, the failed try-branch build advances the
+  hydration cursor; `saveHydration`/`restoreHydration` rewind it before the
+  catch branch hydrates. If the try branch throws *after* walking past real
+  content (rather than before), the rewind may not fully restore the cursor.

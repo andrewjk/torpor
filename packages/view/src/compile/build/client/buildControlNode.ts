@@ -8,6 +8,7 @@ import buildIfNode from "./buildIfNode";
 import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
+import buildTryNode from "./buildTryNode";
 
 export default function buildControlNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	switch (node.operation) {
@@ -45,8 +46,13 @@ export default function buildControlNode(node: ControlNode, status: BuildStatus,
 		}
 		case "@await":
 		case "@then":
+		case "@try":
 		case "@catch": {
-			// These get handled with @await group, above
+			// These get handled with @await group or @try group, above
+			break;
+		}
+		case "@try group": {
+			buildTryNode(node, status, b);
 			break;
 		}
 		case "@replace group": {
