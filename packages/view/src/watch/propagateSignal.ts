@@ -8,6 +8,71 @@ import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 
 /**
+ * Walk the target graph from a signal source (ProxySignal or Computed),
+ * marking each dependent as needing recalculation and queuing effects for
+ * re-run. Shared between `propagateSignal` (for proxy writes) and `$await`'s
+ * promise-resolve handler (for async value resolution).
+ *
+ * Must be called inside `batchStart`/`batchEnd` — callers own the batch.
+ */
+export function propagateFromSignal(signal: { firstTarget: Subscription | null }): void {
+	const first = signal.firstTarget;
+	if (first === null) return;
+	let targetSub: Subscription = first;
+
+	let computed: Computed | undefined;
+	outer: while (true) {
+		// De-activate all targets, so they can be re-used/updated/deleted
+		targetSub.active = false;
+		targetSub.recalc = true;
+
+		const target = targetSub.target;
+		if (target.type === EFFECT_TYPE) {
+			// Add the effect to the context for running after triggering,
+			// appending via the tail pointer for O(1)
+			if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
+				if (context.lastEffectToRun === null) {
+					context.firstEffectToRun = target;
+				} else {
+					context.lastEffectToRun.nextEffectToRun = target;
+				}
+				context.lastEffectToRun = target;
+			}
+		} else if (/*target.type === COMPUTED_TYPE*/ !target.recalc) {
+			// This may need to be re-computed in the pull phase
+			target.recalc = true;
+
+			// Check the computed's targets
+			if (target.firstTarget !== null) {
+				computed = target;
+				computed.rollback = targetSub;
+				targetSub = target.firstTarget;
+				continue;
+			}
+		}
+
+		// If there are no more targets, we may need to rollback to the
+		// last computed that had more targets
+		while (targetSub.nextTarget === null && computed !== undefined) {
+			const rollback = computed.rollback;
+			if (rollback === null) break; // reached the root signal
+			targetSub = rollback;
+			if (targetSub.source.type !== COMPUTED_TYPE) {
+				computed = undefined;
+				continue outer;
+			}
+			computed = targetSub.source;
+		}
+
+		if (targetSub.nextTarget === null) {
+			break;
+		}
+
+		targetSub = targetSub.nextTarget;
+	}
+}
+
+/**
  * When a signal is changed, we need to
  * - Set the signal's subscriptions to recalc
  * - Set any dependent computed values to recalc
@@ -34,57 +99,7 @@ export default function propagateSignal(proxy: ProxyData, key: PropertyKey): voi
 				context.lastSignalToUpdate = signal;
 			}
 
-			// De-activate all targets, so they can be re-used/updated/deleted,
-			// and mark them to be recalculated
-			let targetSub: Subscription = signal.firstTarget;
-			let computed: Computed | undefined;
-			outer: while (true) {
-				// De-activate all targets, so they can be re-used/updated/deleted
-				targetSub.active = false;
-				targetSub.recalc = true;
-
-				const target = targetSub.target;
-				if (target.type === EFFECT_TYPE) {
-					// Add the effect to the context for running after triggering,
-					// appending via the tail pointer for O(1)
-					if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
-						if (context.lastEffectToRun === null) {
-							context.firstEffectToRun = target;
-						} else {
-							context.lastEffectToRun.nextEffectToRun = target;
-						}
-						context.lastEffectToRun = target;
-					}
-				} else if (/*target.type === COMPUTED_TYPE*/ !target.recalc) {
-					// This may need to be re-computed in the pull phase
-					target.recalc = true;
-
-					// Check the computed's targets
-					if (target.firstTarget !== null) {
-						computed = target;
-						computed.rollback = targetSub;
-						targetSub = target.firstTarget;
-						continue;
-					}
-				}
-
-				// If there are no more targets, we may need to rollback to the
-				// last computed that had more targets
-				while (targetSub.nextTarget === null && computed !== undefined) {
-					targetSub = computed.rollback!;
-					if (targetSub.source.type !== COMPUTED_TYPE) {
-						computed = undefined;
-						continue outer;
-					}
-					computed = targetSub.source;
-				}
-
-				if (targetSub.nextTarget === null) {
-					break;
-				}
-
-				targetSub = targetSub.nextTarget;
-			}
+			propagateFromSignal(signal);
 		} finally {
 			batchEnd();
 		}

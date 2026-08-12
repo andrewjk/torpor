@@ -48,6 +48,15 @@ export default interface Effect {
 	didError: boolean;
 
 	/**
+	 * True if the effect's last run read a suspended (`didSuspend`) computed.
+	 * Set by the proxy get trap's suspend-taint propagation. Unused by the
+	 * effect machinery itself (effects don't cache values); present for
+	 * symmetry with Computed and to let `runEffect` skip finalization on a
+	 * suspended run.
+	 */
+	didSuspend: boolean;
+
+	/**
 	 * The name of the effect, for debugging.
 	 */
 	name?: string;

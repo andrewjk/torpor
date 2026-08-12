@@ -9,6 +9,24 @@ import { proxyDataSymbol } from "./symbols";
 import trackProxySignal from "./trackProxySignal";
 import trackSignal from "./trackSignal";
 
+/**
+ * Called when a read hits a `didSuspend` computed. Subscribes the reader (so
+ * resolve re-runs it through the normal reactive graph), propagates the
+ * suspend up the cache chain by tainting the active reader, and notifies the
+ * nearest `@loading` boundary. Returns `undefined` as a placeholder — the
+ * boundary discards the partial render.
+ */
+function suspendRead(signal: Computed): undefined {
+	trackSignal(signal);
+	if (context.activeTarget !== null) {
+		context.activeTarget.didSuspend = true;
+	}
+	if (context.loadingBoundary !== null) {
+		context.loadingBoundary.suspended = true;
+	}
+	return undefined;
+}
+
 export default function proxyGet(
 	target: Record<PropertyKey, any>,
 	key: PropertyKey,
@@ -54,17 +72,30 @@ export default function proxyGet(
 				// the UI update, then set the value concretely later (e.g. if
 				// updating a `count` via a fetch)
 
-				const oldRegisterComputed = context.registerComputed;
-				try {
-					// Allow calling `$cache` to assign the computed to a proxy
-					// signal
-					context.registerComputed = (computed: Computed) => {
-						data.signals.set(key, computed);
-					};
-					return Reflect.get(target, key, receiver);
-				} finally {
-					context.registerComputed = oldRegisterComputed;
+			const oldRegisterComputed = context.registerComputed;
+			try {
+				// Allow calling `$cache`/`$await` to assign the computed to a
+				// proxy signal
+				context.registerComputed = (computed: Computed) => {
+					data.signals.set(key, computed);
+				};
+				const result = Reflect.get(target, key, receiver);
+				// After running the getter, check if the just-registered
+				// computed suspended (e.g. an $await getter returning a
+				// pending promise). If so, handle suspend instead of
+				// returning the raw promise.
+				const registered = data.signals.get(key) as Computed | undefined;
+				if (
+					registered !== undefined &&
+					registered.type === COMPUTED_TYPE &&
+					registered.didSuspend
+				) {
+					return suspendRead(registered);
 				}
+				return result;
+			} finally {
+				context.registerComputed = oldRegisterComputed;
+			}
 			}
 		} else if (data.isArray) {
 			// If it's a function in an array, we may intercept it
@@ -88,13 +119,19 @@ export default function proxyGet(
 			// but the computed hasn't yet been read, it may need to be
 			// re-computed
 			checkComputed(signal);
-		} else if (signal.didError) {
+		}
+		if (signal.didError) {
 			// If there was a previous error, and no dependencies have
 			// changed, throw the error again
 			throw signal.value;
-		} else {
-			trackSignal(signal);
 		}
+		if (signal.didSuspend) {
+			// The computed returned a pending promise — subscribe the reader
+			// (so resolve re-runs it), taint up the cache chain, and notify
+			// the nearest @loading boundary
+			return suspendRead(signal);
+		}
+		trackSignal(signal);
 		return signal.value;
 	}
 

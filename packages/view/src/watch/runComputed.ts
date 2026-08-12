@@ -10,6 +10,7 @@ export default function runComputed<T>(computed: Computed<T>): T {
 
 	computed.running = true;
 	computed.didError = false;
+	computed.didSuspend = false;
 
 	try {
 		// Set the active target, so that any properties accessed while running it

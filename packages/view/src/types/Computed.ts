@@ -51,6 +51,22 @@ export default interface Computed<T = any> {
 	didError: boolean;
 
 	/**
+	 * True if the computed's last run returned a pending Promise. Set by
+	 * `$await`; read by the proxy get trap to suspend readers. Cleared when
+	 * the promise resolves (or rejects), at which point dependents are
+	 * propagated through the reactive graph.
+	 */
+	didSuspend: boolean;
+
+	/**
+	 * Generation counter for `$await`'s stale-resolve guard. Each run of an
+	 * `$await` computed increments this; the `.then` handler captures the
+	 * generation and ignores resolves from stale (previous) runs. Unused by
+	 * plain `$cache` computeds.
+	 */
+	generation: number;
+
+	/**
 	 * A subscription to roll back to when recursively updating signal targets.
 	 */
 	rollback: Subscription | null;

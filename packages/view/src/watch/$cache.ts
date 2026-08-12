@@ -22,6 +22,8 @@ export default function $cache<T>(fn: () => T): T {
 		recalc: false,
 		running: false,
 		didError: false,
+		didSuspend: false,
+		generation: 0,
 		rollback: null,
 		//name: dev.effectName(fn),
 	};
@@ -29,6 +31,17 @@ export default function $cache<T>(fn: () => T): T {
 	context.registerComputed(computed);
 
 	runComputed(computed);
+
+	// Guard: a Promise return from $cache would be cached as a raw value and
+	// never suspend — the value would render as [object Promise]. The compiler
+	// enforces this statically (Stage B.4); this catches the dynamic cases.
+	if (
+		computed.value !== null &&
+		computed.value !== undefined &&
+		typeof (computed.value as any).then === "function"
+	) {
+		throw new Error("$cache returned a Promise — use $await for async getters");
+	}
 
 	return computed.value;
 }

@@ -2,6 +2,7 @@ import type Animation from "./Animation";
 import type Cleanup from "./Cleanup";
 import type Computed from "./Computed";
 import type Effect from "./Effect";
+import type LoadingBoundary from "./LoadingBoundary";
 import type ProxySignal from "./ProxySignal";
 import type Region from "./Region";
 
@@ -74,6 +75,15 @@ export default interface Context {
 	 * The root region of the current UI, for debugging.
 	 */
 	rootRegion: Region;
+
+	/**
+	 * The innermost active `@loading` boundary's suspend mailbox, or null
+	 * when not inside a loading boundary. The proxy get trap sets
+	 * `.suspended = true` on this when a read hits a `didSuspend` computed;
+	 * the boundary effect checks it after rendering content to decide
+	 * fallback vs content. Save/restored across nested boundaries.
+	 */
+	loadingBoundary: LoadingBoundary | null;
 
 	/**
 	 * Functions that were run via $mount, which should be collected and flushed

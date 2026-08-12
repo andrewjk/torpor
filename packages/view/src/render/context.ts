@@ -23,6 +23,8 @@ const context: Context =
 		previousRegion: null as unknown as Region,
 		rootRegion: null as unknown as Region,
 
+		loadingBoundary: null,
+
 		mountEffects: [],
 		stashedEvents: [],
 		stashedAnimations: [],

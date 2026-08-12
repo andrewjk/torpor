@@ -40,6 +40,7 @@ import type ListItemSpec from "./types/ListItemSpec";
 import type SlotRender from "./types/SlotRender";
 import type StyleValue from "./types/StyleValue";
 import $batch from "./watch/$batch";
+import $await from "./watch/$await";
 import $bind from "./watch/$bind";
 import $cache from "./watch/$cache";
 import $handle from "./watch/$handle";
@@ -54,7 +55,7 @@ import ReactiveDate from "./wrappers/ReactiveDate";
 export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
-export { $watch, $handle, $bind, $cache, $run, $mount, $unwrap, $peek, $batch };
+export { $watch, $handle, $bind, $cache, $await, $run, $mount, $unwrap, $peek, $batch };
 
 // Wrapped objects for using in reactive objects
 export { ReactiveDate };

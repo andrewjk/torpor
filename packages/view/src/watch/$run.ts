@@ -28,6 +28,7 @@ export default function $run(
 		extent: 0,
 		nextEffectToRun: null,
 		didError: false,
+		didSuspend: false,
 		name,
 		isMountEffect: options?.isMountEffect,
 		forVarMask: options?.forVarMask,
