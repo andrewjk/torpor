@@ -30,6 +30,7 @@ const importsMap: Record<string, string> = {
 	t_run_branch: 'import { t_run_branch } from "${folder}";',
 	t_list_item: 'import { t_list_item } from "${folder}";',
 	t_run_list: 'import { t_run_list } from "${folder}";',
+	t_run_loading: 'import { t_run_loading } from "${folder}";',
 	t_add_fragment: 'import { t_add_fragment } from "${folder}";',
 	t_add_element: 'import { t_add_element } from "${folder}";',
 	t_apply_props: 'import { t_apply_props } from "${folder}";',

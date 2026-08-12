@@ -26,6 +26,8 @@ const controlOperations = [
 	"@default",
 	"@await",
 	"@then",
+	"@loading",
+	"@fallback",
 	"@try",
 	"@catch",
 	"@replace",
@@ -260,6 +262,23 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 				break;
 			}
 		}
+	} else if (node.operation === "@loading") {
+		const loadingGroup: ControlNode = {
+			type: "control",
+			operation: "@loading group",
+			statement: "",
+			children: [node],
+			span: { start: 0, end: 0 },
+		};
+		parentNode.children.push(loadingGroup);
+	} else if (node.operation === "@fallback") {
+		for (let i = parentNode.children.length - 1; i >= 0; i--) {
+			const lastChild = parentNode.children[i];
+			if (isControlNode(lastChild) && lastChild.operation === "@loading group") {
+				lastChild.children.push(node);
+				break;
+			}
+		}
 	} else if (node.operation === "@catch") {
 		// `@catch` is shared by `@await` (its existing `catch` branch) and
 		// `@try`. Attach to whichever matching group is most recent in the
@@ -330,7 +349,8 @@ function parseControlBranches(
 			accept("case", status, false) ||
 			accept("default", status, false) ||
 			accept("then", status, false) ||
-			accept("catch", status, false)
+			accept("catch", status, false) ||
+			accept("fallback", status, false)
 		) {
 			parseControl(status, parentNode);
 		} else {

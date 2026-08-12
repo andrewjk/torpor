@@ -110,7 +110,35 @@ messages:[...c.messages, {id:2}]}))`; then
   already exists. Tests to add: reassign nested array then read/`find`+mutate
   a deep element, after an initial deep read.
 
-## packages/build
+## Async model Stage B — `@loading` boundary
+
+Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
+`@loading` boundary, and the parser/codegen/runtime pipeline.
+
+### Not yet implemented
+
+- **`@loading` hydration.** The server renders the fallback branch; the
+  client's `runLoading` immediately attempts a speculative content render
+  (creating elements from templates rather than hydrating against the
+  server DOM), causing `insertBefore` errors. Needs hydration-aware
+  handling: start from fallback matching the server output, then attempt
+  content on resolve. `runControl`'s hydration cursor reset
+  (`runControl.ts:50-52`) is the pattern to follow. Test is
+  `test/loading/loading.test.ts` (currently `test.skip`).
+- **`$pending` query.** Not yet implemented (ASYNC.md §7.4). The reactive
+  query that distinguishes first-load (owned by `@loading`) from refresh
+  (inline indicator).
+- **Compiler check for promise-getter requirement.** Not yet implemented
+  (ASYNC.md §7.2). The compiler should reject promise-returning getters
+  that use `$cache` instead of `$await`. Currently only enforced at runtime
+  by the `$cache` guard.
+- **Fine-grained updates within `@loading` content.** The boundary effect
+  re-runs on any dependency change and may re-render content if suspend
+  state changed. Non-suspend dep changes (e.g. a toggle inside content)
+  are handled by child effects, but the `anySourceSuspended` check walks
+  `effect.firstSource` on every run — O(N) in the number of sources.
+
+
 
 ### Dead/duplicated code paths elsewhere
 

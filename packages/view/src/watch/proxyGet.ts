@@ -23,6 +23,17 @@ function suspendRead(signal: Computed): undefined {
 	}
 	if (context.loadingBoundary !== null) {
 		context.loadingBoundary.suspended = true;
+		// Subscribe the boundary effect to this computed so the boundary
+		// re-runs when the promise resolves. Without this, the subscription
+		// would only exist on child effects that are destroyed when content
+		// is cleared.
+		const boundaryEffect = context.loadingBoundary.effect;
+		if (boundaryEffect !== null && boundaryEffect !== context.activeTarget) {
+			const oldActive = context.activeTarget;
+			context.activeTarget = boundaryEffect;
+			trackSignal(signal);
+			context.activeTarget = oldActive;
+		}
 	}
 	return undefined;
 }
