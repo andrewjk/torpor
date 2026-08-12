@@ -34,6 +34,7 @@ function gatherClasses(name, value, classes) {
 	else if (typeof value === "object") for (const n in value) gatherClasses(n, value[n], classes);
 	else classes.push(name);
 }
+const CAMEL_TO_DASH = /[A-Z]+(?![a-z])|[A-Z]/g;
 function buildStyles(value) {
 	if (typeof value === "string") return value;
 	else {
@@ -46,7 +47,7 @@ function gatherStyles(value, styles) {
 	if (value) if (Array.isArray(value)) for (let v of value) gatherStyles(v, styles);
 	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
 		if (v === null || v === void 0) continue;
-		const key = n.replace(/[A-Z]+(?![a-z])|[A-Z]/g, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
+		const key = n.replace(CAMEL_TO_DASH, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
 		styles.push(`${key}: ${v}`);
 	}
 	else styles.push(String(value));
@@ -70,7 +71,9 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	batchOperation: 0,
 	registerComputed: null,
 	firstEffectToRun: null,
+	lastEffectToRun: null,
 	firstSignalToUpdate: null,
+	lastSignalToUpdate: null,
 	activeRegion: null,
 	previousRegion: null,
 	rootRegion: null,
@@ -230,6 +233,7 @@ function triggerEffects() {
 	}
 	effect = context.firstEffectToRun;
 	context.firstEffectToRun = null;
+	context.lastEffectToRun = null;
 	while (effect !== null) {
 		let nextEffect = effect.nextEffectToRun;
 		effect.nextEffectToRun = null;
@@ -237,6 +241,7 @@ function triggerEffects() {
 	}
 	let signal = context.firstSignalToUpdate;
 	context.firstSignalToUpdate = null;
+	context.lastSignalToUpdate = null;
 	while (signal !== null) {
 		const nextSignal = signal.nextSignalToUpdate;
 		signal.nextSignalToUpdate = null;
@@ -283,7 +288,7 @@ function runEffect(effect) {
 		batchEnd();
 	}
 }
-function $run(fn, name) {
+function $run(fn, name, options) {
 	let effect = {
 		type: 2,
 		run: fn,
@@ -293,7 +298,9 @@ function $run(fn, name) {
 		extent: 0,
 		nextEffectToRun: null,
 		didError: false,
-		name
+		name,
+		isMountEffect: options?.isMountEffect,
+		forVarMask: options?.forVarMask
 	};
 	const region = context.activeRegion;
 	if (region !== null) region.effects.push(effect);
@@ -410,7 +417,7 @@ function isFragmentNode(node) {
 function runMountSideEffects(parent, activeRegion, hydrationNode) {
 	if (isFragmentNode(parent)) return;
 	if (hydrationNode === null) {
-		for (let effect of context.mountEffects) $run(effect);
+		for (let effect of context.mountEffects) $run(effect, void 0, { isMountEffect: true });
 		context.mountEffects.length = 0;
 	}
 	if (context.stashedEvents.length > 0) {
@@ -773,16 +780,18 @@ function nodeSkip(node, count) {
 	else for (let i = 0; i < count; i++) nextNode = nextNode.nextSibling;
 	return nextNode;
 }
-function rerunRegionEffects(region) {
-	rerunEffectsOnRegion(region);
+function rerunRegionEffects(region, changedMask) {
+	rerunEffectsOnRegion(region, changedMask);
 	let child = region.nextRegion;
 	while (child !== null && child.depth > region.depth) {
-		rerunEffectsOnRegion(child);
+		rerunEffectsOnRegion(child, changedMask);
 		child = child.nextRegion;
 	}
 }
-function rerunEffectsOnRegion(region) {
+function rerunEffectsOnRegion(region, changedMask) {
 	for (let effect of region.effects) {
+		if (effect.isMountEffect) continue;
+		if (effect.forVarMask !== void 0 && (effect.forVarMask & changedMask) === 0) continue;
 		runCleanups(effect);
 		deactivateSources(effect);
 		runEffect(effect);
@@ -820,14 +829,13 @@ function propagateSignal(proxy, key) {
 	if (signal !== void 0 && signal.firstTarget !== null) {
 		batchStart();
 		try {
-			if (context.firstSignalToUpdate === null) context.firstSignalToUpdate = signal;
-			else if (signal.nextSignalToUpdate === null) {
-				let lastSignal = context.firstSignalToUpdate;
-				while (lastSignal.nextSignalToUpdate !== null) lastSignal = lastSignal.nextSignalToUpdate;
-				lastSignal.nextSignalToUpdate = signal;
+			if (context.lastSignalToUpdate === null) {
+				context.firstSignalToUpdate = signal;
+				context.lastSignalToUpdate = signal;
+			} else if (signal.nextSignalToUpdate === null) {
+				context.lastSignalToUpdate.nextSignalToUpdate = signal;
+				context.lastSignalToUpdate = signal;
 			}
-			let lastEffect = context.firstEffectToRun;
-			if (lastEffect !== null) while (lastEffect.nextEffectToRun !== null) lastEffect = lastEffect.nextEffectToRun;
 			let targetSub = signal.firstTarget;
 			let computed;
 			outer: while (true) {
@@ -835,12 +843,10 @@ function propagateSignal(proxy, key) {
 				targetSub.recalc = true;
 				const target = targetSub.target;
 				if (target.type === 2) {
-					if (lastEffect === null) {
-						context.firstEffectToRun = target;
-						lastEffect = target;
-					} else if (target.nextEffectToRun === null && lastEffect !== target) {
-						lastEffect.nextEffectToRun = target;
-						lastEffect = target;
+					if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
+						if (context.lastEffectToRun === null) context.firstEffectToRun = target;
+						else context.lastEffectToRun.nextEffectToRun = target;
+						context.lastEffectToRun = target;
 					}
 				} else if (!target.recalc) {
 					target.recalc = true;
@@ -997,7 +1003,7 @@ function proxySet(target, key, value, receiver) {
 		if (oldValue && oldValue[proxyDataSymbol] !== void 0) value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
 		Reflect.set(target, key, value, receiver);
 		propagateSignal(data, key);
-		if (data.isArray && !isNaN(+String(key))) propagateSignal(data, "length");
+		if (data.isArray && typeof key !== "symbol" && !isNaN(+key)) propagateSignal(data, "length");
 	}
 	return true;
 }
