@@ -291,6 +291,12 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 				isControlNode(lastChild) &&
 				(lastChild.operation === "@await group" || lastChild.operation === "@try group")
 			) {
+				if (lastChild.operation === "@await group") {
+					console.warn(
+						"@catch on @await is deprecated — use @try/@catch for error handling " +
+							"and $await for promise tracking (ASYNC.md §7.7)",
+					);
+				}
 				lastChild.children.push(node);
 				break;
 			}

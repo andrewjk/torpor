@@ -125,13 +125,18 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
   content on resolve. `runControl`'s hydration cursor reset
   (`runControl.ts:50-52`) is the pattern to follow. Test is
   `test/loading/loading.test.ts` (currently `test.skip`).
-- **`$pending` query.** Not yet implemented (ASYNC.md §7.4). The reactive
-  query that distinguishes first-load (owned by `@loading`) from refresh
-  (inline indicator).
+- **`$pending` query — basic version implemented.** Returns `true` whenever a
+  read computed is in-flight, without the "quiet on bare refresh" semantics
+  (ASYNC.md §7.4 open question: how to distinguish first-load from refresh).
+  The peek-mode mechanism (`context.suspendPeek`) is the right hook for the
+  full version — it would also need a "did a signal change since last
+  resolve" check.
 - **Compiler check for promise-getter requirement.** Not yet implemented
   (ASYNC.md §7.2). The compiler should reject promise-returning getters
-  that use `$cache` instead of `$await`. Currently only enforced at runtime
-  by the `$cache` guard.
+  that use `$cache` instead of `$await`. Currently enforced at runtime by
+  the `$cache` guard. A static check would need type information the
+  template compiler doesn't have — TypeScript's own type checker is the
+  natural home for this.
 - **Fine-grained updates within `@loading` content.** The boundary effect
   re-runs on any dependency change and may re-render content if suspend
   state changed. Non-suspend dep changes (e.g. a toggle inside content)

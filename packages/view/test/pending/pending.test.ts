@@ -46,9 +46,9 @@ test("$pending returns false for non-suspended values", () => {
 });
 
 test("$pending doesn't cause the calling effect to suspend", () => {
-	let resolvePromise!: (v: string) => void;
+	let _resolvePromise!: (v: string) => void;
 	const promise = new Promise<string>((resolve) => {
-		resolvePromise = resolve;
+		_resolvePromise = resolve;
 	});
 
 	let $state = $watch({
