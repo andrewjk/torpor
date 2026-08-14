@@ -1,4 +1,5 @@
 import type Effect from "./Effect";
+import type ErrorBoundary from "./ErrorBoundary";
 
 export default interface Region {
 	startNode: ChildNode | null;
@@ -23,6 +24,14 @@ export default interface Region {
 	 * Effects that are owned by this region.
 	 */
 	effects: Effect[];
+
+	/**
+	 * Set by `t_run_try` (`@try`/`@catch` groups and top-level `@error`
+	 * blocks) when a catch/error branch exists. `routeEffectError` walks the
+	 * region chain from a failing effect's owning region and routes the error
+	 * to the nearest boundary.
+	 */
+	errorBoundary?: ErrorBoundary;
 
 	/**
 	 * Generation counter used by `runControl` to detect stale effects. Each

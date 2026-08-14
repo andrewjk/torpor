@@ -29,6 +29,8 @@ export default function $run(
 		nextEffectToRun: null,
 		didError: false,
 		didSuspend: false,
+		region: null,
+		errorSources: null,
 		name,
 		isMountEffect: options?.isMountEffect,
 		forVarMask: options?.forVarMask,
@@ -39,6 +41,7 @@ export default function $run(
 	const region = context.activeRegion;
 	if (region !== null) {
 		region.effects.push(effect);
+		effect.region = region;
 	}
 
 	// DEV:

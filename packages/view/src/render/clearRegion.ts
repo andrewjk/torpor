@@ -125,6 +125,10 @@ function releaseRegion(region: Region) {
 	region.previousRegion = null;
 	region.nextRegion = null;
 	region.animations = null;
+	// Detach any error boundary: the region (and the effects that could
+	// route errors to it) is being released, and its boundary effect is
+	// destroyed with its owning region
+	region.errorBoundary = undefined;
 
 	// Clean up effects owned by this region. For each effect we both run its
 	// optional cleanup function AND detach every source subscription from the

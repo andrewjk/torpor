@@ -29,6 +29,7 @@ import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
 import t_run_await from "./render/runAwait";
+import t_run_try from "./render/runTry";
 import t_save_hydration from "./render/saveHydration";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
@@ -103,6 +104,7 @@ export {
 	t_list_item,
 	t_run_list,
 	t_run_await,
+	t_run_try,
 	t_save_hydration,
 	t_restore_hydration,
 	t_attribute,

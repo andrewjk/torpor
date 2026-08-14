@@ -140,6 +140,8 @@ const importsMap: Record<string, string> = {
 		'import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";',
 	'import { t_run_control } from "@torpor/view";':
 		'import t_run_control from "../../../../src/render/runControl";',
+	'import { t_run_try } from "@torpor/view";':
+		'import t_run_try from "../../../../src/render/runTry";',
 	'import { t_run_branch } from "@torpor/view";':
 		'import t_run_branch from "../../../../src/render/runControlBranch";',
 	'import { t_list_item } from "@torpor/view";':
@@ -206,16 +208,16 @@ const importsMap: Record<string, string> = {
 		'import $unwrap from "../../../../src/ssr/$serverUnwrap";',
 	'import { $peek } from "@torpor/view/ssr";':
 		'import $peek from "../../../../src/ssr/$serverPeek";',
- 	'import { $batch } from "@torpor/view/ssr";':
- 		'import $batch from "../../../../src/ssr/$serverBatch";',
- 	'import { $async } from "@torpor/view/ssr";':
- 		'import $async from "../../../../src/ssr/$serverAsync";',
- 	'import { $pending } from "@torpor/view/ssr";':
- 		'import $pending from "../../../../src/ssr/$serverPending";',
- 	'import { $refresh } from "@torpor/view/ssr";':
- 		'import $refresh from "../../../../src/ssr/$serverRefresh";',
- 	'import { t_fmt } from "@torpor/view/ssr";':
- 		'import t_fmt from "../../../../src/render/formatText";',
+	'import { $batch } from "@torpor/view/ssr";':
+		'import $batch from "../../../../src/ssr/$serverBatch";',
+	'import { $async } from "@torpor/view/ssr";':
+		'import $async from "../../../../src/ssr/$serverAsync";',
+	'import { $pending } from "@torpor/view/ssr";':
+		'import $pending from "../../../../src/ssr/$serverPending";',
+	'import { $refresh } from "@torpor/view/ssr";':
+		'import $refresh from "../../../../src/ssr/$serverRefresh";',
+	'import { t_fmt } from "@torpor/view/ssr";':
+		'import t_fmt from "../../../../src/render/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_class } from "@torpor/view/ssr";':

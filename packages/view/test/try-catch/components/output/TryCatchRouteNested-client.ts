@@ -13,16 +13,17 @@ import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_try from "../../../../src/render/runTry";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function TryCatchNested(
+export default function NestedBoundaries(
 	$parent: ParentNode,
 	$anchor: Node | null,
-	_$props?: Record<PropertyKey, any>,
+	$props: { danger: boolean },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, SlotRender>,
 ): void {
 
-	function boom() {
-		throw new Error("inner boom");
+	function maybeThrow() {
+		if ($props.danger) throw new Error("boom");
+		return "ok";
 	}
 
 	/* User interface */
@@ -43,20 +44,22 @@ export default function TryCatchNested(
 		/* @try */
 		const t_try_region_2 = t_region();
 		t_run_try(t_try_region_2, t_try_anchor_2, (t_before) => {
-			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>Inner ok</p>`);
+			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>#</p>`);
 			const t_root_2 = t_root_el(t_fragment_2);
 			const t_p_1 = t_root_2 as HTMLElement;
-			/* @const */
-			const x = boom();
+			const t_text_1 = t_child(t_p_1);
+			$run(() => {
+				t_text_1.textContent = `Inner: ${t_fmt(maybeThrow())}`;
+			});
 			t_add_element(t_p_1, t_fragment_1, t_before);
 			t_next(t_p_1);
 		},(t_before, inner) => {
-			const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p>#</p>`);
+			const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<p class="inner">#</p>`);
 			const t_root_3 = t_root_el(t_fragment_3);
 			const t_p_2 = t_root_3 as HTMLElement;
-			const t_text_1 = t_child(t_p_2);
+			const t_text_2 = t_child(t_p_2);
 			$run(() => {
-				t_text_1.textContent = `Inner caught: ${t_fmt(inner.message)}`;
+				t_text_2.textContent = `Inner caught: ${t_fmt(inner.message)}`;
 			});
 			t_add_element(t_p_2, t_fragment_1, t_before);
 			t_next(t_p_2);
@@ -65,12 +68,12 @@ export default function TryCatchNested(
 		t_add_fragment(t_fragment_1, t_fragment_0, t_before, t_try_anchor_2, t_root_1);
 		t_next(t_try_anchor_2);
 	},(t_before, outer) => {
-		const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<p>#</p>`);
+		const t_fragment_4 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 4, `<p class="outer">#</p>`);
 		const t_root_4 = t_root_el(t_fragment_4);
 		const t_p_3 = t_root_4 as HTMLElement;
-		const t_text_2 = t_child(t_p_3);
+		const t_text_3 = t_child(t_p_3);
 		$run(() => {
-			t_text_2.textContent = `Outer caught: ${t_fmt(outer.message)}`;
+			t_text_3.textContent = `Outer caught: ${t_fmt(outer.message)}`;
 		});
 		t_add_element(t_p_3, t_fragment_0, t_before);
 		t_next(t_p_3);

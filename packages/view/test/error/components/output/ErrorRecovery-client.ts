@@ -17,7 +17,7 @@ import t_run_control from "../../../../src/render/runControl";
 import t_run_try from "../../../../src/render/runTry";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function ErrorBlock(
+export default function ErrorRecovery(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	$props: { danger: boolean },

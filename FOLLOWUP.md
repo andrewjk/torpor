@@ -73,30 +73,15 @@ control removed; `@loading`/`@fallback` renamed to `@await`/`with`) are shipped
 
 ## Error boundaries — remaining gaps
 
-- **Effect-rerun error routing.** The compiled `try/catch` only catches errors
-  thrown synchronously while building the boundary's subtree (initial render,
-  child component renders, direct `@const` reads). A `$run` effect created
-  inside the boundary that throws on a _later_ re-run (e.g. a text
-  interpolation getter that throws after a state change) still propagates out
-  of `triggerEffects.ts:58-60` and breaks the app. Routing effect errors to the
-  nearest boundary region needs a runtime hook (e.g. `Region.onError`, walked
-  from the effect's owning region in `triggerEffects`) — deliberately deferred,
-  it touches reactivity.
-- **Recovery outside direct reads.** Recovery (catch → try) currently works
-  only when the erroring expression is read _directly_ by the boundary's
-  control effect — i.e. via `@const` or a nested control condition. Reads
-  wrapped in `$run` effects (text/attribute interpolation) are tracked by the
-  nested effect, not the boundary, so once the catch branch renders it stays.
-- **Top-level `@error` recovery.** Same as above but structural: the `@error`
-  try/catch wraps only the _initial_ `@render` build; a later re-render error
-  (from a nested control re-running after a prop change) is not caught, and a
-  later recovery can't clear the already-rendered error content. Needs the
-  same boundary machinery.
-- **Partial render on mid-build throw.** If a `@try`/`@error` subtree throws
-  _after_ some DOM was added (throw after `t_add_element`/`t_add_fragment`),
-  the partial content isn't cleared before the catch branch renders. The
-  common case (throw during compute, before fragment insert) is clean because
-  `buildRootNode` inserts only at the end.
+The recovery trio (effect-rerun error routing, recovery outside direct
+reads, top-level `@error` recovery) is fixed via the `t_run_try` runtime
+(`render/runTry.ts` + `watch/routeEffectError.ts`): `@try`/`@catch` and
+top-level `@error` now register an error boundary on their region, effect
+re-run errors are routed to the nearest boundary from `triggerEffects`, and
+the boundary holds the erroring effect's source signals so recovery
+re-attempts the try branch. Mid-build partial renders are cleared by the
+branch switch.
+
 - **Server `t_try_body` snapshot** discards any `t_head` appended before the
   throw (`buildServerCode.ts` / `buildServerTryNode.ts` restore only `t_body`).
   An erroring render that had already appended `<head>` tags leaves them.

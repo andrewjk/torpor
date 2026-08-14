@@ -1,4 +1,7 @@
 import type Cleanup from "./Cleanup";
+import type Computed from "./Computed";
+import type ProxySignal from "./ProxySignal";
+import type Region from "./Region";
 import type Subscription from "./Subscription";
 import { EFFECT_TYPE } from "./constants";
 
@@ -60,6 +63,20 @@ export default interface Effect {
 	 * The name of the effect, for debugging.
 	 */
 	name?: string;
+
+	/**
+	 * The region that was active when this effect was created, and which
+	 * owns its cleanup. Used by `routeEffectError` to walk to the nearest
+	 * enclosing error boundary.
+	 */
+	region?: Region | null;
+
+	/**
+	 * The effect's source signals, captured just before `clearSources` runs
+	 * after a failed run (see `runEffect`). Read by `routeEffectError` so an
+	 * error boundary can hold the subscriptions needed for recovery.
+	 */
+	errorSources?: (ProxySignal | Computed)[] | null;
 
 	/**
 	 * True when this effect wraps a `$mount`/`onmount` callback (created by

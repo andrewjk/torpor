@@ -34,6 +34,7 @@ const importsMap: Record<string, string> = {
 	t_list_item: 'import { t_list_item } from "${folder}";',
 	t_run_list: 'import { t_run_list } from "${folder}";',
 	t_run_await: 'import { t_run_await } from "${folder}";',
+	t_run_try: 'import { t_run_try } from "${folder}";',
 	t_add_fragment: 'import { t_add_fragment } from "${folder}";',
 	t_add_element: 'import { t_add_element } from "${folder}";',
 	t_apply_props: 'import { t_apply_props } from "${folder}";',
@@ -191,10 +192,18 @@ function buildTemplate(
 				b.append("");
 				b.append("/* User interface */");
 
-				// An @error block wraps the render in an implicit try/catch so
-				// that render-time errors render the error content instead
+				// An @error block wraps the render in an error boundary
+				// (t_run_try), so that BOTH sync render errors and later
+				// effect re-run errors (routed from triggerEffects) render
+				// the error content, and a recovery re-render restores the
+				// normal content. The content builds into $parent/$anchor
+				// exactly as before — the boundary re-inserts at the same
+				// position when it switches branches
 				if (current.error) {
-					b.append("try {");
+					status.imports.add("t_region");
+					status.imports.add("t_run_try");
+					b.append(`const t_error_region = t_region();`);
+					b.append(`t_run_try(t_error_region, $anchor, () => {`);
 				}
 
 				buildFragmentText(current.markup, status, b);
@@ -203,13 +212,13 @@ function buildTemplate(
 			}
 		} else if (chunk.script === "/* @error */") {
 			if (current.markup && current.error) {
-				b.append(`} catch (${current.errorVar}) {`);
+				b.append(`}, (_, ${current.errorVar ?? "err"}) => {`);
 				b.append("");
 				b.append("/* User interface error */");
 				buildFragmentText(current.error, status, b);
 				b.append("");
 				buildNode(current.error, status, b, "$parent", "$anchor", true);
-				b.append("}");
+				b.append(`}${status.options.dev === true ? ', "runError"' : ""});`);
 			}
 		} else if (chunk.script === "/* @head */") {
 			if (current.head) {
