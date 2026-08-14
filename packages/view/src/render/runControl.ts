@@ -42,6 +42,40 @@ export default function runControl(
 
 		popRegion(oldRegion);
 
+		// Widen ancestor regions whose node window starts at our anchor.
+		//
+		// A region that owns only a control's anchor comment captures
+		// `startNode = endNode = anchor` when it mounts (e.g. a `@for` row
+		// whose body is a single `@if`). Content rendered by a LATER re-run
+		// of this control is inserted into the live DOM just BEFORE the
+		// anchor — outside that window — so clearing the owning region would
+		// remove only the anchor and orphan the branch content. At mount
+		// time this can't happen (content is added to the region's detached
+		// fragment first, so its `startNode` already covers it), which is
+		// why only re-runs need this fix.
+		//
+		// The first node of the newly rendered content is the first child
+		// region of this control that owns nodes. Ancestors are the regions
+		// with strictly decreasing depth on the `previousRegion` chain.
+		if (anchor !== null) {
+			let child = region.nextRegion;
+			while (child !== null && child.depth > region.depth && child.startNode === null) {
+				child = child.nextRegion;
+			}
+			if (child !== null && child.depth > region.depth && child.startNode !== anchor) {
+				const firstNode = child.startNode;
+				let ancestor = region.previousRegion;
+				let ancestorDepth = region.depth;
+				while (ancestor !== null && ancestor.depth < ancestorDepth) {
+					if (ancestor.startNode === anchor) {
+						ancestor.startNode = firstNode;
+					}
+					ancestorDepth = ancestor.depth;
+					ancestor = ancestor.previousRegion;
+				}
+			}
+		}
+
 		// While hydrating, reset the cursor to the control's anchor after its
 		// content has been hydrated. The branches leave the cursor deep inside
 		// (at the last nested node), but the parent fragment needs a stable

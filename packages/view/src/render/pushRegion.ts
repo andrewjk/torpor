@@ -14,6 +14,13 @@ export default function pushRegion(region: Region, toParent = false): Region {
 		const nextRegion = previousRegion.nextRegion;
 		previousRegion.nextRegion = region;
 		region.nextRegion = nextRegion;
+		// Keep the sibling chain doubly-linked: the region we displaced must
+		// point back at us. Without this, `clearRegion`'s unlink
+		// (`region.previousRegion.nextRegion = region.nextRegion`) writes
+		// through a stale back-pointer and detaches live regions.
+		if (nextRegion !== null) {
+			nextRegion.previousRegion = region;
+		}
 
 		region.depth = activeRegion.depth + 1;
 	}

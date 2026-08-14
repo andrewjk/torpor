@@ -55,32 +55,6 @@ floor — ASYNC.md §7.)
 
 ## packages/view
 
-### Infinite loop: `@if` inside a keyed `@for` over a reactive array
-
-- `packages/view/src/render/runListItems.ts` relink walk
-  (`while (next !== null && next.depth > item.depth)`). A `@for` that iterates
-  a reactive array and contains an inner `@if` in its body hangs in an infinite
-  synchronous loop as soon as the array is updated (e.g. toggling all todos in
-  the TodoMVC benchmark fixture).
-- Reproduced in `packages/view` (vitest) and in the browser with a minimal
-  component: `@for (let t of $state.todos) { @key = t.id @if (cond) { <li/> } }`
-  then `$state.todos = $state.todos.map(...)`. First update (on) works; second
-  update (off) hangs. The page's main thread blocks completely.
-- Root cause: the sibling region chain gains a **cycle** (depth 2 → 3 → 2 → 3)
-  when the `@if` control re-runs during a list update. The relink walk then
-  never terminates. Verified it's NOT the R15 incremental-relink fast path
-  (forcing the full relink still hangs) and NOT caused by the recent relink
-  perf work (pre-R15 `runListItems` also hangs) — a pre-existing bug.
-- Workaround for fixtures: filter _outside_ the loop into a derived getter
-  (`get visible() { ... }`) and avoid inner `@if`s in `@for` bodies. The
-  TodoMVC torpor fixture uses this pattern for the list itself, but the per-row
-  edit-input `@if` still triggers it — a component-wrapper or
-  always-mounted+hidden `.edit` input may be needed.
-- Triage: `runControl` re-run + region-chain splicing during keyed-list
-  `update`. Tests to add: `for` containing `@if` with reactive-array updates
-  (toggle, append, remove) — the existing `for-containing-if` test only covers
-  a static `@for (let i = 0; i < 5; i++)`, which is why it slipped through.
-
 ### Deep-wrap lost on reassigned nested array after a prior read
 
 - `packages/view/src/watch/proxyGet.ts`. Reading `$state.a[0].messages`,

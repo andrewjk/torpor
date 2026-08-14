@@ -103,12 +103,26 @@ export default function runListItems(
 	// Capture the region that follows the entire list BEFORE reconciliation —
 	// `clearRegion` during the messy middle releases old items and nulls their
 	// chain pointers, so the only safe moment to read the list's trailing
-	// sibling is now. When the list has items, that sibling lives on the old
-	// last item's `nextRegion`; when the list is empty, it lives on the list
-	// region's own `nextRegion` (set by `pushRegion(region, true)` on first
-	// mount, or by a prior empty-list pass through the relink below).
-	const nextSibling: Region | null =
-		oldItems.length > 0 ? oldItems[oldItems.length - 1]!.nextRegion : region.nextRegion;
+	// sibling is now. When the list has items, that sibling lives after the
+	// old last item's LAST DESCENDANT: an item with an inner `@if`/`@for` owns
+	// deeper child regions linked off `item.nextRegion`, so we must walk past
+	// them — reading `oldItems[last].nextRegion` directly would capture the
+	// item's first child, and the full relink below would then splice the
+	// child into its own subtree (e.g. `if.nextRegion = if`), creating the
+	// cycle that hangs the relink walk. When the list is empty, the sibling
+	// lives on the list region's own `nextRegion` (set by
+	// `pushRegion(region, true)` on first mount, or by a prior empty-list pass
+	// through the relink below).
+	let nextSibling: Region | null;
+	if (oldItems.length > 0) {
+		const lastOld = oldItems[oldItems.length - 1]!;
+		nextSibling = lastOld.nextRegion;
+		while (nextSibling !== null && nextSibling.depth > lastOld.depth) {
+			nextSibling = nextSibling.nextRegion;
+		}
+	} else {
+		nextSibling = region.nextRegion;
+	}
 
 	let oldStart = 0;
 	let oldEnd = oldItems.length - 1;
@@ -174,8 +188,11 @@ export default function runListItems(
 
 	// 2. Old middle exhausted → mount remaining new middle (common: append,
 	//    fresh create, or prefix-only change). Insert before the first suffix
-	//    node (or the list anchor if there's no suffix).
-	if (oldStart > oldEnd) {
+	//    node (or the list anchor if there's no suffix). Guarded on
+	//    `newStart <= newEnd` so a pass fully consumed by the head/tail fast
+	//    path (pure update — nothing mounted) does NOT flag the chain for a
+	//    relink it doesn't need.
+	if (oldStart > oldEnd && newStart <= newEnd) {
 		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1]!.startNode : anchor;
 		for (let i = newStart; i <= newEnd; i++) {
 			newItems[i] = mountSpec(newSpecs[i]!, region, before, create, noWatch);
