@@ -525,6 +525,7 @@ const SUITES = [
 		servers: [
 			{ filter: 'octane-tsrx-async-composition-bench', port: 5282 },
 			{ filter: 'react-async-composition-bench', port: 5284 },
+			{ filter: 'torpor-async-composition-bench', port: 5283 },
 		],
 		iter: { normal: 10, quick: 2 },
 		runs: [{ script: 'run.mjs', args: (n) => [String(n)] }],

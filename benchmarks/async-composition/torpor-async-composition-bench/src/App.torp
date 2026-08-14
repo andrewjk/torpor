@@ -1,105 +1,91 @@
 import { loadResource } from "./data.js";
 
-// Dashboard with 8 versioned resources. Independent resources fetch eagerly at
-// mount (wave 0); `owner` depends on `project.ownerId`, so it starts after
-// project resolves (wave 1). Each resource is its own component that awaits
-// and renders the exact `[data-resource]` element the harness signature reads.
+// Dashboard with 8 versioned resources using torpor's `$await` model. Each
+// resource is a component with an `$await` getter keyed on `$props.version`;
+// reading the getter suspends while the promise is pending and returns the
+// retained `staleValue` during a re-fetch, so on a version bump the DOM keeps
+// showing the previous values until the new promises resolve — the keep-old-UI
+// transition the harness gate requires (`retainedOldResourceValues`).
+//
+// The seven independent resources start at mount (wave 0). `owner` is the one
+// true dependency: it may only start once `project` resolved to the current
+// version's ownerId. Between the version bump and that resolution it must keep
+// showing the previous owner value without re-fetching (or suspending), so the
+// getter returns the last resolved value in that window.
 
 function ProjectHeader($props) {
-	let $state = $watch({ data: loadResource("project", $props.version) });
-
-	$run(() => {
-		$state.data = loadResource("project", $props.version);
+	let $state = $watch({
+		get data() {
+			return $await(() => loadResource("project", $props.version));
+		},
 	});
 
 	@render {
 		<header data-panel="project">
-			@await ($state.data) {
-				<h1 data-resource="project">…</h1>
-				<p data-resource="viewer">…</p>
-				<div class="project-meta">
-					<strong data-resource="badge">…</strong>
-					<span data-resource="owner">…</span>
-				</div>
-			} then (project) {
-				<h1 data-resource="project">{project.label}</h1>
-				<Viewer version={$props.version} />
-				<div class="project-meta">
-					<Badge version={$props.version} />
-					<Owner version={$props.version} ownerId={project.ownerId} />
-				</div>
-			}
+			<h1 data-resource="project">{$state.data?.label}</h1>
+			<Viewer version={$props.version} />
+			<div class="project-meta">
+				<Badge version={$props.version} />
+				<Owner version={$props.version} ownerId={$state.data?.ownerId} />
+			</div>
 		</header>
 	}
 }
 
 function Viewer($props) {
-	let $state = $watch({ data: loadResource("viewer", $props.version) });
-
-	$run(() => {
-		$state.data = loadResource("viewer", $props.version);
+	let $state = $watch({
+		get data() {
+			return $await(() => loadResource("viewer", $props.version));
+		},
 	});
 
 	@render {
-		@await ($state.data) {
-			<p data-resource="viewer">…</p>
-		} then (data) {
-			<p data-resource="viewer">{data.label}</p>
-		}
+		<p data-resource="viewer">{$state.data?.label}</p>
 	}
 }
 
 function Badge($props) {
-	let $state = $watch({ data: loadResource("badge", $props.version) });
-
-	$run(() => {
-		$state.data = loadResource("badge", $props.version);
+	let $state = $watch({
+		get data() {
+			return $await(() => loadResource("badge", $props.version));
+		},
 	});
 
 	@render {
-		@await ($state.data) {
-			<strong data-resource="badge">…</strong>
-		} then (data) {
-			<strong data-resource="badge">{data.label}</strong>
-		}
+		<strong data-resource="badge">{$state.data?.label}</strong>
 	}
 }
 
 function Owner($props) {
+	let lastOwner = null;
 	let $state = $watch({
-		data: $props.ownerId === "owner-" + $props.version
-			? loadResource("owner", $props.version, $props.ownerId)
-			: null,
-	});
-
-	$run(() => {
-		if ($props.ownerId === "owner-" + $props.version) {
-			$state.data = loadResource("owner", $props.version, $props.ownerId);
-		}
+		get data() {
+			return $await(() => {
+				const ready = $props.ownerId === "owner-" + $props.version;
+				if (!ready) return lastOwner;
+				const promise = loadResource("owner", $props.version, $props.ownerId);
+				promise.then((value) => {
+					lastOwner = value;
+				});
+				return promise;
+			});
+		},
 	});
 
 	@render {
-		@await ($state.data) {
-			<span data-resource="owner">…</span>
-		} then (data) {
-			<span data-resource="owner">{data.label}</span>
-		}
+		<span data-resource="owner">{$state.data?.label}</span>
 	}
 }
 
 function ResourceCell($props) {
-	let $state = $watch({ data: loadResource($props.name, $props.version) });
-
-	$run(() => {
-		$state.data = loadResource($props.name, $props.version);
+	let $state = $watch({
+		get data() {
+			return $await(() => loadResource($props.name, $props.version));
+		},
 	});
 
 	@render {
-		@await ($state.data) {
-			<span data-resource={$props.name}>…</span>
-		} then (data) {
-			<span data-resource={$props.name}>{data.label}</span>
-		}
+		<span data-resource={$props.name}>{$state.data?.label}</span>
 	}
 }
 

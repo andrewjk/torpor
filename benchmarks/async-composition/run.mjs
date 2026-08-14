@@ -14,6 +14,7 @@ const TARGETS = process.env.TARGETS
 	: [
 			{ name: 'octane-tsrx', url: 'http://localhost:5282/' },
 			{ name: 'react', url: 'http://localhost:5284/' },
+			{ name: 'torpor-async-composition', url: 'http://localhost:5283/' },
 		];
 
 const expectedText = (resource, version) =>
@@ -31,6 +32,10 @@ const OBSERVATION_CEILINGS = {
 	react: {
 		init: { mixedStates: 0 },
 		update: { mixedStates: 0 },
+	},
+	'torpor-async-composition': {
+		init: { waves: 2, calls: 8, mixedStates: 0 },
+		update: { waves: 2, calls: 8, mixedStates: 1 },
 	},
 };
 
@@ -125,7 +130,7 @@ function validateObservation(target, operation, version, result) {
 	if (calls.length < starts.length) {
 		throw new Error(`${prefix}: trace lost resource-call observations`);
 	}
-	if (target === 'octane-tsrx') {
+	if (target === 'octane-tsrx' || target === 'torpor-async-composition') {
 		const firstWave = result.trace.waves[0]?.resources?.toSorted() || [];
 		if (JSON.stringify(firstWave) !== JSON.stringify(INDEPENDENT_RESOURCES.toSorted())) {
 			throw new Error(`${prefix}: first wave missed independent work: ${firstWave.join(', ')}`);

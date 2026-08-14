@@ -127,3 +127,41 @@ Every independent request starts before the first 50ms network wave settles;
 `owner` alone waits for `project.ownerId`. The remaining single mixed update
 signature is transition atomicity work rather than an async-discovery waterfall,
 and stays visible under its tightened one-state ceiling.
+
+## Torpor result (2026-08-14)
+
+`torpor-async-composition-bench` was ported from the legacy `@await` model to
+`$await` getters and added to the manifest. The old fixture failed the
+transition gate: `@await` tears down on promise reassignment, so the version
+bump immediately replaced old values with pending placeholders
+(`retainedOldResourceValues` false). With `$await`, each resource is a getter
+keyed on `$props.version`; on the version bump the getter re-fetches and reads
+return the retained `staleValue` until the new promise resolves, so the DOM
+keeps showing the previous values throughout the transition — exactly what the
+gate requires.
+
+Torpor needs no Suspense boundary for this: components render immediately, so
+the seven independent getters start in wave 0 and the tree has no structural
+waterfall. `owner` is guarded to start only once `project` resolved to the
+current version's ownerId (it returns the last resolved value in the window
+between the version bump and that resolution), so it alone waits for wave 1.
+
+Recorded production run (10 samples):
+
+| target | init | update | waves (init / update) | calls (init / update) | observed mixed update states |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| torpor-async-composition | 104.4ms | 102.9ms | 2 / 2 | 8 / 8 | 1 |
+
+```text
+viewer+badge+project+activity+activity-summary+insights+insights-chart → owner
+```
+
+Torpor lands at the workload's two-wave floor with exactly one mixed update
+signature — the owner, held at the previous version until `project` advanced.
+Observation ceilings of 2 waves / 8 calls / 1 mixed update state are enforced
+for the target so the topology is load-bearing.
+
+> Note: the `octane-tsrx` fixture fails its own observation ceiling in this
+> tree (`update` reports 13 calls vs its recorded 8) — its checked-in build
+> doesn't reproduce the 2026-07-17 optimized numbers here. Unrelated to the
+> torpor port.

@@ -5,21 +5,15 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Benchmark porting (torpor fixtures)
 
-Ported torpor fixtures for 11 server-backed suites (all pass gates through
+Ported torpor fixtures for 12 server-backed suites (all pass gates through
 `node benchmarks/bench.mjs --quick <suite>`): js-framework, todomvc,
 chat-stream, dbmon, recursive-context, signal-favoring, effectful-list,
-memo-wall, portal-swarm, async-waterfall, list-clear. Each lives in
-`benchmarks/<suite>/torpor-*` and the harness default TARGETS + bench.mjs
-`servers` entries were updated.
+memo-wall, portal-swarm, async-waterfall, list-clear, async-composition. Each
+lives in `benchmarks/<suite>/torpor-*` and the harness default TARGETS +
+bench.mjs `servers` entries were updated.
 
 ### Not-portable suites (torpor's model can't satisfy the gate)
 
-- **async-composition** — the transition gate requires the old dashboard to
-  stay visible while the new version loads (`retainedOldResourceValues`).
-  Torpor's `@await` tears down on promise reassignment, so `update` fails.
-  A fixture is built (`benchmarks/async-composition/torpor-async-composition-bench`)
-  but cannot be added to the manifest. Would need a Suspense-transition
-  primitive.
 - **SSR / streaming suites** (ssr-throughput, streaming-ssr, ssr-http,
   streaming-backpressure, ssr-workerd, tanstack-start) — measure octane's
   `renderToPipeableStream`/`prerender` streaming APIs; torpor's SSR
@@ -33,6 +27,24 @@ memo-wall, portal-swarm, async-waterfall, list-clear. Each lives in
 - **build-based news/hydration/runtime-stress suites** — need a full
   `news/torpor` SSR fixture + harness TARGETS updates; deferred (see the
   "everything feasible" option).
+
+### async-composition — now portable (`$await` model)
+
+The `async-composition` transition gate (`retainedOldResourceValues` — old
+dashboard stays visible while the new version loads) previously failed because
+`@await` tears down on promise reassignment. The fixture was ported to `$await`
+getters: each resource is a getter keyed on `$props.version`, and reads return
+the retained `staleValue` during a re-fetch, so the version-bump transition
+keeps showing old values — the gate's exact requirement. `owner` is guarded to
+start only once `project` resolved to the current ownerId (returning the last
+resolved value in the interim), so it alone waits for wave 1. Recorded
+production run: init 104.4ms / update 102.9ms, 2/2 waves, 8/8 calls, 1 mixed
+update state — the two-wave floor with the ideal topology
+(`viewer+badge+project+activity+activity-summary+insights+insights-chart → owner`).
+Observation ceilings (2 waves / 8 calls / 1 mixed update state) are enforced
+for the target in `benchmarks/async-composition/run.mjs`. Note: the checked-in
+`octane-tsrx` fixture fails its own ceiling here (13 update calls vs recorded 8)
+— an environment/build drift unrelated to the torpor port.
 
 ### Observed perf gaps (torpor vs octane, same harness, quick)
 
