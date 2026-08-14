@@ -1,6 +1,6 @@
-import { $async } from "@torpor/view/ssr";
-import { $pending } from "@torpor/view/ssr";
-import { $refresh } from "@torpor/view/ssr";
+import $async from "../../../../src/ssr/$serverAsync";
+import $pending from "../../../../src/ssr/$serverPending";
+import $refresh from "../../../../src/ssr/$serverRefresh";
 import $watch from "../../../../src/ssr/$serverWatch";
 import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/render/formatText";

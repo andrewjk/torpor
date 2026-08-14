@@ -1,4 +1,4 @@
-import { $async } from "@torpor/view/ssr";
+import $async from "../../../../src/ssr/$serverAsync";
 import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 

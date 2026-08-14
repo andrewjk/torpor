@@ -137,8 +137,8 @@ renamed to match: `runLoading`→`runAwait`, `t_run_loading`→`t_run_await`,
 ### Not yet implemented
 
 - **`$pending` query — quiet-on-refresh implemented.** `$pending` now
-  distinguishes first-load and dependency-change refreshes (both *loud* →
-  `true`) from a bare refresh (re-fetch with no dependency change → *quiet* →
+  distinguishes first-load and dependency-change refreshes (both _loud_ →
+  `true`) from a bare refresh (re-fetch with no dependency change → _quiet_ →
   `false`), per ASYNC.md §7.4. The decision is captured at suspend time in
   `$async`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
   on resolve/reject) and `suspendQuiet` (`hasResolved && !recalc`). The peek
@@ -177,8 +177,6 @@ renamed to match: `runLoading`→`runAwait`, `t_run_loading`→`t_run_await`,
   are handled by child effects, but the `anySourceSuspended` check walks
   `effect.firstSource` on every run — O(N) in the number of sources.
 
-
-
 ### Dead/duplicated code paths elsewhere
 
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
@@ -195,14 +193,6 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 
 ### Not yet implemented (Stage B / follow-up)
 
-- **Server build imports for the async primitives dangle.** `buildServerCode.ts`
-  importsMap maps `$async`, `$pending`, and `$refresh` to `@torpor/view/ssr`,
-  but `src/ssr.ts` (and the built `dist/ssr.mjs`) export none of them — they're
-  client-only APIs. A server-rendered component whose script references one
-  would emit a broken `import { $async } from "@torpor/view/ssr"`. Pre-existing
-  for `$async`/`$pending`; `$refresh` follows the same pattern. Fix options: add
-  no-op server stubs, or drop them from the server importsMap (they never run
-  server-side).
 - **`$refresh` first-read double fetch.** If `fn` reads an `$async` getter that
   the UI has never read, the collection read initializes it (starts a fetch),
   then the refresh re-runs it (second fetch); the first resolve is ignored via
@@ -211,24 +201,24 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 - **Effect-rerun error routing.** The compiled `try/catch` only catches errors
   thrown synchronously while building the boundary's subtree (initial render,
   child component renders, direct `@const` reads). A `$run` effect created
-  inside the boundary that throws on a *later* re-run (e.g. a text
+  inside the boundary that throws on a _later_ re-run (e.g. a text
   interpolation getter that throws after a state change) still propagates out
   of `triggerEffects.ts:58-60` and breaks the app. Routing effect errors to the
   nearest boundary region needs a runtime hook (e.g. `Region.onError`, walked
   from the effect's owning region in `triggerEffects`) — deliberately deferred,
   it touches reactivity.
 - **Recovery outside direct reads.** Recovery (catch → try) currently works
-  only when the erroring expression is read *directly* by the boundary's
+  only when the erroring expression is read _directly_ by the boundary's
   control effect — i.e. via `@const` or a nested control condition. Reads
   wrapped in `$run` effects (text/attribute interpolation) are tracked by the
   nested effect, not the boundary, so once the catch branch renders it stays.
 - **Top-level `@error` recovery.** Same as above but structural: the `@error`
-  try/catch wraps only the *initial* `@render` build; a later re-render error
+  try/catch wraps only the _initial_ `@render` build; a later re-render error
   (from a nested control re-running after a prop change) is not caught, and a
   later recovery can't clear the already-rendered error content. Needs the
   same boundary machinery.
 - **Partial render on mid-build throw.** If a `@try`/`@error` subtree throws
-  *after* some DOM was added (throw after `t_add_element`/`t_add_fragment`),
+  _after_ some DOM was added (throw after `t_add_element`/`t_add_fragment`),
   the partial content isn't cleared before the catch branch renders. The
   common case (throw during compute, before fragment insert) is clean because
   `buildRootNode` inserts only at the end.
@@ -241,5 +231,5 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 - **Hydration dual-branch walk.** When the server renders the catch branch and
   the client's try branch throws, the failed try-branch build advances the
   hydration cursor; `saveHydration`/`restoreHydration` rewind it before the
-  catch branch hydrates. If the try branch throws *after* walking past real
+  catch branch hydrates. If the try branch throws _after_ walking past real
   content (rather than before), the rewind may not fully restore the cursor.
