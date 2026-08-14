@@ -1,6 +1,7 @@
 import type Template from "../../../types/Template";
 import type BuildOptions from "../../types/BuildOptions";
 import Builder from "../../utils/Builder";
+import collectMarkupExpressions from "../../utils/collectMarkupExpressions";
 import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -13,6 +14,7 @@ const importsMap: Record<string, string> = {
 	$cache: 'import { $cache } from "${folder}";',
 	$await: 'import { $await } from "${folder}";',
 	$pending: 'import { $pending } from "${folder}";',
+	$refresh: 'import { $refresh } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
 	$unwrap: 'import { $unwrap } from "${folder}";',
@@ -60,6 +62,14 @@ function buildServerTemplate(
 	// TODO: Do this while looping chunks
 	let script = template.script.map((s) => s.script).join("\n");
 
+	// Include markup expressions in import detection: `$`-primitives used
+	// inside markup live in the template, not the script.
+	for (const component of template.components) {
+		if (component.markup) script += "\n" + collectMarkupExpressions(component.markup);
+		if (component.error) script += "\n" + collectMarkupExpressions(component.error);
+		if (component.head) script += "\n" + collectMarkupExpressions(component.head);
+	}
+
 	// Add default imports
 	if (/\$watch\b/.test(script)) imports.add("$watch");
 	if (/\$bind\b/.test(script)) imports.add("$bind");
@@ -67,6 +77,7 @@ function buildServerTemplate(
 	if (/\$cache\b/.test(script)) imports.add("$cache");
 	if (/\$await\b/.test(script)) imports.add("$await");
 	if (/\$pending\b/.test(script)) imports.add("$pending");
+	if (/\$refresh\b/.test(script)) imports.add("$refresh");
 	if (/\$run\b/.test(script)) imports.add("$run");
 	if (/\$mount\b/.test(script)) imports.add("$mount");
 	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");

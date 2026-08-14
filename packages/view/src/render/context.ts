@@ -28,6 +28,8 @@ const context: Context =
 		suspendPeek: false,
 		suspendPeekHit: false,
 
+		refreshSignals: null,
+
 		mountEffects: [],
 		stashedEvents: [],
 		stashedAnimations: [],

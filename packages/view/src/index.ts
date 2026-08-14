@@ -48,6 +48,7 @@ import $handle from "./watch/$handle";
 import $mount from "./watch/$mount";
 import $peek from "./watch/$peek";
 import $pending from "./watch/$pending";
+import $refresh from "./watch/$refresh";
 import $run from "./watch/$run";
 import $unwrap from "./watch/$unwrap";
 import $watch from "./watch/$watch";
@@ -57,7 +58,20 @@ import ReactiveDate from "./wrappers/ReactiveDate";
 export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
 
 // Functions for the user that can be called from components
-export { $watch, $handle, $bind, $cache, $await, $pending, $run, $mount, $unwrap, $peek, $batch };
+export {
+	$watch,
+	$handle,
+	$bind,
+	$cache,
+	$await,
+	$pending,
+	$refresh,
+	$run,
+	$mount,
+	$unwrap,
+	$peek,
+	$batch,
+};
 
 // Wrapped objects for using in reactive objects
 export { ReactiveDate };

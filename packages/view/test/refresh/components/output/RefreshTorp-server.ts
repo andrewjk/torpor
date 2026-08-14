@@ -1,8 +1,10 @@
 import { $await } from "@torpor/view/ssr";
+import { $pending } from "@torpor/view/ssr";
+import { $refresh } from "@torpor/view/ssr";
 import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function LoadingStale(
+export default function RefreshSkeleton(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -10,28 +12,25 @@ export default function LoadingStale(
 	let t_body = "";
 	let t_head = "";
 
+	let fetchCount = 0;
 	let $state = $watch({
-		version: 0,
 		get data() {
 			return $await(() => {
-				// Read version synchronously so the computed tracks it and
-				// re-fetches when it changes (reading inside setTimeout would
-				// run in an untracked context).
-				const version = $state.version;
+				const count = ++fetchCount;
 				return new Promise((resolve) => {
-					setTimeout(() => resolve("loaded v" + version), 10);
+					setTimeout(() => resolve("loaded #" + count), 10);
 				});
 			});
 		},
 	});
 
 	function refresh() {
-		$state.version++;
+		$refresh(() => $state.data);
 	}
 
 	/* User interface */
 	t_body += `<![>`;
-	t_body += `<p>Loading...</p>`;
+	t_body += `<p class="skeleton">Loading...</p>`;
 	t_body += `<!]><!> <button>refresh</button>`;
 
 	return { body: t_body, head: t_head };

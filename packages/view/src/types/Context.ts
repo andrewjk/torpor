@@ -102,6 +102,15 @@ export default interface Context {
 	suspendPeekHit: boolean;
 
 	/**
+	 * When non-null, `$refresh` is running its tracking function. Every
+	 * `$await` computed read during `fn` is appended here so `$refresh` can
+	 * re-run them as bare refreshes (ASYNC.md §7.4 / `$refresh`). `$cache`
+	 * computeds are never collected. Reading a computed in this mode does not
+	 * recalc, taint, or notify a loading boundary — collection is a pure peek.
+	 */
+	refreshSignals: Computed[] | null;
+
+	/**
 	 * Functions that were run via $mount, which should be collected and flushed
 	 * when the component has been mounted in the DOM
 	 */

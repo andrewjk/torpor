@@ -102,30 +102,42 @@ export default function proxyGet(
 				// the UI update, then set the value concretely later (e.g. if
 				// updating a `count` via a fetch)
 
-			const oldRegisterComputed = context.registerComputed;
-			try {
-				// Allow calling `$cache`/`$await` to assign the computed to a
-				// proxy signal
-				context.registerComputed = (computed: Computed) => {
-					data.signals.set(key, computed);
-				};
-				const result = Reflect.get(target, key, receiver);
-				// After running the getter, check if the just-registered
-				// computed suspended (e.g. an $await getter returning a
-				// pending promise). If so, handle suspend instead of
-				// returning the raw promise.
-				const registered = data.signals.get(key) as Computed | undefined;
-				if (
-					registered !== undefined &&
-					registered.type === COMPUTED_TYPE &&
-					registered.didSuspend
-				) {
-					return suspendRead(registered);
+				const oldRegisterComputed = context.registerComputed;
+				try {
+					// Allow calling `$cache`/`$await` to assign the computed to a
+					// proxy signal
+					context.registerComputed = (computed: Computed) => {
+						data.signals.set(key, computed);
+					};
+					const result = Reflect.get(target, key, receiver);
+					// After running the getter, check if the just-registered
+					// computed suspended (e.g. an $await getter returning a
+					// pending promise). If so, handle suspend instead of
+					// returning the raw promise.
+					const registered = data.signals.get(key) as Computed | undefined;
+					if (
+						context.refreshSignals !== null &&
+						registered !== undefined &&
+						registered.type === COMPUTED_TYPE &&
+						registered.isAwait
+					) {
+						// $refresh collection: record the $await computed (this is
+						// the first-ever read, so it isn't in data.signals yet).
+						// suspendRead below still runs in peek mode ($refresh sets
+						// suspendPeek), so no taint/boundary notification happens.
+						context.refreshSignals.push(registered);
+					}
+					if (
+						registered !== undefined &&
+						registered.type === COMPUTED_TYPE &&
+						registered.didSuspend
+					) {
+						return suspendRead(registered);
+					}
+					return result;
+				} finally {
+					context.registerComputed = oldRegisterComputed;
 				}
-				return result;
-			} finally {
-				context.registerComputed = oldRegisterComputed;
-			}
 			}
 		} else if (data.isArray) {
 			// If it's a function in an array, we may intercept it
@@ -142,6 +154,15 @@ export default function proxyGet(
 		// effect, track it
 		trackProxySignal(data, key);
 	} else if (signal.type === COMPUTED_TYPE) {
+		if (context.refreshSignals !== null && signal.isAwait) {
+			// $refresh collection: record the $await computed so it can be
+			// re-run as a bare refresh, then return its current value without
+			// recalc/taint/boundary handling — collection is a pure peek. fn's
+			// result is ignored by $refresh, so the value is only read to
+			// trigger the same read path a UI read would.
+			context.refreshSignals.push(signal);
+			return signal.value;
+		}
 		if (signal.running) {
 			throw new Error("Cycle detected");
 		} else if (signal.recalc) {
@@ -152,7 +173,12 @@ export default function proxyGet(
 		}
 		if (signal.didError) {
 			// If there was a previous error, and no dependencies have
-			// changed, throw the error again
+			// changed, throw the error again. Subscribe first so the reader
+			// re-runs if the computed later recovers (e.g. via a `$refresh`
+			// that resolves a fresh fetch) — without this, the reader loses
+			// its subscription on the throwing read and recovery can never
+			// reach it.
+			trackSignal(signal);
 			throw signal.value;
 		}
 		if (signal.didSuspend) {

@@ -26,6 +26,7 @@ export default function $await<T>(fn: () => Promise<T>): T {
 
 	const computed: Computed = {
 		type: COMPUTED_TYPE,
+		isAwait: true,
 		value: null,
 		run: null as unknown as () => any,
 		firstSource: null,
@@ -36,6 +37,7 @@ export default function $await<T>(fn: () => Promise<T>): T {
 		didSuspend: false,
 		generation: 0,
 		hasResolved: false,
+		lastErrored: false,
 		suspendQuiet: false,
 		staleValue: undefined,
 		rollback: null,
@@ -61,15 +63,18 @@ export default function $await<T>(fn: () => Promise<T>): T {
 			// old content instead of flashing fallback — stale-while-revalidate
 			// (ASYNC.md §6.2). Inside run(), computed.value still holds the
 			// previous run's result; undefined on a first load (hasResolved).
-			computed.staleValue = computed.hasResolved ? computed.value : undefined;
+			// A rejected result (lastErrored) is never retained — a retry
+			// suspend must not hand the previous error to readers as content.
+			computed.staleValue =
+				computed.hasResolved && !computed.lastErrored ? computed.value : undefined;
 			// Capture the quiet-on-refresh decision at suspend time
 			// (ASYNC.md §7.4). `recalc` is still true during a source-driven
 			// re-run — `checkComputed` clears it only after `runComputed`
 			// returns — so a suspend is quiet iff the computed has resolved
 			// before AND this run wasn't triggered by a dependency change
-			// (i.e. a bare refresh, e.g. a future `refresh()` primitive).
+			// (i.e. a silent `$refresh(fn, { silent: true })`).
 			// First loads are loud (`hasResolved` is false); dep-change
-			// refreshes are loud (`recalc` is true).
+			// refreshes and loud `$refresh` calls are loud (`recalc` is true).
 			computed.suspendQuiet = computed.hasResolved && !computed.recalc;
 			(value as Promise<T>).then(
 				(v: T) => {
@@ -77,6 +82,7 @@ export default function $await<T>(fn: () => Promise<T>): T {
 					computed.value = v;
 					computed.didSuspend = false;
 					computed.hasResolved = true;
+					computed.lastErrored = false;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();
@@ -87,6 +93,7 @@ export default function $await<T>(fn: () => Promise<T>): T {
 					computed.didError = true;
 					computed.didSuspend = false;
 					computed.hasResolved = true;
+					computed.lastErrored = true;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();

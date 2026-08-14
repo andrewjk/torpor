@@ -384,13 +384,13 @@ runtime machinery. It is a sketch, not a spec; open questions at the end.
 
 ### 7.1 The new surface
 
-| primitive                       | kind                                   | replaces                                                                             |
-| ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| `$await(fn)`                    | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
-| `@loading { … }`                | control block (boundary)               | the pending/then branches of `@await`                                                |
-| `$pending(fn)`                  | reactive query                         | (new — no equivalent today)                                                          |
-| `@try { … } @catch (err) { … }` | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
-| `@error (err) { … }`            | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
+| primitive                      | kind                                   | replaces                                                                             |
+| ------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------ |
+| `$await(fn)`                   | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
+| `@loading { … }`               | control block (boundary)               | the pending/then branches of `@await`                                                |
+| `$pending(fn)`                 | reactive query                         | (new — no equivalent today)                                                          |
+| `@try { … } catch (err) { … }` | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
+| `@error (err) { … }`           | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
 
 Plus, hidden: a **promise indicator** (`didSuspend`) on the `Computed` that
 `$await` creates, which the get trap reads through (§7.2). `@await`/`@then`
@@ -428,7 +428,7 @@ compose with each other.
 
 **`Computed` type** — one new field: `didSuspend: boolean`.
 
-**`runComputed.ts` — unchanged.** The thenable check does *not* live here;
+**`runComputed.ts` — unchanged.** The thenable check does _not_ live here;
 it lives in `$await` (next subsection). The sync `$cache` hot path pays
 nothing.
 
@@ -651,6 +651,16 @@ sugar for `@if ($pending(fn)) { … }`. It doesn't buy anything structural
 over `@if`, and it can't drive attributes (`disabled={$pending(...)}`), so
 ship the function form first and add the block later if ergonomics demand.
 
+**Companion primitive: `$refresh(fn)` (implemented).** The quiet-on-refresh
+rule needs a way to trigger a bare refresh — a re-fetch with no dependency
+change. `$refresh(fn)` collects the `$await` computeds read by `fn` and
+re-runs them, **loud by default** so `$pending` flips `true` and subscribers
+are notified at suspend _start_ (the spinner pattern for pull-to-refresh).
+`$refresh(fn, { silent: true })` opts into the quiet form (§6.2's bare
+`refresh()`): the suspend reads quiet (`suspendQuiet`), `$pending` stays
+`false`, and nothing re-runs until resolve — for polling, refetch-on-focus.
+See `packages/view/src/watch/$refresh.ts`.
+
 ### 7.5 `@try`/`@catch` — error boundary
 
 The current `@catch` in `@await` is narrow: a `.catch()` callback on one
@@ -662,7 +672,7 @@ model separates errors from any specific promise:
 	@loading {
 		<Profile user={$user} />
 	}
-} @catch (err) {
+} catch (err) {
 	<ErrorView error={err} />
 }
 ```
@@ -705,7 +715,7 @@ ship one either.
 specific subtrees. But "this component should not crash the app" is a
 per-component concern, and without a top-level form, every resilient
 component ends up wrapping its entire `@render` body in
-`@try { … } @catch (err) { … }` — pure boilerplate. A top-level `@error`
+`@try { … } catch (err) { … }` — pure boilerplate. A top-level `@error`
 block, as a sibling of `@render`, provides the catch-all without the
 wrapping noise:
 
@@ -791,7 +801,7 @@ runtime:
 3. **Stage C — deprecate `@await`.** Once `@loading` covers the cases,
    emit a compiler warning for `@await` and document the migration
    (`@await (p) {…} then (v) {…}` → `get x() { return $await(() => p) }`
-   + `@loading {…x…}`). Keep `@await` compiling for a major version.
+   - `@loading {…x…}`). Keep `@await` compiling for a major version.
 
 ### 7.8 Open questions
 

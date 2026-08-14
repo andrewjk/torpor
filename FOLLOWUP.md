@@ -124,14 +124,28 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
   `$await`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
   on resolve/reject) and `suspendQuiet` (`hasResolved && !recalc`). The peek
   branch in `proxyGet.suspendRead` only records a loud hit when
-  `!suspendQuiet`. Torpor has no `refresh()` primitive yet, so a bare refresh
-  can't be triggered through the public API — the quiet path is exercised in
-  `test/pending` by calling `runComputed` directly (what a future `refresh()`
-  would do). When `refresh()` lands, it re-runs the computed without setting
-  `recalc`, and `$pending` stays quiet automatically. §7.8's "first-load
-  semantics" open question is resolved: first load is per-computed (via
-  `hasResolved`), and an `@if` branch that mounts and reads a never-resolved
-  computed is a first load; reading an already-resolved computed is not.
+  `!suspendQuiet`. **`$refresh` primitive landed** (`watch/$refresh.ts`):
+  `$refresh(fn)` collects the `$await` computeds read by `fn` (a new
+  `Computed.isAwait` marker + a `context.refreshSignals` collector hooked into
+  both `proxyGet` read paths) and re-runs each, **loud by default** (recalc
+  left true so the suspend is loud and `$pending` flips `true`, plus a
+  propagate-at-start so `$pending` indicators flip on immediately — the
+  spinner pattern). `$refresh(fn, { silent: true })` opts into quiet
+  (stale-while-revalidate): recalc left false, no notification until resolve —
+  for polling / refetch-on-focus. The re-run happens with no active target so
+  an imperative refresh never subscribes its caller. A `didError` read in
+  `proxyGet` now `trackSignal`s before throwing so an errored reader re-runs
+  when a `$refresh` resolves (retry-after-error), and a new
+  `Computed.lastErrored` flag stops an error from being retained as
+  `staleValue` (a retry suspend never renders the previous error as content).
+  Import detection in `buildCode`/`buildServerCode` now also scans markup
+  expressions (via `compile/utils/collectMarkupExpressions`), so
+  `$`-primitives used in the template (e.g. `@if ($pending(...))`,
+  `disabled={$pending(...)}`) get their imports injected — previously only
+  script usage did. §7.8's "first-load semantics" open question is
+  resolved: first load is per-computed (via `hasResolved`), and an `@if`
+  branch that mounts and reads a never-resolved computed is a first load;
+  reading an already-resolved computed is not.
 - **Compiler check for promise-getter requirement.** Not yet implemented
   (ASYNC.md §7.2). The compiler should reject promise-returning getters
   that use `$cache` instead of `$await`. Currently enforced at runtime by
@@ -162,6 +176,19 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 
 ### Not yet implemented (Stage B / follow-up)
 
+- **Server build imports for the async primitives dangle.** `buildServerCode.ts`
+  importsMap maps `$await`, `$pending`, and `$refresh` to `@torpor/view/ssr`,
+  but `src/ssr.ts` (and the built `dist/ssr.mjs`) export none of them — they're
+  client-only APIs. A server-rendered component whose script references one
+  would emit a broken `import { $await } from "@torpor/view/ssr"`. Pre-existing
+  for `$await`/`$pending`; `$refresh` follows the same pattern. Fix options: add
+  no-op server stubs, or drop them from the server importsMap (they never run
+  server-side).
+- **`$refresh` first-read double fetch.** If `fn` reads an `$await` getter that
+  the UI has never read, the collection read initializes it (starts a fetch),
+  then the refresh re-runs it (second fetch); the first resolve is ignored via
+  the generation guard. Normal components always render the getter first, so
+  this only affects getters referenced exclusively by `$refresh`.
 - **Effect-rerun error routing.** The compiled `try/catch` only catches errors
   thrown synchronously while building the boundary's subtree (initial render,
   child component renders, direct `@const` reads). A `$run` effect created

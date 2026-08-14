@@ -144,6 +144,90 @@ let $state = $watch({
 
 `$cache` supports chains (a cached getter depending on another cached getter).
 
+### `$await(fn)` — async getter
+
+Caches a promise-returning getter. The peer of `$cache` for async values: only
+valid inside a getter, lazy, and re-fetched when dependencies change. While the
+promise is pending, reads of the getter suspend — pair with `@loading` for the
+fallback:
+
+```torp
+let $state = $watch({
+	get user() {
+		return $await(() => fetchUser($props.id));
+	},
+});
+```
+
+A getter whose result is a Promise must use `$await`, not `$cache` (`$cache`
+throws if it returns a Promise).
+
+### `$pending(fn)` — is it loading?
+
+Reactive query for inline "loading…" indicators. Returns `true` while any
+`$await` getter read inside `fn` is pending in a **loud** way — a first load,
+a dependency-change refresh, or a `$refresh` (loud by default). A _silent_
+`$refresh(fn, { silent: true })` (background revalidation) stays quiet:
+
+```torp
+<button disabled={$pending(() => $state.user)}>Save</button>
+@if ($pending(() => $state.data)) { <Spinner small /> }
+```
+
+### `$refresh(fn)` — re-fetch without a dependency change
+
+Re-runs the `$await` getters read inside `fn`, starting a fresh fetch with no
+tracked dependency change. `$cache` getters are ignored. Use for pull-to-
+refresh, refresh buttons, refetch-on-focus, polling, and retry-after-error:
+
+```torp
+function refresh() {
+	$refresh(() => $state.user);
+}
+```
+
+A `$refresh` is **loud by default**: `$pending` reads `true` and inline
+"updating…" indicators flip on while the re-fetch is in flight, while readers
+keep displaying the previously resolved value (no flicker); an `@loading`
+boundary keeps its content mounted instead of flashing fallback. On resolve,
+subscribers update through the normal reactive graph.
+
+**Show a spinner during a refresh** — no option needed; just read `$pending`:
+
+```torp
+function pullToRefresh() {
+	$refresh(() => $state.data);
+}
+
+@render {
+	@loading {
+		@if ($pending(() => $state.data)) { <Spinner /> }  	// shows on refresh
+		<ul>{items}</ul>
+	} fallback {
+		<Skeleton />                                        // first load only
+	}
+	<div onpointerdown={pullToRefresh} />
+}
+```
+
+**`{ silent: true }` re-fetches quietly** (stale-while-revalidate): `$pending`
+stays `false` and nothing re-runs until the new promise resolves. For
+background revalidation where feedback would be noise — polling,
+refetch-on-focus:
+
+```torp
+$run(() => {
+	const id = setInterval(() => $refresh(() => $state.data, { silent: true }), 30_000);
+	return () => clearInterval(id);
+});
+```
+
+A refresh is loud regardless of `silent` when the computed has never resolved
+(e.g. retrying a fetch that failed on first load).
+
+`$pending`/`$refresh` are usable directly in markup — the compiler detects
+`$`-primitives in template expressions and injects the imports.
+
 ### `$bind(state, props, ...keys)`
 
 Two-way sync between matching keys on `state` and `props`:

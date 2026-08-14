@@ -15,6 +15,7 @@ export default function $cache<T>(fn: () => T): T {
 
 	let computed: Computed = {
 		type: COMPUTED_TYPE,
+		isAwait: false,
 		value: null,
 		run: fn,
 		firstSource: null,
@@ -25,6 +26,7 @@ export default function $cache<T>(fn: () => T): T {
 		didSuspend: false,
 		generation: 0,
 		hasResolved: false,
+		lastErrored: false,
 		suspendQuiet: false,
 		staleValue: undefined,
 		rollback: null,

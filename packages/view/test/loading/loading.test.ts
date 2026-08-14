@@ -23,7 +23,7 @@ export default function LoadingTest() {
 	@render {
 		@loading {
 			<p>Result: {$state.data}</p>
-		} @fallback {
+		} fallback {
 			<p>Loading...</p>
 		}
 	}
@@ -83,6 +83,67 @@ test("@loading hydrated shows fallback then content", async () => {
 	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
 });
 
+const twoListsSource = `
+export default function LoadingTwoLists() {
+	let $state = $watch({
+		get listA() {
+			return $await(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve("A loaded"), 10);
+					}),
+			);
+		},
+		get listB() {
+			return $await(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve("B loaded"), 20);
+					}),
+			);
+		},
+	});
+
+	@render {
+		@loading {
+			<p>A: {$state.listA}</p>
+		} fallback {
+			<p>Loading A...</p>
+		}
+		@loading {
+			<p>B: {$state.listB}</p>
+		} fallback {
+			<p>Loading B...</p>
+		}
+	}
+}
+`;
+
+test("sibling @loading boundaries are independent per async getter", async () => {
+	// One boundary tracks every $await read inside its OWN subtree, not the
+	// whole component. Two sibling boundaries — one per filtered list — give
+	// each its own fallback and resolve independently.
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, twoListsSource, "client");
+	mountComponent(container, component);
+
+	const { waitFor } = await import("@testing-library/dom");
+
+	// Both lists load independently
+	expect(queryByText(container, "Loading A...")).not.toBeNull();
+	expect(queryByText(container, "Loading B...")).not.toBeNull();
+
+	// A resolves first; B keeps its own fallback
+	await waitFor(() => expect(queryByText(container, "A: A loaded")).not.toBeNull());
+	expect(queryByText(container, "Loading A...")).toBeNull();
+	expect(queryByText(container, "Loading B...")).not.toBeNull();
+	expect(queryByText(container, "B: B loaded")).toBeNull();
+
+	// B resolves independently
+	await waitFor(() => expect(queryByText(container, "B: B loaded")).not.toBeNull());
+	expect(queryByText(container, "Loading B...")).toBeNull();
+});
+
 const staleSource = `
 export default function LoadingStale() {
 	let $state = $watch({
@@ -107,7 +168,7 @@ export default function LoadingStale() {
 	@render {
 		@loading {
 			<p>Result: {$state.data}</p>
-		} @fallback {
+		} fallback {
 			<p>Loading...</p>
 		}
 		<button onclick={refresh}>refresh</button>

@@ -13,6 +13,15 @@ export default interface Computed<T = any> {
 	type: typeof COMPUTED_TYPE;
 
 	/**
+	 * True if this computed was created by `$await` (an async getter whose run
+	 * returns a Promise and suspends readers until it resolves). False for
+	 * plain `$cache` computeds. `$refresh` targets only `isAwait` computeds,
+	 * so re-running a `$cache` getter (which would recompute a sync value for
+	 * no reason) never happens.
+	 */
+	isAwait: boolean;
+
+	/**
 	 * The cached, computed value.
 	 */
 	value: T;
@@ -75,17 +84,28 @@ export default interface Computed<T = any> {
 	hasResolved: boolean;
 
 	/**
+	 * True when the last settled result of an `$await` computed was a
+	 * rejection. Set by the `.then` reject handler, cleared by the resolve
+	 * handler. `$await`'s run reads it to avoid retaining an error as
+	 * `staleValue` — a retry-after-error re-suspend must not hand the previous
+	 * error to readers as "stale content" (it renders as a raw value, bypassing
+	 * the error boundary). Unused by plain `$cache` computeds.
+	 */
+	lastErrored: boolean;
+
+	/**
 	 * True when the current suspend is a "bare refresh" — a re-fetch with no
-	 * tracked dependency change (e.g. a future `refresh()` primitive), per
-	 * ASYNC.md §7.4's quiet-on-refresh rule. `$pending` reads this to stay
-	 * quiet (return `false`) on bare refreshes, matching Solid's
-	 * stale-while-revalidate default.
+	 * tracked dependency change, i.e. a silent `$refresh(fn, { silent: true })`
+	 * (background revalidation), per ASYNC.md §7.4's quiet-on-refresh rule.
+	 * `$pending` reads this to stay quiet (return `false`) on silent refreshes,
+	 * matching Solid's stale-while-revalidate default.
 	 *
 	 * Captured at suspend time inside `$await`'s run: a suspend is quiet iff
 	 * the computed has resolved before (`hasResolved`) AND the run was NOT
-	 * source-driven (`recalc === false`, i.e. not triggered by
-	 * `checkComputed`). First loads are always loud (`hasResolved` is false);
-	 * dependency-change refreshes are always loud (`recalc` is true).
+	 * source-driven (`recalc === false`, i.e. not triggered by `checkComputed`
+	 * and not a loud `$refresh`). First loads are always loud (`hasResolved`
+	 * is false); dependency-change refreshes and loud `$refresh` calls are
+	 * always loud (`recalc` is true).
 	 */
 	suspendQuiet: boolean;
 

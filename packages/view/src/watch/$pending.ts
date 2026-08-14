@@ -12,12 +12,13 @@ import context from "../render/context";
  *
  * Quiet-on-refresh semantics (ASYNC.md §7.4): a suspend is *quiet* — and
  * therefore `$pending` returns `false` for it — when the computed has resolved
- * before and the re-fetch wasn't triggered by a tracked dependency change (a
- * "bare refresh", e.g. a future `refresh()` primitive). This matches Solid's
- * stale-while-revalidate default: re-asking the same question shouldn't ping
- * the user. First loads and dependency-change refreshes are loud (`true`).
- * Quiet-ness is captured per computed at suspend time via `suspendQuiet`
- * (computed in `$await`'s run from `hasResolved` and `recalc`).
+ * before and the re-fetch was a *silent* `$refresh(fn, { silent: true })` (a
+ * bare refresh with no tracked dependency change, used for background
+ * revalidation). This matches Solid's stale-while-revalidate default: quietly
+ * re-asking the same question shouldn't ping the user. First loads and
+ * dependency-change refreshes are loud (`true`), as is the default (loud)
+ * `$refresh(fn)`. Quiet-ness is captured per computed at suspend time via
+ * `suspendQuiet` (computed in `$await`'s run from `hasResolved` and `recalc`).
  *
  * @param fn A function that reads the reactive values to check.
  */

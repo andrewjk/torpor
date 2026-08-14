@@ -77,6 +77,10 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	activeRegion: null,
 	previousRegion: null,
 	rootRegion: null,
+	loadingBoundary: null,
+	suspendPeek: false,
+	suspendPeekHit: false,
+	refreshSignals: null,
 	mountEffects: [],
 	stashedEvents: [],
 	stashedAnimations: [],
@@ -139,6 +143,7 @@ function runComputed(computed) {
 	const oldActiveTarget = context.activeTarget;
 	computed.running = true;
 	computed.didError = false;
+	computed.didSuspend = false;
 	try {
 		context.activeTarget = computed;
 		computed.value = computed.run();
@@ -298,6 +303,7 @@ function $run(fn, name, options) {
 		extent: 0,
 		nextEffectToRun: null,
 		didError: false,
+		didSuspend: false,
 		name,
 		isMountEffect: options?.isMountEffect,
 		forVarMask: options?.forVarMask
@@ -798,6 +804,9 @@ function rerunEffectsOnRegion(region, changedMask) {
 		clearSources(effect);
 	}
 }
+function restoreHydration(node) {
+	if (context.hydrationNode !== null) context.hydrationNode = node;
+}
 function runControl(region, anchor, create, name) {
 	let first = true;
 	const gen = region.generation = (region.generation ?? 0) + 1;
@@ -824,6 +833,44 @@ function runControlBranch(region, oldIndex, index) {
 	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
 }
+function propagateFromSignal(signal) {
+	const first = signal.firstTarget;
+	if (first === null) return;
+	let targetSub = first;
+	let computed;
+	outer: while (true) {
+		targetSub.active = false;
+		targetSub.recalc = true;
+		const target = targetSub.target;
+		if (target.type === 2) {
+			if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
+				if (context.lastEffectToRun === null) context.firstEffectToRun = target;
+				else context.lastEffectToRun.nextEffectToRun = target;
+				context.lastEffectToRun = target;
+			}
+		} else if (!target.recalc) {
+			target.recalc = true;
+			if (target.firstTarget !== null) {
+				computed = target;
+				computed.rollback = targetSub;
+				targetSub = target.firstTarget;
+				continue;
+			}
+		}
+		while (targetSub.nextTarget === null && computed !== void 0) {
+			const rollback = computed.rollback;
+			if (rollback === null) break;
+			targetSub = rollback;
+			if (targetSub.source.type !== 1) {
+				computed = void 0;
+				continue outer;
+			}
+			computed = targetSub.source;
+		}
+		if (targetSub.nextTarget === null) break;
+		targetSub = targetSub.nextTarget;
+	}
+}
 function propagateSignal(proxy, key) {
 	let signal = proxy.signals.get(key);
 	if (signal !== void 0 && signal.firstTarget !== null) {
@@ -836,38 +883,7 @@ function propagateSignal(proxy, key) {
 				context.lastSignalToUpdate.nextSignalToUpdate = signal;
 				context.lastSignalToUpdate = signal;
 			}
-			let targetSub = signal.firstTarget;
-			let computed;
-			outer: while (true) {
-				targetSub.active = false;
-				targetSub.recalc = true;
-				const target = targetSub.target;
-				if (target.type === 2) {
-					if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
-						if (context.lastEffectToRun === null) context.firstEffectToRun = target;
-						else context.lastEffectToRun.nextEffectToRun = target;
-						context.lastEffectToRun = target;
-					}
-				} else if (!target.recalc) {
-					target.recalc = true;
-					if (target.firstTarget !== null) {
-						computed = target;
-						computed.rollback = targetSub;
-						targetSub = target.firstTarget;
-						continue;
-					}
-				}
-				while (targetSub.nextTarget === null && computed !== void 0) {
-					targetSub = computed.rollback;
-					if (targetSub.source.type !== 1) {
-						computed = void 0;
-						continue outer;
-					}
-					computed = targetSub.source;
-				}
-				if (targetSub.nextTarget === null) break;
-				targetSub = targetSub.nextTarget;
-			}
+			propagateFromSignal(signal);
 		} finally {
 			batchEnd();
 		}
@@ -884,6 +900,25 @@ function trackProxySignal(data, key) {
 		data.signals.set(key, signal);
 	}
 	trackSignal(signal);
+}
+function suspendRead(signal) {
+	trackSignal(signal);
+	if (context.suspendPeek) {
+		if (!signal.suspendQuiet) context.suspendPeekHit = true;
+		return;
+	}
+	if (context.activeTarget !== null) context.activeTarget.didSuspend = true;
+	if (context.loadingBoundary !== null) {
+		context.loadingBoundary.suspended = true;
+		const boundaryEffect = context.loadingBoundary.effect;
+		if (boundaryEffect !== null && boundaryEffect !== context.activeTarget) {
+			const oldActive = context.activeTarget;
+			context.activeTarget = boundaryEffect;
+			trackSignal(signal);
+			context.activeTarget = oldActive;
+		}
+	}
+	return signal.staleValue;
 }
 function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
@@ -904,7 +939,11 @@ function proxyGet(target, key, receiver) {
 					context.registerComputed = (computed) => {
 						data.signals.set(key, computed);
 					};
-					return Reflect.get(target, key, receiver);
+					const result = Reflect.get(target, key, receiver);
+					const registered = data.signals.get(key);
+					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAwait) context.refreshSignals.push(registered);
+					if (registered !== void 0 && registered.type === 1 && registered.didSuspend) return suspendRead(registered);
+					return result;
 				} finally {
 					context.registerComputed = oldRegisterComputed;
 				}
@@ -914,10 +953,18 @@ function proxyGet(target, key, receiver) {
 		} else trackProxySignal(data, key);
 	} else if (signal.type === 0) trackProxySignal(data, key);
 	else if (signal.type === 1) {
+		if (context.refreshSignals !== null && signal.isAwait) {
+			context.refreshSignals.push(signal);
+			return signal.value;
+		}
 		if (signal.running) throw new Error("Cycle detected");
 		else if (signal.recalc) checkComputed(signal);
-		else if (signal.didError) throw signal.value;
-		else trackSignal(signal);
+		if (signal.didError) {
+			trackSignal(signal);
+			throw signal.value;
+		}
+		if (signal.didSuspend) return suspendRead(signal);
+		trackSignal(signal);
 		return signal.value;
 	}
 	return target[key];
@@ -1218,6 +1265,67 @@ function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 		popRegion(oldRegion);
 	});
 }
+function anySourceSuspended(effect) {
+	for (let sub = effect.firstSource; sub !== null; sub = sub.nextSource) {
+		const source = sub.source;
+		if (source.type === 1 && source.didSuspend === true) return true;
+	}
+	return false;
+}
+function runLoading(region, anchor, renderContent, renderFallback, name) {
+	const boundary = {
+		suspended: false,
+		effect: null
+	};
+	let index = -1;
+	let first = true;
+	let hasContent = false;
+	let theEffect = null;
+	const gen = region.generation = (region.generation ?? 0) + 1;
+	$run(function runLoading() {
+		if (region.generation !== gen) return;
+		theEffect = context.activeTarget;
+		boundary.effect = theEffect;
+		const oldRegion = pushRegion(region, first);
+		first = false;
+		const renderBranch = (targetIndex, fn) => {
+			runControlBranch(region, index, targetIndex);
+			context.previousRegion = region;
+			const oldR = pushRegion(newRegion(targetIndex === 0 ? "loading_content" : "loading_fallback"), true);
+			fn(anchor);
+			popRegion(oldR);
+			index = targetIndex;
+		};
+		const attemptContent = () => {
+			const oldBoundary = context.loadingBoundary;
+			context.loadingBoundary = boundary;
+			boundary.suspended = false;
+			const savedHydration = context.hydrationNode;
+			if (savedHydration !== null) context.hydrationNode = null;
+			renderBranch(0, renderContent);
+			if (savedHydration !== null) context.hydrationNode = savedHydration;
+			context.loadingBoundary = oldBoundary;
+			if (boundary.suspended && renderFallback !== null) renderBranch(1, renderFallback);
+			else if (!boundary.suspended) hasContent = true;
+		};
+		if (theEffect === null) attemptContent();
+		else {
+			const targetIndex = anySourceSuspended(theEffect) ? 1 : 0;
+			if (targetIndex !== index) {
+				if (targetIndex === 0) attemptContent();
+				else if (!hasContent) if (renderFallback !== null) renderBranch(1, renderFallback);
+				else {
+					runControlBranch(region, index, 1);
+					index = 1;
+				}
+			}
+		}
+		popRegion(oldRegion);
+	}, name);
+}
+function saveHydration() {
+	return context.hydrationNode;
+}
 function setAttribute(el, name, value) {
 	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
 	else el.setAttribute(name, value);
@@ -1239,6 +1347,60 @@ function $batch(fn) {
 		batchEnd();
 	}
 }
+function $await(fn) {
+	if (context.registerComputed === null) throw new Error("$await must be used in a getter");
+	const computed = {
+		type: 1,
+		isAwait: true,
+		value: null,
+		run: null,
+		firstSource: null,
+		firstTarget: null,
+		recalc: false,
+		running: false,
+		didError: false,
+		didSuspend: false,
+		generation: 0,
+		hasResolved: false,
+		lastErrored: false,
+		suspendQuiet: false,
+		staleValue: void 0,
+		rollback: null
+	};
+	computed.run = () => {
+		const value = fn();
+		if (value !== null && value !== void 0 && typeof value.then === "function") {
+			const gen = ++computed.generation;
+			computed.didSuspend = true;
+			computed.staleValue = computed.hasResolved && !computed.lastErrored ? computed.value : void 0;
+			computed.suspendQuiet = computed.hasResolved && !computed.recalc;
+			value.then((v) => {
+				if (computed.generation !== gen) return;
+				computed.value = v;
+				computed.didSuspend = false;
+				computed.hasResolved = true;
+				computed.lastErrored = false;
+				batchStart();
+				propagateFromSignal(computed);
+				batchEnd();
+			}, (e) => {
+				if (computed.generation !== gen) return;
+				computed.value = e;
+				computed.didError = true;
+				computed.didSuspend = false;
+				computed.hasResolved = true;
+				computed.lastErrored = true;
+				batchStart();
+				propagateFromSignal(computed);
+				batchEnd();
+			});
+		}
+		return value;
+	};
+	context.registerComputed(computed);
+	runComputed(computed);
+	return computed.value;
+}
 function $bind(state, props, ...keys) {
 	if (props === void 0) return;
 	for (let key of keys.flat()) {
@@ -1258,6 +1420,7 @@ function $cache(fn) {
 	if (context.registerComputed === null) throw new Error("$cache must be used in a getter");
 	let computed = {
 		type: 1,
+		isAwait: false,
 		value: null,
 		run: fn,
 		firstSource: null,
@@ -1265,10 +1428,17 @@ function $cache(fn) {
 		recalc: false,
 		running: false,
 		didError: false,
+		didSuspend: false,
+		generation: 0,
+		hasResolved: false,
+		lastErrored: false,
+		suspendQuiet: false,
+		staleValue: void 0,
 		rollback: null
 	};
 	context.registerComputed(computed);
 	runComputed(computed);
+	if (computed.value !== null && computed.value !== void 0 && typeof computed.value.then === "function") throw new Error("$cache returned a Promise — use $await for async getters");
 	return computed.value;
 }
 function $handle(fn) {
@@ -1288,6 +1458,50 @@ function $peek(fn) {
 	const result = fn();
 	context.activeTarget = oldActiveTarget;
 	return result;
+}
+function $pending(fn) {
+	const oldPeek = context.suspendPeek;
+	context.suspendPeek = true;
+	context.suspendPeekHit = false;
+	try {
+		fn();
+		return context.suspendPeekHit;
+	} finally {
+		context.suspendPeek = oldPeek;
+	}
+}
+function $refresh(fn, options) {
+	const silent = options?.silent === true;
+	const oldRefreshSignals = context.refreshSignals;
+	const oldPeek = context.suspendPeek;
+	context.refreshSignals = [];
+	context.suspendPeek = true;
+	let unique;
+	try {
+		fn();
+		unique = new Set(context.refreshSignals ?? []);
+	} finally {
+		context.refreshSignals = oldRefreshSignals;
+		context.suspendPeek = oldPeek;
+	}
+	for (const computed of unique) {
+		computed.recalc = !silent;
+		deactivateSources(computed);
+		const oldActiveTarget = context.activeTarget;
+		context.activeTarget = null;
+		try {
+			runComputed(computed);
+		} finally {
+			context.activeTarget = oldActiveTarget;
+		}
+		computed.recalc = false;
+		clearSources(computed);
+		if (!silent) {
+			batchStart();
+			propagateFromSignal(computed);
+			batchEnd();
+		}
+	}
 }
 let initialized = false;
 var ReactiveDate = class ReactiveDate extends Date {
@@ -1342,10 +1556,13 @@ let t_pop_region = popRegion;
 let t_push_region = pushRegion;
 let t_region = newRegion;
 let t_rerun_region_effects = rerunRegionEffects;
+let t_restore_hydration = restoreHydration;
 let t_root = nodeRoot;
 let t_root_el = nodeRootElement;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
+let t_run_loading = runLoading;
+let t_save_hydration = saveHydration;
 let t_skip = nodeSkip;
 let t_style = buildStyles;
