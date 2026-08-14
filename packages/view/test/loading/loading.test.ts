@@ -1,4 +1,5 @@
 import { queryByText } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
 import hydrateComponent from "../hydrateComponent";
@@ -80,4 +81,62 @@ test("@loading hydrated shows fallback then content", async () => {
 	// Server renders fallback; client hydrates and eventually shows content
 	const { waitFor } = await import("@testing-library/dom");
 	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
+});
+
+const staleSource = `
+export default function LoadingStale() {
+	let $state = $watch({
+		version: 0,
+		get data() {
+			return $await(() => {
+				// Read version synchronously so the computed tracks it and
+				// re-fetches when it changes (reading inside setTimeout would
+				// run in an untracked context).
+				const version = $state.version;
+				return new Promise((resolve) => {
+					setTimeout(() => resolve("loaded v" + version), 10);
+				});
+			});
+		},
+	});
+
+	function refresh() {
+		$state.version++;
+	}
+
+	@render {
+		@loading {
+			<p>Result: {$state.data}</p>
+		} @fallback {
+			<p>Loading...</p>
+		}
+		<button onclick={refresh}>refresh</button>
+	}
+}
+`;
+
+test("@loading keeps stale content during a refresh instead of flashing fallback", async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, staleSource, "client");
+	mountComponent(container, component);
+
+	const { waitFor } = await import("@testing-library/dom");
+
+	// First load: fallback, then resolved content
+	expect(queryByText(container, "Loading...")).not.toBeNull();
+	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
+	expect(queryByText(container, "Loading...")).toBeNull();
+
+	// Trigger a refresh (dependency change → re-fetch). While the new promise
+	// is in flight the boundary must keep showing the old resolved content
+	// (stale-while-revalidate) rather than flashing fallback.
+	const button = container.getElementsByTagName("button")[0];
+	await userEvent.click(button);
+
+	expect(queryByText(container, "Loading...")).toBeNull();
+	expect(queryByText(container, "Result: loaded v0")).not.toBeNull();
+
+	// Once the new promise resolves, content updates in place
+	await waitFor(() => expect(queryByText(container, "Result: loaded v1")).not.toBeNull());
+	expect(queryByText(container, "Loading...")).toBeNull();
 });

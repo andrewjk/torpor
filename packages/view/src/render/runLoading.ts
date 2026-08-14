@@ -32,6 +32,14 @@ function anySourceSuspended(effect: Effect): boolean {
  * computeds — only switching branches when the suspend state actually
  * changes, leaving fine-grained child effects to handle value updates.
  *
+ * Stale-while-revalidate (ASYNC.md §6.2): once content has been produced
+ * (`hasContent`), a subsequent suspend during a refresh does NOT switch to
+ * fallback — the boundary keeps the stale content mounted. `$await` retains
+ * the previous resolved value (`Computed.staleValue`) and `suspendRead`
+ * returns it, so child effects keep displaying the old value until the new
+ * promise resolves and updates them in place. Fallback is shown only on the
+ * first load, before content has ever rendered successfully.
+ *
  * @param renderContent Builds the content children (may read $await getters).
  * @param renderFallback Builds the fallback children, or null for empty.
  */
@@ -45,6 +53,7 @@ export default function runLoading(
 	const boundary: LoadingBoundary = { suspended: false, effect: null };
 	let index = -1; // -1 = initial, 0 = content, 1 = fallback
 	let first = true;
+	let hasContent = false; // true once content has rendered without suspending
 	let theEffect: Effect | null = null;
 
 	const gen = (region.generation = (region.generation ?? 0) + 1);
@@ -103,6 +112,10 @@ export default function runLoading(
 
 			if (boundary.suspended && renderFallback !== null) {
 				renderBranch(1, renderFallback);
+			} else if (!boundary.suspended) {
+				// Content rendered without suspending — mark it so a later
+				// refresh suspend keeps showing stale content (§6.2).
+				hasContent = true;
 			}
 		};
 
@@ -120,11 +133,19 @@ export default function runLoading(
 				if (targetIndex === 0) {
 					// Switching to content — render and check for re-suspend
 					attemptContent();
-				} else if (renderFallback !== null) {
-					renderBranch(1, renderFallback);
-				} else {
-					runControlBranch(region, index, 1);
-					index = 1;
+				} else if (!hasContent) {
+					// First-load suspend (content never shown): show fallback.
+					// When hasContent, a refresh suspend keeps the stale content
+					// mounted instead of flashing fallback — stale-while-
+					// revalidate (ASYNC.md §6.2). Child effects read the
+					// retained value via $await's staleValue and re-render with
+					// the new value when the promise resolves.
+					if (renderFallback !== null) {
+						renderBranch(1, renderFallback);
+					} else {
+						runControlBranch(region, index, 1);
+						index = 1;
+					}
 				}
 			}
 		}

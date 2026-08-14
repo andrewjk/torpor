@@ -35,6 +35,9 @@ export default function $await<T>(fn: () => Promise<T>): T {
 		didError: false,
 		didSuspend: false,
 		generation: 0,
+		hasResolved: false,
+		suspendQuiet: false,
+		staleValue: undefined,
 		rollback: null,
 	};
 
@@ -52,11 +55,28 @@ export default function $await<T>(fn: () => Promise<T>): T {
 		) {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
+			// Stash the previously resolved value before runComputed overwrites
+			// `value` with this new promise. suspendRead returns it to readers
+			// during the refresh so an `@loading` boundary keeps displaying the
+			// old content instead of flashing fallback — stale-while-revalidate
+			// (ASYNC.md §6.2). Inside run(), computed.value still holds the
+			// previous run's result; undefined on a first load (hasResolved).
+			computed.staleValue = computed.hasResolved ? computed.value : undefined;
+			// Capture the quiet-on-refresh decision at suspend time
+			// (ASYNC.md §7.4). `recalc` is still true during a source-driven
+			// re-run — `checkComputed` clears it only after `runComputed`
+			// returns — so a suspend is quiet iff the computed has resolved
+			// before AND this run wasn't triggered by a dependency change
+			// (i.e. a bare refresh, e.g. a future `refresh()` primitive).
+			// First loads are loud (`hasResolved` is false); dep-change
+			// refreshes are loud (`recalc` is true).
+			computed.suspendQuiet = computed.hasResolved && !computed.recalc;
 			(value as Promise<T>).then(
 				(v: T) => {
 					if (computed.generation !== gen) return;
 					computed.value = v;
 					computed.didSuspend = false;
+					computed.hasResolved = true;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();
@@ -66,6 +86,7 @@ export default function $await<T>(fn: () => Promise<T>): T {
 					computed.value = e;
 					computed.didError = true;
 					computed.didSuspend = false;
+					computed.hasResolved = true;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();

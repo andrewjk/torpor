@@ -13,15 +13,28 @@ import trackSignal from "./trackSignal";
  * Called when a read hits a `didSuspend` computed. Subscribes the reader (so
  * resolve re-runs it through the normal reactive graph), propagates the
  * suspend up the cache chain by tainting the active reader, and notifies the
- * nearest `@loading` boundary. Returns `undefined` as a placeholder — the
- * boundary discards the partial render.
+ * nearest `@loading` boundary.
+ *
+ * Return value (stale-while-revalidate, ASYNC.md §6.2): on a refresh suspend
+ * (the computed has resolved before) returns the previously resolved value
+ * held in `staleValue`, so readers keep displaying the old content instead of
+ * a placeholder — an `@loading` boundary thus keeps its content mounted
+ * rather than flashing fallback. On a first load (`staleValue` is undefined)
+ * returns `undefined`, which the boundary replaces with its fallback. In peek
+ * mode (used by `$pending`) always returns `undefined` — the value isn't
+ * needed, only the subscription.
  */
-function suspendRead(signal: Computed): undefined {
+function suspendRead(signal: Computed): any {
 	trackSignal(signal);
 	// In peek mode (used by $pending), track the signal for subscription but
-	// don't taint the reader or notify the boundary — just record the hit
+	// don't taint the reader or notify the boundary. Record a "loud" hit only
+	// for non-quiet suspends — a bare refresh (suspendQuiet) stays quiet per
+	// ASYNC.md §7.4, so $pending returns false for it. The signal is still
+	// tracked above so $pending re-evaluates when the quiet refresh resolves.
 	if (context.suspendPeek) {
-		context.suspendPeekHit = true;
+		if (!signal.suspendQuiet) {
+			context.suspendPeekHit = true;
+		}
 		return undefined;
 	}
 	if (context.activeTarget !== null) {
@@ -41,7 +54,7 @@ function suspendRead(signal: Computed): undefined {
 			context.activeTarget = oldActive;
 		}
 	}
-	return undefined;
+	return signal.staleValue;
 }
 
 export default function proxyGet(

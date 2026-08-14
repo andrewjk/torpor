@@ -24,6 +24,9 @@ export default function $cache<T>(fn: () => T): T {
 		didError: false,
 		didSuspend: false,
 		generation: 0,
+		hasResolved: false,
+		suspendQuiet: false,
+		staleValue: undefined,
 		rollback: null,
 		//name: dev.effectName(fn),
 	};

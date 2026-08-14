@@ -94,9 +94,10 @@ export default interface Context {
 	suspendPeek: boolean;
 
 	/**
-	 * Set by `suspendRead` when a suspended computed is read in peek mode.
-	 * `$pending` resets this before running its tracking function and checks
-	 * it after.
+	 * Set by `suspendRead` when a suspended computed is read in peek mode, but
+	 * only for *loud* suspends (not bare refreshes — see `Computed.suspendQuiet`
+	 * and ASYNC.md §7.4). `$pending` resets this before running its tracking
+	 * function and returns it as the result.
 	 */
 	suspendPeekHit: boolean;
 

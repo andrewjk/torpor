@@ -1,19 +1,23 @@
 import context from "../render/context";
 
 /**
- * Returns `true` if any value read inside `fn` is currently suspended (a
- * `$await` getter whose promise hasn't resolved yet). A reactive query for
- * inline "loading…" indicators — the calling effect subscribes to the same
- * computeds, so `$pending` re-evaluates when they resolve.
+ * Returns `true` if any value read inside `fn` is currently suspended in a
+ * "loud" way — a `$await` getter whose promise hasn't resolved yet. A reactive
+ * query for inline "loading…" indicators: the calling effect subscribes to the
+ * same computeds, so `$pending` re-evaluates when they resolve.
  *
  * Uses a "peek mode" internally: reads during `fn` are tracked for
  * subscription but don't propagate taint or notify a `@loading` boundary.
  * This lets `$pending` return a plain boolean without itself suspending.
  *
- * Note: this is the basic version — it returns `true` whenever a read
- * computed is in-flight, regardless of whether it's a first load or a
- * refresh. The "quiet on bare refresh" semantics (ASYNC.md §7.4) are a
- * future enhancement.
+ * Quiet-on-refresh semantics (ASYNC.md §7.4): a suspend is *quiet* — and
+ * therefore `$pending` returns `false` for it — when the computed has resolved
+ * before and the re-fetch wasn't triggered by a tracked dependency change (a
+ * "bare refresh", e.g. a future `refresh()` primitive). This matches Solid's
+ * stale-while-revalidate default: re-asking the same question shouldn't ping
+ * the user. First loads and dependency-change refreshes are loud (`true`).
+ * Quiet-ness is captured per computed at suspend time via `suspendQuiet`
+ * (computed in `$await`'s run from `hasResolved` and `recalc`).
  *
  * @param fn A function that reads the reactive values to check.
  */

@@ -117,12 +117,21 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
 
 ### Not yet implemented
 
-- **`$pending` query — basic version implemented.** Returns `true` whenever a
-  read computed is in-flight, without the "quiet on bare refresh" semantics
-  (ASYNC.md §7.4 open question: how to distinguish first-load from refresh).
-  The peek-mode mechanism (`context.suspendPeek`) is the right hook for the
-  full version — it would also need a "did a signal change since last
-  resolve" check.
+- **`$pending` query — quiet-on-refresh implemented.** `$pending` now
+  distinguishes first-load and dependency-change refreshes (both *loud* →
+  `true`) from a bare refresh (re-fetch with no dependency change → *quiet* →
+  `false`), per ASYNC.md §7.4. The decision is captured at suspend time in
+  `$await`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
+  on resolve/reject) and `suspendQuiet` (`hasResolved && !recalc`). The peek
+  branch in `proxyGet.suspendRead` only records a loud hit when
+  `!suspendQuiet`. Torpor has no `refresh()` primitive yet, so a bare refresh
+  can't be triggered through the public API — the quiet path is exercised in
+  `test/pending` by calling `runComputed` directly (what a future `refresh()`
+  would do). When `refresh()` lands, it re-runs the computed without setting
+  `recalc`, and `$pending` stays quiet automatically. §7.8's "first-load
+  semantics" open question is resolved: first load is per-computed (via
+  `hasResolved`), and an `@if` branch that mounts and reads a never-resolved
+  computed is a first load; reading an already-resolved computed is not.
 - **Compiler check for promise-getter requirement.** Not yet implemented
   (ASYNC.md §7.2). The compiler should reject promise-returning getters
   that use `$cache` instead of `$await`. Currently enforced at runtime by

@@ -10,8 +10,6 @@ import runEffect from "./runEffect";
  * of its sources have changed) and re-runs it if necessary.
  */
 export default function checkEffect(effect: Effect): void {
-	//console.log(`checking effect '${effect.name}'`);
-
 	let rerun = checkSources(effect);
 
 	if (rerun) {

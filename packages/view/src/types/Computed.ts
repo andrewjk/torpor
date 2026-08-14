@@ -67,6 +67,40 @@ export default interface Computed<T = any> {
 	generation: number;
 
 	/**
+	 * True once an `$await` computed's promise has resolved or rejected at
+	 * least once. Used by `$pending` to distinguish a first load (never
+	 * resolved) from a refresh. Monotonic — once true it stays true across
+	 * subsequent re-suspends. Unused by plain `$cache` computeds.
+	 */
+	hasResolved: boolean;
+
+	/**
+	 * True when the current suspend is a "bare refresh" — a re-fetch with no
+	 * tracked dependency change (e.g. a future `refresh()` primitive), per
+	 * ASYNC.md §7.4's quiet-on-refresh rule. `$pending` reads this to stay
+	 * quiet (return `false`) on bare refreshes, matching Solid's
+	 * stale-while-revalidate default.
+	 *
+	 * Captured at suspend time inside `$await`'s run: a suspend is quiet iff
+	 * the computed has resolved before (`hasResolved`) AND the run was NOT
+	 * source-driven (`recalc === false`, i.e. not triggered by
+	 * `checkComputed`). First loads are always loud (`hasResolved` is false);
+	 * dependency-change refreshes are always loud (`recalc` is true).
+	 */
+	suspendQuiet: boolean;
+
+	/**
+	 * The previously resolved value, retained across a refresh suspend for
+	 * stale-while-revalidate (ASYNC.md §6.2). Captured inside `$await`'s run
+	 * before `runComputed` overwrites `value` with the new promise; read by
+	 * `suspendRead` so readers keep displaying the old value instead of a
+	 * placeholder while the new promise is in flight. `undefined` on first
+	 * load (never resolved) and for plain `$cache` computeds (which never
+	 * suspend, so `suspendRead` is never reached for them).
+	 */
+	staleValue: any;
+
+	/**
 	 * A subscription to roll back to when recursively updating signal targets.
 	 */
 	rollback: Subscription | null;
