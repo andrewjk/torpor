@@ -8,6 +8,7 @@ import newRegion from "./newRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
 import runControlBranch from "./runControlBranch";
+import widenAncestorsAtAnchor from "./widenAncestorsAtAnchor";
 
 /**
  * Returns true if any source of the effect is a suspended `Computed`
@@ -154,5 +155,11 @@ export default function runAwait(
 		}
 
 		popRegion(oldRegion);
+
+		// A later run that switched branches may have rendered content
+		// before our anchor that an ancestor's node window doesn't cover —
+		// widen those windows so clearing the ancestor can't orphan the
+		// content (see widenAncestorsAtAnchor).
+		widenAncestorsAtAnchor(region, anchor);
 	}, name);
 }

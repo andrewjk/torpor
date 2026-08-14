@@ -48,6 +48,12 @@ export default function clearRegion(region: Region): void {
 function clearNodes(region: Region) {
 	// Clear the nodes for this region
 	if (region.startNode !== null && region.endNode !== null) {
+		// The node that follows the region's content, captured before any
+		// removal — after the backward walk below, it is the first remaining
+		// node at the region's position (e.g. the control's anchor that
+		// branch content was rendered before).
+		const after = region.endNode.nextSibling;
+
 		// The stop boundary is normally the region's own start node. But when
 		// an inner control (e.g. an @if inside a @for item) has re-rendered and
 		// replaced the nodes the start node originally pointed at, the start
@@ -84,6 +90,29 @@ function clearNodes(region: Region) {
 		// belongs to the sibling.
 		if (!fallback && currentNode === region.startNode) {
 			currentNode.remove();
+		}
+
+		// Repair ancestor node windows whose start node was just removed.
+		//
+		// When a control branch's content is cleared, ancestor regions whose
+		// window was WIDENED to that content (see widenAncestorsAtAnchor) are
+		// left with a detached startNode. A later moveRegion on such an
+		// ancestor would resurrect the detached node (insertBefore re-attaches
+		// it). Reset any detached ancestor start to the first node that
+		// remains at the cleared position: the node after the removed span —
+		// `after`, or `stop` when the fallback kept the preceding sibling's
+		// end node as the boundary.
+		const firstRemaining = (fallback ? stop : after) as ChildNode | null;
+		if (firstRemaining !== null) {
+			let ancestor: Region | null = region.previousRegion;
+			let ancestorDepth = region.depth;
+			while (ancestor !== null && ancestor.depth < ancestorDepth) {
+				if (ancestor.startNode !== null && ancestor.startNode.parentNode === null) {
+					ancestor.startNode = firstRemaining;
+				}
+				ancestorDepth = ancestor.depth;
+				ancestor = ancestor.previousRegion;
+			}
 		}
 	}
 	releaseRegion(region);

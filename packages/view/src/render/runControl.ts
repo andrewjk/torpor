@@ -3,6 +3,7 @@ import $run from "../watch/$run";
 import context from "./context";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
+import widenAncestorsAtAnchor from "./widenAncestorsAtAnchor";
 
 /**
  * Runs an `if`, `switch` or `await` control statement
@@ -42,39 +43,11 @@ export default function runControl(
 
 		popRegion(oldRegion);
 
-		// Widen ancestor regions whose node window starts at our anchor.
-		//
-		// A region that owns only a control's anchor comment captures
-		// `startNode = endNode = anchor` when it mounts (e.g. a `@for` row
-		// whose body is a single `@if`). Content rendered by a LATER re-run
-		// of this control is inserted into the live DOM just BEFORE the
-		// anchor — outside that window — so clearing the owning region would
-		// remove only the anchor and orphan the branch content. At mount
-		// time this can't happen (content is added to the region's detached
-		// fragment first, so its `startNode` already covers it), which is
-		// why only re-runs need this fix.
-		//
-		// The first node of the newly rendered content is the first child
-		// region of this control that owns nodes. Ancestors are the regions
-		// with strictly decreasing depth on the `previousRegion` chain.
-		if (anchor !== null) {
-			let child = region.nextRegion;
-			while (child !== null && child.depth > region.depth && child.startNode === null) {
-				child = child.nextRegion;
-			}
-			if (child !== null && child.depth > region.depth && child.startNode !== anchor) {
-				const firstNode = child.startNode;
-				let ancestor = region.previousRegion;
-				let ancestorDepth = region.depth;
-				while (ancestor !== null && ancestor.depth < ancestorDepth) {
-					if (ancestor.startNode === anchor) {
-						ancestor.startNode = firstNode;
-					}
-					ancestorDepth = ancestor.depth;
-					ancestor = ancestor.previousRegion;
-				}
-			}
-		}
+		// A later re-run may have rendered content before our anchor that
+		// an ancestor's node window doesn't cover — widen those windows so
+		// clearing the ancestor can't orphan the content (see
+		// widenAncestorsAtAnchor).
+		widenAncestorsAtAnchor(region, anchor);
 
 		// While hydrating, reset the cursor to the control's anchor after its
 		// content has been hydrated. The branches leave the cursor deep inside
