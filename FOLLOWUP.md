@@ -28,11 +28,11 @@ bench.mjs `servers` entries were updated.
   `news/torpor` SSR fixture + harness TARGETS updates; deferred (see the
   "everything feasible" option).
 
-### async-composition — now portable (`$await` model)
+### async-composition — now portable (`$async` model)
 
 The `async-composition` transition gate (`retainedOldResourceValues` — old
 dashboard stays visible while the new version loads) previously failed because
-`@await` tears down on promise reassignment. The fixture was ported to `$await`
+`@await` tears down on promise reassignment. The fixture was ported to `$async`
 getters: each resource is a getter keyed on `$props.version`, and reads return
 the retained `staleValue` during a re-fetch, so the version-bump transition
 keeps showing old values — the gate's exact requirement. `owner` is guarded to
@@ -122,10 +122,17 @@ messages:[...c.messages, {id:2}]}))`; then
   already exists. Tests to add: reassign nested array then read/`find`+mutate
   a deep element, after an initial deep read.
 
-## Async model Stage B — `@loading` boundary
+## Async model Stage B + C — `@await` boundary
 
-Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
-`@loading` boundary, and the parser/codegen/runtime pipeline.
+Stage B (ASYNC.md §7.7) shipped `$async` (promise indicator + `didSuspend`),
+the `@await` boundary, and the parser/codegen/runtime pipeline. Stage C is
+also done: the old `@await (p) {…} then (v) {…} catch (e) {…}` control was
+**removed** (the parser errors on the old `@await (expr)` form with a
+migration hint), and the boundary syntax was renamed from
+`@loading {…} @fallback {…}` to `@await {…} with {…}`. Runtime internals were
+renamed to match: `runLoading`→`runAwait`, `t_run_loading`→`t_run_await`,
+`LoadingBoundary`→`AwaitBoundary`, `context.loadingBoundary`→
+`context.awaitBoundary`.
 
 ### Not yet implemented
 
@@ -133,12 +140,12 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
   distinguishes first-load and dependency-change refreshes (both *loud* →
   `true`) from a bare refresh (re-fetch with no dependency change → *quiet* →
   `false`), per ASYNC.md §7.4. The decision is captured at suspend time in
-  `$await`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
+  `$async`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
   on resolve/reject) and `suspendQuiet` (`hasResolved && !recalc`). The peek
   branch in `proxyGet.suspendRead` only records a loud hit when
   `!suspendQuiet`. **`$refresh` primitive landed** (`watch/$refresh.ts`):
-  `$refresh(fn)` collects the `$await` computeds read by `fn` (a new
-  `Computed.isAwait` marker + a `context.refreshSignals` collector hooked into
+  `$refresh(fn)` collects the `$async` computeds read by `fn` (a new
+  `Computed.isAsync` marker + a `context.refreshSignals` collector hooked into
   both `proxyGet` read paths) and re-runs each, **loud by default** (recalc
   left true so the suspend is loud and `$pending` flips `true`, plus a
   propagate-at-start so `$pending` indicators flip on immediately — the
@@ -160,11 +167,11 @@ Stage B (ASYNC.md §7.7) shipped `$await` (promise indicator + `didSuspend`),
   reading an already-resolved computed is not.
 - **Compiler check for promise-getter requirement.** Not yet implemented
   (ASYNC.md §7.2). The compiler should reject promise-returning getters
-  that use `$cache` instead of `$await`. Currently enforced at runtime by
+  that use `$cache` instead of `$async`. Currently enforced at runtime by
   the `$cache` guard. A static check would need type information the
   template compiler doesn't have — TypeScript's own type checker is the
   natural home for this.
-- **Fine-grained updates within `@loading` content.** The boundary effect
+- **Fine-grained updates within `@await` content.** The boundary effect
   re-runs on any dependency change and may re-render content if suspend
   state changed. Non-suspend dep changes (e.g. a toggle inside content)
   are handled by child effects, but the `anySourceSuspended` check walks
@@ -189,14 +196,14 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 ### Not yet implemented (Stage B / follow-up)
 
 - **Server build imports for the async primitives dangle.** `buildServerCode.ts`
-  importsMap maps `$await`, `$pending`, and `$refresh` to `@torpor/view/ssr`,
+  importsMap maps `$async`, `$pending`, and `$refresh` to `@torpor/view/ssr`,
   but `src/ssr.ts` (and the built `dist/ssr.mjs`) export none of them — they're
   client-only APIs. A server-rendered component whose script references one
-  would emit a broken `import { $await } from "@torpor/view/ssr"`. Pre-existing
-  for `$await`/`$pending`; `$refresh` follows the same pattern. Fix options: add
+  would emit a broken `import { $async } from "@torpor/view/ssr"`. Pre-existing
+  for `$async`/`$pending`; `$refresh` follows the same pattern. Fix options: add
   no-op server stubs, or drop them from the server importsMap (they never run
   server-side).
-- **`$refresh` first-read double fetch.** If `fn` reads an `$await` getter that
+- **`$refresh` first-read double fetch.** If `fn` reads an `$async` getter that
   the UI has never read, the collection read initializes it (starts a fetch),
   then the refresh re-runs it (second fetch); the first resolve is ignored via
   the generation guard. Normal components always render the getter first, so
@@ -228,8 +235,9 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
 - **Server `t_try_body` snapshot** discards any `t_head` appended before the
   throw (`buildServerCode.ts` / `buildServerTryNode.ts` restore only `t_body`).
   An erroring render that had already appended `<head>` tags leaves them.
-- **`@catch` without a preceding `@try`/`@await`** is silently dropped by the
-  parser (matches pre-existing `@then` behavior); no error is raised.
+- **`@catch` without a preceding `@try`** is silently dropped by the
+  parser (matches pre-existing `@else`/`@with`-without-group behavior); no
+  error is raised.
 - **Hydration dual-branch walk.** When the server renders the catch branch and
   the client's try branch throws, the failed try-branch build advances the
   hydration cursor; `saveHydration`/`restoreHydration` rewind it before the

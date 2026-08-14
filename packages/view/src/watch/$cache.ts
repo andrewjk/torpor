@@ -15,7 +15,7 @@ export default function $cache<T>(fn: () => T): T {
 
 	let computed: Computed = {
 		type: COMPUTED_TYPE,
-		isAwait: false,
+		isAsync: false,
 		value: null,
 		run: fn,
 		firstSource: null,
@@ -45,7 +45,7 @@ export default function $cache<T>(fn: () => T): T {
 		computed.value !== undefined &&
 		typeof (computed.value as any).then === "function"
 	) {
-		throw new Error("$cache returned a Promise — use $await for async getters");
+		throw new Error("$cache returned a Promise — use $async for async getters");
 	}
 
 	return computed.value;

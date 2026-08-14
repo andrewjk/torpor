@@ -5,7 +5,6 @@ import buildAwaitNode from "./buildAwaitNode";
 import buildForNode from "./buildForNode";
 import buildHtmlNode from "./buildHtmlNode";
 import buildIfNode from "./buildIfNode";
-import buildLoadingNode from "./buildLoadingNode";
 import buildReplaceNode from "./buildReplaceNode";
 import buildScriptNode from "./buildScriptNode";
 import buildSwitchNode from "./buildSwitchNode";
@@ -46,19 +45,10 @@ export default function buildControlNode(node: ControlNode, status: BuildStatus,
 			break;
 		}
 		case "@await":
-		case "@then":
+		case "@with":
 		case "@try":
 		case "@catch": {
 			// These get handled with @await group or @try group, above
-			break;
-		}
-		case "@loading group": {
-			buildLoadingNode(node, status, b);
-			break;
-		}
-		case "@loading":
-		case "@fallback": {
-			// These get handled with @loading group, above
 			break;
 		}
 		case "@try group": {

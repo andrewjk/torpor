@@ -1,4 +1,4 @@
-import { $await } from "@torpor/view";
+import { $async } from "@torpor/view";
 import { $pending } from "@torpor/view";
 import { $refresh } from "@torpor/view";
 import $run from "../../../../src/watch/$run";
@@ -24,7 +24,7 @@ export default function SelfDisablingRefresh(
 	let fetchCount = 0;
 	let $state = $watch({
 		get users() {
-			return $await(() => {
+			return $async(() => {
 				const count = ++fetchCount;
 				return new Promise((resolve) => {
 					setTimeout(() => resolve("users #" + count), 10);

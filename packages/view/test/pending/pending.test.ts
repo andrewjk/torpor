@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
-import $await from "../../src/watch/$await";
+import $async from "../../src/watch/$async";
 import $pending from "../../src/watch/$pending";
 import $run from "../../src/watch/$run";
 import $watch from "../../src/watch/$watch";
@@ -16,7 +16,7 @@ test("$pending returns true while awaiting, false after resolve", async () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 	});
 
@@ -56,7 +56,7 @@ test("$pending doesn't cause the calling effect to suspend", () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 	});
 
@@ -79,15 +79,14 @@ test("$pending re-evaluates on re-suspend", async () => {
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(
-				() =>
-					$state.version === 0
-						? new Promise<string>((r) => {
-								resolveFirst = r;
-							})
-						: new Promise<string>((r) => {
-								resolveSecond = r;
-							}),
+			return $async(() =>
+				$state.version === 0
+					? new Promise<string>((r) => {
+							resolveFirst = r;
+						})
+					: new Promise<string>((r) => {
+							resolveSecond = r;
+						}),
 			);
 		},
 	});
@@ -123,15 +122,14 @@ test("$pending: first load is loud, dependency-change refresh is loud", async ()
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(
-				() =>
-					$state.version === 0
-						? new Promise<string>((r) => {
-								resolveFirst = r;
-							})
-						: new Promise<string>((r) => {
-								resolveSecond = r;
-							}),
+			return $async(() =>
+				$state.version === 0
+					? new Promise<string>((r) => {
+							resolveFirst = r;
+						})
+					: new Promise<string>((r) => {
+							resolveSecond = r;
+						}),
 			);
 		},
 	});
@@ -178,15 +176,14 @@ test("$pending is quiet on a bare refresh (no dependency change)", async () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(
-				() =>
-					++call === 1
-						? new Promise<string>((r) => {
-								resolveFirst = r;
-							})
-						: new Promise<string>((r) => {
-								resolveBare = r;
-							}),
+			return $async(() =>
+				++call === 1
+					? new Promise<string>((r) => {
+							resolveFirst = r;
+						})
+					: new Promise<string>((r) => {
+							resolveBare = r;
+						}),
 			);
 		},
 	});
@@ -228,28 +225,26 @@ test("$pending: a loud refresh after a quiet one reads as pending", async () => 
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(
-				() => {
-					// Read version so a real dependency change re-runs this;
-					// the bare refresh below bypasses that path by calling
-					// runComputed directly (recalc stays false).
-					void $state.version;
-					++call;
-					if (call === 1) {
-						return new Promise<string>((r) => {
-							resolveFirst = r;
-						});
-					}
-					if (call === 2) {
-						return new Promise<string>((r) => {
-							resolveBare = r;
-						});
-					}
+			return $async(() => {
+				// Read version so a real dependency change re-runs this;
+				// the bare refresh below bypasses that path by calling
+				// runComputed directly (recalc stays false).
+				void $state.version;
+				++call;
+				if (call === 1) {
 					return new Promise<string>((r) => {
-						resolveLoud = r;
+						resolveFirst = r;
 					});
-				},
-			);
+				}
+				if (call === 2) {
+					return new Promise<string>((r) => {
+						resolveBare = r;
+					});
+				}
+				return new Promise<string>((r) => {
+					resolveLoud = r;
+				});
+			});
 		},
 	});
 

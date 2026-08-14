@@ -144,28 +144,28 @@ let $state = $watch({
 
 `$cache` supports chains (a cached getter depending on another cached getter).
 
-### `$await(fn)` — async getter
+### `$async(fn)` — async getter
 
 Caches a promise-returning getter. The peer of `$cache` for async values: only
 valid inside a getter, lazy, and re-fetched when dependencies change. While the
-promise is pending, reads of the getter suspend — pair with `@loading` for the
-fallback:
+promise is pending, reads of the getter suspend — pair with `@await` for the
+`with`-branch fallback:
 
 ```torp
 let $state = $watch({
 	get user() {
-		return $await(() => fetchUser($props.id));
+		return $async(() => fetchUser($props.id));
 	},
 });
 ```
 
-A getter whose result is a Promise must use `$await`, not `$cache` (`$cache`
+A getter whose result is a Promise must use `$async`, not `$cache` (`$cache`
 throws if it returns a Promise).
 
 ### `$pending(fn)` — is it loading?
 
 Reactive query for inline "loading…" indicators. Returns `true` while any
-`$await` getter read inside `fn` is pending in a **loud** way — a first load,
+`$async` getter read inside `fn` is pending in a **loud** way — a first load,
 a dependency-change refresh, or a `$refresh` (loud by default). A _silent_
 `$refresh(fn, { silent: true })` (background revalidation) stays quiet:
 
@@ -176,7 +176,7 @@ a dependency-change refresh, or a `$refresh` (loud by default). A _silent_
 
 ### `$refresh(fn)` — re-fetch without a dependency change
 
-Re-runs the `$await` getters read inside `fn`, starting a fresh fetch with no
+Re-runs the `$async` getters read inside `fn`, starting a fresh fetch with no
 tracked dependency change. `$cache` getters are ignored. Use for pull-to-
 refresh, refresh buttons, refetch-on-focus, polling, and retry-after-error:
 
@@ -188,9 +188,9 @@ function refresh() {
 
 A `$refresh` is **loud by default**: `$pending` reads `true` and inline
 "updating…" indicators flip on while the re-fetch is in flight, while readers
-keep displaying the previously resolved value (no flicker); an `@loading`
-boundary keeps its content mounted instead of flashing fallback. On resolve,
-subscribers update through the normal reactive graph.
+keep displaying the previously resolved value (no flicker); an `@await`
+boundary keeps its content mounted instead of flashing the `with` branch. On
+resolve, subscribers update through the normal reactive graph.
 
 **Show a spinner during a refresh** — no option needed; just read `$pending`:
 
@@ -200,10 +200,10 @@ function pullToRefresh() {
 }
 
 @render {
-	@loading {
+	@await {
 		@if ($pending(() => $state.data)) { <Spinner /> }  	// shows on refresh
 		<ul>{items}</ul>
-	} fallback {
+	} with {
 		<Skeleton />                                        // first load only
 	}
 	<div onpointerdown={pullToRefresh} />
@@ -323,42 +323,50 @@ Keyed list rendering. The `@key` value decides item identity for diffing.
 
 String case values and missing-default are supported.
 
-### `@await` / `then` / `catch`
+### `@await` / `with` — async boundary
 
-Reactive async rendering. Re-renders the matching branch as the promise
-resolves/rejects:
+Renders content that reads `$async` getters, showing the `with` branch while
+any read is still pending. The content block commits only once nothing inside
+suspends; an `@await` boundary tracks every `$async` read in its subtree (its
+own block only, not the whole component):
 
 ```torp
-@await ($state.guesser) {
+@await {
+	<p>Is it a number? {$state.guesser}</p>
+} with {
 	<p>Hmm...</p>
-} then (number) {
-	<p>Is it a number? {number}</p>
-} catch (ex) {
-	<p class="error">Something went wrong: {ex}!</p>
 }
 ```
 
-Reassigning the awaited value (e.g. `$state.guesser = guessNumber(100)`)
-restarts the whole cycle.
+- Without a `with` branch, nothing renders while suspended.
+- Sibling `@await` boundaries are independent — each gets its own `with`
+  branch and resolves on its own.
+- Once content has rendered, a later suspend during a refresh **keeps the
+  stale content** mounted (stale-while-revalidate) instead of flashing the
+  `with` branch.
+- Async rejections surface as errors — catch them with `@try`/`@catch` (or the
+  top-level `@error`).
 
 ### `@try` / `catch` — error boundary
 
 Catches **sync render errors** thrown while rendering the `@try` subtree:
 component render errors, getter / computed errors, `@const` / `@if` condition
-throws, and errors that bubble up from child components. The `catch` branch
-renders in place of the failed content:
+throws, async rejections surfaced through `$async` reads, and errors that
+bubble up from child components. The `catch` branch renders in place of the
+failed content:
 
 ```torp
 @try {
-	@const user = fetchUser($props.id)
-	<p>Hello, {user.name}!</p>
+	@await {
+		<p>Hello, {user.name}!</p>
+	} with {
+		<p>Loading…</p>
+	}
 } catch (err) {
 	<p class="error">Couldn't load user: {err.message}</p>
 }
 ```
 
-- `@catch` is shared with `@await`; it attaches to whichever of `@try` or
-  `@await` is most recent in the same parent.
 - A `@try` without a `catch` renders its content and lets errors bubble up to
   the nearest boundary.
 - If a tracked dependency is read _directly_ by the `@try` control (e.g. via a

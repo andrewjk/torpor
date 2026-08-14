@@ -77,7 +77,7 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	activeRegion: null,
 	previousRegion: null,
 	rootRegion: null,
-	loadingBoundary: null,
+	awaitBoundary: null,
 	suspendPeek: false,
 	suspendPeekHit: false,
 	refreshSignals: null,
@@ -908,9 +908,9 @@ function suspendRead(signal) {
 		return;
 	}
 	if (context.activeTarget !== null) context.activeTarget.didSuspend = true;
-	if (context.loadingBoundary !== null) {
-		context.loadingBoundary.suspended = true;
-		const boundaryEffect = context.loadingBoundary.effect;
+	if (context.awaitBoundary !== null) {
+		context.awaitBoundary.suspended = true;
+		const boundaryEffect = context.awaitBoundary.effect;
 		if (boundaryEffect !== null && boundaryEffect !== context.activeTarget) {
 			const oldActive = context.activeTarget;
 			context.activeTarget = boundaryEffect;
@@ -941,7 +941,7 @@ function proxyGet(target, key, receiver) {
 					};
 					const result = Reflect.get(target, key, receiver);
 					const registered = data.signals.get(key);
-					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAwait) context.refreshSignals.push(registered);
+					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAsync) context.refreshSignals.push(registered);
 					if (registered !== void 0 && registered.type === 1 && registered.didSuspend) return suspendRead(registered);
 					return result;
 				} finally {
@@ -953,7 +953,7 @@ function proxyGet(target, key, receiver) {
 		} else trackProxySignal(data, key);
 	} else if (signal.type === 0) trackProxySignal(data, key);
 	else if (signal.type === 1) {
-		if (context.refreshSignals !== null && signal.isAwait) {
+		if (context.refreshSignals !== null && signal.isAsync) {
 			context.refreshSignals.push(signal);
 			return signal.value;
 		}
@@ -1272,7 +1272,7 @@ function anySourceSuspended(effect) {
 	}
 	return false;
 }
-function runLoading(region, anchor, renderContent, renderFallback, name) {
+function runAwait(region, anchor, renderContent, renderWith, name) {
 	const boundary = {
 		suspended: false,
 		effect: null
@@ -1282,7 +1282,7 @@ function runLoading(region, anchor, renderContent, renderFallback, name) {
 	let hasContent = false;
 	let theEffect = null;
 	const gen = region.generation = (region.generation ?? 0) + 1;
-	$run(function runLoading() {
+	$run(function runAwait() {
 		if (region.generation !== gen) return;
 		theEffect = context.activeTarget;
 		boundary.effect = theEffect;
@@ -1291,21 +1291,21 @@ function runLoading(region, anchor, renderContent, renderFallback, name) {
 		const renderBranch = (targetIndex, fn) => {
 			runControlBranch(region, index, targetIndex);
 			context.previousRegion = region;
-			const oldR = pushRegion(newRegion(targetIndex === 0 ? "loading_content" : "loading_fallback"), true);
+			const oldR = pushRegion(newRegion(targetIndex === 0 ? "await_content" : "await_with"), true);
 			fn(anchor);
 			popRegion(oldR);
 			index = targetIndex;
 		};
 		const attemptContent = () => {
-			const oldBoundary = context.loadingBoundary;
-			context.loadingBoundary = boundary;
+			const oldBoundary = context.awaitBoundary;
+			context.awaitBoundary = boundary;
 			boundary.suspended = false;
 			const savedHydration = context.hydrationNode;
 			if (savedHydration !== null) context.hydrationNode = null;
 			renderBranch(0, renderContent);
 			if (savedHydration !== null) context.hydrationNode = savedHydration;
-			context.loadingBoundary = oldBoundary;
-			if (boundary.suspended && renderFallback !== null) renderBranch(1, renderFallback);
+			context.awaitBoundary = oldBoundary;
+			if (boundary.suspended && renderWith !== null) renderBranch(1, renderWith);
 			else if (!boundary.suspended) hasContent = true;
 		};
 		if (theEffect === null) attemptContent();
@@ -1313,7 +1313,7 @@ function runLoading(region, anchor, renderContent, renderFallback, name) {
 			const targetIndex = anySourceSuspended(theEffect) ? 1 : 0;
 			if (targetIndex !== index) {
 				if (targetIndex === 0) attemptContent();
-				else if (!hasContent) if (renderFallback !== null) renderBranch(1, renderFallback);
+				else if (!hasContent) if (renderWith !== null) renderBranch(1, renderWith);
 				else {
 					runControlBranch(region, index, 1);
 					index = 1;
@@ -1347,11 +1347,11 @@ function $batch(fn) {
 		batchEnd();
 	}
 }
-function $await(fn) {
-	if (context.registerComputed === null) throw new Error("$await must be used in a getter");
+function $async(fn) {
+	if (context.registerComputed === null) throw new Error("$async must be used in a getter");
 	const computed = {
 		type: 1,
-		isAwait: true,
+		isAsync: true,
 		value: null,
 		run: null,
 		firstSource: null,
@@ -1420,7 +1420,7 @@ function $cache(fn) {
 	if (context.registerComputed === null) throw new Error("$cache must be used in a getter");
 	let computed = {
 		type: 1,
-		isAwait: false,
+		isAsync: false,
 		value: null,
 		run: fn,
 		firstSource: null,
@@ -1438,7 +1438,7 @@ function $cache(fn) {
 	};
 	context.registerComputed(computed);
 	runComputed(computed);
-	if (computed.value !== null && computed.value !== void 0 && typeof computed.value.then === "function") throw new Error("$cache returned a Promise — use $await for async getters");
+	if (computed.value !== null && computed.value !== void 0 && typeof computed.value.then === "function") throw new Error("$cache returned a Promise — use $async for async getters");
 	return computed.value;
 }
 function $handle(fn) {
@@ -1559,10 +1559,10 @@ let t_rerun_region_effects = rerunRegionEffects;
 let t_restore_hydration = restoreHydration;
 let t_root = nodeRoot;
 let t_root_el = nodeRootElement;
+let t_run_await = runAwait;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
-let t_run_loading = runLoading;
 let t_save_hydration = saveHydration;
 let t_skip = nodeSkip;
 let t_style = buildStyles;

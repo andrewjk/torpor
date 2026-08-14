@@ -34,6 +34,24 @@ Recorded medians (2026-07-09): octane-tsrx init 20.1ms
 solid 19.0/18.6ms; ripple 19.2/17.5ms. (Pre-pipeline, 2026-07-08: octane was
 174.8/172.4ms — 10.9× the floor, the waterfall this suite existed to pin.)
 
+## Torpor result (2026-08-14)
+
+The torpor fixture was ported from the legacy `@await (p) { … } then (v) { … }`
+control (removed — ASYNC.md §7.7 Stage C) to `$async` getters + `@await { … }
+with { … }` boundaries. The old `@await` nested the child inside the resolved
+branch, so level N+1 didn't mount — nor fetch — until level N resolved: the
+11× structural waterfall. The `@await` boundary renders its content
+speculatively on first mount, which mounts the nested child and starts its
+fetch, so every level's fetch starts in the first wave — there is no
+structural waterfall in the model. Recorded run (5 samples):
+
+| target | init | update |
+| --- | ---: | ---: |
+| torpor | 20.6ms (1.3× floor) | 17.4ms (1.1×) |
+
+Torpor lands at the parallel floor alongside octane's compiler-eliminated
+`use` and the parallel-by-model frameworks (Solid/ripple).
+
 ## Guards
 
 Octane is ratio-guarded on BOTH sides now: ≤0.25× React (a regression back

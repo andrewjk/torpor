@@ -17,7 +17,7 @@ const importsMap: Record<string, string> = {
 	$bind: 'import { $bind } from "${folder}";',
 	$handle: 'import { $handle } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
-	$await: 'import { $await } from "${folder}";',
+	$async: 'import { $async } from "${folder}";',
 	$pending: 'import { $pending } from "${folder}";',
 	$refresh: 'import { $refresh } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
@@ -33,7 +33,7 @@ const importsMap: Record<string, string> = {
 	t_run_branch: 'import { t_run_branch } from "${folder}";',
 	t_list_item: 'import { t_list_item } from "${folder}";',
 	t_run_list: 'import { t_run_list } from "${folder}";',
-	t_run_loading: 'import { t_run_loading } from "${folder}";',
+	t_run_await: 'import { t_run_await } from "${folder}";',
 	t_add_fragment: 'import { t_add_fragment } from "${folder}";',
 	t_add_element: 'import { t_add_element } from "${folder}";',
 	t_apply_props: 'import { t_apply_props } from "${folder}";',
@@ -133,7 +133,7 @@ function buildTemplate(
 	if (/\$bind\b/.test(script)) imports.add("$bind");
 	if (/\$handle\b/.test(script)) imports.add("$handle");
 	if (/\$cache\b/.test(script)) imports.add("$cache");
-	if (/\$await\b/.test(script)) imports.add("$await");
+	if (/\$async\b/.test(script)) imports.add("$async");
 	if (/\$pending\b/.test(script)) imports.add("$pending");
 	if (/\$refresh\b/.test(script)) imports.add("$refresh");
 	if (/\$run\b/.test(script)) imports.add("$run");

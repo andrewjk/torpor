@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
-import $await from "../../src/watch/$await";
+import $async from "../../src/watch/$async";
 import $cache from "../../src/watch/$cache";
 import $pending from "../../src/watch/$pending";
 import $refresh from "../../src/watch/$refresh";
@@ -9,13 +9,13 @@ import $watch from "../../src/watch/$watch";
 
 const tick = () => new Promise((r) => setTimeout(r));
 
-test("$refresh re-runs the $await thunk and updates on resolve", async () => {
+test("$refresh re-runs the $async thunk and updates on resolve", async () => {
 	let call = 0;
 	let resolvers: ((v: string) => void)[] = [];
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -53,7 +53,7 @@ test("$refresh works from outside any effect (event-handler style)", async () =>
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -87,7 +87,7 @@ test("$refresh with silent:true is quiet — $pending stays false", async () => 
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -120,7 +120,7 @@ test("$refresh with silent:true doesn't re-run subscribers at refresh start", as
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -154,7 +154,7 @@ test("$refresh keeps showing the stale value while the new fetch is in flight", 
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -186,7 +186,7 @@ test("$refresh re-fetches a computed that has never resolved (retry first load)"
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -217,7 +217,7 @@ test("$refresh recovers after an error (retry-after-error)", async () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				if (++call === 1) return Promise.reject(new Error("boom"));
 				return Promise.resolve("recovered");
 			});
@@ -250,14 +250,14 @@ test("$refresh recovers after an error (retry-after-error)", async () => {
 	expect(errors).toEqual(["boom"]);
 });
 
-test("$refresh re-fetches every $await getter read by fn", async () => {
+test("$refresh re-fetches every $async getter read by fn", async () => {
 	let calls = { a: 0, b: 0 };
 	let resolversA: ((v: string) => void)[] = [];
 	let resolversB: ((v: string) => void)[] = [];
 
 	let $state = $watch({
 		get a() {
-			return $await(() => {
+			return $async(() => {
 				calls.a++;
 				return new Promise<string>((resolve) => {
 					resolversA.push(resolve);
@@ -265,7 +265,7 @@ test("$refresh re-fetches every $await getter read by fn", async () => {
 			});
 		},
 		get b() {
-			return $await(() => {
+			return $async(() => {
 				calls.b++;
 				return new Promise<string>((resolve) => {
 					resolversB.push(resolve);
@@ -305,7 +305,7 @@ test("$refresh ignores $cache computeds", () => {
 			return $cache(() => ++cacheCalls);
 		},
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				return new Promise<string>((resolve) => {
 					resolvers.push(resolve);
 				});
@@ -324,13 +324,13 @@ test("$refresh ignores $cache computeds", () => {
 		void $state.data;
 	});
 
-	// The $await computed was re-run (new fetch queued); the $cache getter was
+	// The $async computed was re-run (new fetch queued); the $cache getter was
 	// not re-computed.
 	expect(cacheCalls).toBe(1);
 	expect(resolvers).toHaveLength(2);
 });
 
-test("$refresh with no $await getters is a no-op", () => {
+test("$refresh with no $async getters is a no-op", () => {
 	let $state = $watch({
 		value: 42,
 	});
@@ -350,7 +350,7 @@ test("$refresh is loud by default — $pending flips true at refresh start", asy
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;
@@ -386,7 +386,7 @@ test("$refresh is loud by default — keeps showing the stale value (no flicker)
 
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const i = call++;
 				return new Promise<string>((resolve) => {
 					resolvers[i] = resolve;

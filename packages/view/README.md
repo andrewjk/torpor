@@ -25,7 +25,7 @@ npm install torpor
   - `@if` statement
   - `@for` loop
   - `@switch` statement
-  - `@await` statement for loading data from an async function
+  - `@await` async boundary (with `with` branch) for loading `$async` getters
   - And
     - `@replace` to re-run a section when a property changes
     - `@const` to declare a const variable in markup
@@ -66,10 +66,16 @@ export default function Component($props: { name: string }) {
     // Use the $watch function to declare reactive state
     let $state = $watch({
         count: 0,
+        guessVersion: 0,
         get isEven() {
             return this.count % 2 === 0
         },
-        tasks: []
+        tasks: [],
+        // An async getter: $async tracks the promise and suspends reads until
+        // it resolves. Reading guessVersion makes it re-fetch on "Guess again".
+        get guesser() {
+            return $async(() => guessNumber($state.guessVersion === 0 ? 1000 : 500))
+        }
     })
 
     // Use the $run function to declare an effect that runs whenever its dependent state changes
@@ -80,7 +86,6 @@ export default function Component($props: { name: string }) {
     })
 
     // This is an async function
-    $state.guesser = guessNumber(1000)
     async function guessNumber(ms) {
         ...
     }
@@ -147,17 +152,19 @@ export default function Component($props: { name: string }) {
             </div>
 
             <h2>Await statements</h2>
-            <p>There is a construct for await/then/catch.</p>
+            <p>Read $async getters inside @await blocks; use @try/@catch for errors.</p>
             <div class="demo">
                 <p>Think of a number between 1 and 10...</p>
-                @await ($state.guesser) {
-                    <p>Hmm...</p>
-                } then (number) {
-                    <p>Is it {number}?</p>
+                @try {
+                    @await {
+                        <p>Is it {$state.guesser}?</p>
+                    } with {
+                        <p>Hmm...</p>
+                    }
                 } catch (ex) {
                     <p class="error">Something went wrong: {ex}!</p>
                 }
-                <button onclick={() => $state.guesser = guessNumber(500)}>
+                <button onclick={() => $state.guessVersion++}>
                     Guess again
                 </button>
             </div>

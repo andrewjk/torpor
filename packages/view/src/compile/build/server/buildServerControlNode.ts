@@ -5,7 +5,6 @@ import buildServerAwaitNode from "./buildServerAwaitNode";
 import buildServerForNode from "./buildServerForNode";
 import buildServerHtmlNode from "./buildServerHtmlNode";
 import buildServerIfNode from "./buildServerIfNode";
-import buildServerLoadingNode from "./buildServerLoadingNode";
 import buildServerReplaceNode from "./buildServerReplaceNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
@@ -50,19 +49,10 @@ export default function buildServerControlNode(
 			break;
 		}
 		case "@await":
-		case "@then":
+		case "@with":
 		case "@try":
 		case "@catch": {
 			// These get handled with @await group or @try group, above
-			break;
-		}
-		case "@loading group": {
-			buildServerLoadingNode(node, status, b);
-			break;
-		}
-		case "@loading":
-		case "@fallback": {
-			// These get handled with @loading group, above
 			break;
 		}
 		case "@try group": {

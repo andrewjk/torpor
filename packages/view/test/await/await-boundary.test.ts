@@ -7,11 +7,11 @@ import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
 
 const source = `
-export default function LoadingTest() {
+export default function AwaitTest() {
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(
+			return $async(
 				() =>
 					new Promise((resolve) => {
 						setTimeout(() => resolve("loaded v" + $state.version), 10);
@@ -21,21 +21,21 @@ export default function LoadingTest() {
 	});
 
 	@render {
-		@loading {
+		@await {
 			<p>Result: {$state.data}</p>
-		} fallback {
+		} with {
 			<p>Loading...</p>
 		}
 	}
 }
 `;
 
-test("@loading shows fallback then content -- mounted", async () => {
+test("@await shows the with-branch then content -- mounted", async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
-	// Initially suspended → fallback
+	// Initially suspended → with-branch
 	expect(queryByText(container, "Loading...")).not.toBeNull();
 	expect(queryByText(container, "Result: loaded v0")).toBeNull();
 
@@ -45,17 +45,17 @@ test("@loading shows fallback then content -- mounted", async () => {
 	expect(queryByText(container, "Loading...")).toBeNull();
 });
 
-test("@loading without fallback shows nothing while suspended", async () => {
+test("@await without a with-branch shows nothing while suspended", async () => {
 	const sourceNoFallback = `
-	export default function LoadingNoFallback() {
+	export default function AwaitNoWith() {
 		let $state = $watch({
 			get data() {
-				return $await(() => Promise.resolve("quick"));
+				return $async(() => Promise.resolve("quick"));
 			},
 		});
 
 		@render {
-			@loading {
+			@await {
 				<p>Value: {$state.data}</p>
 			}
 		}
@@ -72,22 +72,22 @@ test("@loading without fallback shows nothing while suspended", async () => {
 	await waitFor(() => expect(queryByText(container, "Value: quick")).not.toBeNull());
 });
 
-test("@loading hydrated shows fallback then content", async () => {
+test("@await hydrated shows the with-branch then content", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	// Server renders fallback; client hydrates and eventually shows content
+	// Server renders the with-branch; client hydrates and eventually shows content
 	const { waitFor } = await import("@testing-library/dom");
 	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
 });
 
 const twoListsSource = `
-export default function LoadingTwoLists() {
+export default function AwaitTwoLists() {
 	let $state = $watch({
 		get listA() {
-			return $await(
+			return $async(
 				() =>
 					new Promise((resolve) => {
 						setTimeout(() => resolve("A loaded"), 10);
@@ -95,7 +95,7 @@ export default function LoadingTwoLists() {
 			);
 		},
 		get listB() {
-			return $await(
+			return $async(
 				() =>
 					new Promise((resolve) => {
 						setTimeout(() => resolve("B loaded"), 20);
@@ -105,24 +105,24 @@ export default function LoadingTwoLists() {
 	});
 
 	@render {
-		@loading {
+		@await {
 			<p>A: {$state.listA}</p>
-		} fallback {
+		} with {
 			<p>Loading A...</p>
 		}
-		@loading {
+		@await {
 			<p>B: {$state.listB}</p>
-		} fallback {
+		} with {
 			<p>Loading B...</p>
 		}
 	}
 }
 `;
 
-test("sibling @loading boundaries are independent per async getter", async () => {
-	// One boundary tracks every $await read inside its OWN subtree, not the
+test("sibling @await boundaries are independent per async getter", async () => {
+	// One boundary tracks every $async read inside its OWN subtree, not the
 	// whole component. Two sibling boundaries — one per filtered list — give
-	// each its own fallback and resolve independently.
+	// each its own with-branch and resolve independently.
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, twoListsSource, "client");
 	mountComponent(container, component);
@@ -133,7 +133,7 @@ test("sibling @loading boundaries are independent per async getter", async () =>
 	expect(queryByText(container, "Loading A...")).not.toBeNull();
 	expect(queryByText(container, "Loading B...")).not.toBeNull();
 
-	// A resolves first; B keeps its own fallback
+	// A resolves first; B keeps its own with-branch
 	await waitFor(() => expect(queryByText(container, "A: A loaded")).not.toBeNull());
 	expect(queryByText(container, "Loading A...")).toBeNull();
 	expect(queryByText(container, "Loading B...")).not.toBeNull();
@@ -145,11 +145,11 @@ test("sibling @loading boundaries are independent per async getter", async () =>
 });
 
 const staleSource = `
-export default function LoadingStale() {
+export default function AwaitStale() {
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				// Read version synchronously so the computed tracks it and
 				// re-fetches when it changes (reading inside setTimeout would
 				// run in an untracked context).
@@ -166,9 +166,9 @@ export default function LoadingStale() {
 	}
 
 	@render {
-		@loading {
+		@await {
 			<p>Result: {$state.data}</p>
-		} fallback {
+		} with {
 			<p>Loading...</p>
 		}
 		<button onclick={refresh}>refresh</button>
@@ -176,21 +176,21 @@ export default function LoadingStale() {
 }
 `;
 
-test("@loading keeps stale content during a refresh instead of flashing fallback", async () => {
+test("@await keeps stale content during a refresh instead of flashing the with-branch", async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, staleSource, "client");
 	mountComponent(container, component);
 
 	const { waitFor } = await import("@testing-library/dom");
 
-	// First load: fallback, then resolved content
+	// First load: with-branch, then resolved content
 	expect(queryByText(container, "Loading...")).not.toBeNull();
 	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
 	expect(queryByText(container, "Loading...")).toBeNull();
 
 	// Trigger a refresh (dependency change → re-fetch). While the new promise
 	// is in flight the boundary must keep showing the old resolved content
-	// (stale-while-revalidate) rather than flashing fallback.
+	// (stale-while-revalidate) rather than flashing the with-branch.
 	const button = container.getElementsByTagName("button")[0];
 	await userEvent.click(button);
 

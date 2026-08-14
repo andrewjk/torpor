@@ -28,7 +28,7 @@ import t_restore_hydration from "./render/restoreHydration";
 import t_run_control from "./render/runControl";
 import t_run_branch from "./render/runControlBranch";
 import t_run_list from "./render/runList";
-import t_run_loading from "./render/runLoading";
+import t_run_await from "./render/runAwait";
 import t_save_hydration from "./render/saveHydration";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
@@ -41,7 +41,7 @@ import type ListItemSpec from "./types/ListItemSpec";
 import type SlotRender from "./types/SlotRender";
 import type StyleValue from "./types/StyleValue";
 import $batch from "./watch/$batch";
-import $await from "./watch/$await";
+import $async from "./watch/$async";
 import $bind from "./watch/$bind";
 import $cache from "./watch/$cache";
 import $handle from "./watch/$handle";
@@ -63,7 +63,7 @@ export {
 	$handle,
 	$bind,
 	$cache,
-	$await,
+	$async,
 	$pending,
 	$refresh,
 	$run,
@@ -102,7 +102,7 @@ export {
 	t_run_branch,
 	t_list_item,
 	t_run_list,
-	t_run_loading,
+	t_run_await,
 	t_save_hydration,
 	t_restore_hydration,
 	t_attribute,

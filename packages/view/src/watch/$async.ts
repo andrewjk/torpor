@@ -19,14 +19,14 @@ import runComputed from "./runComputed";
  * @param fn A thunk returning the Promise to await. Signal reads inside `fn`
  *   are tracked, so the fetch re-runs when dependencies change.
  */
-export default function $await<T>(fn: () => Promise<T>): T {
+export default function $async<T>(fn: () => Promise<T>): T {
 	if (context.registerComputed === null) {
-		throw new Error("$await must be used in a getter");
+		throw new Error("$async must be used in a getter");
 	}
 
 	const computed: Computed = {
 		type: COMPUTED_TYPE,
-		isAwait: true,
+		isAsync: true,
 		value: null,
 		run: null as unknown as () => any,
 		firstSource: null,
@@ -50,16 +50,12 @@ export default function $await<T>(fn: () => Promise<T>): T {
 	// generation guard without any changes to runComputed or checkComputed.
 	computed.run = () => {
 		const value = fn();
-		if (
-			value !== null &&
-			value !== undefined &&
-			typeof (value as any).then === "function"
-		) {
+		if (value !== null && value !== undefined && typeof (value as any).then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
 			// Stash the previously resolved value before runComputed overwrites
 			// `value` with this new promise. suspendRead returns it to readers
-			// during the refresh so an `@loading` boundary keeps displaying the
+			// during the refresh so an `@await` boundary keeps displaying the
 			// old content instead of flashing fallback — stale-while-revalidate
 			// (ASYNC.md §6.2). Inside run(), computed.value still holds the
 			// previous run's result; undefined on a first load (hasResolved).

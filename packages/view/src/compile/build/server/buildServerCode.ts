@@ -12,7 +12,7 @@ const importsMap: Record<string, string> = {
 	$bind: 'import { $bind } from "${folder}";',
 	$handle: 'import { $handle } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
-	$await: 'import { $await } from "${folder}";',
+	$async: 'import { $async } from "${folder}";',
 	$pending: 'import { $pending } from "${folder}";',
 	$refresh: 'import { $refresh } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
@@ -75,7 +75,7 @@ function buildServerTemplate(
 	if (/\$bind\b/.test(script)) imports.add("$bind");
 	if (/\$handle\b/.test(script)) imports.add("$handle");
 	if (/\$cache\b/.test(script)) imports.add("$cache");
-	if (/\$await\b/.test(script)) imports.add("$await");
+	if (/\$async\b/.test(script)) imports.add("$async");
 	if (/\$pending\b/.test(script)) imports.add("$pending");
 	if (/\$refresh\b/.test(script)) imports.add("$refresh");
 	if (/\$run\b/.test(script)) imports.add("$run");

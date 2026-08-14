@@ -23,7 +23,7 @@ const context: Context =
 		previousRegion: null as unknown as Region,
 		rootRegion: null as unknown as Region,
 
-		loadingBoundary: null,
+		awaitBoundary: null,
 
 		suspendPeek: false,
 		suspendPeekHit: false,

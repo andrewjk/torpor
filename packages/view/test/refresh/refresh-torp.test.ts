@@ -10,7 +10,7 @@ export default function RefreshTorp() {
 	let fetchCount = 0;
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const count = ++fetchCount;
 				return new Promise((resolve) => {
 					setTimeout(() => resolve("loaded #" + count), 10);
@@ -24,9 +24,9 @@ export default function RefreshTorp() {
 	}
 
 	@render {
-		@loading {
+		@await {
 			<p>Result: {$state.data}</p>
-		} fallback {
+		} with {
 			<p>Loading...</p>
 		}
 		<button onclick={refresh}>refresh</button>
@@ -34,21 +34,21 @@ export default function RefreshTorp() {
 }
 `;
 
-test("refresh button re-fetches a $await getter without a dependency change", async () => {
+test("refresh button re-fetches a $async getter without a dependency change", async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
 	const { waitFor } = await import("@testing-library/dom");
 
-	// First load: fallback, then resolved content
+	// First load: with-branch, then resolved content
 	expect(queryByText(container, "Loading...")).not.toBeNull();
 	await waitFor(() => expect(queryByText(container, "Result: loaded #1")).not.toBeNull());
 	expect(queryByText(container, "Loading...")).toBeNull();
 
 	// A bare refresh — no dependency changes. While the new promise is in
 	// flight the boundary keeps showing the old content (stale-while-
-	// revalidate) rather than flashing fallback.
+	// revalidate) rather than flashing the with-branch.
 	const button = container.getElementsByTagName("button")[0];
 	await userEvent.click(button);
 
@@ -65,7 +65,7 @@ export default function RefreshSpinner() {
 	let fetchCount = 0;
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const count = ++fetchCount;
 				return new Promise((resolve) => {
 					setTimeout(() => resolve("loaded #" + count), 10);
@@ -79,9 +79,9 @@ export default function RefreshSpinner() {
 	}
 
 	@render {
-		@loading {
+		@await {
 			<p>Result: {$state.data}</p>
-		} fallback {
+		} with {
 			<p>Loading...</p>
 		}
 		@if ($pending(() => $state.data)) {
@@ -99,7 +99,7 @@ test("refresh is loud by default — $pending drives an inline spinner while in 
 
 	const { waitFor } = await import("@testing-library/dom");
 
-	// First load: fallback → content; the first-load pending shows the spinner
+	// First load: with-branch → content; the first-load pending shows the spinner
 	// but it disappears once content arrives.
 	expect(queryByText(container, "Loading...")).not.toBeNull();
 	await waitFor(() => expect(queryByText(container, "Result: loaded #1")).not.toBeNull());
@@ -124,7 +124,7 @@ export default function RefreshSkeleton() {
 	let fetchCount = 0;
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const count = ++fetchCount;
 				return new Promise((resolve) => {
 					setTimeout(() => resolve("loaded #" + count), 10);
@@ -138,12 +138,12 @@ export default function RefreshSkeleton() {
 	}
 
 	@render {
-		@loading {
+		@await {
 			@if ($pending(() => $state.data)) {
 				<p class="spinner">Updating...</p>
 			}
 			<p>Result: {$state.data}</p>
-		} fallback {
+		} with {
 			<p class="skeleton">Loading...</p>
 		}
 		<button onclick={refresh}>refresh</button>
@@ -153,8 +153,8 @@ export default function RefreshSkeleton() {
 
 test("skeleton on load, spinner on refresh — the spinner lives inside the content branch", async () => {
 	// The skeleton/spinner split doesn't need a mode flag on $pending: put the
-	// $pending spinner inside the @loading content branch. On first load the
-	// content branch is discarded in favor of the fallback (skeleton), so only
+	// $pending spinner inside the @await content branch. On first load the
+	// content branch is discarded in favor of the with-branch (skeleton), so only
 	// the skeleton shows; on a refresh the content stays mounted and the
 	// spinner appears.
 	const container = document.createElement("div");
@@ -189,7 +189,7 @@ export default function SelfDisablingRefresh() {
 	let fetchCount = 0;
 	let $state = $watch({
 		get users() {
-			return $await(() => {
+			return $async(() => {
 				const count = ++fetchCount;
 				return new Promise((resolve) => {
 					setTimeout(() => resolve("users #" + count), 10);

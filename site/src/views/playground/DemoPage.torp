@@ -182,10 +182,14 @@ export default function Index($props: { name: string }) {
 		<Repl
 			input={`
 export default function Index($props: { name: string }) {
-	let $state = $watch({})
+	let $state = $watch({
+		guessVersion: 0,
+		get guesser() {
+			return $async(() => guessNumber($state.guessVersion === 0 ? 1000 : 500))
+		},
+	})
 
 	let attempt = 0
-	$state.guesser = guessNumber(1000)
 	async function guessNumber(ms) {
 		attempt++
 		return new Promise((ok, err) => {
@@ -199,17 +203,19 @@ export default function Index($props: { name: string }) {
 
 	@render {
 		<h2>Await statements</h2>
-		<p>There is a construct for await/then/catch.</p>
+		<p>Read $async getters inside @await blocks; use @try/@catch for errors.</p>
 		<div class="demo">
 			<p>Think of a number between 1 and 10...</p>
-			@await ($state.guesser) {
-				<p>Hmm...</p>
-			} then (number) {
-				<p>Is it {number}?</p>
+			@try {
+				@await {
+					<p>Is it {$state.guesser}?</p>
+				} with {
+					<p>Hmm...</p>
+				}
 			} catch (ex) {
 				<p class="error">Something went wrong: {ex}!</p>
 			}
-			<button onclick={() => $state.guesser = guessNumber(500)}>
+			<button onclick={() => $state.guessVersion++}>
 				Guess again
 			</button>
 		</div>

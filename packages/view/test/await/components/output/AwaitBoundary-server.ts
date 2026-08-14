@@ -1,8 +1,8 @@
-import { $await } from "@torpor/view/ssr";
+import { $async } from "@torpor/view/ssr";
 import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function LoadingStale(
+export default function AwaitStale(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -13,7 +13,7 @@ export default function LoadingStale(
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				// Read version synchronously so the computed tracks it and
 				// re-fetches when it changes (reading inside setTimeout would
 				// run in an untracked context).

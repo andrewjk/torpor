@@ -1,8 +1,8 @@
 import type Animation from "./Animation";
+import type AwaitBoundary from "./AwaitBoundary";
 import type Cleanup from "./Cleanup";
 import type Computed from "./Computed";
 import type Effect from "./Effect";
-import type LoadingBoundary from "./LoadingBoundary";
 import type ProxySignal from "./ProxySignal";
 import type Region from "./Region";
 
@@ -77,13 +77,13 @@ export default interface Context {
 	rootRegion: Region;
 
 	/**
-	 * The innermost active `@loading` boundary's suspend mailbox, or null
-	 * when not inside a loading boundary. The proxy get trap sets
+	 * The innermost active `@await` boundary's suspend mailbox, or null
+	 * when not inside an await boundary. The proxy get trap sets
 	 * `.suspended = true` on this when a read hits a `didSuspend` computed;
-	 * the boundary effect checks it after rendering content to decide
-	 * fallback vs content. Save/restored across nested boundaries.
+	 * the boundary effect checks it after rendering content to decide between
+	 * the content and `with` branches. Save/restored across nested boundaries.
 	 */
-	loadingBoundary: LoadingBoundary | null;
+	awaitBoundary: AwaitBoundary | null;
 
 	/**
 	 * When `true`, `suspendRead` suppresses taint propagation and boundary
@@ -103,10 +103,10 @@ export default interface Context {
 
 	/**
 	 * When non-null, `$refresh` is running its tracking function. Every
-	 * `$await` computed read during `fn` is appended here so `$refresh` can
+	 * `$async` computed read during `fn` is appended here so `$refresh` can
 	 * re-run them as bare refreshes (ASYNC.md §7.4 / `$refresh`). `$cache`
 	 * computeds are never collected. Reading a computed in this mode does not
-	 * recalc, taint, or notify a loading boundary — collection is a pure peek.
+	 * recalc, taint, or notify a  boundary — collection is a pure peek.
 	 */
 	refreshSignals: Computed[] | null;
 

@@ -23,9 +23,11 @@ export default function buildServerAwaitNode(
 		status.output = "";
 	}
 
-	// Build the await statement
+	// On the server, render the `with` branch (the pending state) since the
+	// promise hasn't resolved yet. The client will hydrate and swap to content
+	// when the $async getter resolves.
 	for (let branch of node.children) {
-		if (isControlNode(branch) && branch.operation === "@await") {
+		if (isControlNode(branch) && branch.operation === "@with") {
 			buildServerAwaitBranch(branch, status, b);
 		}
 	}

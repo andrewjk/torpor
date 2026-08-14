@@ -8,7 +8,7 @@ Torpor is a full-stack JavaScript framework that aims for simplicity and complet
 
 - Compose your views with JavaScript, HTML and CSS
 - Components are functions with script, markup and styles
-- In-markup JavaScript logic with `@if`, `@for`, `@switch` and `@await` keywords
+- In-markup JavaScript logic with `@if`, `@for`, `@switch`, `@try/@catch`, and `@await` (async boundary) keywords
   - And `@replace`, `@const`, `@console`, `@debugger`, `@function` and `@html`
 - Runtime reactivity via proxies that can be used in any JavaScript file
 - Scoped styles, two-way binding, child components and more -- see [torpor/view](./packages/view)

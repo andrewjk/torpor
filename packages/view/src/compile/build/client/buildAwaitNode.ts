@@ -1,166 +1,64 @@
 import type ControlNode from "../../types/nodes/ControlNode";
 import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
-import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
-import addMappedText from "./addMappedText";
 import addPopDevBoundary from "./addPopDevBoundary";
 import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName ?? "null";
-	const parentName = node.parentName!;
+	const parentName = node.parentName || anchorName + ".parentNode";
 	const regionName = nextVarName("await_region", status);
-	const indexName = nextVarName("await_index", status);
-	const tokenName = nextVarName("await_token", status);
 
 	// Filter non-control branches (spaces)
 	const branches = node.children.filter((n) => isControlNode(n)) as ControlNode[];
-
-	// Make sure all branches exist
-	let awaitBranch = branches.find((n) => n.operation === "@await")!;
-	if (!awaitBranch) {
-		// TODO: Error handling
-	}
-	let thenBranch = branches.find((n) => n.operation === "@then");
-	if (!thenBranch) {
-		thenBranch = {
-			type: "control",
-			operation: "@then",
-			statement: "then",
-			children: [],
-			span: { start: 0, end: 0 },
-		};
-	}
-	let catchBranch = branches.find((n) => n.operation === "@catch");
-	if (!catchBranch) {
-		catchBranch = {
-			type: "control",
-			operation: "@catch",
-			statement: "catch",
-			children: [],
-			span: { start: 0, end: 0 },
-		};
-	}
-
-	const awaiterName = trimMatched(awaitBranch.statement.substring("await".length).trim(), "(", ")");
-	const thenVar = trimMatched(thenBranch.statement.substring("then".length).trim(), "(", ")");
-	const catchVar = trimMatched(catchBranch.statement.substring("catch".length).trim(), "(", ")");
-
-	// Use an incrementing token to make sure only the last request gets handled
-	// TODO: This might have unforeseen consequences
+	const awaitBranch = branches.find((n) => n.operation === "@await");
+	const withBranch = branches.find((n) => n.operation === "@with");
 
 	status.imports.add("t_region");
-	status.imports.add("t_run_control");
-	status.imports.add("t_run_branch");
-	status.imports.add("t_push_region");
-	status.imports.add("t_pop_region");
+	status.imports.add("t_run_await");
 
 	b.append("");
 	b.append("/* @await */");
 
-	addPushDevBoundary("control", `@${branches[0].statement}`, status, b);
+	addPushDevBoundary("control", "@await", status, b);
 
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"await"` : ""});
-		let ${tokenName} = 0;
-		let ${indexName} = -1;
-		t_run_control(${regionName}, ${anchorName}, (t_before) => {`);
+		t_run_await(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
 
-	let index = 0;
-
-	// Build the waiting branch before anything happens
-	buildAwaitBranch(awaitBranch, status, b, parentName, regionName, indexName, index++);
-
-	b.append(`
-		${tokenName}++;
-		((t_token) => {`);
-
-	// TODO: replaceForVarNames is going to throw mapping out
-	awaitBranch.span.start += "await".length + 2;
-	addMappedText("", replaceForVarNames(awaiterName, status), "", awaitBranch.span, status, b);
-
-	// TODO: replaceForVarNames is going to throw mapping out
-	thenBranch.span.start -= 1;
-	addMappedText(
-		".then((",
-		replaceForVarNames(thenVar, status),
-		") => {",
-		thenBranch.span,
-		status,
-		b,
-	);
-
-	b.append(`if (t_token === ${tokenName}) {`);
-	buildAwaitBranch(thenBranch, status, b, parentName, regionName, indexName, index++);
-	b.append(`}
-		})`);
-
-	// TODO: replaceForVarNames is going to throw mapping out
-	catchBranch.span.start -= 1;
-	addMappedText(
-		".catch((",
-		replaceForVarNames(catchVar, status),
-		") => {",
-		catchBranch.span,
-		status,
-		b,
-	);
-
-	b.append(`if (t_token === ${tokenName}) {`);
-	buildAwaitBranch(catchBranch, status, b, parentName, regionName, indexName, index++);
-	b.append(`}
-				});
-			})(${tokenName});
-		}${status.options.dev === true ? `, "runAwait"` : ""});`);
-
-	addPopDevBoundary(status, b);
-
-	b.append("");
-}
-
-function buildAwaitBranch(
-	node: ControlNode,
-	status: BuildStatus,
-	b: Builder,
-	parentName: string,
-	regionName: string,
-	indexName: string,
-	index: number,
-) {
-	b.append(`if (!t_run_branch(${regionName}, ${indexName}, ${index})) return;`);
-
-	if (node.children.length > 0) {
-		// NOTE: for await branches, we need to push the control region again,
-		// because it will have been popped by the time the `then` or `catch`
-		// branches are hit
-		b.append(`
-			const t_new_region = t_region(${status.options.dev === true ? `"await_branch"` : ""});
-			const t_old_control_region = t_push_region(${regionName});
-			const t_old_region = t_push_region(t_new_region, true);
-		`);
-
-		buildFragment(node, status, b, parentName, "t_before");
-
-		status.fragmentStack.push({
-			fragment: node.fragment!,
-			path: "",
-		});
-		for (let child of node.children) {
+	// Content branch children
+	if (awaitBranch !== undefined && awaitBranch.children.length > 0) {
+		buildFragment(awaitBranch, status, b, parentName, "t_before");
+		status.fragmentStack.push({ fragment: awaitBranch.fragment, path: "" });
+		for (let child of awaitBranch.children) {
 			buildNode(child, status, b, parentName, "t_before");
 		}
 		status.fragmentStack.pop();
-
-		buildAddFragment(node, status, b, parentName, "t_before");
-
-		b.append("t_pop_region(t_old_region);");
-		b.append("t_pop_region(t_old_control_region);");
+		buildAddFragment(awaitBranch, status, b, parentName, "t_before");
 	}
 
-	b.append(`${indexName} = ${index};`);
+	// Close content callback; open with-branch (or pass null)
+	if (withBranch !== undefined) {
+		b.append(`}, (${status.inHead ? "" : "t_before"}) => {`);
+		if (withBranch.children.length > 0) {
+			buildFragment(withBranch, status, b, parentName, "t_before");
+			status.fragmentStack.push({ fragment: withBranch.fragment, path: "" });
+			for (let child of withBranch.children) {
+				buildNode(child, status, b, parentName, "t_before");
+			}
+			status.fragmentStack.pop();
+			buildAddFragment(withBranch, status, b, parentName, "t_before");
+		}
+		b.append(`}${status.options.dev === true ? `, "runAwait"` : ""});`);
+	} else {
+		b.append(`}, null${status.options.dev === true ? `, "runAwait"` : ""});`);
+	}
+
+	addPopDevBoundary(status, b);
+	b.append("");
 }

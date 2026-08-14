@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "version": "0.0.1",
-  "description": "async-composition bench fixture for Torpor - dashboard with 8 versioned async resources via $await getters (stale-while-revalidate keeps old values during the version-bump transition). Matches the shared window contract in ../README.md.",
+  "description": "async-composition bench fixture for Torpor - dashboard with 8 versioned async resources via $async getters (stale-while-revalidate keeps old values during the version-bump transition). Matches the shared window contract in ../README.md.",
   "scripts": {
     "dev": "vp dev --host --port 5283 --strictPort",
     "build": "vp build",

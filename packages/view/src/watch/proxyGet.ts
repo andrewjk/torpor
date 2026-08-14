@@ -13,24 +13,24 @@ import trackSignal from "./trackSignal";
  * Called when a read hits a `didSuspend` computed. Subscribes the reader (so
  * resolve re-runs it through the normal reactive graph), propagates the
  * suspend up the cache chain by tainting the active reader, and notifies the
- * nearest `@loading` boundary.
+ * nearest `@await` boundary.
  *
  * Return value (stale-while-revalidate, ASYNC.md §6.2): on a refresh suspend
  * (the computed has resolved before) returns the previously resolved value
  * held in `staleValue`, so readers keep displaying the old content instead of
- * a placeholder — an `@loading` boundary thus keeps its content mounted
- * rather than flashing fallback. On a first load (`staleValue` is undefined)
- * returns `undefined`, which the boundary replaces with its fallback. In peek
- * mode (used by `$pending`) always returns `undefined` — the value isn't
- * needed, only the subscription.
+ * a placeholder — an `@await` boundary thus keeps its content mounted
+ * rather than flashing the `with` branch. On a first load (`staleValue` is
+ * undefined) returns `undefined`, which the boundary replaces with its
+ * `with` branch. In peek mode (used by `$pending`) always returns `undefined`
+ * — the value isn't needed, only the subscription.
  */
 function suspendRead(signal: Computed): any {
 	trackSignal(signal);
 	// In peek mode (used by $pending), track the signal for subscription but
 	// don't taint the reader or notify the boundary. Record a "loud" hit only
-	// for non-quiet suspends — a bare refresh (suspendQuiet) stays quiet per
+	// for non-quiet suspends — a silent refresh (suspendQuiet) stays quiet per
 	// ASYNC.md §7.4, so $pending returns false for it. The signal is still
-	// tracked above so $pending re-evaluates when the quiet refresh resolves.
+	// tracked above so $pending re-evaluates when the silent refresh resolves.
 	if (context.suspendPeek) {
 		if (!signal.suspendQuiet) {
 			context.suspendPeekHit = true;
@@ -40,13 +40,13 @@ function suspendRead(signal: Computed): any {
 	if (context.activeTarget !== null) {
 		context.activeTarget.didSuspend = true;
 	}
-	if (context.loadingBoundary !== null) {
-		context.loadingBoundary.suspended = true;
+	if (context.awaitBoundary !== null) {
+		context.awaitBoundary.suspended = true;
 		// Subscribe the boundary effect to this computed so the boundary
 		// re-runs when the promise resolves. Without this, the subscription
 		// would only exist on child effects that are destroyed when content
 		// is cleared.
-		const boundaryEffect = context.loadingBoundary.effect;
+		const boundaryEffect = context.awaitBoundary.effect;
 		if (boundaryEffect !== null && boundaryEffect !== context.activeTarget) {
 			const oldActive = context.activeTarget;
 			context.activeTarget = boundaryEffect;
@@ -104,14 +104,14 @@ export default function proxyGet(
 
 				const oldRegisterComputed = context.registerComputed;
 				try {
-					// Allow calling `$cache`/`$await` to assign the computed to a
+					// Allow calling `$cache`/`$async` to assign the computed to a
 					// proxy signal
 					context.registerComputed = (computed: Computed) => {
 						data.signals.set(key, computed);
 					};
 					const result = Reflect.get(target, key, receiver);
 					// After running the getter, check if the just-registered
-					// computed suspended (e.g. an $await getter returning a
+					// computed suspended (e.g. an $async getter returning a
 					// pending promise). If so, handle suspend instead of
 					// returning the raw promise.
 					const registered = data.signals.get(key) as Computed | undefined;
@@ -119,9 +119,9 @@ export default function proxyGet(
 						context.refreshSignals !== null &&
 						registered !== undefined &&
 						registered.type === COMPUTED_TYPE &&
-						registered.isAwait
+						registered.isAsync
 					) {
-						// $refresh collection: record the $await computed (this is
+						// $refresh collection: record the $async computed (this is
 						// the first-ever read, so it isn't in data.signals yet).
 						// suspendRead below still runs in peek mode ($refresh sets
 						// suspendPeek), so no taint/boundary notification happens.
@@ -154,8 +154,8 @@ export default function proxyGet(
 		// effect, track it
 		trackProxySignal(data, key);
 	} else if (signal.type === COMPUTED_TYPE) {
-		if (context.refreshSignals !== null && signal.isAwait) {
-			// $refresh collection: record the $await computed so it can be
+		if (context.refreshSignals !== null && signal.isAsync) {
+			// $refresh collection: record the $async computed so it can be
 			// re-run as a bare refresh, then return its current value without
 			// recalc/taint/boundary handling — collection is a pure peek. fn's
 			// result is ignored by $refresh, so the value is only read to
@@ -184,7 +184,7 @@ export default function proxyGet(
 		if (signal.didSuspend) {
 			// The computed returned a pending promise — subscribe the reader
 			// (so resolve re-runs it), taint up the cache chain, and notify
-			// the nearest @loading boundary
+			// the nearest  boundary
 			return suspendRead(signal);
 		}
 		trackSignal(signal);

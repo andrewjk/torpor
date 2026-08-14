@@ -131,10 +131,10 @@ and stays visible under its tightened one-state ceiling.
 ## Torpor result (2026-08-14)
 
 `torpor-async-composition-bench` was ported from the legacy `@await` model to
-`$await` getters and added to the manifest. The old fixture failed the
+`$async` getters and added to the manifest. The old fixture failed the
 transition gate: `@await` tears down on promise reassignment, so the version
 bump immediately replaced old values with pending placeholders
-(`retainedOldResourceValues` false). With `$await`, each resource is a getter
+(`retainedOldResourceValues` false). With `$async`, each resource is a getter
 keyed on `$props.version`; on the version bump the getter re-fetches and reads
 return the retained `staleValue` until the new promise resolves, so the DOM
 keeps showing the previous values throughout the transition — exactly what the

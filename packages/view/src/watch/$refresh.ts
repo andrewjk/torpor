@@ -22,18 +22,18 @@ export interface RefreshOptions {
 }
 
 /**
- * Re-fetches the `$await` getters read inside `fn` without changing a
+ * Re-fetches the `$async` getters read inside `fn` without changing a
  * dependency. A companion to `$pending` (ASYNC.md §6.2): pull-to-refresh,
  * refresh buttons, refetch-on-focus, polling, retry-after-error.
  *
- * `fn` is run in a tracking context that collects every `$await` computed it
+ * `fn` is run in a tracking context that collects every `$async` computed it
  * reads (`$cache` computeds are ignored). Each collected computed is then
  * re-run with `recalc` left true — a "bare refresh" — so the suspend is
  * *loud*: `$pending(fn)` returns `true` while the re-fetch is in flight and
  * subscribers are notified at suspend *start*, so an inline "updating…"
  * indicator appears immediately. Readers keep displaying the previous
  * resolved value (`Computed.staleValue`) until the new promise resolves and
- * propagates through the reactive graph; an `@loading` boundary keeps its
+ * propagates through the reactive graph; an `@await` boundary keeps its
  * content mounted instead of flashing fallback.
  *
  * Pass `{ silent: true }` to re-fetch quietly (stale-while-revalidate):
@@ -74,7 +74,7 @@ export default function $refresh(fn: () => any, options?: RefreshOptions): void 
 	}
 
 	for (const computed of unique) {
-		// Bare refresh: recalc must be true when `$await`'s run captures
+		// Bare refresh: recalc must be true when `$async`'s run captures
 		// suspendQuiet so the suspend reads as loud (suspendQuiet =
 		// hasResolved && !recalc = false), and false for a silent refresh
 		// (quiet). Restore it after the run.

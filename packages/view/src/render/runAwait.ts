@@ -1,5 +1,5 @@
 import type Effect from "../types/Effect";
-import type LoadingBoundary from "../types/LoadingBoundary";
+import type AwaitBoundary from "../types/AwaitBoundary";
 import type Region from "../types/Region";
 import { COMPUTED_TYPE } from "../types/constants";
 import $run from "../watch/$run";
@@ -25,40 +25,41 @@ function anySourceSuspended(effect: Effect): boolean {
 }
 
 /**
- * Renders an `@loading` boundary. On the first run, content is rendered
+ * Renders an `@await` boundary. On the first run, content is rendered
  * speculatively; if any read inside suspends (`didSuspend`), the boundary
- * discards the partial render and shows the fallback branch instead. On
+ * discards the partial render and shows the `with` branch instead. On
  * subsequent runs, the effect checks its own source chain for suspended
  * computeds — only switching branches when the suspend state actually
  * changes, leaving fine-grained child effects to handle value updates.
  *
  * Stale-while-revalidate (ASYNC.md §6.2): once content has been produced
  * (`hasContent`), a subsequent suspend during a refresh does NOT switch to
- * fallback — the boundary keeps the stale content mounted. `$await` retains
- * the previous resolved value (`Computed.staleValue`) and `suspendRead`
- * returns it, so child effects keep displaying the old value until the new
- * promise resolves and updates them in place. Fallback is shown only on the
- * first load, before content has ever rendered successfully.
+ * the `with` branch — the boundary keeps the stale content mounted. `$async`
+ * retains the previous resolved value (`Computed.staleValue`) and
+ * `suspendRead` returns it, so child effects keep displaying the old value
+ * until the new promise resolves and updates them in place. The `with` branch
+ * is shown only on the first load, before content has ever rendered
+ * successfully.
  *
- * @param renderContent Builds the content children (may read $await getters).
- * @param renderFallback Builds the fallback children, or null for empty.
+ * @param renderContent Builds the content children (may read $async getters).
+ * @param renderWith Builds the `with`-branch children, or null for empty.
  */
-export default function runLoading(
+export default function runAwait(
 	region: Region,
 	anchor: Node | null,
 	renderContent: (anchor: Node | null) => void,
-	renderFallback: ((anchor: Node | null) => void) | null,
+	renderWith: ((anchor: Node | null) => void) | null,
 	name?: string,
 ): void {
-	const boundary: LoadingBoundary = { suspended: false, effect: null };
-	let index = -1; // -1 = initial, 0 = content, 1 = fallback
+	const boundary: AwaitBoundary = { suspended: false, effect: null };
+	let index = -1; // -1 = initial, 0 = content, 1 = with
 	let first = true;
 	let hasContent = false; // true once content has rendered without suspending
 	let theEffect: Effect | null = null;
 
 	const gen = (region.generation = (region.generation ?? 0) + 1);
 
-	$run(function runLoading() {
+	$run(function runAwait() {
 		if (region.generation !== gen) return;
 
 		// On the first call, $run hasn't returned yet so theEffect is null.
@@ -76,9 +77,9 @@ export default function runLoading(
 			runControlBranch(region, index, targetIndex);
 			// runControlBranch may have cleared the previous branch, leaving
 			// context.previousRegion pointing at a released region. Reset it
-			// to the loading region so the new branch links correctly.
+			// to the await region so the new branch links correctly.
 			context.previousRegion = region;
-			const branchRegion = newRegion(targetIndex === 0 ? "loading_content" : "loading_fallback");
+			const branchRegion = newRegion(targetIndex === 0 ? "await_content" : "await_with");
 			const oldR = pushRegion(branchRegion, true);
 			fn(anchor);
 			popRegion(oldR);
@@ -86,17 +87,18 @@ export default function runLoading(
 		};
 
 		// Render content with boundary context active; if it suspends and a
-		// fallback exists, immediately switch to fallback
+		// with-branch exists, immediately switch to it
 		const attemptContent = () => {
-			const oldBoundary = context.loadingBoundary;
-			context.loadingBoundary = boundary;
+			const oldBoundary = context.awaitBoundary;
+			context.awaitBoundary = boundary;
 			boundary.suspended = false;
 
-			// During hydration, the server rendered fallback (not content).
-			// Temporarily disable hydration so the speculative content render
-			// creates fresh nodes instead of reusing the server's fallback
-			// nodes (which would be destroyed when content is cleared on
-			// suspend, leaving nothing for fallback to hydrate against).
+			// During hydration, the server rendered the with-branch (not
+			// content). Temporarily disable hydration so the speculative
+			// content render creates fresh nodes instead of reusing the
+			// server's with-branch nodes (which would be destroyed when
+			// content is cleared on suspend, leaving nothing for the
+			// with-branch to hydrate against).
 			const savedHydration = context.hydrationNode;
 			if (savedHydration !== null) {
 				context.hydrationNode = null;
@@ -108,10 +110,10 @@ export default function runLoading(
 				context.hydrationNode = savedHydration;
 			}
 
-			context.loadingBoundary = oldBoundary;
+			context.awaitBoundary = oldBoundary;
 
-			if (boundary.suspended && renderFallback !== null) {
-				renderBranch(1, renderFallback);
+			if (boundary.suspended && renderWith !== null) {
+				renderBranch(1, renderWith);
 			} else if (!boundary.suspended) {
 				// Content rendered without suspending — mark it so a later
 				// refresh suspend keeps showing stale content (§6.2).
@@ -134,14 +136,15 @@ export default function runLoading(
 					// Switching to content — render and check for re-suspend
 					attemptContent();
 				} else if (!hasContent) {
-					// First-load suspend (content never shown): show fallback.
-					// When hasContent, a refresh suspend keeps the stale content
-					// mounted instead of flashing fallback — stale-while-
-					// revalidate (ASYNC.md §6.2). Child effects read the
-					// retained value via $await's staleValue and re-render with
-					// the new value when the promise resolves.
-					if (renderFallback !== null) {
-						renderBranch(1, renderFallback);
+					// First-load suspend (content never shown): show the
+					// with-branch. When hasContent, a refresh suspend keeps
+					// the stale content mounted instead of flashing the
+					// with-branch — stale-while-revalidate (ASYNC.md §6.2).
+					// Child effects read the retained value via $async's
+					// staleValue and re-render with the new value when the
+					// promise resolves.
+					if (renderWith !== null) {
+						renderBranch(1, renderWith);
 					} else {
 						runControlBranch(region, index, 1);
 						index = 1;

@@ -10,7 +10,7 @@ import batchStart from "./batchStart";
 /**
  * Walk the target graph from a signal source (ProxySignal or Computed),
  * marking each dependent as needing recalculation and queuing effects for
- * re-run. Shared between `propagateSignal` (for proxy writes) and `$await`'s
+ * re-run. Shared between `propagateSignal` (for proxy writes) and `$async`'s
  * promise-resolve handler (for async value resolution).
  *
  * Must be called inside `batchStart`/`batchEnd` — callers own the batch.

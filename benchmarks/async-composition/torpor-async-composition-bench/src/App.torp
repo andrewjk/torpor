@@ -1,7 +1,7 @@
 import { loadResource } from "./data.js";
 
-// Dashboard with 8 versioned resources using torpor's `$await` model. Each
-// resource is a component with an `$await` getter keyed on `$props.version`;
+// Dashboard with 8 versioned resources using torpor's `$async` model. Each
+// resource is a component with an `$async` getter keyed on `$props.version`;
 // reading the getter suspends while the promise is pending and returns the
 // retained `staleValue` during a re-fetch, so on a version bump the DOM keeps
 // showing the previous values until the new promises resolve — the keep-old-UI
@@ -16,7 +16,7 @@ import { loadResource } from "./data.js";
 function ProjectHeader($props) {
 	let $state = $watch({
 		get data() {
-			return $await(() => loadResource("project", $props.version));
+			return $async(() => loadResource("project", $props.version));
 		},
 	});
 
@@ -35,7 +35,7 @@ function ProjectHeader($props) {
 function Viewer($props) {
 	let $state = $watch({
 		get data() {
-			return $await(() => loadResource("viewer", $props.version));
+			return $async(() => loadResource("viewer", $props.version));
 		},
 	});
 
@@ -47,7 +47,7 @@ function Viewer($props) {
 function Badge($props) {
 	let $state = $watch({
 		get data() {
-			return $await(() => loadResource("badge", $props.version));
+			return $async(() => loadResource("badge", $props.version));
 		},
 	});
 
@@ -60,7 +60,7 @@ function Owner($props) {
 	let lastOwner = null;
 	let $state = $watch({
 		get data() {
-			return $await(() => {
+			return $async(() => {
 				const ready = $props.ownerId === "owner-" + $props.version;
 				if (!ready) return lastOwner;
 				const promise = loadResource("owner", $props.version, $props.ownerId);
@@ -80,7 +80,7 @@ function Owner($props) {
 function ResourceCell($props) {
 	let $state = $watch({
 		get data() {
-			return $await(() => loadResource($props.name, $props.version));
+			return $async(() => loadResource($props.name, $props.version));
 		},
 	});
 

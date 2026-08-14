@@ -1,11 +1,11 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
-import $await from "../../src/watch/$await";
+import $async from "../../src/watch/$async";
 import $cache from "../../src/watch/$cache";
 import $run from "../../src/watch/$run";
 import $watch from "../../src/watch/$watch";
 
-test("$await suspends then resolves", async () => {
+test("$async suspends then resolves", async () => {
 	let resolvePromise!: (v: string) => void;
 	const promise = new Promise<string>((resolve) => {
 		resolvePromise = resolve;
@@ -13,7 +13,7 @@ test("$await suspends then resolves", async () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 	});
 
@@ -32,7 +32,7 @@ test("$await suspends then resolves", async () => {
 	expect(values).toEqual([undefined, "loaded"]);
 });
 
-test("$await resolved value is cached", async () => {
+test("$async resolved value is cached", async () => {
 	let computeCount = 0;
 	let resolvePromise!: (v: string) => void;
 	const promise = new Promise<string>((resolve) => {
@@ -42,7 +42,7 @@ test("$await resolved value is cached", async () => {
 	let $state = $watch({
 		get data() {
 			computeCount++;
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 	});
 
@@ -67,7 +67,7 @@ test("$await resolved value is cached", async () => {
 	expect(computeCount).toBe(1);
 });
 
-test("$await rejects propagate as errors", async () => {
+test("$async rejects propagate as errors", async () => {
 	let rejectPromise!: (e: any) => void;
 	const promise = new Promise<string>((_resolve, reject) => {
 		rejectPromise = reject;
@@ -75,7 +75,7 @@ test("$await rejects propagate as errors", async () => {
 
 	let $state = $watch({
 		get data() {
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 	});
 
@@ -98,22 +98,21 @@ test("$await rejects propagate as errors", async () => {
 	expect(errors).toEqual(["boom"]);
 });
 
-test("$await ignores stale resolves via generation guard", async () => {
+test("$async ignores stale resolves via generation guard", async () => {
 	let resolveFirst!: (v: string) => void;
 	let resolveSecond!: (v: string) => void;
 
 	let $state = $watch({
 		version: 0,
 		get data() {
-			return $await(
-				() =>
-					$state.version === 0
-						? new Promise<string>((r) => {
-								resolveFirst = r;
-							})
-						: new Promise<string>((r) => {
-								resolveSecond = r;
-							}),
+			return $async(() =>
+				$state.version === 0
+					? new Promise<string>((r) => {
+							resolveFirst = r;
+						})
+					: new Promise<string>((r) => {
+							resolveSecond = r;
+						}),
 			);
 		},
 	});
@@ -144,7 +143,7 @@ test("$await ignores stale resolves via generation guard", async () => {
 	expect(values).toEqual([undefined, undefined, "fresh"]);
 });
 
-test("$await taint propagates through cache chain", async () => {
+test("$async taint propagates through cache chain", async () => {
 	let resolvePromise!: (v: string) => void;
 	const promise = new Promise<string>((resolve) => {
 		resolvePromise = resolve;
@@ -152,10 +151,10 @@ test("$await taint propagates through cache chain", async () => {
 
 	let $state = $watch({
 		get raw() {
-			return $await(() => promise);
+			return $async(() => promise);
 		},
 		get greeting() {
-			// $cache reading a suspended $await getter should also suspend
+			// $cache reading a suspended $async getter should also suspend
 			// (taint propagation) — not cache "Hello, undefined"
 			return $cache(() => "Hello, " + $state.raw);
 		},
@@ -183,6 +182,6 @@ test("$cache throws when it returns a Promise", () => {
 				return $cache(() => Promise.resolve(42));
 			},
 		});
-			void $state.bad;
+		void $state.bad;
 	}).toThrow("$cache returned a Promise");
 });

@@ -386,15 +386,14 @@ runtime machinery. It is a sketch, not a spec; open questions at the end.
 
 | primitive                      | kind                                   | replaces                                                                             |
 | ------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| `$await(fn)`                   | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
+| `$async(fn)`                   | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
 | `@loading { … }`               | control block (boundary)               | the pending/then branches of `@await`                                                |
 | `$pending(fn)`                 | reactive query                         | (new — no equivalent today)                                                          |
 | `@try { … } catch (err) { … }` | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
 | `@error (err) { … }`           | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
 
 Plus, hidden: a **promise indicator** (`didSuspend`) on the `Computed` that
-`$await` creates, which the get trap reads through (§7.2). `@await`/`@then`
-stays during the transition as the legacy single-promise primitive (§7.6).
+`$async` creates, which the get trap reads through (§7.2).
 
 ### 7.2 The promise indicator (hidden machinery)
 
@@ -429,12 +428,12 @@ compose with each other.
 **`Computed` type** — one new field: `didSuspend: boolean`.
 
 **`runComputed.ts` — unchanged.** The thenable check does _not_ live here;
-it lives in `$await` (next subsection). The sync `$cache` hot path pays
+it lives in `$async` (next subsection). The sync `$cache` hot path pays
 nothing.
 
 **`proxyGet.ts` computed-read logic** — add a `didSuspend` branch beside
 `didError`. This applies on both read paths: the first read (where the
-getter has just run via `$await`/`$cache` and registered the computed) and
+getter has just run via `$async`/`$cache` and registered the computed) and
 subsequent reads (the `COMPUTED_TYPE` branch):
 
 ```ts
@@ -455,34 +454,34 @@ return signal.value;
 
 **No throw.** The suspend is data, not control flow.
 
-#### `$await` — the opt-in primitive
+#### `$async` — the opt-in primitive
 
-`$await` is the user-facing way to mark a getter as suspendable. It is a
-peer of `$cache`: `$cache` for sync cached values, `$await` for async
+`$async` is the user-facing way to mark a getter as suspendable. It is a
+peer of `$cache`: `$cache` for sync cached values, `$async` for async
 cached values. A getter uses one or the other, never both.
 
 ```torp
 function Profile($props) {
 	get user() {
-		return $await(() => fetchUser($props.id));
+		return $async(() => fetchUser($props.id));
 	}
 }
 ```
 
-**Signature:** `$await<T>(fn: () => Promise<T>): T`. The thunk runs inside
+**Signature:** `$async<T>(fn: () => Promise<T>): T`. The thunk runs inside
 a `Computed` (so signal reads like `$props.id` are tracked and re-fetch
 happens on change), exactly like `$cache<T>(fn: () => T): T`. Must be used
 in a getter (same constraint as `$cache`, `$cache.ts:12-14`).
 
-**Implementation** — `$await` creates a `Computed` with `run = fn`,
+**Implementation** — `$async` creates a `Computed` with `run = fn`,
 registers it (via the same `context.registerComputed` path `$cache` uses),
 runs it, then does the thenable check + `.then` wiring that §7.2's earlier
 draft had placed in `runComputed`:
 
 ```ts
-function $await<T>(fn: () => Promise<T>): T {
+function $async<T>(fn: () => Promise<T>): T {
 	if (context.registerComputed === null) {
-		throw new Error("$await must be used in a getter");
+		throw new Error("$async must be used in a getter");
 	}
 	let computed: Computed = { /* …same shape as $cache… */ didSuspend: false };
 	context.registerComputed(computed);
@@ -517,17 +516,17 @@ no separate error machinery for async. The `generation` token handles
 stale-resolve on rapid prop changes (§7.8).
 
 **The requirement (enforced).** A getter whose static return type is
-`Promise<T>` must use `$await`, not `$cache`. The compiler rejects
+`Promise<T>` must use `$async`, not `$cache`. The compiler rejects
 promise-returning getters that use `$cache` (or no wrapper). Belt-and-
 suspenders runtime guard in dev: if `$cache`'s result is a thenable, throw
-_"use `$await` for promise-returning getters."_ This dissolves the
+_"use `$async` for promise-returning getters."_ This dissolves the
 "promises that don't pass through `$cache`" long tail: there is no
 bare-promise-read case, because the compiler enforces that every
-promise-returning getter declares itself via `$await`. Promises arriving
-via `$props` or `$context` are wrapped through an `$await`ing getter in
+promise-returning getter declares itself via `$async`. Promises arriving
+via `$props` or `$context` are wrapped through an `$async`ing getter in
 the receiving component.
 
-There is **no function-style `$await(p)` that takes a bare promise** — the
+There is **no function-style `$async(p)` that takes a bare promise** — the
 thunk form is required so that dep tracking and re-fetch work.
 
 #### How suspend propagates without unwinding
@@ -579,49 +578,51 @@ With the flag, suspend and error are cleanly separated — `@try` catches
 errors, `@loading` catches suspends, and they never meet at the same throw
 site.
 
-### 7.3 `@loading` — async boundary
+### 7.3 `@await` — async boundary (shipped; formerly `@loading`, with `with` in place of `@fallback`)
 
 ```torp
 function Profile($props) {
 	get user() {
-		return $await(() => fetchUser($props.id));
+		return $async(() => fetchUser($props.id));
 	}
 
 	@render {
-		@loading {
+		@await {
 		// user reads set didSuspend on first paint → boundary
-		// shows fallback; on resolve, re-renders with the real value
+		// shows the with branch; on resolve, re-renders with the real value
 			<ProfileHeader user={user} />
 			<ProfileBody user={user} />
+		} with {
+			<Skeleton />
 		}
 	}
 }
 ```
 
-- The boundary renders its content with itself on `context.loadingBoundary`.
+- The boundary renders its content with itself on `context.awaitBoundary`.
   If any read inside sets `boundary.suspended` (§7.2), it discards the
-  partial content and renders fallback. Re-render on resolve is automatic:
-  the boundary's effect is a dependent of every suspended computed it read,
-  so the reactive graph drives the retry.
+  partial content and renders the `with` branch. Re-render on resolve is
+  automatic: the boundary's effect is a dependent of every suspended computed
+  it read, so the reactive graph drives the retry.
 - When the promise resolves, the boundary re-renders. **On subsequent
   dependency changes** (e.g., `$props.id` changes), the boundary keeps
   showing stale content during revalidation (Solid's branch-readiness rule).
-  An opt-in `on` clause re-shows fallback for key-level changes:
+  An opt-in `on` clause re-shows the `with` branch for key-level changes:
 
   ```torp
-  @loading on ($props.id) { … }   // re-show fallback when id changes
+  @await on ($props.id) { … }   // re-show with branch when id changes
   ```
 
 - A single boundary commits its content only when no read inside suspends.
-  Two independent pending reads inside one boundary stay on fallback until
-  both resolve; for incremental fill, use nested or sibling boundaries.
-  Sibling `@loading` boundaries are independent by construction — which is
+  Two independent pending reads inside one boundary stay on the `with` branch
+  until both resolve; for incremental fill, use nested or sibling boundaries.
+  Sibling `@await` boundaries are independent by construction — which is
   what parallelizes the waterfall fixture without an authoring change:
   sibling levels each own their own boundary, so fetches start together.
 
-This replaces the pending/then branches of `@await`. Authoring that needs
-the resolved value just reads it (`{$user.name}`); the boundary owns the
-not-ready state.
+This replaces the pending/then branches of the old `@await` control (removed
+in Stage C, §7.7). Authoring that needs the resolved value just reads it
+(`{$user.name}`); the boundary owns the not-ready state.
 
 ### 7.4 `$pending(fn)` — refresh indicator
 
@@ -653,7 +654,7 @@ ship the function form first and add the block later if ergonomics demand.
 
 **Companion primitive: `$refresh(fn)` (implemented).** The quiet-on-refresh
 rule needs a way to trigger a bare refresh — a re-fetch with no dependency
-change. `$refresh(fn)` collects the `$await` computeds read by `fn` and
+change. `$refresh(fn)` collects the `$async` computeds read by `fn` and
 re-runs them, **loud by default** so `$pending` flips `true` and subscribers
 are notified at suspend _start_ (the spinner pattern for pull-to-refresh).
 `$refresh(fn, { silent: true })` opts into the quiet form (§6.2's bare
@@ -689,22 +690,18 @@ model separates errors from any specific promise:
 - One error path. The dual inline-`.error` vs `ErrorBoundary` split that
   Solid 2.0 explicitly rejects (§6.2) is avoided by construction.
 - **Suspend is not an error.** `didSuspend` is handled entirely by
-  `@loading` (§7.3) and never reaches `@try`. This is a benefit of the
+  `@await` (§7.3) and never reaches `@try`. This is a benefit of the
   flag-based design: with a throw-based suspend, `@try` would need to
   distinguish `PromiseNotReady` from real errors by `instanceof` on every
   catch.
 
-Parser-wise, this is the same shape as `@if`/`@else` and
-`@await`/`@then`/`@catch`: a control group with branches. The existing walk
-in `parseControl.ts:252-260` that attaches `@then`/`@catch` to the most
-recent `@await group` extends to attach `@catch` to the most recent
+Parser-wise, this is the same shape as `@if`/`@else`: a control group with
+branches. The walk in `parseControl.ts` attaches `@catch` to the most recent
 `@try group`.
 
-**Naming collision with `@catch`:** it's already used by `@await`. During
-the transition, `wrangleControlNode` (`parseControl.ts:198-282`) attaches
-`@catch` to whichever matching group — `@await group` or `@try group` — is
-most recent in the parent's children. Once `@await` is deprecated (§7.8),
-the collision resolves.
+**Naming collision with `@catch` (resolved).** The old `@await` control's
+`@catch` branch is gone (removed in Stage C, §7.7), so `@catch` attaches only
+to the nearest `@try group` — no collision.
 
 **No `@finally`:** no clear declarative use case; Solid and Svelte don't
 ship one either.
@@ -722,7 +719,7 @@ wrapping noise:
 ```torp
 function Profile($props) {
 	get user() {
-		return $await(() => fetchUser($props.id));
+		return $async(() => fetchUser($props.id));
 	}
 
 	@render {
@@ -787,40 +784,39 @@ runtime:
    break apps), low-risk (no promise machinery), and exercise the parser
    changes for new control groups and a new top-level block without touching
    reactivity. Land this even if the rest is deferred.
-2. **Stage B — `$await` + promise indicator + `@loading` + `$pending`.**
+2. **Stage B — `$async` + promise indicator + `@loading` + `$pending`.**
    Ship together; they're inseparable. Runtime changes: `didSuspend` (and a
-   `generation` counter) on `Computed`; the `$await` primitive (new —
+   `generation` counter) on `Computed`; the `$async` primitive (new —
    creates the `Computed`, runs it, does the thenable check + `.then`
    wiring); the `didSuspend` branch in `proxyGet` (mirrored on both read
-   paths); `context.loadingBoundary` for boundary notification. `runComputed`
-   is unchanged. Compiler changes: `$await` recognition + the promise-getter
-   requirement (§7.2); `@loading`/`$pending` codegen. Deprecate `@await`'s
-   `@catch` branch in the same release (errors now flow through `@try`), but
-   keep `@await`/`@then` working until Stage C. The compiler emits a
-   deprecation warning when `@catch` is used on an `@await group`.
-3. **Stage C — deprecate `@await`.** Once `@loading` covers the cases,
-   emit a compiler warning for `@await` and document the migration
-   (`@await (p) {…} then (v) {…}` → `get x() { return $await(() => p) }`
-   - `@loading {…x…}`). Keep `@await` compiling for a major version.
+   paths); `context.awaitBoundary` for boundary notification. `runComputed`
+   is unchanged. Compiler changes: `$async` recognition + the promise-getter
+   requirement (§7.2); `@await`/`with`/`$pending` codegen.
+3. **Stage C — remove `@await` (done).** The old `@await (p) {…} then (v)
+   {…} catch (e) {…}` control was removed and the boundary renamed from
+   `@loading {…} @fallback {…}` to `@await {…} with {…}` (the parser errors
+   on the old `@await (expr)` form pointing at the migration:
+   `get x() { return $async(() => p) }` + `@await {…x…}`). `$refresh` and the
+   `with` branch shipped alongside.
 
 ### 7.8 Open questions
 
-- **Promise identity and re-fetch.** `$await`'s `Computed` keys on the
+- **Promise identity and re-fetch.** `$async`'s `Computed` keys on the
   promise its thunk returned. If the thunk returns a fresh Promise every
   run (`() => fetch(url)` with no module cache), each re-run re-suspends. Is
   that the right behavior (the boundary re-shows fallback — arguably
   correct), or do we need a per-source key?
-- **Rapid prop changes.** `$await`'s `generation` counter handles stale-
+- **Rapid prop changes.** `$async`'s `generation` counter handles stale-
   resolve (a resolve from a previous run is ignored), but the boundary also
   needs a token to ignore stale re-renders — same shape as
   `buildAwaitNode.ts:71`'s await token.
-- **SSR.** The server build (`buildServerAwaitNode.ts:27-31`) currently
-  renders the pending branch only. For `@loading`, what does the server
-  render? Options: (a) render fallback and stream replacements as promises
-  resolve (Solid's `deferStream`); (b) `await` the boundary's promises and
-  render resolved content (Svelte's `await render(...)` today); (c) render
-  fallback only, no streaming. Solid makes this per-primitive via
-  `ssrSource`; torpor would have to pick a default.
+- **SSR.** The server build (`buildServerAwaitNode.ts`) currently
+  renders the `with` branch only. For `@await`, what does the server
+  render? Options: (a) render the `with` branch and stream replacements as
+  promises resolve (Solid's `deferStream`); (b) `await` the boundary's
+  promises and render resolved content (Svelte's `await render(...)` today);
+  (c) render the `with` branch only, no streaming. Solid makes this
+  per-primitive via `ssrSource`; torpor would have to pick a default.
 - **`$pending` first-load semantics.** The "quiet on bare refresh" rule
   requires the indicator to know whether a read is the first for a given
   `Computed` or a re-read after a dependency change. How is "first"
@@ -831,7 +827,7 @@ runtime:
   `Computed`s already participate in the reactive graph across `$context`
   and component boundaries — no per-region/per-tree scope decision to make.
   Promises passed _in_ via `$context` or `$props` are wrapped through an
-  `$await`ing getter in the receiving component (§7.2).
+  `$async`ing getter in the receiving component (§7.2).
 - **Taint propagation cost.** Every read of a suspended `Computed` flips
   `didSuspend` on the active reader, up the cache chain. For deep cache
   chains this is O(depth) per read. Probably fine (chains are shallow in
