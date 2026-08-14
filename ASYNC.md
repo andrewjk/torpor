@@ -2,8 +2,15 @@
 
 Notes on torpor's async story vs the other frameworks, grounded in the
 `async-waterfall` benchmark fixture (`benchmarks/async-waterfall`) and octane's
-runtime source (`node_modules/octane/dist/universal-core.js`). This is an
-analysis doc — no decisions made here yet.
+runtime source (`node_modules/octane/dist/universal-core.js`).
+
+Torpor's async model is shipped: `$async` getters, the `@await`/`with`
+boundary, `$pending`/`$refresh`, and `@try`/`@catch`/`@error` (§7). The old
+`@await (p) { … } then (v) { … } catch (e) { … }` control was removed (Stage C,
+§7.7). Torpor now lands at the `async-waterfall` parallel floor and passes the
+`async-composition` transition gate. §1–§3 are the historical analysis of the
+waterfall that motivated the change; §6 is the survey that reframed the choice;
+§7 is the shipped design.
 
 ---
 
@@ -21,8 +28,11 @@ fetched text, and (unless it's the deepest) a child `Level`.
 The measured ops are `init` (cold mount → deepest level rendered) and `update`
 (version bump → deepest level shows the new value).
 
-Recorded torpor numbers (quick mode): `init` ≈ 170ms (11×), `update` ≈ 155ms
-(9.7×). Octane: `init` ≈ 22ms (1.4×), `update` ≈ 19.6ms (1.2×).
+Recorded (2026-07-09): Octane `init` ≈ 22ms (1.4×), `update` ≈ 19.6ms (1.2×).
+The old `@await`-based torpor fixture waterfalled at ~11× (§2's Family A shape).
+After the model change, torpor's fixture lands at the parallel floor: `init` ≈
+20ms (1.2×), `update` ≈ 18ms (1.1×) — §7.3's boundary pre-fetches nested
+children, so nesting doesn't serialize.
 
 ---
 
@@ -42,9 +52,10 @@ The child is created _inside_ the resolved branch, so level N+1 doesn't mount
 - **Octane** (`use(fetch)` + `Suspense`) — same authoring as React, but the
   **compiler hoists** the fetches up-front → ~1.3×. The only framework in the
   suite that parallelizes Family A authoring.
-- **Torpor** (`@await`) — structurally identical to React's authoring: the
-  recursive `<Level>` sits inside the `@await`'s `then` branch, so it
-  waterfalls (~11×). No compiler hoist.
+- **Torpor** (the old `@await (p) { … } then (v) { … }` control) — was
+  structurally identical to React's authoring: the recursive `<Level>` sat
+  inside the `then` branch, so it waterfalled (~11×). No compiler hoist. That
+  control was removed in Stage C (§7.7); the shipped model (§7) is Family B.
 
 ### Family B — "tree created immediately, data fills in" (parallel by model)
 
@@ -70,7 +81,7 @@ by **where the child sits relative to the await**. Three authoring shapes:
 
 | shape | child location                                       | result                                             |
 | ----- | ---------------------------------------------------- | -------------------------------------------------- |
-| 1     | inside `then`                                        | serial (React, octane-authored, torpor-as-written) |
+| 1     | inside `then`                                        | serial (React, octane-authored, the old torpor authoring) |
 | 2     | sibling of the await; only the value text awaits     | parallel (Solid, ripple, Svelte)                   |
 | 3     | inside `then`, but compiler hoists the awaited calls | parallel (octane)                                  |
 
@@ -102,104 +113,16 @@ most of it.
 
 ---
 
-## 4. Why torpor lags, and what it would take
-
-Torpor's `@await` is **runtime-only, per-component, serial**. Each `Level`
-renders `@await ($state.data)` → pending branch → on resolve, the `then`
-branch mounts the next `Level`, which starts _its_ fetch. There is no compiler
-plan — nothing pre-runs the child's `fetchData` before the parent resolves.
-
-### Two honest paths for torpor
-
-**Option A — authoring change (free):** port the fixture to Family B's shape —
-`@await` only the `<span class="val">`, keep `<Level>` as a **sibling**. Torpor
-already supports this (multi-root / sibling children around an `@await`). This
-makes the benchmark land at the parallel floor today. But it changes the
-authored shape: a user writing idiomatic nested `@await` (child inside `then`)
-still waterfalls.
-
-**Option B — compiler transform (octane-style):** hoist the awaited
-promise-creating calls so shape 1 also parallelizes without changing
-authoring. This is the genuinely useful feature.
-
-### Feasibility of Option B
-
-The minimal version is a compiler transformation, not a deep runtime feature:
-
-```torp
-function Level($props) {
-  let $state = $watch({ data: fetchData($props.level, $props.version) });
-  @render {
-    @await ($state.data) { … } then (data) { <Level level={$props.level+1} …/> }
-  }
-}
-```
-
-The compiler could detect an `@await` over a `$watch`-init expression that
-calls a function, and hoist that call into an "eager fetch" pass executed at
-mount time for the whole subtree — before the first `@await` renders its
-pending branch. Torpor compiles components into functions and knows the tree
-statically (as it does for `@for`/`@if`/`@await` → `runControl` regions), so:
-
-1. Recognize `fetchData(level, version)` as a hoistable call.
-2. Emit a sibling warm function that just calls the fetch (deduped by the
-   module cache).
-3. Run it for the root `Level` and, knowing the recursion, for each child.
-
-Why it's tractable: torpor's `@await` is structurally simpler than octane's
-`use`/`Suspense` — no attempt/retry, no deps-versioned warm-cache, no
-`Suspense` boundary needed. A focused implementation for the "nested `@await`
-of a module function call" pattern would be a few hundred lines in
-`buildAwaitNode.ts` + a warm runtime helper.
-
-The hard/risky parts:
-
-- **Purity assumption** — hoisting `fetchData(...)` means calling it early.
-  Octane does this unconditionally (aggressive). If the awaited expression has
-  side effects or isn't cached, eager invocation changes semantics. Torpor
-  would need the same caveat, or a narrower trigger (only hoist when the
-  awaited value is a plain call into a module-level function — the benchmark
-  shape).
-- **Recursion detection** — `Level` → `Level`; the compiler must prove the
-  recursion is finite/guarded (torpor's `@if (level < LEVELS-1)` guard) to
-  pre-run exactly 10 fetches, not loop forever. Octane caps warm depth at 64.
-- **Hydration/SSR interplay** — a warm pre-pass runs before the region
-  renders; torpor's hydration markers and `$mount` ordering must tolerate it.
-
-### Related suite
-
-`async-composition` (adjacent panels, an imported custom hook with two
-independent `use()` reads, and one true dependency `owner` ← `project`) has a
-**transition gate** that requires the old dashboard to stay visible while the
-new version loads (`retainedOldResourceValues`). Torpor's `@await` tears down
-on promise reassignment, so `update` fails that gate. A torpor fixture is
-built (`benchmarks/async-composition/torpor-async-composition-bench`) but
-can't be added to the manifest until torpor has a keep-old-UI transition
-primitive — a separate feature from waterfall elimination.
-
----
-
-## 5. Open questions
-
-- Is the goal to make the _fixture_ land at the parallel floor (Option A), or
-  to make idiomatic nested `@await` fast for users (Option B)?
-- Should eager hoisting be unconditional (octane's stance) or gated on
-  "awaited expression is a plain module-function call"?
-- Does the same warm pre-pass need to work for `update` (re-fetch on version
-  change), or only cold `init`?
-- How does this interact with `@await` on non-function values (promises from
-  `$context`, props, computed getters)?
-
----
-
 ## 6. Newer async models: the real gap
 
-Sections 2–5 frame the choice as Option A (authoring change) vs Option B
-(compiler hoist). Both are bounded interventions on torpor's existing
-`@await` model. Surveying what Solid 2.0 and Svelte 5.36 actually ship for
-async UI reframes the choice: **Option B optimizes a model that is
-structurally less capable than what the newer frameworks now ship**, and the
-honest upgrade path is a model change, not a transform.
+The old torpor `@await (p) { … } then (v) { … }` control was a runtime-only,
+per-component, serial await: it tore down on promise reassignment, coupled the
+async value to the loading UI in one block, and could only parallelize via an
+authoring change or a compiler hoist (octane's approach, §3). Surveying what
+Solid 2.0 and Svelte 5.36 actually ship reframed the choice: **a transform
+would optimize a model that is structurally less capable than what the newer
+frameworks now ship**, and the honest upgrade path was a model change, not a
+transform. That model is §7.
 
 Sources: `solid-2.0/05-async-data.md` on Solid's `next` branch (accessed
 2026-08); `docs/svelte/await-expressions` for Svelte 5.36+ (experimental,
@@ -239,14 +162,15 @@ const user = createMemo(() => fetchUser(id()));
 </Loading>;
 ```
 
-The pieces that matter for the gaps §4 identifies in torpor:
+The pieces that matter for the gaps in torpor's old `@await` model:
 
 - **`Loading` is branch-readiness, not "fallback replaces content."** Once a
   branch has produced content, subsequent revalidation keeps the stale
   content visible (transition). The `on` prop opts back into re-showing
-  fallback for key-level changes. This is **the keep-old-UI primitive torpor
-  doesn't have** — the thing blocking the `async-composition` transition
-  gate (§4). Torpor's `@await` tears down on promise reassignment by design.
+  fallback for key-level changes. This is the keep-old-UI behavior the old
+  torpor control lacked (it tore down on promise reassignment, failing the
+  `async-composition` transition gate); the shipped `@await` boundary (§7.3)
+  provides it via stale-while-revalidate.
 - **`isPending(fn)` splits first-load from refresh.** The boundary owns
   first-load fallback; `isPending` is for inline "updating…" indicators on
   subsequent refreshes. Critically, a bare `refresh()` is _quiet_ (not
@@ -257,9 +181,8 @@ The pieces that matter for the gaps §4 identifies in torpor:
   decides whether the client trusts the serialized server value, re-runs the
   compute, or skips server compute entirely. Plus `deferStream: true` holds
   the SSR stream open for a late source, and `transparent: true` makes a
-  client-only node hydration-invisible. Torpor's server build
-  (`buildServerAwaitNode.ts:27-31`) hard-codes "render pending branch only"
-  — Solid makes it the author's call per source.
+  client-only node hydration-invisible. Torpor's server build renders the
+  `@await` `with` branch only — Solid makes it the author's call per source.
 - **One error path.** Async errors propagate through the graph into `Errored`
   boundaries; no inline `.error` check vs `ErrorBoundary` split (the
   `createResource` legacy torpor would inherit if it grew a `.loading` flag).
@@ -328,69 +251,46 @@ Solid and Svelte arrive at the same three ideas from different directions:
    automatically and warns on accidental serialization; Solid does it
    structurally because sibling computations are independent in the graph.
 
-Torpor's nested `@await` implements none of these.
-
 ### 6.5 What this means for torpor
 
-Option B (compiler hoist of nested `@await`) is **a band-aid on a model the
-rest of the ecosystem has moved past**. It buys the benchmark number without
-addressing any of the structural gaps:
+Torpor's old nested `@await` implemented none of these; the model change was
+built and shipped (§7):
 
-- It still tears down on promise reassignment (fails the `async-composition`
-  transition gate).
-- It still couples the _async value_ to the _loading UI_ in one control
-  block (no first-load vs refresh split).
-- It still has no answer for parallel independent awaits outside the narrow
-  "child inside `@then` of a module-function call" shape.
+- `$async` (item 1, adapted) — the opt-in getter marker, rather than automatic
+  promise tracking in `$watch`. A getter whose result is a Promise must use
+  `$async`; the `$cache` runtime guard enforces this (§7.2).
+- `@await`/`with` boundary + `$pending` (item 2) — the first-load/refresh split
+  that closes the keep-old-UI gap.
+- Independent reads parallelize by construction (item 3): sibling boundaries
+  are independent, and nesting doesn't serialize because the boundary's
+  speculative content render pre-fetches children — so the `await_waterfall`
+  warning is obsolete (only genuine data dependencies serialize).
+- `fork()`-style intent-based preloading (item 4) remains an open idea.
 
-The honest upgrade path is a model change, roughly in the Solid direction:
-
-1. **Track promises natively in `$watch` / `$cache`.** Reading a Promise in a
-   reactive context registers it; reads that aren't ready throw a
-   `NotReady`-style signal caught by an outer boundary.
-   `$state = $watch({ data: fetchData(...) })` becomes the whole authoring
-   — no `@await` needed at the value site.
-2. **Split `@await` into two primitives.** A boundary primitive
-   (`@loading`?) owns first-paint fallback and keeps stale content during
-   revalidation. A pending primitive (`$pending(fn)`?) exposes in-flight
-   state for inline indicators. This is the structural change that closes
-   the keep-old-UI gap.
-3. **Parallelize independent reads.** Sibling reactive reads of promises
-   start together by default; the compiler can warn when an `@await` is
-   nested where it didn't need to be (Svelte-style `await_waterfall`).
-4. **Optional: `fork()`-style intent-based preloading** for navigation and
-   hover hints.
-
-This is a multi-package redesign (compiler + runtime), bigger than Option B
-by an order of magnitude — but Option B's complexity is spent preserving a
-model Solid and Svelte have already obsoleted. If torpor is going to invest
-in async, invest in the model, not in a hoist.
-
-The waterfall benchmark stays honest in the meantime: torpor-as-authored
-waterfalls at ~11× because nested `@await` waterfalls by structure, and the
-fixture exists to document that fact, not to be optimized around. Section 5's
-Option B questions stay on the books as the cost of the band-aid path; §6 is
-the argument for not walking it.
+Option B (compiler hoist of nested `@await`) was the band-aid path: it buys
+the benchmark number without addressing the structural gaps, and its
+complexity is spent preserving a model Solid and Svelte have already
+obsoleted.
 
 ---
 
-## 7. Design sketch: the model change
+## 7. Design: the model change (shipped)
 
 §6 argued the honest upgrade path is a model change in the Solid direction:
-track promises natively in `$watch`/`$cache`, split the boundary from the
-value, and parallelize independent reads. This section sketches what that
-looks like in torpor's idioms — four new primitives plus one piece of hidden
-runtime machinery. It is a sketch, not a spec; open questions at the end.
+track promises in the reactive graph, split the boundary from the value, and
+parallelize independent reads. This section is the design that shipped —
+four primitives plus one piece of hidden runtime machinery. The rollout
+(§7.7) is complete; §7.8 holds the questions that remain open.
 
 ### 7.1 The new surface
 
-| primitive                      | kind                                   | replaces                                                                             |
-| ------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| `$async(fn)`                   | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
-| `@loading { … }`               | control block (boundary)               | the pending/then branches of `@await`                                                |
-| `$pending(fn)`                 | reactive query                         | (new — no equivalent today)                                                          |
-| `@try { … } catch (err) { … }` | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
-| `@error (err) { … }`           | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
+| primitive                       | kind                                   | replaces                                                                             |
+| ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
+| `$async(fn)`                    | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
+| `@await { … }` / `with { … }`   | control block (boundary)               | the pending/then branches of `@await`                                                |
+| `$pending(fn)`                  | reactive query                         | (new — no equivalent today)                                                          |
+| `@try { … } catch (err) { … }`  | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
+| `@error (err) { … }`            | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
 
 Plus, hidden: a **promise indicator** (`didSuspend`) on the `Computed` that
 `$async` creates, which the get trap reads through (§7.2).
@@ -443,9 +343,9 @@ if (signal.didSuspend) {
 		// propagate the suspend up the cache chain
 		context.activeTarget.didSuspend = true;
 	}
-	if (context.loadingBoundary !== null) {
-		// notify the nearest @loading boundary
-		context.loadingBoundary.suspended = true;
+	if (context.awaitBoundary !== null) {
+		// notify the nearest @await boundary
+		context.awaitBoundary.suspended = true;
 	}
 	return undefined; // placeholder; boundary discards the partial render
 }
@@ -515,16 +415,16 @@ Resolve and reject both flow through the existing propagation path
 no separate error machinery for async. The `generation` token handles
 stale-resolve on rapid prop changes (§7.8).
 
-**The requirement (enforced).** A getter whose static return type is
-`Promise<T>` must use `$async`, not `$cache`. The compiler rejects
-promise-returning getters that use `$cache` (or no wrapper). Belt-and-
-suspenders runtime guard in dev: if `$cache`'s result is a thenable, throw
-_"use `$async` for promise-returning getters."_ This dissolves the
-"promises that don't pass through `$cache`" long tail: there is no
-bare-promise-read case, because the compiler enforces that every
-promise-returning getter declares itself via `$async`. Promises arriving
-via `$props` or `$context` are wrapped through an `$async`ing getter in
-the receiving component.
+**The requirement (enforced at runtime).** A getter whose result is a
+`Promise` must use `$async`, not `$cache`. There is no static/compiler
+check — torpor deliberately avoids parsing JS statically (the template
+compiler emits expressions verbatim, and a type-level check would need
+TypeScript's checker). Instead, `$cache` throws at runtime if its result is
+a thenable: _"use `$async` for promise-returning getters."_ This dissolves
+the "promises that don't pass through `$cache`" long tail: a promise cached
+by `$cache` would render as `[object Promise]`, so the guard catches it at
+the getter's first read. Promises arriving via `$props` or `$context` are
+wrapped through an `$async`ing getter in the receiving component.
 
 There is **no function-style `$async(p)` that takes a bare promise** — the
 thunk form is required so that dep tracking and re-fetch work.
@@ -545,9 +445,9 @@ a thrown `PromiseNotReady` would have done:
    mid-run. `runComputed` checks `didSuspend` on exit and treats the run as
    suspended rather than finalizing `"Hello, undefined"` as a cached value.
    The partial result is never cached.
-3. **Setting `loadingBoundary.suspended`** tells the nearest `@loading`
+3. **Setting `awaitBoundary.suspended`** tells the nearest `@await`
    boundary that its content render touched something pending. The boundary
-   discards the partial render and shows fallback (§7.3).
+   discards the partial render and shows the `with` branch (§7.3).
 
 This is the same shape as `$mount` pushing onto `context.mountEffects`
 (`$mount.ts`) and `addEvent` pushing onto `context.stashedEvents`
@@ -568,14 +468,14 @@ enough that the trade-off flips:
 - one branch in `proxyGet` (mirrored on the first-read getter path);
 - taint propagation piggybacks on the reactive graph that `trackSignal`
   already builds;
-- the boundary detects suspend through a context flag (`loadingBoundary`),
+- the boundary detects suspend through a context flag (`awaitBoundary`),
   the same shape as `$mount`/`addEvent` accumulating onto `context`.
 
 The throw costs that motivated the flip: debugger noise (pause-on-exceptions
 trips on every suspend), V8 throw overhead per suspend, and fragile
-`instanceof PromiseNotReady` checks in user code rendered under `@loading`.
+`instanceof PromiseNotReady` checks in user code rendered under `@await`.
 With the flag, suspend and error are cleanly separated — `@try` catches
-errors, `@loading` catches suspends, and they never meet at the same throw
+errors, `@await` catches suspends, and they never meet at the same throw
 site.
 
 ### 7.3 `@await` — async boundary (shipped; formerly `@loading`, with `with` in place of `@fallback`)
@@ -626,14 +526,16 @@ in Stage C, §7.7). Authoring that needs the resolved value just reads it
 
 ### 7.4 `$pending(fn)` — refresh indicator
 
-`$pending` is the query that distinguishes first-load (owned by `@loading`)
+`$pending` is the query that distinguishes first-load (owned by `@await`)
 from refresh (inline indicator):
 
 ```torp
-@loading {
+@await {
 	<ProfileHeader user={$user} />
-	<button disabled={$pending($user)}>Save</button>
-	@if ($pending($user)) { <Spinner small /> }
+	<button disabled={$pending(() => $user)}>Save</button>
+	@if ($pending(() => $user)) { <Spinner small /> }
+} with {
+	<Skeleton />
 }
 ```
 
@@ -641,11 +543,11 @@ Mechanically, `$pending(fn)`:
 
 - Runs `fn` in a tracking context and collects which suspended `Computed`s
   were read.
-- Returns `true` iff a read `Computed` has `didSuspend` **and** a tracked
-  dependency (signal) changed since the last resolved value. A bare refresh
-  (same args, re-fetched) is _quiet_ — `false`. This is Solid's
-  stale-while-revalidate default and matches what §4 says torpor lacks for
-  the `async-composition` transition gate.
+- Returns `true` iff a read `Computed` has `didSuspend` **and** the suspend is
+  loud (`!suspendQuiet`) — a first load, a dependency-change refresh, or a
+  loud `$refresh`. A silent `$refresh(fn, { silent: true })` (bare re-fetch)
+  stays quiet — `false`. This is Solid's stale-while-revalidate default and
+  the behavior the `async-composition` transition gate requires.
 
 `$pending` is the primitive; `@pending (fn) { … }` as a block is optional
 sugar for `@if ($pending(fn)) { … }`. It doesn't buy anything structural
@@ -664,14 +566,15 @@ See `packages/view/src/watch/$refresh.ts`.
 
 ### 7.5 `@try`/`@catch` — error boundary
 
-The current `@catch` in `@await` is narrow: a `.catch()` callback on one
-Promise (`buildAwaitNode.ts:105-117`), not a render-time try/catch. The new
-model separates errors from any specific promise:
+Errors are separated from any specific promise (the old `@await`'s `@catch`
+was a `.catch()` callback on one promise):
 
 ```torp
 @try {
-	@loading {
+	@await {
 		<Profile user={$user} />
+	} with {
+		<Skeleton />
 	}
 } catch (err) {
 	<ErrorView error={err} />
@@ -765,12 +668,12 @@ Semantics:
 `@try` in the top-level syntax. Matches Solid's `<Errored>` and React's
 "error boundary" terminology.
 
-**Symmetry with `@loading`?** In principle, a top-level
-`@loading { fallback }` as a sibling of `@render` would handle the "whole
+**Symmetry with `@await`?** In principle, a top-level
+`@await { … } with { … }` as a sibling of `@render` would handle the "whole
 component is async" case the same way. But loading fallbacks are usually
 layout-specific (different positions in the tree need different fallbacks),
 while error fallbacks are usually uniform ("show an error in place of this
-component"). Ship `@error` first; revisit top-level `@loading` if
+component"). Ship `@error` first; revisit a top-level `@await` if
 boilerplate complaints emerge.
 
 ### 7.7 Migration path
@@ -784,14 +687,15 @@ runtime:
    break apps), low-risk (no promise machinery), and exercise the parser
    changes for new control groups and a new top-level block without touching
    reactivity. Land this even if the rest is deferred.
-2. **Stage B — `$async` + promise indicator + `@loading` + `$pending`.**
+2. **Stage B — `$async` + promise indicator + `@await` boundary + `$pending`.**
    Ship together; they're inseparable. Runtime changes: `didSuspend` (and a
    `generation` counter) on `Computed`; the `$async` primitive (new —
    creates the `Computed`, runs it, does the thenable check + `.then`
    wiring); the `didSuspend` branch in `proxyGet` (mirrored on both read
    paths); `context.awaitBoundary` for boundary notification. `runComputed`
-   is unchanged. Compiler changes: `$async` recognition + the promise-getter
-   requirement (§7.2); `@await`/`with`/`$pending` codegen.
+   is unchanged. Compiler changes: `$async` recognition + the runtime
+   `$cache` guard (no static check — §7.2); `@await`/`with`/`$pending`
+   codegen.
 3. **Stage C — remove `@await` (done).** The old `@await (p) {…} then (v)
    {…} catch (e) {…}` control was removed and the boundary renamed from
    `@loading {…} @fallback {…}` to `@await {…} with {…}` (the parser errors
@@ -804,7 +708,7 @@ runtime:
 - **Promise identity and re-fetch.** `$async`'s `Computed` keys on the
   promise its thunk returned. If the thunk returns a fresh Promise every
   run (`() => fetch(url)` with no module cache), each re-run re-suspends. Is
-  that the right behavior (the boundary re-shows fallback — arguably
+  that the right behavior (the boundary re-shows the `with` branch — arguably
   correct), or do we need a per-source key?
 - **Rapid prop changes.** `$async`'s `generation` counter handles stale-
   resolve (a resolve from a previous run is ignored), but the boundary also
@@ -817,34 +721,20 @@ runtime:
   promises and render resolved content (Svelte's `await render(...)` today);
   (c) render the `with` branch only, no streaming. Solid makes this
   per-primitive via `ssrSource`; torpor would have to pick a default.
-- **`$pending` first-load semantics.** The "quiet on bare refresh" rule
-  requires the indicator to know whether a read is the first for a given
-  `Computed` or a re-read after a dependency change. How is "first"
-  defined — per computed? per signal? What about a read inside an `@if`
-  that flips from false to true (a "new" first load)?
-- **`$context` and cross-component promises.** Dissolved under the
-  indicator model: a `Computed` carries its own `didSuspend`, and
-  `Computed`s already participate in the reactive graph across `$context`
-  and component boundaries — no per-region/per-tree scope decision to make.
-  Promises passed _in_ via `$context` or `$props` are wrapped through an
-  `$async`ing getter in the receiving component (§7.2).
 - **Taint propagation cost.** Every read of a suspended `Computed` flips
   `didSuspend` on the active reader, up the cache chain. For deep cache
   chains this is O(depth) per read. Probably fine (chains are shallow in
   practice), but worth measuring on the `async-composition` fixture.
-- **Recursion under `@loading`.** A `<Level>` rendered inside an `@loading`
-  boundary that reads its own `$state.data` (the waterfall fixture's shape)
-  — does each level need its own boundary, or does one outer boundary own
-  the whole tree? Solid catches everything in its subtree; Svelte's nested
-  `<svelte:boundary>` allows either. Under the flag model a single boundary
-  commits only when no read suspends, so a single outer boundary over the
-  whole recursion would wait for the deepest level before committing
-  anything — the fixture needs sibling per-level boundaries to parallelize.
-  That matches the authoring shape in §7.3 anyway. It also affects what
-  "stale during revalidation" means for a recursive child whose own data
-  hasn't resolved yet.
-- **Interaction with hydration markers.** Server renders fallback (today's
-  shape) or streamed content (option (a) above); client hydrates against
-  whichever it gets. The hydration comments emitted by
-  `buildServerAwaitNode.ts:19,34,37` assume a single branch — multiple
+- **Interaction with hydration markers.** Server renders the `with` branch
+  (today's shape) or streamed content (option (a) above); client hydrates
+  against whichever it gets. The hydration comments emitted by
+  `buildServerAwaitNode.ts` assume a single branch — multiple
   resolved-promise states need a richer marker scheme.
+
+Resolved during the rollout: `$pending`'s "first-load" semantics (first load
+is per-computed via `hasResolved`; an `@if` branch that mounts and reads a
+never-resolved computed is a first load); `$context`/cross-component promises
+(dissolved — a `Computed` carries its own `didSuspend` and participates in the
+reactive graph across boundaries); and recursion under `@await` (nesting
+parallelizes because the boundary's speculative content render pre-fetches
+children — the waterfall fixture needs no per-level sibling boundaries).

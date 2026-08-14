@@ -5,12 +5,12 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Benchmark porting (torpor fixtures)
 
-Ported torpor fixtures for 12 server-backed suites (all pass gates through
-`node benchmarks/bench.mjs --quick <suite>`): js-framework, todomvc,
-chat-stream, dbmon, recursive-context, signal-favoring, effectful-list,
-memo-wall, portal-swarm, async-waterfall, list-clear, async-composition. Each
-lives in `benchmarks/<suite>/torpor-*` and the harness default TARGETS +
-bench.mjs `servers` entries were updated.
+Torpor fixtures exist for the 12 server-backed suites and pass their gates via
+`node benchmarks/bench.mjs --quick <suite>`: js-framework, todomvc, chat-stream,
+dbmon, recursive-context, signal-favoring, effectful-list, memo-wall,
+portal-swarm, async-waterfall, list-clear, async-composition. Each lives in
+`benchmarks/<suite>/torpor-*` and the harness default TARGETS + bench.mjs
+`servers` entries were updated.
 
 ### Not-portable suites (torpor's model can't satisfy the gate)
 
@@ -28,23 +28,9 @@ bench.mjs `servers` entries were updated.
   `news/torpor` SSR fixture + harness TARGETS updates; deferred (see the
   "everything feasible" option).
 
-### async-composition — now portable (`$async` model)
-
-The `async-composition` transition gate (`retainedOldResourceValues` — old
-dashboard stays visible while the new version loads) previously failed because
-`@await` tears down on promise reassignment. The fixture was ported to `$async`
-getters: each resource is a getter keyed on `$props.version`, and reads return
-the retained `staleValue` during a re-fetch, so the version-bump transition
-keeps showing old values — the gate's exact requirement. `owner` is guarded to
-start only once `project` resolved to the current ownerId (returning the last
-resolved value in the interim), so it alone waits for wave 1. Recorded
-production run: init 104.4ms / update 102.9ms, 2/2 waves, 8/8 calls, 1 mixed
-update state — the two-wave floor with the ideal topology
-(`viewer+badge+project+activity+activity-summary+insights+insights-chart → owner`).
-Observation ceilings (2 waves / 8 calls / 1 mixed update state) are enforced
-for the target in `benchmarks/async-composition/run.mjs`. Note: the checked-in
-`octane-tsrx` fixture fails its own ceiling here (13 update calls vs recorded 8)
-— an environment/build drift unrelated to the torpor port.
+Note: the checked-in `octane-tsrx` async-composition fixture fails its own
+observation ceiling in this tree (13 update calls vs its recorded 8) — an
+environment/build drift unrelated to torpor's port.
 
 ### Observed perf gaps (torpor vs octane, same harness, quick)
 
@@ -59,13 +45,13 @@ for the target in `benchmarks/async-composition/run.mjs`. Note: the checked-in
 | effectful-list    | update_nodeps 17x                | update_deps 0.05, mount 0.22                |
 | memo-wall         | one_change_A 15x, ctx 1.2x       | mount 0.45                                  |
 | portal-swarm      | mount_closed 1.7x, dispatch 2.5x | open 0.65                                   |
-| async-waterfall   | —                                | init 0.13 (waterfall ~170ms vs octane 22ms) |
 | list-clear        | all clears 1.3-1.6x              | —                                           |
 
 The recurring lag pattern: **per-row mount cost** (dbmon/memo-wall/effectful-list
-mount), **fine-grained update wins** (signal-favoring, recursive-context
-update_root, update_nodeps), and **no compiler waterfall-elimination**
-(async-waterfall ~8x octane).
+mount) and **fine-grained update wins** (signal-favoring, recursive-context
+update_root, update_nodeps). (async-waterfall previously lagged at ~0.13× from
+the old `@await` waterfall; the Stage C model change put torpor at the parallel
+floor — ASYNC.md §7.)
 
 ## packages/view
 
@@ -105,7 +91,7 @@ update_root, update_nodeps), and **no compiler waterfall-elimination**
   effects.
 - Minimal repro (`packages/view`, vitest): `$watch({a:[{messages:[{id:1}]}]})`;
   `void $state.a[0].messages.length`; `$state.a = $state.a.map(c => ({...c,
-messages:[...c.messages, {id:2}]}))`; then
+  messages:[...c.messages, {id:2}]}))`; then
   `expect($state.a[0].messages[proxyDataSymbol]).toBeDefined()` FAILS (raw).
 - Mechanism: the `convs` array's proxyData/signals map is REUSED across the
   reassignment (the new array inherits the old proxy's signal map via the
@@ -122,82 +108,26 @@ messages:[...c.messages, {id:2}]}))`; then
   already exists. Tests to add: reassign nested array then read/`find`+mutate
   a deep element, after an initial deep read.
 
-## Async model Stage B + C — `@await` boundary
+## Async model — remaining gaps
 
-Stage B (ASYNC.md §7.7) shipped `$async` (promise indicator + `didSuspend`),
-the `@await` boundary, and the parser/codegen/runtime pipeline. Stage C is
-also done: the old `@await (p) {…} then (v) {…} catch (e) {…}` control was
-**removed** (the parser errors on the old `@await (expr)` form with a
-migration hint), and the boundary syntax was renamed from
-`@loading {…} @fallback {…}` to `@await {…} with {…}`. Runtime internals were
-renamed to match: `runLoading`→`runAwait`, `t_run_loading`→`t_run_await`,
-`LoadingBoundary`→`AwaitBoundary`, `context.loadingBoundary`→
-`context.awaitBoundary`.
+Stage A (`@try`/`@catch`, top-level `@error`), Stage B (`$async`, `@await`/`with`
+boundary, `$pending`, `$refresh`), and Stage C (old `@await (p) {…} then (v) {…}`
+control removed; `@loading`/`@fallback` renamed to `@await`/`with`) are shipped
+(ASYNC.md §7.7).
 
-### Not yet implemented
-
-- **`$pending` query — quiet-on-refresh implemented.** `$pending` now
-  distinguishes first-load and dependency-change refreshes (both _loud_ →
-  `true`) from a bare refresh (re-fetch with no dependency change → _quiet_ →
-  `false`), per ASYNC.md §7.4. The decision is captured at suspend time in
-  `$async`'s run via two new `Computed` fields: `hasResolved` (monotonic, set
-  on resolve/reject) and `suspendQuiet` (`hasResolved && !recalc`). The peek
-  branch in `proxyGet.suspendRead` only records a loud hit when
-  `!suspendQuiet`. **`$refresh` primitive landed** (`watch/$refresh.ts`):
-  `$refresh(fn)` collects the `$async` computeds read by `fn` (a new
-  `Computed.isAsync` marker + a `context.refreshSignals` collector hooked into
-  both `proxyGet` read paths) and re-runs each, **loud by default** (recalc
-  left true so the suspend is loud and `$pending` flips `true`, plus a
-  propagate-at-start so `$pending` indicators flip on immediately — the
-  spinner pattern). `$refresh(fn, { silent: true })` opts into quiet
-  (stale-while-revalidate): recalc left false, no notification until resolve —
-  for polling / refetch-on-focus. The re-run happens with no active target so
-  an imperative refresh never subscribes its caller. A `didError` read in
-  `proxyGet` now `trackSignal`s before throwing so an errored reader re-runs
-  when a `$refresh` resolves (retry-after-error), and a new
-  `Computed.lastErrored` flag stops an error from being retained as
-  `staleValue` (a retry suspend never renders the previous error as content).
-  Import detection in `buildCode`/`buildServerCode` now also scans markup
-  expressions (via `compile/utils/collectMarkupExpressions`), so
-  `$`-primitives used in the template (e.g. `@if ($pending(...))`,
-  `disabled={$pending(...)}`) get their imports injected — previously only
-  script usage did. §7.8's "first-load semantics" open question is
-  resolved: first load is per-computed (via `hasResolved`), and an `@if`
-  branch that mounts and reads a never-resolved computed is a first load;
-  reading an already-resolved computed is not.
-- **Compiler check for promise-getter requirement.** Not yet implemented
-  (ASYNC.md §7.2). The compiler should reject promise-returning getters
-  that use `$cache` instead of `$async`. Currently enforced at runtime by
-  the `$cache` guard. A static check would need type information the
-  template compiler doesn't have — TypeScript's own type checker is the
-  natural home for this.
 - **Fine-grained updates within `@await` content.** The boundary effect
   re-runs on any dependency change and may re-render content if suspend
   state changed. Non-suspend dep changes (e.g. a toggle inside content)
   are handled by child effects, but the `anySourceSuspended` check walks
   `effect.firstSource` on every run — O(N) in the number of sources.
-
-### Dead/duplicated code paths elsewhere
-
-- `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
-  default plugins are a good idea. Not a HACK to remove; flagged for the
-  framework's design discussion.
-
-## Error boundaries (`@try`/`@catch` and `@error`) — Stage A gaps
-
-Stage A (ASYNC.md §7.7) shipped `@try`/`@catch` and the top-level `@error`
-block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
-/ `buildServerTryNode`, `@error` in `parseCode.ts`/`buildCode.ts`/
-`buildServerCode.ts`, hydration snapshot/restore helpers
-(`render/saveHydration.ts`, `render/restoreHydration.ts`).
-
-### Not yet implemented (Stage B / follow-up)
-
 - **`$refresh` first-read double fetch.** If `fn` reads an `$async` getter that
   the UI has never read, the collection read initializes it (starts a fetch),
   then the refresh re-runs it (second fetch); the first resolve is ignored via
   the generation guard. Normal components always render the getter first, so
   this only affects getters referenced exclusively by `$refresh`.
+
+## Error boundaries — remaining gaps
+
 - **Effect-rerun error routing.** The compiled `try/catch` only catches errors
   thrown synchronously while building the boundary's subtree (initial render,
   child component renders, direct `@const` reads). A `$run` effect created
@@ -233,3 +163,9 @@ block: `parseControl.ts` `@try group` + shared `@catch` attach, `buildTryNode`
   hydration cursor; `saveHydration`/`restoreHydration` rewind it before the
   catch branch hydrates. If the try branch throws _after_ walking past real
   content (rather than before), the rewind may not fully restore the cursor.
+
+## Dead/duplicated code paths elsewhere
+
+- `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
+  default plugins are a good idea. Not a HACK to remove; flagged for the
+  framework's design discussion.

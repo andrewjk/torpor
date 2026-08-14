@@ -38,8 +38,9 @@ export default function $cache<T>(fn: () => T): T {
 	runComputed(computed);
 
 	// Guard: a Promise return from $cache would be cached as a raw value and
-	// never suspend — the value would render as [object Promise]. The compiler
-	// enforces this statically (Stage B.4); this catches the dynamic cases.
+	// never suspend — the value would render as [object Promise]. This runtime
+	// guard is the enforcement (torpor doesn't parse JS statically, so there's
+	// no compiler check — ASYNC.md §7.2); it fires on the getter's first read.
 	if (
 		computed.value !== null &&
 		computed.value !== undefined &&
