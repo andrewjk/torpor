@@ -57,6 +57,21 @@ function suspendRead(signal: Computed): any {
 	return signal.staleValue;
 }
 
+/**
+ * Deep-wraps a value with `$watch` if it is a plain object that is not already
+ * watched and is not a promise. Returns the value unchanged otherwise.
+ */
+function deepWrap(value: any): any {
+	return value !== undefined &&
+		value !== null &&
+		typeof value === "object" &&
+		value[proxyDataSymbol] === undefined &&
+		// But not if it's a Promise (i.e. has a `then` method)
+		value.then === undefined
+		? $watch(value)
+		: value;
+}
+
 export default function proxyGet(
 	target: Record<PropertyKey, any>,
 	key: PropertyKey,
@@ -80,15 +95,9 @@ export default function proxyGet(
 				if (data.shallow !== true) {
 					// Set the value to a new proxy if it's an object
 					const value = target[key];
-					if (
-						value !== undefined &&
-						value !== null &&
-						typeof value === "object" &&
-						value[proxyDataSymbol] === undefined &&
-						// But not if it's a Promise (i.e. has a `then` method)
-						value.then === undefined
-					) {
-						target[key] = $watch(value);
+					const wrapped = deepWrap(value);
+					if (wrapped !== value) {
+						target[key] = wrapped;
 					}
 				}
 
@@ -150,6 +159,19 @@ export default function proxyGet(
 			trackProxySignal(data, key);
 		}
 	} else if (signal.type === SIGNAL_TYPE) {
+		// The signal may have been created for a PREVIOUS value at this key —
+		// e.g. the property was reassigned to a raw object that skipped the
+		// `set` trap's re-wrap (the trap only re-wraps when the OLD value was
+		// a proxy). Make sure the current value is deep-wrapped, the same as
+		// the first-read path above
+		if (data.shallow !== true) {
+			const value = target[key];
+			const wrapped = deepWrap(value);
+			if (wrapped !== value) {
+				target[key] = wrapped;
+			}
+		}
+
 		// If a property is being accessed in the course of setting up an
 		// effect, track it
 		trackProxySignal(data, key);
@@ -233,17 +255,12 @@ const arrayWrapper: Record<PropertyKey, any> = {
 				next() {
 					if (index >= target.length) return { value: undefined, done: true };
 					let value = target[index];
-					if (
-						data.shallow !== true &&
-						value !== undefined &&
-						value !== null &&
-						typeof value === "object" &&
-						value[proxyDataSymbol] === undefined &&
-						// But not if it's a Promise (i.e. has a `then` method)
-						value.then === undefined
-					) {
-						value = $watch(value);
-						target[index] = value;
+					if (data.shallow !== true) {
+						const wrapped = deepWrap(value);
+						if (wrapped !== value) {
+							value = wrapped;
+							target[index] = value;
+						}
 					}
 					// Mirror the `get` trap's per-index signal creation (a plain
 					// index is never subscribed during iteration — activeTarget is

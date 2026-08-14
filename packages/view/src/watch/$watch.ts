@@ -43,8 +43,16 @@ export default function $watch<T extends Record<PropertyKey, any>>(
 		signals: new Map(),
 	};
 
-	// @ts-ignore
-	object[proxyDataSymbol] = data;
+	// Non-enumerable, so spreading or `Object.assign`-ing a watched object
+	// (`$state.a = $state.a.map(c => ({ ...c }))`) doesn't copy the marker
+	// into the new object — a copied ProxyData points at the OLD target and
+	// makes the new object look already-watched, so it never gets deep-wrapped
+	Object.defineProperty(object, proxyDataSymbol, {
+		value: data,
+		writable: true,
+		enumerable: false,
+		configurable: true,
+	});
 
 	const proxy = new Proxy(object, sharedHandler) as T;
 

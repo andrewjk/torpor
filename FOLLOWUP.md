@@ -53,35 +53,6 @@ update_root, update_nodeps). (async-waterfall previously lagged at ~0.13× from
 the old `@await` waterfall; the Stage C model change put torpor at the parallel
 floor — ASYNC.md §7.)
 
-## packages/view
-
-### Deep-wrap lost on reassigned nested array after a prior read
-
-- `packages/view/src/watch/proxyGet.ts`. Reading `$state.a[0].messages`,
-  then `$state.a = $state.a.map(...)` (replacing the nested array), then
-  reading `$state.a[0].messages` again returns the **raw** array — the
-  `$watch` deep-wrap is skipped, so `find`/`findIndex`/`[idx]` return raw
-  elements and in-place mutation (`msg.done = x`) does NOT propagate to
-  effects.
-- Minimal repro (`packages/view`, vitest): `$watch({a:[{messages:[{id:1}]}]})`;
-  `void $state.a[0].messages.length`; `$state.a = $state.a.map(c => ({...c,
-  messages:[...c.messages, {id:2}]}))`; then
-  `expect($state.a[0].messages[proxyDataSymbol]).toBeDefined()` FAILS (raw).
-- Mechanism: the `convs` array's proxyData/signals map is REUSED across the
-  reassignment (the new array inherits the old proxy's signal map via the
-  proxy), so a subsequent `convs[0]` read finds an existing signal for `"0"`
-  and takes the `signal.type === SIGNAL_TYPE` fast path (track + return
-  `target[key]`) instead of the `propDescriptor.writable` deep-wrap branch.
-  The freshly-assigned conv object at `target[0]` is therefore never
-  `$watch`-wrapped, and its `.messages` array is never wrapped either.
-- Workaround: mutate via **immutable replacement** (build a new array with
-  `map`/spread and assign to `$state`) instead of in-place mutation of a
-  nested element. The chat-stream torpor fixture's `__pump` does this.
-- Triage: when a watched array is reassigned, either reuse the old proxy's
-  signals correctly or ensure element deep-wrap happens even when a signal
-  already exists. Tests to add: reassign nested array then read/`find`+mutate
-  a deep element, after an initial deep read.
-
 ## Async model — remaining gaps
 
 Stage A (`@try`/`@catch`, top-level `@error`), Stage B (`$async`, `@await`/`with`

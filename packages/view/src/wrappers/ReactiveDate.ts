@@ -22,13 +22,17 @@ export default class ReactiveDate extends Date {
 
 		// @ts-ignore
 		this[proxyHandledSymbol] = true;
-		// @ts-ignore
-		this[proxyDataSymbol] = {
-			target: this,
-			isArray: false,
-			shallow: true,
-			signals: new Map(),
-		} satisfies ProxyData;
+		Object.defineProperty(this, proxyDataSymbol, {
+			value: {
+				target: this,
+				isArray: false,
+				shallow: true,
+				signals: new Map(),
+			} satisfies ProxyData,
+			writable: true,
+			enumerable: false,
+			configurable: true,
+		});
 	}
 
 	#init() {
