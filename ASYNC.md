@@ -79,11 +79,11 @@ Vue Vapor isn't in this suite (no fixture), but its model is Solid-like
 **Key takeaway:** the waterfall is not inherent to any runtime — it's caused
 by **where the child sits relative to the await**. Three authoring shapes:
 
-| shape | child location                                       | result                                             |
-| ----- | ---------------------------------------------------- | -------------------------------------------------- |
+| shape | child location                                       | result                                                    |
+| ----- | ---------------------------------------------------- | --------------------------------------------------------- |
 | 1     | inside `then`                                        | serial (React, octane-authored, the old torpor authoring) |
-| 2     | sibling of the await; only the value text awaits     | parallel (Solid, ripple, Svelte)                   |
-| 3     | inside `then`, but compiler hoists the awaited calls | parallel (octane)                                  |
+| 2     | sibling of the await; only the value text awaits     | parallel (Solid, ripple, Svelte)                          |
+| 3     | inside `then`, but compiler hoists the awaited calls | parallel (octane)                                         |
 
 ---
 
@@ -284,13 +284,13 @@ four primitives plus one piece of hidden runtime machinery. The rollout
 
 ### 7.1 The new surface
 
-| primitive                       | kind                                   | replaces                                                                             |
-| ------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| `$async(fn)`                    | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
-| `@await { … }` / `with { … }`   | control block (boundary)               | the pending/then branches of `@await`                                                |
-| `$pending(fn)`                  | reactive query                         | (new — no equivalent today)                                                          |
-| `@try { … } catch (err) { … }`  | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
-| `@error (err) { … }`            | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
+| primitive                      | kind                                   | replaces                                                                             |
+| ------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------ |
+| `$async(fn)`                   | reactive primitive (in a getter)       | `@await`'s value-binding role; the opt-in that makes a getter suspendable            |
+| `@await { … }` / `with { … }`  | control block (boundary)               | the pending/then branches of `@await`                                                |
+| `$pending(fn)`                 | reactive query                         | (new — no equivalent today)                                                          |
+| `@try { … } catch (err) { … }` | control group (boundary)               | `@await`'s `@catch`; also catches sync errors for the first time                     |
+| `@error (err) { … }`           | top-level block (sibling of `@render`) | per-component catch-all; avoids boilerplate `@try` wrapping the whole `@render` body |
 
 Plus, hidden: a **promise indicator** (`didSuspend`) on the `Computed` that
 `$async` creates, which the get trap reads through (§7.2).
@@ -504,6 +504,14 @@ function Profile($props) {
   partial content and renders the `with` branch. Re-render on resolve is
   automatic: the boundary's effect is a dependent of every suspended computed
   it read, so the reactive graph drives the retry.
+- On each re-run the boundary decides only whether to SWITCH branches, from
+  the `pending` set of suspended computeds that `suspendRead` recorded:
+  resolved entries drop out, still-suspended ones re-subscribe the boundary
+  effect (a re-run deactivates all its source subscriptions, so they must be
+  re-tracked to survive `clearSources` — the same shape as `runTry`'s
+  `holdSignals`). The check is O(pending reads), never a walk of all effect
+  sources, and non-suspend dependency changes inside content are left to the
+  child effects that read them — the boundary isn't re-run by them at all.
 - When the promise resolves, the boundary re-renders. **On subsequent
   dependency changes** (e.g., `$props.id` changes), the boundary keeps
   showing stale content during revalidation (Solid's branch-readiness rule).
@@ -697,7 +705,7 @@ runtime:
    `$cache` guard (no static check — §7.2); `@await`/`with`/`$pending`
    codegen.
 3. **Stage C — remove `@await` (done).** The old `@await (p) {…} then (v)
-   {…} catch (e) {…}` control was removed and the boundary renamed from
+{…} catch (e) {…}` control was removed and the boundary renamed from
    `@loading {…} @fallback {…}` to `@await {…} with {…}` (the parser errors
    on the old `@await (expr)` form pointing at the migration:
    `get x() { return $async(() => p) }` + `@await {…x…}`). `$refresh` and the

@@ -2,6 +2,7 @@ import { queryByText } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
+import $watch from "../../src/watch/$watch";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
@@ -175,6 +176,115 @@ export default function AwaitStale() {
 	}
 }
 `;
+
+const multiPendingSource = `
+export default function AwaitMultiPending() {
+	let $state = $watch({
+		get listA() {
+			return $async(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve("A loaded"), 10);
+					}),
+			);
+		},
+		get listB() {
+			return $async(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve("B loaded"), 30);
+					}),
+			);
+		},
+	});
+
+	@render {
+		@await {
+			<p>A: {$state.listA}</p>
+			<p>B: {$state.listB}</p>
+		} with {
+			<p>Loading...</p>
+		}
+	}
+}
+`;
+
+test("single boundary with two pending reads stays on the with-branch until both resolve", async () => {
+	// A boundary commits content only when no read inside suspends (ASYNC.md
+	// §7.3). When the first promise resolves, the boundary must re-run,
+	// re-check its remaining pending read, and keep the with-branch — without
+	// losing its subscription to the still-pending computed (a no-op re-run
+	// deactivates all source subscriptions; they must be re-established or
+	// the boundary never re-runs when the second promise resolves).
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, multiPendingSource, "client");
+	mountComponent(container, component);
+
+	const { waitFor } = await import("@testing-library/dom");
+
+	// Both pending -> with-branch
+	expect(queryByText(container, "Loading...")).not.toBeNull();
+
+	// A resolves at 10ms; B still pending -> still Loading
+	await new Promise((r) => setTimeout(r, 25));
+	expect(queryByText(container, "Loading...")).not.toBeNull();
+	expect(queryByText(container, "A: A loaded")).toBeNull();
+
+	// B resolves at 30ms -> content shows both, with-branch gone
+	await waitFor(() => expect(queryByText(container, "A: A loaded")).not.toBeNull());
+	expect(queryByText(container, "B: B loaded")).not.toBeNull();
+	expect(queryByText(container, "Loading...")).toBeNull();
+});
+
+const fineGrainedSource = `
+export default function AwaitFineGrained($props: { toggle: boolean }) {
+	let $state = $watch({
+		get data() {
+			return $async(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve("loaded"), 10);
+					}),
+			);
+		},
+	});
+
+	@render {
+		@await {
+			<p>Result: {$state.data} <span class="flag">{$props.toggle}</span></p>
+		} with {
+			<p>Loading...</p>
+		}
+	}
+}
+`;
+
+test("non-suspend state changes update content in place without re-running the boundary", async () => {
+	// A toggle read inside content is handled by the child effect that read
+	// it — the boundary must not flash the with-branch or re-render content.
+	let $props = $watch({ toggle: false });
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, fineGrainedSource, "client");
+	mountComponent(container, component, $props);
+
+	const { waitFor } = await import("@testing-library/dom");
+
+	// First load: with-branch, then content
+	expect(queryByText(container, "Loading...")).not.toBeNull();
+	const flag = () => container.getElementsByClassName("flag")[0].textContent;
+	const paragraph = () => container.getElementsByTagName("p")[0];
+	await waitFor(() => expect(paragraph().textContent).toContain("loaded"));
+	expect(flag()).toBe("false");
+	expect(queryByText(container, "Loading...")).toBeNull();
+
+	// Toggle while content is shown — the child effect patches the span in
+	// place; the boundary must not re-render (same <p> node) or flash Loading
+	const paragraphBefore = paragraph();
+	$props.toggle = true;
+	await waitFor(() => expect(flag()).toBe("true"));
+	expect(queryByText(container, "Loading...")).toBeNull();
+	expect(paragraph()).toBe(paragraphBefore);
+});
 
 test("@await keeps stale content during a refresh instead of flashing the with-branch", async () => {
 	const container = document.createElement("div");

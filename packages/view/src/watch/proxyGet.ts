@@ -42,6 +42,10 @@ function suspendRead(signal: Computed): any {
 	}
 	if (context.awaitBoundary !== null) {
 		context.awaitBoundary.suspended = true;
+		// Record the suspended computed on the boundary, so its effect can
+		// re-check (and re-subscribe to) just the pending reads on each
+		// re-run instead of walking its whole source list
+		context.awaitBoundary.pending.add(signal);
 		// Subscribe the boundary effect to this computed so the boundary
 		// re-runs when the promise resolves. Without this, the subscription
 		// would only exist on child effects that are destroyed when content

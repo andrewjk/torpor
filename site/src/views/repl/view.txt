@@ -910,6 +910,7 @@ function suspendRead(signal) {
 	if (context.activeTarget !== null) context.activeTarget.didSuspend = true;
 	if (context.awaitBoundary !== null) {
 		context.awaitBoundary.suspended = true;
+		context.awaitBoundary.pending.add(signal);
 		const boundaryEffect = context.awaitBoundary.effect;
 		if (boundaryEffect !== null && boundaryEffect !== context.activeTarget) {
 			const oldActive = context.activeTarget;
@@ -1265,16 +1266,10 @@ function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 		popRegion(oldRegion);
 	});
 }
-function anySourceSuspended(effect) {
-	for (let sub = effect.firstSource; sub !== null; sub = sub.nextSource) {
-		const source = sub.source;
-		if (source.type === 1 && source.didSuspend === true) return true;
-	}
-	return false;
-}
 function runAwait(region, anchor, renderContent, renderWith, name) {
 	const boundary = {
 		suspended: false,
+		pending: new Set(),
 		effect: null
 	};
 	let index = -1;
@@ -1310,7 +1305,14 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 		};
 		if (theEffect === null) attemptContent();
 		else {
-			const targetIndex = anySourceSuspended(theEffect) ? 1 : 0;
+			let suspended = false;
+			for (const signal of boundary.pending) {
+				if (signal.didSuspend) {
+					suspended = true;
+					trackSignal(signal);
+				} else boundary.pending.delete(signal);
+			}
+			const targetIndex = suspended ? 1 : 0;
 			if (targetIndex !== index) {
 				if (targetIndex === 0) attemptContent();
 				else if (!hasContent) if (renderWith !== null) renderBranch(1, renderWith);

@@ -1,8 +1,8 @@
 import type Effect from "../types/Effect";
 import type AwaitBoundary from "../types/AwaitBoundary";
 import type Region from "../types/Region";
-import { COMPUTED_TYPE } from "../types/constants";
 import $run from "../watch/$run";
+import trackSignal from "../watch/trackSignal";
 import context from "./context";
 import newRegion from "./newRegion";
 import popRegion from "./popRegion";
@@ -11,27 +11,18 @@ import runControlBranch from "./runControlBranch";
 import widenAncestorsAtAnchor from "./widenAncestorsAtAnchor";
 
 /**
- * Returns true if any source of the effect is a suspended `Computed`
- * (`didSuspend === true`). Used on subsequent runs to detect whether the
- * suspend state has changed without re-rendering content.
- */
-function anySourceSuspended(effect: Effect): boolean {
-	for (let sub = effect.firstSource; sub !== null; sub = sub.nextSource) {
-		const source = sub.source as any;
-		if (source.type === COMPUTED_TYPE && source.didSuspend === true) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
  * Renders an `@await` boundary. On the first run, content is rendered
  * speculatively; if any read inside suspends (`didSuspend`), the boundary
- * discards the partial render and shows the `with` branch instead. On
- * subsequent runs, the effect checks its own source chain for suspended
- * computeds — only switching branches when the suspend state actually
- * changes, leaving fine-grained child effects to handle value updates.
+ * discards the partial render and shows the `with` branch instead.
+ *
+ * Fine-grained updates: on subsequent runs the boundary only decides whether
+ * to SWITCH branches. It does so from its `pending` set — the suspended
+ * computeds recorded by `suspendRead` — dropping entries that resolved and
+ * re-subscribing the still-suspended ones (a re-run deactivates all of the
+ * effect's source subscriptions, so they must be re-tracked to survive
+ * `clearSources`). That check is O(pending reads), not O(all sources), and
+ * non-suspend dependency changes inside content are left to the child
+ * effects that read them — the boundary isn't re-run by them at all.
  *
  * Stale-while-revalidate (ASYNC.md §6.2): once content has been produced
  * (`hasContent`), a subsequent suspend during a refresh does NOT switch to
@@ -52,7 +43,11 @@ export default function runAwait(
 	renderWith: ((anchor: Node | null) => void) | null,
 	name?: string,
 ): void {
-	const boundary: AwaitBoundary = { suspended: false, effect: null };
+	const boundary: AwaitBoundary = {
+		suspended: false,
+		pending: new Set(),
+		effect: null,
+	};
 	let index = -1; // -1 = initial, 0 = content, 1 = with
 	let first = true;
 	let hasContent = false; // true once content has rendered without suspending
@@ -65,8 +60,7 @@ export default function runAwait(
 
 		// On the first call, $run hasn't returned yet so theEffect is null.
 		// runEffect sets context.activeTarget to this effect before calling
-		// run(), so capture it here for both suspendRead's subscription and
-		// anySourceSuspended's source walk.
+		// run(), so capture it here for suspendRead's subscription.
 		theEffect = context.activeTarget as Effect;
 		boundary.effect = theEffect;
 
@@ -127,9 +121,22 @@ export default function runAwait(
 			// content speculatively to detect suspend
 			attemptContent();
 		} else {
-			// Subsequent run: check source chain for suspend state without
-			// re-rendering. Only switch branches when suspend state changed.
-			const suspended = anySourceSuspended(theEffect);
+			// Subsequent run: refresh the pending set — resolved computeds
+			// drop out, still-suspended ones re-subscribe the boundary effect
+			// (checkEffect deactivated every source subscription before this
+			// run; without re-tracking, clearSources would detach the
+			// boundary from its pending reads and it would never re-run when
+			// they resolve). Only switch branches when the suspend state
+			// actually changed.
+			let suspended = false;
+			for (const signal of boundary.pending) {
+				if (signal.didSuspend) {
+					suspended = true;
+					trackSignal(signal);
+				} else {
+					boundary.pending.delete(signal);
+				}
+			}
 			const targetIndex = suspended ? 1 : 0;
 
 			if (targetIndex !== index) {
