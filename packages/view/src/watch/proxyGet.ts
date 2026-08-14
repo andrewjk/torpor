@@ -139,6 +139,11 @@ export default function proxyGet(
 						// suspendRead below still runs in peek mode ($refresh sets
 						// suspendPeek), so no taint/boundary notification happens.
 						context.refreshSignals.push(registered);
+						// The collection read itself just initialized this computed
+						// — its fetch is already in flight, so $refresh must not
+						// re-run it (that would start a duplicate fetch whose
+						// resolve the generation guard would drop)
+						context.refreshInitialized?.add(registered);
 					}
 					if (
 						registered !== undefined &&

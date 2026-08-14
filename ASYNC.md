@@ -570,7 +570,10 @@ are notified at suspend _start_ (the spinner pattern for pull-to-refresh).
 `$refresh(fn, { silent: true })` opts into the quiet form (§6.2's bare
 `refresh()`): the suspend reads quiet (`suspendQuiet`), `$pending` stays
 `false`, and nothing re-runs until resolve — for polling, refetch-on-focus.
-See `packages/view/src/watch/$refresh.ts`.
+If `fn` reads a getter the UI has never read, the collection read
+initializes it — and that fetch IS the refresh (the computed is not re-run;
+a second fetch would be a duplicate whose resolve the generation guard
+drops). See `packages/view/src/watch/$refresh.ts`.
 
 ### 7.5 `@try`/`@catch` — error boundary
 

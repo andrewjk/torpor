@@ -111,6 +111,16 @@ export default interface Context {
 	refreshSignals: Computed[] | null;
 
 	/**
+	 * When `$refresh` is collecting, the computeds that were *initialized*
+	 * by the collection read itself — their getter's first-ever read happened
+	 * inside `fn`, so the fetch the caller asked `$refresh` for is already in
+	 * flight. `$refresh` skips re-running these; a second run would start a
+	 * duplicate fetch whose resolve the generation guard would drop. null
+	 * outside collection.
+	 */
+	refreshInitialized: Set<Computed> | null;
+
+	/**
 	 * Functions that were run via $mount, which should be collected and flushed
 	 * when the component has been mounted in the DOM
 	 */

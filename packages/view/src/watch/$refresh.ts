@@ -54,6 +54,12 @@ export interface RefreshOptions {
  * load — or when the re-fetch is triggered by a dependency change, which
  * flows through the normal `recalc` path instead of here.
  *
+ * If `fn` reads a getter the UI has never read, the collection read
+ * initializes it — and that fetch IS the refresh: the computed is not re-run
+ * (a second fetch would be a duplicate whose resolve the generation guard
+ * drops). Getters already read (pending, resolved, or errored) are re-run as
+ * usual.
+ *
  * The returned value of `fn` is ignored; use `fn` to reference the getters.
  */
 export default function $refresh(fn: () => any, options?: RefreshOptions): void {
@@ -61,19 +67,35 @@ export default function $refresh(fn: () => any, options?: RefreshOptions): void 
 
 	const oldRefreshSignals = context.refreshSignals;
 	const oldPeek = context.suspendPeek;
+	const oldInitialized = context.refreshInitialized;
 	context.refreshSignals = [];
 	context.suspendPeek = true;
+	context.refreshInitialized = new Set();
 	let unique: Set<Computed>;
+	let initialized: Set<Computed>;
 	try {
 		fn();
 		// Dedupe — fn may read the same getter several times.
 		unique = new Set<Computed>(context.refreshSignals ?? []);
+		initialized = context.refreshInitialized;
 	} finally {
 		context.refreshSignals = oldRefreshSignals;
 		context.suspendPeek = oldPeek;
+		context.refreshInitialized = oldInitialized;
 	}
 
 	for (const computed of unique) {
+		if (initialized.has(computed)) {
+			// The collection read was this computed's first-ever read: it
+			// initialized the getter and started the fetch the caller is
+			// asking for. Re-running would start a duplicate fetch (its
+			// resolve dropped by the generation guard), so the
+			// initialization IS the refresh — skip the re-run and its
+			// notifications. First loads are loud regardless of `silent`
+			// (`suspendQuiet` is false while `hasResolved` is false), so
+			// `$pending` still reads `true` for it.
+			continue;
+		}
 		// Bare refresh: recalc must be true when `$async`'s run captures
 		// suspendQuiet so the suspend reads as loud (suspendQuiet =
 		// hasResolved && !recalc = false), and false for a silent refresh

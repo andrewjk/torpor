@@ -29,6 +29,7 @@ const context: Context =
 		suspendPeekHit: false,
 
 		refreshSignals: null,
+		refreshInitialized: null,
 
 		mountEffects: [],
 		stashedEvents: [],

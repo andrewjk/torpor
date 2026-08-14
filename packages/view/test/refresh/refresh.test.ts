@@ -180,7 +180,7 @@ test("$refresh keeps showing the stale value while the new fetch is in flight", 
 	expect($state.data).toBe("second");
 });
 
-test("$refresh re-fetches a computed that has never resolved (retry first load)", async () => {
+test("$refresh re-fetches a computed whose first load is still pending (retry first load)", async () => {
 	let call = 0;
 	let resolvers: ((v: string) => void)[] = [];
 
@@ -195,7 +195,13 @@ test("$refresh re-fetches a computed that has never resolved (retry first load)"
 		},
 	});
 
-	// First load still pending when the refresh happens
+	// The UI read the getter; its first load is still pending when the
+	// refresh happens
+	$run(() => {
+		void $state.data;
+	});
+	expect(call).toBe(1);
+
 	$refresh(() => $state.data);
 	expect(call).toBe(2);
 
@@ -210,6 +216,94 @@ test("$refresh re-fetches a computed that has never resolved (retry first load)"
 	resolvers[1]("fresh");
 	await tick();
 	expect($state.data).toBe("fresh");
+});
+
+test("$refresh on a never-read getter fetches once (no double fetch)", async () => {
+	let call = 0;
+	let resolvers: ((v: string) => void)[] = [];
+
+	let $state = $watch({
+		get data() {
+			return $async(() => {
+				const i = call++;
+				return new Promise<string>((resolve) => {
+					resolvers[i] = resolve;
+				});
+			});
+		},
+	});
+
+	// No UI read has ever touched the getter — the first-ever read happens
+	// inside $refresh's collection, which initializes it and starts the
+	// fetch. That fetch IS the refresh: no second one may start (its resolve
+	// would be dropped by the generation guard).
+	$refresh(() => $state.data);
+	expect(call).toBe(1);
+
+	// First loads are loud, so $pending still reads true while in flight
+	expect($pending(() => $state.data)).toBe(true);
+
+	resolvers[0]("fresh");
+	await tick();
+	expect($state.data).toBe("fresh");
+	expect($pending(() => $state.data)).toBe(false);
+});
+
+test("$refresh on a never-read getter is single-fetch even when silent", async () => {
+	let call = 0;
+	let resolvers: ((v: string) => void)[] = [];
+
+	let $state = $watch({
+		get data() {
+			return $async(() => {
+				const i = call++;
+				return new Promise<string>((resolve) => {
+					resolvers[i] = resolve;
+				});
+			});
+		},
+	});
+
+	$refresh(() => $state.data, { silent: true });
+	expect(call).toBe(1);
+
+	// A first load is loud regardless of silent (hasResolved is false)
+	expect($pending(() => $state.data)).toBe(true);
+
+	resolvers[0]("fresh");
+	await tick();
+	expect($state.data).toBe("fresh");
+});
+
+test("$refresh re-fetches a never-read getter after it resolves", async () => {
+	let call = 0;
+	let resolvers: ((v: string) => void)[] = [];
+
+	let $state = $watch({
+		get data() {
+			return $async(() => {
+				const i = call++;
+				return new Promise<string>((resolve) => {
+					resolvers[i] = resolve;
+				});
+			});
+		},
+	});
+
+	// Initialize via $refresh (single fetch), resolve
+	$refresh(() => $state.data);
+	resolvers[0]("first");
+	await tick();
+	expect($state.data).toBe("first");
+
+	// A later $refresh reads an already-initialized getter: the collection
+	// is a pure peek and the refresh re-runs it normally
+	$refresh(() => $state.data);
+	expect(call).toBe(2);
+
+	resolvers[1]("second");
+	await tick();
+	expect($state.data).toBe("second");
 });
 
 test("$refresh recovers after an error (retry-after-error)", async () => {

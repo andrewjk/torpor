@@ -81,6 +81,7 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	suspendPeek: false,
 	suspendPeekHit: false,
 	refreshSignals: null,
+	refreshInitialized: null,
 	mountEffects: [],
 	stashedEvents: [],
 	stashedAnimations: [],
@@ -942,7 +943,10 @@ function proxyGet(target, key, receiver) {
 					};
 					const result = Reflect.get(target, key, receiver);
 					const registered = data.signals.get(key);
-					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAsync) context.refreshSignals.push(registered);
+					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAsync) {
+					context.refreshSignals.push(registered);
+					if (context.refreshInitialized !== null) context.refreshInitialized.add(registered);
+				}
 					if (registered !== void 0 && registered.type === 1 && registered.didSuspend) return suspendRead(registered);
 					return result;
 				} finally {
@@ -1476,17 +1480,23 @@ function $refresh(fn, options) {
 	const silent = options?.silent === true;
 	const oldRefreshSignals = context.refreshSignals;
 	const oldPeek = context.suspendPeek;
+	const oldInitialized = context.refreshInitialized;
 	context.refreshSignals = [];
 	context.suspendPeek = true;
+	context.refreshInitialized = new Set();
 	let unique;
+	let initialized;
 	try {
 		fn();
 		unique = new Set(context.refreshSignals ?? []);
+		initialized = context.refreshInitialized;
 	} finally {
 		context.refreshSignals = oldRefreshSignals;
 		context.suspendPeek = oldPeek;
+		context.refreshInitialized = oldInitialized;
 	}
 	for (const computed of unique) {
+		if (initialized.has(computed)) continue;
 		computed.recalc = !silent;
 		deactivateSources(computed);
 		const oldActiveTarget = context.activeTarget;
