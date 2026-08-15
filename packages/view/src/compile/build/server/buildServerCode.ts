@@ -133,6 +133,7 @@ function buildServerTemplate(
 				// that render-time errors render the error content instead
 				if (current.error) {
 					b.append(`const t_try_body = t_body;`);
+					b.append(`const t_try_head = t_head;`);
 					b.append("try {");
 				}
 
@@ -156,6 +157,7 @@ function buildServerTemplate(
 
 				b.append(`} catch (${current.errorVar}) {`);
 				b.append("t_body = t_try_body;");
+				b.append("t_head = t_try_head;");
 
 				b.append("/* User interface error */");
 				buildServerNode(current.error, status, b);

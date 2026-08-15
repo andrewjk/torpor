@@ -58,7 +58,7 @@ export default function parseControl(
 
 	// Some operations don't have children
 	if (standaloneOperations.includes(node.operation)) {
-		wrangleControlNode(node, parentNode);
+		wrangleControlNode(node, parentNode, status);
 		return;
 	}
 
@@ -98,7 +98,7 @@ export default function parseControl(
 		}
 	}
 
-	wrangleControlNode(node, parentNode);
+	wrangleControlNode(node, parentNode, status);
 
 	parseControlBranches(status, parentNode);
 }
@@ -208,8 +208,13 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
  * Groups the control node into the correct parent e.g. if/else into an if group
  * @param node The control node
  * @param parentNode The parent node
+ * @param status The parse status, for error reporting
  */
-function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNode | ControlNode) {
+function wrangleControlNode(
+	node: ControlNode,
+	parentNode: RootNode | ElementNode | ControlNode,
+	status: ParseStatus,
+) {
 	// Group
 	// * if/else into an if group
 	// * for into a for group
@@ -274,14 +279,35 @@ function wrangleControlNode(node: ControlNode, parentNode: RootNode | ElementNod
 			}
 		}
 	} else if (node.operation === "@catch") {
-		// `@catch` attaches only to the nearest `@try group`.
+		// `@catch` attaches only to the nearest `@try group` — and only
+		// once; a second `@catch` on the same group would be silently
+		// dropped by the builders
+		let attached = false;
+		let duplicate = false;
 		for (let i = parentNode.children.length - 1; i >= 0; i--) {
 			const lastChild = parentNode.children[i];
 			// TODO: Break if it's an element, do more checking
 			if (isControlNode(lastChild) && lastChild.operation === "@try group") {
-				lastChild.children.push(node);
+				if (
+					lastChild.children.some((child) => isControlNode(child) && child.operation === "@catch")
+				) {
+					duplicate = true;
+				} else {
+					lastChild.children.push(node);
+					attached = true;
+				}
 				break;
 			}
+		}
+		if (!attached) {
+			addError(
+				status,
+				duplicate
+					? "`@try` cannot have more than one `@catch` block"
+					: "`@catch` must follow a `@try` block",
+				node.span.start,
+				node.span.end,
+			);
 		}
 	} else if (node.operation === "@try") {
 		const tryGroup: ControlNode = {

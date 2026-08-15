@@ -17,10 +17,12 @@ export default function TryInterpolation(
 	/* User interface */
 	t_body += `<![>`;
 	const t_try_body = t_body;
+	const t_try_head = t_head;
 	try {
 		t_body += `<p>Value: ${t_fmt(maybeThrow())}</p>`;
 	} catch (err) {
 		t_body = t_try_body;
+		t_head = t_try_head;
 		t_body += `<p class="error">Caught: ${t_fmt(err.message)}</p>`;
 	}
 	t_body += `<!]><!>`;

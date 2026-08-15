@@ -806,7 +806,7 @@ function rerunEffectsOnRegion(region, changedMask) {
 	}
 }
 function restoreHydration(node) {
-	if (context.hydrationNode !== null) context.hydrationNode = node;
+	context.hydrationNode = node;
 }
 function runControl(region, anchor, create, name) {
 	let first = true;

@@ -303,3 +303,41 @@ export default function Test() {
 	};
 	expect(output).toEqual(expected);
 });
+
+test("@catch without a preceding @try", () => {
+	const input = `
+export default function Test() {
+	@render {
+		@catch (err) {
+			<p>No try around me</p>
+		}
+	}
+}
+  `;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.length).toBeGreaterThan(0);
+	expect(output.errors[0].message).toBe("`@catch` must follow a `@try` block");
+});
+
+test("bare catch without a preceding @try", () => {
+	const input = `
+export default function Test() {
+	@render {
+		@try {
+			<p>fine</p>
+		} catch (err) {
+			<p>caught</p>
+		}
+		catch (err2) {
+			<p>orphaned</p>
+		}
+	}
+}
+  `;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(
+		output.errors.some((e) => e.message === "`@try` cannot have more than one `@catch` block"),
+	).toBe(true);
+});

@@ -16,19 +16,23 @@ export default function TryCatchNested(
 	/* User interface */
 	t_body += `<![>`;
 	const t_try_body = t_body;
+	const t_try_head = t_head;
 	try {
 		t_body += `<![>`;
 		const t_try_body = t_body;
+		const t_try_head = t_head;
 		try {
 			const x = boom();
 			t_body += `<p>Inner ok</p>`;
 		} catch (inner) {
 			t_body = t_try_body;
+			t_head = t_try_head;
 			t_body += `<p>Inner caught: ${t_fmt(inner.message)}</p>`;
 		}
 		t_body += `<!]><!>`;
 	} catch (outer) {
 		t_body = t_try_body;
+		t_head = t_try_head;
 		t_body += `<p>Outer caught: ${t_fmt(outer.message)}</p>`;
 	}
 	t_body += `<!]><!>`;

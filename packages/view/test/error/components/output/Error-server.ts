@@ -16,6 +16,7 @@ export default function ErrorBlock(
 
 	/* User interface */
 	const t_try_body = t_body;
+	const t_try_head = t_head;
 	try {
 		t_body += `<![>`;
 		if (maybeThrow()) {
@@ -25,6 +26,7 @@ export default function ErrorBlock(
 
 	} catch (err) {
 		t_body = t_try_body;
+		t_head = t_try_head;
 		/* User interface error */
 		t_body += `<p class="error">Oops: ${t_fmt(err.message)}</p>`;
 	}

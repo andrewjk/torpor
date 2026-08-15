@@ -611,7 +611,8 @@ was a `.catch()` callback on one promise):
 
 Parser-wise, this is the same shape as `@if`/`@else`: a control group with
 branches. The walk in `parseControl.ts` attaches `@catch` to the most recent
-`@try group`.
+`@try group`. A `@catch` with no preceding `@try` (or a second `@catch` on
+one group) is a parse error, not a silent drop.
 
 **Naming collision with `@catch` (resolved).** The old `@await` control's
 `@catch` branch is gone (removed in Stage C, §7.7), so `@catch` attaches only

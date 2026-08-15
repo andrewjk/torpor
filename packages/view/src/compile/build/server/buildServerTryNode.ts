@@ -29,9 +29,11 @@ export default function buildServerTryNode(
 	let catchBranch = branches.find((n) => n.operation === "@catch");
 
 	if (catchBranch) {
-		// Snapshot t_body so that any partially-flushed try output is
-		// discarded if the try branch throws
+		// Snapshot t_body and t_head so that any partially-flushed try output
+		// is discarded if the try branch throws — including <head> tags
+		// appended by child components or styles rendered before the throw
 		b.append(`const t_try_body = t_body;`);
+		b.append(`const t_try_head = t_head;`);
 		b.append("try {");
 		if (tryBranch) {
 			buildServerTryBranch(tryBranch, status, b);
@@ -40,6 +42,7 @@ export default function buildServerTryNode(
 		const catchVar = trimMatched(catchBranch.statement.substring("catch".length).trim(), "(", ")");
 		b.append(`} catch (${catchVar || "err"}) {`);
 		b.append("t_body = t_try_body;");
+		b.append("t_head = t_try_head;");
 		buildServerTryBranch(catchBranch, status, b);
 		b.append("}");
 	} else if (tryBranch) {

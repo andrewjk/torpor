@@ -34,6 +34,7 @@ export default function TryCatchChildError(
 	/* User interface */
 	t_body += `<![>`;
 	const t_try_body = t_body;
+	const t_try_head = t_head;
 	try {
 		t_body += `<![>`;
 		const t_comp_1 = Thrower(undefined, $context);
@@ -42,6 +43,7 @@ export default function TryCatchChildError(
 		t_body += `<!]><!>`;
 	} catch (err) {
 		t_body = t_try_body;
+		t_head = t_try_head;
 		t_body += `<p class="error">Caught: ${t_fmt(err.message)}</p>`;
 	}
 	t_body += `<!]><!>`;
