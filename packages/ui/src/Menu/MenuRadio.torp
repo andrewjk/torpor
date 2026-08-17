@@ -30,6 +30,7 @@ interface MenuRadioProps {
  */
 export default function MenuRadio($props: MenuRadioProps) {
 	let $state: RadioGroupItemState = $watch({
+		index: -1,
 		value: $props.value,
 		checked: $props?.checked ?? false,
 	});

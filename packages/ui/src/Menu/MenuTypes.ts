@@ -50,6 +50,7 @@ export interface ItemState {
 }
 
 export interface RadioGroupItemState {
+	index: number;
 	value: string;
 	checked: boolean;
 }

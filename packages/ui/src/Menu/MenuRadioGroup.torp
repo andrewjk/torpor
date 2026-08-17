@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { createItemGroup } from "../utils/createItemGroup";
 import {
 	type MenuRadioGroupContext,
 	MenuRadioGroupContextName,
@@ -24,21 +25,17 @@ interface MenuRadioGroupProps {
  * A container for a logical group of menu RadioGroup items.
  */
 export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) {
-	// A collection containing the state and some functions for each item
-	let itemStates: RadioGroupItemState[] = [];
-
 	let $state = $watch({
 		value: $props?.value,
 	});
 
 	$bind($state, $props, "value");
 
-	// Sync the checked state of all items from the group value
-	$run(() => {
-		let value = $state.value;
-		for (let item of itemStates) {
-			item.checked = item.value === value;
-		}
+	const group = createItemGroup<RadioGroupItemState>({
+		state: $state,
+		type: "single",
+		selectedProperty: "checked",
+		allowDeselect: false,
 	});
 
 	// Dispatch the change event when the value changes
@@ -49,19 +46,10 @@ export default function MenuRadioGroup($props: MenuRadioGroupProps | undefined) 
 
 	// Set the context to pass down to items
 	let context: MenuRadioGroupContext = {
-		registerItemInGroup,
-		toggleItem,
+		registerItemInGroup: group.registerItem,
+		toggleItem: group.toggleItem,
 	};
 	$context[MenuRadioGroupContextName] = context;
-
-	function registerItemInGroup(item: RadioGroupItemState) {
-		itemStates.push(item);
-		item.checked = item.value === $state.value;
-	}
-
-	function toggleItem(toggleValue: string) {
-		$state.value = toggleValue;
-	}
 
 	@render {
 		<div
