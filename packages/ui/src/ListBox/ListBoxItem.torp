@@ -97,24 +97,13 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 	}
 
 	function handleMount(el: HTMLButtonElement) {
-		// If the item has no value, set it to the text content
+		// If the item has no value, set it to the text content; selected is
+		// derived from the group value, so it picks this up automatically
 		if (!$state.text) {
 			$state.text = el.textContent.trim();
 		}
 		if ($state.value === undefined || $state.value === null) {
 			$state.value = $state.text;
-			if (context.state.value !== undefined && context.state.value !== null) {
-				switch (context.type) {
-					case "single": {
-						$state.selected = context.state.value === $state.value;
-						break;
-					}
-					case "multiple": {
-						$state.selected = context.state.value.includes($state.value);
-						break;
-					}
-				}
-			}
 		}
 	}
 

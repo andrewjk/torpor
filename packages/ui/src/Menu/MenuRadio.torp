@@ -1,4 +1,4 @@
-import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import type { ClassValue, StyleValue } from "@torpor/view";
 import {
 	type MenuButtonContext,
 	MenuButtonContextName,
@@ -18,8 +18,6 @@ interface MenuRadioProps {
 	style?: StyleValue;
 	/** The value of the item */
 	value: string;
-	/** Whether this item is checked */
-	checked: Bindable<boolean | undefined>;
 	/** Whether this item is disabled */
 	disabled?: boolean;
 }
@@ -32,10 +30,8 @@ export default function MenuRadio($props: MenuRadioProps) {
 	let $state: RadioGroupItemState = $watch({
 		index: -1,
 		value: $props.value,
-		checked: $props?.checked ?? false,
+		checked: false,
 	});
-
-	$bind($state, $props, "checked");
 
 	let button: HTMLButtonElement;
 
@@ -84,9 +80,9 @@ export default function MenuRadio($props: MenuRadioProps) {
 			{$props?.disabled}
 			role="menuitemradio"
 			tabindex="-1"
-			aria-checked={$props?.checked ? "true" : "false"}
+			aria-checked={$state.checked ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-state={$props?.checked ? "checked" : "unchecked"}
+			data-state={$state.checked ? "checked" : "unchecked"}
 			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleItemKey}
 			onclick={handleClick}

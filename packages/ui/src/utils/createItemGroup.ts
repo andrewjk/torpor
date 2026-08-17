@@ -1,4 +1,4 @@
-import { $run } from "@torpor/view";
+import { $cache, $run } from "@torpor/view";
 
 export interface ItemGroupItem {
 	index: number;
@@ -17,12 +17,17 @@ export interface ItemGroup<T extends ItemGroupItem> {
  * Creates a managed collection of selectable items for group-style components
  * (Accordion, ListBox, TabGroup, Tree, etc.).
  *
- * Handles item registration, removal, toggle logic, and reactive syncing of
- * each item's selection state from the group's value — eliminating the
- * boilerplate that was duplicated across ~5 components.
+ * Handles item registration, removal, and toggle logic. Each item's selection
+ * state is derived: registration installs a `$cache` getter over
+ * `selectedProperty` that computes from the group value, so selection can
+ * never drift out of sync with it — eliminating the boilerplate that was
+ * duplicated across ~5 components.
  *
  * The returned `itemStates` array is the source of truth; components should
  * store it in their context for child items to access.
+ *
+ * NOTE: Items must be registered before their selection property is first
+ * read, so the derived getter can take the property over.
  */
 export function createItemGroup<T extends ItemGroupItem>(options: {
 	/** The reactive state containing the group value */
@@ -45,26 +50,6 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	const allowDeselect = options.allowDeselect ?? true;
 	const itemStates: T[] = [];
 	let nextIndex = 0;
-
-	// Sync each item's selection state from the group value
-	$run(() => {
-		const value = state.value;
-		switch (getType()) {
-			case "single": {
-				for (let item of itemStates) {
-					(item as any)[selectedProperty] = item.value === value;
-				}
-				break;
-			}
-			case "multiple": {
-				const values = Array.isArray(value) ? value : value !== undefined ? [value] : [];
-				for (let item of itemStates) {
-					(item as any)[selectedProperty] = values.indexOf(item.value) !== -1;
-				}
-				break;
-			}
-		}
-	});
 
 	// Propagate disabled state from parent
 	if (options.disabled) {
@@ -93,7 +78,17 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 		if (options.onRegister) {
 			options.onRegister(item);
 		}
-		(item as any)[selectedProperty] = isItemSelected(item, state.value);
+		// Make the selection property derived: a cached getter computed from the
+		// group value, so it always reflects (and only reflects) that value
+		// Make the selection property derived: a cached getter computed from the
+		// group value, so it always reflects (and only reflects) that value
+		Object.defineProperty(item, selectedProperty, {
+			get() {
+				return $cache(() => isItemSelected(item, state.value));
+			},
+			enumerable: true,
+			configurable: true,
+		});
 		if (options.disabled) {
 			item.parentDisabled = options.disabled() === true;
 		}

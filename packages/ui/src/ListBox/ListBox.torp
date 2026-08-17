@@ -137,8 +137,9 @@ export default function ListBox($props: ListBoxProps | undefined) {
 	}
 
 	function markElement(id: string) {
+		// selected stays derived from the group value; active marks the
+		// keyboard-focus preview
 		group.itemStates.forEach((i) => {
-			i.selected = false;
 			i.active = i.id === id;
 		});
 	}
