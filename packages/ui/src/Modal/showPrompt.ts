@@ -13,8 +13,8 @@ export default function showPrompt(
 	target?: Element,
 ): Promise<any> {
 	return new Promise((resolve) => {
-		// Add the promise as the callback
-		const allProps = Object.assign({}, props, { callback: resolve });
+		// Add the promise as the onclose handler
+		const allProps = Object.assign({}, props, { onclose: resolve });
 
 		// Create the modal
 		// TODO: This needs to clean up after itself, like the use methods do

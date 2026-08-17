@@ -43,8 +43,12 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 		triggerItem: context.triggerItem,
 		handleHeaderKey: context.handleHeaderKey,
 		state: $state,
-		orientation: context.orientation,
-		activation: context.activation,
+		get orientation() {
+			return context.orientation;
+		},
+		get activation() {
+			return context.activation;
+		},
 	};
 	$context[TabItemContextName] = itemContext;
 

@@ -62,21 +62,27 @@ export default function TabGroup($props: TabGroupProps | undefined) {
 		removeItem,
 		triggerItem,
 		handleHeaderKey,
-		orientation,
-		activation,
+		get orientation() {
+			return $props?.orientation ?? "horizontal";
+		},
+		get activation() {
+			return $props?.activation ?? "automatic";
+		},
 	};
 	$context[TabGroupContextName] = context;
 
+	// Read the value unconditionally so this effect subscribes to it even
+	// before any items have registered
 	$run(() => {
-		// Ensure the value passed in was a string (in case e.g. the user has set values to ints)
-		$state.value = $state.value.toString();
+		const value = $state.value;
 		for (let item of itemStates) {
-			item.active = item.value === $state.value;
+			item.active = item.value === value;
 		}
 	});
 
 	$run(() => {
-		itemStates.forEach((s) => (s.parentDisabled = $props?.disabled === true));
+		const disabled = $props?.disabled === true;
+		itemStates.forEach((s) => (s.parentDisabled = disabled));
 	});
 
 	// Dispatch the change event when the value changes

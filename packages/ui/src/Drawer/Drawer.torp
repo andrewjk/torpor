@@ -14,10 +14,6 @@ interface DrawerProps {
 	visible: Bindable<boolean | undefined>;
 	/** Which side of the window to show the drawer from */
 	position?: "left" | "right" | "top" | "bottom";
-	/** A function to be called when the user selects a response */
-	callback?: (value: any) => void;
-	/** Raised when the drawer is opened or closed */
-	ontoggle?: (open: boolean) => void;
 	/** Raised when the drawer has opened */
 	onopen?: () => void;
 	/** Raised when the drawer has closed */
@@ -55,11 +51,10 @@ export default function Drawer($props: DrawerProps | undefined) {
 	};
 	$context[DrawerContextName] = context;
 
-	// Dispatch the toggle event when the drawer is opened or closed
+	// Dispatch the open/close events when the drawer is opened or closed
 	$handle((first) => {
 		const visible = $state.visible;
 		if (first) return;
-		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
 		} else {
@@ -86,11 +81,6 @@ export default function Drawer($props: DrawerProps | undefined) {
 
 		// Hide the drawer
 		$state.visible = false;
-
-		// Call the callback
-		if ($props?.callback) {
-			$props?.callback(result);
-		}
 	}
 
 	function handleClickOutside(e: MouseEvent) {

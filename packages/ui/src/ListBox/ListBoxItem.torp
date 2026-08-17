@@ -17,8 +17,8 @@ interface ListBoxItemProps {
 	value?: string;
 	/** If set to true, the user cannot interact with this ListBoxItem */
 	disabled?: boolean;
-	/** Raised when this item is opened or closed */
-	ontoggle?: (open: boolean) => void;
+	/** Raised when this item's selected state has changed */
+	onchange?: (selected: boolean) => void;
 }
 
 /**
@@ -57,10 +57,10 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 		};
 	});
 
-	// Dispatch the toggle event when the value of selected changes
+	// Dispatch the change event when the value of selected changes
 	$handle((first) => {
 		const selected = $state.selected;
-		if (!first) $props?.ontoggle?.(selected);
+		if (!first) $props?.onchange?.(selected);
 	});
 
 	// This function is called by the parent ListBox to focus this item's button

@@ -27,8 +27,8 @@ export interface ItemGroup<T extends ItemGroupItem> {
 export function createItemGroup<T extends ItemGroupItem>(options: {
 	/** The reactive state containing the group value */
 	state: { value: any };
-	/** Selection type */
-	type: "single" | "multiple";
+	/** Selection type, or a getter for it if it can change */
+	type: "single" | "multiple" | (() => "single" | "multiple");
 	/** The boolean property on items that reflects selection state */
 	selectedProperty: keyof T;
 	/** Getter for parent disabled state */
@@ -40,7 +40,8 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	/** Callback after a toggle, for side effects like closing a popout */
 	onToggle?: (value: any) => void;
 }): ItemGroup<T> {
-	const { state, selectedProperty, type } = options;
+	const { state, selectedProperty } = options;
+	const getType = typeof options.type === "function" ? options.type : () => options.type;
 	const allowDeselect = options.allowDeselect ?? true;
 	const itemStates: T[] = [];
 	let nextIndex = 0;
@@ -48,7 +49,7 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	// Sync each item's selection state from the group value
 	$run(() => {
 		const value = state.value;
-		switch (type) {
+		switch (getType()) {
 			case "single": {
 				for (let item of itemStates) {
 					(item as any)[selectedProperty] = item.value === value;
@@ -78,7 +79,7 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 
 	function isItemSelected(item: T, value: any): boolean {
 		if (value === undefined || value === null) return false;
-		if (type === "multiple") {
+		if (getType() === "multiple") {
 			const values = Array.isArray(value) ? value : [value];
 			return values.indexOf(item.value) !== -1;
 		}
@@ -108,7 +109,7 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	}
 
 	function toggleItem(value: any) {
-		switch (type) {
+		switch (getType()) {
 			case "single": {
 				if (allowDeselect) {
 					for (let item of itemStates) {

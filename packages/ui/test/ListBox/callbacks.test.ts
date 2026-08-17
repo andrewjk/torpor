@@ -72,7 +72,7 @@ describe("ListBox", () => {
 		expect(onchange.mock.calls[2][0]).toContain(2);
 	});
 
-	it("ontoggle fires when item is selected", async () => {
+	it("item onchange fires when item is selected", async () => {
 		const onToggle0 = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -83,7 +83,7 @@ describe("ListBox", () => {
 		expect(onToggle0).toHaveBeenCalledWith(true);
 	});
 
-	it("ontoggle fires when item is deselected", async () => {
+	it("item onchange fires when item is deselected", async () => {
 		const onToggle0 = vi.fn();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -94,7 +94,7 @@ describe("ListBox", () => {
 		expect(onToggle0).toHaveBeenCalledWith(false);
 	});
 
-	it("ontoggle fires for multiple items independently", async () => {
+	it("item onchange fires for multiple items independently", async () => {
 		const onToggle0 = vi.fn();
 		const onToggle1 = vi.fn();
 		const container = document.createElement("div");

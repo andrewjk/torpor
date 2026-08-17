@@ -6,7 +6,7 @@ import {
 export default function PaginationWithCallbacks() {
 	let $state = $watch({ number: 5, lastClicked: "" });
 
-	function handleToggle(active: boolean) {
+	function handleChange(active: boolean) {
 		if (active) {
 			$state.lastClicked = `Page ${$state.number}`;
 		}
@@ -16,7 +16,7 @@ export default function PaginationWithCallbacks() {
 		<div>
 			<Pagination count={10} &number={$state.number}>
 				@for (let page of $slot.pages) {
-					<PaginationItem page={page} active={$state.number === page} ontoggle={handleToggle}>
+					<PaginationItem page={page} active={$state.number === page} onchange={handleChange}>
 						{page}
 					</PaginationItem>
 				}

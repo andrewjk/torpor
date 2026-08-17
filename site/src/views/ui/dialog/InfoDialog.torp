@@ -5,10 +5,10 @@ export default function InfoDialog($props: any) {
 	$props.confirmText ||= "OK";
 
 	@render {
-		<Modal visible {$props.callback}>
+		<Modal visible {$props.onclose}>
 			<ModalOverlay class="info-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="info-dialog-content" {$props.callback}>
+				<Dialog class="info-dialog-content">
 					@if ($props.header) {
 						<DialogHeader>
 							<h4>{$props.header}</h4>

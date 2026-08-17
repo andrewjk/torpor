@@ -6,37 +6,6 @@ import { describe, expect, it, vi } from "vite-plus/test";
 import ToolBarCallbacks from "./components/ToolBarCallbacks.torp";
 
 describe("ToolBar", () => {
-	it("Callbacks - ontoggle fires with correct state when opening", async () => {
-		const onToggle = vi.fn();
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, ToolBarCallbacks, { ontoggle: onToggle });
-
-		const trigger = getByText(container, "Popout");
-
-		// Open popout
-		await userEvent.click(trigger);
-
-		// ontoggle should be called with true
-		expect(onToggle).toHaveBeenCalledWith(true);
-	});
-
-	it("Callbacks - ontoggle fires with correct state when closing", async () => {
-		const onToggle = vi.fn();
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, ToolBarCallbacks, { ontoggle: onToggle });
-
-		const trigger = getByText(container, "Popout");
-
-		// Open then close popout
-		await userEvent.click(trigger);
-		await userEvent.click(trigger);
-
-		// ontoggle should be called with false
-		expect(onToggle).toHaveBeenCalledWith(false);
-	});
-
 	it("Callbacks - onopen fires when popout opens", async () => {
 		const onOpen = vi.fn();
 		const container = document.createElement("div");

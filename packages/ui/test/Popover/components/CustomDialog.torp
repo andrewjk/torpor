@@ -3,7 +3,7 @@ import { Popover, PopoverContent } from "../../../src/Popover/index";
 
 export default function CustomDialog() {
 	@render {
-		<Popover visible {$props.callback}>
+		<Popover visible {$props.onclose}>
 			<PopoverContent>
 				<Dialog>
 					<DialogBody>

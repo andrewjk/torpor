@@ -10,10 +10,10 @@ export default function PromptDialog($props: any) {
 	});
 
 	@render {
-		<Modal visible {$props.callback}>
+		<Modal visible {$props.onclose}>
 			<ModalOverlay class="prompt-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="prompt-dialog-content" {$props.callback}>
+				<Dialog class="prompt-dialog-content">
 					@if ($props.header) {
 						<DialogHeader>
 							<h4>{$props.header}</h4>

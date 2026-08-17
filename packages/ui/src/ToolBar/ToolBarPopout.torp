@@ -10,8 +10,6 @@ interface ToolBarPopoutProps {
 	style?: StyleValue;
 	/** Whether the popout is visible */
 	visible: Bindable<boolean | undefined>;
-	/** Raised when the popout is opened or closed */
-	ontoggle?: (open: boolean) => void;
 	/** Raised when the popout has opened */
 	onopen?: () => void;
 	/** Raised when the popout has closed */
@@ -51,7 +49,6 @@ export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
 	$handle((first) => {
 		const visible = $state.visible;
 		if (first) return;
-		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
 		} else {

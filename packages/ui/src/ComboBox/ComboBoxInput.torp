@@ -41,13 +41,6 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	let $state = context.state;
 	context.focusInput = focusInput;
 
-	// Fall back to context values (set by the parent ComboBox) when props
-	// are not explicitly provided to this input
-	let name = $props?.name !== undefined ? $props.name : context.name;
-	let placeholder = $props?.placeholder !== undefined ? $props.placeholder : context.placeholder;
-	let required = $props?.required !== undefined ? $props.required : context.required;
-	let ariaLabel = $props?.ariaLabel !== undefined ? $props.ariaLabel : context.ariaLabel;
-
 	function focusInput() {
 		input.focus();
 	}
@@ -118,15 +111,15 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			{$props?.id}
 			class={["torp-combo-box-input", $props?.class]}
 			{$props?.style}
-			{name}
+			name={$props?.name !== undefined ? $props.name : context.name}
 			&value={Array.isArray($state.value) ? $state.value.join(", ") : $state.value}
-			{placeholder}
-			{required}
+			placeholder={$props?.placeholder !== undefined ? $props.placeholder : context.placeholder}
+			required={$props?.required !== undefined ? $props.required : context.required}
 			aria-readonly
 			aria-controls={$state.contentId}
 			aria-activedescendant={$state.activeDescendant}
 			aria-expanded={$state.visible ? "true" : "false"}
-			aria-label={ariaLabel}
+			aria-label={$props?.ariaLabel !== undefined ? $props.ariaLabel : context.ariaLabel}
 			{$props?.onchange}
 			onclick={handleClick}
 			oninput={handleInput}

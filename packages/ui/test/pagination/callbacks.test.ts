@@ -18,7 +18,7 @@ describe("Pagination - Callbacks", () => {
 		expect(lastClicked?.textContent).toBe("");
 	});
 
-	it("ontoggle is called on page change", async () => {
+	it("onchange is called on page change", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, PaginationWithCallbacks);

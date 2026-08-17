@@ -9,7 +9,7 @@ describe("TabGroup", () => {
 	it("Disabled tab group prevents interaction", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, TabGroupDisabled, { disabled: true, value: 0 });
+		mount(container, TabGroupDisabled, { disabled: true, value: "0" });
 
 		expect(queryByText(container, "Content 1")).toBeInTheDocument();
 		expect(queryByText(container, "Content 2")).not.toBeInTheDocument();
@@ -25,7 +25,7 @@ describe("TabGroup", () => {
 	it("Disabled tab group has aria-disabled on all triggers", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, TabGroupDisabled, { disabled: true, value: 1 });
+		mount(container, TabGroupDisabled, { disabled: true, value: "1" });
 
 		expect(getByText(container, "Header 1")).toHaveAttribute("aria-disabled", "true");
 		expect(getByText(container, "Header 2")).toHaveAttribute("aria-disabled", "true");
@@ -35,7 +35,7 @@ describe("TabGroup", () => {
 	it("Disabled tab group has data-disabled on all items", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, TabGroupDisabled, { disabled: true, value: 1 });
+		mount(container, TabGroupDisabled, { disabled: true, value: "1" });
 
 		const items = container.querySelectorAll(".torp-tab-content");
 		expect(items[0]).toHaveAttribute("data-disabled", "true");

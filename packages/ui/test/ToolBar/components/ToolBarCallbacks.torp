@@ -13,7 +13,7 @@ export default function ToolBarCallbacks() {
 			<ToolBarButton>
 				Button
 			</ToolBarButton>
-			<ToolBarPopout {$props?.ontoggle} {$props?.onopen} {$props?.onclose}>
+			<ToolBarPopout {$props?.onopen} {$props?.onclose}>
 				<ToolBarPopoutTrigger>Popout</ToolBarPopoutTrigger>
 				<ToolBarPopoutContent>
 					<Menu ariaLabel="Popout menu">

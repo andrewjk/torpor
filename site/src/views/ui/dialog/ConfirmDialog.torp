@@ -6,10 +6,10 @@ export default function ConfirmDialog($props: any) {
 	$props.cancelText ||= "Cancel";
 
 	@render {
-		<Modal visible {$props.callback}>
+		<Modal visible {$props.onclose}>
 			<ModalOverlay class="confirm-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="confirm-dialog-content" {$props.callback}>
+				<Dialog class="confirm-dialog-content">
 					@if ($props.header) {
 						<DialogHeader>
 							<h4>{$props.header}</h4>

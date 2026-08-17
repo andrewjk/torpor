@@ -11,17 +11,12 @@ import {
 import { Modal, ModalContent } from "../../../src/Modal";
 
 export default function MenuCallbacks($state: any) {
-	function handleCallback(value: string) {
+	function handleClose(value: string) {
 		$state.callbackValue = value;
 	}
 
 	function handleButtonClick(value: string) {
 		$state.buttonClickedValue = value;
-	}
-
-	function handlePopoutToggle(open: boolean) {
-		$state.popoutToggled = true;
-		$state.popoutToggledValue = open;
 	}
 
 	function handlePopoutOpen() {
@@ -34,7 +29,7 @@ export default function MenuCallbacks($state: any) {
 	}
 
 	@render {
-		<Modal visible callback={(value: string) => handleCallback(value)}>
+		<Modal visible onclose={(value: string) => handleClose(value)}>
 			<ModalContent>
 				<Menu ariaLabel="A menu">
 					<MenuButton value="button-value-1" onclick={() => handleButtonClick("button-value-1")}>
@@ -43,11 +38,7 @@ export default function MenuCallbacks($state: any) {
 					<MenuCheck &checked={$state.checkChecked}>
 						Check item
 					</MenuCheck>
-					<MenuPopout
-						ontoggle={handlePopoutToggle}
-						onopen={handlePopoutOpen}
-						onclose={handlePopoutClose}
-					>
+					<MenuPopout onopen={handlePopoutOpen} onclose={handlePopoutClose}>
 						<MenuPopoutTrigger>Popout trigger</MenuPopoutTrigger>
 						<MenuPopoutContent>
 							<Menu ariaLabel="A submenu">

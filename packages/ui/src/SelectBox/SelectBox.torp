@@ -19,10 +19,8 @@ interface SelectBoxProps {
 	//required?: boolean,
 	/** Whether the popout is visible  */
 	visible: Bindable<boolean | undefined>;
-	/** A function to be called when the user selects a response */
-	callback?: (value: any) => void;
-	/** Raised when the popout is opened or closed */
-	ontoggle?: (open: boolean) => void;
+	/** Raised when the value has changed */
+	onchange?: (value: any) => void;
 	/** Raised when the popout has opened */
 	onopen?: () => void;
 	/** Raised when the popout has closed */
@@ -57,7 +55,9 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	let context: SelectBoxContext = {
 		handleButton,
 		handleClickOutside,
-		placeholder: $props?.placeholder,
+		get placeholder() {
+			return $props?.placeholder;
+		},
 		state: $state,
 	};
 	$context[SelectBoxContextName] = context;
@@ -66,11 +66,16 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	let popoutContext: PopoutContext = context;
 	$context[PopoutContextName] = popoutContext;
 
-	// Dispatch the toggle event when the popout is opened or closed
+	// Dispatch the change event when the value changes
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
+	});
+
+	// Dispatch the open/close events when the popout is opened or closed
 	$handle((first) => {
 		const visible = $state.visible;
 		if (first) return;
-		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
 		} else {
@@ -106,11 +111,6 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 			if (context.focusTrigger) {
 				context.focusTrigger();
 			}
-		}
-
-		// Call the callback
-		if ($props?.callback) {
-			$props?.callback(result);
 		}
 	}
 

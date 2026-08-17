@@ -15,7 +15,7 @@ export default function ToolBarPopoutTest() {
 	@render {
 		<ToolBar ariaLabel="Popout test toolbar">
 			<ToolBarButton>Button 1</ToolBarButton>
-			<ToolBarPopout visible={visible1} ontoggle={(open) => visible1 = open}>
+			<ToolBarPopout visible={visible1} onopen={() => (visible1 = true)} onclose={() => (visible1 = false)}>
 				<ToolBarPopoutTrigger hoverDelay={100}>Popout 1</ToolBarPopoutTrigger>
 				<ToolBarPopoutContent>
 					<Menu ariaLabel="Popout menu 1">
@@ -25,7 +25,7 @@ export default function ToolBarPopoutTest() {
 				</ToolBarPopoutContent>
 			</ToolBarPopout>
 			<ToolBarButton>Button 2</ToolBarButton>
-			<ToolBarPopout visible={visible2} ontoggle={(open) => visible2 = open}>
+			<ToolBarPopout visible={visible2} onopen={() => (visible2 = true)} onclose={() => (visible2 = false)}>
 				<ToolBarPopoutTrigger>Popout 2</ToolBarPopoutTrigger>
 				<ToolBarPopoutContent>
 					<Menu ariaLabel="Popout menu 2">

@@ -3,10 +3,10 @@ import { Modal, ModalContent, ModalOverlay } from "@torpor/ui/Modal";
 
 export default function CustomDialog($props: any) {
 	@render {
-		<Modal visible {$props.callback}>
+		<Modal visible {$props.onclose}>
 			<ModalOverlay class="custom-dialog-overlay" />
 			<ModalContent>
-				<Dialog class="custom-dialog-content" {$props.callback}>
+				<Dialog class="custom-dialog-content">
 					<DialogHeader>
 						<h4>Header</h4>
 					</DialogHeader>

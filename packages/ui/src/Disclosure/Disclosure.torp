@@ -17,7 +17,7 @@ interface DisclosureProps {
 	/** If set to true, the user cannot interact with this disclosure */
 	disabled?: boolean;
 	/** Raised when the disclosure is opened or closed */
-	ontoggle?: (open: boolean) => void;
+	onchange?: (open: boolean) => void;
 }
 
 /**
@@ -62,10 +62,10 @@ export default function Disclosure($props: DisclosureProps | undefined) {
 	};
 	$context[DisclosureContextName] = itemContext;
 
-	// Dispatch the toggle event when the value of expanded changes
+	// Dispatch the change event when the value of expanded changes
 	$handle((first) => {
 		const expanded = $state.expanded;
-		if (!first) $props?.ontoggle?.(expanded);
+		if (!first) $props?.onchange?.(expanded);
 	});
 
 	@render {

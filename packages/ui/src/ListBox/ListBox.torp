@@ -49,13 +49,17 @@ interface ListBoxProps {
  */
 export default function ListBox($props: ListBoxProps | undefined) {
 	let defaultId = getId();
-	let type = $props?.type ?? "single";
+
+	// Get the current selection type, re-reading $props so changes are picked up
+	function getType(): "single" | "multiple" {
+		return $props?.type ?? "single";
+	}
 
 	// This may come from a PopoutContext, or we may need to handle it ourselves
 	let searchText: string | undefined;
 
 	let $state = $watch({
-		value: $props?.value ?? (type === "single" ? undefined : []),
+		value: $props?.value ?? (getType() === "single" ? undefined : []),
 	});
 
 	$bind($state, $props, "value");
@@ -81,7 +85,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	const group = createItemGroup<ItemState>({
 		state: $state,
-		type,
+		type: getType,
 		selectedProperty: "selected",
 		disabled: () => $props?.disabled,
 		onToggle: () => {
@@ -91,7 +95,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			}
 			// Pass this along to the containing popout if applicable
 			if (handleButton) {
-				if (type === "single") {
+				if (getType() === "single") {
 					handleButton("confirm", $state.value);
 				} else {
 					handleButton(undefined, $state.value);
@@ -102,7 +106,9 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	// Set the context to pass down to items, with functions for each item to call
 	let context: ListBoxContext = {
-		type,
+		get type() {
+			return getType();
+		},
 		state: $state,
 		registerItem: group.registerItem,
 		removeItem: group.removeItem,
@@ -262,7 +268,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			role="listbox"
 			aria-label={$props?.ariaLabel}
 			aria-labelledby={$props?.ariaLabelledBy}
-			aria-multiselectable={type === "multiple" ? "true" : undefined}
+			aria-multiselectable={getType() === "multiple" ? "true" : undefined}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			aria-orientation={$props?.orientation}
 		>

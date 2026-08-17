@@ -17,7 +17,7 @@ interface PaginationItemProps {
 	/** Whether this is the active item */
 	active?: boolean;
 	/** Raised when this item is made active */
-	ontoggle?: (active: boolean) => void;
+	onchange?: (active: boolean) => void;
 }
 
 export default function PaginationItem($props: PaginationItemProps) {
@@ -39,14 +39,14 @@ export default function PaginationItem($props: PaginationItemProps) {
 		};
 	});
 
-	// Call ontoggle when the active state changes
+	// Call onchange when the active state changes
 	let prevActive = $props.active ?? false;
 	$run(() => {
 		const active = $props.active ?? false;
 		if (active !== prevActive) {
 			prevActive = active;
-			if ($props?.ontoggle) {
-				$props.ontoggle(active);
+			if ($props?.onchange) {
+				$props.onchange(active);
 			}
 		}
 	});
@@ -58,8 +58,8 @@ export default function PaginationItem($props: PaginationItemProps) {
 
 			/** Raised when this item is made active */
 			//dispatch("toggle", value);
-			if ($props?.ontoggle) {
-				$props.ontoggle(value);
+			if ($props?.onchange) {
+				$props.onchange(value);
 			}
 		}
 	}

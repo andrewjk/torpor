@@ -31,8 +31,6 @@ export default function TabList($props: TabListProps | undefined) {
 	if (!context) {
 		throw new Error("TabList must be contained within a TabGroup");
 	}
-	// TODO: const { orientation } = context;
-	const orientation = context.orientation;
 
 	@render {
 		<div
@@ -41,8 +39,8 @@ export default function TabList($props: TabListProps | undefined) {
 			{$props?.style}
 			role="tablist"
 			aria-label={$props?.ariaLabel}
-			aria-orientation={orientation}
-			data-orientation={orientation}
+			aria-orientation={context.orientation}
+			data-orientation={context.orientation}
 		>
 			<slot />
 		</div>

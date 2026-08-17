@@ -39,10 +39,8 @@ interface AccordionProps {
  * ```
  */
 export default function Accordion($props: AccordionProps | undefined) {
-	let type = $props?.type ?? "single";
-
 	let $state = $watch({
-		value: $props?.value ?? (type === "single" ? undefined : []),
+		value: $props?.value ?? (($props?.type ?? "single") === "single" ? undefined : []),
 	});
 
 	$bind($state, $props, "value");
@@ -55,7 +53,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 
 	const group = createItemGroup<ItemState>({
 		state: $state,
-		type,
+		type: () => $props?.type ?? "single",
 		selectedProperty: "expanded",
 		disabled: () => $props?.disabled,
 		onRegister: (item) => {

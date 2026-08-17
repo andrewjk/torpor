@@ -7,37 +7,6 @@ import DrawerCallbacks from "./components/DrawerCallbacks.torp";
 import DrawerControlled from "./components/DrawerControlled.torp";
 
 describe("Drawer", () => {
-	it("Callbacks - ontoggle fires with correct state when opening", async () => {
-		const onToggle = vi.fn();
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, DrawerCallbacks, { ontoggle: onToggle });
-
-		const trigger = getByText(container, "Open Drawer");
-
-		// Open drawer
-		await userEvent.click(trigger);
-
-		// ontoggle should be called with true
-		expect(onToggle).toHaveBeenCalledWith(true);
-	});
-
-	it("Callbacks - ontoggle fires with correct state when closing", async () => {
-		const onToggle = vi.fn();
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, DrawerCallbacks, { ontoggle: onToggle });
-
-		const trigger = getByText(container, "Open Drawer");
-
-		// Open then close drawer
-		await userEvent.click(trigger);
-		await userEvent.click(trigger);
-
-		// ontoggle should be called with false
-		expect(onToggle).toHaveBeenCalledWith(false);
-	});
-
 	it("Callbacks - onopen fires when drawer opens", async () => {
 		const onOpen = vi.fn();
 		const container = document.createElement("div");

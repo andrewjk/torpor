@@ -19,10 +19,8 @@ interface ComboBoxProps {
 	required?: boolean;
 	/** Whether the popout is visible  */
 	visible: Bindable<boolean | undefined>;
-	/** A function to be called when the user selects a response */
-	callback?: (value: any) => void;
-	/** Raised when the popout is opened or closed */
-	ontoggle?: (open: boolean) => void;
+	/** Raised when the value has changed */
+	onchange?: (value: any) => void;
 	/** Raised when the popout has opened */
 	onopen?: () => void;
 	/** Raised when the popout has closed */
@@ -58,10 +56,18 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	let context: ComboBoxContext = {
 		handleButton,
 		handleClickOutside,
-		placeholder: $props?.placeholder,
-		required: $props?.required,
-		ariaLabel: $props?.ariaLabel,
-		name: $props?.name,
+		get placeholder() {
+			return $props?.placeholder;
+		},
+		get required() {
+			return $props?.required;
+		},
+		get ariaLabel() {
+			return $props?.ariaLabel;
+		},
+		get name() {
+			return $props?.name;
+		},
 		state: $state,
 	};
 	$context[ComboBoxContextName] = context;
@@ -70,11 +76,16 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	let popoutContext: PopoutContext = context;
 	$context[PopoutContextName] = popoutContext;
 
-	// Dispatch the toggle event when the popout is opened or closed
+	// Dispatch the change event when the value changes
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
+	});
+
+	// Dispatch the open/close events when the popout is opened or closed
 	$handle((first) => {
 		const visible = $state.visible;
 		if (first) return;
-		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
 		} else {
@@ -112,11 +123,6 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 			}
 		} else if (type === "cancel") {
 			$state.visible = false;
-		}
-
-		// Call the callback
-		if ($props?.callback) {
-			$props?.callback(result);
 		}
 	}
 

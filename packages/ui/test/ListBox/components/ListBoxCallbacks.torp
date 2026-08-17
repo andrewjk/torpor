@@ -3,13 +3,13 @@ import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 export default function ListBoxCallbacks($props: any) {
 	@render {
 		<ListBox {$props.value} {$props.onchange} {$props.type}>
-			<ListBoxItem value={0} ontoggle={$props.onToggle0}>
+			<ListBoxItem value={0} onchange={$props.onToggle0}>
 				Content 1
 			</ListBoxItem>
-			<ListBoxItem value={1} ontoggle={$props.onToggle1}>
+			<ListBoxItem value={1} onchange={$props.onToggle1}>
 				Content 2
 			</ListBoxItem>
-			<ListBoxItem value={2} ontoggle={$props.onToggle2}>
+			<ListBoxItem value={2} onchange={$props.onToggle2}>
 				Content 3
 			</ListBoxItem>
 		</ListBox>

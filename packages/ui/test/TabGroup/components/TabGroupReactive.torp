@@ -1,0 +1,24 @@
+import {
+	TabGroup,
+	TabList,
+	TabHeader,
+	TabTrigger,
+	TabContent,
+} from "../../../src/TabGroup/index";
+
+export default function TabGroupReactive() {
+	@render {
+		<TabGroup value={$props?.value} {$props?.orientation} {$props?.activation}>
+			<TabList ariaLabel="Reactive tabs">
+				<TabHeader>
+					<TabTrigger>Header 1</TabTrigger>
+				</TabHeader>
+				<TabHeader>
+					<TabTrigger>Header 2</TabTrigger>
+				</TabHeader>
+			</TabList>
+			<TabContent>Content 1</TabContent>
+			<TabContent>Content 2</TabContent>
+		</TabGroup>
+	}
+}

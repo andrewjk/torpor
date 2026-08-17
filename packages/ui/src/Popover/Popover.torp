@@ -22,10 +22,6 @@ interface PopoverProps {
 	anchor?: HTMLElement;
 	/** The position to display this popover at if it's contextual, as an alternative to supplying a PopoverTriggerContextual  */
 	position?: Point;
-	/** A function to be called when the user selects a response */
-	callback?: (value: any) => void;
-	/** Raised when the popover is opened or closed */
-	ontoggle?: (open: boolean) => void;
 	/** Raised when the popover has opened */
 	onopen?: () => void;
 	/** Raised when the popover has closed */
@@ -71,11 +67,10 @@ export default function Popover($props: PopoverProps | undefined) {
 	let popoutContext: PopoutContext = context;
 	$context[PopoutContextName] = popoutContext;
 
-	// Dispatch the toggle event when the popover is opened or closed
+	// Dispatch the open/close events when the popover is opened or closed
 	$handle((first) => {
 		const visible = $state.visible;
 		if (first) return;
-		$props?.ontoggle?.(visible);
 		if (visible) {
 			$props?.onopen?.();
 		} else {
@@ -102,11 +97,6 @@ export default function Popover($props: PopoverProps | undefined) {
 
 		// Hide the popover
 		$state.visible = false;
-
-		// Call the callback
-		if ($props?.callback) {
-			$props?.callback(result);
-		}
 	}
 
 	function handleClickOutside(e: MouseEvent) {
