@@ -13,8 +13,7 @@ const context: Context =
 		batchOperation: 0,
 		registerComputed: null,
 
-		firstEffectToRun: null,
-		lastEffectToRun: null,
+		effectsToRun: [],
 		firstSignalToUpdate: null,
 		lastSignalToUpdate: null,
 

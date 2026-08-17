@@ -41,9 +41,11 @@ export default interface Effect {
 	extent: number;
 
 	/**
-	 * When signals have been changed, this is the next dependent effect to run.
+	 * True while the effect is linked into the current run queue. Reset as
+	 * soon as the effect is processed, so a signal write later in the same
+	 * flush — or during the effect's own run — can correctly re-queue it.
 	 */
-	nextEffectToRun: Effect | null;
+	queued: boolean;
 
 	/**
 	 * True if the effect encountered an exception in its last run.

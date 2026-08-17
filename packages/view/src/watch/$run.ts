@@ -26,7 +26,7 @@ export default function $run(
 		firstSource: null,
 		nextEffect: null,
 		extent: 0,
-		nextEffectToRun: null,
+		queued: false,
 		didError: false,
 		didSuspend: false,
 		region: null,

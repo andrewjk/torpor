@@ -1,5 +1,4 @@
 import context from "../render/context";
-import type Effect from "../types/Effect";
 import type ProxySignal from "../types/ProxySignal";
 import checkEffect from "./checkEffect";
 import clearTargets from "./clearTargets";
@@ -18,10 +17,20 @@ export default function triggerEffects(): void {
 	// rethrown after the batch, as before boundaries existed.
 	let unhandledError: { error: any } | null = null;
 
-	// Run the effects
-	let effect: Effect | null = context.firstEffectToRun;
-	while (effect !== null) {
+	// Run the queued effects. Appends made while running (by signal writes
+	// within an effect) land in the same array and are picked up by the
+	// index-based loop. An effect that already ran in this flush can be
+	// re-queued the same way — `queued` is reset as each effect is
+	// processed, so a later write re-runs it with fresh values.
+	const queue = context.effectsToRun;
+	for (let i = 0; i < queue.length; i++) {
+		const effect = queue[i];
 		context.batchOperation++;
+
+		// Mark as not-queued BEFORE running, so that a signal write made
+		// during this run — or during a later effect's run in the same
+		// flush — can re-queue it if a source changed again
+		effect.queued = false;
 
 		try {
 			checkEffect(effect);
@@ -42,19 +51,14 @@ export default function triggerEffects(): void {
 				unhandledError = { error: err };
 			}
 		}
-
-		effect = effect.nextEffectToRun;
 	}
 
-	// Clear the effects
-	effect = context.firstEffectToRun;
-	context.firstEffectToRun = null;
-	context.lastEffectToRun = null;
-	while (effect !== null) {
-		let nextEffect = effect.nextEffectToRun;
-		effect.nextEffectToRun = null;
-		effect = nextEffect;
+	// Clear the queue and reset the queued flag defensively (every processed
+	// effect already reset its own, but an error may have skipped a run)
+	for (let effect of queue) {
+		effect.queued = false;
 	}
+	context.effectsToRun = [];
 
 	// Clear unused target subscriptions for the signals that were updated
 	// during the batch

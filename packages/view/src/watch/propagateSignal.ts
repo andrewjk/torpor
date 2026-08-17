@@ -28,15 +28,18 @@ export function propagateFromSignal(signal: { firstTarget: Subscription | null }
 
 		const target = targetSub.target;
 		if (target.type === EFFECT_TYPE) {
-			// Add the effect to the context for running after triggering,
-			// appending via the tail pointer for O(1)
-			if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
-				if (context.lastEffectToRun === null) {
-					context.firstEffectToRun = target;
-				} else {
-					context.lastEffectToRun.nextEffectToRun = target;
-				}
-				context.lastEffectToRun = target;
+			// Add the effect to the queue for running after triggering.
+			// Dedupe on the `queued` flag — NOT on a link into the queue —
+			// because link-based dedupe can't tell an effect still pending
+			// in this flush from one that already ran earlier in this flush
+			// but whose link hasn't been cleared yet. That gap silently
+			// dropped re-queues for effects downstream of a computed whose
+			// value oscillated within a single batch (e.g. a derived flag
+			// during a props → state → props round-trip), freezing them at
+			// a stale value.
+			if (!target.queued) {
+				target.queued = true;
+				context.effectsToRun.push(target);
 			}
 		} else if (/*target.type === COMPUTED_TYPE*/ !target.recalc) {
 			// This may need to be re-computed in the pull phase

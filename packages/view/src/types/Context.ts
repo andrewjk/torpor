@@ -42,9 +42,12 @@ export default interface Context {
 	registerComputed: ((computed: Computed) => void) | null;
 
 	/**
-	 * The first effect to run, either immediately or when the batch is finished.
+	 * The effects queued to run, either immediately or when the batch is
+	 * finished. An array (rather than a linked list) so that an effect can be
+	 * re-queued after it has already been processed within the same flush —
+	 * dedupe is handled by the `queued` flag on each effect.
 	 */
-	firstEffectToRun: Effect | null;
+	effectsToRun: Effect[];
 
 	/**
 	 * The first signal to update, either immediately or when the batch is finished.
@@ -55,11 +58,6 @@ export default interface Context {
 	 * The last signal queued for update, so we can append in O(1).
 	 */
 	lastSignalToUpdate: ProxySignal | null;
-
-	/**
-	 * The last effect queued to run, so we can append in O(1).
-	 */
-	lastEffectToRun: Effect | null;
 
 	/**
 	 * The region that is currently being created.
