@@ -1,0 +1,18 @@
+export default function Counter() {
+	let $state = $watch({
+		count: 0,
+	});
+
+	@render {
+		<h1>Micro Site</h1>
+		<p>
+			The count is {$state.count}.
+		</p>
+		<button onclick={() => $state.count++}>
+			Increment
+		</button>
+		<button onclick={() => $state.count = 0}>
+			Reset
+		</button>
+	}
+}

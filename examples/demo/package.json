@@ -1,5 +1,5 @@
 {
-	"name": "@torpor/demo",
+	"name": "@torpor/examples-demo",
 	"version": "0.0.1",
 	"description": "A demo site built with torpor/build",
 	"type": "module",

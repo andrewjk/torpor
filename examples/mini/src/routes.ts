@@ -21,7 +21,7 @@ export default function addRoutes(site: Site) {
 		// Root layout — wraps every page in a <main> with a header
 		layout: "./src/Layout.torp",
 		// Error page — rendered when a route errors
-		error: "./src/ErrorPage.torp",
+		error: "./src/Error.torp",
 		// Server hook — runs on every request before data loading
 		hookServer: {
 			handle: async (event) => {

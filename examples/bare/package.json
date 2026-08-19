@@ -1,7 +1,7 @@
 {
-	"name": "@torpor/examples-mini",
+	"name": "@torpor/examples-bare",
 	"version": "0.0.1",
-	"description": "A mini site built with torpor/build",
+	"description": "A bare site built with torpor/build",
 	"type": "module",
 	"private": true,
 	"scripts": {

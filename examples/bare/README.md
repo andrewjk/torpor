@@ -2,10 +2,8 @@
 
 A demo site built with [torpor/build](./build).
 
-This shows a minimal but still full-featured torpor/build site:
+This shows a bare torpor/build site that just has an endpoint (no components):
 
-- add Layout and Error components in the src folder
-- add a component in the src folder
 - add a routes.ts file that sets up routing
 - edit site.config.ts to load routes
 
@@ -19,7 +17,7 @@ Clone Torpor and use `npm` (or your preferred package manager) to run the demo:
 
 ```bash
 git clone https://github.com/andrewjk/torpor.git
-cd torpor/examples/mini
+cd torpor/examples/bare
 npm install
 npm run dev
 ```

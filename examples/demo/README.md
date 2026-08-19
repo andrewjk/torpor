@@ -10,7 +10,7 @@ Clone Torpor and use `npm` (or your preferred package manager) to run the demo:
 
 ```bash
 git clone https://github.com/andrewjk/torpor.git
-cd torpor/demo
+cd torpor/examples/demo
 npm install
 npm run dev
 ```
