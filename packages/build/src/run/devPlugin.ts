@@ -1,5 +1,5 @@
 import { type IncomingMessage, type ServerResponse } from "node:http";
-import { promises as fs } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { Readable } from "node:stream";
 import { type Plugin, type ViteDevServer } from "vite";
@@ -45,24 +45,28 @@ export default function devPlugin(site: Site): Plugin {
 }
 
 async function createDevHandler(vite: ViteDevServer, site: Site): Promise<ReqHandler> {
-	// Read site.html
-	// It's called site.html because @torpor/build builds the site (html, routes
-	// etc) while the user builds the app (components etc)
-	const templateFile = path.resolve(site.root, "src/site.html");
-	let template = await fs.readFile(templateFile, "utf-8");
-
-	// Apply Vite HTML transforms. This injects the Vite HMR client, and also
-	// applies HTML transforms from Vite plugins. Note that we only support a
-	// universal transform, not individual transforms for each route
-	template = await vite.transformIndexHtml("", template);
-
 	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
-	const clientScript = path.join(siteFolder, "clientEntry.ts");
-	const clientDevScript = path.join(siteFolder, "clientEntryDev.ts");
 	const serverScript = path.join(siteFolder, "serverEntry.ts");
 
-	// Prepare site.html so that we can just splice components into it
-	template = prepareTemplate(template, clientScript, clientDevScript);
+	// Read site.html if present
+	// It's called site.html because @torpor/build builds the site (html, routes
+	// etc) while the user builds the app (components etc). An endpoints-only
+	// site has no site.html, and no template is needed
+	let template: string | undefined;
+	const templateFile = path.resolve(site.root, "src/site.html");
+	if (existsSync(templateFile)) {
+		template = await fs.readFile(templateFile, "utf-8");
+
+		// Apply Vite HTML transforms. This injects the Vite HMR client, and also
+		// applies HTML transforms from Vite plugins. Note that we only support a
+		// universal transform, not individual transforms for each route
+		template = await vite.transformIndexHtml("", template);
+
+		// Prepare site.html so that we can just splice components into it
+		const clientScript = path.join(siteFolder, "clientEntry.ts");
+		const clientDevScript = path.join(siteFolder, "clientEntryDev.ts");
+		template = prepareTemplate(template, clientScript, clientDevScript);
+	}
 
 	const server = new Server();
 

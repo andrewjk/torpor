@@ -65,3 +65,11 @@ control removed; `@loading`/`@fallback` renamed to `@await`/`with`) are shipped
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
   default plugins are a good idea. Not a HACK to remove; flagged for the
   framework's design discussion.
+
+## Preview of built page sites fails at runtime (pre-existing)
+
+`tb --preview` on page-based examples (`examples/demo`, `examples/mini`) returns
+`{"code":"ERR_MODULE_NOT_FOUND"}` / `{"code":"ERR_UNKNOWN_FILE_EXTENSION"}` from
+`dist/server/serverEntry.js` — its runtime imports (e.g. `.torp` route files)
+aren't resolvable by plain Node. Reproduces at HEAD without the endpoints-only
+site.html fix. Dev mode (`tb --dev`, which uses `vite.ssrLoadModule`) works fine.

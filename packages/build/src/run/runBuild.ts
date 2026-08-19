@@ -25,7 +25,10 @@ export default async function runBuild(site: Site): Promise<void> {
 	}
 
 	// TODO: From a setting
-	let siteHtml = path.resolve(site.root, "src/site.html");
+	// An endpoints-only site has no site.html, so everything template-related
+	// is optional
+	const siteHtml = path.resolve(site.root, "src/site.html");
+	const hasSiteHtml = existsSync(siteHtml);
 
 	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
 	let clientScript = path.join(siteFolder, "clientEntry.ts");
@@ -43,7 +46,7 @@ export default async function runBuild(site: Site): Promise<void> {
 	clientConfig.build.outDir = clientFolder;
 	clientConfig.build.rollupOptions ??= {};
 	clientConfig.build.rollupOptions.input = [
-		siteHtml,
+		...(hasSiteHtml ? [siteHtml] : []),
 		clientScript,
 		...site.routes
 			.filter((r) => r.file && !/server\.(ts|js)$/.test(r.file))
@@ -74,9 +77,13 @@ export default async function runBuild(site: Site): Promise<void> {
 
 	// Move the site.html file into /client
 	// HACK: Should do this in Rollup if possible?
-	siteHtml = path.join(clientFolder, "site.html");
-	await fs.rename(path.join(clientFolder, "src", "site.html"), siteHtml);
-	await fs.rm(path.join(clientFolder, "src"), { recursive: true });
+	if (hasSiteHtml) {
+		await fs.rename(
+			path.join(clientFolder, "src", "site.html"),
+			path.join(clientFolder, "site.html"),
+		);
+		await fs.rm(path.join(clientFolder, "src"), { recursive: true });
+	}
 
 	// HOOK: Postbuild
 	if (site.adapter.postbuild) {

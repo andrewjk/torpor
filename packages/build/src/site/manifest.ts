@@ -58,7 +58,8 @@ export default {
 					} else {
 						// Client-side stub: check if the inline
 						// endpoint has a load function
-						const haveLoad = typeof r.endPoint?.load === "function";
+						const haveLoad =
+							typeof (r.endPoint as Record<string, unknown> | undefined)?.load === "function";
 						endPoint = haveLoad ? "() => load" : "undefined";
 					}
 				} else if (serverRequest || !/server\.(ts|js)$/.test(r.file)) {

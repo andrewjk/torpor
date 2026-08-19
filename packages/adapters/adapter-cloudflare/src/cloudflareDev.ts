@@ -1,6 +1,6 @@
 import { cloudflare } from "@cloudflare/vite-plugin";
 import { type Site } from "@torpor/build";
-import { promises as fs } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { type Plugin, type ViteDevServer } from "vite";
 import prepareTemplate from "./prepareTemplate";
@@ -18,7 +18,7 @@ const RESOLVED_TEMPLATE_ID = `\0${TEMPLATE_ID}`;
  */
 export default function cloudflareDev(site: Site): Plugin[] {
 	let viteServer: ViteDevServer | undefined;
-	let templatePromise: Promise<string> | undefined;
+	let templatePromise: Promise<string | undefined> | undefined;
 
 	const templatePlugin: Plugin = {
 		name: "torpor-cloudflare-template",
@@ -45,9 +45,13 @@ export default function cloudflareDev(site: Site): Plugin[] {
 	return [templatePlugin, ...cfPlugins];
 }
 
-async function buildDevTemplate(vite: ViteDevServer, site: Site): Promise<string> {
-	// Read site.html and apply Vite HTML transforms (injects the HMR client etc)
+async function buildDevTemplate(vite: ViteDevServer, site: Site): Promise<string | undefined> {
+	// Read site.html if present. An endpoints-only site has no site.html, and
+	// no template is needed
 	const templateFile = path.resolve(site.root, "src/site.html");
+	if (!existsSync(templateFile)) {
+		return undefined;
+	}
 	let template = await fs.readFile(templateFile, "utf-8");
 	template = await vite.transformIndexHtml("", template);
 

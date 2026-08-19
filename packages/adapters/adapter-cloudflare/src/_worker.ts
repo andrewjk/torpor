@@ -6,7 +6,10 @@ import { load } from "%SERVER_SCRIPT%";
 // This file has the above imports replaced and is then compiled to create a
 // Cloudflare Pages worker file
 
-const template = `%HTML_TEMPLATE%`;
+// The backticks around %HTML_TEMPLATE% keep this file parseable; postbuild
+// replaces the whole literal with a JSON string, or `undefined` for
+// endpoints-only sites with no site.html
+const template: string | undefined = `%HTML_TEMPLATE%`;
 
 // Send all requests through Server to handle middleware, cookies, headers, etc
 const server = new Server();

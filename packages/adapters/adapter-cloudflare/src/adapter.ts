@@ -1,7 +1,7 @@
 import { type Adapter, Site } from "@torpor/build";
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
-import { promises as fs } from "node:fs";
+import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
 import cloudflareDev from "./cloudflareDev";
@@ -53,19 +53,21 @@ async function postbuild(site: Site): Promise<void> {
 	let workerFile = path.join(adapterDistFolder, "_worker.ts");
 	let workerSource = await fs.readFile(workerFile, "utf-8");
 
-	// Find the client script file in /assets
-	let clientScript = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
-		f.startsWith("clientEntry-"),
-	);
-	if (!clientScript) {
-		throw new Error("clientEntry.js not found");
-	}
-	clientScript = `/assets/${clientScript}`;
+	// Read and prepare site.html so that we can just splice components into it.
+	// An endpoints-only site has no site.html, and no template is needed
+	let template: string | undefined;
+	const siteHtml = path.join(clientFolder, "site.html");
+	if (existsSync(siteHtml)) {
+		let clientScript = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
+			f.startsWith("clientEntry-"),
+		);
+		if (!clientScript) {
+			throw new Error("clientEntry.js not found");
+		}
+		clientScript = `/assets/${clientScript}`;
 
-	// Read and prepare site.html so that we can just splice components into it
-	let siteHtml = path.join(clientFolder, "site.html");
-	let template = await fs.readFile(siteHtml, "utf-8");
-	template = prepareTemplate(template, clientScript);
+		template = prepareTemplate(await fs.readFile(siteHtml, "utf-8"), clientScript);
+	}
 
 	const serverClass = path.join(buildSrcFolder, "server", "Server.ts");
 	const serverScript = path.join(serverFolder, "serverEntry.js");
@@ -74,7 +76,7 @@ async function postbuild(site: Site): Promise<void> {
 	workerSource = workerSource
 		.replace("%SERVER_CLASS%", serverClass)
 		.replace("%SERVER_SCRIPT%", serverScript)
-		.replace("%HTML_TEMPLATE%", template);
+		.replace("`%HTML_TEMPLATE%`", () => (template ? JSON.stringify(template) : "undefined"));
 
 	workerFile = path.join(tempFolder, "_worker.ts");
 	await fs.mkdir(tempFolder);

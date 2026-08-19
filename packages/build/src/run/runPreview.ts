@@ -16,23 +16,24 @@ export default async function runPreview(site: Site): Promise<void> {
 	const clientFolder = path.join(distFolder, "client");
 	const serverFolder = path.join(distFolder, "server");
 
-	// Find the client script file in /assets
-	let clientScript = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
-		f.startsWith("clientEntry-"),
-	);
-	if (!clientScript) {
-		throw new Error("clientEntry.js not found");
+	// Read site.html if present, and find the client script file in /assets.
+	// An endpoints-only site has no site.html, and no template is needed
+	let template: string | undefined;
+	const siteHtml = path.join(clientFolder, "site.html");
+	if (existsSync(siteHtml)) {
+		let clientScript = (await fs.readdir(path.join(clientFolder, "assets"))).find((f) =>
+			f.startsWith("clientEntry-"),
+		);
+		if (!clientScript) {
+			throw new Error("clientEntry.js not found");
+		}
+		clientScript = `/assets/${clientScript}`;
+
+		template = await fs.readFile(siteHtml, "utf-8");
+
+		// Prepare site.html so that we can just splice components into it
+		template = prepareTemplate(template, clientScript);
 	}
-	clientScript = `/assets/${clientScript}`;
-
-	// Read site.html
-	// It's called site.html because @torpor/build builds the site (html, routes
-	// etc) while the user builds the app (components etc)
-	let siteHtml = path.join(clientFolder, "site.html");
-	let template = await fs.readFile(siteHtml, "utf-8");
-
-	// Prepare site.html so that we can just splice components into it
-	template = prepareTemplate(template, clientScript);
 
 	// Configure the server
 	const server = new Server();

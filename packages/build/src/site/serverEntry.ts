@@ -29,7 +29,7 @@ router.addPages(manifest.routes);
 
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
-export async function load(ev: ServerEvent, template: string): Promise<Response> {
+export async function load(ev: ServerEvent, template?: string): Promise<Response> {
 	const url = new URL(ev.request.url);
 	const path = url.pathname;
 	const query = url.searchParams;
@@ -183,7 +183,7 @@ async function loadView(
 	url: URL,
 	handler: RouteHandler,
 	params: Record<string, string>,
-	template: string,
+	template: string | undefined,
 	formStatus?: number,
 	form?: Record<string, string | number>,
 ) {
@@ -191,6 +191,13 @@ async function loadView(
 	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
 	if (!clientEndPoint?.component) {
 		return notFound();
+	}
+
+	// The template comes from site.html, which endpoints-only sites don't have
+	if (!template) {
+		throw new Error(
+			"Page routes require a src/site.html file, which was not found; add it, or remove page/layout routes to serve endpoints only",
+		);
 	}
 
 	// There may be a server endpoint
@@ -309,7 +316,7 @@ async function runAction(
 	serverEndPoint: PageServerEndPoint | undefined,
 	params: Record<string, string>,
 	query: URLSearchParams,
-	template: string,
+	template: string | undefined,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
 	if (serverEndPoint?.actions) {
