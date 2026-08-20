@@ -1,4 +1,10 @@
+import type { Jsonify } from "../types/Jsonify";
+import type TypedResponse from "./TypedResponse";
 import response from "./response";
+
+type OkResponse<T extends object | string | undefined> = T extends object
+	? TypedResponse<Jsonify<T>>
+	: Response;
 
 /**
  * 200 OK
@@ -17,13 +23,18 @@ import response from "./response";
  * - TRACE: The response has a message body containing the request as received
  *   by the server.
  *
- * Although possible, successful PUT or DELETE requests often do not result in a
- * 200 OK response. It is more common to see 201 Created if the resource is
+ * Although possible, successful PUT or DELETE requests often do not result in
+ * a 200 OK response. It is more common to see 201 Created if the resource is
  * uploaded or created for the first time, or 204 No Content upon successful
  * deletion of a resource.
  *
+ * An object body is typed: the client sees its JSON form through
+ * `makeApi`-created callers.
+ *
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200
  */
-export default function ok(body?: object | string): Response {
-	return response(200, body);
+export default function ok<T extends object | string | undefined>(
+	body?: T,
+): OkResponse<T> {
+	return response(200, body) as OkResponse<T>;
 }

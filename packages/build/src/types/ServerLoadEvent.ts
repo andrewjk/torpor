@@ -1,7 +1,12 @@
 import CookieHelper from "../server/CookieHelper";
 import HeaderHelper from "../server/HeaderHelper";
+import type { RouteParamsOf } from "./ParseRouteParams";
 
-export default interface ServerLoadEvent {
+/**
+ * The event passed to server functions. Annotate with a route path to get
+ * typed params, e.g. `ServerLoadEvent<"/posts/[id]">`.
+ */
+export default interface ServerLoadEvent<Route extends string | undefined = undefined> {
 	/**
 	 * The URL for the server function.
 	 */
@@ -9,7 +14,7 @@ export default interface ServerLoadEvent {
 	/**
 	 * Route params from the URL and route path.
 	 */
-	params: Record<string, string>;
+	params: RouteParamsOf<Route>;
 	// TODO: Maybe we should find a better name for the data that is set set in
 	// pages, and just call this data?
 	/**

@@ -1,20 +1,22 @@
 import { type Component } from "@torpor/view";
+import type { RouteArgsOf } from "./ParseRouteParams";
 import type PageLoadEvent from "./PageLoadEvent";
 
 /**
- * For +page.
+ * For +page. Annotate with a route path to get typed params, e.g.
+ * `PageEndPoint<"/posts/[id]">`.
  */
-export default interface PageEndPoint {
+export default interface PageEndPoint<Route extends string | undefined = undefined> {
 	/**
 	 * Builds the route path for the page in a type-safe manner.
 	 * TODO: Not sure this is actually the best way to do it...
 	 */
-	route?: (...args: any[]) => string;
+	route?: (...args: RouteArgsOf<Route>) => string;
 	/**
 	 * Loads data for the page.
 	 */
 	load?: (
-		event: PageLoadEvent,
+		event: PageLoadEvent<Route>,
 	) => Response | undefined | void | Promise<Response | undefined | void>;
 	/**
 	 * The component that is displayed for the page.
@@ -24,7 +26,7 @@ export default interface PageEndPoint {
 	/**
 	 * The head element data for the page, which may include a <title> and <meta> elements.
 	 */
-	head?: HeadElement[] | ((event: PageLoadEvent) => HeadElement[]);
+	head?: HeadElement[] | ((event: PageLoadEvent<Route>) => HeadElement[]);
 }
 
 type HeadElement = TitleElement | MetaElement;
