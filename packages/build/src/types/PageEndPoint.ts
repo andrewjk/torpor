@@ -1,12 +1,17 @@
 import { type Component } from "@torpor/view";
 import type { RouteArgsOf } from "./ParseRouteParams";
 import type PageLoadEvent from "./PageLoadEvent";
+import type { PageLoadReturn } from "./PageLoadReturn";
 
 /**
- * For +page. Annotate with a route path to get typed params, e.g.
- * `PageEndPoint<"/posts/[id]">`.
+ * For +page. Annotate with a route path to get typed params, and with a data
+ * shape to flag loads that return keys the page doesn't expect, e.g.
+ * `PageEndPoint<"/posts/[id]", PageData<typeof server>>`.
  */
-export default interface PageEndPoint<Route extends string | undefined = undefined> {
+export default interface PageEndPoint<
+	Route extends string | undefined = undefined,
+	Data = Record<string, any>,
+> {
 	/**
 	 * Builds the route path for the page in a type-safe manner.
 	 * TODO: Not sure this is actually the best way to do it...
@@ -17,7 +22,7 @@ export default interface PageEndPoint<Route extends string | undefined = undefin
 	 */
 	load?: (
 		event: PageLoadEvent<Route>,
-	) => Response | undefined | void | Promise<Response | undefined | void>;
+	) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;
 	/**
 	 * The component that is displayed for the page.
 	 */

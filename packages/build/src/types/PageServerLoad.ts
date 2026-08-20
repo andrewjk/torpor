@@ -1,7 +1,8 @@
 import type ServerLoadEvent from "./ServerLoadEvent";
+import type { PageLoadReturn } from "./PageLoadReturn";
 
-type PageServerLoad<Route extends string | undefined = undefined> = (
+type PageServerLoad<Route extends string | undefined = undefined, Data = Record<string, any>> = (
 	event: ServerLoadEvent<Route>,
-) => Response | undefined | void | Promise<Response | undefined | void>;
+) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;
 
 export default PageServerLoad;
