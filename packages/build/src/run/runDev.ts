@@ -10,8 +10,17 @@ import {
 	type ViteDevServer,
 } from "vite";
 import Site from "../site/Site.ts";
-import { checkRoute, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
+import {
+	checkApiCallSource,
+	checkApiCalls,
+	checkRoute,
+	checkRoutes,
+	createApiCallCheck,
+	type RouteCheckIssue,
+	reportRouteIssues,
+} from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
+import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import devPlugin from "./devPlugin.ts";
 
 export default async function runDev(site: Site): Promise<void> {
@@ -74,12 +83,13 @@ export default async function runDev(site: Site): Promise<void> {
 }
 
 /**
- * Reports route type issues at startup, then re-checks route files as they
- * change so annotation problems surface during development without failing
- * the dev server.
+ * Reports route type issues at startup, then re-checks route files and
+ * `makeApi` calls as they change so annotation problems surface during
+ * development without failing the dev server.
  */
 function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 	reportRouteIssues(checkRoutes(site));
+	reportRouteIssues(checkApiCalls(site));
 
 	// Map absolute route file paths to their manifest entries, so changed
 	// files can be re-checked against their derived route
@@ -88,19 +98,36 @@ function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 			.filter((r) => r.file?.endsWith(".ts"))
 			.map((r) => [path.resolve(site.root, r.file!), r]),
 	);
+	const apiCheck = createApiCallCheck(site);
 	// Only report when a file's issues change, to avoid repeating the same
 	// warnings on every save
 	const reported = new Map<string, string>();
 
-	vite.watcher.on("change", (file) => {
-		const route = routeFiles.get(file);
-		if (!route) return;
-		const issues = checkRoute(site, route);
+	const report = (file: string, issues: RouteCheckIssue[]) => {
 		const key = JSON.stringify(issues);
 		if (reported.get(file) === key) return;
 		reported.set(file, key);
 		reportRouteIssues(issues);
-	});
+	};
+
+	const recheck = (file: string): void => {
+		const route = routeFiles.get(file);
+		if (route) {
+			report(file, checkRoute(site, route));
+			return;
+		}
+		if (!/\.(ts|js|torp)$/.test(file)) return;
+		let source: string;
+		try {
+			source = readFileSync(file, "utf8");
+		} catch {
+			return;
+		}
+		report(file, checkApiCallSource(source, file, apiCheck));
+	};
+
+	vite.watcher.on("change", recheck);
+	vite.watcher.on("add", recheck);
 }
 
 function normalizePlugins(plugins: Plugin | Plugin[] | void): Plugin[] {
@@ -108,95 +135,10 @@ function normalizePlugins(plugins: Plugin | Plugin[] | void): Plugin[] {
 	return Array.isArray(plugins) ? plugins : [plugins];
 }
 
-type AliasEntry = { find: string | RegExp; replacement: string };
-
 function asAliasArray(alias: AliasOptions | undefined): AliasEntry[] {
 	// Normalize an existing `resolve.alias` value (array | object | undefined)
 	// into an array so we can concatenate our tsconfig-derived aliases.
 	if (!alias) return [];
 	if (Array.isArray(alias)) return alias;
 	return Object.entries(alias).map(([find, replacement]) => ({ find, replacement }));
-}
-
-/**
- * Reads `tsconfig.json` `compilerOptions.paths` (relative to `baseUrl`,
- * defaulting to the tsconfig directory) and converts them to Vite
- * `resolve.alias` entries. Only handles paths declared in the root tsconfig
- * (not inherited via `extends`).
- */
-function tsconfigAliases(root: string): AliasEntry[] {
-	const file = path.join(root, "tsconfig.json");
-	let paths: Record<string, string[]> | undefined;
-	let baseUrl: string;
-	try {
-		const tsconfig = JSON.parse(stripJsonc(readFileSync(file, "utf-8")));
-		const compilerOptions = tsconfig.compilerOptions ?? {};
-		baseUrl = compilerOptions.baseUrl ? path.resolve(root, compilerOptions.baseUrl) : root;
-		paths = compilerOptions.paths;
-	} catch {
-		return [];
-	}
-	if (!paths) return [];
-
-	const aliases: AliasEntry[] = [];
-	for (const [pattern, targets] of Object.entries(paths)) {
-		const target = targets?.[0];
-		if (!target) continue;
-		if (pattern.endsWith("*")) {
-			// `@/*` -> `./src/*`: match the literal prefix (`@/`) and rewrite to
-			// the target dir. A string `find` is used (not a RegExp) because
-			// Vite applies prefix-string aliases during SSR transform, which is
-			// what makes path aliases resolve in the SSR module runner.
-			const find = pattern.slice(0, -1);
-			const targetDir = target.slice(0, -1);
-			aliases.push({
-				find,
-				replacement: `${path.resolve(baseUrl, targetDir)}/`,
-			});
-		} else {
-			aliases.push({ find: pattern, replacement: path.resolve(baseUrl, target) });
-		}
-	}
-	return aliases;
-}
-
-/**
- * Strips JSONC comments and trailing commas so `tsconfig.json` (which permits
- * both) can be parsed with `JSON.parse`. String contents are preserved.
- */
-function stripJsonc(text: string): string {
-	let out = "";
-	for (let i = 0; i < text.length;) {
-		const c = text[i];
-		if (c === '"' || c === "'") {
-			const quote = c;
-			out += c;
-			i++;
-			while (i < text.length) {
-				if (text[i] === "\\") {
-					out += text[i] + (text[i + 1] ?? "");
-					i += 2;
-					continue;
-				}
-				const cc = text[i++];
-				out += cc;
-				if (cc === quote) break;
-			}
-			continue;
-		}
-		if (c === "/" && text[i + 1] === "/") {
-			i += 2;
-			while (i < text.length && text[i] !== "\n") i++;
-			continue;
-		}
-		if (c === "/" && text[i + 1] === "*") {
-			i += 2;
-			while (i < text.length && !(text[i] === "*" && text[i + 1] === "/")) i++;
-			i += 2;
-			continue;
-		}
-		out += c;
-		i++;
-	}
-	return out.replace(/,(\s*[}\]])/g, "$1");
 }

@@ -4,9 +4,15 @@ import type { RouteParamsOf } from "./ParseRouteParams";
 
 /**
  * The event passed to server functions. Annotate with a route path to get
- * typed params, e.g. `ServerLoadEvent<"/posts/[id]">`.
+ * typed params, e.g. `ServerLoadEvent<"/posts/[id]">`, and with a body type
+ * to get typed request bodies in API endpoints, e.g.
+ * `ServerLoadEvent<"/api/posts", { title: string }>` — which also types the
+ * `body` param of client calls made with `makeApi`.
  */
-export default interface ServerLoadEvent<Route extends string | undefined = undefined> {
+export default interface ServerLoadEvent<
+	Route extends string | undefined = undefined,
+	Body = unknown,
+> {
 	/**
 	 * The URL for the server function.
 	 */
@@ -27,6 +33,10 @@ export default interface ServerLoadEvent<Route extends string | undefined = unde
 	 */
 	request: Request;
 	//response: ServerResponse;
+	/**
+	 * Reads the request body as JSON, typed by the event's `Body` annotation.
+	 */
+	json: () => Promise<Body>;
 	/**
 	 * A helper for getting and setting cookie data.
 	 */

@@ -439,6 +439,7 @@ function buildServerParams(
 		params,
 		appData: {},
 		request: ev.request,
+		json: () => ev.json(),
 		cookies: ev.cookies,
 		headers: ev.headers,
 		adapter: ev.adapter,

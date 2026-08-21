@@ -36,4 +36,11 @@ export default class ServerEvent {
 			this.response.headers.append(header[0], header[1]);
 		}
 	}
+
+	/**
+	 * Reads the request body as JSON.
+	 */
+	json(): Promise<unknown> {
+		return this.request.json();
+	}
 }

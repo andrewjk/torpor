@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import type Route from "../types/Route";
 import {
@@ -10,6 +10,7 @@ import {
 	PAGE_SERVER_ROUTE,
 	SERVER_ROUTE,
 } from "../types/RouteType";
+import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import type Site from "./Site";
 
 /**
@@ -159,6 +160,161 @@ export function reportRouteIssues(issues: RouteCheckIssue[]): number {
 		console.error(`[torpor] ${issue.severity}: ${issue.file}:${issue.line} ${issue.message}`);
 	}
 	return issues.filter((i) => i.severity === "error").length;
+}
+
+const MAKE_API_RE = /\bmakeApi\s*<\s*(["'])([^"']+)\1\s*,\s*typeof\s+([A-Za-z_$][\w$]*)/g;
+
+const DEFAULT_IMPORT_RE =
+	/\bimport\s+(?:type\s+)?([A-Za-z_$][\w$]*)\s+from\s*(["'])([^"']+)\2/g;
+
+const SKIP_DIRS = new Set(["node_modules", "dist", ".git", ".torpor", ".vite", "coverage"]);
+
+const SOURCE_FILE_RE = /\.(ts|js|torp)$/;
+
+/**
+ * Precomputed state for checking `makeApi` calls: the site root, its route
+ * files keyed by path, and tsconfig path aliases for resolving imports.
+ */
+export interface ApiCallCheck {
+	root: string;
+	routesByFile: Map<string, Route>;
+	aliases: AliasEntry[];
+}
+
+/**
+ * Creates the shared state used by `checkApiCallSource`, so per-file checks
+ * (e.g. re-checking a changed file during dev) don't rebuild it.
+ */
+export function createApiCallCheck(site: Site): ApiCallCheck {
+	const routesByFile = new Map<string, Route>();
+	for (const route of site.routes) {
+		if (route.file) routesByFile.set(route.file.replaceAll("\\", "/"), route);
+	}
+	return { root: site.root, routesByFile, aliases: tsconfigAliases(site.root) };
+}
+
+/**
+ * Checks `makeApi<Route, typeof endpoint>` calls across the site's source
+ * files: the `Route` argument must match the route derived from the imported
+ * endpoint file's location. Calls whose endpoint isn't a type-only import of
+ * a known route file are skipped.
+ */
+export function checkApiCalls(site: Site): RouteCheckIssue[] {
+	const check = createApiCallCheck(site);
+	const issues: RouteCheckIssue[] = [];
+	for (const file of walkSourceFiles(site.root)) {
+		let source: string;
+		try {
+			source = readFileSync(file, "utf8");
+		} catch {
+			continue;
+		}
+		issues.push(...checkApiCallSource(source, file, check));
+	}
+	return issues;
+}
+
+/**
+ * Checks the `makeApi` calls in a single file's source.
+ * @param source The file's source code
+ * @param file The file's absolute path (used to resolve relative imports and
+ * to derive the path shown in messages)
+ * @param check Shared state from `createApiCallCheck`
+ */
+export function checkApiCallSource(
+	source: string,
+	file: string,
+	check: ApiCallCheck,
+): RouteCheckIssue[] {
+	const imports = new Map<string, string>();
+	for (let m = DEFAULT_IMPORT_RE.exec(source); m; m = DEFAULT_IMPORT_RE.exec(source)) {
+		imports.set(m[1], m[3]);
+	}
+	const issues: RouteCheckIssue[] = [];
+	for (let m = MAKE_API_RE.exec(source); m; m = MAKE_API_RE.exec(source)) {
+		const specifier = imports.get(m[3]);
+		if (!specifier) continue;
+		const resolved = resolveSpecifier(specifier, file, check);
+		if (!resolved) continue;
+		const relFile = path.relative(check.root, resolved).replaceAll("\\", "/");
+		const route = check.routesByFile.get(relFile);
+		if (!route) continue;
+		const expected = expectedAnnotationPath(route);
+		if (m[2] !== expected) {
+			issues.push({
+				file: path.relative(check.root, file).replaceAll("\\", "/"),
+				line: lineOf(source, m.index),
+				severity: "error",
+				message: `makeApi route "${m[2]}" doesn't match the endpoint's route "${expected}" (derived from ${relFile}). Did the endpoint move?`,
+			});
+		}
+	}
+	return issues;
+}
+
+/**
+ * Resolves an import specifier to an existing file: relative specifiers are
+ * resolved against the importing file, others against tsconfig path aliases.
+ * Bare module specifiers that match no alias return undefined.
+ */
+function resolveSpecifier(
+	specifier: string,
+	fromFile: string,
+	check: ApiCallCheck,
+): string | undefined {
+	let candidate: string | undefined;
+	if (specifier.startsWith("./") || specifier.startsWith("../")) {
+		candidate = path.resolve(path.dirname(fromFile), specifier);
+	} else {
+		for (const alias of check.aliases) {
+			if (typeof alias.find === "string") {
+				if (specifier.startsWith(alias.find)) {
+					candidate = path.resolve(alias.replacement, specifier.slice(alias.find.length));
+					break;
+				}
+			} else if (alias.find.test(specifier)) {
+				candidate = specifier.replace(alias.find, alias.replacement);
+				break;
+			}
+		}
+	}
+	if (!candidate) return undefined;
+	const probes = [
+		candidate,
+		`${candidate}.ts`,
+		`${candidate}.js`,
+		path.join(candidate, "index.ts"),
+		path.join(candidate, "index.js"),
+	];
+	for (const probe of probes) {
+		if (existsSync(probe) && statSync(probe).isFile()) return probe;
+	}
+	return undefined;
+}
+
+function walkSourceFiles(root: string): string[] {
+	const files: string[] = [];
+	const visit = (dir: string): void => {
+		let entries;
+		try {
+			entries = readdirSync(dir, { withFileTypes: true });
+		} catch {
+			return;
+		}
+		for (const entry of entries) {
+			if (entry.isDirectory()) {
+				if (!SKIP_DIRS.has(entry.name)) visit(path.join(dir, entry.name));
+			} else if (
+				entry.isFile() &&
+				SOURCE_FILE_RE.test(entry.name) &&
+				!entry.name.endsWith(".d.ts")
+			) {
+				files.push(path.join(dir, entry.name));
+			}
+		}
+	};
+	visit(root);
+	return files;
 }
 
 /**

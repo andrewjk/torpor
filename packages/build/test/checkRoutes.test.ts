@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
 import {
+	checkApiCalls,
 	checkRouteSource,
 	checkRoutes,
 	expectedAnnotationPath,
@@ -210,6 +211,73 @@ describe("checkRoutes", () => {
 		await site.addRouteFolder("test/routes");
 		await site.addRouteFolder("test/api", "api");
 		expect(checkRoutes(site)).toEqual([]);
+	});
+});
+
+describe("checkApiCalls", () => {
+	async function apiSite(name: string, clientSource: string, tsconfig?: object) {
+		const root = path.join(tmpRoot, name);
+		await fs.mkdir(path.join(root, "src/routes/api/time"), { recursive: true });
+		await fs.mkdir(path.join(root, "src/lib"), { recursive: true });
+		await fs.writeFile(path.join(root, "src/routes/api/time/+server.ts"), "export default {};\n");
+		await fs.writeFile(path.join(root, "src/lib/client.ts"), clientSource);
+		if (tsconfig) {
+			await fs.writeFile(path.join(root, "tsconfig.json"), JSON.stringify(tsconfig));
+		}
+		const site = new Site();
+		site.root = root;
+		await site.addRouteFolder("src/routes");
+		return site;
+	}
+
+	test("validates makeApi routes against the endpoint's location", async () => {
+		const site = await apiSite(
+			"api1",
+			[
+				'import type endpoint from "../routes/api/time/+server";',
+				'const good = makeApi<"/api/time", typeof endpoint>("/api/time");',
+				'const bad = makeApi<"/api/nope", typeof endpoint>("/api/nope");',
+				"",
+			].join("\n"),
+		);
+		const issues = checkApiCalls(site);
+		expect(issues).toHaveLength(1);
+		expect(issues[0].file).toBe("src/lib/client.ts");
+		expect(issues[0].line).toBe(3);
+		expect(issues[0].severity).toBe("error");
+		expect(issues[0].message).toContain('"/api/nope"');
+		expect(issues[0].message).toContain('"/api/time"');
+	});
+
+	test("resolves tsconfig path aliases", async () => {
+		const site = await apiSite(
+			"api2",
+			[
+				'import type endpoint from "@/routes/api/time/+server";',
+				'makeApi<"/api/wrong", typeof endpoint>("/api/wrong");',
+				"",
+			].join("\n"),
+			{ compilerOptions: { paths: { "@/*": ["./src/*"] } } },
+		);
+		const issues = checkApiCalls(site);
+		expect(issues).toHaveLength(1);
+	});
+
+	test("skips calls without a typeof import and unknown endpoints", async () => {
+		const site = await apiSite(
+			"api3",
+			[
+				'import type endpoint from "../routes/api/time/+server";',
+				'import type other from "./other";',
+				'const explicit = makeApi<"/api/other", SomeEndpoint>("/api/other");',
+				'const bare = makeApi("/whatever");',
+				'const notRoute = makeApi<"/api/zzz", typeof other>("/api/zzz");',
+				'const good = makeApi<"/api/time", typeof endpoint>("/api/time");',
+				"",
+			].join("\n"),
+		);
+		await fs.writeFile(path.join(site.root, "src/lib/other.ts"), "export default {};\n");
+		expect(checkApiCalls(site)).toEqual([]);
 	});
 });
 

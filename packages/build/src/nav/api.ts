@@ -13,12 +13,25 @@ type ApiResult<Handler> = Handler extends (event: any) => any
 		: unknown
 	: never;
 
+/**
+ * The body a client call accepts: the endpoint event's annotated JSON body
+ * type (from `ServerLoadEvent<Route, Body>`), or a loose value when the
+ * handler doesn't annotate one.
+ */
+type ApiRequestBody<Handler> = Handler extends (event: infer Event) => any
+	? Event extends { json: () => Promise<infer Body> }
+		? unknown extends Body
+			? BodyInit | object
+			: Body
+		: BodyInit | object
+	: BodyInit | object;
+
 /** The callable methods of an endpoint, one per handler it defines. */
 export type ApiMethods<Endpoint extends object> = {
 	[Method in string & keyof Endpoint as Endpoint[Method] extends (event: any) => any
 		? Method
 		: never]: (
-		body?: BodyInit | object,
+		body?: ApiRequestBody<Endpoint[Method]>,
 		init?: RequestInit,
 	) => Promise<ApiResult<Endpoint[Method]>>;
 };
