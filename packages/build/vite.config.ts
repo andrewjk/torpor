@@ -4,6 +4,7 @@ export default defineConfig({
 	pack: {
 		entry: [
 			"src/index.ts",
+			"src/form.ts",
 			"src/nav.ts",
 			"src/response.ts",
 			"src/run.ts",

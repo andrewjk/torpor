@@ -24,7 +24,9 @@ export default function buildType(template: Template, options?: BuildOptions): s
 			}
 			b.append(`
 			${component.documentation ?? ""}
-			${component.default ? "declare" : "export declare"} function ${component.name}(
+			${component.default ? "declare" : "export declare"} function ${component.name}${
+				component.typeParams ?? ""
+			}(
 				$parent: ParentNode,
 				$anchor: Node | null,
 				${component.params || "$props?: Record<PropertyKey, any>"},

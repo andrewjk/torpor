@@ -133,6 +133,25 @@ function parseComponentStart(status: ParseStatus) {
 	};
 	status.components.push(current);
 
+	// Look for type parameters, e.g. `function Form<Data = any>(...)`
+	if (status.source[status.i] === "<") {
+		const typeParamsStart = status.i;
+		let level = 0;
+		for (status.i; status.i < status.source.length; status.i++) {
+			const char = status.source[status.i];
+			if (char === "<") {
+				level += 1;
+			} else if (char === ">") {
+				level -= 1;
+				if (level === 0) {
+					current.typeParams = status.source.substring(typeParamsStart, status.i + 1);
+					status.i += 1;
+					break;
+				}
+			}
+		}
+	}
+
 	// Look for /** ... */ documentation comments
 	let presource = source.substring(0, status.i).trimEnd();
 	let lastNewline = presource.lastIndexOf("\n");

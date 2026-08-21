@@ -2,15 +2,18 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import { type FormContext, FormContextName, type ValidationIssue } from "./FormTypes";
 import { StandardSchemaV1 } from "./StandardSchemaV1";
 
-interface FormProps {
+interface FormProps<Data = Record<string, any>> {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
-	/** The data to display in the form */
-	data?: any;
+	/**
+	 * The data to display in the form. Type it with the page's form result
+	 * (e.g. `PageForm<typeof server>`) to get field name autocomplete
+	 */
+	data?: Data;
 	/** Where to post the form's data **/
 	action?: string;
 	/** The action to use when submitting the form, which defaults to POST */
@@ -28,7 +31,7 @@ interface FormProps {
 /**
  * A form for submitting values.
  */
-export default function Form($props: FormProps | undefined) {
+export default function Form<Data = Record<string, any>>($props: FormProps<Data> | undefined) {
 	let $state = $watch({
 		data: $props?.data ?? {},
 		hasFile: false,

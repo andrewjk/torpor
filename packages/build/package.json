@@ -12,6 +12,10 @@
 			"types": "./src/dev.ts",
 			"import": "./src/dev.ts"
 		},
+		"./form": {
+			"types": "./dist/form.d.mts",
+			"import": "./dist/form.mjs"
+		},
 		"./nav": {
 			"types": "./dist/nav.d.mts",
 			"import": "./dist/nav.mjs"

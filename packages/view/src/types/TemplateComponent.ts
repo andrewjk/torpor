@@ -13,6 +13,8 @@ export default interface TemplateComponent {
 	documentation?: string;
 	/** Params declared by the user in the component's function */
 	params?: string;
+	/** Type parameters declared by the user in the component's function, e.g. `<Data = any>` */
+	typeParams?: string;
 	markup?: RootNode;
 	/** The markup of the component's top-level `@error` block, if any */
 	error?: RootNode;
