@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import getScrollParent from "../utils/getScrollParent";
 import setPopoverPosition from "../utils/setPopoverPosition";
 import { type NavMenuPopoutContext, NavMenuPopoutContextName } from "./NavMenuTypes";
@@ -21,6 +22,7 @@ interface NavMenuPopoutContentProps {
  *
  */
 export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps | undefined) {
+	let defaultId = getId();
 	let div: HTMLDivElement;
 	let shown = false;
 
@@ -30,6 +32,9 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps |
 		throw new Error("NavMenuPopoutContent must be contained within a NavMenuPopout");
 	}
 	let $state = context.state;
+
+	// Set the content ID so that the trigger can use it with aria-controls
+	$state.contentId = $props?.id ?? defaultId;
 
 	$run(() => {
 		if (!$state.visible) {
@@ -79,7 +84,7 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps |
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-nav-menu-popout-content", $props?.class]}
 				{$props?.style}
 				&ref={div}

@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { type ComboBoxContext, ComboBoxContextName } from "./ComboBoxTypes";
 
 interface ComboBoxTriggerProps {
@@ -14,12 +15,17 @@ interface ComboBoxTriggerProps {
  * The button that causes a ComboBox to appear or disappear.
  */
 export default function ComboBoxTrigger($props: ComboBoxTriggerProps | undefined) {
+	let defaultId = getId();
+
 	// Get stuff out of the ComboBoxContext
 	const context = $context[ComboBoxContextName] as ComboBoxContext;
 	if (!context) {
 		throw new Error("ComboBoxTrigger must be contained within a ComboBox");
 	}
 	let $state = context.state;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	function handleClick() {
 		$state.visible = !$state.visible;
@@ -28,7 +34,7 @@ export default function ComboBoxTrigger($props: ComboBoxTriggerProps | undefined
 	@render {
 		<button
 			type="button"
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-combo-box-trigger", $props?.class]}
 			{$props?.style}
 			aria-haspopup={$state.contentRole}

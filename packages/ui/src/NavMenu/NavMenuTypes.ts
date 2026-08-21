@@ -16,6 +16,10 @@ export interface NavMenuContext {
 export interface NavMenuPopoutContext {
 	state: {
 		visible: boolean;
+		/** The ID of the popout content, for use with aria-controls */
+		contentId?: string;
+		/** The ID of the popout trigger, for use with aria-labelledby */
+		triggerId?: string;
 	};
 	anchorElement?: HTMLElement;
 	focusFirstElement?: () => void;

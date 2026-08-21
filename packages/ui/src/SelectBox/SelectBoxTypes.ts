@@ -20,5 +20,6 @@ export interface SelectBoxState {
 	value: any;
 	name?: string;
 	contentId?: string;
+	triggerId?: string;
 	contentRole?: string;
 }

@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
 import setPopoverPosition from "../utils/setPopoverPosition";
 import {
 	type MenuBarContext,
@@ -25,6 +26,7 @@ interface MenuBarItemContentProps {
  * The content that is displayed for a MenuBarItem when it is open.
  */
 export default function MenuBarItemContent($props: MenuBarItemContentProps | undefined) {
+	let defaultId = getId();
 	let div: HTMLDivElement;
 	let closeOnClick = false;
 	let shown = false;
@@ -106,7 +108,7 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps | und
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-menu-bar-item-content", $props?.class]}
 				{$props?.style}
 				&ref={div}

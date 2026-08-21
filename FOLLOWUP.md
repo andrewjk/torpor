@@ -73,3 +73,23 @@ control removed; `@loading`/`@fallback` renamed to `@await`/`with`) are shipped
 `dist/server/serverEntry.js` — its runtime imports (e.g. `.torp` route files)
 aren't resolvable by plain Node. Reproduces at HEAD without the endpoints-only
 site.html fix. Dev mode (`tb --dev`, which uses `vite.ssrLoadModule`) works fine.
+
+## Popout family behavioral differences (deferred to component review)
+
+The API-cleanup pass (packages/ui PLAN "API cleanup") aligned props, default
+ids, and context state (`contentId`/`triggerId`/`contentRole`) across all
+XTrigger/XContent components. Behavioral differences remain, for the per-
+component APG review to settle:
+
+- **Escape-to-close**: MenuPopoutContent and ToolBarPopoutContent listen for
+  document keydown; PopoverContent, ContextualContent, NavMenuPopoutContent and
+  MenuBarItemContent don't.
+- **Scroll/resize repositioning**: PopoverContent, ContextualContent,
+  ToolBarPopoutContent and NavMenuPopoutContent listen on the anchor's scroll
+  parent; MenuPopoutContent and MenuBarItemContent listen on `window`.
+- **Default side/alignment**: MenuPopoutContent defaults right/start (submenu);
+  ToolBar/NavMenu/MenuBarItem contents bottom/start; PopoverContent
+  bottom/center.
+- **Hover-open delay**: MenuPopout/ToolBarPopout/NavMenuPopout triggers have a
+  `hoverDelay` prop; MenuBarItemTrigger opens on mouseenter immediately;
+  Popover/Modal/Contextual triggers use an `activation` prop instead.

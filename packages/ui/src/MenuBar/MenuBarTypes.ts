@@ -28,6 +28,8 @@ export interface MenuBarItemContext extends FocusApi {
 		visible: boolean;
 		/** The role of this item's popout content, used by the trigger for aria-haspopup */
 		contentRole?: string;
+		/** The ID of this item's trigger, for use with aria-labelledby */
+		triggerId?: string;
 	};
 	index: number;
 	anchorElement?: HTMLElement;

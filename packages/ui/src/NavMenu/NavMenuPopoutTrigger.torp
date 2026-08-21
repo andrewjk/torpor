@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import {
 	type NavMenuContext,
 	NavMenuContextName,
@@ -24,6 +25,7 @@ interface NavMenuPopoutTriggerProps {
  *
  */
 export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps | undefined) {
+	let defaultId = getId();
 	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
@@ -42,6 +44,9 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 		throw new Error("NavMenuPopoutTrigger must be contained within a NavMenuPopout");
 	}
 	let $state = popoutContext.state;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent NavMenu and store the index
 	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
@@ -104,7 +109,7 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 
 	@render {
 		<button
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-nav-menu-popout-button", $props?.class]}
 			{$props?.style}
 			type="button"
@@ -112,6 +117,7 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 			role="menuitem"
 			aria-haspopup="true"
 			aria-expanded={$state.visible.toString()}
+			aria-controls={$state.contentId}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}

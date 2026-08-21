@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { type SelectBoxContext, SelectBoxContextName } from "./SelectBoxTypes";
 
 interface SelectBoxTriggerProps {
@@ -16,6 +17,7 @@ interface SelectBoxTriggerProps {
  * The input that causes a SelectBox to appear or disappear.
  */
 export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefined) {
+	let defaultId = getId();
 	let button: HTMLButtonElement;
 
 	// Get stuff out of the SelectBoxContext
@@ -25,6 +27,9 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 	}
 	let $state = context.state;
 	context.focusTrigger = focusTrigger;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	function focusTrigger() {
 		button.focus();
@@ -101,7 +106,7 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 		<button
 			type="button"
 			role="combobox"
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-select-box-trigger", $props?.class]}
 			{$props?.style}
 			aria-controls={$state.contentId}

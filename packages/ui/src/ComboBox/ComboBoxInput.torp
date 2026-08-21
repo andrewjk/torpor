@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { type ComboBoxContext, ComboBoxContextName } from "./ComboBoxTypes";
 
 interface ComboBoxInputProps {
@@ -31,6 +32,7 @@ interface ComboBoxInputProps {
  * The input that causes a ComboBox to appear or disappear.
  */
 export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
+	let defaultId = getId();
 	let input: HTMLInputElement;
 
 	// Get stuff out of the ComboBoxContext
@@ -40,6 +42,9 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	}
 	let $state = context.state;
 	context.focusInput = focusInput;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
 
 	function focusInput() {
 		input.focus();
@@ -108,7 +113,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	@render {
 		<input
 			role="combobox"
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-combo-box-input", $props?.class]}
 			{$props?.style}
 			name={$props?.name !== undefined ? $props.name : context.name}

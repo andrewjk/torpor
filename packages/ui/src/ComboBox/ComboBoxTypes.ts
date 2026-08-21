@@ -25,6 +25,7 @@ export interface ComboBoxState {
 	value: any;
 	name?: string;
 	contentId?: string;
+	triggerId?: string;
 	contentRole?: string;
 	activeDescendant?: string;
 }

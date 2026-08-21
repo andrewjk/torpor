@@ -118,7 +118,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 
 	@render {
 		<button
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-tool-bar-popout-trigger", $props?.class]}
 			{$props?.style}
 			type="button"

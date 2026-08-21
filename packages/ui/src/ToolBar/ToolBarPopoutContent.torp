@@ -119,7 +119,7 @@ export default function ToolBarPopoutContent($props: ToolBarPopoutContentProps |
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-tool-bar-popout-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
