@@ -42,7 +42,7 @@ describe("Breadcrumb - Accessibility", () => {
 		const items = nav.querySelectorAll("li");
 		expect(items.length).toBe(3);
 		items.forEach((item) => {
-			expect(item).toHaveClass("torp-breadcrumb");
+			expect(item).toHaveClass("torp-breadcrumb-item");
 		});
 	});
 

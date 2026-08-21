@@ -124,6 +124,7 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 				class={["torp-drawer-content", $props?.class]}
 				{$props?.style}
 				&ref={drawer}
+				role="dialog"
 				aria-modal={$state.modal}
 				aria-label={$props?.ariaLabel}
 				aria-labelledby={$props?.ariaLabel ? undefined : $state.triggerId}

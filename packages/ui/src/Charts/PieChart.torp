@@ -21,6 +21,8 @@ interface PieChartProps {
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
+	/** An ARIA label describing the chart for screen readers */
+	ariaLabel?: string;
 	data: PieData[];
 	size?: number;
 	radius?: number;
@@ -123,7 +125,7 @@ A${theCutoutSize},${theCutoutSize} 0 ${largeArc} 0 ${cutoutstartx},${cutoutstart
 
 	@render {
 		<div {$props?.id} class={["torp-pie-chart", $props?.class]} {$props?.style}>
-			<svg version="1.1" width={$props.size} height={$props.size}>
+			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$props.size} height={$props.size}>
 				<g>
 					@for (let [i, segment] of $state.segments.entries()) {
 						<path d={segment.path} fill={segment.color || chartColors[i % chartColors.length]}>

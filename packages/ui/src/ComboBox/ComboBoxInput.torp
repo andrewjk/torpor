@@ -113,6 +113,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	@render {
 		<input
 			role="combobox"
+			aria-autocomplete="list"
 			id={$props?.id ?? defaultId}
 			class={["torp-combo-box-input", $props?.class]}
 			{$props?.style}

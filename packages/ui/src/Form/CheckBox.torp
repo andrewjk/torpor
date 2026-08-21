@@ -92,6 +92,8 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 			&checked={$state.value}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
+			aria-describedby={$state.messageId}
+			aria-invalid={fieldContext && !$state.valid ? "true" : undefined}
 			{$props?.onchange}
 			oninput={handleInput}
 			onblur={handleBlur}

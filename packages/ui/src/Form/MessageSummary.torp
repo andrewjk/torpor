@@ -23,7 +23,12 @@ export default function MessageSummary($props: MessageSummaryProps | undefined) 
 
 	@render {
 		@if ($state.issues.length > 0) {
-			<ul {$props?.id} class={["torp-message-summary", $props?.class]} {$props?.style}>
+			<ul
+				{$props?.id}
+				class={["torp-message-summary", $props?.class]}
+				{$props?.style}
+				role="alert"
+			>
 				<slot />
 				@for (let issue of $state.issues) {
 					<li>{issue.message}</li>

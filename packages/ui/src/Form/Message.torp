@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
 import { type FieldContext, FieldContextName } from "./FormTypes";
 
 interface MessageProps {
@@ -15,6 +16,8 @@ interface MessageProps {
  * problems that need to be fixed.
  */
 export default function Message($props: MessageProps | undefined) {
+	let defaultId = getId();
+
 	// Get stuff out of the FieldContext
 	const context = $context[FieldContextName] as FieldContext;
 	if (!context) {
@@ -22,12 +25,17 @@ export default function Message($props: MessageProps | undefined) {
 	}
 	const { state: $state } = context;
 
+	// Set the message ID so that it can be used with aria-describedby in
+	// input components
+	$state.messageId = $props?.id ?? defaultId;
+
 	@render {
 		@if ($state.message) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-message", $props?.class]}
 				{$props?.style}
+				role="alert"
 				data-valid={$state.valid ? "valid" : "invalid"}
 			>
 				<slot name="message">

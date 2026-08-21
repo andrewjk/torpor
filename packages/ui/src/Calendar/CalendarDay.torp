@@ -41,7 +41,7 @@ export default function CalendarDay($props: CalendarDayProps) {
 	if (!context) {
 		throw new Error("CalendarDay must be contained within a Calendar");
 	}
-	const { registerDay, handleDay, selectable } = context;
+	const { registerDay, handleDay } = context;
 
 	// Register this item with the parent Calendar, which will handle toggling active for all days
 	registerDay(reactiveDate, setActive);
@@ -76,13 +76,13 @@ export default function CalendarDay($props: CalendarDayProps) {
 			{
 				muted: $props.muted,
 				today: isToday(),
-				active: selectable && $props.active,
+				active: context.selectable && $props.active,
 			},
 		];
 	}
 
 	@render {
-		@if (selectable) {
+		@if (context.selectable) {
 			<button
 				{$props?.id}
 				class={buildClass()}

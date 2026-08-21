@@ -39,7 +39,7 @@ export default function Breadcrumb($props: BreadcrumbProps | undefined) {
 			{$props?.id}
 			class={["torp-breadcrumb", $props?.class]}
 			{$props?.style}
-			aria-label={$props?.ariaLabel}
+			aria-label={$props?.ariaLabel ?? "Breadcrumbs"}
 		>
 			<slot />
 		</nav>

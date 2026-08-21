@@ -34,6 +34,11 @@ describe("ComboBox", () => {
 		// The popup is an element that has role listbox, tree, grid, or dialog
 		expect(listbox).toHaveAttribute("role", "listbox");
 
+		// The combobox element is editable and presents suggested values
+		// corresponding to the typed characters, so it has aria-autocomplete
+		// set to list
+		expect(button).toHaveAttribute("aria-autocomplete", "list");
+
 		// NOTE: N/A:
 		// If the popup has a role other than listbox, the element with role
 		// combobox has aria-haspopup set to a value that corresponds to the

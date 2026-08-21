@@ -26,6 +26,8 @@ export interface FieldContext {
 	schema?: StandardSchemaV1;
 	state: {
 		inputId: string;
+		/** The ID of the Message component in this field, if any, for use with aria-describedby */
+		messageId?: string;
 		value?: any;
 		issues: ValidationIssue[];
 		valid: boolean;

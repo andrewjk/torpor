@@ -9,6 +9,8 @@ interface SparkLineProps {
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
+	/** An ARIA label describing the chart for screen readers */
+	ariaLabel?: string;
 	data: number[];
 	color?: string;
 	height?: number;
@@ -51,7 +53,7 @@ export default function SparkLine($props: SparkLineProps) {
 
 	@render {
 		<div {$props?.id} class={["torp-spark-line", $props?.class]} {$props?.style} &ref={container}>
-			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
+			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
 				<g>
 					<polyline
 						points={$state.pointSeries.map((p) => `${p.x},${p.y}`).join(" ")}

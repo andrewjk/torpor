@@ -15,13 +15,13 @@ interface BreadcrumbSeparatorProps {
  */
 export default function BreadcrumbSeparator($props: BreadcrumbSeparatorProps | undefined) {
 	@render {
-		<div
+		<li
 			{$props?.id}
 			class={["torp-breadcrumb-separator", $props?.class]}
 			{$props?.style}
 			aria-hidden="true"
 		>
 			<slot />
-		</div>
+		</li>
 	}
 }

@@ -36,6 +36,7 @@ export default function TreeItemChildren() {
 			{$props?.id}
 			class={["torp-tree-item-children", $props?.class, $state.expanded ? undefined : "hidden"]}
 			{$props?.style}
+			role="group"
 		>
 			<slot />
 		</div>

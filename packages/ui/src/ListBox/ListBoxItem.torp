@@ -113,6 +113,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 			class={["torp-list-box-item", $props?.class]}
 			{$props?.style}
 			role="option"
+			tabindex="-1"
 			aria-selected={$state.selected ? "true" : "false"}
 			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			data-state={$state.selected || $state.active ? "active" : undefined}

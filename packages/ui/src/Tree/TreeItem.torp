@@ -116,6 +116,7 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 			{$props?.style}
 			role="treeitem"
 			aria-level={$state.level + 1}
+			aria-expanded={$state.hasChildren ? ($state.expanded ? "true" : "false") : undefined}
 			aria-selected={$state.selected ? "true" : "false"}
 			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			data-selected={$state.selected ? "selected" : undefined}

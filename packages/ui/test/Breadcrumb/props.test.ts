@@ -74,7 +74,7 @@ describe("Breadcrumb - Props", () => {
 		document.body.appendChild(container);
 		mount(container, BreadcrumbWithProps);
 
-		const items = container.querySelectorAll("li.torp-breadcrumb");
+		const items = container.querySelectorAll("li.torp-breadcrumb-item");
 		expect(items[0]).toHaveClass("custom-item");
 		expect(items[1]).toHaveClass("custom-item");
 	});

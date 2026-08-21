@@ -8,6 +8,8 @@ interface NotificationCloseProps {
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
+	/** An ARIA label for the close button, for screen readers when the button contains no text */
+	ariaLabel?: string;
 }
 
 /**
@@ -31,6 +33,7 @@ export default function NotificationClose($props: NotificationCloseProps | undef
 			class={["torp-notification-close", $props?.class]}
 			{$props?.style}
 			type="button"
+			aria-label={$props?.ariaLabel ?? "Dismiss"}
 			onclick={handleClick}
 		>
 			<slot />

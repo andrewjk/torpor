@@ -1,6 +1,7 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type AccordionContext, AccordionContextName, type ItemState } from "./AccordionTypes";
 import { createItemGroup } from "../utils/createItemGroup";
+import { focusItem } from "../utils/focusItem";
 
 interface AccordionProps {
 	/** An ID for the root element */
@@ -76,43 +77,23 @@ export default function Accordion($props: AccordionProps | undefined) {
 		const itemStates = group.itemStates;
 		switch (e.key) {
 			case "ArrowUp": {
-				for (let i = headerIndex - 1; i >= 0; i--) {
-					if (!itemStates[i].disabled) {
-						e.preventDefault();
-						itemStates[i].setFocused();
-						break;
-					}
-				}
+				e.preventDefault();
+				focusItem(itemStates, headerIndex, "previous");
 				break;
 			}
 			case "ArrowDown": {
-				for (let i = headerIndex + 1; i < itemStates.length; i++) {
-					if (!itemStates[i].disabled) {
-						e.preventDefault();
-						itemStates[i].setFocused();
-						break;
-					}
-				}
+				e.preventDefault();
+				focusItem(itemStates, headerIndex, "next");
 				break;
 			}
 			case "Home": {
-				for (let i = 0; i < itemStates.length; i++) {
-					if (!itemStates[i].disabled) {
-						e.preventDefault();
-						itemStates[i].setFocused();
-						break;
-					}
-				}
+				e.preventDefault();
+				focusItem(itemStates, headerIndex, "start");
 				break;
 			}
 			case "End": {
-				for (let i = itemStates.length - 1; i >= 0; i--) {
-					if (!itemStates[i].disabled) {
-						e.preventDefault();
-						itemStates[i].setFocused();
-						break;
-					}
-				}
+				e.preventDefault();
+				focusItem(itemStates, headerIndex, "end");
 				break;
 			}
 		}

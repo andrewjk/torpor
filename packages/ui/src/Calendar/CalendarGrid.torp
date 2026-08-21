@@ -21,7 +21,7 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 	if (!context) {
 		throw new Error("CalendarGrid must be contained within a Calendar");
 	}
-	const { selectable, handleKey, state: $state } = context;
+	const { handleKey, state: $state } = context;
 
 	// Focus the day with `class=active`
 	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
@@ -37,12 +37,13 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 			{$props?.id}
 			class={["torp-calendar-grid", $props?.class]}
 			{$props?.style}
-			tabindex={selectable ? 0 : -1}
+			tabindex={context.selectable ? 0 : -1}
 			onfocus={handleFocus}
 			onkeydown={handleKey}
 			role="grid"
-			aria-label={$props?.ariaLabel}
+			aria-label={$props?.ariaLabel ?? "Calendar"}
 			aria-colcount="7"
+			aria-readonly={!context.selectable ? "true" : undefined}
 		>
 			<slot {$state.days} />
 		</div>

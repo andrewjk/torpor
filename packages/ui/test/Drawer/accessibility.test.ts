@@ -56,9 +56,8 @@ describe("Drawer", () => {
 
 		expect(drawerContent).toBeInTheDocument();
 
-		// TODO: Only if it contains a dialog, menu, etc...
-		// role="dialog"
-		//expect(drawerContent).toHaveAttribute("role", "dialog");
+		// A drawer panel is a dialog surface, so it has role dialog
+		expect(drawerContent).toHaveAttribute("role", "dialog");
 
 		// aria-modal should be true for modal drawer
 		expect(drawerContent).toHaveAttribute("aria-modal", "true");

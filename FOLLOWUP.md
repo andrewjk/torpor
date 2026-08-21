@@ -85,3 +85,41 @@ Escape-to-close and scroll-parent repositioning were adopted by the components
 that lacked them; NavMenuPopoutContent also gained outside-click close. Any
 remaining per-component deviations should be settled in the component review
 phase against these defaults.
+
+## Calendar: day cells lack row/gridcell structure (component review)
+
+Found during the Calendar APG review. The calendar grid has `role="grid"`,
+an `aria-colcount`, and a proper header (`role="row"` > `columnheader`), but
+the days are rendered as a flat list of buttons/spans directly inside the
+grid -- no `role="row"` wrappers per week and no `role="gridcell"` per day,
+so screen readers can't navigate it as a grid. The selected-day state is also
+expressed as `aria-selected` on the `<button>`, which is only valid on a
+gridcell/option/row/tab.
+
+Fixing this properly is an API change: `buildDays` would need to group days
+by week, and `CalendarGrid`'s slot contract changes from `$slot.days` to
+weeks that users wrap in rows (or the grid renders days internally). Deferred
+because it alters user-facing composition; everything else in the review was
+fixed inline (single grid element instead of nested grids, reactive
+`selectable` context getter so `aria-readonly`/`tabindex` update).
+
+## Menu: type-ahead not implemented (component review)
+
+Found during the Menu APG review. The menu pattern's supported keys include
+type-ahead (typing a character moves focus to the next item whose name starts
+with it), which `Menu.handleItemKey` doesn't handle. Implementing it needs the
+item's text at registration time (`ItemState` currently only carries
+focus/disabled/visibility), i.e. a registration API change shared by
+MenuButton/MenuCheck/MenuRadio. Deferred; everything else in the review was
+conformant (roles, aria-checked, separators, submenu wiring, disabled
+skipping, Escape/Tab close).
+
+## MenuBar: arrow keys in an open menu don't navigate the menubar
+
+Found during the MenuBar APG review. Per the menubar pattern, when a menu is
+open under a menubar item, Left/Right should move to the adjacent menubar
+item (opening its menu). Currently `Menu` inside a `MenuBarItem` treats those
+keys as no-ops (it only closes on ArrowLeft inside a `MenuPopout` submenu).
+Needs cross-component plumbing: `Menu` would signal the parent popout,
+`MenuBarItem` forwards to `MenuBarContext` to move focus between triggers.
+No keyboard tests exist for MenuBar yet either -- both should land together.

@@ -36,6 +36,7 @@ export default function TabContent($props: TabContentProps | undefined) {
 			class={["torp-tab-content", $props?.class]}
 			{$props?.style}
 			role="tabpanel"
+			tabindex="0"
 			aria-labelledby={$state.headerId}
 			data-orientation={context.orientation}
 			data-state={$state.active ? "active" : "inactive"}

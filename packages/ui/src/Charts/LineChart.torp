@@ -21,6 +21,8 @@ interface LineChartProps {
 	class?: ClassValue;
 	/** Styles for the root element */
 	style?: StyleValue;
+	/** An ARIA label describing the chart for screen readers */
+	ariaLabel?: string;
 	series: DataSeries[];
 	height?: number;
 	width?: number;
@@ -125,7 +127,7 @@ export default function LineChart($props: LineChartProps) {
 
 	@render {
 		<div {$props?.id} class={["torp-line-chart", $props?.class]} {$props?.style} &ref={container}>
-			<svg version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
+			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
 				<g>
 					<text &ref={measurer} x="-999" y="-999">8</text>
 

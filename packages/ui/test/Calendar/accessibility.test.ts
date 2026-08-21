@@ -12,13 +12,15 @@ describe("Calendar", () => {
 
 		mount(container, CalendarTest, $props);
 
-		const grid = container.querySelector(".torp-calendar");
+		// The calendar root is a plain container -- the grid role is on the
+		// grid itself (nested grids are not valid)
+		const root = container.querySelector(".torp-calendar");
+		expect(root).not.toHaveAttribute("role");
+
+		const grid = container.querySelector(".torp-calendar-grid");
 		expect(grid).toHaveAttribute("role", "grid");
 		expect(grid).toHaveAttribute("aria-label");
-
-		const gridElement = container.querySelector(".torp-calendar-grid");
-		expect(gridElement).toHaveAttribute("role", "grid");
-		expect(gridElement).toHaveAttribute("aria-colcount", "7");
+		expect(grid).toHaveAttribute("aria-colcount", "7");
 
 		$props.selectable = false;
 		expect(grid).toHaveAttribute("aria-readonly", "true");

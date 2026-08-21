@@ -162,6 +162,14 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		}
 	}
 
+	function focusSelectedElement() {
+		// Called when the list box receives focus: focus the selected option,
+		// or the first option if none is selected
+		const itemStates = group.itemStates;
+		const target = itemStates.find((i) => i.selected) ?? itemStates[0];
+		target?.setFocused();
+	}
+
 	function handleKey(index: number, e: KeyboardEvent) {
 		const itemStates = group.itemStates;
 		// Finds the nearest focusable item, skipping disabled ones
@@ -270,6 +278,8 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			class={["torp-list-box", $props?.class]}
 			{$props?.style}
 			role="listbox"
+			tabindex="0"
+			onfocus={focusSelectedElement}
 			aria-label={$props?.ariaLabel}
 			aria-labelledby={$props?.ariaLabelledBy}
 			aria-multiselectable={getType() === "multiple" ? "true" : undefined}
