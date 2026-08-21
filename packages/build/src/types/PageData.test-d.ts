@@ -1,8 +1,9 @@
 import found from "../response/found";
 import ok from "../response/ok";
 import type TypedResponse from "../response/TypedResponse";
-import type { PageData } from "./PageData";
+import type { MergePageData, PageData } from "./PageData";
 import type PageEndPoint from "./PageEndPoint";
+import type PageLoadEvent from "./PageLoadEvent";
 import type PageProps from "./PageProps";
 import type PageServerEndPoint from "./PageServerEndPoint";
 
@@ -86,3 +87,52 @@ export const badServer: PageServerEndPoint<"/posts", { posts: Post[] }> = {
 const props: PageProps<PageData<PostsServer>> = null as never;
 export const posts: { title: string }[] = props.data.posts;
 export const form: Record<string, any> | undefined = props.form;
+
+// --- Layout data ---
+
+// A layout endpoint with its own typed load
+interface LayoutServer {
+	load: () => Promise<TypedResponse<{ user: { name: string } }>>;
+}
+
+export const layoutServer: LayoutServer = {
+	load: async () => ok({ user: { name: "Andrew" } }),
+};
+
+// MergePageData intersects layout and page data, in order
+export type M01 = Expect<
+	Equals<
+		MergePageData<[typeof layoutServer, PostsServer]>,
+		{ user: { name: string } } & { posts: { title: string }[] }
+	>
+>;
+
+// A single endpoint merges to its own data
+export type M02 = Expect<Equals<MergePageData<[PostsServer]>, { posts: { title: string }[] }>>;
+
+// The merged shape is what the page component receives as $props.data
+const mergedProps: PageProps<MergePageData<[typeof layoutServer, PostsServer]>> = null as never;
+export const userName: string = mergedProps.data.user.name;
+export const mergedPosts: { title: string }[] = mergedProps.data.posts;
+
+// Endpoints without a typed load contribute only looseness
+const looseProps: PageProps<MergePageData<[typeof actionsOnly, PostsServer]>> = null as never;
+export const loosePosts: { title: string }[] = looseProps.data.posts;
+
+// --- Client load events ---
+
+// event.data is typed by the second annotation, e.g. the layout's data
+export const clientLoad = (
+	event: PageLoadEvent<"/posts", PageData<typeof layoutServer>>,
+): void => void event.data.user.name;
+
+// 'nope' is not part of the accumulated layout data
+export const badClientLoad = (
+	event: PageLoadEvent<"/posts", PageData<typeof layoutServer>>,
+): void =>
+	// @ts-expect-error 'nope' is not part of the accumulated layout data
+	void event.data.nope;
+
+// Without a data annotation it stays loose
+export const looseClientLoad = (event: PageLoadEvent<"/posts">): void =>
+	void event.data.whatever;

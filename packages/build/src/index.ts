@@ -2,7 +2,7 @@ import Router from "./site/Router";
 import Site from "./site/Site";
 import type Adapter from "./types/Adapter";
 import type { Jsonify } from "./types/Jsonify";
-import type { PageData } from "./types/PageData";
+import type { MergePageData, PageData } from "./types/PageData";
 import type { PageForm } from "./types/PageForm";
 import type PageEndPoint from "./types/PageEndPoint";
 import type PageLoadEvent from "./types/PageLoadEvent";
@@ -48,6 +48,7 @@ export type {
 	TypedResponse,
 	UntypedResponse,
 	PageData,
+	MergePageData,
 	PageForm,
 	PageLoadReturn,
 	PageProps,
