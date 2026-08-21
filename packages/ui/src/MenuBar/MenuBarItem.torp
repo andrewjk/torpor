@@ -37,6 +37,9 @@ interface MenuBarItemProps {
 export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 	let $state = $watch({
 		visible: $props?.visible ?? false,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	let result: any;

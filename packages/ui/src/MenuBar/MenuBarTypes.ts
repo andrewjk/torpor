@@ -1,4 +1,4 @@
-import { type FocusApi } from "../utils/PopoutTypes";
+import { type FocusApi, type PopoutState } from "../utils/PopoutTypes";
 
 export const MenuBarContextName: unique symbol = Symbol.for("torp.MenuBar");
 export const MenuBarItemContextName: unique symbol = Symbol.for("torp.MenuBarItem");
@@ -24,13 +24,7 @@ export interface MenuBarContext {
 
 export interface MenuBarItemContext extends FocusApi {
 	setVisible: (value: boolean) => void;
-	state: {
-		visible: boolean;
-		/** The role of this item's popout content, used by the trigger for aria-haspopup */
-		contentRole?: string;
-		/** The ID of this item's trigger, for use with aria-labelledby */
-		triggerId?: string;
-	};
+	state: PopoutState;
 	index: number;
 	anchorElement?: HTMLElement;
 }

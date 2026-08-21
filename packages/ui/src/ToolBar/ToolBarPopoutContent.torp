@@ -1,9 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
-import getScrollParent from "../utils/getScrollParent";
-import setPopoverPosition from "../utils/setPopoverPosition";
+import { createPopoutContent } from "../utils/popoutContent";
 
 interface ToolBarPopoutContentProps {
 	/** An ID for the root element */
@@ -25,10 +23,6 @@ interface ToolBarPopoutContentProps {
 export default function ToolBarPopoutContent($props: ToolBarPopoutContentProps | undefined) {
 	const defaultId = getId();
 
-	let div: HTMLDivElement;
-	let shown = false;
-	let closeOnClick = false;
-
 	// Get stuff out of the PopoutContext
 	const context = $context[PopoutContextName] as PopoutContext;
 	if (!context) {
@@ -41,80 +35,24 @@ export default function ToolBarPopoutContent($props: ToolBarPopoutContentProps |
 	$state.contentId = $props?.id ?? defaultId;
 	$state.contentRole = "menu";
 
-	$run(() => {
-		if (!$state.visible) {
-			hide();
-		}
+	const popout = createPopoutContent({
+		getAnchor: () => context.anchorElement,
+		getContent: () => div,
+		close: () => ($state.visible = false),
+		side: $props?.side ?? "bottom",
+		alignment: $props?.alignment ?? "start",
+		closeOnEscape: true,
+		focusFirstElement: () => context.focusFirstElement?.(),
+		refocusAnchorOnHide: true,
 	});
 
-	function show() {
-		shown = true;
+	let div: HTMLDivElement;
 
-		// Set the position and listen for window resize and scroll to reset the position
-		setPosition();
-		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement);
-		scrollParent.addEventListener("resize", setPosition);
-		scrollParent.addEventListener("scroll", setPosition);
-		if (context.focusFirstElement) {
-			context.focusFirstElement();
+	$run(() => {
+		if (!$state.visible) {
+			popout.hide();
 		}
-
-		// HACK: Because this ToolBar could be shown with a click, we need to wait for another mousedown
-		// before we close on click. Otherwise the click immediately bubbles to the document
-		closeOnClick = false;
-		addDocumentEvent("mousedown", handleDocumentMouseDown);
-		addDocumentEvent("click", handleDocumentClick);
-		addDocumentEvent("keydown", handleDocumentKeyDown);
-	}
-
-	function hide() {
-		if (!shown) return;
-
-		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement);
-		scrollParent.removeEventListener("resize", setPosition);
-		scrollParent.removeEventListener("scroll", setPosition);
-		if (anchorElement.focus) {
-			anchorElement.focus();
-		}
-
-		removeDocumentEvent("mousedown", handleDocumentMouseDown);
-		removeDocumentEvent("click", handleDocumentClick);
-		removeDocumentEvent("keydown", handleDocumentKeyDown);
-	}
-
-	function setPosition() {
-		if (!context.anchorElement) {
-			throw new Error("ToolBarPopoutContent must have an anchor element");
-		}
-
-		if (div) {
-			let side = $props?.side ?? "bottom";
-			let alignment = $props?.alignment ?? "start";
-			setPopoverPosition(context.anchorElement, div, side, alignment);
-		}
-	}
-
-	function handleDocumentMouseDown() {
-		closeOnClick = true;
-	}
-
-	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && div && !div.contains(e.target as HTMLElement)) {
-			e.preventDefault();
-			//context.handleClickOutside!(e);
-			$state.visible = false;
-		}
-	}
-
-	function handleDocumentKeyDown(e: KeyboardEvent) {
-		if (e.key === "Escape") {
-			e.preventDefault();
-			$state.visible = false;
-		}
-	}
+	});
 
 	@render {
 		@if ($state.visible) {
@@ -125,7 +63,7 @@ export default function ToolBarPopoutContent($props: ToolBarPopoutContentProps |
 				&ref={div}
 				role="menu"
 				aria-labelledby={context.anchorElement?.id}
-				onmount={show}
+				onmount={() => popout.show()}
 			>
 				<slot />
 			</div>

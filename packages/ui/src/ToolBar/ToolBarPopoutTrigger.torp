@@ -1,6 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import getId from "../utils/getId";
+import { createHoverOpen } from "../utils/hoverOpen";
 import { type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarPopoutTriggerProps {
@@ -26,7 +27,6 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 	let defaultHoverDelay = 500;
 
 	let button: HTMLButtonElement;
-	let interval: NodeJS.Timeout | undefined;
 
 	// Get stuff out of the ToolBarContext
 	const toolBarContext = $context[ToolBarContextName] as ToolBarContext;
@@ -87,34 +87,11 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 		}
 	}
 
-	function handleMouseEnter() {
-		if ($props?.disabled) return;
-
-		// Handle the hover after a delay
-		if (!interval) {
-			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
-		}
-	}
-
-	function handleMouseLeave() {
-		if ($props?.disabled) return;
-
-		// Prevent short hovers or touches from firing the event
-		if (interval) {
-			clearTimeout(interval);
-			interval = undefined;
-		}
-	}
-
-	function handleMouseMove() {
-		if ($props?.disabled) return;
-
-		// Reset the interval on mouse move
-		if (interval) {
-			clearTimeout(interval);
-			interval = setTimeout(() => ($state.visible = true), $props?.hoverDelay ?? defaultHoverDelay);
-		}
-	}
+	const hoverOpen = createHoverOpen(
+		() => ($state.visible = true),
+		() => $props?.disabled ?? false,
+		$props?.hoverDelay ?? defaultHoverDelay,
+	);
 
 	@render {
 		<button
@@ -130,9 +107,9 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}
-			onmouseenter={handleMouseEnter}
-			onmouseleave={handleMouseLeave}
-			onmousemove={handleMouseMove}
+			onmouseenter={hoverOpen.handleMouseEnter}
+			onmouseleave={hoverOpen.handleMouseLeave}
+			onmousemove={hoverOpen.handleMouseMove}
 			&ref={button}
 			onmount={(el) => popoutContext.anchorElement = el }
 		>

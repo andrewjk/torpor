@@ -1,20 +1,11 @@
-import { type FocusApi } from "../utils/PopoutTypes";
+import { type PopoutContext, type PopoutState } from "../utils/PopoutTypes";
 
 export const ModalContextName: unique symbol = Symbol.for("torp.Modal");
 
 /** The shared context for modal components (Contextual, Prompt and Modal) */
-export interface ModalContext extends FocusApi {
-	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
-	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
-	// There may be a more elegant way to accomplish this too
-	handleClickOutside?: (e: MouseEvent) => void;
+export interface ModalContext extends PopoutContext {
 	state: ModalState;
 }
 
-export interface ModalState {
-	visible: boolean;
-	contentId?: string;
-	triggerId?: string;
-	/** The role of the modal's content, used by triggers for aria-haspopup */
-	contentRole?: string;
-}
+/** A modal's state is exactly the shared popout state */
+export type ModalState = PopoutState;

@@ -44,6 +44,9 @@ export default function Contextual($props: ContextualProps | undefined) {
 	let $state: ContextualState = $watch({
 		visible: false,
 		position: { x: 0, y: 0 },
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible");

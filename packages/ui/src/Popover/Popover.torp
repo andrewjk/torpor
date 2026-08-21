@@ -44,6 +44,9 @@ export default function Popover($props: PopoverProps | undefined) {
 	let $state: PopoverState = $watch({
 		visible: false,
 		position: { x: 0, y: 0 },
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible");

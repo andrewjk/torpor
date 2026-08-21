@@ -1,7 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
-import setPopoverPosition from "../utils/setPopoverPosition";
+import { createPopoutContent } from "../utils/popoutContent";
 import {
 	type MenuBarContext,
 	MenuBarContextName,
@@ -28,8 +27,6 @@ interface MenuBarItemContentProps {
 export default function MenuBarItemContent($props: MenuBarItemContentProps | undefined) {
 	let defaultId = getId();
 	let div: HTMLDivElement;
-	let closeOnClick = false;
-	let shown = false;
 
 	// Get stuff out of the MenuBarContext
 	const context = $context[MenuBarContextName] as MenuBarContext;
@@ -44,66 +41,21 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps | und
 	}
 	const { state: $state, setVisible } = itemContext;
 
-	$run(() => {
-		if (!$state.visible) {
-			hide();
-		}
+	const popout = createPopoutContent({
+		getAnchor: () => itemContext.anchorElement,
+		getContent: () => div,
+		close: () => setVisible(false),
+		side: $props?.side ?? "bottom",
+		alignment: $props?.alignment ?? "start",
+		focusFirstElement: () => itemContext.focusFirstElement?.(),
+		refocusAnchorOnHide: true,
 	});
 
-	function show() {
-		shown = true;
-
-		// HACK: Because this Contextual could be shown with a click, we need to wait for another mousedown
-		// before we close on click. Otherwise the click immediately bubbles to the document. I guess
-		// we could require the user to preventDefault after calling showContextual, but that seems very
-		// error-prone?
-		closeOnClick = false;
-		addDocumentEvent("mousedown", handleDocumentMouseDown);
-		addDocumentEvent("click", handleDocumentClick);
-
-		// Set the position and listen for window resize and scroll to reset the position
-		setPosition();
-		addEventListener("resize", setPosition);
-		addEventListener("scroll", setPosition);
-		if (itemContext.focusFirstElement) {
-			itemContext.focusFirstElement();
+	$run(() => {
+		if (!$state.visible) {
+			popout.hide();
 		}
-	}
-
-	function hide() {
-		if (!shown) return;
-
-		removeDocumentEvent("mousedown", handleDocumentMouseDown);
-		removeDocumentEvent("click", handleDocumentClick);
-
-		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		removeEventListener("resize", setPosition);
-		removeEventListener("scroll", setPosition);
-		if (itemContext.anchorElement?.focus) {
-			itemContext.anchorElement.focus();
-		}
-	}
-
-	function handleDocumentMouseDown() {
-		closeOnClick = true;
-	}
-
-	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && !div.contains(e.target as HTMLElement)) {
-			//context.active = false;
-			setVisible(false);
-		}
-	}
-
-	function setPosition() {
-		if (!itemContext.anchorElement) {
-			throw new Error("MenuBarItemContent must have an anchor element");
-		}
-
-		let side = $props?.side ?? "bottom";
-		let alignment = $props?.alignment ?? "start";
-		setPopoverPosition(itemContext.anchorElement, div, side, alignment);
-	}
+	});
 
 	@render {
 		@if ($state.visible) {
@@ -112,7 +64,7 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps | und
 				class={["torp-menu-bar-item-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={show}
+				onmount={() => popout.show()}
 			>
 				<slot />
 			</div>

@@ -45,6 +45,9 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 	let $state: SelectBoxState = $watch({
 		visible: false,
 		value: $props?.value,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible", "value");

@@ -31,6 +31,9 @@ interface ToolBarPopoutProps {
 export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
 	let $state = $watch({
 		visible: false,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible");

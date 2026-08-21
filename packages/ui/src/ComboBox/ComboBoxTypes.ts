@@ -1,31 +1,19 @@
-import { type FocusApi } from "../utils/PopoutTypes";
+import { type PopoutContext, type PopoutState } from "../utils/PopoutTypes";
 
 export const ComboBoxContextName: unique symbol = Symbol.for("torp.ComboBox");
 
-/** The shared context for modal components (Contextual, Prompt and ComboBox) */
-export interface ComboBoxContext extends FocusApi {
-	handleButton: (type: "confirm" | "cancel" | undefined, value?: any) => void;
-	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
-	// There may be a more elegant way to accomplish this too
-	handleClickOutside?: (e: MouseEvent) => void;
+/** The shared context for ComboBox components */
+export interface ComboBoxContext extends PopoutContext {
 	placeholder?: string;
 	required?: boolean;
 	ariaLabel?: string;
 	name?: string;
 	state: ComboBoxState;
 	focusInput?: () => void;
-	markElement?: (id: string) => void;
-	selectMarkedElement?: () => void;
-	searchText?: string;
-	searchItems?: (searchText: string) => { id: string; setFocused: () => void } | undefined;
 }
 
-export interface ComboBoxState {
-	visible: boolean;
+export interface ComboBoxState extends PopoutState {
 	value: any;
 	name?: string;
-	contentId?: string;
-	triggerId?: string;
-	contentRole?: string;
 	activeDescendant?: string;
 }

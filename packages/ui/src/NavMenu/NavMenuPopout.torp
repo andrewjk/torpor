@@ -31,6 +31,9 @@ interface NavMenuPopoutProps {
 export default function NavMenuPopout($props: NavMenuPopoutProps | undefined) {
 	let $state = $watch({
 		visible: false,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible");

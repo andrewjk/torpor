@@ -35,6 +35,9 @@ interface ModalProps {
 export default function Modal($props: ModalProps | undefined) {
 	let $state: ModalState = $watch({
 		visible: false,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
 	});
 
 	$bind($state, $props, "visible");

@@ -1,6 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
+import { createPopoutContent } from "../utils/popoutContent";
 import { type ModalContext, ModalContextName } from "./ModalTypes";
 
 interface ModalContentProps {
@@ -13,14 +13,10 @@ interface ModalContentProps {
 }
 
 /**
- * The content that is displayed for a Modal when it is open, displayed
- * alongside an element.
+ * The content that is displayed for a Modal when it is open.
  */
 export default function ModalContent($props: ModalContentProps | undefined) {
 	let defaultId = getId();
-	let div: HTMLDivElement;
-	let shown = false;
-	let closeOnClick = false;
 
 	// Get stuff out of the ModalContext
 	const context = $context[ModalContextName] as ModalContext;
@@ -32,39 +28,19 @@ export default function ModalContent($props: ModalContentProps | undefined) {
 	// Set the content ID so that the trigger can use it with aria-controls
 	$state.contentId = $props?.id ?? defaultId;
 
-	$run(() => {
-		if (!$state.visible) {
-			hide();
-		}
+	const popout = createPopoutContent({
+		getAnchor: () => undefined,
+		getContent: () => div,
+		close: (e) => context.handleClickOutside?.(e),
 	});
 
-	function show() {
-		shown = true;
+	let div: HTMLDivElement;
 
-		// HACK: Because this Modal could be shown with a click, we need to wait for another mousedown
-		// before we close on click. Otherwise the click immediately bubbles to the document
-		closeOnClick = false;
-		addDocumentEvent("mousedown", handleDocumentMouseDown);
-		addDocumentEvent("click", handleDocumentClick);
-	}
-
-	function hide() {
-		if (!shown) return;
-
-		removeDocumentEvent("mousedown", handleDocumentMouseDown);
-		removeDocumentEvent("click", handleDocumentClick);
-	}
-
-	function handleDocumentMouseDown() {
-		closeOnClick = true;
-	}
-
-	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && div && !div.contains(e.target as HTMLElement)) {
-			e.preventDefault();
-			context.handleClickOutside!(e);
+	$run(() => {
+		if (!$state.visible) {
+			popout.hide();
 		}
-	}
+	});
 
 	@render {
 		@if ($state.visible) {
@@ -73,7 +49,7 @@ export default function ModalContent($props: ModalContentProps | undefined) {
 				class={["torp-modal-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={show}
+				onmount={() => popout.show()}
 			>
 				<slot />
 			</div>

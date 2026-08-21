@@ -1,7 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
-import getScrollParent from "../utils/getScrollParent";
-import setPopoverPosition from "../utils/setPopoverPosition";
+import { createPopoutContent } from "../utils/popoutContent";
 import { type NavMenuPopoutContext, NavMenuPopoutContextName } from "./NavMenuTypes";
 
 interface NavMenuPopoutContentProps {
@@ -23,8 +22,6 @@ interface NavMenuPopoutContentProps {
  */
 export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps | undefined) {
 	let defaultId = getId();
-	let div: HTMLDivElement;
-	let shown = false;
 
 	// Get stuff out of the NavMenuPopoutContext
 	const context = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
@@ -36,50 +33,24 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps |
 	// Set the content ID so that the trigger can use it with aria-controls
 	$state.contentId = $props?.id ?? defaultId;
 
-	$run(() => {
-		if (!$state.visible) {
-			hide();
-		}
+	const popout = createPopoutContent({
+		getAnchor: () => context.anchorElement,
+		getContent: () => div,
+		close: () => ($state.visible = false),
+		side: $props?.side ?? "bottom",
+		alignment: $props?.alignment ?? "start",
+		closeOnEscape: true,
+		focusFirstElement: () => context.focusFirstElement?.(),
+		refocusAnchorOnHide: true,
 	});
 
-	function show() {
-		shown = true;
+	let div: HTMLDivElement;
 
-		// Set the position and listen for window resize and scroll to reset the position
-		setPosition();
-		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement);
-		scrollParent.addEventListener("resize", setPosition);
-		scrollParent.addEventListener("scroll", setPosition);
-		if (context.focusFirstElement) {
-			context.focusFirstElement();
+	$run(() => {
+		if (!$state.visible) {
+			popout.hide();
 		}
-	}
-
-	function hide() {
-		if (!shown) return;
-
-		// Stop listening for window resize and focus the anchor element per WAI guidelines
-		const anchorElement = context.anchorElement!;
-		const scrollParent = getScrollParent(anchorElement);
-		scrollParent.removeEventListener("resize", setPosition);
-		scrollParent.removeEventListener("scroll", setPosition);
-		if (anchorElement.focus) {
-			anchorElement.focus();
-		}
-	}
-
-	function setPosition() {
-		if (!context.anchorElement) {
-			throw new Error("NavMenuPopoutContent must have an anchor element");
-		}
-
-		if (div) {
-			let side = $props?.side ?? "bottom";
-			let alignment = $props?.alignment ?? "start";
-			setPopoverPosition(context.anchorElement, div, side, alignment);
-		}
-	}
+	});
 
 	@render {
 		@if ($state.visible) {
@@ -88,7 +59,7 @@ export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps |
 				class={["torp-nav-menu-popout-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={show}
+				onmount={() => popout.show()}
 			>
 				<slot />
 			</div>

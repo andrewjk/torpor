@@ -17,6 +17,8 @@ interface ComboBoxProps {
 	placeholder?: string;
 	/** Whether the input's value is required */
 	required?: boolean;
+	/** An ARIA label for describing the input to screen readers when there is no associated label element */
+	ariaLabel?: string;
 	/** Whether the popout is visible  */
 	visible: Bindable<boolean | undefined>;
 	/** Raised when the value has changed */
@@ -46,6 +48,10 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	let $state: ComboBoxState = $watch({
 		visible: false,
 		value: $props?.value,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: undefined,
+		activeDescendant: undefined,
 	});
 
 	$bind($state, $props, "visible", "value");

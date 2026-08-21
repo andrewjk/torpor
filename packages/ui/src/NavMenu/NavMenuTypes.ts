@@ -1,3 +1,5 @@
+import { type FocusApi, type PopoutState } from "../utils/PopoutTypes";
+
 export const NavMenuContextName: unique symbol = Symbol.for("torp.NavMenu");
 export const NavMenuPopoutContextName: unique symbol = Symbol.for("torp.NavMenuPopout");
 export const NavMenuGroupContextName: unique symbol = Symbol.for("torp.NavMenuGroup");
@@ -13,17 +15,9 @@ export interface NavMenuContext {
 	registerItem: (item: ItemState) => { index: number };
 }
 
-export interface NavMenuPopoutContext {
-	state: {
-		visible: boolean;
-		/** The ID of the popout content, for use with aria-controls */
-		contentId?: string;
-		/** The ID of the popout trigger, for use with aria-labelledby */
-		triggerId?: string;
-	};
+export interface NavMenuPopoutContext extends FocusApi {
+	state: PopoutState;
 	anchorElement?: HTMLElement;
-	focusFirstElement?: () => void;
-	focusLastElement?: () => void;
 }
 
 export interface NavMenuGroupContext {
