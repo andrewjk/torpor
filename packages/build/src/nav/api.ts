@@ -1,4 +1,4 @@
-import type { RouteArgs } from "../types/ParseRouteParams";
+import type { ExactRouteParams, ParseRouteParams } from "../types/ParseRouteParams";
 import type TypedResponse from "../response/TypedResponse";
 import route from "./route";
 
@@ -43,11 +43,21 @@ const METHODS = ["get", "post", "patch", "put", "del", "options", "head"] as con
  * @param params The route params, required if the path has dynamic segments
  * @returns An object with one caller per handler defined by the endpoint
  */
-export default function makeApi<Route extends string, Endpoint extends object>(
+export default function makeApi<
+	Route extends string,
+	Endpoint extends object,
+	Params extends ParseRouteParams<Route> = ParseRouteParams<Route>,
+>(
 	path: Route,
-	...args: RouteArgs<Route>
+	// NOTE: The rest args conditional must stay INLINE — routing it through a
+	// type alias defeats `Params` inference, and excess keys stop being checked
+	...args: string extends Route
+		? [params?: Record<string, string>]
+		: keyof ParseRouteParams<Route> extends never
+			? []
+			: [params: Params & ExactRouteParams<Params, ParseRouteParams<Route>>]
 ): ApiMethods<Endpoint> {
-	const url = route(path, ...(args as [params?: Record<string, string>]));
+	const url = route(path as string, ...(args as [params?: Record<string, string>]));
 	const api: Record<string, (body?: unknown, init?: RequestInit) => Promise<unknown>> = {};
 	for (const method of METHODS) {
 		api[method] = (body, init) => request(method, url, body, init);

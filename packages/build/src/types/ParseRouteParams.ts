@@ -33,6 +33,19 @@ export type RouteParamsOf<Route extends string | undefined> = string extends Rou
 		: Record<string, string>;
 
 /**
+ * Validates an inferred params object against a route's params shape:
+ * resolves to the params type when its keys are exactly the route's keys, and
+ * `never` when keys are missing or extra — so wrong keys error at the call
+ * site (excess property checks are skipped for deferred conditional rest
+ * tuples, but assignability to `never` can't be).
+ */
+export type ExactRouteParams<Params, Shape> = Params extends Shape
+	? [Exclude<keyof Params, keyof Shape>] extends [never]
+		? Params
+		: never
+	: never;
+
+/**
  * The arguments for building a route path: nothing for static routes, or the
  * route's params object for dynamic routes.
  */

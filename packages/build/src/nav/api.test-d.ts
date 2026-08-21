@@ -45,6 +45,8 @@ export const postApi: ApiMethods<TimeEndPoint> = makeApi<"/api/posts/[id]", Time
 void makeApi<"/api/posts/[id]", TimeEndPoint>("/api/posts/[id]");
 // @ts-expect-error params are not accepted for static paths
 void makeApi<"/api/time", TimeEndPoint>("/api/time", {});
+// @ts-expect-error 'nope' is not a param of /api/posts/[id]
+void makeApi<"/api/posts/[id]", TimeEndPoint>("/api/posts/[id]", { nope: "1" });
 
 // ok() typing: object bodies are typed, strings are not
 export const typed: TypedResponse<{ time: number }> = ok({ time: 5 });

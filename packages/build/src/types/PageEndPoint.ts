@@ -1,5 +1,5 @@
 import { type Component } from "@torpor/view";
-import type { RouteArgsOf } from "./ParseRouteParams";
+import type { ExactRouteParams, ParseRouteParams, RouteParamsOf } from "./ParseRouteParams";
 import type PageLoadEvent from "./PageLoadEvent";
 import type { PageLoadReturn } from "./PageLoadReturn";
 
@@ -13,10 +13,21 @@ export default interface PageEndPoint<
 	Data = Record<string, any>,
 > {
 	/**
-	 * Builds the route path for the page in a type-safe manner.
-	 * TODO: Not sure this is actually the best way to do it...
+	 * Builds the route path for the page in a type-safe manner. The params
+	 * object is checked for exact keys when `Route` is annotated.
+	 *
+	 * NOTE: The rest args conditional must stay INLINE — routing it through a
+	 * type alias defeats `Params` inference, and excess keys stop being checked
 	 */
-	route?: (...args: RouteArgsOf<Route>) => string;
+	route?: <Params extends RouteParamsOf<Route>>(
+		...args: Route extends string
+			? string extends Route
+				? [params?: Record<string, string>]
+				: keyof ParseRouteParams<Route> extends never
+					? []
+					: [params: Params & ExactRouteParams<Params, ParseRouteParams<Route>>]
+			: [params?: Record<string, string>]
+	) => string;
 	/**
 	 * Loads data for the page.
 	 */

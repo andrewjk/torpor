@@ -71,10 +71,14 @@ export const dynamicRoute: string = route("/posts/[id]", { id: "5" });
 export const splatRoute: string = route("/files/[...path]", { path: "a/b" });
 // @ts-expect-error missing params
 void route("/posts/[id]");
-// NOTE: keys inside the params object are not checked (deferred conditional
-// rest tuples skip property checks); wrong keys throw at runtime instead
 // @ts-expect-error params are not accepted for static routes
 void route("/about", {});
+// @ts-expect-error 'nope' is not a param of /posts/[id]
+void route("/posts/[id]", { nope: "1" });
+// @ts-expect-error 'extra' is not a param of /posts/[id]
+void route("/posts/[id]", { id: "5", extra: "x" });
+// @ts-expect-error 'id' is required
+void route("/posts/[id]", {});
 
 // Non-literal paths fall back to a loose optional params object
 export const looseRoute: string = route("/posts/[id]" as string, { id: "5" });
