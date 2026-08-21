@@ -1,0 +1,11 @@
+import { ToolBar, ToolBarButton } from "../../../src/ToolBar";
+
+export default function ToolBarDisabledMiddle() {
+	@render {
+		<ToolBar ariaLabel="Test toolbar">
+			<ToolBarButton>First</ToolBarButton>
+			<ToolBarButton disabled>Middle</ToolBarButton>
+			<ToolBarButton>Last</ToolBarButton>
+		</ToolBar>
+	}
+}

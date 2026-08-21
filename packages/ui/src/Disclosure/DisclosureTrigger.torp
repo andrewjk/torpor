@@ -38,7 +38,6 @@ export default function DisclosureTrigger($props: DisclosureTriggerProps | undef
 			aria-disabled={$state.disabled}
 			aria-controls={$state.contentId}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled}
 			onclick={() => $state.expanded = !$state.expanded}
 		>
 			<slot />

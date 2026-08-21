@@ -37,7 +37,6 @@ export default function AccordionContent($props: AccordionContentProps | undefin
 			aria-labelledby={$state.headerId}
 			aria-hidden={$state.expanded ? undefined : "true"}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			@if ($state.expanded) {
 				<slot />

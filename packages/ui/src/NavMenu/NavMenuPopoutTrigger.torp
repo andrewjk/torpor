@@ -44,7 +44,7 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 	let $state = popoutContext.state;
 
 	// Register this item with the parent NavMenu and store the index
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	// TODO: $mount should be run AFTER the button has been set
 	//$mount(() => {
@@ -113,7 +113,6 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 			aria-haspopup="true"
 			aria-expanded={$state.visible.toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

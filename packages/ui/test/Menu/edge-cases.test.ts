@@ -31,13 +31,13 @@ describe("Menu edge cases", () => {
 		expect(disabledButton).toBeDisabled();
 	});
 
-	it("disabled items have data-disabled attribute", () => {
+	it("disabled items have a disabled attribute", () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, MenuEdgeCases);
 
 		const disabledButton = getByText(container, "Disabled item 1");
-		expect(disabledButton).toHaveAttribute("data-disabled", "true");
+		expect(disabledButton).toHaveAttribute("disabled");
 	});
 
 	it("MenuPopoutTrigger hover delay works", async () => {

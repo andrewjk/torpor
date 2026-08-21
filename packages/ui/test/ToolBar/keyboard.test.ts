@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vite-plus/test";
 import ToolBarKeyboard from "./components/ToolBarKeyboard.torp";
+import ToolBarDisabledMiddle from "./components/ToolBarDisabledMiddle.torp";
 import ToolBarVertical from "./components/ToolBarVertical.torp";
 
 describe("ToolBar", () => {
@@ -207,6 +208,28 @@ describe("ToolBar", () => {
 			button3.focus();
 			fireEvent(button3, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 			expect(document.activeElement).toBe(button3);
+		});
+	});
+
+	describe("Disabled items", () => {
+		it("Arrow navigation skips disabled items", async () => {
+			const container = document.createElement("div");
+			document.body.appendChild(container);
+			mount(container, ToolBarDisabledMiddle);
+
+			const first = getByText(container, "First");
+			const last = getByText(container, "Last");
+
+			first.focus();
+			expect(document.activeElement).toBe(first);
+
+			// Moving forward skips the disabled middle item
+			fireEvent(first, new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }));
+			expect(document.activeElement).toBe(last);
+
+			// Moving back skips it again
+			fireEvent(last, new KeyboardEvent("keydown", { key: "ArrowLeft", bubbles: true }));
+			expect(document.activeElement).toBe(first);
 		});
 	});
 });

@@ -31,7 +31,7 @@ export default function ToolBarButton($props: ToolBarButtonProps | undefined) {
 	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
 
 	// Register this item with the parent ToolBar and store the index
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	function setFocused() {
 		button.focus();
@@ -45,7 +45,6 @@ export default function ToolBarButton($props: ToolBarButtonProps | undefined) {
 			type="button"
 			{$props?.disabled}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			{$props?.onclick}
 			onkeydown={handleItemKey}
 			onfocus={() => handleItemFocus(index)}

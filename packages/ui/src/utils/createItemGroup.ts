@@ -66,9 +66,9 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 		if (value === undefined || value === null) return false;
 		if (getType() === "multiple") {
 			const values = Array.isArray(value) ? value : [value];
-			return values.indexOf(item.value) !== -1;
+			return values.some((v) => sameValue(v, item.value));
 		}
-		return item.value === value;
+		return sameValue(item.value, value);
 	}
 
 	function registerItem(item: T) {
@@ -78,8 +78,6 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 		if (options.onRegister) {
 			options.onRegister(item);
 		}
-		// Make the selection property derived: a cached getter computed from the
-		// group value, so it always reflects (and only reflects) that value
 		// Make the selection property derived: a cached getter computed from the
 		// group value, so it always reflects (and only reflects) that value
 		Object.defineProperty(item, selectedProperty, {
@@ -106,24 +104,25 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	function toggleItem(value: any) {
 		switch (getType()) {
 			case "single": {
+				const item = itemStates.find((i) => sameValue(i.value, value));
 				if (allowDeselect) {
-					for (let item of itemStates) {
-						if (item.value === value) {
-							state.value = (item as any)[selectedProperty] ? undefined : item.value;
-							break;
-						}
+					if (item) {
+						state.value = (item as any)[selectedProperty] ? undefined : item.value;
 					}
 				} else {
-					state.value = value;
+					// Store the item's own value, so the group value keeps its
+					// canonical type
+					state.value = item ? item.value : value;
 				}
 				break;
 			}
 			case "multiple": {
 				const newValue: any[] = [];
 				for (let item of itemStates) {
+					const toggled = sameValue(item.value, value);
 					if (
-						(item.value === value && !(item as any)[selectedProperty]) ||
-						(item.value !== value && (item as any)[selectedProperty])
+						(toggled && !(item as any)[selectedProperty]) ||
+						(!toggled && (item as any)[selectedProperty])
 					) {
 						newValue.push(item.value);
 					}
@@ -138,4 +137,16 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 	}
 
 	return { itemStates, registerItem, removeItem, toggleItem };
+}
+
+/**
+ * Compares an item value with a group/toggle value. Primitives are compared
+ * as strings — DOM values are always strings, while callers may pass e.g.
+ * numbers — and everything else by strict equality.
+ */
+function sameValue(a: any, b: any): boolean {
+	if (a === b) return true;
+	if (a === null || b === null || a === undefined || b === undefined) return false;
+	if (typeof a === "object" || typeof b === "object") return false;
+	return String(a) === String(b);
 }

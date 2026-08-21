@@ -50,7 +50,7 @@ export default function MenuRadio($props: MenuRadioProps) {
 	const { registerItemInGroup, toggleItem } = groupContext;
 
 	// Register this item with the parent Menu
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	// Register this item with the parent MenuRadioGroup
 	registerItemInGroup($state);
@@ -83,7 +83,6 @@ export default function MenuRadio($props: MenuRadioProps) {
 			aria-checked={$state.checked ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-state={$state.checked ? "checked" : "unchecked"}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleItemKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

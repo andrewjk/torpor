@@ -74,7 +74,6 @@ export default function TreeItemLabel() {
 			tabindex="0"
 			role="none"
 			data-selected={$state.selected ? "selected" : undefined}
-			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			onclick={handleSelectClick}
 			onkeydown={handleKey}
 			&ref={label}

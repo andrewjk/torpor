@@ -26,6 +26,7 @@ describe("ListBox", () => {
 
 		item1.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
 
-		expect(document.activeElement).toBe(getByText(container, "Content 2"));
+		// Focus skips the disabled second item
+		expect(document.activeElement).toBe(getByText(container, "Content 3"));
 	});
 });

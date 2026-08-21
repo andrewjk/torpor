@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import { focusItem as focusListItem } from "../utils/focusItem";
 import { type ItemState, type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuProps {
@@ -73,13 +74,9 @@ export default function Menu($props: MenuProps | undefined) {
 		}
 	}
 
-	function registerItem(setFocused: () => void, setVisible?: (visible: boolean) => void) {
+	function registerItem(item: ItemState) {
 		// Add the item's state to the array and return its index
-		const item: ItemState = {
-			index: itemStates.length,
-			setFocused,
-			setVisible,
-		};
+		item.index = itemStates.length;
 		itemStates.push(item);
 		return { index: item.index };
 	}
@@ -131,25 +128,7 @@ export default function Menu($props: MenuProps | undefined) {
 	}
 
 	function focusItem(target: "start" | "previous" | "next" | "end") {
-		switch (target) {
-			case "start": {
-				focusIndex = 0;
-				break;
-			}
-			case "previous": {
-				focusIndex = Math.max(0, focusIndex - 1);
-				break;
-			}
-			case "next": {
-				focusIndex = Math.min(itemStates.length - 1, focusIndex + 1);
-				break;
-			}
-			case "end": {
-				focusIndex = itemStates.length - 1;
-				break;
-			}
-		}
-		itemStates[focusIndex]?.setFocused();
+		focusIndex = focusListItem(itemStates, focusIndex, target);
 	}
 
 	function handlePopout(index: number) {

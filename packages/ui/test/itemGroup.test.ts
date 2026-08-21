@@ -113,4 +113,65 @@ describe("createItemGroup", () => {
 		expect(shown1).toBe(false);
 		expect(shown2).toBe(true);
 	});
+
+	it("coerces values to strings when toggling", () => {
+		// DOM values are always strings, but callers pass e.g. numbers —
+		// toggling with an int must match an item whose value is the string
+		const $state = $watch({ value: "" as any });
+		const group = createItemGroup<TestItem>({
+			state: $state,
+			type: "single",
+			selectedProperty: "active",
+			allowDeselect: false,
+		});
+
+		const item1: TestItem = $watch({ index: -1, value: "1", active: false });
+		const item2: TestItem = $watch({ index: -1, value: "2", active: false });
+		group.registerItem(item1);
+		group.registerItem(item2);
+
+		let shown1: boolean | undefined;
+		let shown2: boolean | undefined;
+		$run(() => {
+			shown1 = item1.active;
+		});
+		$run(() => {
+			shown2 = item2.active;
+		});
+
+		group.toggleItem(1);
+		expect(shown1).toBe(true);
+		expect(shown2).toBe(false);
+		// The item's own value is stored, not the coerced one
+		expect($state.value).toBe("1");
+
+		group.toggleItem(2);
+		expect(shown1).toBe(false);
+		expect(shown2).toBe(true);
+		expect($state.value).toBe("2");
+	});
+
+	it("coerces values in multiple selection", () => {
+		const $state = $watch({ value: [] as any[] });
+		const group = createItemGroup<TestItem>({
+			state: $state,
+			type: "multiple",
+			selectedProperty: "active",
+		});
+
+		const item1: TestItem = $watch({ index: -1, value: "1", active: false });
+		const item2: TestItem = $watch({ index: -1, value: "2", active: false });
+		group.registerItem(item1);
+		group.registerItem(item2);
+
+		group.toggleItem(1);
+		expect(item1.active).toBe(true);
+		expect(item2.active).toBe(false);
+		expect($state.value).toEqual(["1"]);
+
+		// Toggling the same value as a string deselects it
+		group.toggleItem("1");
+		expect(item1.active).toBe(false);
+		expect($state.value).toEqual([]);
+	});
 });

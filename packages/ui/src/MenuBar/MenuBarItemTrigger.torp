@@ -39,7 +39,7 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 	const { state: $state, setVisible } = itemContext;
 
 	// Register this item with the parent MenuBar and store the index
-	const { index } = registerItem(setVisible, setFocused);
+	const { index } = registerItem({ setVisible, setFocused, disabled: $props?.disabled });
 
 	$mount(() => {
 		// Set the anchor element to the button when it exists
@@ -84,7 +84,6 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 			aria-haspopup="true"
 			aria-expanded={($state.visible ?? false).toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleKey}
 			onclick={handleClick}
 			onfocus={() => handleButtonFocus(index)}

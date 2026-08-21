@@ -33,7 +33,7 @@ export default function MenuButton($props: MenuButtonProps | undefined) {
 	const { registerItem, handleButton, handleItemKey, handleItemFocus } = menuContext;
 
 	// Register this item with the parent Menu and store the index
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	function handleKeyDown(e: KeyboardEvent) {
 		handleItemKey(e);
@@ -63,7 +63,6 @@ export default function MenuButton($props: MenuButtonProps | undefined) {
 			role="menuitem"
 			tabindex="-1"
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleKeyDown}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

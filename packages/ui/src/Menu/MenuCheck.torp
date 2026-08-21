@@ -43,7 +43,7 @@ export default function MenuCheck($props: MenuCheckProps | undefined) {
 	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
 
 	// Register this item with the parent Menu
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	// Set the context to pass down to items
 	let context: MenuButtonContext = {
@@ -74,7 +74,6 @@ export default function MenuCheck($props: MenuCheckProps | undefined) {
 			aria-checked={$state.checked ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			data-state={$props?.checked ? "checked" : "unchecked"}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleItemKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

@@ -21,10 +21,7 @@ export interface MenuContext {
 	anchorElement?: HTMLElement;
 
 	/** Called from each MenuButton/Check/Radio to register itself with this Menu */
-	registerItem: (
-		setFocused: () => void,
-		setVisible?: (visible: boolean) => void,
-	) => { index: number };
+	registerItem: (item: ItemState) => { index: number };
 }
 
 export interface MenuState {
@@ -44,9 +41,12 @@ export interface MenuRadioGroupContext {
 }
 
 export interface ItemState {
-	index: number;
+	/** Assigned by the Menu on registration */
+	index?: number;
 	setFocused: () => void;
 	setVisible?: (visible: boolean) => void;
+	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
+	disabled?: boolean;
 }
 
 export interface RadioGroupItemState {

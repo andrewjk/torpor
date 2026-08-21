@@ -13,10 +13,7 @@ export interface ToolBarContext {
 	handlePopout: (index: number) => void;
 
 	/** Called from each ToolBarLink or ToolBarButton to register itself with this ToolBar */
-	registerItem: (
-		setFocused: () => void,
-		setVisible?: (visible: boolean) => void,
-	) => { index: number };
+	registerItem: (item: ItemState) => { index: number };
 
 	orientation: "horizontal" | "vertical";
 }
@@ -28,7 +25,10 @@ export interface ToolBarGroupContext {
 }
 
 export interface ItemState {
-	index: number;
+	/** Assigned by the ToolBar on registration */
+	index?: number;
 	setFocused: () => void;
 	setVisible?: (visible: boolean) => void;
+	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
+	disabled?: boolean;
 }

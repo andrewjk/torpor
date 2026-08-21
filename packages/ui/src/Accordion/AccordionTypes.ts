@@ -3,7 +3,7 @@ export const AccordionItemContextName: unique symbol = Symbol.for("torp.Accordio
 
 export interface AccordionContext {
 	/** Called from an AccordionItem when it is added */
-	registerItem: (state: ItemState, setFocused: () => void) => void;
+	registerItem: (state: ItemState) => void;
 	/** Called from an AccordionItem when it is removed */
 	removeItem: (index: number) => void;
 	/** Called from an AccordionItem when it is toggled */

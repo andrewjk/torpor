@@ -45,7 +45,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent Menu and store the index
-	const { index } = registerItem(setFocused, setVisible);
+	const { index } = registerItem({ setFocused, setVisible, disabled: $props?.disabled });
 
 	function setFocused() {
 		button.focus();
@@ -113,7 +113,6 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 			aria-haspopup="true"
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

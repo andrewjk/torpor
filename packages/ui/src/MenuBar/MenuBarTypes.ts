@@ -1,3 +1,5 @@
+import { type FocusApi } from "../utils/PopoutTypes";
+
 export const MenuBarContextName: unique symbol = Symbol.for("torp.MenuBar");
 export const MenuBarItemContextName: unique symbol = Symbol.for("torp.MenuBarItem");
 
@@ -12,7 +14,7 @@ export interface MenuBarContext {
 	handleButtonKey: (e: KeyboardEvent) => void;
 
 	/** Called from each MenuBarButton to register itself with this MenuBar */
-	registerItem: (setVisible: (value: boolean) => void, setFocused: () => void) => { index: number };
+	registerItem: (item: ItemState) => { index: number };
 
 	state: {
 		/** Whether a menubar item is showing its content. If so, changing to another item should show its content */
@@ -20,17 +22,18 @@ export interface MenuBarContext {
 	};
 }
 
-export interface MenuBarItemContext {
+export interface MenuBarItemContext extends FocusApi {
 	setVisible: (value: boolean) => void;
 	state: {
 		visible: boolean;
 	};
 	index: number;
 	anchorElement?: HTMLElement;
-	focusFirstElement?: () => void;
 }
 
 export interface ItemState {
 	setVisible: (value: boolean) => void;
 	setFocused: () => void;
+	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
+	disabled?: boolean;
 }

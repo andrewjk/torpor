@@ -10,7 +10,7 @@ export interface NavMenuContext {
 	handleItemKey: (e: KeyboardEvent) => void;
 
 	/** Called from each NavMenuLink or NavMenuButton to register itself with this NavMenu */
-	registerItem: (setFocused: () => void) => { index: number };
+	registerItem: (item: ItemState) => { index: number };
 }
 
 export interface NavMenuPopoutContext {
@@ -30,4 +30,6 @@ export interface NavMenuGroupContext {
 
 export interface ItemState {
 	setFocused: () => void;
+	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
+	disabled?: boolean;
 }

@@ -34,7 +34,6 @@ export default function DisclosureHeader($props: DisclosureHeaderProps | undefin
 			class={["torp-disclosure-header", $props?.class]}
 			{$props?.style}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
 		</div>

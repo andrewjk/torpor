@@ -52,19 +52,9 @@ export default function Pagination($props: PaginationProps) {
 	};
 	$context[PaginationContextName] = context;
 
-	function registerItem(
-		target: PageNumber,
-		setActive: (value: boolean) => void,
-		setFocused: () => void,
-	) {
+	function registerItem(item: ItemState) {
 		// Add the item's state to the array
-		const newItemState: ItemState = {
-			target,
-			active: false,
-			setActive,
-			setFocused,
-		};
-		itemStates.push(newItemState);
+		itemStates.push(item);
 	}
 
 	function removeItem(target: PageNumber) {

@@ -119,7 +119,6 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 			aria-selected={$state.selected ? "true" : "false"}
 			aria-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 			data-selected={$state.selected ? "selected" : undefined}
-			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			@// HACK: May be better to do this with CSS?
 			@if ($state.level) {

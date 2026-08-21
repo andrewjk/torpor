@@ -65,7 +65,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 
 	// Set the context to pass down to items, with functions for each item to call
 	let context: AccordionContext = {
-		registerItem: (state: ItemState, _setFocused: () => void) => group.registerItem(state),
+		registerItem: (state: ItemState) => group.registerItem(state),
 		removeItem: group.removeItem,
 		toggleItem: group.toggleItem,
 		handleHeaderKey,

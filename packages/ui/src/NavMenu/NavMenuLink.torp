@@ -31,7 +31,7 @@ export default function NavMenuLink($props: NavMenuLinkProps | undefined) {
 	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
 
 	// Register this item with the parent NavMenu and store the index
-	const { index } = registerItem(setFocused);
+	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
 
 	function setFocused() {
 		link.focus();
@@ -47,7 +47,6 @@ export default function NavMenuLink($props: NavMenuLinkProps | undefined) {
 			target={$props?.newWindow ? "_blank" : undefined}
 			role="menuitem"
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown
 			onkeydown={handleItemKey}
 			onclick

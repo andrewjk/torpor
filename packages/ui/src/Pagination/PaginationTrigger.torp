@@ -29,7 +29,7 @@ export default function PaginationTrigger($props: PaginationTriggerProps) {
 	const { registerItem, removeItem, toggleItem, handleItemKey } = context;
 
 	// Register this item with the parent Pagination, which will handle setting this item's focus on keyboard events
-	registerItem($props.page, () => {}, setFocused);
+	registerItem({ target: $props.page, active: false, setActive: () => {}, setFocused });
 
 	$run(() => {
 		return () => {

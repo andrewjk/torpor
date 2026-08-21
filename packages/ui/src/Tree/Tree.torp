@@ -236,7 +236,7 @@ export default function Tree($props: TreeProps | undefined) {
 
 		for (let i = index + 1; i < itemStates.length; i++) {
 			let item = itemStates[i];
-			if (isItemVisible(item, itemStates)) {
+			if (isItemVisible(item, itemStates) && !item.disabled) {
 				return item;
 			}
 		}
@@ -247,7 +247,7 @@ export default function Tree($props: TreeProps | undefined) {
 	function getPreviousVisibleItem(index: number): ItemState | undefined {
 		for (let i = index - 1; i >= 0; i--) {
 			let item = itemStates[i];
-			if (isItemVisible(item, itemStates)) {
+			if (isItemVisible(item, itemStates) && !item.disabled) {
 				return item;
 			}
 		}

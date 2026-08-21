@@ -46,7 +46,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent ToolBar and store the index
-	const { index } = registerItem(setFocused, setVisible);
+	const { index } = registerItem({ setFocused, setVisible, disabled: $props?.disabled });
 
 	// TODO: $mount should be run AFTER the button has been set
 	//$mount(() => {
@@ -127,7 +127,6 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 			aria-controls={popoutContext.state.contentId}
 			aria-expanded={$state.visible.toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}
-			data-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}

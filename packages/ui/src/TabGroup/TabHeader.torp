@@ -68,7 +68,6 @@ export default function TabHeader($props: TabHeaderProps | undefined) {
 				context.orientation
 			]}
 			data-state={$state.active ? "active" : "inactive"}
-			data-disabled={$state.disabled ? "true" : undefined}
 		>
 			<slot />
 		</div>

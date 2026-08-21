@@ -34,7 +34,6 @@ export default function AccordionHeader($props: AccordionHeaderProps | undefined
 			class={["torp-accordion-header", $props?.class]}
 			{$props?.style}
 			data-state={$state.expanded ? "open" : "closed"}
-			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			<slot />
 		</div>

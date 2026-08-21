@@ -64,7 +64,6 @@ export default function TabTrigger($props: TabTriggerProps | undefined) {
 			aria-disabled={$state.disabled || $state.parentDisabled}
 			aria-controls={$state.contentId}
 			data-state={$state.active ? "active" : "inactive"}
-			data-disabled={$state.disabled}
 			data-orientation={context.orientation}
 			&ref={button}
 			onclick={handleClick}

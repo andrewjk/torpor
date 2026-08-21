@@ -32,14 +32,14 @@ describe("Accordion", () => {
 		expect(getByText(container, "Header 3")).toHaveAttribute("aria-disabled", "true");
 	});
 
-	it("Disabled accordion has data-disabled on all items", async () => {
+	it("Disabled accordion are disabled", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, AccordionDisabled, { disabled: true, value: 1 });
 
-		const items = container.querySelectorAll(".torp-accordion-item");
-		expect(items[0]).toHaveAttribute("data-disabled", "true");
-		expect(items[1]).toHaveAttribute("data-disabled", "true");
-		expect(items[2]).toHaveAttribute("data-disabled", "true");
+		const items = container.querySelectorAll(".torp-accordion-trigger");
+		expect(items[0]).toHaveAttribute("disabled");
+		expect(items[1]).toHaveAttribute("disabled");
+		expect(items[2]).toHaveAttribute("disabled");
 	});
 });

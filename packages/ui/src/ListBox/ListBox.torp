@@ -162,52 +162,53 @@ export default function ListBox($props: ListBoxProps | undefined) {
 
 	function handleKey(index: number, e: KeyboardEvent) {
 		const itemStates = group.itemStates;
+		// Finds the nearest focusable item, skipping disabled ones
+		const findFocusable = (from: number, step: number): number => {
+			let i = from;
+			while (i >= 0 && i < itemStates.length && itemStates[i].disabled) {
+				i += step;
+			}
+			return i;
+		};
+		const clearSearch = () => {
+			if (popoutContext) {
+				popoutContext.searchText = undefined;
+			} else {
+				searchText = undefined;
+			}
+		};
 		switch (e.key) {
 			case "ArrowUp": {
-				if (index > 0) {
+				const target = findFocusable(index - 1, -1);
+				if (target >= 0) {
 					e.preventDefault();
-					itemStates[index - 1].setFocused();
-					if (popoutContext) {
-						popoutContext.searchText = undefined;
-					} else {
-						searchText = undefined;
-					}
+					itemStates[target].setFocused();
+					clearSearch();
 				}
 				break;
 			}
 			case "ArrowDown": {
-				if (index < itemStates.length - 1) {
+				const target = findFocusable(index + 1, 1);
+				if (target < itemStates.length) {
 					e.preventDefault();
-					itemStates[index + 1].setFocused();
-					if (popoutContext) {
-						popoutContext.searchText = undefined;
-					} else {
-						searchText = undefined;
-					}
+					itemStates[target].setFocused();
+					clearSearch();
 				}
 				break;
 			}
 			case "Home": {
 				if (index > 0) {
 					e.preventDefault();
-					itemStates[0].setFocused();
-					if (popoutContext) {
-						popoutContext.searchText = undefined;
-					} else {
-						searchText = undefined;
-					}
+					itemStates[findFocusable(0, 1)].setFocused();
+					clearSearch();
 				}
 				break;
 			}
 			case "End": {
 				if (index < itemStates.length - 1) {
 					e.preventDefault();
-					itemStates[itemStates.length - 1].setFocused();
-					if (popoutContext) {
-						popoutContext.searchText = undefined;
-					} else {
-						searchText = undefined;
-					}
+					itemStates[findFocusable(itemStates.length - 1, -1)].setFocused();
+					clearSearch();
 				}
 				break;
 			}

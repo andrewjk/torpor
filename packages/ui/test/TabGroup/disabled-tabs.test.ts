@@ -32,14 +32,14 @@ describe("TabGroup", () => {
 		expect(getByText(container, "Header 3")).toHaveAttribute("aria-disabled", "true");
 	});
 
-	it("Disabled tab group has data-disabled on all items", async () => {
+	it("Disabled tab group are disabled", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, TabGroupDisabled, { disabled: true, value: "1" });
 
-		const items = container.querySelectorAll(".torp-tab-content");
-		expect(items[0]).toHaveAttribute("data-disabled", "true");
-		expect(items[1]).toHaveAttribute("data-disabled", "true");
-		expect(items[2]).toHaveAttribute("data-disabled", "true");
+		const items = container.querySelectorAll(".torp-tab-trigger");
+		expect(items[0]).toHaveAttribute("disabled");
+		expect(items[1]).toHaveAttribute("disabled");
+		expect(items[2]).toHaveAttribute("disabled");
 	});
 });

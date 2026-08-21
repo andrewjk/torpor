@@ -39,7 +39,6 @@ export default function TreeItemContent($props: TreeItemContentProps | undefined
 			class={["torp-tree-item-content", $props?.class]}
 			{$props?.style}
 			data-selected={$state.selected ? "selected" : undefined}
-			data-disabled={$state.disabled || $state.parentDisabled ? "true" : undefined}
 		>
 			<slot />
 		</div>
