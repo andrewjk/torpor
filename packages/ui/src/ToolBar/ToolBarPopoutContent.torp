@@ -36,7 +36,10 @@ export default function ToolBarPopoutContent($props: ToolBarPopoutContentProps |
 	}
 	let $state = context.state;
 
+	// Set the content ID and role so that triggers can use them with
+	// aria-controls / aria-haspopup
 	$state.contentId = $props?.id ?? defaultId;
+	$state.contentRole = "menu";
 
 	$run(() => {
 		if (!$state.visible) {

@@ -13,4 +13,8 @@ export interface ModalContext extends FocusApi {
 
 export interface ModalState {
 	visible: boolean;
+	contentId?: string;
+	triggerId?: string;
+	/** The role of the modal's content, used by triggers for aria-haspopup */
+	contentRole?: string;
 }

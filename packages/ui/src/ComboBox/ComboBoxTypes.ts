@@ -25,5 +25,6 @@ export interface ComboBoxState {
 	value: any;
 	name?: string;
 	contentId?: string;
+	contentRole?: string;
 	activeDescendant?: string;
 }

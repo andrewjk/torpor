@@ -1,6 +1,8 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { ReactiveDate } from "@torpor/view";
 import { areDatesEqual } from "../utils/dateUtils";
+import getId from "../utils/getId";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import {
 	type CalendarContext,
 	CalendarContextName,
@@ -50,6 +52,8 @@ interface CalendarProps {
  * ```
  */
 export default function Calendar($props: CalendarProps) {
+	let defaultId = getId();
+
 	$props ??= $watch({});
 
 	// Ensure the value is a reactive date
@@ -75,6 +79,15 @@ export default function Calendar($props: CalendarProps) {
 
 	let container: HTMLElement;
 	let refocus = false;
+
+	// Maybe get stuff out of a popout context
+	const popoutContext = $context[PopoutContextName] as PopoutContext | undefined;
+	if (popoutContext) {
+		// Set the content ID and role so that triggers can use them with
+		// aria-controls / aria-haspopup
+		popoutContext.state.contentId = $props?.id ?? defaultId;
+		popoutContext.state.contentRole = "grid";
+	}
 
 	const context: CalendarContext = {
 		selectable: $props.selectable === true,
@@ -236,7 +249,7 @@ export default function Calendar($props: CalendarProps) {
 
 	@render {
 		<div
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-calendar", $props?.class]}
 			{$props?.style}
 			&ref={container}

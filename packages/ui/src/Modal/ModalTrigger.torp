@@ -44,6 +44,9 @@ export default function ModalTrigger($props: ModalTriggerProps | undefined) {
 			{$props?.id}
 			class={["torp-modal-trigger", $props?.class]}
 			{$props?.style}
+			aria-haspopup={$state.contentRole ?? "true"}
+			aria-expanded={$state.visible ? "true" : "false"}
+			aria-controls={$state.contentId}
 			onclick={handleClick}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

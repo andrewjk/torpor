@@ -1,5 +1,7 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { createItemGroup } from "../utils/createItemGroup";
+import getId from "../utils/getId";
 import { type ItemState, type TreeContext, TreeContextName } from "./TreeTypes";
 
 interface TreeProps {
@@ -48,6 +50,8 @@ interface TreeProps {
  * ```
  */
 export default function Tree($props: TreeProps | undefined) {
+	let defaultId = getId();
+
 	// Get the current selection type, re-reading $props so changes are picked up
 	function getType(): "single" | "multiple" {
 		return $props?.type ?? "single";
@@ -59,6 +63,15 @@ export default function Tree($props: TreeProps | undefined) {
 	});
 
 	$bind($state, $props, "expanded", "value");
+
+	// Maybe get stuff out of a popout context
+	const popoutContext = $context[PopoutContextName] as PopoutContext | undefined;
+	if (popoutContext) {
+		// Set the content ID and role so that triggers can use them with
+		// aria-controls / aria-haspopup
+		popoutContext.state.contentId = $props?.id ?? defaultId;
+		popoutContext.state.contentRole = "tree";
+	}
 
 	// Expansion behaves like a multiple-select group over the "expanded" flag;
 	// selection behaves like a single- or multiple-select group over "selected".
@@ -308,7 +321,7 @@ export default function Tree($props: TreeProps | undefined) {
 
 	@render {
 		<div
-			{$props?.id}
+			id={$props?.id ?? defaultId}
 			class={["torp-tree", $props?.class]}
 			{$props?.style}
 			role="tree"

@@ -79,8 +79,10 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		popoutContext.selectMarkedElement = selectMarkedElement;
 		popoutContext.searchItems = searchItems;
 
-		// Set the content ID so that it can be used with aria-controls in AccordionTrigger
+		// Set the content ID and role so that triggers can use them with
+		// aria-controls / aria-haspopup
 		popoutContext.state.contentId = $props?.id ?? defaultId;
+		popoutContext.state.contentRole = "listbox";
 	}
 
 	const group = createItemGroup<ItemState>({

@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
 import getScrollParent from "../utils/getScrollParent";
 import setContextPosition from "../utils/setContextPosition";
 import { type ContextualContext, ContextualContextName } from "./ContextualTypes";
@@ -18,6 +19,7 @@ interface ContextualContentProps {
  * position that the user right-clicked.
  */
 export default function ContextualContent($props: ContextualContentProps | undefined) {
+	let defaultId = getId();
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -28,6 +30,9 @@ export default function ContextualContent($props: ContextualContentProps | undef
 		throw new Error("ContextualContent must be contained within a Contextual");
 	}
 	let $state = context.state;
+
+	// Set the content ID so that the trigger can use it with aria-controls
+	$state.contentId = $props?.id ?? defaultId;
 
 	$run(() => {
 		if (!$state.visible) {
@@ -99,7 +104,7 @@ export default function ContextualContent($props: ContextualContentProps | undef
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-popover-content-contextual", $props?.class]}
 				{$props?.style}
 				&ref={div}

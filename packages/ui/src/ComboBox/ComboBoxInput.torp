@@ -117,6 +117,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			required={$props?.required !== undefined ? $props.required : context.required}
 			aria-readonly
 			aria-controls={$state.contentId}
+			aria-haspopup={$state.contentRole}
 			aria-activedescendant={$state.activeDescendant}
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-label={$props?.ariaLabel !== undefined ? $props.ariaLabel : context.ariaLabel}

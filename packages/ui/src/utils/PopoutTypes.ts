@@ -41,7 +41,12 @@ export interface PopoutState {
 	visible: boolean;
 	contentId?: string;
 	triggerId?: string;
-	childRole?: string;
+	/**
+	 * The role of this popout's content ("menu", "listbox", "tree", "grid" or
+	 * "dialog"), set by the content component so that triggers can use it for
+	 * their aria-haspopup attribute.
+	 */
+	contentRole?: string;
 }
 
 export interface Point {

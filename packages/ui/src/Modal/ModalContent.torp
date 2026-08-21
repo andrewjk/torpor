@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
 import { type ModalContext, ModalContextName } from "./ModalTypes";
 
 interface ModalContentProps {
@@ -16,6 +17,7 @@ interface ModalContentProps {
  * alongside an element.
  */
 export default function ModalContent($props: ModalContentProps | undefined) {
+	let defaultId = getId();
 	let div: HTMLDivElement;
 	let shown = false;
 	let closeOnClick = false;
@@ -26,6 +28,9 @@ export default function ModalContent($props: ModalContentProps | undefined) {
 		throw new Error("ModalContent must be contained within a Modal");
 	}
 	let $state = context.state;
+
+	// Set the content ID so that the trigger can use it with aria-controls
+	$state.contentId = $props?.id ?? defaultId;
 
 	$run(() => {
 		if (!$state.visible) {
@@ -64,7 +69,7 @@ export default function ModalContent($props: ModalContentProps | undefined) {
 	@render {
 		@if ($state.visible) {
 			<div
-				{$props?.id}
+				id={$props?.id ?? defaultId}
 				class={["torp-modal-content", $props?.class]}
 				{$props?.style}
 				&ref={div}

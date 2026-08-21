@@ -32,8 +32,9 @@ interface MenuPopoutProps {
 export default function MenuPopout($props: MenuPopoutProps | undefined) {
 	let $state = $watch({
 		visible: $props?.visible ?? false,
-		// Set this so that child menus know that they are in a submenu
-		childRole: "menu",
+		// Set this so that the trigger knows its content is a menu, and child
+		// menus know that they are in a submenu
+		contentRole: "menu",
 	});
 
 	let result: any;

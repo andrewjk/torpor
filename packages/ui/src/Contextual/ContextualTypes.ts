@@ -22,6 +22,10 @@ export interface ContextualContext {
 export interface ContextualState {
 	visible: boolean;
 	position: Point;
+	contentId?: string;
+	triggerId?: string;
+	/** The role of the contextual's content, used by triggers for aria-haspopup */
+	contentRole?: string;
 }
 
 export interface Point {

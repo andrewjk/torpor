@@ -105,6 +105,7 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 			class={["torp-select-box-trigger", $props?.class]}
 			{$props?.style}
 			aria-controls={$state.contentId}
+			aria-haspopup={$state.contentRole}
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-label={$props?.ariaLabel}
 			onclick={handleClick}

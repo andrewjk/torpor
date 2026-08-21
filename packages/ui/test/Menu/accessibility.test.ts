@@ -34,7 +34,11 @@ describe("Menu", () => {
 		//   * Is the sibling element immediately following its parent menuitem
 
 		// A parent menuitem has aria-haspopup set to either menu or true
-		expect(queryByText(container, "Check popout button")).toHaveAttribute("aria-haspopup", "true");
+		// NOTE: We use the content's role, as published in the popout context
+		expect(queryByText(container, "Check popout button")).toHaveAttribute("aria-haspopup", "menu");
+
+		// A parent menuitem has aria-controls set to the ID of its submenu
+		expect(queryByText(container, "Check popout button")).toHaveAttribute("aria-controls");
 
 		// A parent menuitem has aria-expanded set to false when its child menu is not visible and set
 		// to true when the child menu is visible

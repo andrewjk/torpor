@@ -26,6 +26,8 @@ export interface MenuBarItemContext extends FocusApi {
 	setVisible: (value: boolean) => void;
 	state: {
 		visible: boolean;
+		/** The role of this item's popout content, used by the trigger for aria-haspopup */
+		contentRole?: string;
 	};
 	index: number;
 	anchorElement?: HTMLElement;

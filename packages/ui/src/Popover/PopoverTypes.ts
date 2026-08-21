@@ -16,6 +16,10 @@ export interface PopoverContext extends FocusApi {
 export interface PopoverState {
 	visible: boolean;
 	position: Point;
+	contentId?: string;
+	triggerId?: string;
+	/** The role of the popover's content, used by triggers for aria-haspopup */
+	contentRole?: string;
 }
 
 export interface Point {

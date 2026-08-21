@@ -60,6 +60,9 @@ export default function ContextualTrigger($props: ContextualTriggerProps | undef
 			{$props?.id}
 			class={["torp-popover-trigger-contextual", $props?.class]}
 			{$props?.style}
+			aria-haspopup={$state.contentRole ?? "true"}
+			aria-expanded={$state.visible ? "true" : "false"}
+			aria-controls={$state.contentId}
 			oncontextmenu={handleContextualMenu}
 			onmount={(el) => hoverTrigger(el, { onHover: handleHover, onExit: handleHover })}
 			&ref={context.anchorElement}

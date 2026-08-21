@@ -81,7 +81,7 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 			type="button"
 			{$props?.disabled}
 			role="menuitem"
-			aria-haspopup="true"
+			aria-haspopup={$state.contentRole ?? "true"}
 			aria-expanded={($state.visible ?? false).toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleKey}

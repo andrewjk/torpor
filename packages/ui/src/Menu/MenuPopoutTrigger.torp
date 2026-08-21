@@ -110,8 +110,9 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 			{$props?.disabled}
 			role="menuitem"
 			tabindex="-1"
-			aria-haspopup="true"
+			aria-haspopup={$state.contentRole ?? "true"}
 			aria-expanded={$state.visible ? "true" : "false"}
+			aria-controls={$state.contentId}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handlePopoutKey}
 			onclick={handleClick}

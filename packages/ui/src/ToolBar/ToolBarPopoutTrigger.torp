@@ -123,7 +123,7 @@ export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps |
 			{$props?.style}
 			type="button"
 			{$props?.disabled}
-			aria-haspopup="menu"
+			aria-haspopup={$state.contentRole ?? "true"}
 			aria-controls={popoutContext.state.contentId}
 			aria-expanded={$state.visible.toString()}
 			aria-disabled={$props?.disabled ? "true" : undefined}

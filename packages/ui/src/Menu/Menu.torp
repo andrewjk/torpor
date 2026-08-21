@@ -44,8 +44,8 @@ export default function Menu($props: MenuProps | undefined) {
 	}
 	const { handleButton, state } = popoutContext;
 
-	const inPopout = state.childRole === "menu";
-	state.childRole = "menu";
+	const inPopout = state.contentRole === "menu";
+	state.contentRole = "menu";
 
 	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
 	popoutContext.focusFirstElement = focusFirstElement;

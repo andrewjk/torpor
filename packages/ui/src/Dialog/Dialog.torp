@@ -63,6 +63,11 @@ export default function Dialog($props: DialogProps | undefined) {
 		// Set the focusFirstElement method in the PopoutContext so that it can be
 		// called after everything has been shown
 		popoutContext.focusFirstElement = focusFirstElement;
+
+		// Set the content ID and role so that triggers can use them with
+		// aria-controls / aria-haspopup
+		popoutContext.state.contentId = $props?.id ?? defaultId;
+		popoutContext.state.contentRole = "dialog";
 	}
 
 	// Set the IDs for using in the Dialog's ARIA attributes
