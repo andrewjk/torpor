@@ -3,6 +3,7 @@ import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
 import Site from "../site/Site";
+import { checkRoutes, reportRouteIssues } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
 
 // TODO: Don't cache index.html in dev?
@@ -11,6 +12,15 @@ import manifest from "../site/manifest.ts";
 // TODO: Call the correct +page and +server routes when in the same folder
 
 export default async function runBuild(site: Site): Promise<void> {
+	// Check route type annotations against the routes derived from file
+	// locations; errors fail the build before anything is written
+	const errorCount = reportRouteIssues(checkRoutes(site));
+	if (errorCount > 0) {
+		throw new Error(
+			`Route type check failed with ${errorCount} error${errorCount === 1 ? "" : "s"} (see above)`,
+		);
+	}
+
 	// Delete the dist folder if it exists
 	const distFolder = path.resolve(site.root, "dist");
 	if (existsSync(distFolder)) {

@@ -10,9 +10,8 @@ interface TimeEndPoint {
 	post: (event: ServerLoadEvent<"/api/time">) => Promise<Response>;
 }
 
-type Equals<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-	? true
-	: false;
+type Equals<A, B> =
+	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 type Expect<T extends true> = T;
 
 // The get caller resolves to the typed JSON body (or a raw Response)
@@ -36,12 +35,12 @@ export type R03 = Expect<Equals<keyof ApiMethods<TimeEndPoint>, "get" | "post">>
 
 // Usage: params are enforced by the route path
 export const timeApi: ApiMethods<TimeEndPoint> = makeApi<"/api/time", TimeEndPoint>("/api/time");
-export const postApi: ApiMethods<TimeEndPoint> = makeApi<
+export const postApi: ApiMethods<TimeEndPoint> = makeApi<"/api/posts/[id]", TimeEndPoint>(
 	"/api/posts/[id]",
-	TimeEndPoint
->("/api/posts/[id]", {
-	id: "5",
-});
+	{
+		id: "5",
+	},
+);
 // @ts-expect-error missing params
 void makeApi<"/api/posts/[id]", TimeEndPoint>("/api/posts/[id]");
 // @ts-expect-error params are not accepted for static paths

@@ -7,18 +7,15 @@ import route from "./route";
  * returns a typed response, or the raw Response when the body isn't JSON.
  * Untyped endpoints resolve to `unknown`.
  */
-type ApiResult<Handler> =
-	Handler extends (event: any) => any
-		? Awaited<ReturnType<Handler>> extends TypedResponse<infer Body>
-			? Body | Response
-			: unknown
-		: never;
+type ApiResult<Handler> = Handler extends (event: any) => any
+	? Awaited<ReturnType<Handler>> extends TypedResponse<infer Body>
+		? Body | Response
+		: unknown
+	: never;
 
 /** The callable methods of an endpoint, one per handler it defines. */
 export type ApiMethods<Endpoint extends object> = {
-	[Method in string & keyof Endpoint as Endpoint[Method] extends (
-		event: any,
-	) => any
+	[Method in string & keyof Endpoint as Endpoint[Method] extends (event: any) => any
 		? Method
 		: never]: (
 		body?: BodyInit | object,
@@ -67,12 +64,7 @@ async function request(
 	// `del` is the endpoint handler name for DELETE requests
 	const httpMethod = method === "del" ? "delete" : method;
 	const options: RequestInit = { method: httpMethod.toUpperCase(), ...init };
-	if (
-		body !== undefined &&
-		options.body === undefined &&
-		method !== "get" &&
-		method !== "head"
-	) {
+	if (body !== undefined && options.body === undefined && method !== "get" && method !== "head") {
 		if (typeof body === "object") {
 			options.headers ??= { "Content-Type": "application/json" };
 			options.body = JSON.stringify(body);

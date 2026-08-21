@@ -5,9 +5,8 @@ import type { ParseRouteParams, RouteArgs, RouteParamsOf } from "./ParseRoutePar
 import type ServerLoadEvent from "./ServerLoadEvent";
 import route from "../nav/route";
 
-type Equals<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-	? true
-	: false;
+type Equals<A, B> =
+	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 type Mutual<A, B> = A extends B ? (B extends A ? true : false) : false;
 type Expect<T extends true> = T;
 type IsNever<T> = [T] extends [never] ? true : false;

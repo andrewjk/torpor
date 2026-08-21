@@ -6,9 +6,8 @@ import type PageEndPoint from "./PageEndPoint";
 import type PageProps from "./PageProps";
 import type PageServerEndPoint from "./PageServerEndPoint";
 
-type Equals<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-	? true
-	: false;
+type Equals<A, B> =
+	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 type Expect<T extends true> = T;
 
 interface Post {

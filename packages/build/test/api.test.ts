@@ -19,10 +19,7 @@ describe("makeApi", () => {
 		fetchMock.mockResolvedValue(jsonResponse({ time: 123 }));
 		const api = makeApi<string, any>("/api/time");
 		const result = await api.get();
-		expect(fetchMock).toHaveBeenCalledWith(
-			"/api/time",
-			expect.objectContaining({ method: "GET" }),
-		);
+		expect(fetchMock).toHaveBeenCalledWith("/api/time", expect.objectContaining({ method: "GET" }));
 		expect(result).toEqual({ time: 123 });
 	});
 

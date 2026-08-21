@@ -33,8 +33,6 @@ type OkResponse<T extends object | string | undefined> = T extends object
  *
  * See https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/200
  */
-export default function ok<T extends object | string | undefined>(
-	body?: T,
-): OkResponse<T> {
+export default function ok<T extends object | string | undefined>(body?: T): OkResponse<T> {
 	return response(200, body) as OkResponse<T>;
 }

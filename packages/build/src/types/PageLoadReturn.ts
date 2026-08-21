@@ -6,4 +6,8 @@ import type { UntypedResponse } from "../response/TypedResponse";
  * (e.g. `ok({ ... })`) must only contain keys the page expects; untyped
  * responses (redirects, errors, plain text) are always allowed.
  */
-export type PageLoadReturn<Data> = TypedResponse<Partial<Data>> | UntypedResponse | undefined | void;
+export type PageLoadReturn<Data> =
+	| TypedResponse<Partial<Data>>
+	| UntypedResponse
+	| undefined
+	| void;

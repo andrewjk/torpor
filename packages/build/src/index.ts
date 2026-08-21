@@ -8,7 +8,12 @@ import type PageEndPoint from "./types/PageEndPoint";
 import type PageLoadEvent from "./types/PageLoadEvent";
 import type { PageLoadReturn } from "./types/PageLoadReturn";
 import type PageProps from "./types/PageProps";
-import type { ParseRouteParams, RouteArgs, RouteArgsOf, RouteParamsOf } from "./types/ParseRouteParams";
+import type {
+	ParseRouteParams,
+	RouteArgs,
+	RouteArgsOf,
+	RouteParamsOf,
+} from "./types/ParseRouteParams";
 import type PageServerAction from "./types/PageServerAction";
 import type PageServerEndPoint from "./types/PageServerEndPoint";
 import type PageServerLoad from "./types/PageServerLoad";

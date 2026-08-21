@@ -3,8 +3,14 @@ import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { type AliasOptions, createServer as createViteServer, type Plugin } from "vite";
+import {
+	type AliasOptions,
+	createServer as createViteServer,
+	type Plugin,
+	type ViteDevServer,
+} from "vite";
 import Site from "../site/Site.ts";
+import { checkRoute, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
 import devPlugin from "./devPlugin.ts";
 
@@ -61,8 +67,40 @@ export default async function runDev(site: Site): Promise<void> {
 	const vite = await createViteServer(config);
 	await vite.listen();
 
+	watchRouteTypes(site, vite);
+
 	const listeningUrl = vite.resolvedUrls?.local?.[0] ?? connectingUrl;
 	console.log(`Listening on ${listeningUrl}\n`);
+}
+
+/**
+ * Reports route type issues at startup, then re-checks route files as they
+ * change so annotation problems surface during development without failing
+ * the dev server.
+ */
+function watchRouteTypes(site: Site, vite: ViteDevServer): void {
+	reportRouteIssues(checkRoutes(site));
+
+	// Map absolute route file paths to their manifest entries, so changed
+	// files can be re-checked against their derived route
+	const routeFiles = new Map(
+		site.routes
+			.filter((r) => r.file?.endsWith(".ts"))
+			.map((r) => [path.resolve(site.root, r.file!), r]),
+	);
+	// Only report when a file's issues change, to avoid repeating the same
+	// warnings on every save
+	const reported = new Map<string, string>();
+
+	vite.watcher.on("change", (file) => {
+		const route = routeFiles.get(file);
+		if (!route) return;
+		const issues = checkRoute(site, route);
+		const key = JSON.stringify(issues);
+		if (reported.get(file) === key) return;
+		reported.set(file, key);
+		reportRouteIssues(issues);
+	});
 }
 
 function normalizePlugins(plugins: Plugin | Plugin[] | void): Plugin[] {

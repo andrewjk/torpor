@@ -20,9 +20,7 @@ export default interface PageEndPoint<
 	/**
 	 * Loads data for the page.
 	 */
-	load?: (
-		event: PageLoadEvent<Route>,
-	) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;
+	load?: (event: PageLoadEvent<Route>) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;
 	/**
 	 * The component that is displayed for the page.
 	 */

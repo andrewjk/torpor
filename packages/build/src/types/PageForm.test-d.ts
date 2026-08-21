@@ -6,9 +6,8 @@ import type { PageForm } from "./PageForm";
 import type PageProps from "./PageProps";
 import type PageServerEndPoint from "./PageServerEndPoint";
 
-type Equals<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
-	? true
-	: false;
+type Equals<A, B> =
+	(<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
 type Expect<T extends true> = T;
 
 // The docs-site form pattern: ok for success, badRequest for validation errors

@@ -1,3 +1,4 @@
 import { type PageServerEndPoint } from "@torpor/build";
 
-export default {} satisfies PageServerEndPoint as PageServerEndPoint;
+const page: {} = {} satisfies PageServerEndPoint;
+export default page;
