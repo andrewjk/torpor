@@ -2,7 +2,7 @@ import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import getId from "../utils/getId";
 import { createHoverOpen } from "../utils/hoverOpen";
-import { type MenuContext, MenuContextName } from "./MenuTypes";
+import { type ItemState, type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuPopoutTriggerProps {
 	/** An ID for the root element */
@@ -45,7 +45,8 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 	$state.triggerId = $props?.id ?? defaultId;
 
 	// Register this item with the parent Menu and store the index
-	const { index } = registerItem({ setFocused, setVisible, disabled: $props?.disabled });
+	const item: ItemState = { setFocused, setVisible, disabled: $props?.disabled };
+	const { index } = registerItem(item);
 
 	function setFocused() {
 		button.focus();
@@ -53,6 +54,12 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 
 	function setVisible(visible: boolean) {
 		$state.visible = visible;
+	}
+
+	// Store the anchor element, and the item's label for type-ahead
+	function handleMount(el: HTMLButtonElement) {
+		popoutContext.anchorElement = el;
+		item.text = el.textContent.trim();
 	}
 
 	function handleClick() {
@@ -98,7 +105,7 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 			onmouseleave={hoverOpen.handleMouseLeave}
 			onmousemove={hoverOpen.handleMouseMove}
 			&ref={button}
-			onmount={(el) => popoutContext.anchorElement = el}
+			onmount={handleMount}
 		>
 			<slot />
 		</button>

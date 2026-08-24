@@ -49,6 +49,7 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 		handleItemShow,
 		handleButtonFocus,
 		handleButtonKey,
+		handleAdjacentItem,
 		registerItem,
 		state: $state,
 	};
@@ -72,6 +73,17 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 
 	function handleButtonFocus(index: number) {
 		focusIndex = index;
+	}
+
+	function handleAdjacentItem(index: number, target: "previous" | "next") {
+		// Move focus to the adjacent item and open its menu; opening it also
+		// hides the current item's menu via handleItemShow
+		focusIndex = index;
+		focusItem(target);
+		if (focusIndex !== index) {
+			$state.active = true;
+			itemStates[focusIndex].setVisible(true);
+		}
 	}
 
 	function handleButtonKey(e: KeyboardEvent) {

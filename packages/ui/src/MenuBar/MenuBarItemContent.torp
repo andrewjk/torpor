@@ -1,6 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
 import { createPopoutContent } from "../utils/popoutContent";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import {
 	type MenuBarContext,
 	MenuBarContextName,
@@ -41,13 +42,17 @@ export default function MenuBarItemContent($props: MenuBarItemContentProps | und
 	}
 	const { state: $state, setVisible } = itemContext;
 
+	// Get stuff out of the PopoutContext, so that content (e.g. a Menu) can set
+	// the focusFirstElement method that we call when the content is shown
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
+
 	const popout = createPopoutContent({
 		getAnchor: () => itemContext.anchorElement,
 		getContent: () => div,
 		close: () => setVisible(false),
 		side: $props?.side ?? "bottom",
 		alignment: $props?.alignment ?? "start",
-		focusFirstElement: () => itemContext.focusFirstElement?.(),
+		focusFirstElement: () => popoutContext.focusFirstElement?.(),
 		refocusAnchorOnHide: true,
 	});
 

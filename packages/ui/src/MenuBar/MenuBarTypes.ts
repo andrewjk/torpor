@@ -13,6 +13,12 @@ export interface MenuBarContext {
 	/** Called from a MenuBarButton when a key is pressed */
 	handleButtonKey: (e: KeyboardEvent) => void;
 
+	/**
+	 * Called from a MenuBarItem when a contained menu signals that focus should
+	 * move to an adjacent item, opening its menu
+	 */
+	handleAdjacentItem: (index: number, target: "previous" | "next") => void;
+
 	/** Called from each MenuBarButton to register itself with this MenuBar */
 	registerItem: (item: ItemState) => { index: number };
 

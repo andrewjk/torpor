@@ -31,6 +31,12 @@ export interface PopoutContext extends FocusApi {
 	//modal: boolean;
 	anchorElement?: HTMLElement;
 
+	/**
+	 * Called from menu content when an arrow key should move to an adjacent item
+	 * in a containing MenuBar, opening its menu. Only set by MenuBarItem.
+	 */
+	navigateMenuBar?: (target: "previous" | "next") => void;
+
 	markElement?: (id: string) => void;
 	selectMarkedElement?: () => void;
 	searchText?: string;

@@ -1,0 +1,17 @@
+import { Menu, MenuButton } from "../../../src/Menu";
+import { Modal, ModalContent } from "../../../src/Modal";
+
+export default function MenuTypeAhead() {
+	@render {
+		<Modal visible>
+			<ModalContent>
+				<Menu ariaLabel="A menu">
+					<MenuButton>Alpha</MenuButton>
+					<MenuButton disabled>Beta</MenuButton>
+					<MenuButton>Alpha 2</MenuButton>
+					<MenuButton>Gamma</MenuButton>
+				</Menu>
+			</ModalContent>
+		</Modal>
+	}
+}

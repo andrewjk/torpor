@@ -43,6 +43,8 @@ export interface MenuRadioGroupContext {
 export interface ItemState {
 	/** Assigned by the Menu on registration */
 	index?: number;
+	/** The item's label, set from its text content on mount; used for type-ahead */
+	text?: string;
 	setFocused: () => void;
 	setVisible?: (visible: boolean) => void;
 	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */

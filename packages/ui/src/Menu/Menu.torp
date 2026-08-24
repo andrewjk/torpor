@@ -37,6 +37,10 @@ export default function Menu($props: MenuProps | undefined) {
 	let itemStates: ItemState[] = [];
 	let focusIndex = -1;
 
+	// The text typed for type-ahead, which is reset after a short pause between key presses
+	let searchText = "";
+	let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
 	// Get stuff out of the PopoutContext
 	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	if (!popoutContext) {
@@ -103,10 +107,22 @@ export default function Menu($props: MenuProps | undefined) {
 				break;
 			}
 			case "ArrowLeft": {
-				// TODO: This should be based on what side the menu shows on
-				if (inPopout) {
+				if (popoutContext.navigateMenuBar) {
+					// In a menu under a menubar item: move to the previous item and open its menu
+					e.preventDefault();
+					popoutContext.navigateMenuBar("previous");
+				} else if (inPopout) {
+					// TODO: This should be based on what side the menu shows on
 					e.preventDefault();
 					state.visible = false;
+				}
+				break;
+			}
+			case "ArrowRight": {
+				if (popoutContext.navigateMenuBar) {
+					// In a menu under a menubar item: move to the next item and open its menu
+					e.preventDefault();
+					popoutContext.navigateMenuBar("next");
 				}
 				break;
 			}
@@ -122,6 +138,42 @@ export default function Menu($props: MenuProps | undefined) {
 			}
 			case "Tab": {
 				state.visible = false;
+				break;
+			}
+			default: {
+				// Type-ahead: typing a character focuses the next item whose label starts with it
+				if (e.key.length === 1 && e.key !== " ") {
+					e.preventDefault();
+					search(e.key);
+				}
+				break;
+			}
+		}
+	}
+
+	function search(key: string) {
+		const character = key.toLocaleLowerCase();
+		if (searchTimer) {
+			clearTimeout(searchTimer);
+			// Typing the same character repeatedly cycles through the items that
+			// start with it, instead of searching for a repeated-character string
+			if (searchText.length !== 1 || character !== searchText) {
+				searchText += character;
+			}
+		} else {
+			searchText = character;
+		}
+		searchTimer = setTimeout(() => {
+			searchTimer = undefined;
+			searchText = "";
+		}, 1000);
+
+		// Focus the next item whose label starts with the search text, wrapping
+		// around to the start and skipping disabled items
+		for (let offset = 1; offset <= itemStates.length; offset++) {
+			const item = itemStates[(focusIndex + offset) % itemStates.length];
+			if (!item.disabled && item.text?.toLocaleLowerCase().startsWith(searchText)) {
+				item.setFocused();
 				break;
 			}
 		}

@@ -1,0 +1,27 @@
+import { Menu, MenuButton } from "../../../src/Menu";
+import { MenuBar, MenuBarItem, MenuBarItemContent, MenuBarItemTrigger } from "../../../src/MenuBar";
+
+export default function MenuBarKeyboard() {
+	@render {
+		<MenuBar ariaLabel="Window menu">
+			<MenuBarItem>
+				<MenuBarItemTrigger>File</MenuBarItemTrigger>
+				<MenuBarItemContent>
+					<Menu ariaLabel="File menu">
+						<MenuButton>New</MenuButton>
+						<MenuButton>Open</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+			<MenuBarItem>
+				<MenuBarItemTrigger>Edit</MenuBarItemTrigger>
+				<MenuBarItemContent>
+					<Menu ariaLabel="Edit menu">
+						<MenuButton>Cut</MenuButton>
+						<MenuButton>Copy</MenuButton>
+					</Menu>
+				</MenuBarItemContent>
+			</MenuBarItem>
+		</MenuBar>
+	}
+}

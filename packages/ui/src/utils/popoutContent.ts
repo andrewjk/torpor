@@ -116,10 +116,20 @@ export function createPopoutContent(options: PopoutContentOptions): {
 			getScrollParent(anchor).removeEventListener("scroll", setPosition);
 		}
 
-		// Focus the anchor element again, per the WAI guidelines
+		// Focus the anchor element again, per the WAI guidelines, unless focus
+		// has already moved elsewhere (e.g. to an adjacent menubar item's menu).
+		// If the focused element was removed with the content, focus has fallen
+		// back to the body, and the anchor is focused again
 		if (options.refocusAnchorOnHide) {
-			const el = options.getAnchor();
-			el?.focus?.();
+			const content = options.getContent();
+			if (
+				!content ||
+				content.contains(document.activeElement) ||
+				document.activeElement === document.body
+			) {
+				const el = options.getAnchor();
+				el?.focus?.();
+			}
 		}
 	}
 

@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import {
+	type ItemState,
 	type MenuButtonContext,
 	MenuButtonContextName,
 	type MenuContext,
@@ -50,7 +51,8 @@ export default function MenuRadio($props: MenuRadioProps) {
 	const { registerItemInGroup, toggleItem } = groupContext;
 
 	// Register this item with the parent Menu
-	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
+	const item: ItemState = { setFocused, disabled: $props?.disabled };
+	const { index } = registerItem(item);
 
 	// Register this item with the parent MenuRadioGroup
 	registerItemInGroup($state);
@@ -63,6 +65,11 @@ export default function MenuRadio($props: MenuRadioProps) {
 
 	function setFocused() {
 		button.focus();
+	}
+
+	// Store the item's label for type-ahead
+	function handleMount(el: HTMLButtonElement) {
+		item.text = el.textContent.trim();
 	}
 
 	function handleClick() {
@@ -86,6 +93,7 @@ export default function MenuRadio($props: MenuRadioProps) {
 			onkeydown={handleItemKey}
 			onclick={handleClick}
 			onfocus={() => handleItemFocus(index)}
+			onmount={handleMount}
 			&ref={button}
 		>
 			<slot />
