@@ -1,5 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import SubmenuPopout from "../utils/SubmenuPopout.torp";
 
 interface ToolBarPopoutProps {
 	/** An ID for the root element */
@@ -17,7 +17,7 @@ interface ToolBarPopoutProps {
 }
 
 /**
- * A popout that is attached to a menu button and can be used to show a submenu.
+ * A popout that is attached to a toolbar button and can be used to show a submenu.
  *
  * The structure of a ToolBarPopout is:
  *
@@ -29,48 +29,17 @@ interface ToolBarPopoutProps {
  * ```
  */
 export default function ToolBarPopout($props: ToolBarPopoutProps | undefined) {
-	let $state = $watch({
-		visible: false,
-		contentId: undefined,
-		triggerId: undefined,
-		contentRole: undefined,
-	});
-
-	$bind($state, $props, "visible");
-
-	let result: any;
-
-	// Set the context to pass down to items
-	let popoutContext: PopoutContext = {
-		// TODO:
-		handleButton: () => {},
-		state: $state,
-	};
-	$context[PopoutContextName] = popoutContext;
-
-	// Dispatch the toggle event when the popout is opened or closed
-	$handle((first) => {
-		const visible = $state.visible;
-		if (first) return;
-		if (visible) {
-			$props?.onopen?.();
-		} else {
-			$props?.onclose?.(result);
-		}
-	});
-
-	function handleMouseLeave() {
-		$state.visible = false;
-	}
-
 	@render {
-		<div
-			{$props?.id}
+		<SubmenuPopout
+			id={$props?.id}
 			class={["torp-tool-bar-popout", $props?.class]}
-			{$props?.style}
-			onmouseleave={handleMouseLeave}
+			style={$props?.style}
+			visible={$props?.visible}
+			onopen={$props?.onopen}
+			onclose={$props?.onclose}
+			contentRole="menu"
 		>
 			<slot />
-		</div>
+		</SubmenuPopout>
 	}
 }

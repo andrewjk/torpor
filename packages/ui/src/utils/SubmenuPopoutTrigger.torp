@@ -1,0 +1,160 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "./getId";
+import { createHoverOpen } from "./hoverOpen";
+import {
+	type PopoutContext,
+	PopoutContextName,
+	type SubmenuItemState,
+} from "./PopoutTypes";
+
+interface SubmenuPopoutTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The delay before showing the popout on hover, in milliseconds (default 500; 0 opens immediately) */
+	hoverDelay?: number;
+	/** Whether this button is disabled */
+	disabled?: boolean;
+	/** The ARIA role of the trigger */
+	role?: string;
+	/** The element's tabindex, if it should not take focus via tabbing */
+	tabindex?: string;
+	/** The key that opens the popout */
+	openKey?: string;
+	/** The containing group's registration function */
+	registerItem: (item: SubmenuItemState) => { index: number };
+	/** Called with the registration index, for wrappers that need it elsewhere */
+	onRegister?: (index: number) => void;
+	/** The containing group's key handler, called for keys other than openKey */
+	handleItemKey: (e: KeyboardEvent) => void;
+	/** The containing group's focus handler */
+	handleItemFocus: (index: number) => void;
+	/**
+	 * Replaces how the popout is shown/hidden, which by default writes the
+	 * popout's visible state; also registered with the group
+	 */
+	setVisible?: (visible: boolean) => void;
+	/**
+	 * Called with the registration index when the trigger is activated by
+	 * clicking or with openKey, before the popout is shown
+	 */
+	onActivate?: (index: number) => void;
+	/** Replaces the default toggle behaviour when the trigger is clicked */
+	onclick?: () => void;
+}
+
+/**
+ * The shared primitive behind MenuPopoutTrigger, MenuBarItemTrigger,
+ * ToolBarPopoutTrigger and NavMenuPopoutTrigger: it registers itself with the
+ * containing group, opens the popout on hover, on click or with the group's
+ * open key, and renders the standard trigger attributes.
+ */
+export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps | undefined) {
+	let defaultId = getId();
+
+	let button: HTMLButtonElement;
+
+	// Get stuff out of the PopoutContext
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
+	if (!popoutContext) {
+		throw new Error("SubmenuPopoutTrigger must be contained within a SubmenuPopout");
+	}
+	const { state: $state } = popoutContext;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
+
+	function setVisible(visible: boolean) {
+		if ($props?.setVisible) {
+			$props.setVisible(visible);
+		} else {
+			$state.visible = visible;
+		}
+	}
+
+	// Register this item with the containing group and store the index
+	const item: SubmenuItemState = { setFocused, setVisible, disabled: $props?.disabled };
+	const { index } = $props.registerItem(item);
+	$props?.onRegister?.(index);
+
+	function setFocused() {
+		button.focus();
+	}
+
+	// Store the anchor element, and the item's label for type-ahead
+	function handleMount(el: HTMLButtonElement) {
+		popoutContext.anchorElement = el;
+		item.text = el.textContent.trim();
+	}
+
+	function activate() {
+		$props?.onActivate?.(index);
+	}
+
+	function handleClick() {
+		if ($props?.onclick) {
+			$props.onclick();
+			return;
+		}
+		activate();
+		setVisible(!$state.visible);
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (e.key === $props?.openKey) {
+			// TODO: This should be based on what side the menu shows on
+			e.preventDefault();
+			activate();
+			setVisible(true);
+		} else {
+			$props.handleItemKey(e);
+		}
+	}
+
+	const hoverDelay = $props?.hoverDelay ?? 500;
+	const hoverOpen = createHoverOpen(
+		() => setVisible(true),
+		() => $props?.disabled ?? false,
+		hoverDelay,
+	);
+
+	function handleMouseEnter() {
+		// Open immediately when there is no hover delay, as menubar items do
+		if (hoverDelay <= 0) {
+			if (!$props?.disabled) {
+				setVisible(true);
+			}
+		} else {
+			hoverOpen.handleMouseEnter();
+		}
+	}
+
+	@render {
+		<button
+			id={$props?.id ?? defaultId}
+			class={$props?.class}
+			{$props?.style}
+			type="button"
+			{$props?.disabled}
+			role={$props?.role}
+			tabindex={$props?.tabindex}
+			aria-haspopup={$state.contentRole ?? "true"}
+			aria-expanded={$state.visible ? "true" : "false"}
+			aria-controls={$state.contentId}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+			onkeydown={handleKey}
+			onclick={handleClick}
+			onfocus={() => $props.handleItemFocus(index)}
+			onmouseenter={handleMouseEnter}
+			onmouseleave={hoverOpen.handleMouseLeave}
+			onmousemove={hoverOpen.handleMouseMove}
+			&ref={button}
+			onmount={handleMount}
+		>
+			<slot />
+		</button>
+	}
+}

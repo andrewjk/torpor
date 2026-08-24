@@ -1,0 +1,88 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, type PopoutState, PopoutContextName } from "./PopoutTypes";
+
+interface SubmenuPopoutProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** Whether the popout is visible */
+	visible: Bindable<boolean | undefined>;
+	/** Raised when the popout has opened */
+	onopen?: () => void;
+	/** Raised when the popout has closed */
+	onclose?: (result: any) => void;
+	/** The popout's state, supplied when the containing component needs access to it */
+	state?: PopoutState;
+	/** Extra values published through the popout context, e.g. handleButton */
+	context?: Partial<PopoutContext>;
+	/** Whether the popout closes when the pointer leaves it (default true) */
+	closeOnMouseLeave?: boolean;
+	/** The role of the popout's content, published so that triggers can use it for aria-haspopup */
+	contentRole?: string;
+}
+
+/**
+ * The shared primitive behind MenuPopout, MenuBarItem, ToolBarPopout and
+ * NavMenuPopout: it owns the popout's state, publishes the popout context for
+ * its trigger and content, and raises open/close events. The component
+ * wrappers supply their group's behaviour through props.
+ *
+ * The structure of a submenu popout is:
+ *
+ * ```
+ * <XPopout>
+ * 	<XPopoutTrigger /> (optional)
+ * 	<XPopoutContent />
+ * </XPopout>
+ * ```
+ */
+export default function SubmenuPopout($props: SubmenuPopoutProps | undefined) {
+	let $state: PopoutState = $props?.state ?? $watch({
+		visible: false,
+		contentId: undefined,
+		triggerId: undefined,
+		contentRole: $props?.contentRole,
+	});
+
+	$bind($state, $props, "visible");
+
+	let result: any;
+
+	// Set the context to pass down to the trigger and content
+	let context: PopoutContext = {
+		handleButton: () => {},
+		...$props?.context,
+		state: $state,
+	};
+	$context[PopoutContextName] = context;
+
+	$handle((first) => {
+		const visible = $state.visible;
+		if (first) return;
+		if (visible) {
+			$props?.onopen?.();
+		} else {
+			$props?.onclose?.(result);
+		}
+	});
+
+	function handleMouseLeave() {
+		if ($props?.closeOnMouseLeave !== false) {
+			$state.visible = false;
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={$props?.class}
+			{$props?.style}
+			onmouseleave={handleMouseLeave}
+		>
+			<slot />
+		</div>
+	}
+}

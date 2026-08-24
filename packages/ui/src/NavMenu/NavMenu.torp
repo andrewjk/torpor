@@ -1,12 +1,7 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { focusItem as focusListItem } from "../utils/focusItem";
-import {
-	type ItemState,
-	type NavMenuContext,
-	NavMenuContextName,
-	type NavMenuPopoutContext,
-	NavMenuPopoutContextName,
-} from "./NavMenuTypes";
+import { type ItemState, type NavMenuContext, NavMenuContextName } from "./NavMenuTypes";
 
 interface NavMenuProps {
 	/** An ID for the root element */
@@ -45,7 +40,7 @@ export default function NavMenu($props: NavMenuProps | undefined) {
 	let focusIndex = -1;
 
 	// Check whether this is a menu in a popout
-	const popoutContext = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
+	const popoutContext = $context[PopoutContextName] as PopoutContext;
 	const inPopout = !!popoutContext;
 	let popoutState = popoutContext?.state;
 

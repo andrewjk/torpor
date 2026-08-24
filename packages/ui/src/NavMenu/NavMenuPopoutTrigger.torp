@@ -1,12 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import getId from "../utils/getId";
-import { createHoverOpen } from "../utils/hoverOpen";
-import {
-	type NavMenuContext,
-	NavMenuContextName,
-	type NavMenuPopoutContext,
-	NavMenuPopoutContextName,
-} from "./NavMenuTypes";
+import SubmenuPopoutTrigger from "../utils/SubmenuPopoutTrigger.torp";
+import { type NavMenuContext, NavMenuContextName } from "./NavMenuTypes";
 
 interface NavMenuPopoutTriggerProps {
 	/** An ID for the root element */
@@ -26,11 +20,6 @@ interface NavMenuPopoutTriggerProps {
  *
  */
 export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps | undefined) {
-	let defaultId = getId();
-	let defaultHoverDelay = 500;
-
-	let button: HTMLButtonElement;
-
 	// Get stuff out of the NavMenuContext
 	const menuContext = $context[NavMenuContextName] as NavMenuContext;
 	if (!menuContext) {
@@ -38,74 +27,21 @@ export default function NavMenuPopoutTrigger($props: NavMenuPopoutTriggerProps |
 	}
 	const { registerItem, handleItemKey, handleItemFocus } = menuContext;
 
-	// Get stuff out of the NavMenuPopoutContext
-	const popoutContext = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
-	if (!popoutContext) {
-		throw new Error("NavMenuPopoutTrigger must be contained within a NavMenuPopout");
-	}
-	let $state = popoutContext.state;
-
-	// Set the trigger ID so that it can be used with aria-labelledby
-	$state.triggerId = $props?.id ?? defaultId;
-
-	// Register this item with the parent NavMenu and store the index
-	const { index } = registerItem({ setFocused, disabled: $props?.disabled });
-
-	// TODO: $mount should be run AFTER the button has been set
-	//$mount(() => {
-	//	// Set the anchor element to the button when it exists
-	//	popoutContext.anchorElement = button;
-	//});
-
-	function setFocused() {
-		button.focus();
-	}
-
-	function handleClick() {
-		$state.visible = true;
-	}
-
-	function handlePopoutKey(e: KeyboardEvent) {
-		switch (e.key) {
-			case "Right":
-			case "ArrowRight":
-				// TODO: This should be based on what side the menu shows on
-				e.preventDefault();
-				$state.visible = true;
-				break;
-			default:
-				handleItemKey(e);
-		}
-	}
-
-	const hoverOpen = createHoverOpen(
-		() => ($state.visible = true),
-		() => $props?.disabled ?? false,
-		$props?.hoverDelay ?? defaultHoverDelay,
-	);
-
 	@render {
-		<button
-			id={$props?.id ?? defaultId}
+		<SubmenuPopoutTrigger
+			id={$props?.id}
 			class={["torp-nav-menu-popout-button", $props?.class]}
-			{$props?.style}
-			type="button"
-			{$props?.disabled}
+			style={$props?.style}
+			hoverDelay={$props?.hoverDelay}
+			disabled={$props?.disabled}
 			role="menuitem"
-			aria-haspopup="true"
-			aria-expanded={$state.visible.toString()}
-			aria-controls={$state.contentId}
-			aria-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown={handlePopoutKey}
-			onclick={handleClick}
-			onfocus={() => handleItemFocus(index)}
-			onmouseenter={hoverOpen.handleMouseEnter}
-			onmouseleave={hoverOpen.handleMouseLeave}
-			onmousemove={hoverOpen.handleMouseMove}
-			&ref={button}
-			onmount={(el) => popoutContext.anchorElement = el }
+			tabindex="-1"
+			openKey="ArrowRight"
+			registerItem={registerItem}
+			handleItemKey={handleItemKey}
+			handleItemFocus={handleItemFocus}
 		>
 			<slot />
-		</button>
+		</SubmenuPopoutTrigger>
 	}
 }

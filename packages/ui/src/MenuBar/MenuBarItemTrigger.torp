@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import getId from "../utils/getId";
+import SubmenuPopoutTrigger from "../utils/SubmenuPopoutTrigger.torp";
 import {
 	type MenuBarContext,
 	MenuBarContextName,
@@ -23,9 +23,6 @@ interface MenuBarItemTriggerProps {
  *
  */
 export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | undefined) {
-	let defaultId = getId();
-	let button: HTMLButtonElement;
-
 	// Get stuff out of the MenuBarContext
 	const menubarContext = $context[MenuBarContextName] as MenuBarContext;
 	if (!menubarContext) {
@@ -38,65 +35,30 @@ export default function MenuBarItemTrigger($props: MenuBarItemTriggerProps | und
 	if (!itemContext) {
 		throw new Error("MenuBarItemTrigger must be contained within a MenuBarItem");
 	}
-	const { state: $state, setVisible } = itemContext;
-
-	// Set the trigger ID so that it can be used with aria-labelledby
-	$state.triggerId = $props?.id ?? defaultId;
-
-	// Register this item with the parent MenuBar and store the index
-	const { index } = registerItem({ setVisible, setFocused, disabled: $props?.disabled });
-
-	$mount(() => {
-		// Set the anchor element to the button when it exists
-		//itemContext.anchorElement = button;
-		itemContext.index = index;
-	});
-
-	function setFocused() {
-		button.focus();
-	}
 
 	function handleClick() {
 		menubarContext.state.active = !menubarContext.state.active;
-		setVisible(menubarContext.state.active);
-	}
-
-	function handleKey(e: KeyboardEvent) {
-		switch (e.key) {
-			case "ArrowDown":
-				// TODO: This should be based on what side the menu shows on
-				e.preventDefault();
-				menubarContext.state.active = true;
-				setVisible(true);
-				break;
-			default:
-				handleButtonKey(e);
-		}
-	}
-
-	function handleMouseEnter() {
-		setVisible(true);
+		itemContext.setVisible(menubarContext.state.active);
 	}
 
 	@render {
-		<button
-			id={$props?.id ?? defaultId}
+		<SubmenuPopoutTrigger
+			id={$props?.id}
 			class={["torp-menu-bar-item-button", $props?.class]}
-			{$props?.style}
-			type="button"
-			{$props?.disabled}
+			style={$props?.style}
+			disabled={$props?.disabled}
 			role="menuitem"
-			aria-haspopup={$state.contentRole ?? "true"}
-			aria-expanded={($state.visible ?? false).toString()}
-			aria-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown={handleKey}
+			openKey="ArrowDown"
+			hoverDelay={0}
+			registerItem={registerItem}
+			handleItemKey={handleButtonKey}
+			handleItemFocus={handleButtonFocus}
+			setVisible={itemContext.setVisible}
+			onRegister={(index) => (itemContext.index = index)}
+			onActivate={() => (menubarContext.state.active = true)}
 			onclick={handleClick}
-			onfocus={() => handleButtonFocus(index)}
-			onmouseenter={handleMouseEnter}
-			&ref={button}
-			onmount={(el) => itemContext.anchorElement = el}
 		>
 			<slot />
-		</button>
+		</SubmenuPopoutTrigger>
 	}
 }

@@ -1,8 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import getId from "../utils/getId";
-import { createHoverOpen } from "../utils/hoverOpen";
-import { type ItemState, type MenuContext, MenuContextName } from "./MenuTypes";
+import SubmenuPopoutTrigger from "../utils/SubmenuPopoutTrigger.torp";
+import { type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuPopoutTriggerProps {
 	/** An ID for the root element */
@@ -21,12 +19,6 @@ interface MenuPopoutTriggerProps {
  * A button that is placed in a Menu or MenuGroup and signals a response by a user.
  */
 export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undefined) {
-	let defaultId = getId();
-
-	let defaultHoverDelay = 500;
-
-	let button: HTMLButtonElement;
-
 	// Get stuff out of the MenuContext
 	const menuContext = $context[MenuContextName] as MenuContext;
 	if (!menuContext) {
@@ -34,80 +26,22 @@ export default function MenuPopoutTrigger($props: MenuPopoutTriggerProps | undef
 	}
 	const { registerItem, handleItemKey, handleItemFocus, handlePopout } = menuContext;
 
-	// Get stuff out of the PopoutContext
-	const popoutContext = $context[PopoutContextName] as PopoutContext;
-	if (!popoutContext) {
-		throw new Error("MenuPopoutTrigger must be contained within a MenuPopout");
-	}
-	const { state: $state } = popoutContext;
-
-	// Set the trigger ID so that it can be used with aria-labelledby
-	$state.triggerId = $props?.id ?? defaultId;
-
-	// Register this item with the parent Menu and store the index
-	const item: ItemState = { setFocused, setVisible, disabled: $props?.disabled };
-	const { index } = registerItem(item);
-
-	function setFocused() {
-		button.focus();
-	}
-
-	function setVisible(visible: boolean) {
-		$state.visible = visible;
-	}
-
-	// Store the anchor element, and the item's label for type-ahead
-	function handleMount(el: HTMLButtonElement) {
-		popoutContext.anchorElement = el;
-		item.text = el.textContent.trim();
-	}
-
-	function handleClick() {
-		handlePopout(index);
-		$state.visible = !$state.visible;
-	}
-
-	function handlePopoutKey(e: KeyboardEvent) {
-		switch (e.key) {
-			case "ArrowRight":
-				// TODO: This should be based on what side the menu shows on
-				e.preventDefault();
-				$state.visible = true;
-				break;
-			default:
-				handleItemKey(e);
-		}
-	}
-
-	const hoverOpen = createHoverOpen(
-		() => ($state.visible = true),
-		() => $props?.disabled ?? false,
-		$props?.hoverDelay ?? defaultHoverDelay,
-	);
-
 	@render {
-		<button
-			id={$props?.id ?? defaultId}
+		<SubmenuPopoutTrigger
+			id={$props?.id}
 			class={["torp-menu-popout-trigger", $props?.class]}
-			{$props?.style}
-			type="button"
-			{$props?.disabled}
+			style={$props?.style}
+			hoverDelay={$props?.hoverDelay}
+			disabled={$props?.disabled}
 			role="menuitem"
 			tabindex="-1"
-			aria-haspopup={$state.contentRole ?? "true"}
-			aria-expanded={$state.visible ? "true" : "false"}
-			aria-controls={$state.contentId}
-			aria-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown={handlePopoutKey}
-			onclick={handleClick}
-			onfocus={() => handleItemFocus(index)}
-			onmouseenter={hoverOpen.handleMouseEnter}
-			onmouseleave={hoverOpen.handleMouseLeave}
-			onmousemove={hoverOpen.handleMouseMove}
-			&ref={button}
-			onmount={handleMount}
+			openKey="ArrowRight"
+			registerItem={registerItem}
+			handleItemKey={handleItemKey}
+			handleItemFocus={handleItemFocus}
+			onActivate={handlePopout}
 		>
 			<slot />
-		</button>
+		</SubmenuPopoutTrigger>
 	}
 }

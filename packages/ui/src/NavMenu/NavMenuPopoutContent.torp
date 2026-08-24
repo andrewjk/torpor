@@ -1,7 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import getId from "../utils/getId";
-import { createPopoutContent } from "../utils/popoutContent";
-import { type NavMenuPopoutContext, NavMenuPopoutContextName } from "./NavMenuTypes";
+import SubmenuPopoutContent from "../utils/SubmenuPopoutContent.torp";
 
 interface NavMenuPopoutContentProps {
 	/** An ID for the root element */
@@ -21,48 +19,15 @@ interface NavMenuPopoutContentProps {
  *
  */
 export default function NavMenuPopoutContent($props: NavMenuPopoutContentProps | undefined) {
-	let defaultId = getId();
-
-	// Get stuff out of the NavMenuPopoutContext
-	const context = $context[NavMenuPopoutContextName] as NavMenuPopoutContext;
-	if (!context) {
-		throw new Error("NavMenuPopoutContent must be contained within a NavMenuPopout");
-	}
-	let $state = context.state;
-
-	// Set the content ID so that the trigger can use it with aria-controls
-	$state.contentId = $props?.id ?? defaultId;
-
-	const popout = createPopoutContent({
-		getAnchor: () => context.anchorElement,
-		getContent: () => div,
-		close: () => ($state.visible = false),
-		side: $props?.side ?? "bottom",
-		alignment: $props?.alignment ?? "start",
-		closeOnEscape: true,
-		focusFirstElement: () => context.focusFirstElement?.(),
-		refocusAnchorOnHide: true,
-	});
-
-	let div: HTMLDivElement;
-
-	$run(() => {
-		if (!$state.visible) {
-			popout.hide();
-		}
-	});
-
 	@render {
-		@if ($state.visible) {
-			<div
-				id={$props?.id ?? defaultId}
-				class={["torp-nav-menu-popout-content", $props?.class]}
-				{$props?.style}
-				&ref={div}
-				onmount={() => popout.show()}
-			>
-				<slot />
-			</div>
-		}
+		<SubmenuPopoutContent
+			id={$props?.id}
+			class={["torp-nav-menu-popout-content", $props?.class]}
+			style={$props?.style}
+			side={$props?.side}
+			alignment={$props?.alignment}
+		>
+			<slot />
+		</SubmenuPopoutContent>
 	}
 }

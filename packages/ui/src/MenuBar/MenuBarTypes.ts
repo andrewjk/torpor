@@ -1,4 +1,4 @@
-import { type FocusApi, type PopoutState } from "../utils/PopoutTypes";
+import { type PopoutState, type SubmenuItemState } from "../utils/PopoutTypes";
 
 export const MenuBarContextName: unique symbol = Symbol.for("torp.MenuBar");
 export const MenuBarItemContextName: unique symbol = Symbol.for("torp.MenuBarItem");
@@ -28,16 +28,10 @@ export interface MenuBarContext {
 	};
 }
 
-export interface MenuBarItemContext extends FocusApi {
+export interface MenuBarItemContext {
 	setVisible: (value: boolean) => void;
 	state: PopoutState;
 	index: number;
-	anchorElement?: HTMLElement;
 }
 
-export interface ItemState {
-	setVisible: (value: boolean) => void;
-	setFocused: () => void;
-	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
-	disabled?: boolean;
-}
+export type ItemState = SubmenuItemState;

@@ -1,7 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import getId from "../utils/getId";
-import { createHoverOpen } from "../utils/hoverOpen";
+import SubmenuPopoutTrigger from "../utils/SubmenuPopoutTrigger.torp";
 import { type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarPopoutTriggerProps {
@@ -22,98 +20,28 @@ interface ToolBarPopoutTriggerProps {
  *
  */
 export default function ToolBarPopoutTrigger($props: ToolBarPopoutTriggerProps | undefined) {
-	let defaultId = getId();
-
-	let defaultHoverDelay = 500;
-
-	let button: HTMLButtonElement;
-
 	// Get stuff out of the ToolBarContext
 	const toolBarContext = $context[ToolBarContextName] as ToolBarContext;
 	if (!toolBarContext) {
 		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBar");
 	}
-	const { registerItem, handleItemKey, handleItemFocus, handlePopout } = toolBarContext;
-
-	// Get stuff out of the PopoutContext
-	const popoutContext = $context[PopoutContextName] as PopoutContext;
-	if (!popoutContext) {
-		throw new Error("ToolBarPopoutTrigger must be contained within a ToolBarPopout");
-	}
-	const { state: $state } = popoutContext;
-
-	// Set the trigger ID so that it can be used with aria-labelledby
-	$state.triggerId = $props?.id ?? defaultId;
-
-	// Register this item with the parent ToolBar and store the index
-	const { index } = registerItem({ setFocused, setVisible, disabled: $props?.disabled });
-
-	// TODO: $mount should be run AFTER the button has been set
-	//$mount(() => {
-	//	// Set the anchor element to the button when it exists
-	//	popoutContext.anchorElement = button;
-	//});
-
-	function setFocused() {
-		button.focus();
-	}
-
-	function setVisible(visible: boolean) {
-		$state.visible = visible;
-	}
-
-	function handleClick() {
-		handlePopout(index);
-		$state.visible = !$state.visible;
-	}
-
-	function handlePopoutKey(e: KeyboardEvent) {
-		switch (e.key) {
-			case "ArrowRight":
-				if (toolBarContext.orientation === "vertical") {
-					// TODO: This should be based on what side the menu shows on
-					e.preventDefault();
-					$state.visible = true;
-				}
-				break;
-			case "ArrowDown":
-				if (toolBarContext.orientation === "horizontal") {
-					e.preventDefault();
-					$state.visible = true;
-				}
-				break;
-			default:
-				handleItemKey(e);
-		}
-	}
-
-	const hoverOpen = createHoverOpen(
-		() => ($state.visible = true),
-		() => $props?.disabled ?? false,
-		$props?.hoverDelay ?? defaultHoverDelay,
-	);
+	const { registerItem, handleItemKey, handleItemFocus, handlePopout, orientation } =
+		toolBarContext;
 
 	@render {
-		<button
-			id={$props?.id ?? defaultId}
+		<SubmenuPopoutTrigger
+			id={$props?.id}
 			class={["torp-tool-bar-popout-trigger", $props?.class]}
-			{$props?.style}
-			type="button"
-			{$props?.disabled}
-			aria-haspopup={$state.contentRole ?? "true"}
-			aria-controls={popoutContext.state.contentId}
-			aria-expanded={$state.visible.toString()}
-			aria-disabled={$props?.disabled ? "true" : undefined}
-			onkeydown={handlePopoutKey}
-			onclick={handleClick}
-			onfocus={() => handleItemFocus(index)}
-			onmouseenter={hoverOpen.handleMouseEnter}
-			onmouseleave={hoverOpen.handleMouseLeave}
-			onmousemove={hoverOpen.handleMouseMove}
-			&ref={button}
-			onmount={(el) => popoutContext.anchorElement = el }
+			style={$props?.style}
+			hoverDelay={$props?.hoverDelay}
+			disabled={$props?.disabled}
+			openKey={orientation === "vertical" ? "ArrowRight" : "ArrowDown"}
+			registerItem={registerItem}
+			handleItemKey={handleItemKey}
+			handleItemFocus={handleItemFocus}
+			onActivate={handlePopout}
 		>
 			<slot />
-		</button>
+		</SubmenuPopoutTrigger>
 	}
 }

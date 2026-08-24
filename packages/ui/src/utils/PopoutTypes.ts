@@ -55,6 +55,23 @@ export interface PopoutState {
 	contentRole?: string;
 }
 
+/**
+ * The state that a submenu trigger registers with its containing group
+ * (Menu, MenuBar, ToolBar or NavMenu). Passed to `registerItem`; the group
+ * assigns `index`, and the trigger assigns `text` from its label on mount.
+ */
+export interface SubmenuItemState {
+	/** Assigned by the group on registration */
+	index?: number;
+	/** The item's label, set from its text content on mount; used for type-ahead */
+	text?: string;
+	setFocused: () => void;
+	/** Shows or hides the item's submenu */
+	setVisible?: (visible: boolean) => void;
+	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
+	disabled?: boolean;
+}
+
 export interface Point {
 	x: number;
 	y: number;

@@ -1,3 +1,5 @@
+import type { SubmenuItemState } from "../utils/PopoutTypes";
+
 export const MenuContextName: unique symbol = Symbol.for("torp.Menu");
 export const MenuButtonContextName: unique symbol = Symbol.for("torp.MenuButton");
 export const MenuRadioGroupContextName: unique symbol = Symbol.for("torp.MenuRadioGroup");
@@ -40,16 +42,7 @@ export interface MenuRadioGroupContext {
 	toggleItem: (value: string) => void;
 }
 
-export interface ItemState {
-	/** Assigned by the Menu on registration */
-	index?: number;
-	/** The item's label, set from its text content on mount; used for type-ahead */
-	text?: string;
-	setFocused: () => void;
-	setVisible?: (visible: boolean) => void;
-	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
-	disabled?: boolean;
-}
+export type ItemState = SubmenuItemState;
 
 export interface RadioGroupItemState {
 	index: number;

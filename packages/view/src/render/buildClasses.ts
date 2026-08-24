@@ -1,4 +1,5 @@
 import ClassValue from "../types/ClassValue";
+import $unwrap from "../watch/$unwrap";
 
 export default function buildClasses(value: ClassValue, styleHash?: string): string {
 	if (typeof value === "string") {
@@ -18,6 +19,13 @@ export default function buildClasses(value: ClassValue, styleHash?: string): str
 
 function gatherClasses(name: string, value: unknown, classes: string[]) {
 	if (value) {
+		// Unwrap watched values before iterating: component props are
+		// deep-wrapped, and iterating a watched array disables the active
+		// effect (see the array iterator in proxyGet), which would break
+		// tracking of reads later in the same effect. Per-element tracking is
+		// unnecessary here anyway -- the caller has already subscribed to the
+		// property read that produced the value
+		value = $unwrap(value as Record<PropertyKey, any>);
 		if (Array.isArray(value)) {
 			for (let v of value) {
 				gatherClasses(v as string, v, classes);

@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import SubmenuPopout from "../utils/SubmenuPopout.torp";
 import { type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuPopoutProps {
@@ -30,53 +30,24 @@ interface MenuPopoutProps {
  * ```
  */
 export default function MenuPopout($props: MenuPopoutProps | undefined) {
-	let $state = $watch({
-		visible: $props?.visible ?? false,
-		contentId: undefined,
-		triggerId: undefined,
-		// Set this so that the trigger knows its content is a menu, and child
-		// menus know that they are in a submenu
-		contentRole: "menu",
-	});
-
-	let result: any;
-
 	// Get stuff out of the MenuContext
 	const menuContext = $context[MenuContextName] as MenuContext;
 	if (!menuContext) {
 		throw new Error("MenuPopout must be contained within a Menu");
 	}
-	const { handleButton } = menuContext;
-
-	// Set the context to pass down to items
-	let context: PopoutContext = {
-		handleButton,
-		state: $state,
-	};
-	$context[PopoutContextName] = context;
-
-	$handle((first) => {
-		const visible = $state.visible;
-		if (first) return;
-		if (visible) {
-			$props?.onopen?.();
-		} else {
-			$props?.onclose?.(result);
-		}
-	});
-
-	function handleMouseLeave() {
-		$state.visible = false;
-	}
 
 	@render {
-		<div
-			{$props?.id}
+		<SubmenuPopout
+			id={$props?.id}
 			class={["torp-menu-popout", $props?.class]}
-			{$props?.style}
-			onmouseleave={handleMouseLeave}
+			style={$props?.style}
+			visible={$props?.visible}
+			onopen={$props?.onopen}
+			onclose={$props?.onclose}
+			context={{ handleButton: menuContext.handleButton }}
+			contentRole="menu"
 		>
 			<slot />
-		</div>
+		</SubmenuPopout>
 	}
 }

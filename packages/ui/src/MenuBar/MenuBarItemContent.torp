@@ -1,13 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import getId from "../utils/getId";
-import { createPopoutContent } from "../utils/popoutContent";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import {
-	type MenuBarContext,
-	MenuBarContextName,
-	type MenuBarItemContext,
-	MenuBarItemContextName,
-} from "./MenuBarTypes";
+import SubmenuPopoutContent from "../utils/SubmenuPopoutContent.torp";
 
 interface MenuBarItemContentProps {
 	/** An ID for the root element */
@@ -26,53 +18,16 @@ interface MenuBarItemContentProps {
  * The content that is displayed for a MenuBarItem when it is open.
  */
 export default function MenuBarItemContent($props: MenuBarItemContentProps | undefined) {
-	let defaultId = getId();
-	let div: HTMLDivElement;
-
-	// Get stuff out of the MenuBarContext
-	const context = $context[MenuBarContextName] as MenuBarContext;
-	if (!context) {
-		throw new Error("MenuBarItemContent must be contained within a MenuBar");
-	}
-
-	// Get stuff out of the MenuBarItemContext
-	const itemContext = $context[MenuBarItemContextName] as MenuBarItemContext;
-	if (!itemContext) {
-		throw new Error("MenuBarItemContent must be contained within a MenuBarItem");
-	}
-	const { state: $state, setVisible } = itemContext;
-
-	// Get stuff out of the PopoutContext, so that content (e.g. a Menu) can set
-	// the focusFirstElement method that we call when the content is shown
-	const popoutContext = $context[PopoutContextName] as PopoutContext;
-
-	const popout = createPopoutContent({
-		getAnchor: () => itemContext.anchorElement,
-		getContent: () => div,
-		close: () => setVisible(false),
-		side: $props?.side ?? "bottom",
-		alignment: $props?.alignment ?? "start",
-		focusFirstElement: () => popoutContext.focusFirstElement?.(),
-		refocusAnchorOnHide: true,
-	});
-
-	$run(() => {
-		if (!$state.visible) {
-			popout.hide();
-		}
-	});
-
 	@render {
-		@if ($state.visible) {
-			<div
-				id={$props?.id ?? defaultId}
-				class={["torp-menu-bar-item-content", $props?.class]}
-				{$props?.style}
-				&ref={div}
-				onmount={() => popout.show()}
-			>
-				<slot />
-			</div>
-		}
+		<SubmenuPopoutContent
+			id={$props?.id}
+			class={["torp-menu-bar-item-content", $props?.class]}
+			style={$props?.style}
+			side={$props?.side}
+			alignment={$props?.alignment}
+			closeOnEscape={false}
+		>
+			<slot />
+		</SubmenuPopoutContent>
 	}
 }

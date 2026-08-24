@@ -1,5 +1,6 @@
+import type { SubmenuItemState } from "../utils/PopoutTypes";
+
 export const ToolBarContextName: unique symbol = Symbol.for("torp.ToolBar");
-export const ToolBarPopoutContextName: unique symbol = Symbol.for("torp.ToolBarPopout");
 export const ToolBarGroupContextName: unique symbol = Symbol.for("torp.ToolBarGroup");
 
 export interface ToolBarContext {
@@ -24,11 +25,4 @@ export interface ToolBarGroupContext {
 	};
 }
 
-export interface ItemState {
-	/** Assigned by the ToolBar on registration */
-	index?: number;
-	setFocused: () => void;
-	setVisible?: (visible: boolean) => void;
-	/** Whether the item is disabled; disabled items are skipped by keyboard navigation */
-	disabled?: boolean;
-}
+export type ItemState = SubmenuItemState;

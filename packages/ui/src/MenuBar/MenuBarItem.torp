@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import SubmenuPopout from "../utils/SubmenuPopout.torp";
 import {
 	type MenuBarContext,
 	MenuBarContextName,
@@ -36,13 +36,11 @@ interface MenuBarItemProps {
  */
 export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 	let $state = $watch({
-		visible: $props?.visible ?? false,
+		visible: false,
 		contentId: undefined,
 		triggerId: undefined,
 		contentRole: undefined,
 	});
-
-	let result: any;
 
 	// Get stuff out of the MenuBarContext
 	const menubarContext = $context[MenuBarContextName] as MenuBarContext;
@@ -51,50 +49,28 @@ export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 	}
 	const { handleItemShow, handleAdjacentItem } = menubarContext;
 
-	// Set the context to pass down to items
-	let context: MenuBarItemContext = {
+	// Set the context to pass down to the trigger and content
+	let itemContext: MenuBarItemContext = {
 		setVisible,
 		state: $state,
 		index: -1,
 	};
-	$context[MenuBarItemContextName] = context;
-
-	// Set the context to pass down to items
-	let popoutContext: PopoutContext = {
-		handleButton,
-		navigateMenuBar: handleNavigateMenuBar,
-		state: $state,
-	};
-	$context[PopoutContextName] = popoutContext;
-
-	$mount(() => {
-		setVisible(false);
-	});
+	$context[MenuBarItemContextName] = itemContext;
 
 	function handleNavigateMenuBar(target: "previous" | "next") {
 		// Called from a contained Menu when focus should move to an adjacent
 		// menubar item; the MenuBar moves focus and opens that item's menu
-		handleAdjacentItem(context.index, target);
+		handleAdjacentItem(itemContext.index, target);
 	}
 
 	function setVisible(value: boolean) {
 		if (!value || menubarContext.state.active) {
 			$state.visible = value;
 			if (value) {
-				handleItemShow(context.index);
+				handleItemShow(itemContext.index);
 			}
 		}
 	}
-
-	$handle((first) => {
-		const visible = $state.visible;
-		if (first) return;
-		if (visible) {
-			$props?.onopen?.();
-		} else {
-			$props?.onclose?.(result);
-		}
-	});
 
 	function handleButton(_type: "confirm" | "cancel" | undefined, _value?: any) {
 		menubarContext.state.active = false;
@@ -102,8 +78,18 @@ export default function MenuBarItem($props: MenuBarItemProps | undefined) {
 	}
 
 	@render {
-		<div {$props?.id} class={["torp-menu-bar-item", $props?.class]} {$props?.style}>
+		<SubmenuPopout
+			id={$props?.id}
+			class={["torp-menu-bar-item", $props?.class]}
+			style={$props?.style}
+			visible={$props?.visible}
+			onopen={$props?.onopen}
+			onclose={$props?.onclose}
+			state={$state}
+			context={{ handleButton, navigateMenuBar: handleNavigateMenuBar }}
+			closeOnMouseLeave={false}
+		>
 			<slot />
-		</div>
+		</SubmenuPopout>
 	}
 }
