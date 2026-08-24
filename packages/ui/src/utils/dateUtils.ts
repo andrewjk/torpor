@@ -229,16 +229,17 @@ function formatMonth(date: Date, m: string): string {
 	} else if (m.length === 3) {
 		return monthNames[date.getMonth()].substring(0, 3);
 	} else if (m.length == 2) {
-		let text = date.getMonth().toString();
-		return text.length < 2 ? "0" + text : text;
+		// getMonth is zero-based
+		return String(date.getMonth() + 1).padStart(2, "0");
 	} else {
 		return date.getMonth().toString();
 	}
 }
 
 function formatYear(date: Date, y: string): string {
-	return date
-		.getFullYear()
-		.toString()
-		.substring(4 - y.length, y.length);
+	const year = date.getFullYear().toString();
+	if (y.length >= 4) {
+		return year;
+	}
+	return year.substring(4 - y.length);
 }
