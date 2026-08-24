@@ -20,9 +20,9 @@ interface TreeItemProps {
 	/** If set to true, the user cannot interact with this TreeItem */
 	disabled?: boolean;
 	/** Raised when this item is expanded or collapsed */
-	onExpand?: (expanded: boolean) => void;
+	onexpand?: (expanded: boolean) => void;
 	/** Raised when this item is selected or deselected */
-	onSelect?: (selected: boolean) => void;
+	onselect?: (selected: boolean) => void;
 }
 
 /**
@@ -80,18 +80,18 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 	});
 
 	$run(() => {
-		const onExpand = $props?.onExpand;
+		const onexpand = $props?.onexpand;
 		const expanded = $state.expanded;
-		if (onExpand) {
-			onExpand(expanded);
+		if (onexpand) {
+			onexpand(expanded);
 		}
 	});
 
 	$run(() => {
-		const onSelect = $props?.onSelect;
+		const onselect = $props?.onselect;
 		const selected = $state.selected;
-		if (onSelect) {
-			onSelect(selected);
+		if (onselect) {
+			onselect(selected);
 		}
 	});
 

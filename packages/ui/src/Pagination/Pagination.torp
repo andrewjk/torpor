@@ -16,8 +16,8 @@ interface PaginationProps {
 	style?: StyleValue;
 	/** The total number of pages (or items if the page size is greater than 1) */
 	count: number;
-	/** The active page number */
-	number: number;
+	/** The active page */
+	page: number;
 	/** The number of items on each page **/
 	pageSize?: number;
 	/** The maximum number of pages to display (gaps will be indicated with ellipses) **/
@@ -34,7 +34,7 @@ interface PaginationProps {
 export default function Pagination($props: PaginationProps) {
 	let $state = $watch({
 		get pages() {
-			return buildPages($props.count, $props.number, $props.pageSize, $props.maxPages);
+			return buildPages($props.count, $props.page, $props.pageSize, $props.maxPages);
 		},
 	});
 
@@ -47,7 +47,7 @@ export default function Pagination($props: PaginationProps) {
 		toggleItem,
 		handleItemKey,
 		jumpToPage: (page: number) => {
-			$props.number = Math.max(1, Math.min($props.count, page));
+			$props.page = Math.max(1, Math.min($props.count, page));
 		},
 	};
 	$context[PaginationContextName] = context;
@@ -68,30 +68,30 @@ export default function Pagination($props: PaginationProps) {
 	function toggleItem(target: PageNumber) {
 		switch (target) {
 			case "start": {
-				$props.number = 1;
+				$props.page = 1;
 				break;
 			}
 			case "previous": {
-				$props.number = Math.max(1, $props.number - 1);
+				$props.page = Math.max(1, $props.page - 1);
 				break;
 			}
 			case "next": {
-				$props.number = Math.min($props.count, $props.number + 1);
+				$props.page = Math.min($props.count, $props.page + 1);
 				break;
 			}
 			case "end": {
-				$props.number = $props.count;
+				$props.page = $props.count;
 				break;
 			}
 			case "startgap":
 			case "endgap": {
 				if ($props.onjump) {
-					$props.onjump($props.number, context.jumpToPage);
+					$props.onjump($props.page, context.jumpToPage);
 				}
 				break;
 			}
 			default: {
-				$props.number = target;
+				$props.page = target;
 			}
 		}
 

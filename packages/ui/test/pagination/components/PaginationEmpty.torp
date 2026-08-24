@@ -4,12 +4,12 @@ import {
 } from "../../../src/Pagination/index";
 
 export default function PaginationEmpty() {
-	let $state = $watch({ number: 1 });
+	let $state = $watch({ page: 1 });
 
 	@render {
-		<Pagination count={0} number={$state.number}>
+		<Pagination count={0} page={$state.page}>
 			@for (let page of $slot.pages) {
-				<PaginationItem page={page} active={$state.number === page}>
+				<PaginationItem page={page} active={$state.page === page}>
 					{page}
 				</PaginationItem>
 			}

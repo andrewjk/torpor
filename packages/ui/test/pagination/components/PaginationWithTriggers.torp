@@ -4,14 +4,14 @@ import {
 } from "../../../src/Pagination/index";
 
 export default function PaginationWithTriggers() {
-	let $state = $watch({ number: 5 });
+	let $state = $watch({ page: 5 });
 
 	@render {
-		<Pagination count={20} &number={$state.number}>
+		<Pagination count={20} &page={$state.page}>
 			<PaginationItem page="start">«</PaginationItem>
 			<PaginationItem page="previous">‹</PaginationItem>
 			@for (let page of $slot.pages) {
-				<PaginationItem page={page} active={$state.number === page}>
+				<PaginationItem page={page} active={$state.page === page}>
 					{page}
 				</PaginationItem>
 			}

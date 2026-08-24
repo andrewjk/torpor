@@ -22,9 +22,9 @@ interface TreeProps {
 	/** The aria-label for the root element */
 	ariaLabel?: string | undefined;
 	/** Raised when the expanded item(s) have changed */
-	onExpandedChange?: (value: string | string[]) => void;
+	onexpand?: (value: string | string[]) => void;
 	/** Raised when the selected item(s) have changed */
-	onSelectedChange?: (value: string | string[] | undefined) => void;
+	onchange?: (value: string | string[] | undefined) => void;
 }
 
 /**
@@ -118,16 +118,16 @@ export default function Tree($props: TreeProps | undefined) {
 	};
 	$context[TreeContextName] = context;
 
-	// Dispatch the expanded change event when the expanded value changes
+	// Dispatch the expand event when the expanded value changes
 	$handle((first) => {
 		const value = $state.expanded;
-		if (!first) $props?.onExpandedChange?.(value);
+		if (!first) $props?.onexpand?.(value);
 	});
 
-	// Dispatch the selected change event when the selected value changes
+	// Dispatch the change event when the selected value changes
 	$handle((first) => {
 		const value = $state.value;
-		if (!first) $props?.onSelectedChange?.(value);
+		if (!first) $props?.onchange?.(value);
 	});
 
 	function registerItem(itemState: ItemState, level: number) {

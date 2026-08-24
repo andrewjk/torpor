@@ -4,19 +4,19 @@ import {
 } from "../../../src/Pagination/index";
 
 export default function PaginationEdgeCases() {
-	let $state = $watch({ number: 1 });
+	let $state = $watch({ page: 1 });
 
 	@render {
-		<Pagination {$props.count} number={$state.number}>
-			<PaginationItem page="start" active={$state.number === 1}>«</PaginationItem>
-			<PaginationItem page="previous" active={$state.number === 1}>‹</PaginationItem>
+		<Pagination {$props.count} page={$state.page}>
+			<PaginationItem page="start" active={$state.page === 1}>«</PaginationItem>
+			<PaginationItem page="previous" active={$state.page === 1}>‹</PaginationItem>
 			@for (let page of $slot.pages) {
-				<PaginationItem page={page} active={$state.number === page}>
+				<PaginationItem page={page} active={$state.page === page}>
 					{page}
 				</PaginationItem>
 			}
-			<PaginationItem page="next" active={$state.number === $props.count}>›</PaginationItem>
-			<PaginationItem page="end" active={$state.number === $props.count}>»</PaginationItem>
+			<PaginationItem page="next" active={$state.page === $props.count}>›</PaginationItem>
+			<PaginationItem page="end" active={$state.page === $props.count}>»</PaginationItem>
 		</Pagination>
 	}
 }

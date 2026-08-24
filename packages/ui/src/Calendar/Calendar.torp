@@ -27,8 +27,17 @@ interface CalendarProps {
 	value?: Date;
 	// /** Events to show in the calendar */
 	// TODO: events?: CalendarEvent[],
+	/**
+	 * Raised when the user selects a date (only when `selectable` is true);
+	 * use this for the calendar's value
+	 */
 	onchange?: (value: Date) => void;
+	/**
+	 * Raised when the visible date changes, i.e. when the user navigates to a
+	 * different month via the previous/next triggers or the keyboard
+	 */
 	onchangedate?: (value: Date) => void;
+	/** Raised when the user presses Escape, so date pickers can close */
 	onclose?: () => void;
 }
 

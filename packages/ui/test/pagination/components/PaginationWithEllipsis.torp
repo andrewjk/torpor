@@ -4,17 +4,17 @@ import {
 } from "../../../src/Pagination/index";
 
 export default function PaginationWithEllipsis() {
-	let $state = $watch({ number: 15 });
+	let $state = $watch({ page: 15 });
 
 	@render {
-		<Pagination count={50} number={$state.number} maxPages={7}>
-			<PaginationItem page="start" active={$state.number === 1}>«</PaginationItem>
-			<PaginationItem page="previous" active={$state.number === 1}>‹</PaginationItem>
+		<Pagination count={50} page={$state.page} maxPages={7}>
+			<PaginationItem page="start" active={$state.page === 1}>«</PaginationItem>
+			<PaginationItem page="previous" active={$state.page === 1}>‹</PaginationItem>
 			@for (let page of $slot.pages) {
-				<PaginationItem page={page} active={$state.number === page} />
+				<PaginationItem page={page} active={$state.page === page} />
 			}
-			<PaginationItem page="next" active={$state.number === 50}>›</PaginationItem>
-			<PaginationItem page="end" active={$state.number === 50}>»</PaginationItem>
+			<PaginationItem page="next" active={$state.page === 50}>›</PaginationItem>
+			<PaginationItem page="end" active={$state.page === 50}>»</PaginationItem>
 		</Pagination>
 	}
 }

@@ -4,13 +4,13 @@ import { type PageNumber } from "./PaginationTypes";
  * Builds the pages that should be displayed for pagination.
  *
  * @param count The total number of pages (or items if the page size is greater than 1)
- * @param number The active page number
+ * @param page The active page
  * @param pageSize The number of items on each page
  * @param maxPages The maximum number of pages to display (gaps will be indicated with ellipses)
  */
 export default function buildPages(
 	count: number,
-	number: number,
+	page: number,
 	pageSize: number = 1,
 	maxPages: number = 9,
 ): PageNumber[] {
@@ -26,8 +26,8 @@ export default function buildPages(
 		// Get the start and end around the current page number
 		// Use floor and ceil in case there is an even number of pages (e.g. if
 		// maxPages is 8, there will be 3 numbers at the start and 4 at the end)
-		let start = number - Math.floor((maxPages - 1) / 2);
-		let end = number + Math.ceil((maxPages - 1) / 2);
+		let start = page - Math.floor((maxPages - 1) / 2);
+		let end = page + Math.ceil((maxPages - 1) / 2);
 		if (start < 1) {
 			end += Math.abs(start) + 1;
 			start = 1;

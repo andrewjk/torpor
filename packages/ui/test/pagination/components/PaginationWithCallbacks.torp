@@ -4,19 +4,19 @@ import {
 } from "../../../src/Pagination/index";
 
 export default function PaginationWithCallbacks() {
-	let $state = $watch({ number: 5, lastClicked: "" });
+	let $state = $watch({ page: 5, lastClicked: "" });
 
 	function handleChange(active: boolean) {
 		if (active) {
-			$state.lastClicked = `Page ${$state.number}`;
+			$state.lastClicked = `Page ${$state.page}`;
 		}
 	}
 
 	@render {
 		<div>
-			<Pagination count={10} &number={$state.number}>
+			<Pagination count={10} &page={$state.page}>
 				@for (let page of $slot.pages) {
-					<PaginationItem page={page} active={$state.number === page} onchange={handleChange}>
+					<PaginationItem page={page} active={$state.page === page} onchange={handleChange}>
 						{page}
 					</PaginationItem>
 				}

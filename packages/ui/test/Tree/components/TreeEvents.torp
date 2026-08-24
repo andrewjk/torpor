@@ -1,0 +1,35 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemChildren,
+	TreeItemContent,
+	TreeItemLabel,
+	TreeItemTrigger,
+} from "../../../src/Tree/index";
+
+export default function TreeEvents($props: any) {
+	@render {
+		<Tree {$props?.expanded} {$props?.value} onexpand={$props?.onexpand} onchange={$props?.onchange}>
+			<TreeItem value="folder-1">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Folder 1</TreeItemLabel>
+				</TreeItemContent>
+				<TreeItemChildren>
+					<TreeItem value="file-1-1">
+						<TreeItemContent>
+							<TreeItemTrigger />
+							<TreeItemLabel>Nested File 1.1</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+				</TreeItemChildren>
+			</TreeItem>
+			<TreeItem value="file-2">
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>File 2</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+}
