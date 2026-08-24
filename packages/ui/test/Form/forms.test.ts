@@ -48,7 +48,7 @@ describe("Components in forms", () => {
 		mount(container, FormTabsTest);
 
 		// Nothing open initially
-		expect(formData(container, "accordion-form").get("panel")).toBeUndefined();
+		expect(formData(container, "accordion-form").get("panel")).toBeNull();
 
 		fireEvent.click(within(container).getByText("Panel A"));
 

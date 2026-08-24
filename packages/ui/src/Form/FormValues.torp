@@ -19,10 +19,12 @@ function toText(value: any): string {
 /**
  * Renders hidden inputs for a component's value, so that it can take part
  * in native form submission. One input per entry when the value is an array.
+ * Nothing is rendered when the value is null or undefined, so that the
+ * field is omitted from the submitted form data.
  */
 export default function FormValues($props: FormValuesProps | undefined) {
 	@render {
-		@if ($props?.name) {
+		@if ($props?.name && $props.value != null) {
 			@if (Array.isArray($props.value)) {
 				@for (let item of $props.value) {
 					<input type="hidden" name={$props.name} value={toText(item)} />

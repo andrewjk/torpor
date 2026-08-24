@@ -41,7 +41,7 @@ interface AccordionItemProps {
 export default function AccordionItem($props: AccordionItemProps | undefined) {
 	let $state: ItemState = $watch({
 		index: -1,
-		value: "",
+		value: $props?.value,
 		expanded: false,
 		headerId: "",
 		contentId: "",
