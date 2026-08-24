@@ -84,7 +84,7 @@ export default function ExampleBasic() {
 		}
 
 		.example-tree-item {
-			/* HACK: Shouldn't need this! */
+			// HACK: Shouldn't need this!
 		}
 
 		.example-tree-item.spacer {

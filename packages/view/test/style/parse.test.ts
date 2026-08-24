@@ -339,6 +339,45 @@ export default function Test(/* @params */) /* @return_type */ {/* @start */
 	});
 });
 
+test("style with comments inside blocks", () => {
+	const input = `
+export default function Test() {
+	@style {
+		button {
+			//color: green;
+			color: blue;
+			/* border: none; */
+		}
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+	assert(output.template);
+	expect(output.template.components.length).toBe(1);
+
+	const styleObject = {
+		global: false,
+		children: [
+			block("button", [
+				comment("//color: green;"),
+				attr("color", "blue"),
+				comment("/* border: none; */"),
+			]),
+		],
+		hash: "1u5jole",
+	};
+	expect(output.template.components[0].style).toEqual(styleObject);
+
+	// Comments are not emitted
+	const style = buildStyles(styleObject, "1u5jole");
+	expect(style).toEqual(`button.torp-1u5jole {
+	color: blue;
+}
+`);
+});
+
 test("style with quotes", () => {
 	const input = `
 export default function Test() {

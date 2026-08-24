@@ -51,26 +51,8 @@ export default function parseStyles(source: string, status: ParseStatus): void {
 function parseStyleNode(status: ParseStatus): StyleNode | undefined {
 	const gapBefore = /\n\s*\n\s*$/.test(status.source.slice(0, status.i));
 
-	if (accept("//", status)) {
-		const start = status.i - 2;
-		status.i = status.source.indexOf("\n", status.i);
-		if (status.i === -1) status.i = status.source.length;
-		const comment: CommentNode = {
-			type: "comment",
-			content: status.source.substring(start, status.i),
-			gapBefore,
-		};
-		return comment;
-	} else if (accept("/*", status)) {
-		const start = status.i - 2;
-		status.i = status.source.indexOf("*/", status.i) + 2;
-		if (status.i === -1) status.i = status.source.length;
-		const comment: CommentNode = {
-			type: "comment",
-			content: status.source.substring(start, status.i),
-			gapBefore,
-		};
-		return comment;
+	if (accept("//", status, false) || accept("/*", status, false)) {
+		return parseComment(status, gapBefore);
 	}
 
 	const selector = consumeUntil("{", status).trim();
@@ -83,23 +65,28 @@ function parseStyleNode(status: ParseStatus): StyleNode | undefined {
 		};
 		consumeSpace(status);
 		while (status.source[status.i] !== "}") {
-			// HACK: Is it an attribute or a child block?
-			let nextColon = status.source.indexOf(":", status.i);
-			if (nextColon === -1) nextColon = status.source.length;
-			let nextOpenBrace = status.source.indexOf("{", status.i);
-			if (nextOpenBrace === -1) nextOpenBrace = status.source.length;
-			if (nextColon < nextOpenBrace) {
-				const attribute = parseStyleAttribute(status);
-				block.children.push(attribute);
-			} else if (nextOpenBrace < nextColon) {
-				const child = parseStyleNode(status);
-				if (child) {
-					block.children.push(child);
-				} else {
-					break;
-				}
+			if (accept("//", status, false) || accept("/*", status, false)) {
+				// Comments are parsed but not emitted
+				block.children.push(parseComment(status, false));
 			} else {
-				return block;
+				// HACK: Is it an attribute or a child block?
+				let nextColon = status.source.indexOf(":", status.i);
+				if (nextColon === -1) nextColon = status.source.length;
+				let nextOpenBrace = status.source.indexOf("{", status.i);
+				if (nextOpenBrace === -1) nextOpenBrace = status.source.length;
+				if (nextColon < nextOpenBrace) {
+					const attribute = parseStyleAttribute(status);
+					block.children.push(attribute);
+				} else if (nextOpenBrace < nextColon) {
+					const child = parseStyleNode(status);
+					if (child) {
+						block.children.push(child);
+					} else {
+						break;
+					}
+				} else {
+					return block;
+				}
 			}
 			consumeSpace(status);
 		}
@@ -107,6 +94,24 @@ function parseStyleNode(status: ParseStatus): StyleNode | undefined {
 
 		return block;
 	}
+}
+
+function parseComment(status: ParseStatus, gapBefore: boolean): CommentNode {
+	const start = status.i;
+	if (accept("//", status)) {
+		const end = status.source.indexOf("\n", status.i);
+		status.i = end === -1 ? status.source.length : end;
+	} else {
+		accept("/*", status);
+		const end = status.source.indexOf("*/", status.i);
+		status.i = end === -1 ? status.source.length : end + 2;
+	}
+	const comment: CommentNode = {
+		type: "comment",
+		content: status.source.substring(start, status.i),
+		gapBefore,
+	};
+	return comment;
 }
 
 function parseStyleAttribute(status: ParseStatus): AttributeNode {
