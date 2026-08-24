@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type SelectBoxContext, SelectBoxContextName, type SelectBoxState } from "./SelectBoxTypes";
 
@@ -127,8 +128,6 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 			<slot />
 		</div>
 
-		@if ($props?.name) {
-			<input type="hidden" {$props?.name} {$props?.value} />
-		}
+		<FormValues name={$props?.name} value={$state.value} />
 	}
 }

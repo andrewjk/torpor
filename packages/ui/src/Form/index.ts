@@ -2,6 +2,7 @@ import CheckBox from "./CheckBox.torp";
 import Field from "./Field.torp";
 import File from "./File.torp";
 import Form from "./Form.torp";
+import FormValues from "./FormValues.torp";
 import Hidden from "./Hidden.torp";
 import Input from "./Input.torp";
 import Label from "./Label.torp";
@@ -17,6 +18,7 @@ export {
 	Field,
 	File,
 	Form,
+	FormValues,
 	Hidden,
 	Input,
 	Label,

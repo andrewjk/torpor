@@ -1,0 +1,16 @@
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+import { Slider } from "../../../src/Slider/index";
+
+export default function FormListTest($props: any) {
+	@render {
+		<form id="form-under-test">
+			<ListBox name="colors" {$props?.value} ariaLabel="Colors">
+				<ListBoxItem value="red">Red</ListBoxItem>
+				<ListBoxItem value="green">Green</ListBoxItem>
+				<ListBoxItem value="blue">Blue</ListBoxItem>
+			</ListBox>
+
+			<Slider name="volume" min={0} max={100} step={10} value={$props?.sliderValue} ariaLabel="Volume" />
+		</form>
+	}
+}

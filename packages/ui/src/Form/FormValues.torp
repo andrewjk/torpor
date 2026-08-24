@@ -1,0 +1,28 @@
+interface FormValuesProps {
+	/** The name of the form data field(s) */
+	name?: string;
+	/** The value, or an array of values, to submit with the form */
+	value?: any;
+}
+
+/**
+ * Renders hidden inputs for a component's value, so that it can take part
+ * in native form submission. One input per entry when the value is an array.
+ */
+export default function FormValues($props: FormValuesProps | undefined) {
+	@render {
+		@if ($props?.name) {
+			@if (Array.isArray($props.value)) {
+				@for (let item of $props.value) {
+					<input type="hidden" name={$props.name} value={item == null ? "" : String(item)} />
+				}
+			} @else {
+				<input
+					type="hidden"
+					name={$props.name}
+					value={$props.value == null ? "" : String($props.value)}
+				/>
+			}
+		}
+	}
+}

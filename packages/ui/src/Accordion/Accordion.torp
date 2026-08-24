@@ -2,6 +2,7 @@ import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type AccordionContext, AccordionContextName, type ItemState } from "./AccordionTypes";
 import { createItemGroup } from "../utils/createItemGroup";
 import { focusItem } from "../utils/focusItem";
+import FormValues from "../Form/FormValues.torp";
 
 interface AccordionProps {
 	/** An ID for the root element */
@@ -17,6 +18,8 @@ interface AccordionProps {
 	/** If set to true, the user cannot interact with any items in the Accordion */
 	disabled?: boolean;
 	/** Raised when the expanded item(s) have changed */
+	/** The name of the component's form data field */
+	name?: string;
 	onchange?: (value: any | any[]) => void;
 }
 
@@ -103,5 +106,7 @@ export default function Accordion($props: AccordionProps | undefined) {
 		<div {$props?.id} class={["torp-accordion", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
+
+		<FormValues name={$props?.name} value={$state.value} />
 	}
 }

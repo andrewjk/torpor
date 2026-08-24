@@ -1,6 +1,7 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type ComboBoxContext, ComboBoxContextName, type ComboBoxState } from "./ComboBoxTypes";
+import FormValues from "../Form/FormValues.torp";
 
 interface ComboBoxProps {
 	/** An ID for the root element */
@@ -141,5 +142,7 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		<div {$props?.id} class={["torp-combo-box", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
+
+		<FormValues name={$props?.name} value={$props?.value} />
 	}
 }

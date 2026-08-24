@@ -7,6 +7,7 @@ import {
 import { createItemGroup } from "../utils/createItemGroup";
 import getId from "../utils/getId";
 import { type ItemState, type ListBoxContext, ListBoxContextName } from "./ListBoxTypes";
+import FormValues from "../Form/FormValues.torp";
 
 // TODO: orientation
 
@@ -30,6 +31,8 @@ interface ListBoxProps {
 	/** The orientation of the ListBox */
 	orientation?: "vertical" | "horizontal";
 	/** Raised when the selected item(s) have changed */
+	/** The name of the component's form data field */
+	name?: string;
 	onchange?: (value: any | any[]) => void;
 }
 
@@ -288,5 +291,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 		>
 			<slot />
 		</div>
+
+		<FormValues name={$props?.name} value={$state.value} />
 	}
 }

@@ -1,0 +1,66 @@
+import {
+	Accordion,
+	AccordionContent,
+	AccordionHeader,
+	AccordionItem,
+	AccordionTrigger,
+} from "../../../src/Accordion/index";
+import {
+	TabGroup,
+	TabContent,
+	TabHeader,
+	TabList,
+	TabTrigger,
+} from "../../../src/TabGroup/index";
+import { Tree, TreeItem, TreeItemContent, TreeItemLabel } from "../../../src/Tree/index";
+
+export default function FormTabsTest() {
+	@render {
+		<form id="tabs-form">
+			<TabGroup name="section" value="b">
+				<TabList ariaLabel="Sections">
+					<TabHeader>
+						<TabTrigger>Section 1</TabTrigger>
+					</TabHeader>
+					<TabHeader>
+						<TabTrigger>Section 2</TabTrigger>
+					</TabHeader>
+				</TabList>
+				<TabContent>Body 1</TabContent>
+				<TabContent>Body 2</TabContent>
+			</TabGroup>
+		</form>
+
+		<form id="accordion-form">
+			<Accordion name="panel">
+				<AccordionItem value="a">
+					<AccordionHeader>
+						<AccordionTrigger>Panel A</AccordionTrigger>
+					</AccordionHeader>
+					<AccordionContent>Content A</AccordionContent>
+				</AccordionItem>
+				<AccordionItem value="b">
+					<AccordionHeader>
+						<AccordionTrigger>Panel B</AccordionTrigger>
+					</AccordionHeader>
+					<AccordionContent>Content B</AccordionContent>
+				</AccordionItem>
+			</Accordion>
+		</form>
+
+		<form id="tree-form">
+			<Tree name="picked" value="item-2">
+				<TreeItem value="item-1">
+					<TreeItemContent>
+						<TreeItemLabel>Folder 1</TreeItemLabel>
+					</TreeItemContent>
+				</TreeItem>
+				<TreeItem value="item-2">
+					<TreeItemContent>
+						<TreeItemLabel>Folder 2</TreeItemLabel>
+					</TreeItemContent>
+				</TreeItem>
+			</Tree>
+		</form>
+	}
+}
