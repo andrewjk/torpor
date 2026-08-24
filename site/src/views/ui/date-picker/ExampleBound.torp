@@ -1,0 +1,97 @@
+import { DatePicker } from "@torpor/ui/DatePicker";
+
+export default function ExampleBound() {
+	let $state = $watch({
+		value: new Date() as Date | undefined,
+	});
+
+	@render {
+		<p>Value: {$state.value ? $state.value.toLocaleDateString() : "-"}</p>
+
+		<DatePicker
+			class="example-date-picker"
+			ariaLabel="Select a date"
+			dateFormat="d MMM yyyy"
+			placeholder="Pick a date"
+			&value={$state.value}
+		/>
+	}
+
+	@style {
+		.example-date-picker {
+			width: 200px;
+		}
+
+		:global(.torp-date-picker-trigger) {
+			all: unset;
+			box-sizing: border-box;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			cursor: default;
+			padding: 5px 10px;
+			white-space: nowrap;
+		}
+
+		:global(.torp-date-picker-trigger:focus) {
+			border-color: dodgerblue;
+		}
+
+		:global(.torp-date-picker-content) {
+			background-color: white;
+			border: 1px solid gainsboro;
+			border-radius: 4px;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+			box-sizing: border-box;
+			padding: 10px;
+			position: absolute;
+			z-index: 10;
+		}
+
+		:global(.torp-date-picker-header) {
+			margin-block: 0.5rem;
+		}
+
+		:global(.torp-calendar) {
+			text-align: center;
+		}
+
+		:global(
+			.torp-calendar-trigger,
+			.torp-calendar-day
+		) {
+			all: unset;
+			box-sizing: border-box;
+			cursor: default;
+			display: inline-flex;
+			align-items: center;
+			user-select: none;
+			white-space: nowrap;
+			padding: 5px 10px;
+		}
+
+		:global(
+			.torp-calendar-trigger:hover,
+			.torp-calendar-trigger:focus,
+			.torp-calendar-day:hover,
+			.torp-calendar-day:focus,
+			.torp-calendar-day.active
+		) {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+
+		:global(.torp-calendar-day.today) {
+			font-weight: bold;
+		}
+
+		:global(.torp-calendar-header) {
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+		}
+
+		:global(.torp-calendar-day.muted) {
+			color: #bbb;
+		}
+	}
+}

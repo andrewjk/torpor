@@ -1,0 +1,206 @@
+import { ReactiveDate, type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
+import {
+	Calendar,
+	CalendarDay,
+	CalendarDayHeader,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
+} from "../Calendar/index";
+import { formatDate } from "../utils/dateUtils";
+import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
+import DatePickerHeader from "./DatePickerHeader.torp";
+
+interface DatePickerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the date picker's form data field */
+	name?: string;
+	/** The selected date */
+	value?: Bindable<Date | undefined>;
+	/** Text to display when the value is empty */
+	placeholder?: string;
+	/** The format for the displayed date (e.g. "d MMM yyyy") */
+	dateFormat?: string;
+	/** If set to true, the user cannot interact with this date picker */
+	disabled?: boolean;
+	/** An accessible name for the trigger button */
+	ariaLabel?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: Date) => void;
+}
+
+/**
+ * An input for selecting a date from a calendar popout.
+ *
+ * The structure of a DatePicker is a trigger button that displays the
+ * selected date, with a selectable Calendar in a popout.
+ */
+export default function DatePicker($props: DatePickerProps | undefined) {
+	let defaultId = getId();
+
+	let content: HTMLDivElement;
+	let closeOnClick = false;
+
+	function getDateFormat(): string {
+		return $props?.dateFormat ?? "yyyy-MM-dd";
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		value: undefined as Date | undefined,
+		visible: false,
+		triggerId: "",
+		contentId: "",
+	});
+
+	$bind($state, $props, "value");
+
+	// Set default IDs so that the trigger can use aria-controls and the
+	// content can be labelled by the trigger
+	$run(() => {
+		$state.triggerId = `${$props?.id ?? defaultId}-trigger`;
+		$state.contentId = `${$props?.id ?? defaultId}-content`;
+	});
+
+	function displayText(): string {
+		const value = $state.value;
+		if (value) {
+			return formatDate($unwrap(value), getDateFormat());
+		}
+		return $props?.placeholder || "-";
+	}
+
+	function toggle() {
+		setVisible(!$state.visible);
+	}
+
+	function setVisible(visible: boolean) {
+		$state.visible = visible;
+		if (visible) {
+			// HACK: Because this may be shown with a click, we need to wait for
+			// another mousedown before we close on click. Otherwise the click
+			// immediately bubbles up to the document
+			closeOnClick = false;
+			addDocumentEvent("mousedown", handleDocumentMouseDown);
+			addDocumentEvent("click", handleDocumentClick);
+			focusCalendar();
+		} else {
+			removeDocumentEvent("mousedown", handleDocumentMouseDown);
+			removeDocumentEvent("click", handleDocumentClick);
+		}
+	}
+
+	function focusCalendar() {
+		// Wait for the popout to be shown before focusing it
+		setTimeout(() => {
+			const grid = content?.querySelector(".torp-calendar-grid");
+			if (grid instanceof HTMLElement && !getDisabled()) {
+				grid.focus();
+			}
+		});
+	}
+
+	function handleDate(date: Date) {
+		$state.value = new ReactiveDate(date);
+		$props?.onchange?.($state.value);
+		setVisible(false);
+		focusTrigger();
+	}
+
+	function handleClose() {
+		setVisible(false);
+		focusTrigger();
+	}
+
+	function focusTrigger() {
+		const trigger = document.getElementById($state.triggerId);
+		if (trigger instanceof HTMLElement) {
+			trigger.focus();
+		}
+	}
+
+	function handleDocumentMouseDown() {
+		closeOnClick = true;
+	}
+
+	function handleDocumentClick(e: MouseEvent) {
+		if (closeOnClick && content && !content.contains(e.target as HTMLElement)) {
+			e.preventDefault();
+			setVisible(false);
+		}
+	}
+
+	function handleClick(e: MouseEvent) {
+		// Don't close when the trigger itself is clicked
+		e.stopPropagation();
+		toggle();
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-date-picker", getDisabled() ? "torp-date-picker-disabled" : undefined, $props?.class]}
+			{$props?.style}
+		>
+			<button
+				type="button"
+				id={$state.triggerId}
+				class="torp-date-picker-trigger"
+				aria-haspopup="dialog"
+				aria-expanded={$state.visible ? "true" : "false"}
+				aria-controls={$state.visible ? $state.contentId : undefined}
+				aria-label={$props?.ariaLabel}
+				disabled={getDisabled()}
+				onclick={handleClick}
+			>
+				{displayText()}
+			</button>
+
+			<div
+				id={$state.contentId}
+				class={["torp-date-picker-content", $state.visible ? undefined : "hidden"]}
+				aria-hidden={$state.visible ? undefined : "true"}
+				&ref={content}
+			>
+				<Calendar selectable {$state.value} onchange={handleDate} onclose={handleClose}>
+					<CalendarHeader>
+						<CalendarHeaderTrigger type="previous" />
+						<DatePickerHeader class="torp-date-picker-header" />
+						<CalendarHeaderTrigger type="next" />
+					</CalendarHeader>
+					<CalendarGridHeader>
+						@for (let day of $slot.days) {
+							<CalendarDayHeader {day.dayName} {day.shortDayName} />
+						}
+					</CalendarGridHeader>
+					<CalendarGrid>
+						@for (let day of $slot.days) {
+							@key = day.date
+							<CalendarDay {day.date} {day.muted} {day.active} />
+						}
+					</CalendarGrid>
+				</Calendar>
+			</div>
+		</div>
+
+		@if ($props?.name) {
+			<input type="hidden" name={$props.name} value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : ""} />
+		}
+	}
+
+	@style {
+		/* Visibility only -- see SelectBoxContent */
+		.torp-date-picker-content.hidden {
+			display: none;
+		}
+	}
+}

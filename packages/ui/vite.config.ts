@@ -7,6 +7,7 @@ const components = [
 	"Charts",
 	"ComboBox",
 	"Contextual",
+	"DatePicker",
 	"Dialog",
 	"Disclosure",
 	"Drawer",

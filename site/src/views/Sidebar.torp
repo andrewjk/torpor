@@ -26,6 +26,7 @@ export default function Sidebar() {
 				<li><a href="/ui/charts">Charts</a></li>
 				<li><a href="/ui/combo-box">ComboBox</a></li>
 				<li><a href="/ui/contextual">Contextual</a></li>
+				<li><a href="/ui/date-picker">DatePicker</a></li>
 				<li><a href="/ui/dialog">Dialog</a></li>
 				<li><a href="/ui/disclosure">Disclosure</a></li>
 				<li><a href="/ui/drawer">Drawer</a></li>

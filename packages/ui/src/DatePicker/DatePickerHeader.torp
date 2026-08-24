@@ -1,0 +1,20 @@
+import { CalendarContextName, type CalendarContext } from "../Calendar/CalendarTypes";
+import { monthNames } from "../utils/dateUtils";
+
+/**
+ * Displays the month and year of the currently visible date in a Calendar.
+ * Must be contained within a Calendar.
+ */
+export default function DatePickerHeader($props: { class?: string }) {
+	const context = $context[CalendarContextName] as CalendarContext;
+	if (!context) {
+		throw new Error("DatePickerHeader must be contained within a Calendar");
+	}
+	const $state = context.state;
+
+	@render {
+		<h4 class={$props.class}>
+			{monthNames[$state.visibleDate.getMonth()]} {$state.visibleDate.getFullYear()}
+		</h4>
+	}
+}

@@ -28,6 +28,10 @@
 			"types": "./dist/Contextual/index.d.ts",
 			"import": "./dist/Contextual/index.js"
 		},
+		"./DatePicker": {
+			"types": "./dist/DatePicker/index.d.ts",
+			"import": "./dist/DatePicker/index.js"
+		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
 			"import": "./dist/Dialog/index.js"

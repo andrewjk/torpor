@@ -1,0 +1,52 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./date-picker/ExampleBasic.torp";
+import ExampleBasicCode from "./date-picker/ExampleBasic.torp?raw";
+import ExampleBound from "./date-picker/ExampleBound.torp";
+import ExampleBoundCode from "./date-picker/ExampleBound.torp?raw";
+
+export default function DatePickerPage() {
+	@head {
+		<title>DatePicker | Torpor</title>
+	}
+
+	@render {
+		<h1>DatePicker</h1>
+		<p>
+			An input for selecting a date from a calendar popout.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<DatePicker />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Bound
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBound />
+					<fill name="code">
+						<CodePreview code={ExampleBoundCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

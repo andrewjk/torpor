@@ -1,0 +1,13 @@
+import { DatePicker } from "../../../src/DatePicker/index";
+import { formatDate } from "../../../src/utils/dateUtils";
+
+export default function DatePickerBindingTest() {
+	let $state = $watch({ value: undefined as Date | undefined });
+
+	@render {
+		<div>
+			<DatePicker &value={$state.value} ariaLabel="Bound date" />
+			<div id="bound-value" data-testid="bound-value">{$state.value ? formatDate($state.value, "yyyy-MM-dd") : "none"}</div>
+		</div>
+	}
+}
