@@ -1,0 +1,12 @@
+import { Slider } from "../../../src/Slider/index";
+
+export default function SliderBindingTest() {
+	let $state = $watch({ value: 25 });
+
+	@render {
+		<div>
+			<Slider min={0} max={50} &value={$state.value} ariaLabel="Bound slider" />
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

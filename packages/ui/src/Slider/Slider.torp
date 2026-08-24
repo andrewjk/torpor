@@ -1,84 +1,247 @@
-export default function Slider($props: any | undefined) {
-	//export let value = 0;
-	//export let total = 0;
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 
-	let position = 0;
-	let dragging = false;
-	let background: HTMLElement;
-	let handle: HTMLElement;
-	let skipRecalc = false;
+interface SliderProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The minimum allowed value */
+	min?: number;
+	/** The maximum allowed value */
+	max?: number;
+	/** The amount by which the value is increased or decreased */
+	step?: number;
+	/** The current value of the slider */
+	value?: Bindable<number>;
+	/** The orientation of the slider */
+	orientation?: "horizontal" | "vertical";
+	/** If set to true, the user cannot interact with this slider */
+	disabled?: boolean;
+	/** An accessible name for the slider */
+	ariaLabel?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: number) => void;
+}
 
-	$mount(() => {
-		calculatePosition();
+/**
+ * An input where the user selects a value from within a given range, by
+ * dragging a thumb along a track or by using the keyboard.
+ *
+ * See [the WAI ARIA guidelines for Sliders](https://www.w3.org/WAI/ARIA/apg/patterns/slider/).
+ */
+export default function Slider($props: SliderProps | undefined) {
+	let track: HTMLElement;
+	let thumb: HTMLElement;
+
+	function getMin(): number {
+		return $props?.min ?? 0;
+	}
+	function getMax(): number {
+		return $props?.max ?? 100;
+	}
+	function getStep(): number {
+		const step = $props?.step ?? 1;
+		return step > 0 ? step : 1;
+	}
+	function getOrientation(): "horizontal" | "vertical" {
+		return $props?.orientation === "vertical" ? "vertical" : "horizontal";
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		value: 0,
 	});
 
-	beforeUpdate(() => {
-		if (background && handle) {
-			if (skipRecalc) {
-				skipRecalc = false;
-			} else {
-				calculatePosition();
-			}
+	$bind($state, $props, "value");
+
+	// Dispatch the change event when the value changes
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
+	});
+
+	function clamp(value: number): number {
+		return Math.min(getMax(), Math.max(getMin(), value));
+	}
+
+	// Snap a raw position-derived value to the nearest step multiple
+	function snap(value: number): number {
+		const min = getMin();
+		const snapped = min + Math.round((value - min) / getStep()) * getStep();
+		return snapped === -0 ? 0 : snapped;
+	}
+
+	// The clamped value that is displayed and reported to assistive tech
+	function getValue(): number {
+		return clamp($state.value);
+	}
+
+	// The percentage of the range that the value represents (0..100)
+	function getPct(): number {
+		const min = getMin();
+		const max = getMax();
+		if (max <= min) return 0;
+		return ((getValue() - min) / (max - min)) * 100;
+	}
+
+	function setValue(value: number) {
+		const next = clamp(snap(value));
+		if (next !== $state.value) {
+			$state.value = next;
+			return true;
 		}
-	});
-
-	function calculatePosition() {
-		// Calculate the initial handle position
-		const handleRect = handle.getBoundingClientRect();
-		const backgroundRect = background.getBoundingClientRect();
-		const offsetX = (value / total) * backgroundRect.width;
-		position = offsetX - handleRect.width / 2;
+		return false;
 	}
 
-	function handleMouseDown() {
+	// Convert a pointer position into a value along the track
+	function valueFromPointer(e: { clientX: number; clientY: number }): number {
+		const rect = track.getBoundingClientRect();
+		const horizontal = getOrientation() === "horizontal";
+		const pos = horizontal ? e.clientX - rect.left : e.clientY - rect.top;
+		const size = horizontal ? rect.width : rect.height;
+		if (!(size > 0)) {
+			return getValue();
+		}
+		const ratio = Math.min(1, Math.max(0, pos / size));
+		return getMin() + ratio * (getMax() - getMin());
+	}
+
+	let dragging = false;
+
+	function removeDragListeners() {
+		removeEventListener("mousemove", handleMouseMove);
+		removeEventListener("mouseup", handleMouseUp);
+	}
+
+	function handleMouseDown(e: MouseEvent) {
+		if (getDisabled()) return;
+		e.preventDefault();
 		dragging = true;
-	}
-
-	function handleMouseUp() {
-		dragging = false;
+		setValue(valueFromPointer(e));
+		thumb.focus();
+		addEventListener("mousemove", handleMouseMove);
+		addEventListener("mouseup", handleMouseUp);
 	}
 
 	function handleMouseMove(e: MouseEvent) {
-		if (!e.buttons) {
-			dragging = false;
-		}
+		if (!dragging || getDisabled()) return;
+		setValue(valueFromPointer(e));
+	}
 
-		if (dragging) {
-			const handleRect = handle.getBoundingClientRect();
-			const backgroundRect = background.getBoundingClientRect();
-			let offsetX = e.clientX - backgroundRect.left;
+	function handleMouseUp() {
+		if (!dragging) return;
+		dragging = false;
+		removeDragListeners();
+	}
 
-			const minWidth = handleRect.width / 2;
-			const maxWidth = backgroundRect.width - handleRect.width / 2;
+	// Stop listening if the slider is unmounted mid-drag
+	$mount(() => {
+		return () => removeDragListeners();
+	});
 
-			if (offsetX < minWidth) {
-				offsetX = minWidth;
-				value = 0;
-			} else if (offsetX > maxWidth) {
-				offsetX = maxWidth;
-				value = total;
-			} else {
-				const width = backgroundRect.width - handleRect.width;
-				value = Math.floor((total / width) * offsetX);
+	function handleKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+
+		switch (e.key) {
+			case "ArrowRight":
+			case "ArrowUp": {
+				e.preventDefault();
+				setValue($state.value + getStep());
+				break;
 			}
-
-			position = offsetX - handleRect.width / 2;
+			case "ArrowLeft":
+			case "ArrowDown": {
+				e.preventDefault();
+				setValue($state.value - getStep());
+				break;
+			}
+			case "PageUp": {
+				e.preventDefault();
+				setValue($state.value + getStep() * 10);
+				break;
+			}
+			case "PageDown": {
+				e.preventDefault();
+				setValue($state.value - getStep() * 10);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				setValue(getMin());
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				setValue(getMax());
+				break;
+			}
 		}
-
-		// Don't recalc with the value change - we know where everything should be
-		skipRecalc = true;
 	}
 
 	@render {
 		<div
 			{$props?.id}
-			class={["torp-slider", $props?.class]}
+			class={["torp-slider", getDisabled() ? "torp-slider-disabled" : undefined, $props?.class]}
 			{$props?.style}
-			onmousemove={handleMouseMove}
-			onmouseup={handleMouseUp}
+			onmousedown={handleMouseDown}
+			&ref={track}
 		>
-			<div &ref={background} />
-			<div &ref={handle} style={`left: ${position}px;`} onmousedown={handleMouseDown} />
+			<div class="torp-slider-fill" style={`${getOrientation() === "vertical" ? "height" : "width"}: ${getPct()}%;`} />
+			<div
+				class="torp-slider-thumb"
+				style={`${getOrientation() === "vertical" ? "top" : "left"}: ${getPct()}%;`}
+				role="slider"
+				tabindex={getDisabled() ? -1 : 0}
+				aria-orientation={getOrientation()}
+				aria-valuemin={getMin()}
+				aria-valuemax={getMax()}
+				aria-valuenow={getValue()}
+				aria-label={$props?.ariaLabel}
+				aria-disabled={getDisabled() ? "true" : undefined}
+				onkeydown={handleKey}
+				&ref={thumb}
+			/>
 		</div>
+	}
+
+	@style {
+		.torp-slider {
+			position: relative;
+			display: flex;
+			align-items: center;
+			height: 20px;
+			width: 100%;
+			touch-action: none;
+			user-select: none;
+		}
+		.torp-slider-fill {
+			position: absolute;
+			left: 0;
+			height: 4px;
+			background-color: var(--torp-slider-fill, var(--color, var(--text-color, currentColor)));
+			border-radius: 2px;
+			pointer-events: none;
+		}
+		.torp-slider-thumb {
+			position: absolute;
+			transform: translateX(-50%);
+			width: 16px;
+			height: 16px;
+			background-color: var(--torp-slider-thumb, var(--color, var(--text-color, currentColor)));
+			border-radius: 50%;
+			cursor: pointer;
+		}
+		.torp-slider-thumb:focus-visible {
+			outline: 2px solid var(--focus-color, Highlight);
+			outline-offset: 2px;
+		}
+		.torp-slider-disabled .torp-slider-thumb {
+			cursor: default;
+			opacity: 0.5;
+		}
 	}
 }

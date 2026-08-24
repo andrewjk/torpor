@@ -20,6 +20,7 @@ const components = [
 	"Pagination",
 	"Popover",
 	"SelectBox",
+	"Slider",
 	"TabGroup",
 	"Tree",
 	"ToolBar",

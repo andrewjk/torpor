@@ -1,0 +1,60 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./slider/ExampleBasic.torp";
+import ExampleBasicCode from "./slider/ExampleBasic.torp?raw";
+import ExampleRange from "./slider/ExampleRange.torp";
+import ExampleRangeCode from "./slider/ExampleRange.torp?raw";
+
+export default function SliderPage() {
+	@head {
+		<title>Slider | Torpor</title>
+	}
+
+	@render {
+		<h1>Slider</h1>
+		<p>
+			An input where the user selects a value from within a given range, by dragging a thumb
+			along a track or by using the keyboard.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/slider/">
+				the WAI ARIA guidelines for Sliders
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Slider />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Range
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleRange />
+					<fill name="code">
+						<CodePreview code={ExampleRangeCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

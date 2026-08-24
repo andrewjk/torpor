@@ -80,6 +80,10 @@
 			"types": "./dist/SelectBox/index.d.ts",
 			"import": "./dist/SelectBox/index.js"
 		},
+		"./Slider": {
+			"types": "./dist/Slider/index.d.ts",
+			"import": "./dist/Slider/index.js"
+		},
 		"./TabGroup": {
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js"
