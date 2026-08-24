@@ -2,12 +2,13 @@ import type ElementNode from "../types/nodes/ElementNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import isSpaceNode from "../utils/isSpaceNode";
 import isSpecialNode from "../utils/isSpecialNode";
+import usesSlot from "./utils/usesSlot";
 
 /**
  * Moves any child nodes that aren't already in a <fill> node into a default
  * <fill> node
  */
-export default function slottifyChildNodes(node: ElementNode, source: string): void {
+export default function slottifyChildNodes(node: ElementNode): void {
 	// Gather nodes that are not in <fill> nodes, and not the spaces surrounding fill nodes
 	let nonFillNodes: TemplateNode[] = [];
 	for (let child of node.children) {
@@ -37,10 +38,7 @@ export default function slottifyChildNodes(node: ElementNode, source: string): v
 				attributes: [],
 				children: nonFillNodes,
 				span: { start: 0, end: 0 },
-				// HACK: We're checking all children, potentially including the
-				// fill nodes we filtered out, and child components which
-				// shouldn't affect the parent component
-				hasSlotProps: /\$slot\b/.test(source),
+				hasSlotProps: usesSlot(nonFillNodes),
 			};
 			node.children.unshift(defaultFillNode);
 		}

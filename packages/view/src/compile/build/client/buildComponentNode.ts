@@ -205,17 +205,17 @@ export default function buildComponentNode(
 				const slotParams = [
 					"$sparent: ParentNode",
 					"$sanchor: Node | null",
-					// HACK: The hasSlotProps value may have been set due to a
-					// child component, in which case $slot may have a not used
-					// error for THIS component, so just ignore that for now
-					// e.g. <Parent><Child>{$slot.content}</Child></Parent>
-					// would have a problem with the $slot param passed to
-					// the Parent component
+					// NOTE: The $slot param is only declared with its real name
+					// when the fill reads it (hasSlotProps), otherwise it would
+					// be reported as unused
 					slot.hasSlotProps
 						? "$slot: Record<PropertyKey, any>"
 						: "_$slot?: Record<PropertyKey, any>",
 					"// @ts-ignore\n// eslint-disable-next-line no-unused-vars\n$context?: Record<PropertyKey, any>",
 				];
+				// NOTE: The @ts-ignore suppresses the assignability error from
+				// the required $slot param, which is not compatible with the
+				// optional $slot param of the SlotRender type
 				b.append(
 					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`,
 				);
