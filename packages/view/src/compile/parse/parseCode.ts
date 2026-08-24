@@ -37,6 +37,9 @@ export default function parseCode(source: string): ParseResult {
 			status.level -= 1;
 			if (status.level === 0) {
 				parseComponentEnd(status);
+			} else if (status.level < 0) {
+				addError(status, `Unexpected closing brace`, status.i, status.i + 1);
+				status.level = 0;
 			}
 		} else if (accept("function", status)) {
 			// If the function name starts with a capital, parse it as a component
@@ -90,6 +93,17 @@ export default function parseCode(source: string): ParseResult {
 			parseComponentStyle(status);
 		}
 	}
+
+	if (status.level > 0) {
+		const count = status.level;
+		addError(
+			status,
+			`Unbalanced braces: missing ${count} closing brace${count === 1 ? "" : "s"}`,
+			source.length,
+			source.length,
+		);
+	}
+
 	status.script.push({
 		script: source.substring(status.marker, source.length),
 		span: { start: status.marker, end: source.length },
