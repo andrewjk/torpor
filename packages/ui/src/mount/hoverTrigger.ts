@@ -10,7 +10,7 @@ export default function hoverTrigger(node: HTMLElement, options: HoverTriggerOpt
 	const hoverDelay = options.hoverDelay || 1000;
 	const touchDelay = options.touchDelay || 1000;
 
-	let interval: NodeJS.Timeout | undefined;
+	let interval: ReturnType<typeof setTimeout> | undefined;
 
 	// Add click event handlers to the node
 	node.addEventListener("mouseenter", handleMouseEnter);

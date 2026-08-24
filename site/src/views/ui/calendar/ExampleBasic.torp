@@ -69,7 +69,7 @@ export default function ExampleBasic() {
 
 		:global(.torp-calendar-header) {
 			display: grid;
-			//align-items: center;
+			/* align-items: center; */
 			grid-template-columns: auto 1fr auto;
 		}
 

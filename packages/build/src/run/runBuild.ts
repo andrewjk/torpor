@@ -1,10 +1,11 @@
 import torpor from "@torpor/unplugin/vite";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
-import { build, defineConfig } from "vite";
+import { build, defineConfig, type AliasOptions } from "vite";
 import Site from "../site/Site";
 import { checkApiCalls, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
+import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 
 // TODO: Don't cache index.html in dev?
 // TODO: Multiple hook.server locations
@@ -51,8 +52,15 @@ export default async function runBuild(site: Site): Promise<void> {
 	const clientConfig = structuredClone(site.viteConfig ?? {});
 	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
 	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
+	// for the client, but hardcodes tsconfigPaths:false on the SSR
+	// externalization path, so mirror tsconfig `compilerOptions.paths` as Vite
+	// `resolve.alias` to resolve them during transform for both client and SSR
 	clientConfig.resolve ??= {};
 	clientConfig.resolve.tsconfigPaths ??= true;
+	clientConfig.resolve.alias = [
+		...asAliasArray(clientConfig.resolve.alias),
+		...tsconfigAliases(site.root),
+	];
 	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
@@ -71,10 +79,13 @@ export default async function runBuild(site: Site): Promise<void> {
 	// Build the server assets, including the server entry script and the route
 	// files
 	const serverConfig = structuredClone(site.viteConfig ?? {});
-	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
-	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
+	// Resolve tsconfig path aliases (e.g. `@/*`), as above
 	serverConfig.resolve ??= {};
 	serverConfig.resolve.tsconfigPaths ??= true;
+	serverConfig.resolve.alias = [
+		...asAliasArray(serverConfig.resolve.alias),
+		...tsconfigAliases(site.root),
+	];
 	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
@@ -101,4 +112,12 @@ export default async function runBuild(site: Site): Promise<void> {
 	if (site.adapter.postbuild) {
 		await site.adapter.postbuild(site);
 	}
+}
+
+function asAliasArray(alias: AliasOptions | undefined): AliasEntry[] {
+	// Normalize an existing `resolve.alias` value (array | object | undefined)
+	// into an array so we can concatenate our tsconfig-derived aliases.
+	if (!alias) return [];
+	if (Array.isArray(alias)) return alias;
+	return Object.entries(alias).map(([find, replacement]) => ({ find, replacement }));
 }
