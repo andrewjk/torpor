@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
 
 interface SliderProps {
 	/** An ID for the root element */
@@ -21,6 +22,8 @@ interface SliderProps {
 	disabled?: boolean;
 	/** An accessible name for the slider */
 	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
 	/** Raised when the value has changed */
 	onchange?: (value: number) => void;
 }
@@ -206,42 +209,20 @@ export default function Slider($props: SliderProps | undefined) {
 				&ref={thumb}
 			/>
 		</div>
+
+		<FormValues name={$props?.name} value={getValue()} />
 	}
 
 	@style {
+		/* Headless: positioning only, so the thumb sits at the value along
+		   the track. All appearance is up to the consuming theme */
 		.torp-slider {
 			position: relative;
-			display: flex;
-			align-items: center;
-			height: 20px;
-			width: 100%;
 			touch-action: none;
-			user-select: none;
-		}
-		.torp-slider-fill {
-			position: absolute;
-			left: 0;
-			height: 4px;
-			background-color: var(--torp-slider-fill, var(--color, var(--text-color, currentColor)));
-			border-radius: 2px;
-			pointer-events: none;
 		}
 		.torp-slider-thumb {
 			position: absolute;
 			transform: translateX(-50%);
-			width: 16px;
-			height: 16px;
-			background-color: var(--torp-slider-thumb, var(--color, var(--text-color, currentColor)));
-			border-radius: 50%;
-			cursor: pointer;
-		}
-		.torp-slider-thumb:focus-visible {
-			outline: 2px solid var(--focus-color, Highlight);
-			outline-offset: 2px;
-		}
-		.torp-slider-disabled .torp-slider-thumb {
-			cursor: default;
-			opacity: 0.5;
 		}
 	}
 }
