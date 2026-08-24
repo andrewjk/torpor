@@ -4,6 +4,8 @@ import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./form/ExampleBasic.torp";
 import ExampleBasicCode from "./form/ExampleBasic.torp?raw";
+import ExampleToggle from "./form/ExampleToggle.torp";
+import ExampleToggleCode from "./form/ExampleToggle.torp?raw";
 
 export default function FormPage() {
 	@head {
@@ -31,12 +33,23 @@ export default function FormPage() {
 				<ExampleTabHeader>
 					Basic
 				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Toggle
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>
 					<ExampleBasic />
 					<fill name="code">
 						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleToggle />
+					<fill name="code">
+						<CodePreview code={ExampleToggleCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

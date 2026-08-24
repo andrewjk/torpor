@@ -1,0 +1,14 @@
+import { Toggle } from "../../../src/Form/index";
+
+export default function ToggleFormTest($props: any) {
+	@render {
+		<form id="test-form">
+			<Toggle
+				name="notifications"
+				{$props?.checked}
+				{$props?.disabled}
+				ariaLabel="Notifications"
+			/>
+		</form>
+	}
+}

@@ -1,0 +1,93 @@
+import { $page } from "@torpor/build/state";
+import { Field, Form, Label, Message, Toggle } from "@torpor/ui/Form";
+import * as z from "zod";
+
+export default function ExampleToggle($props: any) {
+	const schema = z.object({
+		enabled: z.literal(true, { message: "Must be switched on" }),
+	});
+
+	let $state = $watch({
+		data: {
+			enabled: $props?.form?.enabled === "true" || $props?.form?.enabled === true,
+		},
+	});
+
+	@render {
+		<p>Switch the toggle on to sucessfully submit the form.</p>
+
+		@if ($page?.form) {
+			@if ($page?.form?.ok) {
+				<p style="color: green">
+					All good
+				</p>
+			} else {
+				<p style="color: red">
+					{$page?.form?.message}
+				</p>
+			}
+		}
+
+		<Form class="example-form" {$state.data} {schema}>
+			<Field class="example-form-field example-toggle-field" name="enabled" &value={$state.data.enabled}>
+				<Label>Enable notifications</Label>
+				<Toggle class="example-toggle" />
+				<Message />
+			</Field>
+			<button>Submit</button>
+		</Form>
+	}
+
+	@style {
+		.example-form {
+			width: 100%;
+		}
+
+		.example-form-field {
+			padding: 10px 0;
+		}
+
+		.example-toggle-field {
+			align-items: center;
+			display: flex;
+			gap: 10px;
+		}
+
+		.example-toggle {
+			appearance: none;
+			background-color: gainsboro;
+			border-radius: 999px;
+			box-sizing: border-box;
+			cursor: default;
+			height: 20px;
+			margin: 0;
+			position: relative;
+			transition: background-color 150ms;
+			width: 36px;
+		}
+
+		.example-toggle::after {
+			background-color: white;
+			border-radius: 50%;
+			content: "";
+			height: 16px;
+			left: 2px;
+			position: absolute;
+			top: 2px;
+			transition: left 150ms;
+			width: 16px;
+		}
+
+		.example-toggle:checked {
+			background-color: dodgerblue;
+		}
+
+		.example-toggle:checked::after {
+			left: 18px;
+		}
+
+		.example-toggle:focus-visible {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+	}
+}

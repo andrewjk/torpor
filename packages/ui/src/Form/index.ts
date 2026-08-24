@@ -10,6 +10,7 @@ import MessageSummary from "./MessageSummary.torp";
 import Option from "./Option.torp";
 import Select from "./Select.torp";
 import TextArea from "./TextArea.torp";
+import Toggle from "./Toggle.torp";
 
 export {
 	CheckBox,
@@ -24,4 +25,5 @@ export {
 	Option,
 	Select,
 	TextArea,
+	Toggle,
 };
