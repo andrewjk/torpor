@@ -6,6 +6,17 @@ interface FormValuesProps {
 }
 
 /**
+ * Converts a form value to its text representation, without relying on
+ * implicit primitive conversion (which fails for reactive proxies).
+ */
+function toText(value: any): string {
+	if (value == null) return "";
+	if (typeof value === "string") return value;
+	if (typeof value === "number" || typeof value === "boolean") return String(value);
+	return JSON.stringify(value);
+}
+
+/**
  * Renders hidden inputs for a component's value, so that it can take part
  * in native form submission. One input per entry when the value is an array.
  */
@@ -14,14 +25,10 @@ export default function FormValues($props: FormValuesProps | undefined) {
 		@if ($props?.name) {
 			@if (Array.isArray($props.value)) {
 				@for (let item of $props.value) {
-					<input type="hidden" name={$props.name} value={item == null ? "" : String(item)} />
+					<input type="hidden" name={$props.name} value={toText(item)} />
 				}
 			} @else {
-				<input
-					type="hidden"
-					name={$props.name}
-					value={$props.value == null ? "" : String($props.value)}
-				/>
+				<input type="hidden" name={$props.name} value={toText($props.value)} />
 			}
 		}
 	}
