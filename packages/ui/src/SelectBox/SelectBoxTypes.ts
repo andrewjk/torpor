@@ -5,6 +5,7 @@ export const SelectBoxContextName: unique symbol = Symbol.for("torp.SelectBox");
 /** The shared context for SelectBox components */
 export interface SelectBoxContext extends PopoutContext {
 	placeholder?: string;
+	multiple?: boolean;
 	state: SelectBoxState;
 	focusTrigger?: () => void;
 }

@@ -1,0 +1,19 @@
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "../../../src/SelectBox/index";
+
+export default function SelectBoxMultipleTest($props: any) {
+	@render {
+		<form id="multi-form">
+			<SelectBox name="tags" multiple placeholder="Pick tags">
+				<SelectBoxTrigger ariaLabel="Tags" />
+				<SelectBoxContent>
+					<ListBox type="multiple" ariaLabel="Tags">
+						<ListBoxItem value="red">Red</ListBoxItem>
+						<ListBoxItem value="green">Green</ListBoxItem>
+						<ListBoxItem value="blue">Blue</ListBoxItem>
+					</ListBox>
+				</SelectBoxContent>
+			</SelectBox>
+		</form>
+	}
+}

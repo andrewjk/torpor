@@ -12,8 +12,10 @@ interface ComboBoxProps {
 	style?: StyleValue;
 	/** The name of the input's form data field */
 	name?: string;
-	/** The data value selected by the user */
+	/** The data value selected by the user, or an array of values if multiple is set */
 	value: Bindable<any>;
+	/** Whether multiple values can be selected at the same time */
+	multiple?: boolean;
 	/** Text to display when the input value is empty */
 	placeholder?: string;
 	/** Whether the input's value is required */

@@ -35,6 +35,14 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 		button.focus();
 	}
 
+	function displayValue(): string | undefined {
+		const value = $state.value;
+		if (value === undefined || value === null || value === "") {
+			return undefined;
+		}
+		return Array.isArray(value) ? (value as any[]).join(", ") : String(value);
+	}
+
 	function handleClick() {
 		$state.visible = !$state.visible;
 		if (!$state.visible) {
@@ -118,10 +126,10 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 			&ref={button}
 		>
 			<slot>
-				@if ($state.value === undefined || $state.value === null || $state.value === "") {
+				@if (displayValue()) {
+					<span>{displayValue()}</span>
+				} @else {
 					<span>{context.placeholder || "-"}</span>
-				} else {
-					<span>{$state.value}</span>
 				}
 			</slot>
 		</button>
