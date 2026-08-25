@@ -1,0 +1,16 @@
+import { Splitter, SplitterHandle, SplitterPane } from "../../../src/Splitter/index";
+
+export default function SplitterBindingTest() {
+	let $state = $watch({ value: 30 });
+
+	@render {
+		<div>
+			<Splitter &value={$state.value}>
+				<SplitterPane>One</SplitterPane>
+				<SplitterHandle />
+				<SplitterPane>Two</SplitterPane>
+			</Splitter>
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

@@ -1,0 +1,19 @@
+import { Splitter, SplitterHandle, SplitterPane } from "../../../src/Splitter/index";
+
+export default function SplitterTest($props: any) {
+	@render {
+		<Splitter
+			{$props?.value}
+			{$props?.orientation}
+			{$props?.min}
+			{$props?.max}
+			{$props?.step}
+			{$props?.disabled}
+			onchange={$props?.onchange}
+		>
+			<SplitterPane>One</SplitterPane>
+			<SplitterHandle ariaLabel={$props?.handleLabel ?? "Resize panes"} />
+			<SplitterPane>Two</SplitterPane>
+		</Splitter>
+	}
+}

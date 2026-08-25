@@ -1,0 +1,155 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type SplitterContext, SplitterContextName } from "./SplitterTypes";
+
+interface SplitterProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The orientation of the splitter (default horizontal) */
+	orientation?: "horizontal" | "vertical";
+	/** The percentage of the container taken up by the primary (first) pane */
+	value?: Bindable<number>;
+	/** The minimum percentage for the primary pane (default 0) */
+	min?: number;
+	/** The maximum percentage for the primary pane (default 100) */
+	max?: number;
+	/** The percentage by which keyboard interaction changes the value (default 1) */
+	step?: number;
+	/** If set to true, the user cannot interact with this splitter */
+	disabled?: boolean;
+	/** Raised when the value has changed */
+	onchange?: (value: number) => void;
+}
+
+/**
+ * Two resizable panes with a separator between them, which the user can drag
+ * or move with the keyboard to resize the panes.
+ *
+ * See [the WAI ARIA guidelines for Window Splitters](https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/).
+ *
+ * The structure of a Splitter is:
+ *
+ * ```
+ * <Splitter>
+ * 	<SplitterPane>...</SplitterPane>
+ * 	<SplitterHandle ariaLabel="Resize" />
+ * 	<SplitterPane>...</SplitterPane>
+ * </Splitter>
+ * ```
+ */
+export default function Splitter($props: SplitterProps | undefined) {
+	let container: HTMLElement;
+
+	let $state = $watch({
+		value: 50,
+		panes: [] as SplitterPaneStateLite[],
+	});
+
+	interface SplitterPaneStateLite {
+		index: number;
+	}
+
+	$bind($state, $props, "value");
+
+	// Keep the stored value clamped, so that out-of-range initial values or
+	// min/max changes don't later surface as user changes
+	$run(() => {
+		const clamped = getValue();
+		if (clamped !== $state.value) {
+			$state.value = clamped;
+		}
+	});
+
+	// Set the context to pass down to panes and handles
+	const context: SplitterContext = {
+		registerPane,
+		removePane,
+		getOrientation,
+		getValue,
+		getMin,
+		getMax,
+		getStep,
+		getDisabled,
+		setValue,
+		count: () => $state.panes.length,
+		getContainer: () => container,
+	};
+	$context[SplitterContextName] = context;
+
+	// Dispatch the change event when the value changes
+	$handle((first) => {
+		const value = getValue();
+		if (!first) $props?.onchange?.(value);
+	});
+
+	function getOrientation(): "horizontal" | "vertical" {
+		return $props?.orientation === "vertical" ? "vertical" : "horizontal";
+	}
+
+	function getMin(): number {
+		return clampPercent($props?.min ?? 0);
+	}
+
+	function getMax(): number {
+		return clampPercent($props?.max ?? 100);
+	}
+
+	function clampPercent(value: number): number {
+		return Math.min(100, Math.max(0, value));
+	}
+
+	function getStep(): number {
+		const step = $props?.step ?? 1;
+		return step > 0 ? step : 1;
+	}
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	// The clamped value that is applied to the primary pane
+	function getValue(): number {
+		return Math.min(getMax(), Math.max(getMin(), $state.value));
+	}
+
+	function setValue(value: number) {
+		$state.value = Math.min(getMax(), Math.max(getMin(), value));
+	}
+
+	function registerPane(): SplitterPaneStateLite {
+		const state: SplitterPaneStateLite = $watch({ index: $state.panes.length });
+		$state.panes.push(state);
+		return state;
+	}
+
+	function removePane(index: number) {
+		if (index >= 0 && index < $state.panes.length) {
+			$state.panes.splice(index, 1);
+		}
+		$state.panes.forEach((pane, i) => (pane.index = i));
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-splitter", $props?.class]}
+			{$props?.style}
+			data-orientation={getOrientation()}
+			style={`flex-direction: ${getOrientation()};`}
+			&ref={container}
+		>
+			<slot />
+		</div>
+	}
+
+	@style {
+		/* Headless: layout only, so the panes split the container. All other
+		   appearance is up to the consuming theme */
+		.torp-splitter {
+			display: flex;
+		}
+	}
+}

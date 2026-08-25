@@ -25,6 +25,7 @@ const components = [
 	"Rating",
 	"SelectBox",
 	"Slider",
+	"Splitter",
 	"TabGroup",
 	"Tree",
 	"ToolBar",

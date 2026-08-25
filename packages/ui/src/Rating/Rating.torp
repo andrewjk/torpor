@@ -54,6 +54,15 @@ export default function Rating($props: RatingProps | undefined) {
 
 	$bind($state, $props, "value");
 
+	// Keep the stored value clamped, so that out-of-range initial values
+	// don't later surface as user changes
+	$run(() => {
+		const clamped = clamp($state.value);
+		if (clamped !== $state.value) {
+			$state.value = clamped;
+		}
+	});
+
 	// Dispatch the change event when the value changes
 	$handle((first) => {
 		const value = $state.value;

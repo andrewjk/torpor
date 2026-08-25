@@ -1,0 +1,51 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./splitter/ExampleBasic.torp";
+import ExampleBasicCode from "./splitter/ExampleBasic.torp?raw";
+
+export default function SplitterPage() {
+	@head {
+		<title>Splitter | Torpor</title>
+	}
+
+	@render {
+		<h1>Splitter</h1>
+		<p>
+			Two resizable panes with a separator between them, which the user can drag or move with
+			the keyboard to resize the panes.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/">
+				the WAI ARIA guidelines for Window Splitters
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Splitter>
+	<SplitterPane>...</SplitterPane>
+	<SplitterHandle ariaLabel="Resize panes" />
+	<SplitterPane>...</SplitterPane>
+</Splitter>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}
