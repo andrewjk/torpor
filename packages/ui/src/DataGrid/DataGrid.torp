@@ -1,0 +1,365 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type DataColumn } from "./DataGridTypes";
+import type {
+	LoadRequest,
+	LoadResult,
+	Loader,
+} from "../utils/loader";
+import { normalizeLoadResult } from "../utils/loader";
+import sortRows from "./sortRows";
+import getId from "../utils/getId";
+
+interface DataGridProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** A caption for the table, rendered in a `<caption>` element */
+	caption?: string;
+	/** The columns to display */
+	columns: DataColumn[];
+	/** The rows to display. Pass either `data` (static rows) or `load`. */
+	data?: any[];
+	/**
+	 * Reads rows from the network (or anywhere async). Receives a request with
+	 * `page`/`pageSize`, `searchText` and `sortBy`/`sortDirection`, plus an
+	 * AbortSignal. Pass either `load` or `data`, not both.
+	 */
+	load?: Loader;
+	/** The active page (1-based). Two-way bindable. */
+	page?: Bindable<number>;
+	/** The number of rows per page. Static data is sliced locally; loaders receive it in the request. */
+	pageSize?: number;
+	/** The field the data is sorted by. Two-way bindable. */
+	sortBy?: Bindable<string | undefined>;
+	/** The direction the data is sorted in. Two-way bindable. */
+	sortDirection?: Bindable<"asc" | "desc">;
+	/** An ARIA label describing the grid to screen readers */
+	ariaLabel?: string;
+	/** An ID of an element that labels the grid */
+	ariaLabelledBy?: string;
+	/** Called after each successful load with the normalized result (including `total`) */
+	onload?: (result: LoadResult) => void;
+	/** Called when the user sorts by a column */
+	onsortchange?: (sortBy: string | undefined, sortDirection: "asc" | "desc") => void;
+}
+
+/**
+ * A table of rows that supports sorting, paging and loading data from the
+ * network.
+ *
+ * See [the WAI-ARIA guidelines for grids](https://www.w3.org/WAI/ARIA/apg/patterns/grid/).
+ *
+ * The structure of a DataGrid is:
+ *
+ * ```
+ * <DataGrid columns={columns} data={rows}>
+ * 	(cell content, using $slot.row / $slot.column / $slot.value)
+ * </DataGrid>
+ * ```
+ *
+ * Cells render their value as text by default. Pass children to customize:
+ *
+ * ```
+ * <DataGrid columns={columns} data={rows}>
+ * 	{@if ($slot.column.key === "avatar") {
+ * 		<img src={$slot.value} alt="" />
+ * 	} else {
+ * 		{$slot.value}
+ * 	}}
+ * </DataGrid>
+ * ```
+ *
+ * Named slots: `loading` (while the first load is pending), `error`
+ * (receives nothing -- use it around the message), `empty` (when there are
+ * no rows) and `header` isn't needed since headers come from the columns.
+ */
+export default function DataGrid($props: DataGridProps) {
+	let defaultId = getId();
+
+	if (!$props.columns || $props.columns.length === 0) {
+		throw new Error("DataGrid: pass a non-empty `columns` array");
+	}
+	const hasLoader = typeof $props.load === "function";
+	if (hasLoader && $props.data !== undefined) {
+		throw new Error("DataGrid: pass either `load` or `data`, not both");
+	}
+	if (!hasLoader && $props.data === undefined) {
+		throw new Error("DataGrid: pass either `load` or `data`");
+	}
+
+	let tableElement: HTMLTableElement;
+
+	// Columns are assumed static once passed; precompute entries with indices
+	// so cells can be keyed and addressed by position
+	const columnEntries = $props.columns.map((column, index) => ({ column, index }));
+
+	let $state = $watch({
+		page: $props.page ?? 1,
+		sortBy: $props.sortBy,
+		sortDirection: $props.sortDirection ?? "asc",
+		activeCell: { row: 0, col: 0 },
+
+		// The result of the current load. Suspends while pending when read,
+		// which drives the @await boundary in the template.
+		get loadResult(): LoadResult | undefined {
+			if (!hasLoader) {
+				return undefined;
+			}
+			return $async(() => runLoad());
+		},
+		get sortedRows(): any[] {
+			if (hasLoader) {
+				return this.loadResult?.items ?? [];
+			}
+			return sortRows($props.data ?? [], this.sortBy, this.sortDirection, columnEntries.map((e) => e.column));
+		},
+		get totalCount(): number {
+			if (hasLoader && this.loadResult?.total !== undefined) {
+				return this.loadResult.total;
+			}
+			return this.sortedRows.length;
+		},
+		get rows(): any[] {
+			const pageSize = $props.pageSize;
+			if (!pageSize || hasLoader) {
+				return this.sortedRows;
+			}
+			const start = (this.page - 1) * pageSize;
+			return this.sortedRows.slice(start, start + pageSize);
+		},
+		get rowEntries() {
+			return this.rows.map((row: any, index: number) => ({ row, index }));
+		},
+	});
+
+	$bind($state, $props, "page", "sortBy", "sortDirection");
+
+	// The active cell, clamped to the current grid size -- rows can shrink
+	// (e.g. after a load returns fewer rows) and the stored position must
+	// stay addressable so exactly one cell remains the tab stop.
+	// Clamping is done at the use sites rather than in an effect: effects
+	// can't safely read suspended ($async) getters.
+	function activeCell(): { row: number; col: number } {
+		const maxRow = Math.max(0, $state.rows.length - 1);
+		const maxCol = Math.max(0, $props.columns.length - 1);
+		return {
+			row: Math.min(Math.max(0, $state.activeCell.row), maxRow),
+			col: Math.min(Math.max(0, $state.activeCell.col), maxCol),
+		};
+	}
+
+	function runLoad(): Promise<LoadResult> {
+		const request: LoadRequest = {};
+		if ($props.pageSize) {
+			request.page = $state.page;
+			request.pageSize = $props.pageSize;
+		}
+		if ($state.sortBy != null) {
+			request.sortBy = $state.sortBy;
+			request.sortDirection = $state.sortDirection;
+		}
+		const result = Promise.resolve(($props.load as Loader)(request)).then(normalizeLoadResult);
+		// Report successful loads to the consumer; failures surface through
+		// the component's error boundary, not this notification chain
+		result.then((r) => $props.onload?.(r), () => {});
+		return result;
+	}
+
+	function cellValue(row: any, column: DataColumn): any {
+		if (column.getValue) {
+			return column.getValue(row);
+		}
+		return row?.[column.key];
+	}
+
+	function cellId(row: number, col: number): string {
+		return `${row}:${col}`;
+	}
+
+	function isActiveCell(row: number, col: number): boolean {
+		const active = activeCell();
+		return active.row === row && active.col === col;
+	}
+
+	function ariaSort(key: string): "ascending" | "descending" | undefined {
+		if ($state.sortBy !== key) {
+			return undefined;
+		}
+		return $state.sortDirection === "asc" ? "ascending" : "descending";
+	}
+
+	function toggleSort(column: DataColumn) {
+		if (!column.sortable) {
+			return;
+		}
+		if ($state.sortBy === column.key) {
+			$state.sortDirection = $state.sortDirection === "asc" ? "desc" : "asc";
+		} else {
+			$state.sortBy = column.key;
+			$state.sortDirection = "asc";
+		}
+		$props.onsortchange?.($state.sortBy, $state.sortDirection);
+	}
+
+	function focusCell(row: number, col: number) {
+		$state.activeCell = { row, col };
+		tableElement.querySelector(`[data-cell="${cellId(row, col)}"]`)?.focus();
+	}
+
+	// Any other way of focusing a cell (tabbing in, script) also moves the
+	// keyboard navigation origin
+	function handleFocusin(e: FocusEvent) {
+		const cell = (e.target as HTMLElement).closest?.("td[data-cell]");
+		if (!cell) {
+			return;
+		}
+		const [row, col] = cell.getAttribute("data-cell")!.split(":").map(Number);
+		$state.activeCell = { row, col };
+	}
+
+	// Standard grid keyboard navigation (roving tabindex over body cells)
+	function handleKeydown(e: KeyboardEvent) {
+		const target = e.target as HTMLElement;
+		if (!target.matches?.("td[data-cell]")) {
+			return;
+		}
+		if (target.closest("button,input,select,textarea,a[href]")) {
+			return;
+		}
+		const maxRow = $state.rows.length - 1;
+		const maxCol = $props.columns.length - 1;
+		const active = activeCell();
+		const row = active.row;
+		const col = active.col;
+		switch (e.key) {
+			case "ArrowLeft": {
+				if (col > 0) {
+					e.preventDefault();
+					focusCell(row, col - 1);
+				}
+				break;
+			}
+			case "ArrowRight": {
+				if (col < maxCol) {
+					e.preventDefault();
+					focusCell(row, col + 1);
+				}
+				break;
+			}
+			case "ArrowUp": {
+				if (row > 0) {
+					e.preventDefault();
+					focusCell(row - 1, col);
+				}
+				break;
+			}
+			case "ArrowDown": {
+				if (row < maxRow) {
+					e.preventDefault();
+					focusCell(row + 1, col);
+				}
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				focusCell(e.ctrlKey || e.metaKey ? 0 : row, e.ctrlKey || e.metaKey ? 0 : 0);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				focusCell(e.ctrlKey || e.metaKey ? maxRow : row, maxCol);
+				break;
+			}
+		}
+	}
+
+	const alignClass = (align: "start" | "center" | "end" | undefined) =>
+		align ? `torp-data-grid-align-${align}` : undefined;
+
+	@render {
+		@try {
+			@await {
+				<table
+					id={$props.id ?? defaultId}
+					class={["torp-data-grid", $props.class]}
+					{$props?.style}
+					&ref={tableElement}
+					role="grid"
+					aria-label={$props.ariaLabel}
+					aria-labelledby={$props.ariaLabelledBy}
+					aria-rowcount={hasLoader ? $state.totalCount : undefined}
+					onkeydown={handleKeydown}
+					onfocusin={handleFocusin}
+				>
+					@if ($props.caption) {
+						<caption>{$props.caption}</caption>
+					}
+					<thead>
+						<tr role="row">
+							@for (let entry of columnEntries) {
+								@key = entry.column.key
+								<th
+									scope="col"
+									role="columnheader"
+									class={[alignClass(entry.column.align), entry.column.sortable ? "torp-data-grid-sortable" : undefined]}
+									aria-sort={ariaSort(entry.column.key)}
+								>
+									@if (entry.column.sortable) {
+										<button type="button" onclick={() => toggleSort(entry.column)}>
+											{entry.column.label ?? entry.column.key}
+										</button>
+									} else {
+										<span>{entry.column.label ?? entry.column.key}</span>
+									}
+								</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						@if ($state.rowEntries.length === 0) {
+							<tr role="row">
+								<td colspan={$props.columns.length}>
+									<slot name="empty">No results.</slot>
+								</td>
+							</tr>
+						} else {
+							@for (let rowEntry of $state.rowEntries) {
+								@key = rowEntry.row
+								<tr role="row">
+									@for (let entry of columnEntries) {
+										@key = entry.column.key
+										<td
+											role="gridcell"
+											class={alignClass(entry.column.align)}
+											data-cell={cellId(rowEntry.index, entry.index)}
+											tabindex={isActiveCell(rowEntry.index, entry.index) ? 0 : -1}
+										>
+											<slot
+												row={rowEntry.row}
+												column={entry.column}
+												value={cellValue(rowEntry.row, entry.column)}
+											>
+												{cellValue(rowEntry.row, entry.column)}
+											</slot>
+										</td>
+									}
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			} with {
+				<div class="torp-data-grid-loading" role="status">
+					<slot name="loading">Loading…</slot>
+				</div>
+			}
+		} catch (err) {
+			<div class="torp-data-grid-error" role="alert">
+				<slot name="error">{err instanceof Error ? err.message : String(err)}</slot>
+			</div>
+		}
+	}
+}

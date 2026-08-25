@@ -1,0 +1,14 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+/** Five rows, two per page, with a button to advance the bound page */
+export default function PagedGrid() {
+	let $state = $watch({ page: 1 });
+
+	let columns = [{ key: "name", label: "Name" }];
+	let rows = ["A", "B", "C", "D", "E"].map((name) => ({ name }));
+
+	@render {
+		<DataGrid columns={columns} data={rows} pageSize={2} page={$state.page} />
+		<button onclick={() => ($state.page = $state.page + 1)}>next page</button>
+	}
+}

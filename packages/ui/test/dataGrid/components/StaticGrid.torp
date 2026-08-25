@@ -1,0 +1,23 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+export default function StaticGrid() {
+	let columns = [
+		{ key: "name", label: "Name", sortable: true },
+		{ key: "email", label: "Email" },
+	];
+	let rows = [
+		{ name: "Cara", email: "cara@example.com" },
+		{ name: "Alice", email: "alice@example.com" },
+		{ name: "Bob", email: "bob@example.com" },
+	];
+
+	@render {
+		<DataGrid columns={columns} data={rows}>
+			@if ($slot.column.key === "name") {
+				<strong>{$slot.value}</strong>
+			} else {
+				<span>{$slot.value}</span>
+			}
+		</DataGrid>
+	}
+}

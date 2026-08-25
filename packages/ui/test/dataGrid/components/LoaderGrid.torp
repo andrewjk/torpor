@@ -1,0 +1,15 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+/** Loads rows from a function passed as the `load` prop */
+export default function LoaderGrid($props: { load: any; pageSize?: number }) {
+	let columns = [
+		{ key: "name", label: "Name", sortable: true },
+		{ key: "role", label: "Role" },
+	];
+
+	@render {
+		<DataGrid columns={columns} load={$props.load} pageSize={$props.pageSize}>
+			<fill name="empty">Nothing here.</fill>
+		</DataGrid>
+	}
+}

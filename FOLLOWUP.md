@@ -33,3 +33,37 @@ weeks that users wrap in rows (or the grid renders days internally). Deferred
 because it alters user-facing composition; everything else in the review was
 fixed inline (single grid element instead of nested grids, reactive
 `selectable` context getter so `aria-readonly`/`tabindex` update).
+
+## $run effects can't read suspended $async getters (view runtime)
+
+Found while building DataGrid: a bare `$run(() => ... $state.someAsyncGetter ...)`
+effect gets `undefined` from a suspended read instead of suspending or
+throwing -- in one scratch case it crashed with `TypeError: Cannot read
+properties of undefined` on first run; in another shape it silently produced
+an unhandled promise rejection when the getter later rejected.
+`@await` boundaries handle suspension correctly; plain effects don't.
+DataGrid works around it by never reading async getters outside the template's
+boundary (active-cell clamping moved into functions called at use sites).
+Worth either documenting as a rule ("only read $async getters inside @await
+boundaries") or making effects suspend like boundaries do.
+
+## DataGrid: known gaps from the first version
+
+Built with static `data` or a network `load` function (the shared loader shape
+lives in `src/ui/utils/loader.ts`, ready to port to ComboBox etc.). Left out
+deliberately:
+
+- No PageUp/PageDown keyboard navigation (APG grid suggests it when rows
+  paginate); arrows/Home/End/Ctrl+Home/Ctrl+End only.
+- No selection model (row or cell), so no `aria-selected`; APG's
+  "optional interactive" behaviors (editable cells, checkboxes) are unhandled.
+- No virtualization -- every row of the current page renders. Fine for paged
+  grids; a virtual-scroll variant will want windowed rendering plus
+  `aria-rowcount`/-rowindex handling.
+- Columns are read once at setup (adding a column later won't re-render
+  headers). Rows are fully reactive; columns assumed static.
+- Sorting a loader-backed grid refetches with `sortBy`/`sortDirection` in the
+  request but there is no optimistic local sort or stale-request cancellation
+  yet (the `AbortSignal` param exists on the Loader type, unused by DataGrid).
+- `aria-rowcount` is set from the loader's `total` when provided; not wired to
+  `aria-rowindex` on rows.

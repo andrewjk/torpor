@@ -28,6 +28,10 @@
 			"types": "./dist/Contextual/index.d.ts",
 			"import": "./dist/Contextual/index.js"
 		},
+		"./DataGrid": {
+			"types": "./dist/DataGrid/index.d.ts",
+			"import": "./dist/DataGrid/index.js"
+		},
 		"./DatePicker": {
 			"types": "./dist/DatePicker/index.d.ts",
 			"import": "./dist/DatePicker/index.js"
