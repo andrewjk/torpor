@@ -90,7 +90,7 @@ export default function DataGrid($props: DataGridProps) {
 		throw new Error("DataGrid: pass either `load` or `data`");
 	}
 
-	let tableElement: HTMLTableElement;
+	let tableElement: HTMLElement;
 
 	// Columns are assumed static once passed; precompute entries with indices
 	// so cells can be keyed and addressed by position
@@ -206,7 +206,7 @@ export default function DataGrid($props: DataGridProps) {
 
 	function focusCell(row: number, col: number) {
 		$state.activeCell = { row, col };
-		tableElement.querySelector(`[data-cell="${cellId(row, col)}"]`)?.focus();
+		tableElement.querySelector<HTMLElement>(`[data-cell="${cellId(row, col)}"]`)?.focus();
 	}
 
 	// Any other way of focusing a cell (tabbing in, script) also moves the

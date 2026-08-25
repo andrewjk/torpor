@@ -91,7 +91,7 @@ export default function Dialog($props: DialogProps | undefined) {
 		}
 	}
 
-	function handleClickOutside(e: MouseEvent) {
+	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
 		// Don't allow the user to click outside -- they must press a button or
 		// the Esc key
 		e.preventDefault();

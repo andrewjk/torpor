@@ -108,7 +108,7 @@ export default function Form<Data = Record<string, any>>($props: FormProps<Data>
 		}
 
 		// If there's a @torpor/build context, call its submit event
-		let buildContext = $context["TorporBuildContext"];
+		let buildContext = $context?.["TorporBuildContext"];
 		if (buildContext?.onformsubmit) {
 			let buildSubmit = buildContext.onformsubmit(e);
 			if (buildSubmit instanceof Promise) {

@@ -59,7 +59,7 @@ export default function PopoverContent($props?: PopoverContentProps | undefined)
 				class={["torp-popover-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={() => popout.show()}
+				onmount={(_el) => popout.show()}
 			>
 				<slot />
 			</div>

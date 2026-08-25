@@ -78,7 +78,7 @@ export default function SubmenuPopoutContent($props: SubmenuPopoutContentProps |
 				role={$props?.role}
 				aria-labelledby={$props?.role ? $state.triggerId : undefined}
 				&ref={div}
-				onmount={() => popout.show()}
+				onmount={(_el) => popout.show()}
 			>
 				<slot />
 			</div>

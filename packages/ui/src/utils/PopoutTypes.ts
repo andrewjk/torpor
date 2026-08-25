@@ -26,7 +26,7 @@ export interface PopoutContext extends FocusApi {
 	handleButton: HandleButtonPress;
 	// HACK: We need to be able to let children (i.e. Dialogs) override the click outside functionality
 	// There may be a more elegant way to accomplish this too
-	handleClickOutside?: (e: MouseEvent) => void;
+	handleClickOutside?: (e: MouseEvent | KeyboardEvent) => void;
 	state: PopoutState;
 	//modal: boolean;
 	anchorElement?: HTMLElement;
@@ -53,6 +53,10 @@ export interface PopoutState {
 	 * their aria-haspopup attribute.
 	 */
 	contentRole?: string;
+	/** Whether the popout is modal (e.g. it has an overlay) */
+	modal?: boolean;
+	/** The ID of the active descendant element, for aria-activedescendant */
+	activeDescendant?: string;
 }
 
 /**

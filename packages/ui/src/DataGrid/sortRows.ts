@@ -23,7 +23,7 @@ export default function sortRows<T>(
 		return rows;
 	}
 	const column = columns.find((c) => c.key === sortBy);
-	const getValue = column?.getValue ?? ((row: T) => row[sortBy]);
+	const getValue = column?.getValue ?? ((row: any) => row?.[sortBy]);
 	const sorted = [...rows].sort((a, b) => compareValues(getValue(a), getValue(b)));
 	if (sortDirection === "desc") {
 		sorted.reverse();

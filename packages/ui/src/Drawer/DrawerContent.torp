@@ -128,7 +128,7 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 				aria-modal={$state.modal}
 				aria-label={$props?.ariaLabel}
 				aria-labelledby={$props?.ariaLabel ? undefined : $state.triggerId}
-				onmount={show}
+				onmount={(_el) => show()}
 			>
 				<slot />
 			</div>

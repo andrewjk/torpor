@@ -15,12 +15,18 @@ interface OptionProps {
  * An option in a select.
  */
 export default function Option($props: OptionProps | undefined) {
+	let $state = $watch({
+		value: $props?.value,
+	});
+
+	$bind($state, $props, "value");
+
 	@render {
 		<option
 			{$props?.id}
 			class={["torp-option", $props?.class]}
 			{$props?.style}
-			&value={$props.value}
+			&value={$state.value}
 		/>
 	}
 }

@@ -77,7 +77,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 
 	// Register this item with the containing group and store the index
 	const item: SubmenuItemState = { setFocused, setVisible, disabled: $props?.disabled };
-	const { index } = $props.registerItem(item);
+	const { index } = $props!.registerItem(item);
 	$props?.onRegister?.(index);
 
 	function setFocused() {
@@ -110,7 +110,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 			activate();
 			setVisible(true);
 		} else {
-			$props.handleItemKey(e);
+			$props!.handleItemKey(e);
 		}
 	}
 
@@ -147,7 +147,7 @@ export default function SubmenuPopoutTrigger($props: SubmenuPopoutTriggerProps |
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			onkeydown={handleKey}
 			onclick={handleClick}
-			onfocus={() => $props.handleItemFocus(index)}
+			onfocus={() => $props!.handleItemFocus(index)}
 			onmouseenter={handleMouseEnter}
 			onmouseleave={hoverOpen.handleMouseLeave}
 			onmousemove={hoverOpen.handleMouseMove}

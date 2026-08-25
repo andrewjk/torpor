@@ -33,7 +33,7 @@ export default function DrawerOverlay($props: DrawerOverlayProps | undefined) {
 				class={["torp-drawer-overlay", $props?.class]}
 				{$props?.style}
 				tabindex="-1"
-				onmount={(el) => disableScroll(el)}
+				onmount={(_el) => disableScroll()}
 			>
 				<slot />
 			</div>

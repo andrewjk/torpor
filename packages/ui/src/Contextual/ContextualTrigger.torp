@@ -46,14 +46,15 @@ export default function ContextualTrigger($props: ContextualTriggerProps | undef
 		$state.visible = !$state.visible;
 	}
 
-	function handleHover(node: HTMLElement, e: MouseEvent) {
+	function handleHover(node: HTMLElement, e: MouseEvent | TouchEvent) {
 		if (activation !== "hover") return;
 
 		if ($state.position) {
 			// Get the position relative to the element, so we can reposition on scroll
 			const rect = node.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
+			const point = e instanceof TouchEvent ? e.touches[0] : e;
+			const x = (point?.clientX ?? 0) - rect.left;
+			const y = (point?.clientY ?? 0) - rect.top;
 			$state.position = { x, y };
 			//$state.position = { x: window.scrollX + e.clientX, y: window.scrollY + e.clientY };
 		}

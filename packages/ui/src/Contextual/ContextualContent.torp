@@ -59,7 +59,7 @@ export default function ContextualContent($props: ContextualContentProps | undef
 				class={["torp-popover-content-contextual", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={() => popout.show()}
+				onmount={(_el) => popout.show()}
 			>
 				<slot />
 			</div>

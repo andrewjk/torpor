@@ -135,7 +135,7 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		}
 	}
 
-	function handleClickOutside(e: MouseEvent) {
+	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
 		e.preventDefault();
 		$state.visible = false;
 	}

@@ -49,7 +49,7 @@ export default function ModalContent($props: ModalContentProps | undefined) {
 				class={["torp-modal-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={() => popout.show()}
+				onmount={(_el) => popout.show()}
 			>
 				<slot />
 			</div>

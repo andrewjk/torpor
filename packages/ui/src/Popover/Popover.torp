@@ -102,7 +102,7 @@ export default function Popover($props: PopoverProps | undefined) {
 		$state.visible = false;
 	}
 
-	function handleClickOutside(e: MouseEvent) {
+	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
 		e.preventDefault();
 		$state.visible = false;
 	}

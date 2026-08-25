@@ -33,7 +33,7 @@ export default function ModalOverlay($props: ModalOverlayProps | undefined) {
 				class={["torp-modal-overlay", $props?.class]}
 				{$props?.style}
 				tabindex="-1"
-				onmount={(el) => disableScroll(el)}
+				onmount={(_el) => disableScroll()}
 			>
 				<slot />
 			</div>

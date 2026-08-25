@@ -88,7 +88,7 @@ export default function Modal($props: ModalProps | undefined) {
 		$state.visible = false;
 	}
 
-	function handleClickOutside(e: MouseEvent) {
+	function handleClickOutside(e: MouseEvent | KeyboardEvent) {
 		e.preventDefault();
 		$state.visible = false;
 	}
