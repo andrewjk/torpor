@@ -1,0 +1,88 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface ProgressProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The minimum value (default 0) */
+	min?: number;
+	/** The maximum value (default 100) */
+	max?: number;
+	/** The current value; omit it for an indeterminate progress bar */
+	value?: number;
+	/** A human-readable version of the current value, e.g. "3 of 10 files" */
+	valuetext?: string;
+	/** An accessible name for the progress bar */
+	ariaLabel?: string;
+}
+
+/**
+ * A progress bar that shows how far along an operation is, either with a
+ * specific value or as indeterminate when the extent is unknown.
+ *
+ * See [the WAI ARIA guidelines for Progress Bars](https://www.w3.org/WAI/ARIA/apg/patterns/progressbar/).
+ */
+export default function Progress($props: ProgressProps | undefined) {
+	function getMin(): number {
+		return $props?.min ?? 0;
+	}
+	function getMax(): number {
+		return $props?.max ?? 100;
+	}
+	function isIndeterminate(): boolean {
+		return $props?.value == null;
+	}
+
+	// The clamped value that is reported to assistive tech
+	function getValue(): number {
+		return Math.min(getMax(), Math.max(getMin(), $props?.value ?? getMin()));
+	}
+
+	// The percentage of the range that the value represents (0..100)
+	function getPct(): number {
+		const min = getMin();
+		const max = getMax();
+		if (max <= min) return 0;
+		return ((getValue() - min) / (max - min)) * 100;
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-progress", $props?.class]}
+			{$props?.style}
+			role="progressbar"
+			aria-label={$props?.ariaLabel}
+			aria-valuemin={isIndeterminate() ? undefined : getMin()}
+			aria-valuemax={isIndeterminate() ? undefined : getMax()}
+			aria-valuenow={isIndeterminate() ? undefined : getValue()}
+			aria-valuetext={$props?.valuetext}
+			data-state={isIndeterminate() ? "indeterminate" : "determinate"}
+		>
+			<div
+				class="torp-progress-bar"
+				data-state={isIndeterminate() ? "indeterminate" : "determinate"}
+				style={isIndeterminate() ? undefined : `width: ${getPct()}%;`}
+			/>
+		</div>
+	}
+
+	@style {
+		/* Headless: layout only, so the bar fills the track proportionally.
+		   All appearance is up to the consuming theme */
+		.torp-progress {
+			position: relative;
+			overflow: hidden;
+		}
+		.torp-progress-bar {
+			position: absolute;
+			inset: 0 auto 0 0;
+		}
+		.torp-progress-bar[data-state="indeterminate"] {
+			width: 100%;
+		}
+	}
+}

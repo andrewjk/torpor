@@ -80,6 +80,10 @@
 			"types": "./dist/Pagination/index.d.ts",
 			"import": "./dist/Pagination/index.js"
 		},
+		"./Progress": {
+			"types": "./dist/Progress/index.d.ts",
+			"import": "./dist/Progress/index.js"
+		},
 		"./Popover": {
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js"

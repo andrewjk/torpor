@@ -1,0 +1,60 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./progress/ExampleBasic.torp";
+import ExampleBasicCode from "./progress/ExampleBasic.torp?raw";
+import ExampleIndeterminate from "./progress/ExampleIndeterminate.torp";
+import ExampleIndeterminateCode from "./progress/ExampleIndeterminate.torp?raw";
+
+export default function ProgressPage() {
+	@head {
+		<title>Progress | Torpor</title>
+	}
+
+	@render {
+		<h1>Progress</h1>
+		<p>
+			A progress bar that shows how far along an operation is, either with a specific value or
+			as indeterminate when the extent is unknown.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/progressbar/">
+				the WAI ARIA guidelines for Progress Bars
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Progress ariaLabel="Loading" value={40} />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Indeterminate
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleIndeterminate />
+					<fill name="code">
+						<CodePreview code={ExampleIndeterminateCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

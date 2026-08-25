@@ -19,6 +19,7 @@ const components = [
 	"NavMenu",
 	"Notification",
 	"Pagination",
+	"Progress",
 	"Popover",
 	"Rating",
 	"SelectBox",

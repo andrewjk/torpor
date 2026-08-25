@@ -1,0 +1,35 @@
+import { Progress } from "@torpor/ui/Progress";
+
+export default function ExampleIndeterminate() {
+	@render {
+		<Progress class="example-progress" ariaLabel="Loading" />
+	}
+
+	@style {
+		:global(.example-progress) {
+			background-color: gainsboro;
+			border-radius: 4px;
+			height: 10px;
+			width: 240px;
+		}
+
+		:global(.example-progress .torp-progress-bar) {
+			background-color: dodgerblue;
+		}
+
+		@keyframes example-progress-indeterminate {
+			0% {
+				transform: translateX(-100%);
+			}
+			100% {
+				transform: translateX(100%);
+			}
+		}
+
+		:global(.example-progress .torp-progress-bar[data-state="indeterminate"]) {
+			animation: example-progress-indeterminate 1.2s ease-in-out infinite;
+			border-radius: 4px;
+			width: 50%;
+		}
+	}
+}

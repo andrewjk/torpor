@@ -148,7 +148,7 @@ of the library follows:
 
 - [ ] Toast (transient messages announced via aria-live; complements the
       persistent Notification component)
-- [ ] Progress (determinate and indeterminate, `role="progressbar"`; pairs
+- [x] Progress (determinate and indeterminate, `role="progressbar"`; pairs
       with the shared Loader contract for network waits)
 - [x] Rating (APG pattern; star / score input with keyboard support)
 - [ ] Carousel (APG pattern; slide regions with next/previous and dot controls)

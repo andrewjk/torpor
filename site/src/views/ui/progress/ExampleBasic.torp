@@ -1,0 +1,24 @@
+import { Progress } from "@torpor/ui/Progress";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 60 });
+
+	@render {
+		<Progress class="example-progress" ariaLabel="Loading" value={$state.value} />
+	}
+
+	@style {
+		:global(.example-progress) {
+			background-color: gainsboro;
+			border-radius: 4px;
+			height: 10px;
+			width: 240px;
+		}
+
+		:global(.example-progress .torp-progress-bar) {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			transition: width 0.2s ease;
+		}
+	}
+}
