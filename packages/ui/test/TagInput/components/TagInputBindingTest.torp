@@ -1,0 +1,12 @@
+import { TagInput } from "../../../src/TagInput/index";
+
+export default function TagInputBindingTest() {
+	let $state = $watch({ value: ["red"] });
+
+	@render {
+		<div>
+			<TagInput &value={$state.value} ariaLabel="Colors" />
+			<div id="bound-value">{$state.value.join(",")}</div>
+		</div>
+	}
+}

@@ -1,0 +1,190 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
+
+interface TagInputProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The current tags */
+	value?: Bindable<string[]>;
+	/** Placeholder text for the empty input */
+	placeholder?: string;
+	/** If set to true, the user cannot interact with this input */
+	disabled?: boolean;
+	/** An accessible name for the input */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when the tags have changed */
+	onchange?: (value: string[]) => void;
+}
+
+/**
+ * An input where the user enters multiple free-text values, each shown as a
+ * tag that can be removed. Typing a value and pressing Enter or comma adds
+ * it as a tag, and pressing Backspace in an empty field removes the last one.
+ */
+export default function TagInput($props: TagInputProps | undefined) {
+	let input: HTMLInputElement;
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		// Seed from the props so the initial tags render; $bind handles later
+		// pushes both ways
+		// Seed from the props so the initial tags render; $bind handles later
+		// pushes both ways
+		value: ($props?.value ?? []) as string[],
+		text: "",
+	});
+
+	$bind($state, $props, "value");
+
+	// Dispatch the change event when the tags change
+	$handle((first) => {
+		const values = $state.value;
+		if (!first) $props?.onchange?.([...values]);
+	});
+
+	// Keep the input's value in sync with the text; typing sets the property
+	// directly, so an attribute alone would not update it
+	function syncInput() {
+		if (input && input.value !== $state.text) {
+			input.value = $state.text;
+		}
+	}
+	$run(() => {
+		const text = $state.text;
+		if (input && input.value !== text) {
+			input.value = text;
+		}
+	});
+	$mount(() => syncInput());
+
+	function addTag() {
+		if (getDisabled()) return;
+		const text = $state.text.trim();
+		if (text === "") return;
+		$state.value = [...$state.value, text];
+		$state.text = "";
+		syncInput();
+		input?.focus();
+	}
+
+	function removeTag(index: number) {
+		if (getDisabled()) return;
+		$state.value = $state.value.filter((_, i) => i !== index);
+	}
+
+	function removeLastTag() {
+		if (getDisabled()) return;
+		if ($state.text === "" && $state.value.length > 0) {
+			$state.value = $state.value.slice(0, -1);
+		}
+	}
+
+	function handleInput(e: Event) {
+		const el = e.currentTarget as HTMLInputElement;
+		$state.text = el.value;
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+
+		switch (e.key) {
+			case "Enter": {
+				e.preventDefault();
+				addTag();
+				break;
+			}
+			case ",": {
+				e.preventDefault();
+				addTag();
+				break;
+			}
+			case "Backspace": {
+				if ($state.text === "") {
+					e.preventDefault();
+					removeLastTag();
+				}
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={[
+				"torp-tag-input",
+				getDisabled() ? "torp-tag-input-disabled" : undefined,
+				$props?.class,
+			]}
+			{$props?.style}
+			onmousedown={(e: MouseEvent) => {
+				// Focus the field wherever the user clicks, without stealing
+				// focus from the remove button they may have clicked
+				if (!getDisabled() && e.target === e.currentTarget) {
+					e.preventDefault();
+					input?.focus();
+				}
+			}}
+		>
+			<ul class="torp-tag-input-tags">
+				@for (let [index, tag] of $state.value.entries()) {
+					@key = index
+					<li class="torp-tag-input-tag">
+						<span class="torp-tag-input-tag-text">{tag}</span>
+						<button
+							type="button"
+							class="torp-tag-input-remove"
+							aria-label={`Remove ${tag}`}
+							disabled={getDisabled()}
+							onclick={() => removeTag(index)}
+						>
+							<slot>×</slot>
+						</button>
+					</li>
+				}
+			</ul>
+			<input
+				class="torp-tag-input-field"
+				type="text"
+				&ref={input}
+				value={$state.text}
+				placeholder={$props?.placeholder}
+				disabled={getDisabled()}
+				aria-label={$props?.ariaLabel}
+				oninput={handleInput}
+				onkeydown={handleKey}
+			/>
+		</div>
+
+		<FormValues name={$props?.name} value={$state.value} />
+	}
+
+	@style {
+		/* Headless: layout only, so the tags sit in a row with the field. All
+		   appearance is up to the consuming theme */
+		.torp-tag-input {
+			display: flex;
+			flex-wrap: wrap;
+		}
+		.torp-tag-input-tags {
+			display: flex;
+			flex-wrap: wrap;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.torp-tag-input-field {
+			flex: 1 1 auto;
+			min-width: 4em;
+		}
+	}
+}

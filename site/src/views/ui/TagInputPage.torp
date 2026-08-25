@@ -1,0 +1,41 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./tag-input/ExampleBasic.torp";
+import ExampleBasicCode from "./tag-input/ExampleBasic.torp?raw";
+
+export default function TagInputPage() {
+	@head {
+		<title>TagInput | Torpor</title>
+	}
+
+	@render {
+		<h1>TagInput</h1>
+		<p>
+			An input where the user enters multiple free-text values, each shown as a tag that can be
+			removed. Typing a value and pressing Enter or comma adds it as a tag, and pressing
+			Backspace in an empty field removes the last one.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<TagInput ariaLabel="Labels" placeholder="Add tag" />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

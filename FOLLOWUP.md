@@ -85,6 +85,14 @@ content is slotted in. Left out deliberately:
 - Tree lazy child loading (per-node load functions) doesn't fit this shape
   and needs its own contract when implemented.
 
+## $bind silently no-ops when the state key differs from the prop key (view runtime)
+
+`$bind(state, props, key)` syncs same-named keys. Binding a differently-named
+state property (e.g. `$state.values` against `props.value`) compiles and runs but
+syncs nothing — no warning. Found while building TagInput (named the state key
+`values`); worked around by naming the state key `value` like ListBox/Tree do.
+`$bind` could validate that each key exists on both objects and throw in dev.
+
 ## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
 
 Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators.torp):

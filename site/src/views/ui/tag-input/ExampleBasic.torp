@@ -1,0 +1,49 @@
+import { TagInput } from "@torpor/ui/TagInput";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: ["work", "personal"] });
+
+	@render {
+		<div>
+			<TagInput
+				class="example-tag-input"
+				placeholder="Add tag"
+				ariaLabel="Labels"
+				&value={$state.value}
+			/>
+			<p>Tags: {$state.value.join(", ")}</p>
+		</div>
+	}
+
+	@style {
+		:global(.example-tag-input) {
+			border: 1px solid gray;
+			border-radius: 4px;
+			gap: 4px;
+			padding: 4px;
+			width: 320px;
+		}
+
+		:global(.example-tag-input .torp-tag-input-tag) {
+			align-items: center;
+			background-color: dodgerblue;
+			border-radius: 999px;
+			color: white;
+			display: flex;
+			font-size: 14px;
+			gap: 4px;
+			padding: 2px 4px 2px 10px;
+		}
+
+		:global(.example-tag-input .torp-tag-input-remove) {
+			all: unset;
+			cursor: pointer;
+		}
+
+		:global(.example-tag-input .torp-tag-input-field) {
+			border: none;
+			font-size: 14px;
+			outline: none;
+		}
+	}
+}

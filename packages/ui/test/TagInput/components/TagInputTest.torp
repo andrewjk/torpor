@@ -1,0 +1,14 @@
+import { TagInput } from "../../../src/TagInput/index";
+
+export default function TagInputTest($props: any) {
+	@render {
+		<TagInput
+			{$props?.value}
+			{$props?.disabled}
+			{$props?.name}
+			placeholder={$props?.placeholder ?? "Add tag"}
+			ariaLabel={$props?.ariaLabel ?? "Tags"}
+			onchange={$props?.onchange}
+		/>
+	}
+}

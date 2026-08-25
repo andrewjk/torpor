@@ -28,6 +28,7 @@ const components = [
 	"Slider",
 	"Splitter",
 	"TabGroup",
+	"TagInput",
 	"Tree",
 	"ToolBar",
 	"icons",

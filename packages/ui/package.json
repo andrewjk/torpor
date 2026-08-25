@@ -116,6 +116,10 @@
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js"
 		},
+		"./TagInput": {
+			"types": "./dist/TagInput/index.d.ts",
+			"import": "./dist/TagInput/index.js"
+		},
 		"./Tree": {
 			"types": "./dist/Tree/index.d.ts",
 			"import": "./dist/Tree/index.js"

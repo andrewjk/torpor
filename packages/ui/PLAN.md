@@ -153,7 +153,7 @@ of the library follows:
 - [x] Splitter (APG window splitter; resizable panes with keyboard resize)
 - [x] SpinButton / NumberInput (APG pattern; could be the building block for
       TimePicker)
-- [ ] TagInput (free-text multi-value "chip" input; complements the multiple
+- [x] TagInput (free-text multi-value "chip" input; complements the multiple
       option on SelectBox / ComboBox)
 - [ ] SegmentedControl (compact single-select, possibly TabGroup-based)
 - [ ] Stepper (multi-step / wizard flow)
