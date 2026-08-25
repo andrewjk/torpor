@@ -1,0 +1,53 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./carousel/ExampleBasic.torp";
+import ExampleBasicCode from "./carousel/ExampleBasic.torp?raw";
+
+export default function CarouselPage() {
+	@head {
+		<title>Carousel | Torpor</title>
+	}
+
+	@render {
+		<h1>Carousel</h1>
+		<p>
+			A carousel that displays a sequence of slides, which the user can move between with
+			previous and next controls, slide indicators, or the keyboard.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/carousel/">
+				the WAI ARIA guidelines for Carousels
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Carousel ariaLabel="Featured">
+	<CarouselPrevious />
+	<CarouselSlide>...</CarouselSlide>
+	<CarouselSlide>...</CarouselSlide>
+	<CarouselNext />
+	<CarouselIndicators />
+</Carousel>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

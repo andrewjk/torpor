@@ -1,0 +1,18 @@
+import { Carousel, CarouselNext, CarouselPrevious, CarouselSlide } from "../../../src/Carousel/index";
+
+export default function CarouselBindingTest() {
+	let $state = $watch({ value: 0 });
+
+	@render {
+		<div>
+			<Carousel ariaLabel="Bound carousel" &value={$state.value}>
+				<CarouselPrevious />
+				<CarouselSlide>One</CarouselSlide>
+				<CarouselSlide>Two</CarouselSlide>
+				<CarouselSlide>Three</CarouselSlide>
+				<CarouselNext />
+			</Carousel>
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

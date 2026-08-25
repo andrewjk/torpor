@@ -1,0 +1,21 @@
+import {
+	Carousel,
+	CarouselIndicators,
+	CarouselNext,
+	CarouselPrevious,
+	CarouselSlide,
+} from "../../../src/Carousel/index";
+
+export default function CarouselTest($props: any) {
+	@render {
+		<Carousel {$props?.wrap} ariaLabel="Featured" onchange={$props?.onchange}>
+			<CarouselPrevious />
+			@for (let slide of [1, 2, 3]) {
+				@key = slide
+				<CarouselSlide>Slide {slide}</CarouselSlide>
+			}
+			<CarouselNext />
+			<CarouselIndicators />
+		</Carousel>
+	}
+}

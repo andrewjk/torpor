@@ -16,6 +16,10 @@
 			"types": "./dist/Calendar/index.d.ts",
 			"import": "./dist/Calendar/index.js"
 		},
+		"./Carousel": {
+			"types": "./dist/Carousel/index.d.ts",
+			"import": "./dist/Carousel/index.js"
+		},
 		"./Charts": {
 			"types": "./dist/Charts/index.d.ts",
 			"import": "./dist/Charts/index.js"

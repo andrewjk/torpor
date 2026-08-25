@@ -146,12 +146,10 @@ interaction-layer and aria standards above, with deviations fixed inline.
 Candidates not covered above, aligned with the WAI-ARIA APG patterns the rest
 of the library follows:
 
-- [ ] Toast (transient messages announced via aria-live; complements the
-      persistent Notification component)
 - [x] Progress (determinate and indeterminate, `role="progressbar"`; pairs
       with the shared Loader contract for network waits)
 - [x] Rating (APG pattern; star / score input with keyboard support)
-- [ ] Carousel (APG pattern; slide regions with next/previous and dot controls)
+- [x] Carousel (APG pattern; slide regions with next/previous and dot controls)
 - [ ] Splitter (APG window splitter; resizable panes with keyboard resize)
 - [ ] SpinButton / NumberInput (APG pattern; could be the building block for
       TimePicker)

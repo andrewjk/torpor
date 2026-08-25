@@ -4,6 +4,7 @@ const components = [
 	"Accordion",
 	"Breadcrumb",
 	"Calendar",
+	"Carousel",
 	"Charts",
 	"ComboBox",
 	"Contextual",

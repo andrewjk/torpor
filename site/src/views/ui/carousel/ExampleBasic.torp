@@ -1,0 +1,78 @@
+import {
+	Carousel,
+	CarouselIndicators,
+	CarouselNext,
+	CarouselPrevious,
+	CarouselSlide,
+} from "@torpor/ui/Carousel";
+
+export default function ExampleBasic() {
+	@render {
+		<Carousel class="example-carousel" ariaLabel="Featured destinations">
+			<CarouselPrevious class="example-carousel-prev" />
+			<CarouselSlide class="example-carousel-slide">Slide 1</CarouselSlide>
+			<CarouselSlide class="example-carousel-slide">Slide 2</CarouselSlide>
+			<CarouselSlide class="example-carousel-slide">Slide 3</CarouselSlide>
+			<CarouselNext class="example-carousel-next" />
+			<CarouselIndicators class="example-carousel-indicators" />
+		</Carousel>
+	}
+
+	@style {
+		.example-carousel {
+			position: relative;
+			width: 360px;
+		}
+
+		.example-carousel-slide {
+			background-color: dodgerblue;
+			border-radius: 8px;
+			box-sizing: border-box;
+			color: white;
+			font-size: 24px;
+			height: 160px;
+			padding: 60px;
+			text-align: center;
+		}
+
+		.example-carousel-prev,
+		.example-carousel-next {
+			all: unset;
+			background-color: white;
+			border-radius: 50%;
+			box-shadow: black 0 0 4px;
+			cursor: pointer;
+			height: 32px;
+			position: absolute;
+			top: 64px;
+			width: 32px;
+		}
+
+		.example-carousel-prev {
+			left: 8px;
+		}
+
+		.example-carousel-next {
+			right: 8px;
+		}
+
+		.example-carousel-indicators {
+			gap: 8px;
+			justify-content: center;
+			margin-top: 8px;
+		}
+
+		:global(.example-carousel-indicators .torp-carousel-indicator) {
+			all: unset;
+			background-color: lightgray;
+			border-radius: 50%;
+			cursor: pointer;
+			height: 10px;
+			width: 10px;
+		}
+
+		:global(.example-carousel-indicators .torp-carousel-indicator[data-state="active"]) {
+			background-color: dodgerblue;
+		}
+	}
+}

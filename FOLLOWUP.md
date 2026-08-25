@@ -67,3 +67,30 @@ deliberately:
   yet (the `AbortSignal` param exists on the Loader type, unused by DataGrid).
 - `aria-rowcount` is set from the loader's `total` when provided; not wired to
   `aria-rowindex` on rows.
+
+## Loader adoption in ComboBox/SelectBox: known gaps
+
+ComboBox and SelectBox now accept the shared `load` prop (utils/loader.ts
+`createItemLoader`) and auto-render a ListBox of loaded options when no
+content is slotted in. Left out deliberately:
+
+- No built-in debounce for ComboBox typing -- every keystroke starts a fetch.
+  Consumers wrap their loader if they need it; a shared `debounceMs` option
+  would be the nicer API (needs timer handling inside the reactive getter).
+- Stale-response ordering relies on `$async`'s generation guard; no
+  AbortSignal is passed to loaders yet, so cancelled fetches still run to
+  completion over the wire.
+- SelectBox loads once per mount (content stays mounted but hidden), not once
+  per open; a refresh-on-reopen option may be wanted.
+- Tree lazy child loading (per-node load functions) doesn't fit this shape
+  and needs its own contract when implemented.
+
+## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
+
+Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators.torp):
+`` `Go to slide ${slide.index + 1}` `` in an `aria-label` compiled to something like
+`Go to t_item_1.data 1` -- member access plus arithmetic on a loop variable inside a
+`${}` interpolation silently degrades. Works fine outside `@for` (CarouselSlide
+interpolates `$state.index + 1` correctly), and plain member expressions in loop
+bodies (`data-state={context.isActive(slide.index)}`) are fine. Worked around by
+computing the label in a helper function. Worth a compiler test + fix.

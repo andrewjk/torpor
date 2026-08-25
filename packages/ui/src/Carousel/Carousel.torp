@@ -1,0 +1,179 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type CarouselContext, CarouselContextName } from "./CarouselTypes";
+
+interface CarouselProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The index of the active slide */
+	value?: Bindable<number>;
+	/** Whether the next and previous controls wrap around at the ends (default true) */
+	wrap?: boolean;
+	/** An accessible label for the carousel region */
+	ariaLabel?: string;
+	/** Raised when the active slide has changed */
+	onchange?: (index: number) => void;
+}
+
+/**
+ * A carousel that displays a sequence of slides, which the user can move
+ * between with previous and next controls, slide indicators, or the keyboard.
+ *
+ * See [the WAI ARIA guidelines for Carousels](https://www.w3.org/WAI/ARIA/apg/patterns/carousel/).
+ *
+ * The structure of a Carousel is:
+ *
+ * ```
+ * <Carousel ariaLabel="Featured">
+ * 	<CarouselPrevious />
+ * 	<CarouselSlide>...</CarouselSlide>
+ * 	<CarouselSlide>...</CarouselSlide>
+ * 	<CarouselNext />
+ * 	<CarouselIndicators />
+ * </Carousel>
+ * ```
+ */
+export default function Carousel($props: CarouselProps | undefined) {
+	let $state = $watch({
+		value: 0,
+		slides: [] as SlideStateLite[],
+	});
+
+	interface SlideStateLite {
+		index: number;
+	}
+
+	$bind($state, $props, "value");
+
+	// Set the context to pass down to slides and controls
+	const context: CarouselContext = {
+		registerSlide,
+		removeSlide,
+		goToSlide,
+		nextSlide,
+		previousSlide,
+		isActive,
+		canNext,
+		canPrevious,
+		slides: () => $state.slides,
+		count: () => $state.slides.length,
+	};
+	$context[CarouselContextName] = context;
+
+	// Dispatch the change event when the active slide changes
+	$handle((first) => {
+		const value = getValue();
+		if (!first) $props?.onchange?.(value);
+	});
+
+	function getWrap(): boolean {
+		return $props?.wrap !== false;
+	}
+
+	// The clamped index that is displayed and reported to assistive tech
+	function getValue(): number {
+		const last = Math.max(0, $state.slides.length - 1);
+		return Math.min(last, Math.max(0, $state.value));
+	}
+
+	function isActive(index: number): boolean {
+		return getValue() === index;
+	}
+
+	function canNext(): boolean {
+		if ($state.slides.length < 2) return false;
+		return getWrap() || getValue() < $state.slides.length - 1;
+	}
+
+	function canPrevious(): boolean {
+		if ($state.slides.length < 2) return false;
+		return getWrap() || getValue() > 0;
+	}
+
+	function goToSlide(index: number) {
+		const last = Math.max(0, $state.slides.length - 1);
+		$state.value = Math.min(last, Math.max(0, index));
+	}
+
+	function nextSlide() {
+		const count = $state.slides.length;
+		if (count < 2) return;
+		if (getWrap()) {
+			goToSlide((getValue() + 1) % count);
+		} else {
+			goToSlide(getValue() + 1);
+		}
+	}
+
+	function previousSlide() {
+		const count = $state.slides.length;
+		if (count < 2) return;
+		if (getWrap()) {
+			goToSlide((getValue() - 1 + count) % count);
+		} else {
+			goToSlide(getValue() - 1);
+		}
+	}
+
+	function registerSlide(): SlideStateLite {
+		const state: SlideStateLite = $watch({ index: $state.slides.length });
+		$state.slides.push(state);
+		return state;
+	}
+
+	function removeSlide(index: number) {
+		if (index >= 0 && index < $state.slides.length) {
+			$state.slides.splice(index, 1);
+		}
+		$state.slides.forEach((slide, i) => (slide.index = i));
+	}
+
+	// The keyboard interface is the previous / next controls; arrow keys also
+	// work when focus is on the region or a slide, but never when it is on an
+	// interactive element inside the carousel
+	function handleKey(e: KeyboardEvent) {
+		const target = e.target as HTMLElement;
+		if (target.closest("button, a, input, select, textarea, [contenteditable]")) {
+			return;
+		}
+		switch (e.key) {
+			case "ArrowRight": {
+				e.preventDefault();
+				nextSlide();
+				break;
+			}
+			case "ArrowLeft": {
+				e.preventDefault();
+				previousSlide();
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				goToSlide(0);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				goToSlide($state.slides.length - 1);
+				break;
+			}
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-carousel", $props?.class]}
+			{$props?.style}
+			role="region"
+			aria-roledescription="carousel"
+			aria-label={$props?.ariaLabel ?? "Carousel"}
+			onkeydown={handleKey}
+		>
+			<slot />
+		</div>
+	}
+}
