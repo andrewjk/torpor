@@ -1,0 +1,24 @@
+import { Rating } from "@torpor/ui/Rating";
+
+export default function ExampleDisabled() {
+	@render {
+		<Rating class="example-rating" ariaLabel="Average rating" value={4} disabled={true} />
+	}
+
+	@style {
+		:global(.example-rating .torp-rating-star) {
+			all: unset;
+			cursor: default;
+			font-size: 32px;
+			line-height: 1;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="filled"] span) {
+			color: gold;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="empty"] span) {
+			color: lightgray;
+		}
+	}
+}

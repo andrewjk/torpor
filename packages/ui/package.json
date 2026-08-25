@@ -84,6 +84,10 @@
 			"types": "./dist/Popover/index.d.ts",
 			"import": "./dist/Popover/index.js"
 		},
+		"./Rating": {
+			"types": "./dist/Rating/index.d.ts",
+			"import": "./dist/Rating/index.js"
+		},
 		"./SelectBox": {
 			"types": "./dist/SelectBox/index.d.ts",
 			"import": "./dist/SelectBox/index.js"

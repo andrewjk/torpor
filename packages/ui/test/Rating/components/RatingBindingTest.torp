@@ -1,0 +1,12 @@
+import { Rating } from "../../../src/Rating/index";
+
+export default function RatingBindingTest() {
+	let $state = $watch({ value: 2 });
+
+	@render {
+		<div>
+			<Rating max={5} &value={$state.value} ariaLabel="Bound rating" />
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

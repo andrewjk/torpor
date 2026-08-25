@@ -1,0 +1,14 @@
+import { Rating } from "../../../src/Rating/index";
+
+export default function RatingTest($props: any) {
+	@render {
+		<Rating
+			{$props?.max}
+			{$props?.value}
+			{$props?.disabled}
+			{$props?.allowClear}
+			ariaLabel={$props?.ariaLabel ?? "Rating"}
+			onchange={$props?.onchange}
+		/>
+	}
+}

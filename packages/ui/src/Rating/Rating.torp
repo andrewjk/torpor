@@ -1,0 +1,183 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
+
+interface RatingProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The maximum rating, i.e. the number of stars (default 5) */
+	max?: number;
+	/** The current rating */
+	value?: Bindable<number>;
+	/** If set to true, the user cannot interact with this rating */
+	disabled?: boolean;
+	/** If set to false, clicking or re-selecting the current rating does not clear it (default true) */
+	allowClear?: boolean;
+	/** An accessible name for the rating */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when the rating has changed */
+	onchange?: (value: number) => void;
+}
+
+/**
+ * A star rating input, where the user selects a value from 1 to a maximum
+ * number of stars by clicking or by using the keyboard.
+ *
+ * Implements the radio group pattern: each star is a radio button, the star
+ * matching the current rating is checked, and arrow keys move the rating.
+ *
+ * See [the WAI ARIA guidelines for Rating](https://www.w3.org/WAI/ARIA/apg/patterns/rating/).
+ */
+export default function Rating($props: RatingProps | undefined) {
+	let stars: (HTMLButtonElement | undefined)[] = [];
+
+	function getMax(): number {
+		const max = $props?.max ?? 5;
+		return max > 0 ? Math.floor(max) : 5;
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		value: 0,
+		hover: 0,
+		get stars(): number[] {
+			return Array.from({ length: getMax() }, (_, i) => i + 1);
+		},
+	});
+
+	$bind($state, $props, "value");
+
+	// Dispatch the change event when the value changes
+	$handle((first) => {
+		const value = $state.value;
+		if (!first) $props?.onchange?.(value);
+	});
+
+	function clamp(value: number): number {
+		return Math.min(getMax(), Math.max(0, value));
+	}
+
+	function getValue(): number {
+		return clamp($state.value);
+	}
+
+	function setValue(value: number, focus = false) {
+		const next = clamp(value);
+		if (next !== $state.value) {
+			$state.value = next;
+		}
+		if (focus) {
+			stars[next - 1]?.focus();
+		}
+	}
+
+	// The number of filled stars to display, taking the hovered star into
+	// account for the mouse preview
+	function getDisplayValue(): number {
+		return getDisabled() ? getValue() : Math.max(getValue(), $state.hover);
+	}
+
+	function handleClick(value: number) {
+		if (getDisabled()) return;
+		if (value === $state.value && ($props?.allowClear ?? true)) {
+			setValue(0);
+		} else {
+			setValue(value);
+		}
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+
+		switch (e.key) {
+			case "ArrowRight":
+			case "ArrowUp": {
+				e.preventDefault();
+				setValue(Math.max(1, $state.value + 1), true);
+				break;
+			}
+			case "ArrowLeft":
+			case "ArrowDown": {
+				e.preventDefault();
+				setValue($state.value <= 1 ? 1 : $state.value - 1, true);
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				setValue(1, true);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				setValue(getMax(), true);
+				break;
+			}
+		}
+	}
+
+	// Roving tabindex: the star matching the current rating (or the first
+	// star when there is no rating) is the single tab stop
+	function tabStop(value: number): boolean {
+		return value === ($state.value > 0 ? $state.value : 1);
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-rating", getDisabled() ? "torp-rating-disabled" : undefined, $props?.class]}
+			{$props?.style}
+			role="radiogroup"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			onmouseleave={() => ($state.hover = 0)}
+		>
+			@for (let value of $state.stars) {
+				@key = value
+				<button
+					type="button"
+					class="torp-rating-star"
+					role="radio"
+					tabindex={tabStop(value) ? 0 : -1}
+					aria-checked={value === getValue() ? "true" : "false"}
+					aria-label={`${value} ${value === 1 ? "star" : "stars"}`}
+					aria-disabled={getDisabled() ? "true" : undefined}
+					data-state={value <= getDisplayValue() ? "filled" : "empty"}
+					onmount={(el) => {
+						stars[value - 1] = el;
+						return () => {
+							if (stars[value - 1] === el) {
+								stars[value - 1] = undefined;
+							}
+						};
+					}}
+					onclick={() => handleClick(value)}
+					onkeydown={handleKey}
+					onmouseenter={() => {
+						if (!getDisabled()) $state.hover = value;
+					}}
+				>
+					<slot item={{ value: value, filled: value <= getDisplayValue() }}>
+						<span aria-hidden="true">{value <= getDisplayValue() ? "★" : "☆"}</span>
+					</slot>
+				</button>
+			}
+		</div>
+
+		<FormValues name={$props?.name} value={getValue() > 0 ? getValue() : undefined} />
+	}
+
+	@style {
+		/* Headless: layout only, so the stars sit in a row. All appearance is
+		   up to the consuming theme */
+		.torp-rating {
+			display: inline-flex;
+		}
+	}
+}

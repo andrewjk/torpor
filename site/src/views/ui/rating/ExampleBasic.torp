@@ -1,0 +1,33 @@
+import { Rating } from "@torpor/ui/Rating";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 3 });
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<Rating class="example-rating" ariaLabel="Rate this product" &value={$state.value} />
+	}
+
+	@style {
+		:global(.example-rating .torp-rating-star) {
+			all: unset;
+			cursor: pointer;
+			font-size: 32px;
+			line-height: 1;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="filled"] span) {
+			color: gold;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="empty"] span) {
+			color: lightgray;
+		}
+
+		:global(.example-rating .torp-rating-star:focus-visible) {
+			outline: 2px solid black;
+			outline-offset: 2px;
+		}
+	}
+}

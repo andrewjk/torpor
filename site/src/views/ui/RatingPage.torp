@@ -1,0 +1,57 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./rating/ExampleBasic.torp";
+import ExampleBasicCode from "./rating/ExampleBasic.torp?raw";
+import ExampleDisabled from "./rating/ExampleDisabled.torp";
+import ExampleDisabledCode from "./rating/ExampleDisabled.torp?raw";
+
+export default function RatingPage() {
+	@head {
+		<title>Rating | Torpor</title>
+	}
+
+	@render {
+		<h1>Rating</h1>
+		<p>A star rating input, where the user selects a value from 1 to a maximum number of stars.</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/rating/">
+				the WAI ARIA guidelines for Rating
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Rating ariaLabel="Rate this product" />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Disabled
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleDisabled />
+					<fill name="code">
+						<CodePreview code={ExampleDisabledCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}
