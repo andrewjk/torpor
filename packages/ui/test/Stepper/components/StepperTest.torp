@@ -1,0 +1,21 @@
+import { Stepper, StepperNext, StepperPrevious, StepperStep } from "../../../src/Stepper/index";
+
+export default function StepperTest($props: any) {
+	@render {
+		<Stepper
+			{$props?.value}
+			{$props?.linear}
+			ariaLabel="Sign up"
+			onchange={$props?.onchange}
+			oncomplete={$props?.oncomplete}
+		>
+			<StepperStep label="Account" />
+			<StepperStep label="Profile" />
+			<StepperStep label="Confirm" />
+			<fill name="nav">
+				<StepperPrevious />
+				<StepperNext>Next</StepperNext>
+			</fill>
+		</Stepper>
+	}
+}

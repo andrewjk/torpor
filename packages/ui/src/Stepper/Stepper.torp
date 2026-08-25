@@ -1,0 +1,145 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import { type StepperContext, StepperContextName } from "./StepperTypes";
+
+interface StepperProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The index of the current step */
+	value?: Bindable<number>;
+	/** Whether steps can only be visited in order, with completed ones revisitable (default true) */
+	linear?: boolean;
+	/** An accessible label for the steps */
+	ariaLabel?: string;
+	/** Raised when the current step has changed */
+	onchange?: (index: number) => void;
+	/** Raised when the user moves next from the last step */
+	oncomplete?: () => void;
+}
+
+/**
+ * A sequence of steps in a task, showing progress through them. Steps before
+ * the current one are complete, and can be revisited; the user moves between
+ * steps with the navigation controls.
+ *
+ * The structure of a Stepper is:
+ *
+ * ```
+ * <Stepper ariaLabel="Sign up">
+ * 	<StepperStep label="Account" />
+ * 	<StepperStep label="Profile" />
+ * 	<fill name="nav">
+ * 		<StepperPrevious />
+ * 		<StepperNext />
+ * 	</fill>
+ * </Stepper>
+ * ```
+ */
+export default function Stepper($props: StepperProps | undefined) {
+	let $state = $watch({
+		value: 0,
+		steps: [] as StepperStepStateLite[],
+	});
+
+	interface StepperStepStateLite {
+		index: number;
+	}
+
+	$bind($state, $props, "value");
+
+	// Set the context to pass down to steps and navigation controls
+	const context: StepperContext = {
+		registerStep,
+		removeStep,
+		getValue,
+		setValue,
+		next,
+		previous,
+		canNext,
+		canPrevious,
+		steps: () => $state.steps,
+		count: () => $state.steps.length,
+		linear: $props?.linear !== false,
+	};
+	$context[StepperContextName] = context;
+
+	// Dispatch the change event when the current step changes
+	$handle((first) => {
+		const value = getValue();
+		if (!first) $props?.onchange?.(value);
+	});
+
+	// The clamped index of the current step
+	function getValue(): number {
+		const last = Math.max(0, $state.steps.length - 1);
+		return Math.min(last, Math.max(0, $state.value));
+	}
+
+	function canNext(): boolean {
+		return getValue() < $state.steps.length - 1;
+	}
+
+	function canPrevious(): boolean {
+		return getValue() > 0;
+	}
+
+	function setValue(index: number) {
+		const last = Math.max(0, $state.steps.length - 1);
+		$state.value = Math.min(last, Math.max(0, index));
+	}
+
+	function next() {
+		if (canNext()) {
+			setValue(getValue() + 1);
+		} else {
+			$props?.oncomplete?.();
+		}
+	}
+
+	function previous() {
+		if (canPrevious()) {
+			setValue(getValue() - 1);
+		}
+	}
+
+	function registerStep(): StepperStepStateLite {
+		const state: StepperStepStateLite = $watch({ index: $state.steps.length });
+		$state.steps.push(state);
+		return state;
+	}
+
+	function removeStep(index: number) {
+		if (index >= 0 && index < $state.steps.length) {
+			$state.steps.splice(index, 1);
+		}
+		$state.steps.forEach((step, i) => (step.index = i));
+	}
+
+	@render {
+		<div {$props?.id} class={["torp-stepper", $props?.class]} {$props?.style}>
+			<ol class="torp-stepper-steps" aria-label={$props?.ariaLabel}>
+				<slot />
+			</ol>
+			<div class="torp-stepper-nav">
+				<slot name="nav" />
+			</div>
+		</div>
+	}
+
+	@style {
+		/* Headless: layout only, so the steps and navigation sit in rows. All
+		   appearance is up to the consuming theme */
+		.torp-stepper-steps {
+			display: flex;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.torp-stepper-nav {
+			display: flex;
+		}
+	}
+}

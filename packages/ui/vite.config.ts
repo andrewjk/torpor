@@ -28,6 +28,7 @@ const components = [
 	"SegmentedControl",
 	"Slider",
 	"Splitter",
+	"Stepper",
 	"TabGroup",
 	"TagInput",
 	"Tree",

@@ -156,7 +156,7 @@ of the library follows:
 - [x] TagInput (free-text multi-value "chip" input; complements the multiple
       option on SelectBox / ComboBox)
 - [x] SegmentedControl (compact single-select, possibly TabGroup-based)
-- [ ] Stepper (multi-step / wizard flow)
+- [x] Stepper (multi-step / wizard flow)
 - [ ] DateRangePicker (extend Calendar / DatePicker with range selection)
 - [ ] CommandPalette (Modal + ComboBox composition for app-wide actions)
 - [ ] FileDropzone (file upload with drag and drop, once DnD lands)

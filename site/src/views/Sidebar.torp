@@ -47,6 +47,7 @@ export default function Sidebar() {
 				<li><a href="/ui/segmented-control">SegmentedControl</a></li>
 				<li><a href="/ui/slider">Slider</a></li>
 				<li><a href="/ui/splitter">Splitter</a></li>
+				<li><a href="/ui/stepper">Stepper</a></li>
 				<li><a href="/ui/tab-group">TabGroup</a></li>
 				<li><a href="/ui/tag-input">TagInput</a></li>
 				<li><a href="/ui/tool-bar">ToolBar</a></li>

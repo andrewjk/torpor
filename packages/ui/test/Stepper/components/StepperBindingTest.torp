@@ -1,0 +1,19 @@
+import { Stepper, StepperNext, StepperPrevious, StepperStep } from "../../../src/Stepper/index";
+
+export default function StepperBindingTest() {
+	let $state = $watch({ value: 0 });
+
+	@render {
+		<div>
+			<Stepper ariaLabel="Sign up" &value={$state.value}>
+				<StepperStep label="Account" />
+				<StepperStep label="Profile" />
+				<fill name="nav">
+					<StepperPrevious />
+					<StepperNext>Next</StepperNext>
+				</fill>
+			</Stepper>
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

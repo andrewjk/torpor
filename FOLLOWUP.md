@@ -93,6 +93,19 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 `values`); worked around by naming the state key `value` like ListBox/Tree do.
 `$bind` could validate that each key exists on both objects and throw in dev.
 
+## View compiler/runtime quirks found while building the new UI components
+
+- A second component function with its own `@render` in the same `.torp` file
+  (after the default export) crashes the client build with `TypeError: Cannot
+  read properties of undefined (reading 'markup')` in buildTemplate. Same-file
+  plain helper functions are fine. Worked around in Stepper by moving the
+  nested `Marker` component into its own file (src/ui/Stepper/StepperMarker.torp).
+- `<@element self={expr}>` renders the dynamic tag but silently drops all
+  other attributes on it (class, type, aria-label, onclick...). Docs say
+  children/slots are preserved; attributes appear unsupported.
+- Template-literal interpolation with arithmetic on `@for` loop variables
+  miscompiles (details in the section below).
+
 ## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
 
 Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators.torp):

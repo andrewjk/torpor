@@ -1,0 +1,99 @@
+import { Stepper, StepperNext, StepperPrevious, StepperStep } from "@torpor/ui/Stepper";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 0 });
+
+	@render {
+		<div>
+			<Stepper class="example-stepper" ariaLabel="Sign up" &value={$state.value}>
+				<StepperStep label="Account" />
+				<StepperStep label="Profile" />
+				<StepperStep label="Confirm" />
+				<fill name="nav">
+					<StepperPrevious class="example-stepper-previous">Back</StepperPrevious>
+					<StepperNext class="example-stepper-next">{$state.value < 2 ? "Next" : "Finish"}</StepperNext>
+				</fill>
+			</Stepper>
+			@switch ($state.value) {
+				case 0: {
+					<p>Account fields...</p>
+				}
+				case 1: {
+					<p>Profile fields...</p>
+				}
+				default: {
+					<p>Confirm your details...</p>
+				}
+			}
+		</div>
+	}
+
+	@style {
+		.example-stepper-steps {
+			gap: 24px;
+		}
+
+		:global(.example-stepper .torp-stepper-step-button),
+		:global(.example-stepper .torp-stepper-step-label) {
+			all: unset;
+			align-items: center;
+			cursor: pointer;
+			display: flex;
+			font-size: 14px;
+			gap: 8px;
+		}
+
+		:global(.example-stepper .torp-stepper-step-label) {
+			cursor: default;
+		}
+
+		:global(.example-stepper .torp-stepper-marker) {
+			align-items: center;
+			border: 1px solid gray;
+			border-radius: 50%;
+			box-sizing: border-box;
+			color: gray;
+			display: flex;
+			height: 28px;
+			justify-content: center;
+			width: 28px;
+		}
+
+		:global(.example-stepper .torp-stepper-marker[data-state="complete"]) {
+			background-color: dodgerblue;
+			border-color: dodgerblue;
+			color: white;
+		}
+
+		:global(.example-stepper .torp-stepper-step[data-state="current"] .torp-stepper-marker) {
+			border-color: dodgerblue;
+			color: dodgerblue;
+		}
+
+		:global(.example-stepper .torp-stepper-step-button:focus-visible) {
+			outline: 2px solid black;
+			outline-offset: 2px;
+		}
+
+		:global(.example-stepper .torp-stepper-step-button[aria-current="step"]) {
+			font-weight: bold;
+		}
+
+		.example-stepper-previous,
+		.example-stepper-next {
+			background: none;
+			border: 1px solid gray;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			margin: 16px 4px 0 0;
+			padding: 8px 16px;
+		}
+
+		.example-stepper-next {
+			background-color: dodgerblue;
+			border-color: dodgerblue;
+			color: white;
+		}
+	}
+}

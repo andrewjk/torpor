@@ -1,0 +1,48 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./stepper/ExampleBasic.torp";
+import ExampleBasicCode from "./stepper/ExampleBasic.torp?raw";
+
+export default function StepperPage() {
+	@head {
+		<title>Stepper | Torpor</title>
+	}
+
+	@render {
+		<h1>Stepper</h1>
+		<p>
+			A sequence of steps in a task, showing progress through them. Steps before the current one
+			are complete, and can be revisited; the user moves between steps with the navigation
+			controls.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<Stepper ariaLabel="Sign up">
+	<StepperStep label="Account" />
+	<StepperStep label="Profile" />
+	<fill name="nav">
+		<StepperPrevious />
+		<StepperNext />
+	</fill>
+</Stepper>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

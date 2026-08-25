@@ -116,6 +116,10 @@
 			"types": "./dist/Splitter/index.d.ts",
 			"import": "./dist/Splitter/index.js"
 		},
+		"./Stepper": {
+			"types": "./dist/Stepper/index.d.ts",
+			"import": "./dist/Stepper/index.js"
+		},
 		"./TabGroup": {
 			"types": "./dist/TabGroup/index.d.ts",
 			"import": "./dist/TabGroup/index.js"

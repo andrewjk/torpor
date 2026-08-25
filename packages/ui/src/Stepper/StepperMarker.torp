@@ -1,0 +1,24 @@
+import Check from "../icons/Check.torp";
+
+interface StepperMarkerProps {
+	/** Whether the step this marker belongs to is complete */
+	complete: boolean;
+	/** The index of the step this marker belongs to */
+	index: number;
+}
+
+/**
+ * The marker for a Stepper step, which shows a check when the step is
+ * complete or its number otherwise.
+ */
+export default function StepperMarker($props: StepperMarkerProps) {
+	@render {
+		<span class="torp-stepper-marker" data-state={$props.complete ? "complete" : "incomplete"}>
+			@if ($props.complete) {
+				<Check />
+			} @else {
+				<span aria-hidden="true">{$props.index + 1}</span>
+			}
+		</span>
+	}
+}
