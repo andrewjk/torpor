@@ -151,7 +151,7 @@ of the library follows:
 - [x] Rating (APG pattern; star / score input with keyboard support)
 - [x] Carousel (APG pattern; slide regions with next/previous and dot controls)
 - [x] Splitter (APG window splitter; resizable panes with keyboard resize)
-- [ ] SpinButton / NumberInput (APG pattern; could be the building block for
+- [x] SpinButton / NumberInput (APG pattern; could be the building block for
       TimePicker)
 - [ ] TagInput (free-text multi-value "chip" input; complements the multiple
       option on SelectBox / ComboBox)

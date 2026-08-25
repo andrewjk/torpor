@@ -1,0 +1,47 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./number-input/ExampleBasic.torp";
+import ExampleBasicCode from "./number-input/ExampleBasic.torp?raw";
+
+export default function NumberInputPage() {
+	@head {
+		<title>NumberInput | Torpor</title>
+	}
+
+	@render {
+		<h1>NumberInput</h1>
+		<p>
+			An input where the user enters or steps a number between minimum and maximum values, by
+			typing, by pressing the arrow keys, or by pressing the Home, End, PageUp or PageDown keys.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/">
+				the WAI ARIA guidelines for Spin Buttons
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<NumberInput min={0} max={10} ariaLabel="Quantity" />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

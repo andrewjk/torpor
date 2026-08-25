@@ -72,6 +72,10 @@
 			"types": "./dist/Modal/index.d.ts",
 			"import": "./dist/Modal/index.js"
 		},
+		"./NumberInput": {
+			"types": "./dist/NumberInput/index.d.ts",
+			"import": "./dist/NumberInput/index.js"
+		},
 		"./NavMenu": {
 			"types": "./dist/NavMenu/index.d.ts",
 			"import": "./dist/NavMenu/index.js"

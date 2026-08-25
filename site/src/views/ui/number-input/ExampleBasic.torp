@@ -1,0 +1,33 @@
+import { NumberInput } from "@torpor/ui/NumberInput";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: 5 });
+
+	@render {
+		<div>
+			<NumberInput
+				class="example-number-input"
+				min={0}
+				max={10}
+				&value={$state.value}
+				ariaLabel="Quantity"
+			/>
+			<p>Quantity: {$state.value}</p>
+		</div>
+	}
+
+	@style {
+		:global(.example-number-input) {
+			border: 1px solid gray;
+			border-radius: 4px;
+			font-size: 16px;
+			padding: 8px;
+			width: 120px;
+		}
+
+		:global(.example-number-input:focus-visible) {
+			outline: 2px solid black;
+			outline-offset: 2px;
+		}
+	}
+}

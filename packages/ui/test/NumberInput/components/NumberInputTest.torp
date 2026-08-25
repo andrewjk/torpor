@@ -1,0 +1,16 @@
+import { NumberInput } from "../../../src/NumberInput/index";
+
+export default function NumberInputTest($props: any) {
+	@render {
+		<NumberInput
+			{$props?.value}
+			{$props?.min}
+			{$props?.max}
+			{$props?.step}
+			{$props?.disabled}
+			{$props?.name}
+			ariaLabel={$props?.ariaLabel ?? "Amount"}
+			onchange={$props?.onchange}
+		/>
+	}
+}

@@ -1,0 +1,235 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
+
+interface NumberInputProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The current value of the input; null if the field is empty */
+	value?: Bindable<number | null>;
+	/** The minimum allowed value */
+	min?: number;
+	/** The maximum allowed value */
+	max?: number;
+	/** The amount by which the value is increased or decreased (default 1) */
+	step?: number;
+	/** If set to true, the user cannot interact with this input */
+	disabled?: boolean;
+	/** An accessible name for the input */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: number | null) => void;
+}
+
+/**
+ * An input where the user enters or steps a number between minimum and
+ * maximum values, by typing, by pressing the arrow keys, or by pressing the
+ * Home, End, PageUp or PageDown keys.
+ *
+ * See [the WAI ARIA guidelines for Spin Buttons](https://www.w3.org/WAI/ARIA/apg/patterns/spinbutton/).
+ */
+export default function NumberInput($props: NumberInputProps | undefined) {
+	let input: HTMLInputElement;
+
+	function getMin(): number | undefined {
+		return $props?.min;
+	}
+	function getMax(): number | undefined {
+		return $props?.max;
+	}
+	function getStep(): number {
+		const step = $props?.step ?? 1;
+		return step > 0 ? step : 1;
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	// The number of decimal places implied by the step, e.g. 0.25 -> 2
+	function getPrecision(): number {
+		const text = String(getStep());
+		const dot = text.indexOf(".");
+		return dot === -1 ? 0 : text.length - dot - 1;
+	}
+
+	let $state = $watch({
+		value: null as number | null,
+		text: "",
+		editing: false,
+	});
+
+	$bind($state, $props, "value");
+
+	// Keep the stored value clamped, so that out-of-range initial values
+	// don't later surface as user changes
+	$run(() => {
+		const clamped = clamp($state.value);
+		if (clamped !== $state.value) {
+			$state.value = clamped;
+		}
+	});
+
+	// The text tracks the value, unless the user is typing
+	$run(() => {
+		if (!$state.editing) {
+			$state.text = $state.value == null ? "" : String($state.value);
+		}
+	});
+
+	// Keep the input's value in sync with the text; typing sets the property
+	// directly, so an attribute alone would not update it
+	function syncInput() {
+		if (input && !$state.editing && input.value !== $state.text) {
+			input.value = $state.text;
+		}
+	}
+	$run(() => {
+		const text = $state.text;
+		const editing = $state.editing;
+		if (input && !editing && input.value !== text) {
+			input.value = text;
+		}
+	});
+	$mount(() => syncInput());
+
+	// Dispatch the change event when a committed value changes
+	$handle((first) => {
+		const value = $state.value;
+		if (!first && !$state.editing) $props?.onchange?.(value);
+	});
+
+	function clamp(value: number | null): number | null {
+		if (value == null) return null;
+		let result = value;
+		if (getMin() != null) result = Math.max(getMin()!, result);
+		if (getMax() != null) result = Math.min(getMax()!, result);
+		return round(result);
+	}
+
+	function round(value: number): number {
+		const precision = getPrecision();
+		return precision ? Number(value.toFixed(precision)) : value;
+	}
+
+	function parse(text: string): number | null {
+		const trimmed = text.trim();
+		if (trimmed === "") return null;
+		const parsed = Number(trimmed);
+		return Number.isFinite(parsed) ? parsed : null;
+	}
+
+	function setValue(value: number | null, focus = false) {
+		const next = clamp(value);
+		$state.editing = false;
+		if (next !== $state.value) {
+			$state.value = next;
+		}
+		// The text always matches what was committed
+		$state.text = next == null ? "" : String(next);
+	}
+
+	function stepValue(delta: number) {
+		if (getDisabled()) return;
+		const base = $state.value ?? 0;
+		setValue(base + delta);
+	}
+
+	function handleInput(e: Event) {
+		const el = e.currentTarget as HTMLInputElement;
+		$state.editing = true;
+		$state.text = el.value;
+	}
+
+	// Typing commits on blur or Enter; invalid text reverts
+	function commit() {
+		const text = $state.text;
+		$state.editing = false;
+		const parsed = parse(text);
+		if (parsed == null && text.trim() !== "") {
+			// Not a number: revert to the last committed value
+			$state.text = $state.value == null ? "" : String($state.value);
+			return;
+		}
+		setValue(parsed);
+	}
+
+	function handleBlur() {
+		commit();
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+
+		switch (e.key) {
+			case "ArrowUp": {
+				e.preventDefault();
+				stepValue(getStep());
+				break;
+			}
+			case "ArrowDown": {
+				e.preventDefault();
+				stepValue(-getStep());
+				break;
+			}
+			case "PageUp": {
+				e.preventDefault();
+				stepValue(getStep() * 10);
+				break;
+			}
+			case "PageDown": {
+				e.preventDefault();
+				stepValue(-getStep() * 10);
+				break;
+			}
+			case "Home": {
+				if (getMin() != null) {
+					e.preventDefault();
+					setValue(getMin()!);
+				}
+				break;
+			}
+			case "End": {
+				if (getMax() != null) {
+					e.preventDefault();
+					setValue(getMax()!);
+				}
+				break;
+			}
+			case "Enter": {
+				e.preventDefault();
+				commit();
+				break;
+			}
+		}
+	}
+
+	@render {
+		<input
+			id={$props?.id}
+			class={["torp-number-input", $props?.class]}
+			{$props?.style}
+			type="text"
+			inputmode="decimal"
+			role="spinbutton"
+			value={$state.text}
+			&ref={input}
+			tabindex={getDisabled() ? -1 : 0}
+			aria-label={$props?.ariaLabel}
+			aria-valuemin={getMin()}
+			aria-valuemax={getMax()}
+			aria-valuenow={$state.value == null ? undefined : $state.value}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			disabled={getDisabled()}
+			oninput={handleInput}
+			onblur={handleBlur}
+			onkeydown={handleKey}
+		/>
+
+		<FormValues name={$props?.name} value={$state.value} />
+	}
+}

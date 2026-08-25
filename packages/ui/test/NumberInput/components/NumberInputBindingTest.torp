@@ -1,0 +1,12 @@
+import { NumberInput } from "../../../src/NumberInput/index";
+
+export default function NumberInputBindingTest() {
+	let $state = $watch({ value: 5 });
+
+	@render {
+		<div>
+			<NumberInput min={0} &value={$state.value} ariaLabel="Bound amount" />
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

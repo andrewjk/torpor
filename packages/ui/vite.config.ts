@@ -18,6 +18,7 @@ const components = [
 	"MenuBar",
 	"Modal",
 	"NavMenu",
+	"NumberInput",
 	"Notification",
 	"Pagination",
 	"Progress",
