@@ -1,0 +1,16 @@
+import { SegmentedControl, SegmentedItem } from "../../../src/SegmentedControl/index";
+
+export default function SegmentedControlTest($props: any) {
+	@render {
+		<SegmentedControl
+			{$props?.value}
+			{$props?.disabled}
+			ariaLabel={$props?.ariaLabel ?? "View"}
+			onchange={$props?.onchange}
+		>
+			<SegmentedItem value="day" disabled={$props?.disableDay}>Day</SegmentedItem>
+			<SegmentedItem value="week">Week</SegmentedItem>
+			<SegmentedItem value="month">Month</SegmentedItem>
+		</SegmentedControl>
+	}
+}

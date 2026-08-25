@@ -1,0 +1,16 @@
+import { SegmentedControl, SegmentedItem } from "../../../src/SegmentedControl/index";
+
+export default function SegmentedControlBindingTest() {
+	let $state = $watch({ value: "week" });
+
+	@render {
+		<div>
+			<SegmentedControl ariaLabel="View" &value={$state.value}>
+				<SegmentedItem value="day">Day</SegmentedItem>
+				<SegmentedItem value="week">Week</SegmentedItem>
+				<SegmentedItem value="month">Month</SegmentedItem>
+			</SegmentedControl>
+			<div id="bound-value">{$state.value}</div>
+		</div>
+	}
+}

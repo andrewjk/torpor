@@ -1,0 +1,188 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import FormValues from "../Form/FormValues.torp";
+import { createItemGroup } from "../utils/createItemGroup";
+import { focusItem, type FocusTarget } from "../utils/focusItem";
+import {
+	type ItemState,
+	type SegmentedControlContext,
+	SegmentedControlContextName,
+} from "./SegmentedControlTypes";
+
+interface SegmentedControlProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The value of the active segment */
+	value?: Bindable<string | undefined>;
+	/** If set to true, the user cannot interact with any segments */
+	disabled?: boolean;
+	/** An accessible name for the control */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when the active segment has changed */
+	onchange?: (value: string) => void;
+}
+
+/**
+ * A compact group of segments, of which exactly one is active. The user moves
+ * between segments with the arrow keys, or selects one directly.
+ *
+ * See [the WAI ARIA guidelines for Radio Groups](https://www.w3.org/WAI/ARIA/apg/patterns/radiogroup/).
+ *
+ * The structure of a SegmentedControl is:
+ *
+ * ```
+ * <SegmentedControl ariaLabel="View">
+ * 	<SegmentedItem value="day">Day</SegmentedItem>
+ * 	<SegmentedItem value="week">Week</SegmentedItem>
+ * </SegmentedControl>
+ * ```
+ */
+export default function SegmentedControl($props: SegmentedControlProps | undefined) {
+	let nextItemIndex = 0;
+
+	let $state = $watch({
+		value: $props?.value ?? "",
+	});
+
+	$bind($state, $props, "value");
+
+	const group = createItemGroup<ItemState>({
+		state: $state,
+		type: "single",
+		selectedProperty: "active",
+		allowDeselect: false,
+		disabled: () => $props?.disabled,
+		// Select the first enabled item as items register, when nothing is
+		// selected yet; this is a default, not a user change, so it doesn't
+		// raise onchange
+		onRegister: (item) => {
+			if ($state.value === "" && !item.disabled) {
+				skipNextChange = true;
+				$state.value = item.value;
+			}
+		},
+	});
+
+	// Set the context to pass down to items
+	const context: SegmentedControlContext = {
+		registerItem,
+		removeItem: group.removeItem,
+		triggerItem: group.toggleItem,
+		handleItemKey,
+	};
+	$context[SegmentedControlContextName] = context;
+
+	// Dispatch the change event when the value changes
+	let skipNextChange = false;
+	$handle((first) => {
+		const value = $state.value;
+		if (skipNextChange) {
+			skipNextChange = false;
+			return;
+		}
+		if (!first && value !== "") $props?.onchange?.(value);
+	});
+
+	function registerItem(
+		index: number | undefined,
+		value: string | undefined,
+		disabled: boolean | undefined,
+	): ItemState {
+		// If an index wasn't set for the item, set it automatically
+		if (index === undefined) {
+			index = nextItemIndex++;
+		}
+
+		// If we already have an item with this index, just return it
+		const existing = group.itemStates.find((item) => item.index === index);
+		if (existing) {
+			return existing;
+		}
+
+		// If a value wasn't set for the item, set it to the index
+		if (value === undefined) {
+			value = index.toString();
+		}
+
+		const itemState: ItemState = $watch({
+			index,
+			value,
+			active: false,
+			disabled: disabled ?? false,
+			parentDisabled: $props?.disabled ?? false,
+			setFocused: () => {},
+		});
+		group.registerItem(itemState);
+
+		return itemState;
+	}
+
+	function handleItemKey(index: number, e: KeyboardEvent) {
+		switch (e.key) {
+			case "ArrowRight":
+			case "ArrowDown": {
+				e.preventDefault();
+				move(index, "next");
+				break;
+			}
+			case "ArrowLeft":
+			case "ArrowUp": {
+				e.preventDefault();
+				move(index, "previous");
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				move(index, "start");
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				move(index, "end");
+				break;
+			}
+		}
+	}
+
+	// Moving with the keyboard both selects and focuses the target segment,
+	// like a radio group
+	function move(index: number, target: FocusTarget) {
+		const next = focusItem(group.itemStates, index, target);
+		const item = group.itemStates[next];
+		if (item) {
+			group.toggleItem(item.value);
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={[
+				"torp-segmented-control",
+				$props?.disabled ? "torp-segmented-control-disabled" : undefined,
+				$props?.class,
+			]}
+			{$props?.style}
+			role="radiogroup"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={$props?.disabled ? "true" : undefined}
+		>
+			<slot />
+		</div>
+
+		<FormValues name={$props?.name} value={$state.value} />
+	}
+
+	@style {
+		/* Headless: layout only, so the segments sit in a row. All appearance
+		   is up to the consuming theme */
+		.torp-segmented-control {
+			display: inline-flex;
+		}
+	}
+}

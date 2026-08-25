@@ -1,0 +1,43 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./segmented-control/ExampleBasic.torp";
+import ExampleBasicCode from "./segmented-control/ExampleBasic.torp?raw";
+
+export default function SegmentedControlPage() {
+	@head {
+		<title>SegmentedControl | Torpor</title>
+	}
+
+	@render {
+		<h1>SegmentedControl</h1>
+		<p>
+			A compact group of segments, of which exactly one is active. The user moves between
+			segments with the arrow keys, or selects one directly.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<SegmentedControl ariaLabel="View">
+	<SegmentedItem value="day">Day</SegmentedItem>
+	<SegmentedItem value="week">Week</SegmentedItem>
+</SegmentedControl>
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

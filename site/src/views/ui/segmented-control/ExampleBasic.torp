@@ -1,0 +1,46 @@
+import { SegmentedControl, SegmentedItem } from "@torpor/ui/SegmentedControl";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: "week" });
+
+	@render {
+		<div>
+			<SegmentedControl class="example-segmented-control" ariaLabel="View" &value={$state.value}>
+				<SegmentedItem value="day">Day</SegmentedItem>
+				<SegmentedItem value="week">Week</SegmentedItem>
+				<SegmentedItem value="month">Month</SegmentedItem>
+			</SegmentedControl>
+			<p>View: {$state.value}</p>
+		</div>
+	}
+
+	@style {
+		:global(.example-segmented-control) {
+			border: 1px solid gray;
+			border-radius: 8px;
+			overflow: hidden;
+		}
+
+		:global(.example-segmented-control .torp-segmented-item) {
+			all: unset;
+			box-sizing: border-box;
+			cursor: pointer;
+			font-size: 14px;
+			padding: 8px 16px;
+		}
+
+		:global(.example-segmented-control .torp-segmented-item:not(:first-child)) {
+			border-left: 1px solid gray;
+		}
+
+		:global(.example-segmented-control .torp-segmented-item[data-state="active"]) {
+			background-color: dodgerblue;
+			color: white;
+		}
+
+		:global(.example-segmented-control .torp-segmented-item:focus-visible) {
+			outline: 2px solid black;
+			outline-offset: -2px;
+		}
+	}
+}

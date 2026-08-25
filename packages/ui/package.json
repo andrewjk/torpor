@@ -104,6 +104,10 @@
 			"types": "./dist/SelectBox/index.d.ts",
 			"import": "./dist/SelectBox/index.js"
 		},
+		"./SegmentedControl": {
+			"types": "./dist/SegmentedControl/index.d.ts",
+			"import": "./dist/SegmentedControl/index.js"
+		},
 		"./Slider": {
 			"types": "./dist/Slider/index.d.ts",
 			"import": "./dist/Slider/index.js"
