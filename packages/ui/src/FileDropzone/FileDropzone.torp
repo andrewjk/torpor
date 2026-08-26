@@ -1,0 +1,130 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "../utils/getId";
+
+interface FileDropzoneProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the input's form data field */
+	name?: string;
+	/** The type of files that this input accepts e.g. `image/*` */
+	accept?: string;
+	/** Whether the user can drop or select multiple files at once */
+	multiple?: boolean;
+	/** If set to true, the user cannot interact with this dropzone */
+	disabled?: boolean;
+	/** An accessible name for the dropzone */
+	ariaLabel?: string;
+	/** Raised when files have been dropped or selected */
+	onfiles?: (files: File[]) => void;
+}
+
+/**
+ * An area where the user can drop one or more files, or activate it to select
+ * files with a file dialog.
+ *
+ * See [the MDN docs for the Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API).
+ */
+export default function FileDropzone($props: FileDropzoneProps | undefined) {
+	let defaultId = getId();
+	let input: HTMLInputElement;
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function handleFiles(files: FileList | File[] | undefined | null) {
+		if (getDisabled() || !files) return;
+		const all = Array.from(files);
+		if (all.length === 0) return;
+		const selected = $props?.multiple ? all : all.slice(0, 1);
+		$props?.onfiles?.(selected);
+	}
+
+	function openDialog() {
+		if (getDisabled()) return;
+		input?.click();
+	}
+
+	function handleClick(e: MouseEvent) {
+		e.preventDefault();
+		openDialog();
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			openDialog();
+		}
+	}
+
+	function handleDrop(e: DragEvent) {
+		e.preventDefault();
+		if (getDisabled()) return;
+		e.currentTarget?.removeAttribute("data-state");
+		handleFiles(e.dataTransfer?.files);
+	}
+
+	function handleDragOver(e: DragEvent) {
+		e.preventDefault();
+		if (getDisabled()) return;
+		(e.currentTarget as HTMLElement)?.setAttribute("data-state", "over");
+	}
+
+	function handleDragLeave(e: DragEvent) {
+		(e.currentTarget as HTMLElement)?.removeAttribute("data-state");
+	}
+
+	function handleChange(e: Event) {
+		handleFiles((e.currentTarget as HTMLInputElement).files);
+	}
+
+	@render {
+		<div
+			id={$props?.id ?? defaultId}
+			class={[
+				"torp-file-dropzone",
+				getDisabled() ? "torp-file-dropzone-disabled" : undefined,
+				$props?.class,
+			]}
+			{$props?.style}
+			role="button"
+			tabindex={getDisabled() ? -1 : 0}
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			onclick={handleClick}
+			onkeydown={handleKey}
+			ondrop={handleDrop}
+			ondragover={handleDragOver}
+			ondragleave={handleDragLeave}
+		>
+			<slot>
+				<span class="torp-file-dropzone-text">Drag and drop files here, or press Enter to browse</span>
+			</slot>
+		</div>
+
+		<input
+			class="torp-file-dropzone-input"
+			type="file"
+			name={$props?.name}
+			aria-hidden="true"
+			tabindex={-1}
+			multiple={$props?.multiple}
+			{$props?.accept}
+			disabled={getDisabled()}
+			&ref={input}
+			onchange={handleChange}
+		/>
+	}
+
+	@style {
+		/* Headless: hide the input, since the dropzone is the interactive
+		   element. All appearance is up to the consuming theme */
+		.torp-file-dropzone-input {
+			display: none;
+		}
+	}
+}

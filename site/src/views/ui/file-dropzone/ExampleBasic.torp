@@ -1,0 +1,47 @@
+import { FileDropzone } from "@torpor/ui/FileDropzone";
+
+export default function ExampleBasic() {
+	let $state = $watch({ files: [] as any[] });
+
+	function onfiles(files: File[]) {
+		$state.files = [...files];
+	}
+
+	@render {
+		<div>
+			<FileDropzone
+				class="example-file-dropzone"
+				accept="image/*"
+				multiple={true}
+				ariaLabel="Upload images"
+				onfiles={onfiles}
+			/>
+			@if ($state.files.length > 0) {
+				<ul>
+					@for (let file of $state.files) {
+						@key = file.name
+						<li>{file.name}</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+
+	@style {
+		.example-file-dropzone {
+			border: 2px dashed gray;
+			border-radius: 8px;
+			box-sizing: border-box;
+			cursor: pointer;
+			font-size: 14px;
+			padding: 32px;
+			text-align: center;
+			width: 360px;
+		}
+
+		.example-file-dropzone:focus-visible {
+			outline: 2px solid black;
+			outline-offset: 2px;
+		}
+	}
+}

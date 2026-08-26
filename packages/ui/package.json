@@ -56,6 +56,10 @@
 			"types": "./dist/Disclosure/index.d.ts",
 			"import": "./dist/Disclosure/index.js"
 		},
+		"./FileDropzone": {
+			"types": "./dist/FileDropzone/index.d.ts",
+			"import": "./dist/FileDropzone/index.js"
+		},
 		"./Drawer": {
 			"types": "./dist/Drawer/index.d.ts",
 			"import": "./dist/Drawer/index.js"

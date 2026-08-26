@@ -1,0 +1,14 @@
+import { FileDropzone } from "../../../src/FileDropzone/index";
+
+export default function FileDropzoneTest($props: any) {
+	@render {
+		<FileDropzone
+			{$props?.multiple}
+			{$props?.accept}
+			{$props?.disabled}
+			{$props?.name}
+			ariaLabel={$props?.ariaLabel ?? "Upload files"}
+			onfiles={$props?.onfiles}
+		/>
+	}
+}

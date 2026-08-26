@@ -14,6 +14,7 @@ const components = [
 	"Dialog",
 	"Disclosure",
 	"Drawer",
+	"FileDropzone",
 	"Form",
 	"ListBox",
 	"Menu",

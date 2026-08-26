@@ -1,0 +1,40 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./file-dropzone/ExampleBasic.torp";
+import ExampleBasicCode from "./file-dropzone/ExampleBasic.torp?raw";
+
+export default function FileDropzonePage() {
+	@head {
+		<title>FileDropzone | Torpor</title>
+	}
+
+	@render {
+		<h1>FileDropzone</h1>
+		<p>
+			An area where the user can drop one or more files, or activate it to select files with a
+			file dialog.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<FileDropzone ariaLabel="Upload files" />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}
