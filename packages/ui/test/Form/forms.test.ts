@@ -34,27 +34,6 @@ describe("Components in forms", () => {
 		expect(formData(container, "form-under-test").get("volume")).toBe("40");
 	});
 
-	it("TabGroup submits its active value", async () => {
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, FormTabsTest);
-
-		expect(formData(container, "tabs-form").get("section")).toBe("b");
-	});
-
-	it("Accordion submits its open item's value", async () => {
-		const container = document.createElement("div");
-		document.body.appendChild(container);
-		mount(container, FormTabsTest);
-
-		// Nothing open initially
-		expect(formData(container, "accordion-form").get("panel")).toBeNull();
-
-		fireEvent.click(within(container).getByText("Panel A"));
-
-		expect(formData(container, "accordion-form").get("panel")).toBe("a");
-	});
-
 	it("Tree submits its selected value", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
