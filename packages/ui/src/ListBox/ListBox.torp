@@ -1,13 +1,16 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import {
-	type HandleButtonPress,
-	type PopoutContext,
-	PopoutContextName,
-} from "../utils/PopoutTypes";
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
 import { createItemGroup } from "../utils/createItemGroup";
 import getId from "../utils/getId";
+import createFormField from "../utils/formField";
+import { type HandleButtonPress, type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type ItemState, type ListBoxContext, ListBoxContextName } from "./ListBoxTypes";
-import FormValues from "../Form/FormValues.torp";
 
 // TODO: orientation
 
@@ -52,6 +55,14 @@ interface ListBoxProps {
  */
 export default function ListBox($props: ListBoxProps | undefined) {
 	let defaultId = getId();
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	// Get the current selection type, re-reading $props so changes are picked up
 	function getType(): "single" | "multiple" {
@@ -98,6 +109,7 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			for (let item of group.itemStates) {
 				item.active = false;
 			}
+			form.handleInput();
 			// Pass this along to the containing popout if applicable
 			if (handleButton) {
 				if (getType() === "single") {
@@ -288,10 +300,20 @@ export default function ListBox($props: ListBoxProps | undefined) {
 			aria-multiselectable={getType() === "multiple" ? "true" : undefined}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			aria-orientation={$props?.orientation}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+			onfocusout={(e: FocusEvent) => {
+				// Only validate when focus leaves the whole list box
+				if (!root.contains(e.relatedTarget as Node | null)) {
+					form.handleBlur();
+				}
+			}}
+			&ref={root}
 		>
 			<slot />
 		</div>
 
-		<FormValues name={$props?.name} value={$state.value} />
+		<FormValues name={form.name} value={$state.value} />
 	}
 }

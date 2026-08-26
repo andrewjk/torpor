@@ -1,7 +1,14 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { createItemGroup } from "../utils/createItemGroup";
 import getId from "../utils/getId";
+import createFormField from "../utils/formField";
 import { type ItemState, type TreeContext, TreeContextName } from "./TreeTypes";
 import FormValues from "../Form/FormValues.torp";
 
@@ -54,6 +61,14 @@ interface TreeProps {
  */
 export default function Tree($props: TreeProps | undefined) {
 	let defaultId = getId();
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	// Get the current selection type, re-reading $props so changes are picked up
 	function getType(): "single" | "multiple" {
@@ -109,7 +124,10 @@ export default function Tree($props: TreeProps | undefined) {
 		registerItem,
 		removeItem,
 		toggleExpand: expandedGroup.toggleItem,
-		toggleSelect: selectGroup.toggleItem,
+		toggleSelect: (value) => {
+			selectGroup.toggleItem(value);
+			form.handleInput();
+		},
 		handleKey,
 		focusFirstItem,
 		focusLastItem,
@@ -330,10 +348,20 @@ export default function Tree($props: TreeProps | undefined) {
 			role="tree"
 			aria-label={$props?.ariaLabel}
 			aria-multiselectable={getType() === "multiple" ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+			onfocusout={(e: FocusEvent) => {
+				// Only validate when focus leaves the whole tree
+				if (!root.contains(e.relatedTarget as Node | null)) {
+					form.handleBlur();
+				}
+			}}
+			&ref={root}
 		>
 			<slot />
 		</div>
 
-		<FormValues name={$props?.name} value={$state.value} />
+		<FormValues name={form.name} value={$state.value} />
 	}
 }

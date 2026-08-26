@@ -1,0 +1,38 @@
+import * as z from "zod";
+import {
+	ComboBox,
+	ComboBoxContent,
+	ComboBoxInput,
+	ComboBoxTrigger,
+} from "../../../src/ComboBox/index";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+
+export default function ComboBoxFormTest() {
+	const schema = z.string().refine((v) => v === "Item 2", { message: "Pick item 2" });
+
+	let $state = $watch({
+		data: {
+			picked: "",
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="picked" schema={schema} &value={$state.data.picked}>
+				<ComboBox &value={$state.data.picked} ariaLabel="Items">
+					<ComboBoxInput />
+					<ComboBoxTrigger />
+					<ComboBoxContent>
+						<ListBox &value={$state.data.picked}>
+							<ListBoxItem>Item 1</ListBoxItem>
+							<ListBoxItem>Item 2</ListBoxItem>
+							<ListBoxItem>Item 3</ListBoxItem>
+						</ListBox>
+					</ComboBoxContent>
+				</ComboBox>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

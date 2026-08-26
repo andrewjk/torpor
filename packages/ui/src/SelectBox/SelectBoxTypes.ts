@@ -9,6 +9,14 @@ export interface SelectBoxContext extends PopoutContext {
 	multiple?: boolean;
 	state: SelectBoxState;
 	focusTrigger?: () => void;
+	/** Whether the component is contained within a Form Field */
+	inField?: () => boolean;
+	/** Whether the Field's value is valid, for data-valid / aria-invalid */
+	valid?: () => boolean;
+	/** The ID of the Field's Message component, for aria-describedby */
+	messageId?: () => string | undefined;
+	/** Called by the trigger when it loses focus, to run Field validation */
+	handleBlur?: () => void;
 	/** Returns the items loaded from the network loader, when one is set */
 	getLoadedItems?: () => any[];
 	/** Extracts the display text for a loaded item */

@@ -121,6 +121,10 @@ export default function SelectBoxTrigger($props: SelectBoxTriggerProps | undefin
 			aria-haspopup={$state.contentRole}
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-label={$props?.ariaLabel}
+			data-valid={context.valid?.() ? "valid" : "invalid"}
+			aria-describedby={context.messageId?.()}
+			aria-invalid={context.inField?.() && !context.valid?.() ? "true" : undefined}
+			onblur={() => context.handleBlur?.()}
 			onclick={handleClick}
 			onkeydown={handleKey}
 			&ref={button}

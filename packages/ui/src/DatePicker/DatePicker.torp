@@ -8,9 +8,16 @@ import {
 	CalendarHeader,
 	CalendarHeaderTrigger,
 } from "../Calendar/index";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import { formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
+import createFormField from "../utils/formField";
 import DatePickerHeader from "./DatePickerHeader.torp";
 
 interface DatePickerProps {
@@ -47,6 +54,13 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 
 	let content: HTMLDivElement;
 	let closeOnClick = false;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	function getDateFormat(): string {
 		return $props?.dateFormat ?? "yyyy-MM-dd";
@@ -112,6 +126,7 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 	function handleDate(date: Date) {
 		$state.value = new ReactiveDate(date);
 		$props?.onchange?.($state.value);
+		form.handleInput();
 		setVisible(false);
 		focusTrigger();
 	}
@@ -159,6 +174,10 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 				aria-expanded={$state.visible ? "true" : "false"}
 				aria-controls={$state.visible ? $state.contentId : undefined}
 				aria-label={$props?.ariaLabel}
+				data-valid={form.valid ? "valid" : "invalid"}
+				aria-describedby={form.messageId}
+				aria-invalid={form.inField && !form.valid ? "true" : undefined}
+				onblur={() => form.handleBlur()}
 				disabled={getDisabled()}
 				onclick={handleClick}
 			>
@@ -192,8 +211,8 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 			</div>
 		</div>
 
-		@if ($props?.name) {
-			<input type="hidden" name={$props.name} value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : ""} />
+		@if (form.name) {
+			<input type="hidden" name={form.name} value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : ""} />
 		}
 	}
 

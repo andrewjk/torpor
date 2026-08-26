@@ -1,0 +1,32 @@
+import * as z from "zod";
+import {
+	Calendar,
+	CalendarDayHeader,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
+} from "../../../src/Calendar/index";
+import { DatePicker } from "../../../src/DatePicker/index";
+import { Field, Form, Message } from "../../../src/Form/index";
+
+export default function DatePickerFormTest() {
+	const schema = z.custom<Date>((d) => !!d && d.getDate() !== 15, {
+		message: "The 15th is unavailable",
+	});
+
+	let $state = $watch({
+		data: {
+			date: undefined as Date | undefined,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="date" schema={schema} &value={$state.data.date}>
+				<DatePicker ariaLabel="Pick a date" &value={$state.data.date} />
+				<Message />
+			</Field>
+		</Form>
+	}
+}

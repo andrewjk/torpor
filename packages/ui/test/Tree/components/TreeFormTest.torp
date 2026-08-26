@@ -1,0 +1,38 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { Tree, TreeItem, TreeItemContent, TreeItemLabel } from "../../../src/Tree/index";
+
+export default function TreeFormTest() {
+	const schema = z.string().refine((v) => v === "item-2", { message: "Pick folder 2" });
+
+	let $state = $watch({
+		data: {
+			picked: "item-3",
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="picked" schema={schema} &value={$state.data.picked}>
+				<Tree ariaLabel="Folders" &value={$state.data.picked}>
+					<TreeItem value="item-1">
+						<TreeItemContent>
+							<TreeItemLabel>Folder 1</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+					<TreeItem value="item-2">
+						<TreeItemContent>
+							<TreeItemLabel>Folder 2</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+					<TreeItem value="item-3">
+						<TreeItemContent>
+							<TreeItemLabel>Folder 3</TreeItemLabel>
+						</TreeItemContent>
+					</TreeItem>
+				</Tree>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

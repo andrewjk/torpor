@@ -8,9 +8,16 @@ import {
 	CalendarHeaderTrigger,
 } from "../Calendar/index";
 import DatePickerHeader from "../DatePicker/DatePickerHeader.torp";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import { formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
+import createFormField from "../utils/formField";
 import { type DateRange, type DateRangePickerContext, DateRangePickerContextName } from "./DateRangePickerTypes";
 import DateRangePickerDay from "./DateRangePickerDay.torp";
 
@@ -51,6 +58,13 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 
 	let content: HTMLDivElement;
 	let closeOnClick = false;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	function getDateFormat(): string {
 		return $props?.dateFormat ?? "yyyy-MM-dd";
@@ -169,6 +183,7 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 			end: new ReactiveDate($state.end!),
 		};
 		$props?.onchange?.($state.value);
+		form.handleInput();
 		setVisible(false);
 		focusTrigger();
 	}
@@ -220,6 +235,10 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 				aria-expanded={$state.visible ? "true" : "false"}
 				aria-controls={$state.visible ? $state.contentId : undefined}
 				aria-label={$props?.ariaLabel}
+				data-valid={form.valid ? "valid" : "invalid"}
+				aria-describedby={form.messageId}
+				aria-invalid={form.inField && !form.valid ? "true" : undefined}
+				onblur={() => form.handleBlur()}
 				disabled={getDisabled()}
 				onclick={handleClick}
 			>
@@ -253,15 +272,15 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 			</div>
 		</div>
 
-		@if ($props?.name) {
+		@if (form.name) {
 			<input
 				type="hidden"
-				name={`${$props.name}-start`}
+				name={`${form.name}-start`}
 				value={$state.value?.start ? formatDate($unwrap($state.value.start), "yyyy-MM-dd") : ""}
 			/>
 			<input
 				type="hidden"
-				name={`${$props.name}-end`}
+				name={`${form.name}-end`}
 				value={$state.value?.end ? formatDate($unwrap($state.value.end), "yyyy-MM-dd") : ""}
 			/>
 		}

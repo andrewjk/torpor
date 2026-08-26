@@ -3,28 +3,11 @@
 Items that were noticed and deliberately left out of scope of a previous change.
 Each entry should describe what was seen, where, and any relevant context.
 
-## Field/form integration for remaining standalone input components
+## Site example type errors (pre-existing)
 
-`utils/formField.ts` (createFormField) wires an input component into an
-enclosing Form/Field: name resolution from the Field context, validate() calls
-on user input and blur, and data-valid / aria-invalid / aria-describedby
-attributes. NumberInput, Rating, TagInput, SegmentedControl and Slider are
-wired up; these still only submit values through FormValues and skip
-Field-level validation:
-
-- ListBox, ComboBox, SelectBox (selection changes would call handleInput via
-  their toggle paths)
-- Tree, TabGroup, Accordion (same, via createItemGroup's onToggle)
-- DatePicker, DateRangePicker (validate on date select; blur on the trigger)
-
-The pattern per component is small -- create the helper with $props.name and
-the two contexts, call form.handleInput() after user-driven value changes,
-form.handleBlur() on focus leave (focusout + relatedTarget check for composite
-widgets), render the three validity attributes, and pass form.name to
-FormValues. Tests live next to each component as form.test.ts, using a zod
-schema on the Field (Field schemas validate the field's value directly; the
-Form-level schema only runs after first submit, since Form gates its context
-validate() on `submitted`).
+The site's torp-check reports ~90 pre-existing type errors (e.g. accordion and
+combo-box examples not passing the now-required `value` prop to Accordion /
+ListBox) but exits 0. Worth cleaning up separately.
 
 ## Dead/duplicated code paths elsewhere
 

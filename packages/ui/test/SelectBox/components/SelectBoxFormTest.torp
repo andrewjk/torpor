@@ -1,0 +1,39 @@
+import * as z from "zod";
+import {
+	ListBox,
+	ListBoxItem,
+} from "../../../src/ListBox/index";
+import { Field, Form, Message } from "../../../src/Form/index";
+import {
+	SelectBox,
+	SelectBoxContent,
+	SelectBoxTrigger,
+} from "../../../src/SelectBox/index";
+
+export default function SelectBoxFormTest() {
+	const schema = z.string().refine((v) => v === "Item 2", { message: "Pick item 2" });
+
+	let $state = $watch({
+		data: {
+			picked: "",
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="picked" schema={schema} &value={$state.data.picked}>
+				<SelectBox &value={$state.data.picked} ariaLabel="Items">
+					<SelectBoxTrigger />
+					<SelectBoxContent>
+						<ListBox &value={$state.data.picked}>
+							<ListBoxItem>Item 1</ListBoxItem>
+							<ListBoxItem>Item 2</ListBoxItem>
+							<ListBoxItem>Item 3</ListBoxItem>
+						</ListBox>
+					</SelectBoxContent>
+				</SelectBox>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

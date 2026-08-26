@@ -1,0 +1,32 @@
+import * as z from "zod";
+import {
+	Calendar,
+	CalendarDayHeader,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
+} from "../../../src/Calendar/index";
+import { DateRangePicker } from "../../../src/DateRangePicker/index";
+import { Field, Form, Message } from "../../../src/Form/index";
+
+export default function DateRangePickerFormTest() {
+	const schema = z.custom<any>((value) => value.end.getDate() <= 20, {
+		message: "Stays must end by the 20th",
+	});
+
+	let $state = $watch({
+		data: {
+			dates: undefined as any,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="dates" schema={schema} &value={$state.data.dates}>
+				<DateRangePicker ariaLabel="Pick dates" &value={$state.data.dates} />
+				<Message />
+			</Field>
+		</Form>
+	}
+}

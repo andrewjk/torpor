@@ -109,6 +109,7 @@ export default function ListBoxItem($props: ListBoxItemProps | undefined) {
 
 	@render {
 		<button
+			type="button"
 			{$state.id}
 			class={["torp-list-box-item", $props?.class]}
 			{$props?.style}

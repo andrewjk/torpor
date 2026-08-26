@@ -1,0 +1,26 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+
+export default function ListBoxFormTest() {
+	const schema = z.string().refine((v) => v === "green", { message: "Pick green" });
+
+	let $state = $watch({
+		data: {
+			color: "",
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="color" schema={schema} &value={$state.data.color}>
+				<ListBox ariaLabel="Colors" &value={$state.data.color}>
+					<ListBoxItem value="red">Red</ListBoxItem>
+					<ListBoxItem value="green">Green</ListBoxItem>
+					<ListBoxItem value="blue">Blue</ListBoxItem>
+				</ListBox>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

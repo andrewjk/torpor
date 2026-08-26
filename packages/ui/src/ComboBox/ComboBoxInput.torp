@@ -131,6 +131,10 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			aria-activedescendant={$state.activeDescendant}
 			aria-expanded={$state.visible ? "true" : "false"}
 			aria-label={$props?.ariaLabel !== undefined ? $props.ariaLabel : context.ariaLabel}
+			data-valid={context.valid?.() ? "valid" : "invalid"}
+			aria-describedby={context.messageId?.()}
+			aria-invalid={context.inField?.() && !context.valid?.() ? "true" : undefined}
+			onblur={() => context.handleBlur?.()}
 			{$props?.onchange}
 			onclick={handleClick}
 			oninput={handleInput}

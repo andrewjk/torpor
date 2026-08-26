@@ -1,6 +1,13 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import { type LoadResult, type Loader, createItemLoader } from "../utils/loader";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
+import createFormField from "../utils/formField";
 import { type ComboBoxContext, ComboBoxContextName, type ComboBoxState } from "./ComboBoxTypes";
 import FormValues from "../Form/FormValues.torp";
 
@@ -61,6 +68,12 @@ interface ComboBoxProps {
  * ```
  */
 export default function ComboBox($props: ComboBoxProps | undefined) {
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 	let $state: ComboBoxState = $watch({
 		visible: false,
 		value: $props?.value,
@@ -108,6 +121,10 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		get multiple() {
 			return $props?.multiple === true;
 		},
+		inField: () => form.inField,
+		valid: () => form.valid,
+		messageId: () => form.messageId,
+		handleBlur: () => form.handleBlur(),
 		state: $state,
 		getLoadedItems: $load ? () => $load.items : undefined,
 		getItemLabel: $props?.getItemLabel,
@@ -122,7 +139,10 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 	// Dispatch the change event when the value changes
 	$handle((first) => {
 		const value = $state.value;
-		if (!first) $props?.onchange?.(value);
+		if (!first) {
+			form.handleInput();
+			$props?.onchange?.(value);
+		}
 	});
 
 	// Dispatch the open/close events when the popout is opened or closed
@@ -179,6 +199,6 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 			<slot />
 		</div>
 
-		<FormValues name={$props?.name} value={$props?.value} />
+		<FormValues name={form.name} value={$props?.value} />
 	}
 }
