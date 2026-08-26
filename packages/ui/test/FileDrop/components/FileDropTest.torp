@@ -1,8 +1,8 @@
-import { FileDropzone } from "../../../src/FileDropzone/index";
+import { FileDrop } from "../../../src/Form/index";
 
-export default function FileDropzoneTest($props: any) {
+export default function FileDropTest($props: any) {
 	@render {
-		<FileDropzone
+		<FileDrop
 			{$props?.multiple}
 			{$props?.accept}
 			{$props?.disabled}

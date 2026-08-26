@@ -4,6 +4,8 @@ import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./form/ExampleBasic.torp";
 import ExampleBasicCode from "./form/ExampleBasic.torp?raw";
+import ExampleFileDrop from "./form/ExampleFileDrop.torp";
+import ExampleFileDropCode from "./form/ExampleFileDrop.torp?raw";
 import ExampleToggle from "./form/ExampleToggle.torp";
 import ExampleToggleCode from "./form/ExampleToggle.torp?raw";
 
@@ -36,6 +38,9 @@ export default function FormPage() {
 				<ExampleTabHeader>
 					Toggle
 				</ExampleTabHeader>
+				<ExampleTabHeader>
+					File drop
+				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>
@@ -50,6 +55,14 @@ export default function FormPage() {
 					<ExampleToggle />
 					<fill name="code">
 						<CodePreview code={ExampleToggleCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleFileDrop />
+					<fill name="code">
+						<CodePreview code={ExampleFileDropCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

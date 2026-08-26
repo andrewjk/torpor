@@ -159,4 +159,4 @@ of the library follows:
 - [x] Stepper (multi-step / wizard flow)
 - [x] DateRangePicker (extend Calendar / DatePicker with range selection)
 - [x] CommandPalette (Modal + ComboBox composition for app-wide actions)
-- [x] FileDropzone (file upload with drag and drop, once DnD lands)
+- [x] FileDrop (file upload with drag and drop, in the Form family)

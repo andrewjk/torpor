@@ -1,7 +1,13 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import getId from "../utils/getId";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "./FormTypes";
 
-interface FileDropzoneProps {
+interface FileDropProps {
 	/** An ID for the root element */
 	id?: string;
 	/** Classes for the root element */
@@ -23,24 +29,63 @@ interface FileDropzoneProps {
 }
 
 /**
- * An area where the user can drop one or more files, or activate it to select
- * files with a file dialog.
+ * A file input in a form, where the user can drop one or more files onto it,
+ * or activate it to select files with a file dialog.
  *
  * See [the MDN docs for the Drag and Drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API).
  */
-export default function FileDropzone($props: FileDropzoneProps | undefined) {
+export default function FileDrop($props: FileDropProps | undefined) {
 	let defaultId = getId();
+	let inputId = `${$props?.id ?? defaultId}-input`;
 	let input: HTMLInputElement;
+
+	let name = $props?.name;
+
+	let blurred = false;
 
 	function getDisabled(): boolean {
 		return $props?.disabled === true;
 	}
+
+	// Get stuff out of the FormContext and FieldContext
+	const formContext = $context[FormContextName] as FormContext;
+	const fieldContext = $context[FieldContextName] as FieldContext;
+	if (fieldContext) {
+		name ??= fieldContext.name;
+	}
+
+	// This will change the form's enctype to `multipart/form-data`
+	if (formContext) {
+		formContext.state.hasFile = true;
+	}
+
+	// Use the FieldContext's state, or create a new one
+	let $state =
+		fieldContext?.state ??
+		$watch({
+			inputId,
+			value: null,
+			errors: {} as Record<string, string>,
+			valid: false,
+			message: "",
+		});
+
+	// Set the input ID now that we know it and it will get linked with the associated label
+	$state.inputId = inputId;
 
 	function handleFiles(files: FileList | File[] | undefined | null) {
 		if (getDisabled() || !files) return;
 		const all = Array.from(files);
 		if (all.length === 0) return;
 		const selected = $props?.multiple ? all : all.slice(0, 1);
+
+		if (formContext) {
+			formContext.validate();
+		}
+		if (fieldContext && blurred) {
+			fieldContext.validate();
+		}
+
 		$props?.onfiles?.(selected);
 	}
 
@@ -82,12 +127,19 @@ export default function FileDropzone($props: FileDropzoneProps | undefined) {
 		handleFiles((e.currentTarget as HTMLInputElement).files);
 	}
 
+	function handleBlur() {
+		if (fieldContext) {
+			fieldContext.validate();
+		}
+		blurred = true;
+	}
+
 	@render {
 		<div
 			id={$props?.id ?? defaultId}
 			class={[
-				"torp-file-dropzone",
-				getDisabled() ? "torp-file-dropzone-disabled" : undefined,
+				"torp-file-drop",
+				getDisabled() ? "torp-file-drop-disabled" : undefined,
 				$props?.class,
 			]}
 			{$props?.style}
@@ -95,21 +147,26 @@ export default function FileDropzone($props: FileDropzoneProps | undefined) {
 			tabindex={getDisabled() ? -1 : 0}
 			aria-label={$props?.ariaLabel}
 			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={$state.valid ? "valid" : "invalid"}
+			aria-describedby={$state.messageId}
+			aria-invalid={fieldContext && !$state.valid ? "true" : undefined}
 			onclick={handleClick}
 			onkeydown={handleKey}
+			onblur={handleBlur}
 			ondrop={handleDrop}
 			ondragover={handleDragOver}
 			ondragleave={handleDragLeave}
 		>
 			<slot>
-				<span class="torp-file-dropzone-text">Drag and drop files here, or press Enter to browse</span>
+				<span class="torp-file-drop-text">Drag and drop files here, or press Enter to browse</span>
 			</slot>
 		</div>
 
 		<input
-			class="torp-file-dropzone-input"
+			id={inputId}
+			class="torp-file-drop-input"
 			type="file"
-			name={$props?.name}
+			{name}
 			aria-hidden="true"
 			tabindex={-1}
 			multiple={$props?.multiple}
@@ -123,7 +180,7 @@ export default function FileDropzone($props: FileDropzoneProps | undefined) {
 	@style {
 		/* Headless: hide the input, since the dropzone is the interactive
 		   element. All appearance is up to the consuming theme */
-		.torp-file-dropzone-input {
+		.torp-file-drop-input {
 			display: none;
 		}
 	}

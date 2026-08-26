@@ -33,7 +33,6 @@ export default function Sidebar() {
 				<li><a href="/ui/dialog">Dialog</a></li>
 				<li><a href="/ui/disclosure">Disclosure</a></li>
 				<li><a href="/ui/drawer">Drawer</a></li>
-				<li><a href="/ui/file-dropzone">FileDropzone</a></li>
 				<li><a href="/ui/form">Form</a></li>
 				<li><a href="/ui/list-box">ListBox</a></li>
 				<li><a href="/ui/menu">Menu</a></li>

@@ -2,13 +2,13 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
-import FileDropzoneTest from "./components/FileDropzoneTest.torp";
+import FileDropTest from "./components/FileDropTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {
 	const onfiles = vi.fn();
 	const container = document.createElement("div");
 	document.body.appendChild(container);
-	mount(container, FileDropzoneTest, { ...props, onfiles });
+	mount(container, FileDropTest, { ...props, onfiles });
 	return {
 		container,
 		onfiles,
@@ -21,7 +21,7 @@ function makeFiles(names: string[]): any {
 	return names.map((name) => new File(["content"], name, { type: "text/plain" }));
 }
 
-describe("FileDropzone", () => {
+describe("FileDrop", () => {
 	it("is a labelled button", async () => {
 		const { dropzone } = setup();
 
@@ -32,7 +32,7 @@ describe("FileDropzone", () => {
 	it("shows fallback content when empty", async () => {
 		const { container } = setup();
 
-		expect(container.querySelector(".torp-file-dropzone-text")).toHaveTextContent(
+		expect(container.querySelector(".torp-file-drop-text")).toHaveTextContent(
 			"Drag and drop files here",
 		);
 	});

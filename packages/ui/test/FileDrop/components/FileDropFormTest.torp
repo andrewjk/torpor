@@ -1,0 +1,14 @@
+import { FileDrop, Form } from "../../../src/Form/index";
+
+export default function FileDropFormTest($props: any) {
+	@render {
+		<Form id="test-form" action="/">
+			<FileDrop
+				name="attachments"
+				{$props?.multiple}
+				{$props?.disabled}
+				ariaLabel="Upload files"
+			/>
+		</Form>
+	}
+}

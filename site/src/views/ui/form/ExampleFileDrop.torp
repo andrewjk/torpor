@@ -1,6 +1,6 @@
-import { FileDropzone } from "@torpor/ui/FileDropzone";
+import { FileDrop } from "@torpor/ui/Form";
 
-export default function ExampleBasic() {
+export default function ExampleFileDrop() {
 	let $state = $watch({ files: [] as any[] });
 
 	function onfiles(files: File[]) {
@@ -9,8 +9,8 @@ export default function ExampleBasic() {
 
 	@render {
 		<div>
-			<FileDropzone
-				class="example-file-dropzone"
+			<FileDrop
+				class="example-file-drop"
 				accept="image/*"
 				multiple={true}
 				ariaLabel="Upload images"
@@ -28,7 +28,7 @@ export default function ExampleBasic() {
 	}
 
 	@style {
-		.example-file-dropzone {
+		.example-file-drop {
 			border: 2px dashed gray;
 			border-radius: 8px;
 			box-sizing: border-box;
@@ -39,7 +39,7 @@ export default function ExampleBasic() {
 			width: 360px;
 		}
 
-		.example-file-dropzone:focus-visible {
+		.example-file-drop:focus-visible {
 			outline: 2px solid black;
 			outline-offset: 2px;
 		}
