@@ -1,5 +1,12 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
+import createFormField from "../utils/formField";
 
 interface RatingProps {
 	/** An ID for the root element */
@@ -35,6 +42,14 @@ interface RatingProps {
  */
 export default function Rating($props: RatingProps | undefined) {
 	let stars: (HTMLButtonElement | undefined)[] = [];
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	function getMax(): number {
 		const max = $props?.max ?? 5;
@@ -100,6 +115,7 @@ export default function Rating($props: RatingProps | undefined) {
 		} else {
 			setValue(value);
 		}
+		form.handleInput();
 	}
 
 	function handleKey(e: KeyboardEvent) {
@@ -110,24 +126,35 @@ export default function Rating($props: RatingProps | undefined) {
 			case "ArrowUp": {
 				e.preventDefault();
 				setValue(Math.max(1, $state.value + 1), true);
+				form.handleInput();
 				break;
 			}
 			case "ArrowLeft":
 			case "ArrowDown": {
 				e.preventDefault();
 				setValue($state.value <= 1 ? 1 : $state.value - 1, true);
+				form.handleInput();
 				break;
 			}
 			case "Home": {
 				e.preventDefault();
 				setValue(1, true);
+				form.handleInput();
 				break;
 			}
 			case "End": {
 				e.preventDefault();
 				setValue(getMax(), true);
+				form.handleInput();
 				break;
 			}
+		}
+	}
+
+	// Only blur when focus leaves the whole rating
+	function handleFocusOut(e: FocusEvent) {
+		if (!root.contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
 		}
 	}
 
@@ -145,7 +172,12 @@ export default function Rating($props: RatingProps | undefined) {
 			role="radiogroup"
 			aria-label={$props?.ariaLabel}
 			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
 			onmouseleave={() => ($state.hover = 0)}
+			onfocusout={handleFocusOut}
+			&ref={root}
 		>
 			@for (let value of $state.stars) {
 				@key = value
@@ -179,7 +211,7 @@ export default function Rating($props: RatingProps | undefined) {
 			}
 		</div>
 
-		<FormValues name={$props?.name} value={getValue() > 0 ? getValue() : undefined} />
+		<FormValues name={form.name} value={getValue() > 0 ? getValue() : undefined} />
 	}
 
 	@style {

@@ -1,5 +1,12 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
+import createFormField from "../utils/formField";
 
 interface SliderProps {
 	/** An ID for the root element */
@@ -37,6 +44,13 @@ interface SliderProps {
 export default function Slider($props: SliderProps | undefined) {
 	let track: HTMLElement;
 	let thumb: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	function getMin(): number {
 		return $props?.min ?? 0;
@@ -95,6 +109,7 @@ export default function Slider($props: SliderProps | undefined) {
 		const next = clamp(snap(value));
 		if (next !== $state.value) {
 			$state.value = next;
+			form.handleInput();
 			return true;
 		}
 		return false;
@@ -205,12 +220,16 @@ export default function Slider($props: SliderProps | undefined) {
 				aria-valuenow={getValue()}
 				aria-label={$props?.ariaLabel}
 				aria-disabled={getDisabled() ? "true" : undefined}
+				data-valid={form.valid ? "valid" : "invalid"}
+				aria-describedby={form.messageId}
+				aria-invalid={form.inField && !form.valid ? "true" : undefined}
+				onblur={form.handleBlur}
 				onkeydown={handleKey}
 				&ref={thumb}
 			/>
 		</div>
 
-		<FormValues name={$props?.name} value={getValue()} />
+		<FormValues name={form.name} value={getValue()} />
 	}
 
 	@style {

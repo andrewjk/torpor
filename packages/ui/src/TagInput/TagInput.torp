@@ -1,5 +1,12 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
+import createFormField from "../utils/formField";
 
 interface TagInputProps {
 	/** An ID for the root element */
@@ -29,6 +36,14 @@ interface TagInputProps {
  */
 export default function TagInput($props: TagInputProps | undefined) {
 	let input: HTMLInputElement;
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	function getDisabled(): boolean {
 		return $props?.disabled === true;
@@ -74,17 +89,20 @@ export default function TagInput($props: TagInputProps | undefined) {
 		$state.text = "";
 		syncInput();
 		input?.focus();
+		form.handleInput();
 	}
 
 	function removeTag(index: number) {
 		if (getDisabled()) return;
 		$state.value = $state.value.filter((_, i) => i !== index);
+		form.handleInput();
 	}
 
 	function removeLastTag() {
 		if (getDisabled()) return;
 		if ($state.text === "" && $state.value.length > 0) {
 			$state.value = $state.value.slice(0, -1);
+			form.handleInput();
 		}
 	}
 
@@ -126,6 +144,16 @@ export default function TagInput($props: TagInputProps | undefined) {
 				$props?.class,
 			]}
 			{$props?.style}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+			&ref={root}
+			onfocusout={(e: FocusEvent) => {
+				// Only blur when focus leaves the whole input
+				if (!root.contains(e.relatedTarget as Node | null)) {
+					form.handleBlur();
+				}
+			}}
 			onmousedown={(e: MouseEvent) => {
 				// Focus the field wherever the user clicks, without stealing
 				// focus from the remove button they may have clicked
@@ -165,7 +193,7 @@ export default function TagInput($props: TagInputProps | undefined) {
 			/>
 		</div>
 
-		<FormValues name={$props?.name} value={$state.value} />
+		<FormValues name={form.name} value={$state.value} />
 	}
 
 	@style {

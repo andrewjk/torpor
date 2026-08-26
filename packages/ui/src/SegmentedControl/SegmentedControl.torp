@@ -1,6 +1,13 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
 import { createItemGroup } from "../utils/createItemGroup";
+import createFormField from "../utils/formField";
 import { focusItem, type FocusTarget } from "../utils/focusItem";
 import {
 	type ItemState,
@@ -44,6 +51,14 @@ interface SegmentedControlProps {
  */
 export default function SegmentedControl($props: SegmentedControlProps | undefined) {
 	let nextItemIndex = 0;
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
 
 	let $state = $watch({
 		value: $props?.value ?? "",
@@ -72,7 +87,10 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 	const context: SegmentedControlContext = {
 		registerItem,
 		removeItem: group.removeItem,
-		triggerItem: group.toggleItem,
+		triggerItem: (value) => {
+			group.toggleItem(value);
+			form.handleInput();
+		},
 		handleItemKey,
 	};
 	$context[SegmentedControlContextName] = context;
@@ -156,6 +174,14 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 		const item = group.itemStates[next];
 		if (item) {
 			group.toggleItem(item.value);
+			form.handleInput();
+		}
+	}
+
+	// Only blur when focus leaves the whole control
+	function handleFocusOut(e: FocusEvent) {
+		if (!root.contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
 		}
 	}
 
@@ -171,11 +197,16 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 			role="radiogroup"
 			aria-label={$props?.ariaLabel}
 			aria-disabled={$props?.disabled ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			aria-invalid={form.inField && !form.valid ? "true" : undefined}
+			onfocusout={handleFocusOut}
+			&ref={root}
 		>
 			<slot />
 		</div>
 
-		<FormValues name={$props?.name} value={$state.value} />
+		<FormValues name={form.name} value={$state.value} />
 	}
 
 	@style {

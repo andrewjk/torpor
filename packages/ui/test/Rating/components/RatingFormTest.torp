@@ -1,0 +1,22 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { Rating } from "../../../src/Rating/index";
+
+export default function RatingFormTest() {
+	const schema = z.number().min(3, { message: "Give at least 3 stars" });
+
+	let $state = $watch({
+		data: {
+			score: 0,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="score" schema={schema} &value={$state.data.score}>
+				<Rating ariaLabel="Score" &value={$state.data.score} />
+				<Message />
+			</Field>
+		</Form>
+	}
+}

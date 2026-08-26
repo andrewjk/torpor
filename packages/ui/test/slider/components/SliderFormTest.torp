@@ -1,0 +1,22 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { Slider } from "../../../src/Slider/index";
+
+export default function SliderFormTest() {
+	const schema = z.number().min(50, { message: "Volume must be at least 50" });
+
+	let $state = $watch({
+		data: {
+			volume: 10,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="volume" schema={schema} &value={$state.data.volume}>
+				<Slider ariaLabel="Volume" min={0} max={100} &value={$state.data.volume} />
+				<Message />
+			</Field>
+		</Form>
+	}
+}

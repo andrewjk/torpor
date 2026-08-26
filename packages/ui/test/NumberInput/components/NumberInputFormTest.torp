@@ -1,0 +1,23 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { NumberInput } from "../../../src/NumberInput/index";
+
+export default function NumberInputFormTest($props: any) {
+	const schema = z.number().min(5, { message: "Amount must be at least 5" });
+
+	let $state = $watch({
+		data: {
+			amount: 1,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="amount" schema={schema} &value={$state.data.amount}>
+				<NumberInput ariaLabel="Amount" min={0} &value={$state.data.amount} />
+				<Message />
+			</Field>
+			{$props?.children}
+		</Form>
+	}
+}

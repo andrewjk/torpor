@@ -1,0 +1,26 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { SegmentedControl, SegmentedItem } from "../../../src/SegmentedControl/index";
+
+export default function SegmentedControlFormTest() {
+	const schema = z.string().refine((v) => v === "month", { message: "Pick the month view" });
+
+	let $state = $watch({
+		data: {
+			view: "",
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="view" schema={schema} &value={$state.data.view}>
+				<SegmentedControl ariaLabel="View" &value={$state.data.view}>
+					<SegmentedItem value="day">Day</SegmentedItem>
+					<SegmentedItem value="week">Week</SegmentedItem>
+					<SegmentedItem value="month">Month</SegmentedItem>
+				</SegmentedControl>
+				<Message />
+			</Field>
+		</Form>
+	}
+}

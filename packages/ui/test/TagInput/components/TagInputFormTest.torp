@@ -1,0 +1,22 @@
+import * as z from "zod";
+import { Field, Form, Message } from "../../../src/Form/index";
+import { TagInput } from "../../../src/TagInput/index";
+
+export default function TagInputFormTest() {
+	const schema = z.array(z.string()).min(1, { message: "Add at least one label" });
+
+	let $state = $watch({
+		data: {
+			labels: [] as string[],
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="labels" schema={schema} &value={$state.data.labels}>
+				<TagInput ariaLabel="Labels" &value={$state.data.labels} />
+				<Message />
+			</Field>
+		</Form>
+	}
+}
