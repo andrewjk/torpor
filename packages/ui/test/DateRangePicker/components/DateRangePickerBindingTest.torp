@@ -1,0 +1,14 @@
+import { DateRangePicker } from "../../../src/DateRangePicker/index";
+
+export default function DateRangePickerBindingTest() {
+	let $state = $watch({ value: undefined as any });
+
+	@render {
+		<div>
+			<DateRangePicker ariaLabel="Select dates" &value={$state.value} />
+			<div id="bound-value">
+				{$state.value ? `${$state.value.start.toISOString().slice(0, 10)} to ${$state.value.end.toISOString().slice(0, 10)}` : "none"}
+			</div>
+		</div>
+	}
+}

@@ -1,0 +1,58 @@
+import { DateRangePicker } from "@torpor/ui/DateRangePicker";
+
+export default function ExampleBasic() {
+	let $state = $watch({ value: undefined as any });
+
+	function onchange(value: any) {
+		$state.value = value;
+	}
+
+	@render {
+		<div>
+			<DateRangePicker
+				class="example-date-range-picker"
+				placeholder="Select dates"
+				ariaLabel="Stay dates"
+				&value={$state.value}
+				onchange={onchange}
+			/>
+			@if ($state.value) {
+				<p>
+					From {$state.value.start.toDateString()} to {$state.value.end.toDateString()}
+				</p>
+			}
+		</div>
+	}
+
+	@style {
+		:global(.example-date-range-picker .torp-date-range-picker-trigger) {
+			background: none;
+			border: 1px solid gray;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			padding: 8px 12px;
+		}
+
+		:global(.example-date-range-picker .torp-date-range-day) {
+			all: unset;
+			box-sizing: border-box;
+			cursor: pointer;
+			display: flex;
+			height: 32px;
+			align-items: center;
+			justify-content: center;
+			width: 32px;
+		}
+
+		:global(.example-date-range-picker .torp-date-range-day[data-range="inside"]) {
+			background-color: aliceblue;
+		}
+
+		:global(.example-date-range-picker .torp-date-range-day.selected) {
+			background-color: dodgerblue;
+			border-radius: 4px;
+			color: white;
+		}
+	}
+}

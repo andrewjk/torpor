@@ -1,0 +1,14 @@
+import { DateRangePicker } from "../../../src/DateRangePicker/index";
+
+export default function DateRangePickerTest($props: any) {
+	@render {
+		<DateRangePicker
+			{$props?.value}
+			{$props?.disabled}
+			{$props?.name}
+			placeholder={$props?.placeholder ?? "Select dates"}
+			ariaLabel="Select dates"
+			onchange={$props?.onchange}
+		/>
+	}
+}

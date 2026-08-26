@@ -1,0 +1,276 @@
+import { ReactiveDate, type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
+import {
+	Calendar,
+	CalendarDayHeader,
+	CalendarGrid,
+	CalendarGridHeader,
+	CalendarHeader,
+	CalendarHeaderTrigger,
+} from "../Calendar/index";
+import DatePickerHeader from "../DatePicker/DatePickerHeader.torp";
+import { formatDate } from "../utils/dateUtils";
+import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import getId from "../utils/getId";
+import { type DateRange, type DateRangePickerContext, DateRangePickerContextName } from "./DateRangePickerTypes";
+import DateRangePickerDay from "./DateRangePickerDay.torp";
+
+interface DateRangePickerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The name of the date range picker's form data fields; "-start" and "-end" are appended */
+	name?: string;
+	/** The selected date range */
+	value?: Bindable<DateRange | undefined>;
+	/** Text to display when the value is empty */
+	placeholder?: string;
+	/** The format for the displayed dates (e.g. "d MMM yyyy") */
+	dateFormat?: string;
+	/** If set to true, the user cannot interact with this date range picker */
+	disabled?: boolean;
+	/** An accessible name for the trigger button */
+	ariaLabel?: string;
+	/** Raised when a complete range has been selected */
+	onchange?: (value: DateRange) => void;
+}
+
+/**
+ * An input for selecting a range of dates from a calendar popout. The first
+ * click sets the start of the range and the second sets its end; clicking a
+ * date before the start begins a new range there, and a third click starts
+ * over.
+ *
+ * The structure of a DateRangePicker is a trigger button that displays the
+ * selected range, with a selectable Calendar in a popout.
+ */
+export default function DateRangePicker($props: DateRangePickerProps | undefined) {
+	let defaultId = getId();
+
+	let content: HTMLDivElement;
+	let closeOnClick = false;
+
+	function getDateFormat(): string {
+		return $props?.dateFormat ?? "yyyy-MM-dd";
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	let $state = $watch({
+		value: $props?.value as DateRange | undefined,
+		start: $props?.value?.start as Date | undefined,
+		end: $props?.value?.end as Date | undefined,
+		preview: undefined as Date | undefined,
+		visible: false,
+		triggerId: "",
+		contentId: "",
+	});
+
+	// Seed from the props so the initial value displays; $bind handles later
+	// pushes both ways
+	$bind($state, $props, "value");
+
+	// Set default IDs so that the trigger can use aria-controls and the
+	// content can be labelled by the trigger
+	$run(() => {
+		$state.triggerId = `${$props?.id ?? defaultId}-trigger`;
+		$state.contentId = `${$props?.id ?? defaultId}-content`;
+	});
+
+	// Set the context that days use to render range highlighting. Dates are
+	// unwrapped so that consumers can call date methods on them
+	const context: DateRangePickerContext = {
+		getStart,
+		getEnd: () => ($state.end ? ($unwrap($state.end) as Date) : undefined),
+		getPreview: () => ($state.preview ? ($unwrap($state.preview) as Date) : undefined),
+		isSelecting,
+		setPreview: (date) => {
+			if (isSelecting()) {
+				$state.preview = date ? new ReactiveDate(date) : undefined;
+			}
+		},
+	};
+	$context[DateRangePickerContextName] = context;
+
+	function isSelecting(): boolean {
+		return $state.start !== undefined && $state.end === undefined;
+	}
+
+	// The plain (unwrapped) start date, for comparisons
+	function getStart(): Date | undefined {
+		return $state.start ? ($unwrap($state.start) as Date) : undefined;
+	}
+
+	function displayText(): string {
+		const value = $state.value;
+		if (value?.start && value?.end) {
+			return `${formatDate($unwrap(value.start), getDateFormat())} – ${formatDate($unwrap(value.end), getDateFormat())}`;
+		}
+		return $props?.placeholder || "-";
+	}
+
+	function toggle() {
+		setVisible(!$state.visible);
+	}
+
+	function setVisible(visible: boolean) {
+		$state.visible = visible;
+		if (visible) {
+			// HACK: Because this may be shown with a click, we need to wait for
+			// another mousedown before we close on click. Otherwise the click
+			// immediately bubbles up to the document
+			closeOnClick = false;
+			addDocumentEvent("mousedown", handleDocumentMouseDown);
+			addDocumentEvent("click", handleDocumentClick);
+			focusCalendar();
+		} else {
+			removeDocumentEvent("mousedown", handleDocumentMouseDown);
+			removeDocumentEvent("click", handleDocumentClick);
+		}
+	}
+
+	function focusCalendar() {
+		// Wait for the popout to be shown before focusing it
+		setTimeout(() => {
+			const grid = content?.querySelector(".torp-calendar-grid");
+			if (grid instanceof HTMLElement && !getDisabled()) {
+				grid.focus();
+			}
+		});
+	}
+
+	function handleDay(date: Date) {
+		if (getDisabled()) return;
+
+		const start = getStart();
+		if (!isSelecting()) {
+			// Start a new range
+			$state.start = new ReactiveDate(date);
+			$state.end = undefined;
+			$state.preview = undefined;
+		} else if (date < start!) {
+			// A date before the start begins a new range there
+			$state.start = new ReactiveDate(date);
+			$state.preview = undefined;
+		} else {
+			// Complete the range
+			$state.end = new ReactiveDate(date);
+			$state.preview = undefined;
+			complete();
+		}
+	}
+
+	function complete() {
+		$state.value = {
+			start: new ReactiveDate($state.start!),
+			end: new ReactiveDate($state.end!),
+		};
+		$props?.onchange?.($state.value);
+		setVisible(false);
+		focusTrigger();
+	}
+
+	function handleClose() {
+		setVisible(false);
+		focusTrigger();
+	}
+
+	function focusTrigger() {
+		const trigger = document.getElementById($state.triggerId);
+		if (trigger instanceof HTMLElement) {
+			trigger.focus();
+		}
+	}
+
+	function handleDocumentMouseDown() {
+		closeOnClick = true;
+	}
+
+	function handleDocumentClick(e: MouseEvent) {
+		if (closeOnClick && content && !content.contains(e.target as HTMLElement)) {
+			e.preventDefault();
+			setVisible(false);
+		}
+	}
+
+	function handleClick(e: MouseEvent) {
+		// Don't close when the trigger itself is clicked
+		e.stopPropagation();
+		toggle();
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={[
+				"torp-date-range-picker",
+				getDisabled() ? "torp-date-range-picker-disabled" : undefined,
+				$props?.class,
+			]}
+			{$props?.style}
+		>
+			<button
+				type="button"
+				id={$state.triggerId}
+				class="torp-date-range-picker-trigger"
+				aria-haspopup="dialog"
+				aria-expanded={$state.visible ? "true" : "false"}
+				aria-controls={$state.visible ? $state.contentId : undefined}
+				aria-label={$props?.ariaLabel}
+				disabled={getDisabled()}
+				onclick={handleClick}
+			>
+				{displayText()}
+			</button>
+
+			<div
+				id={$state.contentId}
+				class={["torp-date-range-picker-content", $state.visible ? undefined : "hidden"]}
+				aria-hidden={$state.visible ? undefined : "true"}
+				&ref={content}
+			>
+				<Calendar selectable {$state.start} onchange={handleDay} onclose={handleClose}>
+					<CalendarHeader>
+						<CalendarHeaderTrigger type="previous" />
+						<DatePickerHeader class="torp-date-range-picker-header" />
+						<CalendarHeaderTrigger type="next" />
+					</CalendarHeader>
+					<CalendarGridHeader>
+						@for (let day of $slot.days) {
+							<CalendarDayHeader {day.dayName} {day.shortDayName} />
+						}
+					</CalendarGridHeader>
+					<CalendarGrid>
+						@for (let day of $slot.days) {
+							@key = day.date
+							<DateRangePickerDay {day.date} {day.muted} {day.active} />
+						}
+					</CalendarGrid>
+				</Calendar>
+			</div>
+		</div>
+
+		@if ($props?.name) {
+			<input
+				type="hidden"
+				name={`${$props.name}-start`}
+				value={$state.value?.start ? formatDate($unwrap($state.value.start), "yyyy-MM-dd") : ""}
+			/>
+			<input
+				type="hidden"
+				name={`${$props.name}-end`}
+				value={$state.value?.end ? formatDate($unwrap($state.value.end), "yyyy-MM-dd") : ""}
+			/>
+		}
+	}
+
+	@style {
+		/* Visibility only -- see SelectBoxContent */
+		.torp-date-range-picker-content.hidden {
+			display: none;
+		}
+	}
+}

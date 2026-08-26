@@ -9,6 +9,7 @@ const components = [
 	"ComboBox",
 	"Contextual",
 	"DatePicker",
+	"DateRangePicker",
 	"Dialog",
 	"Disclosure",
 	"Drawer",

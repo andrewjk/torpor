@@ -40,6 +40,10 @@
 			"types": "./dist/DatePicker/index.d.ts",
 			"import": "./dist/DatePicker/index.js"
 		},
+		"./DateRangePicker": {
+			"types": "./dist/DateRangePicker/index.d.ts",
+			"import": "./dist/DateRangePicker/index.js"
+		},
 		"./Dialog": {
 			"types": "./dist/Dialog/index.d.ts",
 			"import": "./dist/Dialog/index.js"

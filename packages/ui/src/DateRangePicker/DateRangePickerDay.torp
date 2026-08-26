@@ -1,0 +1,137 @@
+import { ReactiveDate, type ClassValue, type StyleValue } from "@torpor/view";
+import { areDatesEqual } from "../utils/dateUtils";
+import { type CalendarContext, CalendarContextName } from "../Calendar/CalendarTypes";
+import {
+	type DateRangePickerContext,
+	DateRangePickerContextName,
+} from "./DateRangePickerTypes";
+
+// TODO: Internationalization?? On the server and/or the client...
+const formatDate = (date: Date): string => {
+	return new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+	}).format(date);
+};
+
+interface DateRangePickerDayProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The date to display */
+	date: Date;
+	/** Whether the date is muted (i.e. not in the currently displayed month) */
+	muted?: boolean;
+	/** Whether the date is the active (keyboard cursor) date */
+	active?: boolean;
+	/** An ARIA label for describing the day to screen readers */
+	ariaLabel?: string | undefined;
+}
+
+/**
+ * A day in a DateRangePicker's calendar, which highlights the start and end
+ * of the range being selected, the dates in between, and a preview of the
+ * range while the user hovers.
+ */
+export default function DateRangePickerDay($props: DateRangePickerDayProps | undefined) {
+	// Ensure the value is a reactive date
+	let reactiveDate = new ReactiveDate($unwrap($props?.date ?? new Date()));
+	$props!.date = reactiveDate;
+
+	// Get stuff out of the Calendar context
+	const calendarContext = $context[CalendarContextName] as CalendarContext;
+	if (!calendarContext) {
+		throw new Error("DateRangePickerDay must be contained within a Calendar");
+	}
+
+	// Get stuff out of the DateRangePicker context
+	const rangeContext = $context[DateRangePickerContextName] as DateRangePickerContext;
+	if (!rangeContext) {
+		throw new Error("DateRangePickerDay must be contained within a DateRangePicker");
+	}
+
+	// Register this day with the parent Calendar, which will handle setting
+	// the active (keyboard cursor) date
+	calendarContext.registerDay(reactiveDate, setActive);
+
+	// This function is called by the parent Calendar to set this item's active value
+	function setActive(value: boolean) {
+		$props!.active = value;
+	}
+
+	function isToday() {
+		const today = new Date();
+		return areDatesEqual($props!.date, today);
+	}
+
+	function isStart(): boolean {
+		const start = rangeContext.getStart();
+		return !!start && areDatesEqual($props!.date, start);
+	}
+
+	function isEnd(): boolean {
+		const end = rangeContext.getEnd();
+		return !!end && areDatesEqual($props!.date, end);
+	}
+
+	// The end of the preview range is the hovered date while a range is being
+	// selected, or the real end once it's complete
+	function getRangeEnd(): Date | undefined {
+		return rangeContext.getEnd() ?? rangeContext.getPreview();
+	}
+
+	function isInRange(): boolean {
+		const start = rangeContext.getStart();
+		const end = getRangeEnd();
+		if (!start || !end) return false;
+		if (areDatesEqual($props!.date, start) || areDatesEqual($props!.date, end)) return false;
+		return $props!.date > start && $props!.date < end;
+	}
+
+	function handleClick() {
+		calendarContext.handleDay(reactiveDate);
+	}
+
+	function handleEnter() {
+		rangeContext.setPreview(new Date($props!.date));
+	}
+
+	@render {
+		<button
+			{$props?.id}
+			class={buildClass()}
+			{$props?.style}
+			type="button"
+			tabindex="-1"
+			onclick={handleClick}
+			onmouseenter={handleEnter}
+			aria-label={$props?.ariaLabel ?? formatDate($props!.date)}
+			aria-current={isToday() ? "date" : undefined}
+			aria-selected={isStart() || isEnd() || $props?.active ? "true" : "false"}
+			aria-disabled={$props?.muted ? "true" : undefined}
+			data-range={isStart() ? "start" : isEnd() ? "end" : isInRange() ? "inside" : undefined}
+		>
+			<slot>
+				{$props!.date.getDate()}
+			</slot>
+		</button>
+	}
+
+	function buildClass() {
+		return [
+			"torp-date-range-day",
+			$props?.class,
+			{
+				muted: $props?.muted,
+				today: isToday(),
+				active: $props?.active,
+				selected: isStart() || isEnd(),
+				"in-range": isInRange(),
+			},
+		];
+	}
+}
