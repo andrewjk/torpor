@@ -40,8 +40,8 @@ interface SelectBoxProps {
 	placeholder?: string;
 	///** Whether the input's value is required */
 	//required?: boolean,
-	/** Whether the popout is visible  */
-	visible: Bindable<boolean | undefined>;
+	/** Whether the popout is visible; only bind this to control it from outside */
+	visible?: Bindable<boolean | undefined>;
 	/** Raised when the value has changed */
 	onchange?: (value: any) => void;
 	/** Raised when the popout has opened */

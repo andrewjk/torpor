@@ -44,14 +44,34 @@ async function run() {
 			dts += typeDef;
 		}
 		dts += `export { ${exportNames.join(", ")} };\n`;
+
+		// Add re-exports for plain TS modules (e.g. showModal, showNotification)
+		// that the component's index.ts exports but which don't come from .torp
+		// files, so that they keep their types for consumers
+		const indexSource = await fs.readFile(join(componentFolder, "index.ts"), "utf8");
+		const allExports = [...indexSource.matchAll(/export \{([^}]+)\}/g)]
+			.flatMap((m) => m[1].split(","))
+			.map((n) =>
+				n
+					.trim()
+					.split(/\s+as\s+/)
+					.pop()!,
+			)
+			.filter((n) => n && !exportNames.includes(n));
+		const tsFiles = (await fs.readdir(componentFolder)).filter(
+			(f) => f.endsWith(".ts") && f !== "index.ts",
+		);
+		for (const name of allExports) {
+			if (tsFiles.includes(`${name}.ts`)) {
+				dts += `export { default as ${name} } from "./${name}";\n`;
+			}
+		}
+
 		await fs.writeFile(join(distFolder, component, "index.d.ts"), dts);
 
 		// Copy all *.ts files (except index.ts) into the dist folder, so that
 		// imports from the .torp files resolve for consumers
 		console.log(chalk.cyan.inverse(" POST "), `Tidy ${component}`);
-		let tsFiles = (await fs.readdir(componentFolder)).filter(
-			(f) => f.endsWith(".ts") && f !== "index.ts",
-		);
 		for (const file of tsFiles) {
 			await fs.copyFile(join(componentFolder, file), join(distFolder, component, file));
 		}

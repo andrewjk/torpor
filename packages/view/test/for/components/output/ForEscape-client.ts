@@ -58,7 +58,7 @@ export default function ForEscape(
 			const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
 			$run(() => {
-				t_input_1.value = t_item_1.data.i || "";
+				t_input_1.value = String(t_item_1.data.i || "");
 			}, undefined, { forVarMask: 1 });
 			t_event(t_input_1, "input", (e) => t_item_1.data.i = e.target.value);
 			$run(() => {

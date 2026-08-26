@@ -28,7 +28,7 @@ export default function BindCheckbox(
 	const t_p_1 = t_next(t_next(t_root_0, true)) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_input_1.value = $state.agreed || false;
+		t_input_1.value = String($state.agreed || false);
 	});
 	t_event(t_input_1, "input", (e) => $state.agreed = e.target.checked);
 	$run(() => {

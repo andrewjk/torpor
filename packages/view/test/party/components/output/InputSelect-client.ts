@@ -86,7 +86,7 @@ export default function ColorSelect(
 	);
 
 	$run(() => {
-		t_select_1.value = $state.selectedColorId || "";
+		t_select_1.value = String($state.selectedColorId || "");
 	});
 	t_event(t_select_1, "change", (e) => $state.selectedColorId = e.target.value);
 	$run(() => {

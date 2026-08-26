@@ -28,7 +28,7 @@ export default function BindTextarea(
 	const t_p_1 = t_next(t_next(t_textarea_1, true)) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_textarea_1.value = $state.message || "";
+		t_textarea_1.value = String($state.message || "");
 	});
 	t_event(t_textarea_1, "input", (e) => $state.message = e.target.value);
 	$run(() => {

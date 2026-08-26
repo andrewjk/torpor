@@ -29,7 +29,7 @@ export default function InputHello(
 	const t_text_1 = t_child(t_root_0);
 	const t_input_1 = t_next(t_next(t_root_0, true)) as HTMLInputElement;
 	$run(() => {
-		t_input_1.value = $state.text || "";
+		t_input_1.value = String($state.text || "");
 	});
 	t_event(t_input_1, "input", (e) => $state.text = e.target.value);
 	$run(() => {

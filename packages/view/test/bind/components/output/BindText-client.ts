@@ -30,11 +30,11 @@ export default function BindText(
 	const t_p_1 = t_next(t_next(t_next(t_next(t_select_1, true)), true)) as HTMLElement;
 	const t_text_2 = t_child(t_p_1);
 	$run(() => {
-		t_input_1.value = $state.name || "";
+		t_input_1.value = String($state.name || "");
 	});
 	t_event(t_input_1, "input", (e) => $state.name = e.target.value);
 	$run(() => {
-		t_select_1.value = $state.selected || "";
+		t_select_1.value = String($state.selected || "");
 	});
 	t_event(t_select_1, "change", (e) => $state.selected = e.target.value);
 	$run(() => {

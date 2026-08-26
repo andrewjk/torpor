@@ -67,7 +67,7 @@ function BindText(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_input_1 = t_root_0 as HTMLInputElement;
 	$run(() => {
-		t_input_1.value = $props.name || "";
+		t_input_1.value = String($props.name || "");
 	});
 	t_event(t_input_1, "input", (e) => $props.name = e.target.value);
 	t_add_element(t_input_1, $parent, $anchor);

@@ -13,7 +13,7 @@ interface AccordionProps {
 	/** Whether a single AccordionItem or multiple AccordionItems can be expanded at the same time */
 	type?: "single" | "multiple";
 	/** The value of the expanded AccordionItem, or an array of values if the type is "multiple" */
-	value: Bindable<any | any[]>;
+	value?: Bindable<any | any[]>;
 	/** If set to true, the user cannot interact with any items in the Accordion */
 	disabled?: boolean;
 	/** Raised when the expanded item(s) have changed */

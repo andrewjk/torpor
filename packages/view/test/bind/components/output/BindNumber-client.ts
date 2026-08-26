@@ -25,7 +25,7 @@ export default function NumberInput(
 	const t_p_1 = t_next(t_next(t_input_1, true)) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_input_1.value = $props.value || 0;
+		t_input_1.value = String($props.value || 0);
 	});
 	t_event(t_input_1, "input", (e) => $props.value = Number(e.target.value));
 	$run(() => {

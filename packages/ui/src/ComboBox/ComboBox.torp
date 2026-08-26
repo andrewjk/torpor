@@ -42,8 +42,8 @@ interface ComboBoxProps {
 	required?: boolean;
 	/** An ARIA label for describing the input to screen readers when there is no associated label element */
 	ariaLabel?: string;
-	/** Whether the popout is visible  */
-	visible: Bindable<boolean | undefined>;
+	/** Whether the popout is visible; only bind this to control it from outside */
+	visible?: Bindable<boolean | undefined>;
 	/** Raised when the value has changed */
 	onchange?: (value: any) => void;
 	/** Raised when the popout has opened */

@@ -9,8 +9,12 @@
  * existing `ListItem` (matched by key, reused wholesale) or a freshly mounted
  * one (for genuinely new keys), keeping the per-update cost proportional to
  * what actually changed instead of to the list size.
+ *
+ * NOTE: `data` is `any` rather than `Record<string, any>` -- when a `@for`
+ * body binds a single loop variable and is proxy-safe, the variable is stored
+ * directly (e.g. `data: page` for a number), not as a bag.
  */
 export default interface ListItemSpec {
 	key: any;
-	data: Record<string, any>;
+	data: any;
 }

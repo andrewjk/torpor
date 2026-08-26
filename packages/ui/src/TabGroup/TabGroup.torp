@@ -14,7 +14,7 @@ interface TabGroupProps {
 	/** How tabs are activated; if automatic they are shown on focus, if manual they must be clicked */
 	activation?: "automatic" | "manual";
 	/** The value of the active TabContent */
-	value: Bindable<string | undefined>;
+	value?: Bindable<string | undefined>;
 	/** If set to true, the user cannot interact with any items in the TabGroup */
 	disabled?: boolean;
 	/** Raised when the active item has changed */

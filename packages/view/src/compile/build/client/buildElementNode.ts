@@ -342,7 +342,12 @@ function buildBindAttribute(
 	}
 	let set = `${value} || ${defaultValue}`;
 	const propName = name.substring(1);
-	const setAttribute = `${varName}.${propName} = ${set}`;
+	// NOTE: The DOM value property is always a string, while the bound state
+	// may be a number (e.g. with `<input type="number">`), so convert
+	const setAttribute =
+		propName === "value"
+			? `${varName}.${propName} = String(${set})`
+			: `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
 	status.imports.add("t_event");

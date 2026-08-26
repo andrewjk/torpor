@@ -25,7 +25,7 @@ export default function SelectBind(
 	const t_p_1 = t_next(t_next(t_select_1, true)) as HTMLElement;
 	const t_text_1 = t_child(t_p_1);
 	$run(() => {
-		t_select_1.value = $props.value || "";
+		t_select_1.value = String($props.value || "");
 	});
 	t_event(t_select_1, "change", (e) => $props.value = e.target.value);
 	$run(() => {
