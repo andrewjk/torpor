@@ -1,0 +1,47 @@
+import { ListBox, ListBoxItem } from "../ListBox/index";
+
+interface LoadedItemsProps {
+	/** The items to render */
+	items: any[];
+	/** The selected value(s), bound through to the internal ListBox */
+	value: any;
+	/** Whether multiple items can be selected */
+	multiple?: boolean;
+	/** Extracts the display text for an item (defaults to label ?? text ?? item) */
+	getItemLabel?: (item: any) => any;
+	/** Extracts the value for an item (defaults to value ?? id) */
+	getItemValue?: (item: any) => any;
+}
+
+function defaultLabel(item: any): string {
+	const label = item?.label ?? item?.text ?? item;
+	return typeof label === "string" ? label : String(label);
+}
+
+function defaultValue(item: any): any {
+	return item?.value ?? item?.id;
+}
+
+/**
+ * The internally rendered list of options for components that load their
+ * items from a network loader (ComboBox auto-complete etc). Used as the
+ * fallback content when a consumer doesn't slot their own ListBox.
+ */
+export default function LoadedItems($props: LoadedItemsProps) {
+	const getLabel = $props.getItemLabel ?? defaultLabel;
+	const getValue = $props.getItemValue ?? defaultValue;
+
+	@render {
+		<ListBox type={$props.multiple ? "multiple" : "single"} value={$props.value}>
+			@for (let item of $props.items) {
+				@key = getValue(item)
+				<ListBoxItem value={getValue(item)}>
+					{getLabel(item)}
+				</ListBoxItem>
+			}
+		</ListBox>
+		@if ($props.items.length === 0) {
+			<span class="torp-loaded-items-empty">No results.</span>
+		}
+	}
+}

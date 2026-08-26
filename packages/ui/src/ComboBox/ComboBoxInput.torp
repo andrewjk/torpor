@@ -55,7 +55,11 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	}
 
 	function handleInput(e: InputEvent) {
-		if (context.searchItems) {
+		if (context.getLoadedItems) {
+			// Loaded from a network loader: refetch with the current text
+			$state.searchText = input.value;
+			$state.visible = true;
+		} else if (context.searchItems) {
 			context.searchText = input.value;
 			const found = context.searchItems(context.searchText);
 			if (found !== undefined) {

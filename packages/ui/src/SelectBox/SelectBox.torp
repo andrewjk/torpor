@@ -1,5 +1,6 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
 import FormValues from "../Form/FormValues.torp";
+import { type LoadResult, type Loader, createItemLoader } from "../utils/loader";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { type SelectBoxContext, SelectBoxContextName, type SelectBoxState } from "./SelectBoxTypes";
 
@@ -16,6 +17,18 @@ interface SelectBoxProps {
 	value: Bindable<any>;
 	/** Whether multiple values can be selected at the same time */
 	multiple?: boolean;
+	/**
+	 * Reads options from the network (or anywhere async) when the box is
+	 * shown. When set and no content is slotted in, the options are rendered
+	 * automatically.
+	 */
+	load?: Loader;
+	/** Called after each successful load with the normalized result */
+	onload?: (result: LoadResult) => void;
+	/** Extracts the display text for a loaded item (defaults to `label ?? text ?? item`) */
+	getItemLabel?: (item: any) => any;
+	/** Extracts the value for a loaded item (defaults to `value ?? id`) */
+	getItemValue?: (item: any) => any;
 	/** Text to display when the input value is empty */
 	placeholder?: string;
 	///** Whether the input's value is required */
@@ -55,6 +68,20 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 
 	$bind($state, $props, "visible", "value");
 
+	if ($props?.load !== undefined && typeof $props.load !== "function") {
+		throw new Error("SelectBox: `load` must be a function");
+	}
+	const hasLoader = typeof $props?.load === "function";
+
+	// Load options from the network (lazily, on first read)
+	const $load = hasLoader
+		? createItemLoader({
+				load: $props!.load!,
+				getRequest: () => ({}),
+				onload: (r) => $props?.onload?.(r),
+			})
+		: undefined;
+
 	let result: any;
 
 	// Set the context to pass down to items
@@ -68,6 +95,9 @@ export default function SelectBox($props: SelectBoxProps | undefined) {
 			return $props?.multiple === true;
 		},
 		state: $state,
+		getLoadedItems: $load ? () => $load.items : undefined,
+		getItemLabel: $props?.getItemLabel,
+		getItemValue: $props?.getItemValue,
 	};
 	$context[SelectBoxContextName] = context;
 

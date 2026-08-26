@@ -1,0 +1,19 @@
+import { SelectBox, SelectBoxContent, SelectBoxTrigger } from "../../../src/SelectBox/index";
+
+/** A SelectBox that loads its options from the `load` prop when shown */
+export default function LoaderSelectBox($props: any) {
+	@render {
+		<SelectBox
+			&value={$props.value}
+			load={$props.load}
+			onload={$props.onload}
+			onchange={$props.onchange}
+			getItemLabel={$props.getItemLabel}
+			getItemValue={$props.getItemValue}
+			multiple={$props.multiple}
+		>
+			<SelectBoxTrigger />
+			<SelectBoxContent />
+		</SelectBox>
+	}
+}

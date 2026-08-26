@@ -1,3 +1,5 @@
+import { $async, $watch } from "@torpor/view";
+
 /**
  * Shared contract for loading data from the network, used by components that
  * can take either static data or a loader function (DataGrid now, ComboBox
@@ -44,4 +46,61 @@ export type Loader<T = any, TRequest extends LoadRequest = LoadRequest> = (
 /** Wraps a bare array in a LoadResult so consumers always get the same shape */
 export function normalizeLoadResult<T>(result: LoadResult<T> | T[]): LoadResult<T> {
 	return Array.isArray(result) ? { items: result } : result;
+}
+
+export interface ItemLoaderOptions<T = any> {
+	/** The loader function to fetch items */
+	load: Loader<T>;
+	/**
+	 * Builds the request for the current fetch. Called inside the async
+	 * getter, so reads of reactive state here re-fetch when they change.
+	 */
+	getRequest: () => LoadRequest;
+	/** Called after each successful load with the normalized result */
+	onload?: (result: LoadResult<T>) => void;
+}
+
+/** Reactive loading state returned by createItemLoader */
+export interface ItemLoaderState<T = any> {
+	/** The full result of the current load; suspends while a fetch is pending */
+	readonly result: LoadResult<T> | undefined;
+	/** The loaded items; suspends while a fetch is pending */
+	readonly items: T[];
+}
+
+/**
+ * Shared loading state for components that read items from a network loader
+ * (DataGrid, ComboBox auto-complete etc). Read the returned state's `items`
+ * or `result` inside an `@await` boundary: while a fetch is pending the read
+ * suspends, and when dependencies read inside `getRequest` change the fetch
+ * re-runs.
+ *
+ * ```
+ * let $load = createItemLoader({
+ * 	load: $props.load,
+ * 	getRequest: () => ({ searchText: $state.searchText }),
+ * });
+ * @await { ...$load.items... } with { <span>Loading…</span> }
+ * ```
+ */
+export function createItemLoader<T = any>(options: ItemLoaderOptions<T>): ItemLoaderState<T> {
+	return $watch({
+		get result(): LoadResult<T> | undefined {
+			return $async(() => {
+				const promise = Promise.resolve(options.load(options.getRequest())).then(
+					normalizeLoadResult,
+				);
+				// Report successful loads to the consumer; failures surface
+				// through the component's error boundary, not this chain
+				promise.then(
+					(r) => options.onload?.(r),
+					() => {},
+				);
+				return promise as Promise<LoadResult<T>>;
+			});
+		},
+		get items(): T[] {
+			return this.result?.items ?? [];
+		},
+	});
 }

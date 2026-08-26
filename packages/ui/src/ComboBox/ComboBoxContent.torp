@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
+import LoadedItems from "../utils/LoadedItems.torp";
 import { type ComboBoxContext, ComboBoxContextName } from "./ComboBoxTypes";
 
 interface ComboBoxContentProps {
@@ -84,7 +85,28 @@ export default function ComboBoxContent($props: ComboBoxContentProps | undefined
 			aria-hidden={$state.visible ? undefined : "true"}
 			&ref={div}
 		>
-			<slot />
+			<slot>
+				@if (context.getLoadedItems) {
+					@// Options loaded from a network loader, rendered automatically
+					@try {
+						@await {
+							<LoadedItems
+								items={context.getLoadedItems!()}
+								value={$state.value}
+								multiple={context.multiple}
+								getItemLabel={context.getItemLabel}
+								getItemValue={context.getItemValue}
+							/>
+						} with {
+							<span class="torp-combo-box-loading">Loading…</span>
+						}
+					} catch (err) {
+						<span class="torp-combo-box-error" role="alert">
+							{err instanceof Error ? err.message : String(err)}
+						</span>
+					}
+				}
+			</slot>
 		</div>
 	}
 }
