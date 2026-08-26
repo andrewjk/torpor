@@ -5,3 +5,8 @@ declare module "*.torp" {
 	const Component: ComponentType;
 	export default Component;
 }
+
+declare module "*.svg" {
+	const content: string;
+	export default content;
+}

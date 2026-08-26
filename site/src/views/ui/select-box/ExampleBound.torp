@@ -23,7 +23,7 @@ export default function ExampleBound() {
 				{$state.text || "-"}
 			</SelectBoxTrigger>
 			<SelectBoxContent class="example-select-box-content">
-				<ListBox class="example-list-box">
+				<ListBox class="example-list-box" &value={$state.value}>
 					@for (let item of items) {
 						@key = item.id;
 						<ListBoxItem class="example-list-box-item" value={item.id}>

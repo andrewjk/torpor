@@ -3,16 +3,19 @@ import { codeToHtml } from "@torpor/shiki";
 /**
  * Displays a colorized code preview.
  */
-export default function CodePreview($props) {
+export default function CodePreview($props: { code: string }) {
 	@head {
 		<title>Torpor</title>
 	}
 
 	let $state = $watch({
-		// Format the code asynchronously; re-formats when $props.code changes.
+		get code() {
+			return $props!.code;
+		},
+		// Format the code asynchronously; re-formats when the code changes.
 		get formatted() {
 			return $async(async () => {
-				const code = $props.code;
+				const code = this.code;
 				return (await codeToHtml(code, {
 					lang: "torpor",
 					theme: "light-plus",
@@ -25,7 +28,7 @@ export default function CodePreview($props) {
 		@await {
 			@html($state.formatted)
 		} with {
-			<pre><code>{$props.code}</code></pre>
+			<pre><code>{$state.code}</code></pre>
 		}
 	}
 }

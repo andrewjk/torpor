@@ -1,6 +1,8 @@
 import Repl from "../repl/Repl.torp";
 
 export default function PartyPage() {
+	// The playground samples mention $props, so it gets auto-imported into this file
+	void $props;
 	@head {
 		<title>Component Party | Torpor</title>
 	}

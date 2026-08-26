@@ -26,7 +26,7 @@ export default function ExampleMultiple() {
 				{$state.text || "-"}
 			</SelectBoxTrigger>
 			<SelectBoxContent class="example-select-box-content">
-				<ListBox class="example-list-box" type="multiple">
+				<ListBox class="example-list-box" type="multiple" &value={$state.value}>
 					@for (let item of items) {
 						@key = item.id;
 						<ListBoxItem class="example-list-box-item" value={item.id}>

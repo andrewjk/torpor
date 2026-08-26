@@ -33,7 +33,7 @@ export default function ExampleBasic($props: any) {
 		<Form class="example-form" {$state.data} {schema}>
 			<Field class="example-form-field" name="text" &value={$state.data.text}>
 				<Label>Text</Label>
-				<Input placeholder="Type ok to succeed" />
+				<Input placeholder="Type ok to succeed" &value={$state.data.text} />
 				<Message />
 			</Field>
 			<button>Submit</button>

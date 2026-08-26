@@ -2,7 +2,7 @@ import { Notification, NotificationClose, NotificationContent } from "@torpor/ui
 
 export default function CustomNotification() {
 	@render {
-		<Notification class="custom-notification-function">
+		<Notification class="custom-notification-function" visible={true}>
 			<NotificationContent>{$props.text}</NotificationContent>
 			<NotificationClose>X</NotificationClose>
 		</Notification>

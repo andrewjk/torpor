@@ -2,17 +2,17 @@ import { build, parse } from "@torpor/view/compile";
 import { transform } from "sucrase";
 import script from "./view.txt?raw";
 
-export default function Repl($props) {
-	let input = $props.input ?? "";
+export default function Repl($props: { input?: string } | undefined) {
+	let input = $props?.input ?? "";
 
 	let $state = $watch({
 		input,
 		output: "",
-		errors: [],
+		errors: [] as { message: string; startIndex: number }[],
 	});
 
-	let timer;
-	function debounce(fn, timeout = 600) {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	function debounce(fn: () => void, timeout = 600) {
 		if (timer) {
 			clearTimeout(timer);
 			timer = setTimeout(fn, timeout);
@@ -31,7 +31,7 @@ export default function Repl($props) {
 			let parsed = parse(input);
 			if (parsed.ok) {
 				$state.errors = [];
-				let component = build(parsed.template);
+				let component = build(parsed.template!);
 				$state.output = `
 <html>
 <head>
@@ -52,7 +52,7 @@ ${component.styles.map((s) => `<style>${s.style}</style>`).join("\n")}
 <script>
 const target = document.getElementById("repl-target");
 try {
-	mount(target, ${parsed.template.components.find((c) => c.default).name});
+	mount(target, ${parsed.template!.components.find((c) => c.default)!.name});
 } catch (error) {
 	target.innerHTML = '<span style="color: red"><p>Script syntax error</p><p>' + error + '</p></span>';
 }
@@ -61,7 +61,7 @@ try {
 </html>
 `.trimStart();
 			} else {
-				$state.errors = parsed.errors.sort((a, b) => a.start - b.start);
+				$state.errors = parsed.errors.sort((a, b) => a.startIndex - b.startIndex);
 			}
 		});
 	});
@@ -91,7 +91,7 @@ try {
 							<p>Template errors:</p>
 							<ul>
 								@for (let error of $state.errors) {
-									<li>{error.message}, position: {error.start}</li>
+									<li>{error.message}, position: {error.startIndex}</li>
 								}
 							</ul>
 						</div>
@@ -124,7 +124,7 @@ try {
 		}
 	}
 
-	function textAreaMount(e) {
+	function textAreaMount(e: HTMLTextAreaElement) {
 		// HACK: Something is out of order somewhere
 		setTimeout(() => {
 			e.style.height = e.scrollHeight + "px";
@@ -132,17 +132,19 @@ try {
 		}, 1);
 	}
 
-	function textAreaInput(e) {
+	function textAreaInput(this: Element) {
+		const area = this as HTMLTextAreaElement;
 		let x = window.scrollX,
 			y = window.scrollY;
-		this.style.height = "";
-		this.style.height = this.scrollHeight + "px";
+		area.style.height = "";
+		area.style.height = area.scrollHeight + "px";
 		window.scrollTo(x, y);
 	}
 
 	// From https://stackoverflow.com/a/45396754
 	let tabEnabled = true;
-	function textAreaKeyDown(e) {
+	function textAreaKeyDown(this: Element, e: KeyboardEvent) {
+		const area = this as HTMLTextAreaElement;
 		// Escape key toggles tab on/off
 		if (e.keyCode === 27) {
 			tabEnabled = !tabEnabled;
@@ -152,10 +154,10 @@ try {
 		// Enter xey?
 		if (e.keyCode === 13 && tabEnabled) {
 			// selection?
-			if (this.selectionStart === this.selectionEnd) {
+			if (area.selectionStart === area.selectionEnd) {
 				// Find start of the current line
-				var sel = this.selectionStart;
-				var text = this.value;
+				var sel = area.selectionStart;
+				var text = area.value;
 				while (sel > 0 && text[sel - 1] !== "\n") {
 					sel--;
 				}
@@ -181,22 +183,22 @@ try {
 		// Tab key?
 		if (e.keyCode === 9 && tabEnabled) {
 			// selection?
-			if (this.selectionStart === this.selectionEnd) {
+			if (area.selectionStart === area.selectionEnd) {
 				// These single character operations are undoable
 				if (!e.shiftKey) {
 					document.execCommand("insertText", false, "\t");
 				} else {
-					var text = this.value;
-					if (this.selectionStart > 0 && text[this.selectionStart - 1] === "\t") {
+					var text = area.value;
+					if (area.selectionStart > 0 && text[area.selectionStart - 1] === "\t") {
 						document.execCommand("delete");
 					}
 				}
 			} else {
 				// Block indent/unindent trashes undo stack
 				// Select whole lines
-				var selStart = this.selectionStart;
-				var selEnd = this.selectionEnd;
-				var text = this.value;
+				var selStart = area.selectionStart;
+				var selEnd = area.selectionEnd;
+				var text = area.value;
 				while (selStart > 0 && text[selStart - 1] !== "\n") {
 					selStart--;
 				}
@@ -225,12 +227,12 @@ try {
 						lines[i] = "\t" + lines[i];
 					}
 				}
-				lines = lines.join("\n");
+				const newText = lines.join("\n");
 
 				// Update the text area
-				this.value = text.substr(0, selStart) + lines + text.substr(selEnd);
-				this.selectionStart = selStart;
-				this.selectionEnd = selStart + lines.length;
+				area.value = text.substr(0, selStart) + newText + text.substr(selEnd);
+				area.selectionStart = selStart;
+				area.selectionEnd = selStart + newText.length;
 			}
 
 			e.preventDefault();
@@ -241,7 +243,9 @@ try {
 		return true;
 	}
 
-	function resizeIframe(e) {
-		e.target.style.height = e.target.contentWindow.document.documentElement.scrollHeight + "px";
+	function resizeIframe(e: Event) {
+		const target = e.target as HTMLIFrameElement;
+		target.style.height =
+			target.contentWindow?.document.documentElement.scrollHeight + "px";
 	}
 }

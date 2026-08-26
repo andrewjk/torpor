@@ -9,19 +9,19 @@ export default function ExampleBasic() {
 	];
 
 	let $state = $watch({
-		value: 0,
+		value: "",
 		get text() {
-			return items.find((i) => i.id === this.value)?.text;
+			return items.find((i) => i.text === this.value)?.text ?? "";
 		},
 	});
 
 	@render {
-		<p>Value: <input type="number" &value={$state.value} /></p>
+		<p>Value: {$state.value}</p>
 
 		<ComboBox class="example-select-box" &value={$state.value}>
 			<ComboBoxInput class="example-select-box-input" value={$state.text} />
 			<ComboBoxContent class="example-select-box-content">
-				<ListBox class="example-list-box">
+				<ListBox class="example-list-box" &value={$state.value}>
 					@for (let item of items) {
 						@key = item.id;
 						<ListBoxItem class="example-list-box-item">

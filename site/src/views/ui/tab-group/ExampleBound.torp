@@ -8,7 +8,7 @@ export default function ExampleBound() {
 	let $state = $watch({ value: "0" });
 
 	@render {
-		<p>Selected value: <input type="number" &value={$state.value} /></p>
+		<p>Selected value: <input type="text" &value={$state.value} /></p>
 
 		<TabGroup &value={$state.value}>
 			<TabList class="example-tab-list" ariaLabel="Basic tab example">

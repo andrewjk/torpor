@@ -18,6 +18,11 @@ const devContext = globalThis[DEV_CONTEXT_SYMBOL] ??= {
 	signalSet: noop,
 	effectRun: noop
 };
+const proxyDataSymbol = Symbol.for("torp.ProxyData");
+const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
+function $unwrap(object) {
+	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
+}
 function buildClasses(value, styleHash) {
 	if (typeof value === "string") {
 		if (styleHash !== void 0) value += " " + styleHash;
@@ -30,9 +35,12 @@ function buildClasses(value, styleHash) {
 	}
 }
 function gatherClasses(name, value, classes) {
-	if (value) if (Array.isArray(value)) for (let v of value) gatherClasses(v, v, classes);
-	else if (typeof value === "object") for (const n in value) gatherClasses(n, value[n], classes);
-	else classes.push(name);
+	if (value) {
+		value = $unwrap(value);
+		if (Array.isArray(value)) for (let v of value) gatherClasses(v, v, classes);
+		else if (typeof value === "object") for (const n in value) gatherClasses(n, value[n], classes);
+		else classes.push(name);
+	}
 }
 const CAMEL_TO_DASH = /[A-Z]+(?![a-z])|[A-Z]/g;
 function buildStyles(value) {
@@ -52,11 +60,6 @@ function gatherStyles(value, styles) {
 	}
 	else styles.push(String(value));
 }
-const proxyDataSymbol = Symbol.for("torp.ProxyData");
-const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
-function $unwrap(object) {
-	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
-}
 function formatText(value) {
 	if (value === void 0 || value === null) return "";
 	if (typeof value === "string") return value;
@@ -70,8 +73,7 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	batch: 0,
 	batchOperation: 0,
 	registerComputed: null,
-	firstEffectToRun: null,
-	lastEffectToRun: null,
+	effectsToRun: [],
 	firstSignalToUpdate: null,
 	lastSignalToUpdate: null,
 	activeRegion: null,
@@ -221,30 +223,52 @@ function checkEffect(effect) {
 		clearSources(effect);
 	}
 }
+function routeEffectError(effect, error) {
+	let region = effect.region ?? null;
+	while (region !== null) {
+		const boundary = region.errorBoundary;
+		if (boundary !== void 0 && boundary.effect !== null) {
+			const boundaryEffect = boundary.effect;
+			const held = [];
+			for (let sub = boundaryEffect.firstSource; sub !== null; sub = sub.nextSource) held.push(sub.source);
+			for (const signal of effect.errorSources ?? []) if (!held.includes(signal)) held.push(signal);
+			boundary.error = error;
+			boundary.hasError = true;
+			boundary.heldSignals = held;
+			runCleanups(boundaryEffect);
+			deactivateSources(boundaryEffect);
+			runEffect(boundaryEffect);
+			clearSources(boundaryEffect);
+			return true;
+		}
+		const depth = region.depth;
+		let previous = region.previousRegion;
+		while (previous !== null && previous.depth >= depth) previous = previous.previousRegion;
+		region = previous;
+	}
+	return false;
+}
 function triggerEffects() {
-	let didError = false;
-	let error;
-	let effect = context.firstEffectToRun;
-	while (effect !== null) {
+	let unhandledError = null;
+	const queue = context.effectsToRun;
+	for (let i = 0; i < queue.length; i++) {
+		const effect = queue[i];
 		context.batchOperation++;
+		effect.queued = false;
 		try {
 			checkEffect(effect);
 		} catch (err) {
-			if (!didError) {
-				didError = true;
-				error = err;
+			let handled = false;
+			try {
+				handled = routeEffectError(effect, err);
+			} catch (routingError) {
+				if (unhandledError === null) unhandledError = { error: routingError };
 			}
+			if (!handled && unhandledError === null) unhandledError = { error: err };
 		}
-		effect = effect.nextEffectToRun;
 	}
-	effect = context.firstEffectToRun;
-	context.firstEffectToRun = null;
-	context.lastEffectToRun = null;
-	while (effect !== null) {
-		let nextEffect = effect.nextEffectToRun;
-		effect.nextEffectToRun = null;
-		effect = nextEffect;
-	}
+	for (let effect of queue) effect.queued = false;
+	context.effectsToRun = [];
 	let signal = context.firstSignalToUpdate;
 	context.firstSignalToUpdate = null;
 	context.lastSignalToUpdate = null;
@@ -253,7 +277,7 @@ function triggerEffects() {
 		signal.nextSignalToUpdate = null;
 		signal = nextSignal;
 	}
-	if (didError) throw error;
+	if (unhandledError !== null) throw unhandledError.error;
 }
 function batchEnd() {
 	if (context.batch > 1) {
@@ -276,6 +300,7 @@ function runEffect(effect) {
 	const oldActiveTarget = context.activeTarget;
 	const oldExtent = context.extent;
 	effect.didError = false;
+	effect.errorSources = null;
 	batchStart();
 	try {
 		if (context.previousEffect !== null) context.previousEffect.nextEffect = effect;
@@ -286,6 +311,9 @@ function runEffect(effect) {
 		effect.extent = context.extent;
 	} catch (err) {
 		effect.didError = true;
+		let sources = null;
+		for (let sub = effect.firstSource; sub !== null; sub = sub.nextSource) (sources ??= []).push(sub.source);
+		effect.errorSources = sources;
 		clearSources(effect);
 		throw err;
 	} finally {
@@ -302,15 +330,20 @@ function $run(fn, name, options) {
 		firstSource: null,
 		nextEffect: null,
 		extent: 0,
-		nextEffectToRun: null,
+		queued: false,
 		didError: false,
 		didSuspend: false,
+		region: null,
+		errorSources: null,
 		name,
 		isMountEffect: options?.isMountEffect,
 		forVarMask: options?.forVarMask
 	};
 	const region = context.activeRegion;
-	if (region !== null) region.effects.push(effect);
+	if (region !== null) {
+		region.effects.push(effect);
+		effect.region = region;
+	}
 	devContext.onRun(effect);
 	runEffect(effect);
 	return effect;
@@ -505,6 +538,7 @@ function clearRegion(region) {
 }
 function clearNodes(region) {
 	if (region.startNode !== null && region.endNode !== null) {
+		const after = region.endNode.nextSibling;
 		let stop = region.startNode;
 		const startDetached = region.startNode.parentNode === null;
 		let fallback = false;
@@ -524,6 +558,16 @@ function clearNodes(region) {
 			currentNode = previousNode;
 		}
 		if (!fallback && currentNode === region.startNode) currentNode.remove();
+		const firstRemaining = fallback ? stop : after;
+		if (firstRemaining !== null) {
+			let ancestor = region.previousRegion;
+			let ancestorDepth = region.depth;
+			while (ancestor !== null && ancestor.depth < ancestorDepth) {
+				if (ancestor.startNode !== null && ancestor.startNode.parentNode === null) ancestor.startNode = firstRemaining;
+				ancestorDepth = ancestor.depth;
+				ancestor = ancestor.previousRegion;
+			}
+		}
 	}
 	releaseRegion(region);
 }
@@ -534,6 +578,7 @@ function releaseRegion(region) {
 	region.previousRegion = null;
 	region.nextRegion = null;
 	region.animations = null;
+	region.errorBoundary = void 0;
 	for (const effect of region.effects) {
 		if (typeof effect.cleanup === "function") {
 			effect.cleanup();
@@ -585,6 +630,7 @@ function pushRegion(region, toParent = false) {
 		const nextRegion = previousRegion.nextRegion;
 		previousRegion.nextRegion = region;
 		region.nextRegion = nextRegion;
+		if (nextRegion !== null) nextRegion.previousRegion = region;
 		region.depth = activeRegion.depth + 1;
 	}
 	context.activeRegion = region;
@@ -808,6 +854,20 @@ function rerunEffectsOnRegion(region, changedMask) {
 function restoreHydration(node) {
 	context.hydrationNode = node;
 }
+function widenAncestorsAtAnchor(region, anchor) {
+	if (anchor === null) return;
+	let child = region.nextRegion;
+	while (child !== null && child.depth > region.depth && child.startNode === null) child = child.nextRegion;
+	if (child === null || child.depth <= region.depth || child.startNode === anchor) return;
+	const firstNode = child.startNode;
+	let ancestor = region.previousRegion;
+	let ancestorDepth = region.depth;
+	while (ancestor !== null && ancestor.depth < ancestorDepth) {
+		if (ancestor.startNode === anchor) ancestor.startNode = firstNode;
+		ancestorDepth = ancestor.depth;
+		ancestor = ancestor.previousRegion;
+	}
+}
 function runControl(region, anchor, create, name) {
 	let first = true;
 	const gen = region.generation = (region.generation ?? 0) + 1;
@@ -818,12 +878,15 @@ function runControl(region, anchor, create, name) {
 		first = false;
 		create(anchor);
 		popRegion(oldRegion);
+		widenAncestorsAtAnchor(region, anchor);
 		if (context.hydrationNode !== null && anchor !== null) context.hydrationNode = anchor;
 	}, name);
 }
 function runControlBranch(region, oldIndex, index) {
 	const recreate = region.recreate;
 	if (recreate) region.recreate = false;
+	const firstRender = region.hasRenderedBranch !== true;
+	region.hasRenderedBranch = true;
 	if (oldIndex === index) {
 		if (recreate) {
 			if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
@@ -831,7 +894,7 @@ function runControlBranch(region, oldIndex, index) {
 		}
 		return false;
 	}
-	if (region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
+	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
 }
 function propagateFromSignal(signal) {
@@ -844,10 +907,9 @@ function propagateFromSignal(signal) {
 		targetSub.recalc = true;
 		const target = targetSub.target;
 		if (target.type === 2) {
-			if (target.nextEffectToRun === null && context.lastEffectToRun !== target) {
-				if (context.lastEffectToRun === null) context.firstEffectToRun = target;
-				else context.lastEffectToRun.nextEffectToRun = target;
-				context.lastEffectToRun = target;
+			if (!target.queued) {
+				target.queued = true;
+				context.effectsToRun.push(target);
 			}
 		} else if (!target.recalc) {
 			target.recalc = true;
@@ -922,6 +984,9 @@ function suspendRead(signal) {
 	}
 	return signal.staleValue;
 }
+function deepWrap(value) {
+	return value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0 ? $watch(value) : value;
+}
 function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
 	if (key === proxyDataSymbol) return data;
@@ -932,7 +997,8 @@ function proxyGet(target, key, receiver) {
 			if (propDescriptor.writable) {
 				if (data.shallow !== true) {
 					const value = target[key];
-					if (value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) target[key] = $watch(value);
+					const wrapped = deepWrap(value);
+					if (wrapped !== value) target[key] = wrapped;
 				}
 				trackProxySignal(data, key);
 			} else if (propDescriptor.get) {
@@ -944,9 +1010,9 @@ function proxyGet(target, key, receiver) {
 					const result = Reflect.get(target, key, receiver);
 					const registered = data.signals.get(key);
 					if (context.refreshSignals !== null && registered !== void 0 && registered.type === 1 && registered.isAsync) {
-					context.refreshSignals.push(registered);
-					if (context.refreshInitialized !== null) context.refreshInitialized.add(registered);
-				}
+						context.refreshSignals.push(registered);
+						context.refreshInitialized?.add(registered);
+					}
 					if (registered !== void 0 && registered.type === 1 && registered.didSuspend) return suspendRead(registered);
 					return result;
 				} finally {
@@ -956,8 +1022,14 @@ function proxyGet(target, key, receiver) {
 		} else if (data.isArray) {
 			if (arrayWrapper[key] !== void 0) return arrayWrapper[key](data, target, key);
 		} else trackProxySignal(data, key);
-	} else if (signal.type === 0) trackProxySignal(data, key);
-	else if (signal.type === 1) {
+	} else if (signal.type === 0) {
+		if (data.shallow !== true) {
+			const value = target[key];
+			const wrapped = deepWrap(value);
+			if (wrapped !== value) target[key] = wrapped;
+		}
+		trackProxySignal(data, key);
+	} else if (signal.type === 1) {
 		if (context.refreshSignals !== null && signal.isAsync) {
 			context.refreshSignals.push(signal);
 			return signal.value;
@@ -987,9 +1059,12 @@ const arrayWrapper = {
 						done: true
 					};
 					let value = target[index];
-					if (data.shallow !== true && value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0) {
-						value = $watch(value);
-						target[index] = value;
+					if (data.shallow !== true) {
+						const wrapped = deepWrap(value);
+						if (wrapped !== value) {
+							value = wrapped;
+							target[index] = value;
+						}
 					}
 					trackProxySignal(data, String(index));
 					index++;
@@ -1071,7 +1146,12 @@ function $watch(object, options) {
 		shallow: options?.shallow === true,
 		signals: /* @__PURE__ */ new Map()
 	};
-	object[proxyDataSymbol] = data;
+	Object.defineProperty(object, proxyDataSymbol, {
+		value: data,
+		writable: true,
+		enumerable: false,
+		configurable: true
+	});
 	const proxy = new Proxy(object, sharedHandler);
 	devContext.onWatch(data);
 	return proxy;
@@ -1139,7 +1219,12 @@ function mountSpec(spec, region, before, create, noWatch) {
 }
 function runListItems(region, parent, anchor, oldItems, newSpecs, create, update, noWatch) {
 	const newItems = Array.from({ length: newSpecs.length });
-	const nextSibling = oldItems.length > 0 ? oldItems[oldItems.length - 1].nextRegion : region.nextRegion;
+	let nextSibling;
+	if (oldItems.length > 0) {
+		const lastOld = oldItems[oldItems.length - 1];
+		nextSibling = lastOld.nextRegion;
+		while (nextSibling !== null && nextSibling.depth > lastOld.depth) nextSibling = nextSibling.nextRegion;
+	} else nextSibling = region.nextRegion;
 	let oldStart = 0;
 	let oldEnd = oldItems.length - 1;
 	let newStart = 0;
@@ -1174,7 +1259,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 		oldEnd--;
 		newStart++;
 	} else break;
-	if (oldStart > oldEnd) {
+	if (oldStart > oldEnd && newStart <= newEnd) {
 		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1].startNode : anchor;
 		for (let i = newStart; i <= newEnd; i++) newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
 		chainNeedsRelink = true;
@@ -1273,7 +1358,7 @@ function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 function runAwait(region, anchor, renderContent, renderWith, name) {
 	const boundary = {
 		suspended: false,
-		pending: new Set(),
+		pending: /* @__PURE__ */ new Set(),
 		effect: null
 	};
 	let index = -1;
@@ -1310,12 +1395,10 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 		if (theEffect === null) attemptContent();
 		else {
 			let suspended = false;
-			for (const signal of boundary.pending) {
-				if (signal.didSuspend) {
-					suspended = true;
-					trackSignal(signal);
-				} else boundary.pending.delete(signal);
-			}
+			for (const signal of boundary.pending) if (signal.didSuspend) {
+				suspended = true;
+				trackSignal(signal);
+			} else boundary.pending.delete(signal);
 			const targetIndex = suspended ? 1 : 0;
 			if (targetIndex !== index) {
 				if (targetIndex === 0) attemptContent();
@@ -1327,10 +1410,67 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 			}
 		}
 		popRegion(oldRegion);
+		widenAncestorsAtAnchor(region, anchor);
 	}, name);
 }
 function saveHydration() {
 	return context.hydrationNode;
+}
+function runTry(region, anchor, renderTry, renderCatch, name) {
+	const boundary = {
+		error: void 0,
+		hasError: false,
+		effect: null,
+		heldSignals: null
+	};
+	if (renderCatch !== null) region.errorBoundary = boundary;
+	let index = -1;
+	let first = true;
+	const gen = region.generation = (region.generation ?? 0) + 1;
+	$run(function runTry() {
+		if (region.generation !== gen) return;
+		const theEffect = context.activeTarget;
+		boundary.effect = theEffect;
+		const oldRegion = pushRegion(region, first);
+		first = false;
+		const renderBranch = (targetIndex, fn) => {
+			runControlBranch(region, index, targetIndex);
+			context.previousRegion = region;
+			const oldR = pushRegion(newRegion(targetIndex === 0 ? "try" : "catch"), true);
+			fn(anchor);
+			popRegion(oldR);
+			index = targetIndex;
+		};
+		const holdSignals = () => {
+			if (boundary.heldSignals === null || theEffect === null) return;
+			for (const signal of boundary.heldSignals) trackSignal(signal);
+		};
+		const hasRoutedError = boundary.hasError;
+		const routedError = boundary.error;
+		boundary.hasError = false;
+		if (hasRoutedError && renderCatch !== null) {
+			index = -1;
+			renderBranch(1, (a) => renderCatch(a, routedError));
+			holdSignals();
+		} else if (index !== 0) {
+			const snapshot = saveHydration();
+			try {
+				renderBranch(0, renderTry);
+				boundary.heldSignals = null;
+			} catch (err) {
+				pushRegion(region);
+				restoreHydration(snapshot);
+				if (renderCatch !== null) {
+					index = -1;
+					renderBranch(1, (a) => renderCatch(a, err));
+					holdSignals();
+				} else throw err;
+			}
+		}
+		popRegion(oldRegion);
+		widenAncestorsAtAnchor(region, anchor);
+		if (context.hydrationNode !== null && anchor !== null) context.hydrationNode = anchor;
+	}, name);
 }
 function setAttribute(el, name, value) {
 	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
@@ -1483,7 +1623,7 @@ function $refresh(fn, options) {
 	const oldInitialized = context.refreshInitialized;
 	context.refreshSignals = [];
 	context.suspendPeek = true;
-	context.refreshInitialized = new Set();
+	context.refreshInitialized = /* @__PURE__ */ new Set();
 	let unique;
 	let initialized;
 	try {
@@ -1521,12 +1661,17 @@ var ReactiveDate = class ReactiveDate extends Date {
 		super(...params);
 		if (!initialized) this.#init();
 		this[proxyHandledSymbol] = true;
-		this[proxyDataSymbol] = {
-			target: this,
-			isArray: false,
-			shallow: true,
-			signals: /* @__PURE__ */ new Map()
-		};
+		Object.defineProperty(this, proxyDataSymbol, {
+			value: {
+				target: this,
+				isArray: false,
+				shallow: true,
+				signals: /* @__PURE__ */ new Map()
+			},
+			writable: true,
+			enumerable: false,
+			configurable: true
+		});
 	}
 	#init() {
 		initialized = true;
@@ -1575,6 +1720,7 @@ let t_run_await = runAwait;
 let t_run_branch = runControlBranch;
 let t_run_control = runControl;
 let t_run_list = runList;
+let t_run_try = runTry;
 let t_save_hydration = saveHydration;
 let t_skip = nodeSkip;
 let t_style = buildStyles;

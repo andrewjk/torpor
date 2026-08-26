@@ -2,6 +2,7 @@ import { Popover, PopoverContent } from "@torpor/ui/Popover";
 
 interface Props {
 	anchor: HTMLElement;
+	position?: string;
 	text: string;
 }
 

@@ -1,12 +1,13 @@
 import { TabContent, TabGroup, TabHeader, TabList, TabTrigger } from "@torpor/ui/TabGroup";
 import buildItems from "../../../lib/buildItems";
 
-export default function ExampleVertical(props: any) {
+export default function ExampleVertical() {
+	let $state = $watch({ value: "0" });
 	let itemCount = 5;
 	let items = buildItems(itemCount);
 
 	@render {
-		<TabGroup class="example-tab" orientation="vertical">
+		<TabGroup class="example-tab" orientation="vertical" &value={$state.value}>
 			<TabList class="example-tab-list" ariaLabel="Vertical tab example">
 				@for (let [index, item] of items.entries()) {
 					<TabHeader>

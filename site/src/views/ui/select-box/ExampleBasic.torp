@@ -12,7 +12,7 @@ export default function ExampleBasic() {
 		<SelectBox class="example-select-box" &value={$state.value}>
 			<SelectBoxTrigger class="example-select-box-trigger" {$state.value} />
 			<SelectBoxContent class="example-select-box-content">
-				<ListBox class="example-list-box">
+				<ListBox class="example-list-box" &value={$state.value}>
 					<ListBoxItem class="example-list-box-item">
 						Cat
 					</ListBoxItem>

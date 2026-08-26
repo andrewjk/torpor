@@ -51,7 +51,7 @@ export default function ExampleQueue() {
 		<NotificationContainer class={["example-notification-container", $state.position].join(" ")}>
 			@for (let note of $state.notifications) {
 				@key = note.id;
-				<Notification class="example-notification" onclose={() => removeNotification(note.id)}>
+				<Notification class="example-notification" visible={true} onclose={() => removeNotification(note.id)}>
 					<NotificationContent>{note.text}</NotificationContent>
 					<NotificationClose>X</NotificationClose>
 				</Notification>

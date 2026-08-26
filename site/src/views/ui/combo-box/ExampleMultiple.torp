@@ -24,7 +24,7 @@ export default function ExampleMultiple() {
 		<ComboBox class="example-select-box" &value={$state.value}>
 			<ComboBoxInput class="example-select-box-input" value={$state.text} />
 			<ComboBoxContent class="example-select-box-content">
-				<ListBox class="example-list-box" type="multiple">
+				<ListBox class="example-list-box" type="multiple" &value={$state.value}>
 					@for (let item of items) {
 						@key = item.id;
 						<ListBoxItem class="example-list-box-item">

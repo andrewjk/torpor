@@ -10,11 +10,8 @@ export default function ExampleBound() {
 	let $state = $watch({ expanded: false });
 
 	@render {
-		<p>Expanded:
-			<select &value={$state.expanded}>
-				<option value="false">No</option>
-				<option value="true">Yes</option>
-			</select>
+		<p>
+			Expanded: <input type="checkbox" &checked={$state.expanded} />
 		</p>
 
 		<Disclosure class="example-disclosure" &expanded={$state.expanded}>

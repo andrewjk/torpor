@@ -1,20 +1,20 @@
 import { ListBox, ListBoxItem, ListBoxSeparator } from "@torpor/ui/ListBox";
 
 export default function ExampleBasic() {
-	let $state = $watch({ value: 0 });
+	let $state = $watch({ value: "" });
 
 	@render {
-		<p>Value: <input type="number" &value={$state.value} /></p>
+		<p>Value: <input type="text" &value={$state.value} /></p>
 
 		<ListBox class="example-list-box" &value={$state.value}>
-			<ListBoxItem class="example-list-box-item">
+			<ListBoxItem class="example-list-box-item" value="item-1">
 				Item 1
 			</ListBoxItem>
-			<ListBoxItem class="example-list-box-item">
+			<ListBoxItem class="example-list-box-item" value="item-2">
 				Item 2
 			</ListBoxItem>
 			<ListBoxSeparator class="example-list-box-separator" />
-			<ListBoxItem class="example-list-box-item">
+			<ListBoxItem class="example-list-box-item" value="item-3">
 				Item 3
 			</ListBoxItem>
 		</ListBox>

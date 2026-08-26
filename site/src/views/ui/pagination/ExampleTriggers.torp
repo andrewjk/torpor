@@ -15,7 +15,7 @@ export default function ExampleTriggers() {
 				disabled={$state.page < 2}
 			/>
 			@for (let page of $slot.pages) {
-				<PaginationItem class="example-pagination-item" {page} active={page == $state.page} />
+				<PaginationItem class="example-pagination-item" {page} active={String(page) === String($state.page)} />
 			}
 			<PaginationItem
 				class="example-pagination-trigger"
