@@ -1,0 +1,40 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./command-palette/ExampleBasic.torp";
+import ExampleBasicCode from "./command-palette/ExampleBasic.torp?raw";
+
+export default function CommandPalettePage() {
+	@head {
+		<title>CommandPalette | Torpor</title>
+	}
+
+	@render {
+		<h1>CommandPalette</h1>
+		<p>
+			A modal input for searching and running commands, opened with a keyboard shortcut or
+			programmatically.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<CommandPalette hotkey="mod+k" commands={commands} />
+`.trim()}</code></pre>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

@@ -1,0 +1,81 @@
+import { CommandPalette } from "@torpor/ui/CommandPalette";
+
+const commands = [
+	{ value: "new", label: "New file", shortcut: "⌘N", run: () => {} },
+	{ value: "open", label: "Open file...", keywords: "load browse", shortcut: "⌘O", run: () => {} },
+	{ value: "save", label: "Save file", keywords: "write", shortcut: "⌘S", run: () => {} },
+	{ value: "settings", label: "Open settings", keywords: "preferences options", run: () => {} },
+];
+
+export default function ExampleBasic() {
+	let $state = $watch({ visible: false });
+
+	@render {
+		<div>
+			<p>
+				Press <kbd>⌘K</kbd> (or Ctrl+K) anywhere on this page, or{" "}
+				<button class="example-command-palette-button" onclick={() => ($state.visible = true)}>
+					open the palette
+				</button>
+				.
+			</p>
+			<CommandPalette
+				class="example-command-palette"
+				placeholder="Type a command..."
+				hotkey="mod+k"
+				ariaLabel="Search commands"
+				emptyText="No matching commands"
+				commands={commands}
+				&visible={$state.visible}
+			/>
+		</div>
+	}
+
+	@style {
+		.example-command-palette-button {
+			background: none;
+			border: 1px solid gray;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: inherit;
+			padding: 2px 8px;
+		}
+
+		:global(.example-command-palette .torp-command-palette-content) {
+			background-color: white;
+			border-radius: 8px;
+			box-shadow: rgba(0, 0, 0, 0.35) 0 8px 24px;
+			gap: 4px;
+			left: 50%;
+			max-width: 480px;
+			padding: 12px;
+			position: fixed;
+			top: 80px;
+			transform: translateX(-50%);
+			width: 90%;
+		}
+
+		:global(.example-command-palette .torp-command-palette-input) {
+			border: 1px solid lightgray;
+			border-radius: 6px;
+			font-size: 16px;
+			padding: 10px;
+		}
+
+		:global(.example-command-palette .torp-command-palette-item) {
+			border-radius: 6px;
+			cursor: pointer;
+			display: flex;
+			justify-content: space-between;
+			padding: 8px 10px;
+		}
+
+		:global(.example-command-palette .torp-command-palette-item[data-state="active"]) {
+			background-color: aliceblue;
+		}
+
+		:global(.example-command-palette .torp-command-palette-shortcut) {
+			color: gray;
+		}
+	}
+}

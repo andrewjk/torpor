@@ -24,6 +24,10 @@
 			"types": "./dist/Charts/index.d.ts",
 			"import": "./dist/Charts/index.js"
 		},
+		"./CommandPalette": {
+			"types": "./dist/CommandPalette/index.d.ts",
+			"import": "./dist/CommandPalette/index.js"
+		},
 		"./ComboBox": {
 			"types": "./dist/ComboBox/index.d.ts",
 			"import": "./dist/ComboBox/index.js"

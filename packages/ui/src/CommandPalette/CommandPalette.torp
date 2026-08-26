@@ -1,0 +1,220 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import Modal from "../Modal/Modal.torp";
+import ModalContent from "../Modal/ModalContent.torp";
+import ModalOverlay from "../Modal/ModalOverlay.torp";
+import getId from "../utils/getId";
+import type { Command } from "./CommandTypes";
+
+interface CommandPaletteProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** Whether the palette is visible */
+	visible: Bindable<boolean | undefined>;
+	/** The commands that the user can choose from */
+	commands: Command[];
+	/** Text to display in the input when it is empty */
+	placeholder?: string;
+	/**
+	 * A keyboard shortcut that toggles the palette, e.g. "mod+k", where "mod"
+	 * means the Cmd key on Mac and the Ctrl key elsewhere
+	 */
+	hotkey?: string;
+	/** An accessible name for the input */
+	ariaLabel?: string;
+	/** Text to display when no commands match the search */
+	emptyText?: string;
+	/** Raised when a command has been run */
+	onrun?: (command: Command) => void;
+}
+
+/**
+ * A modal input for searching and running commands, opened with a keyboard
+ * shortcut or programmatically.
+ *
+ * The structure of a CommandPalette is a Modal containing a search input and
+ * a filtered list of commands.
+ */
+export default function CommandPalette($props: CommandPaletteProps | undefined) {
+	let defaultId = getId();
+	let input: HTMLInputElement;
+
+	function getDisabled(command: Command): boolean {
+		return command.disabled === true;
+	}
+
+	let $state = $watch({
+		visible: false,
+		search: "",
+		activeIndex: 0,
+	});
+
+	$bind($state, $props, "visible");
+
+	// Reset the active item whenever the search changes or the palette opens
+	let lastSearch = "";
+	let lastVisible = false;
+	$run(() => {
+		const search = $state.search;
+		const visible = $state.visible;
+		if (search !== lastSearch || (visible && !lastVisible)) {
+			$state.activeIndex = 0;
+		}
+		lastSearch = search;
+		lastVisible = visible;
+		if (!visible) {
+			$state.search = "";
+			if (input) {
+				input.value = "";
+			}
+		}
+	});
+
+	// The commands that match the current search text
+	function filteredCommands(): Command[] {
+		const search = $state.search.trim().toLowerCase();
+		if (search === "") return $props?.commands ?? [];
+		return ($props?.commands ?? []).filter(
+			(command) =>
+				command.label.toLowerCase().includes(search) ||
+				(command.keywords ?? "").toLowerCase().includes(search),
+		);
+	}
+
+	function activeCommand(): Command | undefined {
+		return filteredCommands()[$state.activeIndex];
+	}
+
+	function optionId(index: number): string {
+		return `${$props?.id ?? defaultId}-option-${index}`;
+	}
+
+	function runCommand(command: Command | undefined) {
+		if (!command || getDisabled(command)) return;
+		$state.visible = false;
+		command.run?.();
+		$props?.onrun?.(command);
+	}
+
+	function handleInput(e: Event) {
+		$state.search = (e.currentTarget as HTMLInputElement).value;
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		switch (e.key) {
+			case "ArrowDown": {
+				e.preventDefault();
+				const count = filteredCommands().length;
+				$state.activeIndex = Math.min(count - 1, $state.activeIndex + 1);
+				break;
+			}
+			case "ArrowUp": {
+				e.preventDefault();
+				$state.activeIndex = Math.max(0, $state.activeIndex - 1);
+				break;
+			}
+			case "Enter": {
+				e.preventDefault();
+				runCommand(activeCommand());
+				break;
+			}
+			case "Escape": {
+				e.preventDefault();
+				$state.visible = false;
+				break;
+			}
+		}
+	}
+
+	// Toggle the palette with a keyboard shortcut, e.g. mod+k
+	$mount(() => {
+		if (!$props?.hotkey) return;
+		const [modifier, key] = parseHotkey($props.hotkey);
+		if (!key) return;
+		const handler = (e: KeyboardEvent) => {
+			const modOk =
+				modifier === "mod" ? e.metaKey || e.ctrlKey : modifier === "shift" ? e.shiftKey : true;
+			if (modOk && e.key.toLowerCase() === key.toLowerCase()) {
+				e.preventDefault();
+				$state.visible = !$state.visible;
+			}
+		};
+		document.addEventListener("keydown", handler);
+		return () => document.removeEventListener("keydown", handler);
+	});
+
+	function parseHotkey(hotkey: string): [string | undefined, string | undefined] {
+		const parts = hotkey.split("+");
+		if (parts.length === 2) {
+			return [parts[0].toLowerCase(), parts[1]];
+		}
+		return [undefined, hotkey];
+	}
+
+	@render {
+		<div {$props?.id} class={["torp-command-palette", $props?.class]} {$props?.style}>
+			<Modal {$state.visible}>
+				<ModalOverlay />
+				<ModalContent class="torp-command-palette-content">
+					<input
+						class="torp-command-palette-input"
+						type="text"
+						role="combobox"
+						aria-expanded="true"
+						aria-controls={`${$props?.id ?? defaultId}-list`}
+						aria-activedescendant={optionId($state.activeIndex)}
+						aria-autocomplete="list"
+						aria-label={$props?.ariaLabel}
+						placeholder={$props?.placeholder}
+						&ref={input}
+						oninput={handleInput}
+						onkeydown={handleKey}
+					/>
+					<ul class="torp-command-palette-list" role="listbox" id={`${$props?.id ?? defaultId}-list`}>
+						@for (let [index, command] of filteredCommands().entries()) {
+							@key = command.value
+							<li
+								class="torp-command-palette-item"
+								role="option"
+								id={optionId(index)}
+								aria-selected={$state.activeIndex === index ? "true" : "false"}
+								aria-disabled={getDisabled(command) ? "true" : undefined}
+								data-state={$state.activeIndex === index ? "active" : "inactive"}
+								onclick={() => runCommand(command)}
+							>
+								<span class="torp-command-palette-label">{command.label}</span>
+								@if (command.shortcut) {
+									<span class="torp-command-palette-shortcut" aria-hidden="true">
+										{command.shortcut}
+									</span>
+								}
+							</li>
+						}
+						@if (filteredCommands().length === 0) {
+							<li class="torp-command-palette-empty">
+								{$props?.emptyText ?? "No results"}
+							</li>
+						}
+					</ul>
+				</ModalContent>
+			</Modal>
+		</div>
+	}
+
+	@style {
+		/* Headless: layout only, so the input sits above the list. All
+		   appearance is up to the consuming theme */
+		.torp-command-palette-content {
+			display: flex;
+			flex-direction: column;
+		}
+		.torp-command-palette-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+	}
+}

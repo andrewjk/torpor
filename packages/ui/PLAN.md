@@ -158,5 +158,5 @@ of the library follows:
 - [x] SegmentedControl (compact single-select, possibly TabGroup-based)
 - [x] Stepper (multi-step / wizard flow)
 - [x] DateRangePicker (extend Calendar / DatePicker with range selection)
-- [ ] CommandPalette (Modal + ComboBox composition for app-wide actions)
+- [x] CommandPalette (Modal + ComboBox composition for app-wide actions)
 - [ ] FileDropzone (file upload with drag and drop, once DnD lands)

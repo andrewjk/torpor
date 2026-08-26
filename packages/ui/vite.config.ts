@@ -7,6 +7,7 @@ const components = [
 	"Carousel",
 	"Charts",
 	"ComboBox",
+	"CommandPalette",
 	"Contextual",
 	"DatePicker",
 	"DateRangePicker",
