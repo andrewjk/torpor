@@ -33,7 +33,7 @@ export default function Html(
 		if (t_html_first_1 !== null && t_html_last_1 !== null) {
 			let t_node: ChildNode | null = t_html_last_1;
 			while (t_node !== null && t_node !== t_html_first_1) {
-				const t_prev = t_node.previousSibling;
+				const t_prev: ChildNode | null = t_node.previousSibling;
 				t_node.remove();
 				t_node = t_prev;
 			}

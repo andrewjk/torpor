@@ -6,7 +6,10 @@ import type SlotRender from "./SlotRender";
 type Component = (
 	$parent: ParentNode,
 	$anchor: Node | null,
-	$props?: Record<PropertyKey, any>,
+	// NOTE: `any` rather than `Record<PropertyKey, any>` so that components
+	// which declare props (compiling to a required `$props`) can be passed
+	// anywhere a Component is expected
+	$props?: any,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, SlotRender>,
 ) => void;

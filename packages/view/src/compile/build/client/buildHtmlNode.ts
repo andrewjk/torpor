@@ -34,7 +34,7 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append(`if (${firstNodeVar} !== null && ${lastNodeVar} !== null) {`);
 	b.append(`let t_node: ChildNode | null = ${lastNodeVar};`);
 	b.append(`while (t_node !== null && t_node !== ${firstNodeVar}) {`);
-	b.append(`const t_prev = t_node.previousSibling;`);
+	b.append(`const t_prev: ChildNode | null = t_node.previousSibling;`);
 	b.append(`t_node.remove();`);
 	b.append(`t_node = t_prev;`);
 	b.append(`}`);
