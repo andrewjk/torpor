@@ -1,14 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { chartColors } from "../utils/chartColors";
-import {
-	calculateChartBottom,
-	calculateChartLeft,
-	calculateItemWidth,
-	calculateMaxValue,
-	calculateStepLabels,
-	calculateStepValue,
-	calculateValueHeight,
-} from "../utils/chartUtils";
+import { createChartLayout, measureChartText } from "../utils/chartLayout";
 import type DataSeries from "./DataSeries";
 import GridLines from "./GridLines.torp";
 import XAxis from "./XAxis.torp";
@@ -39,87 +31,33 @@ interface LineChartProps {
 }
 
 export default function LineChart($props: LineChartProps) {
-	const defaultHeight = 200;
-	const defaultWidth = 400;
-
 	let container: HTMLElement;
 	let measurer: SVGTextElement;
 
-	let $state = $watch({
-		textWidth: 0,
-		textHeight: 0,
-		get labels() {
-			return $props.series.map((s) => s.name);
-		},
-		get calculatedHeight() {
-			return $props.height || defaultHeight;
-		},
-		get calculatedWidth() {
-			return $props.width || container?.clientWidth || defaultWidth;
-		},
-		get maxValue() {
-			return $props.maxValue || calculateMaxValue($props.series);
-		},
-		get calculatedStepValue() {
-			return $props.stepValue || calculateStepValue($state.maxValue, $props.stepCount);
-		},
-		get stepLabels() {
-			return calculateStepLabels($props.stepCount || 2, $state.calculatedStepValue);
-		},
-		get itemWidth() {
-			return calculateItemWidth($state.calculatedWidth, $state.chartLeft, $state.labels);
-		},
-		get valueHeight() {
-			return calculateValueHeight(
-				$state.chartBottom,
-				$state.textHeight,
-				$state.calculatedStepValue,
-				$props.stepCount || 2,
-			);
-		},
-		get chartBottom() {
-			return calculateChartBottom($props.xLabel ?? "", $state.calculatedHeight, $state.textHeight);
-		},
-		get chartLeft() {
-			return calculateChartLeft(
-				$state.stepLabels,
-				$props.yLabel ?? "",
-				$state.textHeight,
-				$state.textWidth,
-			);
-		},
-		get pointSeries() {
-			return buildPointSeries(
-				$props.series,
-				$state.chartLeft,
-				$state.chartBottom,
-				$state.itemWidth,
-				$state.valueHeight,
-			);
-		},
+	let $layout = createChartLayout({
+		series: () => $props.series,
+		height: () => $props.height,
+		width: () => $props.width,
+		xLabel: () => $props.xLabel,
+		yLabel: () => $props.yLabel,
+		maxValue: () => $props.maxValue,
+		stepCount: () => $props.stepCount,
+		stepValue: () => $props.stepValue,
+		getContainer: () => container,
 	});
 
 	$mount(() => {
 		// HACK: Wait until the measurer is really available
-		setTimeout(() => {
-			const bbox = measurer.getBBox();
-			$state.textWidth = bbox.width;
-			$state.textHeight = bbox.height * 1.5;
-			measurer.remove();
-		}, 1);
+		setTimeout(() => measureChartText($layout, measurer), 1);
 	});
 
-	function buildPointSeries(
+	function pointSeries(
 		theSeries: DataSeries[],
-		theChartLeft: number,
-		theChartBottom: number,
-		theItemWidth: number,
-		theValueHeight: number,
-	): { x: number; y: number }[][] {
+	) : { x: number; y: number }[][] {
 		return theSeries.map((series) => {
 			return series.data.map((value, i) => {
-				const x = +(theChartLeft + i * theItemWidth + theItemWidth / 2).toFixed(2);
-				const y = +(theChartBottom - value * theValueHeight).toFixed(2);
+				const x = +($layout.chartLeft + i * $layout.itemWidth + $layout.itemWidth / 2).toFixed(2);
+				const y = +($layout.chartBottom - value * $layout.valueHeight).toFixed(2);
 				return { x, y };
 			});
 		});
@@ -127,59 +65,59 @@ export default function LineChart($props: LineChartProps) {
 
 	@render {
 		<div {$props?.id} class={["torp-line-chart", $props?.class]} {$props?.style} &ref={container}>
-			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$state.calculatedWidth} height={$state.calculatedHeight}>
+			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$layout.calculatedWidth} height={$layout.calculatedHeight}>
 				<g>
 					<text &ref={measurer} x="-999" y="-999">8</text>
 
-					@if ($state.textWidth && $state.textHeight) {
+					@if ($layout.textWidth && $layout.textHeight) {
 						<XAxis
 							showAxis={!$props.hideXAxis}
-							height={$state.calculatedHeight}
-							width={$state.calculatedWidth}
-							{$state.itemWidth}
-							{$state.textHeight}
+							height={$layout.calculatedHeight}
+							width={$layout.calculatedWidth}
+							{$layout.itemWidth}
+							{$layout.textHeight}
 							xLabel={$props.xLabel ?? ""}
-							{$state.labels}
+							{$layout.labels}
 							stepLabels={[]}
 							stepValue={0}
-							{$state.chartLeft}
-							{$state.chartBottom}
+							{$layout.chartLeft}
+							{$layout.chartBottom}
 						/>
 						<YAxis
 							showAxis={!$props.hideYAxis}
-							{$state.valueHeight}
-							{$state.textHeight}
+							{$layout.valueHeight}
+							{$layout.textHeight}
 							yLabel={$props.yLabel ?? ""}
-							{$state.stepLabels}
-							stepValue={$state.calculatedStepValue}
-							{$state.chartLeft}
-							{$state.chartBottom}
+							{$layout.stepLabels}
+							stepValue={$layout.stepValue}
+							{$layout.chartLeft}
+							{$layout.chartBottom}
 						/>
 						<GridLines
 							{$props.showHLines}
 							{$props.showVLines}
-							width={$state.calculatedWidth}
-							{$state.labels}
+							width={$layout.calculatedWidth}
+							{$layout.labels}
 							xStepValue={0}
 							xStepLabels={[]}
-							yStepValue={$state.calculatedStepValue}
+							yStepValue={$layout.stepValue}
 							yStepLabels={[]}
-							{$state.stepLabels}
-							{$state.itemWidth}
-							{$state.valueHeight}
-							{$state.chartLeft}
-							{$state.chartBottom}
+							{$layout.stepLabels}
+							{$layout.itemWidth}
+							{$layout.valueHeight}
+							{$layout.chartLeft}
+							{$layout.chartBottom}
 							type="line"
 						/>
 						@for (let [i, series] of $props.series.entries()) {
 							<polyline
-								points={$state.pointSeries[i].map((p) => `${p.x},${p.y}`).join(" ")}
+								points={pointSeries($props.series)[i].map((p) => `${p.x},${p.y}`).join(" ")}
 								stroke={series.color || chartColors[i % chartColors.length]}
 								stroke-width="2"
 								fill="none"
 							/>
 							@if ($props.showPoints) {
-								@for (let [j, point] of $state.pointSeries[i].entries()) {
+								@for (let [j, point] of pointSeries($props.series)[i].entries()) {
 									<circle
 										cx={point.x}
 										cy={point.y}
@@ -188,7 +126,7 @@ export default function LineChart($props: LineChartProps) {
 										stroke-width="2"
 										fill="white"
 									>
-										<title>{`${[series.name, $state.labels[j], series.data[j]].filter(Boolean).join("\n")}`}</title>
+										<title>{`${[series.name, $layout.labels[j], series.data[j]].filter(Boolean).join("\n")}`}</title>
 									</circle>
 								}
 							}
