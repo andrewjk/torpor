@@ -1,0 +1,19 @@
+import { BarChart } from "../../../src/Charts/index";
+
+export default function BarChartTest($props: any) {
+	@render {
+		<BarChart
+			height={200}
+			width={400}
+			ariaLabel="Bar chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			series={[
+				{ name: "One", color: "", data: [35] },
+				{ name: "Two", color: "", data: [25] },
+				{ name: "Three", color: "", data: [45] },
+			]}
+		/>
+	}
+}

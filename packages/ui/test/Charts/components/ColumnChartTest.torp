@@ -1,0 +1,18 @@
+import { ColumnChart } from "../../../src/Charts/index";
+
+export default function ColumnChartTest($props: any) {
+	@render {
+		<ColumnChart
+			height={200}
+			width={400}
+			ariaLabel="Column chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			series={[
+				{ name: "Q1", color: "hotpink", data: [50, 30] },
+				{ name: "Q2", color: "", data: [40, 20, 60] },
+			]}
+		/>
+	}
+}

@@ -1,0 +1,18 @@
+import { LineChart } from "../../../src/Charts/index";
+
+export default function LineChartTest($props: any) {
+	@render {
+		<LineChart
+			height={200}
+			width={400}
+			ariaLabel="Line chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			series={[
+				{ name: "A", color: "", data: [10, 30, 70] },
+				{ name: "B", color: "#123456", data: [20, 60, 40] },
+			]}
+		/>
+	}
+}

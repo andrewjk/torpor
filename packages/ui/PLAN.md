@@ -117,7 +117,11 @@ interaction-layer and aria standards above, with deviations fixed inline.
 - [x] All inputs should work in forms
 - [ ] Split out PopoverTrigger / PopoverHover (and ContextualTrigger,
       ModalTrigger?)
-- [ ] Split Charts into components; add ColumnChart
+- [x] Split Charts into components; add ColumnChart. The shared layout
+      scaffold (text measuring + plot geometry) moved to
+      utils/chartLayout.ts (`createChartLayout`); BarChart and LineChart are
+      now thin mark-layers over it (ScatterChart keeps its two-axis variant).
+      ColumnChart draws a column per value, grouped under the series label
 - [x] Fix Slider (rewritten: `role="slider"` with aria-valuemin/max/now,
       keyboard support per the APG pattern -- arrows/Home/End/PageUp/PageDown,
       mouse drag on track and thumb, disabled state, two-way `value` binding;
