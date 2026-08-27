@@ -1,0 +1,41 @@
+import ListBoxItem from "./ListBoxItem.torp";
+
+interface LoadedListBoxItemsProps {
+	/** The loaded items */
+	items: any[];
+	/** Extracts the display text for an item (defaults to `label ?? text ?? item`) */
+	getItemLabel?: (item: any) => any;
+	/** Extracts the value for an item (defaults to `value ?? id`) */
+	getItemValue?: (item: any) => any;
+}
+
+function defaultLabel(item: any): string {
+	const label = item?.label ?? item?.text ?? item;
+	return typeof label === "string" ? label : String(label);
+}
+
+function defaultValue(item: any): any {
+	return item?.value ?? item?.id;
+}
+
+/**
+ * The internally rendered options for a ListBox that loads them from a
+ * network loader. Used as the slot fallback when no ListBoxItems are slotted
+ * in; not part of the public API.
+ */
+export default function LoadedListBoxItems($props?: LoadedListBoxItemsProps) {
+	const getLabel = $props?.getItemLabel ?? defaultLabel;
+	const getValue = $props?.getItemValue ?? defaultValue;
+
+	@render {
+		@for (let item of $props!.items) {
+			@key = getValue(item)
+			<ListBoxItem value={getValue(item)}>
+				{getLabel(item)}
+			</ListBoxItem>
+		}
+		@if ($props!.items.length === 0) {
+			<span class="torp-list-box-empty">No results.</span>
+		}
+	}
+}

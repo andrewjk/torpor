@@ -1,0 +1,20 @@
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+
+/** A ListBox that loads its options from the `load` prop */
+export default function ListBoxLoader($props: any) {
+	@render {
+		<ListBox
+			ariaLabel="Items"
+			load={$props.load}
+			onload={$props.onload}
+			getItemLabel={$props.getItemLabel}
+			getItemValue={$props.getItemValue}
+			&searchText={$props.searchTextState?.v}
+			onchange={$props.onchange}
+		>
+			@if ($props.slotItems) {
+				<ListBoxItem value="slotted">Slotted</ListBoxItem>
+			}
+		</ListBox>
+	}
+}

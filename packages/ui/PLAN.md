@@ -168,8 +168,9 @@ interaction-layer and aria standards above, with deviations fixed inline.
       DataGrid also virtualizes now: `virtual` + `rowHeight` (+ `height`,
       `overscan`) render only the visible window with spacer rows filling
       the rest of the tbody; keyboard nav scrolls to keep the active cell
-      visible and PageUp/PageDown page by viewport. Remaining: filtered
-      options from the network for other components
+      visible and PageUp/PageDown page by viewport. Network-filtered options now also cover ListBox (loader + bindable
+      `searchText`, auto-rendered when no items are slotted) and TagInput
+      (suggestions fetched as the user types, Enter/arrows/click to add)
 - [ ] Plain theme -- unset all buttons, var(--border-color) etc
 
 ## Order

@@ -14,6 +14,12 @@ export interface ListBoxContext {
 	handleKey: (index: number, e: KeyboardEvent) => void;
 	/** Called from a ListBoxItem when it receives focus */
 	setActiveDescendant?: (id: string) => void;
+	/** Reads the items loaded from the network loader, when one is set */
+	getLoadedItems?: () => any[];
+	/** Extracts the display text for a loaded item */
+	getItemLabel?: (item: any) => any;
+	/** Extracts the value for a loaded item */
+	getItemValue?: (item: any) => any;
 }
 
 export interface ListBoxState {

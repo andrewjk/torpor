@@ -6,6 +6,8 @@ import {
 	FormContextName,
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
+import { type Loader, createItemLoader } from "../utils/loader";
+import getId from "../utils/getId";
 import createFormField from "../utils/formField";
 
 interface TagInputProps {
@@ -27,6 +29,16 @@ interface TagInputProps {
 	name?: string;
 	/** Raised when the tags have changed */
 	onchange?: (value: string[]) => void;
+	/**
+	 * Reads suggestions from the network (or anywhere async) as the user
+	 * types, receiving `{ searchText }`. Suggestions are offered in a
+	 * dropdown; selecting one adds it as a tag
+	 */
+	load?: Loader;
+	/** Extracts the display text for a suggestion (defaults to `label ?? text ?? item`) */
+	getItemLabel?: (item: any) => any;
+	/** Raised when the suggestion list opens or closes */
+	onopen?: (open: boolean) => void;
 }
 
 /**
@@ -49,16 +61,63 @@ export default function TagInput($props: TagInputProps | undefined) {
 		return $props?.disabled === true;
 	}
 
+	let defaultId = getId();
+
 	let $state = $watch({
-		// Seed from the props so the initial tags render; $bind handles later
-		// pushes both ways
 		// Seed from the props so the initial tags render; $bind handles later
 		// pushes both ways
 		value: ($props?.value ?? []) as string[],
 		text: "",
+		suggestionsOpen: false,
+		activeSuggestion: -1,
 	});
 
 	$bind($state, $props, "value");
+
+	if ($props?.load !== undefined && typeof $props.load !== "function") {
+		throw new Error("TagInput: `load` must be a function");
+	}
+	const hasLoader = typeof $props?.load === "function";
+
+	function getLabel(item: any): string {
+		const getItemLabel = $props?.getItemLabel;
+		if (getItemLabel) return String(getItemLabel(item));
+		const label = (item as any)?.label ?? (item as any)?.text ?? item;
+		return typeof label === "string" ? label : String(label);
+	}
+
+	// Fetches suggestions as the text changes; nothing is fetched while the
+	// field is empty (the loader only mounts with the suggestion list)
+	const $load = hasLoader
+		? createItemLoader({
+				load: $props!.load!,
+				getRequest: () => ({ searchText: $state.text }),
+			})
+		: undefined;
+
+	function openSuggestions() {
+		if (!hasLoader || $state.text.trim() === "") return;
+		if (!$state.suggestionsOpen) {
+			$state.suggestionsOpen = true;
+			$props?.onopen?.(true);
+		}
+	}
+
+	function closeSuggestions() {
+		if ($state.suggestionsOpen) {
+			$state.suggestionsOpen = false;
+			$state.activeSuggestion = -1;
+			$props?.onopen?.(false);
+		}
+	}
+
+	function suggestionId(index: number): string {
+		return `${defaultId}-suggestion-${index}`;
+	}
+
+	function suggestions(): any[] {
+		return $load ? $load.items : [];
+	}
 
 	// Dispatch the change event when the tags change
 	$handle((first) => {
@@ -81,15 +140,29 @@ export default function TagInput($props: TagInputProps | undefined) {
 	});
 	$mount(() => syncInput());
 
-	function addTag() {
-		if (getDisabled()) return;
-		const text = $state.text.trim();
-		if (text === "") return;
-		$state.value = [...$state.value, text];
+	function addTagFromText(text: string) {
+		const trimmed = text.trim();
+		if (trimmed === "") return;
+		$state.value = [...$state.value, trimmed];
 		$state.text = "";
 		syncInput();
+		closeSuggestions();
 		input?.focus();
 		form.handleInput();
+	}
+
+	function addTag() {
+		if (getDisabled()) return;
+
+		// A highlighted suggestion is selected over the raw text
+		if ($state.suggestionsOpen && $state.activeSuggestion >= 0) {
+			const item = suggestions()[$state.activeSuggestion];
+			if (item !== undefined) {
+				addTagFromText(getLabel(item));
+				return;
+			}
+		}
+		addTagFromText($state.text);
 	}
 
 	function removeTag(index: number) {
@@ -109,12 +182,42 @@ export default function TagInput($props: TagInputProps | undefined) {
 	function handleInput(e: Event) {
 		const el = e.currentTarget as HTMLInputElement;
 		$state.text = el.value;
+		$state.activeSuggestion = -1;
+		if ($state.text.trim() === "") {
+			closeSuggestions();
+		} else {
+			openSuggestions();
+		}
 	}
 
 	function handleKey(e: KeyboardEvent) {
 		if (getDisabled()) return;
 
 		switch (e.key) {
+			case "ArrowDown": {
+				if ($state.suggestionsOpen) {
+					e.preventDefault();
+					const count = suggestions().length;
+					if (count > 0) {
+						$state.activeSuggestion = Math.min(count - 1, $state.activeSuggestion + 1);
+					}
+				}
+				break;
+			}
+			case "ArrowUp": {
+				if ($state.suggestionsOpen) {
+					e.preventDefault();
+					$state.activeSuggestion = Math.max(-1, $state.activeSuggestion - 1);
+				}
+				break;
+			}
+			case "Escape": {
+				if ($state.suggestionsOpen) {
+					e.preventDefault();
+					closeSuggestions();
+				}
+				break;
+			}
 			case "Enter": {
 				e.preventDefault();
 				addTag();
@@ -133,6 +236,10 @@ export default function TagInput($props: TagInputProps | undefined) {
 				break;
 			}
 		}
+	}
+
+	function pickSuggestion(item: any) {
+		addTagFromText(getLabel(item));
 	}
 
 	@render {
@@ -188,9 +295,54 @@ export default function TagInput($props: TagInputProps | undefined) {
 				placeholder={$props?.placeholder}
 				disabled={getDisabled()}
 				aria-label={$props?.ariaLabel}
+				role={hasLoader ? "combobox" : undefined}
+				aria-expanded={hasLoader ? ($state.suggestionsOpen ? "true" : "false") : undefined}
+				aria-controls={$state.suggestionsOpen ? `${defaultId}-suggestions` : undefined}
+				aria-autocomplete="list"
+				aria-activedescendant={$state.activeSuggestion >= 0 ? suggestionId($state.activeSuggestion) : undefined}
 				oninput={handleInput}
 				onkeydown={handleKey}
 			/>
+			@if ($state.suggestionsOpen) {
+				@try {
+					@await {
+						<ul
+							id={`${defaultId}-suggestions`}
+							class="torp-tag-input-suggestions"
+							role="listbox"
+							aria-label={$props?.ariaLabel}
+						>
+							@for (let [index, item] of suggestions().entries()) {
+								@key = getLabel(item)
+								<li
+									class="torp-tag-input-suggestion"
+									role="option"
+									id={suggestionId(index)}
+									aria-selected={$state.activeSuggestion === index ? "true" : "false"}
+									data-active={$state.activeSuggestion === index ? "active" : undefined}
+									onmouseenter={() => ($state.activeSuggestion = index)}
+									onmousedown={(e: MouseEvent) => {
+										// mousedown so the field doesn't blur first
+										e.preventDefault();
+										pickSuggestion(item);
+									}}
+								>
+									{getLabel(item)}
+								</li>
+							}
+							@if (suggestions().length === 0) {
+								<li class="torp-tag-input-empty" role="presentation">No matches.</li>
+							}
+						</ul>
+					} with {
+						<div class="torp-tag-input-loading" role="status">Loading…</div>
+					}
+				} catch (err) {
+					<div class="torp-tag-input-error" role="alert">
+						{err instanceof Error ? err.message : String(err)}
+					</div>
+				}
+			}
 		</div>
 
 		<FormValues name={form.name} value={$state.value} />
@@ -213,6 +365,13 @@ export default function TagInput($props: TagInputProps | undefined) {
 		.torp-tag-input-field {
 			flex: 1 1 auto;
 			min-width: 4em;
+		}
+		.torp-tag-input-suggestions {
+			position: absolute;
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			z-index: 10;
 		}
 	}
 }

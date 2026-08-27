@@ -1,0 +1,15 @@
+import { TagInput } from "../../../src/TagInput/index";
+
+/** A TagInput that loads suggestions from the `load` prop as the user types */
+export default function TagInputLoader($props: any) {
+	@render {
+		<TagInput
+			{$props?.value}
+			load={$props.load}
+			getItemLabel={$props.getItemLabel}
+			onchange={$props.onchange}
+			onopen={$props.onopen}
+			placeholder={$props.placeholder}
+		/>
+	}
+}
