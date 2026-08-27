@@ -64,6 +64,13 @@ export interface FocusGroup<T extends FocusItemState> {
 	 * per-item tabindex from this plus the tracked focus index
 	 */
 	getFocusIndex: () => number;
+
+	/**
+	 * Whether item `index` should be the group's single tab stop: when focus
+	 * hasn't entered the group yet that is item 0, otherwise whichever item
+	 * focus last rested on.
+	 */
+	isTabStop: (index: number) => boolean;
 }
 
 export function createFocusGroup<T extends FocusItemState>(): FocusGroup<T> {
@@ -100,6 +107,10 @@ export function createFocusGroup<T extends FocusItemState>(): FocusGroup<T> {
 
 	function getFocusIndex(): number {
 		return $state.index;
+	}
+
+	function isTabStop(index: number): boolean {
+		return ($state.index === -1 ? 0 : $state.index) === index;
 	}
 
 	function moveFocus(index: number, target: FocusTarget) {
@@ -192,5 +203,6 @@ export function createFocusGroup<T extends FocusItemState>(): FocusGroup<T> {
 		focusFirstItem,
 		focusLastItem,
 		getFocusIndex,
+		isTabStop,
 	};
 }

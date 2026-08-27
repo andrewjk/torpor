@@ -52,7 +52,7 @@ export default function FocusGroup($props?: FocusGroupProps) {
 				vertical: orientation === "vertical",
 			});
 		},
-		tabStopIndex: () => (group.getFocusIndex() === -1 ? 0 : group.getFocusIndex()),
+		isTabStop: (index) => group.isTabStop(index),
 	};
 	$context[FocusGroupContextName] = context;
 

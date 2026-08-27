@@ -1,0 +1,154 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
+import { createFocusGroup, type FocusItemState } from "../utils/focusGroup";
+import { defaultPalette, parseHex } from "../utils/colorUtils";
+import createFormField from "../utils/formField";
+
+interface ColorPaletteProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The selected color as "#rrggbb"; undefined if nothing is selected */
+	value?: Bindable<string | undefined>;
+	/** The colors to offer (default: a built-in gray + hue palette) */
+	colors?: string[];
+	/** If set to true, the user cannot interact with this palette */
+	disabled?: boolean;
+	/** An accessible name for the palette */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when a color has been selected or deselected */
+	onchange?: (value: string | undefined) => void;
+}
+
+/**
+ * A grid of color swatches that behaves like a radio group: one swatch can
+ * be selected, clicking it again deselects, and the arrow keys move through
+ * the swatches selecting as they go.
+ *
+ * Use ColorPicker instead when arbitrary hex values should be enterable
+ * alongside the palette.
+ */
+export default function ColorPalette($props: ColorPaletteProps | undefined) {
+	let root: HTMLElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function getColors(): string[] {
+		return $props?.colors ?? defaultPalette;
+	}
+
+	let $state = $watch({
+		value: undefined as string | undefined,
+	});
+
+	$bind($state, $props, "value");
+
+	const group = createFocusGroup<FocusItemState>();
+
+	function normalized(color: string | undefined | null): string {
+		return parseHex(color) ?? "";
+	}
+
+	function isSelected(color: string): boolean {
+		return $state.value !== undefined && normalized($state.value) === normalized(color);
+	}
+
+	function select(color: string) {
+		if (getDisabled()) return;
+		const next = normalized(color);
+		// Selecting the current swatch clears it, like Rating's allowClear
+		$state.value = isSelected(color) ? undefined : next || undefined;
+		form.handleInput();
+		$props?.onchange?.($state.value);
+	}
+
+	function handleKey(index: number, e: KeyboardEvent) {
+		if (getDisabled()) return;
+		switch (e.key) {
+			case "Enter":
+			case " ": {
+				e.preventDefault();
+				select(getColors()[index]);
+				break;
+			}
+			default: {
+				const before = group.getFocusIndex();
+				group.handleGroupKey(index, e);
+				const after = group.getFocusIndex();
+				if (after !== before && after >= 0) {
+					group.handleItemFocus(after);
+					select(getColors()[after]);
+				}
+				break;
+			}
+		}
+	}
+
+	// Only blur when focus leaves the whole palette
+	function handleFocusOut(e: FocusEvent) {
+		if (!root.contains(e.relatedTarget as Node | null)) {
+			form.handleBlur();
+		}
+	}
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-color-palette", $props?.class]}
+			{$props?.style}
+			role="radiogroup"
+			aria-label={$props?.ariaLabel}
+			aria-disabled={getDisabled() ? "true" : undefined}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+			onfocusout={handleFocusOut}
+			&ref={root}
+		>
+			@for (let [i, color] of getColors().entries()) {
+				@key = color
+				<button
+					type="button"
+					class="torp-color-palette-swatch"
+					role="radio"
+					tabindex={group.isTabStop(i) ? 0 : -1}
+					aria-checked={isSelected(color) ? "true" : "false"}
+					aria-label={normalized(color)}
+					aria-disabled={getDisabled() ? "true" : undefined}
+					data-color={color}
+					data-selected={isSelected(color) ? "selected" : undefined}
+					disabled={getDisabled()}
+					style={`background-color:${color}`}
+					onclick={() => select(color)}
+					onkeydown={(e: KeyboardEvent) => handleKey(i, e)}
+					onmount={(el: HTMLElement) => {
+						const item: FocusItemState = { setFocused: () => el.focus() };
+						group.registerItem(item);
+						return () => group.removeItem(item.index!);
+					}}
+				/>
+			}
+		</div>
+
+		<FormValues name={form.name} value={$state.value} />
+	}
+}

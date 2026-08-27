@@ -45,7 +45,7 @@ export default function FocusGroupButton($props?: FocusGroupButtonProps) {
 			class={["torp-focus-group-button", $props?.class]}
 			{$props?.style}
 			type="button"
-			tabindex={context.tabStopIndex() === index ? 0 : -1}
+			tabindex={context.isTabStop(index) ? 0 : -1}
 			{$props?.disabled}
 			aria-disabled={$props?.disabled ? "true" : undefined}
 			onclick={$props?.onclick}

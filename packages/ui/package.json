@@ -28,6 +28,10 @@
 			"types": "./dist/CommandPalette/index.d.ts",
 			"import": "./dist/CommandPalette/index.js"
 		},
+		"./ColorPicker": {
+			"types": "./dist/ColorPicker/index.d.ts",
+			"import": "./dist/ColorPicker/index.js"
+		},
 		"./ComboBox": {
 			"types": "./dist/ComboBox/index.d.ts",
 			"import": "./dist/ComboBox/index.js"

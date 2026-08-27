@@ -1,16 +1,14 @@
+import type { FocusItemState } from "../utils/focusGroup";
+
 export const FocusGroupContextName: unique symbol = Symbol.for("torp.FocusGroupItem");
 
-export interface FocusGroupItemState {
-	index?: number;
-	setFocused: () => void;
-	disabled?: boolean;
-}
+export type { FocusItemState };
 
 export interface FocusGroupContext {
-	registerItem: (item: FocusGroupItemState) => { index: number };
+	registerItem: (item: FocusItemState) => { index: number };
 	removeItem: (index: number) => void;
 	handleItemFocus: (index: number) => void;
 	handleItemKey: (e: KeyboardEvent) => void;
-	/** Which item index currently holds (or would receive) the tab stop */
-	tabStopIndex: () => number;
+	/** Whether item `index` is currently the group's single tab stop */
+	isTabStop: (index: number) => boolean;
 }

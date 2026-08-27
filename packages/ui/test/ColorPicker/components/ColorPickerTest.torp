@@ -1,0 +1,14 @@
+import { ColorPicker } from "../../../src/ColorPicker/index";
+
+export default function ColorPickerTest($props: any) {
+	@render {
+		<ColorPicker
+			{$props?.value}
+			colors={$props.colors}
+			showInput={$props.showInput}
+			disabled={$props.disabled}
+			ariaLabel="Accent color"
+			onchange={$props.onchange}
+		/>
+	}
+}

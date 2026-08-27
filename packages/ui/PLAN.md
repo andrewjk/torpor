@@ -119,7 +119,11 @@ interaction-layer and aria standards above, with deviations fixed inline.
 - [x] DatePicker
 - [ ] TimePicker
 - [ ] MaskedInput
-- [ ] ColorPicker
+- [x] ColorPicker, as colorpalette/colorpicker like calendar/datepicker.
+      ColorPalette is a radio-group of swatches (arrow keys move and select,
+      reselect clears) built on the focus group; ColorPicker adds an optional
+      hex field with NumberInput-style commit/revert. utils/colorUtils.ts
+      has the parsing/normalization helpers and the default palette
 - [x] Drag and drop. Platform capability in the mount-directive style:
       utils/dragState.ts tracks the active drag reactively (id/kind/data,
       with an integrity type encoded into the dataTransfer); mount/draggable
