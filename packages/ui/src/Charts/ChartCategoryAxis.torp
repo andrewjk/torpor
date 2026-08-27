@@ -1,0 +1,98 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartCategoryAxisProps {
+	/** Whether to draw the axis line itself (default true) */
+	showAxis?: boolean;
+	/** Which edge of the plot the category axis runs along (default "bottom") */
+	side?: "bottom" | "left";
+	/** An axis title, overriding the Chart's x label (bottom side only) */
+	label?: string;
+}
+
+/**
+ * The category axis for a chart: one slot per series, labeled with the
+ * series name. Runs along the bottom by default; use `side="left"` for
+ * horizontal bar charts.
+ */
+export default function ChartCategoryAxis($props?: ChartCategoryAxisProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartCategoryAxis must be contained within a Chart");
+	}
+	const { layout, xLabel } = context;
+
+	function showAxis(): boolean {
+		return $props?.showAxis !== false;
+	}
+
+	function side(): "bottom" | "left" {
+		return $props?.side ?? "bottom";
+	}
+
+	function title(): string {
+		if ($props?.label !== undefined) return $props.label;
+		return side() === "bottom" ? xLabel() : "";
+	}
+
+	function bandHeight(): number {
+		const count = Math.max(1, layout.labels.length);
+		return (layout.chartBottom - topPad()) / count;
+	}
+
+	function topPad(): number {
+		return layout.textHeight / 3;
+	}
+
+	function bandCenter(i: number): number {
+		return topPad() + i * bandHeight() + bandHeight() / 2;
+	}
+
+	function tickY(): number {
+		return layout.calculatedHeight - layout.textHeight / 3;
+	}
+
+	@render {
+		<svg>
+			@if (showAxis()) {
+				@if (side() === "bottom") {
+					<line x1={layout.chartLeft} y1={layout.chartBottom} x2={layout.calculatedWidth} y2={layout.chartBottom} stroke="currentcolor" />
+				} else {
+					<line x1={layout.chartLeft} y1={layout.chartBottom} x2={layout.chartLeft} y2={0} stroke="currentcolor" />
+				}
+			}
+			@if (side() === "bottom" && title()) {
+				<text
+					text-anchor="middle"
+					dominant-baseline="text-after-edge"
+					x={layout.calculatedWidth - (layout.calculatedWidth - layout.chartLeft) / 2}
+					y={layout.calculatedHeight}
+				>
+					{title()}
+				</text>
+			}
+			@if (side() === "bottom") {
+				@for (let [i, label] of layout.labels.entries()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="text-after-edge"
+						x={layout.chartLeft + layout.itemWidth * i + layout.itemWidth / 2}
+						y={tickY()}
+					>
+						{label}
+					</text>
+				}
+			} else {
+				@for (let [i, label] of layout.labels.entries()) {
+					<text
+						text-anchor="end"
+						dominant-baseline="middle"
+						x={layout.chartLeft - layout.textHeight / 4}
+						y={bandCenter(i)}
+					>
+						{label}
+					</text>
+				}
+			}
+		</svg>
+	}
+}

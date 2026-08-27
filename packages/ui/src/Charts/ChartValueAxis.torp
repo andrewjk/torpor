@@ -1,0 +1,118 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartValueAxisProps {
+	/** Whether to draw the axis line itself (default true) */
+	showAxis?: boolean;
+	/** Which edge of the plot the value axis runs along (default "left") */
+	side?: "left" | "right" | "bottom";
+	/** An axis title, overriding the Chart's y label (left side only) */
+	label?: string;
+}
+
+/**
+ * The value axis for a chart: a line down the left or right edge with a
+ * tick label for each step between 0 and the maximum value -- or along the
+ * bottom for horizontal bar charts.
+ *
+ * Drawing it on either side does not change the plot geometry; overlaying
+ * an axis is purely presentational. Both sides read the same scale.
+ */
+export default function ChartValueAxis($props?: ChartValueAxisProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartValueAxis must be contained within a Chart");
+	}
+	const { layout, yLabel } = context;
+
+	function showAxis(): boolean {
+		return $props?.showAxis !== false;
+	}
+
+	function side(): "left" | "right" | "bottom" {
+		return $props?.side ?? "left";
+	}
+
+	function title(): string {
+		if ($props?.label !== undefined) return $props.label;
+		return side() === "left" ? yLabel() : "";
+	}
+
+	function plotWidth(): number {
+		return layout.calculatedWidth - layout.chartLeft;
+	}
+
+	function unitWidth(): number {
+		return plotWidth() / Math.max(1, layout.maxValue);
+	}
+
+	function tickX(i: number): number {
+		return layout.chartLeft + i * layout.stepValue * unitWidth();
+	}
+
+	function tickY(): number {
+		return layout.calculatedHeight - layout.textHeight / 3;
+	}
+
+	function axisX(): number {
+		switch (side()) {
+			case "left":
+				return layout.chartLeft;
+			case "right":
+				return layout.calculatedWidth;
+			case "bottom":
+				return 0;
+		}
+	}
+
+	function anchor(): string {
+		switch (side()) {
+			case "left":
+				return "end";
+			case "right":
+				return "start";
+			case "bottom":
+				return "middle";
+		}
+	}
+
+	@render {
+		<svg>
+			@if (showAxis()) {
+				@if (side() === "bottom") {
+					<line x1={layout.chartLeft} y1={layout.chartBottom} x2={layout.calculatedWidth} y2={layout.chartBottom} stroke="currentcolor" />
+				} else {
+					<line x1={axisX()} y1={layout.chartBottom} x2={axisX()} y2={0} stroke="currentcolor" />
+				}
+			}
+			@if (side() === "left" && title()) {
+				<text
+					text-anchor="middle"
+					dominant-baseline="hanging"
+					x={0}
+					y={layout.chartBottom / 2}
+					transform={`rotate(-90, 0, ${layout.chartBottom / 2})`}
+				>
+					{title()}
+				</text>
+			}
+			@if (side() === "bottom") {
+				@for (let [i, label] of layout.stepLabels.entries()) {
+					<text text-anchor={anchor()} dominant-baseline="text-after-edge" x={tickX(i)} y={tickY()}>
+						{label}
+					</text>
+				}
+			} else {
+				@for (let [i, label] of layout.stepLabels.entries()) {
+					<text
+						text-anchor={anchor()}
+						dominant-baseline="middle"
+						x={side() === "left" ? layout.chartLeft - layout.textHeight / 4 : layout.calculatedWidth + layout.textHeight / 4}
+						y={layout.chartBottom - i * layout.stepValue * layout.valueHeight}
+					>
+						{label}
+					</text>
+				}
+			}
+		</svg>
+	}
+}

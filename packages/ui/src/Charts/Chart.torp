@@ -1,0 +1,110 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { chartColors } from "../utils/chartColors";
+import { createChartLayout, measureChartText, type ChartLayout } from "../utils/chartLayout";
+import type DataSeries from "./DataSeries";
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** An ARIA label describing the chart for screen readers */
+	ariaLabel?: string;
+	/** The series that layers draw from (layers reference them by index) */
+	series: DataSeries[];
+	/** Fixed height in pixels (default 200) */
+	height?: number;
+	/** Fixed width in pixels (default: fills the container, minimum 400) */
+	width?: number;
+	/** Label under the x axis */
+	xLabel?: string;
+	/** Label beside the y axis */
+	yLabel?: string;
+	/** The value at the top of the value axis, instead of the series' maximum */
+	maxValue?: number;
+	/** The number of steps between 0 and the maximum value (default 2) */
+	stepCount?: number;
+	/** The size of each step, instead of being calculated */
+	stepValue?: number;
+}
+
+/**
+ * A container for layered chart components. It measures its text, works out
+ * the plot geometry and provides it to whatever axes, grid lines and marks
+ * are slotted inside:
+ *
+ * ```
+ * <Chart ariaLabel="Revenue" series={revenue}>
+ * 	<ChartYAxis side="right" />
+ * 	<ChartGrid />
+ * 	<ChartXAxis />
+ * 	<ChartColumns />
+ * 	<ChartLines seriesIndex={1} showPoints />
+ * </Chart>
+ * ```
+ *
+ * Layers can be mixed freely -- columns with a line overlaid, an axis on
+ * either side, only a y axis with no x axis -- so a preset like LineChart is
+ * just one such combination.
+ *
+ * See also the ready-made presets: BarChart, ColumnChart, LineChart,
+ * ScatterChart.
+ */
+export default function Chart($props: ChartProps | undefined) {
+	let container: HTMLElement;
+	let measurer: SVGTextElement;
+
+	const $layout = createChartLayout({
+		series: () => $props?.series ?? [],
+		height: () => $props?.height,
+		width: () => $props?.width,
+		xLabel: () => $props?.xLabel,
+		yLabel: () => $props?.yLabel,
+		maxValue: () => $props?.maxValue,
+		stepCount: () => $props?.stepCount,
+		stepValue: () => $props?.stepValue,
+		getContainer: () => container,
+	});
+
+	$mount(() => {
+		// HACK: Wait until the measurer is really available
+		setTimeout(() => measureChartText($layout, measurer), 1);
+	});
+
+	function colorAt(i: number): string {
+		const series = $props?.series[i];
+		return series?.color || chartColors[i % chartColors.length];
+	}
+
+	const context: ChartContext = {
+		layout: $layout as unknown as ChartLayout,
+		series: () => $props?.series ?? [],
+		xLabel: () => $props?.xLabel ?? "",
+		yLabel: () => $props?.yLabel ?? "",
+		colorAt,
+	};
+	$context[ChartContextName] = context;
+
+	@render {
+		<div {$props?.id} class={["torp-chart", $props?.class]} {$props?.style} &ref={container}>
+			<svg
+				role={$props?.ariaLabel ? "img" : undefined}
+				aria-label={$props?.ariaLabel}
+				version="1.1"
+				width={$layout.calculatedWidth}
+				height={$layout.calculatedHeight}
+			>
+				<g>
+					<text &ref={measurer} x="-999" y="-999">8</text>
+
+					@if ($layout.textWidth && $layout.textHeight) {
+						<slot />
+					}
+				</g>
+			</svg>
+		</div>
+	}
+}

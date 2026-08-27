@@ -1,0 +1,24 @@
+import {
+	Chart,
+	ChartCategoryAxis,
+	ChartColumns,
+	ChartGrid,
+	ChartLines,
+	ChartValueAxis,
+} from "../../../src/Charts/index";
+
+/**
+ * A hand-composed chart: columns for all series with a line overlaid for
+ * series 1, and the value axis drawn on the right
+ */
+export default function LayeredChartTest($props: any) {
+	@render {
+		<Chart ariaLabel="Layered" height={200} width={400} maxValue={100} stepCount={2} stepValue={50} series={$props.series}>
+			<ChartValueAxis side="right" />
+			<ChartGrid />
+			<ChartCategoryAxis />
+			<ChartColumns />
+			<ChartLines seriesIndex={1} showPoints={true} />
+		</Chart>
+	}
+}

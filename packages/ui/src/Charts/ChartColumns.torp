@@ -1,0 +1,65 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartColumnsProps {
+	/**
+	 * The index of the series to draw, when the Chart has other layers
+	 * reading different series. Defaults to all series.
+	 */
+	seriesIndex?: number;
+}
+
+/**
+ * Vertical column marks for a Chart: every value in the chosen series is
+ * drawn as a vertical column, grouped under its label.
+ *
+ * For one thick bar per series, use ChartBars -- those run horizontally.
+ */
+export default function ChartColumns($props?: ChartColumnsProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+
+	function indexes(): number[] {
+		if ($props?.seriesIndex !== undefined) {
+			return [$props.seriesIndex];
+		}
+		return series().map((_, i) => i);
+	}
+
+	function columnWidth(count: number): number {
+		return Math.max(1, (layout.itemWidth / count) * 0.7);
+	}
+
+	function columnGap(count: number): number {
+		return (layout.itemWidth - columnWidth(count) * count) / (count + 1);
+	}
+
+	function columnX(i: number, j: number): number {
+		return (
+			layout.chartLeft +
+			i * layout.itemWidth +
+			columnGap(series()[i].data.length) +
+			j * columnWidth(series()[i].data.length)
+		);
+	}
+
+	@render {
+		<svg>
+			@for (let i of indexes()) {
+				@for (let [j, value] of series()[i].data.entries()) {
+					<rect
+						x={columnX(i, j)}
+						y={layout.chartBottom - Math.max(1, value * layout.valueHeight)}
+						width={columnWidth(series()[i].data.length)}
+						height={Math.max(1, value * layout.valueHeight)}
+						fill={colorAt(i)}
+					>
+						<title>{`${[layout.labels[i], value].filter(Boolean).join("\n")}`}</title>
+					</rect>
+				}
+			}
+		</svg>
+	}
+}

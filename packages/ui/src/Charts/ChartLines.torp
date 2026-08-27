@@ -1,0 +1,59 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+import type DataSeries from "./DataSeries";
+
+interface ChartLinesProps {
+	/** The index of the series to draw (default 0) */
+	seriesIndex?: number;
+	/** The color to draw with, instead of the series' own */
+	color?: string;
+	/** Draws a point at each value (default false) */
+	showPoints?: boolean;
+}
+
+/**
+ * Line marks for a Chart: draws the chosen series as a connected line
+ * across the category slots.
+ *
+ * Add alongside ChartColumns or ChartBars for overlaid layers -- or use two
+ * ChartLines with different `seriesIndex` to compare series.
+ */
+export default function ChartLines($props?: ChartLinesProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+
+	function index(): number {
+		return $props?.seriesIndex ?? 0;
+	}
+
+	function current(): DataSeries | undefined {
+		return series()[index()];
+	}
+
+	function points(): { x: number; y: number }[] {
+		const data = current()?.data ?? [];
+		return data.map((value, j) => ({
+			x: +(layout.chartLeft + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
+			y: +(layout.chartBottom - value * layout.valueHeight).toFixed(2),
+		}));
+	}
+
+	function stroke(): string {
+		return $props?.color || colorAt(index());
+	}
+
+	@render {
+		<svg>
+			<polyline points={points().map((p) => `${p.x},${p.y}`).join(" ")} stroke={stroke()} stroke-width="2" fill="none" />
+			@if ($props?.showPoints) {
+				@for (let [j, point] of points().entries()) {
+					<circle cx={point.x} cy={point.y} r="4" stroke={stroke()} stroke-width="2" fill="white">
+						<title>{`${[current()?.name, layout.labels[j], current()?.data[j]].filter(Boolean).join("\n")}`}</title>
+					</circle>
+				}
+			}
+		</svg>
+	}
+}

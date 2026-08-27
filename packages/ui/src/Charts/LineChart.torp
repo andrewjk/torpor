@@ -1,10 +1,10 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { chartColors } from "../utils/chartColors";
-import { createChartLayout, measureChartText } from "../utils/chartLayout";
+import Chart from "./Chart.torp";
+import ChartCategoryAxis from "./ChartCategoryAxis.torp";
+import ChartGrid from "./ChartGrid.torp";
+import ChartLines from "./ChartLines.torp";
+import ChartValueAxis from "./ChartValueAxis.torp";
 import type DataSeries from "./DataSeries";
-import GridLines from "./GridLines.torp";
-import XAxis from "./XAxis.torp";
-import YAxis from "./YAxis.torp";
 
 interface LineChartProps {
 	/** An ID for the root element */
@@ -24,116 +24,50 @@ interface LineChartProps {
 	stepCount?: number;
 	stepValue?: number;
 	showPoints?: boolean;
-	hideXAxis?: boolean;
-	hideYAxis?: boolean;
 	showHLines?: boolean;
 	showVLines?: boolean;
 }
 
+/**
+ * A line chart: each series drawn as a connected line across the category
+ * slots.
+ *
+ * This is a preset over the layered chart components:
+ *
+ * ```
+ * <Chart>
+ * 	<ChartValueAxis />
+ * 	<ChartGrid />
+ * 	<ChartCategoryAxis />
+ * 	<ChartLines seriesIndex={0} />
+ * </Chart>
+ * ```
+ *
+ * Compose those directly for overlaid layers (columns plus a line, multiple
+ * separately-indexed lines etc).
+ */
 export default function LineChart($props: LineChartProps) {
-	let container: HTMLElement;
-	let measurer: SVGTextElement;
-
-	let $layout = createChartLayout({
-		series: () => $props.series,
-		height: () => $props.height,
-		width: () => $props.width,
-		xLabel: () => $props.xLabel,
-		yLabel: () => $props.yLabel,
-		maxValue: () => $props.maxValue,
-		stepCount: () => $props.stepCount,
-		stepValue: () => $props.stepValue,
-		getContainer: () => container,
-	});
-
-	$mount(() => {
-		// HACK: Wait until the measurer is really available
-		setTimeout(() => measureChartText($layout, measurer), 1);
-	});
-
-	function pointSeries(
-		theSeries: DataSeries[],
-	) : { x: number; y: number }[][] {
-		return theSeries.map((series) => {
-			return series.data.map((value, i) => {
-				const x = +($layout.chartLeft + i * $layout.itemWidth + $layout.itemWidth / 2).toFixed(2);
-				const y = +($layout.chartBottom - value * $layout.valueHeight).toFixed(2);
-				return { x, y };
-			});
-		});
-	}
-
 	@render {
-		<div {$props?.id} class={["torp-line-chart", $props?.class]} {$props?.style} &ref={container}>
-			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$layout.calculatedWidth} height={$layout.calculatedHeight}>
-				<g>
-					<text &ref={measurer} x="-999" y="-999">8</text>
-
-					@if ($layout.textWidth && $layout.textHeight) {
-						<XAxis
-							showAxis={!$props.hideXAxis}
-							height={$layout.calculatedHeight}
-							width={$layout.calculatedWidth}
-							{$layout.itemWidth}
-							{$layout.textHeight}
-							xLabel={$props.xLabel ?? ""}
-							{$layout.labels}
-							stepLabels={[]}
-							stepValue={0}
-							{$layout.chartLeft}
-							{$layout.chartBottom}
-						/>
-						<YAxis
-							showAxis={!$props.hideYAxis}
-							{$layout.valueHeight}
-							{$layout.textHeight}
-							yLabel={$props.yLabel ?? ""}
-							{$layout.stepLabels}
-							stepValue={$layout.stepValue}
-							{$layout.chartLeft}
-							{$layout.chartBottom}
-						/>
-						<GridLines
-							{$props.showHLines}
-							{$props.showVLines}
-							width={$layout.calculatedWidth}
-							{$layout.labels}
-							xStepValue={0}
-							xStepLabels={[]}
-							yStepValue={$layout.stepValue}
-							yStepLabels={[]}
-							{$layout.stepLabels}
-							{$layout.itemWidth}
-							{$layout.valueHeight}
-							{$layout.chartLeft}
-							{$layout.chartBottom}
-							type="line"
-						/>
-						@for (let [i, series] of $props.series.entries()) {
-							<polyline
-								points={pointSeries($props.series)[i].map((p) => `${p.x},${p.y}`).join(" ")}
-								stroke={series.color || chartColors[i % chartColors.length]}
-								stroke-width="2"
-								fill="none"
-							/>
-							@if ($props.showPoints) {
-								@for (let [j, point] of pointSeries($props.series)[i].entries()) {
-									<circle
-										cx={point.x}
-										cy={point.y}
-										r="4"
-										stroke={series.color || chartColors[i % chartColors.length]}
-										stroke-width="2"
-										fill="white"
-									>
-										<title>{`${[series.name, $layout.labels[j], series.data[j]].filter(Boolean).join("\n")}`}</title>
-									</circle>
-								}
-							}
-						}
-					}
-				</g>
-			</svg>
-		</div>
+		<Chart
+			{$props?.id}
+			class={["torp-line-chart", $props?.class]}
+			{$props?.style}
+			{$props?.ariaLabel}
+			{$props?.series}
+			{$props?.height}
+			{$props?.width}
+			{$props?.xLabel}
+			{$props?.yLabel}
+			{$props?.maxValue}
+			{$props?.stepCount}
+			{$props?.stepValue}
+		>
+			<ChartValueAxis showAxis={true} />
+			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
+			<ChartCategoryAxis />
+			@for (let i of $props.series.map((_, i) => i)) {
+				<ChartLines seriesIndex={i} showPoints={$props.showPoints} />
+			}
+		</Chart>
 	}
 }

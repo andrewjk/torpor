@@ -1,0 +1,54 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartGridProps {
+	/** Horizontal lines across the plot at each value step (default true) */
+	hLines?: boolean;
+	/** Vertical lines at each category slot (default false) */
+	vLines?: boolean;
+}
+
+/**
+ * Grid lines for a Chart: horizontal lines at each value step and/or
+ * vertical lines through each category slot.
+ */
+export default function ChartGrid($props?: ChartGridProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout } = context;
+
+	function hLines(): boolean {
+		return $props?.hLines !== false;
+	}
+	function vLines(): boolean {
+		return $props?.vLines === true;
+	}
+
+	@render {
+		<svg>
+			@if (hLines()) {
+				@for (let [i] of layout.stepLabels.entries()) {
+					<line
+						x1={layout.chartLeft}
+						y1={layout.chartBottom - i * layout.stepValue * layout.valueHeight}
+						x2={layout.calculatedWidth}
+						y2={layout.chartBottom - i * layout.stepValue * layout.valueHeight}
+						stroke="currentcolor"
+					/>
+				}
+			}
+			@if (vLines()) {
+				@for (let [i] of layout.labels.entries()) {
+					<line
+						x1={layout.chartLeft + i * layout.itemWidth + layout.itemWidth / 2}
+						y1={layout.chartBottom}
+						x2={layout.chartLeft + i * layout.itemWidth + layout.itemWidth / 2}
+						y2={0}
+						stroke="currentcolor"
+					/>
+				}
+			}
+		</svg>
+	}
+}

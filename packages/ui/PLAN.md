@@ -117,11 +117,18 @@ interaction-layer and aria standards above, with deviations fixed inline.
 - [x] All inputs should work in forms
 - [ ] Split out PopoverTrigger / PopoverHover (and ContextualTrigger,
       ModalTrigger?)
-- [x] Split Charts into components; add ColumnChart. The shared layout
-      scaffold (text measuring + plot geometry) moved to
-      utils/chartLayout.ts (`createChartLayout`); BarChart and LineChart are
-      now thin mark-layers over it (ScatterChart keeps its two-axis variant).
-      ColumnChart draws a column per value, grouped under the series label
+- [x] Split Charts into components; add ColumnChart. The cartesian charts
+      are now layered: the `Chart` container owns the layout
+      (utils/chartLayout.ts) and publishes it via context; ChartValueAxis
+      (left/right/bottom), ChartCategoryAxis (bottom/left), ChartGrid,
+      ChartColumns, ChartBars and ChartLines compose freely inside it.
+      ColumnChart = vertical columns per value (grouped under each series
+      label); BarChart = horizontal bars with category labels on the left
+      and value ticks along the bottom. ColumnChart/BarChart/LineChart are
+      now thin presets over the layers; ScatterChart still uses its own
+      two-axis furniture (XAxis/YAxis/GridLines kept for it, un-exported
+      eventually). Future chart types (area, stacked columns...) are new
+      mark layers over the same context
 - [x] Fix Slider (rewritten: `role="slider"` with aria-valuemin/max/now,
       keyboard support per the APG pattern -- arrows/Home/End/PageUp/PageDown,
       mouse drag on track and thumb, disabled state, two-way `value` binding;

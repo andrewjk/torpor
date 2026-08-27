@@ -1,0 +1,77 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartBarsProps {
+	/**
+	 * The index of the series to draw, when the Chart has other layers
+	 * reading different series. Defaults to all series.
+	 */
+	seriesIndex?: number;
+}
+
+/**
+ * Horizontal bar marks for a Chart: one thick horizontal bar per series,
+ * drawn from the left edge of the plot towards its value.
+ *
+ * For a column per value grouped under each label, use ChartColumns --
+ * those run vertically.
+ */
+export default function ChartBars($props?: ChartBarsProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+
+	function indexes(): number[] {
+		if ($props?.seriesIndex !== undefined) {
+			return [$props.seriesIndex];
+		}
+		return series().map((_, i) => i);
+	}
+
+	// The vertical band each series occupies within the plot
+	function bandHeight(): number {
+		const count = Math.max(1, layout.labels.length);
+		return (layout.chartBottom - topPad()) / count;
+	}
+
+	// A little space above for breathing room, matching ChartXAxis's labels
+	function topPad(): number {
+		return layout.textHeight / 3;
+	}
+
+	function barHeight(count: number): number {
+		return Math.max(1, (bandHeight() / count) * 0.7);
+	}
+
+	function valueWidth(value: number): number {
+		const plotWidth = layout.calculatedWidth - layout.chartLeft;
+		const max = Math.max(1, layout.maxValue);
+		return Math.max(1, (value / max) * plotWidth);
+	}
+
+	function barY(i: number): number {
+		const count = series().length || 1;
+		return (
+			topPad() +
+			i * bandHeight() +
+			(bandHeight() - barHeight(count)) / 2
+		);
+	}
+
+	@render {
+		<svg>
+			@for (let i of indexes()) {
+				<rect
+					x={layout.chartLeft}
+					y={barY(i)}
+					width={valueWidth(series()[i].data[0])}
+					height={barHeight(Math.max(1, series().length))}
+					fill={colorAt(i)}
+				>
+					<title>{`${[layout.labels[i], series()[i].data[0]].filter(Boolean).join("\n")}`}</title>
+				</rect>
+			}
+		</svg>
+	}
+}
