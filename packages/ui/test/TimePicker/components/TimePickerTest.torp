@@ -1,0 +1,19 @@
+import { TimePicker } from "../../../src/TimePicker/index";
+
+/** A plain TimePicker taking all props through */
+export default function TimePickerTest($props: any) {
+	@render {
+		<TimePicker
+			id={$props.id}
+			{$props?.value}
+			hour12={$props.hour12}
+			seconds={$props.seconds}
+			step={$props.step}
+			min={$props.min}
+			max={$props.max}
+			disabled={$props.disabled}
+			ariaLabel={$props.ariaLabel}
+			onchange={$props.onchange}
+		/>
+	}
+}

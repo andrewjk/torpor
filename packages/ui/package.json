@@ -143,7 +143,11 @@
 		"./ToolBar": {
 			"types": "./dist/ToolBar/index.d.ts",
 			"import": "./dist/ToolBar/index.js"
+		},		"./TimePicker": {
+			"types": "./dist/TimePicker/index.d.ts",
+			"import": "./dist/TimePicker/index.js"
 		},
+
 		"./icons": {
 			"types": "./dist/icons/index.d.ts",
 			"import": "./dist/icons/index.js"

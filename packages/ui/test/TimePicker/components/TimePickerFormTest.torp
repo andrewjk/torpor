@@ -1,0 +1,22 @@
+import * as z from "zod";
+import { Field, Form } from "../../../src/Form/index";
+import TimePicker from "../../../src/TimePicker/TimePicker.torp";
+
+/** A Form with a named TimePicker field, for form integration tests */
+export default function TimePickerFormTest($props: any) {
+	const schema = z.string();
+
+	let $state = $watch({
+		data: {
+			alarm: $props?.value,
+		},
+	});
+
+	@render {
+		<Form {$state.data} {schema}>
+			<Field name="alarm" schema={schema} &value={$state.data.alarm}>
+				<TimePicker &value={$state.data.alarm} />
+			</Field>
+		</Form>
+	}
+}

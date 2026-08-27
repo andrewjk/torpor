@@ -1,0 +1,462 @@
+import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import {
+	type FieldContext,
+	FieldContextName,
+	type FormContext,
+	FormContextName,
+} from "../Form/FormTypes";
+import FormValues from "../Form/FormValues.torp";
+import createFormField from "../utils/formField";
+
+interface TimePickerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/**
+	 * The current time as "HH:mm" or "HH:mm:ss" (24-hour), or undefined if
+	 * the field is empty
+	 */
+	value?: Bindable<string | undefined>;
+	/** If set to true, times are displayed and entered in 12-hour format with an AM/PM toggle */
+	hour12?: boolean;
+	/** If set to true, a seconds field is shown */
+	seconds?: boolean;
+	/** The amount by which the minute field steps (default 1) */
+	step?: number;
+	/** The earliest allowed time, as "HH:mm" or "HH:mm:ss" */
+	min?: string;
+	/** The latest allowed time, as "HH:mm" or "HH:mm:ss" */
+	max?: string;
+	/** If set to true, the user cannot interact with this input */
+	disabled?: boolean;
+	/** An accessible name for the whole input */
+	ariaLabel?: string;
+	/** The name of the component's form data field */
+	name?: string;
+	/** Raised when the value has changed */
+	onchange?: (value: string | undefined) => void;
+}
+
+type Part = "hour" | "minute" | "second";
+
+const PAD = [2, 2, 2];
+
+/**
+ * An input for entering a time of day, made of hour, minute and (optionally)
+ * second fields that follow the WAI ARIA spinbutton pattern -- each can be
+ * typed into or stepped with the arrow keys -- plus an AM/PM toggle in
+ * 12-hour mode.
+ *
+ * The value is always the canonical 24-hour form ("HH:mm" or "HH:mm:ss"),
+ * regardless of display format.
+ */
+export default function TimePicker($props: TimePickerProps | undefined) {
+	let hourInput: HTMLInputElement;
+	let minuteInput: HTMLInputElement;
+	let secondInput: HTMLInputElement;
+	let periodButton: HTMLButtonElement;
+
+	// Wire up the enclosing Form and Field, if any
+	const form = createFormField(
+		$props?.name,
+		$context[FormContextName] as FormContext | undefined,
+		$context[FieldContextName] as FieldContext | undefined,
+	);
+
+	function getSeconds(): boolean {
+		return $props?.seconds === true;
+	}
+	function getDisabled(): boolean {
+		return $props?.disabled === true;
+	}
+
+	function parseTime(text: string | undefined): { h: number; m: number; s: number } | undefined {
+		if (!text) return undefined;
+		const match = text.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/);
+		if (!match) return undefined;
+		return {
+			h: Number(match[1]),
+			m: Number(match[2]),
+			s: match[3] ? Number(match[3]) : 0,
+		};
+	}
+
+	function clampPart(part: Part, n: number): number {
+		switch (part) {
+			case "hour":
+				return Math.min(23, Math.max(0, n));
+			case "minute":
+				return Math.min(59, Math.max(0, n));
+			case "second":
+				return Math.min(59, Math.max(0, n));
+		}
+	}
+
+	function format(n: number): string {
+		return String(n).padStart(2, "0");
+	}
+
+	function formatValue(h: number, m: number, s: number): string {
+		return getSeconds() ? `${format(h)}:${format(m)}:${format(s)}` : `${format(h)}:${format(m)}`;
+	}
+
+	let $state = $watch({
+		value: undefined as string | undefined,
+
+		// The text being typed in each segment; committed on completion
+		hourText: "",
+		minuteText: "",
+		secondText: "",
+	});
+
+	$bind($state, $props, "value");
+
+	// The committed parts of the current value; missing parts are zero
+	function parts(): { h: number; m: number; s: number } {
+		const parsed = parseTime($state.value);
+		return parsed ?? { h: 0, m: 0, s: 0 };
+	}
+
+	function getMin(): number {
+		const parsed = parseTime($props?.min);
+		if (!parsed) return 0;
+		return parsed.h * 3600 + parsed.m * 60 + parsed.s;
+	}
+
+	function getMax(): number {
+		const parsed = parseTime($props?.max);
+		if (!parsed) return 24 * 3600 - (getSeconds() ? 1 : 60);
+		return parsed.h * 3600 + parsed.m * 60 + parsed.s;
+	}
+
+	function totalSeconds(h: number, m: number, s: number): number {
+		return h * 3600 + m * 60 + s;
+	}
+
+	function setParts(h: number, m: number, s: number) {
+		// Clamp the assembled time between min and max
+		let t = totalSeconds(
+			clampPart("hour", h),
+			clampPart("minute", m),
+			clampPart("second", s),
+		);
+		t = Math.min(getMax(), Math.max(getMin(), t));
+
+		const next = formatValue(Math.floor(t / 3600), Math.floor((t % 3600) / 60), t % 60);
+		if (next !== $state.value) {
+			$state.value = next;
+			form.handleInput();
+			$props?.onchange?.(next);
+		}
+	}
+
+	// --- Spinbutton segments ---
+
+	function partDisplay(part: Part): string {
+		const p = parts();
+		const n = part === "hour" ? p.h : part === "minute" ? p.m : p.s;
+		if (part !== "hour") {
+			return format(n);
+		}
+		if ($props?.hour12) {
+			const twelve = n % 12 === 0 ? 12 : n % 12;
+			return format(twelve);
+		}
+		return format(n);
+	}
+
+	function isPM(): boolean {
+		return parts().h >= 12;
+	}
+
+	function commitBuffer(part: Part, buffer: string): boolean {
+		if (buffer.trim() === "") return false;
+		const n = Number(buffer);
+		if (!Number.isFinite(n)) return false;
+		setPartValue(part, n, false);
+		return true;
+	}
+
+	/**
+	 * Steps a segment by delta hours/minutes/seconds, wrapping within its
+	 * range like a clock face
+	 */
+	function stepPart(part: Part, delta: number) {
+		if (getDisabled()) return;
+		const p = parts();
+		let h = p.h;
+		let m = p.m;
+		let s = p.s;
+		switch (part) {
+			case "hour": {
+				h = ((h + delta) % 24 + 24) % 24;
+				break;
+			}
+			case "minute": {
+				m = ((m + delta) % 60 + 60) % 60;
+				break;
+			}
+			case "second": {
+				s = ((s + delta) % 60 + 60) % 60;
+				break;
+			}
+		}
+		setParts(h, m, s);
+		syncInputs();
+	}
+
+	function setPartValue(part: Part, n: number, sync: boolean) {
+		const p = parts();
+		switch (part) {
+			case "hour":
+				setParts(clampPart("hour", n), p.m, p.s);
+				break;
+			case "minute":
+				setParts(p.h, clampPart("minute", n), p.s);
+				break;
+			case "second":
+				setParts(p.h, p.m, clampPart("second", n));
+				break;
+		}
+		if (sync) syncInputs();
+	}
+
+	// Keep segment inputs showing the committed values unless typing there
+	function syncInputs() {
+		if (!hourInput || !minuteInput) return;
+		const editing = (el: HTMLInputElement, buffer: string) =>
+			document.activeElement === el && el.value !== buffer;
+		if (!editing(hourInput, $state.hourText)) {
+			hourInput.value = partDisplay("hour");
+		}
+		if (!editing(minuteInput, $state.minuteText)) {
+			minuteInput.value = partDisplay("minute");
+		}
+		if (secondInput && !editing(secondInput, $state.secondText)) {
+			secondInput.value = partDisplay("second");
+		}
+	}
+
+	function handleInput(part: Part, e: Event) {
+		if (getDisabled()) return;
+		const el = e.currentTarget as HTMLInputElement;
+
+		// Accept digits only; strip everything else as it is typed
+		let text = el.value.replace(/\D/g, "");
+		const limit = part === "hour" ? ($props?.hour12 ? 12 : 23) : 59;
+		while (text.length > 0 && Number(text) > limit && text.length > 1) {
+			text = text.slice(1);
+		}
+
+		el.value = text;
+		setBuffer(part, text);
+
+		// Two digits fills the segment; move on to the next one
+		if (text.length >= (PAD[partIndex(part)] ?? 2)) {
+			commitBuffer(part, text);
+			focusNextSegment(part);
+		}
+	}
+
+	function handleBlur(part: Part, e: FocusEvent) {
+		const el = e.target as HTMLInputElement;
+		commitBuffer(part, el.value);
+		setBuffer(part, "");
+		el.value = partDisplay(part);
+		form.handleBlur();
+	}
+
+	function handleSegmentKey(part: Part, e: KeyboardEvent) {
+		if (getDisabled()) return;
+		const el = e.currentTarget as HTMLInputElement;
+
+		switch (e.key) {
+			case "ArrowUp": {
+				e.preventDefault();
+				const s = $props?.step ?? 1;
+				stepPart(part, part === "minute" ? s : 1);
+				break;
+			}
+			case "ArrowDown": {
+				e.preventDefault();
+				const s = $props?.step ?? 1;
+				stepPart(part, -(part === "minute" ? s : 1));
+				break;
+			}
+			case "Home": {
+				e.preventDefault();
+				setPartValue(part, 0, true);
+				break;
+			}
+			case "End": {
+				e.preventDefault();
+				setPartValue(part, part === "hour" ? 23 : 59, true);
+				break;
+			}
+			case "Enter": {
+				e.preventDefault();
+				commitBuffer(part, el.value);
+				setBuffer(part, "");
+				el.value = partDisplay(part);
+				break;
+			}
+		}
+	}
+
+	function setBuffer(part: Part, text: string) {
+		switch (part) {
+			case "hour":
+				$state.hourText = text;
+				break;
+			case "minute":
+				$state.minuteText = text;
+				break;
+			case "second":
+				$state.secondText = text;
+				break;
+		}
+	}
+
+	function partIndex(part: Part): number {
+		switch (part) {
+			case "hour":
+				return 0;
+			case "minute":
+				return 1;
+			case "second":
+				return 2;
+		}
+	}
+
+	function focusNextSegment(part: Part) {
+		if (part === "hour") {
+			minuteInput?.focus();
+		} else if (part === "minute" && getSeconds()) {
+			secondInput?.focus();
+		} else if (part === "minute" && $props?.hour12) {
+			periodButton?.focus();
+		}
+	}
+
+	// --- AM/PM toggle ---
+
+	function togglePeriod() {
+		if (getDisabled()) return;
+		const p = parts();
+		setParts(isPM() ? p.h - 12 : p.h + 12, p.m, p.s);
+	}
+
+	function handlePeriodKey(e: KeyboardEvent) {
+		if (getDisabled()) return;
+		switch (e.key) {
+			case "ArrowUp":
+			case "ArrowDown": {
+				e.preventDefault();
+				togglePeriod();
+				break;
+			}
+		}
+	}
+
+	function ariaNow(part: Part): number {
+		const p = parts();
+		return part === "hour" ? p.h : part === "minute" ? p.m : p.s;
+	}
+
+	function ariaText(part: Part): string {
+		if (part === "hour" && $props?.hour12) {
+			return `${partDisplay("hour")} ${isPM() ? "PM" : "AM"}`;
+		}
+		return String(ariaNow(part));
+	}
+
+	@render {
+		<div
+			id={$props?.id}
+			class={["torp-time-picker", $props?.class]}
+			{$props?.style}
+			role="group"
+			aria-label={$props?.ariaLabel}
+			data-valid={form.valid ? "valid" : "invalid"}
+			aria-describedby={form.messageId}
+		>
+			<input
+				&ref={hourInput}
+				class="torp-time-picker-part"
+				type="text"
+				inputmode="numeric"
+				role="spinbutton"
+				value={partDisplay("hour")}
+				aria-label={$props?.hour12 ? "Hour (12-hour)" : "Hour"}
+				aria-valuemin={0}
+				aria-valuemax={23}
+				aria-valuenow={ariaNow("hour")}
+				aria-valuetext={ariaText("hour")}
+				disabled={getDisabled()}
+				tabindex={getDisabled() ? -1 : 0}
+				oninput={(e: Event) => handleInput("hour", e)}
+				onblur={(e: FocusEvent) => handleBlur("hour", e)}
+				onkeydown={(e: KeyboardEvent) => handleSegmentKey("hour", e)}
+			/>
+			<span class="torp-time-picker-separator">:</span>
+			<input
+				&ref={minuteInput}
+				class="torp-time-picker-part"
+				type="text"
+				inputmode="numeric"
+				role="spinbutton"
+				value={partDisplay("minute")}
+				aria-label="Minute"
+				aria-valuemin={0}
+				aria-valuemax={59}
+				aria-valuenow={ariaNow("minute")}
+				aria-valuetext={ariaText("minute")}
+				disabled={getDisabled()}
+				tabindex={getDisabled() ? -1 : 0}
+				oninput={(e: Event) => handleInput("minute", e)}
+				onblur={(e: FocusEvent) => handleBlur("minute", e)}
+				onkeydown={(e: KeyboardEvent) => handleSegmentKey("minute", e)}
+			/>
+			@if (getSeconds()) {
+				<span class="torp-time-picker-separator">:</span>
+				<input
+					&ref={secondInput}
+					class="torp-time-picker-part"
+					type="text"
+					inputmode="numeric"
+					role="spinbutton"
+					value={partDisplay("second")}
+					aria-label="Second"
+					aria-valuemin={0}
+					aria-valuemax={59}
+					aria-valuenow={ariaNow("second")}
+					aria-valuetext={ariaText("second")}
+					disabled={getDisabled()}
+					tabindex={getDisabled() ? -1 : 0}
+					oninput={(e: Event) => handleInput("second", e)}
+					onblur={(e: FocusEvent) => handleBlur("second", e)}
+					onkeydown={(e: KeyboardEvent) => handleSegmentKey("second", e)}
+				/>
+			}
+			@if ($props?.hour12) {
+				<button
+					&ref={periodButton}
+					type="button"
+					class="torp-time-picker-period"
+					disabled={getDisabled()}
+					tabindex={getDisabled() ? -1 : 0}
+					aria-label={isPM() ? "PM" : "AM"}
+					onclick={togglePeriod}
+					onkeydown={handlePeriodKey}
+				>
+					{isPM() ? "PM" : "AM"}
+				</button>
+			}
+		</div>
+
+		<FormValues name={form.name} value={$state.value} />
+	}
+}
