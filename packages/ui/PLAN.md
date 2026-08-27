@@ -119,9 +119,11 @@ interaction-layer and aria standards above, with deviations fixed inline.
       ModalTrigger?)
 - [x] Split Charts into components; add ColumnChart. The cartesian charts
       are now layered: the `Chart` container owns the layout
-      (utils/chartLayout.ts) and publishes it via context; ChartValueAxis
-      (left/right/bottom), ChartCategoryAxis (bottom/left), ChartGrid,
-      ChartColumns, ChartBars and ChartLines compose freely inside it.
+      (utils/chartLayout.ts) and publishes it via context; ChartXAxis,
+      ChartYAxis, ChartGrid, ChartColumns, ChartBars and ChartLines compose
+      freely inside it. The axes infer their scale from the marks present --
+      columns/lines make x the category axis and y the value axis (left or
+      right via side); bars flip them (y carries the labels, x the scale).
       ColumnChart = vertical columns per value (grouped under each series
       label); BarChart = horizontal bars with category labels on the left
       and value ticks along the bottom. ColumnChart/BarChart/LineChart are

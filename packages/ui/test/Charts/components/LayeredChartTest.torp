@@ -1,10 +1,10 @@
 import {
 	Chart,
-	ChartCategoryAxis,
 	ChartColumns,
 	ChartGrid,
 	ChartLines,
-	ChartValueAxis,
+	ChartXAxis,
+	ChartYAxis,
 } from "../../../src/Charts/index";
 
 /**
@@ -14,9 +14,9 @@ import {
 export default function LayeredChartTest($props: any) {
 	@render {
 		<Chart ariaLabel="Layered" height={200} width={400} maxValue={100} stepCount={2} stepValue={50} series={$props.series}>
-			<ChartValueAxis side="right" />
+			<ChartYAxis side="right" />
 			<ChartGrid />
-			<ChartCategoryAxis />
+			<ChartXAxis />
 			<ChartColumns />
 			<ChartLines seriesIndex={1} showPoints={true} />
 		</Chart>

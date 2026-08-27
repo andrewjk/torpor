@@ -1,9 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import Chart from "./Chart.torp";
-import ChartCategoryAxis from "./ChartCategoryAxis.torp";
+import ChartXAxis from "./ChartXAxis.torp";
 import ChartGrid from "./ChartGrid.torp";
 import ChartLines from "./ChartLines.torp";
-import ChartValueAxis from "./ChartValueAxis.torp";
+import ChartYAxis from "./ChartYAxis.torp";
 import type DataSeries from "./DataSeries";
 
 interface LineChartProps {
@@ -38,7 +38,7 @@ interface LineChartProps {
  * <Chart>
  * 	<ChartValueAxis />
  * 	<ChartGrid />
- * 	<ChartCategoryAxis />
+ * 	<ChartXAxis />
  * 	<ChartLines seriesIndex={0} />
  * </Chart>
  * ```
@@ -62,9 +62,9 @@ export default function LineChart($props: LineChartProps) {
 			{$props?.stepCount}
 			{$props?.stepValue}
 		>
-			<ChartValueAxis showAxis={true} />
+			<ChartYAxis />
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
-			<ChartCategoryAxis />
+			<ChartXAxis />
 			@for (let i of $props.series.map((_, i) => i)) {
 				<ChartLines seriesIndex={i} showPoints={$props.showPoints} />
 			}

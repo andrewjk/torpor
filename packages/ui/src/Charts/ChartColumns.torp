@@ -20,6 +20,7 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 		throw new Error("This layer must be contained within a Chart");
 	}
 	const { layout, series, colorAt } = context;
+	context.registerMark("vertical");
 
 	function indexes(): number[] {
 		if ($props?.seriesIndex !== undefined) {

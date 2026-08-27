@@ -1,11 +1,11 @@
 import BarChart from "./BarChart.torp";
 import Chart from "./Chart.torp";
 import ChartBars from "./ChartBars.torp";
-import ChartCategoryAxis from "./ChartCategoryAxis.torp";
 import ChartColumns from "./ChartColumns.torp";
 import ChartGrid from "./ChartGrid.torp";
 import ChartLines from "./ChartLines.torp";
-import ChartValueAxis from "./ChartValueAxis.torp";
+import ChartXAxis from "./ChartXAxis.torp";
+import ChartYAxis from "./ChartYAxis.torp";
 import ColumnChart from "./ColumnChart.torp";
 import GridLines from "./GridLines.torp";
 import LineChart from "./LineChart.torp";
@@ -18,8 +18,8 @@ import YAxis from "./YAxis.torp";
 export {
 	// Layered
 	Chart,
-	ChartValueAxis,
-	ChartCategoryAxis,
+	ChartXAxis,
+	ChartYAxis,
 	ChartGrid,
 	ChartColumns,
 	ChartBars,

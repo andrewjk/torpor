@@ -1,9 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import Chart from "./Chart.torp";
 import ChartBars from "./ChartBars.torp";
-import ChartCategoryAxis from "./ChartCategoryAxis.torp";
+import ChartXAxis from "./ChartXAxis.torp";
 import ChartGrid from "./ChartGrid.torp";
-import ChartValueAxis from "./ChartValueAxis.torp";
+import ChartYAxis from "./ChartYAxis.torp";
 import type DataSeries from "./DataSeries";
 
 interface BarChartProps {
@@ -36,9 +36,9 @@ interface BarChartProps {
  *
  * ```
  * <Chart>
- * 	<ChartValueAxis side="bottom" />
+ * 	<ChartYAxis />
  * 	<ChartGrid />
- * 	<ChartCategoryAxis side="left" />
+ * 	<ChartXAxis />
  * 	<ChartBars />
  * </Chart>
  * ```
@@ -46,10 +46,6 @@ interface BarChartProps {
  * For a vertical column per value, use ColumnChart instead.
  */
 export default function BarChart($props: BarChartProps) {
-	function xTitle(): string {
-		return $props.yLabel || $props.xLabel || "";
-	}
-
 	@render {
 		<Chart
 			id={$props.id}
@@ -59,14 +55,15 @@ export default function BarChart($props: BarChartProps) {
 			series={$props.series}
 			height={$props.height}
 			width={$props.width}
+			xLabel={$props.xLabel}
 			yLabel={$props.yLabel}
 			maxValue={$props.maxValue}
 			stepCount={$props.stepCount}
 			stepValue={$props.stepValue}
 		>
-			<ChartValueAxis side="bottom" showAxis={true} label={xTitle()} />
+			<ChartYAxis />
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
-			<ChartCategoryAxis side="left" />
+			<ChartXAxis />
 			<ChartBars />
 		</Chart>
 	}

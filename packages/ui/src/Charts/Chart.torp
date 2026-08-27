@@ -79,11 +79,21 @@ export default function Chart($props: ChartProps | undefined) {
 		return series?.color || chartColors[i % chartColors.length];
 	}
 
+	let $chartState = $watch({
+		horizontal: false,
+	});
+
 	const context: ChartContext = {
 		layout: $layout as unknown as ChartLayout,
 		series: () => $props?.series ?? [],
 		xLabel: () => $props?.xLabel ?? "",
 		yLabel: () => $props?.yLabel ?? "",
+		horizontal: () => $chartState.horizontal,
+		registerMark: (orientation) => {
+			if (orientation === "horizontal") {
+				$chartState.horizontal = true;
+			}
+		},
 		colorAt,
 	};
 	$context[ChartContextName] = context;

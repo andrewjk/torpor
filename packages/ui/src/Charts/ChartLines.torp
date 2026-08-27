@@ -23,6 +23,7 @@ export default function ChartLines($props?: ChartLinesProps) {
 		throw new Error("This layer must be contained within a Chart");
 	}
 	const { layout, series, colorAt } = context;
+	context.registerMark("vertical");
 
 	function index(): number {
 		return $props?.seriesIndex ?? 0;

@@ -1,0 +1,83 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartXAxisProps {
+	/** Whether to draw the axis line itself (default true) */
+	showAxis?: boolean;
+	/** An axis title, overriding the Chart's x label */
+	label?: string;
+}
+
+/**
+ * The x axis for a chart. For vertical marks (columns, lines) it runs along
+ * the bottom with each series' label centered under its slot; for
+ * horizontal marks (bars) it becomes the value scale, with a tick for each
+ * step along the bottom.
+ */
+export default function ChartXAxis($props?: ChartXAxisProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartXAxis must be contained within a Chart");
+	}
+	const { layout, xLabel, horizontal } = context;
+
+	function showAxis(): boolean {
+		return $props?.showAxis !== false;
+	}
+
+	function title(): string {
+		if ($props?.label !== undefined) return $props.label;
+		return xLabel();
+	}
+
+	function plotWidth(): number {
+		return layout.calculatedWidth - layout.chartLeft;
+	}
+
+	function unitWidth(): number {
+		return plotWidth() / Math.max(1, layout.maxValue);
+	}
+
+	function tickX(i: number): number {
+		return layout.chartLeft + i * layout.stepValue * unitWidth();
+	}
+
+	function tickY(): number {
+		return layout.calculatedHeight - layout.textHeight / 3;
+	}
+
+	@render {
+		<svg>
+			@if (showAxis()) {
+				<line x1={layout.chartLeft} y1={layout.chartBottom} x2={layout.calculatedWidth} y2={layout.chartBottom} stroke="currentcolor" />
+			}
+			@if (!horizontal()) {
+				@if (title()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="text-after-edge"
+						x={layout.calculatedWidth - (layout.calculatedWidth - layout.chartLeft) / 2}
+						y={layout.calculatedHeight}
+					>
+						{title()}
+					</text>
+				}
+				@for (let [i, label] of layout.labels.entries()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="text-after-edge"
+						x={layout.chartLeft + layout.itemWidth * i + layout.itemWidth / 2}
+						y={tickY()}
+					>
+						{label}
+					</text>
+				}
+			} else {
+				@for (let [i, label] of layout.stepLabels.entries()) {
+					<text text-anchor="middle" dominant-baseline="text-after-edge" x={tickX(i)} y={tickY()}>
+						{label}
+					</text>
+				}
+			}
+		</svg>
+	}
+}

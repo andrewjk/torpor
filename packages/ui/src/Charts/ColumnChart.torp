@@ -1,9 +1,9 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import Chart from "./Chart.torp";
-import ChartCategoryAxis from "./ChartCategoryAxis.torp";
+import ChartXAxis from "./ChartXAxis.torp";
 import ChartColumns from "./ChartColumns.torp";
 import ChartGrid from "./ChartGrid.torp";
-import ChartValueAxis from "./ChartValueAxis.torp";
+import ChartYAxis from "./ChartYAxis.torp";
 import type DataSeries from "./DataSeries";
 
 interface ColumnChartProps {
@@ -37,7 +37,7 @@ interface ColumnChartProps {
  * <Chart>
  * 	<ChartValueAxis />
  * 	<ChartGrid />
- * 	<ChartCategoryAxis />
+ * 	<ChartXAxis />
  * 	<ChartColumns />
  * </Chart>
  * ```
@@ -61,9 +61,9 @@ export default function ColumnChart($props: ColumnChartProps) {
 			{$props?.stepCount}
 			{$props?.stepValue}
 		>
-			<ChartValueAxis showAxis={true} />
+			<ChartYAxis />
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
-			<ChartCategoryAxis />
+			<ChartXAxis />
 			<ChartColumns />
 		</Chart>
 	}

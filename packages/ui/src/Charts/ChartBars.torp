@@ -21,6 +21,7 @@ export default function ChartBars($props?: ChartBarsProps) {
 		throw new Error("This layer must be contained within a Chart");
 	}
 	const { layout, series, colorAt } = context;
+	context.registerMark("horizontal");
 
 	function indexes(): number[] {
 		if ($props?.seriesIndex !== undefined) {

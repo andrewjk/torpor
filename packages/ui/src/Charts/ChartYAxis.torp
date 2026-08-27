@@ -1,0 +1,105 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartYAxisProps {
+	/** Whether to draw the axis line itself (default true) */
+	showAxis?: boolean;
+	/** Which side of the plot the value scale runs on (default "left") */
+	side?: "left" | "right";
+	/** An axis title, overriding the Chart's y label */
+	label?: string;
+}
+
+/**
+ * The y axis for a chart. For vertical marks (columns, lines) it is the
+ * value scale -- a line down the `side` edge with a tick for each step
+ * between 0 and the maximum value. For horizontal marks (bars) it carries
+ * the category labels, one per band down the left.
+ *
+ * Drawing it on either side does not change the plot geometry; overlaying
+ * an axis is purely presentational.
+ */
+export default function ChartYAxis($props?: ChartYAxisProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartYAxis must be contained within a Chart");
+	}
+	const { layout, yLabel, horizontal } = context;
+
+	function showAxis(): boolean {
+		return $props?.showAxis !== false;
+	}
+
+	function side(): "left" | "right" {
+		return $props?.side ?? "left";
+	}
+
+	function title(): string {
+		if ($props?.label !== undefined) return $props.label;
+		return yLabel();
+	}
+
+	function bandHeight(): number {
+		const count = Math.max(1, layout.labels.length);
+		return (layout.chartBottom - topPad()) / count;
+	}
+
+	function topPad(): number {
+		return layout.textHeight / 3;
+	}
+
+	function bandCenter(i: number): number {
+		return topPad() + i * bandHeight() + bandHeight() / 2;
+	}
+
+	function axisX(): number {
+		return side() === "left" ? layout.chartLeft : layout.calculatedWidth;
+	}
+
+	function tickX(): number {
+		if (side() === "left") {
+			return layout.chartLeft - layout.textHeight / 4;
+		}
+		return layout.calculatedWidth + layout.textHeight / 4;
+	}
+
+	function anchor(): string {
+		return side() === "left" ? "end" : "start";
+	}
+
+	@render {
+		<svg>
+			@if (showAxis()) {
+				<line x1={axisX()} y1={layout.chartBottom} x2={axisX()} y2={0} stroke="currentcolor" />
+			}
+			@if (horizontal()) {
+				@for (let [i, label] of layout.labels.entries()) {
+					<text
+						text-anchor="end"
+						dominant-baseline="middle"
+						x={layout.chartLeft - layout.textHeight / 4}
+						y={bandCenter(i)}
+					>
+						{label}
+					</text>
+				}
+			} else {
+				@if (side() === "left" && title()) {
+					<text
+						text-anchor="middle"
+						dominant-baseline="hanging"
+						x={0}
+						y={layout.chartBottom / 2}
+						transform={`rotate(-90, 0, ${layout.chartBottom / 2})`}
+					>
+						{title()}
+					</text>
+				}
+				@for (let [i, label] of layout.stepLabels.entries()) {
+					<text text-anchor={anchor()} dominant-baseline="middle" x={tickX()} y={layout.chartBottom - i * layout.stepValue * layout.valueHeight}>
+						{label}
+					</text>
+				}
+			}
+		</svg>
+	}
+}
