@@ -1,0 +1,18 @@
+import { Popover, PopoverContent, PopoverHover, PopoverTrigger } from "../../../src/Popover/index";
+
+/** A Popover with both a hover trigger and a press button sharing one content */
+export default function PopoverHoverTest($props: any) {
+	@render {
+		<Popover visible={$props.visible}>
+			<PopoverTrigger>Open</PopoverTrigger>
+			<PopoverHover
+				hoverDelay={$props.hoverDelay}
+				exitGrace={$props.exitGrace}
+				disabled={$props.disabled}
+			>
+				Hover area
+			</PopoverHover>
+			<PopoverContent>Popover content</PopoverContent>
+		</Popover>
+	}
+}

@@ -148,3 +148,25 @@ template-literal arithmetic entry above.
 `NumberInput.torp:139` (`focus` parameter declared but never read). Both predate the
 Tree lazy-loading work; flagged here so they don't get mistaken for regressions from
 later UI work.
+
+## Spread attributes on an element don't compile (view compiler)
+
+Found while building PopoutClickTrigger (src/ui/utils/PopoutClickTrigger.torp):
+rendering `{...attributes()}` (a function returning an attribute object) compiled,
+but the generated code crashed at runtime with `Spread syntax requires
+...iterable[Symbol.iterator] to be a function`. Worked around by spelling the
+attributes out explicitly in each branch of the button/div conditional. Worth either
+supporting (objects should spread as attributes) or rejecting at compile time.
+
+## refocusAnchorOnHide focuses whatever component anchors the content
+
+When popout content hides, `createPopoutContent` (utils/popoutContent.ts) returns
+focus to `context.anchorElement` -- which is now sometimes a component that opens on
+focus, not just a passive trigger. PopoverHover/ContextualHover hit this: hiding
+refocused their hover div, whose focus-to-open handler immediately reopened in a
+loop. utils/hoverReveal.ts works around it with a one-shot `suppressFocusOpen`
+guard armed right before hide. Any future focus-to-open component needs the same
+guard; alternatively the runtime could distinguish script-driven refocus from real
+user focus events.
+
+## $run effects can't read suspended $async getters (view runtime)

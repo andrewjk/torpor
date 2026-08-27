@@ -1,5 +1,6 @@
 import Contextual from "./Contextual.torp";
 import ContextualContent from "./ContextualContent.torp";
+import ContextualHover from "./ContextualHover.torp";
 import ContextualTrigger from "./ContextualTrigger.torp";
 
-export { Contextual, ContextualContent, ContextualTrigger };
+export { Contextual, ContextualTrigger, ContextualHover, ContextualContent };

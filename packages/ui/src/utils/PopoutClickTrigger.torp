@@ -1,0 +1,99 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import getId from "./getId";
+import { type PopoutContext } from "./PopoutTypes";
+
+interface PopoutClickTriggerProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/** The element to render: a button, or a div for right-click regions */
+	tag?: "button" | "div";
+	/** The event that activates the popout */
+	event?: "click" | "contextmenu";
+	/** The containing popout's context (the family-specific one, not PopoutContext) */
+	context: PopoutContext;
+	/**
+	 * Called with the activating event before visibility is toggled, for
+	 * triggers that track a position (right-click coordinates etc)
+	 */
+	onactivate?: (node: HTMLElement, e: MouseEvent) => void;
+}
+
+/**
+ * The shared primitive behind PopoverTrigger, ContextualTrigger and
+ * ModalTrigger: it publishes the trigger id, renders the standard trigger
+ * attributes (aria-haspopup / aria-expanded / aria-controls), anchors the
+ * popout to itself and toggles visibility on the configured event.
+ *
+ * Hover activation deliberately lives in PopoverHover / ContextualHover,
+ * whose open/close semantics (intent delay, exit grace) differ enough from
+ * a press to warrant their own component.
+ */
+export default function PopoutClickTrigger($props?: PopoutClickTriggerProps) {
+	let defaultId = getId();
+
+	const context = $props!.context;
+	const $state = context.state;
+
+	// Set the trigger ID so that it can be used with aria-labelledby
+	$state.triggerId = $props?.id ?? defaultId;
+
+	const tag = $props?.tag ?? "button";
+	const event = $props?.event ?? "click";
+
+	function handleEvent(node: HTMLElement, e: MouseEvent) {
+		if (event === "contextmenu") {
+			e.preventDefault();
+		}
+		$props?.onactivate?.(node, e);
+		$state.visible = !$state.visible;
+	}
+
+	function handleClick(e: MouseEvent) {
+		if (event !== "click") return;
+		handleEvent(e.currentTarget as HTMLElement, e);
+	}
+
+	function handleContextMenu(e: MouseEvent) {
+		if (event !== "contextmenu") return;
+		handleEvent(e.currentTarget as HTMLElement, e);
+	}
+
+	function handleMount(el: HTMLElement) {
+		context.anchorElement = el;
+	}
+
+	@render {
+		@if (tag === "button") {
+			<button
+				type="button"
+				id={$props?.id ?? defaultId}
+				class={["torp-popout-trigger", $props?.class]}
+				{$props?.style}
+				aria-haspopup={$state.contentRole ?? "true"}
+				aria-expanded={$state.visible ? "true" : "false"}
+				aria-controls={$state.contentId}
+				onclick={handleClick}
+				onmount={handleMount}
+			>
+				<slot />
+			</button>
+		} else {
+			<div
+				id={$props?.id ?? defaultId}
+				class={["torp-popout-trigger", $props?.class]}
+				{$props?.style}
+				aria-haspopup={$state.contentRole ?? "true"}
+				aria-expanded={$state.visible ? "true" : "false"}
+				aria-controls={$state.contentId}
+				oncontextmenu={handleContextMenu}
+				onmount={handleMount}
+			>
+				<slot />
+			</div>
+		}
+	}
+}

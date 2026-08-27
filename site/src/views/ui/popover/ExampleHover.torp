@@ -1,11 +1,11 @@
-import { Popover, PopoverContent, PopoverTrigger } from "@torpor/ui/Popover";
+import { Popover, PopoverContent, PopoverHover } from "@torpor/ui/Popover";
 
 export default function ExampleHover() {
 	@render {
 		<p>Hover over the panel below to trigger a tooltip.</p>
 
 		<Popover>
-			<PopoverTrigger activation="hover" class="example-popover-target">Hover me</PopoverTrigger>
+			<PopoverHover hoverDelay={0} class="example-popover-target">Hover me</PopoverHover>
 			<PopoverContent class="example-popover-content">
 				I'm a tooltip...
 			</PopoverContent>

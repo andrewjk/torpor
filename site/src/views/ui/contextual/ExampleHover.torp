@@ -1,4 +1,4 @@
-import { Contextual, ContextualContent, ContextualTrigger } from "@torpor/ui/Contextual";
+import { Contextual, ContextualContent, ContextualHover } from "@torpor/ui/Contextual";
 import { Menu, MenuButton, MenuCheck, MenuIndicator, MenuSeparator } from "@torpor/ui/Menu";
 
 export default function Example() {
@@ -15,10 +15,10 @@ export default function Example() {
 	}
 
 	@render {
-		<p>Right-click on the panel below to trigger a contextual menu.</p>
+		<p>Hover over the panel below to trigger a contextual menu.</p>
 
 		<Contextual>
-			<ContextualTrigger class="example-contextual-element" activation="hover">
+			<ContextualHover class="example-contextual-element" hoverDelay={0}>
 				<p
 					class={{
 						"example-contextual-menu-message": true,
@@ -29,7 +29,7 @@ export default function Example() {
 				>
 					Style this paragraph
 				</p>
-			</ContextualTrigger>
+			</ContextualHover>
 			<ContextualContent class="example-contextual-content">
 				<Menu class="example-contextual-menu" ariaLabel="Font style">
 					<MenuCheck class="example-contextual-menu-button" &checked={$state.bold}>
