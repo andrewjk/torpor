@@ -1,0 +1,24 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemContent,
+	TreeItemLabel,
+	TreeItemTrigger,
+} from "../../../src/Tree/index";
+
+/**
+ * A Tree where the lazy item brings its own per-item `load` function, which
+ * takes precedence over the tree's
+ */
+export default function ItemLoaderTree($props: any) {
+	@render {
+		<Tree {$props?.expanded} {$props?.value} load={$props.load} onload={$props.onload}>
+			<TreeItem value="root" hasChildren={true} load={$props.itemLoad}>
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Root</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+}

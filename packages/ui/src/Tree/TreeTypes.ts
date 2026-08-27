@@ -1,3 +1,12 @@
+import type { LoadRequest, Loader } from "../utils/loader";
+import type { LoadResult } from "../utils/loader";
+
+/** The shape of a request sent to a Tree's `load` function */
+export interface TreeLoadRequest extends LoadRequest {
+	/** The value of the item whose children to load */
+	item?: string;
+}
+
 export const TreeContextName: unique symbol = Symbol.for("torp.Tree");
 
 export interface TreeContext {
@@ -15,6 +24,17 @@ export interface TreeContext {
 	getPreviousVisibleItem: (index: number) => ItemState | undefined;
 	getParentItem: (index: number) => ItemState | undefined;
 	getFirstChildItem: (index: number) => ItemState | undefined;
+	/**
+	 * Reads the children of an item that declares `hasChildren`, called when
+	 * the item is first expanded
+	 */
+	load: Loader<any, TreeLoadRequest> | undefined;
+	/** Called after each successful child load with the normalized result */
+	onload: ((result: LoadResult, item: string | undefined) => void) | undefined;
+	/** Extracts the display text for a loaded item (defaults to `label ?? text ?? item`) */
+	getItemLabel: ((item: any) => any) | undefined;
+	/** Extracts the value for a loaded item (defaults to `value ?? id`) */
+	getItemValue: ((item: any) => any) | undefined;
 }
 
 export const TreeItemContextName: unique symbol = Symbol.for("torp.TreeItem");

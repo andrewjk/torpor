@@ -92,8 +92,10 @@ content is slotted in. Left out deliberately:
   completion over the wire.
 - SelectBox loads once per mount (content stays mounted but hidden), not once
   per open; a refresh-on-reopen option may be wanted.
-- Tree lazy child loading (per-node load functions) doesn't fit this shape
-  and needs its own contract when implemented.
+- ~~Tree lazy child loading doesn't fit this shape~~ -- it did after all: Tree
+  loads each `hasChildren` item's children on first expansion via
+  `createItemLoader`, gated behind an `@if` so the fetch starts when the item
+  expands (see src/ui/Tree/TreeLoadedChildren.torp).
 
 ## $bind silently no-ops when the state key differs from the prop key (view runtime)
 
@@ -125,3 +127,24 @@ Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators
 interpolates `$state.index + 1` correctly), and plain member expressions in loop
 bodies (`data-state={context.isActive(slide.index)}`) are fine. Worked around by
 computing the label in a helper function. Worth a compiler test + fix.
+
+## Optional chaining on a @for loop variable breaks the list change mask (view compiler)
+
+Found while building Tree lazy loading (src/ui/Tree/TreeLoadedChildren.torp): a loop
+body attribute expression using optional chaining directly on the loop variable --
+`hasChildren={child?.hasChildren === true}` -- compiles to a `t_changed_mask`
+function that references the bare identifier, so re-rendering after the list
+resolves throws `ReferenceError: child is not defined` (surfaces as the @try/@catch
+error branch). A plain ternary over the same data (`item ? item.hasChildren === true :
+false`) works, as does mapping items to plain entry objects in script first (the
+DataGrid `$state.rowEntries` pattern, which is what Tree now uses). Sibling in-family:
+member access without `?.` also works. Worth a compiler test + fix alongside the
+template-literal arithmetic entry above.
+
+## ui package check: two pre-existing type errors
+
+`pnpm check` in packages/ui reports `FileDrop.torp:111`
+(`removeAttribute` does not exist on `EventTarget`; needs an HTMLElement cast) and
+`NumberInput.torp:139` (`focus` parameter declared but never read). Both predate the
+Tree lazy-loading work; flagged here so they don't get mistaken for regressions from
+later UI work.

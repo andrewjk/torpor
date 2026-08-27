@@ -1,0 +1,122 @@
+import type { Loader } from "../utils/loader";
+import { createItemLoader } from "../utils/loader";
+import {
+	type ItemState,
+	type TreeContext,
+	TreeContextName,
+	type TreeLoadRequest,
+} from "./TreeTypes";
+import TreeItemChildren from "./TreeItemChildren.torp";
+import TreeItem from "./TreeItem.torp";
+import TreeItemContent from "./TreeItemContent.torp";
+import TreeItemLabel from "./TreeItemLabel.torp";
+import TreeItemTrigger from "./TreeItemTrigger.torp";
+
+interface TreeLoadedChildrenProps {
+	/** The state of the item whose children are loaded */
+	itemState: ItemState;
+	/** The load function that reads this item's children */
+	load: Loader<any, TreeLoadRequest>;
+}
+
+/** A loaded item, normalized for rendering */
+interface ChildEntry {
+	/** The item's value as a string, for the @key directive */
+	key: string;
+	value: any;
+	label: any;
+	hasChildren: boolean;
+}
+
+function defaultLabel(item: any): string {
+	const label = item?.label ?? item?.text ?? item;
+	return typeof label === "string" ? label : String(label);
+}
+
+function defaultValue(item: any): any {
+	return item?.value ?? item?.id;
+}
+
+/**
+ * Loads the children of a TreeItem that declares `hasChildren` but has no
+ * slotted TreeItemChildren, rendering them as nested TreeItems. The load
+ * starts when the item is first expanded and is not repeated afterwards;
+ * the results stay mounted (hidden while collapsed) so the tree can search
+ * through them.
+ *
+ * This is rendered automatically by TreeItem when there is a `load`
+ * function available; it is not part of the public API.
+ */
+export default function TreeLoadedChildren($props: TreeLoadedChildrenProps | undefined) {
+	const context = $context[TreeContextName] as TreeContext;
+	if (!context) {
+		throw new Error("TreeLoadedChildren must be contained within a Tree");
+	}
+
+	const $itemState = $props!.itemState;
+
+	const getLabel = context.getItemLabel ?? defaultLabel;
+	const getValue = context.getItemValue ?? defaultValue;
+
+	let $state = $watch({
+		started: false,
+		get childEntries(): ChildEntry[] {
+			return this.items.map(toEntry);
+		},
+		get items(): any[] {
+			return $load.items;
+		},
+	});
+
+	function toEntry(item: any): ChildEntry {
+		return {
+			key: String(getValue(item)),
+			value: getValue(item),
+			label: getLabel(item),
+			hasChildren: item?.hasChildren === true,
+		};
+	}
+
+	// Nothing is fetched until the item's first expansion; afterwards the
+	// loader keeps its result while the item is collapsed again
+	const $load = createItemLoader({
+		load: $props!.load,
+		getRequest: () => ({ item: $itemState.value }),
+		onload: (r) => context.onload?.(r, $itemState.value),
+	});
+
+	$run(() => {
+		if ($itemState.expanded) {
+			$state.started = true;
+		}
+	});
+
+	@render {
+		@if ($state.started) {
+			<TreeItemChildren>
+				@try {
+					@await {
+						@for (let entry of $state.childEntries) {
+							@key = entry.key
+							<TreeItem value={entry.value} hasChildren={entry.hasChildren}>
+								<TreeItemContent>
+									<TreeItemTrigger />
+									<TreeItemLabel>{entry.label}</TreeItemLabel>
+								</TreeItemContent>
+							</TreeItem>
+						}
+						@if ($state.childEntries.length === 0) {
+							<span class="torp-tree-item-empty">No items.</span>
+						}
+					} with {
+						<span class="torp-tree-item-loading">Loading…</span>
+					}
+				} catch (err) {
+					<span class="torp-tree-item-error" role="alert">
+						{err instanceof Error ? err.message : String(err)}
+					</span>
+				}
+			</TreeItemChildren>
+		}
+	}
+}

@@ -1,4 +1,14 @@
 import { type TreeItemContext, TreeItemContextName } from "./TreeTypes";
+import type { ClassValue, StyleValue } from "@torpor/view";
+
+interface TreeItemChildrenProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+}
 
 /**
  * A container for nested TreeItems. This component must be a direct child of TreeItem.
@@ -14,7 +24,7 @@ import { type TreeItemContext, TreeItemContextName } from "./TreeTypes";
  * </TreeItem>
  * ```
  */
-export default function TreeItemChildren() {
+export default function TreeItemChildren($props?: TreeItemChildrenProps) {
 	const itemContext = $context[TreeItemContextName] as TreeItemContext;
 
 	if (!itemContext) {

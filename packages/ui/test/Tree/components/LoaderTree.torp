@@ -1,0 +1,30 @@
+import {
+	Tree,
+	TreeItem,
+	TreeItemContent,
+	TreeItemLabel,
+	TreeItemTrigger,
+} from "../../../src/Tree/index";
+
+/** A Tree that loads the children of `hasChildren` items from the tree `load` prop */
+export default function LoaderTree($props: any) {
+	@render {
+		<Tree
+			{$props?.expanded}
+			{$props?.value}
+			load={$props.load}
+			onload={$props.onload}
+			getItemLabel={$props.getItemLabel}
+			getItemValue={$props.getItemValue}
+			onexpand={$props.onexpand}
+			onchange={$props.onchange}
+		>
+			<TreeItem value="root" hasChildren={true}>
+				<TreeItemContent>
+					<TreeItemTrigger />
+					<TreeItemLabel>Root</TreeItemLabel>
+				</TreeItemContent>
+			</TreeItem>
+		</Tree>
+	}
+}

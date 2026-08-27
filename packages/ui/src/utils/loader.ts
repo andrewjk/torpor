@@ -48,14 +48,14 @@ export function normalizeLoadResult<T>(result: LoadResult<T> | T[]): LoadResult<
 	return Array.isArray(result) ? { items: result } : result;
 }
 
-export interface ItemLoaderOptions<T = any> {
+export interface ItemLoaderOptions<T = any, TRequest extends LoadRequest = LoadRequest> {
 	/** The loader function to fetch items */
-	load: Loader<T>;
+	load: Loader<T, TRequest>;
 	/**
 	 * Builds the request for the current fetch. Called inside the async
 	 * getter, so reads of reactive state here re-fetch when they change.
 	 */
-	getRequest: () => LoadRequest;
+	getRequest: () => TRequest;
 	/** Called after each successful load with the normalized result */
 	onload?: (result: LoadResult<T>) => void;
 }
@@ -75,6 +75,11 @@ export interface ItemLoaderState<T = any> {
  * suspends, and when dependencies read inside `getRequest` change the fetch
  * re-runs.
  *
+ * For lazy loading (fetch only once some condition is met), gate the whole
+ * rendering of the region that reads this loader behind that condition
+ * (`@if`), so the `@await` boundary -- and with it the first fetch --
+ * comes into existence when the condition flips.
+ *
  * ```
  * let $load = createItemLoader({
  * 	load: $props.load,
@@ -83,7 +88,9 @@ export interface ItemLoaderState<T = any> {
  * @await { ...$load.items... } with { <span>Loading…</span> }
  * ```
  */
-export function createItemLoader<T = any>(options: ItemLoaderOptions<T>): ItemLoaderState<T> {
+export function createItemLoader<T = any, TRequest extends LoadRequest = LoadRequest>(
+	options: ItemLoaderOptions<T, TRequest>,
+): ItemLoaderState<T> {
 	return $watch({
 		get result(): LoadResult<T> | undefined {
 			return $async(() => {

@@ -1,4 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import type { Loader } from "../utils/loader";
 import getId from "../utils/getId";
 import {
 	type ItemState,
@@ -6,7 +7,9 @@ import {
 	TreeContextName,
 	type TreeItemContext,
 	TreeItemContextName,
+	type TreeLoadRequest,
 } from "./TreeTypes";
+import TreeLoadedChildren from "./TreeLoadedChildren.torp";
 
 interface TreeItemProps {
 	/** An ID for the root element */
@@ -17,8 +20,20 @@ interface TreeItemProps {
 	style?: StyleValue;
 	/** A value for the item */
 	value?: string;
+	/**
+	 * Declares that the item has children that are not slotted in. When a
+	 * `load` function is available (this item's, or the tree's) they are
+	 * loaded from the network when the item is first expanded.
+	 */
+	hasChildren?: boolean;
 	/** If set to true, the user cannot interact with this TreeItem */
 	disabled?: boolean;
+	/**
+	 * Reads this item's children from the network (or anywhere async),
+	 * receiving `{ item }` (the item's value). Set alongside `hasChildren`;
+	 * overrides the tree's `load` function for this item.
+	 */
+	load?: Loader<any, TreeLoadRequest>;
 	/** Raised when this item is expanded or collapsed */
 	onexpand?: (expanded: boolean) => void;
 	/** Raised when this item is selected or deselected */
@@ -66,10 +81,28 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 		throw new Error("TreeItem must be contained within a Tree");
 	}
 
-	//$run(() => {
-	//	let parentLevel = $state.level;
-	//	$state.level = parentLevel + 1;
-	//});
+	// Whether the item declares children that aren't slotted in and can be
+	// loaded when expanded. TreeItemChildren sets `slottedChildren` itself.
+	const declaredChildren = $props?.hasChildren === true;
+	const slottedLoad = typeof $props?.load === "function" ? $props.load : undefined;
+	let slottedChildren = false;
+
+	function updateHasChildren() {
+		if (declaredChildren || slottedChildren) {
+			if (!$state.hasChildren) $state.hasChildren = true;
+		} else if ($state.hasChildren) {
+			$state.hasChildren = false;
+		}
+	}
+	updateHasChildren();
+
+	// The loader for this item's children: the item's own or the tree's
+	const itemLoader = slottedLoad ?? (declaredChildren ? context.load : undefined);
+	if (declaredChildren && !itemLoader) {
+		throw new Error(
+			"TreeItem: declaring `hasChildren` requires a `load` function on the item or on the tree",
+		);
+	}
 
 	context.registerItem($state, $state.level);
 
@@ -104,7 +137,8 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 	let itemContext: TreeItemContext = {
 		state: $state,
 		setHasChildren: (hasChildren) => {
-			$state.hasChildren = hasChildren;
+			slottedChildren = hasChildren;
+			updateHasChildren();
 		},
 	};
 	$context[TreeItemContextName] = itemContext;
@@ -133,6 +167,9 @@ export default function TreeItem($props: TreeItemProps | undefined) {
 				<div>
 					<slot />
 				</div>
+			}
+			@if (declaredChildren && itemLoader) {
+				<TreeLoadedChildren itemState={$state} load={itemLoader} />
 			}
 		</div>
 	}

@@ -5,11 +5,17 @@ import {
 	type FormContext,
 	FormContextName,
 } from "../Form/FormTypes";
+import type { LoadResult, Loader } from "../utils/loader";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
 import { createItemGroup } from "../utils/createItemGroup";
 import getId from "../utils/getId";
 import createFormField from "../utils/formField";
-import { type ItemState, type TreeContext, TreeContextName } from "./TreeTypes";
+import {
+	type ItemState,
+	type TreeContext,
+	type TreeLoadRequest,
+	TreeContextName,
+} from "./TreeTypes";
 import FormValues from "../Form/FormValues.torp";
 
 interface TreeProps {
@@ -29,6 +35,19 @@ interface TreeProps {
 	disabled?: boolean;
 	/** The aria-label for the root element */
 	ariaLabel?: string | undefined;
+	/**
+	 * Reads the children of an item from the network (or anywhere async) when
+	 * the item is first expanded. Receives a request with `item` (the parent
+	 * item's value). Items load automatically when they set the TreeItem
+	 * `hasChildren` prop; a TreeItem `load` prop overrides this per item.
+	 */
+	load?: Loader<any, TreeLoadRequest>;
+	/** Called after each successful child load with the normalized result */
+	onload?: (result: LoadResult, item: string | undefined) => void;
+	/** Extracts the display text for a loaded item (defaults to `label ?? text ?? item`) */
+	getItemLabel?: (item: any) => any;
+	/** Extracts the value for a loaded item (defaults to `value ?? id`) */
+	getItemValue?: (item: any) => any;
 	/** Raised when the expanded item(s) have changed */
 	onexpand?: (value: string | string[]) => void;
 	/** Raised when the selected item(s) have changed */
@@ -73,6 +92,10 @@ export default function Tree($props: TreeProps | undefined) {
 	// Get the current selection type, re-reading $props so changes are picked up
 	function getType(): "single" | "multiple" {
 		return $props?.type ?? "single";
+	}
+
+	if ($props?.load !== undefined && typeof $props.load !== "function") {
+		throw new Error("Tree: `load` must be a function");
 	}
 
 	let $state = $watch({
@@ -136,6 +159,10 @@ export default function Tree($props: TreeProps | undefined) {
 		getPreviousVisibleItem,
 		getParentItem,
 		getFirstChildItem,
+		load: typeof $props?.load === "function" ? $props.load : undefined,
+		onload: $props?.onload,
+		getItemLabel: $props?.getItemLabel,
+		getItemValue: $props?.getItemValue,
 	};
 	$context[TreeContextName] = context;
 
