@@ -32,6 +32,17 @@ interface DataGridProps {
 	page?: Bindable<number>;
 	/** The number of rows per page. Static data is sliced locally; loaders receive it in the request. */
 	pageSize?: number;
+	/**
+	 * Renders only the rows visible in the viewport, for large datasets.
+	 * Requires `rowHeight`; supersedes local page slicing while enabled
+	 */
+	virtual?: boolean;
+	/** The fixed pixel height of a row, required by virtualization */
+	rowHeight?: number;
+	/** The scroll viewport height in pixels when virtual (default 400) */
+	height?: number;
+	/** Extra rows rendered above and below the visible window (default 5) */
+	overscan?: number;
 	/** The field the data is sorted by. Two-way bindable. */
 	sortBy?: Bindable<string | undefined>;
 	/** The direction the data is sorted in. Two-way bindable. */
@@ -91,6 +102,7 @@ export default function DataGrid($props: DataGridProps) {
 	}
 
 	let tableElement: HTMLElement;
+	let wrap: HTMLElement;
 
 	// Columns are assumed static once passed; precompute entries with indices
 	// so cells can be keyed and addressed by position
@@ -133,9 +145,62 @@ export default function DataGrid($props: DataGridProps) {
 		get rowEntries() {
 			return this.rows.map((row: any, index: number) => ({ row, index }));
 		},
+		// The rows currently rendered: everything when not virtual, the
+		// visible window otherwise
+		get bodyEntries() {
+			if (!isVirtual()) return this.rowEntries;
+			return this.rows.slice(win.start, win.endExclusive).map(
+				(row: any, i: number) => ({ row, index: win.start + i }),
+			);
+		},
 	});
 
 	$bind($state, $props, "page", "sortBy", "sortDirection");
+
+	// --- Virtualization ---
+
+	function isVirtual(): boolean {
+		return $props?.virtual === true && ($props?.rowHeight ?? 0) > 0;
+	}
+
+	function getRowHeight(): number {
+		return Math.max(1, Math.floor($props?.rowHeight ?? 32));
+	}
+
+	function getOverscan(): number {
+		return Math.max(0, Math.floor($props?.overscan ?? 5));
+	}
+
+	function getViewportHeight(): number {
+		return wrap?.clientHeight || $props?.height || 400;
+	}
+
+	// The rendered row window; endExclusive may pass loaded rows when a
+	// loader reports a total larger than what it sent so far -- slicing is
+	// naturally safe against that
+	const win = $watch({ start: 0, endExclusive: 0 });
+
+	function updateWindow() {
+		if (!isVirtual()) return;
+
+		const total = $state.totalCount;
+		if (!total || !wrap) {
+			win.start = 0;
+			win.endExclusive = 0;
+			return;
+		}
+
+		const rh = getRowHeight();
+		const overscan = getOverscan();
+		const start = Math.min(Math.max(0, Math.floor(wrap.scrollTop / rh) - overscan), total);
+		const visible = Math.ceil(getViewportHeight() / rh);
+		win.start = start;
+		win.endExclusive = Math.min(total, start + visible + overscan * 2);
+	}
+
+	function handleScroll() {
+		updateWindow();
+	}
 
 	// The active cell, clamped to the current grid size -- rows can shrink
 	// (e.g. after a load returns fewer rows) and the stored position must
@@ -204,7 +269,28 @@ export default function DataGrid($props: DataGridProps) {
 		$props.onsortchange?.($state.sortBy, $state.sortDirection);
 	}
 
+	// Scrolls the virtual window so a logical row is rendered, before it is
+	// focused
+	function makeRowVisible(row: number) {
+		if (!isVirtual() || !wrap) return;
+
+		const rh = getRowHeight();
+		const overscan = getOverscan();
+		if (row < win.start) {
+			wrap.scrollTop = Math.max(0, (row - overscan) * rh);
+			updateWindow();
+		} else if (row >= win.endExclusive) {
+			const below = Math.max(
+				0,
+				(row + 1 + overscan) * rh - getViewportHeight(),
+			);
+			wrap.scrollTop = below;
+			updateWindow();
+		}
+	}
+
 	function focusCell(row: number, col: number) {
+		makeRowVisible(row);
 		$state.activeCell = { row, col };
 		tableElement.querySelector<HTMLElement>(`[data-cell="${cellId(row, col)}"]`)?.focus();
 	}
@@ -273,15 +359,46 @@ export default function DataGrid($props: DataGridProps) {
 				focusCell(e.ctrlKey || e.metaKey ? maxRow : row, maxCol);
 				break;
 			}
+			case "PageUp": {
+				if (isVirtual()) {
+					e.preventDefault();
+					const step = Math.max(1, Math.floor(getViewportHeight() / getRowHeight()));
+					focusCell(Math.max(0, active.row - step), col);
+				}
+				break;
+			}
+			case "PageDown": {
+				if (isVirtual()) {
+					e.preventDefault();
+					const step = Math.max(1, Math.floor(getViewportHeight() / getRowHeight()));
+					focusCell(Math.min(maxRow, active.row + step), col);
+				}
+				break;
+			}
 		}
 	}
 
 	const alignClass = (align: "start" | "center" | "end" | undefined) =>
 		align ? `torp-data-grid-align-${align}` : undefined;
 
+	function wrapStyle(): string | undefined {
+		if (!isVirtual()) return undefined;
+		return `max-height:${getViewportHeight()}px;overflow:auto;`;
+	}
+
 	@render {
 		@try {
 			@await {
+				<div
+					class="torp-data-grid-wrap"
+					style={wrapStyle()}
+					onscroll={handleScroll}
+					onmount={(el: HTMLElement) => {
+						wrap = el;
+						updateWindow();
+					}}
+					&ref={wrap}
+				>
 				<table
 					id={$props.id ?? defaultId}
 					class={["torp-data-grid", $props.class]}
@@ -290,7 +407,7 @@ export default function DataGrid($props: DataGridProps) {
 					role="grid"
 					aria-label={$props.ariaLabel}
 					aria-labelledby={$props.ariaLabelledBy}
-					aria-rowcount={hasLoader ? $state.totalCount : undefined}
+					aria-rowcount={hasLoader || isVirtual() ? $state.totalCount : undefined}
 					onkeydown={handleKeydown}
 					onfocusin={handleFocusin}
 				>
@@ -326,7 +443,12 @@ export default function DataGrid($props: DataGridProps) {
 								</td>
 							</tr>
 						} else {
-							@for (let rowEntry of $state.rowEntries) {
+							@if (isVirtual()) {
+								<tr aria-hidden="true" class="torp-data-grid-spacer">
+									<td colspan={$props.columns.length} style={`height:${win.start * getRowHeight()}px`} />
+								</tr>
+							}
+							@for (let rowEntry of $state.bodyEntries) {
 								@key = rowEntry.row
 								<tr role="row">
 									@for (let entry of columnEntries) {
@@ -348,9 +470,18 @@ export default function DataGrid($props: DataGridProps) {
 									}
 								</tr>
 							}
+							@if (isVirtual()) {
+								<tr aria-hidden="true" class="torp-data-grid-spacer">
+									<td
+										colspan={$props.columns.length}
+										style={`height:${Math.max(0, ($state.rows.length - win.endExclusive)) * getRowHeight()}px`}
+									/>
+								</tr>
+							}
 						}
 					</tbody>
 				</table>
+				</div>
 			} with {
 				<div class="torp-data-grid-loading" role="status">
 					<slot name="loading">Loading…</slot>

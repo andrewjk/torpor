@@ -161,12 +161,15 @@ interaction-layer and aria standards above, with deviations fixed inline.
       keyboard support per the APG pattern -- arrows/Home/End/PageUp/PageDown,
       mouse drag on track and thumb, disabled state, two-way `value` binding;
       tests in test/slider)
-- [ ] Loading functions for most components (virtual grids, filtered options
-      from the network etc) -- shared `Loader` contract in utils/loader.ts
-      (`createItemLoader`); adopted by DataGrid (paged/sorted requests) and
-      ComboBox + SelectBox (options loaded from the network, rendered
-      automatically when no content is slotted in). Tree lazy child loading
-      still to do
+- [x] Loading functions for most components -- shared `Loader` contract in
+      utils/loader.ts (`createItemLoader`); adopted by DataGrid (paged/sorted
+      requests), ComboBox + SelectBox (network options rendered when no
+      content is slotted in) and Tree (lazy child loading on first expand).
+      DataGrid also virtualizes now: `virtual` + `rowHeight` (+ `height`,
+      `overscan`) render only the visible window with spacer rows filling
+      the rest of the tbody; keyboard nav scrolls to keep the active cell
+      visible and PageUp/PageDown page by viewport. Remaining: filtered
+      options from the network for other components
 - [ ] Plain theme -- unset all buttons, var(--border-color) etc
 
 ## Order

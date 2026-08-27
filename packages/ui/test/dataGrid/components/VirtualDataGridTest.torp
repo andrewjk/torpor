@@ -1,0 +1,21 @@
+import { DataGrid } from "../../../src/DataGrid/index";
+
+/** A DataGrid with a large static dataset, optionally virtualized */
+export default function VirtualDataGridTest($props: any) {
+	const columns = [{ key: "label", label: "Label" }];
+	const data = Array.from({ length: $props.count ?? 500 }, (_, i) => ({
+		label: `Item ${i}`,
+	}));
+
+	@render {
+		<DataGrid
+			ariaLabel="Virtual grid"
+			columns={columns}
+			data={data}
+			virtual={$props.virtual}
+			rowHeight={$props.rowHeight ?? 10}
+			height={$props.height ?? 100}
+			overscan={$props.overscan}
+		/>
+	}
+}
