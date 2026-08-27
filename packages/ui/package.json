@@ -96,6 +96,10 @@
 			"types": "./dist/NavMenu/index.d.ts",
 			"import": "./dist/NavMenu/index.js"
 		},
+		"./MaskedInput": {
+			"types": "./dist/MaskedInput/index.d.ts",
+			"import": "./dist/MaskedInput/index.js"
+		},
 		"./Notification": {
 			"types": "./dist/Notification/index.d.ts",
 			"import": "./dist/Notification/index.js"

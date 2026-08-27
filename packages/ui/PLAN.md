@@ -118,7 +118,13 @@ interaction-layer and aria standards above, with deviations fixed inline.
       button rows -- the "tab to the group, arrow around" case
 - [x] DatePicker
 - [ ] TimePicker
-- [ ] MaskedInput
+- [x] MaskedInput. Masks use `9` (digit), `L` (letter), `a` (alphanumeric)
+      tokens plus literals and `\x` escapes; the bound value is the raw
+      characters only, literals are display sugar. Rejected characters are
+      dropped as typed, mid-string deletions keep later values, incomplete
+      values are allowed so schema validation decides completeness.
+      Caret stays at the end after each edit -- selection-preserving
+      rewrites are a possible refinement
 - [x] ColorPicker, as colorpalette/colorpicker like calendar/datepicker.
       ColorPalette is a radio-group of swatches (arrow keys move and select,
       reselect clears) built on the focus group; ColorPicker adds an optional

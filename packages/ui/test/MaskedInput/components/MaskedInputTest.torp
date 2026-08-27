@@ -1,0 +1,15 @@
+import { MaskedInput } from "../../../src/MaskedInput/index";
+
+export default function MaskedInputTest($props: any) {
+	@render {
+		<MaskedInput
+			mask={$props.mask}
+			{$props?.value}
+			placeholder={$props.placeholder}
+			disabled={$props.disabled}
+			name={$props.name}
+			ariaLabel="Input"
+			onchange={$props.onchange}
+		/>
+	}
+}
