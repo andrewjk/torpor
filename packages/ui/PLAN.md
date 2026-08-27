@@ -107,7 +107,15 @@ interaction-layer and aria standards above, with deviations fixed inline.
       `LoadResult` / `Loader` in utils/loader.ts -- is the shared contract
       other components should adopt for reading from the network, e.g.
       ComboBox auto-complete)
-- [ ] FocusGroup
+- [x] FocusGroup. The shared machinery is utils/focusGroup.ts
+      (createFocusGroup): the item ledger with dense reindexing on removal,
+      reactive roving-tabindex tracking, orientation-aware arrow/Home/End
+      movement over enabled items, and first/last focus for popout opening.
+      Adopted by ToolBar, NavMenu, MenuBar, Menu (which keeps its own
+      wrapping arrows + type-ahead on top) and SegmentedControl (whose
+      selection group stays the source of truth; the focus group only tracks
+      the tab stop). The new FocusGroup/FocusGroupButton pair wraps plain
+      button rows -- the "tab to the group, arrow around" case
 - [x] DatePicker
 - [ ] TimePicker
 - [ ] MaskedInput

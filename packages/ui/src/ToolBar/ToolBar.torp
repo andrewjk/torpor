@@ -1,6 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import { focusItem as focusListItem } from "../utils/focusItem";
+import { createFocusGroup } from "../utils/focusGroup";
 import { type ItemState, type ToolBarContext, ToolBarContextName } from "./ToolBarTypes";
 
 interface ToolBarProps {
@@ -35,9 +35,8 @@ interface ToolBarProps {
 export default function ToolBar($props: ToolBarProps | undefined) {
 	let orientation = $props?.orientation ?? "horizontal";
 
-	// A collection containing the state and some functions for each item
-	let itemStates: ItemState[] = [];
-	let focusIndex = -1;
+	// The focus group owns the item ledger and roving-tabindex bookkeeping
+	const group = createFocusGroup<ItemState>();
 
 	// Check whether this is a menu in a popout
 	const popoutContext = $context[PopoutContextName] as PopoutContext;
@@ -46,8 +45,8 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 
 	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
 	if (popoutContext) {
-		popoutContext.focusFirstElement = focusFirstElement;
-		popoutContext.focusLastElement = focusLastElement;
+		popoutContext.focusFirstElement = group.focusFirstItem;
+		popoutContext.focusLastElement = group.focusLastItem;
 	}
 
 	// Set the context to pass down to items
@@ -60,101 +59,41 @@ export default function ToolBar($props: ToolBarProps | undefined) {
 	};
 	$context[ToolBarContextName] = context;
 
-	// If the ToolBar is not in a popout, focus its first item. Otherwise the popout will call focusFirstElement, below
+	// If the ToolBar is not in a popout, focus its first item. Otherwise the popout will call focusFirstItem, below
 	function handleFocus() {
-		if (!popoutContext && itemStates.length) {
-			itemStates[0].setFocused();
-		}
-	}
-
-	function focusFirstElement() {
-		if (itemStates.length) {
-			itemStates[0].setFocused();
-		}
-	}
-
-	function focusLastElement() {
-		if (itemStates.length > 0) {
-			itemStates.at(-1)!.setFocused();
+		if (!popoutContext && group.itemStates.length) {
+			group.focusFirstItem();
 		}
 	}
 
 	function registerItem(item: ItemState) {
-		// Add the item's state to the array and return its index
-		item.index = itemStates.length;
-		itemStates.push(item);
-		return { index: item.index };
+		return group.registerItem(item);
 	}
 
 	function handleItemFocus(index: number) {
-		focusIndex = index;
+		group.handleItemFocus(index);
 	}
 
 	function handleItemKey(e: KeyboardEvent) {
+		const index = group.getFocusIndex();
 		switch (e.key) {
 			case "Escape": {
 				if (inPopout) {
 					e.preventDefault();
-					//setPopoutVisible(false);
 					popoutState.visible = false;
 				}
 				break;
 			}
-			case "ArrowRight": {
-				if (orientation === "horizontal") {
-					e.preventDefault();
-					focusItem("next");
-				}
-				break;
-			}
-			case "ArrowLeft": {
-				if (orientation === "horizontal") {
-					e.preventDefault();
-					focusItem("previous");
-				}
-				break;
-			}
-			case "ArrowDown": {
-				if (orientation === "vertical") {
-					e.preventDefault();
-					focusItem("next");
-				}
-				break;
-			}
-			case "ArrowUp": {
-				if (orientation === "vertical") {
-					e.preventDefault();
-					focusItem("previous");
-				} else {
-					// TODO: This should be based on what side the menu shows on
-					// And on the orientation
-					if (inPopout) {
-						e.preventDefault();
-						popoutState.visible = false;
-					}
-				}
-				break;
-			}
-			case "Home": {
-				e.preventDefault();
-				focusItem("start");
-				break;
-			}
-			case "End": {
-				e.preventDefault();
-				focusItem("end");
+			default: {
+				group.handleGroupKey(index, e, { vertical: orientation === "vertical" });
 				break;
 			}
 		}
 	}
 
-	function focusItem(target: "start" | "previous" | "next" | "end") {
-		focusIndex = focusListItem(itemStates, focusIndex, target);
-	}
-
 	function handlePopout(index: number) {
 		// Hide all other popouts
-		for (let item of itemStates) {
+		for (let item of group.itemStates) {
 			if (item.index !== index) {
 				item.setVisible?.(false);
 			}

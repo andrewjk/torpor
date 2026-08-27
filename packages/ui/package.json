@@ -60,6 +60,10 @@
 			"types": "./dist/Drawer/index.d.ts",
 			"import": "./dist/Drawer/index.js"
 		},
+		"./FocusGroup": {
+			"types": "./dist/FocusGroup/index.d.ts",
+			"import": "./dist/FocusGroup/index.js"
+		},
 		"./Form": {
 			"types": "./dist/Form/index.d.ts",
 			"import": "./dist/Form/index.js"

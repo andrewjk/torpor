@@ -1,0 +1,70 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { createFocusGroup } from "../utils/focusGroup";
+import {
+	type FocusGroupContext,
+	FocusGroupContextName,
+} from "./FocusGroupTypes";
+
+interface FocusGroupProps {
+	/** An ID for the root element */
+	id?: string;
+	/** Classes for the root element */
+	class?: ClassValue;
+	/** Styles for the root element */
+	style?: StyleValue;
+	/**
+	 * The orientation of the group, which affects which arrow keys move
+	 * within it (default "horizontal")
+	 */
+	orientation?: "horizontal" | "vertical";
+	/** An accessible name for the group */
+	ariaLabel?: string;
+}
+
+/**
+ * A group of buttons (or any focusable elements) that behaves as a single
+ * tab stop: tabbing into the group lands on one item, and the arrow keys
+ * move focus between items -- Home and End jump to the ends. Disabled items
+ * are skipped.
+ *
+ * Wrap any set of controls in it:
+ *
+ * ```
+ * <FocusGroup ariaLabel="Text options">
+ * 	<FocusGroupButton onclick={bold}>Bold</FocusGroupButton>
+ * 	<FocusGroupButton onclick={italic}>Italic</FocusGroupButton>
+ * </FocusGroup>
+ * ```
+ *
+ * Use ToolBar instead when the group needs popouts or separators; use
+ * SegmentedControl when exactly one item must be active.
+ */
+export default function FocusGroup($props?: FocusGroupProps) {
+	const orientation = $props?.orientation ?? "horizontal";
+	const group = createFocusGroup();
+
+	const context: FocusGroupContext = {
+		registerItem: (item) => group.registerItem(item),
+		removeItem: (index) => group.removeItem(index),
+		handleItemFocus: (index) => group.handleItemFocus(index),
+		handleItemKey: (e) => {
+			group.handleGroupKey(group.getFocusIndex(), e, {
+				vertical: orientation === "vertical",
+			});
+		},
+		tabStopIndex: () => (group.getFocusIndex() === -1 ? 0 : group.getFocusIndex()),
+	};
+	$context[FocusGroupContextName] = context;
+
+	@render {
+		<div
+			{$props?.id}
+			class={["torp-focus-group", $props?.class]}
+			{$props?.style}
+			role="group"
+			aria-label={$props?.ariaLabel}
+		>
+			<slot />
+		</div>
+	}
+}

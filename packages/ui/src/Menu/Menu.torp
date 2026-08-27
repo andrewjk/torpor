@@ -1,6 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
-import { focusItem as focusListItem } from "../utils/focusItem";
+import { createFocusGroup } from "../utils/focusGroup";
 import { type ItemState, type MenuContext, MenuContextName } from "./MenuTypes";
 
 interface MenuProps {
@@ -34,8 +34,8 @@ interface MenuProps {
  */
 export default function Menu($props: MenuProps | undefined) {
 	// A collection containing the state and some functions for each item
-	let itemStates: ItemState[] = [];
-	let focusIndex = -1;
+	const group = createFocusGroup<ItemState>();
+	const { itemStates } = group;
 
 	// The text typed for type-ahead, which is reset after a short pause between key presses
 	let searchText = "";
@@ -52,8 +52,8 @@ export default function Menu($props: MenuProps | undefined) {
 	state.contentRole = "menu";
 
 	// Set the focusFirstElement method in the PopoverContext(s) so that it can be called after everything has been shown
-	popoutContext.focusFirstElement = focusFirstElement;
-	popoutContext.focusLastElement = focusLastElement;
+	popoutContext.focusFirstElement = group.focusFirstItem;
+	popoutContext.focusLastElement = group.focusLastItem;
 
 	// Set the context to pass down to items
 	let context: MenuContext = {
@@ -66,27 +66,12 @@ export default function Menu($props: MenuProps | undefined) {
 	};
 	$context[MenuContextName] = context;
 
-	function focusFirstElement() {
-		if (itemStates.length) {
-			itemStates[0].setFocused();
-		}
-	}
-
-	function focusLastElement() {
-		if (itemStates.length > 0) {
-			itemStates.at(-1)!.setFocused();
-		}
-	}
-
 	function registerItem(item: ItemState) {
-		// Add the item's state to the array and return its index
-		item.index = itemStates.length;
-		itemStates.push(item);
-		return { index: item.index };
+		return group.registerItem(item);
 	}
 
 	function handleItemFocus(index: number) {
-		focusIndex = index;
+		group.handleItemFocus(index);
 	}
 
 	function handleItemKey(e: KeyboardEvent) {
@@ -171,7 +156,7 @@ export default function Menu($props: MenuProps | undefined) {
 		// Focus the next item whose label starts with the search text, wrapping
 		// around to the start and skipping disabled items
 		for (let offset = 1; offset <= itemStates.length; offset++) {
-			const item = itemStates[(focusIndex + offset) % itemStates.length];
+			const item = itemStates[(group.getFocusIndex() + offset) % itemStates.length];
 			if (!item.disabled && item.text?.toLocaleLowerCase().startsWith(searchText)) {
 				item.setFocused();
 				break;
@@ -180,7 +165,7 @@ export default function Menu($props: MenuProps | undefined) {
 	}
 
 	function focusItem(target: "start" | "previous" | "next" | "end") {
-		focusIndex = focusListItem(itemStates, focusIndex, target);
+		group.moveFocus(group.getFocusIndex(), target);
 	}
 
 	function handlePopout(index: number) {

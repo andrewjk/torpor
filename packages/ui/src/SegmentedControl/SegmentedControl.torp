@@ -6,9 +6,10 @@ import {
 	FormContextName,
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
+import { createFocusGroup } from "../utils/focusGroup";
 import { createItemGroup } from "../utils/createItemGroup";
 import createFormField from "../utils/formField";
-import { focusItem, type FocusTarget } from "../utils/focusItem";
+import type { FocusTarget } from "../utils/focusItem";
 import {
 	type ItemState,
 	type SegmentedControlContext,
@@ -83,10 +84,17 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 		},
 	});
 
+	// The focus group owns the roving-tabindex bookkeeping; the selection
+	// group above stays the source of truth for the active segment
+	const focusGroup = createFocusGroup<ItemState>();
+
 	// Set the context to pass down to items
 	const context: SegmentedControlContext = {
 		registerItem,
-		removeItem: group.removeItem,
+		removeItem: (itemIndex) => {
+			group.removeItem(itemIndex);
+			focusGroup.removeItem(itemIndex);
+		},
 		triggerItem: (value) => {
 			group.toggleItem(value);
 			form.handleInput();
@@ -136,6 +144,7 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 			setFocused: () => {},
 		});
 		group.registerItem(itemState);
+		focusGroup.registerItem(itemState);
 
 		return itemState;
 	}
@@ -170,11 +179,15 @@ export default function SegmentedControl($props: SegmentedControlProps | undefin
 	// Moving with the keyboard both selects and focuses the target segment,
 	// like a radio group
 	function move(index: number, target: FocusTarget) {
-		const next = focusItem(group.itemStates, index, target);
-		const item = group.itemStates[next];
-		if (item) {
-			group.toggleItem(item.value);
-			form.handleInput();
+		const before = focusGroup.getFocusIndex();
+		focusGroup.moveFocus(index, target);
+		const next = focusGroup.getFocusIndex();
+		if (next !== before) {
+			const item = focusGroup.itemStates[next];
+			if (item) {
+				group.toggleItem(item.value);
+				form.handleInput();
+			}
 		}
 	}
 

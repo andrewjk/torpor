@@ -1,5 +1,5 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { focusItem as focusListItem } from "../utils/focusItem";
+import { createFocusGroup } from "../utils/focusGroup";
 import { type ItemState, type MenuBarContext, MenuBarContextName } from "./MenuBarTypes";
 
 interface MenuBarProps {
@@ -40,9 +40,9 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 		active: false,
 	});
 
-	// A collection containing the state and some functions for each item
-	let itemStates: ItemState[] = [];
-	let focusIndex = -1;
+	// The focus group owns the item ledger and roving-tabindex bookkeeping
+	const group = createFocusGroup<ItemState>();
+	const { itemStates } = group;
 
 	// Set the context to pass down to items
 	let context: MenuBarContext = {
@@ -56,10 +56,7 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 	$context[MenuBarContextName] = context;
 
 	function registerItem(item: ItemState) {
-		// Add the item's state to the array and return its index
-		itemStates.push(item);
-		itemStates = itemStates;
-		return { index: itemStates.length - 1 };
+		return group.registerItem(item);
 	}
 
 	function handleItemShow(index: number) {
@@ -72,65 +69,29 @@ export default function MenuBar($props: MenuBarProps | undefined) {
 	}
 
 	function handleButtonFocus(index: number) {
-		focusIndex = index;
+		group.handleItemFocus(index);
 	}
 
 	function handleAdjacentItem(index: number, target: "previous" | "next") {
 		// Move focus to the adjacent item and open its menu; opening it also
 		// hides the current item's menu via handleItemShow
-		focusIndex = index;
+		group.handleItemFocus(index);
 		focusItem(target);
-		if (focusIndex !== index) {
+		const next = group.getFocusIndex();
+		if (next !== index) {
 			$state.active = true;
-			itemStates[focusIndex].setVisible?.(true);
+			itemStates[next].setVisible?.(true);
 		}
 	}
 
 	function handleButtonKey(e: KeyboardEvent) {
-		switch (e.key) {
-			case "ArrowRight": {
-				if (orientation === "horizontal") {
-					e.preventDefault();
-					focusItem("next");
-				}
-				break;
-			}
-			case "ArrowLeft": {
-				if (orientation === "horizontal") {
-					e.preventDefault();
-					focusItem("previous");
-				}
-				break;
-			}
-			case "ArrowDown": {
-				if (orientation === "vertical") {
-					e.preventDefault();
-					focusItem("next");
-				}
-				break;
-			}
-			case "ArrowUp": {
-				if (orientation === "vertical") {
-					e.preventDefault();
-					focusItem("previous");
-				}
-				break;
-			}
-			case "Home": {
-				e.preventDefault();
-				focusItem("start");
-				break;
-			}
-			case "End": {
-				e.preventDefault();
-				focusItem("end");
-				break;
-			}
-		}
+		group.handleGroupKey(group.getFocusIndex(), e, {
+			vertical: orientation === "vertical",
+		});
 	}
 
 	function focusItem(target: "start" | "previous" | "next" | "end") {
-		focusIndex = focusListItem(itemStates, focusIndex, target);
+		group.moveFocus(group.getFocusIndex(), target);
 	}
 
 	@render {

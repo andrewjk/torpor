@@ -1,0 +1,11 @@
+import { FocusGroup, FocusGroupButton } from "../../../src/FocusGroup/index";
+
+export default function FocusGroupTest($props: any) {
+	@render {
+		<FocusGroup ariaLabel="Actions" orientation={$props.orientation}>
+			<FocusGroupButton disabled={$props.disabledSecond} onclick={$props.onfirst}>First</FocusGroupButton>
+			<FocusGroupButton disabled={$props.disabledSecond} onclick={$props.onsecond}>Second</FocusGroupButton>
+			<FocusGroupButton onclick={$props.onthird}>Third</FocusGroupButton>
+		</FocusGroup>
+	}
+}
