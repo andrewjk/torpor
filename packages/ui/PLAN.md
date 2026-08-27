@@ -120,7 +120,15 @@ interaction-layer and aria standards above, with deviations fixed inline.
 - [ ] TimePicker
 - [ ] MaskedInput
 - [ ] ColorPicker
-- [ ] Drag and drop
+- [x] Drag and drop. Platform capability in the mount-directive style:
+      utils/dragState.ts tracks the active drag reactively (id/kind/data,
+      with an integrity type encoded into the dataTransfer); mount/draggable
+      and mount/dropTarget wire source and target elements, handling
+      preventDefault, effect negotiation and hover feedback. Pure helpers in
+      utils/reorderList.ts (moveItem, moveToSlot, slotIndex) cover list
+      reordering math for lists and trees alike. Keyboard-accessible
+      alternatives (move-before/move-after commands) remain each component's
+      responsibility -- HTML5 DnD has no keyboard path
 - [ ] Rich text
 - [x] All inputs should work in forms
 - [ ] Split out PopoverTrigger / PopoverHover (and ContextualTrigger,

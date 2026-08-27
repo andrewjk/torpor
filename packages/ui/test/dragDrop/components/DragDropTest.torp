@@ -1,0 +1,39 @@
+import { dragState, resolveDrag } from "../../../src/utils/dragState";
+import draggable from "../../../src/mount/draggable";
+import dropTarget from "../../../src/mount/dropTarget";
+
+/** Fixture wiring a draggable item and two drop targets together */
+export default function DragDropTest($props: any) {
+	function wireItem(el: HTMLElement) {
+		return draggable(el, {
+			kind: "list-item",
+			data: { label: "item" },
+			onstart: $props.onstart,
+			onend: $props.onend,
+		});
+	}
+
+	function wirePanel(el: HTMLElement) {
+		return dropTarget(el, {
+			accepts: (info) => info.kind === "list-item",
+			dragClass: "dropping",
+			effect: $props.effect,
+			onenter: (info) => $props.onenter?.(info),
+			onleave: () => $props.onleave?.(),
+			ondrop: (info, e) => {
+				$props.ondrop?.(info, e);
+				if ($props.reject === true) return false;
+				return undefined;
+			},
+		});
+	}
+
+	@render {
+		<div class="panel" onmount={wirePanel}>
+			<div class="item" onmount={wireItem} />
+			<div class="foreign" onmount={(el) =>
+				draggable(el, { kind: "other", data: {} })
+			} />
+		</div>
+	}
+}
