@@ -10,6 +10,7 @@ import {
 	CodeAction,
 	CodeActionContext,
 	CompletionContext,
+	CompletionItem,
 	CompletionList,
 	Hover,
 	Diagnostic,
@@ -27,7 +28,7 @@ export interface LanguageMode {
 		document: TextDocument,
 		position: Position,
 		context?: CompletionContext,
-	) => CompletionList;
+	) => CompletionList | CompletionItem[] | null;
 	doCodeAction?: (document: TextDocument, range: Range, context: CodeActionContext) => CodeAction[];
 	doHover?: (document: TextDocument, position: Position) => Hover | null;
 	doDefinition?: (document: TextDocument, position: Position) => Definition | null;
@@ -79,12 +80,12 @@ export function getLanguageModes(): LanguageModes {
 				.get(document)
 				.getLanguageRanges(range)
 				.map((r) => {
-					return <LanguageModeRange>{
+					return {
 						start: r.start,
 						end: r.end,
 						mode: r.languageId && modes[r.languageId],
 						attributeValue: r.attributeValue,
-					};
+					} as LanguageModeRange;
 				});
 		},
 		getAllModesInDocument(document: TextDocument): LanguageMode[] {

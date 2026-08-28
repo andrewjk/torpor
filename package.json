@@ -40,6 +40,7 @@
 		"packages/build",
 		"packages/check",
 		"packages/create-build",
+		"packages/language-server",
 		"packages/prettier",
 		"packages/shiki",
 		"packages/textmate",

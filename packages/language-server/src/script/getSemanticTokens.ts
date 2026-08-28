@@ -9,7 +9,7 @@ export default function getSemanticTokens(
 	document: TextDocument,
 	range?: Range,
 	_cancellationToken?: CancellationToken,
-) {
+): number[] | null {
 	try {
 		const transformed = loadDocument(document);
 		if (!transformed.ok) {

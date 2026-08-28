@@ -7,7 +7,7 @@ export default function doComplete(
 	document: TextDocument,
 	position: Position,
 	context?: CompletionContext,
-) {
+): CompletionItem[] | null {
 	try {
 		const transformed = loadDocument(document);
 		if (!transformed.ok) {
@@ -60,9 +60,9 @@ export default function doComplete(
 				}
 				return completion;
 			})
-			.filter(Boolean);
+			.filter((item): item is CompletionItem => Boolean(item));
 
-		return result as any;
+		return result;
 	} catch (ex) {
 		console.log("COMPLETE ERROR:", ex);
 		return null;

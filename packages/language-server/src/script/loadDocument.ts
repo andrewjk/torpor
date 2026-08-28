@@ -99,7 +99,16 @@ function loadTypeScriptEnv(filename: string, key: string) {
 		// Push a dummy file into the map, it will get updated shortly
 		vts.virtualFiles.set(key, "const x = 5;");
 
-		const system = tsvfs.createFSBackedSystem(vts.virtualFiles, vts.projectRoot, ts);
+		// Point the vfs at the loaded TypeScript's own lib folder. Its default
+		// resolution relies on require(), which is not available in an ES module
+		const tsLibDirectory = path.dirname(ts.sys.getExecutingFilePath());
+
+		const system = tsvfs.createFSBackedSystem(
+			vts.virtualFiles,
+			vts.projectRoot,
+			ts,
+			tsLibDirectory,
+		);
 		vts.env = tsvfs.createVirtualTypeScriptEnvironment(system, [key], ts, vts.config);
 		vts.lang = vts.env.languageService as LanguageService;
 

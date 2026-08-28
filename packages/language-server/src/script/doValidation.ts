@@ -3,14 +3,14 @@ import { type Diagnostic } from "vscode-languageserver";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { loadDocument } from "./loadDocument";
 
-export default function doValidation(document: TextDocument) {
+export default function doValidation(document: TextDocument): Diagnostic[] {
 	try {
 		const transformed = loadDocument(document);
 		if (!transformed.ok) {
 			// If there were parse or build errors, return them immediately
 			// TODO: Do we want to clear the virtual file??
 			if (!transformed.ok) {
-				return transformed.errors.map((e: any) => {
+				return transformed.errors.map((e: any): Diagnostic => {
 					return {
 						message: e.message,
 						range: {

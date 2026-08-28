@@ -119,7 +119,7 @@ export function plain(parts: ts.SymbolDisplayPart[] | string): string {
 export function getMarkdownDocumentation(
 	documentation: ts.SymbolDisplayPart[] | undefined,
 	tags: ts.JSDocTagInfo[] | undefined,
-) {
+): string {
 	let result: Array<string | undefined> = [];
 	if (documentation) {
 		result.push(plain(documentation));

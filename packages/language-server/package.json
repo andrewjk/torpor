@@ -1,0 +1,47 @@
+{
+	"name": "@torpor/language-server",
+	"version": "0.0.1",
+	"description": "A language server for Torpor, for use in any editor",
+	"type": "module",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.mts",
+			"import": "./dist/index.mjs",
+			"default": "./dist/index.mjs"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
+	"bin": {
+		"torpor-lsp": "./dist/bin/index.js"
+	},
+	"scripts": {
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && vp pack",
+		"build:fix": "tsx scripts/postbuild.ts",
+		"build:watch": "vp pack --watch",
+		"test": "vp test"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@torpor/view": "workspace:^",
+		"@typescript/vfs": "^1.6.4",
+		"typescript": "6.0.3",
+		"vscode-css-languageservice": "^6.3.8",
+		"vscode-html-languageservice": "^5.6.0",
+		"vscode-languageserver": "^9.0.1",
+		"vscode-languageserver-textdocument": "^1.0.12"
+	},
+	"devDependencies": {
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"tsx": "^4.23.5",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
+	}
+}

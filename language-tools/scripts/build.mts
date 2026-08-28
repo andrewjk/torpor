@@ -70,7 +70,7 @@ const clientOptions: esbuild.BuildOptions = {
 
 const serverOptions: esbuild.BuildOptions = {
 	absWorkingDir: root,
-	entryPoints: ["server/src/server.ts"],
+	entryPoints: ["server.ts"],
 	outfile: "dist/server.js",
 	bundle: true,
 	format: "cjs",

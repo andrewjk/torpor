@@ -236,30 +236,15 @@ importers:
 
   language-tools:
     dependencies:
-      '@torpor/view':
+      '@torpor/language-server':
         specifier: workspace:^
-        version: link:../packages/view
-      '@typescript/vfs':
-        specifier: ^1.6.4
-        version: 1.6.4(supports-color@10.2.2)(typescript@6.0.3)
+        version: link:../packages/language-server
       typescript:
         specifier: 6.0.3
         version: 6.0.3
-      vscode-css-languageservice:
-        specifier: ^6.3.8
-        version: 6.3.10
-      vscode-html-languageservice:
-        specifier: ^5.6.0
-        version: 5.6.2
       vscode-languageclient:
         specifier: ^9.0.1
         version: 9.0.1
-      vscode-languageserver:
-        specifier: ^9.0.1
-        version: 9.0.1
-      vscode-languageserver-textdocument:
-        specifier: ^1.0.12
-        version: 1.0.14
     devDependencies:
       '@torpor/textmate':
         specifier: workspace:^
@@ -396,6 +381,43 @@ importers:
         version: 0.2.7(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@30.0.1(@noble/hashes@2.2.0))(svelte@5.56.8(@typescript-eslint/types@8.66.0))(terser@5.49.0)(tsx@4.23.5)(typescript@6.0.3)(yaml@2.9.0)
 
   packages/create-build: {}
+
+  packages/language-server:
+    dependencies:
+      '@torpor/view':
+        specifier: workspace:^
+        version: link:../view
+      '@typescript/vfs':
+        specifier: ^1.6.4
+        version: 1.6.4(supports-color@10.2.2)(typescript@6.0.3)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+      vscode-css-languageservice:
+        specifier: ^6.3.8
+        version: 6.3.10
+      vscode-html-languageservice:
+        specifier: ^5.6.0
+        version: 5.6.2
+      vscode-languageserver:
+        specifier: ^9.0.1
+        version: 9.0.1
+      vscode-languageserver-textdocument:
+        specifier: ^1.0.12
+        version: 1.0.14
+    devDependencies:
+      '@typescript/native-preview':
+        specifier: 7.0.0-dev.20260707.2
+        version: 7.0.0-dev.20260707.2
+      tsx:
+        specifier: ^4.23.5
+        version: 4.23.5
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.2.7(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@6.0.3)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@30.0.1(@noble/hashes@2.2.0))(svelte@5.56.8(@typescript-eslint/types@8.66.0))(terser@5.49.0)(tsx@4.23.5)(typescript@6.0.3)(yaml@2.9.0)
+      vitest:
+        specifier: 4.1.10
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@vitest/browser-preview@4.1.10)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@6.0.3)(yaml@2.9.0))(happy-dom@20.11.1)(jsdom@30.0.1(@noble/hashes@2.2.0))
 
   packages/prettier:
     dependencies:

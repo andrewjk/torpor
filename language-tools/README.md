@@ -55,8 +55,10 @@ export default function Counter() {
 This package is part of the Torpor pnpm workspace and integrates with the
 other packages directly:
 
-- `@torpor/view` (`workspace:^`) provides the compiler used by the language
-  server to transform `.torp` files into TypeScript
+- `@torpor/language-server` (`workspace:^`) provides the language server,
+  which bundles the Torpor compiler and TypeScript support -- see
+  [packages/language-server](../packages/language-server). It lives in its
+  own package so that other editors (Neovim, Helix, Zed, ...) can use it too
 - `@torpor/textmate` (`workspace:^`) provides the TextMate grammar, which is
   copied into `syntaxes/` as part of the build
 

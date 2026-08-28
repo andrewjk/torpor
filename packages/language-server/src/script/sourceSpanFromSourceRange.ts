@@ -1,6 +1,9 @@
 import { type Range } from "vscode-languageserver";
 
-export default function sourceSpanFromSourceRange(text: string, range: Range) {
+export default function sourceSpanFromSourceRange(
+	text: string,
+	range: Range,
+): { start: number; length: number } {
 	// HACK: maybe we need to generate lineMaps
 	let start = 0;
 	let end = 0;

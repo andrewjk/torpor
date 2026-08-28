@@ -11,5 +11,5 @@
 		"noEmit": true,
 		"types": ["node"]
 	},
-	"include": ["client/src", "server/src", "server/test", "scripts"]
+	"include": ["client/src", "scripts", "server.ts"]
 }
