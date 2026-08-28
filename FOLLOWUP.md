@@ -134,16 +134,6 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 `values`); worked around by naming the state key `value` like ListBox/Tree do.
 `$bind` could validate that each key exists on both objects and throw in dev.
 
-## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
-
-Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators.torp):
-`` `Go to slide ${slide.index + 1}` `` in an `aria-label` compiled to something like
-`Go to t_item_1.data 1` -- member access plus arithmetic on a loop variable inside a
-`${}` interpolation silently degrades. Works fine outside `@for` (CarouselSlide
-interpolates `$state.index + 1` correctly), and plain member expressions in loop
-bodies (`data-state={context.isActive(slide.index)}`) are fine. Worked around by
-computing the label in a helper function. Worth a compiler test + fix.
-
 ## Optional chaining on a @for loop variable breaks the list change mask (view compiler)
 
 Found while building Tree lazy loading (src/ui/Tree/TreeLoadedChildren.torp): a loop
@@ -154,8 +144,9 @@ resolves throws `ReferenceError: child is not defined` (surfaces as the @try/@ca
 error branch). A plain ternary over the same data (`item ? item.hasChildren === true :
 false`) works, as does mapping items to plain entry objects in script first (the
 DataGrid `$state.rowEntries` pattern, which is what Tree now uses). Sibling in-family:
-member access without `?.` also works. Worth a compiler test + fix alongside the
-template-literal arithmetic entry above.
+member access without `?.` also works. Worth a compiler test + fix. (The related
+template-literal arithmetic issue has since been fixed: `replaceForVarNames` now
+skips string-literal contents.)
 
 ## ui package check: two pre-existing type errors
 
