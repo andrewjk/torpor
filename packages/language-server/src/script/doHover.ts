@@ -1,4 +1,3 @@
-import ts from "typescript";
 import { type Hover, type Position } from "vscode-languageserver";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { getMarkdownDocumentation } from "../utils/previewer";
@@ -24,7 +23,7 @@ export default function doHover(document: TextDocument, position: Position): Hov
 		}
 
 		// Stole this from the Svelte extension:
-		let declaration = ts.displayPartsToString(info.displayParts);
+		let declaration = vts.ts.displayPartsToString(info.displayParts);
 		const documentation = getMarkdownDocumentation(info.documentation, info.tags);
 		// https://microsoft.github.io/language-server-protocol/specification#textDocument_hover
 		const contents = ["```typescript", declaration, "```"]

@@ -5,7 +5,17 @@
 /**
  * adopted from https://github.com/microsoft/vscode/blob/10722887b8629f90cc38ee7d90d54e8246dc895f/extensions/typescript-language-features/src/utils/previewer.ts
  */
-import ts from "typescript";
+import type ts from "typescript";
+
+/**
+ * Joins a set of display parts into a string. This is our own version of
+ * TypeScript's displayPartsToString, so that the previewer does not need the
+ * TypeScript module at run time (the parts may come from the project's own
+ * TypeScript version)
+ */
+function displayPartsToString(parts: ts.SymbolDisplayPart[] | string | undefined): string {
+	return typeof parts === "string" ? parts : (parts ?? []).map((part) => part.text).join("");
+}
 
 function replaceLinks(text: string): string {
 	return (
@@ -68,19 +78,19 @@ function getTagBodyText(tag: ts.JSDocTagInfo): string | undefined {
 
 	switch (tag.name) {
 		case "example":
-			return makeExampleTag(ts.displayPartsToString(tag.text));
+			return makeExampleTag(displayPartsToString(tag.text));
 		case "author":
-			return makeEmailTag(ts.displayPartsToString(tag.text));
+			return makeEmailTag(displayPartsToString(tag.text));
 		case "default":
-			return makeCodeblock(ts.displayPartsToString(tag.text));
+			return makeCodeblock(displayPartsToString(tag.text));
 	}
 
-	return processInlineTags(ts.displayPartsToString(tag.text));
+	return processInlineTags(displayPartsToString(tag.text));
 }
 
 export function getTagDocumentation(tag: ts.JSDocTagInfo): string | undefined {
 	function getWithType() {
-		const body = (ts.displayPartsToString(tag.text) || "").split(/^(\S+)\s*-?\s*/);
+		const body = (displayPartsToString(tag.text) || "").split(/^(\S+)\s*-?\s*/);
 		if (body?.length === 3) {
 			const param = body[1];
 			const doc = body[2];
@@ -113,7 +123,7 @@ export function getTagDocumentation(tag: ts.JSDocTagInfo): string | undefined {
 }
 
 export function plain(parts: ts.SymbolDisplayPart[] | string): string {
-	return processInlineTags(typeof parts === "string" ? parts : ts.displayPartsToString(parts));
+	return processInlineTags(displayPartsToString(parts));
 }
 
 export function getMarkdownDocumentation(

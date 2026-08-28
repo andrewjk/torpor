@@ -1,4 +1,5 @@
-import ts, { type DiagnosticMessageChain } from "typescript";
+import type { DiagnosticMessageChain } from "typescript";
+import type ts from "typescript";
 import { type Diagnostic } from "vscode-languageserver";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { loadDocument } from "./loadDocument";

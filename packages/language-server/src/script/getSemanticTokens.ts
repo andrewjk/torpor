@@ -1,4 +1,3 @@
-import ts from "typescript";
 import { type CancellationToken, type Range } from "vscode-languageserver";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { loadDocument } from "./loadDocument";
@@ -24,7 +23,7 @@ export default function getSemanticTokens(
 		const { spans } = vts.lang.getEncodedSemanticClassifications(
 			key,
 			span,
-			ts.SemanticClassificationFormat.TwentyTwenty,
+			vts.ts.SemanticClassificationFormat.TwentyTwenty,
 		);
 
 		let sourceSpans = [] as number[];

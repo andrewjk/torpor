@@ -2,13 +2,15 @@ import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
 import * as tsvfs from "@typescript/vfs";
-import ts, { type LanguageService } from "typescript";
+import type { CompilerOptions, LanguageService } from "typescript";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import type SourceMap from "./SourceMap";
 import { transformDocument } from "./transformDocument";
+import { loadTypeScriptModule, type TypeScriptModule } from "./typescriptLoader";
 
 export interface VTS {
-	config: ts.CompilerOptions;
+	ts: TypeScriptModule;
+	config: CompilerOptions;
 	configPath: string | undefined;
 	projectRoot: string;
 	virtualFiles: Map<string, string>;
@@ -18,6 +20,7 @@ export interface VTS {
 }
 
 let vts: VTS = {
+	ts: undefined as unknown as TypeScriptModule,
 	env: undefined,
 	// @ts-ignore This will definitely be set
 	lang: undefined,
@@ -25,12 +28,7 @@ let vts: VTS = {
 	configPath: undefined,
 	// This is just the default config, it should be overwritten by the one from the
 	// user's tsconfig.json
-	config: {
-		target: ts.ScriptTarget.ES2022,
-		module: ts.ModuleKind.ESNext,
-		moduleResolution: ts.ModuleResolutionKind.Bundler,
-		esModuleInterop: true,
-	},
+	config: undefined as unknown as CompilerOptions,
 	virtualFiles: new Map<string, string>(),
 	virtualFileMaps: new Map<string, { sourceFile: string; map: SourceMap[] }>(),
 };
@@ -85,6 +83,19 @@ function loadTypeScriptEnv(filename: string, key: string) {
 			return;
 		}
 
+		// Load the project's own TypeScript, so that language features match
+		// the user's build (falls back to the bundled version)
+		vts.ts = loadTypeScriptModule(filename);
+
+		// The default config, to use if no tsconfig.json is found. It matches
+		// what the compiler generates
+		vts.config = {
+			target: vts.ts.ScriptTarget.ES2022,
+			module: vts.ts.ModuleKind.ESNext,
+			moduleResolution: vts.ts.ModuleResolutionKind.Bundler,
+			esModuleInterop: true,
+		};
+
 		// Maybe load tsconfig from a file
 		// TODO: reload if the file is changed
 		try {
@@ -101,15 +112,15 @@ function loadTypeScriptEnv(filename: string, key: string) {
 
 		// Point the vfs at the loaded TypeScript's own lib folder. Its default
 		// resolution relies on require(), which is not available in an ES module
-		const tsLibDirectory = path.dirname(ts.sys.getExecutingFilePath());
+		const tsLibDirectory = path.dirname(vts.ts.sys.getExecutingFilePath());
 
 		const system = tsvfs.createFSBackedSystem(
 			vts.virtualFiles,
 			vts.projectRoot,
-			ts,
+			vts.ts,
 			tsLibDirectory,
 		);
-		vts.env = tsvfs.createVirtualTypeScriptEnvironment(system, [key], ts, vts.config);
+		vts.env = tsvfs.createVirtualTypeScriptEnvironment(system, [key], vts.ts, vts.config);
 		vts.lang = vts.env.languageService as LanguageService;
 
 		console.log("Torpor type checking loaded");
@@ -127,6 +138,7 @@ function updateVirtualFile(key: string, content: string, sourceFile: string, map
 }
 
 function loadTypeScriptConfig(): Record<string, any> | undefined {
+	const ts = vts.ts;
 	const configFileName = ts.findConfigFile(vts.projectRoot, (path) => ts.sys.fileExists(path));
 	if (configFileName) {
 		vts.configPath = path.dirname(configFileName);

@@ -20,7 +20,13 @@ The transport can also be set explicitly with `--node-ipc` or
 
 The server reads the project's `tsconfig.json`, and resolves imports against
 the project's `node_modules`, so it works best inside a Torpor project that
-has `@torpor/view` and TypeScript installed.
+has `@torpor/view` installed.
+
+It also uses the project's own TypeScript for the language service when one
+is installed (resolved from the opened file, like Node would), so that
+diagnostics match the user's build. If the project does not have TypeScript,
+or the installed version is not compatible, it falls back to the version
+bundled with this package.
 
 ## Editors
 
