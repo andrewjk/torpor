@@ -25,13 +25,13 @@ describe("Server", () => {
 
 	test("use returns the server for chaining", () => {
 		const s = new Server();
-		const result = s.use(async () => {});
+		const result = s.use({});
 		expect(result).toBe(s);
 	});
 
 	test("use appends to middleware without mutating the original array", () => {
 		const s = new Server();
-		const mw = async () => {};
+		const mw = { enter: () => {} };
 		s.use(mw);
 		expect(s.middleware).toHaveLength(1);
 		expect(s.middleware[0]).toBe(mw);
@@ -108,36 +108,201 @@ describe("Server.fetch", () => {
 		expect(await res.text()).toBe("POST");
 	});
 
-	test("runs middleware before the route handler in order", async () => {
+	test("runs enter hooks before and exit hooks after the route handler", async () => {
 		const order: string[] = [];
 		const s = new Server();
-		s.use(async (_ev, next) => {
-			order.push("mw1-before");
-			await next();
-			order.push("mw1-after");
+		s.use({
+			enter: async () => {
+				order.push("mw1-enter");
+			},
+			exit: async () => {
+				order.push("mw1-exit");
+			},
 		});
-		s.use(async (_ev, next) => {
-			order.push("mw2-before");
-			await next();
-			order.push("mw2-after");
+		s.use({
+			enter: async () => {
+				order.push("mw2-enter");
+			},
+			exit: async () => {
+				order.push("mw2-exit");
+			},
 		});
 		s.add("/x", async () => {
 			order.push("handler");
 			return new Response("ok");
 		});
 		await s.fetch("https://example.com/x");
-		expect(order).toEqual(["mw1-before", "mw2-before", "handler", "mw2-after", "mw1-after"]);
+		expect(order).toEqual(["mw1-enter", "mw2-enter", "handler", "mw2-exit", "mw1-exit"]);
 	});
 
-	test("middleware can short-circuit by setting ev.response", async () => {
+	test("middleware can short-circuit by returning a response", async () => {
 		const s = new Server();
-		s.use(async (ev) => {
-			ev.response = new Response("blocked", { status: 403 });
+		s.use({
+			enter: () => new Response("blocked", { status: 403 }),
 		});
 		s.add("/x", async () => new Response("should-not-run"));
 		const res = await s.fetch("https://example.com/x");
 		expect(res.status).toBe(403);
 		expect(await res.text()).toBe("blocked");
+	});
+
+	test("setting ev.response without returning does not short-circuit", async () => {
+		const s = new Server();
+		s.use({
+			enter: (ev) => {
+				ev.response = new Response("ignored", { status: 403 });
+			},
+		});
+		s.add("/x", async () => new Response("ok"));
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(200);
+		expect(await res.text()).toBe("ok");
+	});
+
+	test("exit hooks of entered middleware run after a short-circuit", async () => {
+		const order: string[] = [];
+		const s = new Server();
+		s.use({
+			enter: () => {
+				order.push("mw1-enter");
+				return new Response("blocked", { status: 403 });
+			},
+			exit: () => {
+				order.push("mw1-exit");
+			},
+		});
+		s.use({
+			enter: () => {
+				order.push("mw2-enter");
+			},
+			exit: () => {
+				order.push("mw2-exit");
+			},
+		});
+		s.add("/x", () => {
+			order.push("handler");
+			return new Response("nope");
+		});
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(403);
+		expect(order).toEqual(["mw1-enter", "mw1-exit"]);
+	});
+
+	test("an exit hook can replace the response", async () => {
+		const s = new Server();
+		s.use({
+			exit: () => new Response("replaced", { status: 202 }),
+		});
+		s.add("/x", () => new Response("original"));
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(202);
+		expect(await res.text()).toBe("replaced");
+	});
+
+	test("exit hooks run even when the handler throws", async () => {
+		const order: string[] = [];
+		const s = new Server();
+		s.use({
+			enter: () => {
+				order.push("enter");
+			},
+			exit: () => {
+				order.push("exit");
+			},
+		});
+		s.add("/x", async () => {
+			throw new Error("boom");
+		});
+		await expect(s.fetch("https://example.com/x")).rejects.toThrow("boom");
+		expect(order).toEqual(["enter", "exit"]);
+	});
+
+	test("an exit hook can handle a handler error via ev.error", async () => {
+		const s = new Server();
+		s.use({
+			exit: (ev) => {
+				if (ev.error) {
+					return new Response(`handled: ${(ev.error as Error).message}`, { status: 500 });
+				}
+			},
+		});
+		s.add("/x", async () => {
+			throw new Error("boom");
+		});
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(500);
+		expect(await res.text()).toBe("handled: boom");
+	});
+
+	test("an exit hook can handle an error thrown by a later enter hook", async () => {
+		const s = new Server();
+		s.use({
+			exit: (ev) => {
+				if (ev.error) {
+					return new Response("handled enter error", { status: 502 });
+				}
+			},
+		});
+		s.use({
+			enter: () => {
+				throw new Error("enter boom");
+			},
+		});
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(502);
+		expect(await res.text()).toBe("handled enter error");
+	});
+
+	test("an enter hook error propagates when no exit hook handles it", async () => {
+		const handlerRan: boolean[] = [];
+		const s = new Server();
+		s.use({
+			enter: () => {
+				throw new Error("enter boom");
+			},
+		});
+		s.add("/x", () => {
+			handlerRan.push(true);
+			return new Response("nope");
+		});
+		await expect(s.fetch("https://example.com/x")).rejects.toThrow("enter boom");
+		expect(handlerRan).toEqual([]);
+	});
+
+	test("an exit hook error propagates and skips remaining exit hooks", async () => {
+		const order: string[] = [];
+		const s = new Server();
+		s.use({
+			exit: () => {
+				order.push("mw1-exit");
+			},
+		});
+		s.use({
+			exit: () => {
+				order.push("mw2-exit");
+				throw new Error("exit boom");
+			},
+		});
+		s.add("/x", () => new Response("ok"));
+		await expect(s.fetch("https://example.com/x")).rejects.toThrow("exit boom");
+		expect(order).toEqual(["mw2-exit"]);
+	});
+
+	test("supports middleware with only an exit hook", async () => {
+		const order: string[] = [];
+		const s = new Server();
+		s.use({
+			exit: () => {
+				order.push("exit");
+			},
+		});
+		s.add("/x", () => {
+			order.push("handler");
+			return new Response("ok");
+		});
+		const res = await s.fetch("https://example.com/x");
+		expect(res.status).toBe(200);
+		expect(order).toEqual(["handler", "exit"]);
 	});
 
 	test("cookies set on ev.cookies are appended to the response on addHeaders", async () => {

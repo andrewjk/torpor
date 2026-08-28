@@ -8,51 +8,59 @@ import requestToNodeMessage from "./requestToNodeMessage";
 // From https://github.com/vikejs/vike-node/blob/main/packages/vike-node/src/runtime/adapters/connectToWeb.ts
 
 /**
- * Converts a Connect-style middleware to a web-compatible request handler.
+ * Converts a Connect-style middleware to a torpor middleware.
+ *
+ * If the Connect handler writes a response, it is returned from the `enter`
+ * hook and the middleware chain is short-circuited. If the handler calls
+ * `next()`, the rest of the chain runs after this middleware completes.
  *
  * @param handler - The Connect-style middleware function to be converted.
- * @returns A function that handles web requests and returns a Response or undefined.
+ * @returns A middleware whose `enter` hook handles the web request.
  */
 export default function connectMiddleware(
 	handler: ConnectMiddleware | ConnectMiddlewareBoolean,
 ): MiddlewareFunction {
-	return async (ev, next) => {
-		const req = requestToNodeMessage(ev.request);
-		const { res, onReadable } = nodeMessageToNodeResponse(req);
+	return {
+		enter: (ev) =>
+			new Promise<Response | void>((resolve, reject) => {
+				const req = requestToNodeMessage(ev.request);
+				const { res, onReadable } = nodeMessageToNodeResponse(req);
 
-		await new Promise<void>((resolve, reject) => {
-			onReadable(({ readable, headers, status }) => {
-				const responseBody: ReadableStream | null = statusCodesWithoutBody.includes(status)
-					? null
-					: (Readable.toWeb(readable) as unknown as ReadableStream);
-				ev.response = new Response(responseBody, {
-					status,
-					headers: flattenHeaders(headers),
+				onReadable(({ readable, headers, status }) => {
+					const responseBody: ReadableStream | null = statusCodesWithoutBody.includes(status)
+						? null
+						: (Readable.toWeb(readable) as unknown as ReadableStream);
+					resolve(
+						new Response(responseBody, {
+							status,
+							headers: flattenHeaders(headers),
+						}),
+					);
 				});
-				resolve();
-			});
 
-			const cnext = (error?: unknown) => {
-				if (error) {
-					// eslint-disable-next-line no-base-to-string
-					reject(error instanceof Error ? error : new Error(String(error)));
-				} else {
-					// TODO: Can we nest the next functions less? This is a bit weird
-					Promise.resolve(next()).then(resolve, reject);
-				}
-			};
-
-			Promise.resolve(handler(req, res, cnext))
-				.then((handled) => {
-					if (handled === false) {
-						res.destroy();
+				const cnext = (error?: unknown) => {
+					if (error) {
+						// eslint-disable-next-line no-base-to-string
+						reject(error instanceof Error ? error : new Error(String(error)));
+					} else {
+						// The Connect handler is passing the request on
 						resolve();
 					}
-				})
-				.catch((e: unknown) => {
-					cnext(e);
-				});
-		});
+				};
+
+				Promise.resolve(handler(req, res, cnext))
+					.then((handled) => {
+						if (handled === false) {
+							res.destroy();
+							// Returning false signals that the request was handled,
+							// so return an empty response to stop the chain
+							resolve(new Response(null, { status: 200 }));
+						}
+					})
+					.catch((e: unknown) => {
+						cnext(e);
+					});
+			}),
 	};
 }
 

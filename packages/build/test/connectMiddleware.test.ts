@@ -18,17 +18,11 @@ describe("connectMiddleware", () => {
 		const mw = connectMiddleware(textHandler(200, "hello"));
 		const req = new Request("https://example.com/");
 		const ev = new ServerEvent(req);
-		let nextCalled = false;
-		await mw(ev, async () => {
-			nextCalled = true;
-		});
-		expect(ev.response).toBeInstanceOf(Response);
-		expect(ev.response!.status).toBe(200);
-		expect(await ev.response!.text()).toBe("hello");
-		expect(ev.response!.headers.get("content-type")).toBe("text/plain");
-		// Connect handler called next(); the wrapped middleware then runs the
-		// web `next` callback to signal it's done
-		expect(nextCalled).toBe(true);
+		const res = await mw.enter!(ev);
+		expect(res).toBeInstanceOf(Response);
+		expect(res!.status).toBe(200);
+		expect(await res!.text()).toBe("hello");
+		expect(res!.headers.get("content-type")).toBe("text/plain");
 	});
 
 	test("forwards the request method and url to the Connect handler", async () => {
@@ -40,9 +34,17 @@ describe("connectMiddleware", () => {
 			next();
 		});
 		const ev = new ServerEvent(new Request("https://example.com/foo?bar=1", { method: "POST" }));
-		await mw(ev, async () => {});
+		await mw.enter!(ev);
 		expect(seen.method).toBe("POST");
 		expect(seen.url).toBe("/foo?bar=1");
+	});
+
+	test("returns undefined when the handler calls next()", async () => {
+		const mw = connectMiddleware((_req, _res, next) => {
+			next();
+		});
+		const ev = new ServerEvent(new Request("https://example.com/"));
+		expect(await mw.enter!(ev)).toBeUndefined();
 	});
 
 	test("rejects when the handler calls next with an error", async () => {
@@ -50,7 +52,7 @@ describe("connectMiddleware", () => {
 			next(new Error("kaboom"));
 		});
 		const ev = new ServerEvent(new Request("https://example.com/"));
-		await expect(mw(ev, async () => {})).rejects.toThrow(/kaboom/);
+		await expect(mw.enter!(ev)).rejects.toThrow(/kaboom/);
 	});
 
 	test("rejects when the handler throws", async () => {
@@ -58,21 +60,17 @@ describe("connectMiddleware", () => {
 			throw new Error("thrown");
 		});
 		const ev = new ServerEvent(new Request("https://example.com/"));
-		await expect(mw(ev, async () => {})).rejects.toThrow(/thrown/);
+		await expect(mw.enter!(ev)).rejects.toThrow(/thrown/);
 	});
 
-	test("resolves without calling web next() when handler returns false", async () => {
+	test("returns an empty response when handler returns false", async () => {
 		const mw = connectMiddleware((_req, res) => {
 			res.end();
 			return false;
 		});
 		const ev = new ServerEvent(new Request("https://example.com/"));
-		let nextCalled = false;
-		await mw(ev, async () => {
-			nextCalled = true;
-		});
-		expect(nextCalled).toBe(false);
-		expect(ev.response).toBeInstanceOf(Response);
+		const res = await mw.enter!(ev);
+		expect(res).toBeInstanceOf(Response);
 	});
 
 	test("carries multi-value Set-Cookie headers through flattenHeaders", async () => {
@@ -82,8 +80,8 @@ describe("connectMiddleware", () => {
 			next();
 		});
 		const ev = new ServerEvent(new Request("https://example.com/"));
-		await mw(ev, async () => {});
-		const setCookies = ev.response!.headers.getSetCookie();
+		const res = await mw.enter!(ev);
+		const setCookies = res!.headers.getSetCookie();
 		// Regression: previously flattened as ["a=1,b=2,c=3", "a=1,b=2,c=3", "a=1,b=2,c=3"]
 		expect(setCookies).toEqual(["a=1", "b=2", "c=3"]);
 	});
@@ -95,8 +93,8 @@ describe("connectMiddleware", () => {
 			next();
 		});
 		const ev = new ServerEvent(new Request("https://example.com/"));
-		await mw(ev, async () => {});
-		expect(ev.response!.status).toBe(204);
-		expect(ev.response!.body).toBeNull();
+		const res = await mw.enter!(ev);
+		expect(res!.status).toBe(204);
+		expect(res!.body).toBeNull();
 	});
 });

@@ -3,8 +3,6 @@ import ServerEvent from "./ServerEvent";
 import type MiddlewareFunction from "./types/MiddlewareFunction";
 import type ServerFunction from "./types/ServerFunction";
 
-const noop = () => {};
-
 /**
  * A Fetch API Request/Response server.
  */
@@ -32,22 +30,46 @@ export default class Server {
 
 		if (this.middleware.length) {
 			// TODO: Get middleware that applies to this route only?
-			await this.middleware[0](ev, buildNext(this.middleware, 0));
-			function buildNext(middleware: MiddlewareFunction[], i: number): () => void | Promise<void> {
-				if (ev.response) {
-					return noop;
+			let entered = 0;
+			let response: Response | undefined = undefined;
+			let error: unknown = undefined;
+			try {
+				for (; entered < this.middleware.length && !response; entered++) {
+					// A middleware returns a Response to short-circuit the request
+					const result = await this.middleware[entered].enter?.(ev);
+					if (result) {
+						response = result;
+					}
 				}
-
-				if (i < middleware.length - 1) {
-					let next = middleware[i + 1];
-					return async () => next(ev, buildNext(middleware, i + 1));
-				} else {
-					return match
-						? async () => {
-								ev.response = await match.fn(ev);
-							}
-						: noop;
+				if (!response && match) {
+					const result = await match.fn(ev);
+					if (result) {
+						response = result;
+					}
 				}
+			} catch (e) {
+				// Exits can handle the error by returning a Response; if none
+				// does, it is rethrown below
+				error = e;
+				ev.error = e;
+			} finally {
+				if (response) {
+					ev.response = response;
+				}
+				// Run exit hooks in reverse order for the middleware that were
+				// entered. An exit hook can return a Response to replace the
+				// response, or to handle ev.error
+				while (entered > 0) {
+					entered--;
+					const result = await this.middleware[entered].exit?.(ev);
+					if (result) {
+						response = result;
+						ev.response = result;
+					}
+				}
+			}
+			if (error && !response) {
+				throw error;
 			}
 		} else if (match) {
 			ev.response = await match.fn(ev);

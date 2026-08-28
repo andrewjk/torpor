@@ -183,18 +183,21 @@ async function loadData(
 
 			const serverParams = buildServerParams(ev, url, params, values);
 
-			if (handler.serverHook) {
-				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-				if (serverHook?.handle) {
-					await serverHook.handle(serverParams);
-				}
+			const serverHook: ServerHook | undefined = handler.serverHook
+				? (await handler.serverHook()).default
+				: undefined;
+			// The hook can return a Response to short-circuit the request
+			const enterResult = await serverHook?.enter?.(serverParams);
+
+			try {
+				const result = enterResult || (await handlerFn(serverParams));
+
+				// If there was no response returned from load (such as errors or a
+				// redirect), send an ok response
+				return result || ok();
+			} finally {
+				await serverHook?.exit?.(serverParams);
 			}
-
-			const result = await handlerFn(serverParams);
-
-			// If there was no response returned from load (such as errors or a
-			// redirect), send an ok response
-			return result || ok();
 		} catch (error) {
 			const response = validationErrorResponse(error);
 			if (response) return response;
@@ -248,100 +251,107 @@ async function loadView(
 
 	// Maybe hit the server hook
 	const serverParams = buildServerParams(ev, url, params, query ? { query } : {});
-	if (handler.serverHook) {
-		const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-		if (serverHook?.handle) {
-			await serverHook.handle(serverParams);
+	const serverHook: ServerHook | undefined = handler.serverHook
+		? (await handler.serverHook()).default
+		: undefined;
+	// The hook can return a Response to short-circuit the request
+	const enterResult = await serverHook?.enter?.(serverParams);
+
+	try {
+		if (enterResult) {
+			return enterResult;
 		}
-	}
 
-	// Pass the data into $props
-	// TODO: Promise.all
-	// NOTE: We're loading data from top to bottom, overriding as we go, and I'm not sure if this is the best way to go
-	let data = {};
-	if (handler.layouts) {
-		for (let layout of handler.layouts) {
-			const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
-			const layoutServerEndPoint: PageServerEndPoint | undefined =
-				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
-			const layoutResponse = await loadClientAndServerData(
-				url,
-				params,
-				serverParams,
-				data,
-				layoutEndPoint,
-				layoutServerEndPoint,
-			);
-			if (layoutResponse?.ok === false) {
-				return layoutResponse;
-			}
-		}
-	}
-	let endPointResponse = await loadClientAndServerData(
-		url,
-		params,
-		serverParams,
-		data,
-		clientEndPoint,
-		serverEndPoint,
-	);
-	if (endPointResponse?.ok === false) {
-		return endPointResponse;
-	}
-	let $props: Record<string, any> = { data };
-
-	let styles = "";
-
-	// If there are layouts, work our way upwards, pushing each component into
-	// the default slot of its parent
-	// TODO: Also handle layout server data
-	// TODO: There's probably a nicer way to do this with reducers or something
-	let component = clientEndPoint.component as ServerComponent;
-	let slots: Record<string, ServerSlotRender> | undefined = undefined;
-	if (handler.layouts) {
-		let slotFunctions: ServerSlotRender[] = [];
-		slotFunctions[handler.layouts.length] = (_, $context) => {
-			let { body, head } = (clientEndPoint.component as ServerComponent)($props, $context);
-			styles += head;
-			return body;
-		};
-		for (let i = handler.layouts.length - 1; i >= 0; i--) {
-			const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
-				?.default;
-			if (layoutEndPoint?.component) {
-				if (i === 0) {
-					component = layoutEndPoint.component as ServerComponent;
-					slots = { _: slotFunctions[i + 1] };
-				} else {
-					slotFunctions[i] = (_, $context) => {
-						let { body, head } = (layoutEndPoint.component as ServerComponent)($props, $context, {
-							_: slotFunctions[i + 1],
-						});
-						styles += head;
-						return body;
-					};
+		// Pass the data into $props
+		// TODO: Promise.all
+		// NOTE: We're loading data from top to bottom, overriding as we go, and I'm not sure if this is the best way to go
+		let data = {};
+		if (handler.layouts) {
+			for (let layout of handler.layouts) {
+				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
+				const layoutServerEndPoint: PageServerEndPoint | undefined =
+					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+				const layoutResponse = await loadClientAndServerData(
+					url,
+					params,
+					serverParams,
+					data,
+					layoutEndPoint,
+					layoutServerEndPoint,
+				);
+				if (layoutResponse?.ok === false) {
+					return layoutResponse;
 				}
 			}
 		}
-	}
+		let endPointResponse = await loadClientAndServerData(
+			url,
+			params,
+			serverParams,
+			data,
+			clientEndPoint,
+			serverEndPoint,
+		);
+		if (endPointResponse?.ok === false) {
+			return endPointResponse;
+		}
+		let $props: Record<string, any> = { data };
 
-	let html;
-	try {
-		let { body, head } = component($props, undefined, slots);
-		styles += head;
-		html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD%", styles);
-	} catch (error) {
-		// TODO: Show a proper Error component
-		html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
-		console.log(error);
-	}
+		let styles = "";
 
-	return new Response(html, {
-		status: 200,
-		headers: {
-			"Content-Type": "text/html",
-		},
-	});
+		// If there are layouts, work our way upwards, pushing each component into
+		// the default slot of its parent
+		// TODO: Also handle layout server data
+		// TODO: There's probably a nicer way to do this with reducers or something
+		let component = clientEndPoint.component as ServerComponent;
+		let slots: Record<string, ServerSlotRender> | undefined = undefined;
+		if (handler.layouts) {
+			let slotFunctions: ServerSlotRender[] = [];
+			slotFunctions[handler.layouts.length] = (_, $context) => {
+				let { body, head } = (clientEndPoint.component as ServerComponent)($props, $context);
+				styles += head;
+				return body;
+			};
+			for (let i = handler.layouts.length - 1; i >= 0; i--) {
+				const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
+					?.default;
+				if (layoutEndPoint?.component) {
+					if (i === 0) {
+						component = layoutEndPoint.component as ServerComponent;
+						slots = { _: slotFunctions[i + 1] };
+					} else {
+						slotFunctions[i] = (_, $context) => {
+							let { body, head } = (layoutEndPoint.component as ServerComponent)($props, $context, {
+								_: slotFunctions[i + 1],
+							});
+							styles += head;
+							return body;
+						};
+					}
+				}
+			}
+		}
+
+		let html;
+		try {
+			let { body, head } = component($props, undefined, slots);
+			styles += head;
+			html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD%", styles);
+		} catch (error) {
+			// TODO: Show a proper Error component
+			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+			console.log(error);
+		}
+
+		return new Response(html, {
+			status: 200,
+			headers: {
+				"Content-Type": "text/html",
+			},
+		});
+	} finally {
+		await serverHook?.exit?.(serverParams);
+	}
 }
 
 async function runAction(
@@ -377,14 +387,17 @@ async function runAction(
 
 				const serverParams = buildServerParams(ev, url, params, form ? { form } : {});
 
-				if (handler.serverHook) {
-					const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-					if (serverHook?.handle) {
-						await serverHook.handle(serverParams);
-					}
-				}
+				const serverHook: ServerHook | undefined = handler.serverHook
+					? (await handler.serverHook()).default
+					: undefined;
+				// The hook can return a Response to short-circuit the action
+				const enterResult = await serverHook?.enter?.(serverParams);
 
-				result = await action(serverParams);
+				try {
+					result = enterResult || (await action(serverParams));
+				} finally {
+					await serverHook?.exit?.(serverParams);
+				}
 			} catch (error) {
 				const response = validationErrorResponse(error);
 				if (response) return response;

@@ -4,6 +4,12 @@ import HeaderHelper from "./HeaderHelper";
 export default class ServerEvent {
 	request: Request;
 	response: Response | undefined | void;
+	/**
+	 * Set when the route handler (or a middleware enter hook) threw an
+	 * error. Exit hooks can return a Response to handle it; if none does,
+	 * the error is rethrown to the caller.
+	 */
+	error: unknown;
 	// TODO: Should we cast types??
 	params?: Record<string, string>;
 

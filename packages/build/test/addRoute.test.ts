@@ -57,7 +57,7 @@ test("addRoute layoutServer creates a _layout/~server route", () => {
 test("addRoute hookServer creates a _hook/~server route", () => {
 	const site = new Site();
 	site.addRoute("/", {
-		hookServer: { handle: async () => undefined },
+		hookServer: { enter: async () => undefined },
 	});
 
 	expect(site.routes).toHaveLength(1);
@@ -67,7 +67,7 @@ test("addRoute hookServer creates a _hook/~server route", () => {
 
 test("addRoute hookServer with subFolder", () => {
 	const site = new Site();
-	site.addRoute("/api", { hookServer: { handle: async () => undefined } }, "api");
+	site.addRoute("/api", { hookServer: { enter: async () => undefined } }, "api");
 
 	expect(site.routes).toHaveLength(1);
 	expect(site.routes[0].path).toBe("/api/_hook/~server");
@@ -92,7 +92,7 @@ test("addRoute with all options in one call", () => {
 		layout: "./src/Layout.torp",
 		layoutServer: { load: async () => undefined },
 		error: "./src/ErrorPage.torp",
-		hookServer: { handle: async () => undefined },
+		hookServer: { enter: async () => undefined },
 	});
 
 	const paths = site.routes.map((r) => ({ path: r.path, type: r.type }));
@@ -100,8 +100,14 @@ test("addRoute with all options in one call", () => {
 	expect(paths).toContainEqual({ path: "/~server", type: PAGE_SERVER_ROUTE });
 	expect(paths).toContainEqual({ path: "/", type: SERVER_ROUTE });
 	expect(paths).toContainEqual({ path: "/_layout", type: LAYOUT_ROUTE });
-	expect(paths).toContainEqual({ path: "/_layout/~server", type: LAYOUT_SERVER_ROUTE });
-	expect(paths).toContainEqual({ path: "/_hook/~server", type: HOOK_SERVER_ROUTE });
+	expect(paths).toContainEqual({
+		path: "/_layout/~server",
+		type: LAYOUT_SERVER_ROUTE,
+	});
+	expect(paths).toContainEqual({
+		path: "/_hook/~server",
+		type: HOOK_SERVER_ROUTE,
+	});
 	expect(paths).toContainEqual({ path: "/_error", type: ERROR_ROUTE });
 });
 
@@ -109,7 +115,7 @@ test("addRoute stores inline endpoints in inlineEndPoints keyed by path:type", (
 	const site = new Site();
 	const pageServerEP = { actions: { default: async () => undefined } };
 	const serverEP = { get: async () => undefined };
-	const hookEP = { handle: async () => undefined };
+	const hookEP = { enter: async () => undefined };
 
 	site.addRoute("/", {
 		pageServer: pageServerEP,

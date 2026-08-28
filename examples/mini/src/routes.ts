@@ -24,7 +24,7 @@ export default function addRoutes(site: Site) {
 		error: "./src/Error.torp",
 		// Server hook — runs on every request before data loading
 		hookServer: {
-			handle: async (event) => {
+			enter: async (event) => {
 				event.appData.hookRan = true;
 			},
 		} satisfies ServerHook,

@@ -5,7 +5,14 @@ import type ServerLoadEvent from "./ServerLoadEvent";
  */
 export default interface ServerHook<Route extends string | undefined = undefined> {
 	/**
-	 * Called on each server request.
+	 * Called before each server request is handled. Return a Response to
+	 * short-circuit the request, skipping the load, action or view rendering
+	 * (e.g. a redirect for unauthenticated users).
 	 */
-	handle?: (event: ServerLoadEvent<Route>) => Promise<void> | void;
+	enter?: (event: ServerLoadEvent<Route>) => Promise<Response | void> | Response | void;
+	/**
+	 * Called after the request has been handled, even if the handler threw
+	 * an error or the enter hook short-circuited it.
+	 */
+	exit?: (event: ServerLoadEvent<Route>) => Promise<void> | void;
 }

@@ -236,7 +236,7 @@ export default class Site {
 	 * // A root layout, server hook, and error page
 	 * site.addRoute("/", {
 	 *   layout: "./src/Layout.torp",
-	 *   hookServer: { handle: async (event) => {} },
+	 *   hookServer: { enter: async (event) => {} },
 	 *   error: "./src/ErrorPage.torp",
 	 * });
 	 *

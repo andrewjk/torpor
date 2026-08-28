@@ -33,11 +33,47 @@ beforeAll(async () => {
 		`,
 	);
 
-	// A hook that we can verify was *not* called for unmatched paths
+	// A simple page /page/+page.ts with an inline component
+	await fs.mkdir(path.join(tmpRoot, "src/routes/page"), { recursive: true });
+	await fs.writeFile(
+		path.join(tmpRoot, "src/routes/page/+page.ts"),
+		`
+		export default {
+			component: () => ({ body: "<p>page</p>", head: "" }),
+		};
+		`,
+	);
+
+	// A hook that records enter/exit calls on a global, so tests can verify
+	// when it did and didn't run. Setting __hookRedirect makes it
+	// short-circuit the request with a redirect response
 	await fs.writeFile(
 		path.join(tmpRoot, "src/routes/_hook.server.ts"),
 		`
-		export default {};
+		export default {
+			enter: (ev) => {
+				(globalThis.__hookCalls ??= []).push("enter:" + ev.url.pathname);
+				if (globalThis.__hookRedirect) {
+					return new Response(null, { status: 302, headers: { location: "/login" } });
+				}
+			},
+			exit: (ev) => {
+				(globalThis.__hookCalls ??= []).push("exit:" + ev.url.pathname);
+			},
+		};
+		`,
+	);
+
+	// A GET /error/+server.ts whose handler throws
+	await fs.mkdir(path.join(tmpRoot, "src/routes/error"), { recursive: true });
+	await fs.writeFile(
+		path.join(tmpRoot, "src/routes/error/+server.ts"),
+		`
+		export default {
+			get: () => {
+				throw new Error("handler boom");
+			},
+		};
 		`,
 	);
 });
@@ -102,5 +138,73 @@ describe("runTest", () => {
 		const ev = new ServerEvent(req);
 		const res = await runTest(site, "/about", ev);
 		expect(await res.json()).toEqual({ cookie: "xyz" });
+	});
+
+	test("runs hook enter before and exit after the handler", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		const res = await runTest(site, "/");
+		expect(res.status).toBe(200);
+		expect((globalThis as any).__hookCalls).toEqual(["enter:/", "exit:/"]);
+	});
+
+	test("does not run the hook for unmatched paths", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		const res = await runTest(site, "/no-such-path");
+		expect(res.status).toBe(404);
+		expect((globalThis as any).__hookCalls).toEqual([]);
+	});
+
+	test("runs hook exit even when the handler throws", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		await expect(runTest(site, "/error")).rejects.toThrow("handler boom");
+		expect((globalThis as any).__hookCalls).toEqual(["enter:/error", "exit:/error"]);
+	});
+
+	test("hook enter can short-circuit an endpoint with a response", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		(globalThis as any).__hookRedirect = true;
+		try {
+			const res = await runTest(site, "/");
+			expect(res.status).toBe(302);
+			expect(res.headers.get("location")).toBe("/login");
+			// The handler was skipped, but exit still ran
+			expect((globalThis as any).__hookCalls).toEqual(["enter:/", "exit:/"]);
+		} finally {
+			(globalThis as any).__hookRedirect = false;
+		}
+	});
+
+	test("hook enter can short-circuit page rendering with a response", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		(globalThis as any).__hookRedirect = true;
+		try {
+			const res = await runTest(site, "/page");
+			expect(res.status).toBe(302);
+			expect(res.headers.get("location")).toBe("/login");
+			// The load and component render were skipped, but exit still ran
+			expect((globalThis as any).__hookCalls).toEqual(["enter:/page", "exit:/page"]);
+		} finally {
+			(globalThis as any).__hookRedirect = false;
+		}
 	});
 });
