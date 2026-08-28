@@ -54,12 +54,22 @@ export default interface Effect {
 
 	/**
 	 * True if the effect's last run read a suspended (`didSuspend`) computed.
-	 * Set by the proxy get trap's suspend-taint propagation. Unused by the
-	 * effect machinery itself (effects don't cache values); present for
-	 * symmetry with Computed and to let `runEffect` skip finalization on a
-	 * suspended run.
+	 * Set by the proxy get trap's suspend-taint propagation and reset at the
+	 * start of each run. Read by `triggerEffects` to detect a crash that may
+	 * have been caused by a pending value.
 	 */
 	didSuspend: boolean;
+
+	/**
+	 * The suspended computeds read during the effect's current (or last
+	 * failed) run, recorded by `suspendRead`. Cleared at the start of each
+	 * run. Read by `triggerEffects` when a run throws with no error boundary
+	 * to handle it: the effect is re-subscribed to these so the promise's
+	 * resolve re-runs it, turning a crash on a pending read's `undefined`
+	 * into a self-healing one-off error instead of a permanently dead
+	 * effect.
+	 */
+	suspendSources?: Set<Computed> | null;
 
 	/**
 	 * The name of the effect, for debugging.

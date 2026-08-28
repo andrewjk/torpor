@@ -19,6 +19,11 @@ export default function runEffect(effect: Effect): void {
 
 	effect.didError = false;
 	effect.errorSources = null;
+	// Reset the per-run suspend state, so `didSuspend` reflects the run that
+	// is about to happen and `suspendSources` doesn't re-subscribe reads
+	// from a previous run (see triggerEffects)
+	effect.didSuspend = false;
+	effect.suspendSources = null;
 
 	batchStart();
 

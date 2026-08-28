@@ -1,7 +1,8 @@
 import context from "../render/context";
 import type Computed from "../types/Computed";
+import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
-import { COMPUTED_TYPE, SIGNAL_TYPE } from "../types/constants";
+import { COMPUTED_TYPE, EFFECT_TYPE, SIGNAL_TYPE } from "../types/constants";
 import $watch from "./$watch";
 import checkComputed from "./checkComputed";
 import propagateSignal from "./propagateSignal";
@@ -39,6 +40,15 @@ function suspendRead(signal: Computed): any {
 	}
 	if (context.activeTarget !== null) {
 		context.activeTarget.didSuspend = true;
+		if (context.activeTarget.type === EFFECT_TYPE) {
+			// Record the suspended read on the effect, so `triggerEffects`
+			// can re-subscribe it if the run crashes with no error boundary
+			// to handle the error — otherwise the crash would detach the
+			// subscription above and the effect would never re-run on
+			// resolve
+			const effect = context.activeTarget as Effect;
+			(effect.suspendSources ??= new Set()).add(signal);
+		}
 	}
 	if (context.awaitBoundary !== null) {
 		context.awaitBoundary.suspended = true;

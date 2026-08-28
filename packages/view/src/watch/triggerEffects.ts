@@ -1,8 +1,28 @@
 import context from "../render/context";
+import type Effect from "../types/Effect";
 import type ProxySignal from "../types/ProxySignal";
 import checkEffect from "./checkEffect";
 import clearTargets from "./clearTargets";
 import routeEffectError from "./routeEffectError";
+import trackSignal from "./trackSignal";
+
+/**
+ * Re-subscribes a failed effect to the suspended computeds its run had read,
+ * after `runEffect`'s catch detached them via `clearSources`. Called when no
+ * error boundary handled the crash: the error still surfaces (see below),
+ * but the promise's resolve re-runs the effect, so a crash caused by a
+ * pending read's `undefined` heals instead of leaving a dead effect.
+ */
+function resubscribeSuspendSources(effect: Effect): void {
+	const sources = effect.suspendSources;
+	if (!sources || sources.size === 0) return;
+	const oldActive = context.activeTarget;
+	context.activeTarget = effect;
+	for (const signal of sources) {
+		trackSignal(signal);
+	}
+	context.activeTarget = oldActive;
+}
 
 /**
  * Runs the effects that have been collected during the batch.
@@ -47,8 +67,16 @@ export default function triggerEffects(): void {
 					unhandledError = { error: routingError };
 				}
 			}
-			if (!handled && unhandledError === null) {
-				unhandledError = { error: err };
+			if (!handled) {
+				// No boundary took the error. If the failed run had read a
+				// suspended $async getter, the crash may be caused by the
+				// pending `undefined` it returned — keep the effect
+				// subscribed so resolve re-runs it (self-heal) while the
+				// error still surfaces below
+				resubscribeSuspendSources(effect);
+				if (unhandledError === null) {
+					unhandledError = { error: err };
+				}
 			}
 		}
 	}

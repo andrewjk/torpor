@@ -456,6 +456,52 @@ through the existing reactive graph on resolve — not an exception walking
 the stack, and not a separate accumulator drained at DOM-insertion. The
 cache indicator is the registration; the reactive graph is the drain.
 
+#### Reading `$async` outside a boundary
+
+A read that reaches `suspendRead` with no enclosing `@await` boundary
+(`context.awaitBoundary === null`) still returns a value instead of
+throwing: `undefined` on a first load (`staleValue` unset), the previous
+value on a refresh suspend (stale-while-revalidate, §6.2). The reader is
+subscribed either way, so when the promise resolves, subscribers re-run
+through the normal reactive graph. This contract is load-bearing:
+`$refresh`-driven views and plain template reads of `$async` getters work
+without an `@await` wrapper precisely because undefined-then-recover holds
+everywhere.
+
+The rule that comes with it: **don't use a first-load read's value as
+data.** It is `undefined` until resolve, so either gate on it
+(`if (user !== undefined) …`), query it through `$pending` (§7.4 — peek
+mode, subscribes without returning a value), or put the read inside
+`@await` so the boundary owns the not-ready state.
+
+Ignoring the rule has two shapes (both seen in DataGrid work):
+
+- **Silent misuse** — the effect body runs with `undefined` (e.g. firing a
+  spurious fetch off it), then self-heals on resolve. Wasteful but
+  recoverable.
+- **Crash** — the body throws on the `undefined` (e.g. reading a property
+  of it). `runEffect`'s catch calls `clearSources`, detaching the very
+  subscription the suspended read had just made — so when no error boundary
+  handles the crash, `triggerEffects` re-subscribes the effect to the
+  suspended reads (`Effect.suspendSources`, recorded by `suspendRead`):
+  the error still surfaces, but the promise's resolve re-runs the effect,
+  which typically succeeds. (Inside `@try`, recovery is owned by the
+  boundary — `errorSources` includes the suspended computed, so its resolve
+  re-attempts the try branch. A crash on the effect's *first* run during
+  component setup is not recoverable this way: it fails the mount, which is
+  the right outcome for a half-built component.)
+
+Rejections surface through the normal error path, not the suspend path:
+after a getter rejects, re-reads throw the cached error (the `didError`
+branch), so an effect reading a rejecting getter needs `@try`/`@error` above
+it or its own try/catch.
+
+Making bare *effects* suspend like boundaries do (deferring the body until
+resolve) was considered and rejected: side effects can't be speculatively
+run and rolled back the way a boundary's speculative content render can,
+and deferring would change the observable contract `$refresh` views are
+built on.
+
 #### Why not throw (decision record)
 
 The throw design reuses `runComputed.ts:21-25`'s error cache for free —

@@ -3,6 +3,48 @@
 Items that were noticed and deliberately left out of scope of a previous change.
 Each entry should describe what was seen, where, and any relevant context.
 
+## Standard schema validation: remaining integration points
+
+Endpoints now support standard schemas for request bodies (`json()`), form
+data (`form()`), query strings (`query()` for get/head handlers and load
+functions) and route params (the reserved `params` schema key). Surfaces
+deliberately left out:
+
+- **Server hook schemas** (`ServerHook.enter`): a hook could declare
+  body/query schemas for cross-cutting validation (auth tokens, session
+  cookies). The `validate()` helper from `@torpor/build/schema` covers this
+  manually for now.
+- **Client load functions** (`+page.ts` / `PageLoadEvent`): query validation
+  for client loads. These run in the browser, so the schema would be included
+  in the client bundle; needs a bundle-cost tradeoff decision.
+- **Response validation**: validating what handlers return (Fastify-style
+  output schemas, potentially feeding OpenAPI generation). Runtime cost on
+  every response; bigger feature.
+- **Client-side pre-submit validation** (`nav/formSubmit.ts`): validate form
+  data in the browser before POSTing for instant feedback. Requires shipping
+  schemas to the client and a shared error shape into `$page.form`.
+- **makeApi query typing**: `makeApi` callers get their body param from the
+  endpoint's json schema, but GET callers can't pass a validated/typed query
+  object; the query string must still be appended to the URL manually.
+- **Layout endpoint schemas**: schemas declared on `_layout.server` endpoints
+  are not applied to the layout's own load/actions; the page's server
+  endpoint schema is the one used for shared params/query validation during
+  SSR.
+- **Reserved schema keys**: on `PageServerEndPoint`, an action literally
+  named `load` or `params` would collide with the reserved `load` (query) and
+  `params` (route params) schema keys. Not enforced or warned about.
+
+## Form re-render runs load query validation against the POST url (edge case)
+
+When a form is submitted without javascript and the action returns a 4xx,
+`runAction` re-renders the view by calling `loadView` with the POST's URL
+(query preserved since this change). The load function's query schema is
+validated against that query. If the form action URL drops query params the
+load schema requires (e.g. a `?page=` param), the re-render fails validation
+and redirects to the error page instead of showing the form errors. A
+possible fix is skipping/satisfying load query validation during form
+re-renders, or rendering from cached load data.
+
 ## Compiler injects runtime imports for $-identifiers in prose text
 
 The .torp compiler injects `$watch` / `$mount` / `$props` etc. into a file's
@@ -43,19 +85,6 @@ weeks that users wrap in rows (or the grid renders days internally). Deferred
 because it alters user-facing composition; everything else in the review was
 fixed inline (single grid element instead of nested grids, reactive
 `selectable` context getter so `aria-readonly`/`tabindex` update).
-
-## $run effects can't read suspended $async getters (view runtime)
-
-Found while building DataGrid: a bare `$run(() => ... $state.someAsyncGetter ...)`
-effect gets `undefined` from a suspended read instead of suspending or
-throwing -- in one scratch case it crashed with `TypeError: Cannot read
-properties of undefined` on first run; in another shape it silently produced
-an unhandled promise rejection when the getter later rejected.
-`@await` boundaries handle suspension correctly; plain effects don't.
-DataGrid works around it by never reading async getters outside the template's
-boundary (active-cell clamping moved into functions called at use sites).
-Worth either documenting as a rule ("only read $async getters inside @await
-boundaries") or making effects suspend like boundaries do.
 
 ## DataGrid: known gaps from the first version
 
@@ -169,4 +198,38 @@ guard armed right before hide. Any future focus-to-open component needs the same
 guard; alternatively the runtime could distinguish script-driven refocus from real
 user focus events.
 
-## $run effects can't read suspended $async getters (view runtime)
+## Language server duplicates @torpor/check's compile-and-check pipeline
+
+Found while modernizing the VS Code extension (now packages/vscode): the LSP server is now a standalone
+workspace package (packages/language-server, with a `torpor-lsp` bin that
+defaults to stdio), but it still carries its own copy of the same pipeline as
+@torpor/check (packages/check/src/) -- transformDocument (compile a .torp
+into TS via @torpor/view, rewrite imports of .torp components into virtual
+.ts files), loadDocument (set up the @typescript/vfs environment from the
+project's tsconfig), and error mapping back to source ranges. They will
+drift. Worth extracting a shared package (e.g. @torpor/analyze) that both the
+CLI check and the language server use.
+
+## TypeScript 7 (native) is not yet supported by the language server
+
+The language server prefers the project's own TypeScript for the language
+service (Volar-style, with a fallback to the version bundled with
+@torpor/language-server), but TypeScript 7's native package does not expose
+the compiler enums (ScriptTarget, ModuleKind, ...) or the same service
+internals, so the loader's compatibility check falls back to the bundled
+version for TS 7 projects. When @typescript/vfs and the service calls are
+updated for the native API, the guard in
+packages/language-server/src/script/typescriptLoader.ts can be lifted.
+Related: the vfs is pointed at the loaded TypeScript's lib folder explicitly
+(`ts.sys.getExecutingFilePath()`), because @typescript/vfs's default
+resolution relies on require(), which doesn't exist in ES modules.
+
+## Zed support needs an extension package plus a tree-sitter grammar
+
+Zed can't consume a language server generically -- it needs an extension
+(extension.toml + a small Rust shim) that registers the language, and Zed
+wants a tree-sitter grammar for syntax highlighting (the TextMate grammar in
+@torpor/textmate can't be used there). Until a tree-sitter-torpor grammar
+exists, the extension can only provide partial support. The language-server
+README documents setups for editors that work today (Neovim, Helix,
+OpenCode).
