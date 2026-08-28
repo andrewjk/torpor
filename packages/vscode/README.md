@@ -9,7 +9,7 @@ completeness.
 The extension provides language support for `.torp` files:
 
 - Syntax highlighting (via the TextMate grammar in
-  [@torpor/textmate](../packages/textmate))
+  [@torpor/textmate](../textmate))
 - Type checking and diagnostics, powered by the Torpor compiler and the
   TypeScript compiler
 - Auto-completion for script, HTML and CSS regions
@@ -57,7 +57,7 @@ other packages directly:
 
 - `@torpor/language-server` (`workspace:^`) provides the language server,
   which bundles the Torpor compiler and TypeScript support -- see
-  [packages/language-server](../packages/language-server). It lives in its
+  [packages/language-server](../language-server). It lives in its
   own package so that other editors (Neovim, Helix, Zed, ...) can use it too
 - `@torpor/textmate` (`workspace:^`) provides the TextMate grammar, which is
   copied into `syntaxes/` as part of the build
@@ -77,7 +77,7 @@ TypeScript's `lib/*.d.ts` files from disk at runtime, via `@typescript/vfs`).
 
 ### Debugging
 
-Open the `language-tools` folder in VS Code and press `F5` ("Launch
+Open the `packages/vscode` folder in VS Code and press `F5` ("Launch
 Extension"). This starts the watch task and opens a new Extension Development
 Host window. To debug the language server itself, use "Attach to Language
 Server" after launching.

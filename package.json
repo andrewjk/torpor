@@ -36,7 +36,6 @@
 	"workspaces": [
 		"packages/adapters/adapter-cloudflare",
 		"packages/adapters/adapter-node",
-		"language-tools",
 		"packages/build",
 		"packages/check",
 		"packages/create-build",
@@ -46,7 +45,8 @@
 		"packages/textmate",
 		"packages/ui",
 		"packages/unplugin",
-		"packages/view"
+		"packages/view",
+		"packages/vscode"
 	],
 	"packageManager": "pnpm@11.20.0"
 }

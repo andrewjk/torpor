@@ -27,7 +27,7 @@ has `@torpor/view` and TypeScript installed.
 ### VS Code
 
 Use the [Torpor extension](https://marketplace.visualstudio.com/items?itemName=Torpor.torpor),
-which bundles this server -- see [language-tools](../../language-tools).
+which bundles this server -- see [packages/vscode](../vscode).
 
 ### Neovim
 
