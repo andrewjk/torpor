@@ -45,6 +45,11 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// No elements on the server
+		} else if (name.startsWith("...") && value != null) {
+			// Spread attributes: serialize each entry (no events on the
+			// server). The value carries the leading `...`, so strip it.
+			status.imports.add("t_spread");
+			attributes.push(`\${t_spread(${value.substring(3)})}`);
 		} else if (name.startsWith("on") || name.startsWith(":on")) {
 			// No events on the server
 		} else if (name.startsWith("transition") && value) {

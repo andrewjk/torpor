@@ -158,15 +158,6 @@ limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
 "Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
 write detection.
 
-## Spread attributes on an element don't compile (view compiler)
-
-Found while building PopoutClickTrigger (src/ui/utils/PopoutClickTrigger.torp):
-rendering `{...attributes()}` (a function returning an attribute object) compiled,
-but the generated code crashed at runtime with `Spread syntax requires
-...iterable[Symbol.iterator] to be a function`. Worked around by spelling the
-attributes out explicitly in each branch of the button/div conditional. Worth either
-supporting (objects should spread as attributes) or rejecting at compile time.
-
 ## refocusAnchorOnHide focuses whatever component anchors the content
 
 When popout content hides, `createPopoutContent` (utils/popoutContent.ts) returns
