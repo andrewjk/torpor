@@ -8,7 +8,6 @@ import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 
 // TODO: Don't cache index.html in dev?
-// TODO: Multiple hook.server locations
 // TODO: Don't reload layouts during client routing
 // TODO: Call the correct +page and +server routes when in the same folder
 

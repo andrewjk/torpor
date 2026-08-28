@@ -64,6 +64,21 @@ beforeAll(async () => {
 		`,
 	);
 
+	// A nested hook, to verify that hooks compose from the root down
+	await fs.writeFile(
+		path.join(tmpRoot, "src/routes/about/_hook.server.ts"),
+		`
+		export default {
+			enter: (ev) => {
+				(globalThis.__hookCalls ??= []).push("leaf-enter:" + ev.url.pathname);
+			},
+			exit: (ev) => {
+				(globalThis.__hookCalls ??= []).push("leaf-exit:" + ev.url.pathname);
+			},
+		};
+		`,
+	);
+
 	// A GET /error/+server.ts whose handler throws
 	await fs.mkdir(path.join(tmpRoot, "src/routes/error"), { recursive: true });
 	await fs.writeFile(
@@ -203,6 +218,39 @@ describe("runTest", () => {
 			expect(res.headers.get("location")).toBe("/login");
 			// The load and component render were skipped, but exit still ran
 			expect((globalThis as any).__hookCalls).toEqual(["enter:/page", "exit:/page"]);
+		} finally {
+			(globalThis as any).__hookRedirect = false;
+		}
+	});
+
+	test("nested hooks run from the root down and exit in reverse", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		const res = await runTest(site, "/about");
+		expect(res.status).toBe(200);
+		expect((globalThis as any).__hookCalls).toEqual([
+			"enter:/about",
+			"leaf-enter:/about",
+			"leaf-exit:/about",
+			"exit:/about",
+		]);
+	});
+
+	test("a hook short-circuit skips later hooks", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		(globalThis as any).__hookCalls = [];
+		(globalThis as any).__hookRedirect = true;
+		try {
+			const res = await runTest(site, "/about");
+			expect(res.status).toBe(302);
+			// The leaf hook never ran; the root hook's exit did
+			expect((globalThis as any).__hookCalls).toEqual(["enter:/about", "exit:/about"]);
 		} finally {
 			(globalThis as any).__hookRedirect = false;
 		}

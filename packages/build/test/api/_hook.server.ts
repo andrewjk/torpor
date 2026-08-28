@@ -1,3 +1,4 @@
 import type { ServerHook } from "@torpor/build";
 
-export default {} satisfies ServerHook;
+const hook: {} = {} satisfies ServerHook;
+export default hook;

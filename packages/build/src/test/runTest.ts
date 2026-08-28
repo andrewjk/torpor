@@ -183,20 +183,30 @@ async function loadData(
 
 			const serverParams = buildServerParams(ev, url, params, values);
 
-			const serverHook: ServerHook | undefined = handler.serverHook
-				? (await handler.serverHook()).default
-				: undefined;
-			// The hook can return a Response to short-circuit the request
-			const enterResult = await serverHook?.enter?.(serverParams);
-
+			const serverHooks = await loadServerHooks(handler);
+			let entered = 0;
+			let enterResponse: Response | undefined = undefined;
 			try {
-				const result = enterResult || (await handlerFn(serverParams));
+				// Hooks run from the root down; a hook's enter can return a
+				// Response to short-circuit the request
+				for (; entered < serverHooks.length && !enterResponse; entered++) {
+					const hookResult = await serverHooks[entered].enter?.(serverParams);
+					if (hookResult) {
+						enterResponse = hookResult;
+					}
+				}
+
+				const result = enterResponse || (await handlerFn(serverParams));
 
 				// If there was no response returned from load (such as errors or a
 				// redirect), send an ok response
 				return result || ok();
 			} finally {
-				await serverHook?.exit?.(serverParams);
+				// Run exit hooks in reverse order for hooks that were entered
+				while (entered > 0) {
+					entered--;
+					await serverHooks[entered].exit?.(serverParams);
+				}
 			}
 		} catch (error) {
 			const response = validationErrorResponse(error);
@@ -249,17 +259,22 @@ async function loadView(
 		}
 	}
 
-	// Maybe hit the server hook
+	// Maybe hit the server hooks
 	const serverParams = buildServerParams(ev, url, params, query ? { query } : {});
-	const serverHook: ServerHook | undefined = handler.serverHook
-		? (await handler.serverHook()).default
-		: undefined;
-	// The hook can return a Response to short-circuit the request
-	const enterResult = await serverHook?.enter?.(serverParams);
-
+	const serverHooks = await loadServerHooks(handler);
+	let entered = 0;
+	let enterResponse: Response | undefined = undefined;
 	try {
-		if (enterResult) {
-			return enterResult;
+		// Hooks run from the root down; a hook's enter can return a Response
+		// to short-circuit the request
+		for (; entered < serverHooks.length && !enterResponse; entered++) {
+			const hookResult = await serverHooks[entered].enter?.(serverParams);
+			if (hookResult) {
+				enterResponse = hookResult;
+			}
+		}
+		if (enterResponse) {
+			return enterResponse;
 		}
 
 		// Pass the data into $props
@@ -350,7 +365,11 @@ async function loadView(
 			},
 		});
 	} finally {
-		await serverHook?.exit?.(serverParams);
+		// Run exit hooks in reverse order for hooks that were entered
+		while (entered > 0) {
+			entered--;
+			await serverHooks[entered].exit?.(serverParams);
+		}
 	}
 }
 
@@ -387,16 +406,26 @@ async function runAction(
 
 				const serverParams = buildServerParams(ev, url, params, form ? { form } : {});
 
-				const serverHook: ServerHook | undefined = handler.serverHook
-					? (await handler.serverHook()).default
-					: undefined;
-				// The hook can return a Response to short-circuit the action
-				const enterResult = await serverHook?.enter?.(serverParams);
-
+				const serverHooks = await loadServerHooks(handler);
+				let entered = 0;
+				let enterResponse: Response | undefined = undefined;
 				try {
-					result = enterResult || (await action(serverParams));
+					// Hooks run from the root down; a hook's enter can return a
+					// Response to short-circuit the action
+					for (; entered < serverHooks.length && !enterResponse; entered++) {
+						const hookResult = await serverHooks[entered].enter?.(serverParams);
+						if (hookResult) {
+							enterResponse = hookResult;
+						}
+					}
+
+					result = enterResponse || (await action(serverParams));
 				} finally {
-					await serverHook?.exit?.(serverParams);
+					// Run exit hooks in reverse order for hooks that were entered
+					while (entered > 0) {
+						entered--;
+						await serverHooks[entered].exit?.(serverParams);
+					}
 				}
 			} catch (error) {
 				const response = validationErrorResponse(error);
@@ -454,6 +483,19 @@ function buildClientParams(url: URL, params: Record<string, any>, data: Record<s
 		params,
 		data,
 	};
+}
+
+/**
+ * Loads the route's server hooks, from the root down
+ */
+async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
+	const hooks: ServerHook[] = [];
+	if (handler.serverHooks) {
+		for (let serverHook of handler.serverHooks) {
+			hooks.push((await serverHook()).default);
+		}
+	}
+	return hooks;
 }
 
 function buildServerParams(

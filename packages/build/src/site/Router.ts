@@ -76,7 +76,7 @@ export default class Router {
 	#loadHandler(handler: RouteHandler, path: string) {
 		handler.layouts = this.#findLayouts(path, handler);
 		handler.serverEndPoint = this.#findServer(path);
-		handler.serverHook = this.#findServerHook(handler);
+		handler.serverHooks = this.#findServerHooks(handler);
 	}
 
 	#findLayouts(path: string, handler: RouteHandler): LayoutHandler[] | undefined {
@@ -113,14 +113,32 @@ export default class Router {
 		return serverRoute && serverRoute.handler.endPoint;
 	}
 
-	#findServerHook(handler: RouteHandler): (() => Promise<any>) | undefined {
-		// TODO: Should this be a collection, like layouts?
-		let serverHookPath = "/_hook/~server";
-		if (handler.subFolder !== undefined) {
-			serverHookPath = handler.subFolder + serverHookPath;
+	#findServerHooks(handler: RouteHandler): (() => Promise<any>)[] | undefined {
+		// Collect the hooks from the root down to the route path, like
+		// layouts. Only hooks with the same subFolder are included, so that
+		// e.g. an `api` set of routes can have its own hooks
+		const hooks: (() => Promise<any>)[] = [];
+		let parts = handler.path
+			// Strip the trailing `~server` (so we don't look for
+			// `~server/_hook/~server` which will never exist)
+			.replace(/\/~server$/, "")
+			// The path will always start with / so splitting e.g.
+			// `/first/second` will result in ['', 'first', 'second'] and
+			// checks for `/_hook/~server`, `/first/_hook/~server` and
+			// `/second/_hook/~server`
+			.split("/");
+		let basePath = "";
+		for (let i = 0; i < parts.length; i++) {
+			if (i > 0) {
+				basePath += "/" + parts[i];
+			}
+			const hookPath = basePath + "/_hook/~server";
+			const hookRoute = this.routes.find((r) => r.path === hookPath);
+			if (hookRoute && hookRoute.handler.subFolder === handler.subFolder) {
+				hooks.push(hookRoute.handler.endPoint);
+			}
 		}
-		const serverHookRoute = this.routes.find((r) => r.path === serverHookPath);
-		return serverHookRoute && serverHookRoute.handler.endPoint;
+		return hooks.length ? hooks : undefined;
 	}
 
 	// HACK: We're doing this here as well as in Site, so that you can use the
