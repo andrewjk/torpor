@@ -134,18 +134,17 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 `values`); worked around by naming the state key `value` like ListBox/Tree do.
 `$bind` could validate that each key exists on both objects and throw in dev.
 
-## View compiler/runtime quirks found while building the new UI components
+## ListBox loading test fails at HEAD: binding through optional chaining
 
-- A second component function with its own `@render` in the same `.torp` file
-  (after the default export) crashes the client build with `TypeError: Cannot
-read properties of undefined (reading 'markup')` in buildTemplate. Same-file
-  plain helper functions are fine. Worked around in Stepper by moving the
-  nested `Marker` component into its own file (src/ui/Stepper/StepperMarker.torp).
-- `<@element self={expr}>` renders the dynamic tag but silently drops all
-  other attributes on it (class, type, aria-label, onclick...). Docs say
-  children/slots are preserved; attributes appear unsupported.
-- Template-literal interpolation with arithmetic on `@for` loop variables
-  miscompiles (details in the section below).
+`pnpm vitest run` in packages/ui: `test/ListBox/loading.test.ts` fails to
+transform at HEAD (predates the compiler fixes for multi-component files and
+`@element` attributes). The fixture binds through an optional chain —
+`&searchText={$props.searchTextState?.v}` in
+`test/ListBox/components/ListBoxLoader.torp` — and the compiler emits
+`$props.searchTextState?.v = …` as an assignment target, which is invalid JS
+(oxc: "Cannot assign to this expression"). Either support binding through
+optional chaining (compile to a guarded write) or reject it at compile time
+with a clear message. Same family as the `$bind` key-mismatch entry below.
 
 ## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
 

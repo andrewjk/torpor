@@ -60,20 +60,37 @@ export default function buildElementNode(
 
 function buildDynamicElementNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	let selfAttribute = node.attributes.find((a) => a.name === "self");
-	if (selfAttribute && selfAttribute.value && selfAttribute.fullyReactive) {
-		status.imports.add("$run");
+
+	if (selfAttribute && selfAttribute.value) {
 		status.imports.add("t_dynamic");
 		let selfValue = selfAttribute.value;
 
-		b.append("$run(() => {");
-		b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
-		b.append(`}${status.options.dev === true ? `, "setDynamic"` : ""});`);
-
-		// Process children with the existing fragment stack (parent's fragment),
-		// so text content effects are properly stashed and emitted by the parent
-		for (let child of node.children) {
-			buildNode(child, status, b, node.varName!, "null");
+		if (selfAttribute.fullyReactive) {
+			// Swap the tag whenever the expression changes. Emitted BEFORE
+			// the attributes below, so the events it stashes (and the
+			// reactive attribute runs) apply to the swapped element;
+			// t_dynamic copies the current attribute values and event
+			// listeners onto the new tag
+			status.imports.add("$run");
+			b.append("$run(() => {");
+			b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
+			b.append(`}${status.options.dev === true ? `, "setDynamic"` : ""});`);
+		} else {
+			// A static (or interpolated, non-reactive) tag: swap once
+			b.append(`${node.varName} = t_dynamic(${node.varName}, ${selfValue});`);
 		}
+	}
+
+	// Apply the element's reactive attributes and events —
+	// buildElementAttributes skips `self` (and &ref) itself. Static
+	// attributes are already in the fragment's template HTML and are
+	// carried across tag swaps by t_dynamic's attribute copy
+	buildElementAttributes(node, node.varName!, status, b);
+
+	// Process children with the existing fragment stack (parent's fragment),
+	// so text content effects are properly stashed and emitted by the parent
+	for (let child of node.children) {
+		buildNode(child, status, b, node.varName!, "null");
 	}
 }
 

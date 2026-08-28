@@ -1,4 +1,5 @@
 import context from "./context";
+import { copyEventListeners } from "./delegatedEvents";
 
 // TODO: Should we @toggle this instead? That would call onmount etc again for the new element
 
@@ -13,6 +14,9 @@ export default function setDynamicElement(el: HTMLElement, tag: string): HTMLEle
 	for (const attr of el.attributes) {
 		newElement.setAttributeNS(null, attr.name, attr.value);
 	}
+	// Carry over event listeners, so a reactive `self` tag change doesn't
+	// silently drop the element's handlers
+	copyEventListeners(el, newElement);
 	newElement.replaceChildren(...el.childNodes.values());
 	el.replaceWith(newElement);
 

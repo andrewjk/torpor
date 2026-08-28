@@ -153,3 +153,56 @@ export function attachDelegatedEvent(
 	ensureDelegatedListener(type);
 	(el as any)[key] = listener;
 }
+
+// Property on an element recording its direct (non-delegated) listeners, so
+// a dynamic-element tag swap (`t_dynamic`) can re-attach them. Direct
+// listeners are the rare path (focus, blur, scroll, …), so the extra
+// per-element array is acceptable next to the delegated-handler slots.
+const DIRECT_LISTENERS = "torp.$directListeners";
+
+/**
+ * Records a direct (non-delegated) listener on the element at attach time,
+ * so `copyEventListeners` can re-attach it after a dynamic-element tag
+ * swap. `addEventListener` listeners can't be discovered after the fact.
+ */
+export function recordDirectListener(
+	el: Element,
+	type: string,
+	listener: (this: Element, ev: any) => any,
+): void {
+	let list = (el as any)[DIRECT_LISTENERS] as
+		| { type: string; listener: (this: Element, ev: any) => any }[]
+		| undefined;
+	if (!list) {
+		list = [];
+		(el as any)[DIRECT_LISTENERS] = list;
+	}
+	list.push({ type, listener });
+}
+
+/**
+ * Copies the event listeners attached to one element onto another — used by
+ * `t_dynamic` so a dynamic element keeps its listeners when its tag changes.
+ * Delegated handlers are `torp.$$<type>` properties, copied per known
+ * delegated type (swaps are rare, so the fixed set of checks is fine);
+ * direct listeners are re-registered from the list `recordDirectListener`
+ * built at attach time.
+ */
+export function copyEventListeners(from: Element, to: Element): void {
+	for (const type of DELEGATED_EVENT_TYPES) {
+		const key = DELEGATE_PREFIX + type;
+		const handler = (from as any)[key];
+		if (handler !== undefined) {
+			(to as any)[key] = handler;
+		}
+	}
+	const direct = (from as any)[DIRECT_LISTENERS] as
+		| { type: string; listener: (this: Element, ev: any) => any }[]
+		| undefined;
+	if (direct) {
+		(to as any)[DIRECT_LISTENERS] = direct;
+		for (const { type, listener } of direct) {
+			to.addEventListener(type, listener);
+		}
+	}
+}

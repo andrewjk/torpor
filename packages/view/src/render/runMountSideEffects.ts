@@ -2,7 +2,11 @@ import type Region from "../types/Region";
 import $run from "../watch/$run";
 import animate from "./animate";
 import context from "./context";
-import { attachDelegatedEvent, isDelegatedEventType } from "./delegatedEvents";
+import {
+	attachDelegatedEvent,
+	isDelegatedEventType,
+	recordDirectListener,
+} from "./delegatedEvents";
 import isFragmentNode from "./isFragmentNode";
 
 /**
@@ -46,6 +50,9 @@ export default function runMountSideEffects(
 				attachDelegatedEvent(event.el, event.type, event.listener);
 			} else {
 				event.el.addEventListener(event.type, event.listener);
+				// Record it on the element, so a dynamic-element tag swap
+				// (t_dynamic) can re-attach the listener on the new element
+				recordDirectListener(event.el, event.type, event.listener);
 			}
 		}
 		context.stashedEvents.length = 0;

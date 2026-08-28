@@ -196,6 +196,7 @@ function buildElementFragmentText(
 	currentFragment.text += `<${tagName}`;
 	let attributesText = node.attributes
 		.filter((a) => !a.name.startsWith("on"))
+		.filter((a) => !(a.name === "self" && node.tagName === "@element"))
 		.map((a) => {
 			if (a.value && a.reactive) {
 				// Adding a placeholder for reactive attributes seems to speed things

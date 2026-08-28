@@ -21,6 +21,7 @@ export default function parseCode(source: string): ParseResult {
 		i: 0,
 		marker: 0,
 		level: 0,
+		braces: [],
 		imports: [],
 		script: [],
 		components: [],
@@ -33,9 +34,17 @@ export default function parseCode(source: string): ParseResult {
 			// Keep going
 		} else if (status.source[status.i] === "{") {
 			status.level += 1;
+			// A brace opened by the main loop is other top-level script (an
+			// interface, type or object literal), not a component function
+			status.braces.push(false);
 		} else if (status.source[status.i] === "}") {
 			status.level -= 1;
-			if (status.level === 0) {
+			// Only a brace that was opened by a component function ends the
+			// component — a closing brace from other top-level script (e.g.
+			// an interface between two components) must not emit an end
+			// marker, or the build's component/chunk bookkeeping desyncs
+			const fromComponent = status.braces.pop();
+			if (status.level === 0 && fromComponent) {
 				parseComponentEnd(status);
 			} else if (status.level < 0) {
 				addError(status, `Unexpected closing brace`, status.i, status.i + 1);
@@ -139,6 +148,10 @@ function parseComponentStart(status: ParseStatus) {
 	let componentStart = status.i;
 	let name = consumeAlphaNumeric(status);
 
+	if (def && status.components.some((c) => c.default)) {
+		addError(status, `Multiple default exports`, componentStart, componentStart + name.length);
+	}
+
 	const current: TemplateComponent = {
 		start: componentStart,
 		name,
@@ -230,6 +243,7 @@ function parseComponentStart(status: ParseStatus) {
 					i: bracesStart + 1,
 					marker: 0,
 					level: 0,
+					braces: [],
 					imports: [],
 					script: [],
 					components: [],
@@ -257,6 +271,8 @@ function parseComponentStart(status: ParseStatus) {
 
 	accept("{", status);
 	status.level += 1;
+	// The component's own brace — its matching close ends the component
+	status.braces.push(true);
 
 	// Sneak in a function type
 	const postFunctionChunk = {
