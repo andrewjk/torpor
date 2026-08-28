@@ -109,7 +109,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	function handleDrop(e: DragEvent) {
 		e.preventDefault();
 		if (getDisabled()) return;
-		e.currentTarget?.removeAttribute("data-state");
+		(e.currentTarget as HTMLElement)?.removeAttribute("data-state");
 		handleFiles(e.dataTransfer?.files);
 	}
 

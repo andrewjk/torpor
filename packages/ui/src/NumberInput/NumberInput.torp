@@ -137,7 +137,7 @@ export default function NumberInput($props: NumberInputProps | undefined) {
 		return Number.isFinite(parsed) ? parsed : null;
 	}
 
-	function setValue(value: number | null, focus = false) {
+	function setValue(value: number | null) {
 		const next = clamp(value);
 		$state.editing = false;
 		if (next !== $state.value) {

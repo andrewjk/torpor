@@ -158,14 +158,6 @@ limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
 "Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
 write detection.
 
-## ui package check: two pre-existing type errors
-
-`pnpm check` in packages/ui reports `FileDrop.torp:111`
-(`removeAttribute` does not exist on `EventTarget`; needs an HTMLElement cast) and
-`NumberInput.torp:139` (`focus` parameter declared but never read). Both predate the
-Tree lazy-loading work; flagged here so they don't get mistaken for regressions from
-later UI work.
-
 ## Spread attributes on an element don't compile (view compiler)
 
 Found while building PopoutClickTrigger (src/ui/utils/PopoutClickTrigger.torp):
