@@ -134,19 +134,29 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 `values`); worked around by naming the state key `value` like ListBox/Tree do.
 `$bind` could validate that each key exists on both objects and throw in dev.
 
-## Optional chaining on a @for loop variable breaks the list change mask (view compiler)
+## replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
-Found while building Tree lazy loading (src/ui/Tree/TreeLoadedChildren.torp): a loop
-body attribute expression using optional chaining directly on the loop variable --
-`hasChildren={child?.hasChildren === true}` -- compiles to a `t_changed_mask`
-function that references the bare identifier, so re-rendering after the list
-resolves throws `ReferenceError: child is not defined` (surfaces as the @try/@catch
-error branch). A plain ternary over the same data (`item ? item.hasChildren === true :
-false`) works, as does mapping items to plain entry objects in script first (the
-DataGrid `$state.rowEntries` pattern, which is what Tree now uses). Sibling in-family:
-member access without `?.` also works. Worth a compiler test + fix. (The related
-template-literal arithmetic issue has since been fixed: `replaceForVarNames` now
-skips string-literal contents.)
+Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
+text, not AST-based. Recently hardened (string/template-literal contents are
+skipped; `?` is a boundary so `item?.x` and `a ?? item` rewrite), but the approach
+still has inherent blind spots:
+
+- **Shadowing**: a nested function's param/`let` with the same name as a loop var
+  gets wrongly rewritten -- `.filter(child => child.ok)` inside a `@for` body
+  rewrites the arrow param into `t_item_1.data` (broken). Scopes are invisible to
+  a text scan; needs an AST pass (e.g. acorn walk renaming resolvable
+  `Identifier` nodes) to fix properly.
+- **No-space operator styles**: `x=child`, `a+b`, `a&&b` etc. aren't caught --
+  the operator characters aren't boundary chars. Usual spaced formatting is fine.
+- **Comments and regex literals** in expressions aren't skipped (a comment
+  containing a loop-var-shaped word gets rewritten; a regex literal containing a
+  quote could desync the string scanner).
+
+Object-literal keys that share a loop var's name are safe only by accident (no
+`:` in the follower class -- adding it would break keys). The same textual
+limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
+"Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
+write detection.
 
 ## ui package check: two pre-existing type errors
 

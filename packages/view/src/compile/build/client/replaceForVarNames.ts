@@ -29,7 +29,11 @@ function replaceVarNames(code: string, status: BuildStatus): string {
 	for (let varName of status.forVarNames) {
 		code = code.replaceAll(
 			new RegExp(
-				`(^|\\s|\\(|\\[|\\{|!|\\.\\.\\.)${varName[0]}($|\\s|\\.|,|\\(|\\)|\\[|\\]|\\}|;)`,
+				// The boundary characters are the ones that can legitimately
+				// precede/follow an identifier reference — including `?` for
+				// optional chaining (`item?.name`) and nullish coalescing
+				// (`fallback ?? item`).
+				`(^|\\s|\\(|\\[|\\{|!|\\?|\\.\\.\\.)${varName[0]}($|\\s|\\.|,|\\(|\\)|\\[|\\]|\\}|;|\\?)`,
 				"g",
 			),
 			`$1${varName[1]}$2`,
