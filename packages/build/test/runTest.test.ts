@@ -44,6 +44,22 @@ beforeAll(async () => {
 		`,
 	);
 
+	// A page /greet/[name]/+page.ts whose client load echoes the params and
+	// data it received, rendered into the body by the component
+	await fs.mkdir(path.join(tmpRoot, "src/routes/greet/[name]"), { recursive: true });
+	await fs.writeFile(
+		path.join(tmpRoot, "src/routes/greet/[name]/+page.ts"),
+		`
+		export default {
+			component: ($props) => ({
+				body: "<p>" + JSON.stringify($props.data) + "</p>",
+				head: "",
+			}),
+			load: (ev) => Response.json({ gotParams: ev.params, gotData: ev.data }),
+		};
+		`,
+	);
+
 	// A hook that records enter/exit calls on a global, so tests can verify
 	// when it did and didn't run. Setting __hookRedirect makes it
 	// short-circuit the request with a redirect response
@@ -153,6 +169,19 @@ describe("runTest", () => {
 		const ev = new ServerEvent(req);
 		const res = await runTest(site, "/about", ev);
 		expect(await res.json()).toEqual({ cookie: "xyz" });
+	});
+
+	test("client load receives route params and accumulated data", async () => {
+		const site = new Site();
+		site.root = tmpRoot;
+		await site.addRouteFolder("src/routes");
+
+		const res = await runTest(site, "/greet/world");
+		expect(res.status).toBe(200);
+		const html = await res.text();
+		// The client load echoes what it was given: params from the URL and
+		// the (still empty) data accumulated by the layouts above
+		expect(html).toContain(JSON.stringify({ gotParams: { name: "world" }, gotData: {} }));
 	});
 
 	test("runs hook enter before and exit after the handler", async () => {

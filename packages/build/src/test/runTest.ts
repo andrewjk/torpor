@@ -451,7 +451,7 @@ async function loadClientAndServerData(
 	serverEndPoint?: PageServerEndPoint,
 ) {
 	if (clientEndPoint?.load) {
-		const clientParams = buildClientParams(url, data, params);
+		const clientParams = buildClientParams(url, params, data);
 		const clientResponse = await clientEndPoint.load(clientParams);
 		if (clientResponse) {
 			if (clientResponse.ok) {
