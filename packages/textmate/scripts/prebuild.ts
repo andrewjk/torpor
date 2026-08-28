@@ -7,8 +7,10 @@ const srcFolder = resolve(scriptsFolder, "../src");
 const grammarFile = join(srcFolder, "grammar.json");
 const outputFile = join(srcFolder, "index.ts");
 
-const grammar = readFileSync(grammarFile, "utf8")
-	.replaceAll(/\s/g, "")
+// Minify with JSON.stringify (not whitespace stripping), since whitespace
+// inside string values is meaningful -- e.g. injection selectors like
+// "L:source.torp - comment - style.group.torp".
+const grammar = JSON.stringify(JSON.parse(readFileSync(grammarFile, "utf8")))
 	.replaceAll("\\", "\\\\")
 	.replaceAll("'", "\\'");
 
