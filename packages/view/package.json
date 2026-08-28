@@ -48,18 +48,18 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
-		"@testing-library/dom": "catalog:",
-		"@testing-library/jest-dom": "catalog:",
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^7.0.0",
 		"@testing-library/user-event": "^14.6.3",
 		"@types/jsdom": "^28.0.3",
 		"@types/node": "^26.1.2",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"fast-glob": "^3.3.3",
 		"jsdom": "^30.0.1",
-		"sucrase": "catalog:",
+		"sucrase": "^3.35.1",
 		"tinybench": "^6.1.2",
 		"tsx": "^4.23.5",
-		"typescript": "catalog:",
+		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
 	}

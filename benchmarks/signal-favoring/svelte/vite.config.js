@@ -1,9 +1,0 @@
-import { svelte } from '@sveltejs/vite-plugin-svelte';
-import { defineConfig } from 'vite-plus';
-
-export default defineConfig({
-	plugins: [svelte()],
-	mode: 'production',
-	build: { target: 'esnext', minify: false },
-	server: { port: 5276, strictPort: true },
-});

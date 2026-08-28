@@ -1,1 +1,0 @@
-../.agents/ui-style.md
