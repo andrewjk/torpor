@@ -1,12 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 import url from "node:url";
+import * as tsvfs from "@typescript/vfs";
 import ts, { type LanguageService } from "typescript";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import type SourceMap from "./SourceMap";
 import { transformDocument } from "./transformDocument";
-
-const tsvfs = require("@typescript/vfs");
 
 export interface VTS {
 	config: ts.CompilerOptions;
@@ -119,10 +118,10 @@ function updateVirtualFile(key: string, content: string, sourceFile: string, map
 }
 
 function loadTypeScriptConfig(): Record<string, any> | undefined {
-	const configFileName = ts.findConfigFile(vts.projectRoot, ts.sys.fileExists);
+	const configFileName = ts.findConfigFile(vts.projectRoot, (path) => ts.sys.fileExists(path));
 	if (configFileName) {
 		vts.configPath = path.dirname(configFileName);
-		const configFile = ts.readConfigFile(configFileName, ts.sys.readFile);
+		const configFile = ts.readConfigFile(configFileName, (path) => ts.sys.readFile(path));
 		return ts.parseJsonConfigFileContent(configFile.config, ts.sys, vts.projectRoot);
 	}
 }

@@ -66,13 +66,13 @@ connection.onInitialize((_params: InitializeParams) => {
 
 connection.onDidChangeConfiguration((_change) => {
 	// Revalidate all open text documents
-	documents.all().forEach(validateTextDocument);
+	documents.all().forEach((document) => void validateTextDocument(document));
 });
 
 // The content of a text document has changed. This event is emitted
 // when the text document first opened or when its content has changed.
 documents.onDidChangeContent((change) => {
-	validateTextDocument(change.document);
+	void validateTextDocument(change.document);
 });
 
 async function validateTextDocument(textDocument: TextDocument) {
@@ -91,7 +91,7 @@ async function validateTextDocument(textDocument: TextDocument) {
 						});
 					}
 				});
-				connection.sendDiagnostics({ uri: latestTextDocument.uri, diagnostics });
+				void connection.sendDiagnostics({ uri: latestTextDocument.uri, diagnostics });
 			}
 		}
 	} catch (e) {

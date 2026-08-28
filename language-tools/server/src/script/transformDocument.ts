@@ -1,11 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
+import { build, parse } from "@torpor/view/compile";
 import pathReplace from "../utils/pathReplace";
 import type SourceMap from "./SourceMap";
 import { type VTS } from "./loadDocument";
-
-const torpor = require("@torpor/view/compile");
-//const torpor = require("../../../../packages/view/dist/compile.mjs");
 
 export interface TransformResult {
 	ok: boolean;
@@ -22,10 +20,10 @@ export function transformDocument(
 ): TransformResult {
 	try {
 		// Build the main file as a component
-		const parsed = torpor.parse(source);
+		const parsed = parse(source);
 
 		// If not ok, don't validate
-		if (!parsed.ok) {
+		if (!parsed.ok || !parsed.template) {
 			return {
 				ok: false,
 				errors: parsed.errors,
@@ -34,7 +32,7 @@ export function transformDocument(
 			};
 		}
 
-		let { code, map } = torpor.build(parsed.template, { mapped: true });
+		let { code, map } = build(parsed.template, { mapped: true });
 
 		code = importComponentFiles(vts, filename, code, map, debug);
 

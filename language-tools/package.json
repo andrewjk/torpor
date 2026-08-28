@@ -1,24 +1,32 @@
 {
 	"name": "torpor",
-	"description": "The Torpor language server.",
-	"author": "",
-	"icon": "logo.png",
-	"license": "ISC",
+	"displayName": "Torpor",
+	"description": "Torpor language support for VS Code: syntax highlighting, diagnostics, completions, hover, go to definition and more for .torp files",
 	"version": "0.3.39",
+	"private": true,
+	"publisher": "torpor",
+	"author": "",
+	"license": "ISC",
+	"icon": "logo.png",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/andrewjk/torpor"
+		"url": "https://github.com/andrewjk/torpor",
+		"directory": "language-tools"
 	},
-	"publisher": "torpor",
-	"categories": [],
-	"keywords": [],
+	"categories": [
+		"Programming Languages"
+	],
+	"keywords": [
+		"torpor",
+		"torp"
+	],
 	"engines": {
-		"vscode": "^1.74.0"
+		"vscode": "^1.105.0"
 	},
 	"activationEvents": [
 		"onLanguage:torpor"
 	],
-	"main": "./client/out/extension",
+	"main": "./dist/client.js",
 	"contributes": {
 		"languages": [
 			{
@@ -42,24 +50,36 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm install && npm run compile",
-		"compile": "tsc -b",
-		"watch": "tsc -b -w",
-		"lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-		"test": "vitest",
-		"postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-		"publish": "vsce publish",
-		"publish:patch": "vsce publish patch",
-		"publish:minor": "vsce publish minor",
-		"publish:major": "vsce publish major"
+		"build": "tsx scripts/build.mts",
+		"watch": "tsx scripts/build.mts --watch",
+		"vscode:prepublish": "pnpm build --pack",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"test": "vp test",
+		"package": "vsce package --no-dependencies",
+		"publish": "vsce publish --no-dependencies",
+		"publish:patch": "vsce publish patch --no-dependencies",
+		"publish:minor": "vsce publish minor --no-dependencies",
+		"publish:major": "vsce publish major --no-dependencies"
+	},
+	"dependencies": {
+		"@torpor/view": "workspace:^",
+		"@typescript/vfs": "^1.6.4",
+		"typescript": "6.0.3",
+		"vscode-css-languageservice": "^6.3.8",
+		"vscode-html-languageservice": "^5.6.0",
+		"vscode-languageclient": "^9.0.1",
+		"vscode-languageserver": "^9.0.1",
+		"vscode-languageserver-textdocument": "^1.0.12"
 	},
 	"devDependencies": {
-		"@types/mocha": "^10.0.10",
-		"@types/node": "^24.10.1",
-		"@typescript-eslint/eslint-plugin": "^8.46.4",
-		"@typescript-eslint/parser": "^8.46.4",
-		"eslint": "^9.39.1",
-		"typescript": "5.5.4",
-		"vitest": "^4.0.8"
+		"@torpor/textmate": "workspace:^",
+		"@types/node": "^26.1.2",
+		"@types/vscode": "^1.105.0",
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"@vscode/vsce": "^3.9.2",
+		"esbuild": "^0.28.1",
+		"tsx": "^4.23.5",
+		"vite-plus": "catalog:",
+		"vitest": "catalog:"
 	}
 }

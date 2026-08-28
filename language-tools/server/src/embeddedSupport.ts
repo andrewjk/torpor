@@ -118,20 +118,27 @@ function getRenderRegions(start: number, documentText: string, regions: Embedded
 		} else if (char === "<" && documentText.substring(i + 1).startsWith("!--")) {
 			// Skip HTML comments
 			i = documentText.indexOf("-->", i) + 2;
-		} else if (char === "<" && /[A-Z]/.test(documentText.substring(i + 1))) {
-			// Component names are function calls
-			i++;
-			regions.push({ languageId: "html", start, end: i });
-			start = i;
-			end = documentText.length;
-			for (let j = i; j < documentText.length; j++) {
-				if (/[\s>]/.test(documentText[j])) {
-					end = j;
-					break;
-				}
+		} else if (char === "<" && /[A-Za-z]/.test(documentText[i + 1] ?? "")) {
+			// Find the end of the tag name. Only component names (which start
+			// with an uppercase letter) are function calls
+			let nameEnd = i + 1;
+			while (nameEnd < documentText.length && /[A-Za-z0-9.$]/.test(documentText[nameEnd])) {
+				nameEnd++;
 			}
-			regions.push({ languageId: "script", start, end });
-			start = i = end;
+			if (/[A-Z]/.test(documentText[i + 1])) {
+				i = nameEnd;
+				regions.push({ languageId: "html", start, end: i });
+				start = i;
+				end = documentText.length;
+				for (let j = i; j < documentText.length; j++) {
+					if (/[\s>]/.test(documentText[j])) {
+						end = j;
+						break;
+					}
+				}
+				regions.push({ languageId: "script", start, end });
+				start = i = end;
+			}
 		} else if (char === '"' || char === "'") {
 			// Skip string contents
 			for (let j = i + 1; j < documentText.length; j++) {

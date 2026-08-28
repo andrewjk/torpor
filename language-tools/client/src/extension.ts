@@ -7,24 +7,26 @@ import {
 	TransportKind,
 } from "vscode-languageclient/node";
 
-let client: LanguageClient;
+let client: LanguageClient | undefined;
 
 export function activate(context: ExtensionContext) {
-	// The server is implemented in node
-	const serverModule = context.asAbsolutePath(path.join("server", "out", "server.js"));
-	// If the extension is launched in debug mode then the debug server options are used
-	// Otherwise the run options are used
+	// The server is bundled into dist by scripts/build.ts
+	const serverModule = context.asAbsolutePath(path.join("dist", "server.js"));
+
+	// If the extension is launched in debug mode then the debug server options
+	// are used. Otherwise the run options are used.
 	const serverOptions: ServerOptions = {
 		run: { module: serverModule, transport: TransportKind.ipc },
 		debug: {
 			module: serverModule,
 			transport: TransportKind.ipc,
+			options: { execArgv: ["--nolazy", "--inspect=6009"] },
 		},
 	};
 
 	// Options to control the language client
 	const clientOptions: LanguageClientOptions = {
-		// Register the server for *.torp documents (defined in the top-level package.json)
+		// Register the server for .torp documents (defined in the package.json)
 		documentSelector: [{ scheme: "file", language: "torpor" }],
 	};
 
@@ -37,7 +39,7 @@ export function activate(context: ExtensionContext) {
 	);
 
 	// Start the client. This will also launch the server
-	client.start();
+	void client.start();
 }
 
 export function deactivate(): Thenable<void> | undefined {

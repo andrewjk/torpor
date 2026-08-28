@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - packages/adapters/*
+  - language-tools
   - site
   - examples/*
 
@@ -23,7 +24,9 @@ peerDependencyRules:
     vitest: "*"
 
 allowBuilds:
+  "@vscode/vsce-sign": true
   esbuild: true
+  keytar: true
   playwright: true
   workerd: true
 

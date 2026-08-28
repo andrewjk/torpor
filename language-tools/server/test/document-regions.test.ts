@@ -141,6 +141,11 @@ function td(source: string): TextDocument {
 			return offset;
 		},
 		lineCount: source.split("\n").length,
+		getLineRange: (line) => {
+			const lineText = source.split("\n")[line] ?? "";
+			return { start: pos(line, 0), end: pos(line, lineText.length) };
+		},
+		getEOLCharacters: () => "\n",
 	};
 }
 

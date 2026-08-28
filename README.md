@@ -22,7 +22,7 @@ Torpor is a full-stack JavaScript framework that aims for simplicity and complet
 
 ## Language Tools
 
-You can install the Torpor language server for VS Code by searching in the extensions sidebar or from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Torpor.torpor). The language server currently only provides syntax highlighting for `.torp` files.
+You can install the Torpor extension for VS Code by searching in the extensions sidebar or from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Torpor.torpor). It provides syntax highlighting, type checking, auto-completion, hover information and go to definition for `.torp` files. See [language-tools](./language-tools) for details.
 
 ## A Simple Component
 
