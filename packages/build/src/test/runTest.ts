@@ -3,6 +3,7 @@ import path from "node:path";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
+import unprocessable from "../response/unprocessable.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import Router from "../site/Router.ts";
 import Site from "../site/Site";
@@ -10,6 +11,7 @@ import $page from "../state/$page.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
+import type ServerRequest from "../types/ServerRequest.ts";
 import {
 	ERROR_ROUTE,
 	HOOK_ROUTE,
@@ -23,6 +25,9 @@ import {
 import type ServerEndPoint from "../types/ServerEndPoint.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
+import type { StandardSchemaV1 } from "../types/StandardSchema.ts";
+import validate from "../validation/validate.ts";
+import ValidationError from "../validation/ValidationError.ts";
 
 /**
  * Runs a site route in test mode
@@ -143,24 +148,54 @@ async function loadData(
 	params: Record<string, string>,
 ) {
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
-	if (serverEndPoint && serverEndPoint[functionName]) {
-		const serverParams = buildServerParams(ev, url, params);
+	// `functionName` is computed from the request method, so the handlers are
+	// accessed through a loose record
+	const handlers = serverEndPoint as unknown as Record<string, ServerRequest | undefined>;
+	const handlerFn: ServerRequest | undefined = handlers?.[functionName];
+	if (serverEndPoint && handlerFn) {
+		try {
+			// If the endpoint declares a schema for this handler, validate the
+			// request body up front and reject with 422 if it fails. Otherwise
+			// the handler reads (and validates) the body itself via `json()`
+			const schema = endPointSchema(serverEndPoint, functionName);
+			const body = schema ? await validate(schema, await ev.json()) : undefined;
 
-		if (handler.serverHook) {
-			const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-			if (serverHook?.handle) {
-				await serverHook.handle(serverParams);
+			const serverParams = buildServerParams(ev, url, params, body);
+
+			if (handler.serverHook) {
+				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
+				if (serverHook?.handle) {
+					await serverHook.handle(serverParams);
+				}
 			}
+
+			const result = await handlerFn(serverParams);
+
+			// If there was no response returned from load (such as errors or a
+			// redirect), send an ok response
+			return result || ok();
+		} catch (error) {
+			if (error instanceof ValidationError) {
+				return unprocessable({ message: error.message, issues: error.issues });
+			}
+			throw error;
 		}
-
-		const result = await serverEndPoint[functionName](serverParams);
-
-		// If there was no response returned from load (such as errors or a
-		// redirect), send an ok response
-		return result || ok();
 	}
 
 	return notFound();
+}
+
+/**
+ * Gets the standard schema declared for a handler, if any. The schemas map
+ * is keyed by handler name; the runtime treats it as a loose record.
+ */
+function endPointSchema(
+	serverEndPoint: ServerEndPoint,
+	functionName: string,
+): StandardSchemaV1 | undefined {
+	return (serverEndPoint.schema as Record<string, StandardSchemaV1 | undefined> | undefined)?.[
+		functionName
+	];
 }
 
 async function loadView(
@@ -359,13 +394,16 @@ function buildServerParams(
 	ev: ServerEvent,
 	url: URL,
 	params: Record<string, string>,
+	body?: unknown,
 ): ServerLoadEvent {
 	return {
 		url,
 		params,
 		appData: {},
 		request: ev.request,
-		json: () => ev.json(),
+		// The body may have been validated already, in which case the request
+		// body has been consumed and the parsed value is returned instead
+		json: () => (body !== undefined ? Promise.resolve(body) : ev.json()),
 		cookies: ev.cookies,
 		headers: ev.headers,
 		adapter: ev.adapter,

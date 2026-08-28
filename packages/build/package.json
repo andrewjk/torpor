@@ -24,6 +24,10 @@
 			"types": "./dist/response.d.mts",
 			"import": "./dist/response.mjs"
 		},
+		"./schema": {
+			"types": "./dist/schema.d.mts",
+			"import": "./dist/schema.mjs"
+		},
 		"./run": {
 			"types": "./dist/run.d.mts",
 			"import": "./dist/run.mjs"

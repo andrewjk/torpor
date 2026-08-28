@@ -8,6 +8,7 @@ export default defineConfig({
 			"src/nav.ts",
 			"src/response.ts",
 			"src/run.ts",
+			"src/schema.ts",
 			"src/server.ts",
 			"src/state.ts",
 			"src/test.ts",

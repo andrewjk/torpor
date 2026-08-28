@@ -20,9 +20,11 @@ import type PageServerLoad from "./types/PageServerLoad";
 import type TypedResponse from "./response/TypedResponse";
 import type { UntypedResponse } from "./response/TypedResponse";
 import type ServerEndPoint from "./types/ServerEndPoint";
+import type { ServerEndPointSchemas } from "./types/ServerEndPoint";
 import type ServerHook from "./types/ServerHook";
 import type ServerLoadEvent from "./types/ServerLoadEvent";
 import type ServerRequest from "./types/ServerRequest";
+import type { StandardSchemaV1 } from "./types/StandardSchema";
 
 // NOTE: Don't export any general functionality from here -- it may result in
 // Vite errors like `Could not resolve '../pkg' in lightningcss` etc
@@ -36,10 +38,12 @@ export type {
 	PageServerLoad,
 	PageServerAction,
 	ServerEndPoint,
+	ServerEndPointSchemas,
 	ServerRequest,
 	ServerHook,
-	PageLoadEvent,
 	ServerLoadEvent,
+	StandardSchemaV1,
+	PageLoadEvent,
 	ParseRouteParams,
 	RouteArgs,
 	RouteArgsOf,
