@@ -1,5 +1,6 @@
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import path from "node:path";
+import formDataToRecord from "../form/formDataToRecord.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
@@ -111,7 +112,9 @@ async function load(router: Router, ev: ServerEvent, template: string): Promise<
 			if (ev.request.method === "GET") {
 				return await loadView(ev, url, handler, params, template);
 			} else if (ev.request.method === "POST") {
-				return await runAction(ev, url, handler, params, query);
+				const serverEndPoint: PageServerEndPoint | undefined =
+					handler.serverEndPoint && (await handler.serverEndPoint()).default;
+				return await runAction(ev, url, handler, serverEndPoint, params, query);
 			}
 			break;
 		}
@@ -120,6 +123,10 @@ async function load(router: Router, ev: ServerEvent, template: string): Promise<
 			// It's a /+page.server.ts or /_layout.server.ts endpoint
 			if (ev.request.method === "GET") {
 				return await loadData(ev, url, handler, "load", params);
+			} else if (ev.request.method === "POST") {
+				const serverEndPoint: PageServerEndPoint | undefined =
+					handler.endPoint && (await handler.endPoint()).default;
+				return await runAction(ev, url, handler, serverEndPoint, params, query);
 			}
 			break;
 		}
@@ -195,6 +202,19 @@ function endPointSchema(
 ): StandardSchemaV1 | undefined {
 	return (serverEndPoint.schema as Record<string, StandardSchemaV1 | undefined> | undefined)?.[
 		functionName
+	];
+}
+
+/**
+ * Gets the standard schema declared for an action, if any. The schemas map
+ * is keyed by action name; the runtime treats it as a loose record.
+ */
+function actionSchema(
+	serverEndPoint: PageServerEndPoint,
+	actionName: string,
+): StandardSchemaV1 | undefined {
+	return (serverEndPoint.schema as Record<string, StandardSchemaV1 | undefined> | undefined)?.[
+		actionName
 	];
 }
 
@@ -317,26 +337,40 @@ async function runAction(
 	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
+	serverEndPoint: PageServerEndPoint | undefined,
 	params: Record<string, string>,
 	query: URLSearchParams,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
-	const serverEndPoint: PageServerEndPoint | undefined =
-		handler.serverEndPoint && (await handler.serverEndPoint()).default;
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
-			const serverParams = buildServerParams(ev, url, params);
+			let result: Response | undefined | void;
+			try {
+				// If the endpoint declares a schema for this action, validate the
+				// submitted form data up front and reject with 422 if it fails
+				const schema = actionSchema(serverEndPoint, actionName);
+				const form = schema
+					? await validate(schema, await formDataToRecord(ev.request))
+					: undefined;
 
-			if (handler.serverHook) {
-				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
-				if (serverHook?.handle) {
-					await serverHook.handle(serverParams);
+				const serverParams = buildServerParams(ev, url, params, undefined, form);
+
+				if (handler.serverHook) {
+					const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
+					if (serverHook?.handle) {
+						await serverHook.handle(serverParams);
+					}
 				}
-			}
 
-			const result = await action(serverParams); // <--
+				result = await action(serverParams);
+			} catch (error) {
+				if (error instanceof ValidationError) {
+					return unprocessable({ message: error.message, issues: error.issues });
+				}
+				throw error;
+			}
 
 			// If there was no response returned from the action (such as errors
 			// or a redirect), reload the page by redirecting
@@ -395,15 +429,20 @@ function buildServerParams(
 	url: URL,
 	params: Record<string, string>,
 	body?: unknown,
+	form?: unknown,
 ): ServerLoadEvent {
 	return {
 		url,
 		params,
 		appData: {},
 		request: ev.request,
-		// The body may have been validated already, in which case the request
-		// body has been consumed and the parsed value is returned instead
-		json: () => (body !== undefined ? Promise.resolve(body) : ev.json()),
+		// The bodies may have been validated already, in which case the request
+		// body has been consumed and the parsed values are returned instead.
+		// Their types come from the endpoint's schemas, so they are loosely
+		// typed here
+		json: (): Promise<any> => (body !== undefined ? Promise.resolve(body) : ev.json()),
+		form: (): Promise<any> =>
+			form !== undefined ? Promise.resolve(form) : formDataToRecord(ev.request),
 		cookies: ev.cookies,
 		headers: ev.headers,
 		adapter: ev.adapter,

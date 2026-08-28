@@ -2,6 +2,7 @@ import { expect, test } from "vite-plus/test";
 import { runTest } from "../src/test";
 import ServerEvent from "../src/server/ServerEvent";
 import Site from "../src/site/Site";
+import type PageServerEndPoint from "../src/types/PageServerEndPoint";
 import type ServerEndPoint from "../src/types/ServerEndPoint";
 import type { StandardSchemaV1 } from "../src/types/StandardSchema";
 
@@ -94,4 +95,103 @@ test("handlers without a schema still read the raw request body", async () => {
 
 	expect(res.status).toBe(200);
 	expect(await res.json()).toEqual({ anything: true });
+});
+
+/**
+ * A minimal standard schema for a form: requires a `title` string and returns
+ * it uppercased as well.
+ */
+const formSchema: StandardSchemaV1<{ title: string }, { title: string; upper: string }> = {
+	"~standard": {
+		version: 1,
+		vendor: "test",
+		validate: (value) => {
+			const title = (value as { title?: unknown } | undefined)?.title;
+			if (typeof title !== "string") {
+				return { issues: [{ message: "title is required", path: ["title"] }] };
+			}
+			return { value: { title, upper: title.toUpperCase() } };
+		},
+		types: { input: undefined as any, output: undefined as any },
+	},
+};
+
+function siteWithSchemaAction(): { site: Site; calls: number[] } {
+	const calls: number[] = [];
+	const site = new Site();
+	site.addRoute("/form", {
+		pageServer: {
+			schema: {
+				default: formSchema,
+			},
+			actions: {
+				default: async (ev) => {
+					calls.push(1);
+					// The form read in the action is the schema's parsed output
+					const form = await ev.form();
+					return new Response(JSON.stringify(form), {
+						headers: { "Content-Type": "application/json" },
+					});
+				},
+			},
+		} satisfies PageServerEndPoint,
+	});
+	return { site, calls };
+}
+
+function formEvent(path: string, title?: string): ServerEvent {
+	const formData = new FormData();
+	if (title !== undefined) formData.append("title", title);
+	const req = new Request(`http://localhost${path}`, { method: "POST", body: formData });
+	return new ServerEvent(req);
+}
+
+test("a valid form submission is parsed and passed to the action", async () => {
+	const { site, calls } = siteWithSchemaAction();
+	const res = await runTest(site, "/form/~server", formEvent("/form/~server", "hello"));
+
+	expect(res.status).toBe(200);
+	expect(await res.json()).toEqual({ title: "hello", upper: "HELLO" });
+	expect(calls).toHaveLength(1);
+});
+
+test("an invalid form submission is rejected with 422 before the action runs", async () => {
+	const { site, calls } = siteWithSchemaAction();
+	const res = await runTest(site, "/form/~server", formEvent("/form/~server"));
+
+	expect(res.status).toBe(422);
+	const body = await res.json();
+	expect(body.message).toBe("Validation failed");
+	expect(body.issues).toEqual([{ message: "title is required", path: ["title"] }]);
+	expect(calls).toHaveLength(0);
+});
+
+test("actions without a schema read the raw form record", async () => {
+	const site = new Site();
+	site.addRoute("/plain", {
+		pageServer: {
+			actions: {
+				default: async (ev) => {
+					const form = await ev.form();
+					return new Response(JSON.stringify(form), {
+						headers: { "Content-Type": "application/json" },
+					});
+				},
+			},
+		} satisfies PageServerEndPoint,
+	});
+
+	const formData = new FormData();
+	formData.append("a", "1");
+	formData.append("b", "2");
+	formData.append("b", "3");
+	const req = new Request("http://localhost/plain/~server", {
+		method: "POST",
+		body: formData,
+	});
+	const res = await runTest(site, "/plain/~server", new ServerEvent(req));
+
+	expect(res.status).toBe(200);
+	// Multiple values for one field come back as an array
+	expect(await res.json()).toEqual({ a: "1", b: ["2", "3"] });
 });

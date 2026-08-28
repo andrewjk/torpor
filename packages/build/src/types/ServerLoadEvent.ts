@@ -3,6 +3,12 @@ import HeaderHelper from "../server/HeaderHelper";
 import type { RouteParamsOf } from "./ParseRouteParams";
 
 /**
+ * The values read from a form submission: one value per field, or an array
+ * when a field was submitted with multiple values (e.g. a multi select).
+ */
+export type FormDataRecord = Record<string, FormDataEntryValue | FormDataEntryValue[]>;
+
+/**
  * The event passed to server functions. Annotate with a route path to get
  * typed params, e.g. `ServerLoadEvent<"/posts/[id]">`, and with a body type
  * to get typed request bodies in API endpoints, e.g.
@@ -12,6 +18,7 @@ import type { RouteParamsOf } from "./ParseRouteParams";
 export default interface ServerLoadEvent<
 	Route extends string | undefined = undefined,
 	Body = unknown,
+	FormBody = FormDataRecord,
 > {
 	/**
 	 * The URL for the server function.
@@ -37,6 +44,12 @@ export default interface ServerLoadEvent<
 	 * Reads the request body as JSON, typed by the event's `Body` annotation.
 	 */
 	json: () => Promise<Body>;
+	/**
+	 * Reads the request body as form data, returning a record of field values.
+	 * When the endpoint declares a schema for the form, the values are
+	 * validated and typed by the schema's output.
+	 */
+	form: () => Promise<FormBody>;
 	/**
 	 * A helper for getting and setting cookie data.
 	 */
