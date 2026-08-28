@@ -4,7 +4,6 @@ import formDataToRecord from "../form/formDataToRecord.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
-import unprocessable from "../response/unprocessable.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import Router from "../site/Router.ts";
 import Site from "../site/Site";
@@ -26,9 +25,15 @@ import {
 import type ServerEndPoint from "../types/ServerEndPoint.ts";
 import type ServerHook from "../types/ServerHook.ts";
 import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
-import type { StandardSchemaV1 } from "../types/StandardSchema.ts";
+import searchParamsToRecord from "../utils/searchParamsToRecord.ts";
 import validate from "../validation/validate.ts";
 import ValidationError from "../validation/ValidationError.ts";
+import {
+	endpointSchema,
+	validateEndpointParams,
+	validateHandlerInput,
+	validationErrorResponse,
+} from "../validation/endpoint.ts";
 
 /**
  * Runs a site route in test mode
@@ -152,7 +157,7 @@ async function loadData(
 	url: URL,
 	handler: RouteHandler,
 	functionName: string,
-	params: Record<string, string>,
+	params: Record<string, any>,
 ) {
 	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
 	// `functionName` is computed from the request method, so the handlers are
@@ -160,14 +165,23 @@ async function loadData(
 	const handlers = serverEndPoint as unknown as Record<string, ServerRequest | undefined>;
 	const handlerFn: ServerRequest | undefined = handlers?.[functionName];
 	if (serverEndPoint && handlerFn) {
+		// Route params come from the URL, so a failed validation means the
+		// resource doesn't exist
 		try {
-			// If the endpoint declares a schema for this handler, validate the
-			// request body up front and reject with 422 if it fails. Otherwise
-			// the handler reads (and validates) the body itself via `json()`
-			const schema = endPointSchema(serverEndPoint, functionName);
-			const body = schema ? await validate(schema, await ev.json()) : undefined;
+			params = await validateEndpointParams(serverEndPoint, params);
+		} catch (error) {
+			if (error instanceof ValidationError) return notFound();
+			throw error;
+		}
 
-			const serverParams = buildServerParams(ev, url, params, body);
+		try {
+			// If the endpoint declares a schema for this handler, validate its
+			// input up front and reject with 422 if it fails. get/head schemas
+			// validate the query string; other schemas validate the json body
+			const schema = endpointSchema(serverEndPoint, functionName);
+			const values = await validateHandlerInput(schema, functionName, url, ev);
+
+			const serverParams = buildServerParams(ev, url, params, values);
 
 			if (handler.serverHook) {
 				const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
@@ -182,9 +196,8 @@ async function loadData(
 			// redirect), send an ok response
 			return result || ok();
 		} catch (error) {
-			if (error instanceof ValidationError) {
-				return unprocessable({ message: error.message, issues: error.issues });
-			}
+			const response = validationErrorResponse(error);
+			if (response) return response;
 			throw error;
 		}
 	}
@@ -192,37 +205,11 @@ async function loadData(
 	return notFound();
 }
 
-/**
- * Gets the standard schema declared for a handler, if any. The schemas map
- * is keyed by handler name; the runtime treats it as a loose record.
- */
-function endPointSchema(
-	serverEndPoint: ServerEndPoint,
-	functionName: string,
-): StandardSchemaV1 | undefined {
-	return (serverEndPoint.schema as Record<string, StandardSchemaV1 | undefined> | undefined)?.[
-		functionName
-	];
-}
-
-/**
- * Gets the standard schema declared for an action, if any. The schemas map
- * is keyed by action name; the runtime treats it as a loose record.
- */
-function actionSchema(
-	serverEndPoint: PageServerEndPoint,
-	actionName: string,
-): StandardSchemaV1 | undefined {
-	return (serverEndPoint.schema as Record<string, StandardSchemaV1 | undefined> | undefined)?.[
-		actionName
-	];
-}
-
 async function loadView(
 	ev: ServerEvent,
 	url: URL,
 	handler: RouteHandler,
-	params: Record<string, string>,
+	params: Record<string, any>,
 	template: string,
 ) {
 	// There must be a client endpoint with a component
@@ -235,8 +222,32 @@ async function loadView(
 	const serverEndPoint: PageServerEndPoint | undefined =
 		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
+	// Validate the route params and the load query against the server
+	// endpoint's schemas, if it declares any. Params come from the URL, so a
+	// failed validation means the resource doesn't exist; a failed query
+	// returns like any other load failure
+	let query: unknown;
+	if (serverEndPoint) {
+		try {
+			params = await validateEndpointParams(serverEndPoint, params);
+		} catch (error) {
+			if (error instanceof ValidationError) return notFound();
+			throw error;
+		}
+		const loadSchema = endpointSchema(serverEndPoint, "load");
+		if (loadSchema) {
+			try {
+				query = await validate(loadSchema, searchParamsToRecord(url.searchParams));
+			} catch (error) {
+				const response = validationErrorResponse(error);
+				if (response) return response;
+				throw error;
+			}
+		}
+	}
+
 	// Maybe hit the server hook
-	const serverParams = buildServerParams(ev, url, params);
+	const serverParams = buildServerParams(ev, url, params, query ? { query } : {});
 	if (handler.serverHook) {
 		const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
 		if (serverHook?.handle) {
@@ -338,7 +349,7 @@ async function runAction(
 	url: URL,
 	handler: RouteHandler,
 	serverEndPoint: PageServerEndPoint | undefined,
-	params: Record<string, string>,
+	params: Record<string, any>,
 	query: URLSearchParams,
 ) {
 	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
@@ -346,16 +357,25 @@ async function runAction(
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
 			// TODO: form.errors etc
+			// Route params come from the URL, so a failed validation means the
+			// resource doesn't exist
+			try {
+				params = await validateEndpointParams(serverEndPoint, params);
+			} catch (error) {
+				if (error instanceof ValidationError) return notFound();
+				throw error;
+			}
+
 			let result: Response | undefined | void;
 			try {
 				// If the endpoint declares a schema for this action, validate the
 				// submitted form data up front and reject with 422 if it fails
-				const schema = actionSchema(serverEndPoint, actionName);
+				const schema = endpointSchema(serverEndPoint, actionName);
 				const form = schema
 					? await validate(schema, await formDataToRecord(ev.request))
 					: undefined;
 
-				const serverParams = buildServerParams(ev, url, params, undefined, form);
+				const serverParams = buildServerParams(ev, url, params, form ? { form } : {});
 
 				if (handler.serverHook) {
 					const serverHook: ServerHook | undefined = (await handler.serverHook()).default;
@@ -366,9 +386,8 @@ async function runAction(
 
 				result = await action(serverParams);
 			} catch (error) {
-				if (error instanceof ValidationError) {
-					return unprocessable({ message: error.message, issues: error.issues });
-				}
+				const response = validationErrorResponse(error);
+				if (response) return response;
 				throw error;
 			}
 
@@ -383,7 +402,7 @@ async function runAction(
 
 async function loadClientAndServerData(
 	url: URL,
-	params: Record<string, string>,
+	params: Record<string, any>,
 	serverParams: ServerLoadEvent,
 	data: Record<string, any>,
 	clientEndPoint?: PageEndPoint,
@@ -416,7 +435,7 @@ async function loadClientAndServerData(
 	}
 }
 
-function buildClientParams(url: URL, params: Record<string, string>, data: Record<string, any>) {
+function buildClientParams(url: URL, params: Record<string, any>, data: Record<string, any>) {
 	return {
 		url,
 		params,
@@ -427,22 +446,26 @@ function buildClientParams(url: URL, params: Record<string, string>, data: Recor
 function buildServerParams(
 	ev: ServerEvent,
 	url: URL,
-	params: Record<string, string>,
-	body?: unknown,
-	form?: unknown,
+	params: Record<string, any>,
+	values: { json?: unknown; form?: unknown; query?: unknown } = {},
 ): ServerLoadEvent {
 	return {
 		url,
 		params,
 		appData: {},
 		request: ev.request,
-		// The bodies may have been validated already, in which case the request
+		// The inputs may have been validated already, in which case the request
 		// body has been consumed and the parsed values are returned instead.
 		// Their types come from the endpoint's schemas, so they are loosely
 		// typed here
-		json: (): Promise<any> => (body !== undefined ? Promise.resolve(body) : ev.json()),
+		json: (): Promise<any> =>
+			values.json !== undefined ? Promise.resolve(values.json) : ev.json(),
 		form: (): Promise<any> =>
-			form !== undefined ? Promise.resolve(form) : formDataToRecord(ev.request),
+			values.form !== undefined ? Promise.resolve(values.form) : formDataToRecord(ev.request),
+		query: (): Promise<any> =>
+			values.query !== undefined
+				? Promise.resolve(values.query)
+				: Promise.resolve(searchParamsToRecord(url.searchParams)),
 		cookies: ev.cookies,
 		headers: ev.headers,
 		adapter: ev.adapter,

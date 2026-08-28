@@ -98,6 +98,44 @@ test("handlers without a schema still read the raw request body", async () => {
 });
 
 /**
+ * A query schema requiring a numeric `page` param, e.g. `?page=2`.
+ */
+const querySchema: StandardSchemaV1<{ page: string }, { page: number }> = {
+	"~standard": {
+		version: 1,
+		vendor: "test",
+		validate: (value) => {
+			const page = (value as { page?: unknown } | undefined)?.page;
+			const n = Number(page);
+			if (page === undefined || Number.isNaN(n)) {
+				return { issues: [{ message: "page is required", path: ["page"] }] };
+			}
+			return { value: { page: n } };
+		},
+		types: { input: undefined as any, output: undefined as any },
+	},
+};
+
+/**
+ * A params schema coercing an `id` param to a number, e.g. `/posts/[id]`.
+ */
+const paramsSchema: StandardSchemaV1<{ id: string }, { id: number }> = {
+	"~standard": {
+		version: 1,
+		vendor: "test",
+		validate: (value) => {
+			const id = (value as { id?: unknown } | undefined)?.id;
+			const n = Number(id);
+			if (id === undefined || Number.isNaN(n)) {
+				return { issues: [{ message: "id is required", path: ["id"] }] };
+			}
+			return { value: { id: n } };
+		},
+		types: { input: undefined as any, output: undefined as any },
+	},
+};
+
+/**
  * A minimal standard schema for a form: requires a `title` string and returns
  * it uppercased as well.
  */
@@ -194,4 +232,144 @@ test("actions without a schema read the raw form record", async () => {
 	expect(res.status).toBe(200);
 	// Multiple values for one field come back as an array
 	expect(await res.json()).toEqual({ a: "1", b: ["2", "3"] });
+});
+
+function siteWithQueryEndpoint(): { site: Site; calls: number[] } {
+	const calls: number[] = [];
+	const site = new Site();
+	site.addRoute("/api/posts", {
+		server: {
+			schema: {
+				get: querySchema,
+			},
+			get: async (ev) => {
+				calls.push(1);
+				const query = await ev.query();
+				return new Response(JSON.stringify(query), {
+					headers: { "Content-Type": "application/json" },
+				});
+			},
+		} satisfies ServerEndPoint<"/api/posts">,
+	});
+	return { site, calls };
+}
+
+function getEvent(path: string): ServerEvent {
+	return new ServerEvent(new Request(`http://localhost${path}`));
+}
+
+test("a valid query string is parsed and passed to a get handler", async () => {
+	const { site, calls } = siteWithQueryEndpoint();
+	const res = await runTest(site, "/api/posts", getEvent("/api/posts?page=2&sort=asc"));
+
+	expect(res.status).toBe(200);
+	// The schema coerces page to a number; unknown params are dropped
+	expect(await res.json()).toEqual({ page: 2 });
+	expect(calls).toHaveLength(1);
+});
+
+test("an invalid query string is rejected with 422 before the handler runs", async () => {
+	const { site, calls } = siteWithQueryEndpoint();
+	const res = await runTest(site, "/api/posts", getEvent("/api/posts"));
+
+	expect(res.status).toBe(422);
+	const body = await res.json();
+	expect(body.issues).toEqual([{ message: "page is required", path: ["page"] }]);
+	expect(calls).toHaveLength(0);
+});
+
+function siteWithParamsEndpoint(): { site: Site; calls: number[] } {
+	const calls: number[] = [];
+	const site = new Site();
+	site.addRoute("/api/posts/[id]", {
+		server: {
+			schema: {
+				params: paramsSchema,
+			},
+			get: async (ev) => {
+				calls.push(1);
+				return new Response(JSON.stringify(ev.params), {
+					headers: { "Content-Type": "application/json" },
+				});
+			},
+		} satisfies ServerEndPoint<"/api/posts/[id]">,
+	});
+	return { site, calls };
+}
+
+test("valid route params are coerced and passed to the handler", async () => {
+	const { site, calls } = siteWithParamsEndpoint();
+	const res = await runTest(site, "/api/posts/5", getEvent("/api/posts/5"));
+
+	expect(res.status).toBe(200);
+	// The schema coerces the id param to a number
+	expect(await res.json()).toEqual({ id: 5 });
+	expect(calls).toHaveLength(1);
+});
+
+test("invalid route params are rejected with 404, since the url can't exist", async () => {
+	const { site, calls } = siteWithParamsEndpoint();
+	const res = await runTest(site, "/api/posts/abc", getEvent("/api/posts/abc"));
+
+	expect(res.status).toBe(404);
+	expect(calls).toHaveLength(0);
+});
+
+function siteWithLoadQuery(): { site: Site; calls: number[] } {
+	const calls: number[] = [];
+	const site = new Site();
+	site.addRoute("/posts", {
+		pageServer: {
+			schema: {
+				load: querySchema,
+			},
+			load: async (ev) => {
+				calls.push(1);
+				const query = await ev.query();
+				return new Response(JSON.stringify(query), {
+					headers: { "Content-Type": "application/json" },
+				});
+			},
+		} satisfies PageServerEndPoint,
+	});
+	return { site, calls };
+}
+
+test("a load function's schema validates the query string", async () => {
+	const { site, calls } = siteWithLoadQuery();
+	const res = await runTest(site, "/posts/~server", getEvent("/posts/~server?page=3"));
+
+	expect(res.status).toBe(200);
+	expect(await res.json()).toEqual({ page: 3 });
+	expect(calls).toHaveLength(1);
+});
+
+test("a load function with an invalid query is rejected with 422", async () => {
+	const { site, calls } = siteWithLoadQuery();
+	const res = await runTest(site, "/posts/~server", getEvent("/posts/~server"));
+
+	expect(res.status).toBe(422);
+	expect(calls).toHaveLength(0);
+});
+
+test("an action's params schema rejects invalid urls with 404", async () => {
+	const site = new Site();
+	site.addRoute("/posts/[id]", {
+		pageServer: {
+			schema: {
+				params: paramsSchema,
+			},
+			actions: {
+				default: async () => new Response("ok"),
+			},
+		} satisfies PageServerEndPoint,
+	});
+
+	const req = new Request("http://localhost/posts/[id]/~server".replace("[id]", "abc"), {
+		method: "POST",
+		body: new FormData(),
+	});
+	const res = await runTest(site, "/posts/abc/~server", new ServerEvent(req));
+
+	expect(res.status).toBe(404);
 });

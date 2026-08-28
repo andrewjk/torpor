@@ -1,8 +1,11 @@
 import ok from "../response/ok";
-import type PageServerAction from "./PageServerAction";
+import type {
+	ActionBody,
+	LoadParams,
+	LoadQuery,
+	PageServerActionSchemas,
+} from "./PageServerEndPoint";
 import type PageServerEndPoint from "./PageServerEndPoint";
-import type { PageServerActionSchemas } from "./PageServerEndPoint";
-import type { FormDataRecord } from "./ServerLoadEvent";
 import type { StandardSchemaV1 } from "./StandardSchema";
 
 type Equals<A, B> =
@@ -11,6 +14,8 @@ type Expect<T extends true> = T;
 
 // A mock schema library's schema, with input and output types
 declare const postSchema: StandardSchemaV1<{ title: string }, { title: string; upper: string }>;
+declare const querySchema: StandardSchemaV1<{ page: string }, { page: number }>;
+declare const paramsSchema: StandardSchemaV1<{ id: string }, { id: number }>;
 
 const schemas: { default: typeof postSchema } = { default: postSchema };
 
@@ -24,41 +29,77 @@ export const endPoint: PageServerEndPoint<"/form", Record<string, any>, typeof s
 	},
 };
 
-// The body type inferred for a named action, from the schemas object
-type ActionForm<Schemas extends PageServerActionSchemas, Name extends string> = [Name] extends [
-	keyof Schemas & string,
-]
-	? Schemas[Name] extends StandardSchemaV1
-		? StandardSchemaV1.InferOutput<Schemas[Name]>
-		: FormDataRecord
-	: FormDataRecord;
-
-// The default action's form() returns the schema's output type
+// The type helpers behind the load/action signatures
 export type A01 = Expect<
-	Equals<ActionForm<typeof schemas, "default">, { title: string; upper: string }>
+	Equals<ActionBody<typeof schemas, "default">, { title: string; upper: string }>
+>;
+export type A02 = Expect<
+	Equals<
+		ActionBody<typeof schemas, "missing">,
+		Record<string, FormDataEntryValue | FormDataEntryValue[]>
+	>
+>;
+export type A03 = Expect<
+	Equals<
+		ActionBody<PageServerActionSchemas, "default">,
+		Record<string, FormDataEntryValue | FormDataEntryValue[]>
+	>
 >;
 
-// Actions without a schema keep the loose form record type
-export type A02 = Expect<Equals<ActionForm<typeof schemas, "missing">, FormDataRecord>>;
-export type A03 = Expect<Equals<ActionForm<PageServerActionSchemas, "default">, FormDataRecord>>;
+// The load function's schema (the `load` key) types the query string
+const querySchemas: { load: typeof querySchema } = { load: querySchema };
+export type A04 = Expect<Equals<LoadQuery<typeof querySchemas>, { page: number }>>;
+export type A05 = Expect<
+	Equals<LoadQuery<PageServerActionSchemas>, Record<string, string | string[]>>
+>;
 
-// An untyped (annotated) action event's form() returns the loose record
-const plainAction: PageServerAction<"/form"> = async ({ form }) =>
-	ok({ title: (await form()).title });
-type PlainForm = Awaited<ReturnType<Parameters<typeof plainAction>[0]["form"]>>;
-export type A04 = Expect<Equals<PlainForm, FormDataRecord>>;
+// The `params` key types the params of the load function and actions
+const paramSchemas: { params: typeof paramsSchema } = { params: paramsSchema };
+export type A06 = Expect<Equals<LoadParams<typeof paramSchemas, "/posts/[id]">, { id: number }>>;
+export type A07 = Expect<
+	Equals<LoadParams<PageServerActionSchemas, "/posts/[id]">, { id: string }>
+>;
 
-// Typed ok() bodies still flow through actions (PageForm's source)
-declare const typedAction: PageServerAction<"/form", { title: string; upper: string }>;
-type TypedReturn = Awaited<ReturnType<typeof typedAction>>;
-export type A05 = Expect<Equals<TypedReturn, Response | undefined | void>>;
+// An endpoint using all of them: the `page` access below compiles only when
+// the load's query is typed from its schema
+export const fullEndPoint: PageServerEndPoint<
+	"/posts/[id]",
+	Record<string, any>,
+	{ params: typeof paramsSchema; load: typeof querySchema; default: typeof postSchema }
+> = {
+	schema: {
+		params: paramsSchema,
+		load: querySchema,
+		default: postSchema,
+	},
+	load: async ({ params, query }) => ok({ id: params.id, page: (await query()).page }),
+	actions: {
+		default: async ({ params, form }) => ok({ id: params.id, title: (await form()).upper }),
+	},
+};
 
-// Usage: the schema property is optional, as before
-const noSchemaEndPoint: PageServerEndPoint<"/form"> = {
+// An untyped action keeps the loose form record and string params
+type PlainAction = NonNullable<NonNullable<typeof plainEndPoint.actions>["default"]>;
+const plainEndPoint: PageServerEndPoint<"/form"> = {
 	actions: {
 		default: async ({ form }) => ok({ title: (await form()).title }),
 	},
 };
-export type A06 = Expect<
-	Equals<typeof noSchemaEndPoint extends { schema?: unknown } ? true : false, true>
+type PlainEvent = Parameters<PlainAction>[0];
+export type A08 = Expect<
+	Equals<
+		Awaited<ReturnType<PlainEvent["form"]>>,
+		Record<string, FormDataEntryValue | FormDataEntryValue[]>
+	>
+>;
+
+// Typed ok() bodies still flow through actions (PageForm's source)
+type DefaultReturn = Awaited<
+	ReturnType<NonNullable<NonNullable<typeof endPoint.actions>["default"]>>
+>;
+export type A09 = Expect<Equals<DefaultReturn, Response | undefined | void>>;
+
+// The schema property is optional, as before
+export type A10 = Expect<
+	Equals<PageServerEndPoint extends { schema?: unknown } ? true : false, true>
 >;
