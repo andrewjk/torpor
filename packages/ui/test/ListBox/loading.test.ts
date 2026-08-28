@@ -3,6 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { mount, $watch } from "@torpor/view";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import ListBoxLoader from "./components/ListBoxLoader.torp";
+import ListBoxLoaderSlotted from "./components/ListBoxLoaderSlotted.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
 
@@ -130,13 +131,9 @@ describe("ListBox - loading options from a loader", () => {
 		const loader = createDeferredLoader();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, ListBoxLoader as any, {
+		mount(container, ListBoxLoaderSlotted as any, {
 			load: loader.load,
-			slotItems: true,
 		});
-
-		loader.resolveNext({ items: [{ id: 1, label: "Loaded" }] });
-		await tick();
 
 		// The loader never runs because real content was slotted in
 		expect(loader.requests.length).toBe(0);

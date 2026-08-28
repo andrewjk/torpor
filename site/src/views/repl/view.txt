@@ -248,6 +248,14 @@ function routeEffectError(effect, error) {
 	}
 	return false;
 }
+function resubscribeSuspendSources(effect) {
+	const sources = effect.suspendSources;
+	if (!sources || sources.size === 0) return;
+	const oldActive = context.activeTarget;
+	context.activeTarget = effect;
+	for (const signal of sources) trackSignal(signal);
+	context.activeTarget = oldActive;
+}
 function triggerEffects() {
 	let unhandledError = null;
 	const queue = context.effectsToRun;
@@ -264,7 +272,10 @@ function triggerEffects() {
 			} catch (routingError) {
 				if (unhandledError === null) unhandledError = { error: routingError };
 			}
-			if (!handled && unhandledError === null) unhandledError = { error: err };
+			if (!handled) {
+				resubscribeSuspendSources(effect);
+				if (unhandledError === null) unhandledError = { error: err };
+			}
 		}
 	}
 	for (let effect of queue) effect.queued = false;
@@ -301,6 +312,8 @@ function runEffect(effect) {
 	const oldExtent = context.extent;
 	effect.didError = false;
 	effect.errorSources = null;
+	effect.didSuspend = false;
+	effect.suspendSources = null;
 	batchStart();
 	try {
 		if (context.previousEffect !== null) context.previousEffect.nextEffect = effect;
@@ -451,6 +464,30 @@ function attachDelegatedEvent(el, type, listener) {
 	ensureDelegatedListener(type);
 	el[key] = listener;
 }
+const DIRECT_LISTENERS = "torp.$directListeners";
+function recordDirectListener(el, type, listener) {
+	let list = el[DIRECT_LISTENERS];
+	if (!list) {
+		list = [];
+		el[DIRECT_LISTENERS] = list;
+	}
+	list.push({
+		type,
+		listener
+	});
+}
+function copyEventListeners(from, to) {
+	for (const type of DELEGATED_EVENT_TYPES) {
+		const key = DELEGATE_PREFIX + type;
+		const handler = from[key];
+		if (handler !== void 0) to[key] = handler;
+	}
+	const direct = from[DIRECT_LISTENERS];
+	if (direct) {
+		to[DIRECT_LISTENERS] = direct;
+		for (const { type, listener } of direct) to.addEventListener(type, listener);
+	}
+}
 function isFragmentNode(node) {
 	return node.nodeType === 11;
 }
@@ -462,7 +499,10 @@ function runMountSideEffects(parent, activeRegion, hydrationNode) {
 	}
 	if (context.stashedEvents.length > 0) {
 		for (let event of context.stashedEvents) if (isDelegatedEventType(event.type)) attachDelegatedEvent(event.el, event.type, event.listener);
-		else event.el.addEventListener(event.type, event.listener);
+		else {
+			event.el.addEventListener(event.type, event.listener);
+			recordDirectListener(event.el, event.type, event.listener);
+		}
 		context.stashedEvents.length = 0;
 	}
 	for (let animation of context.stashedAnimations) {
@@ -970,7 +1010,13 @@ function suspendRead(signal) {
 		if (!signal.suspendQuiet) context.suspendPeekHit = true;
 		return;
 	}
-	if (context.activeTarget !== null) context.activeTarget.didSuspend = true;
+	if (context.activeTarget !== null) {
+		context.activeTarget.didSuspend = true;
+		if (context.activeTarget.type === 2) {
+			const effect = context.activeTarget;
+			(effect.suspendSources ??= /* @__PURE__ */ new Set()).add(signal);
+		}
+	}
 	if (context.awaitBoundary !== null) {
 		context.awaitBoundary.suspended = true;
 		context.awaitBoundary.pending.add(signal);
@@ -1480,6 +1526,7 @@ function setDynamicElement(el, tag) {
 	if (context.hydrationNode !== null) return el;
 	let newElement = el.ownerDocument.createElement(tag);
 	for (const attr of el.attributes) newElement.setAttributeNS(null, attr.name, attr.value);
+	copyEventListeners(el, newElement);
 	newElement.replaceChildren(...el.childNodes.values());
 	el.replaceWith(newElement);
 	return newElement;

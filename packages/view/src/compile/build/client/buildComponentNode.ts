@@ -1,6 +1,7 @@
 import type SourceSpan from "../../types/SourceSpan";
 import type ElementNode from "../../types/nodes/ElementNode";
 import Builder from "../../utils/Builder";
+import bindingTarget from "../../utils/bindingTarget";
 import isSpecialNode from "../../utils/isSpecialNode";
 import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
@@ -67,7 +68,7 @@ export default function buildComponentNode(
 						spans: [span],
 					});
 					runs.push(`${propsName}["${name}"] = ${value};`);
-					bindingRuns.push(`${value} = ${propsName}["${name}"];`);
+					bindingRuns.push(bindingTarget(value, `${propsName}["${name}"]`, name, status.imports));
 				} else if (name.startsWith("...")) {
 					// It's a spread property
 					name = "";

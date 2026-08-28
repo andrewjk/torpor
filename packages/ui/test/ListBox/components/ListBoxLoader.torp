@@ -1,4 +1,4 @@
-import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+import { ListBox } from "../../../src/ListBox/index";
 
 /** A ListBox that loads its options from the `load` prop */
 export default function ListBoxLoader($props: any) {
@@ -11,10 +11,6 @@ export default function ListBoxLoader($props: any) {
 			getItemValue={$props.getItemValue}
 			&searchText={$props.searchTextState?.v}
 			onchange={$props.onchange}
-		>
-			@if ($props.slotItems) {
-				<ListBoxItem value="slotted">Slotted</ListBoxItem>
-			}
-		</ListBox>
+		/>
 	}
 }

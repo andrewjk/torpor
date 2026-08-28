@@ -134,18 +134,6 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 `values`); worked around by naming the state key `value` like ListBox/Tree do.
 `$bind` could validate that each key exists on both objects and throw in dev.
 
-## ListBox loading test fails at HEAD: binding through optional chaining
-
-`pnpm vitest run` in packages/ui: `test/ListBox/loading.test.ts` fails to
-transform at HEAD (predates the compiler fixes for multi-component files and
-`@element` attributes). The fixture binds through an optional chain —
-`&searchText={$props.searchTextState?.v}` in
-`test/ListBox/components/ListBoxLoader.torp` — and the compiler emits
-`$props.searchTextState?.v = …` as an assignment target, which is invalid JS
-(oxc: "Cannot assign to this expression"). Either support binding through
-optional chaining (compile to a guarded write) or reject it at compile time
-with a clear message. Same family as the `$bind` key-mismatch entry below.
-
 ## Template-literal arithmetic miscompiles inside @for attribute values (view compiler)
 
 Found while building the Carousel indicators (src/ui/Carousel/CarouselIndicators.torp):

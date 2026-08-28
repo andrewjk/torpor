@@ -1,0 +1,15 @@
+import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
+
+/** A ListBox with a slotted item, which takes precedence over the loader */
+export default function ListBoxLoaderSlotted($props: any) {
+	@render {
+		<ListBox
+			ariaLabel="Items"
+			load={$props.load}
+			getItemLabel={$props.getItemLabel}
+			getItemValue={$props.getItemValue}
+		>
+			<ListBoxItem value="slotted">Slotted</ListBoxItem>
+		</ListBox>
+	}
+}
