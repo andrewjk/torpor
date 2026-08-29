@@ -137,11 +137,14 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 ## replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
-text, not AST-based. Recently hardened (string/template-literal contents are
+text, not AST-based. Recently hardened: string/template-literal contents are
 skipped; `?` is a boundary so `item?.x` and `a ?? item` rewrite; comments are
-skipped too -- an apostrophe inside a `//` comment used to swallow the rest of
-the expression as an unterminated string, which broke TagInput's suggestion
-clicks). The approach still has inherent blind spots:
+skipped (an apostrophe inside a `//` comment used to swallow the rest of the
+expression as an unterminated string, which broke TagInput's suggestion
+clicks); regex literals are skipped too. The string/template/comment/regex
+skipping itself now lives in one shared scanner (`compile/utils/codeScanner.ts`,
+with unit tests) used by the parse and build phases. The rewriting approach
+still has inherent blind spots:
 
 - **Shadowing**: a nested function's param/`let` with the same name as a loop var
   gets wrongly rewritten -- `.filter(child => child.ok)` inside a `@for` body
@@ -150,8 +153,9 @@ clicks). The approach still has inherent blind spots:
   `Identifier` nodes) to fix properly.
 - **No-space operator styles**: `x=child`, `a+b`, `a&&b` etc. aren't caught --
   the operator characters aren't boundary chars. Usual spaced formatting is fine.
-- **Regex literals** in expressions aren't skipped (a `/` that starts a regex
-  followed by a quote-like character could desync the string scanner).
+- **Regex-vs-division disambiguation is a lexical heuristic** (previous
+  significant token + keyword list), not a real parse -- exotic ASI cases
+  (`a = b\n/c/`) could still fool it.
 
 Object-literal keys that share a loop var's name are safe only by accident (no
 `:` in the follower class -- adding it would break keys). The same textual

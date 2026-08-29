@@ -1,6 +1,5 @@
 import type TextNode from "../../types/nodes/TextNode";
-import endOfString from "../../utils/endOfString";
-import endOfTemplateString from "../../utils/endOfTemplateString";
+import { skipStringOrComment } from "../../utils/codeScanner";
 import type BuildServerStatus from "./BuildServerStatus";
 
 export default function buildServerTextNode(node: TextNode, status: BuildServerStatus): void {
@@ -16,7 +15,6 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 	let level = 0;
 	for (let i = 0; i < content.length; i++) {
 		const char = content[i];
-		const nextChar = content[i + 1];
 		if (char === "{") {
 			level++;
 			if (level === 1) {
@@ -33,29 +31,12 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 			// Escape backticks outside of braces, as they will be within a backtick string
 			status.output += "\\";
 		} else if (level > 0) {
-			if (char === "/" && nextChar === "/") {
-				// Skip one-line comments
-				let start = i;
-				i = content.indexOf("\n", i);
-				status.output += escapeHtml(content.substring(start, i + 1));
-				continue;
-			} else if (char === "/" && nextChar === "*") {
-				// Skip block comments
-				let start = i;
-				i = content.indexOf("*/", i) + 1;
-				status.output += escapeHtml(content.substring(start, i + 1));
-				continue;
-			} else if (char === '"' || char === "'") {
-				// Skip string contents
-				let start = i;
-				i = endOfString(char, content, i);
-				status.output += escapeHtml(content.substring(start, i + 1));
-				continue;
-			} else if (char === "`") {
-				// Skip interpolated string contents
-				let start = i;
-				i = endOfTemplateString(content, i);
-				status.output += escapeHtml(content.substring(start, i + 1));
+			const skipped = skipStringOrComment(content, i);
+			if (skipped !== -1) {
+				// Copy strings, template strings, comments and regex literals
+				// into the output as-is (HTML-escaped)
+				status.output += escapeHtml(content.substring(i, skipped));
+				i = skipped - 1;
 				continue;
 			}
 		}

@@ -1,8 +1,7 @@
 import type SourceSpan from "../types/SourceSpan";
 import type ElementNode from "../types/nodes/ElementNode";
 import type TextNode from "../types/nodes/TextNode";
-import endOfString from "../utils/endOfString";
-import endOfTemplateString from "../utils/endOfTemplateString";
+import { skipStringOrComment } from "../utils/codeScanner";
 import isTextNode from "../utils/isTextNode";
 import type ParseStatus from "./ParseStatus";
 import isSpaceChar from "./utils/isSpaceChar";
@@ -28,26 +27,19 @@ export default function parseText(status: ParseStatus, element: ElementNode): vo
 			let level = 0;
 			for (let k = j; k < status.source.length; k++) {
 				const char = status.source[k];
-				const nextChar = status.source[k + 1];
-				if (char === "/" && nextChar === "/") {
-					// Skip one-line comments
-					k = status.source.indexOf("\n", k);
-				} else if (char === "/" && nextChar === "*") {
-					// Skip block comments
-					k = status.source.indexOf("*/", k) + 1;
-				} else if (char === '"' || char === "'") {
-					// Skip string contents
-					k = endOfString(char, status.source, k);
-				} else if (char === "`") {
-					// Skip template string contents
-					k = endOfTemplateString(status.source, k);
-				} else if (char === "{") {
+				if (char === "{") {
 					level += 1;
 				} else if (char === "}") {
 					level -= 1;
 					if (level === 0) {
 						j = k;
 						break;
+					}
+				} else {
+					// Skip strings, template strings, comments and regex literals
+					const skipped = skipStringOrComment(status.source, k);
+					if (skipped !== -1) {
+						k = skipped - 1;
 					}
 				}
 			}

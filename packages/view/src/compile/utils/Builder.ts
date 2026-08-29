@@ -1,4 +1,4 @@
-import endOfTemplateString from "./endOfTemplateString";
+import { skipStringOrComment } from "./codeScanner";
 
 export default class Builder {
 	#text = "";
@@ -58,7 +58,7 @@ export default class Builder {
 				while (i < text.length && text[i] !== "\n") {
 					// Just add backticked text as-is
 					if (text[i] === "`") {
-						i = endOfTemplateString(text, i);
+						i = skipStringOrComment(text, i) - 1;
 					}
 					i++;
 				}

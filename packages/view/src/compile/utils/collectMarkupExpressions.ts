@@ -3,8 +3,7 @@ import type ElementNode from "../types/nodes/ElementNode";
 import type ParentNode from "../types/nodes/ParentNode";
 import type TemplateNode from "../types/nodes/TemplateNode";
 import type TextNode from "../types/nodes/TextNode";
-import endOfString from "./endOfString";
-import endOfTemplateString from "./endOfTemplateString";
+import { skipStringOrComment } from "./codeScanner";
 import isParentNode from "./isParentNode";
 
 /**
@@ -45,15 +44,16 @@ export default function collectMarkupExpressions(root: TemplateNode): string {
 }
 
 /**
- * Extracts the `{expr}` interpolation segments from text content, skipping
- * string literals and comments inside the braces.
+ * Extracts the `{expr}` interpolation segments from text content (level 0
+ * text is prose and is dropped), skipping string literals, template strings,
+ * comments and regex literals inside the braces (they're copied into the
+ * output verbatim).
  */
 function extractInterpolations(content: string): string {
 	let out = "";
 	let level = 0;
 	for (let i = 0; i < content.length; i++) {
 		const char = content[i];
-		const nextChar = content[i + 1];
 		if (char === "{") {
 			if (level === 0) out += "\n";
 			level++;
@@ -61,23 +61,13 @@ function extractInterpolations(content: string): string {
 		} else if (char === "}") {
 			level--;
 			out += char;
-		} else if (char === "`" && level > 0) {
-			const start = i;
-			i = endOfTemplateString(content, i);
-			out += content.substring(start, i + 1);
-		} else if (level > 0 && (char === '"' || char === "'")) {
-			const start = i;
-			i = endOfString(char, content, i);
-			out += content.substring(start, i + 1);
-		} else if (level > 0 && char === "/" && nextChar === "/") {
-			const start = i;
-			i = content.indexOf("\n", i);
-			out += content.substring(start, i + 1);
-		} else if (level > 0 && char === "/" && nextChar === "*") {
-			const start = i;
-			i = content.indexOf("*/", i) + 1;
-			out += content.substring(start, i + 1);
 		} else if (level > 0) {
+			const skipped = skipStringOrComment(content, i);
+			if (skipped !== -1) {
+				out += content.substring(i, skipped);
+				i = skipped - 1;
+				continue;
+			}
 			out += char;
 		}
 	}

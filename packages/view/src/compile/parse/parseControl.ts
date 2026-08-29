@@ -2,8 +2,7 @@ import type ControlNode from "../types/nodes/ControlNode";
 import type ElementNode from "../types/nodes/ElementNode";
 import type OperationType from "../types/nodes/OperationType";
 import type RootNode from "../types/nodes/RootNode";
-import endOfString from "../utils/endOfString";
-import endOfTemplateString from "../utils/endOfTemplateString";
+import { skipStringOrComment } from "../utils/codeScanner";
 import isControlNode from "../utils/isControlNode";
 import trimMatched from "../utils/trimMatched";
 import trimStart from "../utils/trimStart";
@@ -173,6 +172,11 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 function parseControlStatement(start: number, operation: string, status: ParseStatus) {
 	let parenCount = 0;
 	while (status.i < status.source.length) {
+		const skipped = skipStringOrComment(status.source, status.i);
+		if (skipped !== -1) {
+			status.i = skipped;
+			continue;
+		}
 		if (accept("(", status)) {
 			parenCount += 1;
 		} else if (accept(")", status)) {
@@ -184,19 +188,6 @@ function parseControlStatement(start: number, operation: string, status: ParseSt
 			if (parenCount === 0) {
 				return trimStart(status.source.substring(start, status.i - 1).trim(), "@");
 			}
-		} else if (accept("//", status)) {
-			// Skip one-line comments
-			status.i = status.source.indexOf("\n", status.i) + 1;
-		} else if (accept("/*", status)) {
-			// Skip block comments
-			status.i = status.source.indexOf("*/", status.i) + 2;
-		} else if (accept('"', status) || accept("'", status)) {
-			// Skip string contents
-			let char = status.source[status.i - 1];
-			status.i = endOfString(char, status.source, status.i - 1) + 1;
-		} else if (accept("`", status)) {
-			// Skip template string contents
-			status.i = endOfTemplateString(status.source, status.i - 1) + 1;
 		} else {
 			status.i += 1;
 		}

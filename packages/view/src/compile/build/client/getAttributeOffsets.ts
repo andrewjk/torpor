@@ -1,6 +1,5 @@
 import type SourceSpan from "../../types/SourceSpan";
-import endOfString from "../../utils/endOfString";
-import endOfTemplateString from "../../utils/endOfTemplateString";
+import { skipStringOrComment } from "../../utils/codeScanner";
 import trimQuotes from "../../utils/trimQuotes";
 
 export default function getAttributeOffsets(
@@ -25,7 +24,6 @@ export default function getAttributeOffsets(
 	let level = 0;
 	for (let i = 0; i < value.length; i++) {
 		const char = value[i];
-		const nextChar = value[i + 1];
 		if (char === "{") {
 			level++;
 			//maxLevel = Math.max(level, maxLevel);
@@ -51,29 +49,12 @@ export default function getAttributeOffsets(
 			// Escape backticks outside of braces, as they will be within a backtick string
 			textContent += "\\";
 		} else if (level > 0) {
-			if (char === "/" && nextChar === "/") {
-				// Skip one-line comments
-				let start = i;
-				i = value.indexOf("\n", i);
-				textContent += value.substring(start, i + 1);
-				continue;
-			} else if (char === "/" && nextChar === "*") {
-				// Skip block comments
-				let start = i;
-				i = value.indexOf("*/", i) + 1;
-				textContent += value.substring(start, i + 1);
-				continue;
-			} else if (char === '"' || char === "'") {
-				// Skip string contents
-				let start = i;
-				i = endOfString(char, value, i);
-				textContent += value.substring(start, i + 1);
-				continue;
-			} else if (char === "`") {
-				// Skip interpolated string contents
-				let start = i;
-				i = endOfTemplateString(value, i);
-				textContent += value.substring(start, i + 1);
+			const skipped = skipStringOrComment(value, i);
+			if (skipped !== -1) {
+				// Copy strings, template strings, comments and regex literals
+				// into the output as-is
+				textContent += value.substring(i, skipped);
+				i = skipped - 1;
 				continue;
 			}
 		}

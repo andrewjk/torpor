@@ -1,5 +1,6 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
+import { skipStringOrComment } from "../utils/codeScanner";
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
@@ -542,23 +543,9 @@ function getContextUsage(source: string): string[] | undefined {
 }
 
 function consumeScriptComments(status: ParseStatus): boolean {
-	const char = status.source[status.i];
-	const nextChar = status.source[status.i + 1];
-	if (char === "/" && nextChar === "/") {
-		// Skip one-line comments
-		status.i = status.source.indexOf("\n", status.i);
-		return true;
-	} else if (char === "/" && nextChar === "*") {
-		// Skip block comments
-		status.i = status.source.indexOf("*/", status.i) + 1;
-		return true;
-	} else if (char === '"' || char === "'") {
-		// Skip string contents
-		status.i = endOfString(char, status.source, status.i);
-		return true;
-	} else if (char === "`") {
-		// Skip interpolated string contents
-		status.i = endOfTemplateString(status.source, status.i);
+	const skipped = skipStringOrComment(status.source, status.i);
+	if (skipped !== -1) {
+		status.i = skipped;
 		return true;
 	}
 	return false;

@@ -1,5 +1,4 @@
-import endOfString from "./endOfString";
-import endOfTemplateString from "./endOfTemplateString";
+import { skipStringOrComment } from "./codeScanner";
 
 /**
  * Builds the statements that write a component's prop value back to the
@@ -39,10 +38,13 @@ export default function bindingTarget(
 
 	for (let i = 0; i < value.length; i++) {
 		let char = value[i];
-		if (char === '"' || char === "'" || char === "`") {
-			// Skip strings and template strings
-			i = char === "`" ? endOfTemplateString(value, i) : endOfString(char, value, i);
-			continue;
+		if (char === '"' || char === "'" || char === "`" || char === "/") {
+			// Skip strings, template strings, comments and regex literals
+			const skipped = skipStringOrComment(value, i);
+			if (skipped !== -1) {
+				i = skipped - 1;
+				continue;
+			}
 		}
 		if (char === "?" && value[i + 1] === "." && !/[0-9]/.test(value[i + 2] ?? "")) {
 			// NOTE: `?.` followed by a digit is a ternary (e.g. `a ?.5 : b`),

@@ -1,6 +1,5 @@
 import type TextNode from "../../types/nodes/TextNode";
-import endOfString from "../../utils/endOfString";
-import endOfTemplateString from "../../utils/endOfTemplateString";
+import { skipStringOrComment } from "../../utils/codeScanner";
 import type BuildStatus from "./BuildStatus";
 import stashRunWithOffsets from "./stashRunWithOffsets";
 
@@ -27,7 +26,6 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 	let maxLevel = 0;
 	for (let i = 0; i < content.length; i++) {
 		const char = content[i];
-		const nextChar = content[i + 1];
 		if (char === "{") {
 			level++;
 			maxLevel = Math.max(level, maxLevel);
@@ -48,29 +46,12 @@ export default function buildTextNode(node: TextNode, status: BuildStatus): void
 			// Escape backticks outside of braces, as they will be within a backtick string
 			textContent += "\\";
 		} else if (level > 0) {
-			if (char === "/" && nextChar === "/") {
-				// Skip one-line comments
-				let start = i;
-				i = content.indexOf("\n", i);
-				textContent += content.substring(start, i + 1);
-				continue;
-			} else if (char === "/" && nextChar === "*") {
-				// Skip block comments
-				let start = i;
-				i = content.indexOf("*/", i) + 1;
-				textContent += content.substring(start, i + 1);
-				continue;
-			} else if (char === '"' || char === "'") {
-				// Skip string contents
-				let start = i;
-				i = endOfString(char, content, i);
-				textContent += content.substring(start, i + 1);
-				continue;
-			} else if (char === "`") {
-				// Skip interpolated string contents
-				let start = i;
-				i = endOfTemplateString(content, i);
-				textContent += content.substring(start, i + 1);
+			const skipped = skipStringOrComment(content, i);
+			if (skipped !== -1) {
+				// Copy strings, template strings, comments and regex literals
+				// into the output as-is
+				textContent += content.substring(i, skipped);
+				i = skipped - 1;
 				continue;
 			}
 		}
