@@ -1597,6 +1597,7 @@ function $async(fn) {
 function $bind(state, props, ...keys) {
 	if (props === void 0) return;
 	for (let key of keys.flat()) {
+		if (!(key in state)) throw new Error(`$bind: the key "${key}" does not exist on the state object. $bind syncs same-named keys, so the state object must declare it (e.g. in the initial $watch).`);
 		$run(() => {
 			const v = props[key];
 			if (v !== void 0) state[key] = v;

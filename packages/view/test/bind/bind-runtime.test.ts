@@ -110,3 +110,24 @@ test("$bind reactions are scoped to their subscribed keys", () => {
 	$state.other = 5;
 	expect($props.other).toBe(99);
 });
+
+test("$bind throws when the key does not exist on state", () => {
+	// The TagInput mistake: a state key named differently from the prop.
+	// This used to compile, run and silently sync nothing.
+	let $state = $watch({ values: [] as string[] });
+	let $props = $watch({ value: null });
+
+	expect(() => $bind($state, $props, "value")).toThrowError(/does not exist on the state object/);
+});
+
+test("$bind is inert when the parent didn't pass an optional prop", () => {
+	// Optional controlled props: when the caller doesn't pass `value`, the
+	// compiled props object has no key for it. The binding stays inert and
+	// the component works uncontrolled off its own state default.
+	let $state = $watch({ value: 3 });
+
+	$bind($state, $watch({}) as any, "value");
+
+	$state.value = 5;
+	expect($state.value).toBe(5);
+});

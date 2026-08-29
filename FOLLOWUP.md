@@ -126,14 +126,6 @@ content is slotted in. Left out deliberately:
   `createItemLoader`, gated behind an `@if` so the fetch starts when the item
   expands (see src/ui/Tree/TreeLoadedChildren.torp).
 
-## $bind silently no-ops when the state key differs from the prop key (view runtime)
-
-`$bind(state, props, key)` syncs same-named keys. Binding a differently-named
-state property (e.g. `$state.values` against `props.value`) compiles and runs but
-syncs nothing — no warning. Found while building TagInput (named the state key
-`values`); worked around by naming the state key `value` like ListBox/Tree do.
-`$bind` could validate that each key exists on both objects and throw in dev.
-
 ## replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression

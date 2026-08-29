@@ -16,10 +16,22 @@ import $run from "./$run";
  * Same-value writes are no-ops (handled by the proxy layer), so two-way sync
  * stabilises without infinite loops.
  *
+ * `$bind` syncs same-named keys, so the key must exist on the state object.
+ * A state key named differently from the prop (e.g. `values` against a
+ * `value` prop) would silently do nothing -- the binding reads and writes
+ * keys that nothing else touches -- which is almost impossible to debug. The
+ * key is therefore required to exist on the state object, and `$bind` throws
+ * at setup otherwise.
+ *
+ * The prop does *not* need to exist on `props` yet: when the parent doesn't
+ * pass an optional prop, the compiled props object has no key for it, and
+ * the binding is simply inert (uncontrolled mode) until a value is pushed.
+ *
  * @param state The component's reactive state (created via `$watch`).
  * @param props The component's `$props` proxy. When `undefined` (component
  *   called with no props), `$bind` does nothing.
- * @param keys Keys to sync. Each key must exist on both `state` and `props`.
+ * @param keys Keys to sync. Each key must exist on `state`.
+ * @throws When a key does not exist on the state object.
  */
 export default function $bind(
 	state: Record<PropertyKey, any>,
@@ -28,6 +40,12 @@ export default function $bind(
 ): void {
 	if (props === undefined) return;
 	for (let key of keys.flat()) {
+		if (!(key in state)) {
+			throw new Error(
+				`$bind: the key "${key}" does not exist on the state object. ` +
+					`$bind syncs same-named keys, so the state object must declare it (e.g. in the initial $watch).`,
+			);
+		}
 		// Forward: props → state (skip undefined so $watch defaults survive)
 		$run(() => {
 			const v = props[key];
