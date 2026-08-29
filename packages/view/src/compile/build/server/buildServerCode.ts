@@ -1,6 +1,7 @@
 import type Template from "../../../types/Template";
 import type BuildOptions from "../../types/BuildOptions";
 import Builder from "../../utils/Builder";
+import { codeRanges } from "../../utils/codeScanner";
 import collectMarkupExpressions from "../../utils/collectMarkupExpressions";
 import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
@@ -70,19 +71,26 @@ function buildServerTemplate(
 		if (component.head) script += "\n" + collectMarkupExpressions(component.head);
 	}
 
+	// Scan only the code in the script: strings, comments and regex literals
+	// are stripped, so e.g. `$mount` inside a sample-code string doesn't
+	// inject an import that nothing uses
+	let scriptCode = codeRanges(script)
+		.map(([start, end]) => script.substring(start, end))
+		.join("");
+
 	// Add default imports
-	if (/\$watch\b/.test(script)) imports.add("$watch");
-	if (/\$bind\b/.test(script)) imports.add("$bind");
-	if (/\$handle\b/.test(script)) imports.add("$handle");
-	if (/\$cache\b/.test(script)) imports.add("$cache");
-	if (/\$async\b/.test(script)) imports.add("$async");
-	if (/\$pending\b/.test(script)) imports.add("$pending");
-	if (/\$refresh\b/.test(script)) imports.add("$refresh");
-	if (/\$run\b/.test(script)) imports.add("$run");
-	if (/\$mount\b/.test(script)) imports.add("$mount");
-	if (/\$unwrap\b/.test(script)) imports.add("$unwrap");
-	if (/\$peek\b/.test(script)) imports.add("$peek");
-	if (/\$batch\b/.test(script)) imports.add("$batch");
+	if (/\$watch\b/.test(scriptCode)) imports.add("$watch");
+	if (/\$bind\b/.test(scriptCode)) imports.add("$bind");
+	if (/\$handle\b/.test(scriptCode)) imports.add("$handle");
+	if (/\$cache\b/.test(scriptCode)) imports.add("$cache");
+	if (/\$async\b/.test(scriptCode)) imports.add("$async");
+	if (/\$pending\b/.test(scriptCode)) imports.add("$pending");
+	if (/\$refresh\b/.test(scriptCode)) imports.add("$refresh");
+	if (/\$run\b/.test(scriptCode)) imports.add("$run");
+	if (/\$mount\b/.test(scriptCode)) imports.add("$mount");
+	if (/\$unwrap\b/.test(scriptCode)) imports.add("$unwrap");
+	if (/\$peek\b/.test(scriptCode)) imports.add("$peek");
+	if (/\$batch\b/.test(scriptCode)) imports.add("$batch");
 
 	let currentIndex = 0;
 	let current = template.components[0];

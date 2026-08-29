@@ -45,16 +45,6 @@ and redirects to the error page instead of showing the form errors. A
 possible fix is skipping/satisfying load query validation during form
 re-renders, or rendering from cached load data.
 
-## Compiler injects runtime imports for $-identifiers in prose text
-
-The .torp compiler injects `$watch` / `$mount` / `$props` etc. into a file's
-generated imports when those identifiers appear ANYWHERE in the source --
-including inside `<p>` prose (e.g. docs pages saying "from within a $mount
-function") and inside Repl sample-code strings. When nothing actually reads
-them, the import is unused. Site-side this is worked around with `void $props;`statements and`"noUnusedLocals": false` in site/tsconfig.json; the proper fix
-is for the compiler to only inject when the identifier appears outside string
-literals and plain text nodes.
-
 ## Dead/duplicated code paths elsewhere
 
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
