@@ -8,7 +8,20 @@ import { ListBox, ListBoxItem } from "../../../src/ListBox/index";
 
 export default function ComboBoxMultiple($props: any) {
 	@render {
-		<ComboBox &value={$props.value} {...$props}>
+		<ComboBox
+			id={$props.id}
+			class={$props.class}
+			style={$props.style}
+			name={$props.name}
+			&value={$props.value}
+			placeholder={$props.placeholder}
+			required={$props.required}
+			ariaLabel={$props.ariaLabel}
+			visible={$props.visible}
+			onchange={$props.onchange}
+			onopen={$props.onopen}
+			onclose={$props.onclose}
+		>
 			<ComboBoxInput>
 				{$props.value.join(", ")}
 			</ComboBoxInput>

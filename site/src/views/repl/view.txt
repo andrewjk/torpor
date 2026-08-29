@@ -1531,44 +1531,6 @@ function setDynamicElement(el, tag) {
 	el.replaceWith(newElement);
 	return newElement;
 }
-const spreadStates = /* @__PURE__ */ new WeakMap();
-function spreadAttributes(el, attrs, id = 0) {
-	let states = spreadStates.get(el);
-	if (states === void 0) {
-		states = /* @__PURE__ */ new Map();
-		spreadStates.set(el, states);
-	}
-	let state = states.get(id);
-	if (state === void 0) {
-		state = {
-			names: /* @__PURE__ */ new Set(),
-			listeners: /* @__PURE__ */ new Map()
-		};
-		states.set(id, state);
-	}
-	const names = /* @__PURE__ */ new Set();
-	if (attrs != null) for (let [name, value] of Object.entries(attrs)) {
-		names.add(name);
-		if (name.startsWith("on")) {
-			const type = name.substring(2);
-			const listener = value;
-			if (isDelegatedEventType(type)) attachDelegatedEvent(el, type, listener);
-			else {
-				const prev = state.listeners.get(type);
-				if (prev != null && prev !== listener) el.removeEventListener(type, prev);
-				if (listener != null) el.addEventListener(type, listener);
-			}
-			state.listeners.set(type, listener);
-		} else setAttribute(el, name, value);
-	}
-	for (let name of state.names) if (!names.has(name)) el.removeAttribute(name);
-	for (let [type, listener] of state.listeners) if (!names.has(`on${type}`)) {
-		if (isDelegatedEventType(type)) attachDelegatedEvent(el, type, null);
-		else if (listener != null) el.removeEventListener(type, listener);
-		state.listeners.delete(type);
-	}
-	state.names = names;
-}
 function $batch(fn) {
 	if (context.batch > 0) return fn();
 	batchStart();
@@ -1808,5 +1770,4 @@ let t_run_list = runList;
 let t_run_try = runTry;
 let t_save_hydration = saveHydration;
 let t_skip = nodeSkip;
-let t_spread = spreadAttributes;
 let t_style = buildStyles;

@@ -44,22 +44,18 @@ function replaceVarNames(code: string, status: BuildStatus): string {
 
 /**
  * Returns the [start, end) ranges of `value` that are code — i.e. not the
- * contents of string literals. Template string contents are skipped, except
- * for the contents of `${...}` interpolations, which are code again.
+ * contents of string literals or comments. Template string contents are
+ * skipped, except for the contents of `${...}` interpolations, which are
+ * code again.
  */
 function getCodeRanges(value: string): [number, number][] {
 	const ranges: [number, number][] = [];
 	let codeStart = 0;
 	let i = 0;
 	while (i < value.length) {
-		const char = value[i];
-		if (char === "'" || char === '"') {
-			pushRange(ranges, codeStart, i);
-			i = endOfString(char, value, i) + 1;
-			codeStart = i;
-		} else if (char === "`") {
-			pushRange(ranges, codeStart, i);
-			i = skipTemplateString(value, i, ranges);
+		const next = skipStringOrComment(value, i, ranges, codeStart);
+		if (next !== -1) {
+			i = next;
 			codeStart = i;
 		} else {
 			i += 1;
@@ -67,6 +63,42 @@ function getCodeRanges(value: string): [number, number][] {
 	}
 	pushRange(ranges, codeStart, value.length);
 	return ranges;
+}
+
+/**
+ * If the character at `i` starts a string literal or a comment, skips over
+ * it (pushing the code range it interrupted, and collecting the code ranges
+ * of any template string interpolations within) and returns the index just
+ * after it. Returns -1 if the character doesn't start a string or comment.
+ */
+function skipStringOrComment(
+	value: string,
+	i: number,
+	ranges: [number, number][],
+	codeStart: number,
+): number {
+	const char = value[i];
+	if (char === "'" || char === '"') {
+		pushRange(ranges, codeStart, i);
+		return endOfString(char, value, i) + 1;
+	}
+	if (char === "`") {
+		pushRange(ranges, codeStart, i);
+		return skipTemplateString(value, i, ranges);
+	}
+	if (char === "/" && value[i + 1] === "/") {
+		// Line comment -- skip to the end of the line
+		pushRange(ranges, codeStart, i);
+		const end = value.indexOf("\n", i + 2);
+		return end === -1 ? value.length : end;
+	}
+	if (char === "/" && value[i + 1] === "*") {
+		// Block comment
+		pushRange(ranges, codeStart, i);
+		const end = value.indexOf("*/", i + 2);
+		return end === -1 ? value.length : end + 2;
+	}
+	return -1;
 }
 
 /**
@@ -105,15 +137,7 @@ function endOfInterpolation(value: string, start: number, ranges: [number, numbe
 	let i = start;
 	while (i < value.length) {
 		const char = value[i];
-		if (char === "'" || char === '"') {
-			pushRange(ranges, codeStart, i);
-			i = endOfString(char, value, i) + 1;
-			codeStart = i;
-		} else if (char === "`") {
-			pushRange(ranges, codeStart, i);
-			i = skipTemplateString(value, i, ranges);
-			codeStart = i;
-		} else if (char === "{") {
+		if (char === "{") {
 			level += 1;
 			i += 1;
 		} else if (char === "}") {
@@ -124,7 +148,13 @@ function endOfInterpolation(value: string, start: number, ranges: [number, numbe
 			level -= 1;
 			i += 1;
 		} else {
-			i += 1;
+			const next = skipStringOrComment(value, i, ranges, codeStart);
+			if (next !== -1) {
+				i = next;
+				codeStart = i;
+			} else {
+				i += 1;
+			}
 		}
 	}
 	pushRange(ranges, codeStart, value.length);

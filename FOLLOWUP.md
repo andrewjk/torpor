@@ -138,8 +138,10 @@ syncs nothing — no warning. Found while building TagInput (named the state key
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
 text, not AST-based. Recently hardened (string/template-literal contents are
-skipped; `?` is a boundary so `item?.x` and `a ?? item` rewrite), but the approach
-still has inherent blind spots:
+skipped; `?` is a boundary so `item?.x` and `a ?? item` rewrite; comments are
+skipped too -- an apostrophe inside a `//` comment used to swallow the rest of
+the expression as an unterminated string, which broke TagInput's suggestion
+clicks). The approach still has inherent blind spots:
 
 - **Shadowing**: a nested function's param/`let` with the same name as a loop var
   gets wrongly rewritten -- `.filter(child => child.ok)` inside a `@for` body
@@ -148,35 +150,14 @@ still has inherent blind spots:
   `Identifier` nodes) to fix properly.
 - **No-space operator styles**: `x=child`, `a+b`, `a&&b` etc. aren't caught --
   the operator characters aren't boundary chars. Usual spaced formatting is fine.
-- **Comments and regex literals** in expressions aren't skipped (a comment
-  containing a loop-var-shaped word gets rewritten; a regex literal containing a
-  quote could desync the string scanner).
+- **Regex literals** in expressions aren't skipped (a `/` that starts a regex
+  followed by a quote-like character could desync the string scanner).
 
 Object-literal keys that share a loop var's name are safe only by accident (no
 `:` in the follower class -- adding it would break keys). The same textual
 limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
 "Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
 write detection.
-
-## TagInput loader suggestions: destructured @for var in handler is broken (view compiler)
-
-`test/TagInput/loading.test.ts` ("clicking a suggestion adds it as a tag") fails
-deterministically, and `pnpm check` in packages/ui reports
-`TagInput.torp:326 - error TS2304: Cannot find name 'item'`. The component uses
-`@for (let [index, item] of suggestions().entries())` inside `@await`, and the
-li's `onmousedown` handler calls `pickSuggestion(item)` -- the generated client
-code references the bare `item` identifier there (out of scope), so the click
-handler throws and the picked suggestion never clears the query text.
-
-Verified pre-existing: reproduces with packages/view src checked out at e0f1a803
-(before the string-literal/`?`/spread compiler changes), so it's not a regression
-from that work. Destructured for-vars (`[index, item]`) combined with an
-`@await` boundary is the suspect: the handler effect referencing the second
-destructured var escapes the scope the rewrite targets. Same family as the
-fixed optional-chaining/@for issue and the replaceForVarNames blind-spot entry
-above -- likely needs the AST pass to fix properly. (Note: `test/ToolBar/
-popout.test.ts` "Multiple popouts" is separately flaky under full-suite load but
-passes reliably in isolation; unrelated.)
 
 ## refocusAnchorOnHide focuses whatever component anchors the content
 
