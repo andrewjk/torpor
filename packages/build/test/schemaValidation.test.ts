@@ -373,3 +373,26 @@ test("an action's params schema rejects invalid urls with 404", async () => {
 
 	expect(res.status).toBe(404);
 });
+
+test("an action named with a reserved schema key throws", async () => {
+	const site = new Site();
+	site.addRoute("/reserved", {
+		pageServer: {
+			actions: {
+				// "load" collides with the reserved query-validation schema
+				// key, so it can never get the right schema for its form data
+				load: async () => new Response("never"),
+			},
+		} satisfies PageServerEndPoint,
+	});
+
+	const formData = new FormData();
+	const req = new Request("http://localhost/reserved/~server?/load", {
+		method: "POST",
+		body: formData,
+	});
+
+	await expect(runTest(site, "/reserved/~server", new ServerEvent(req))).rejects.toThrowError(
+		/The action name "load" is reserved/,
+	);
+});

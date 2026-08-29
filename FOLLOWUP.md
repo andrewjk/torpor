@@ -30,9 +30,6 @@ deliberately left out:
   are not applied to the layout's own load/actions; the page's server
   endpoint schema is the one used for shared params/query validation during
   SSR.
-- **Reserved schema keys**: on `PageServerEndPoint`, an action literally
-  named `load` or `params` would collide with the reserved `load` (query) and
-  `params` (route params) schema keys. Not enforced or warned about.
 
 ## Form re-render runs load query validation against the POST url (edge case)
 

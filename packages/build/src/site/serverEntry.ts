@@ -413,6 +413,16 @@ async function runAction(
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {
+			if (actionName === "load" || actionName === "params") {
+				// These names are reserved in the endpoint's schema map: `load`
+				// validates the query string and `params` the route params, so
+				// an action with one of these names would get the wrong schema
+				// applied to its form data
+				throw new Error(
+					`The action name "${actionName}" is reserved. ` +
+						`Rename the action (and its schema key, if any), e.g. to "save".`,
+				);
+			}
 			// Route params come from the URL, so a failed validation means the
 			// resource doesn't exist
 			try {
