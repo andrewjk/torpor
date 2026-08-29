@@ -33,7 +33,6 @@ import t_run_try from "./render/runTry";
 import t_save_hydration from "./render/saveHydration";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
-import t_spread from "./render/spreadAttributes";
 import type Animation from "./types/Animation";
 import type Bindable from "./types/Bindable";
 import type ClassValue from "./types/ClassValue";
@@ -110,7 +109,6 @@ export {
 	t_restore_hydration,
 	t_attribute,
 	t_dynamic,
-	t_spread,
 };
 
 export type {

@@ -26,11 +26,7 @@ export default function runControlBranch(region: Region, oldIndex: number, index
 		}
 		return false;
 	}
-	if (
-		!firstRender &&
-		region.nextRegion !== null &&
-		region.nextRegion.depth > region.depth
-	) {
+	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) {
 		clearRegion(region.nextRegion);
 	}
 

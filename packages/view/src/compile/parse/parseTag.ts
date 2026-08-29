@@ -4,6 +4,7 @@ import isFullyReactive from "../utils/isFullyReactive";
 import isReactive from "../utils/isReactive";
 import type ParseStatus from "./ParseStatus";
 import parseInlineScript from "./parseInlineScript";
+import addError from "./utils/addError";
 import accept from "./utils/accept";
 import consumeAlphaNumeric from "./utils/consumeAlphaNumeric";
 import consumeSpace from "./utils/consumeSpace";
@@ -128,6 +129,13 @@ function parseAttribute(status: ParseStatus): Attribute {
 		}
 		reactive = fullyReactive = true;
 	}
+
+	if (value != null && reactive && value.startsWith("...")) {
+		// Spread attributes aren't supported -- spell the attributes (or
+		// props) out explicitly instead
+		addError(status, `Spread attributes are not supported`, valueStart, valueEnd);
+	}
+
 	return {
 		name,
 		value,

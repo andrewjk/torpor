@@ -41,7 +41,6 @@ const importsMap: Record<string, string> = {
 	t_class: 'import { t_class } from "${folder}";',
 	t_style: 'import { t_style } from "${folder}";',
 	t_attribute: 'import { t_attribute } from "${folder}";',
-	t_spread: 'import { t_spread } from "${folder}";',
 	t_dynamic: 'import { t_dynamic } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_fragment: 'import { t_fragment } from "${folder}";',

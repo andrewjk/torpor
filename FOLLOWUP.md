@@ -158,6 +158,26 @@ limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
 "Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
 write detection.
 
+## TagInput loader suggestions: destructured @for var in handler is broken (view compiler)
+
+`test/TagInput/loading.test.ts` ("clicking a suggestion adds it as a tag") fails
+deterministically, and `pnpm check` in packages/ui reports
+`TagInput.torp:326 - error TS2304: Cannot find name 'item'`. The component uses
+`@for (let [index, item] of suggestions().entries())` inside `@await`, and the
+li's `onmousedown` handler calls `pickSuggestion(item)` -- the generated client
+code references the bare `item` identifier there (out of scope), so the click
+handler throws and the picked suggestion never clears the query text.
+
+Verified pre-existing: reproduces with packages/view src checked out at e0f1a803
+(before the string-literal/`?`/spread compiler changes), so it's not a regression
+from that work. Destructured for-vars (`[index, item]`) combined with an
+`@await` boundary is the suspect: the handler effect referencing the second
+destructured var escapes the scope the rewrite targets. Same family as the
+fixed optional-chaining/@for issue and the replaceForVarNames blind-spot entry
+above -- likely needs the AST pass to fix properly. (Note: `test/ToolBar/
+popout.test.ts` "Multiple popouts" is separately flaky under full-suite load but
+passes reliably in isolation; unrelated.)
+
 ## refocusAnchorOnHide focuses whatever component anchors the content
 
 When popout content hides, `createPopoutContent` (utils/popoutContent.ts) returns

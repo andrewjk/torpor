@@ -40,9 +40,7 @@ export default function buildServerComponentNode(
 				name = name.substring(1);
 			}
 
-			if (name.startsWith("...")) {
-				props.push({ name: "", value: value! });
-			} else if (name === "class" && value != null) {
+			if (name === "class" && value != null) {
 				if (node.scopeStyles) {
 					value = `[${value}, "torp-${status.styleHash}"]`;
 				}

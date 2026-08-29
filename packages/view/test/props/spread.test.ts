@@ -1,12 +1,28 @@
-import { queryByText } from "@testing-library/dom";
-import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
-import hydrateComponent from "../hydrateComponent";
-import importComponent from "../importComponent";
-import mountComponent from "../mountComponent";
+import parse from "../../src/compile/parse";
+import { trimParsed } from "../helpers";
 
-const source = `
-export default function Reactive() {
+test("spread attribute on an element", () => {
+	const input = `
+export default function Test() {
+	let $state = $watch({ name: "Jim" })
+
+	@render {
+		<div {...$state}>
+			<p>Content</p>
+		</div>
+	}
+}
+`;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.length).toBe(1);
+	expect(output.errors[0].message).toBe("Spread attributes are not supported");
+});
+
+test("spread attribute on a component", () => {
+	const input = `
+export default function Test() {
 	let $state = $watch({ name: "Jim" })
 
 	@render {
@@ -22,24 +38,24 @@ function Child() {
 	}
 }
 `;
-
-test("props spread -- mounted", async () => {
-	const container = document.createElement("div");
-	const component = await importComponent(import.meta.filename, source, "client");
-	mountComponent(container, component);
-
-	await check(container);
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.length).toBe(1);
+	expect(output.errors[0].message).toBe("Spread attributes are not supported");
 });
 
-test("props spread -- hydrated", async () => {
-	const container = document.createElement("div");
-	const clientComponent = await importComponent(import.meta.filename, source, "client");
-	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+test("spread attribute as a value", () => {
+	const input = `
+export default function Test() {
+	let $state = $watch({ disabled: true })
 
-	await check(container);
-});
-
-async function check(container: HTMLElement) {
-	expect(queryByText(container, "Jim")).toBeInTheDocument();
+	@render {
+		<button disabled={...$state}>Content</button>
+	}
 }
+`;
+	const output = trimParsed(parse(input));
+	expect(output.ok).toBe(false);
+	expect(output.errors.length).toBe(1);
+	expect(output.errors[0].message).toBe("Spread attributes are not supported");
+});

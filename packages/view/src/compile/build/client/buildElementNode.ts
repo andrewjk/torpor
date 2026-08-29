@@ -164,29 +164,13 @@ function buildElementAttributes(
 
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
-	for (let [index, { name, value, reactive, fullyReactive, span }] of node.attributes.entries()) {
+	for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// Ignore this one, it should have been done already, above
 		} else if (value != null && fullyReactive) {
-			if (name.startsWith("...")) {
-				// Spread attributes: apply each entry of the object to the
-				// element (attributes, plus event listeners for `on*` keys).
-				// The value carries the leading `...` (the component spread
-				// build uses it verbatim), so strip it here. The id keeps
-				// the applied state of multiple spreads on one element
-				// separate.
-				status.imports.add("t_spread");
-				stashRun(
-					fragment,
-					`t_spread(${varName}, `,
-					value.substring(3),
-					`, ${index})`,
-					span,
-					status,
-				);
-			} else if (name === "&group") {
+			if (name === "&group") {
 				buildBindGroupAttribute(node, varName, value, status, b);
 			} else if (name === "&value" || name === "&checked") {
 				buildBindAttribute(node, varName, name, value, status, b);

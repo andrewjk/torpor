@@ -69,17 +69,6 @@ export default function buildComponentNode(
 					});
 					runs.push(`${propsName}["${name}"] = ${value};`);
 					bindingRuns.push(bindingTarget(value, `${propsName}["${name}"]`, name, status.imports));
-				} else if (name.startsWith("...")) {
-					// It's a spread property
-					name = "";
-					props.push({
-						name,
-						value,
-						spans: [span],
-					});
-					// TODO: this needs some work (should be at the end, should
-					// take into account other props, etc)
-					runs.push(`${propsName} = { ...${propsName}, ${value} };`);
 				} else if (name === "class") {
 					if (node.scopeStyles) {
 						value = `[${value}, "torp-${status.styleHash}"]`;
