@@ -1,0 +1,149 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function StreamPage() {
+
+	@head {
+		<title>Streams | Torpor</title>
+	}
+
+	@render {
+		<h1>Streams</h1>
+		<p>
+			External event sources &mdash; server-sent events, WebSockets, DOM events,
+			or anything else that pushes values over time &mdash; are subscribed to with
+			the <code>$stream</code> function. Events are written into reactive state,
+			so templates and effects update through the normal reactivity model:
+		</p>
+		<CodePreview
+			code={`
+export default function Chat($props: { room: string }) {
+	let $state = $watch({
+		messages: [] as string[]
+	})
+
+	$stream(fromServer(() => "/sse/" + $props.room), (e) => {
+		$state.messages.push(e.data)
+	})
+
+	@render {
+		<ul>
+			@for (let m of $state.messages) {
+				<li>{m}</li>
+			}
+		</ul>
+	}
+}
+`}
+		/>
+
+		<h2>Managed subscriptions</h2>
+		<p>
+			The subscription is managed by the framework:
+		</p>
+		<ul>
+			<li>
+				It starts when the component is mounted to the DOM, so
+				<code>&amp;ref</code>-bound elements already exist, and it is
+				unsubscribed when the component unmounts or its region is cleared.
+			</li>
+			<li>
+				The source is <em>never invoked during a server render</em>, so
+				browser-only APIs like <code>EventSource</code> are safe to use without
+				any <code>typeof window</code> guards.
+			</li>
+			<li>
+				Errors are values like any other: a source that can fail should push an
+				error-shaped value and own its own reconnection (<code>EventSource</code>
+				reconnects automatically).
+			</li>
+		</ul>
+
+		<h2>Re-subscribing on state changes</h2>
+		<p>
+			Reactive state read <em>inside</em> the source is tracked. When it changes,
+			the old subscription is torn down and a fresh one is opened &mdash; for
+			example, re-opening the connection when a room id changes. Pass the URL as
+			a getter for this to work; a plain string URL is read once.
+		</p>
+		<p>
+			Capture tracked reads in a local variable inside the source, so its cleanup
+			function unsubscribes the listener it actually added (not whatever the
+			value is at teardown time).
+		</p>
+
+		<h2>The fromServer function</h2>
+		<p>
+			<code>fromServer(url)</code> receives <code>message</code> events from a
+			server-sent events endpoint, and <code>fromWebSocket(url)</code> does the
+			same for a WebSocket. The URL may be a string or a getter, as above.
+		</p>
+
+		<h2>The fromElement function</h2>
+		<p>
+			<code>fromElement(el, type)</code> pushes DOM events of the given type.
+			Pass a getter returning a <code>&amp;ref</code>-bound variable, since
+			elements only exist once they are rendered:
+		</p>
+		<CodePreview
+			code={`
+export default function AutoSave() {
+	let input: HTMLInputElement
+	let $state = $watch({
+		saved: ""
+	})
+
+	$stream(fromElement(() => input, "input"), () => {
+		$state.saved = "Saved"
+	}, { debounce: 500 })
+
+	@render {
+		<input &ref={input} oninput={(e) => { $state.draft = e.target.value }} />
+		<p>{$state.saved}</p>
+	}
+}
+`}
+		/>
+		<p>
+			For simple cases, a plain event handler is fine &mdash; see
+			<a href="/docs/events">Events</a>. Reach for
+			<code>fromElement</code> when you want the events debounced, counted, or
+			handled by the framework's lifecycle.
+		</p>
+
+		<h2>The debounce option</h2>
+		<p>
+			Pass <code>&#123; debounce: ms &#125;</code> to delay each handler call
+			until the source has been quiet for that many milliseconds. Every event
+			resets the timer, so only the last event of a burst is handled. A pending
+			debounced call is dropped if the subscription is torn down or
+			re-subscribed first.
+		</p>
+
+		<h2>Custom sources</h2>
+		<p>
+			Any source is just a function that takes a <code>push</code> callback and
+			returns an unsubscribe function (the <code>StreamSource&lt;T&gt;</code>
+			type), so wrapping anything &mdash; an <code>EventEmitter</code>, a
+			<code>BroadcastChannel</code>, a third-party SDK &mdash; is a few lines:
+		</p>
+		<CodePreview
+			code={`
+$stream((push) => {
+	const socket = new WebSocket(url)
+	socket.onmessage = (e) => push(e.data)
+	return () => socket.close()
+}, (message) => {
+	$state.inbox.push(message)
+})
+`}
+		/>
+		<p>
+			Timing options belong on <code>$stream</code>; anything shapeful
+			&mdash; windowing, aggregation, combining multiple streams &mdash; is
+			plain closure logic in the handler. To react to each event in an effect,
+			write it to state and read it from <code>$run</code>. For async data
+			&mdash; one-shot fetches rather than ongoing streams &mdash; see
+			<a href="/docs/async">Async</a>.
+		</p>
+	}
+}

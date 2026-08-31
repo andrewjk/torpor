@@ -229,3 +229,26 @@ performance follow-up, like Svelte's `prebundleSvelteLibraries`: registering
 an optimizer plugin so `.torp` files can actually be _compiled into_ the dep
 optimizer's bundle, instead of being excluded and transformed per-request in
 dev (fine for icon packages, but it's an extra transform per module load).
+
+## `$stream` follow-ups
+
+`$stream(source, handler, options?)` shipped in `@torpor/view` (managed
+external-event subscriptions: mount/unmount lifecycle, dep-tracked
+resubscribe, SSR-safe). Deliberately left out:
+
+- **Site docs page**: the docs site has pages for async (`$async`,
+  `$pending`, `$refresh`) but not yet for `$stream`/`fromElement`/
+  `fromServer`/`fromWebSocket`. TORPOR_AGENTS.md is the reference
+  until then.
+- **`$run(fn, { debounce })`**: debounced _state-triggered_ effects
+  (autosave-on-type). The `$run.ts` TODO covers it; scheduling debounced
+  re-runs needs a scheduler-level hook in `triggerEffects`, not a closure
+  trick, so it's a separate change. Workaround today: `$run` + timer
+  cleanup.
+- **More timing options** (`throttle`, count gates) and stream combinators:
+  intentionally omitted. The `StreamSource<T>` type makes them plain
+  userland functions (`everyN(3, src)` composes by wrapping), so the
+  framework ships zero of them until real usage demands it.
+- **Error channel**: a `StreamSource` has no `fail` callback. Current rule
+  (documented in JSDoc): errors are values; sources own their reconnection.
+  Revisit if wrapper sources (retry/backoff wrappers) become common.

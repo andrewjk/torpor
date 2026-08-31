@@ -106,6 +106,61 @@ $mount(() => {
 });
 ```
 
+### `$stream(source, handler, options?)` — external event streams
+
+Subscribes to an external source of events — server-sent events, WebSockets,
+DOM events, or any custom source — and calls `handler` for each event.
+Events are written into reactive state, which keeps templates/computeds/
+effects updating through the normal reactivity model:
+
+```torp
+let $state = $watch({ messages: [] as string[] });
+
+$stream(fromServer(`/sse/${$props.id}`), (e) => {
+	$state.messages.push(e.data);
+});
+```
+
+The subscription is managed by the framework:
+
+- Starts when the component mounts (so `&ref`-bound elements exist), and is
+  unsubscribed on unmount/region clear.
+- Reactive state read **inside** the source is tracked: when it changes, the
+  source is unsubscribed and re-subscribed with fresh values (e.g.
+  re-opening the connection when a user id changes). Capture tracked reads
+  in locals, so the source's cleanup tears down the subscription it
+  actually created.
+- The source is **never invoked during a server render**, so browser-only
+  APIs are safe to reference.
+- Errors are values like any other: push an error-shaped value and let the
+  source own its reconnection (`EventSource` reconnects automatically).
+
+`{ debounce }` delays each handler call until the source has been quiet for
+that many milliseconds, resetting on every event (only the last event of a
+burst is handled). A pending debounced call is dropped on re-subscribe.
+
+Built-in sources: `fromServer(url)`, `fromWebSocket(url)` (URL may be a
+string or a getter for tracked reconnection), and
+`fromElement(elOrGetter, type)` for DOM events. A custom source is just a
+function that takes a `push` callback and returns an unsubscribe function
+(the `StreamSource<T>` type):
+
+```torp
+$stream(fromElement(() => saveButton, "click"), () => save());
+
+// Custom source: subscribe and return the unsubscribe function
+$stream((push) => {
+	const ws = new WebSocket(url);
+	ws.onmessage = (e) => push(e);
+	return () => ws.close();
+}, (msg) => $state.inbox.push(msg));
+```
+
+Timing options belong on `$stream`/`$run`; anything shapeful (windowing,
+aggregation, combining multiple streams) is plain closure logic in the
+handler. Per-event handling works by writing to state and reacting in
+`$run`/templates — see `$run(fn, ...)` above.
+
 ### `$peek(fn)`
 
 Reads reactive values inside `fn` **without** creating subscriptions. Changes

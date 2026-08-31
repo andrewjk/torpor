@@ -24,6 +24,7 @@ export default function Sidebar($props?: SidebarProps) {
 				<li><a href="/docs/slots" onclick={$props?.onnavigate}>Slots</a></li>
 				<li><a href="/docs/context" onclick={$props?.onnavigate}>Context</a></li>
 				<li><a href="/docs/async" onclick={$props?.onnavigate}>Async</a></li>
+				<li><a href="/docs/streams" onclick={$props?.onnavigate}>Streams</a></li>
 				<li><a href="/docs/transitions" onclick={$props?.onnavigate}>Transitions</a></li>
 				<li><a href="/docs/errors" onclick={$props?.onnavigate}>Errors</a></li>
 				<li><a href="/docs/styles" onclick={$props?.onnavigate}>Styles</a></li>

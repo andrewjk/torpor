@@ -3,9 +3,9 @@
 ## Torpor framework reference
 
 For the full `.torp` component and `@torpor/view` runtime API (`$watch`,
-`$run`, `$handle`, `$mount`, `$peek`, `$batch`, `$cache`, `$bind`, `&ref`,
-`&value`, `&group`, slots, context, transitions, directives, etc.), see
-[TORPOR_AGENTS.md](TORPOR_AGENTS.md).
+`$run`, `$handle`, `$mount`, `$stream`, `$peek`, `$batch`, `$cache`, `$bind`,
+`&ref`, `&value`, `&group`, slots, context, transitions, directives, etc.),
+see [TORPOR_AGENTS.md](TORPOR_AGENTS.md).
 
 ## Commands
 

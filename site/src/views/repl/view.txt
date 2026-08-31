@@ -65,6 +65,35 @@ function formatText(value) {
 	if (typeof value === "string") return value;
 	return String($unwrap(value));
 }
+function fromElement(target, type) {
+	return (push) => {
+		const el = typeof target === "function" ? target() : target;
+		if (!el) throw new Error("fromElement: element not found. When passing a &ref variable, wrap it in a getter: fromElement(() => buttonEl, \"click\")");
+		const listener = push;
+		el.addEventListener(type, listener);
+		return () => {
+			el.removeEventListener(type, listener);
+		};
+	};
+}
+function fromServer(url) {
+	return (push) => {
+		const eventSource = new EventSource(typeof url === "function" ? url() : url);
+		eventSource.onmessage = push;
+		return () => {
+			eventSource.close();
+		};
+	};
+}
+function fromWebSocket(url) {
+	return (push) => {
+		const socket = new WebSocket(typeof url === "function" ? url() : url);
+		socket.onmessage = push;
+		return () => {
+			socket.close();
+		};
+	};
+}
 const CONTEXT_SYMBOL = Symbol.for("torp.Context");
 const context = globalThis[CONTEXT_SYMBOL] ??= {
 	activeTarget: null,
@@ -1705,6 +1734,21 @@ function $refresh(fn, options) {
 			batchEnd();
 		}
 	}
+}
+function $stream(source, handler, options) {
+	context.mountEffects.push(() => {
+		let timer;
+		const unsub = source((value) => {
+			if (options?.debounce) {
+				clearTimeout(timer);
+				timer = setTimeout(() => handler(value), options.debounce);
+			} else handler(value);
+		});
+		return () => {
+			unsub?.();
+			clearTimeout(timer);
+		};
+	});
 }
 let initialized = false;
 var ReactiveDate = class ReactiveDate extends Date {

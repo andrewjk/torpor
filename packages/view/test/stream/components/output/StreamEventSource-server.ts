@@ -1,0 +1,32 @@
+import { $stream } from "@torpor/view/ssr";
+import $watch from "../../../../src/ssr/$serverWatch";
+import { fromServer } from "@torpor/view/ssr";
+import t_fmt from "../../../../src/ssr/formatText";
+import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
+
+export default function StreamEventSource(
+	_$props?: Record<PropertyKey, any>,
+	_$context?: Record<PropertyKey, any>,
+	_$slots?: Record<string, ServerSlotRender>,
+): { body: string; head: string } {
+	let t_body = "";
+	let t_head = "";
+
+	let $state = $watch({
+		id: 1,
+		messages: [] as string[],
+	});
+
+	$stream(fromServer(() => `/sse/${$state.id}`), (e) => {
+		$state.messages.push(String(e.data));
+	});
+
+	/* User interface */
+	t_body += `<button>Bump</button> <ul><![>`;
+	for (let m of $state.messages) {
+		t_body += `<!^><li>${t_fmt(m)}</li>`;
+	}
+	t_body += `<!]><!></ul>`;
+
+	return { body: t_body, head: t_head };
+}

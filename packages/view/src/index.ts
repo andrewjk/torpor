@@ -33,6 +33,9 @@ import t_run_try from "./render/runTry";
 import t_save_hydration from "./render/saveHydration";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
+import fromElement from "./stream/fromElement";
+import fromServer from "./stream/fromServer";
+import fromWebSocket from "./stream/fromWebSocket";
 import type Animation from "./types/Animation";
 import type Bindable from "./types/Bindable";
 import type ClassValue from "./types/ClassValue";
@@ -40,6 +43,7 @@ import type Component from "./types/Component";
 import type ListItem from "./types/ListItem";
 import type ListItemSpec from "./types/ListItemSpec";
 import type SlotRender from "./types/SlotRender";
+import type StreamSource from "./types/StreamSource";
 import type StyleValue from "./types/StyleValue";
 import $batch from "./watch/$batch";
 import $async from "./watch/$async";
@@ -51,6 +55,7 @@ import $peek from "./watch/$peek";
 import $pending from "./watch/$pending";
 import $refresh from "./watch/$refresh";
 import $run from "./watch/$run";
+import $stream from "./watch/$stream";
 import $unwrap from "./watch/$unwrap";
 import $watch from "./watch/$watch";
 import ReactiveDate from "./wrappers/ReactiveDate";
@@ -69,9 +74,13 @@ export {
 	$refresh,
 	$run,
 	$mount,
+	$stream,
 	$unwrap,
 	$peek,
 	$batch,
+	fromElement,
+	fromServer,
+	fromWebSocket,
 };
 
 // Wrapped objects for using in reactive objects
@@ -120,4 +129,5 @@ export type {
 	ClassValue,
 	StyleValue,
 	Bindable,
+	StreamSource,
 };

@@ -12,10 +12,15 @@ import $peek from "./ssr/$serverPeek";
 import $pending from "./ssr/$serverPending";
 import $refresh from "./ssr/$serverRefresh";
 import $run from "./ssr/$serverRun";
+import $stream from "./ssr/$serverStream";
 import $unwrap from "./ssr/$serverUnwrap";
 import $watch from "./ssr/$serverWatch";
+import fromElement from "./stream/fromElement";
+import fromServer from "./stream/fromServer";
+import fromWebSocket from "./stream/fromWebSocket";
 import type ServerComponent from "./types/ServerComponent";
 import type ServerSlotRender from "./types/ServerSlotRender";
+import type StreamSource from "./types/StreamSource";
 
 export {
 	$watch,
@@ -24,16 +29,20 @@ export {
 	$cache,
 	$run,
 	$mount,
+	$stream,
 	$unwrap,
 	$peek,
 	$batch,
 	$async,
 	$pending,
 	$refresh,
+	fromElement,
+	fromServer,
+	fromWebSocket,
 	t_fmt,
 	t_attr,
 	t_class,
 	t_style,
 };
 
-export type { ServerComponent, ServerSlotRender };
+export type { ServerComponent, ServerSlotRender, StreamSource };

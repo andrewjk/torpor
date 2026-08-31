@@ -18,6 +18,10 @@ const importsMap: Record<string, string> = {
 	$refresh: 'import { $refresh } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
 	$mount: 'import { $mount } from "${folder}";',
+	$stream: 'import { $stream } from "${folder}";',
+	fromElement: 'import { fromElement } from "${folder}";',
+	fromServer: 'import { fromServer } from "${folder}";',
+	fromWebSocket: 'import { fromWebSocket } from "${folder}";',
 	$unwrap: 'import { $unwrap } from "${folder}";',
 	$peek: 'import { $peek } from "${folder}";',
 	$batch: 'import { $batch } from "${folder}";',
@@ -88,6 +92,10 @@ function buildServerTemplate(
 	if (/\$refresh\b/.test(scriptCode)) imports.add("$refresh");
 	if (/\$run\b/.test(scriptCode)) imports.add("$run");
 	if (/\$mount\b/.test(scriptCode)) imports.add("$mount");
+	if (/\$stream\b/.test(scriptCode)) imports.add("$stream");
+	if (/\bfromElement\b/.test(scriptCode)) imports.add("fromElement");
+	if (/\bfromServer\b/.test(scriptCode)) imports.add("fromServer");
+	if (/\bfromWebSocket\b/.test(scriptCode)) imports.add("fromWebSocket");
 	if (/\$unwrap\b/.test(scriptCode)) imports.add("$unwrap");
 	if (/\$peek\b/.test(scriptCode)) imports.add("$peek");
 	if (/\$batch\b/.test(scriptCode)) imports.add("$batch");
