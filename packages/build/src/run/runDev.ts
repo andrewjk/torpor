@@ -21,6 +21,7 @@ import {
 } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
+import { addTorporPackageConfig } from "../utils/torporPackages";
 import devPlugin from "./devPlugin.ts";
 
 export default async function runDev(site: Site): Promise<void> {
@@ -62,6 +63,13 @@ export default async function runDev(site: Site): Promise<void> {
 	config.optimizeDeps.rolldownOptions ??= {};
 	config.optimizeDeps.rolldownOptions.plugins ??= [estorpor()];
 	// TODO: config.optimizeDeps.rolldownOptions.plugins.push(estorpor());
+
+	// Packages that ship `.torp` files (e.g. icon libraries) need the torpor
+	// compiler: dep optimization would parse them as plain JavaScript and
+	// fail, and SSR externalization would leave raw `.torp` imports that
+	// Node/workerd can't load. Exclude them from optimization and mark them
+	// for SSR bundling so they go through the torpor plugin
+	addTorporPackageConfig(site.root, config);
 
 	// Load environment variables from a `.env` file, with defaults if not set
 	configDotenv();

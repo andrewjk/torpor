@@ -6,6 +6,7 @@ import Site from "../site/Site";
 import { checkApiCalls, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
+import { addTorporPackageConfig } from "../utils/torporPackages";
 
 // TODO: Don't cache index.html in dev?
 // TODO: Don't reload layouts during client routing
@@ -88,6 +89,9 @@ export default async function runBuild(site: Site): Promise<void> {
 	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
+	// Bundle packages that ship `.torp` files into the server build, as they
+	// need the torpor compiler (Node/workerd can't load them externalized)
+	addTorporPackageConfig(site.root, serverConfig);
 	serverConfig.build.rollupOptions ??= {};
 	serverConfig.build.rollupOptions.input = [
 		serverScript,
