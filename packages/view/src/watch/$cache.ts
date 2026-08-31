@@ -10,7 +10,14 @@ import runComputed from "./runComputed";
  */
 export default function $cache<T>(fn: () => T): T {
 	if (context.registerComputed === null) {
-		throw new Error("$cache must be used in a getter");
+		if (typeof window !== "undefined") {
+			throw new Error("$cache must be used in a getter");
+		}
+		// Server render: getters are evaluated without reactive tracking (state
+		// objects aren't proxied), so there is nothing to register with. Just
+		// evaluate the function — this happens when a shared helper that uses
+		// $cache (e.g. in @torpor/ui) is rendered on the server
+		return fn();
 	}
 
 	let computed: Computed = {

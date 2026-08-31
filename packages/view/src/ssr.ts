@@ -4,7 +4,9 @@ import t_attr from "./render/formatAttributeText";
 import t_fmt from "./render/formatText";
 import $async from "./ssr/$serverAsync";
 import $batch from "./ssr/$serverBatch";
+import $bind from "./ssr/$serverBind";
 import $cache from "./ssr/$serverCache";
+import $handle from "./ssr/$serverHandle";
 import $mount from "./ssr/$serverMount";
 import $peek from "./ssr/$serverPeek";
 import $pending from "./ssr/$serverPending";
@@ -17,6 +19,8 @@ import type ServerSlotRender from "./types/ServerSlotRender";
 
 export {
 	$watch,
+	$bind,
+	$handle,
 	$cache,
 	$run,
 	$mount,
