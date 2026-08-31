@@ -1,6 +1,6 @@
 import $mount from "../../../../src/ssr/$serverMount";
 import $watch from "../../../../src/ssr/$serverWatch";
-import t_fmt from "../../../../src/render/formatText";
+import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function MountCleanupReturn(

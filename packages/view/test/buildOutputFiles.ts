@@ -217,7 +217,7 @@ const importsMap: Record<string, string> = {
 	'import { $refresh } from "@torpor/view/ssr";':
 		'import $refresh from "../../../../src/ssr/$serverRefresh";',
 	'import { t_fmt } from "@torpor/view/ssr";':
-		'import t_fmt from "../../../../src/render/formatText";',
+		'import t_fmt from "../../../../src/ssr/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':
 		'import t_attr from "../../../../src/render/formatAttributeText";',
 	'import { t_class } from "@torpor/view/ssr";':

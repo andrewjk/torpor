@@ -1,5 +1,5 @@
 import t_class from "../../../../src/render/buildClasses";
-import t_fmt from "../../../../src/render/formatText";
+import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function ForNested3(

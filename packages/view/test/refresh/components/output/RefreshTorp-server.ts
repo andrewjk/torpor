@@ -3,7 +3,7 @@ import $pending from "../../../../src/ssr/$serverPending";
 import $refresh from "../../../../src/ssr/$serverRefresh";
 import $watch from "../../../../src/ssr/$serverWatch";
 import t_attr from "../../../../src/render/formatAttributeText";
-import t_fmt from "../../../../src/render/formatText";
+import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function SelfDisablingRefresh(

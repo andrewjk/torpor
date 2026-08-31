@@ -34,18 +34,13 @@ export default function buildServerTextNode(node: TextNode, status: BuildServerS
 			const skipped = skipStringOrComment(content, i);
 			if (skipped !== -1) {
 				// Copy strings, template strings, comments and regex literals
-				// into the output as-is (HTML-escaped)
-				status.output += escapeHtml(content.substring(i, skipped));
+				// into the output as-is. HTML escaping is done at runtime by the
+				// server's t_fmt, so that literals keep their original meaning.
+				status.output += content.substring(i, skipped);
 				i = skipped - 1;
 				continue;
 			}
 		}
 		status.output += char;
 	}
-}
-
-// Escape HTML in comments and strings on the server, so that we don't output unintended tags etc
-// This doesn't need to be done on the client, where we will be setting textContent
-function escapeHtml(text: string) {
-	return text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
 }

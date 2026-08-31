@@ -1,5 +1,6 @@
 import { expect, test } from "vite-plus/test";
 import formatText from "../../src/render/formatText";
+import formatServerText from "../../src/ssr/formatText";
 import $watch from "../../src/watch/$watch";
 
 test("formatText with string", () => {
@@ -90,4 +91,24 @@ test("formatText with unicode", () => {
 
 test("formatText with emoji", () => {
 	expect(formatText("🎉🎊🎈")).toBe("🎉🎊🎈");
+});
+
+test("formatServerText escapes html characters", () => {
+	expect(formatServerText("<button>Click</button>")).toBe("&lt;button&gt;Click&lt;/button&gt;");
+});
+
+test("formatServerText escapes ampersands", () => {
+	expect(formatServerText("a & b")).toBe("a &amp; b");
+});
+
+test("formatServerText leaves plain text unchanged", () => {
+	expect(formatServerText("hello")).toBe("hello");
+});
+
+test("formatServerText with number", () => {
+	expect(formatServerText(42)).toBe("42");
+});
+
+test("formatServerText with null returns empty string", () => {
+	expect(formatServerText(null)).toBe("");
 });

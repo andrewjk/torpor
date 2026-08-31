@@ -1,7 +1,8 @@
+import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function PreHydrate(
-	_$props?: Record<PropertyKey, any>,
+export default function MultiText(
+	$props: { a: string, b: string },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
 ): { body: string; head: string } {
@@ -9,9 +10,7 @@ export default function PreHydrate(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<pre>line1
-line2
-line3</pre>`;
+	t_body += `<p> ${t_fmt($props.a)} and ${t_fmt($props.b)} </p>`;
 
 	return { body: t_body, head: t_head };
 }
