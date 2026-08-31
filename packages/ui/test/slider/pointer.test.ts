@@ -4,7 +4,10 @@ import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
 import SliderTest from "./components/SliderTest.torp";
 
-function setup(props: Record<string, unknown> = {}, rect = { left: 0, top: 0, width: 100, height: 10 }) {
+function setup(
+	props: Record<string, unknown> = {},
+	rect = { left: 0, top: 0, width: 100, height: 10 },
+) {
 	const onchange = vi.fn();
 	const container = document.createElement("div");
 	document.body.appendChild(container);
@@ -12,17 +15,18 @@ function setup(props: Record<string, unknown> = {}, rect = { left: 0, top: 0, wi
 
 	// jsdom has no layout, so give the track a size
 	const track = container.getElementsByClassName("torp-slider")[0] as HTMLElement;
-	track.getBoundingClientRect = () => ({
-		x: rect.left,
-		y: rect.top,
-		left: rect.left,
-		top: rect.top,
-		right: rect.left + rect.width,
-		bottom: rect.top + rect.height,
-		width: rect.width,
-		height: rect.height,
-		toJSON: () => ({}),
-	} as DOMRect);
+	track.getBoundingClientRect = () =>
+		({
+			x: rect.left,
+			y: rect.top,
+			left: rect.left,
+			top: rect.top,
+			right: rect.left + rect.width,
+			bottom: rect.top + rect.height,
+			width: rect.width,
+			height: rect.height,
+			toJSON: () => ({}),
+		}) as DOMRect;
 
 	return { container, onchange, slider: () => within(container).getByRole("slider") };
 }
@@ -79,7 +83,10 @@ describe("Slider (pointer)", () => {
 	});
 
 	it("works with a vertical orientation", async () => {
-		const { slider } = setup({ min: 0, max: 100, orientation: "vertical" }, { left: 0, top: 0, width: 10, height: 200 });
+		const { slider } = setup(
+			{ min: 0, max: 100, orientation: "vertical" },
+			{ left: 0, top: 0, width: 10, height: 200 },
+		);
 
 		fireEvent.mouseDown(slider(), { clientX: 0, clientY: 150 });
 

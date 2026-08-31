@@ -64,9 +64,7 @@ describe("DataGrid - virtualization", () => {
 		fireEvent.scroll(wrap);
 		await tick();
 
-		const labels = getBodyRows(container).map(
-			(tr) => tr.textContent!.trim(),
-		);
+		const labels = getBodyRows(container).map((tr) => tr.textContent!.trim());
 		expect(labels.some((t) => t === "Item 299" || t === "Item 298")).toBe(true);
 		expect(labels.every((t) => Number(t.replace("Item ", "")) > 250)).toBe(true);
 	});
@@ -91,7 +89,6 @@ describe("DataGrid - virtualization", () => {
 		const spacers = [...container.querySelectorAll(".torp-data-grid-spacer td")];
 		expect(spacers.length).toBe(2);
 		for (let td of spacers) {
-	
 		}
 	});
 

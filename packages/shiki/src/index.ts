@@ -61,7 +61,7 @@ const codeToTokensWithThemes: (
 	>,
 ) => Promise<ThemedTokenWithVariants[][]> = dest.codeToTokensWithThemes;
 const getSingletonHighlighter: (
-	options?: Partial<BundledHighlighterOptions<"torpor", "light-plus" | "dark-plus">> | undefined,
+	options?: Partial<BundledHighlighterOptions<"torpor", "light-plus" | "dark-plus">>,
 ) => Promise<HighlighterGeneric<"torpor", "light-plus" | "dark-plus">> =
 	dest.getSingletonHighlighter;
 const getLastGrammarState: typeof dest.getLastGrammarState = dest.getLastGrammarState;

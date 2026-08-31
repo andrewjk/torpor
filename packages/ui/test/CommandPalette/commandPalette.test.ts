@@ -9,7 +9,8 @@ function setup(props: Record<string, unknown> = {}) {
 	const container = document.createElement("div");
 	document.body.appendChild(container);
 	mount(container, CommandPaletteTest, { ...props, onrun });
-	const toggle = () => fireEvent.click(within(container).getByRole("button", { name: "Toggle palette" }));
+	const toggle = () =>
+		fireEvent.click(within(container).getByRole("button", { name: "Toggle palette" }));
 	return {
 		container,
 		onrun,

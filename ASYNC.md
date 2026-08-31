@@ -487,7 +487,7 @@ Ignoring the rule has two shapes (both seen in DataGrid work):
   the error still surfaces, but the promise's resolve re-runs the effect,
   which typically succeeds. (Inside `@try`, recovery is owned by the
   boundary — `errorSources` includes the suspended computed, so its resolve
-  re-attempts the try branch. A crash on the effect's *first* run during
+  re-attempts the try branch. A crash on the effect's _first_ run during
   component setup is not recoverable this way: it fails the mount, which is
   the right outcome for a half-built component.)
 
@@ -496,7 +496,7 @@ after a getter rejects, re-reads throw the cached error (the `didError`
 branch), so an effect reading a rejecting getter needs `@try`/`@error` above
 it or its own try/catch.
 
-Making bare *effects* suspend like boundaries do (deferring the body until
+Making bare _effects_ suspend like boundaries do (deferring the body until
 resolve) was considered and rejected: side effects can't be speculatively
 run and rolled back the way a boundary's speculative content render can,
 and deferring would change the observable contract `$refresh` views are

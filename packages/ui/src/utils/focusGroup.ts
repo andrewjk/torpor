@@ -46,11 +46,7 @@ export interface FocusGroup<T extends FocusItemState> {
 	 * left/right (+up/down when vertical), Home and End; arrow keys depend
 	 * on orientation, matching ToolBar behavior.
 	 */
-	handleGroupKey: (
-		index: number,
-		e: KeyboardEvent,
-		options?: { vertical?: boolean },
-	) => boolean;
+	handleGroupKey: (index: number, e: KeyboardEvent, options?: { vertical?: boolean }) => boolean;
 
 	/** Moves focus from `index` to the target item (disabled items skipped) */
 	moveFocus: (index: number, target: FocusTarget) => void;

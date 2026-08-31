@@ -43,10 +43,12 @@ describe("readForm", () => {
 	});
 
 	test("booleans follow checkbox semantics", async () => {
-		const data = await readForm(
-			form({ on: "on", off: "off", empty: "", explicitTrue: "true" }),
-			{ on: false, off: false, empty: false, explicitTrue: false },
-		);
+		const data = await readForm(form({ on: "on", off: "off", empty: "", explicitTrue: "true" }), {
+			on: false,
+			off: false,
+			empty: false,
+			explicitTrue: false,
+		});
 		expect(data.on).toBe(true);
 		expect(data.off).toBe(false);
 		expect(data.empty).toBe(false);

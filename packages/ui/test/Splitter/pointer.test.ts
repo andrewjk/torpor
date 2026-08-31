@@ -14,17 +14,18 @@ function setup(
 
 	// jsdom has no layout, so give the container a size
 	const root = container.getElementsByClassName("torp-splitter")[0] as HTMLElement;
-	root.getBoundingClientRect = () => ({
-		x: rect.left,
-		y: rect.top,
-		left: rect.left,
-		top: rect.top,
-		right: rect.left + rect.width,
-		bottom: rect.top + rect.height,
-		width: rect.width,
-		height: rect.height,
-		toJSON: () => ({}),
-	} as DOMRect);
+	root.getBoundingClientRect = () =>
+		({
+			x: rect.left,
+			y: rect.top,
+			left: rect.left,
+			top: rect.top,
+			right: rect.left + rect.width,
+			bottom: rect.top + rect.height,
+			width: rect.width,
+			height: rect.height,
+			toJSON: () => ({}),
+		}) as DOMRect;
 
 	return { container, handle: () => within(container).getByRole("separator") };
 }

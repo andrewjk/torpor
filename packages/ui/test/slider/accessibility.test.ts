@@ -48,9 +48,6 @@ describe("Slider (accessibility)", () => {
 		document.body.appendChild(container);
 		mount(container, SliderTest, { orientation: "vertical" });
 
-		expect(within(container).getByRole("slider")).toHaveAttribute(
-			"aria-orientation",
-			"vertical",
-		);
+		expect(within(container).getByRole("slider")).toHaveAttribute("aria-orientation", "vertical");
 	});
 });

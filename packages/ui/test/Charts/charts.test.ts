@@ -39,16 +39,15 @@ describe("Charts", () => {
 		expect(leftLabels.map((t) => t.textContent?.trim())).toEqual(["One", "Two", "Three"]);
 
 		const bottomTicks = [...container.querySelectorAll("svg text")].filter(
-			(t) => t.getAttribute("dominant-baseline") === "text-after-edge" &&
+			(t) =>
+				t.getAttribute("dominant-baseline") === "text-after-edge" &&
 				["0", "50", "100"].includes(t.textContent?.trim() ?? ""),
 		);
 		expect(bottomTicks.length).toBe(3);
 
 		// Bars are wider than they are tall
 		const bar = container.querySelector("svg rect")!;
-		expect(Number(bar.getAttribute("width"))).toBeGreaterThan(
-			Number(bar.getAttribute("height")),
-		);
+		expect(Number(bar.getAttribute("width"))).toBeGreaterThan(Number(bar.getAttribute("height")));
 	});
 
 	it("ColumnChart renders a column for every value", async () => {
@@ -108,9 +107,9 @@ describe("Charts", () => {
 
 		// Two vertical axis lines: right value axis + left category axis... no,
 		// category axis is at the bottom here; expect exactly one vertical line
-		const verticals = [
-			...container.querySelectorAll("svg line"),
-		].filter((l) => l.getAttribute("x1") === l.getAttribute("x2"));
+		const verticals = [...container.querySelectorAll("svg line")].filter(
+			(l) => l.getAttribute("x1") === l.getAttribute("x2"),
+		);
 		expect(verticals.length).toBe(1);
 	});
 });

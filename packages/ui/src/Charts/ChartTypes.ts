@@ -23,4 +23,3 @@ export interface ChartContext {
 	/** The color to draw series i with, from its own color or the palette */
 	colorAt: (i: number) => string;
 }
-

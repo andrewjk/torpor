@@ -42,7 +42,10 @@ describe("ColorPicker", () => {
 	it("keeps the bound value in sync", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
-		mount(container, ColorPickerTest as any, { value: "#ff0000", colors: ["#FFFFFF", "#FF0000", "#00FF88"] });
+		mount(container, ColorPickerTest as any, {
+			value: "#ff0000",
+			colors: ["#FFFFFF", "#FF0000", "#00FF88"],
+		});
 
 		const selected = container.querySelector('[data-selected="selected"]')!;
 		expect(selected).toHaveAttribute("data-color", "#FF0000");

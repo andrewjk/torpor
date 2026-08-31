@@ -164,8 +164,7 @@ export function reportRouteIssues(issues: RouteCheckIssue[]): number {
 
 const MAKE_API_RE = /\bmakeApi\s*<\s*(["'])([^"']+)\1\s*,\s*typeof\s+([A-Za-z_$][\w$]*)/g;
 
-const DEFAULT_IMPORT_RE =
-	/\bimport\s+(?:type\s+)?([A-Za-z_$][\w$]*)\s+from\s*(["'])([^"']+)\2/g;
+const DEFAULT_IMPORT_RE = /\bimport\s+(?:type\s+)?([A-Za-z_$][\w$]*)\s+from\s*(["'])([^"']+)\2/g;
 
 const SKIP_DIRS = new Set(["node_modules", "dist", ".git", ".torpor", ".vite", "coverage"]);
 

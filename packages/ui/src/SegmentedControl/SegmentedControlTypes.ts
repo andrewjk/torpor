@@ -2,7 +2,11 @@ export const SegmentedControlContextName: unique symbol = Symbol.for("torp.Segme
 
 export interface SegmentedControlContext {
 	/** Called from an item when it is added */
-	registerItem: (index: number | undefined, value: string | undefined, disabled: boolean | undefined) => ItemState;
+	registerItem: (
+		index: number | undefined,
+		value: string | undefined,
+		disabled: boolean | undefined,
+	) => ItemState;
 	/** Called from an item when it is removed */
 	removeItem: (index: number) => void;
 	/** Called from an item when it is selected */

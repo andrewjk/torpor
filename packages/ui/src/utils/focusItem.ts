@@ -6,9 +6,11 @@ export type FocusTarget = "start" | "previous" | "next" | "end";
  * disabled. Returns the new focus index, or the original when no focusable
  * item was found.
  */
-export function focusItem<
-	T extends { setFocused: () => void; disabled?: boolean },
->(items: T[], current: number, target: FocusTarget): number {
+export function focusItem<T extends { setFocused: () => void; disabled?: boolean }>(
+	items: T[],
+	current: number,
+	target: FocusTarget,
+): number {
 	if (items.length === 0) return current;
 	let index = current;
 	switch (target) {

@@ -96,10 +96,7 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			return options.maxValue?.() || calculateMaxValue(options.series());
 		},
 		get stepValue() {
-			return (
-				options.stepValue?.() ||
-				calculateStepValue(this.maxValue, options.stepCount?.())
-			);
+			return options.stepValue?.() || calculateStepValue(this.maxValue, options.stepCount?.());
 		},
 		get stepLabels() {
 			return calculateStepLabels(getStepCount(), this.stepValue);
@@ -116,11 +113,7 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			);
 		},
 		get chartBottom() {
-			return calculateChartBottom(
-				options.xLabel?.() ?? "",
-				this.calculatedHeight,
-				this.textHeight,
-			);
+			return calculateChartBottom(options.xLabel?.() ?? "", this.calculatedHeight, this.textHeight);
 		},
 		get chartLeft() {
 			return calculateChartLeft(
@@ -143,10 +136,7 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
  * state and removes it. Call once the element is in the document (from
  * `$mount`, deferred a tick).
  */
-export function measureChartText(
-	layout: ChartLayout,
-	measurer: SVGTextElement,
-): void {
+export function measureChartText(layout: ChartLayout, measurer: SVGTextElement): void {
 	const bbox = measurer.getBBox();
 	layout.setTextSize(bbox.width, bbox.height);
 	measurer.remove();

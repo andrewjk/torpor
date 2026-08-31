@@ -44,10 +44,7 @@ export type R03 = Expect<Equals<keyof ApiMethods<TimeEndPoint>, "get" | "post">>
 export type R04 = Expect<
 	Equals<
 		ApiMethods<CreatePostEndPoint>["post"],
-		(
-			body?: { title: string },
-			init?: RequestInit,
-		) => Promise<{ id: number } | Response>
+		(body?: { title: string }, init?: RequestInit) => Promise<{ id: number } | Response>
 	>
 >;
 

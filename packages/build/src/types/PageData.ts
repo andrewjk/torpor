@@ -30,9 +30,6 @@ export type PageData<EndPoint> = EndPoint extends { load?: (event: any) => infer
  * Each endpoint's data is intersected in order; endpoints without a typed
  * `load` contribute nothing but looseness.
  */
-export type MergePageData<EndPoints extends any[]> = EndPoints extends [
-	infer First,
-	...infer Rest,
-]
+export type MergePageData<EndPoints extends any[]> = EndPoints extends [infer First, ...infer Rest]
 	? PageData<First> & MergePageData<Rest>
 	: unknown;

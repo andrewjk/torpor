@@ -12,9 +12,10 @@ describe("TimePicker (in forms)", () => {
 		document.body.appendChild(container);
 		mount(container, TimePickerFormTest as any, { value: "07:45" });
 
-		expect(
-			container.querySelector('input[type="hidden"][name="alarm"]'),
-		).toHaveAttribute("value", "07:45");
+		expect(container.querySelector('input[type="hidden"][name="alarm"]')).toHaveAttribute(
+			"value",
+			"07:45",
+		);
 
 		// Editing through the picker writes back into the form data
 		fireEvent.input(within(container).getByRole("spinbutton", { name: /hour/i }), {
@@ -25,8 +26,9 @@ describe("TimePicker (in forms)", () => {
 		});
 		await tick();
 
-		expect(
-			container.querySelector('input[type="hidden"][name="alarm"]'),
-		).toHaveAttribute("value", "06:45");
+		expect(container.querySelector('input[type="hidden"][name="alarm"]')).toHaveAttribute(
+			"value",
+			"06:45",
+		);
 	});
 });

@@ -122,9 +122,8 @@ export const loosePosts: { title: string }[] = looseProps.data.posts;
 // --- Client load events ---
 
 // event.data is typed by the second annotation, e.g. the layout's data
-export const clientLoad = (
-	event: PageLoadEvent<"/posts", PageData<typeof layoutServer>>,
-): void => void event.data.user.name;
+export const clientLoad = (event: PageLoadEvent<"/posts", PageData<typeof layoutServer>>): void =>
+	void event.data.user.name;
 
 // 'nope' is not part of the accumulated layout data
 export const badClientLoad = (
@@ -134,5 +133,4 @@ export const badClientLoad = (
 	void event.data.nope;
 
 // Without a data annotation it stays loose
-export const looseClientLoad = (event: PageLoadEvent<"/posts">): void =>
-	void event.data.whatever;
+export const looseClientLoad = (event: PageLoadEvent<"/posts">): void => void event.data.whatever;

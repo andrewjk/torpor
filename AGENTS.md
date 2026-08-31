@@ -15,9 +15,13 @@ For the full `.torp` component and `@torpor/view` runtime API (`$watch`,
 - `pnpm check` - Typecheck all packages recursively
 - In individual packages: `pnpm check` runs `tsgo --noEmit && pnpm dlx oxlint --type-aware`
 
+### Formatting
+
+- Root: `pnpm format` - Format all files with `vp fmt` (oxfmt)
+- Do NOT run prettier; formatting config lives in the `fmt` block of `vite.config.ts`
+
 ### Linting
 
-- Root: `pnpm format` - Format all files with prettier
 - Individual packages: `pnpm dlx oxlint --type-aware` for type-aware linting
 
 ### Testing
@@ -33,14 +37,14 @@ For the full `.torp` component and `@torpor/view` runtime API (`$watch`,
 
 ### Formatting
 
-- Use **tabs** for indentation (enforced by prettier)
+- Use **tabs** for indentation (enforced by `vp fmt`)
 - Print width: **100 characters**
 - Trailing commas: **all** (except in JSON files)
 - Semi-colons: **required**
 
 ### Imports
 
-- Sorted with `@trivago/prettier-plugin-sort-imports`
+- Sorted automatically by `vp fmt` (`importOrder` in the `fmt` block of `vite.config.ts`)
 - Order: Relative imports first (`../`, `./`), then external
 - Use explicit file extensions for TypeScript imports (`.ts`)
 - Node.js built-ins use `node:` protocol: `import fs from "node:fs"`
