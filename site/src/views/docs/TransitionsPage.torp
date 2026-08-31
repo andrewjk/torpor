@@ -1,0 +1,77 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function TransitionsPage() {
+	@head {
+		<title>Transitions | Torpor</title>
+	}
+
+	@render {
+		<h1>Transitions</h1>
+		<p>
+			Elements can be animated when they enter or leave the DOM (typically inside an
+			<code>&commat;if</code> statement) with the <code>transition</code> attribute:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	let $state = $watch({
+		visible: false
+	})
+
+	@render {
+		<button onclick={() => $state.visible = !$state.visible}>
+			Toggle
+		</button>
+
+		@if ($state.visible) {
+			<div transition={(e) => fade(e, { duration: 500 })}>
+				Hello!
+			</div>
+		}
+	}
+}
+`}
+		/>
+		<p>
+			The <code>transition</code> function receives the element and returns
+			<code>&#123; keyframes, options &#125;</code> for the Web Animations API, or you
+			can pass raw keyframes directly:
+		</p>
+		<CodePreview
+			code={`
+<div transition={[{ opacity: 0 }, { opacity: 1 }]}>
+	Hello!
+</div>
+`}
+		/>
+
+		<h2>Transition functions</h2>
+		<p>
+			The <code>&commat;torpor/ui</code> package includes <code>fade</code>, <code>slide</code>,
+			<code>grow</code> and <code>measure</code> functions for common animations:
+		</p>
+		<CodePreview
+			code={`
+import { fade, slide } from "@torpor/ui/motion"
+
+<div transition={(e) => fade(e, { duration: 200 })}>Fades</div>
+<div transition={(e) => slide(e, { side: "left" })}>Slides</div>
+`}
+		/>
+
+		<h2>Transitions in and out</h2>
+		<p>
+			Use <code>transition-in</code> or <code>transition-out</code> to animate only
+			one direction:
+		</p>
+		<CodePreview
+			code={`
+@if ($state.visible) {
+	<div transition-in={(e) => fade(e)}>
+		Hello!
+	</div>
+}
+`}
+		/>
+	}
+}

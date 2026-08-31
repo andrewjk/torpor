@@ -2,6 +2,7 @@ import CodePreview from "../CodePreview.torp";
 import Repl from "../repl/Repl.torp";
 
 export default function BindingPage() {
+
 	@head {
 		<title>Binding | Torpor</title>
 	}
@@ -62,6 +63,45 @@ export default function Component() {
 		<p>
 			Binding works with inputs and the <code>&value</code>, <code>&checked</code>
 			and <code>&group</code> attributes.
+		</p>
+
+		<h2>Component binding</h2>
+		<p>
+			Props can be bound two-way as well, with a <code>&key</code> attribute. The
+			component declares which props are bindable by calling the
+			<code>$bind</code> function:
+		</p>
+		<CodePreview
+			code={`
+export default function App() {
+	let $state = $watch({
+		name: "Torpor"
+	})
+
+	@render {
+		<NameInput &name={$state.name}>
+		<p>
+			Welcome, {$state.name}!
+		</p>
+	}
+}
+
+function NameInput($props: { name?: string }) {
+	let $state = $watch({
+		name: "Torpor"
+	})
+
+	$bind($state, $props, "name")
+
+	@render {
+		<input &value={$state.name}>
+	}
+}
+`}
+		/>
+		<p>
+			When $state.name is changed inside the component, the new value is written back
+			to the parent's $state.name, and vice versa.
 		</p>
 
 		<h2>Element binding</h2>

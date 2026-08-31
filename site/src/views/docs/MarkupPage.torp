@@ -169,6 +169,7 @@ export default function Component() {
 		<h2>Await statements</h2>
 		<p>
 			Use an <code>&commat;await</code> statement to show the result of an asynchronous function:
+			see the <a href="/docs/async">Async</a> section for more.
 		</p>
 		<CodePreview
 			code={`

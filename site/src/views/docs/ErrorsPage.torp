@@ -1,0 +1,65 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function ErrorsPage() {
+
+	@head {
+		<title>Errors | Torpor</title>
+	}
+
+	@render {
+		<h1>Errors</h1>
+		<p>
+			Use a <code>&commat;try</code> statement to catch errors thrown while rendering
+			its content, and show a <code>catch</code> branch instead:
+		</p>
+		<CodePreview
+			code={`
+export default function Component($props: { user: User }) {
+	@render {
+		@try {
+			<p>
+				Hello, {$props.user.name.toUpperCase()}!
+			</p>
+		} catch (err) {
+			<p class="error">
+				Couldn't show user: {err.message}
+			</p>
+		}
+	}
+}
+`}
+		/>
+		<p>
+			A <code>&commat;try</code> statement catches render errors from the component
+			tree below it, including errors thrown by getters, <code>&commat;const</code>
+			statements and async values that reject. A <code>&commat;try</code> without a
+			<code>catch</code> branch lets errors bubble up to the nearest boundary.
+		</p>
+
+		<h2>The @error block</h2>
+		<p>
+			A top-level <code>&commat;error</code> block catches render errors for a whole
+			component, like wrapping the @render block in a @try statement:
+		</p>
+		<CodePreview
+			code={`
+export default function Component($props: { user: User }) {
+	@render {
+		<UserDetails user={$props.user} />
+		<UserPosts user={$props.user} />
+	}
+
+	@error (err) {
+		<p class="error">
+			Something went wrong: {err.message}
+		</p>
+	}
+}
+`}
+		/>
+		<p>
+			Note that the @error block doesn't catch errors thrown by the component's setup
+			code (the statements before @render), only errors thrown while rendering.
+		</p>
+	}
+}

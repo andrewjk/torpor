@@ -9,7 +9,7 @@ export default function ReactivityPage() {
 	@render {
 		<h1>Reactivity</h1>
 		<p>
-			Knowing how <a href="/state">state</a> works in Torpor is enough to get you up and
+			Knowing how <a href="/docs/state">state</a> works in Torpor is enough to get you up and
 			running, but it may also be helpful to know a bit more about how reactivity works
 			in more depth.
 		</p>

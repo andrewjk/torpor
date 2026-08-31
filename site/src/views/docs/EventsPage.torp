@@ -1,0 +1,54 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function EventsPage() {
+	@head {
+		<title>Events | Torpor</title>
+	}
+
+	@render {
+		<h1>Events</h1>
+		<p>
+			Event handlers are attached with <code>on&lt;event&gt;</code> attributes, like
+			<code>onclick</code> and <code>onkeydown</code>:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	function handleClick() {
+		console.log("Clicked!");
+	}
+
+	@render {
+		<button onclick={handleClick}>Click me</button>
+	}
+}
+`}
+		/>
+
+		<h2>The event object</h2>
+		<p>
+			Handlers receive the native event object as their first argument, and
+			<code>this</code> is set to the element that raised the event:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	function handleKeyDown(e: KeyboardEvent) {
+		if (e.key === "Enter") {
+			console.log((e.currentTarget as HTMLInputElement).value);
+		}
+	}
+
+	@render {
+		<input onkeydown={handleKeyDown} />
+	}
+}
+`}
+		/>
+		<p>
+			Common events like <code>click</code>, <code>input</code>, <code>keydown</code>
+			and <code>change</code> are handled with a single delegated listener per event
+			type. Other events fall back to a standard <code>addEventListener</code>.
+		</p>
+	}
+}

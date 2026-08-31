@@ -1611,7 +1611,10 @@ function $bind(state, props, ...keys) {
 	}
 }
 function $cache(fn) {
-	if (context.registerComputed === null) throw new Error("$cache must be used in a getter");
+	if (context.registerComputed === null) {
+		if (typeof window !== "undefined") throw new Error("$cache must be used in a getter");
+		return fn();
+	}
 	let computed = {
 		type: 1,
 		isAsync: false,

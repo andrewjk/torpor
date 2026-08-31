@@ -188,3 +188,44 @@ wants a tree-sitter grammar for syntax highlighting (the TextMate grammar in
 exists, the extension can only provide partial support. The language-server
 README documents setups for editors that work today (Neovim, Helix,
 OpenCode).
+
+## UI docs pages broken in dev (date-picker, slider routes disabled)
+
+Two sidebar links 404: `/ui/date-picker` and `/ui/slider`. Their route files
+exist only as `+page.ts.bak` (from the original component commits,
+518d810c / 32992f73) — the pages were disabled when added and never enabled.
+The page views (`DatePickerPage.torp`, `SliderPage.torp`) and components exist
+and have tests; enabling the routes is probably just renaming the `.bak`
+files, but the components should be smoke-tested first in case that's why
+they were gated.
+
+## `tb --preview` fails to bundle .torp files (pre-existing)
+
+`tb --preview` (wrangler dev over `dist/cloudflare/_worker.js`) dies with
+"No loader is configured for .torp files" for every route view, including
+pre-existing ones (HomePage, ErrorPage, ...). `tb --build` itself succeeds
+and `tb --dev` is unaffected; deploys go through `buildcf.ts` + wrangler
+deploy. Likely wrangler is re-bundling something that still references
+`.torp` paths — worth investigating if local production preview is needed.
+
+## Stale-module SSR errors after rebuilding a workspace package while `tb --dev` runs
+
+After rebuilding `@torpor/view` (or another workspace dep) while the dev
+server is up, SSR pages can fail with confusing errors (e.g.
+"$cache must be used in a getter" from `packages/ui/src/utils/createItemGroup.ts`
+plain-`.ts` files importing client runtime primitives, seen when mixing the
+"development"-condition src resolution with the cloudflare adapter's workerd
+module runner). Restarting `tb --dev` after a package rebuild resolves it.
+A longer-term fix would be invalidating the workerd module graph when
+workspace deps change on disk.
+
+## Prebundling .torp libraries in dep optimization
+
+Handled now: `@torpor/build` detects installed packages that ship `.torp`
+files (a `torpor` field or `.torp` export targets in their package.json) and
+automatically adds them to `optimizeDeps.exclude` and `ssr.noExternal`
+(packages/build/src/utils/torporPackages.ts). What's left is the optional
+performance follow-up, like Svelte's `prebundleSvelteLibraries`: registering
+an optimizer plugin so `.torp` files can actually be _compiled into_ the dep
+optimizer's bundle, instead of being excluded and transformed per-request in
+dev (fine for icon packages, but it's an extra transform per module load).

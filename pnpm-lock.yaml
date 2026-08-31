@@ -689,6 +689,9 @@ importers:
       '@torpor/view':
         specifier: workspace:^
         version: link:../packages/view
+      phosphor-torpor:
+        specifier: ^1.0.2
+        version: 1.0.2(@torpor/view@packages+view)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))
       sucrase:
         specifier: ^3.35.1
         version: 3.35.1
@@ -4876,6 +4879,15 @@ packages:
 
   perfect-debounce@2.1.0:
     resolution: {integrity: sha512-LjgdTytVFXeUgtHZr9WYViYSM/g8MkcTPYDlPa3cDqMirHjKiSZPYd6DoL7pK8AJQr+uWkQvCjHNdiMqsrJs+g==}
+
+  phosphor-torpor@1.0.2:
+    resolution: {integrity: sha512-FtljLdnB2L/KrRM4Unz9zPMOciwayqAbTv9wWHRY+BYmB9HJ2I6+mv78m+u6ClXR3WKDj1VzoWUMDS6bmS22aA==}
+    peerDependencies:
+      '@torpor/view': '>=0.2'
+      vite: '>=5'
+    peerDependenciesMeta:
+      vite:
+        optional: true
 
   picocolors@1.1.1:
     resolution: {integrity: sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA==}
@@ -10127,6 +10139,14 @@ snapshots:
   pend@1.2.0: {}
 
   perfect-debounce@2.1.0: {}
+
+  phosphor-torpor@1.0.2(@torpor/view@packages+view)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)):
+    dependencies:
+      '@torpor/view': link:packages/view
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: '@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)'
 
   picocolors@1.1.1: {}
 

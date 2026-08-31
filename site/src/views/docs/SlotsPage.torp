@@ -1,0 +1,135 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function SlotsPage() {
+
+	@head {
+		<title>Slots | Torpor</title>
+	}
+
+	@render {
+		<h1>Slots</h1>
+		<p>
+			Child content passed to a component is rendered where the
+			<code>&lt;slot /&gt;</code> tag is placed:
+		</p>
+		<CodePreview
+			code={`
+// Button.torp
+export default function Button() {
+	@render {
+		<button>
+			<slot />
+		</button>
+	}
+}
+`}
+		/>
+		<CodePreview
+			code={`
+// App.torp
+import Button from "./Button.torp"
+
+export default function App() {
+	@render {
+		<Button>Click me!</Button>
+	}
+}
+`}
+		/>
+		<p>
+			Content inside the <code>&lt;slot&gt;</code> tag is used as a fallback when no
+			children are passed:
+		</p>
+		<CodePreview
+			code={`
+// Button.torp
+export default function Button() {
+	@render {
+		<button>
+			<slot>
+				<span>Click me!</span>
+			</slot>
+		</button>
+	}
+}
+`}
+		/>
+
+		<h2>Named slots</h2>
+		<p>
+			Use a <code>&lt;fill&gt;</code> tag to send content to a named
+			<code>&lt;slot&gt;</code>. Content without a name is sent to the default slot:
+		</p>
+		<CodePreview
+			code={`
+// Card.torp
+export default function Card() {
+	@render {
+		<section>
+			<header>
+				<slot name="header" />
+			</header>
+			<slot />
+		</section>
+	}
+}
+`}
+		/>
+		<CodePreview
+			code={`
+// App.torp
+import Card from "./Card.torp"
+
+export default function App() {
+	@render {
+		<Card>
+			<fill name="header">Welcome!</fill>
+			<p>The card's content.</p>
+		</Card>
+	}
+}
+`}
+		/>
+
+		<h2>Let slots</h2>
+		<p>
+			A component can pass data back out to the slot content by adding props to the
+			<code>&lt;slot&gt;</code> tag. The parent accesses them with
+			<code>$slot</code>:
+		</p>
+		<CodePreview
+			code={`
+// List.torp
+export default function List($props: { items: string[] }) {
+	@render {
+		<ul>
+			@for (let item of $props.items) {
+				<li>
+					<slot item={item} />
+				</li>
+			}
+		</ul>
+	}
+}
+`}
+		/>
+		<CodePreview
+			code={`
+// App.torp
+import List from "./List.torp"
+
+export default function App() {
+	let $state = $watch({
+		items: ["one", "two", "three"]
+	})
+
+	@render {
+		<List items={$state.items}>
+			{$slot.item}
+		</List>
+	}
+}
+`}
+		/>
+	}
+}

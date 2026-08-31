@@ -1,0 +1,53 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function ContextPage() {
+	@head {
+		<title>Context | Torpor</title>
+	}
+
+	@render {
+		<h1>Context</h1>
+		<p>
+			Every component has a <code>$context</code> object, which can be used to pass
+			values down the component tree without adding props to every component in
+			between. Assign a value in a parent component:
+		</p>
+		<CodePreview
+			code={`
+import UserProfile from "./UserProfile.torp"
+
+export default function App() {
+	$context.user = {
+		name: "John"
+	}
+
+	@render {
+		<UserProfile />
+	}
+}
+`}
+		/>
+		<p>
+			Then read it in any descendant component:
+		</p>
+		<CodePreview
+			code={`
+export default function UserProfile() {
+	let user = $context.user
+
+	@render {
+		<p>
+			Hello, {user.name}!
+		</p>
+	}
+}
+`}
+		/>
+		<p>
+			Any string (or symbol) can be used as a context key, and
+			<code>$context.key</code> is the same as <code>$context["key"]</code>. Values
+			assigned to context may be reactive objects created with $watch, in which case
+			updates to them will be reflected throughout the tree.
+		</p>
+	}
+}

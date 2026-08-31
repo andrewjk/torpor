@@ -1,0 +1,123 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function AsyncPage() {
+
+	@head {
+		<title>Async | Torpor</title>
+	}
+
+	@render {
+		<h1>Async</h1>
+		<p>
+			Async values are created with the <code>$async</code> function, which wraps a
+			promise-returning getter. While the promise is pending, reads of the getter
+			suspend:
+		</p>
+		<CodePreview
+			code={`
+export default function Component($props: { id: number }) {
+	let $state = $watch({
+		get user() {
+			return $async(() => fetchUser($props.id))
+		}
+	})
+
+	@render {
+		<p>
+			Hello, {$state.user.name}!
+		</p>
+	}
+}
+`}
+		/>
+
+		<h2>Await statements</h2>
+		<p>
+			Use an <code>&commat;await</code> statement to show a <code>with</code> branch
+			while suspended, and the content branch when everything has resolved:
+		</p>
+		<CodePreview
+			code={`
+export default function Component($props: { id: number }) {
+	let $state = $watch({
+		get user() {
+			return $async(() => fetchUser($props.id))
+		}
+	})
+
+	@render {
+		@await {
+			<p>
+				Hello, {$state.user.name}!
+			</p>
+		} with {
+			<p>Loading...</p>
+		}
+	}
+}
+`}
+		/>
+		<p>
+			Without a <code>with</code> branch, nothing is rendered while suspended. Once
+			content has rendered, a later suspend keeps the existing content mounted rather
+			than flashing back to the <code>with</code> branch.
+		</p>
+
+		<h2>The $pending function</h2>
+		<p>
+			The <code>$pending</code> function returns <code>true</code> while any
+			$async getter read within it is loading, which is useful for showing a loading
+			indicator inline:
+		</p>
+		<CodePreview
+			code={`
+<button disabled={$pending(() => $state.user)}>
+	Save
+</button>
+@if ($pending(() => $state.user)) {
+	<p>Loading...</p>
+}
+`}
+		/>
+
+		<h2>The $refresh function</h2>
+		<p>
+			The <code>$refresh</code> function re-runs the $async getters read within it,
+			without a dependency having changed. Use it for refresh buttons, polling and
+			retry-after-error:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	let $state = $watch({
+		get data() {
+			return $async(() => fetchData())
+		}
+	})
+
+	function refresh() {
+		$refresh(() => $state.data)
+	}
+
+	@render {
+		<button onclick={refresh}>
+			Refresh
+		</button>
+		<p>
+			{$state.data.message}
+		</p>
+	}
+}
+`}
+		/>
+		<p>
+			A refresh is <em>loud</em> by default: $pending returns true while it is in
+			flight. Pass <code>&#123; silent: true &#125;</code> for a quiet re-fetch, e.g.
+			for polling in the background.
+		</p>
+		<p>
+			When an async value throws, the error can be caught with a
+			<code>&commat;try</code> statement — see <a href="/docs/errors">Errors</a>.
+		</p>
+	}
+}
