@@ -1,6 +1,7 @@
 import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
+import parse from "../../src/compile/parse";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
@@ -45,4 +46,22 @@ test("context -- bare $context read, hydrated", async () => {
 	hydrateComponent(container, clientComponent, serverComponent);
 
 	expect(queryByText(container, "Value: hi from the parent")).not.toBeNull();
+});
+
+test("context -- $context in a sample string is ignored", () => {
+	const input = `
+export default function Test() {
+	const sample = \`
+		function Component() {
+			const context = getIconContext($context);
+		}
+	\`;
+
+	@render {
+		<p>Hello!</p>
+	}
+}
+`;
+	const output = parse(input);
+	expect(output.template?.components[0].contextProps).toBeUndefined();
 });

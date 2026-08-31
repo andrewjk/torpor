@@ -1,6 +1,7 @@
 import type TemplateComponent from "../../types/TemplateComponent";
 import type ParseResult from "../types/ParseResult";
-import { skipStringOrComment } from "../utils/codeScanner";
+import collectMarkupExpressions from "../utils/collectMarkupExpressions";
+import { codeRanges, skipStringOrComment } from "../utils/codeScanner";
 import endOfString from "../utils/endOfString";
 import endOfTemplateString from "../utils/endOfTemplateString";
 import isElementNode from "../utils/isElementNode";
@@ -158,6 +159,7 @@ function parseComponentStart(status: ParseStatus) {
 		name,
 		exported,
 		default: def,
+		scriptStart: status.script.length,
 	};
 	status.components.push(current);
 
@@ -499,9 +501,27 @@ function parseComponentEnd(status: ParseStatus) {
 
 	// Get all usages of $props.name and $props["name"]
 	// Get all usages of $context.name and $context["name"]
-	const componentSource = status.source.substring(current.start || 0, status.i);
-	current.props = getPropsUsage(componentSource);
-	current.contextProps = getContextUsage(componentSource);
+	//
+	// Only scan what the compiled output will actually reference: script code
+	// and markup expressions (control statements, reactive attribute values,
+	// `{...}` interpolations). `codeRanges` identifies the code positions, so
+	// matches that start inside a string, comment or regex literal are
+	// ignored — e.g. sample code in a template literal attribute (like the
+	// docs pages' code samples) doesn't inject a $props param that nothing
+	// uses. Prose text and static attribute values are never compiled into
+	// references
+	const scriptText = status.script
+		.slice(current.scriptStart ?? status.script.length)
+		.map((chunk) => chunk.script)
+		.join("\n");
+	const markupParts: string[] = [];
+	if (current.markup) markupParts.push(collectMarkupExpressions(current.markup));
+	if (current.error) markupParts.push(collectMarkupExpressions(current.error));
+	if (current.head) markupParts.push(collectMarkupExpressions(current.head));
+	const usageSource = scriptText + "\n" + markupParts.join("\n");
+	const usageRanges = codeRanges(usageSource);
+	current.props = getPropsUsage(usageSource, usageRanges);
+	current.contextProps = getContextUsage(usageSource, usageRanges);
 
 	// If the top-level element is <html> and there is whitespace after it,
 	// delete the whitespace, as that's what browsers seem to do. It may be
@@ -518,10 +538,17 @@ function parseComponentEnd(status: ParseStatus) {
 	status.marker = status.i;
 }
 
-function getPropsUsage(source: string): string[] | undefined {
-	const propsMatches = source.matchAll(/\$props\??\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
+/**
+ * Gets the `$props` names that the compiled output references. The input is
+ * the component's code-only text (script plus markup expressions), with
+ * `ranges` marking the positions that are code — matches that start inside a
+ * string, comment or regex literal are ignored, so mentions inside
+ * sample-code strings or prose don't count.
+ */
+function getPropsUsage(source: string, ranges: [number, number][]): string[] | undefined {
 	const props: string[] = [];
-	for (let match of propsMatches) {
+	for (let match of source.matchAll(/\$props\??\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g)) {
+		if (!isInCode(ranges, match.index!)) continue;
 		const name = trimQuotes(match[1] || match[2]);
 		if (!props.includes(name)) {
 			props.push(name);
@@ -533,16 +560,28 @@ function getPropsUsage(source: string): string[] | undefined {
 	// following `:` means it's a (re)declaration or type annotation, and a
 	// following `<` means it's text in markup (e.g. "<code>$props</code>"),
 	// neither of which count
-	if (!props.length && /(?<![\w$])\$props(?![\w])(?!\s*:)(?!<)/.test(source)) {
-		props.push("$props");
+	if (!props.length) {
+		for (let match of source.matchAll(/(?<![\w$])\$props(?![\w])(?!\s*:)(?!<)/g)) {
+			if (!isInCode(ranges, match.index!)) continue;
+			props.push("$props");
+			break;
+		}
 	}
 	return props.length ? props : undefined;
 }
 
-function getContextUsage(source: string): string[] | undefined {
+/**
+ * Gets the `$context` names that the compiled output references. The input is
+ * the component's code-only text (script plus markup expressions), with
+ * `ranges` marking the positions that are code — matches that start inside a
+ * string, comment or regex literal are ignored, so mentions inside
+ * sample-code strings or prose don't count.
+ */
+function getContextUsage(source: string, ranges: [number, number][]): string[] | undefined {
 	const contextsMatches = source.matchAll(/\$context\??\s*(?:\.([\d\w]+)|\[([^\]]+)\])/g);
 	const contexts: string[] = [];
 	for (let match of contextsMatches) {
+		if (!isInCode(ranges, match.index!)) continue;
 		const name = trimQuotes(match[1] || match[2]);
 		if (!contexts.includes(name)) {
 			contexts.push(name);
@@ -554,10 +593,26 @@ function getContextUsage(source: string): string[] | undefined {
 	// `:` means it's a (re)declaration or type annotation, and a following
 	// `<` means it's text in markup (e.g. "<code>$context</code>"), neither
 	// of which count
-	if (!contexts.length && /(?<![\w$])\$context(?![\w])(?!\s*:)(?!<)/.test(source)) {
-		contexts.push("$context");
+	if (!contexts.length) {
+		for (let match of source.matchAll(/(?<![\w$])\$context(?![\w])(?!\s*:)(?!<)/g)) {
+			if (!isInCode(ranges, match.index!)) continue;
+			contexts.push("$context");
+			break;
+		}
 	}
 	return contexts.length ? contexts : undefined;
+}
+
+/**
+ * Returns true if `index` falls inside one of the (sorted, non-overlapping)
+ * code ranges — i.e. not inside a string, comment or regex literal.
+ */
+function isInCode(ranges: [number, number][], index: number): boolean {
+	for (const [start, end] of ranges) {
+		if (index >= start && index < end) return true;
+		if (index < start) return false;
+	}
+	return false;
 }
 
 function consumeScriptComments(status: ParseStatus): boolean {

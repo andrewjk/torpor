@@ -22,6 +22,8 @@ export default interface TemplateComponent {
 	errorVar?: string;
 	head?: RootNode;
 	style?: Style;
+	/** The index of the component's first script chunk in the template's script list */
+	scriptStart?: number;
 	/** The type or interface that is used for the $props param */
 	propsType?: string;
 	/** $props that are used in the component's function */
