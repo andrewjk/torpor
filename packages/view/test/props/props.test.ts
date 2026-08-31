@@ -15,3 +15,19 @@ export default function Test() {
 	const expected = ["name", "age", "address"];
 	expect(output.template?.components[0].props).toEqual(expected);
 });
+
+test("props -- bare $props reference", () => {
+	const input = `
+export default function Test() {
+	let props = $props ?? {};
+
+	@render {
+		<p>
+			Hi {props.name}!
+		</p>
+	}
+}
+`;
+	const output = parse(input);
+	expect(output.template?.components[0].props).toEqual(["$props"]);
+});

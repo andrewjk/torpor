@@ -527,6 +527,15 @@ function getPropsUsage(source: string): string[] | undefined {
 			props.push(name);
 		}
 	}
+	// Also check for bare `$props` references, e.g. spreading it into a new
+	// object with `let props = $props ?? {}`. These don't have a property
+	// accessor, but still need the `$props` parameter to be declared. A
+	// following `:` means it's a (re)declaration or type annotation, and a
+	// following `<` means it's text in markup (e.g. "<code>$props</code>"),
+	// neither of which count
+	if (!props.length && /(?<![\w$])\$props(?![\w])(?!\s*:)(?!<)/.test(source)) {
+		props.push("$props");
+	}
 	return props.length ? props : undefined;
 }
 
@@ -538,6 +547,15 @@ function getContextUsage(source: string): string[] | undefined {
 		if (!contexts.includes(name)) {
 			contexts.push(name);
 		}
+	}
+	// Also check for bare `$context` references, e.g. passing the whole
+	// context object to a function. These don't have a property accessor,
+	// but still need the `$context` parameter to be declared. A following
+	// `:` means it's a (re)declaration or type annotation, and a following
+	// `<` means it's text in markup (e.g. "<code>$context</code>"), neither
+	// of which count
+	if (!contexts.length && /(?<![\w$])\$context(?![\w])(?!\s*:)(?!<)/.test(source)) {
+		contexts.push("$context");
 	}
 	return contexts.length ? contexts : undefined;
 }
