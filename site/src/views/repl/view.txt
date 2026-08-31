@@ -1063,6 +1063,7 @@ function deepWrap(value) {
 	if (value === void 0 || value === null || typeof value !== "object") return value;
 	if (value[proxyDataSymbol] !== void 0) return proxyCache.get(value) ?? value;
 	if (value.then !== void 0) return value;
+	if (value.nodeType !== void 0) return value;
 	let cached = proxyCache.get(value);
 	if (cached !== void 0) return cached;
 	const proxy = $watch(value);
@@ -1108,8 +1109,13 @@ function proxyGet(target, key, receiver) {
 	} else if (signal.type === 0) {
 		if (data.shallow !== true) {
 			const value = target[key];
-			const wrapped = deepWrap(value);
-			if (wrapped !== value) target[key] = wrapped;
+			if (typeof value === "object" && value !== null) {
+				const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
+				if (propDescriptor !== void 0 && propDescriptor.writable) {
+					const wrapped = deepWrap(value);
+					if (wrapped !== value) target[key] = wrapped;
+				}
+			}
 		}
 		trackProxySignal(data, key);
 	} else if (signal.type === 1) {
@@ -1415,7 +1421,7 @@ function proxySet(target, key, value, receiver) {
 		if (context.batchOperation > 100) throw new Error("Cycle detected");
 		let data = target[proxyDataSymbol];
 		devContext.signalSet(data, key);
-		if (oldValue && oldValue[proxyDataSymbol] !== void 0) value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
+		if (data.shallow !== true) value = deepWrap(value);
 		Reflect.set(target, key, value, receiver);
 		propagateSignal(data, key);
 		if (data.isArray && typeof key !== "symbol" && !isNaN(+key)) propagateSignal(data, "length");

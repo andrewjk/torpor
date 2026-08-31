@@ -38,9 +38,10 @@ interface DateRangePickerDayProps {
  * range while the user hovers.
  */
 export default function DateRangePickerDay($props: DateRangePickerDayProps | undefined) {
-	// Ensure the value is a reactive date
-	let reactiveDate = $watch(new Date($unwrap($props?.date ?? new Date())));
-	$props!.date = reactiveDate;
+	// Ensure the value is a reactive date -- assigning a plain date to
+	// watched props/state wraps it automatically
+	$props!.date = new Date($unwrap($props?.date ?? new Date()));
+	let reactiveDate = $props!.date;
 
 	// Get stuff out of the Calendar context
 	const calendarContext = $context[CalendarContextName] as CalendarContext;

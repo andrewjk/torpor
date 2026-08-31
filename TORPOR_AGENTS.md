@@ -44,8 +44,11 @@ and re-run subscribed effects. Updates batch automatically.
 
 ### `$watch(object, options?)`
 
-Creates a reactive proxy. Deep-wraps nested objects/arrays on access (unless
-`options.shallow === true`). Returns the same object if already proxied.
+Creates a reactive proxy. Deep-wraps nested objects/arrays on access, and
+wraps plain objects/arrays/Dates/Maps/Sets **assigned** to watched state
+automatically, so `$state.date = new Date(...)` needs no explicit `$watch`
+(unless `options.shallow === true`, whose children stay unwrapped). Returns
+the same object if already proxied.
 
 ```torp
 let $state = $watch({ count: 0, name: "John" });
@@ -307,7 +310,9 @@ proxy). Useful when passing a proxied object to code that must not be proxied.
 
 `$watch` supports `Date`, `Map` and `Set` values directly -- no wrapper
 classes needed. Their methods are reactive: reads track signals and writes
-notify, so effects re-run when they change.
+notify, so effects re-run when they change. Assigning a plain value to
+watched state wraps it automatically, so there's usually no need to call
+`$watch(new Date(...))` yourself.
 
 ```torp
 let $state = $watch({ date: new Date(2024, 0, 15) });

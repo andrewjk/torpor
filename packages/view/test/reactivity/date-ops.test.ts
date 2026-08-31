@@ -110,17 +110,75 @@ test("top-level date in watched state is reactive", () => {
 	expect(year).toBe(2025);
 });
 
-test("setting the same date time does not re-run effects", () => {
-	let date = $watch(new Date(2024, 0, 15));
+test("setting a plain date on watched state wraps it automatically", () => {
+	let $state = $watch({});
 	let runs = 0;
+	let year = 0;
+
+	$state.date = new Date(2024, 0, 15);
 
 	$run(() => {
 		runs++;
-		void date.getTime();
+		year = $state.date.getFullYear();
+	});
+
+	expect(runs).toBe(1);
+	expect(year).toBe(2024);
+
+	// The stored date is reactive immediately, before any explicit read
+	$state.date.setFullYear(2025);
+	expect(runs).toBe(2);
+	expect(year).toBe(2025);
+
+	// Reads return the same proxy
+	expect($state.date).toBe($state.date);
+});
+
+test("setting a plain object on watched state wraps it automatically", () => {
+	let $state = $watch({});
+	let runs = 0;
+	let count = 0;
+
+	$state.inner = { count: 1 };
+
+	$run(() => {
+		runs++;
+		count = $state.inner.count;
 	});
 
 	expect(runs).toBe(1);
 
-	date.setTime(new Date(2024, 0, 15).getTime());
+	$state.inner.count = 2;
+	expect(runs).toBe(2);
+	expect(count).toBe(2);
+});
+
+test("shallow watches don't wrap values on set", () => {
+	let $state = $watch({ date: new Date(2024, 0, 15) }, { shallow: true });
+	let raw = new Date(2024, 5, 1);
+
+	$state.date = raw;
+
+	// Stored unwrapped -- the value is the raw date itself
+	expect($state.date).toBe(raw);
+});
+
+test("setting the same date reference doesn't re-run effects", () => {
+	let $state = $watch({ date: new Date(2024, 0, 15) });
+	let runs = 0;
+
+	$run(() => {
+		runs++;
+		void $state.date.getTime();
+	});
+
 	expect(runs).toBe(1);
+
+	// Setting the stored value back is a no-op (identity check)
+	const stored = $state.date;
+	$state.date = stored;
+	expect(runs).toBe(1);
+
+	$state.date = new Date(2025, 0, 15);
+	expect(runs).toBe(2);
 });

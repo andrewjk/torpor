@@ -3,10 +3,10 @@ import type Computed from "../types/Computed";
 import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
 import { COMPUTED_TYPE, EFFECT_TYPE, SIGNAL_TYPE } from "../types/constants";
-import $watch from "./$watch";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 import checkComputed from "./checkComputed";
+import deepWrap from "./deepWrap";
 import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol } from "./symbols";
@@ -72,43 +72,6 @@ function suspendRead(signal: Computed): any {
 		}
 	}
 	return signal.staleValue;
-}
-
-/**
- * Deep-wraps a value with `$watch` if it is a plain object that is not already
- * watched and is not a promise. Returns the value unchanged otherwise.
- *
- * Wraps are cached (`proxyCache`), so repeated wraps of the same raw value
- * return the SAME proxy. This matters where the proxy can't be written back
- * into its parent (Set elements, Map values read via `values()`/`forEach`) --
- * without the cache, each read would return a fresh proxy and mutations would
- * be lost to the raw target (whose property writes bypass the traps).
- */
-const proxyCache = new WeakMap<object, object>();
-
-function deepWrap(value: any): any {
-	if (value === undefined || value === null || typeof value !== "object") {
-		return value;
-	}
-	if (value[proxyDataSymbol] !== undefined) {
-		// Already watched -- it's either a proxy itself, or a raw target whose
-		// proxy wasn't cached (e.g. it was wrapped directly via `$watch` and
-		// never deep-wrapped). Short-circuit BEFORE reading `then`, otherwise
-		// the read goes through the proxy's `get` trap and creates a spurious
-		// signal for a property nothing ever sets
-		return proxyCache.get(value) ?? value;
-	}
-	// But not if it's a Promise (i.e. has a `then` method)
-	if (value.then !== undefined) {
-		return value;
-	}
-	const cached = proxyCache.get(value);
-	if (cached !== undefined) {
-		return cached;
-	}
-	const proxy = $watch(value);
-	proxyCache.set(value, proxy);
-	return proxy;
 }
 
 export default function proxyGet(
@@ -217,15 +180,20 @@ export default function proxyGet(
 		}
 	} else if (signal.type === SIGNAL_TYPE) {
 		// The signal may have been created for a PREVIOUS value at this key —
-		// e.g. the property was reassigned to a raw object that skipped the
-		// `set` trap's re-wrap (the trap only re-wraps when the OLD value was
-		// a proxy). Make sure the current value is deep-wrapped, the same as
-		// the first-read path above
+		// e.g. the property was assigned between reads. Make sure the current
+		// value is deep-wrapped, the same as the first-read path above -- but
+		// only for writable own data properties, since prototype accessors
+		// (e.g. a DOM node's `parentElement`) can't be written back
 		if (data.shallow !== true) {
 			const value = target[key];
-			const wrapped = deepWrap(value);
-			if (wrapped !== value) {
-				target[key] = wrapped;
+			if (typeof value === "object" && value !== null) {
+				const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
+				if (propDescriptor !== undefined && propDescriptor.writable) {
+					const wrapped = deepWrap(value);
+					if (wrapped !== value) {
+						target[key] = wrapped;
+					}
+				}
 			}
 		}
 

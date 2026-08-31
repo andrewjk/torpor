@@ -1,6 +1,6 @@
 import devContext from "../dev/devContext";
 import context from "../render/context";
-import $watch from "./$watch";
+import deepWrap from "./deepWrap";
 //import transferEffects from "./transferEffects";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol } from "./symbols";
@@ -26,11 +26,19 @@ export default function proxySet(
 		// DEV:
 		devContext.signalSet(data, key);
 
-		// If the value was previously a proxy, watch the new value and update
-		// its effect subscriptions
-		if (oldValue && oldValue[proxyDataSymbol] !== undefined) {
-			value = $watch(value, { shallow: oldValue[proxyDataSymbol].shallow });
-			//transferEffects(oldValue, newValue);
+		// Wrap the new value if it's an object (plain objects, arrays, Dates,
+		// Maps, Sets), so storing it and mutating it through the proxy is
+		// reactive right away -- same as the `get` trap's deep-wrap on read.
+		// Skipped for shallow watches, whose children stay unwrapped.
+		// NOTE: this is mostly an ergonomics/consistency win (raw values
+		// assigned here used to leak out of raw-target paths like the array
+		// `slice`/`map` handles). The `get` trap's lazy wrap still covers the
+		// common read paths, so if profiling ever shows this line being slow
+		// (it allocates a proxy per assigned object), just delete it and
+		// everything reverts to wrap-on-read
+		if (data.shallow !== true) {
+			value = deepWrap(value);
+			//transferEffects(oldValue, value);
 		}
 
 		// Set the property value on the target

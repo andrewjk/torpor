@@ -64,9 +64,10 @@ export default function Calendar($props: CalendarProps) {
 
 	$props ??= $watch({});
 
-	// Ensure the value is a reactive date
-	let reactiveValue = $watch(new Date($unwrap($props.value ?? new Date())));
-	$props.value = reactiveValue;
+	// Ensure the value is a reactive date -- assigning a plain date to
+	// watched props/state wraps it automatically
+	$props.value = new Date($unwrap($props.value ?? new Date()));
+	let reactiveValue = $props.value;
 
 	// A note on dates:
 	// * value is the selected value
@@ -130,7 +131,7 @@ export default function Calendar($props: CalendarProps) {
 
 	function setValue(date: Date) {
 		// TODO: for date pickers etc
-		// $state.value = $watch(new Date(date));
+		// $state.value = new Date(date);
 
 		// Also set the active date so that the user knows where they are
 		setActiveDate(date);
@@ -141,12 +142,12 @@ export default function Calendar($props: CalendarProps) {
 	}
 
 	function setActiveDate(date: Date, moveRange = false) {
-		$state.activeDate = $watch(new Date(date));
+		$state.activeDate = new Date(date);
 
 		// If the selected date is outside the visible date range, move the date range
 		if (moveRange || date < $state.visibleStartDate || date > $state.visibleEndDate) {
 			refocus = true;
-			$state.visibleDate = $watch(new Date(date));
+			$state.visibleDate = new Date(date);
 			if ($props.onchangedate) {
 				$props.onchangedate(date);
 			}
