@@ -130,7 +130,7 @@ export default function CommandPalette($props: CommandPaletteProps | undefined) 
 	}
 
 	// Toggle the palette with a keyboard shortcut, e.g. mod+k
-	$mount(() => {
+	$onmount(() => {
 		if (!$props?.hotkey) return;
 		const [modifier, key] = parseHotkey($props.hotkey);
 		if (!key) return;

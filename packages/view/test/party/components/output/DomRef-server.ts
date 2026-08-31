@@ -1,4 +1,4 @@
-import $mount from "../../../../src/ssr/$serverMount";
+import $onmount from "../../../../src/ssr/$serverOnmount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function InputFocused(
@@ -11,7 +11,7 @@ export default function InputFocused(
 
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		// HACK: This is easier to test for
 		inputElement.value = "hi";
 	});

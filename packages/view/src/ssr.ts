@@ -6,8 +6,7 @@ import $async from "./ssr/$serverAsync";
 import $batch from "./ssr/$serverBatch";
 import $bind from "./ssr/$serverBind";
 import $cache from "./ssr/$serverCache";
-import $handle from "./ssr/$serverHandle";
-import $mount from "./ssr/$serverMount";
+import $onmount from "./ssr/$serverOnmount";
 import $peek from "./ssr/$serverPeek";
 import $pending from "./ssr/$serverPending";
 import $refresh from "./ssr/$serverRefresh";
@@ -25,10 +24,9 @@ import type StreamSource from "./types/StreamSource";
 export {
 	$watch,
 	$bind,
-	$handle,
 	$cache,
 	$run,
-	$mount,
+	$onmount,
 	$stream,
 	$unwrap,
 	$peek,

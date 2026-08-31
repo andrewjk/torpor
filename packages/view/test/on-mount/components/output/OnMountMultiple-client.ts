@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import $run from "../../../../src/watch/$run";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
@@ -32,11 +32,11 @@ export default function OnMountMultiple(
 	const t_p_1 = t_next(t_next(t_next(t_next(t_select_1, true)), true)) as HTMLElement;
 	const t_text_2 = t_child(t_p_1);
 	// @ts-ignore
-	$mount(() => {
+	$onmount(() => {
 		return ((node) => node.value = "set by onmount")(t_input_1);
 	});
 	// @ts-ignore
-	$mount(() => {
+	$onmount(() => {
 		return ((node) => node.selectedIndex = 2)(t_select_1);
 	});
 	$run(() => {

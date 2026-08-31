@@ -9,17 +9,17 @@ const source = `
 export default function MountOrder() {
 	let $state = $watch({ order: "" });
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("first");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("second");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("third");
 		$state.order = (window as any).__mountLog.join(", ");
 	});

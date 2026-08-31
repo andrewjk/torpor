@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -42,7 +42,7 @@ export default function IfCache(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_p_1 = t_root_1 as HTMLElement;
 			// @ts-ignore
-			$mount(() => {
+			$onmount(() => {
 				return (() => $props.i++)(t_p_1);
 			});
 			t_add_element(t_p_1, t_fragment_0, t_before);

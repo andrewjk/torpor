@@ -7,7 +7,7 @@ import mountComponent from "../mountComponent";
 // Mount effects must fire ONCE per row lifetime, not on every keyed-list
 // update. When the keyed reconciler reuses a row (same key, new data), it
 // force re-runs the row's effects via `rerunEffectsOnRegion` — which must
-// skip the `$mount`/`onmount`-backed effects, or `onmount` would re-fire on
+// skip the `$onmount`/`onmount`-backed effects, or `onmount` would re-fire on
 // every update and mis-count row creations.
 const source = `
 export default function MountEffectList($props: { items: Array<{ id: number; value: string }> }) {

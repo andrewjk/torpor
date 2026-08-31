@@ -39,7 +39,7 @@ export default function buildHtml(source: string, state?: any, componentPath?: s
 const $watch = (obj: Record<PropertyKey, any>) => obj;
 const $unwrap = (obj: Record<PropertyKey, any>) => obj;
 const $run = (fn: Function) => null;
-const $mount = (fn: Function) => null;
+const $onmount = (fn: Function) => null;
 const t_fmt = (value: any) => (value ?? "").toString();
 const t_attr = (value: any) => (value ?? "").toString().replaceAll('"', "&quot;")
 ${

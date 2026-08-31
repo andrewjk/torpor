@@ -1,4 +1,4 @@
-import $mount from "../../../../src/ssr/$serverMount";
+import $onmount from "../../../../src/ssr/$serverOnmount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function Mount(
@@ -11,7 +11,7 @@ export default function Mount(
 
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		inputElement.value = "hi";
 	});
 

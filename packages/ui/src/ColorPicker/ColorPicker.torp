@@ -122,7 +122,7 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 			hexInput.value = text;
 		}
 	});
-	$mount(() => syncInput());
+	$onmount(() => syncInput());
 
 	@render {
 		<div class={["torp-color-picker", $props?.class]} {$props?.style}>

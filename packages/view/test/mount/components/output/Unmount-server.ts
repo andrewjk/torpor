@@ -1,4 +1,4 @@
-import $mount from "../../../../src/ssr/$serverMount";
+import $onmount from "../../../../src/ssr/$serverOnmount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
 export default function UnmountTest(
@@ -9,7 +9,7 @@ export default function UnmountTest(
 	let t_body = "";
 	let t_head = "";
 
-	$mount(() => {
+	$onmount(() => {
 		window.__unmountLog.push("mount")
 		return () => {
 			window.__unmountLog.push("cleanup")

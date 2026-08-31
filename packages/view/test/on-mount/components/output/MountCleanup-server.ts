@@ -1,9 +1,7 @@
-import $mount from "../../../../src/ssr/$serverMount";
-import $watch from "../../../../src/ssr/$serverWatch";
-import t_fmt from "../../../../src/ssr/formatText";
+import $onmount from "../../../../src/ssr/$serverOnmount";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function MountCleanupReturn(
+export default function MultiMount(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -11,18 +9,18 @@ export default function MountCleanupReturn(
 	let t_body = "";
 	let t_head = "";
 
-	let $state = $watch({ mounted: false })
-
-	$mount(() => {
-		$state.mounted = true
-		window.__mountLog.push("mount")
-		return () => {
-			window.__mountLog.push("cleanup")
-		}
+	$onmount(() => {
+		window.__mountLog.push("first")
+	})
+	$onmount(() => {
+		window.__mountLog.push("second")
+	})
+	$onmount(() => {
+		window.__mountLog.push("third")
 	})
 
 	/* User interface */
-	t_body += `<p>Mounted: ${t_fmt($state.mounted)}</p>`;
+	t_body += `<p>Multi</p>`;
 
 	return { body: t_body, head: t_head };
 }

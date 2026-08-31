@@ -37,7 +37,7 @@ export interface ChartLayoutOptions {
  * the plot geometry -- maximum value, step sizes, slot widths and the
  * left/bottom margins -- reactively from the series and axis props.
  *
- * Charts render only their own marks; call `measure` from `$mount` with the
+ * Charts render only their own marks; call `measure` from `$onmount` with the
  * hidden `<text>` element they render for that purpose.
  *
  * ```
@@ -45,7 +45,7 @@ export interface ChartLayoutOptions {
  * 	series: () => $props.series,
  * 	getContainer: () => container,
  * });
- * $mount(() => setTimeout(() => measure($layout, measurer), 1));
+ * $onmount(() => setTimeout(() => measure($layout, measurer), 1));
  * ```
  */
 export interface ChartLayout {
@@ -134,7 +134,7 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 /**
  * Reads the size of a hidden measurer `<text>` element into the layout
  * state and removes it. Call once the element is in the document (from
- * `$mount`, deferred a tick).
+ * `$onmount`, deferred a tick).
  */
 export function measureChartText(layout: ChartLayout, measurer: SVGTextElement): void {
 	const bbox = measurer.getBBox();

@@ -17,8 +17,9 @@ import runEffect from "../watch/runEffect";
  * `changedMask` is a bitmask of the for-var positions whose references
  * actually changed in this update. Each effect carries `forVarMask`
  * (computed at compile time) listing the for-vars its body reads; effects
- * whose `forVarMask & changedMask === 0` are skipped. Mount effects
- * (`isMountEffect`) are always skipped — they fire once per DOM mount.
+ * whose `forVarMask & changedMask === 0` are skipped. Mount callbacks
+ * (`isMountEffect` — `$onmount`/`onmount`) are always skipped: they run
+ * once per DOM mount and their bodies are untracked.
  *
  * Equivalent to what `checkEffect` does when a signal has propagated, but
  * unconditional for the effects that do match: cleanup → deactivate sources
@@ -37,10 +38,10 @@ export default function rerunRegionEffects(region: Region, changedMask: number):
 
 function rerunEffectsOnRegion(region: Region, changedMask: number): void {
 	for (let effect of region.effects) {
-		// Mount effects run once per region mount (their `onmount`/`$mount`
-		// semantics). Re-running them here would fire `onmount` on every
-		// keyed-list item update even when the DOM node is reused. Any
-		// reactive re-runs they need are handled by the normal signal path.
+		// Mount callbacks run once per region mount (their `$onmount`/`onmount`
+		// semantics) and are untracked, so re-running them here would fire
+		// `onmount` again on every keyed-list item update even when the DOM node
+		// is reused.
 		if (effect.isMountEffect) continue;
 		// When `forVarMask` is set (effect emitted inside a no-proxy `@for`
 		// body), skip effects that don't read any of the changed for-vars.

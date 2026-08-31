@@ -1,7 +1,7 @@
 import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
-import $run from "../watch/$run";
+import flushMountEffects from "../watch/flushMountEffects";
 import context from "./context";
 import newRegion from "./newRegion";
 import pushRegion from "./pushRegion";
@@ -33,9 +33,6 @@ export default function hydrate(
 
 	context.hydrationNode = null;
 
-	// Now that we've hydrated, we can run $mount effects
-	for (let effect of context.mountEffects) {
-		$run(effect);
-	}
-	context.mountEffects.length = 0;
+	// Now that we've hydrated, we can run $onmount effects
+	flushMountEffects();
 }

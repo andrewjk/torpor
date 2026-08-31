@@ -34,7 +34,7 @@ export default function DialogButton($props: DialogButtonProps | undefined) {
 	}
 	const handleButton = context.handleButton;
 
-	$mount(() => {
+	$onmount(() => {
 		// Store the confirm or cancel button in the DialogContext
 		if ($props?.type === "confirm") {
 			context.confirmButton = button;

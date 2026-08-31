@@ -11,9 +11,9 @@ export default function buildMount(
 ): void {
 	functionBody = replaceForVarNames(functionBody, status);
 
-	status.imports.add("$mount");
+	status.imports.add("$onmount");
 	// Ignore errors if the user hasn't returned a cleanup function
-	b.append("// @ts-ignore\n$mount(() => {");
+	b.append("// @ts-ignore\n$onmount(() => {");
 	b.append(functionBody);
 	b.append("});");
 }

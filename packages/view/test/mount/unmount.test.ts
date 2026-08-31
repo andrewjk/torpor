@@ -8,7 +8,7 @@ import mountComponent from "../mountComponent";
 
 const source = `
 export default function UnmountTest() {
-	$mount(() => {
+	$onmount(() => {
 		window.__unmountLog.push("mount")
 		return () => {
 			window.__unmountLog.push("cleanup")
@@ -21,7 +21,7 @@ export default function UnmountTest() {
 }
 `;
 
-test("unmount clears the container and runs $mount cleanups", async () => {
+test("unmount clears the container and runs $onmount cleanups", async () => {
 	(window as any).__unmountLog = [];
 
 	const container = document.createElement("div");

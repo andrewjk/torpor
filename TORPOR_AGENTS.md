@@ -84,30 +84,33 @@ $run(() => {
 
 `$run` is what `@if`/`@for`/attribute updates compile down to internally.
 
-### `$handle(fn)`
+### `$onmount(fn)`
 
-Like `$run`, but the callback receives a `first` boolean — `true` on the
-initial run, `false` on change-driven re-runs. Lets you distinguish setup from
-"react to a change" without a manual flag:
+Runs `fn` once, after the component is mounted to the DOM. May return a
+cleanup function (runs on unmount/region clear). Multiple `$onmount`s run in
+order.
 
-```torp
-$handle((first) => {
-	if (first) initStuff();
-	else onChanged();
-});
-```
-
-### `$mount(fn)`
-
-Runs `fn` once after the component is mounted to the DOM. May return a cleanup
-function (runs on unmount/region clear). Multiple `$mount`s run in order.
+The callback is **not reactive**: it never re-runs, and reactive values it
+reads are not tracked. To set up something that should keep updating, put a
+`$run` inside it:
 
 ```torp
-$mount(() => {
+$onmount(() => {
 	inputElement.value = "hi";
 	return () => unlisten();
 });
+
+// Reactive setup that needs the DOM to exist first:
+$onmount(() => {
+	$run(() => {
+		label.textContent = $state.count > 0 ? "+" : "";
+	});
+});
 ```
+
+The element-level equivalent is the `onmount` attribute, which fires once
+when that element is mounted and receives the element:
+`<input onmount={(el) => el.focus()} />`.
 
 ### `$stream(source, handler, options?)` — external event streams
 
@@ -533,13 +536,13 @@ delegated events (including when the click lands on a child).
 
 Two-way bindings use a leading `&`:
 
-| Syntax                          | Purpose                                                                                                          |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `&value={$state.name}`          | Two-way value binding on `input`/`select`/`textarea` (number inputs coerce; text inputs map to string).          |
-| `&checked={$state.isAvailable}` | Two-way checkbox checked state.                                                                                  |
-| `&group={$state.picked}`        | Radio group: selecting a radio writes its `value` into `$state.picked`.                                          |
-| `&ref={var}`                    | DOM reference: assigns the element node to `var` on mount (usable in `$mount`, `@render` after mount, handlers). |
-| `&key={$state.value}`           | Two-way component prop binding (see `$bind` above).                                                              |
+| Syntax                          | Purpose                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `&value={$state.name}`          | Two-way value binding on `input`/`select`/`textarea` (number inputs coerce; text inputs map to string).            |
+| `&checked={$state.isAvailable}` | Two-way checkbox checked state.                                                                                    |
+| `&group={$state.picked}`        | Radio group: selecting a radio writes its `value` into `$state.picked`.                                            |
+| `&ref={var}`                    | DOM reference: assigns the element node to `var` on mount (usable in `$onmount`, `@render` after mount, handlers). |
+| `&key={$state.value}`           | Two-way component prop binding (see `$bind` above).                                                                |
 
 ```torp
 <input &value={$state.text} />

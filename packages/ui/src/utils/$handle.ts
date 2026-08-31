@@ -1,5 +1,4 @@
-import $run from "./$run";
-import type Cleanup from "../types/Cleanup";
+import { $run } from "@torpor/view";
 
 /**
  * Runs a function once on subscription and re-runs it whenever any reactive
@@ -8,14 +7,13 @@ import type Cleanup from "../types/Cleanup";
  * callers can distinguish setup from "react to a change" without maintaining
  * their own `firstChange` flag.
  *
- * Behaves like `$run` (every reactive read inside the body establishes a
- * subscription, so you can react to multiple sources naturally) — the only
- * addition is the `first` argument.
+ * This is a small helper over `$run` kept in @torpor/ui for its components;
+ * library authors can copy it if they need the same pattern.
  *
  * @param fn The function to run, receiving a `first` flag. May return a
  *   cleanup function.
  */
-export default function $handle(fn: (first: boolean) => Cleanup | void): void {
+export default function $handle(fn: (first: boolean) => void | (() => void)): void {
 	let firstRun = true;
 	$run(() => {
 		const first = firstRun;

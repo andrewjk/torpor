@@ -203,7 +203,7 @@ export default function Component() {
 `}
 		/>
 		<p>
-			This can be used to re-run component $mount statements and to re-play transition
+			This can be used to re-run component $onmount statements and to re-play transition
 			animations.
 		</p>
 

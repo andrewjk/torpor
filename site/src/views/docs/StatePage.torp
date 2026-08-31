@@ -102,12 +102,36 @@ export default function Component() {
 			attributes and statements.
 		</p>
 
-		<h2>The $mount function</h2>
+		<h2>The $onmount function</h2>
 		<p>
-			The <code>$mount</code> function is like the $run function, but it delays its first
-			run until after the @render block has been completed and all elements have been mounted.
-			It is automatically imported into your component if used.
+			The <code>$onmount</code> function runs a function once, after the @render
+			block has been completed and all elements have been mounted. It is
+			automatically imported into your component if used.
 		</p>
+		<p>
+			Unlike $run, an $onmount function does not re-run when reactive values
+			change. To set up something that should keep updating, put a $run inside it:
+		</p>
+		<CodePreview
+			code={`
+export default function Component() {
+	let $state = $watch({
+		count: 0,
+	})
+	let label
+
+	$onmount(() => {
+		$run(() => {
+			label.textContent = $state.count > 0 ? "+" : ""
+		})
+	})
+
+	@render {
+		<label &ref={label}></label>
+	}
+}
+`}
+		/>
 
 		<h2>Other functions</h2>
 		<p>

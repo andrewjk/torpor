@@ -35,7 +35,7 @@ export default function addFragment(
 		parent.insertBefore(fragment, before);
 	}
 
-	// If we're adding this fragment to the DOM, we can now run any $mount
+	// If we're adding this fragment to the DOM, we can now run any $onmount
 	// effects, add our stashed events and play our stashed animations
 	runMountSideEffects(parent, activeRegion, hydrationNode);
 }

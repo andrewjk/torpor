@@ -96,7 +96,7 @@ export default function MaskedInput($props: MaskedInputProps | undefined) {
 			input.value = next;
 		}
 	});
-	$mount(() => syncInput());
+	$onmount(() => syncInput());
 
 	function handleInput(e: Event) {
 		if (getDisabled()) return;

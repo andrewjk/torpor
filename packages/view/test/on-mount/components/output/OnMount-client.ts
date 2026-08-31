@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import t_add_element from "../../../../src/render/addElement";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
@@ -20,7 +20,7 @@ export default function OnMount(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_input_1 = t_root_0 as HTMLInputElement;
 	// @ts-ignore
-	$mount(() => {
+	$onmount(() => {
 		return ((node) => node.value = "hi")(t_input_1);
 	});
 	t_add_element(t_input_1, $parent, $anchor);

@@ -93,7 +93,7 @@ describe("createItemGroup", () => {
 			shown2 = item2.active;
 		});
 
-		// $mount-style effect: default the value once, re-running reactively
+		// $onmount-style effect: default the value once, re-running reactively
 		$run(() => {
 			if ($state.value === "" && group.itemStates.length) {
 				$state.value = group.itemStates[0].value;

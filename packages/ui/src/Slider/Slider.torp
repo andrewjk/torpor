@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import $handle from "../utils/$handle";
 import {
 	type FieldContext,
 	FieldContextName,
@@ -157,7 +158,7 @@ export default function Slider($props: SliderProps | undefined) {
 	}
 
 	// Stop listening if the slider is unmounted mid-drag
-	$mount(() => {
+	$onmount(() => {
 		return () => removeDragListeners();
 	});
 

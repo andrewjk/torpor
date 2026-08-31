@@ -119,8 +119,9 @@ export default interface Context {
 	refreshInitialized: Set<Computed> | null;
 
 	/**
-	 * Functions that were run via $mount, which should be collected and flushed
-	 * when the component has been mounted in the DOM
+	 * Functions that were run via $onmount (or the onmount attribute), which
+	 * should be collected and flushed when the component has been mounted in
+	 * the DOM
 	 */
 	mountEffects: (() => Cleanup | void)[];
 

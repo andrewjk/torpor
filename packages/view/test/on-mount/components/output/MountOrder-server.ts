@@ -1,4 +1,4 @@
-import $mount from "../../../../src/ssr/$serverMount";
+import $onmount from "../../../../src/ssr/$serverOnmount";
 import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
@@ -13,17 +13,17 @@ export default function MountOrder(
 
 	let $state = $watch({ order: "" });
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("first");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("second");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("third");
 		$state.order = (window as any).__mountLog.join(", ");
 	});

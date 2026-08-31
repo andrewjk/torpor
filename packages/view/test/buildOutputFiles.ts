@@ -126,7 +126,8 @@ const importsMap: Record<string, string> = {
 	'import { $watch } from "@torpor/view";': 'import $watch from "../../../../src/watch/$watch";',
 	'import { $cache } from "@torpor/view";': 'import $cache from "../../../../src/watch/$cache";',
 	'import { $run } from "@torpor/view";': 'import $run from "../../../../src/watch/$run";',
-	'import { $mount } from "@torpor/view";': 'import $mount from "../../../../src/watch/$mount";',
+	'import { $onmount } from "@torpor/view";':
+		'import $onmount from "../../../../src/watch/$onmount";',
 	'import { $unwrap } from "@torpor/view";': 'import $unwrap from "../../../../src/watch/$unwrap";',
 	'import { $peek } from "@torpor/view";': 'import $peek from "../../../../src/watch/$peek";',
 	'import { $batch } from "@torpor/view";': 'import $batch from "../../../../src/watch/$batch";',
@@ -202,8 +203,8 @@ const importsMap: Record<string, string> = {
 	'import { $cache } from "@torpor/view/ssr";':
 		'import $cache from "../../../../src/ssr/$serverCache";',
 	'import { $run } from "@torpor/view/ssr";': 'import $run from "../../../../src/ssr/$serverRun";',
-	'import { $mount } from "@torpor/view/ssr";':
-		'import $mount from "../../../../src/ssr/$serverMount";',
+	'import { $onmount } from "@torpor/view/ssr";':
+		'import $onmount from "../../../../src/ssr/$serverOnmount";',
 	'import { $unwrap } from "@torpor/view/ssr";':
 		'import $unwrap from "../../../../src/ssr/$serverUnwrap";',
 	'import { $peek } from "@torpor/view/ssr";':

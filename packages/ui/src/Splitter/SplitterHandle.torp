@@ -72,7 +72,7 @@ export default function SplitterHandle($props: SplitterHandleProps | undefined) 
 	}
 
 	// Stop listening if the handle is unmounted mid-drag
-	$mount(() => {
+	$onmount(() => {
 		return () => removeDragListeners();
 	});
 

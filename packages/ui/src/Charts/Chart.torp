@@ -69,7 +69,7 @@ export default function Chart($props: ChartProps | undefined) {
 		getContainer: () => container,
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		// HACK: Wait until the measurer is really available
 		setTimeout(() => measureChartText($layout, measurer), 1);
 	});

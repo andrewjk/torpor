@@ -114,7 +114,7 @@ function NameInput($props: { name?: string }) {
 export default function Component() {
 	let para
 
-	$mount(() => {
+	$onmount(() => {
 		para.classList.add("large-text")
 	})
 
@@ -135,7 +135,7 @@ export default function Component() {
 		<p>
 			Note that the DOM element will not be available until after the component has been
 			mounted and all its elements added to the DOM, and so you should only access it
-			from within a $mount function.
+			from within an $onmount function (or an <code>onmount</code> attribute).
 		</p>
 
 		<h2>Playground</h2>

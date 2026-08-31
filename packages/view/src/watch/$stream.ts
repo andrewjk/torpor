@@ -1,5 +1,6 @@
 import context from "../render/context";
 import type StreamSource from "../types/StreamSource";
+import $run from "./$run";
 
 /**
  * Subscribes to an external source of events — server-sent events,
@@ -46,18 +47,25 @@ export default function $stream<T>(
 	context.mountEffects.push(() => {
 		let timer: ReturnType<typeof setTimeout> | undefined;
 
-		const unsub = source((value) => {
-			if (options?.debounce) {
-				clearTimeout(timer);
-				timer = setTimeout(() => handler(value), options.debounce);
-			} else {
-				handler(value);
-			}
-		});
+		// Mount callbacks are once-only and untracked, so the source is set
+		// up inside a `$run`: reactive state it reads is tracked, and when it
+		// changes the source is unsubscribed and re-subscribed with fresh
+		// values. The debounce timer lives outside the effect so re-runs
+		// share it; the effect's cleanup drops any pending call.
+		$run(() => {
+			const unsub = source((value) => {
+				if (options?.debounce) {
+					clearTimeout(timer);
+					timer = setTimeout(() => handler(value), options.debounce);
+				} else {
+					handler(value);
+				}
+			});
 
-		return () => {
-			unsub?.();
-			clearTimeout(timer);
-		};
+			return () => {
+				unsub?.();
+				clearTimeout(timer);
+			};
+		});
 	});
 }

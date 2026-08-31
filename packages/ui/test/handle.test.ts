@@ -1,6 +1,6 @@
+import { $watch } from "@torpor/view";
 import { expect, test } from "vite-plus/test";
-import $handle from "../../src/watch/$handle";
-import $watch from "../../src/watch/$watch";
+import $handle from "../src/utils/$handle";
 
 test("$handle runs immediately with first=true", () => {
 	let $state = $watch({ count: 1 });

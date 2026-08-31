@@ -9,7 +9,7 @@ don't have to relitigate them.
 
 ## Why `$stream` exists
 
-Before `$stream`, the answer to "listen to a server stream" was `$mount` +
+Before `$stream`, the answer to "listen to a server stream" was `$onmount` +
 manual cleanup + writing into `$state` — roughly ten lines of error-prone
 boilerplate per subscription. Most of that boilerplate is sugar-able, but two
 parts are genuinely hard to hand-roll, and they are where the real value sits:

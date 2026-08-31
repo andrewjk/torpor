@@ -175,7 +175,7 @@ function buildElementAttributes(
 			} else if (name === "&value" || name === "&checked") {
 				buildBindAttribute(node, varName, name, value, status, b);
 			} else if (name === "onmount") {
-				// The onmount event is faked by us by creating a $mount. This
+				// The onmount event is faked by us by creating an $onmount. This
 				// also means that you can have unmount functionality by
 				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);

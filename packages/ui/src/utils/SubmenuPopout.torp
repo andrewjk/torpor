@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import $handle from "./$handle";
 import { type PopoutContext, type PopoutState, PopoutContextName } from "./PopoutTypes";
 
 interface SubmenuPopoutProps {

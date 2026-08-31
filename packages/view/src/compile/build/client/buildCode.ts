@@ -16,13 +16,12 @@ import buildNode from "./buildNode";
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
 	$bind: 'import { $bind } from "${folder}";',
-	$handle: 'import { $handle } from "${folder}";',
 	$cache: 'import { $cache } from "${folder}";',
 	$async: 'import { $async } from "${folder}";',
 	$pending: 'import { $pending } from "${folder}";',
 	$refresh: 'import { $refresh } from "${folder}";',
 	$run: 'import { $run } from "${folder}";',
-	$mount: 'import { $mount } from "${folder}";',
+	$onmount: 'import { $onmount } from "${folder}";',
 	$stream: 'import { $stream } from "${folder}";',
 	fromElement: 'import { fromElement } from "${folder}";',
 	fromServer: 'import { fromServer } from "${folder}";',
@@ -135,7 +134,7 @@ function buildTemplate(
 	}
 
 	// Scan only the code in the script: strings, comments and regex literals
-	// are stripped, so e.g. `$mount` inside a sample-code string doesn't
+	// are stripped, so e.g. `$onmount` inside a sample-code string doesn't
 	// inject an import that nothing uses
 	let scriptCode = codeRanges(script)
 		.map(([start, end]) => script.substring(start, end))
@@ -144,13 +143,12 @@ function buildTemplate(
 	// Add default imports
 	if (/\$watch\b/.test(scriptCode)) imports.add("$watch");
 	if (/\$bind\b/.test(scriptCode)) imports.add("$bind");
-	if (/\$handle\b/.test(scriptCode)) imports.add("$handle");
 	if (/\$cache\b/.test(scriptCode)) imports.add("$cache");
 	if (/\$async\b/.test(scriptCode)) imports.add("$async");
 	if (/\$pending\b/.test(scriptCode)) imports.add("$pending");
 	if (/\$refresh\b/.test(scriptCode)) imports.add("$refresh");
 	if (/\$run\b/.test(scriptCode)) imports.add("$run");
-	if (/\$mount\b/.test(scriptCode)) imports.add("$mount");
+	if (/\$onmount\b/.test(scriptCode)) imports.add("$onmount");
 	if (/\$stream\b/.test(scriptCode)) imports.add("$stream");
 	if (/\bfromElement\b/.test(scriptCode)) imports.add("fromElement");
 	if (/\bfromServer\b/.test(scriptCode)) imports.add("fromServer");

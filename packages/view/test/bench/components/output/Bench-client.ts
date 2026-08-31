@@ -155,7 +155,7 @@ export default function Bench(
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
 			for (let row of $state.data) {
-				t_new_items_1.push({ data: { row }, key:
+				t_new_items_1.push({ data: row, key:
 				row.id });
 			}
 			return t_new_items_1;
@@ -168,23 +168,23 @@ export default function Bench(
 			const t_a_1 = t_child(t_next(t_child(t_tr_1))) as HTMLAnchorElement;
 			const t_text_2 = t_child(t_a_1);
 			const t_a_2 = t_child(t_skip(t_child(t_tr_1), 2)) as HTMLAnchorElement;
-			t_event(t_a_1, "click", () => $state.selected = t_item_1.data.row.id);
-			t_event(t_a_2, "click", () => remove(t_item_1.data.row));
+			t_event(t_a_1, "click", () => $state.selected = t_item_1.data.id);
+			t_event(t_a_2, "click", () => remove(t_item_1.data));
 			$run(() => {
-				t_tr_1.className = t_class({ danger: $state.selected === t_item_1.data.row.id });
-				t_text_1.textContent = t_fmt(t_item_1.data.row.id);
-				t_text_2.textContent = ` ${t_fmt(t_item_1.data.row.label)} `;
-			});
+				t_tr_1.className = t_class({ danger: $state.selected === t_item_1.data.id });
+				t_text_1.textContent = t_fmt(t_item_1.data.id);
+				t_text_2.textContent = ` ${t_fmt(t_item_1.data.label)} `;
+			}, undefined, { forVarMask: 1 });
 			t_add_element(t_tr_1, t_for_parent_1, t_before_1);
 			t_next(t_tr_1);
 		},
 		(t_old_item, t_new_item) => {
-			let t_changed = false;
-			if (t_old_item.data.row !== t_new_item.data.row) {
-				t_old_item.data.row = t_new_item.data.row;
-				t_changed = true;
+			let t_changed_mask = 0;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
+				t_changed_mask = 1;
 			}
-			if (t_changed) t_rerun_region_effects(t_old_item);
+			if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);
 		},
 		true
 	);

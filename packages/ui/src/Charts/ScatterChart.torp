@@ -119,7 +119,7 @@ export default function ScatterChart($props: ScatterChartProps) {
 		},
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		// HACK: Wait until the measurer is really available
 		setTimeout(() => {
 			const bbox = measurer.getBBox();

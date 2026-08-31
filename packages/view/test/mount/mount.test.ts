@@ -8,7 +8,7 @@ const source = `
 export default function Mount() {
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		inputElement.value = "hi";
 	});
 

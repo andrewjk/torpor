@@ -91,12 +91,12 @@ export default interface Effect {
 	errorSources?: (ProxySignal | Computed)[] | null;
 
 	/**
-	 * True when this effect wraps a `$mount`/`onmount` callback (created by
-	 * `runMountSideEffects`). Mount effects run once per region mount and must
-	 * NOT be force re-run by the keyed-list reconciler's
-	 * `rerunEffectsOnRegion` — doing so fires `onmount` on every item update.
-	 * Their reactive re-runs (if any) are still driven by the normal signal
-	 * path (`checkEffect`).
+	 * True when this effect wraps a `$onmount`/`onmount` callback (created by
+	 * `flushMountEffects`). Mount callbacks run once per region mount and
+	 * must NOT be force re-run by the keyed-list reconciler's
+	 * `rerunEffectsOnRegion` — doing so would re-fire `onmount` on every item
+	 * update. Their bodies are also run untracked, so they never gain signal
+	 * subscriptions and never re-run reactively.
 	 */
 	isMountEffect?: boolean;
 

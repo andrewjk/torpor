@@ -1,4 +1,5 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
+import $handle from "../utils/$handle";
 import {
 	type FieldContext,
 	FieldContextName,
@@ -138,7 +139,7 @@ export default function TagInput($props: TagInputProps | undefined) {
 			input.value = text;
 		}
 	});
-	$mount(() => syncInput());
+	$onmount(() => syncInput());
 
 	function addTagFromText(text: string) {
 		const trimmed = text.trim();

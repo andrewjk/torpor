@@ -37,7 +37,7 @@ npm install torpor
   - `$watch` to create a proxy that updates UI on property changes
   - `$cache` to cache proxy getter values that are expensive to update
   - `$run` to create an effect that is re-run when its dependencies change
-  - `$mount` to create an effect that runs after a component has been mounted
+  - `$onmount` to run a function once, after a component has been mounted
   - And
     - `$unwrap` to get the target object from the proxy
     - `$peek` to get the value of a target object without re-running effects on change

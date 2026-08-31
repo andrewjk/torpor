@@ -5,7 +5,7 @@ import runMountSideEffects from "./runMountSideEffects";
  * Companion to `addFragment` for the single-root-element codegen path. Wires
  * a cloned root element (produced by `getElementFragment`) into the live DOM
  * tree, sets the active region's start/end nodes, and runs the same
- * mount-time side effects as `addFragment` (`$mount` effects, stashed event
+ * mount-time side effects as `addFragment` (`$onmount` effects, stashed event
  * listeners, stashed animations).
  *
  * Differences from `addFragment`:
@@ -37,7 +37,7 @@ export default function addElement(node: Element, parent: ParentNode, before: No
 		parent.insertBefore(node, before);
 	}
 
-	// If we're adding this node to the DOM, we can now run any $mount
+	// If we're adding this node to the DOM, we can now run any $onmount
 	// effects, add our stashed events and play our stashed animations
 	runMountSideEffects(parent, activeRegion, hydrationNode);
 }

@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import t_add_element from "../../../../src/render/addElement";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
@@ -15,7 +15,7 @@ export default function Mount(
 
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		inputElement.value = "hi";
 	});
 

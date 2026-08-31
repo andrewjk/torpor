@@ -1,5 +1,6 @@
 import type Region from "../types/Region";
 import $run from "../watch/$run";
+import flushMountEffects from "../watch/flushMountEffects";
 import animate from "./animate";
 import context from "./context";
 import {
@@ -11,10 +12,11 @@ import isFragmentNode from "./isFragmentNode";
 
 /**
  * Runs the mount-time side effects that both `addFragment` and `addElement`
- * share: `$mount` effects (only when not hydrating), stashed event listeners,
- * and stashed animations. No-op when `parent` is itself a `DocumentFragment`
- * (we're being inserted into a detached tree, so `$mount` and event hookup
- * would be premature — they'll run when the outer fragment attaches).
+ * share: `$onmount` effects (only when not hydrating), stashed event
+ * listeners, and stashed animations. No-op when `parent` is itself a
+ * `DocumentFragment` (we're being inserted into a detached tree, so
+ * `$onmount` and event hookup would be premature — they'll run when the
+ * outer fragment attaches).
  *
  * Extracted so the `DocumentFragment` path (`addFragment`) and the
  * single-element path (`addElement`) don't duplicate this logic.
@@ -26,13 +28,10 @@ export default function runMountSideEffects(
 ): void {
 	if (isFragmentNode(parent)) return;
 
-	// Only run $mount effects if not hydrating (if hydrating, they will get
+	// Only run $onmount effects if not hydrating (if hydrating, they will get
 	// run at the end when everything is hooked up)
 	if (hydrationNode === null) {
-		for (let effect of context.mountEffects) {
-			$run(effect, undefined, { isMountEffect: true });
-		}
-		context.mountEffects.length = 0;
+		flushMountEffects();
 	}
 
 	// Attach event listeners. For bubbling event types (the majority —

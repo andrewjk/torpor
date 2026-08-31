@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import $run from "../../../../src/watch/$run";
 import t_add_element from "../../../../src/render/addElement";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -49,7 +49,7 @@ export default function MountEffectList(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			// @ts-ignore
-			$mount(() => {
+			$onmount(() => {
 				return (() => window.__mounts++)(t_li_1);
 			});
 			$run(() => {

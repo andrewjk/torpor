@@ -1,4 +1,4 @@
-import $mount from "../../../../src/watch/$mount";
+import $onmount from "../../../../src/watch/$onmount";
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
 import t_add_element from "../../../../src/render/addElement";
@@ -19,17 +19,17 @@ export default function MountOrder(
 
 	let $state = $watch({ order: "" });
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("first");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("second");
 		$state.order = (window as any).__mountLog.join(", ");
 	});
 
-	$mount(() => {
+	$onmount(() => {
 		(window as any).__mountLog.push("third");
 		$state.order = (window as any).__mountLog.join(", ");
 	});

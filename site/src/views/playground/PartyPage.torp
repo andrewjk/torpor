@@ -133,7 +133,7 @@ export default function Counter() {
 export default function InputFocused() {
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		inputElement.focus();
 	});
 

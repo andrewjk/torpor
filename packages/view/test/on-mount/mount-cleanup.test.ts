@@ -9,7 +9,7 @@ const source = `
 export default function MountCleanupReturn() {
 	let $state = $watch({ mounted: false })
 
-	$mount(() => {
+	$onmount(() => {
 		$state.mounted = true
 		window.__mountLog.push("mount")
 		return () => {
@@ -23,7 +23,7 @@ export default function MountCleanupReturn() {
 }
 `;
 
-test("$mount runs effect on mount", async () => {
+test("$onmount runs effect on mount", async () => {
 	(window as any).__mountLog = [];
 
 	const container = document.createElement("div");
@@ -34,18 +34,18 @@ test("$mount runs effect on mount", async () => {
 	expect(queryByText(container, "Mounted: true")).not.toBeNull();
 });
 
-test("$mount with multiple mount effects run in order", async () => {
+test("$onmount with multiple mount effects run in order", async () => {
 	(window as any).__mountLog = [];
 
 	const multiSource = `
 	export default function MultiMount() {
-		$mount(() => {
+		$onmount(() => {
 			window.__mountLog.push("first")
 		})
-		$mount(() => {
+		$onmount(() => {
 			window.__mountLog.push("second")
 		})
-		$mount(() => {
+		$onmount(() => {
 			window.__mountLog.push("third")
 		})
 
@@ -62,7 +62,7 @@ test("$mount with multiple mount effects run in order", async () => {
 	expect((window as any).__mountLog).toEqual(["first", "second", "third"]);
 });
 
-test("$mount hydrates correctly", async () => {
+test("$onmount hydrates correctly", async () => {
 	(window as any).__mountLog = [];
 
 	const container = document.createElement("div");

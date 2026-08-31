@@ -49,28 +49,30 @@ test("if else false -- hydrated", async () => {
 });
 
 function check(container: HTMLElement, state: Props) {
-	// HACK: onmount gets run twice!
-	expect(state.i).toBe(2);
+	// onmount runs exactly once per branch mount
+	expect(state.i).toBe(1);
 
 	expect(queryByText(container, "It's small!")).not.toBeNull();
 	expect(queryByText(container, "It's not small...")).toBeNull();
 
-	expect(state.i).toBe(2);
+	// Counter changes within the branch don't re-fire onmount
 	state.counter = 1;
-	expect(state.i).toBe(2);
+	expect(state.i).toBe(1);
 	state.counter = 2;
-	expect(state.i).toBe(2);
+	expect(state.i).toBe(1);
 	state.counter = 3;
-	expect(state.i).toBe(2);
+	expect(state.i).toBe(1);
 
+	// Leaving the branch and coming back mounts the element again,
+	// so onmount fires once more
 	state.counter = 6;
-	expect(state.i).toBe(2);
+	expect(state.i).toBe(1);
 
 	expect(queryByText(container, "It's small!")).toBeNull();
 	expect(queryByText(container, "It's not small...")).not.toBeNull();
 
 	state.counter = 3;
-	expect(state.i).toBe(4);
+	expect(state.i).toBe(2);
 
 	expect(queryByText(container, "It's small!")).not.toBeNull();
 	expect(queryByText(container, "It's not small...")).toBeNull();

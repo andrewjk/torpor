@@ -389,6 +389,29 @@ function $run(fn, name, options) {
 	runEffect(effect);
 	return effect;
 }
+function $peek(fn) {
+	const oldActiveTarget = context.activeTarget;
+	context.activeTarget = null;
+	const result = fn();
+	context.activeTarget = oldActiveTarget;
+	return result;
+}
+function flushMountEffects() {
+	if (context.mountEffects.length === 0) return;
+	for (let fn of context.mountEffects) $run(() => runMountCallback(fn), void 0, { isMountEffect: true });
+	context.mountEffects.length = 0;
+}
+function runMountCallback(fn) {
+	if (!devContext.enabled) return $peek(fn);
+	const result = fn();
+	const effect = context.activeTarget;
+	if (effect !== null && effect.type === 2 && effect.firstSource !== null) {
+		console.warn("[torpor] A $onmount/onmount callback read reactive state, but mount callbacks run only once and will not re-run. Wrap the reactive part in $run(), e.g. $onmount(() => { $run(() => ...); });");
+		deactivateSources(effect);
+		clearSources(effect);
+	}
+	return result;
+}
 async function animate(el, enter, keyframes, options) {
 	let animationOptions = Object.assign({
 		direction: enter ? "normal" : "reverse",
@@ -521,10 +544,7 @@ function isFragmentNode(node) {
 }
 function runMountSideEffects(parent, activeRegion, hydrationNode) {
 	if (isFragmentNode(parent)) return;
-	if (hydrationNode === null) {
-		for (let effect of context.mountEffects) $run(effect, void 0, { isMountEffect: true });
-		context.mountEffects.length = 0;
-	}
+	if (hydrationNode === null) flushMountEffects();
 	if (context.stashedEvents.length > 0) {
 		for (let event of context.stashedEvents) if (isDelegatedEventType(event.type)) attachDelegatedEvent(event.el, event.type, event.listener);
 		else {
@@ -746,8 +766,7 @@ function hydrate(parent, component, props, slots) {
 	pushRegion(context.rootRegion);
 	component(parent, null, props, void 0, slots);
 	context.hydrationNode = null;
-	for (let effect of context.mountEffects) $run(effect);
-	context.mountEffects.length = 0;
+	flushMountEffects();
 }
 function mount(parent, component, props, slots) {
 	if (parent.childElementCount > 0) throw new Error("The parent node must have no child elements");
@@ -965,6 +984,18 @@ function runControlBranch(region, oldIndex, index) {
 	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
 }
+const proxyCache = /* @__PURE__ */ new WeakMap();
+function deepWrap(value) {
+	if (value === void 0 || value === null || typeof value !== "object") return value;
+	if (value[proxyDataSymbol] !== void 0) return proxyCache.get(value) ?? value;
+	if (value.then !== void 0) return value;
+	if (value.nodeType !== void 0) return value;
+	const cached = proxyCache.get(value);
+	if (cached !== void 0) return cached;
+	const proxy = $watch(value);
+	proxyCache.set(value, proxy);
+	return proxy;
+}
 function propagateFromSignal(signal) {
 	const first = signal.firstTarget;
 	if (first === null) return;
@@ -1057,18 +1088,6 @@ function suspendRead(signal) {
 		}
 	}
 	return signal.staleValue;
-}
-const proxyCache = /* @__PURE__ */ new WeakMap();
-function deepWrap(value) {
-	if (value === void 0 || value === null || typeof value !== "object") return value;
-	if (value[proxyDataSymbol] !== void 0) return proxyCache.get(value) ?? value;
-	if (value.then !== void 0) return value;
-	if (value.nodeType !== void 0) return value;
-	let cached = proxyCache.get(value);
-	if (cached !== void 0) return cached;
-	const proxy = $watch(value);
-	proxyCache.set(value, proxy);
-	return proxy;
 }
 function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
@@ -1214,8 +1233,7 @@ const COLLECTION_KEY = Symbol("torp.collection");
 const TIME_KEY = "#time";
 function collectionGet(data, target, key, receiver) {
 	if (data.isDate) return dateGet(data, target, key);
-	const wrapper = data.isMap ? mapWrapper : setWrapper;
-	const handle = wrapper[key];
+	const handle = (data.isMap ? mapWrapper : setWrapper)[key];
 	if (handle !== void 0) return handle(data, target, key, receiver);
 	return target[key];
 }
@@ -1336,8 +1354,7 @@ function mapEntries(data, target) {
 	return function() {
 		trackProxySignal(data, COLLECTION_KEY);
 		const wrap = data.shallow !== true;
-		const entries = [...target.entries()].map((entry) => [entry[0], wrap ? deepWrap(entry[1]) : entry[1]]);
-		return entries[Symbol.iterator]();
+		return [...target.entries()].map((entry) => [entry[0], wrap ? deepWrap(entry[1]) : entry[1]])[Symbol.iterator]();
 	};
 }
 const setWrapper = {
@@ -1408,11 +1425,10 @@ function setEntries(data, target) {
 	return function() {
 		trackProxySignal(data, COLLECTION_KEY);
 		const wrap = data.shallow !== true;
-		const entries = [...target.values()].map((value) => {
+		return [...target.values()].map((value) => {
 			const wrapped = wrap ? deepWrap(value) : value;
 			return [wrapped, wrapped];
-		});
-		return entries[Symbol.iterator]();
+		})[Symbol.iterator]();
 	};
 }
 function proxySet(target, key, value, receiver) {
@@ -1889,23 +1905,8 @@ function $cache(fn) {
 	if (computed.value !== null && computed.value !== void 0 && typeof computed.value.then === "function") throw new Error("$cache returned a Promise — use $async for async getters");
 	return computed.value;
 }
-function $handle(fn) {
-	let firstRun = true;
-	$run(() => {
-		const first = firstRun;
-		firstRun = false;
-		return fn(first);
-	});
-}
-function $mount(fn) {
+function $onmount(fn) {
 	context.mountEffects.push(fn);
-}
-function $peek(fn) {
-	const oldActiveTarget = context.activeTarget;
-	context.activeTarget = null;
-	const result = fn();
-	context.activeTarget = oldActiveTarget;
-	return result;
 }
 function $pending(fn) {
 	const oldPeek = context.suspendPeek;
@@ -1960,16 +1961,18 @@ function $refresh(fn, options) {
 function $stream(source, handler, options) {
 	context.mountEffects.push(() => {
 		let timer;
-		const unsub = source((value) => {
-			if (options?.debounce) {
+		$run(() => {
+			const unsub = source((value) => {
+				if (options?.debounce) {
+					clearTimeout(timer);
+					timer = setTimeout(() => handler(value), options.debounce);
+				} else handler(value);
+			});
+			return () => {
+				unsub?.();
 				clearTimeout(timer);
-				timer = setTimeout(() => handler(value), options.debounce);
-			} else handler(value);
+			};
 		});
-		return () => {
-			unsub?.();
-			clearTimeout(timer);
-		};
 	});
 }
 let t_add_element = addElement;

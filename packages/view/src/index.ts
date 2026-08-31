@@ -49,8 +49,7 @@ import $batch from "./watch/$batch";
 import $async from "./watch/$async";
 import $bind from "./watch/$bind";
 import $cache from "./watch/$cache";
-import $handle from "./watch/$handle";
-import $mount from "./watch/$mount";
+import $onmount from "./watch/$onmount";
 import $peek from "./watch/$peek";
 import $pending from "./watch/$pending";
 import $refresh from "./watch/$refresh";
@@ -65,14 +64,13 @@ export { mount, hydrate, unmount, fillLayoutSlot, clearLayoutSlot };
 // Functions for the user that can be called from components
 export {
 	$watch,
-	$handle,
 	$bind,
 	$cache,
 	$async,
 	$pending,
 	$refresh,
 	$run,
-	$mount,
+	$onmount,
 	$stream,
 	$unwrap,
 	$peek,

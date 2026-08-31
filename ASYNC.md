@@ -449,8 +449,8 @@ a thrown `PromiseNotReady` would have done:
    boundary that its content render touched something pending. The boundary
    discards the partial render and shows the `with` branch (§7.3).
 
-This is the same shape as `$mount` pushing onto `context.mountEffects`
-(`$mount.ts`) and `addEvent` pushing onto `context.stashedEvents`
+This is the same shape as `$onmount` pushing onto `context.mountEffects`
+(`$onmount.ts`) and `addEvent` pushing onto `context.stashedEvents`
 (`addEvent.ts`): registration is a side-effect-of-read (set a flag), drained
 through the existing reactive graph on resolve — not an exception walking
 the stack, and not a separate accumulator drained at DOM-insertion. The
@@ -515,7 +515,7 @@ enough that the trade-off flips:
 - taint propagation piggybacks on the reactive graph that `trackSignal`
   already builds;
 - the boundary detects suspend through a context flag (`awaitBoundary`),
-  the same shape as `$mount`/`addEvent` accumulating onto `context`.
+  the same shape as `$onmount`/`addEvent` accumulating onto `context`.
 
 The throw costs that motivated the flip: debugger noise (pause-on-exceptions
 trips on every suspend), V8 throw overhead per suspend, and fragile

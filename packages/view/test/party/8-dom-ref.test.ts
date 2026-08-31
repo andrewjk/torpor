@@ -8,7 +8,7 @@ const source = `
 export default function InputFocused() {
 	let inputElement: HTMLInputElement;
 
-	$mount(() => {
+	$onmount(() => {
 		// HACK: This is easier to test for
 		inputElement.value = "hi";
 	});
