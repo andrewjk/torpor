@@ -67,8 +67,9 @@ export default function transformDocument(
 			map,
 		};
 	} catch (ex) {
-		console.log("Failed to compile", source);
-		console.log(ex);
+		const message = ex instanceof Error ? ex.stack : String(ex);
+		console.log("Failed to compile", filename);
+		console.log(message);
 		return {
 			ok: false,
 			errors: [],
@@ -163,10 +164,13 @@ function importComponentFiles(
 			}
 
 			// Create the virtual file for the component
-			if (!vts.virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
+			const key = typeFile.replace(/\.torp$/, ".ts");
+			if (!vts.virtualFiles.has(key) && fs.existsSync(typeFile)) {
+				// Mark as in progress before transforming, so that circular
+				// component imports don't recurse forever
+				vts.virtualFiles.set(key, "");
 				const typeSource = fs.readFileSync(typeFile, "utf8");
 				const { content } = transformDocument(vts, typeFile, typeSource);
-				const key = typeFile.replace(/\.torp$/, ".ts");
 				vts.virtualFiles.set(key, content);
 				vts.env.createFile(key, content);
 			}
