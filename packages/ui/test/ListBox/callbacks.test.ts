@@ -1,4 +1,4 @@
-import { getByText, queryByText } from "@testing-library/dom";
+import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
@@ -11,7 +11,7 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "single", onchange });
 
-		await getByText(container, "Content 1").click();
+		getByText(container, "Content 1").click();
 
 		expect(onchange).toHaveBeenCalledWith(0);
 	});
@@ -22,8 +22,8 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "single", onchange });
 
-		await getByText(container, "Content 1").click();
-		await getByText(container, "Content 2").click();
+		getByText(container, "Content 1").click();
+		getByText(container, "Content 2").click();
 
 		expect(onchange).toHaveBeenCalledTimes(2);
 		expect(onchange).toHaveBeenNthCalledWith(1, 0);
@@ -36,7 +36,7 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "single", onchange, value: 0 });
 
-		await getByText(container, "Content 1").click();
+		getByText(container, "Content 1").click();
 
 		expect(onchange).toHaveBeenCalledWith(undefined);
 	});
@@ -47,7 +47,7 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "multiple", onchange, value: [] });
 
-		await getByText(container, "Content 1").click();
+		getByText(container, "Content 1").click();
 
 		const callArgs = onchange.mock.calls[0][0];
 		expect(callArgs).toContain(0);
@@ -59,9 +59,9 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "multiple", onchange, value: [] });
 
-		await getByText(container, "Content 1").click();
-		await getByText(container, "Content 2").click();
-		await getByText(container, "Content 3").click();
+		getByText(container, "Content 1").click();
+		getByText(container, "Content 2").click();
+		getByText(container, "Content 3").click();
 
 		expect(onchange).toHaveBeenCalledTimes(3);
 		expect(onchange.mock.calls[0][0]).toContain(0);
@@ -78,7 +78,7 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "single", onToggle0 });
 
-		await getByText(container, "Content 1").click();
+		getByText(container, "Content 1").click();
 
 		expect(onToggle0).toHaveBeenCalledWith(true);
 	});
@@ -89,7 +89,7 @@ describe("ListBox", () => {
 		document.body.appendChild(container);
 		mount(container, ListBoxCallbacks, { type: "single", onToggle0, value: 0 });
 
-		await getByText(container, "Content 1").click();
+		getByText(container, "Content 1").click();
 
 		expect(onToggle0).toHaveBeenCalledWith(false);
 	});

@@ -66,7 +66,6 @@ describe("readForm", () => {
 
 	test("infers the values type from the spec", async () => {
 		type Spec = { title: string; done: boolean; priority: number; tags: string[] };
-		const spec: Spec = { title: "", done: false, priority: 0, tags: [] };
 		type Values = FormValues<Spec>;
 		const values: Values = {
 			title: "a",

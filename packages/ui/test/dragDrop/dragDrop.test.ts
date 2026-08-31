@@ -1,4 +1,4 @@
-import { fireEvent, getByText } from "@testing-library/dom";
+import { fireEvent } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
@@ -149,16 +149,16 @@ describe("drag & drop", () => {
 		const transfer = makeTransfer();
 
 		// No drag in progress
-		expect(resolveDrag({ dataTransfer: transfer } as DragEvent)).toBeUndefined();
+		expect(resolveDrag({ dataTransfer: transfer } as unknown as DragEvent)).toBeUndefined();
 
 		fireEvent(item, drag("dragstart", transfer));
 		const current = dragState.current!;
 		expect(current.id).toBeTruthy();
 
 		// Matching id resolves; a mismatched one is treated as foreign
-		expect(resolveDrag({ dataTransfer: transfer } as DragEvent)).toBe(current);
+		expect(resolveDrag({ dataTransfer: transfer } as unknown as DragEvent)).toBe(current);
 		const wrongTransfer = makeTransfer();
 		wrongTransfer.setData(`application/x-torpor-drag/999`, "999");
-		expect(resolveDrag({ dataTransfer: wrongTransfer } as DragEvent)).toBeUndefined();
+		expect(resolveDrag({ dataTransfer: wrongTransfer } as unknown as DragEvent)).toBeUndefined();
 	});
 });

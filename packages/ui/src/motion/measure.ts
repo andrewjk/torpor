@@ -3,7 +3,7 @@
  * @param el The element to measure
  * @param fn The function to use to get the desired measurement (e.g. el.offsetHeight)
  */
-export default function measure(el: HTMLElement, fn: (_: HTMLElement) => number): number {
+export default function measure(el: HTMLElement, fn: (_el: HTMLElement) => number): number {
 	// From https://stackoverflow.com/a/46707458
 	let oldVisibility = el.style.visibility;
 	let oldPosition = el.style.position;

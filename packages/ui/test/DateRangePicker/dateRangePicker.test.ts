@@ -98,7 +98,7 @@ describe("DateRangePicker", () => {
 	});
 
 	it("restarts the range with a third click", async () => {
-		const { container, open, day, onchange, trigger } = setup();
+		const { container, open, day, onchange } = setup();
 
 		await open();
 		fireEvent.click(day(10));

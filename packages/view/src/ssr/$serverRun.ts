@@ -1,3 +1,3 @@
 import type Cleanup from "../types/Cleanup";
 
-export default function $serverRun(_: () => Cleanup | void): void {}
+export default function $serverRun(_fn: () => Cleanup | void): void {}

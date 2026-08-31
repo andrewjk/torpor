@@ -46,7 +46,7 @@ test("special self -- hydrated", async () => {
 	check(container, $state);
 });
 
-function check(container: HTMLElement, _: Props) {
+function check(container: HTMLElement, _state: Props) {
 	expect(queryByText(container, "Level 1")).not.toBeNull();
 	expect(queryByText(container, "Level 2")).not.toBeNull();
 	expect(queryByText(container, "Level 3")).not.toBeNull();

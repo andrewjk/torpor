@@ -6,4 +6,4 @@ import type Cleanup from "../types/Cleanup";
  * The stub exists so server builds importing `$handle` don't emit a dangling
  * import.
  */
-export default function $serverHandle(_: (first: boolean) => Cleanup | void): void {}
+export default function $serverHandle(_fn: (first: boolean) => Cleanup | void): void {}

@@ -16,7 +16,7 @@ function setup(props: Record<string, unknown> = {}) {
 
 describe("CommandPalette (hotkey)", () => {
 	it("opens with mod+k", async () => {
-		const { container, state } = setup({ hotkey: "mod+k" });
+		const { state } = setup({ hotkey: "mod+k" });
 
 		expect(state()).toBe("closed");
 

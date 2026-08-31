@@ -1,4 +1,4 @@
-import { getByText, queryByText } from "@testing-library/dom";
+import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
@@ -18,7 +18,7 @@ describe("ComboBox", () => {
 		await userEvent.click(button);
 		await userEvent.click(getByText(form, "Item 1"));
 
-		const input = form.querySelector('input[name="test-field"]');
+		const input = form.querySelector('input[name="test-field"]') as HTMLInputElement;
 		assert(input, "input not found");
 
 		expect(input.value).toBe("Item 1");
@@ -50,7 +50,7 @@ describe("ComboBox", () => {
 			required: true,
 		});
 
-		const input = form.querySelector('input[name="required-field"]');
+		const input = form.querySelector('input[name="required-field"]') as HTMLInputElement;
 		assert(input, "input not found");
 
 		expect(input).toHaveAttribute("required");
@@ -72,7 +72,7 @@ describe("ComboBox", () => {
 		await userEvent.click(button);
 		await userEvent.click(getByText(form, "Item 2"));
 
-		const input = form.querySelector('input[name="field-name"]');
+		const input = form.querySelector('input[name="field-name"]') as HTMLInputElement;
 		assert(input, "input not found");
 
 		expect(input.value).toBe("Item 2");
@@ -93,7 +93,7 @@ describe("ComboBox", () => {
 			required: true,
 		});
 
-		const input = form.querySelector('input[name="test-field"]');
+		const input = form.querySelector('input[name="test-field"]') as HTMLInputElement;
 		assert(input, "input not found");
 
 		expect(form.checkValidity()).toBe(false);
@@ -136,7 +136,7 @@ describe("ComboBox", () => {
 
 		mount(form, ComboBoxSingle, { value: "Item 1", name: "test-field" });
 
-		const input = form.querySelector('input[name="test-field"]');
+		const input = form.querySelector('input[name="test-field"]') as HTMLInputElement;
 		assert(input, "input not found");
 
 		expect(input.value).toBe("Item 1");

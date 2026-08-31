@@ -4,7 +4,6 @@ import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import PaginationBasic from "./components/PaginationBasic.torp";
 import PaginationWithEllipsis from "./components/PaginationWithEllipsis.torp";
-import PaginationCustomLabel from "./components/PaginationCustomLabel.torp";
 
 describe("Pagination - Edge Cases", () => {
 	afterEach(() => {

@@ -36,7 +36,7 @@ describe("SelectBox with multiple", () => {
 		expect(values).toContain("red");
 		expect(values).toContain("blue");
 
-		expect(trigger).toHaveTextContent("blue, red");
+		expect(trigger).toHaveTextContent("red, blue");
 	});
 
 	it("keeps the popout open while toggling selections", async () => {

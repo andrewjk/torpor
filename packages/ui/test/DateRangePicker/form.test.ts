@@ -1,6 +1,5 @@
 import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
-import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vite-plus/test";
 import DateRangePickerFormTest from "./components/DateRangePickerFormTest.torp";

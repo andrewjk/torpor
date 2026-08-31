@@ -42,7 +42,7 @@ test("special head -- hydrated", async () => {
 	check(container, $state);
 });
 
-function check(container: HTMLElement, _: Props) {
+function check(container: HTMLElement, _state: Props) {
 	//console.log(container.textContent);
 	//expect(queryByText(container, "Title: Hello")).not.toBeNull();
 	expect(container.ownerDocument.title).toBe("Hello");

@@ -88,8 +88,6 @@ describe("DataGrid - virtualization", () => {
 
 		const spacers = [...container.querySelectorAll(".torp-data-grid-spacer td")];
 		expect(spacers.length).toBe(2);
-		for (let td of spacers) {
-		}
 	});
 
 	it("keyboard navigation scrolls the window to keep focus visible", async () => {

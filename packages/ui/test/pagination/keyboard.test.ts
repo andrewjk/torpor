@@ -1,4 +1,4 @@
-import { getByText, queryByText } from "@testing-library/dom";
+import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";

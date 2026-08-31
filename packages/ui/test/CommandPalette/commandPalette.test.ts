@@ -90,7 +90,7 @@ describe("CommandPalette", () => {
 
 	it("does not run a disabled command", async () => {
 		const commands = [{ value: "a", label: "Alpha", disabled: true }];
-		const { container, open, options, onrun } = setup({ commands });
+		const { open, options, onrun } = setup({ commands });
 
 		await open();
 		fireEvent.click(options()[0]);

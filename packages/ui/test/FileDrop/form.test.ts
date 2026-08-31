@@ -1,7 +1,7 @@
-import { fireEvent, within } from "@testing-library/dom";
+import { fireEvent } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
-import { describe, expect, it, vi } from "vite-plus/test";
+import { describe, expect, it } from "vite-plus/test";
 import FileDropFormTest from "./components/FileDropFormTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {

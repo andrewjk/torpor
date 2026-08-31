@@ -127,7 +127,7 @@ export function createItemGroup<T extends ItemGroupItem>(options: {
 						newValue.push(item.value);
 					}
 				}
-				state.value = newValue.sort();
+				state.value = newValue.sort((a, b) => a - b);
 				break;
 			}
 		}

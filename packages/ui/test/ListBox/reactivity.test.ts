@@ -19,8 +19,8 @@ describe("ListBox reactivity", () => {
 		expect(listBox).toHaveAttribute("aria-multiselectable", "true");
 
 		// Selection should now be multi-select: clicking two items keeps both
-		await getByText(container, "Content 1").click();
-		await getByText(container, "Content 2").click();
+		getByText(container, "Content 1").click();
+		getByText(container, "Content 2").click();
 
 		const selected = container.querySelectorAll('[aria-selected="true"]');
 		expect(selected).toHaveLength(2);

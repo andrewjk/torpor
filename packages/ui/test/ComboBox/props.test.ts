@@ -1,5 +1,5 @@
 import "@testing-library/jest-dom/vitest";
-import { $watch, mount } from "@torpor/view";
+import { mount } from "@torpor/view";
 import { assert, describe, expect, it } from "vite-plus/test";
 import ComboBoxSingle from "./components/ComboBoxSingle.torp";
 

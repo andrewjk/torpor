@@ -4,6 +4,6 @@
  * boundaries render their `with` branch and never read the getter. The stub
  * exists so server builds importing `$async` don't emit a dangling import.
  */
-export default function $serverAsync<T>(_: () => Promise<T>): T {
+export default function $serverAsync<T>(_fn: () => Promise<T>): T {
 	return undefined as T;
 }

@@ -5,7 +5,7 @@ import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import PopoverHoverPress from "./components/PopoverHoverTest.torp";
 
-const tick = () => new Promise((r) => setTimeout(r));
+//const tick = () => new Promise((r) => setTimeout(r));
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function getTrigger(container: HTMLElement): HTMLElement {

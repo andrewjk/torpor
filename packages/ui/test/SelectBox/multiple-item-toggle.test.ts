@@ -1,4 +1,4 @@
-import { getByText, getAllByText, queryByText } from "@testing-library/dom";
+import { getByText, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { $watch, mount } from "@torpor/view";
@@ -17,7 +17,9 @@ describe("SelectBox", () => {
 
 		await userEvent.click(button);
 
-		const listbox = container.querySelector('[role="listbox"]')!;
+		const listbox = container.querySelector('[role="listbox"]') as HTMLElement;
+		assert(listbox);
+
 		expect(queryByText(listbox, "Item 1")).toBeInTheDocument();
 		expect(queryByText(listbox, "Item 2")).toBeInTheDocument();
 		expect(queryByText(listbox, "Item 3")).toBeInTheDocument();

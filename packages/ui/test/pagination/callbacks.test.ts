@@ -1,4 +1,4 @@
-import { getByText, queryByText } from "@testing-library/dom";
+import { getByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it } from "vite-plus/test";

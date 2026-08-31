@@ -5,7 +5,7 @@
  * importing `$bind` don't emit a dangling import.
  */
 export default function $serverBind(
-	_: Record<PropertyKey, any>,
-	__: Record<PropertyKey, any> | undefined,
-	...___: (string | string[])[]
+	_state: Record<PropertyKey, any>,
+	_props: Record<PropertyKey, any> | undefined,
+	..._keys: (string | string[])[]
 ): void {}

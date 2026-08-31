@@ -3,4 +3,4 @@
  * imperative action that never runs during SSR. The stub exists so server
  * builds importing `$refresh` don't emit a dangling import.
  */
-export default function $serverRefresh(_: () => any): void {}
+export default function $serverRefresh(_fn: () => any): void {}

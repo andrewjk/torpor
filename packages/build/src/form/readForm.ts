@@ -48,6 +48,7 @@ export default async function readForm<Spec extends Record<string, unknown>>(
 	const result: Record<string, unknown> = {};
 	for (const key of Object.keys(spec)) {
 		const defaultValue = spec[key];
+		// oxlint-disable-next-line typescript/no-base-to-string
 		const values = formData.getAll(key).map((v) => v.toString());
 		result[key] = Array.isArray(defaultValue)
 			? values.map((value) => coerceValue(value, defaultValue[0]))
