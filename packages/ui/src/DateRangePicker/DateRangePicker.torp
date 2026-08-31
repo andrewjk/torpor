@@ -1,4 +1,4 @@
-import { ReactiveDate, type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
+import { type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
 import {
 	Calendar,
 	CalendarDayHeader,
@@ -103,7 +103,7 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 		isSelecting,
 		setPreview: (date) => {
 			if (isSelecting()) {
-				$state.preview = date ? new ReactiveDate(date) : undefined;
+				$state.preview = date ? $watch(new Date(date)) : undefined;
 			}
 		},
 	};
@@ -162,16 +162,16 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 		const start = getStart();
 		if (!isSelecting()) {
 			// Start a new range
-			$state.start = new ReactiveDate(date);
+			$state.start = $watch(new Date(date));
 			$state.end = undefined;
 			$state.preview = undefined;
 		} else if (date < start!) {
 			// A date before the start begins a new range there
-			$state.start = new ReactiveDate(date);
+			$state.start = $watch(new Date(date));
 			$state.preview = undefined;
 		} else {
 			// Complete the range
-			$state.end = new ReactiveDate(date);
+			$state.end = $watch(new Date(date));
 			$state.preview = undefined;
 			complete();
 		}
@@ -179,8 +179,8 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 
 	function complete() {
 		$state.value = {
-			start: new ReactiveDate($state.start!),
-			end: new ReactiveDate($state.end!),
+			start: $watch(new Date($state.start!)),
+			end: $watch(new Date($state.end!)),
 		};
 		$props?.onchange?.($state.value);
 		form.handleInput();

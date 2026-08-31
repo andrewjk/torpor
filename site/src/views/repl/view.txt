@@ -19,7 +19,6 @@ const devContext = globalThis[DEV_CONTEXT_SYMBOL] ??= {
 	effectRun: noop
 };
 const proxyDataSymbol = Symbol.for("torp.ProxyData");
-const proxyHandledSymbol = Symbol.for("torp.ProxyHandled");
 function $unwrap(object) {
 	return object !== void 0 && object !== null && object[proxyDataSymbol] !== void 0 ? object[proxyDataSymbol].target ?? object : object;
 }
@@ -1059,12 +1058,21 @@ function suspendRead(signal) {
 	}
 	return signal.staleValue;
 }
+const proxyCache = /* @__PURE__ */ new WeakMap();
 function deepWrap(value) {
-	return value !== void 0 && value !== null && typeof value === "object" && value[proxyDataSymbol] === void 0 && value.then === void 0 ? $watch(value) : value;
+	if (value === void 0 || value === null || typeof value !== "object") return value;
+	if (value[proxyDataSymbol] !== void 0) return proxyCache.get(value) ?? value;
+	if (value.then !== void 0) return value;
+	let cached = proxyCache.get(value);
+	if (cached !== void 0) return cached;
+	const proxy = $watch(value);
+	proxyCache.set(value, proxy);
+	return proxy;
 }
 function proxyGet(target, key, receiver) {
 	let data = target[proxyDataSymbol];
 	if (key === proxyDataSymbol) return data;
+	if ((data.isDate || data.isMap || data.isSet) && !Object.prototype.hasOwnProperty.call(target, key)) return collectionGet(data, target, key, receiver);
 	let signal = data.signals.get(key);
 	if (signal === void 0) {
 		const propDescriptor = Object.getOwnPropertyDescriptor(target, key);
@@ -1196,6 +1204,211 @@ function arrayHandle(data, target, key) {
 		return result;
 	};
 }
+const COLLECTION_KEY = Symbol("torp.collection");
+const TIME_KEY = "#time";
+function collectionGet(data, target, key, receiver) {
+	if (data.isDate) return dateGet(data, target, key);
+	const wrapper = data.isMap ? mapWrapper : setWrapper;
+	const handle = wrapper[key];
+	if (handle !== void 0) return handle(data, target, key, receiver);
+	return target[key];
+}
+function collectionKey(key) {
+	const type = typeof key;
+	return type === "string" || type === "number" || type === "symbol" ? key : COLLECTION_KEY;
+}
+function propagateCollection(data, key) {
+	if (key !== COLLECTION_KEY) propagateSignal(data, key);
+	propagateSignal(data, COLLECTION_KEY);
+}
+function dateGet(data, target, key) {
+	if (typeof key === "symbol") {
+		if (key === Symbol.toPrimitive) return function(hint) {
+			const result = target[Symbol.toPrimitive](hint);
+			trackProxySignal(data, TIME_KEY);
+			return result;
+		};
+		return target[key];
+	}
+	if (typeof key !== "string") return target[key];
+	const value = target[key];
+	if (typeof value !== "function") return value;
+	if (key.startsWith("set")) return function(...args) {
+		const before = target.getTime();
+		const result = value.apply(target, args);
+		if (target.getTime() !== before) propagateSignal(data, TIME_KEY);
+		return result;
+	};
+	if (key.startsWith("get") || key.startsWith("to") || key === "valueOf") return function(...args) {
+		const result = value.apply(target, args);
+		trackProxySignal(data, TIME_KEY);
+		return result;
+	};
+	return value;
+}
+const mapWrapper = {
+	size: function(data, target) {
+		trackProxySignal(data, COLLECTION_KEY);
+		return target.size;
+	},
+	get: function(data, target) {
+		return function(key) {
+			key = $unwrap(key);
+			trackProxySignal(data, collectionKey(key));
+			const value = target.get(key);
+			if (data.shallow !== true) {
+				const wrapped = deepWrap(value);
+				if (wrapped !== value) target.set(key, wrapped);
+				return wrapped;
+			}
+			return value;
+		};
+	},
+	has: function(data, target) {
+		return function(key) {
+			key = $unwrap(key);
+			trackProxySignal(data, collectionKey(key));
+			return target.has(key);
+		};
+	},
+	set: function(data, target, _key, receiver) {
+		return function(key, value) {
+			key = $unwrap(key);
+			if (target.has(key) && $unwrap(target.get(key)) === $unwrap(value)) return receiver ?? target;
+			const result = target.set(key, value);
+			propagateCollection(data, collectionKey(key));
+			return receiver ?? result;
+		};
+	},
+	delete: function(data, target) {
+		return function(key) {
+			key = $unwrap(key);
+			const result = target.delete(key);
+			propagateCollection(data, collectionKey(key));
+			return result;
+		};
+	},
+	clear: function(data, target) {
+		return function() {
+			const result = target.clear();
+			batchStart();
+			try {
+				for (const key of data.signals.keys()) propagateSignal(data, key);
+			} finally {
+				batchEnd();
+			}
+			return result;
+		};
+	},
+	keys: function(data, target) {
+		return function() {
+			trackProxySignal(data, COLLECTION_KEY);
+			return [...target.keys()][Symbol.iterator]();
+		};
+	},
+	values: function(data, target) {
+		return function() {
+			trackProxySignal(data, COLLECTION_KEY);
+			let values = [...target.values()];
+			if (data.shallow !== true) values = values.map(deepWrap);
+			return values[Symbol.iterator]();
+		};
+	},
+	entries: mapEntries,
+	[Symbol.iterator]: mapEntries,
+	forEach: function(data, target, _key, receiver) {
+		return function(callback, thisArg) {
+			trackProxySignal(data, COLLECTION_KEY);
+			const wrap = data.shallow !== true;
+			target.forEach((value, key) => {
+				callback.call(thisArg, wrap ? deepWrap(value) : value, key, receiver ?? target);
+			});
+		};
+	}
+};
+function mapEntries(data, target) {
+	return function() {
+		trackProxySignal(data, COLLECTION_KEY);
+		const wrap = data.shallow !== true;
+		const entries = [...target.entries()].map((entry) => [entry[0], wrap ? deepWrap(entry[1]) : entry[1]]);
+		return entries[Symbol.iterator]();
+	};
+}
+const setWrapper = {
+	size: function(data, target) {
+		trackProxySignal(data, COLLECTION_KEY);
+		return target.size;
+	},
+	has: function(data, target) {
+		return function(value) {
+			value = $unwrap(value);
+			trackProxySignal(data, collectionKey(value));
+			return target.has(value);
+		};
+	},
+	add: function(data, target, _key, receiver) {
+		return function(value) {
+			value = $unwrap(value);
+			if (target.has(value)) return receiver ?? target;
+			const result = target.add(value);
+			propagateCollection(data, collectionKey(value));
+			return receiver ?? result;
+		};
+	},
+	delete: function(data, target) {
+		return function(value) {
+			value = $unwrap(value);
+			const result = target.delete(value);
+			propagateCollection(data, collectionKey(value));
+			return result;
+		};
+	},
+	clear: function(data, target) {
+		return function() {
+			const result = target.clear();
+			batchStart();
+			try {
+				for (const key of data.signals.keys()) propagateSignal(data, key);
+			} finally {
+				batchEnd();
+			}
+			return result;
+		};
+	},
+	keys: setValues,
+	values: setValues,
+	[Symbol.iterator]: setValues,
+	entries: setEntries,
+	forEach: function(data, target, _key, receiver) {
+		return function(callback, thisArg) {
+			trackProxySignal(data, COLLECTION_KEY);
+			const wrap = data.shallow !== true;
+			target.forEach((value) => {
+				const wrapped = wrap ? deepWrap(value) : value;
+				callback.call(thisArg, wrapped, wrapped, receiver ?? target);
+			});
+		};
+	}
+};
+function setValues(data, target) {
+	return function() {
+		trackProxySignal(data, COLLECTION_KEY);
+		let values = [...target.values()];
+		if (data.shallow !== true) values = values.map(deepWrap);
+		return values[Symbol.iterator]();
+	};
+}
+function setEntries(data, target) {
+	return function() {
+		trackProxySignal(data, COLLECTION_KEY);
+		const wrap = data.shallow !== true;
+		const entries = [...target.values()].map((value) => {
+			const wrapped = wrap ? deepWrap(value) : value;
+			return [wrapped, wrapped];
+		});
+		return entries[Symbol.iterator]();
+	};
+}
 function proxySet(target, key, value, receiver) {
 	const oldValue = target[key];
 	if (value !== oldValue) {
@@ -1218,6 +1431,9 @@ function $watch(object, options) {
 	const data = {
 		target: object,
 		isArray: Array.isArray(object),
+		isDate: object instanceof Date,
+		isMap: object instanceof Map,
+		isSet: object instanceof Set,
 		shallow: options?.shallow === true,
 		signals: /* @__PURE__ */ new Map()
 	};
@@ -1750,45 +1966,6 @@ function $stream(source, handler, options) {
 		};
 	});
 }
-let initialized = false;
-var ReactiveDate = class ReactiveDate extends Date {
-	constructor(...params) {
-		super(...params);
-		if (!initialized) this.#init();
-		this[proxyHandledSymbol] = true;
-		Object.defineProperty(this, proxyDataSymbol, {
-			value: {
-				target: this,
-				isArray: false,
-				shallow: true,
-				signals: /* @__PURE__ */ new Map()
-			},
-			writable: true,
-			enumerable: false,
-			configurable: true
-		});
-	}
-	#init() {
-		initialized = true;
-		let reactivePrototype = ReactiveDate.prototype;
-		let datePrototype = Date.prototype;
-		const methods = Object.getOwnPropertyNames(datePrototype);
-		for (const method of methods) {
-			if (method.startsWith("get") || method.startsWith("to") || method === "valueOf") reactivePrototype[method] = function(...args) {
-				const data = this[proxyDataSymbol];
-				const result = datePrototype[method].apply(this, args);
-				trackProxySignal(data, "#time");
-				return result;
-			};
-			if (method.startsWith("set")) reactivePrototype[method] = function(...args) {
-				const data = this[proxyDataSymbol];
-				const result = datePrototype[method].apply(this, args);
-				propagateSignal(data, "#time");
-				return result;
-			};
-		}
-	}
-};
 let t_add_element = addElement;
 let t_add_fragment = addFragment;
 let t_anchor = nodeAnchor;

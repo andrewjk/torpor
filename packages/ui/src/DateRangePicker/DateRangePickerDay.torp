@@ -1,4 +1,4 @@
-import { ReactiveDate, type ClassValue, type StyleValue } from "@torpor/view";
+import { type ClassValue, type StyleValue } from "@torpor/view";
 import { areDatesEqual } from "../utils/dateUtils";
 import { type CalendarContext, CalendarContextName } from "../Calendar/CalendarTypes";
 import {
@@ -39,7 +39,7 @@ interface DateRangePickerDayProps {
  */
 export default function DateRangePickerDay($props: DateRangePickerDayProps | undefined) {
 	// Ensure the value is a reactive date
-	let reactiveDate = new ReactiveDate($unwrap($props?.date ?? new Date()));
+	let reactiveDate = $watch(new Date($unwrap($props?.date ?? new Date())));
 	$props!.date = reactiveDate;
 
 	// Get stuff out of the Calendar context

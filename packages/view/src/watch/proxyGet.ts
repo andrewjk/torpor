@@ -4,7 +4,10 @@ import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
 import { COMPUTED_TYPE, EFFECT_TYPE, SIGNAL_TYPE } from "../types/constants";
 import $watch from "./$watch";
+import batchEnd from "./batchEnd";
+import batchStart from "./batchStart";
 import checkComputed from "./checkComputed";
+import $unwrap from "./$unwrap";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol } from "./symbols";
 import trackProxySignal from "./trackProxySignal";
@@ -74,16 +77,38 @@ function suspendRead(signal: Computed): any {
 /**
  * Deep-wraps a value with `$watch` if it is a plain object that is not already
  * watched and is not a promise. Returns the value unchanged otherwise.
+ *
+ * Wraps are cached (`proxyCache`), so repeated wraps of the same raw value
+ * return the SAME proxy. This matters where the proxy can't be written back
+ * into its parent (Set elements, Map values read via `values()`/`forEach`) --
+ * without the cache, each read would return a fresh proxy and mutations would
+ * be lost to the raw target (whose property writes bypass the traps).
  */
+const proxyCache = new WeakMap<object, object>();
+
 function deepWrap(value: any): any {
-	return value !== undefined &&
-		value !== null &&
-		typeof value === "object" &&
-		value[proxyDataSymbol] === undefined &&
-		// But not if it's a Promise (i.e. has a `then` method)
-		value.then === undefined
-		? $watch(value)
-		: value;
+	if (value === undefined || value === null || typeof value !== "object") {
+		return value;
+	}
+	if (value[proxyDataSymbol] !== undefined) {
+		// Already watched -- it's either a proxy itself, or a raw target whose
+		// proxy wasn't cached (e.g. it was wrapped directly via `$watch` and
+		// never deep-wrapped). Short-circuit BEFORE reading `then`, otherwise
+		// the read goes through the proxy's `get` trap and creates a spurious
+		// signal for a property nothing ever sets
+		return proxyCache.get(value) ?? value;
+	}
+	// But not if it's a Promise (i.e. has a `then` method)
+	if (value.then !== undefined) {
+		return value;
+	}
+	const cached = proxyCache.get(value);
+	if (cached !== undefined) {
+		return cached;
+	}
+	const proxy = $watch(value);
+	proxyCache.set(value, proxy);
+	return proxy;
 }
 
 export default function proxyGet(
@@ -95,6 +120,19 @@ export default function proxyGet(
 
 	if (key === proxyDataSymbol) {
 		return data;
+	}
+
+	// Dates, Maps and Sets can't be proxied transparently -- their prototype
+	// methods (`getFullYear`, `get`, `size`...) throw when invoked with the
+	// proxy as `this`, because they need internal slots of the raw object --
+	// so method access is routed through wrapper handlers instead. Own
+	// properties set by user code (`date.foo = 1`) still go through the
+	// generic property path below.
+	if (
+		(data.isDate || data.isMap || data.isSet) &&
+		!Object.prototype.hasOwnProperty.call(target, key)
+	) {
+		return collectionGet(data, target, key, receiver);
 	}
 
 	//console.log(`object get '${String(key)}' on`, target);
@@ -356,3 +394,307 @@ function arrayHandle(data: ProxyData, target: any, key: PropertyKey): Function {
 		return result;
 	};
 }
+
+// #region Date/Map/Set wrappers
+
+// Signal key for collection-wide reads (`size`, iteration). Also the fallback
+// per-key signal for keys that aren't primitives (object keys can't be signal
+// keys, since `data.signals` is keyed by PropertyKey)
+const COLLECTION_KEY = Symbol("torp.collection");
+// Signal key for all Date reads/writes (a Date only has one value, its time)
+const TIME_KEY = "#time";
+
+/**
+ * Routes a `get` on a watched Date/Map/Set to the right wrapper handler.
+ *
+ * Note the two levels of indirection for methods: the handler runs at get-trap
+ * time (returning the method to call), and the returned function runs when the
+ * method is invoked. `size` is the exception -- it returns its value at
+ * get-trap time, because it's a readonly property, not a method.
+ */
+function collectionGet(data: ProxyData, target: any, key: PropertyKey, receiver: any): any {
+	if (data.isDate) {
+		return dateGet(data, target, key);
+	}
+	const wrapper = data.isMap ? mapWrapper : setWrapper;
+	const handle = wrapper[key];
+	if (handle !== undefined) {
+		return handle(data, target, key, receiver);
+	}
+	return target[key];
+}
+
+/**
+ * Returns the signal key for a Map/Set operation: primitives get a per-key
+ * signal, so reading one key doesn't re-run effects when an unrelated key
+ * changes. Anything else shares the collection-wide signal.
+ */
+function collectionKey(key: any): PropertyKey {
+	const type = typeof key;
+	return type === "string" || type === "number" || type === "symbol" ? key : COLLECTION_KEY;
+}
+
+/**
+ * Propagates a Map/Set mutation: the per-key signal (when the key is a
+ * primitive) plus the collection-wide signal. The collection signal is always
+ * enough for object keys, and propagating the same signal twice would re-run
+ * effects twice (they re-subscribe between flushes).
+ */
+function propagateCollection(data: ProxyData, key: PropertyKey): void {
+	if (key !== COLLECTION_KEY) {
+		propagateSignal(data, key);
+	}
+	propagateSignal(data, COLLECTION_KEY);
+}
+
+function dateGet(data: ProxyData, target: any, key: PropertyKey): any {
+	if (typeof key === "symbol") {
+		// `Symbol.toPrimitive` is looked up by the language itself for `==`
+		// comparisons, arithmetic, template literals and JSON.stringify. It
+		// must be invoked on the raw target (internal slots), and reading it
+		// counts as a read of the date's value
+		if (key === Symbol.toPrimitive) {
+			return function (hint: string) {
+				const result = target[Symbol.toPrimitive](hint);
+				trackProxySignal(data, TIME_KEY);
+				return result;
+			};
+		}
+		return target[key];
+	}
+	if (typeof key !== "string") {
+		return target[key];
+	}
+	const value = target[key];
+	if (typeof value !== "function") {
+		return value;
+	}
+	if (key.startsWith("set")) {
+		return function (...args: any[]) {
+			// Only propagate if the time actually changed, so setting the same
+			// value is a no-op (same as the `set` trap)
+			const before = target.getTime();
+			const result = value.apply(target, args);
+			if (target.getTime() !== before) {
+				propagateSignal(data, TIME_KEY);
+			}
+			return result;
+		};
+	}
+	if (key.startsWith("get") || key.startsWith("to") || key === "valueOf") {
+		return function (...args: any[]) {
+			const result = value.apply(target, args);
+			trackProxySignal(data, TIME_KEY);
+			return result;
+		};
+	}
+	return value;
+}
+
+const mapWrapper: Record<PropertyKey, any> = {
+	size: function (data: ProxyData, target: any): number {
+		trackProxySignal(data, COLLECTION_KEY);
+		return target.size;
+	},
+	get: function (data: ProxyData, target: any): Function {
+		return function (key: any) {
+			key = $unwrap(key);
+			trackProxySignal(data, collectionKey(key));
+			const value = target.get(key);
+			if (data.shallow !== true) {
+				// Deep-wrap the value and write the proxy back, so repeated
+				// reads return the same proxy (same as array elements)
+				const wrapped = deepWrap(value);
+				if (wrapped !== value) {
+					target.set(key, wrapped);
+				}
+				return wrapped;
+			}
+			return value;
+		};
+	},
+	has: function (data: ProxyData, target: any): Function {
+		return function (key: any) {
+			key = $unwrap(key);
+			trackProxySignal(data, collectionKey(key));
+			return target.has(key);
+		};
+	},
+	set: function (data: ProxyData, target: any, _key: PropertyKey, receiver: any): Function {
+		return function (key: any, value: any) {
+			key = $unwrap(key);
+			// Only propagate if the value actually changed or the key is new
+			// (same as the `set` trap). Note a stored value may be a proxy
+			// (see `get`), so unwrap both sides before comparing
+			if (target.has(key) && $unwrap(target.get(key)) === $unwrap(value)) {
+				return receiver ?? target;
+			}
+			// A watched object is stored as its proxy, so reads return it
+			// reactively (same as array elements written back by the iterator)
+			const result = target.set(key, value);
+			propagateCollection(data, collectionKey(key));
+			// Map.set returns the map for chaining -- return the proxy so
+			// chained mutations stay reactive
+			return receiver ?? result;
+		};
+	},
+	delete: function (data: ProxyData, target: any): Function {
+		return function (key: any) {
+			key = $unwrap(key);
+			const result = target.delete(key);
+			propagateCollection(data, collectionKey(key));
+			return result;
+		};
+	},
+	clear: function (data: ProxyData, target: any): Function {
+		return function () {
+			const result = target.clear();
+			// Per-key readers must re-run too, and the keys are gone, so
+			// propagate every signal this collection created -- in one batch,
+			// so readers of several signals re-run only once
+			batchStart();
+			try {
+				for (const key of data.signals.keys()) {
+					propagateSignal(data, key);
+				}
+			} finally {
+				batchEnd();
+			}
+			return result;
+		};
+	},
+	keys: function (data: ProxyData, target: any): Function {
+		return function () {
+			trackProxySignal(data, COLLECTION_KEY);
+			return [...target.keys()][Symbol.iterator]();
+		};
+	},
+	values: function (data: ProxyData, target: any): Function {
+		return function () {
+			trackProxySignal(data, COLLECTION_KEY);
+			let values = [...target.values()];
+			if (data.shallow !== true) {
+				values = values.map(deepWrap);
+			}
+			return values[Symbol.iterator]();
+		};
+	},
+	entries: mapEntries,
+	// Map's default iteration protocol yields entries
+	[Symbol.iterator]: mapEntries,
+	forEach: function (data: ProxyData, target: any, _key: PropertyKey, receiver: any): Function {
+		return function (callback: (value: any, key: any, collection: any) => void, thisArg?: any) {
+			trackProxySignal(data, COLLECTION_KEY);
+			const wrap = data.shallow !== true;
+			target.forEach((value: any, key: any) => {
+				callback.call(thisArg, wrap ? deepWrap(value) : value, key, receiver ?? target);
+			});
+		};
+	},
+};
+
+function mapEntries(data: ProxyData, target: any): Function {
+	return function () {
+		trackProxySignal(data, COLLECTION_KEY);
+		const wrap = data.shallow !== true;
+		const entries = [...target.entries()].map((entry) => [
+			entry[0],
+			wrap ? deepWrap(entry[1]) : entry[1],
+		]);
+		return entries[Symbol.iterator]();
+	};
+}
+
+const setWrapper: Record<PropertyKey, any> = {
+	size: function (data: ProxyData, target: any): number {
+		trackProxySignal(data, COLLECTION_KEY);
+		return target.size;
+	},
+	has: function (data: ProxyData, target: any): Function {
+		return function (value: any) {
+			value = $unwrap(value);
+			trackProxySignal(data, collectionKey(value));
+			return target.has(value);
+		};
+	},
+	add: function (data: ProxyData, target: any, _key: PropertyKey, receiver: any): Function {
+		return function (value: any) {
+			value = $unwrap(value);
+			// Adding an existing element is a no-op (same as the `set` trap)
+			if (target.has(value)) {
+				return receiver ?? target;
+			}
+			const result = target.add(value);
+			propagateCollection(data, collectionKey(value));
+			// Set.add returns the set for chaining -- return the proxy so
+			// chained mutations stay reactive
+			return receiver ?? result;
+		};
+	},
+	delete: function (data: ProxyData, target: any): Function {
+		return function (value: any) {
+			value = $unwrap(value);
+			const result = target.delete(value);
+			propagateCollection(data, collectionKey(value));
+			return result;
+		};
+	},
+	clear: function (data: ProxyData, target: any): Function {
+		return function () {
+			const result = target.clear();
+			// Per-element readers must re-run too, and the elements are gone,
+			// so propagate every signal this collection created -- in one
+			// batch, so readers of several signals re-run only once
+			batchStart();
+			try {
+				for (const key of data.signals.keys()) {
+					propagateSignal(data, key);
+				}
+			} finally {
+				batchEnd();
+			}
+			return result;
+		};
+	},
+	// Sets yield the same elements from keys/values/iteration -- all wrapped,
+	// so mutating an element re-runs readers
+	keys: setValues,
+	values: setValues,
+	[Symbol.iterator]: setValues,
+	entries: setEntries,
+	forEach: function (data: ProxyData, target: any, _key: PropertyKey, receiver: any): Function {
+		return function (callback: (value: any, value2: any, collection: any) => void, thisArg?: any) {
+			trackProxySignal(data, COLLECTION_KEY);
+			const wrap = data.shallow !== true;
+			target.forEach((value: any) => {
+				const wrapped = wrap ? deepWrap(value) : value;
+				callback.call(thisArg, wrapped, wrapped, receiver ?? target);
+			});
+		};
+	},
+};
+
+function setValues(data: ProxyData, target: any): Function {
+	return function () {
+		trackProxySignal(data, COLLECTION_KEY);
+		let values = [...target.values()];
+		if (data.shallow !== true) {
+			values = values.map(deepWrap);
+		}
+		return values[Symbol.iterator]();
+	};
+}
+
+function setEntries(data: ProxyData, target: any): Function {
+	return function () {
+		trackProxySignal(data, COLLECTION_KEY);
+		const wrap = data.shallow !== true;
+		const entries = [...target.values()].map((value) => {
+			const wrapped = wrap ? deepWrap(value) : value;
+			return [wrapped, wrapped];
+		});
+		return entries[Symbol.iterator]();
+	};
+}
+
+// #endregion

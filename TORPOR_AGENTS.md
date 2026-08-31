@@ -303,13 +303,39 @@ $bind($state, $props, "name", "age");
 Returns the raw target object behind a proxy (or the value itself if not a
 proxy). Useful when passing a proxied object to code that must not be proxied.
 
-### `ReactiveDate`
+### Dates, Maps and Sets
 
-A `Date` subclass that's reactive: `get*`/`to*`/`valueOf` reads track a
-`#time` signal, and `set*` writes notify.
+`$watch` supports `Date`, `Map` and `Set` values directly -- no wrapper
+classes needed. Their methods are reactive: reads track signals and writes
+notify, so effects re-run when they change.
 
 ```torp
-let $state = $watch({ date: new ReactiveDate(2024, 0, 15) });
+let $state = $watch({ date: new Date(2024, 0, 15) });
+
+$run(() => {
+	console.log($state.date.getFullYear());
+});
+
+$state.date.setFullYear(2025); // re-runs the effect above
+```
+
+Details:
+
+- **Dates** use a single signal: `get*`/`to*`/`valueOf` reads track it, and
+  `set*` writes (that actually change the time) notify. Comparisons,
+  template literals and `JSON.stringify` work too (they read the date's
+  prototype methods through the proxy).
+- **Maps** track `get`/`has` per key, so reading one key doesn't re-run
+  effects when an unrelated key changes. `size`, iteration and `forEach`
+  subscribe to the collection as a whole, and `clear` re-runs all readers.
+  Same-value `set` calls are no-ops.
+- **Sets** work the same, keyed by element (`has`/`add`/`delete`).
+- Objects stored in a Map/Set are wrapped on read, so their properties are
+  reactive like any other nested object.
+
+```torp
+let $state = $watch({ selected: new Set<string>() });
+$state.selected.add("a"); // effects reading `selected.has("a")` re-run
 ```
 
 ---

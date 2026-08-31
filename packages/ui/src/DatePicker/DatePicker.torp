@@ -1,4 +1,4 @@
-import { ReactiveDate, type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
+import { type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
 import {
 	Calendar,
 	CalendarDay,
@@ -124,7 +124,7 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 	}
 
 	function handleDate(date: Date) {
-		$state.value = new ReactiveDate(date);
+		$state.value = $watch(new Date(date));
 		$props?.onchange?.($state.value);
 		form.handleInput();
 		setVisible(false);

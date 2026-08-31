@@ -17,28 +17,27 @@ const sharedHandler: ProxyHandler<Record<PropertyKey, any>> = {
 };
 
 /**
- * Watches an object and runs effects when its properties are changed
+ * Watches an object and runs effects when its properties are changed.
+ *
+ * Dates, Maps and Sets are supported too: their methods are reactive (reads
+ * track, writes notify), so `new Date()`, `new Map()` and `new Set()` can be
+ * used in watched state directly.
  *
  * @param object The object to watch
  */
-export default function $watch<T extends Record<PropertyKey, any>>(
-	object: T,
-	options?: WatchOptions,
-): T {
+export default function $watch<T extends object>(object: T, options?: WatchOptions): T {
 	// Return the object itself if it is undefined or null, or if it is already a proxy
-	if (object === undefined || object === null || object[proxyDataSymbol] !== undefined) {
+	if (object === undefined || object === null || (object as any)[proxyDataSymbol] !== undefined) {
 		return object;
 	}
 
-	// DEBUG: Make sure we can proxy this value
-	//if (typeof object !== "object") {
-	//	throw new Error(`$watch can't be called with a ${typeof object}`);
-	//}
-
 	// Create a proxy handler for each object, and store some data for it here
 	const data: ProxyData = {
-		target: object,
+		target: object as Record<PropertyKey, any>,
 		isArray: Array.isArray(object),
+		isDate: object instanceof Date,
+		isMap: object instanceof Map,
+		isSet: object instanceof Set,
 		shallow: options?.shallow === true,
 		signals: new Map(),
 	};

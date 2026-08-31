@@ -1,5 +1,4 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { ReactiveDate } from "@torpor/view";
 import { areDatesEqual } from "../utils/dateUtils";
 import getId from "../utils/getId";
 import { type PopoutContext, PopoutContextName } from "../utils/PopoutTypes";
@@ -66,7 +65,7 @@ export default function Calendar($props: CalendarProps) {
 	$props ??= $watch({});
 
 	// Ensure the value is a reactive date
-	let reactiveValue = new ReactiveDate($unwrap($props.value ?? new Date()));
+	let reactiveValue = $watch(new Date($unwrap($props.value ?? new Date())));
 	$props.value = reactiveValue;
 
 	// A note on dates:
@@ -122,7 +121,7 @@ export default function Calendar($props: CalendarProps) {
 		}
 	});
 
-	function registerDay(date: ReactiveDate, setActive: (value: boolean) => void) {
+	function registerDay(date: Date, setActive: (value: boolean) => void) {
 		const day = $state.days.find((d) => areDatesEqual(d.date, date));
 		if (day) {
 			day.setActive = setActive;
@@ -131,7 +130,7 @@ export default function Calendar($props: CalendarProps) {
 
 	function setValue(date: Date) {
 		// TODO: for date pickers etc
-		// $state.value = new ReactiveDate(date);
+		// $state.value = $watch(new Date(date));
 
 		// Also set the active date so that the user knows where they are
 		setActiveDate(date);
@@ -142,12 +141,12 @@ export default function Calendar($props: CalendarProps) {
 	}
 
 	function setActiveDate(date: Date, moveRange = false) {
-		$state.activeDate = new ReactiveDate(date);
+		$state.activeDate = $watch(new Date(date));
 
 		// If the selected date is outside the visible date range, move the date range
 		if (moveRange || date < $state.visibleStartDate || date > $state.visibleEndDate) {
 			refocus = true;
-			$state.visibleDate = new ReactiveDate(date);
+			$state.visibleDate = $watch(new Date(date));
 			if ($props.onchangedate) {
 				$props.onchangedate(date);
 			}
@@ -173,7 +172,7 @@ export default function Calendar($props: CalendarProps) {
 		}
 	}
 
-	async function handleDay(date: ReactiveDate) {
+	async function handleDay(date: Date) {
 		if (!$props.selectable) return;
 
 		setValue(date);
