@@ -19,9 +19,8 @@ client.router = router;
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {
-	if (e.target && (e.target as HTMLElement).tagName === "A") {
-		const link = e.target as HTMLAnchorElement;
-
+	const link = getLink(e.target);
+	if (link) {
 		if (ignoreAnchorMouseEvent(link, e)) {
 			return;
 		}
@@ -45,9 +44,8 @@ window.addEventListener("mouseover", maybePrefetch);
 window.addEventListener("touchstart", maybePrefetch);
 
 async function maybePrefetch(e: MouseEvent | TouchEvent) {
-	if (e.target && (e.target as HTMLElement).tagName === "A") {
-		const link = e.target as HTMLAnchorElement;
-
+	const link = getLink(e.target);
+	if (link) {
 		if (ignoreAnchorMouseEvent(link, e)) {
 			return;
 		}
@@ -77,16 +75,31 @@ async function maybePrefetch(e: MouseEvent | TouchEvent) {
 	}
 }
 
+function getLink(target: EventTarget | null): HTMLAnchorElement | undefined {
+	// The target may be a child element of the link (e.g. an icon inside it),
+	// so walk up to the nearest actual link. Fragment-only links (href="#...")
+	// are left to the browser's native jump-to-anchor behavior
+	if (!(target instanceof Element)) return;
+	const link = target.closest("a[href]");
+	if (link?.getAttribute("href")?.startsWith("#")) return;
+	return (link as HTMLAnchorElement) ?? undefined;
+}
+
 function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: MouseEvent | TouchEvent) {
-	// Ignore the event if a modifier key is pressed, or target is not
-	// "_self", or if rel="external"
+	// Ignore the event if it was already handled (e.g. a user handler calling
+	// preventDefault), a modifier key is pressed, the target is not "_self"
+	// (e.g. "_blank"), rel="external", it's a download link, or it's in a
+	// contenteditable region
 	return (
+		e.defaultPrevented ||
 		e.altKey ||
 		e.ctrlKey ||
 		e.metaKey ||
 		e.shiftKey ||
 		(link.target && link.target !== "_self") ||
-		link.rel === "external"
+		link.rel === "external" ||
+		link.hasAttribute("download") ||
+		link.isContentEditable
 	);
 }
 
