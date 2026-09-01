@@ -23,6 +23,7 @@ import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import devPlugin from "./devPlugin.ts";
+import { clearStaleDepCache } from "./depCache";
 
 export default async function runDev(site: Site): Promise<void> {
 	// Create the Vite dev server. Unlike the previous middleware-mode setup, we
@@ -75,6 +76,10 @@ export default async function runDev(site: Site): Promise<void> {
 	// Node/workerd can't load. Exclude them from optimization and mark them
 	// for SSR bundling so they go through the torpor plugin
 	addTorporPackageConfig(site.root, config);
+
+	// Workspace packages may have been rebuilt since the last dev run; drop
+	// Vite's dep cache so SSR never executes stale prebundled modules
+	clearStaleDepCache(site.root, (message) => console.log(`\n${message}`));
 
 	// Load environment variables from a `.env` file, with defaults if not set
 	configDotenv();

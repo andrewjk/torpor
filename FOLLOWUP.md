@@ -92,22 +92,19 @@ deploy. Likely wrangler is re-bundling something that still references
 
 ### Stale-module SSR errors after rebuilding a workspace package while `tb --dev` runs
 
-After rebuilding `@torpor/view` (or another workspace dep) while the dev
-server is up, SSR pages can fail with confusing errors (e.g.
-"$cache must be used in a getter" from `packages/ui/src/utils/createItemGroup.ts`
-plain-`.ts` files importing client runtime primitives, seen when mixing the
-"development"-condition src resolution with the cloudflare adapter's workerd
-module runner). Restarting `tb --dev` after a package rebuild resolves it.
-A longer-term fix would be invalidating the workerd module graph when
-workspace deps change on disk.
+Vite's dep cache (site node_modules/.vite) keys off the lockfile and config,
+not the content of workspace packages, so rebuilt packages kept serving stale
+prebundled modules to the workerd dev runner -- with confusing errors like
+"$cache must be used in a getter" or "ReferenceError: $handle is not defined"
+for identifiers that clearly exist in source.
 
-Related (fixed): UI component pages all rendered
-"ReferenceError: $handle is not defined" in dev because a stale Vite dep
-cache under the site's node_modules folder held old compilations of
-@torpor/ui's dist .torp files, and the workerd dev runner executed those
-cached modules regardless of package rebuilds. Deleting that cache folder
-and restarting the dev server fixed every page. Worth remembering whenever
-dev SSR reports missing runtime identifiers that clearly exist in source.
+`tb --dev` now fingerprints the workspace packages the site depends on at
+startup (path, size, mtime) and deletes the dep cache when they changed
+(packages/build/src/run/depCache.ts), which turns "restart and know the
+trick" into "just restart". Still open: live invalidation while the server
+is running -- after rebuilding a workspace package mid-session, restart the
+dev server to pick it up. A watcher feeding Vite's module graph would remove
+even that.
 
 ## Features
 

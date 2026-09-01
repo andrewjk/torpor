@@ -3,7 +3,7 @@ import { createRequire, isBuiltin } from "node:module";
 import path from "node:path";
 import type { UserConfig } from "vite";
 
-type PackageJson = {
+export type PackageJson = {
 	name?: string;
 	torpor?: string;
 	exports?: unknown;
