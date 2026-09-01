@@ -18,8 +18,9 @@ deliberately left out:
   for client loads. These run in the browser, so the schema would be included
   in the client bundle; needs a bundle-cost tradeoff decision.
 - **Response validation**: validating what handlers return (Fastify-style
-  output schemas, potentially feeding OpenAPI generation). Runtime cost on
-  every response; bigger feature.
+  output schemas). Runtime cost on every response; bigger feature. Now also
+  the natural feed for OpenAPI response schemas (see the OpenAPI section
+  below) -- designing the two together is the plan.
 - **Client-side pre-submit validation** (`nav/formSubmit.ts`): validate form
   data in the browser before POSTing for instant feedback. Requires shipping
   schemas to the client and a shared error shape into `$page.form`.
@@ -30,6 +31,28 @@ deliberately left out:
   are not applied to the layout's own load/actions; the page's server
   endpoint schema is the one used for shared params/query validation during
   SSR.
+
+## OpenAPI generation: known gaps
+
+The `openApi()` site plugin (`@torpor/build/openapi`) generates an OpenAPI
+3.1 document from `+server` routes, served at `/openapi.json` with a Swagger
+UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
+
+- **Response schemas**: every operation documents a stub `200` (plus `422`
+  when the handler declares an input schema). Real response schemas want the
+  response-validation feature first (see above) so both share one schema
+  shape.
+- **No `$ref`/`components` dedup**: converter output is inlined verbatim,
+  including any `$defs` the converter emits. Valid OpenAPI 3.1, but
+  documents with repeated schemas are larger than they could be.
+- **Non-object query/params schemas are ignored**: if a `get`/`params`
+  schema converts to something without `properties`, no parameters are
+  documented (best-effort mapping).
+- **Page-server routes, hooks and layouts aren't documented**: `?/action`
+  POST semantics don't map cleanly to OpenAPI operations. Only `+server`
+  routes (type 3) are included.
+- **The docs page loads Swagger UI from unpkg**: no offline/bundled UI
+  option; a Scalar/self-hosted alternative could be added later.
 
 ## Form re-render runs load query validation against the POST url (edge case)
 

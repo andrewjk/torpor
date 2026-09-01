@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
+import type SitePlugin from "../types/SitePlugin";
 import type { InlineEndPoint } from "../types/Route";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type Route from "../types/Route";
@@ -32,8 +33,17 @@ import defaultAdapter from "./defaultAdapter";
 export default class Site {
 	root: string;
 	routes: Route[] = [];
-	// Is default plugins a bad idea?
-	plugins: Plugin[] = [];
+	/**
+	 * Torpor site plugins, run when the site config is loaded (for dev and
+	 * build) and when the server starts up. Use these to register extra
+	 * routes (e.g. `openApi()` from `@torpor/build/openapi`) or add other
+	 * framework-level functionality
+	 */
+	plugins: SitePlugin[] = [];
+	/**
+	 * Vite plugins to add to the client and server builds
+	 */
+	vitePlugins: Plugin[] = [];
 	// Is default adapter a bad idea?
 	adapter: Adapter = defaultAdapter;
 	/**
@@ -45,7 +55,7 @@ export default class Site {
 	/**
 	 * Vite config options to merge with the standard Torpor build options.
 	 * `plugins` and `build.rollupOptions.input` will be overridden, so you
-	 * should set `Site.plugins` and `Site.inputs` instead. Other options may be
+	 * should set `Site.vitePlugins` and `Site.inputs` instead. Other options may be
 	 * overridden or incompatible, so experimentation may be required
 	 */
 	viteConfig?: UserConfig;
@@ -54,6 +64,22 @@ export default class Site {
 	 * the manifest plugin to import inline endpoints for server builds.
 	 */
 	configFile?: string;
+	/**
+	 * A state map for plugins to store their configuration and state on the
+	 * site, so that framework internals (e.g. the manifest plugin) and other
+	 * plugins can read them back:
+	 *
+	 * ```ts
+	 * const myKey = Symbol.for("my-plugin");
+	 * site.pluginState.set(myKey, options);
+	 * ```
+	 *
+	 * Prefer `Symbol.for("...")` keys (or plain strings) over `Symbol()`,
+	 * because the user's config file and framework internals can be loaded as
+	 * separate module instances -- registry symbols are shared across
+	 * instances, `Symbol()` ones are not.
+	 */
+	pluginState: Map<PropertyKey, unknown> = new Map();
 	/**
 	 * Inline endpoints keyed by `"path:type"`. Populated by `addRoute` when
 	 * the user passes an inline endpoint object instead of a file path.
@@ -311,6 +337,10 @@ export default class Site {
 	 * targets. File paths are resolved relative to the site root; inline
 	 * endpoints are also stored in `inlineEndPoints` keyed by `"path:type"`
 	 * so the manifest plugin can resolve them at build time.
+	 *
+	 * If a route with the same path and type was already added, it is
+	 * replaced, so that running a plugin twice (config load and server
+	 * startup) doesn't add duplicate routes.
 	 */
 	#pushRoute(
 		routePath: string,
@@ -318,13 +348,22 @@ export default class Site {
 		target: string | InlineEndPoint,
 		subFolder?: string,
 	): void {
+		const index = this.routes.findIndex((r) => r.path === routePath && r.type === type);
 		if (typeof target === "string") {
 			let file = fpath.relative(this.root, fpath.resolve(this.root, target));
-			this.routes.push({ path: routePath, file, type, subFolder });
+			if (index >= 0) {
+				this.routes[index] = { path: routePath, file, type, subFolder };
+			} else {
+				this.routes.push({ path: routePath, file, type, subFolder });
+			}
 		} else {
 			let key = `${routePath}:${type}`;
 			this.inlineEndPoints[key] = target;
-			this.routes.push({ path: routePath, endPoint: target, type, subFolder });
+			if (index >= 0) {
+				this.routes[index] = { path: routePath, endPoint: target, type, subFolder };
+			} else {
+				this.routes.push({ path: routePath, endPoint: target, type, subFolder });
+			}
 		}
 	}
 

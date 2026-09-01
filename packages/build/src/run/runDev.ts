@@ -52,7 +52,12 @@ export default async function runDev(site: Site): Promise<void> {
 	const adapterDev = site.adapter.dev?.(site);
 	const devPlugins = normalizePlugins(adapterDev ?? devPlugin(site));
 
-	config.plugins = [manifest(site, true), torpor({ dev: true }), ...devPlugins, ...site.plugins];
+	config.plugins = [
+		manifest(site, true),
+		torpor({ dev: true }),
+		...devPlugins,
+		...site.vitePlugins,
+	];
 
 	// HACK: To be able to import `.torp` files from barrel files in
 	// node_modules, we need to add their libraries to `ssr.noExternal` in

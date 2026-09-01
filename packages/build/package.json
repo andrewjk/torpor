@@ -20,6 +20,10 @@
 			"types": "./dist/nav.d.mts",
 			"import": "./dist/nav.mjs"
 		},
+		"./openapi": {
+			"types": "./dist/openapi.d.mts",
+			"import": "./dist/openapi.mjs"
+		},
 		"./response": {
 			"types": "./dist/response.d.mts",
 			"import": "./dist/response.mjs"

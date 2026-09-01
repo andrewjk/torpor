@@ -61,7 +61,7 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(clientConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
-	clientConfig.plugins = [manifest(site), torpor(), ...site.plugins];
+	clientConfig.plugins = [manifest(site), torpor(), ...site.vitePlugins];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
 	clientConfig.build.rollupOptions ??= {};
@@ -86,7 +86,7 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(serverConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
-	serverConfig.plugins = [manifest(site, true), torpor(), ...site.plugins];
+	serverConfig.plugins = [manifest(site, true), torpor(), ...site.vitePlugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
 	// Bundle packages that ship `.torp` files into the server build, as they

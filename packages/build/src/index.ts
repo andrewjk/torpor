@@ -37,6 +37,7 @@ import type ServerLoadEvent from "./types/ServerLoadEvent";
 import type { FormDataRecord, QueryRecord } from "./types/ServerLoadEvent";
 import type ServerRequest from "./types/ServerRequest";
 import type { StandardSchemaV1 } from "./types/StandardSchema";
+import type SitePlugin from "./types/SitePlugin";
 
 // NOTE: Don't export any general functionality from here -- it may result in
 // Vite errors like `Could not resolve '../pkg' in lightningcss` etc
@@ -61,6 +62,7 @@ export type {
 	ServerRequest,
 	ServerHook,
 	ServerLoadEvent,
+	SitePlugin,
 	FormDataRecord,
 	QueryRecord,
 	StandardSchemaV1,

@@ -6,6 +6,7 @@ export default defineConfig({
 			"src/index.ts",
 			"src/form.ts",
 			"src/nav.ts",
+			"src/openapi.ts",
 			"src/response.ts",
 			"src/run.ts",
 			"src/schema.ts",

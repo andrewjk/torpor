@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
+import { openApi } from "../src/openapi/plugin";
 import manifest, { hasLoadExport } from "../src/site/manifest";
 import Site from "../src/site/Site";
 import { PAGE_ROUTE } from "../src/types/RouteType";
@@ -150,6 +151,71 @@ describe("manifest plugin", () => {
 		const plugin = manifest(site, false);
 		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
 		expect(code).toContain(`type: ${PAGE_ROUTE}`);
+	});
+
+	test("server build: emits the plugin execution loop when plugins are set", () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.plugins = [async () => {}];
+		const plugin = manifest(site, true);
+		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
+		expect(code).toContain(`import __site from "${site.configFile}"`);
+		expect(code).toContain("for (const __plugin of __site.plugins ?? [])");
+		expect(code).toContain("await __plugin(__site)");
+	});
+
+	test("server build: imports the config file when only plugins are set", () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.plugins = [() => {}];
+		const plugin = manifest(site, true);
+		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
+		expect(code).toContain(`import __site from "${site.configFile}"`);
+	});
+
+	test("client build: does not emit the plugin execution loop", () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.plugins = [() => {}];
+		const plugin = manifest(site, false);
+		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
+		expect(code).not.toContain("__plugin");
+		expect(code).not.toContain("import __site");
+	});
+
+	test("server build: emits the OpenAPI document endpoint when the plugin is configured", async () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.addRoute("/api/posts/[id]", {
+			server: { get: async () => undefined },
+		});
+		await openApi({ path: "/openapi.json", toJsonSchema: (s) => s as any })(site);
+
+		const plugin = manifest(site, true);
+		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
+		expect(code).toContain('from "@torpor/build/openapi"');
+		expect(code).toContain(
+			"buildOpenApiDocument(__entries, __site.pluginState.get(OPEN_API_STATE_KEY))",
+		);
+		expect(code).toContain("__openApiRoutes");
+		// Inline endpoints are loaded via __site
+		expect(code).toContain(
+			'"/api/posts/[id]": () => Promise.resolve({ default: __site.inlineEndPoints',
+		);
+		// The document route is appended to the routes list
+		expect(code).toContain(`path: "/openapi.json", type: 3`);
+		expect(code).toContain("get: __openApiGet");
+	});
+
+	test("client build: does not emit the OpenAPI document endpoint", async () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		await openApi({ toJsonSchema: (s) => s as any })(site);
+
+		const plugin = manifest(site, false);
+		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
+		expect(code).not.toContain("__openApi");
+		expect(code).not.toContain("@torpor/build/openapi");
 	});
 });
 
