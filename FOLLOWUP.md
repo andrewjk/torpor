@@ -81,16 +81,6 @@ guard armed right before hide. Any future focus-to-open component needs the same
 guard; alternatively the runtime could distinguish script-driven refocus from real
 user focus events.
 
-### UI docs pages broken in dev (date-picker, slider routes disabled)
-
-Two sidebar links 404: `/ui/date-picker` and `/ui/slider`. Their route files
-exist only as `+page.ts.bak` (from the original component commits,
-518d810c / 32992f73) — the pages were disabled when added and never enabled.
-The page views (`DatePickerPage.torp`, `SliderPage.torp`) and components exist
-and have tests; enabling the routes is probably just renaming the `.bak`
-files, but the components should be smoke-tested first in case that's why
-they were gated.
-
 ### `tb --preview` fails to bundle .torp files (pre-existing)
 
 `tb --preview` (wrangler dev over `dist/cloudflare/_worker.js`) dies with
@@ -110,6 +100,14 @@ plain-`.ts` files importing client runtime primitives, seen when mixing the
 module runner). Restarting `tb --dev` after a package rebuild resolves it.
 A longer-term fix would be invalidating the workerd module graph when
 workspace deps change on disk.
+
+Related (fixed): UI component pages all rendered
+"ReferenceError: $handle is not defined" in dev because a stale Vite dep
+cache under the site's node_modules folder held old compilations of
+@torpor/ui's dist .torp files, and the workerd dev runner executed those
+cached modules regardless of package rebuilds. Deleting that cache folder
+and restarting the dev server fixed every page. Worth remembering whenever
+dev SSR reports missing runtime identifiers that clearly exist in source.
 
 ## Features
 
