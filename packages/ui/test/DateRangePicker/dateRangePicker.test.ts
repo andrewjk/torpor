@@ -76,9 +76,16 @@ describe("DateRangePicker", () => {
 		const end = container.querySelector('[data-range="end"]');
 		const inside = container.querySelectorAll('[data-range="inside"]');
 
-		expect(start).toHaveAttribute("aria-selected", "true");
-		expect(end).toHaveAttribute("aria-selected", "true");
+		expect(start).not.toBeNull();
+		expect(end).not.toBeNull();
 		expect(inside).toHaveLength(3);
+
+		// aria-selected is only valid on a gridcell, so it lives there rather
+		// than on the day's button -- the last clicked day (the range's end)
+		// is the active one
+		expect(start).not.toHaveAttribute("aria-selected");
+		expect(end).not.toHaveAttribute("aria-selected");
+		expect(end!.closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "true");
 	});
 
 	it("starts a new range when clicking before the start", async () => {

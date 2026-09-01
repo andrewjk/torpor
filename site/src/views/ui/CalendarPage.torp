@@ -18,14 +18,16 @@ export default function CalendarPage() {
 		<h2>Structure</h2>
 		<pre><code>{`
 <Calendar>
+	<CalendarHeader>
+		<CalendarHeaderTrigger type="previous" />
+		<h4>{$slot.monthName} {$slot.year}</h4>
+		<CalendarHeaderTrigger type="next" />
+	</CalendarHeader>
+	<CalendarGridHeader>
+		<CalendarDayHeader />
+	</CalendarGridHeader>
 	<CalendarGrid>
-		<CalendarHeader />
-		<CalendarGridHeader>
-			<CalendarDayHeader />
-		</CalendarGridHeader>
-		<CalendarGrid>
-			<CalendarDay />
-		</CalendarGrid>
+		<CalendarDay />
 	</CalendarGrid>
 </Calendar>
 `.trim()}</code></pre>

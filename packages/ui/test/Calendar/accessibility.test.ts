@@ -38,23 +38,41 @@ describe("Calendar", () => {
 			expect(header).toHaveAttribute("abbr");
 		});
 
-		const dayButtons = container.querySelectorAll(".torp-calendar-day button");
-		dayButtons.forEach((button) => {
-			expect(button).toHaveAttribute("aria-label");
-			expect(button.tagName.toLowerCase()).toBe("button");
+		// The days are wrapped in row/gridcell elements so screen readers can
+		// navigate the grid -- one row per week, one gridcell per day
+		const rows = grid.querySelectorAll('[role="row"]');
+		expect(rows.length).toBeGreaterThan(0);
+
+		const gridcells = grid.querySelectorAll('[role="gridcell"]');
+		expect(gridcells.length).toBeGreaterThan(0);
+		expect(gridcells.length % 7).toBe(0);
+
+		gridcells.forEach((cell) => {
+			expect(cell.children.length).toBeGreaterThan(0);
 		});
 
-		const todayButton = container.querySelector(".torp-calendar-day.today button");
-		if (todayButton) {
-			expect(todayButton).toHaveAttribute("aria-current", "date");
-		}
+		const dayButtons = container.querySelectorAll("button.torp-calendar-day");
+		expect(dayButtons.length).toBe(gridcells.length);
+		dayButtons.forEach((button) => {
+			expect(button).toHaveAttribute("aria-label");
+		});
 
-		const activeDay = container.querySelector(".torp-calendar-day.active button");
-		if (activeDay) {
-			expect(activeDay).toHaveAttribute("aria-selected", "true");
-		}
+		const todayButton = container.querySelector("button.torp-calendar-day.today");
+		expect(todayButton).not.toBeNull();
+		expect(todayButton).toHaveAttribute("aria-current", "date");
 
-		const mutedDays = container.querySelectorAll(".torp-calendar-day.muted button");
+		// aria-selected is only valid on a gridcell, so it lives there rather
+		// than on the day's button
+		const activeButton = container.querySelector("button.torp-calendar-day.active");
+		expect(activeButton).not.toBeNull();
+		expect(activeButton).not.toHaveAttribute("aria-selected");
+
+		const activeCell = activeButton!.closest('[role="gridcell"]');
+		expect(activeCell).not.toBeNull();
+		expect(activeCell).toHaveAttribute("aria-selected", "true");
+
+		const mutedDays = container.querySelectorAll("button.torp-calendar-day.muted");
+		expect(mutedDays.length).toBeGreaterThan(0);
 		mutedDays.forEach((button) => {
 			expect(button).toHaveAttribute("aria-disabled", "true");
 		});

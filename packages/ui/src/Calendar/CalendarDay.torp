@@ -93,7 +93,6 @@ export default function CalendarDay($props: CalendarDayProps) {
 				onkeydown={handleKey}
 				aria-label={$props?.ariaLabel ?? formatDate($props.date)}
 				aria-current={isToday() ? "date" : undefined}
-				aria-selected={$props.active ? "true" : "false"}
 				aria-disabled={$props.muted ? "true" : undefined}
 			>
 				<slot>

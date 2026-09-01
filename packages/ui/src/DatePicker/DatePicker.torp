@@ -202,10 +202,7 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 						}
 					</CalendarGridHeader>
 					<CalendarGrid>
-						@for (let day of $slot.days) {
-							@key = day.date
-							<CalendarDay {day.date} {day.muted} {day.active} />
-						}
+						<CalendarDay date={$slot.day.date} muted={$slot.day.muted} active={$slot.day.active} />
 					</CalendarGrid>
 				</Calendar>
 			</div>

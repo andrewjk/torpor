@@ -112,7 +112,6 @@ export default function DateRangePickerDay($props: DateRangePickerDayProps | und
 			onmouseenter={handleEnter}
 			aria-label={$props?.ariaLabel ?? formatDate($props!.date)}
 			aria-current={isToday() ? "date" : undefined}
-			aria-selected={isStart() || isEnd() || $props?.active ? "true" : "false"}
 			aria-disabled={$props?.muted ? "true" : undefined}
 			data-range={isStart() ? "start" : isEnd() ? "end" : isInRange() ? "inside" : undefined}
 		>

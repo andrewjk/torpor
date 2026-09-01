@@ -263,10 +263,11 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 						}
 					</CalendarGridHeader>
 					<CalendarGrid>
-						@for (let day of $slot.days) {
-							@key = day.date
-							<DateRangePickerDay {day.date} {day.muted} {day.active} />
-						}
+						<DateRangePickerDay
+							date={$slot.day.date}
+							muted={$slot.day.muted}
+							active={$slot.day.active}
+						/>
 					</CalendarGrid>
 				</Calendar>
 			</div>

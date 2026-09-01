@@ -1,5 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { type CalendarContext, CalendarContextName } from "./CalendarTypes";
+import { areDatesEqual } from "../utils/dateUtils";
+import { type CalendarContext, CalendarContextName, type DayState } from "./CalendarTypes";
 
 interface CalendarGridProps {
 	/** An ID for the root element */
@@ -13,7 +14,13 @@ interface CalendarGridProps {
 }
 
 /**
- * The grid of calendar items (headers and days).
+ * The grid of calendar days, wrapped in the row/gridcell structure that the
+ * grid role requires: each week is a `role="row"` and each day is a
+ * `role="gridcell"`.
+ *
+ * The days come from the Calendar's state as a flat list; they are grouped
+ * into rows of seven here. The slot is rendered once per day, with the day
+ * passed back to the slot content (`$slot.day`).
  */
 export default function CalendarGrid($props: CalendarGridProps | undefined) {
 	// Get stuff out of the Calendar context
@@ -22,6 +29,27 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 		throw new Error("CalendarGrid must be contained within a Calendar");
 	}
 	const { handleKey, state: $state } = context;
+
+	// Group the flat days list into rows of seven (one row per week)
+	let $grid = $watch({
+		get weeks(): DayState[][] {
+			return $cache(() => {
+				const days = $state.days;
+				const weeks: DayState[][] = [];
+				for (let i = 0; i < days.length; i += 7) {
+					weeks.push(days.slice(i, i + 7));
+				}
+				return weeks;
+			});
+		},
+	});
+
+	// The active date is the selected date, so cells can be marked with
+	// aria-selected (which is only valid on a gridcell, not on the day
+	// component's button)
+	function isSelected(day: DayState): boolean {
+		return areDatesEqual(day.date, $state.activeDate);
+	}
 
 	// Focus the day with `class=active`
 	function handleFocus(e: FocusEvent & { currentTarget: EventTarget & HTMLElement }) {
@@ -45,14 +73,33 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 			aria-colcount="7"
 			aria-readonly={!context.selectable ? "true" : undefined}
 		>
-			<slot {$state.days} />
+			@for (let week of $grid.weeks) {
+				<div role="row" class="torp-calendar-row">
+					@for (let day of week) {
+						@key = day.date
+						<span
+							role="gridcell"
+							class="torp-calendar-cell"
+							aria-selected={context.selectable ? (isSelected(day) ? "true" : "false") : undefined}
+						>
+							<slot {day} />
+						</span>
+					}
+				</div>
+			}
 		</div>
 	}
 
 	@style {
 		.torp-calendar-grid {
 			display: grid;
+		}
+		.torp-calendar-row {
+			display: grid;
 			grid-template-columns: repeat(7, 1fr);
+		}
+		.torp-calendar-cell {
+			display: grid;
 		}
 	}
 }

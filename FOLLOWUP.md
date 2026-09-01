@@ -24,22 +24,15 @@ re-renders, or rendering from cached load data.
 aren't resolvable by plain Node. Reproduces at HEAD without the endpoints-only
 site.html fix. Dev mode (`tb --dev`, which uses `vite.ssrLoadModule`) works fine.
 
-### Calendar: day cells lack row/gridcell structure (component review)
+### DateRangePicker: range endpoints are not exposed to screen readers
 
-Found during the Calendar APG review. The calendar grid has `role="grid"`,
-an `aria-colcount`, and a proper header (`role="row"` > `columnheader`), but
-the days are rendered as a flat list of buttons/spans directly inside the
-grid -- no `role="row"` wrappers per week and no `role="gridcell"` per day,
-so screen readers can't navigate it as a grid. The selected-day state is also
-expressed as `aria-selected` on the `<button>`, which is only valid on a
-gridcell/option/row/tab.
-
-Fixing this properly is an API change: `buildDays` would need to group days
-by week, and `CalendarGrid`'s slot contract changes from `$slot.days` to
-weeks that users wrap in rows (or the grid renders days internally). Deferred
-because it alters user-facing composition; everything else in the review was
-fixed inline (single grid element instead of nested grids, reactive
-`selectable` context getter so `aria-readonly`/`tabindex` update).
+The day buttons used to carry `aria-selected` for the range's start/end, but
+that was invalid (`aria-selected` is only valid on a gridcell/option/row/tab,
+so assistive tech ignored it anyway). The grid now sets `aria-selected` on
+each day's gridcell for the active (last clicked) date only; range endpoints
+are still marked visually via the `selected` class and `data-range`
+attribute, but not announced. Conveying them properly needs per-day selection
+info to reach the gridcell (e.g. a selection hook on the Calendar context).
 
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
