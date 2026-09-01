@@ -6,9 +6,10 @@ export default function PlaygroundPage() {
 	}
 
 	@render {
-		<h1>Playground</h1>
-		<Repl
-			input={`
+		<div id="playground-container">
+			<h1>Playground</h1>
+			<Repl
+				input={`
 export default function Counter() {
 	let $state = $watch({
 		count: 0
@@ -27,6 +28,13 @@ export default function Counter() {
 	}
 }
 `.trimStart()}
-		/>
+			/>
+		</div>
+	}
+
+	@style {
+		#playground-container {
+			padding: 0 1rem;
+		}
 	}
 }

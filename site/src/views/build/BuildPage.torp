@@ -1,0 +1,20 @@
+export default function OverviewPage() {
+	@head {
+		<title>Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Build</h1>
+		<p>
+			Build is Torpor's full-stack framework, which you can use to build flexible,
+			interactive, and accessible sites and apps. It is built on top of
+			<a href="https://vite.dev">Vite</a>.
+		</p>
+		<p>
+			This documentation is built in Build.
+		</p>
+		<p>
+			TODO:
+		</p>
+	}
+}

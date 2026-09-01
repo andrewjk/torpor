@@ -1,0 +1,9 @@
+import SectionLayout from "../SectionLayout.torp";
+
+export default function BuildLayout() {
+	@render {
+		<SectionLayout links={[{ label: "Overview", href: "/build/overview" }]}>
+			<slot />
+		</SectionLayout>
+	}
+}

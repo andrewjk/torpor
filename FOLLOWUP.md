@@ -106,6 +106,15 @@ is running -- after rebuilding a workspace package mid-session, restart the
 dev server to pick it up. A watcher feeding Vite's module graph would remove
 even that.
 
+Related: the site resolves `@torpor/ui/*` to `packages/ui/dist`, whose
+`.torp` files are COPIES made by the ui package's build (`vp pack`). If the
+dist copy is stale (package not rebuilt after changing a component's API),
+the site silently runs the old component -- hit as a
+`$slot.day is undefined` TypeError on the calendar page after the
+CalendarGrid slot API changed from `$slot.days` to `$slot.day`. Rebuild the
+workspace package (and restart `tb --dev`) when site pages use new component
+APIs. A check that dist `.torp` copies match src would catch this earlier.
+
 ## Features
 
 ### Standard schema validation: remaining integration points

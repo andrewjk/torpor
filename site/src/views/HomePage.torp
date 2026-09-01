@@ -1,4 +1,3 @@
-import torporLogo from "@/assets/torpor.svg";
 import CodePreview from "./CodePreview.torp";
 import Counter from "./Counter.torp";
 
@@ -12,12 +11,7 @@ export default function HomePage() {
 
 	@render {
 		<div id="home-container">
-			<div class="hstack spaced">
-				<a href="https://torpor.dev/" target="_blank">
-					<img src={torporLogo} class="logo" alt="Torpor logo" />
-				</a>
-				<h1>Torpor</h1>
-			</div>
+			<h1>Torpor</h1>
 			<p>
 				Torpor is a full-stack JavaScript framework that aims for
 				simplicity and completeness.
@@ -45,8 +39,8 @@ export default function HomePage() {
 						Torpor aims to include most of the things that you need to build high-quality
 						interfaces without having to reach for third party libraries, including:
 					</p>
-					<p>An <a href="ui/overview">accessible, unstyled component library</a></p>
-					<p>A <a href="build/overview">site and app framework</a></p>
+					<p>An <a href="/ui/overview">accessible, unstyled component library</a></p>
+					<p>A <a href="/build/overview">site and app framework</a></p>
 					<p>More to come...</p>
 				</div>
 			</div>
@@ -87,20 +81,16 @@ export default function Counter() {
 				</div>
 			</div>
 			<p>
-				<a href="/playground/play">Edit this component in the playground</a>
+				<a href="/playground">Edit this component in the playground</a>
 			</p>
 		</div>
 	}
 
 	@style {
-		.logo {
-			height: 75px;
-			width: 75px;
-		}
-
 		#home-container {
 			display: flex;
 			flex-direction: column;
+			padding: 0 1rem;
 		}
 
 		.features-card,

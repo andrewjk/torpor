@@ -578,7 +578,7 @@ function addFragment(fragment, parent, before, endNode, startNode) {
 	const activeRegion = context.activeRegion;
 	const hydrationNode = context.hydrationNode;
 	if (hydrationNode !== null) {
-		if (startNode !== void 0) activeRegion.startNode = startNode;
+		if (startNode !== void 0 && startNode.parentNode !== null) activeRegion.startNode = startNode;
 		activeRegion.endNode = endNode ?? hydrationNode;
 	} else {
 		activeRegion.startNode = fragment.firstChild;

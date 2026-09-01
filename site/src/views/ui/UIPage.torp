@@ -1,0 +1,14 @@
+
+export default function UIPage() {
+	@head {
+		<title>UI | Torpor</title>
+	}
+
+	@render {
+		<h1>Torpor UI Components</h1>
+		<p>
+			Torpor comes with (almost) all of the components you need to build high-quality,
+			interactive, and accessible user interfaces.
+		</p>
+	}
+}

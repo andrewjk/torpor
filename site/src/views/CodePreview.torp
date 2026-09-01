@@ -13,13 +13,18 @@ export default function CodePreview($props: { code: string }) {
 			return $props!.code;
 		},
 		// Format the code asynchronously; re-formats when the code changes.
+		// Both light and dark theme colors are emitted, and switched between
+		// by CSS (see the html.dark .shiki rules in style.css), so that
+		// toggling the theme doesn't require a re-render.
 		get formatted() {
 			return $async(async () => {
 				const code = this.code;
 				return (await codeToHtml(code, {
 					lang: "torpor",
-					theme: "light-plus",
-				})).replace(/background-color:\s*#[a-f\d]{6};\s*/i, "");
+					themes: { light: "light-plus", dark: "dark-plus" },
+				}))
+					.replace(/background-color:\s*#[a-f\d]{6};\s*/gi, "")
+					.replace(/--shiki-dark-bg:\s*#[a-f\d]{6};\s*/gi, "");
 			});
 		},
 	});

@@ -1,0 +1,191 @@
+import { $page } from "@torpor/build/state";
+import { NavMenu, NavMenuLink } from "@torpor/ui/NavMenu";
+import { SegmentedControl, SegmentedItem } from "@torpor/ui/SegmentedControl";
+import GithubLogo from "phosphor-torpor/lib/GithubLogo";
+import MoonStars from "phosphor-torpor/lib/MoonStars";
+import Play from "phosphor-torpor/lib/Play";
+import Sun from "phosphor-torpor/lib/Sun";
+import torporLogo from "@/assets/torpor.svg";
+
+export default function Header() {
+	let $state = $watch({
+		theme: "light",
+	});
+
+	$onmount(() => {
+		// The documentElement class is the source of truth for the theme, as it
+		// is set before first paint by the inline script in site.html
+		$state.theme = document.documentElement.classList.contains("dark") ? "dark" : "light";
+
+		$run(() => {
+			const theme = $state.theme;
+			document.documentElement.classList.toggle("dark", theme === "dark");
+			try {
+				localStorage.setItem("torpor-theme", theme);
+			} catch {
+				// Private browsing mode etc, theme just won't be persisted
+			}
+		});
+	});
+
+	function isActive(prefix: string): boolean {
+		const path = $page.url.pathname;
+		return path === prefix || path.startsWith(`${prefix}/`);
+	}
+
+	@render {
+		<header class="site-header">
+			<a href="/" class="nav-link">
+			<span class="hstack spaced">
+				<img src={torporLogo} class="logo" alt="Torpor logo" style="height: 2.4rem; width: 2.4rem" />
+				Torpor
+			</span>
+			</a>
+			<NavMenu class="site-nav" ariaLabel="Site sections">
+				<NavMenuLink href="/docs" class={["nav-link", { active: isActive("/docs") }]}>
+					Docs
+				</NavMenuLink>
+				<NavMenuLink href="/ui" class={["nav-link", { active: isActive("/ui") }]}>
+					Components
+				</NavMenuLink>
+				<NavMenuLink href="/build" class={["nav-link", { active: isActive("/build") }]}>
+					Build
+				</NavMenuLink>
+				<NavMenuLink href="/playground" class={["nav-link", { active: isActive("/playground") }]}>
+					Playground
+				</NavMenuLink>
+			</NavMenu>
+			<div class="actions">
+				<SegmentedControl class="theme-control" ariaLabel="Color theme" &value={$state.theme}>
+					<SegmentedItem value="light" class="theme-item">
+						<Sun />
+					</SegmentedItem>
+					<SegmentedItem value="dark" class="theme-item">
+						<MoonStars />
+					</SegmentedItem>
+				</SegmentedControl>
+				<a
+					href="https://github.com/andrewjk/torpor"
+					target="_blank"
+					rel="external"
+					class="github-button"
+					aria-label="GitHub repository"
+				>
+					<GithubLogo />
+				</a>
+			</div>
+		</header>
+	}
+
+	@style {
+		.site-header {
+			align-items: center;
+			background: var(--bg);
+			border-bottom: 1px solid var(--panel-back);
+			display: flex;
+			gap: 1rem;
+			padding: 0.6rem 1rem;
+		}
+
+		.site-name {
+			color: var(--header);
+			font-family: ui-serif, serif;
+			font-size: 1.6rem;
+			text-decoration: none;
+		}
+
+		.site-name:hover {
+			text-decoration: none;
+		}
+
+		.site-nav {
+			display: flex;
+			gap: 0.25rem;
+			overflow-x: auto;
+		}
+
+		.nav-link {
+			border-radius: var(--brad);
+			color: var(--text);
+			display: inline-block;
+			padding: 0.2rem 0.6rem;
+			text-decoration: none;
+			white-space: nowrap;
+		}
+
+		.nav-link:hover {
+			background: var(--panel-back);
+			text-decoration: none;
+		}
+
+		.nav-link.active {
+			background: var(--panel-back);
+			color: var(--header);
+			font-weight: 600;
+		}
+
+		.actions {
+			align-items: center;
+			display: flex;
+			gap: 0.6rem;
+			margin-left: auto;
+		}
+
+		.playground-button {
+			align-items: center;
+			background: var(--panel-back);
+			border: 1px solid var(--code-back);
+			border-radius: var(--brad);
+			color: var(--header);
+			cursor: pointer;
+			display: inline-flex;
+			font-size: 1.3rem;
+			gap: 0.4rem;
+			padding: 0.3rem 0.7rem;
+			text-decoration: none;
+		}
+
+		.playground-button:hover {
+			text-decoration: none;
+		}
+
+		.theme-control {
+			border: 1px solid var(--code-back);
+			border-radius: var(--brad);
+			padding: 0.15rem;
+		}
+
+		.theme-item {
+			background: none;
+			border: none;
+			border-radius: calc(var(--brad) - 0.15rem);
+			color: var(--text);
+			cursor: pointer;
+			display: inline-flex;
+			padding: 0.25rem 0.4rem;
+		}
+
+		.theme-item[data-state="active"] {
+			background: var(--code-back);
+			color: var(--header);
+		}
+
+		.github-button {
+			color: var(--text);
+			display: inline-flex;
+			font-size: 1.6rem;
+			padding: 0.25rem;
+			text-decoration: none;
+		}
+
+		.github-button:hover {
+			text-decoration: none;
+		}
+
+		@media screen and (max-width: 575px) {
+			.playground-label {
+				display: none;
+			}
+		}
+	}
+}
