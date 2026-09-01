@@ -5,6 +5,23 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
+### Layouts that never render their `<slot />` fail silently, then throw a cryptic error on client nav
+
+The layout engine (serverEntry.ts, nav/navigate.ts) composes nested layouts by
+passing each layout component as the default slot of its parent, so every
+`_layout` component must render `<slot />`. Nothing enforces or warns about
+this: when a layout wraps its content in another component (e.g. a shared
+`SectionLayout`) and forgets to pass `<slot />` down, SSR renders the header
+and sidebar fine with an empty content area (no error), and the first
+client-side navigation into the section throws
+`TypeError: can't access property "startNode", slotRegion is null` from
+navigate.ts's reuse path (the page slot function never ran, so the layout
+stack entry's `slotRegion` was never assigned). Hit while adding per-section
+layouts to the docs site (site/src/views/{docs,ui,build}/*Layout.torp).
+A dev-mode warning when a layout component's slot render is never invoked
+during a render, or a clearer error in the reuse path, would turn this into
+an actionable message.
+
 ### Form re-render runs load query validation against the POST url (edge case)
 
 When a form is submitted without javascript and the action returns a 4xx,

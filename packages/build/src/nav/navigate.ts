@@ -99,6 +99,12 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	let component = clientEndPoint.component as Component;
 	let slots: Record<string, SlotRender> | undefined = undefined;
 	let reused = false;
+	// The index of the innermost reused layout. Its slotRegion is the region
+	// that must be cleared and refilled (it contains the next layout's or the
+	// page's content). This is usually the last entry of the stack, but not
+	// when an outer layout is reused while an inner one is new — e.g.
+	// navigating between sections that share the root layout.
+	let reusedIndex = -1;
 	if (handler.layouts) {
 		let slotFunctions: SlotRender[] = [];
 		// The last slot function will render the client component
@@ -124,6 +130,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 					// the try block below so a failure doesn't leave the slot
 					// half-cleared)
 					component = slotFunctions[i + 1] as Component;
+					reusedIndex = i;
 					reused = true;
 					break;
 				} else if (i === 0) {
@@ -153,7 +160,7 @@ export default async function navigate(url: URL, withHydration = false): Promise
 			// holds the layout's own children (e.g. a header), which `mount`
 			// refuses to mount into. Both the clear and the fill are inside
 			// the try so that a failure doesn't leave the slot half-cleared.
-			const slotRegion = layoutStack[layoutStack.length - 1].slotRegion;
+			const slotRegion = layoutStack[reusedIndex].slotRegion;
 			parent = slotRegion.startNode!.parentNode as HTMLElement;
 			clearLayoutSlot(slotRegion);
 			component(parent, null);
