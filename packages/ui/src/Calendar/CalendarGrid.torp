@@ -1,5 +1,4 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
-import { areDatesEqual } from "../utils/dateUtils";
 import { type CalendarContext, CalendarContextName, type DayState } from "./CalendarTypes";
 
 interface CalendarGridProps {
@@ -44,11 +43,11 @@ export default function CalendarGrid($props: CalendarGridProps | undefined) {
 		},
 	});
 
-	// The active date is the selected date, so cells can be marked with
-	// aria-selected (which is only valid on a gridcell, not on the day
-	// component's button)
+	// The selected date is marked on the gridcell (aria-selected is only
+	// valid there, not on the day component's button); the Calendar decides
+	// which dates count via its isSelected hook
 	function isSelected(day: DayState): boolean {
-		return areDatesEqual(day.date, $state.activeDate);
+		return context.isSelected(day.date);
 	}
 
 	// Focus the day with `class=active`

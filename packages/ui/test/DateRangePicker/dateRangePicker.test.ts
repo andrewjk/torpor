@@ -81,11 +81,37 @@ describe("DateRangePicker", () => {
 		expect(inside).toHaveLength(3);
 
 		// aria-selected is only valid on a gridcell, so it lives there rather
-		// than on the day's button -- the last clicked day (the range's end)
-		// is the active one
+		// than on the day's button -- and both range endpoints are selected,
+		// not just the last clicked day
 		expect(start).not.toHaveAttribute("aria-selected");
 		expect(end).not.toHaveAttribute("aria-selected");
+		expect(start!.closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "true");
 		expect(end!.closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "true");
+	});
+
+	it("exposes the range endpoints to screen readers", async () => {
+		const { container, open } = setup({
+			value: {
+				start: new Date(2026, 0, 10),
+				end: new Date(2026, 0, 20),
+			},
+		});
+
+		await open();
+
+		const day = (dayNumber: number) => {
+			const date = new Date(2026, 0, dayNumber);
+			const label = new Intl.DateTimeFormat("en-US", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+			}).format(date);
+			return within(container).getByRole("button", { name: label });
+		};
+
+		expect(day(10).closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "true");
+		expect(day(20).closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "true");
+		expect(day(15).closest('[role="gridcell"]')).toHaveAttribute("aria-selected", "false");
 	});
 
 	it("starts a new range when clicking before the start", async () => {

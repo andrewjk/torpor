@@ -24,16 +24,6 @@ re-renders, or rendering from cached load data.
 aren't resolvable by plain Node. Reproduces at HEAD without the endpoints-only
 site.html fix. Dev mode (`tb --dev`, which uses `vite.ssrLoadModule`) works fine.
 
-### DateRangePicker: range endpoints are not exposed to screen readers
-
-The day buttons used to carry `aria-selected` for the range's start/end, but
-that was invalid (`aria-selected` is only valid on a gridcell/option/row/tab,
-so assistive tech ignored it anyway). The grid now sets `aria-selected` on
-each day's gridcell for the active (last clicked) date only; range endpoints
-are still marked visually via the `selected` class and `data-range`
-attribute, but not announced. Conveying them properly needs per-day selection
-info to reach the gridcell (e.g. a selection hook on the Calendar context).
-
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression

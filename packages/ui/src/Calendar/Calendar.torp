@@ -38,6 +38,11 @@ interface CalendarProps {
 	onchangedate?: (value: Date) => void;
 	/** Raised when the user presses Escape, so date pickers can close */
 	onclose?: () => void;
+	/**
+	 * Whether a date counts as selected, used for the day gridcells'
+	 * aria-selected. Defaults to the active date
+	 */
+	isSelected?: (date: Date) => boolean;
 }
 
 /**
@@ -112,6 +117,9 @@ export default function Calendar($props: CalendarProps) {
 		handleTrigger,
 		handleDay,
 		handleKey,
+		isSelected: (date: Date) => {
+			return $props.isSelected?.(date) ?? areDatesEqual(date, $state.activeDate);
+		},
 		state: $state,
 	};
 	$context[CalendarContextName] = context;

@@ -14,7 +14,7 @@ import {
 	type FormContext,
 	FormContextName,
 } from "../Form/FormTypes";
-import { formatDate } from "../utils/dateUtils";
+import { areDatesEqual, formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
 import createFormField from "../utils/formField";
@@ -111,6 +111,15 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 
 	function isSelecting(): boolean {
 		return $state.start !== undefined && $state.end === undefined;
+	}
+
+	// The range's endpoints count as selected, so their gridcells get
+	// aria-selected and screen readers announce them
+	function isDaySelected(date: Date): boolean {
+		const start = getStart();
+		if (start && areDatesEqual(date, start)) return true;
+		const end = $state.end ? ($unwrap($state.end) as Date) : undefined;
+		return !!end && areDatesEqual(date, end);
 	}
 
 	// The plain (unwrapped) start date, for comparisons
@@ -251,7 +260,13 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 				aria-hidden={$state.visible ? undefined : "true"}
 				&ref={content}
 			>
-				<Calendar selectable {$state.start} onchange={handleDay} onclose={handleClose}>
+				<Calendar
+					selectable
+					value={$state.start}
+					isSelected={isDaySelected}
+					onchange={handleDay}
+					onclose={handleClose}
+				>
 					<CalendarHeader>
 						<CalendarHeaderTrigger type="previous" />
 						<DatePickerHeader class="torp-date-range-picker-header" />

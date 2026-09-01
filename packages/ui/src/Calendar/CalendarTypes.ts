@@ -9,6 +9,13 @@ export interface CalendarContext {
 	handleTrigger: (type: TriggerType) => void;
 	handleDay: (date: Date) => void;
 	handleKey: (e: KeyboardEvent) => void;
+	/**
+	 * Whether a date counts as selected, used for the day gridcells'
+	 * aria-selected (which is only valid on a gridcell). Defaults to the
+	 * active date; date range pickers override it so both range endpoints
+	 * are announced
+	 */
+	isSelected: (date: Date) => boolean;
 	state: CalendarState;
 }
 
