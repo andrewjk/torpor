@@ -33,6 +33,8 @@
 		"vite-plus": "catalog:"
 	},
 	"workspaces": [
+		"benchmarks/*",
+		"benchmarks/build/servers/torpor",
 		"packages/adapters/adapter-cloudflare",
 		"packages/adapters/adapter-node",
 		"packages/build",

@@ -1,0 +1,20 @@
+{
+	"name": "@torpor/benchmarks-build",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"description": "Server-side benchmarks comparing @torpor/build with Express, Hono, Fastify and Elysia.",
+	"scripts": {
+		"bench": "node run.mjs",
+		"bench:long": "DURATION=5 node run.mjs"
+	},
+	"devDependencies": {
+		"@elysia/node": "2.0.0-exp.3",
+		"@hono/node-server": "^2.0.12",
+		"autocannon": "^8.0.0",
+		"elysia": "2.0.0-beta.4",
+		"express": "^5.2.1",
+		"fastify": "^5.10.0",
+		"hono": "^4.13.1"
+	}
+}

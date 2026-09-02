@@ -3,6 +3,8 @@ packages:
   - packages/adapters/*
   - site
   - examples/*
+  - benchmarks/*
+  - benchmarks/build/servers/torpor
 
 catalogs:
   default:

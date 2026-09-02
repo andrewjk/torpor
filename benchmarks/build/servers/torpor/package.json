@@ -1,0 +1,16 @@
+{
+	"name": "@torpor/benchmarks-build-torpor",
+	"private": true,
+	"type": "module",
+	"version": "0.0.1",
+	"description": "Torpor fixture for the server-side HTTP benchmarks (endpoints-only site).",
+	"scripts": {
+		"build": "tb --build",
+		"serve": "node serve.mjs"
+	},
+	"dependencies": {
+		"@torpor/adapter-node": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/view": "workspace:^"
+	}
+}
