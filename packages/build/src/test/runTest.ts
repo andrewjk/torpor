@@ -83,7 +83,7 @@ export default async function runTest(
 // TODO: Make it shared instead!
 async function load(router: Router, ev: ServerEvent, template: string): Promise<Response> {
 	//const url = new URL(`http://${process.env.HOST ?? "localhost"}${ev.request.url}`);
-	const url = new URL(ev.request.url);
+	const url = ev.url;
 	const path = url.pathname;
 	const query = url.searchParams;
 

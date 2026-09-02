@@ -41,7 +41,7 @@ router.addPages(manifest.routes);
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
 export async function load(ev: ServerEvent, template?: string): Promise<Response> {
-	const url = new URL(ev.request.url);
+	const url = ev.url;
 	const path = url.pathname;
 	const query = url.searchParams;
 

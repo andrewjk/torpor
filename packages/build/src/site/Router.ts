@@ -1,13 +1,17 @@
 import type LayoutHandler from "../types/LayoutHandler";
 import type ManifestRoute from "../types/ManifestRoute";
 import type RouteHandler from "../types/RouteHandler";
-import pathToRegex from "../utils/pathToRegex";
+import PathTrie from "../utils/pathTrie";
 
 /**
  * A router that handles file routes with layouts, hooks, etc.
  */
 export default class Router {
 	routes: Route[] = [];
+	// Match index for the routes above. The routes list is kept for
+	// introspection (layouts/hooks lookup, client nav, tests); the trie is
+	// what `match` walks.
+	#trie = new PathTrie<Route>();
 
 	constructor() {}
 
@@ -18,29 +22,21 @@ export default class Router {
 
 	addPages(routes: ManifestRoute[]): this {
 		for (let r of routes) {
-			this.routes.push(
-				new Route(r.path, {
-					path: r.path,
-					type: r.type,
-					endPoint: r.endPoint,
-					subFolder: r.subFolder,
-				}),
-			);
+			this.addPage(r.path, r.type, r.endPoint, r.subFolder);
 		}
-		this.#sortRoutes();
 		return this;
 	}
 
 	// TODO: Allow calling with the endpoint itself, so that you can setup an app with no scaffold
 	addPage(path: string, type: number, endPoint: () => Promise<any>, subFolder?: string): this {
-		this.routes.push(
-			new Route(path, {
-				path,
-				type,
-				endPoint,
-				subFolder,
-			}),
-		);
+		let route = new Route(path, {
+			path,
+			type,
+			endPoint,
+			subFolder,
+		});
+		this.routes.push(route);
+		this.#trie.insert(path, route);
 		this.#sortRoutes();
 		return this;
 	}
@@ -56,20 +52,19 @@ export default class Router {
 	*/
 
 	match(path: string, query: URLSearchParams): RouteMatch | undefined {
-		for (let route of this.routes) {
-			let match = path.match(route.regex);
-			if (match) {
-				// Lazy load server endpoints and layouts
-				if (!route.handler.loaded) {
-					this.#loadHandler(route.handler, route.path);
-				}
-
-				return {
-					handler: route.handler,
-					params: match.groups,
-					query,
-				};
+		let found = this.#trie.match(path);
+		if (found) {
+			let route = found.value;
+			// Lazy load server endpoints and layouts
+			if (!route.handler.loaded) {
+				this.#loadHandler(route.handler, route.path);
 			}
+
+			return {
+				handler: route.handler,
+				params: found.params,
+				query,
+			};
 		}
 	}
 
@@ -165,12 +160,10 @@ export default class Router {
 
 class Route {
 	path: string;
-	regex: RegExp;
 	handler: RouteHandler;
 
 	constructor(path: string, handler: RouteHandler) {
 		this.path = path;
-		this.regex = pathToRegex(path);
 		this.handler = handler;
 	}
 }

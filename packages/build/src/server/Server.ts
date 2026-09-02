@@ -1,4 +1,4 @@
-import pathToRegex from "../utils/pathToRegex";
+import PathTrie from "../utils/pathTrie";
 import ServerEvent from "./ServerEvent";
 import type MiddlewareFunction from "./types/MiddlewareFunction";
 import type ServerFunction from "./types/ServerFunction";
@@ -9,6 +9,8 @@ import type ServerFunction from "./types/ServerFunction";
 export default class Server {
 	// TODO: We don't use any of the routes, just add("*") in runDev/runBuild...
 	routes: RouteHandler[] = [];
+	// Match index for the routes above
+	#trie = new PathTrie<RouteHandler>();
 	// TODO: We only use the Vite middleware here
 	middleware: MiddlewareFunction[] = [];
 
@@ -23,10 +25,12 @@ export default class Server {
 	 * @returns
 	 */
 	fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-		const request = new Request(input, init);
+		// Use the request as-is when we were given one, so that the adapter
+		// doesn't pay for constructing it twice
+		const request = input instanceof Request && !init ? input : new Request(input, init);
 		const url = new URL(request.url);
 		const match = this.match(url.pathname);
-		let ev = new ServerEvent(request, match?.params);
+		let ev = new ServerEvent(request, match?.params, url);
 
 		if (this.middleware.length) {
 			// TODO: Get middleware that applies to this route only?
@@ -91,20 +95,20 @@ export default class Server {
 	 * @returns
 	 */
 	add(path: string, fn: ServerFunction): Server {
-		this.routes.push(new RouteHandler(path, fn));
+		let handler = new RouteHandler(path, fn);
+		this.routes.push(handler);
+		this.#trie.insert(path, handler);
 		this.#sortRoutes();
 		return this;
 	}
 
 	match(path: string): Match | undefined {
-		for (let handler of this.routes) {
-			let match = path.match(handler.regex);
-			if (match) {
-				return {
-					fn: handler.fn,
-					params: match.groups,
-				};
-			}
+		const found = this.#trie.match(path);
+		if (found) {
+			return {
+				fn: found.value.fn,
+				params: found.params,
+			};
 		}
 		console.log(`Server path not found: ${path}`);
 	}
@@ -138,12 +142,10 @@ export default class Server {
 
 class RouteHandler {
 	path: string;
-	regex: RegExp;
 	fn: ServerFunction;
 
 	constructor(path: string, fn: ServerFunction) {
 		this.path = path;
-		this.regex = pathToRegex(path);
 		this.fn = fn;
 	}
 }

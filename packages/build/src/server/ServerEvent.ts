@@ -18,9 +18,19 @@ export default class ServerEvent {
 	cookies: CookieHelper;
 	headers: HeaderHelper;
 
-	constructor(request: Request, params?: Record<string, string>) {
+	// Parsed once per request; Server.fetch passes the URL it already needed
+	// for matching so it isn't parsed twice
+	#url: URL | undefined;
+
+	/** The request URL, parsed lazily. */
+	get url(): URL {
+		return (this.#url ??= new URL(this.request.url));
+	}
+
+	constructor(request: Request, params?: Record<string, string>, url?: URL) {
 		this.request = request;
 		this.params = params;
+		this.#url = url;
 		this.cookies = new CookieHelper(request);
 		this.headers = new HeaderHelper(request);
 
