@@ -1,3 +1,4 @@
+import { $page } from "@torpor/build/state";
 import { Drawer, DrawerContent, DrawerOverlay } from "@torpor/ui/Drawer";
 import { slide } from "@torpor/ui/motion";
 import List from "phosphor-torpor/lib/List";
@@ -23,6 +24,15 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 		navVisible: false,
 	});
 
+	let content: HTMLElement;
+
+	$run(() => {
+		// Scroll back to the top when the page changes
+		$page.url;
+		content?.scrollTo(0, 0);
+		window.scrollTo(0, 0);
+	});
+
 	@render {
 		<div id="section">
 			<header class="mobile-bar">
@@ -37,7 +47,7 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 			<div id="sidebar">
 				<Sidebar links={$props?.links} />
 			</div>
-			<div id="content">
+			<div id="content" &ref={content}>
 				<slot />
 			</div>
 		</div>
