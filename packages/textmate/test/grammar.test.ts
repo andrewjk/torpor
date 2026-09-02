@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vite-plus/test";
 import { Registry } from "vscode-textmate";
 import { createOnigScanner, createOnigString, loadWASM } from "vscode-oniguruma";
 import grammars from "../src/index";

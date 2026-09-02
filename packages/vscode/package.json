@@ -73,7 +73,6 @@
 		"@vscode/vsce": "^3.9.2",
 		"esbuild": "^0.28.1",
 		"tsx": "^4.23.5",
-		"vite-plus": "catalog:",
-		"vitest": "catalog:"
+		"vite-plus": "catalog:"
 	}
 }

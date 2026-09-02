@@ -203,7 +203,6 @@
 		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:",
-		"vitest": "catalog:",
 		"zod": "^4.4.3"
 	}
 }

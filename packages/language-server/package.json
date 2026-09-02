@@ -41,7 +41,6 @@
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"tsx": "^4.23.5",
-		"vite-plus": "catalog:",
-		"vitest": "catalog:"
+		"vite-plus": "catalog:"
 	}
 }

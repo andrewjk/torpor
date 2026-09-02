@@ -18,15 +18,18 @@ let root: string;
 let site: string;
 
 beforeEach(() => {
-	// A monorepo: <root>/pnpm-workspace.yaml + <root>/packages/ui + <root>/site,
-	// with site/node_modules/@x/ui symlinked to the workspace package (as pnpm
-	// does for workspace deps)
+	// A monorepo: <root>/package.json (with a `workspaces` field) +
+	// <root>/packages/ui + <root>/site, with site/node_modules/@x/ui symlinked
+	// to the workspace package (as npm and pnpm do for workspace deps)
 	root = realpathSync(mkdtempSync(path.join(tmpdir(), "torpor-depcache-")));
 	site = path.join(root, "site");
 	mkdirSync(path.join(root, "packages", "ui"), { recursive: true });
 	mkdirSync(site, { recursive: true });
 
-	writeFileSync(path.join(root, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n");
+	writeFileSync(
+		path.join(root, "package.json"),
+		JSON.stringify({ name: "root", private: true, workspaces: ["packages/*"] }),
+	);
 	writeFileSync(
 		path.join(root, "packages", "ui", "package.json"),
 		JSON.stringify({ name: "@x/ui" }),
@@ -117,6 +120,18 @@ describe("clearStaleDepCache", () => {
 		expect(existsSync(path.join(site, "node_modules", ".vite"))).toBe(true);
 
 		rmSync(outsideRoot, { recursive: true, force: true });
+	});
+
+	test("detects pnpm-style workspaces too", () => {
+		// Swap the npm marker for a pnpm-workspace.yaml
+		rmSync(path.join(root, "package.json"));
+		writeFileSync(path.join(root, "pnpm-workspace.yaml"), "packages:\n  - packages/*\n");
+		makeCache();
+
+		const cleared = clearStaleDepCache(site);
+
+		expect(cleared).toBe(true);
+		expect(existsSync(path.join(site, "node_modules", ".vite"))).toBe(false);
 	});
 
 	test("does nothing outside a workspace", () => {

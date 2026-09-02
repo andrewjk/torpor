@@ -26,9 +26,8 @@ see [TORPOR_AGENTS.md](TORPOR_AGENTS.md).
 
 ### Testing
 
-- `pnpm test` - Run all tests in watch mode
-- `vitest run` - Run all tests once
-- `vitest` - Run tests in watch mode
+- `pnpm test` - Run all tests once (`vp test run`)
+- `pnpm test:watch` - Run all tests in watch mode
 - `vitest run path/to/test.test.ts` - Run a single test file
 - `vitest run -t "test name"` - Run tests matching a pattern
 - In individual packages: `pnpm test` runs vitest

@@ -68,12 +68,27 @@ export function clearStaleDepCache(siteRoot: string, log?: (message: string) => 
 function findWorkspaceRoot(from: string): string | undefined {
 	let dir = path.resolve(from);
 	while (true) {
+		// pnpm-style marker, or a root package.json declaring npm workspaces
 		if (existsSync(path.join(dir, "pnpm-workspace.yaml"))) {
+			return dir;
+		}
+		if (hasWorkspacesField(dir)) {
 			return dir;
 		}
 		const parent = path.dirname(dir);
 		if (parent === dir) return undefined;
 		dir = parent;
+	}
+}
+
+function hasWorkspacesField(dir: string): boolean {
+	const packageJsonPath = path.join(dir, "package.json");
+	if (!existsSync(packageJsonPath)) return false;
+	try {
+		const pkg: PackageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+		return Array.isArray(pkg.workspaces) && pkg.workspaces.length > 0;
+	} catch {
+		return false;
 	}
 }
 
