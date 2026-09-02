@@ -19,15 +19,21 @@ shape, driven through the same buttons (`#run`, `#runlots`, `#add`, `#update`,
 pnpm bench            # from this folder; 5 iterations per op
 node run.mjs 8        # more iterations
 ITER=3 pnpm bench     # fewer, faster
+TARGETS='["torpor","vue"]' node run.mjs   # subset
 ```
 
 Options:
 
 - First CLI arg (or `ITER`) — samples per op (default 5).
-- `TARGETS='[{"name":"torpor","url":"http://localhost:5483/","ready":"#run"}]'` —
-  run a subset against already-running dev servers instead of letting the
-  runner start them.
-- `BENCH_JSON=path` — also write machine-readable results.
+- `TARGETS='["torpor","vue"]'` or
+  `TARGETS='[{"name":"x","url":"http://…","ready":"#run"}]'` — select fixtures,
+  or point at an already-running server.
+- `BENCH_JSON=path` — also write a machine-readable copy.
+
+At the end the runner prints the comparison table and writes
+`benchmarks/results/view.json` plus a self-contained `view.html` report
+(heatmapped timing and DOM-census tables, weighted geometric-mean total vs
+torpor). `view.html` links to the `build.html` page (previous / next nav).
 
 The runner starts each fixture's vite dev server (production mode — the
 configs set `mode: 'production'` and pin `NODE_ENV` so framework runtimes are
@@ -40,7 +46,7 @@ chromium browser (`npx playwright install chromium` if missing).
 |---|---|
 | `fixtures/torpor` | `@torpor/view`, keyed `@for` |
 | `fixtures/react` | React 19 hooks, memo'd rows, `flushSync` |
-| `fixtures/solid` | Solid, keyed `<For>`, `flush()` |
+| `fixtures/solid` | Solid, keyed `<For>` (commits synchronously on click) |
 | `fixtures/svelte` | Svelte 5 runes, keyed `{#each}`, `flushSync` |
 | `fixtures/vue` | Vue 3, keyed `v-for` over a `shallowRef`, `__benchFlush` → `nextTick` |
 

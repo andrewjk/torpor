@@ -21,8 +21,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import autocannon from 'autocannon';
+import { buildHtmlReport } from '../lib/html-report.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(HERE, '..', '..');
+const RESULTS_DIR = path.join(HERE, '..', 'results');
 const HOST = '127.0.0.1';
 const DURATION = parseFloat(process.env.DURATION || '1');
 const CONNECTIONS = parseInt(process.env.CONNECTIONS || '100', 10);
@@ -290,21 +293,31 @@ function printReport(results, names, caseNames) {
 
 		printReport(results, started, cases);
 
+		const payload = {
+			suite: 'build',
+			duration: DURATION,
+			connections: CONNECTIONS,
+			frameworks: started.map((name) => ({
+				name,
+				cases: Object.fromEntries(
+					Object.entries(results[name]).map(([c, r]) => [
+						c,
+						{ rps: r.rps, p50: r.p50, p99: r.p99, non2xx: r.non2xx },
+					]),
+				),
+			})),
+		};
+
+		// Persist the run: machine-readable JSON + a self-contained HTML page
+		// (linked to the other benchmark pages) in the shared results dir.
+		fs.mkdirSync(RESULTS_DIR, { recursive: true });
+		const jsonPath = path.join(RESULTS_DIR, 'build.json');
+		fs.writeFileSync(jsonPath, JSON.stringify(payload, null, '\t') + '\n');
+		const htmlPath = path.join(RESULTS_DIR, 'build.html');
+		fs.writeFileSync(htmlPath, buildBuildHtml(payload));
+		console.error(`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/build.{json,html}`);
+
 		if (process.env.BENCH_JSON) {
-			const payload = {
-				suite: 'build-http',
-				duration: DURATION,
-				connections: CONNECTIONS,
-				frameworks: started.map((name) => ({
-					name,
-					cases: Object.fromEntries(
-						Object.entries(results[name]).map(([c, r]) => [
-							c,
-							{ rps: r.rps, p50: r.p50, p99: r.p99, non2xx: r.non2xx },
-						]),
-					),
-				})),
-			};
 			fs.writeFileSync(process.env.BENCH_JSON, JSON.stringify(payload, null, '\t') + '\n');
 			console.error(`BENCH_JSON written to ${process.env.BENCH_JSON}`);
 		}
@@ -315,3 +328,74 @@ function printReport(results, names, caseNames) {
 	console.error(e);
 	process.exit(1);
 });
+
+// ── HTML report ─────────────────────────────────────────────────────────────
+
+function buildBuildHtml(payload) {
+	const frameworks = payload.frameworks;
+	const names = frameworks.map((f) => f.name);
+	const baseline = names.includes('torpor') ? 'torpor' : names[0];
+	const caseNames = frameworks.flatMap((f) => Object.keys(f.cases)).filter((v, i, a) => a.indexOf(v) === i);
+	const caseRps = (name, c) => frameworks.find((f) => f.name === name)?.cases[c]?.rps;
+
+	// Total row: geometric mean of per-case req/sec ratios vs the baseline
+	// (baseline reads exactly 1; >1 faster overall, <1 slower).
+	const total = Object.fromEntries(
+		names.map((name) => {
+			let logSum = 0;
+			let counted = 0;
+			for (const c of caseNames) {
+				const r = caseRps(name, c);
+				const base = caseRps(baseline, c);
+				if (typeof r === 'number' && r > 0 && typeof base === 'number' && base > 0) {
+					logSum += Math.log(r / base);
+					counted++;
+				}
+			}
+			return [name, counted > 0 ? Math.exp(logSum / counted) : NaN];
+		}),
+	);
+
+	return buildHtmlReport({
+		suite: 'build',
+		title: 'build benchmarks — HTTP request handling',
+		note: `autocannon · ${payload.connections} connections · ${payload.duration}s per case · green = best in row`,
+		columns: names,
+		baseline,
+		sections: [
+			{
+				heading: 'requests/sec',
+				unit: 'higher is better',
+				lowerIsBetter: false,
+				format: 'rps',
+				rows: [
+					...caseNames.map((c) => ({
+						op: c,
+						values: Object.fromEntries(names.map((name) => [name, caseRps(name, c)])),
+					})),
+					{
+						op: `total (geomean vs ${baseline})`,
+						total: true,
+						format: 'ratio',
+						values: total,
+					},
+				],
+			},
+			{
+				heading: 'latency p50',
+				unit: 'ms · lower is better',
+				lowerIsBetter: true,
+				format: 'ms',
+				rows: caseNames.map((c) => ({
+					op: c,
+					values: Object.fromEntries(
+						names.map((name) => [
+							name,
+							frameworks.find((f) => f.name === name)?.cases[c]?.p50,
+						]),
+					),
+				})),
+			},
+		],
+	});
+}

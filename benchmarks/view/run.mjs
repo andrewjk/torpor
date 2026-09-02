@@ -18,6 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { buildHtmlReport } from '../lib/html-report.mjs';
 import { censusDomNodes, deterministicCount } from './lib/dom-nodes.mjs';
 import { scoreOf, summarizeSamples } from './lib/stats.mjs';
 
@@ -26,6 +27,8 @@ const ROW_COUNT = 1000;
 const ROW_COUNT_LARGE = 10000; // matches the canonical suite's runlots / clear size
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(HERE, '..', '..');
+const RESULTS_DIR = path.join(HERE, '..', 'results');
 
 // One dev server per fixture, each on its own fixed port (see the fixtures'
 // vite.config.js — the runner must agree with them).
@@ -295,20 +298,30 @@ function printReport(all, targetNames) {
 
 		printReport(all, targetNames);
 
+		const payload = {
+			suite: 'view',
+			iterations: ITER,
+			targets: targetNames.map((name) => ({
+				name,
+				ops: Object.fromEntries(
+					Object.entries(all[name])
+						.filter(([key]) => key !== '__dom')
+						.map(([key, r]) => [key, timingStatForJson(r)]),
+				),
+				meta: { dom: all[name].__dom },
+			})),
+		};
+
+		// Persist the run: machine-readable JSON + a self-contained HTML page
+		// (linked to the other benchmark pages) in the shared results dir.
+		fs.mkdirSync(RESULTS_DIR, { recursive: true });
+		const jsonPath = path.join(RESULTS_DIR, 'view.json');
+		fs.writeFileSync(jsonPath, JSON.stringify(payload, null, '\t') + '\n');
+		const htmlPath = path.join(RESULTS_DIR, 'view.html');
+		fs.writeFileSync(htmlPath, buildViewHtml(payload));
+		console.error(`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/view.{json,html}`);
+
 		if (process.env.BENCH_JSON) {
-			const payload = {
-				suite: 'view-js-framework',
-				iterations: ITER,
-				targets: targetNames.map((name) => ({
-					name,
-					ops: Object.fromEntries(
-						Object.entries(all[name])
-							.filter(([key]) => key !== '__dom')
-							.map(([key, r]) => [key, timingStatForJson(r)]),
-					),
-					meta: { dom: all[name].__dom },
-				})),
-			};
 			fs.writeFileSync(
 				process.env.BENCH_JSON,
 				JSON.stringify(payload, null, '\t') + '\n',
@@ -322,6 +335,74 @@ function printReport(all, targetNames) {
 	console.error(e);
 	process.exit(1);
 });
+
+// ── HTML report ─────────────────────────────────────────────────────────────
+
+function buildViewHtml(payload) {
+	const targets = payload.targets;
+	const names = targets.map((t) => t.name);
+	const baseline = names.includes('torpor') ? 'torpor' : names[0];
+	const baselineOps = targets.find((t) => t.name === baseline).ops;
+
+	// Total row: reference-time-weighted geometric mean of per-op scores vs the
+	// baseline (baseline reads exactly 1; <1 faster overall, >1 slower).
+	const total = Object.fromEntries(
+		names.map((name) => {
+			const ops = targets.find((t) => t.name === name).ops;
+			let weightedLogSum = 0;
+			let weightSum = 0;
+			for (const op of OPS) {
+				const s = ops[op.name]?.score;
+				const base = baselineOps[op.name]?.score;
+				if (typeof s === 'number' && s > 0 && typeof base === 'number' && base > 0) {
+					weightedLogSum += base * Math.log(s / base);
+					weightSum += base;
+				}
+			}
+			return [name, weightSum > 0 ? Math.exp(weightedLogSum / weightSum) : NaN];
+		}),
+	);
+
+	return buildHtmlReport({
+		suite: 'view',
+		title: 'view benchmarks — keyed 1,000-row table',
+		note: `score = steady-window mean, ${payload.iterations} samples per op · green = best in row`,
+		columns: names,
+		baseline,
+		sections: [
+			{
+				heading: 'timing',
+				unit: 'ms · lower is better',
+				lowerIsBetter: true,
+				format: 'ms',
+				rows: [
+					...OPS.map((op) => ({
+						op: op.name,
+						values: Object.fromEntries(
+							names.map((name) => [name, targets.find((t) => t.name === name).ops[op.name]?.score]),
+						),
+					})),
+					{ op: 'total', total: true, format: 'ratio', values: total },
+				],
+			},
+			{
+				heading: 'DOM census at 1K rows',
+				unit: 'deterministic node counts',
+				lowerIsBetter: true,
+				format: 'count',
+				rows: ['nodes_1k', 'elements_1k', 'text_1k', 'comments_1k'].map((key) => ({
+					op: key.replace(/_1k$/, ''),
+					values: Object.fromEntries(
+						names.map((name) => [
+							name,
+							targets.find((t) => t.name === name).ops[key]?.median,
+						]),
+					),
+				})),
+			},
+		],
+	});
+}
 
 // Local import to keep the JSON payload shape identical to the torpor-bench
 // suite without exporting stats internals from lib/stats.mjs.

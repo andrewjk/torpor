@@ -18,5 +18,5 @@ temp/
 !.vscode/extensions.json
 .idea
 
-# In progress
-view-bench/
+# Generated
+benchmarks/results/

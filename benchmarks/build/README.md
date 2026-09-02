@@ -23,7 +23,7 @@ DURATION=5 pnpm bench         # longer, less noisy
 FRAMEWORKS=torpor,hono pnpm bench
 CASE=query pnpm bench         # cases starting with "query"
 --rebuild                     # force a fresh torpor build
-BENCH_JSON=path               # also write machine-readable results
+BENCH_JSON=path               # also write a machine-readable copy
 ```
 
 The runner starts each framework server on `127.0.0.1` (own port per
@@ -31,6 +31,11 @@ framework), runs a short discarded warmup, then measures with autocannon. The
 torpor fixture (`servers/torpor`) is an endpoints-only site built once with
 `tb --build` and served through the same production path as `tb --preview`
 (`serverEntry.load` via the node adapter).
+
+At the end the runner prints the comparison table and writes
+`benchmarks/results/build.json` plus a self-contained `build.html` report
+(heatmapped req/sec and latency tables, geometric-mean total vs torpor).
+`build.html` links to the `view.html` page (previous / next nav).
 
 If a framework fails to start (e.g. the Elysia node adapter
 `@elysia/node` changes) it is skipped with a warning rather than failing the
