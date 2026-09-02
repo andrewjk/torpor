@@ -1,7 +1,6 @@
 import devContext from "../dev/devContext";
 import context from "../render/context";
 import deepWrap from "./deepWrap";
-//import transferEffects from "./transferEffects";
 import propagateSignal from "./propagateSignal";
 import { proxyDataSymbol } from "./symbols";
 
@@ -38,7 +37,6 @@ export default function proxySet(
 		// everything reverts to wrap-on-read
 		if (data.shallow !== true) {
 			value = deepWrap(value);
-			//transferEffects(oldValue, value);
 		}
 
 		// Set the property value on the target
