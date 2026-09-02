@@ -1,0 +1,20 @@
+{
+	"$schema": "../node_modules/@varlock/bumpy/config-schema.json",
+	"baseBranch": "main",
+	"changelog": "default",
+	"access": "public",
+	"updateInternalDependencies": "patch",
+	// The VS Code extension is a private package, published to the marketplace
+	// via `vsce` instead of npm. `include` opts it into versioning; the custom
+	// publish command (trusted here in the root config) handles releasing it.
+	"include": ["torpor"],
+	"packages": {
+		"torpor": {
+			"publishCommand": "vsce publish --no-dependencies",
+			"skipNpmPublish": true,
+			// the TextMate grammar is copied from @torpor/textmate into the
+			// extension at build time, so its releases must republish the ext
+			"releaseTriggeringDevDeps": ["@torpor/textmate"]
+		}
+	}
+}
