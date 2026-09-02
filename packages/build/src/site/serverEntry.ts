@@ -26,12 +26,7 @@ import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 import searchParamsToRecord from "../utils/searchParamsToRecord.ts";
 import validate from "../validation/validate.ts";
 import ValidationError from "../validation/ValidationError.ts";
-import {
-	endpointSchema,
-	validateEndpointParams,
-	validateHandlerInput,
-	validationErrorResponse,
-} from "../validation/endpoint.ts";
+import { endpointSchema, validateEndpointParams, validationErrorResponse } from "../validation/endpoint.ts";
 import Router from "./Router.ts";
 
 // Build the router from the Site object created by the user
@@ -99,8 +94,8 @@ export async function load(ev: ServerEvent, template?: string): Promise<Response
 			if (ev.request.method === "GET") {
 				return await loadData(ev, url, handler, "load", params);
 			} else if (ev.request.method === "POST") {
-				const serverEndPoint: PageServerEndPoint | undefined =
-					handler.endPoint && (await handler.endPoint()).default;
+				const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
+					.default;
 				return handleResponse(
 					await runAction(ev, url, handler, serverEndPoint, params, query, template),
 					true,
@@ -123,6 +118,22 @@ export async function load(ev: ServerEvent, template?: string): Promise<Response
 	}
 
 	return notFound();
+}
+
+/**
+ * Resolves the route's endpoint module, caching it on the handler so warm
+ * requests don't pay for the loader promise.
+ */
+async function resolveModule(handler: RouteHandler): Promise<any> {
+	return (handler.resolvedModule ??= await (handler.modulePromise ??= handler.endPoint()));
+}
+
+async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
+	if (!handler.serverHooks) return [];
+	// Resolve each hook module once and cache the result on the handler
+	return (handler.resolvedHooks ??= Promise.all(
+		handler.serverHooks.map(async (load) => (await load()).default),
+	));
 }
 
 async function handleResponse(response: Response, fromForm = false): Promise<Response> {
@@ -168,63 +179,77 @@ async function loadData(
 	functionName: string,
 	params: Record<string, any>,
 ) {
-	const serverEndPoint: ServerEndPoint | undefined = (await handler.endPoint()).default;
+	// The endpoint module is cached on the handler, so once warm this is a
+	// plain property read
+	const mod = handler.resolvedModule ?? (await resolveModule(handler));
+	const serverEndPoint: ServerEndPoint | undefined = mod?.default;
 	// `functionName` is computed from the request method, so the handlers are
 	// accessed through a loose record
-	const handlers = serverEndPoint as unknown as Record<string, ServerRequest | undefined>;
-	const handlerFn: ServerRequest | undefined = handlers?.[functionName];
-	if (serverEndPoint && handlerFn) {
-		// Route params come from the URL, so a failed validation means the
-		// resource doesn't exist
+	const handlerFn = (
+		serverEndPoint as unknown as Record<string, ServerRequest | undefined> | undefined
+	)?.[functionName];
+	if (!serverEndPoint || !handlerFn) {
+		return notFound();
+	}
+
+	// Route params come from the URL, so a failed validation means the
+	// resource doesn't exist. Only endpoints declaring a params schema pay
+	// for validation
+	const paramsSchema = endpointSchema(serverEndPoint, "params");
+	if (paramsSchema) {
 		try {
-			params = await validateEndpointParams(serverEndPoint, params);
+			params = (await validate(paramsSchema, params)) as Record<string, any>;
 		} catch (error) {
 			if (error instanceof ValidationError) return notFound();
 			throw error;
 		}
-
-		try {
-			// If the endpoint declares a schema for this handler, validate its
-			// input up front and reject with 422 if it fails. get/head schemas
-			// validate the query string; other schemas validate the json body
-			const schema = endpointSchema(serverEndPoint, functionName);
-			const values = await validateHandlerInput(schema, functionName, url, ev);
-
-			const serverParams = buildServerParams(ev, url, params, values);
-
-			const serverHooks = await loadServerHooks(handler);
-			let entered = 0;
-			let enterResponse: Response | undefined = undefined;
-			try {
-				// Hooks run from the root down; a hook's enter can return a
-				// Response to short-circuit the request
-				for (; entered < serverHooks.length && !enterResponse; entered++) {
-					const hookResult = await serverHooks[entered].enter?.(serverParams);
-					if (hookResult) {
-						enterResponse = hookResult;
-					}
-				}
-
-				const result = enterResponse || (await handlerFn(serverParams));
-
-				// If there was no response returned from load (such as errors or a
-				// redirect), send an ok response
-				return result || ok();
-			} finally {
-				// Run exit hooks in reverse order for hooks that were entered
-				while (entered > 0) {
-					entered--;
-					await serverHooks[entered].exit?.(serverParams);
-				}
-			}
-		} catch (error) {
-			const response = validationErrorResponse(error);
-			if (response) return response;
-			throw error;
-		}
 	}
 
-	return notFound();
+	try {
+		// If the endpoint declares a schema for this handler, validate its
+		// input up front and reject with 422 if it fails. get/head/load
+		// schemas validate the query string; other schemas validate the json
+		// body. Endpoints without a schema skip straight to the handler
+		const schema = endpointSchema(serverEndPoint, functionName);
+		const values = schema
+			? functionName === "get" || functionName === "head" || functionName === "load"
+				? { query: await validate(schema, searchParamsToRecord(url.searchParams)) }
+				: { json: await validate(schema, await ev.json()) }
+			: {};
+
+		const serverParams = buildServerParams(ev, url, params, values);
+
+		// Hooks are resolved once per handler; routes without hooks don't
+		// await anything here
+		const hooks = handler.serverHooks ? await loadServerHooks(handler) : [];
+
+		let entered = 0;
+		let enterResponse: Response | undefined = undefined;
+		try {
+			// Hooks run from the root down; a hook's enter can return a
+			// Response to short-circuit the request
+			for (; entered < hooks.length && !enterResponse; entered++) {
+				const hookResult = await hooks[entered].enter?.(serverParams);
+				if (hookResult) {
+					enterResponse = hookResult;
+				}
+			}
+
+			// If there was no response returned from load (such as errors or a
+			// redirect), send an ok response
+			return (await handlerFn(serverParams)) || ok();
+		} finally {
+			// Run exit hooks in reverse order for hooks that were entered
+			while (entered > 0) {
+				entered--;
+				await hooks[entered].exit?.(serverParams);
+			}
+		}
+	} catch (error) {
+		const response = validationErrorResponse(error);
+		if (response) return response;
+		throw error;
+	}
 }
 
 async function loadView(
@@ -238,7 +263,7 @@ async function loadView(
 	skipHook?: boolean,
 ) {
 	// There must be a client endpoint with a component
-	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
+	const clientEndPoint: PageEndPoint | undefined = (await resolveModule(handler)).default;
 	if (!clientEndPoint?.component) {
 		return notFound();
 	}
@@ -566,19 +591,6 @@ function buildClientParams(url: URL, params: Record<string, any>, data: Record<s
 		params,
 		data,
 	};
-}
-
-/**
- * Loads the route's server hooks, from the root down
- */
-async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
-	const hooks: ServerHook[] = [];
-	if (handler.serverHooks) {
-		for (let serverHook of handler.serverHooks) {
-			hooks.push((await serverHook()).default);
-		}
-	}
-	return hooks;
 }
 
 function buildServerParams(
