@@ -31,12 +31,12 @@ export default function ExampleBasic() {
 			all: unset;
 			box-sizing: border-box;
 			cursor: default;
-			border-bottom: 2px solid gainsboro;
+			border-bottom: 2px solid var(--border);
 			padding: 5px 10px;
 		}
 
 		.example-tab-trigger[data-state="active"] {
-			border-bottom: 2px solid black;
+			border-bottom: 2px solid var(--header);
 		}
 
 		.example-tab-content {

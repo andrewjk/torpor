@@ -13,7 +13,7 @@ export default function ExampleBasic() {
 		:global(.torp-date-picker-trigger) {
 			all: unset;
 			box-sizing: border-box;
-			border: 1px solid gainsboro;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			cursor: default;
 			padding: 5px 10px;
@@ -21,12 +21,12 @@ export default function ExampleBasic() {
 		}
 
 		:global(.torp-date-picker-trigger:focus) {
-			border-color: dodgerblue;
+			border-color: var(--accent);
 		}
 
 		:global(.torp-date-picker-content) {
-			background-color: white;
-			border: 1px solid gainsboro;
+			background-color: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 			box-sizing: border-box;
@@ -64,9 +64,9 @@ export default function ExampleBasic() {
 			.torp-calendar-day:focus,
 			.torp-calendar-day.active
 		) {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 
 		:global(.torp-calendar-day.today) {
@@ -79,7 +79,7 @@ export default function ExampleBasic() {
 		}
 
 		:global(.torp-calendar-day.muted) {
-			color: #bbb;
+			color: var(--muted);
 		}
 	}
 }

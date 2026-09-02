@@ -78,14 +78,14 @@ export default function ExampleBasic() {
 		.example-tool-bar-button:hover,
 		.example-tool-bar-button:focus,
 		.example-tool-bar-button:active {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 
 		.example-tool-bar-button-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			min-width: 100px;
 			padding: 5px;
@@ -100,7 +100,7 @@ export default function ExampleBasic() {
 		}
 
 		.example-tool-bar-separator {
-			border-right: 1px solid gainsboro;
+			border-right: 1px solid var(--border);
 		}
 	}
 }

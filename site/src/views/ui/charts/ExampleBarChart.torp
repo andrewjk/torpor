@@ -24,7 +24,7 @@ export default function ExampleBarChart() {
 
 	@style {
 		svg line {
-			stroke: #222;
+			stroke: var(--text);
 		}
 	}
 }

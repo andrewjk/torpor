@@ -14,17 +14,17 @@ export default function ExampleHover() {
 
 	@style {
 		.example-popover-target {
-			border: 1px dashed #222;
+			border: 1px dashed var(--text);
 			border-radius: 4px;
 			cursor: default;
 			padding: 20px;
 		}
 
 		.example-popover-content {
-			background: #333;
-			border: 1px solid gainsboro;
+			background: var(--inverse-back);
+			border: 1px solid var(--border);
 			border-radius: 4px;
-			color: white;
+			color: var(--inverse-text);
 			padding: 10px;
 			z-index: 200;
 		}

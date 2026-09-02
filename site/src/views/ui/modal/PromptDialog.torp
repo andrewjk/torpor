@@ -52,8 +52,8 @@ export default function PromptDialog() {
 		}
 
 		.prompt-dialog-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			padding: 10px;
 			position: fixed;

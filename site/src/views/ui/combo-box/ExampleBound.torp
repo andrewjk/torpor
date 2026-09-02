@@ -46,7 +46,7 @@ export default function ExampleBound() {
 		}
 
 		.example-list-box {
-			border: 1px solid gainsboro;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			display: flex;
 			flex-direction: column;
@@ -62,11 +62,11 @@ export default function ExampleBound() {
 		}
 
 		.example-list-box-item[data-state="active"] {
-			border: 2px solid lightblue;
+			border: 2px solid var(--accent);
 		}
 
 		.example-list-box-item:hover {
-			border: 2px solid blue;
+			border: 2px solid var(--accent);
 		}
 
 		.example-list-box-item:focus-visible {

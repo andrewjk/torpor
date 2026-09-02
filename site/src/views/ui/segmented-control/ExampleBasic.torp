@@ -16,7 +16,7 @@ export default function ExampleBasic() {
 
 	@style {
 		:global(.example-segmented-control) {
-			border: 1px solid gray;
+			border: 1px solid var(--border);
 			border-radius: 8px;
 			overflow: hidden;
 		}
@@ -30,16 +30,16 @@ export default function ExampleBasic() {
 		}
 
 		:global(.example-segmented-control .torp-segmented-item:not(:first-child)) {
-			border-left: 1px solid gray;
+			border-left: 1px solid var(--border);
 		}
 
 		:global(.example-segmented-control .torp-segmented-item[data-state="active"]) {
-			background-color: dodgerblue;
-			color: white;
+			background-color: var(--accent);
+			color: var(--accent-text);
 		}
 
 		:global(.example-segmented-control .torp-segmented-item:focus-visible) {
-			outline: 2px solid black;
+			outline: 2px solid var(--header);
 			outline-offset: -2px;
 		}
 	}

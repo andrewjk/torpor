@@ -24,7 +24,7 @@ export default function ExampleLineChart() {
 
 	@style {
 		svg line {
-			stroke: #222;
+			stroke: var(--text);
 		}
 	}
 }

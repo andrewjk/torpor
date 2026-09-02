@@ -52,14 +52,14 @@ export default function ExampleBasic() {
 		.example-navmenu-link:hover,
 		.example-navmenu-link:focus,
 		.example-navmenu-link:active {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 
 		.example-navmenu-link-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			min-width: 100px;
 			padding: 5px;
@@ -74,7 +74,7 @@ export default function ExampleBasic() {
 		}
 
 		.example-navmenu-separator {
-			border-right: 1px solid gainsboro;
+			border-right: 1px solid var(--border);
 		}
 	}
 }

@@ -20,22 +20,22 @@ export default function ExampleBasic() {
 		}
 
 		.example-splitter-pane {
-			background-color: aliceblue;
-			border: 1px solid dodgerblue;
+			background-color: var(--accent-soft);
+			border: 1px solid var(--accent);
 			border-radius: 8px;
 			box-sizing: border-box;
 			padding: 12px;
 		}
 
 		.example-splitter-handle {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			cursor: col-resize;
 			flex: 0 0 8px;
 			margin: 0 4px;
 		}
 
 		.example-splitter-handle:focus-visible {
-			outline: 2px solid black;
+			outline: 2px solid var(--header);
 			outline-offset: 2px;
 		}
 	}

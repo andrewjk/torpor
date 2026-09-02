@@ -17,7 +17,7 @@ export default function ExampleBasic() {
 
 	@style {
 		:global(.example-tag-input) {
-			border: 1px solid gray;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			gap: 4px;
 			padding: 4px;
@@ -26,9 +26,9 @@ export default function ExampleBasic() {
 
 		:global(.example-tag-input .torp-tag-input-tag) {
 			align-items: center;
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 999px;
-			color: white;
+			color: var(--accent-text);
 			display: flex;
 			font-size: 14px;
 			gap: 4px;

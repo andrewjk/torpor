@@ -23,8 +23,8 @@ export default function ExampleBasic() {
 
 	@style {
 		.example-notification {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 
 			display: grid;

@@ -18,11 +18,11 @@ export default function ExampleToggle($props: any) {
 
 		@if ($page?.form) {
 			@if ($page?.form?.ok) {
-				<p style="color: green">
+				<p style="color: var(--success)">
 					All good
 				</p>
 			} else {
-				<p style="color: red">
+				<p style="color: var(--danger)">
 					{$page?.form?.message}
 				</p>
 			}
@@ -55,7 +55,7 @@ export default function ExampleToggle($props: any) {
 
 		.example-toggle {
 			appearance: none;
-			background-color: gainsboro;
+			background-color: var(--code-back);
 			border-radius: 999px;
 			box-sizing: border-box;
 			cursor: default;
@@ -67,7 +67,7 @@ export default function ExampleToggle($props: any) {
 		}
 
 		.example-toggle::after {
-			background-color: white;
+			background-color: var(--surface);
 			border-radius: 50%;
 			content: "";
 			height: 16px;
@@ -79,7 +79,7 @@ export default function ExampleToggle($props: any) {
 		}
 
 		.example-toggle:checked {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 		}
 
 		.example-toggle:checked::after {

@@ -27,18 +27,18 @@ export default function ExampleRange() {
 		}
 
 		:global(.example-slider) {
-			background-color: gainsboro;
+			background-color: var(--code-back);
 		}
 
 		:global(.torp-slider-fill) {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
 			height: 100%;
 		}
 
 		:global(.torp-slider-thumb) {
 			all: unset;
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 50%;
 			box-sizing: border-box;
 			cursor: default;

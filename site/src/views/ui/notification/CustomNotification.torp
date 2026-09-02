@@ -12,8 +12,8 @@ export default function CustomNotification() {
 		.custom-notification-function {
 			pointer-events: all;
 
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 
 			display: grid;

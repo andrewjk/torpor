@@ -22,7 +22,7 @@ export default function ExampleBasic() {
 
 	@style {
 		.example-disclosure {
-			border: 1px solid gainsboro;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			width: 200px;
 		}
@@ -44,7 +44,7 @@ export default function ExampleBasic() {
 		}
 
 		.example-disclosure-trigger[data-state="open"] {
-			border-bottom: 2px solid black;
+			border-bottom: 2px solid var(--header);
 		}
 
 		.example-disclosure-content {

@@ -102,7 +102,7 @@ export default function ExampleBasic() {
 		}
 
 		.example-tree-item-content[data-selected="selected"] {
-			border: 2px solid lightblue;
+			border: 2px solid var(--accent);
 		}
 	}
 }

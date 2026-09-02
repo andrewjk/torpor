@@ -18,7 +18,7 @@ export default function ExampleDisabled() {
 		}
 
 		:global(.example-rating .torp-rating-star[data-state="empty"] span) {
-			color: lightgray;
+			color: var(--muted);
 		}
 	}
 }

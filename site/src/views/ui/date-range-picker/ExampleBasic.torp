@@ -27,7 +27,7 @@ export default function ExampleBasic() {
 	@style {
 		:global(.example-date-range-picker .torp-date-range-picker-trigger) {
 			background: none;
-			border: 1px solid gray;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			cursor: pointer;
 			font-size: 14px;
@@ -46,13 +46,13 @@ export default function ExampleBasic() {
 		}
 
 		:global(.example-date-range-picker .torp-date-range-day[data-range="inside"]) {
-			background-color: aliceblue;
+			background-color: var(--accent-soft);
 		}
 
 		:global(.example-date-range-picker .torp-date-range-day.selected) {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 	}
 }

@@ -34,8 +34,8 @@ export default function PopoverDialog($props: Props) {
 		}
 
 		.popover-dialog-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 
 			width: 340px;

@@ -40,12 +40,12 @@ export default function ExampleVertical() {
 			all: unset;
 			box-sizing: border-box;
 			cursor: default;
-			border-right: 2px solid gainsboro;
+			border-right: 2px solid var(--border);
 			padding: 5px 10px;
 		}
 
 		.example-tab-trigger[data-state="active"] {
-			border-right: 2px solid black;
+			border-right: 2px solid var(--header);
 		}
 
 		.example-tab-content {

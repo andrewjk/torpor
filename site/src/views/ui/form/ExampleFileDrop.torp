@@ -29,7 +29,7 @@ export default function ExampleFileDrop() {
 
 	@style {
 		.example-file-drop {
-			border: 2px dashed gray;
+			border: 2px dashed var(--border);
 			border-radius: 8px;
 			box-sizing: border-box;
 			cursor: pointer;
@@ -40,7 +40,7 @@ export default function ExampleFileDrop() {
 		}
 
 		.example-file-drop:focus-visible {
-			outline: 2px solid black;
+			outline: 2px solid var(--header);
 			outline-offset: 2px;
 		}
 	}

@@ -120,8 +120,8 @@ export default function ExampleBasic() {
 		}
 
 		.example-menu-popover-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			min-width: 100px;
 			padding: 5px;
@@ -153,9 +153,9 @@ export default function ExampleBasic() {
 		.example-menu-button:hover,
 		.example-menu-button:focus,
 		.example-menu-button:active {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 
 		.example-menu-indicator {
@@ -169,11 +169,11 @@ export default function ExampleBasic() {
 		}
 
 		.example-menu-separator {
-			border-bottom: 1px solid gainsboro;
+			border-bottom: 1px solid var(--border);
 		}
 
 		.example-menu-message {
-			border: 1px dashed gray;
+			border: 1px dashed var(--border);
 			border-radius: 5px;
 			padding: 10px;
 		}
@@ -191,15 +191,15 @@ export default function ExampleBasic() {
 		}
 
 		.example-menu-message.red {
-			color: red;
+			color: var(--danger);
 		}
 
 		.example-menu-message.blue {
-			color: blue;
+			color: var(--accent);
 		}
 
 		.example-menu-message.green {
-			color: green;
+			color: var(--success);
 		}
 	}
 }

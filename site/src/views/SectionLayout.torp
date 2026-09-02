@@ -62,21 +62,21 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 	}
 
 	@style {
-	#section {
-		display: grid;
-		grid-template-columns: minmax(0, 14rem) 1fr;
-		height: 100%;
-	}
+		#section {
+			display: grid;
+			grid-template-columns: minmax(0, 14rem) 1fr;
+			height: 100%;
+		}
 
-	#sidebar {
-		border-right: 1px solid var(--panel-back);
-		overflow: auto;
-		padding: 0.5rem;
-	}
+		#sidebar {
+			border-right: 1px solid var(--panel-back);
+			overflow: auto;
+			padding: 0.5rem 1rem;
+		}
 
 		#content {
 			overflow: auto;
-			padding: 0.5rem;
+			padding: 0.5rem 1rem;
 		}
 
 		.mobile-bar {

@@ -34,7 +34,7 @@ export default function ExampleBasic() {
 	@style {
 		.example-command-palette-button {
 			background: none;
-			border: 1px solid gray;
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			cursor: pointer;
 			font-size: inherit;
@@ -42,7 +42,7 @@ export default function ExampleBasic() {
 		}
 
 		:global(.example-command-palette .torp-command-palette-content) {
-			background-color: white;
+			background-color: var(--surface);
 			border-radius: 8px;
 			box-shadow: rgba(0, 0, 0, 0.35) 0 8px 24px;
 			gap: 4px;
@@ -56,7 +56,7 @@ export default function ExampleBasic() {
 		}
 
 		:global(.example-command-palette .torp-command-palette-input) {
-			border: 1px solid lightgray;
+			border: 1px solid var(--border);
 			border-radius: 6px;
 			font-size: 16px;
 			padding: 10px;
@@ -71,11 +71,11 @@ export default function ExampleBasic() {
 		}
 
 		:global(.example-command-palette .torp-command-palette-item[data-state="active"]) {
-			background-color: aliceblue;
+			background-color: var(--accent-soft);
 		}
 
 		:global(.example-command-palette .torp-command-palette-shortcut) {
-			color: gray;
+			color: var(--muted);
 		}
 	}
 }

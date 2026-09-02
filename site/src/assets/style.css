@@ -7,6 +7,21 @@
 	--brad: 0.5rem;
 	--link: #1144cc;
 	color-scheme: light;
+
+	/*
+	 * Palette for component examples. All example styles should use these
+	 * instead of hardcoded colors, so that they adapt to dark mode.
+	 */
+	--border: #d9d9d9; /* subtle lines: tab tracks, list borders */
+	--muted: #9aa1a9; /* muted/disabled text */
+	--accent: #1e90ff; /* interactive highlights, active states */
+	--accent-soft: #e7f2ff; /* soft accent backgrounds: selected rows */
+	--accent-text: #fff; /* text on top of accent backgrounds */
+	--surface: #fff; /* elevated surfaces: menus, drawers, knobs */
+	--inverse-back: #333; /* inverted surface: tooltips */
+	--inverse-text: #fff; /* text on inverted surface */
+	--danger: #d93025; /* destructive/error text */
+	--success: #1a7f37; /* success text */
 }
 
 html.dark {
@@ -17,6 +32,17 @@ html.dark {
 	--code-back: #262b34;
 	--link: #86a8ff;
 	color-scheme: dark;
+
+	--border: #3a4049;
+	--muted: #8b929b;
+	--accent: #2f81f7;
+	--accent-soft: #1e3a5f;
+	--accent-text: #fff;
+	--surface: #262b34;
+	--inverse-back: #e8eaf0;
+	--inverse-text: #17191f;
+	--danger: #ff7b72;
+	--success: #7ee787;
 }
 
 html {

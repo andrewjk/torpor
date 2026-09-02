@@ -109,8 +109,8 @@ export default function ExampleQueue() {
 		.example-notification {
 			pointer-events: all;
 
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 
 			display: grid;

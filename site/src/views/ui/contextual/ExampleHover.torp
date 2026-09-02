@@ -53,15 +53,15 @@ export default function Example() {
 
 	@style {
 		.example-contextual-element {
-			border: 1px dashed #222;
+			border: 1px dashed var(--text);
 			border-radius: 4px;
 			cursor: default;
 			padding: 20px;
 		}
 
 		.example-contextual-content {
-			background: white;
-			border: 1px solid gainsboro;
+			background: var(--surface);
+			border: 1px solid var(--border);
 			border-radius: 4px;
 			padding: 10px;
 			z-index: 200;
@@ -91,9 +91,9 @@ export default function Example() {
 		.example-contextual-menu-button:hover,
 		.example-contextual-menu-button:focus,
 		.example-contextual-menu-button:active {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 			border-radius: 4px;
-			color: white;
+			color: var(--accent-text);
 		}
 
 		.example-contextual-menu-indicator {
@@ -102,7 +102,7 @@ export default function Example() {
 		}
 
 		.example-contextual-menu-separator {
-			border-bottom: 1px solid gainsboro;
+			border-bottom: 1px solid var(--border);
 		}
 
 		.example-contextual-menu-message {

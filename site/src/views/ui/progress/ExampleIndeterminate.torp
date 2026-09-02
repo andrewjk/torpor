@@ -7,14 +7,14 @@ export default function ExampleIndeterminate() {
 
 	@style {
 		:global(.example-progress) {
-			background-color: gainsboro;
+			background-color: var(--code-back);
 			border-radius: 4px;
 			height: 10px;
 			width: 240px;
 		}
 
 		:global(.example-progress .torp-progress-bar) {
-			background-color: dodgerblue;
+			background-color: var(--accent);
 		}
 
 		@keyframes example-progress-indeterminate {
