@@ -1,0 +1,92 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function ApiEndpointsPage() {
+	@head {
+		<title>API Endpoints | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>API Endpoints</h1>
+		<p>
+			A <code>+server.ts</code> file is a plain HTTP endpoint &mdash; no page is
+			rendered. Export one function per method it handles:
+		</p>
+		<CodePreview
+			code={`
+// routes/api/posts/+server.ts
+import { created, ok } from "@torpor/build";
+import { type ServerEndPoint } from "@torpor/build";
+import { createPost, getPosts } from "@/lib/db";
+
+export default {
+	get: async () => ok(await getPosts()),
+	post: async ({ json }) => {
+		const body = await json();
+		const post = await createPost(body);
+		return created(post);
+	},
+} satisfies ServerEndPoint;
+`}
+		/>
+		<p>
+			The handler names are <code>get</code>, <code>post</code>,
+			<code>patch</code>, <code>put</code>, <code>del</code> (DELETE),
+			<code>options</code> and <code>head</code>.
+		</p>
+
+		<h2>The request event</h2>
+		<p>
+			Handlers receive an event with <code>json()</code> and <code>form()</code>
+			to read the body, <code>query()</code> to read the query string,
+			<code>params</code> for the route's dynamic segments, plus
+			<code>request</code>, <code>cookies</code>, <code>headers</code> and
+			<code>appData</code>.
+		</p>
+
+		<h2>Validation</h2>
+		<p>
+			Declare a schema per handler (any
+			<a href="https://github.com/standard-schema/standard-schema">Standard Schema</a>
+			library works) to validate and type the request before the handler runs. A
+			body or query string that fails gets a 422 response; params that fail get a
+			404, since the URL can't refer to an existing resource:
+		</p>
+		<CodePreview
+			code={`
+const schema = {
+	params: z.object({ id: z.coerce.number() }),
+	get: z.object({ sort: z.enum(["asc", "desc"]) }),
+	post: z.object({ title: z.string() }),
+};
+
+export default {
+	schema,
+	get: async ({ query }) => ok(await query()),
+	post: async ({ json }) => created(await createPost(await json())),
+} satisfies ServerEndPoint<"/api/posts/[id]", typeof schema>;
+`}
+		/>
+
+		<h2>Typed clients</h2>
+		<p>
+			Call an endpoint from client code with <code>makeApi</code>. Params are
+			filled in from the route path, JSON responses are parsed, and the result is
+			typed from the endpoint's responses. Failed (non-2xx) requests throw:
+		</p>
+		<CodePreview
+			code={`
+import type endpoint from "@/routes/api/posts/[id]/+server";
+
+const post = makeApi<"/api/posts/[id]", typeof endpoint>("/api/posts/[id]", { id: 5 });
+const data = await post.get();
+`}
+		/>
+
+		<h2>OpenAPI</h2>
+		<p>
+			Handler schemas are converted to JSON Schema, so a full OpenAPI document
+			can be generated for the site. Run <code>tb --openapi</code> to write it to
+			<code>openapi.json</code> (or pass a file path).
+		</p>
+	}
+}

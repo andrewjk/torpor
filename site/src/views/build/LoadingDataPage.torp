@@ -1,0 +1,117 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function LoadingDataPage() {
+	@head {
+		<title>Loading Data | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Loading Data</h1>
+		<p>
+			A <code>load</code> function fetches data for a page before it is rendered.
+			Return data with a response helper like <code>ok</code>, and it becomes
+			<code>$props.data</code> in the page component.
+		</p>
+
+		<h2>Server loads</h2>
+		<p>
+			Put <code>load</code> in <code>+page.server.ts</code> to run it on the
+			server, on every request. This is where you talk to your database:
+		</p>
+		<CodePreview
+			code={`
+// routes/posts/+page.server.ts
+import { ok } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
+import { getPosts } from "@/lib/db";
+
+export default {
+	load: async () => {
+		const posts = await getPosts();
+		return ok({ posts });
+	},
+} satisfies PageServerEndPoint;
+`}
+		/>
+		<CodePreview
+			code={`
+// views/Posts.torp
+export default function Posts($props: { data: { posts: Post[] } }) {
+	@render {
+		@for (let post of $props.data.posts) {
+			<article>{post.title}</article>
+		}
+	}
+}
+`}
+		/>
+
+		<h2>Client loads</h2>
+		<p>
+			Put <code>load</code> in <code>+page.ts</code> to run it in the browser
+			during client-side navigation, for example fetching from an external API:
+		</p>
+		<CodePreview
+			code={`
+// routes/weather/+page.ts
+import { ok } from "@torpor/build";
+import component from "@/views/Weather.torp";
+import { type PageEndPoint } from "@torpor/build";
+
+export default {
+	component,
+	load: async () => {
+		const response = await fetch("https://api.example.com/weather");
+		return ok({ forecast: await response.json() });
+	},
+} satisfies PageEndPoint;
+`}
+		/>
+
+		<h2>Layouts load too</h2>
+		<p>
+			A <code>_layout.server.ts</code> load runs before the page's load, and its
+			data accumulates top down: each load receives the data loaded by the layouts
+			above it, may add to it, and the merged result is passed into the page as
+			<code>$props.data</code>.
+		</p>
+
+		<h2>The load event</h2>
+		<p>
+			Server loads receive an event with <code>url</code>, <code>params</code>,
+			<code>data</code> (from the layouts above), <code>appData</code> (set by
+			<a href="/build/hooks">hooks</a>), <code>request</code>, <code>cookies</code>
+			and <code>headers</code>. Client loads receive <code>url</code>,
+			<code>params</code> and <code>data</code>.
+		</p>
+
+		<h2>Query strings</h2>
+		<p>
+			Declare a <code>load</code> schema to validate the URL's query string. The
+			values are validated and typed before <code>load</code> is called, and an
+			invalid query string gets a 422 response without running your code:
+		</p>
+		<CodePreview
+			code={`
+const schema = {
+	load: z.object({ page: z.coerce.number() }),
+};
+
+export default {
+	schema,
+	load: async ({ query }) => {
+		const { page } = await query();
+		return ok({ page });
+	},
+} satisfies PageServerEndPoint<"/posts", Record<string, any>, typeof schema>;
+`}
+		/>
+
+		<h2>Redirects and errors</h2>
+		<p>
+			Loads may return any response instead of data: use
+			<code>seeOther("/login")</code> to redirect, or <code>notFound()</code> to
+			show the <a href="/build/routing">error page</a>.
+		</p>
+	}
+}

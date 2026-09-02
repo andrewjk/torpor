@@ -1,0 +1,65 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function NavigationPage() {
+	@head {
+		<title>Navigation | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Navigation</h1>
+		<p>
+			Plain <code>&lt;a href&gt;</code> links just work: the framework intercepts
+			clicks, fetches the page, and re-renders in the browser. Pages are
+			prefetched on hover and touch, and back/forward buttons are handled.
+			Everything still works without JavaScript.
+		</p>
+
+		<h2>Programmatic navigation</h2>
+		<p>
+			Use <code>load</code> to render a page from code, and <code>reload</code>
+			to re-run the loads for the current page:
+		</p>
+		<CodePreview
+			code={`
+import { load, reload } from "@torpor/build/nav";
+
+await load("/posts");
+await reload();
+`}
+		/>
+
+		<h2>Building URLs</h2>
+		<p>
+			Use <code>route</code> to build URLs from route paths. Params are checked
+			at compile time and URI-encoded:
+		</p>
+		<CodePreview
+			code={`
+import { route } from "@torpor/build/nav";
+
+route("/posts/[id]", { id: 5 }); // "/posts/5"
+`}
+		/>
+
+		<h2>The $page state object</h2>
+		<p>
+			<code>$page</code> is a global reactive object describing the current page.
+			Import it from <code>&#64;torpor/build/state</code>:
+		</p>
+		<CodePreview
+			code={`
+import { $page } from "@torpor/build/state";
+`}
+		/>
+		<ul>
+			<li><code>$page.url</code> &mdash; the current URL</li>
+			<li><code>$page.status</code> &mdash; the response status code</li>
+			<li><code>$page.form</code> &mdash; the result of the last form action</li>
+			<li><code>$page.error?.message</code> &mdash; the current error, if any</li>
+		</ul>
+		<p>
+			It is used by the sidebar of this very site to highlight the active link,
+			and by error pages to show the status.
+		</p>
+	}
+}

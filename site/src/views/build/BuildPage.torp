@@ -13,8 +13,58 @@ export default function BuildPage() {
 		<p>
 			This documentation is built in Build.
 		</p>
+
+		<h2>Quick start</h2>
 		<p>
-			TODO:
+			Use <code>npm</code> (or your preferred package manager) to create a starter project:
 		</p>
+		<pre><code>{`
+npm init @torpor/build@latest my-project
+cd my-project
+npm install
+npm run dev
+`.trim()}</code></pre>
+
+		<h2>Folder structure</h2>
+		<pre><code>{`
+/src
+	/assets
+	/lib
+	/routes
+	/views
+`.trim()}</code></pre>
+		<p>
+			Pages live in <code>routes</code>, and the components they render live in
+			<code>views</code>. See <a href="/build/routing">Routing</a>.
+		</p>
+
+		<h2>What's in the box</h2>
+		<ul>
+			<li>
+				File-based routing, with type-safe URLs &mdash; see
+				<a href="/build/routing">Routing</a>
+			</li>
+			<li>
+				Server and client load functions &mdash; see
+				<a href="/build/loading-data">Loading Data</a>
+			</li>
+			<li>
+				Form actions with schema validation &mdash; see
+				<a href="/build/actions">Actions</a>
+			</li>
+			<li>
+				JSON API endpoints and typed clients &mdash; see
+				<a href="/build/api-endpoints">API Endpoints</a>
+			</li>
+			<li>
+				Request hooks for auth, logging and shared data &mdash; see
+				<a href="/build/hooks">Hooks</a>
+			</li>
+			<li>
+				Client-side navigation, prefetching, and the
+				<code>$page</code> state object &mdash; see
+				<a href="/build/navigation">Navigation</a>
+			</li>
+		</ul>
 	}
 }

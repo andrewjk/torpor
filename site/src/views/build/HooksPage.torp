@@ -1,0 +1,60 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function HooksPage() {
+	@head {
+		<title>Hooks | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Hooks</h1>
+		<p>
+			A <code>_hook.server.ts</code> file defines functions that run around every
+			request in its folder and the folders below it. A hook at the root of
+			<code>src/routes</code> runs for the whole site:
+		</p>
+		<CodePreview
+			code={`
+// routes/_hook.server.ts
+import { type ServerHook } from "@torpor/build";
+import { getUser } from "@/lib/auth";
+
+export default {
+	enter: async (event) => {
+		event.appData.user = await getUser(event.cookies);
+	},
+} satisfies ServerHook;
+`}
+		/>
+
+		<h2>The enter hook</h2>
+		<p>
+			<code>enter</code> runs before each request is handled, including page
+			loads, actions and API endpoints. Return a <code>Response</code> to
+			short-circuit the request &mdash; for example, redirecting users who are
+			not logged in:
+		</p>
+		<CodePreview
+			code={`
+enter: async (event) => {
+	if (!event.appData.user) {
+		return seeOther("/login");
+	}
+},
+`}
+		/>
+
+		<h2>The exit hook</h2>
+		<p>
+			<code>exit</code> runs after the request has been handled, even if the
+			handler threw an error or <code>enter</code> short-circuited it. Use it for
+			logging and cleanup.
+		</p>
+
+		<h2>Shared data</h2>
+		<p>
+			Anything set on <code>event.appData</code> flows down to layouts, pages and
+			endpoints in the same request, so a user loaded in a hook is available
+			everywhere else without fetching it again.
+		</p>
+	}
+}

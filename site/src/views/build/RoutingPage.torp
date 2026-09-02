@@ -1,0 +1,117 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function RoutingPage() {
+	@head {
+		<title>Routing | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Routing</h1>
+		<p>
+			Routes are defined by the folder structure of <code>src/routes</code>. Each
+			folder maps to a URL path, and each file within it handles a part of the
+			request:
+		</p>
+		<pre><code>{`
+/routes
+	/+page.ts              -> /
+	/about/+page.ts        -> /about
+	/posts/[id]/+page.ts   -> /posts/123
+	/api/posts/+server.ts  -> /api/posts
+`.trim()}</code></pre>
+
+		<h2>Special files</h2>
+		<ul>
+			<li>
+				<code>+page.ts</code> &mdash; the page endpoint: the component to render,
+				plus an optional client <code>load</code> function
+			</li>
+			<li>
+				<code>+page.server.ts</code> &mdash; a server-only <code>load</code>
+				function and form <code>actions</code>
+			</li>
+			<li>
+				<code>+server.ts</code> &mdash; a plain HTTP endpoint (no UI) &mdash; see
+				<a href="/build/api-endpoints">API Endpoints</a>
+			</li>
+			<li>
+				<code>_layout.ts</code> and <code>_layout.server.ts</code> &mdash; wrap
+				every route in the folder and the folders below it
+			</li>
+			<li>
+				<code>_error.ts</code> &mdash; the page shown when a request in the folder
+				fails
+			</li>
+			<li>
+				<code>_hook.server.ts</code> &mdash; runs before and after every request
+				below it &mdash; see <a href="/build/hooks">Hooks</a>
+			</li>
+		</ul>
+
+		<h2>Pages</h2>
+		<p>
+			A <code>+page.ts</code> exports the component to render, imported from
+			<code>src/views</code> (or wherever you keep your components):
+		</p>
+		<CodePreview
+			code={`
+// routes/posts/[id]/+page.ts
+import component from "@/views/Post.torp";
+import { type PageEndPoint } from "@torpor/build";
+
+export default {
+	component,
+} satisfies PageEndPoint;
+`}
+		/>
+		<p>
+			Annotate the endpoint with its route path to get typed params in load
+			functions and URL builders, e.g. <code>PageEndPoint&lt;"/posts/[id]"&gt;</code>.
+		</p>
+
+		<h2>Dynamic segments</h2>
+		<p>
+			Use square brackets for dynamic segments: <code>[id]</code> matches a single
+			path segment, and <code>[...path]</code> matches the rest of the path. The
+			values are passed to load functions and actions as strings via
+			<code>event.params</code>.
+		</p>
+
+		<h2>Type-safe URLs</h2>
+		<p>
+			Build URLs with <code>route</code> instead of string concatenation. Params
+			are checked at compile time &mdash; missing or unknown params are errors:
+		</p>
+		<CodePreview
+			code={`
+import { route } from "@torpor/build/nav";
+
+route("/posts/[id]", { id: 5 }); // "/posts/5"
+route("/posts/[id]"); // compile error: missing 'id'
+`}
+		/>
+
+		<h2>Routes in code</h2>
+		<p>
+			For small sites, routes can be added in code instead of using the standard
+			file names. Each option maps to a file route type, and inline server code is
+			kept out of the client bundle automatically:
+		</p>
+		<CodePreview
+			code={`
+import { Site, ok } from "@torpor/build";
+
+const site = new Site();
+
+site.addRoute("/", {
+	page: "./src/Counter.torp",
+	pageServer: { actions: { set: async ({ request }) => ok() } },
+});
+
+site.addRoute("/api/time", {
+	server: { get: async () => ok({ time: Date.now() }) },
+});
+`}
+		/>
+	}
+}

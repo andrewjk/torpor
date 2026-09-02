@@ -1,0 +1,127 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function ActionsPage() {
+	@head {
+		<title>Actions | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Actions</h1>
+		<p>
+			Actions handle form submissions. They are plain HTML forms posting to
+			server functions in <code>+page.server.ts</code> &mdash; they work without
+			JavaScript, and the framework intercepts the submit to fetch and re-render
+			when it is available.
+		</p>
+		<CodePreview
+			code={`
+// routes/posts/new/+page.server.ts
+import { ok, seeOther } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
+import { createPost } from "@/lib/db";
+
+export default {
+	actions: {
+		default: async ({ form }) => {
+			const { title } = await form();
+			await createPost({ title });
+			return seeOther("/posts");
+		},
+	},
+} satisfies PageServerEndPoint;
+`}
+		/>
+		<CodePreview
+			code={`
+// views/NewPost.torp
+export default function NewPost() {
+	@render {
+		<form method="POST">
+			<input name="title" />
+			<button>Create</button>
+		</form>
+	}
+}
+`}
+		/>
+
+		<h2>Named actions</h2>
+		<p>
+			A form without an <code>action</code> attribute calls the
+			<code>default</code> action. Point the action at a query value to call a
+			named one:
+		</p>
+		<CodePreview
+			code={`
+<form method="POST" action="?/like">
+	<button>Like</button>
+</form>
+`}
+		/>
+		<CodePreview
+			code={`
+actions: {
+	like: async ({ params }) => {
+		await addLike(params.id);
+	},
+},
+`}
+		/>
+
+		<h2>Validation</h2>
+		<p>
+			Declare a schema for an action (any
+			<a href="https://github.com/standard-schema/standard-schema">Standard Schema</a>
+			library works &mdash; zod, valibot, arktype, etc) and its form values are
+			validated and typed before the action runs. A form that fails validation
+			gets a 422 response with the schema's issues, without calling your action:
+		</p>
+		<CodePreview
+			code={`
+const schema = {
+	default: z.object({ title: z.string().min(1) }),
+};
+
+export default {
+	schema,
+	actions: {
+		default: async ({ form }) => {
+			const { title } = await form(); // typed as string
+			await createPost({ title });
+			return ok({ saved: true });
+		},
+	},
+} satisfies PageServerEndPoint<"/posts/new", Record<string, any>, typeof schema>;
+`}
+		/>
+
+		<h2>Action results</h2>
+		<p>
+			When an action returns a response with a JSON body &mdash; from
+			<code>ok(&#123; ... &#125;)</code>, <code>unprocessable(&#123; ... &#125;)</code>,
+			etc &mdash; the page is re-rendered and the body becomes
+			<code>$props.form</code> (also available as <code>$page.form</code> from
+			<code>&#64;torpor/build/state</code>):
+		</p>
+		<CodePreview
+			code={`
+export default function NewPost($props: { form?: { saved?: boolean } }) {
+	@render {
+		@if ($props.form?.saved) {
+			<p>Saved!</p>
+		}
+		<form method="POST">
+			<input name="title" />
+			<button>Create</button>
+		</form>
+	}
+}
+`}
+		/>
+		<p>
+			Use <code>unprocessable</code> to return validation errors with their
+			field types, and <code>seeOther</code> to redirect after a successful
+			submission.
+		</p>
+	}
+}
