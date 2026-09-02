@@ -25,7 +25,7 @@ import { load, reload } from "@torpor/build/nav";
 
 await load("/posts");
 await reload();
-`}
+`.trim()}
 		/>
 
 		<h2>Building URLs</h2>

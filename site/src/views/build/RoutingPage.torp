@@ -14,10 +14,10 @@ export default function RoutingPage() {
 		</p>
 		<pre><code>{`
 /routes
-	/+page.ts              -> /
-	/about/+page.ts        -> /about
-	/posts/[id]/+page.ts   -> /posts/123
-	/api/posts/+server.ts  -> /api/posts
+	/+page.ts              → /
+	/about/+page.ts        → /about
+	/posts/[id]/+page.ts   → /posts/123
+	/api/posts/+server.ts  → /api/posts
 `.trim()}</code></pre>
 
 		<h2>Special files</h2>

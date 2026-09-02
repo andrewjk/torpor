@@ -69,7 +69,7 @@ export default function Counter() {
 			Reset
 		</button>
 	}
-}`.trim()}
+}`}
 					/>
 				</div>
 				<div class="demo-card grow">

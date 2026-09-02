@@ -18,7 +18,7 @@ export default function CodePreview($props: { code: string }) {
 		// toggling the theme doesn't require a re-render.
 		get formatted() {
 			return $async(async () => {
-				const code = this.code;
+				const code = this.code.trim();
 				return (await codeToHtml(code, {
 					lang: "torpor",
 					themes: { light: "light-plus", dark: "dark-plus" },
