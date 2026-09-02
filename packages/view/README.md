@@ -9,7 +9,7 @@ Torpor's view library, for writing and mounting components.
 Use `npm` (or your preferred package manager) to add Torpor to your project:
 
 ```bash
-npm install torpor
+npm install @torpor/view
 ```
 
 ## Features

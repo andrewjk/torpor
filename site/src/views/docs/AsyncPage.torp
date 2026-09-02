@@ -11,7 +11,7 @@ export default function AsyncPage() {
 		<p>
 			Async values are created with the <code>$async</code> function, which wraps a
 			promise-returning getter. While the promise is pending, reads of the getter
-			suspend:
+			suspend (and read as <code>undefined</code>, hence the optional chaining):
 		</p>
 		<CodePreview
 			code={`
@@ -24,7 +24,7 @@ export default function Component($props: { id: number }) {
 
 	@render {
 		<p>
-			Hello, {$state.user.name}!
+			Hello, {$state.user?.name}!
 		</p>
 	}
 }
@@ -48,7 +48,7 @@ export default function Component($props: { id: number }) {
 	@render {
 		@await {
 			<p>
-				Hello, {$state.user.name}!
+				Hello, {$state.user?.name}!
 			</p>
 		} with {
 			<p>Loading...</p>

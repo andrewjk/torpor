@@ -9,8 +9,8 @@ export default function StreamPage() {
 	@render {
 		<h1>Streams</h1>
 		<p>
-			External event sources &mdash; server-sent events, WebSockets, DOM events,
-			or anything else that pushes values over time &mdash; are subscribed to with
+			External event sources like server-sent events, WebSockets, DOM events,
+			or anything else that pushes values over time are subscribed to with
 			the <code>$stream</code> function. Events are written into reactive state,
 			so templates and effects update through the normal reactivity model:
 		</p>
@@ -121,10 +121,10 @@ export default function AutoSave() {
 
 		<h2>Custom sources</h2>
 		<p>
-			Any source is just a function that takes a <code>push</code> callback and
+			A source is just a function that takes a <code>push</code> callback and
 			returns an unsubscribe function (the <code>StreamSource&lt;T&gt;</code>
-			type), so wrapping anything &mdash; an <code>EventEmitter</code>, a
-			<code>BroadcastChannel</code>, a third-party SDK &mdash; is a few lines:
+			type), so wrapping things like an <code>EventEmitter</code>, a
+			<code>BroadcastChannel</code> or a third-party SDK takes just a few lines:
 		</p>
 		<CodePreview
 			code={`
@@ -139,10 +139,10 @@ $stream((push) => {
 		/>
 		<p>
 			Timing options belong on <code>$stream</code>; anything shapeful
-			&mdash; windowing, aggregation, combining multiple streams &mdash; is
+			like windowing, aggregation, or combining multiple streams is
 			plain closure logic in the handler. To react to each event in an effect,
 			write it to state and read it from <code>$run</code>. For async data
-			&mdash; one-shot fetches rather than ongoing streams &mdash; see
+			(once-off fetches rather than ongoing streams) see
 			<a href="/docs/async">Async</a>.
 		</p>
 	}

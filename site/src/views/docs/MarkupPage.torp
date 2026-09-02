@@ -51,7 +51,7 @@ export default function Component() {
 
 	@render {
 		<p {id}>
-			Hello, {name}!
+			Hello!
 		</p>
 	}
 }
@@ -97,20 +97,20 @@ export default function Component() {
 export default function Component() {
 	let $state = $watch({
 		stock: [
-			{ code: "W1", name: "Widgets", quantity: 5 }
-			{ code: "B2", name: "Boxes", quantity: 12 }
-			{ code: "D3", name: "Doodads", quantity: 3 }
+			{ code: "W1", name: "Widgets", quantity: 5 },
+			{ code: "B2", name: "Boxes", quantity: 12 },
+			{ code: "D3", name: "Doodads", quantity: 3 },
 		]
 	})
 
 	@render {
-		<button onclick={() => $state.stock.sort((a, b) => a - b)}>
+		<button onclick={() => $state.stock.sort((a, b) => a.quantity - b.quantity)}>
 			Sort by quantity
 		</button>
 
-		@for (let $item of $state.stock) {
-			@key $item.code
-			<p>{$item.name}: {$item.quantity}</p>
+		@for (let item of $state.stock) {
+			@key = item.code
+			<p>{item.name}: {item.quantity}</p>
 		}
 	}
 }
@@ -173,13 +173,21 @@ export default function Component() {
 		</p>
 		<CodePreview
 			code={`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
+export default function Component($props: { id: number }) {
+	let $state = $watch({
+		get user() {
+			return $async(() => fetchUser($props.id))
+		}
+	})
 
 	@render {
-		<div>
-
-		</div>
+		@await {
+			<p>
+				Hello, {$state.user?.name}!
+			</p>
+		} with {
+			<p>Loading...</p>
+		}
 	}
 }
 `}
@@ -187,17 +195,18 @@ export default function Component() {
 
 		<h2>Replace statements</h2>
 		<p>
-			Use a <code>&commat;replace</code> statement to re-render markup when a value is changed:
+			Use a <code>&commat;replace</code> statement to re-render markup when a value is changed,
+			rather than updating it in place:
 		</p>
 		<CodePreview
 			code={`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
+export default function Component($props: { name: string }) {
 	@render {
-		<div>
-
-		</div>
+		@replace ($props.name) {
+			<p>
+				Hello, {$props.name}!
+			</p>
+		}
 	}
 }
 `}
@@ -219,9 +228,14 @@ export default function Component() {
 	let $state = $watch({ counter: 0 })
 
 	@render {
-		<div>
+		@const doubled = $state.counter * 2
+		<p>
+			The count doubled is {doubled}.
+		</p>
 
-		</div>
+		@console.log("The count is", $state.counter)
+
+		@// @debugger
 	}
 }
 `}
@@ -240,9 +254,14 @@ export default function Component() {
 	let $state = $watch({ counter: 0 })
 
 	@render {
-		<div>
+		<button onclick={increment}>Increment</button>
+		<p>
+			The count is {$state.counter}.
+		</p>
 
-		</div>
+		@function increment() {
+			$state.counter += 1
+		}
 	}
 }
 `}
@@ -254,13 +273,11 @@ export default function Component() {
 		</p>
 		<CodePreview
 			code={`
-export default function Component() {
-	let $state = $watch({ counter: 0 })
-
+export default function Component($props: { html: string }) {
 	@render {
-		<div>
-
-		</div>
+		<p>
+			@html($props.html)
+		</p>
 	}
 }
 `}

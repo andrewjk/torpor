@@ -9,7 +9,7 @@ export default function ActionsPage() {
 		<h1>Actions</h1>
 		<p>
 			Actions handle form submissions. They are plain HTML forms posting to
-			server functions in <code>+page.server.ts</code> &mdash; they work without
+			server functions in <code>+page.server.ts</code> so they work without
 			JavaScript, and the framework intercepts the submit to fetch and re-render
 			when it is available.
 		</p>
@@ -72,7 +72,7 @@ actions: {
 		<p>
 			Declare a schema for an action (any
 			<a href="https://github.com/standard-schema/standard-schema">Standard Schema</a>
-			library works &mdash; zod, valibot, arktype, etc) and its form values are
+			library like Zod, Valibot, or ArkType works) and its form values are
 			validated and typed before the action runs. A form that fails validation
 			gets a 422 response with the schema's issues, without calling your action:
 		</p>

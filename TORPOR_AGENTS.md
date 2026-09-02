@@ -542,7 +542,7 @@ Two-way bindings use a leading `&`:
 | `&checked={$state.isAvailable}` | Two-way checkbox checked state.                                                                                    |
 | `&group={$state.picked}`        | Radio group: selecting a radio writes its `value` into `$state.picked`.                                            |
 | `&ref={var}`                    | DOM reference: assigns the element node to `var` on mount (usable in `$onmount`, `@render` after mount, handlers). |
-| `&key={$state.value}`           | Two-way component prop binding (see `$bind` above).                                                                |
+| `&name={$state.value}`          | Two-way component prop binding — the attribute name is the prop to bind (see `$bind` above).                       |
 
 ```torp
 <input &value={$state.text} />

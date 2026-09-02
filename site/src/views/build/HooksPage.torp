@@ -30,7 +30,7 @@ export default {
 		<p>
 			<code>enter</code> runs before each request is handled, including page
 			loads, actions and API endpoints. Return a <code>Response</code> to
-			short-circuit the request &mdash; for example, redirecting users who are
+			short-circuit the request. For example, to redirect users who are
 			not logged in:
 		</p>
 		<CodePreview

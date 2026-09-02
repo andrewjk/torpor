@@ -8,8 +8,8 @@ export default function ApiEndpointsPage() {
 	@render {
 		<h1>API Endpoints</h1>
 		<p>
-			A <code>+server.ts</code> file is a plain HTTP endpoint &mdash; no page is
-			rendered. Export one function per method it handles:
+			A <code>+server.ts</code> file is a plain HTTP endpoint (no page is
+			rendered). Export one function per method it handles:
 		</p>
 		<CodePreview
 			code={`

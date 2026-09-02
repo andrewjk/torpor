@@ -125,7 +125,7 @@ export default function Component() {
 	}
 
 	@style {
-		large-text {
+		.large-text {
 			font-size: 10em;
 		}
 	}

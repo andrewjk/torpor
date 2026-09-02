@@ -80,7 +80,7 @@ export default {
 		<h2>Type-safe URLs</h2>
 		<p>
 			Build URLs with <code>route</code> instead of string concatenation. Params
-			are checked at compile time &mdash; missing or unknown params are errors:
+			are checked at compile time and missing or unknown params are errors:
 		</p>
 		<CodePreview
 			code={`

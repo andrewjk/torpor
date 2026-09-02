@@ -30,7 +30,9 @@ export default function Component() {
 		/>
 		<p>
 			The styles in the style block are scoped to the elements in the component so that
-			they don't affect elements in other components.
+			they don't affect elements in other components. Behind the scenes, each rule is
+			compiled to a hashed class (e.g. <code>torp-a1b2c3</code>) which is added to the
+			component's elements.
 		</p>
 
 		<h2>Playground</h2>

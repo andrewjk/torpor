@@ -158,15 +158,15 @@ export default function Component() {
 
 		<h2>Props</h2>
 		<p>
-			A component function can accept a <code>$props</code> component containing the properties that
-			were passed to the component:
+			A component function can accept a <code>$props</code> parameter containing the
+			properties that were passed to the component:
 		</p>
 		<CodePreview
 			code={`
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
-			Hello, {name}!
+			Hello, {$props.name}!
 		</p>
 	}
 }

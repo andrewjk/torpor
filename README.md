@@ -79,7 +79,7 @@ export default function Component($props: { name: string }) {
 Use `npm` (or your preferred package manager) to add Torpor to your project:
 
 ```bash
-npm install torpor
+npm install @torpor/view
 ```
 
 Clone Torpor to view its source and run a demo:

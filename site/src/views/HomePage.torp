@@ -36,8 +36,8 @@ export default function HomePage() {
 						Torpor aims to include most of the things that you need to build high-quality
 						interfaces without having to reach for third party libraries, including:
 					</p>
-					<p>An <a href="/ui/overview">accessible, unstyled component library</a></p>
-					<p>A <a href="/build/overview">site and app framework</a></p>
+					<p>An <a href="/ui">accessible, unstyled component library</a></p>
+					<p>A <a href="/build">site and app framework</a></p>
 					<p>More to come...</p>
 				</div>
 			</div>

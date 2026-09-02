@@ -12,19 +12,20 @@ export default function ComparisonsPage() {
 
 		<h2>React</h2>
 		<p>
-			React is a hugely popular framework that was launched and backed by Facebook. Its
-			components are written in JavaScript with an embedded XML-like syntax called
-			<strong>JSX</strong> for declaring the UI. It has been used in some of the biggest
-			websites and has an extensive ecosystem of helper libraries as well as a robust
-			jobs market. Despite being one of the older JavaScript frameworks, React is
-			constantly evolving with new (and sometimes controversial) features added frequently.
+			React is a hugely popular framework that was launched and backed by Facebook
+			(now Meta). Its components are written in JavaScript with an embedded XML-like
+			syntax called <strong>JSX</strong> for declaring the UI. It has been used in some
+			of the biggest websites and has an extensive ecosystem of helper libraries as
+			well as a robust jobs market. Despite being one of the older JavaScript
+			frameworks, React is constantly evolving with new (and sometimes controversial)
+			features added frequently.
 		</p>
 		<p>
 			React uses a <strong>Virtual DOM</strong> to store a copy of the browser's UI and
-			update it when component state is changed. This means that state management can be
-			as simple as possible, stored in plain JavaScript variables that are synced
-			automatically to the UI, but this can also lead to performance issues if you're
-			not careful.
+			update it when component state is changed. This means that updating the UI can
+			be as simple as calling a state setter function and letting React re-render and
+			diff the output, but re-rendering more of the UI than necessary can lead to
+			performance issues if you're not careful.
 		</p>
 		<p>
 			Styling in React is achieved by <strong>importing a CSS file</strong>, using style
@@ -33,8 +34,8 @@ export default function ComparisonsPage() {
 		</p>
 		<p>
 			There are many backend frameworks built for use with React, but the most used are
-			probably <strong>Next.js</strong> (maintained by Vercel) and <strong>Remix</strong>
-			(maintained by Shopify).
+			probably <strong>Next.js</strong> (maintained by Vercel) and <strong>React
+			Router</strong> in framework mode (the successor to Remix).
 		</p>
 		<p>
 			<a href="https://en.wikipedia.org/wiki/React_(software)">
@@ -254,7 +255,7 @@ export default function Counter() {
 			</tr>
 			<tr>
 				<th>Server Framework</th>
-				<td>Next or Remix</td>
+				<td>Next / React Router</td>
 				<td>Nuxt</td>
 				<td>SvelteKit</td>
 				<td>SolidStart</td>

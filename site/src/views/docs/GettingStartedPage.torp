@@ -6,10 +6,43 @@ export default function GettingStartedPage() {
 	@render {
 		<h1>Getting Started</h1>
 		<p>
-			Use <code>npm</code> (or your preferred package manager) to add Torpor to your project:
+			You almost certainly want to use <a href="/build">Build</a>, Torpor's
+			full-stack framework, to build a site with Torpor:
 		</p>
 		<pre><code>{`
-npm install torpor
+npm init @torpor/build@latest my-project
+cd my-project
+npm install
+npm run dev
 `.trim()}</code></pre>
+		<p>
+			Otherwise, you can add Torpor's view layer directly to your project:
+		</p>
+		<pre><code>{`
+npm install @torpor/view
+`.trim()}</code></pre>
+
+		<h2>VS Code Extension</h2>
+		<p>
+			You can install the Torpor extension for VS Code by searching in the extensions
+			sidebar or from the <a href="https://marketplace.visualstudio.com/items?itemName=Torpor.torpor">Visual Studio Marketplace</a>.
+			It provides syntax highlighting, type checking, auto-completion, hover information
+			and go to definition for <code>.torp</code> files.
+		</p>
+
+		<h2>Next steps</h2>
+		<ul>
+			<li>
+				Learn how to write <a href="/docs/components">Components</a>, which are functions
+				in a <code>.torp</code> file with script, markup and styles
+			</li>
+			<li>
+				To build a site or app with routing, data loading and forms, see the
+				<a href="/build">Build</a> quick start
+			</li>
+			<li>
+				Try components out in the <a href="/playground">playground</a>
+			</li>
+		</ul>
 	}
 }

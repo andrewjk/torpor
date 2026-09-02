@@ -107,7 +107,7 @@ export default function Component() {
 			in your markup.
 		</p>
 		<p>
-			A component function can accept a <code>$props</code> component containing the
+			A component function can accept a <code>$props</code> parameter containing the
 			properties that were passed to the component:
 		</p>
 		<CodePreview
@@ -115,7 +115,7 @@ export default function Component() {
 export default function Component($props: { name: string }) {
 	@render {
 		<p>
-			Hello, {name}!
+			Hello, {$props.name}!
 		</p>
 	}
 }
