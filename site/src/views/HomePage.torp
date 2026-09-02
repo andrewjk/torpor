@@ -16,9 +16,6 @@ export default function HomePage() {
 				Torpor is a full-stack JavaScript framework that aims for
 				simplicity and completeness.
 			</p>
-			<p class="warning">
-				🚧 WARNING: WORK IN PROGRESS 🚧
-			</p>
 
 			<div class="hstack spaced equal full-width collapse">
 				<div class="features-card">

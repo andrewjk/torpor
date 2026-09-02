@@ -21,7 +21,6 @@ export default function Layout() {
 			flex: 1;
 			min-height: 0;
 			overflow: auto;
-			padding: 0.5rem;
 		}
 
 		@media screen and (max-width: 767px) {

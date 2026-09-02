@@ -1,4 +1,4 @@
-export default function OverviewPage() {
+export default function BuildPage() {
 	@head {
 		<title>Build | Torpor</title>
 	}

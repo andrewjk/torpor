@@ -4,7 +4,7 @@ export default function DocsLayout() {
 	@render {
 		<SectionLayout
 			links={[
-				{ label: "Overview", href: "/docs/overview" },
+				{ label: "Overview", href: "/docs" },
 				{ label: "Getting Started", href: "/docs/getting-started" },
 				{ label: "Components", href: "/docs/components" },
 				{ label: "Markup", href: "/docs/markup" },

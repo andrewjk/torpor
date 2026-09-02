@@ -4,7 +4,7 @@ export default function UILayout() {
 	@render {
 		<SectionLayout
 			links={[
-				{ label: "Overview", href: "/ui/overview" },
+				{ label: "Overview", href: "/ui" },
 				{ label: "Accordion", href: "/ui/accordion" },
 				{ label: "Breadcrumb", href: "/ui/breadcrumb" },
 				{ label: "Calendar", href: "/ui/calendar" },
