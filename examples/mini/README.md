@@ -11,8 +11,6 @@ This shows a minimal but still full-featured torpor/build site:
 
 TODO: When your site gets more complicated, you can migrate this to a site with folder/file based routing and more.
 
-🚧 WARNING: WORK IN PROGRESS 🚧
-
 ## Running
 
 Clone Torpor and use `npm` (or your preferred package manager) to run the demo:

@@ -9,8 +9,6 @@ This shows the absolute bare mininum required for a torpor/build site:
 
 TODO: When you need more functionality, you can migrate this to a minimal site with a router, layouts and more.
 
-🚧 WARNING: WORK IN PROGRESS 🚧
-
 ## Running
 
 Clone Torpor and use `npm` (or your preferred package manager) to run the demo:

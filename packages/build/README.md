@@ -4,8 +4,6 @@ A framework for building sites and apps with Torpor.
 
 Built on top of [Vite](https://vite.dev).
 
-🚧 WARNING: WORK IN PROGRESS 🚧
-
 ## Installation
 
 Use `npm` (or your preferred package manager) to create a starter project:

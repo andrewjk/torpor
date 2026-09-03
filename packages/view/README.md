@@ -2,11 +2,19 @@
 
 Torpor's view library, for writing and mounting components.
 
-🚧 WARNING: WORK IN PROGRESS 🚧
-
 ## Installation
 
-Use `npm` (or your preferred package manager) to add Torpor to your project:
+You almost certainly want to use [torpor/build](./packages/build), Torpor's
+full-stack framework, to build a site with Torpor:
+
+```bash
+npm init @torpor/build@latest my-project
+cd my-project
+npm install
+npm run dev
+```
+
+Otherwise, you can add Torpor's view layer directly to your project:
 
 ```bash
 npm install @torpor/view

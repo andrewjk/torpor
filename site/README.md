@@ -2,11 +2,13 @@
 
 The home and documentation site for Torpor.
 
-🚧 WARNING: WORK IN PROGRESS 🚧
+## Running
 
-## To do
+Clone Torpor and use `npm` (or your preferred package manager) to run the site:
 
-- Getting started
-- Documentation
-- Tutorial
-- REPL
+```bash
+git clone https://github.com/andrewjk/torpor.git
+cd torpor/site
+npm install
+npm run dev
+```

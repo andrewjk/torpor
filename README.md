@@ -2,8 +2,6 @@
 
 Torpor is a full-stack JavaScript framework that aims for simplicity and completeness.
 
-🚧 WARNING: WORK IN PROGRESS 🚧
-
 ## Features
 
 - Compose your views with JavaScript, HTML and CSS
@@ -76,7 +74,17 @@ export default function Component($props: { name: string }) {
 
 ## Installation
 
-Use `npm` (or your preferred package manager) to add Torpor to your project:
+You almost certainly want to use [torpor/build](./packages/build), Torpor's
+full-stack framework, to build a site with Torpor:
+
+```bash
+npm init @torpor/build@latest my-project
+cd my-project
+npm install
+npm run dev
+```
+
+Otherwise, you can add Torpor's view layer directly to your project:
 
 ```bash
 npm install @torpor/view
