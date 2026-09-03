@@ -51,6 +51,9 @@ export default function Header() {
 				<NavMenuLink href="/build" class={["nav-link", { active: isActive("/build") }]}>
 					Build
 				</NavMenuLink>
+				<NavMenuLink href="/blog" class={["nav-link", { active: isActive("/blog") }]}>
+					Blog
+				</NavMenuLink>
 				<NavMenuLink href="/playground" class={["nav-link", { active: isActive("/playground") }]}>
 					Playground
 				</NavMenuLink>

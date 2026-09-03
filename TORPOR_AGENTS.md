@@ -162,7 +162,7 @@ $stream((push) => {
 }, (msg) => $state.inbox.push(msg));
 ```
 
-Timing options belong on `$stream`/`$run`; anything shapeful (windowing,
+Timing options belong on `$stream`; anything stateful (windowing,
 aggregation, combining multiple streams) is plain closure logic in the
 handler. Per-event handling works by writing to state and reacting in
 `$run`/templates — see `$run(fn, ...)` above.

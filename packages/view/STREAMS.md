@@ -218,7 +218,7 @@ to keep this in userland until a use case proves the investment worth it.
 - **Options** (`{ debounce }` today; `throttle`, `{ every: N }` in reserve) —
   the boring 80%, no composition semantics, built in. governed by the arity
   principle above.
-- **Combinators** — userland functions the type enables, for shapeful
+- **Combinators** — userland functions the type enables, for stateful
   patterns (windowing, aggregation, time windows). The framework ships zero.
 - **Pipeline syntax** — don't add until semantics settle; if some array form
   ever earns its keep, it is pure sugar over function composition and can be

@@ -1,0 +1,24 @@
+
+/**
+ * The blog component
+ */
+export default function BlogPage() {
+	@head {
+		<title>Blog | Torpor</title>
+	}
+
+	@render {
+		<div id="blog-container">
+			<h1>Torpor Blog</h1>
+			<p><a href="/blog/01-v1-release">01.&nbsp;&nbsp;Torpor v1 Release</a></p>
+		</div>
+	}
+
+	@style {
+		#blog-container {
+			padding: 0 1rem;
+			max-width: 74rem;
+			margin: 0 auto;
+		}
+	}
+}

@@ -97,7 +97,7 @@ export default function AutoSave() {
 	}, { debounce: 500 })
 
 	@render {
-		<input &ref={input} oninput={(e) => { $state.draft = e.target.value }} />
+		<input &ref={input} />
 		<p>{$state.saved}</p>
 	}
 }
@@ -138,7 +138,7 @@ $stream((push) => {
 `}
 		/>
 		<p>
-			Timing options belong on <code>$stream</code>; anything shapeful
+			Timing options belong on <code>$stream</code>; anything stateful
 			like windowing, aggregation, or combining multiple streams is
 			plain closure logic in the handler. To react to each event in an effect,
 			write it to state and read it from <code>$run</code>. For async data

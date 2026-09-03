@@ -208,10 +208,6 @@ dev (fine for icon packages, but it's an extra transform per module load).
 external-event subscriptions: mount/unmount lifecycle, dep-tracked
 resubscribe, SSR-safe). Deliberately left out:
 
-- **Site docs page**: the docs site has pages for async (`$async`,
-  `$pending`, `$refresh`) but not yet for `$stream`/`fromElement`/
-  `fromServer`/`fromWebSocket`. TORPOR_AGENTS.md is the reference
-  until then.
 - **`$run(fn, { debounce })`**: debounced _state-triggered_ effects
   (autosave-on-type). The `$run.ts` TODO covers it; scheduling debounced
   re-runs needs a scheduler-level hook in `triggerEffects`, not a closure
