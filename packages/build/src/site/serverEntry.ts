@@ -5,7 +5,7 @@ import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
-import $page from "../state/$page";
+import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
@@ -26,7 +26,11 @@ import type ServerLoadEvent from "../types/ServerLoadEvent.ts";
 import searchParamsToRecord from "../utils/searchParamsToRecord.ts";
 import validate from "../validation/validate.ts";
 import ValidationError from "../validation/ValidationError.ts";
-import { endpointSchema, validateEndpointParams, validationErrorResponse } from "../validation/endpoint.ts";
+import {
+	endpointSchema,
+	validateEndpointParams,
+	validationErrorResponse,
+} from "../validation/endpoint.ts";
 import Router from "./Router.ts";
 
 // Build the router from the Site object created by the user

@@ -6,7 +6,8 @@ const PAGE_SYMBOL: unique symbol = Symbol.for("torp.Page");
 const $page: PageState =
 	// @ts-ignore
 	(globalThis[PAGE_SYMBOL] ??=
-		// TODO: Should use the SSR $watch if entering via serverEntry
+		// The server request path uses `state/$serverPage`, which stores the
+		// same state (same `globalThis` slot) without a reactive proxy
 		$watch(
 			{
 				status: 404,

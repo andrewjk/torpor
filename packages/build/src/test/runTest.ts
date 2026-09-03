@@ -7,7 +7,7 @@ import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import Router from "../site/Router.ts";
 import Site from "../site/Site";
-import $page from "../state/$page.ts";
+import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
