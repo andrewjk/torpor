@@ -1832,7 +1832,6 @@ function $async(fn) {
 		if (value !== null && value !== void 0 && typeof value.then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
-			computed.staleValue = computed.hasResolved && !computed.lastErrored ? computed.value : void 0;
 			computed.suspendQuiet = computed.hasResolved && !computed.recalc;
 			value.then((v) => {
 				if (computed.generation !== gen) return;
@@ -1840,6 +1839,7 @@ function $async(fn) {
 				computed.didSuspend = false;
 				computed.hasResolved = true;
 				computed.lastErrored = false;
+				computed.staleValue = v;
 				batchStart();
 				propagateFromSignal(computed);
 				batchEnd();
@@ -1850,6 +1850,7 @@ function $async(fn) {
 				computed.didSuspend = false;
 				computed.hasResolved = true;
 				computed.lastErrored = true;
+				computed.staleValue = void 0;
 				batchStart();
 				propagateFromSignal(computed);
 				batchEnd();

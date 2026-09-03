@@ -48,21 +48,21 @@ export default function $async<T>(fn: () => Promise<T>): T {
 	// inside runComputed (with activeTarget set for dep tracking) on both the
 	// initial call and every recalc, so stale resolves are handled by the
 	// generation guard without any changes to runComputed or checkComputed.
+	//
+	// `staleValue` is maintained by the settle handlers below — it always
+	// holds the last RESOLVED value, cleared on rejection. It is NOT derived
+	// here from `computed.value`: when changes overlap (a re-suspend while an
+	// earlier fetch is still in flight), `computed.value` holds that earlier
+	// run's pending promise, and handing it to readers would render
+	// "[object Promise]" — a superseded generation's value leaking into the
+	// UI. The settle handlers are generation-guarded, so `staleValue` is
+	// generation-safe by construction: the read-side token matching the
+	// resolve-side one (ASYNC.md §7.8, rapid prop changes).
 	computed.run = () => {
 		const value = fn();
 		if (value !== null && value !== undefined && typeof (value as any).then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
-			// Stash the previously resolved value before runComputed overwrites
-			// `value` with this new promise. suspendRead returns it to readers
-			// during the refresh so an `@await` boundary keeps displaying the
-			// old content instead of flashing fallback — stale-while-revalidate
-			// (ASYNC.md §6.2). Inside run(), computed.value still holds the
-			// previous run's result; undefined on a first load (hasResolved).
-			// A rejected result (lastErrored) is never retained — a retry
-			// suspend must not hand the previous error to readers as content.
-			computed.staleValue =
-				computed.hasResolved && !computed.lastErrored ? computed.value : undefined;
 			// Capture the quiet-on-refresh decision at suspend time
 			// (ASYNC.md §7.4). `recalc` is still true during a source-driven
 			// re-run — `checkComputed` clears it only after `runComputed`
@@ -79,6 +79,9 @@ export default function $async<T>(fn: () => Promise<T>): T {
 					computed.didSuspend = false;
 					computed.hasResolved = true;
 					computed.lastErrored = false;
+					// Retain the resolved value for the next refresh suspend
+					// (stale-while-revalidate, ASYNC.md §6.2)
+					computed.staleValue = v;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();
@@ -90,6 +93,9 @@ export default function $async<T>(fn: () => Promise<T>): T {
 					computed.didSuspend = false;
 					computed.hasResolved = true;
 					computed.lastErrored = true;
+					// A retry-after-error re-suspend must not hand the previous
+					// error (or a pre-error value) to readers as "stale content"
+					computed.staleValue = undefined;
 					batchStart();
 					propagateFromSignal(computed);
 					batchEnd();

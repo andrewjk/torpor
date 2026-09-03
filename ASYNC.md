@@ -768,10 +768,6 @@ runtime:
   run (`() => fetch(url)` with no module cache), each re-run re-suspends. Is
   that the right behavior (the boundary re-shows the `with` branch — arguably
   correct), or do we need a per-source key?
-- **Rapid prop changes.** `$async`'s `generation` counter handles stale-
-  resolve (a resolve from a previous run is ignored), but the boundary also
-  needs a token to ignore stale re-renders — same shape as
-  `buildAwaitNode.ts:71`'s await token.
 - **SSR.** The server build (`buildServerAwaitNode.ts`) currently
   renders the `with` branch only. For `@await`, what does the server
   render? Options: (a) render the `with` branch and stream replacements as
@@ -796,3 +792,14 @@ never-resolved computed is a first load); `$context`/cross-component promises
 reactive graph across boundaries); and recursion under `@await` (nesting
 parallelizes because the boundary's speculative content render pre-fetches
 children — the waterfall fixture needs no per-level sibling boundaries).
+
+Resolved after the rollout — **rapid prop changes** (stale re-renders): the
+resolve-side generation guard was not enough, because the value retained for
+readers during a refresh suspend (`Computed.staleValue`) was derived at
+suspend time from `computed.value` — which, when changes overlap (a re-suspend
+while an earlier fetch is still in flight), is the superseded run's _pending
+promise_. Readers rendered it as `[object Promise]`. `staleValue` is now
+maintained by the generation-guarded settle handlers (set on resolve, cleared
+on rejection), so the read-side token is generation-safe by construction — the
+same token shape as the resolve side and the boundary's `region.generation`
+guard. (packages/view/src/watch/$async.ts)

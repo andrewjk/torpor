@@ -311,3 +311,78 @@ test("@await keeps stale content during a refresh instead of flashing the with-b
 	await waitFor(() => expect(queryByText(container, "Result: loaded v1")).not.toBeNull());
 	expect(queryByText(container, "Loading...")).toBeNull();
 });
+
+const rapidSource = `
+export default function AwaitRapid() {
+	let $state = $watch({
+		version: 0,
+		get data() {
+			return $async(() => {
+				// Read version synchronously so the computed tracks it
+				const version = $state.version;
+				// v1 is deliberately slow, so it is still in flight when the
+				// next change lands
+				const delay = version === 1 ? 100 : 10;
+				return new Promise((resolve) => {
+					setTimeout(() => resolve("loaded v" + version), delay);
+				});
+			});
+		},
+	});
+
+	function refresh() {
+		$state.version++;
+	}
+
+	@render {
+		@await {
+			<p>Result: {$state.data}</p>
+		} with {
+			<p>Loading...</p>
+		}
+		<button onclick={refresh}>refresh</button>
+	}
+}
+`;
+
+test("rapid prop changes never render a superseded fetch's in-flight promise", async () => {
+	// Stale-while-revalidate retains the last RESOLVED value for readers
+	// during a refresh. When changes overlap — a re-suspend while an earlier
+	// fetch is still in flight — the retained value must still be that last
+	// resolved value, never the previous run's pending promise (which would
+	// render as "[object Promise]"): the generation guard drops the stale
+	// RESOLVE, but the read-side token must be just as generation-safe.
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, rapidSource, "client");
+	mountComponent(container, component);
+
+	const { waitFor } = await import("@testing-library/dom");
+
+	// First load: with-branch, then resolved content
+	expect(queryByText(container, "Loading...")).not.toBeNull();
+	await waitFor(() => expect(queryByText(container, "Result: loaded v0")).not.toBeNull());
+
+	const button = container.getElementsByTagName("button")[0];
+
+	// Change #1: starts a slow (100ms) fetch
+	await userEvent.click(button);
+	// Stale content stays mounted while the slow fetch is in flight
+	expect(queryByText(container, "Result: loaded v0")).not.toBeNull();
+
+	// Change #2 lands while change #1's fetch is still pending. This re-runs
+	// the computed while its value holds change #1's PROMISE — the boundary
+	// must keep showing the last resolved content, not that promise
+	await userEvent.click(button);
+	expect(queryByText(container, "Result: loaded v0")).not.toBeNull();
+	expect(container.textContent).not.toContain("[object Promise]");
+
+	// The fast fetch for change #2 resolves and updates in place
+	await waitFor(() => expect(queryByText(container, "Result: loaded v2")).not.toBeNull());
+	expect(container.textContent).not.toContain("[object Promise]");
+
+	// The superseded slow fetch eventually resolves but must be dropped
+	await new Promise((r) => setTimeout(r, 120));
+	expect(queryByText(container, "Result: loaded v2")).not.toBeNull();
+	expect(container.textContent).not.toContain("loaded v1");
+	expect(container.textContent).not.toContain("[object Promise]");
+});

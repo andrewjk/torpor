@@ -86,10 +86,10 @@ export default interface Computed<T = any> {
 	/**
 	 * True when the last settled result of an `$async` computed was a
 	 * rejection. Set by the `.then` reject handler, cleared by the resolve
-	 * handler. `$async`'s run reads it to avoid retaining an error as
-	 * `staleValue` — a retry-after-error re-suspend must not hand the previous
-	 * error to readers as "stale content" (it renders as a raw value, bypassing
-	 * the error boundary). Unused by plain `$cache` computeds.
+	 * handler, which also clears `staleValue` — a retry-after-error
+	 * re-suspend must not hand the previous error to readers as "stale
+	 * content" (it renders as a raw value, bypassing the error boundary).
+	 * Unused by plain `$cache` computeds.
 	 */
 	lastErrored: boolean;
 
@@ -111,12 +111,15 @@ export default interface Computed<T = any> {
 
 	/**
 	 * The previously resolved value, retained across a refresh suspend for
-	 * stale-while-revalidate (ASYNC.md §6.2). Captured inside `$async`'s run
-	 * before `runComputed` overwrites `value` with the new promise; read by
-	 * `suspendRead` so readers keep displaying the old value instead of a
-	 * placeholder while the new promise is in flight. `undefined` on first
-	 * load (never resolved) and for plain `$cache` computeds (which never
-	 * suspend, so `suspendRead` is never reached for them).
+	 * stale-while-revalidate (ASYNC.md §6.2). Maintained by `$async`'s
+	 * generation-guarded settle handlers — set on resolve, cleared on
+	 * rejection — so it always holds the last RESOLVED value, never a
+	 * superseded run's in-flight promise (rapid prop changes would otherwise
+	 * render "[object Promise]"). Read by `suspendRead` so readers keep
+	 * displaying the old value instead of a placeholder while the new promise
+	 * is in flight. `undefined` on first load (never resolved) and for plain
+	 * `$cache` computeds (which never suspend, so `suspendRead` is never
+	 * reached for them).
 	 */
 	staleValue: any;
 

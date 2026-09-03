@@ -2,7 +2,7 @@ import $async from "../../../../src/ssr/$serverAsync";
 import $watch from "../../../../src/ssr/$serverWatch";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function AwaitStale(
+export default function AwaitRapid(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -14,12 +14,13 @@ export default function AwaitStale(
 		version: 0,
 		get data() {
 			return $async(() => {
-				// Read version synchronously so the computed tracks it and
-				// re-fetches when it changes (reading inside setTimeout would
-				// run in an untracked context).
+				// Read version synchronously so the computed tracks it
 				const version = $state.version;
+				// v1 is deliberately slow, so it is still in flight when the
+				// next change lands
+				const delay = version === 1 ? 100 : 10;
 				return new Promise((resolve) => {
-					setTimeout(() => resolve("loaded v" + version), 10);
+					setTimeout(() => resolve("loaded v" + version), delay);
 				});
 			});
 		},

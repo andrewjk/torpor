@@ -16,7 +16,7 @@ import t_root_el from "../../../../src/render/nodeRootElement";
 import { t_run_await } from "@torpor/view";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function AwaitStale(
+export default function AwaitRapid(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	_$props?: Record<PropertyKey, any>,
@@ -28,12 +28,13 @@ export default function AwaitStale(
 		version: 0,
 		get data() {
 			return $async(() => {
-				// Read version synchronously so the computed tracks it and
-				// re-fetches when it changes (reading inside setTimeout would
-				// run in an untracked context).
+				// Read version synchronously so the computed tracks it
 				const version = $state.version;
+				// v1 is deliberately slow, so it is still in flight when the
+				// next change lands
+				const delay = version === 1 ? 100 : 10;
 				return new Promise((resolve) => {
-					setTimeout(() => resolve("loaded v" + version), 10);
+					setTimeout(() => resolve("loaded v" + version), delay);
 				});
 			});
 		},
