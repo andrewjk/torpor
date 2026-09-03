@@ -33,14 +33,6 @@ and redirects to the error page instead of showing the form errors. A
 possible fix is skipping/satisfying load query validation during form
 re-renders, or rendering from cached load data.
 
-### Preview of built page sites fails at runtime (pre-existing)
-
-`tb --preview` on page-based examples (`examples/demo`, `examples/mini`) returns
-`{"code":"ERR_MODULE_NOT_FOUND"}` / `{"code":"ERR_UNKNOWN_FILE_EXTENSION"}` from
-`dist/server/serverEntry.js` — its runtime imports (e.g. `.torp` route files)
-aren't resolvable by plain Node. Reproduces at HEAD without the endpoints-only
-site.html fix. Dev mode (`tb --dev`, which uses `vite.ssrLoadModule`) works fine.
-
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
@@ -80,15 +72,6 @@ loop. utils/hoverReveal.ts works around it with a one-shot `suppressFocusOpen`
 guard armed right before hide. Any future focus-to-open component needs the same
 guard; alternatively the runtime could distinguish script-driven refocus from real
 user focus events.
-
-### `tb --preview` fails to bundle .torp files (pre-existing)
-
-`tb --preview` (wrangler dev over `dist/cloudflare/_worker.js`) dies with
-"No loader is configured for .torp files" for every route view, including
-pre-existing ones (HomePage, ErrorPage, ...). `tb --build` itself succeeds
-and `tb --dev` is unaffected; deploys go through `buildcf.ts` + wrangler
-deploy. Likely wrangler is re-bundling something that still references
-`.torp` paths — worth investigating if local production preview is needed.
 
 ### Stale-module SSR errors after rebuilding a workspace package while `tb --dev` runs
 

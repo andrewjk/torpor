@@ -96,6 +96,18 @@ describe("manifest plugin", () => {
 		expect(code).not.toContain("const load = { default: { load: true } };");
 	});
 
+	test("server build (ssr): route imports are processable by the bundler", () => {
+		const site = buildSite();
+		const plugin = manifest(site, true);
+		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
+		// Route imports must NOT be marked `@vite-ignore`: in a production
+		// build that leaves raw source paths in the bundle, which plain Node
+		// (`tb --preview` via the node adapter) and wrangler can't load --
+		// they need to be bundled into chunks with rewritten relative imports
+		expect(code).not.toContain("@vite-ignore");
+		expect(code).toContain(`import("${path.join(site.root, "src/routes/+page.ts")}")`);
+	});
+
 	test("server build (ssr) without ssr option: behaves like client", () => {
 		const site = buildSite();
 		const plugin = manifest(site, true);

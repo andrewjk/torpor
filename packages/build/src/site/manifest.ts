@@ -100,7 +100,12 @@ export default {
 					}
 				} else if (serverRequest || !/server\.(ts|js)$/.test(r.file)) {
 					const filePath = path.join(site.root, r.file);
-					const importExpr = `() => import(/* @vite-ignore */ "${filePath}")`;
+					// NOTE: No `@vite-ignore` here, so that Vite processes the import:
+					// in dev the module runner transforms the file on the fly, and in
+					// a production build Rollup bundles the route into a chunk and
+					// rewrites the import -- leaving the raw source path in place
+					// would hand Node/wrangler `.ts`/`.torp` files it can't load
+					const importExpr = `() => import("${filePath}")`;
 					// A .torp file's default export is a component, so wrap it
 					// as a PageEndPoint ({ component }) for the entries
 					endPoint = r.file.endsWith(".torp")
@@ -142,7 +147,7 @@ function openApiGlueCode(site: Site, options: ResolvedOpenApiOptions): string {
 				return `${JSON.stringify(r.path)}: () => Promise.resolve({ default: __site.inlineEndPoints[${JSON.stringify(key)}] })`;
 			}
 			const filePath = path.join(site.root, r.file);
-			return `${JSON.stringify(r.path)}: () => import(/* @vite-ignore */ ${JSON.stringify(filePath)})`;
+			return `${JSON.stringify(r.path)}: () => import(${JSON.stringify(filePath)})`;
 		})
 		.join(",\n    ");
 
