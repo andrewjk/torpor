@@ -256,7 +256,7 @@ export function checkApiCallSource(
  * resolved against the importing file, others against tsconfig path aliases.
  * Bare module specifiers that match no alias return undefined.
  */
-function resolveSpecifier(
+export function resolveSpecifier(
 	specifier: string,
 	fromFile: string,
 	check: ApiCallCheck,

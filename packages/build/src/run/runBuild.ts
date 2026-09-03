@@ -4,6 +4,7 @@ import path from "node:path";
 import { build, defineConfig, type AliasOptions } from "vite";
 import Site from "../site/Site";
 import { checkApiCalls, checkRoutes, reportRouteIssues } from "../site/checkRoutes";
+import { checkLayoutSlots } from "../site/checkLayoutSlots";
 import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
@@ -14,10 +15,11 @@ import { addTorporPackageConfig } from "../utils/torporPackages";
 
 export default async function runBuild(site: Site): Promise<void> {
 	// Check route type annotations and makeApi calls against the routes
-	// derived from file locations; errors fail the build before anything is
-	// written
+	// derived from file locations, and check that layouts render their slot;
+	// errors fail the build before anything is written
 	let errorCount = reportRouteIssues(checkRoutes(site));
 	errorCount += reportRouteIssues(checkApiCalls(site));
+	errorCount += reportRouteIssues(checkLayoutSlots(site));
 	if (errorCount > 0) {
 		throw new Error(
 			`Route type check failed with ${errorCount} error${errorCount === 1 ? "" : "s"} (see above)`,

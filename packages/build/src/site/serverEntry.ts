@@ -31,6 +31,7 @@ import {
 	validateEndpointParams,
 	validationErrorResponse,
 } from "../validation/endpoint.ts";
+import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts";
 import Router from "./Router.ts";
 
 // Build the router from the Site object created by the user
@@ -370,13 +371,24 @@ async function loadView(
 		// TODO: There's probably a nicer way to do this with reducers or something
 		let component = clientEndPoint.component as ServerComponent;
 		let slots: Record<string, ServerSlotRender> | undefined = undefined;
+		// Which slot levels actually ran during the render below, so a layout
+		// that never rendered its <slot /> (silently dropping the page
+		// content) can be reported (see findMissingSlotLayout)
+		const invokedLevels = new Set<number>();
+		const trackSlot = (level: number, slot: ServerSlotRender): ServerSlotRender => {
+			return ($slot, $context) => {
+				invokedLevels.add(level);
+				return slot($slot, $context);
+			};
+		};
 		if (handler.layouts) {
 			let slotFunctions: ServerSlotRender[] = [];
-			slotFunctions[handler.layouts.length] = (_, $context) => {
+			// The last slot function will render the client component
+			slotFunctions[handler.layouts.length] = trackSlot(handler.layouts.length, (_, $context) => {
 				let { body, head } = (clientEndPoint.component as ServerComponent)($props, $context);
 				styles += head;
 				return body;
-			};
+			});
 			for (let i = handler.layouts.length - 1; i >= 0; i--) {
 				const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 					?.default;
@@ -385,13 +397,13 @@ async function loadView(
 						component = layoutEndPoint.component as ServerComponent;
 						slots = { _: slotFunctions[i + 1] };
 					} else {
-						slotFunctions[i] = (_, $context) => {
+						slotFunctions[i] = trackSlot(i, (_, $context) => {
 							let { body, head } = (layoutEndPoint.component as ServerComponent)($props, $context, {
 								_: slotFunctions[i + 1],
 							});
 							styles += head;
 							return body;
-						};
+						});
 					}
 				}
 			}
@@ -412,6 +424,15 @@ async function loadView(
 			// TODO: Show a proper Error component
 			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
 			console.log(error);
+		}
+
+		// A layout that never rendered <slot /> silently drops the whole page
+		// content from the output; find and report the outermost one
+		if (handler.layouts) {
+			const missingLayout = findMissingSlotLayout(handler.layouts, invokedLevels);
+			if (missingLayout !== undefined) {
+				warnMissingSlotContent(missingLayout);
+			}
 		}
 
 		return new Response(html, {

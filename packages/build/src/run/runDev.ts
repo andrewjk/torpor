@@ -20,6 +20,8 @@ import {
 	reportRouteIssues,
 } from "../site/checkRoutes";
 import manifest from "../site/manifest.ts";
+import { checkLayoutSlot, checkLayoutSlots } from "../site/checkLayoutSlots";
+import { LAYOUT_ROUTE } from "../types/RouteType";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import devPlugin from "./devPlugin.ts";
@@ -108,12 +110,16 @@ export default async function runDev(site: Site): Promise<void> {
 function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 	reportRouteIssues(checkRoutes(site));
 	reportRouteIssues(checkApiCalls(site));
+	reportRouteIssues(checkLayoutSlots(site));
 
 	// Map absolute route file paths to their manifest entries, so changed
-	// files can be re-checked against their derived route
+	// files can be re-checked against their derived route. Layout route files
+	// are included for their slot check (a .torp layout is its own component)
 	const routeFiles = new Map(
 		site.routes
-			.filter((r) => r.file?.endsWith(".ts"))
+			.filter(
+				(r) => r.file?.endsWith(".ts") || (r.file?.endsWith(".torp") && r.type === LAYOUT_ROUTE),
+			)
 			.map((r) => [path.resolve(site.root, r.file!), r]),
 	);
 	const apiCheck = createApiCallCheck(site);
@@ -131,7 +137,10 @@ function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 	const recheck = (file: string): void => {
 		const route = routeFiles.get(file);
 		if (route) {
-			report(file, checkRoute(site, route));
+			report(
+				file,
+				route.type === LAYOUT_ROUTE ? checkLayoutSlot(site, route) : checkRoute(site, route),
+			);
 			return;
 		}
 		if (!/\.(ts|js|torp)$/.test(file)) return;
