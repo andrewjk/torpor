@@ -223,6 +223,34 @@ let $state = $watch({
 A getter whose result is a Promise must use `$async`, not `$cache` (`$cache`
 throws if it returns a Promise).
 
+#### Re-fetch and promise identity
+
+The thunk's return value is the unit of suspension — there is no per-source
+key or promise cache inside `$async`.
+
+- The thunk re-runs only when a signal it reads changes, or on `$refresh`. A
+  re-read with no dependency change returns the cached value — no
+  revalidate-on-mount, no TTL.
+- A re-run keeps readers on the last resolved value (stale-while-revalidate)
+  until the new promise settles. A first load (never resolved) reads
+  `undefined` and shows the `with` branch; after a rejection, a retry reads
+  as a first load.
+- A fresh promise per run means a fetch per run — that's the point. To share
+  or coalesce fetches, return a memoized promise from the thunk:
+
+  ```js
+  const cache = new Map();
+  function getUser(id) {
+  	if (!cache.has(id)) cache.set(id, fetchUser(id));
+  	return cache.get(id);
+  }
+  ```
+
+- An older fetch that settles after a newer run started is discarded,
+  including its error.
+
+`$async` runs on the client; SSR renders the `@await` `with` branch.
+
 ### `$pending(fn)` — is it loading?
 
 Reactive query for inline "loading…" indicators. Returns `true` while any

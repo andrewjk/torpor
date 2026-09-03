@@ -763,11 +763,6 @@ runtime:
 
 ### 7.8 Open questions
 
-- **Promise identity and re-fetch.** `$async`'s `Computed` keys on the
-  promise its thunk returned. If the thunk returns a fresh Promise every
-  run (`() => fetch(url)` with no module cache), each re-run re-suspends. Is
-  that the right behavior (the boundary re-shows the `with` branch — arguably
-  correct), or do we need a per-source key?
 - **SSR.** The server build (`buildServerAwaitNode.ts`) currently
   renders the `with` branch only. For `@await`, what does the server
   render? Options: (a) render the `with` branch and stream replacements as
@@ -803,3 +798,49 @@ maintained by the generation-guarded settle handlers (set on resolve, cleared
 on rejection), so the read-side token is generation-safe by construction — the
 same token shape as the resolve side and the boundary's `region.generation`
 guard. (packages/view/src/watch/$async.ts)
+
+### 7.9 Promise identity & re-fetch — resolved semantics
+
+The §7.8 question "is a fresh promise per run right, or do we need a
+per-source key?" is resolved: **the thunk's return value is the unit of
+suspension, and no per-source key is needed.** The semantics, as shipped:
+
+1. **Every run takes a new promise.** Each run of an `$async` computed calls
+   the thunk and adopts the returned promise as that run's in-flight value
+   (`generation++`, `didSuspend = true` if thenable). There is no promise
+   cache, dedup, or revalidation policy inside `$async` — it is a suspendable
+   `$cache`, nothing more.
+2. **The thunk re-runs only on a tracked change or a `$refresh`.** A plain
+   re-read with no dependency change returns the cached resolved value — no
+   refetch, no revalidate-on-mount, no TTL. So the reactive graph already
+   provides what a resource key would: "same tracked inputs" never re-runs,
+   and "changed inputs" is exactly when a fresh fetch is wanted.
+3. **What a re-suspend shows readers** (stale-while-revalidate, §6.2): first
+   load reads as `undefined` with the boundary on its `with` branch; a
+   refresh keeps serving the last resolved value (`staleValue`,
+   generation-guarded — §7.8's rapid-prop-changes resolution) until the new
+   promise settles; after a rejection the stale value is cleared, so a retry
+   reads as a first load.
+4. **Superseded fetches are discarded safely.** Only the latest generation's
+   settle handler writes value/error. An older in-flight promise's result is
+   dropped, and because `$async` attaches handlers to every promise it
+   adopts, a superseded rejection is consumed — no `unhandledrejection`.
+   The wasted request is the author's to avoid (next point).
+5. **Coalescing and sharing are author-level, plain JS.** Returning a
+   memoized promise from the thunk (`cache.has(key) ? cache.get(key) :
+cache.set(key, fetch(...))`) coalesces overlapping reads and shares
+   results across components; TTL/eviction is ordinary code. Adopting an
+   already-resolved shared promise settles the new run on the next
+   microtask; adopting one promise across two overlapping runs is safe — the
+   latest generation's handler wins.
+6. **Why no per-source key.** A Solid-style resource key moves caching
+   policy into the framework and grows its own invalidation model. Torpor's
+   reactive graph already supplies identity (point 2), and the one thing a
+   key adds beyond that — request coalescing — is a one-line memoize
+   (point 5). A framework-level key would also fight
+   stale-while-revalidate: a keyed cache returning a completed promise and
+   the boundary's keep-stale-content rule would disagree about what "the
+   current value" is during a revalidation.
+
+User-facing documentation: TORPOR_AGENTS.md, `$async` → "Re-fetch and promise
+identity".
