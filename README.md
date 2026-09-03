@@ -22,7 +22,7 @@ Torpor is a full-stack JavaScript framework that aims for simplicity and complet
 
 You can install the Torpor extension for VS Code by searching in the extensions sidebar or from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=Torpor.torpor). It provides syntax highlighting, type checking, auto-completion, hover information and go to definition for `.torp` files.
 
-The language server is also available as a standalone package, [@torpor/language-server](./packages/language-server), for use in any LSP-capable editor (Neovim, Helix, Zed, ...). See [packages/vscode](./packages/vscode) for details.
+The language server is also available as a standalone package, [@torpor/language-server](./packages/language-server), for use in any LSP-capable editor (e.g. Neovim, Helix, but not yet Zed). See [packages/language-server](./packages/language-server) for editor setup details.
 
 ## A Simple Component
 
@@ -90,11 +90,15 @@ Otherwise, you can add Torpor's view layer directly to your project:
 npm install @torpor/view
 ```
 
-Clone Torpor to view its source and run a demo:
+Clone Torpor to view its source and run a demo (this is a
+[pnpm](https://pnpm.io) workspace, so the packages need to be installed and
+built from the root first):
 
 ```bash
 git clone https://github.com/andrewjk/torpor.git
-cd torpor/examples/demo
-npm install
-npm run dev
+cd torpor
+pnpm install
+pnpm build
+cd examples/demo
+pnpm run dev
 ```

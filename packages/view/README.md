@@ -4,7 +4,7 @@ Torpor's view library, for writing and mounting components.
 
 ## Installation
 
-You almost certainly want to use [torpor/build](./packages/build), Torpor's
+You almost certainly want to use [torpor/build](../build), Torpor's
 full-stack framework, to build a site with Torpor:
 
 ```bash
@@ -62,7 +62,7 @@ npm install @torpor/view
 
 ### Not yet
 
-- Animation
+- Animation (beyond the in/out transitions above)
 
 ## A component
 
@@ -247,9 +247,19 @@ function TaskItem() {
 ## Mounting
 
 ```
-import mount from "torpor/view/mount";
+import { mount } from "@torpor/view";
 import Main from "./Main.torp";
 
 const root = document.getElementById("root");
 mount(root, Main);
 ```
+
+`mount` also takes optional props and slots:
+
+```
+mount(root, Main, { name: "World" });
+```
+
+Components can also be compiled for server side rendering (the `ServerComponent`
+type in `@torpor/view/ssr`), with `hydrate` and `unmount` from the main module
+taking over on the client.

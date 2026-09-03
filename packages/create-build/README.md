@@ -1,6 +1,6 @@
 # torpor/create-build
 
-A starter template for building an app with [Torpor Build](./build).
+A starter template for building an app with [Torpor Build](../build).
 
 ## Running
 

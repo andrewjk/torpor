@@ -1,6 +1,6 @@
-# torpor/demo
+# torpor/examples-mini
 
-A demo site built with [torpor/build](./build).
+A mini demo site built with [torpor/build](../../packages/build).
 
 This shows a minimal but still full-featured torpor/build site:
 
@@ -13,11 +13,14 @@ TODO: When your site gets more complicated, you can migrate this to a site with 
 
 ## Running
 
-Clone Torpor and use `npm` (or your preferred package manager) to run the demo:
+Clone Torpor and use [pnpm](https://pnpm.io) (this is a pnpm workspace) to
+install dependencies and build the packages, then run the demo:
 
 ```bash
 git clone https://github.com/andrewjk/torpor.git
-cd torpor/examples/mini
-npm install
-npm run dev
+cd torpor
+pnpm install
+pnpm build
+cd examples/mini
+pnpm run dev
 ```

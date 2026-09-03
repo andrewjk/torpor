@@ -1,8 +1,30 @@
-# torpor/check
+# torpor/prettier
 
-A command line tool that checks Torpor files for errors.
+A [Prettier](https://prettier.io) plugin for formatting Torpor `.torp` files.
 
-## Features
+It formats the JavaScript shell of a component with Prettier's TypeScript
+parser, and the `@render`/`@head` markup and `@style` sections with Torpor's
+own parser (tabs for indentation, attributes wrapped when over the print
+width).
 
-- checks for build errors (e.g. unclosed tags)
-- checks for script and type errors
+## Installation
+
+```bash
+npm install --save-dev @torpor/prettier
+```
+
+## Usage
+
+Add the plugin to your `.prettierrc`:
+
+```json
+{
+	"plugins": ["@torpor/prettier"]
+}
+```
+
+Then format `.torp` files as usual:
+
+```bash
+npx prettier --write src/App.torp
+```
