@@ -119,5 +119,15 @@ export default function Component() {
 			When an async value throws, the error can be caught with a
 			<code>&commat;try</code> statement — see <a href="/docs/errors">Errors</a>.
 		</p>
+
+		<h2>Server rendering</h2>
+		<p>
+			$async getters currently run on the client: the server renders the
+			<code>&commat;await</code> <code>with</code> branch, and fetching starts
+			after the page hydrates. Coming soon: an opt-in
+			<code>source: "server"</code> mode, where the server fetches during
+			render and delivers the result with the page (by await-and-embed first,
+			with streaming delivery to follow).
+		</p>
 	}
 }

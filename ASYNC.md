@@ -763,22 +763,15 @@ runtime:
 
 ### 7.8 Open questions
 
-- **SSR.** The server build (`buildServerAwaitNode.ts`) currently
-  renders the `with` branch only. For `@await`, what does the server
-  render? Options: (a) render the `with` branch and stream replacements as
-  promises resolve (Solid's `deferStream`); (b) `await` the boundary's
-  promises and render resolved content (Svelte's `await render(...)` today);
-  (c) render the `with` branch only, no streaming. Solid makes this
-  per-primitive via `ssrSource`; torpor would have to pick a default.
 - **Taint propagation cost.** Every read of a suspended `Computed` flips
   `didSuspend` on the active reader, up the cache chain. For deep cache
   chains this is O(depth) per read. Probably fine (chains are shallow in
   practice), but worth measuring on the `async-composition` fixture.
-- **Interaction with hydration markers.** Server renders the `with` branch
-  (today's shape) or streamed content (option (a) above); client hydrates
-  against whichever it gets. The hydration comments emitted by
-  `buildServerAwaitNode.ts` assume a single branch — multiple
-  resolved-promise states need a richer marker scheme.
+- **Streaming delivery markers.** The hydration comments emitted by
+  `buildServerAwaitNode.ts` assume a single branch per boundary. The default
+  SSR path (client-fetch) keeps that scheme valid; multi-state markers are
+  needed only for `source: "server"` boundaries (once streaming delivery
+  lands, §7.10).
 
 Resolved during the rollout: `$pending`'s "first-load" semantics (first load
 is per-computed via `hasResolved`; an `@if` branch that mounts and reads a
@@ -844,3 +837,53 @@ cache.set(key, fetch(...))`) coalesces overlapping reads and shares
 
 User-facing documentation: TORPOR_AGENTS.md, `$async` → "Re-fetch and promise
 identity".
+
+### 7.10 SSR strategy — decided
+
+**The default stays client-fetch (today's behavior): `$serverAsync` doesn't
+run the thunk, `@await` renders the `with` branch, and the fetch starts after
+hydration. Server-side fetching is opt-in per getter:**
+
+```torp
+get user() {
+	return $async(() => fetchUser($props.id), { source: "server" });
+}
+```
+
+Why client-fetch as the default (not await-on-server):
+
+- **The shell ships immediately.** A slow async (comments, recommendations)
+  must not hold the whole response hostage; the rest of the page renders and
+  the boundary area shows its `with` branch.
+- **Failure isolation.** On the client a flaky fetch fails inside the
+  boundary — `@try`/`@catch` renders local error UI, `$refresh`/a retry
+  button can re-run it — with the rest of the page intact. A blocking server
+  fetch turns the same flakiness into a 500 or an `/_error` redirect for the
+  entire page.
+- **Retry is naturally client-side**; a server hold would need a timeout
+  policy just to recover.
+
+`source` (rather than `ssr`, following Solid's `ssrSource`) names where the
+value comes from — and deliberately not _how it travels_: delivery is a
+separate axis. `source: "server"` starts as await-and-embed; a streaming
+delivery (render the `with` branch, patch replacements as promises resolve)
+can be added later without the option changing.
+
+What `source: "server"` requires when implemented:
+
+1. `$serverAsync(fn, { source: "server" })` calls the thunk and records the
+   promise on the boundary's context (the default stub still returns
+   `undefined` without calling the thunk).
+2. Server `@await` codegen goes two-pass for boundaries that recorded
+   promises — render content speculatively (which is what starts the
+   fetches, sibling reads in parallel, exactly like the client), await with
+   a timeout that **degrades to the `with` branch + client fetch** rather
+   than failing the page, then render resolved. Server component render
+   becomes async-capable (`loadView` composes a string today).
+3. Resolved values are embedded in the HTML and consulted by the client's
+   `$async` hydration path (no re-fetch, no fallback flash); `runAwait`
+   hydrates the content branch directly for these boundaries instead of the
+   speculative-render/hydrate-`with` dance.
+4. Streaming delivery comes later as the markers-v2 work (§7.8): placeholder
+   - swap protocol, streaming-capable adapters, and pre-flush status/redirect
+     decisions.

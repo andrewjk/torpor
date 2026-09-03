@@ -249,7 +249,9 @@ key or promise cache inside `$async`.
 - An older fetch that settles after a newer run started is discarded,
   including its error.
 
-`$async` runs on the client; SSR renders the `@await` `with` branch.
+`$async` runs on the client; SSR renders the `@await` `with` branch. A
+`source: "server"` opt-in (server-side fetch, await-or-stream delivery) is
+coming soon — see ASYNC.md §7.10 for the design.
 
 ### `$pending(fn)` — is it loading?
 
