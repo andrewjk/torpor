@@ -32,10 +32,12 @@ torpor fixture (`servers/torpor`) is an endpoints-only site built once with
 `tb --build` and served through the same production path as `tb --preview`
 (`serverEntry.load` via the node adapter).
 
-At the end the runner prints the comparison table and writes
-`benchmarks/results/build.json` plus a self-contained `build.html` report
-(heatmapped req/sec and latency tables, geometric-mean total vs torpor).
-`build.html` links to the `view.html` page (previous / next nav).
+At the end the runner prints the comparison table and writes to
+`benchmarks/results/`: `build.json` plus a self-contained `build.html` for the
+latest run (heatmapped req/sec and latency tables, geometric-mean total vs
+torpor), archived as `build-<timestamp>.{json,html}`. Each page shows when it
+was run and links to the previous/next run of the suite and to the `view`
+suite's latest page.
 
 If a framework fails to start (e.g. the Elysia node adapter
 `@elysia/node` changes) it is skipped with a warning rather than failing the

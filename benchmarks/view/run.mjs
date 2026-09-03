@@ -18,7 +18,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
-import { buildHtmlReport } from '../lib/html-report.mjs';
+import { buildHtmlReport, writeRunResults } from '../lib/html-report.mjs';
 import { censusDomNodes, deterministicCount } from './lib/dom-nodes.mjs';
 import { scoreOf, summarizeSamples } from './lib/stats.mjs';
 
@@ -313,13 +313,17 @@ function printReport(all, targetNames) {
 		};
 
 		// Persist the run: machine-readable JSON + a self-contained HTML page
-		// (linked to the other benchmark pages) in the shared results dir.
-		fs.mkdirSync(RESULTS_DIR, { recursive: true });
-		const jsonPath = path.join(RESULTS_DIR, 'view.json');
-		fs.writeFileSync(jsonPath, JSON.stringify(payload, null, '\t') + '\n');
-		const htmlPath = path.join(RESULTS_DIR, 'view.html');
-		fs.writeFileSync(htmlPath, buildViewHtml(payload));
-		console.error(`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/view.{json,html}`);
+		// (linked to the previous/next runs and the other suite) in the shared
+		// results dir
+		const result = writeRunResults({
+			suite: 'view',
+			payload,
+			resultsDir: RESULTS_DIR,
+			renderHtml: buildViewHtml,
+		});
+		console.error(
+			`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/view.html (archive view-${result.timestamp}.html)`,
+		);
 
 		if (process.env.BENCH_JSON) {
 			fs.writeFileSync(
@@ -338,7 +342,7 @@ function printReport(all, targetNames) {
 
 // ── HTML report ─────────────────────────────────────────────────────────────
 
-function buildViewHtml(payload) {
+function buildViewHtml(payload, { prevRun, nextRun } = {}) {
 	const targets = payload.targets;
 	const names = targets.map((t) => t.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
@@ -369,6 +373,9 @@ function buildViewHtml(payload) {
 		note: `score = steady-window mean, ${payload.iterations} samples per op · green = best in row`,
 		columns: names,
 		baseline,
+		generatedAt: payload.generatedAt,
+		prevRun,
+		nextRun,
 		sections: [
 			{
 				heading: 'timing',

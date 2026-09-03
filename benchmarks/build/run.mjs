@@ -21,7 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import autocannon from 'autocannon';
-import { buildHtmlReport } from '../lib/html-report.mjs';
+import { buildHtmlReport, writeRunResults } from '../lib/html-report.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, '..', '..');
@@ -309,13 +309,17 @@ function printReport(results, names, caseNames) {
 		};
 
 		// Persist the run: machine-readable JSON + a self-contained HTML page
-		// (linked to the other benchmark pages) in the shared results dir.
-		fs.mkdirSync(RESULTS_DIR, { recursive: true });
-		const jsonPath = path.join(RESULTS_DIR, 'build.json');
-		fs.writeFileSync(jsonPath, JSON.stringify(payload, null, '\t') + '\n');
-		const htmlPath = path.join(RESULTS_DIR, 'build.html');
-		fs.writeFileSync(htmlPath, buildBuildHtml(payload));
-		console.error(`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/build.{json,html}`);
+		// (linked to the previous/next runs and the other suite) in the shared
+		// results dir
+		const result = writeRunResults({
+			suite: 'build',
+			payload,
+			resultsDir: RESULTS_DIR,
+			renderHtml: buildBuildHtml,
+		});
+		console.error(
+			`results written to ${path.relative(REPO_ROOT, RESULTS_DIR)}/build.html (archive build-${result.timestamp}.html)`,
+		);
 
 		if (process.env.BENCH_JSON) {
 			fs.writeFileSync(process.env.BENCH_JSON, JSON.stringify(payload, null, '\t') + '\n');
@@ -331,7 +335,7 @@ function printReport(results, names, caseNames) {
 
 // ── HTML report ─────────────────────────────────────────────────────────────
 
-function buildBuildHtml(payload) {
+function buildBuildHtml(payload, { prevRun, nextRun } = {}) {
 	const frameworks = payload.frameworks;
 	const names = frameworks.map((f) => f.name);
 	const baseline = names.includes('torpor') ? 'torpor' : names[0];
@@ -362,6 +366,9 @@ function buildBuildHtml(payload) {
 		note: `autocannon · ${payload.connections} connections · ${payload.duration}s per case · green = best in row`,
 		columns: names,
 		baseline,
+		generatedAt: payload.generatedAt,
+		prevRun,
+		nextRun,
 		sections: [
 			{
 				heading: 'requests/sec',

@@ -15,10 +15,12 @@ cd benchmarks/view && pnpm bench
 cd benchmarks/build && pnpm bench
 ```
 
-Each run prints a comparison table and writes `view` / `build` results to
-`benchmarks/results/`: a machine-readable `.json` and a self-contained `.html`
-page with heatmapped tables. The HTML pages link to each other (previous /
-next), so open one and follow the links.
+Each run prints a comparison table and writes to `benchmarks/results/`: the
+latest run as `view` / `build` `.json` + `.html`, plus an immutable archive
+per run (`view-<timestamp>.html` + `.json`). Every page shows the time it was
+run and links to the previous and next run of its suite (a run's "next" link
+is backfilled by the following run) as well as to the other suite's latest
+page — open one and follow the links.
 
 See each folder's README for options (iterations, duration, filters) and
 methodology notes.

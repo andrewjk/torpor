@@ -30,10 +30,12 @@ Options:
   or point at an already-running server.
 - `BENCH_JSON=path` — also write a machine-readable copy.
 
-At the end the runner prints the comparison table and writes
-`benchmarks/results/view.json` plus a self-contained `view.html` report
-(heatmapped timing and DOM-census tables, weighted geometric-mean total vs
-torpor). `view.html` links to the `build.html` page (previous / next nav).
+At the end the runner prints the comparison table and writes to
+`benchmarks/results/`: `view.json` plus a self-contained `view.html` for the
+latest run (heatmapped timing and DOM-census tables, weighted geometric-mean
+total vs torpor), archived as `view-<timestamp>.{json,html}`. Each page shows
+when it was run and links to the previous/next run of the suite and to the
+`build` suite's latest page.
 
 The runner starts each fixture's vite dev server (production mode — the
 configs set `mode: 'production'` and pin `NODE_ENV` so framework runtimes are
