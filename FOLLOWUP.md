@@ -56,31 +56,6 @@ guard armed right before hide. Any future focus-to-open component needs the same
 guard; alternatively the runtime could distinguish script-driven refocus from real
 user focus events.
 
-### Stale-module SSR errors after rebuilding a workspace package while `tb --dev` runs
-
-Vite's dep cache (site node_modules/.vite) keys off the lockfile and config,
-not the content of workspace packages, so rebuilt packages kept serving stale
-prebundled modules to the workerd dev runner -- with confusing errors like
-"$cache must be used in a getter" or "ReferenceError: $handle is not defined"
-for identifiers that clearly exist in source.
-
-`tb --dev` now fingerprints the workspace packages the site depends on at
-startup (path, size, mtime) and deletes the dep cache when they changed
-(packages/build/src/run/depCache.ts), which turns "restart and know the
-trick" into "just restart". Still open: live invalidation while the server
-is running -- after rebuilding a workspace package mid-session, restart the
-dev server to pick it up. A watcher feeding Vite's module graph would remove
-even that.
-
-Related: the site resolves `@torpor/ui/*` to `packages/ui/dist`, whose
-`.torp` files are COPIES made by the ui package's build (`vp pack`). If the
-dist copy is stale (package not rebuilt after changing a component's API),
-the site silently runs the old component -- hit as a
-`$slot.day is undefined` TypeError on the calendar page after the
-CalendarGrid slot API changed from `$slot.days` to `$slot.day`. Rebuild the
-workspace package (and restart `tb --dev`) when site pages use new component
-APIs. A check that dist `.torp` copies match src would catch this earlier.
-
 ## Features
 
 ### Standard schema validation: remaining integration points

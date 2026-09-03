@@ -65,7 +65,7 @@ export function clearStaleDepCache(siteRoot: string, log?: (message: string) => 
 	}
 }
 
-function findWorkspaceRoot(from: string): string | undefined {
+export function findWorkspaceRoot(from: string): string | undefined {
 	let dir = path.resolve(from);
 	while (true) {
 		// pnpm-style marker, or a root package.json declaring npm workspaces
@@ -103,13 +103,13 @@ function readStore(storePath: string): string | undefined {
 }
 
 /**
- * Hashes every file of every site dependency that resolves inside the
- * workspace. Returns undefined when there is nothing to fingerprint (no
- * workspace packages -- the common case outside the monorepo).
+ * Resolves every site dependency that lives inside the workspace to its
+ * package folder. Shared with the other dev-startup checks (e.g. the stale
+ * .torp copy report), which need the same set of packages.
  */
-function fingerprintWorkspacePackages(siteRoot: string, workspaceRoot: string): string | undefined {
+export function workspaceDependencyDirs(siteRoot: string, workspaceRoot: string): string[] {
 	const sitePackageJson = path.join(siteRoot, "package.json");
-	if (!existsSync(sitePackageJson)) return undefined;
+	if (!existsSync(sitePackageJson)) return [];
 
 	const pkg: PackageJson = JSON.parse(readFileSync(sitePackageJson, "utf8"));
 	const require = createRequire(sitePackageJson);
@@ -121,10 +121,18 @@ function fingerprintWorkspacePackages(siteRoot: string, workspaceRoot: string): 
 			packageDirs.add(realpathSync(dir));
 		}
 	}
-	if (packageDirs.size === 0) return undefined;
+	return [...packageDirs].sort();
+}
+
+function fingerprintWorkspacePackages(siteRoot: string, workspaceRoot: string): string | undefined {
+	const sitePackageJson = path.join(siteRoot, "package.json");
+	if (!existsSync(sitePackageJson)) return undefined;
+
+	const packageDirs = workspaceDependencyDirs(siteRoot, workspaceRoot);
+	if (packageDirs.length === 0) return undefined;
 
 	const hash = createHash("sha1");
-	for (let dir of [...packageDirs].sort()) {
+	for (let dir of packageDirs) {
 		hash.update(`package:${dir}\n`);
 		fingerprintDir(dir, dir, hash);
 	}

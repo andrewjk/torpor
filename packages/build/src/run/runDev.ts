@@ -26,6 +26,7 @@ import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import devPlugin from "./devPlugin.ts";
 import { clearStaleDepCache } from "./depCache";
+import { reportStaleTorpCopies } from "./staleTorpCopies";
 
 export default async function runDev(site: Site): Promise<void> {
 	// Create the Vite dev server. Unlike the previous middleware-mode setup, we
@@ -82,6 +83,11 @@ export default async function runDev(site: Site): Promise<void> {
 	// Workspace packages may have been rebuilt since the last dev run; drop
 	// Vite's dep cache so SSR never executes stale prebundled modules
 	clearStaleDepCache(site.root, (message) => console.log(`\n${message}`));
+
+	// A workspace package with dist .torp copies (e.g. @torpor/ui) whose src
+	// changed without a rebuild serves OLD components to the site, silently;
+	// report the drift so it can be fixed with a rebuild
+	reportStaleTorpCopies(site.root, (message) => console.log(`\n${message}`));
 
 	// Load environment variables from a `.env` file, with defaults if not set
 	configDotenv();
