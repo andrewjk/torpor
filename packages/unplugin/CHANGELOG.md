@@ -1,5 +1,12 @@
 # @torpor/unplugin
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(minor)_ Support for `@torpor/build` mini mode server code, and whitespace is now trimmed by default.
+
 ## 0.2.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @torpor/create-build
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(patch)_ Template dependency versions are now kept in sync on release.
+
 ## 0.2.2
 
 ### Patch Changes

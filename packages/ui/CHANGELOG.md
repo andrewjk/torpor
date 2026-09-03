@@ -1,5 +1,34 @@
 # @torpor/ui
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(minor)_ !Edit: SelectBox UI component overhaul
+- _(minor)_ !Edit: split the Calendar out into components
+- _(minor)_
+  - New components: ComboBox, SelectBox (overhauled), Tree, CommandPalette, DateRangePicker, DatePicker, Stepper, SegmentedControl, TagInput, NumberInput, Splitter, Carousel, Progress, Rating, DataGrid, FileDrop and chevron icons
+  - Type-safe forms with field integration across input components
+  - Two-way binding via `Bindable<T>` and `$bind`
+  - Calendar split into subcomponents with corrected ARIA structure; pagination now uses a `pages` slot property
+  - Removed `as` props; standardized event names, ARIA roles and interaction patterns
+- _(patch)_ !Edit: pagination now uses a `pages` slot property
+- _(patch)_ Feat: ComboBox UI component
+- _(patch)_ Style: standardize some prettier output
+- _(patch)_ Fix: suggested Drawer changes and tests
+- _(patch)_ Fix: suggested ToolBar changes and tests
+- _(patch)_ Fix: suggested Calendar changes and tests
+- _(patch)_ Fix: suggested ListBox changes and tests
+- _(patch)_ Fix: suggested Breadcrumb changes and tests
+- _(patch)_ Feat: UI Tree component
+- _(patch)_ Fix: suggested Accordion changes and tests
+- _(patch)_ Feat: chevron double left and right icons
+- _(patch)_ !Edit: remove `as` UI props
+- _(patch)_ Style: remove redundant key names
+- _(patch)_ Fix: suggested TabGroup changes and tests
+- _(patch)_ Fix: suggested Menu changes and tests
+
 ## 0.4.0
 
 ### Minor Changes

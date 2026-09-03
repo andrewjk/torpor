@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/shiki",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"description": "A Shiki highlighter for displaying highlighted Torpor code",
 	"type": "module",
 	"exports": {

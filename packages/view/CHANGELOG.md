@@ -1,5 +1,34 @@
 # @torpor/view
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(minor)_ !Edit: rename `$sprops` to `$slot`
+- _(minor)_
+  - Async components: `@await` boundaries with suspend/fallback branches, `$pending` reactive query state, `$stream` for subscribing to events and `$refresh` for refetching data
+  - Error boundaries: `@try`/`@catch` in `@render` blocks plus top-level `@error`
+  - Two-way binding with `Bindable<T>` and `$bind`; `$handle` for skipping an event's first run; `$mount` renamed to `$onmount`
+  - Spread attributes on elements and spread props on components
+  - Reactive `Date`/`Set`/`Map` proxy wrappers, replacing `ReactiveDate`
+  - Whitespace is now trimmed by default
+  - Performance: delegated events, single-element fragments, signal reuse and `@for` no-proxy specialization
+  - Fixes for SSR text escaping, hydration edge cases, circular imports and optional-chaining bindings
+- _(patch)_ Fix: append element styles instead of replacing
+- _(patch)_ Fix: slightly fewer hydration checks
+- _(patch)_ Style: standardize some prettier output
+- _(patch)_ Fix: set non-reactive $props values with `as const`
+- _(patch)_ Fix: copy attributes for dynamic @elements
+- _(patch)_ Fix: set &ref element before everything else
+- _(patch)_ Feat: include comments in AST for formatting
+- _(patch)_ Fix: style parsing
+- _(patch)_ Fix: dynamic @elements containing slots
+- _(patch)_ Fix: don't close void tags
+- _(patch)_ Fix: slot node parsing
+- _(patch)_ Feat: allow spreading props on components
+- _(patch)_ Fix: switches without defaults
+
 ## 0.4.18
 
 ### Patch Changes

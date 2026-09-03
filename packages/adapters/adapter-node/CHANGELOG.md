@@ -1,5 +1,12 @@
 # @torpor/adapter-node
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(patch)_ Internal tooling updates: migrated to Vite+ and refreshed dependencies.
+
 ## 0.1.2
 
 ### Patch Changes

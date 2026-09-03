@@ -1,5 +1,21 @@
 # @torpor/build
 
+## 1.0.0
+
+<sub>2026-09-03</sub>
+
+- _(major)_ Version 1 is here!
+- _(minor)_
+  - OpenAPI generation via the CLI or at runtime
+  - New mini build mode with server code generation
+  - Nested hooks (like layouts); middleware/hooks `next()` renamed to `enter()`/`exit()`
+  - Adapters now integrate as Vite plugins
+  - Support for downloading files on form submit; standardized HTTP header casing
+  - Fixes: stale dependency cache on dev startup, manifest `load` export detection, `pathToRegex` splat params
+- _(minor)_ Moved from a regex router to a trie router
+- _(patch)_ Edit: standardize HTTP header case
+- _(patch)_ Feat: allow downloading files on form submit
+
 ## 0.4.14
 
 ### Patch Changes
