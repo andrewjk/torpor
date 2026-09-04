@@ -7,6 +7,7 @@ import { serverError } from "../response.ts";
 import Server from "../server/Server.ts";
 import flattenHeaders from "../server/connect/flattenHeaders.ts";
 import type Site from "../site/Site.ts";
+import { siteEntryPaths } from "../utils/entryPaths";
 import prepareTemplate from "./prepareTemplate.ts";
 
 type ReqHandler = (req: IncomingMessage, res: ServerResponse) => Promise<void>;
@@ -20,13 +21,13 @@ type ReqHandler = (req: IncomingMessage, res: ServerResponse) => Promise<void>;
  * Adapters that need a different runtime (e.g. workerd) provide their own
  * `dev()` plugin instead.
  */
-export default function devPlugin(site: Site): Plugin {
+export default function devPlugin(site: Site, sourceMode = false): Plugin {
 	return {
 		name: "torpor-dev",
 		configureServer(vite) {
 			// Kick off async setup immediately; the middleware awaits it so we
 			// don't depend on whether Vite awaits configureServer itself.
-			const handlerPromise = createDevHandler(vite, site);
+			const handlerPromise = createDevHandler(vite, site, sourceMode);
 			// Return a post-hook so our middleware runs AFTER Vite's internal
 			// middlewares (static serving, transforms, HMR), acting as the SSR
 			// fallback.
@@ -44,9 +45,13 @@ export default function devPlugin(site: Site): Plugin {
 	};
 }
 
-async function createDevHandler(vite: ViteDevServer, site: Site): Promise<ReqHandler> {
-	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
-	const serverScript = path.join(siteFolder, "serverEntry.ts");
+async function createDevHandler(
+	vite: ViteDevServer,
+	site: Site,
+	sourceMode: boolean,
+): Promise<ReqHandler> {
+	const entries = siteEntryPaths(site.root, sourceMode);
+	const serverScript = entries.serverEntry;
 
 	// Read site.html if present
 	// It's called site.html because @torpor/build builds the site (html, routes
@@ -63,9 +68,7 @@ async function createDevHandler(vite: ViteDevServer, site: Site): Promise<ReqHan
 		template = await vite.transformIndexHtml("", template);
 
 		// Prepare site.html so that we can just splice components into it
-		const clientScript = path.join(siteFolder, "clientEntry.ts");
-		const clientDevScript = path.join(siteFolder, "clientEntryDev.ts");
-		template = prepareTemplate(template, clientScript, clientDevScript);
+		template = prepareTemplate(template, entries.clientEntry, entries.clientDevEntry);
 	}
 
 	const server = new Server();

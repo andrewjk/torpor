@@ -3,6 +3,7 @@ import { type Site } from "@torpor/build";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { type Plugin, type ViteDevServer } from "vite";
+import { detectSourceMode, siteEntryPaths } from "./entryPaths";
 import prepareTemplate from "./prepareTemplate";
 
 const TEMPLATE_ID = "virtual:torpor-template";
@@ -55,18 +56,17 @@ async function buildDevTemplate(vite: ViteDevServer, site: Site): Promise<string
 	let template = await fs.readFile(templateFile, "utf-8");
 	template = await vite.transformIndexHtml("", template);
 
-	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
-	const clientScript = path.join(siteFolder, "clientEntry.ts");
-	const clientDevScript = path.join(siteFolder, "clientEntryDev.ts");
+	const sourceMode = detectSourceMode(site.root);
+	const entries = siteEntryPaths(site.root, sourceMode);
 
 	// Splice component placeholders and append the production client entry
-	template = prepareTemplate(template, clientScript);
+	template = prepareTemplate(template, entries.clientEntry);
 
 	// Inject the dev client entry (for HMR) just before the client entry
-	const clientTag = `<script type="module" src="${clientScript}"></script>`;
+	const clientTag = `<script type="module" src="${entries.clientEntry}"></script>`;
 	template = template.replace(
 		clientTag,
-		`<script type="module" src="${clientDevScript}"></script>\n${clientTag}`,
+		`<script type="module" src="${entries.clientDevEntry}"></script>\n${clientTag}`,
 	);
 
 	return template;

@@ -24,6 +24,7 @@ import { checkLayoutSlot, checkLayoutSlots } from "../site/checkLayoutSlots";
 import { LAYOUT_ROUTE } from "../types/RouteType";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
+import { detectSourceMode } from "../utils/entryPaths";
 import devPlugin from "./devPlugin.ts";
 import { clearStaleDepCache } from "./depCache";
 import { reportStaleTorpCopies } from "./staleTorpCopies";
@@ -41,10 +42,15 @@ export default async function runDev(site: Site): Promise<void> {
 	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
 	config.resolve ??= {};
 	config.resolve.tsconfigPaths ??= true;
-	// Resolve `@torpor/view` (runtime, compiler, SSR) from source in dev mode
-	// so changes to the compiler take effect without rebuilding dist.
-	config.resolve.conditions ??= [];
-	config.resolve.conditions.push("development");
+	// When the framework itself is linked into the app (workspace/link:
+	// installs), resolve `@torpor/view` and `@torpor/build/dev` from source via
+	// their `development` export conditions, so framework changes take effect
+	// without rebuilding dist. Registry installs run the compiled dist.
+	const sourceMode = detectSourceMode(site.root);
+	if (sourceMode) {
+		config.resolve.conditions ??= [];
+		config.resolve.conditions.push("development");
+	}
 	// vite-plus' `tsconfigPaths` isn't honored by the SSR module-runner's
 	// externalization path (it hardcodes tsconfigPaths:false), so dev SSR can't
 	// resolve path aliases. Mirror tsconfig `compilerOptions.paths` as Vite
@@ -54,7 +60,7 @@ export default async function runDev(site: Site): Promise<void> {
 	// The adapter provides the dev-runtime plugin(s); fall back to the
 	// framework's Node-runtime plugin when it doesn't.
 	const adapterDev = site.adapter.dev?.(site);
-	const devPlugins = normalizePlugins(adapterDev ?? devPlugin(site));
+	const devPlugins = normalizePlugins(adapterDev ?? devPlugin(site, sourceMode));
 
 	config.plugins = [
 		manifest(site, true),

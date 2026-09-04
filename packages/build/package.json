@@ -9,8 +9,9 @@
 			"import": "./dist/index.mjs"
 		},
 		"./dev": {
-			"types": "./src/dev.ts",
-			"import": "./src/dev.ts"
+			"types": "./dist/dev.d.mts",
+			"development": "./src/dev.ts",
+			"import": "./dist/dev.mjs"
 		},
 		"./form": {
 			"types": "./dist/form.d.mts",
@@ -54,7 +55,7 @@
 	},
 	"files": [
 		"dist",
-		"src"
+		"src/types/manifest.d.ts"
 	],
 	"publishConfig": {
 		"access": "public"

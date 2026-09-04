@@ -4,6 +4,7 @@ import { createRequire } from "node:module";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig } from "vite";
+import { detectSourceMode, serverClassPath } from "./entryPaths";
 import cloudflareDev from "./cloudflareDev";
 import prepareTemplate from "./prepareTemplate";
 
@@ -43,7 +44,7 @@ async function postbuild(site: Site): Promise<void> {
 	const tempFolder = path.join(distFolder, "temp");
 	const cloudflareFolder = path.join(distFolder, "cloudflare");
 
-	const buildSrcFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/");
+	const sourceMode = detectSourceMode(site.root);
 	const adapterDistFolder = path.resolve(
 		site.root,
 		"./node_modules/@torpor/adapter-cloudflare/dist/",
@@ -69,7 +70,7 @@ async function postbuild(site: Site): Promise<void> {
 		template = prepareTemplate(await fs.readFile(siteHtml, "utf-8"), clientScript);
 	}
 
-	const serverClass = path.join(buildSrcFolder, "server", "Server.ts");
+	const serverClass = serverClassPath(site.root, sourceMode);
 	const serverScript = path.join(serverFolder, "serverEntry.js");
 
 	// Splice file names into _worker.ts

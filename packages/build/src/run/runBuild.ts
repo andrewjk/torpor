@@ -8,6 +8,7 @@ import { checkLayoutSlots } from "../site/checkLayoutSlots";
 import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
+import { siteEntryPaths } from "../utils/entryPaths";
 
 // TODO: Don't cache index.html in dev?
 // TODO: Don't reload layouts during client routing
@@ -45,9 +46,11 @@ export default async function runBuild(site: Site): Promise<void> {
 	const siteHtml = path.resolve(site.root, "src/site.html");
 	const hasSiteHtml = existsSync(siteHtml);
 
-	const siteFolder = path.resolve(site.root, "./node_modules/@torpor/build/src/site/");
-	let clientScript = path.join(siteFolder, "clientEntry.ts");
-	let serverScript = path.join(siteFolder, "serverEntry.ts");
+	// Production always bundles the compiled entry files from the installed
+	// package, so builds don't depend on (unshipped) framework sources
+	const entries = siteEntryPaths(site.root, false);
+	const clientScript = entries.clientEntry;
+	const serverScript = entries.serverEntry;
 
 	// Build the client assets, including site.html and the route files
 	// EXCLUDING anything with `server.js` in the name
