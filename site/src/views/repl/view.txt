@@ -398,7 +398,12 @@ function $peek(fn) {
 }
 function flushMountEffects() {
 	if (context.mountEffects.length === 0) return;
-	for (let fn of context.mountEffects) $run(() => runMountCallback(fn), void 0, { isMountEffect: true });
+	const activeRegion = context.activeRegion;
+	for (let effect of context.mountEffects) {
+		context.activeRegion = effect.region;
+		$run(() => runMountCallback(effect.fn), void 0, { isMountEffect: true });
+	}
+	context.activeRegion = activeRegion;
 	context.mountEffects.length = 0;
 }
 function runMountCallback(fn) {
@@ -1907,7 +1912,10 @@ function $cache(fn) {
 	return computed.value;
 }
 function $onmount(fn) {
-	context.mountEffects.push(fn);
+	context.mountEffects.push({
+		region: context.activeRegion,
+		fn
+	});
 }
 function $pending(fn) {
 	const oldPeek = context.suspendPeek;
@@ -1960,20 +1968,23 @@ function $refresh(fn, options) {
 	}
 }
 function $stream(source, handler, options) {
-	context.mountEffects.push(() => {
-		let timer;
-		$run(() => {
-			const unsub = source((value) => {
-				if (options?.debounce) {
+	context.mountEffects.push({
+		region: context.activeRegion,
+		fn: () => {
+			let timer;
+			$run(() => {
+				const unsub = source((value) => {
+					if (options?.debounce) {
+						clearTimeout(timer);
+						timer = setTimeout(() => handler(value), options.debounce);
+					} else handler(value);
+				});
+				return () => {
+					unsub?.();
 					clearTimeout(timer);
-					timer = setTimeout(() => handler(value), options.debounce);
-				} else handler(value);
+				};
 			});
-			return () => {
-				unsub?.();
-				clearTimeout(timer);
-			};
-		});
+		}
 	});
 }
 let t_add_element = addElement;

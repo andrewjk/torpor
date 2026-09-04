@@ -23,5 +23,8 @@ import type Cleanup from "../types/Cleanup";
  * @param fn The function to run, which may return a cleanup function
  */
 export default function $onmount(fn: () => Cleanup | void): void {
-	context.mountEffects.push(fn);
+	context.mountEffects.push({
+		region: context.activeRegion,
+		fn,
+	});
 }

@@ -22,7 +22,7 @@ export default function MountEffectList($props: { items: Array<{ id: number; val
 }
 `;
 
-test("onmount fires once per row lifetime on keyed update", async () => {
+test("onmount fires once per row lifetime on keyed update -- mounted", async () => {
 	(window as any).__mounts = 0;
 	const $state = $watch({
 		items: [
@@ -73,7 +73,7 @@ test("onmount fires once per row lifetime on keyed update -- hydrated", async ()
 	expect(container.textContent).toContain("c");
 });
 
-test("onmount fires again for genuinely new rows", async () => {
+test("onmount fires again for genuinely new rows -- mounted", async () => {
 	(window as any).__mounts = 0;
 	const $state = $watch({
 		items: [{ id: 1, value: "a" }],
@@ -82,6 +82,28 @@ test("onmount fires again for genuinely new rows", async () => {
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component, $state);
+
+	expect((window as any).__mounts).toBe(1);
+
+	// Append a genuinely new key — that row's onmount must fire.
+	$state.items = [
+		{ id: 1, value: "a" },
+		{ id: 2, value: "b" },
+	];
+
+	expect((window as any).__mounts).toBe(2);
+});
+
+test("onmount fires again for genuinely new rows -- hydrated", async () => {
+	(window as any).__mounts = 0;
+	const $state = $watch({
+		items: [{ id: 1, value: "a" }],
+	});
+
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(import.meta.filename, source, "client");
+	const serverComponent = await importComponent(import.meta.filename, source, "server");
+	hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect((window as any).__mounts).toBe(1);
 

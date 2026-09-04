@@ -123,7 +123,10 @@ export default interface Context {
 	 * should be collected and flushed when the component has been mounted in
 	 * the DOM
 	 */
-	mountEffects: (() => Cleanup | void)[];
+	mountEffects: {
+		region: Region;
+		fn: () => Cleanup | void;
+	}[];
 
 	/**
 	 * Events which should be added when their element has been mounted in the

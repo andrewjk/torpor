@@ -3,19 +3,23 @@ import mountComponent from "../mountComponent";
 import importComponent from "../importComponent";
 import hydrateComponent from "../hydrateComponent";
 
-// `$onmount` callbacks run exactly once per mount: reactive reads inside
-// them are not tracked, so state changes never re-run them. The reactive
-// part must be wrapped in `$run` instead.
+// A `$run` nested inside `$onmount` (or `onmount`) picks up the reactivity:
+// it runs after the element is in the DOM and re-runs on changes.
 const source = `
-export default function OnmountOnce() {
+export default function OnmountNestedRun() {
 	let $state = $watch({ count: 0 })
+	let label: HTMLElement
 
 	$onmount(() => {
-		window.__log.push("onmount:" + $state.count)
+		window.__log.push("setup")
+		$run(() => {
+			window.__log.push("run:" + $state.count)
+			label.textContent = "run " + $state.count
+		})
 	})
 
 	@render {
-		<p>Count: {$state.count}</p>
+		<span &ref={label}></span>
 		@function increment() {
 			$state.count += 1
 		}
@@ -24,24 +28,23 @@ export default function OnmountOnce() {
 }
 `;
 
-test("$onmount runs once and does not re-run on state change -- mounted", async () => {
+test("$run nested in $onmount is reactive -- mounted", async () => {
 	(window as any).__log = [];
 
 	const container = document.createElement("div");
 	const component = await importComponent(import.meta.filename, source, "client");
 	mountComponent(container, component);
 
-	expect((window as any).__log).toEqual(["onmount:0"]);
+	expect((window as any).__log).toEqual(["setup", "run:0"]);
 
 	const incBtn = container.querySelector("#inc") as HTMLButtonElement;
 	incBtn.click();
-	incBtn.click();
 
-	expect((window as any).__log).toEqual(["onmount:0"]);
-	expect(container.textContent).toContain("Count: 2");
+	expect((window as any).__log).toEqual(["setup", "run:0", "run:1"]);
+	expect(container.querySelector("span")!.textContent).toBe("run 1");
 });
 
-test("$onmount runs once and does not re-run on state change -- hydrated", async () => {
+test("$run nested in $onmount is reactive -- hydrated", async () => {
 	(window as any).__log = [];
 
 	const container = document.createElement("div");
@@ -49,12 +52,11 @@ test("$onmount runs once and does not re-run on state change -- hydrated", async
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	hydrateComponent(container, clientComponent, serverComponent);
 
-	expect((window as any).__log).toEqual(["onmount:0"]);
+	expect((window as any).__log).toEqual(["setup", "run:0"]);
 
 	const incBtn = container.querySelector("#inc") as HTMLButtonElement;
 	incBtn.click();
-	incBtn.click();
 
-	expect((window as any).__log).toEqual(["onmount:0"]);
-	expect(container.textContent).toContain("Count: 2");
+	expect((window as any).__log).toEqual(["setup", "run:0", "run:1"]);
+	expect(container.querySelector("span")!.textContent).toBe("run 1");
 });

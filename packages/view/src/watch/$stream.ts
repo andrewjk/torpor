@@ -44,7 +44,7 @@ export default function $stream<T>(
 	handler: (value: T) => void,
 	options?: { debounce?: number },
 ): void {
-	context.mountEffects.push(() => {
+	const fn = () => {
 		let timer: ReturnType<typeof setTimeout> | undefined;
 
 		// Mount callbacks are once-only and untracked, so the source is set
@@ -67,5 +67,9 @@ export default function $stream<T>(
 				clearTimeout(timer);
 			};
 		});
+	};
+	context.mountEffects.push({
+		region: context.activeRegion,
+		fn,
 	});
 }

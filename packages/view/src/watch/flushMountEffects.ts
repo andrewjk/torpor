@@ -22,10 +22,12 @@ import deactivateSources from "./deactivateSources";
  */
 export default function flushMountEffects(): void {
 	if (context.mountEffects.length === 0) return;
-
-	for (let fn of context.mountEffects) {
-		$run(() => runMountCallback(fn), undefined, { isMountEffect: true });
+	const activeRegion = context.activeRegion;
+	for (let effect of context.mountEffects) {
+		context.activeRegion = effect.region;
+		$run(() => runMountCallback(effect.fn), undefined, { isMountEffect: true });
 	}
+	context.activeRegion = activeRegion;
 	context.mountEffects.length = 0;
 }
 
