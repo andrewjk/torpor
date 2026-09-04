@@ -16,5 +16,9 @@
 			// extension at build time, so its releases must republish the ext
 			"releaseTriggeringDevDeps": ["@torpor/textmate"]
 		}
+	},
+	// You'll need to manually release these in the NPM web interface
+	"publish": {
+		"npmStaged": true
 	}
 }
