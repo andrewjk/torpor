@@ -17,7 +17,6 @@ export default function OnmountOnce() {
 
 	@render {
 		<p>Count: {$state.count}</p>
-		// @ts-ignore
 		@function increment() {
 			$state.count += 1
 		}
