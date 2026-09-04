@@ -168,6 +168,8 @@ const importsMap: Record<string, string> = {
 		'import t_fragment from "../../../../src/render/getFragment";',
 	'import { t_fragment_el } from "@torpor/view";':
 		'import t_fragment_el from "../../../../src/render/getElementFragment";',
+	'import { t_first_inside } from "@torpor/view";':
+		'import t_first_inside from "../../../../src/render/firstInsideNode";',
 	'import { t_event } from "@torpor/view";':
 		'import t_event from "../../../../src/render/addEvent";',
 	'import { t_animate } from "@torpor/view";':

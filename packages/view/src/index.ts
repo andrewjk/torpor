@@ -8,6 +8,7 @@ import t_style from "./render/buildStyles";
 import clearLayoutSlot from "./render/clearLayoutSlot";
 import fillLayoutSlot from "./render/fillLayoutSlot";
 import t_fmt from "./render/formatText";
+import t_first_inside from "./render/firstInsideNode";
 import t_fragment from "./render/getFragment";
 import t_fragment_el from "./render/getElementFragment";
 import hydrate from "./render/hydrate";
@@ -94,6 +95,7 @@ export {
 	t_style,
 	t_region,
 	t_anchor,
+	t_first_inside,
 	t_child,
 	t_next,
 	t_root,

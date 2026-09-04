@@ -1,4 +1,5 @@
 import context from "./context";
+import { setFirstInsideNode } from "./firstInsideNode";
 import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
 import isCommentNode from "./isCommentNode";
 import nodeNext from "./nodeNext";
@@ -65,6 +66,13 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 							if (region.startNode === null && firstInside !== null) {
 								region.startNode = firstInside;
 							}
+
+							// Stash the first node inside the block, keyed by
+							// the anchor being returned. Generated code (e.g.
+							// for `@html`) reads it back to adopt the
+							// server-rendered nodes, since the markers that
+							// bounded them have now been removed.
+							setFirstInsideNode(endNode!, firstInside);
 
 							// NOTE: We know this is not null as it is being
 							// called from generated code

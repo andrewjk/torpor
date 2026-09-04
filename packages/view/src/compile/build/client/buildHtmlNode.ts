@@ -64,9 +64,18 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 
 	// During hydration the fragment isn't inserted, so adopt the existing
 	// server-rendered nodes from the DOM instead
+	status.imports.add("t_first_inside");
 	b.append(`if (${firstNodeVar} !== null && ${firstNodeVar}.parentNode !== ${htmlParentName}) {`);
 	b.append(`${lastNodeVar} = ${htmlAnchorName}.previousSibling as ChildNode | null;`);
 	b.append(`if (${lastNodeVar} !== null) {`);
+	b.append(`const t_stashed_first = t_first_inside(${htmlAnchorName} as ChildNode);`);
+	// The first node inside the hydration block is stashed by `t_anchor`
+	// (`nodeAnchor`) when it strips the hydration markers. Scanning backwards
+	// is only a fallback, as content can contain whitespace text nodes that
+	// would truncate the region.
+	b.append(`if (t_stashed_first !== undefined && t_stashed_first !== null) {`);
+	b.append(`${firstNodeVar} = t_stashed_first;`);
+	b.append(`} else {`);
 	b.append(`${firstNodeVar} = ${lastNodeVar};`);
 	b.append(`let t_scan: ChildNode | null = ${lastNodeVar};`);
 	b.append(
@@ -75,6 +84,7 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append(`t_scan = t_scan.previousSibling;`);
 	b.append(`}`);
 	b.append(`${firstNodeVar} = t_scan;`);
+	b.append(`}`);
 	b.append(`}`);
 	b.append(`}`);
 

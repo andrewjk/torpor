@@ -2,6 +2,7 @@ import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
 import t_child from "../../../../src/render/nodeChild";
+import t_first_inside from "../../../../src/render/firstInsideNode";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
@@ -49,12 +50,17 @@ export default function Html(
 		if (t_html_first_1 !== null && t_html_first_1.parentNode !== t_p_1) {
 			t_html_last_1 = t_html_anchor_1.previousSibling as ChildNode | null;
 			if (t_html_last_1 !== null) {
-				t_html_first_1 = t_html_last_1;
-				let t_scan: ChildNode | null = t_html_last_1;
-				while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== t_html_anchor_1 && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {
-					t_scan = t_scan.previousSibling;
+				const t_stashed_first = t_first_inside(t_html_anchor_1 as ChildNode);
+				if (t_stashed_first !== undefined && t_stashed_first !== null) {
+					t_html_first_1 = t_stashed_first;
+				} else {
+					t_html_first_1 = t_html_last_1;
+					let t_scan: ChildNode | null = t_html_last_1;
+					while (t_scan !== null && t_scan.previousSibling !== null && t_scan.previousSibling !== t_html_anchor_1 && (t_scan.previousSibling.nodeType !== 3 || (t_scan.previousSibling.textContent ?? "").trim() !== "")) {
+						t_scan = t_scan.previousSibling;
+					}
+					t_html_first_1 = t_scan;
 				}
-				t_html_first_1 = t_scan;
 			}
 		}
 	});
