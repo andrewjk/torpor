@@ -76,12 +76,12 @@
 		"@torpor/view": "workspace:^",
 		"cookie": "^2.0.1",
 		"dotenv": "^17.4.2",
-		"vite": "catalog:"
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"esno": "^4.8.0",
-		"typescript": "^7.0.2",
-		"vite-plus": "catalog:"
+		"typescript": "^7.0.2"
 	}
 }

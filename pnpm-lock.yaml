@@ -339,9 +339,6 @@ importers:
       '@torpor/build':
         specifier: workspace:^
         version: link:../../build
-      vite:
-        specifier: npm:@voidzero-dev/vite-plus-core@0.2.7
-        version: '@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)'
     devDependencies:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260707.2
@@ -370,6 +367,9 @@ importers:
       vite:
         specifier: npm:@voidzero-dev/vite-plus-core@0.2.7
         version: '@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)'
+      vite-plus:
+        specifier: 'catalog:'
+        version: 0.2.7(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@30.0.1(@noble/hashes@2.2.0))(svelte@5.56.8(@typescript-eslint/types@8.66.0))(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)
     devDependencies:
       '@typescript/native-preview':
         specifier: 7.0.0-dev.20260707.2
@@ -380,9 +380,6 @@ importers:
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
-      vite-plus:
-        specifier: 'catalog:'
-        version: 0.2.7(@opentelemetry/api@1.9.1)(@types/node@26.1.2)(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(happy-dom@20.11.1)(jiti@2.7.0)(jsdom@30.0.1(@noble/hashes@2.2.0))(svelte@5.56.8(@typescript-eslint/types@8.66.0))(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0)
 
   packages/check:
     dependencies:
@@ -603,7 +600,7 @@ importers:
         version: 9.2.0(455115fc659ddf645bbea2ea9aa85f04)
       '@nuxt/kit':
         specifier: ^4.5.1
-        version: 4.5.1(magic-string@0.30.21)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))
+        version: 4.5.1(magic-string@1.2.3)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))
       '@nuxt/schema':
         specifier: ^4.5.1
         version: 4.5.1
@@ -7198,7 +7195,7 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
-  '@nuxt/kit@4.5.1(magic-string@0.30.21)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))':
+  '@nuxt/kit@4.5.1(magic-string@1.2.3)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))':
     dependencies:
       c12: 3.3.4
       consola: 3.4.2
@@ -7218,7 +7215,7 @@ snapshots:
       scule: 1.3.0
       tinyglobby: 0.2.17
       ufo: 1.6.4
-      unctx: 3.0.0(magic-string@0.30.21)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))
+      unctx: 3.0.0(magic-string@1.2.3)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25)))
       untyped: 2.0.0
       verkit: 0.2.0
     transitivePeerDependencies:
@@ -11835,9 +11832,9 @@ snapshots:
       quansync: 1.0.0
       unconfig-core: 7.5.0
 
-  unctx@3.0.0(magic-string@0.30.21)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25))):
+  unctx@3.0.0(magic-string@1.2.3)(rolldown@1.2.3)(unplugin@3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25))):
     optionalDependencies:
-      magic-string: 0.30.21
+      magic-string: 1.2.3
       rolldown: 1.2.3
       unplugin: 3.3.0(@voidzero-dev/vite-plus-core@0.2.7(@types/node@26.1.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.5)(typescript@7.0.2)(yaml@2.9.0))(esbuild@0.28.1)(rolldown@1.2.3)(rollup@4.62.4)(webpack@5.109.2(esbuild@0.28.1)(lightningcss@1.33.0)(postcss@8.5.25))
 

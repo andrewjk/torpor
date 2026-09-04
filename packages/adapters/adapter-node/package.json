@@ -22,8 +22,7 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/build": "workspace:^",
-		"vite": "catalog:"
+		"@torpor/build": "workspace:^"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
