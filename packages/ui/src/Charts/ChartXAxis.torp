@@ -53,6 +53,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 			@if (!horizontal()) {
 				@if (title()) {
 					<text
+						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
 						x={layout.calculatedWidth - (layout.calculatedWidth - layout.chartLeft) / 2}
@@ -63,6 +64,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 				}
 				@for (let [i, label] of layout.labels.entries()) {
 					<text
+						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
 						x={layout.chartLeft + layout.itemWidth * i + layout.itemWidth / 2}

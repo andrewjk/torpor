@@ -23,6 +23,7 @@ export default function YAxis($props: YAxisProps) {
 			}
 			@if ($props.yLabel) {
 				<text
+					fill="currentcolor"
 					text-anchor="middle"
 					dominant-baseline="hanging"
 					x={0}
@@ -34,6 +35,7 @@ export default function YAxis($props: YAxisProps) {
 			}
 			@for (let [i, label] of $props.stepLabels.entries()) {
 				<text
+					fill="currentcolor"
 					text-anchor="end"
 					dominant-baseline="middle"
 					x={$props.chartLeft - $props.textHeight / 4}

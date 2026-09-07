@@ -30,6 +30,7 @@ export default function XAxis($props: XAxisProps) {
 			}
 			@if ($props.xLabel) {
 				<text
+					fill="currentcolor"
 					text-anchor="middle"
 					dominant-baseline="text-after-edge"
 					x={$props.width - ($props.width - $props.chartLeft) / 2}
@@ -41,6 +42,7 @@ export default function XAxis($props: XAxisProps) {
 			@if ($props.stepLabels.length && $props.stepValue) {
 				@for (let [i, label] of $props.stepLabels.entries()) {
 					<text
+						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
 						x={$props.chartLeft + i * $props.stepValue * $props.itemWidth}
@@ -52,6 +54,7 @@ export default function XAxis($props: XAxisProps) {
 			} else {
 				@for (let [i, label] of $props.labels.entries()) {
 					<text
+						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
 						x={$props.chartLeft + $props.itemWidth * i + $props.itemWidth / 2}
