@@ -29,12 +29,14 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 	let $state = context.state;
 
 	$run(() => {
-		if (!$state.visible) {
+		if ($state.visible) {
+			show();
+		} else {
 			hide();
 		}
 	});
 
-	function show(_: HTMLElement) {
+	function show() {
 		shown = true;
 
 		// HACK: Because this SelectBox could be shown with a click, we need to wait for another mousedown
@@ -56,7 +58,10 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 	}
 
 	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && div && !div.contains(e.target as HTMLElement)) {
+		const target = e.target as HTMLElement;
+		// See DateRangePicker: a re-rendered (detached) target came from
+		// inside the content
+		if (closeOnClick && div && target.isConnected && !div.contains(target)) {
 			e.preventDefault();
 			context.handleClickOutside!(e);
 		}
@@ -71,7 +76,6 @@ export default function SelectBoxContent($props: SelectBoxContentProps | undefin
 			{$props?.style}
 			aria-hidden={$state.visible ? undefined : "true"}
 			&ref={div}
-			onmount={show}
 		>
 			<slot>
 				@if (context.getLoadedItems) {
