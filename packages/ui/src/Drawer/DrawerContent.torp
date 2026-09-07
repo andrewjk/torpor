@@ -76,7 +76,10 @@ export default function DrawerContent($props: DrawerContentProps | undefined) {
 	}
 
 	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && drawer && !drawer.contains(e.target as HTMLElement)) {
+		const target = e.target as HTMLElement;
+		// A re-rendered (detached) target came from inside the drawer -- see
+		// DateRangePicker
+		if (closeOnClick && drawer && target.isConnected && !drawer.contains(target)) {
 			e.preventDefault();
 			context.handleClickOutside!(e);
 		}

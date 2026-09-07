@@ -214,7 +214,11 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 	}
 
 	function handleDocumentClick(e: MouseEvent) {
-		if (closeOnClick && content && !content.contains(e.target as HTMLElement)) {
+		const target = e.target as HTMLElement;
+		// A click can re-render the clicked element (e.g. selecting a date
+		// changes its state), detaching it before the event reaches the
+		// document. A detached target must have come from inside the content
+		if (closeOnClick && content && target.isConnected && !content.contains(target)) {
 			e.preventDefault();
 			setVisible(false);
 		}
