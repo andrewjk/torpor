@@ -37,12 +37,15 @@ export default function ExampleBasic() {
 
 		.example-carousel-prev,
 		.example-carousel-next {
+			align-items: center;
 			all: unset;
 			background-color: var(--surface);
 			border-radius: 50%;
 			box-shadow: black 0 0 4px;
 			cursor: pointer;
+			display: flex;
 			height: 32px;
+			justify-content: center;
 			position: absolute;
 			top: 64px;
 			width: 32px;
