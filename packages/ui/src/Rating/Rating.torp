@@ -206,7 +206,7 @@ export default function Rating($props: RatingProps | undefined) {
 					}}
 				>
 					<slot item={{ value: value, filled: value <= getDisplayValue() }}>
-						<span aria-hidden="true">{value <= getDisplayValue() ? "★" : "☆"}</span>
+						<span aria-hidden="true">★</span>
 					</slot>
 				</button>
 			}
