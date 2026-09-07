@@ -32,7 +32,9 @@ export default function ExampleDialog() {
 		.example-drawer-content {
 			background: var(--surface);
 			padding: 10px;
+			position: fixed;
 			top: 0;
+			left: 0;
 			height: 100vh;
 			z-index: 200;
 		}

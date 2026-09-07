@@ -1,8 +1,4 @@
 import { $page } from "@torpor/build/state";
-import { Drawer, DrawerContent, DrawerOverlay } from "@torpor/ui/Drawer";
-import { slide } from "@torpor/ui/motion";
-import List from "phosphor-torpor/lib/List";
-import X from "phosphor-torpor/lib/X";
 import Sidebar from "./Sidebar.torp";
 
 interface SidebarLink {
@@ -17,13 +13,10 @@ interface SectionLayoutProps {
 
 /**
  * The shared layout for site sections (docs, ui, build) that have a sidebar.
- * On mobile the sidebar is hidden and a hamburger button opens a drawer.
+ * The sidebar is visible on large screens; below the responsive breakpoint
+ * it slides in via the navigation drawer in the site header.
  */
 export default function SectionLayout($props?: SectionLayoutProps) {
-	let $state = $watch({
-		navVisible: false,
-	});
-
 	let content: HTMLElement;
 
 	$run(() => {
@@ -35,15 +28,6 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 
 	@render {
 		<div id="section">
-			<header class="mobile-bar">
-				<button
-					class="nav-button"
-					onclick={() => ($state.navVisible = true)}
-					aria-label="Open navigation"
-				>
-					<List />
-				</button>
-			</header>
 			<div id="sidebar">
 				<Sidebar links={$props?.links} />
 			</div>
@@ -51,24 +35,6 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 				<slot />
 			</div>
 		</div>
-
-		<Drawer &visible={$state.navVisible}>
-			<DrawerOverlay class="nav-overlay" />
-			<DrawerContent ariaLabel="Site navigation">
-				<div class="nav-drawer" transition={(e) => slide(e, { side: "left" })}>
-					<header class="mobile-bar">
-						<button
-							class="nav-button"
-							onclick={() => ($state.navVisible = false)}
-							aria-label="Close navigation"
-						>
-							<X />
-						</button>
-					</header>
-					<Sidebar links={$props?.links} onnavigate={() => ($state.navVisible = false)} />
-				</div>
-			</DrawerContent>
-		</Drawer>
 	}
 
 	@style {
@@ -89,42 +55,6 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 			padding: 1rem;
 		}
 
-		.mobile-bar {
-			display: none;
-			align-items: center;
-			gap: 0.75rem;
-		}
-
-		.nav-button {
-			background: none;
-			border: none;
-			color: var(--text);
-			cursor: pointer;
-			display: inline-flex;
-			font-size: 1.6rem;
-			padding: 0.25rem;
-		}
-
-		.nav-overlay {
-			background-color: rgba(0, 0, 0, 0.6);
-			position: fixed;
-			top: 0;
-			left: 0;
-			height: 100vh;
-			width: 100vw;
-			z-index: 100;
-		}
-
-		.nav-drawer {
-			background: var(--bg);
-			height: 100vh;
-			max-width: 85vw;
-			overflow: auto;
-			padding: 0.5rem;
-			width: 18rem;
-			z-index: 200;
-		}
-
 		@media screen and (max-width: 767px) {
 			#section {
 				grid-template-columns: 1fr;
@@ -138,10 +68,6 @@ export default function SectionLayout($props?: SectionLayoutProps) {
 
 			#content {
 				overflow: visible;
-			}
-
-			.mobile-bar {
-				display: flex;
 			}
 		}
 	}

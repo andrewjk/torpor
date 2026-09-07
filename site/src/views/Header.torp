@@ -1,11 +1,17 @@
 import { $page } from "@torpor/build/state";
+import { Disclosure, DisclosureContent, DisclosureHeader, DisclosureTrigger } from "@torpor/ui/Disclosure";
+import { Drawer, DrawerContent, DrawerOverlay, DrawerTrigger } from "@torpor/ui/Drawer";
+import { slide } from "@torpor/ui/motion";
 import { NavMenu, NavMenuLink } from "@torpor/ui/NavMenu";
 import { SegmentedControl, SegmentedItem } from "@torpor/ui/SegmentedControl";
 import GithubLogo from "phosphor-torpor/lib/GithubLogo";
+import List from "phosphor-torpor/lib/List";
 import MoonStars from "phosphor-torpor/lib/MoonStars";
 import Play from "phosphor-torpor/lib/Play";
 import Sun from "phosphor-torpor/lib/Sun";
 import torporLogo from "@/assets/torpor.svg";
+import { NAV_SECTIONS } from "../utils/nav.ts";
+import { navStore } from "../utils/navStore.ts";
 
 export default function Header() {
 	let $state = $watch({
@@ -33,8 +39,56 @@ export default function Header() {
 		return path === prefix || path.startsWith(`${prefix}/`);
 	}
 
+	function closeDrawer() {
+		navStore.visible = false;
+	}
+
 	@render {
 		<header class="site-header">
+			<Drawer &visible={navStore.visible}>
+				<DrawerTrigger class="hamburger">
+					<span class="visually-hidden">Open navigation menu</span>
+					<List />
+				</DrawerTrigger>
+				<DrawerOverlay class="nav-drawer-overlay" />
+				<DrawerContent ariaLabel="Site navigation">
+					<div class="nav-drawer" transition={(e) => slide(e, { side: "left" })}>
+						<a href="/" class="drawer-home" onclick={closeDrawer}>
+							Torpor
+						</a>
+						@for (let section of NAV_SECTIONS) {
+							@key = section.href
+							<Disclosure expanded={isActive(section.href)} class="drawer-section">
+								<DisclosureHeader>
+									<DisclosureTrigger class="drawer-section-trigger">
+										{section.label}
+									</DisclosureTrigger>
+								</DisclosureHeader>
+								<DisclosureContent>
+									<div class="drawer-sublinks">
+										@for (let link of section.links) {
+											@key = link.href
+											<a
+												href={link.href}
+												class={{ "drawer-sublink": true, active: $page.url.pathname === link.href }}
+												onclick={closeDrawer}
+											>
+												{link.label}
+											</a>
+										}
+									</div>
+								</DisclosureContent>
+							</Disclosure>
+						}
+						<a href="/blog" class="drawer-link" onclick={closeDrawer}>
+							Blog
+						</a>
+						<a href="/playground" class="drawer-link" onclick={closeDrawer}>
+							Playground
+						</a>
+					</div>
+				</DrawerContent>
+			</Drawer>
 			<a href="/" class="nav-link">
 			<span class="hstack spaced">
 				<img src={torporLogo} class="logo" alt="Torpor logo" style="height: 2.4rem; width: 2.4rem" />
@@ -185,7 +239,150 @@ export default function Header() {
 			text-decoration: none;
 		}
 
+		.hamburger {
+			align-items: center;
+			background: none;
+			border: none;
+			color: var(--text);
+			cursor: pointer;
+			display: none;
+			font-size: 1.6rem;
+			padding: 0.25rem;
+		}
+
+		.hamburger:hover {
+			background: var(--panel-back);
+		}
+
+		.visually-hidden {
+			clip: rect(0 0 0 0);
+			clip-path: inset(50%);
+			height: 1px;
+			overflow: hidden;
+			position: absolute;
+			white-space: nowrap;
+			width: 1px;
+		}
+
+		.nav-drawer-overlay {
+			background-color: rgba(0, 0, 0, 0.6);
+			height: 100vh;
+			left: 0;
+			position: fixed;
+			top: 0;
+			width: 100vw;
+			z-index: 100;
+		}
+
+		.nav-drawer {
+			background: var(--bg);
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+			height: 100vh;
+			left: 0;
+			overflow: auto;
+			padding: 1rem;
+			position: fixed;
+			top: 0;
+			width: min(16rem, 80vw);
+			z-index: 200;
+		}
+
+		.drawer-link {
+			border-radius: var(--brad);
+			color: var(--text);
+			display: block;
+			padding: 0.6rem 0.75rem;
+			text-decoration: none;
+		}
+
+		.drawer-link:hover {
+			background: var(--panel-back);
+			text-decoration: none;
+		}
+
+		.drawer-link.active {
+			background: var(--panel-back);
+			color: var(--header);
+			font-weight: 600;
+		}
+
+		.drawer-section-trigger {
+			all: unset;
+			cursor: pointer;
+		}
+
+		.drawer-home,
+		.drawer-link,
+		.drawer-section-trigger {
+			color: var(--text);
+			display: block;
+			font-size: 1.4rem;
+			padding: 0.6rem 0.75rem;
+			text-decoration: none;
+			width: 100%;
+		}
+
+		.drawer-home:hover,
+		.drawer-link:hover,
+		.drawer-section-trigger:hover {
+			background: var(--panel-back);
+			text-decoration: none;
+		}
+
+		.drawer-section-trigger[data-state="open"] {
+			color: var(--header);
+			font-weight: 600;
+		}
+
+		.drawer-sublinks {
+			display: flex;
+			flex-direction: column;
+			padding-bottom: 0.5rem;
+		}
+
+		.drawer-sublink {
+			border-radius: var(--brad);
+			color: var(--text);
+			display: block;
+			font-size: 1.4rem;
+			padding: 0.35rem 0.75rem 0.35rem 1.5rem;
+			text-decoration: none;
+		}
+
+		.drawer-sublink:hover {
+			background: var(--panel-back);
+			text-decoration: none;
+		}
+
+		.drawer-sublink.active {
+			background: var(--panel-back);
+			color: var(--header);
+			font-weight: 600;
+		}
+
+		/* Site nav links, nested in the drawer on small screens only (medium
+		 * screens still show them in the header). Shown at every size when
+		 * there are no sidebar links, so the drawer is never empty */
+		.drawer-nav {
+			display: none;
+			flex-direction: column;
+			gap: 0.25rem;
+			margin-bottom: 0.5rem;
+		}
+
+		@media screen and (max-width: 767px) {
+			.hamburger {
+				display: flex;
+			}
+		}
+
 		@media screen and (max-width: 575px) {
+			.site-nav {
+				display: none;
+			}
+
 			.playground-label {
 				display: none;
 			}

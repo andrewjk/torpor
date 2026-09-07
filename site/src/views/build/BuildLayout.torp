@@ -1,17 +1,10 @@
 import SectionLayout from "../SectionLayout.torp";
+import { BUILD_LINKS } from "../../utils/nav.ts";
 
 export default function BuildLayout() {
 	@render {
 		<SectionLayout
-			links={[
-				{ label: "Overview", href: "/build" },
-				{ label: "Routing", href: "/build/routing" },
-				{ label: "Loading Data", href: "/build/loading-data" },
-				{ label: "Actions", href: "/build/actions" },
-				{ label: "API Endpoints", href: "/build/api-endpoints" },
-				{ label: "Hooks", href: "/build/hooks" },
-				{ label: "Navigation", href: "/build/navigation" },
-			]}
+			links={BUILD_LINKS}
 		>
 			<slot />
 		</SectionLayout>

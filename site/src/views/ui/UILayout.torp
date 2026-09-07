@@ -1,43 +1,10 @@
 import SectionLayout from "../SectionLayout.torp";
+import { UI_LINKS } from "../../utils/nav.ts";
 
 export default function UILayout() {
 	@render {
 		<SectionLayout
-			links={[
-				{ label: "Overview", href: "/ui" },
-				{ label: "Accordion", href: "/ui/accordion" },
-				{ label: "Breadcrumb", href: "/ui/breadcrumb" },
-				{ label: "Calendar", href: "/ui/calendar" },
-				{ label: "Carousel", href: "/ui/carousel" },
-				{ label: "Charts", href: "/ui/charts" },
-				{ label: "CommandPalette", href: "/ui/command-palette" },
-				{ label: "ComboBox", href: "/ui/combo-box" },
-				{ label: "Contextual", href: "/ui/contextual" },
-				{ label: "DatePicker", href: "/ui/date-picker" },
-				{ label: "DateRangePicker", href: "/ui/date-range-picker" },
-				{ label: "Dialog", href: "/ui/dialog" },
-				{ label: "Drawer", href: "/ui/drawer" },
-				{ label: "Form", href: "/ui/form" },
-				{ label: "ListBox", href: "/ui/list-box" },
-				{ label: "Menu", href: "/ui/menu" },
-				{ label: "MenuBar", href: "/ui/menu-bar" },
-				{ label: "Modal", href: "/ui/modal" },
-				{ label: "NavMenu", href: "/ui/nav-menu" },
-				{ label: "NumberInput", href: "/ui/number-input" },
-				{ label: "Notification", href: "/ui/notification" },
-				{ label: "Pagination", href: "/ui/pagination" },
-				{ label: "Popover", href: "/ui/popover" },
-				{ label: "Progress", href: "/ui/progress" },
-				{ label: "Rating", href: "/ui/rating" },
-				{ label: "SelectBox", href: "/ui/select-box" },
-				{ label: "SegmentedControl", href: "/ui/segmented-control" },
-				{ label: "Slider", href: "/ui/slider" },
-				{ label: "Splitter", href: "/ui/splitter" },
-				{ label: "Stepper", href: "/ui/stepper" },
-				{ label: "TabGroup", href: "/ui/tab-group" },
-				{ label: "TagInput", href: "/ui/tag-input" },
-				{ label: "ToolBar", href: "/ui/tool-bar" },
-			]}
+			links={UI_LINKS}
 		>
 			<slot />
 		</SectionLayout>
