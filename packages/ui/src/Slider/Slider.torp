@@ -212,7 +212,7 @@ export default function Slider($props: SliderProps | undefined) {
 			<div class="torp-slider-fill" style={`${getOrientation() === "vertical" ? "height" : "width"}: ${getPct()}%;`} />
 			<div
 				class="torp-slider-thumb"
-				style={`${getOrientation() === "vertical" ? "top" : "left"}: ${getPct()}%;`}
+				style={`position: absolute; transform: translate(-50%, -50%); ${getOrientation() === "vertical" ? `top: ${getPct()}%; left: 50%` : `left: ${getPct()}%; top: 50%`};`}
 				role="slider"
 				tabindex={getDisabled() ? -1 : 0}
 				aria-orientation={getOrientation()}
@@ -234,15 +234,12 @@ export default function Slider($props: SliderProps | undefined) {
 	}
 
 	@style {
-		/* Headless: positioning only, so the thumb sits at the value along
-		   the track. All appearance is up to the consuming theme */
+		/* Headless: all positioning is done with inline styles (so that theme
+		   CSS can't dislodge the thumb from the track). All appearance is up
+		   to the consuming theme */
 		.torp-slider {
 			position: relative;
 			touch-action: none;
-		}
-		.torp-slider-thumb {
-			position: absolute;
-			transform: translateX(-50%);
 		}
 	}
 }

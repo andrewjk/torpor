@@ -17,6 +17,9 @@ export default function ExampleBasic() {
 	@style {
 		.example-splitter {
 			height: 120px;
+			/* Explicit width: percentage pane sizes need a definite container,
+			   otherwise the splitter grows to fit its content while dragging */
+			width: 360px;
 		}
 
 		.example-splitter-pane {
