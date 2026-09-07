@@ -20,9 +20,7 @@ export default function ExampleBound() {
 		<p>Value: <input type="text" &value={$state.value} /></p>
 
 		<ComboBox class="example-select-box" &value={$state.value}>
-			<ComboBoxInput class="example-select-box-trigger">
-				{$state.text || "-"}
-			</ComboBoxInput>
+			<ComboBoxInput class="example-select-box-trigger" text={$state.text} placeholder="-" />
 			<ComboBoxContent class="example-select-box-content">
 				<ListBox class="example-list-box" &value={$state.value}>
 					@for (let item of items) {

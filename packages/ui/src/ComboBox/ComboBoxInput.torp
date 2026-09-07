@@ -15,6 +15,8 @@ interface ComboBoxInputProps {
 	name?: string;
 	/** The value displayed in the input */
 	value?: any;
+	/** The text to display in the input (e.g. the selected item's label), instead of the raw value */
+	text?: string;
 	/** Text to display when the input value is empty */
 	placeholder?: string;
 	/** Whether the input's value is required */
@@ -48,6 +50,20 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 
 	function focusInput() {
 		input.focus();
+	}
+
+	// The text shown in the input: the consumer-supplied label for the
+	// selected value if given, otherwise the raw value itself. One-way: what
+	// the user types is search text, not the value (that's updated on select)
+	function displayValue(): string {
+		if ($props?.text !== undefined) {
+			return $props.text;
+		}
+		const value = $state.value;
+		if (value === undefined || value === null || value === "") {
+			return "";
+		}
+		return Array.isArray(value) ? value.join(", ") : String(value);
 	}
 
 	function handleClick() {
@@ -122,7 +138,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			class={["torp-combo-box-input", $props?.class]}
 			{$props?.style}
 			name={$props?.name !== undefined ? $props.name : context.name}
-			&value={Array.isArray($state.value) ? $state.value.join(", ") : $state.value}
+			value={displayValue()}
 			placeholder={$props?.placeholder !== undefined ? $props.placeholder : context.placeholder}
 			required={$props?.required !== undefined ? $props.required : context.required}
 			aria-readonly
