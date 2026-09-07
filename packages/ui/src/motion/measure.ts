@@ -18,10 +18,14 @@ export default function measure(el: HTMLElement, fn: (_el: HTMLElement) => numbe
 	let result = fn(el);
 	el.parentNode!.removeChild(el);
 
+	// Restore the styles unconditionally: transition functions call this with
+	// a newly created element that isn't attached yet (oldParent is null), and
+	// leaving the measuring styles on it would render it invisible
+	el.style.visibility = oldVisibility;
+	el.style.position = oldPosition;
+
 	if (oldParent !== null) {
 		oldParent.insertBefore(el, oldBefore);
-		el.style.visibility = oldVisibility;
-		el.style.position = oldPosition;
 	}
 
 	return result;
