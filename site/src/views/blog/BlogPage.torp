@@ -1,8 +1,11 @@
+import type { PageProps } from "@torpor/build";
+import type { PostSummary } from "../../lib/markdown/MarkdownDoc.ts";
+import formatDate from "../../utils/formatDate.ts";
 
 /**
- * The blog component
+ * The blog index, generated from the markdown files in src/content/blog
  */
-export default function BlogPage() {
+export default function BlogPage($props: PageProps<{ posts: PostSummary[] }>) {
 	@head {
 		<title>Blog | Torpor</title>
 	}
@@ -10,7 +13,17 @@ export default function BlogPage() {
 	@render {
 		<div id="blog-container">
 			<h1>Torpor Blog</h1>
-			<p><a href="/blog/01-v1-release">01.&nbsp;&nbsp;Torpor v1 Release</a></p>
+			@for (let post of $props.data.posts) {
+				<article class="post">
+					<h2><a href={`/blog/${post.slug}`}>{post.frontmatter.title}</a></h2>
+					<p class="date">
+						<time datetime={post.frontmatter.publish_date}>
+							{formatDate(post.frontmatter.publish_date)}
+						</time>
+					</p>
+					<p>{post.excerpt}</p>
+				</article>
+			}
 		</div>
 	}
 
@@ -19,6 +32,18 @@ export default function BlogPage() {
 			padding: 0 1rem;
 			max-width: 74rem;
 			margin: 0 auto;
+		}
+
+		.post + .post {
+			margin-top: 2rem;
+		}
+
+		.post h2 {
+			margin-bottom: 0.25rem;
+		}
+
+		.date {
+			color: var(--muted);
 		}
 	}
 }

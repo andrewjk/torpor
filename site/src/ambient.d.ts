@@ -6,6 +6,8 @@
 // imports/exports), and the .d.mts files published with @torpor/view are
 // modules. So the declaration can't ship from @torpor/view itself. Same
 // pattern as Vite's vite-env.d.ts.
+/// <reference types="vite/client" />
+
 declare module "*.torp" {
 	import { Component as ComponentType } from "@torpor/view";
 	const Component: ComponentType;

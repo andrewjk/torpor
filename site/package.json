@@ -22,6 +22,7 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
+		"allmark": "^1.0.20",
 		"phosphor-torpor": "^1.0.2",
 		"sucrase": "^3.35.1",
 		"zod": "^4.4.3"

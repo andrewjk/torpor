@@ -1,0 +1,53 @@
+import type { PageProps } from "@torpor/build";
+import type MarkdownDoc from "../../lib/markdown/MarkdownDoc.ts";
+import formatDate from "../../utils/formatDate.ts";
+
+/**
+ * Renders a markdown document from src/content/blog as a blog post
+ */
+export default function PostPage($props: PageProps<{ post: MarkdownDoc }>) {
+	const post = $props.data.post;
+
+	@head {
+		<title>{post.frontmatter.title} | Torpor</title>
+	}
+
+	@render {
+		<article id="post-container">
+			<h1>{post.frontmatter.title}</h1>
+			<p class="date">
+				<time datetime={post.frontmatter.publish_date}>
+					{formatDate(post.frontmatter.publish_date)}
+				</time>
+			</p>
+			<div class="markdown">
+				@html(post.html)
+			</div>
+		</article>
+	}
+
+	@style {
+		#post-container {
+			padding: 0 1rem;
+			max-width: 74rem;
+			margin: 0 auto;
+		}
+
+		.date {
+			color: var(--muted);
+		}
+
+		/* The markdown html isn't compiled, so its elements can't be scoped */
+		.markdown :global(h2) {
+			margin-top: 2rem;
+		}
+
+		.markdown :global(li) {
+			margin: 0.25rem 0;
+		}
+
+		.markdown :global(li > ul) {
+			margin: 0.25rem 0;
+		}
+	}
+}
