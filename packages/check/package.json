@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/check",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Checks Torpor files for errors",
 	"type": "module",
 	"exports": {

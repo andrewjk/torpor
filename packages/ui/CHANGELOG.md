@@ -1,5 +1,22 @@
 # @torpor/ui
 
+## 1.0.1
+
+<sub>2026-09-08</sub>
+
+- _(patch)_
+  Fix: show/hide items on enter transitions (`grow`, `slide`) even
+  if they are unattached (e.g. when expanding AccordionItems).
+- _(patch)_
+  Fix: focus CommandPalette input on show
+  Fix: separate ComboBox value and text
+  Fix: SelectBox open on first click
+  Fix: close DateRangePicker on second date selected
+  Fix: Slider dragger appearance
+  Fix: same size unicode for rating stars
+  Fix: Chart axis theming
+  Fix: Carousel appearance
+
 ## 1.0.0
 
 <sub>2026-09-03</sub>

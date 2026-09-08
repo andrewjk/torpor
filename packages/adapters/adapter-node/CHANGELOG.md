@@ -1,5 +1,11 @@
 # @torpor/adapter-node
 
+## 1.0.1
+
+<sub>2026-09-08</sub>
+
+- _(patch)_ Fix: tidy up the template and created sites
+
 ## 1.0.0
 
 <sub>2026-09-03</sub>

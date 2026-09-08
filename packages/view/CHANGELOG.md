@@ -1,5 +1,19 @@
 # @torpor/view
 
+## 1.0.1
+
+<sub>2026-09-08</sub>
+
+- _(patch)_
+  Fix: store component region with $onmount functions so that any $run effects inside the $onmount can be attached to the correct region
+- _(patch)_ Fix: @html hydration (no longer duplicates html when updating after hydration)
+- _(patch)_
+  Fix: dev servers no longer run the framework from source. `tb --dev` resolves
+  `@torpor/view` to its compiled dist for registry installs; the source-based
+  `development` export conditions are now only active when the framework is
+  symlinked into the app (workspace/`link:` installs), so `src` is no longer
+  shipped in the release.
+
 ## 1.0.0
 
 <sub>2026-09-03</sub>

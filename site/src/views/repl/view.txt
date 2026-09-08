@@ -738,6 +738,13 @@ function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
 	popRegion(oldRegion);
 	return region;
 }
+const firstInsideNodes = /* @__PURE__ */ new WeakMap();
+function setFirstInsideNode(anchor, node) {
+	firstInsideNodes.set(anchor, node);
+}
+function firstInsideNode(anchor) {
+	return firstInsideNodes.get(anchor);
+}
 function getFragment(document, array, index, html, ns) {
 	if (array[index] === void 0) if (ns === true) {
 		const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
@@ -853,6 +860,7 @@ function nodeAnchor(node) {
 							if (context.hydrationNode === currentNode) context.hydrationNode = endNode;
 							const region = context.activeRegion;
 							if (region.startNode === null && firstInside !== null) region.startNode = firstInside;
+							setFirstInsideNode(endNode, firstInside);
 							return endNode;
 						}
 					}
@@ -1968,23 +1976,24 @@ function $refresh(fn, options) {
 	}
 }
 function $stream(source, handler, options) {
+	const fn = () => {
+		let timer;
+		$run(() => {
+			const unsub = source((value) => {
+				if (options?.debounce) {
+					clearTimeout(timer);
+					timer = setTimeout(() => handler(value), options.debounce);
+				} else handler(value);
+			});
+			return () => {
+				unsub?.();
+				clearTimeout(timer);
+			};
+		});
+	};
 	context.mountEffects.push({
 		region: context.activeRegion,
-		fn: () => {
-			let timer;
-			$run(() => {
-				const unsub = source((value) => {
-					if (options?.debounce) {
-						clearTimeout(timer);
-						timer = setTimeout(() => handler(value), options.debounce);
-					} else handler(value);
-				});
-				return () => {
-					unsub?.();
-					clearTimeout(timer);
-				};
-			});
-		}
+		fn
 	});
 }
 let t_add_element = addElement;
@@ -1997,6 +2006,7 @@ let t_child = nodeChild;
 let t_class = buildClasses;
 let t_dynamic = setDynamicElement;
 let t_event = addEvent;
+let t_first_inside = firstInsideNode;
 let t_fmt = formatText;
 let t_fragment = getFragment;
 let t_fragment_el = getElementFragment;

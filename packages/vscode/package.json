@@ -2,7 +2,7 @@
 	"name": "torpor",
 	"displayName": "Torpor",
 	"description": "Torpor language support for VS Code: syntax highlighting, diagnostics, completions, hover, go to definition and more for .torp files",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"private": true,
 	"publisher": "torpor",
 	"author": "",
