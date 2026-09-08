@@ -19,7 +19,7 @@ export type SiteEntryPaths = {
  * TORPOR_SOURCE_DEV env var, or automatically when both `@torpor/build` and
  * `@torpor/view` are symlinked into the app from outside node_modules (as
  * workspace links and `link:` overrides do). Both packages must be linked,
- * because source mode resolves their `development` export conditions, which
+ * because source mode resolves their `torpor:source` export conditions, which
  * point at src files that registry installs don't ship.
  */
 export function detectSourceMode(siteRoot: string): boolean {

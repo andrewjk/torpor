@@ -44,12 +44,16 @@ export default async function runDev(site: Site): Promise<void> {
 	config.resolve.tsconfigPaths ??= true;
 	// When the framework itself is linked into the app (workspace/link:
 	// installs), resolve `@torpor/view` and `@torpor/build/dev` from source via
-	// their `development` export conditions, so framework changes take effect
+	// their `torpor:source` export conditions, so framework changes take effect
 	// without rebuilding dist. Registry installs run the compiled dist.
+	//
+	// Note: this must be a custom condition, not Vite's built-in `development`
+	// one — Vite's dev server activates `development` by default, which made
+	// registry installs resolve the unpublished `src/` files and fail.
 	const sourceMode = detectSourceMode(site.root);
 	if (sourceMode) {
 		config.resolve.conditions ??= [];
-		config.resolve.conditions.push("development");
+		config.resolve.conditions.push("torpor:source");
 	}
 	// vite-plus' `tsconfigPaths` isn't honored by the SSR module-runner's
 	// externalization path (it hardcodes tsconfigPaths:false), so dev SSR can't

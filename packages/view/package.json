@@ -5,25 +5,25 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"development": "./src/index.ts",
+			"torpor:source": "./src/index.ts",
 			"types": "./dist/index.d.mts",
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		},
 		"./compile": {
-			"development": "./src/compile.ts",
+			"torpor:source": "./src/compile.ts",
 			"types": "./dist/compile.d.mts",
 			"import": "./dist/compile.mjs",
 			"require": "./dist/compile.cjs"
 		},
 		"./ssr": {
-			"development": "./src/ssr.ts",
+			"torpor:source": "./src/ssr.ts",
 			"types": "./dist/ssr.d.mts",
 			"import": "./dist/ssr.mjs",
 			"require": "./dist/ssr.cjs"
 		},
 		"./dev": {
-			"development": "./src/dev.ts",
+			"torpor:source": "./src/dev.ts",
 			"types": "./dist/dev.d.mts",
 			"import": "./dist/dev.mjs",
 			"require": "./dist/dev.cjs"

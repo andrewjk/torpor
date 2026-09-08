@@ -4,7 +4,7 @@
  *
  * Exported as `@torpor/build/dev`: registry installs get the compiled
  * `dist/dev.mjs`, while linked (source-mode) installs resolve the
- * `development` condition to this file, so Vite transforms and HMR apply.
+ * `torpor:source` condition to this file, so Vite transforms and HMR apply.
  * Not intended for production use — production workers are bundled from the
  * built output instead.
  */

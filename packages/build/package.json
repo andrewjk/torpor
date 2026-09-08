@@ -10,7 +10,7 @@
 		},
 		"./dev": {
 			"types": "./dist/dev.d.mts",
-			"development": "./src/dev.ts",
+			"torpor:source": "./src/dev.ts",
 			"import": "./dist/dev.mjs"
 		},
 		"./form": {
