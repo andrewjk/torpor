@@ -10,6 +10,7 @@ import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+import flushOutput from "./flushOutput";
 
 export default function buildServerSlotNode(
 	node: ElementNode,
@@ -20,10 +21,7 @@ export default function buildServerSlotNode(
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 
 	// If there's a slot, build that, otherwise build the default nodes
 	let slotName = node.attributes.find((a) => a.name === "name")?.value;
@@ -46,7 +44,9 @@ export default function buildServerSlotNode(
 	}
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
-	b.append(`t_body += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`);
+	b.append(
+		`${status.inHead ? "t_head" : "t_body"} += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
+	);
 	////const slotResult = nextVarName("comp", status);
 	////b.append(
 	////	`const ${slotResult} = $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
@@ -65,10 +65,7 @@ export default function buildServerSlotNode(
 			buildServerNode(child, status, b);
 		}
 
-		if (status.output) {
-			b.append(`t_body += \`${status.output}\`;`);
-			status.output = "";
-		}
+		flushOutput(status, b);
 	}
 
 	b.append(`}`);

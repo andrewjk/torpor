@@ -7,6 +7,7 @@ import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+import flushOutput from "./flushOutput";
 
 const importsMap: Record<string, string> = {
 	$watch: 'import { $watch } from "${folder}";',
@@ -184,12 +185,28 @@ function buildServerTemplate(
 				b.append("}");
 			}
 		} else if (chunk.script === "/* @head */") {
-			//let userScript = script.substring(marker, i);
-			//if (/[^\s]/.test(userScript)) {
-			//	userScript = "\n/* eslint-disable */\n" + userScript.trim() + "\n/* eslint-enable */";
-			//	b.append(userScript);
-			//}
-			// TODO: need to add e.g. a title to the head, but remove when changing page
+			if (current.head) {
+				// Build the head tags (title, meta, etc) into the head string, so
+				// that they can be hoisted into the document's <head> element.
+				// The tags are built like any other markup (with the scoped
+				// class name suppressed), only into t_head instead of t_body
+				const status: BuildServerStatus = {
+					imports,
+					output: "",
+					styleHash: current.style?.hash || "",
+					varNames: {},
+					preserveWhitespace: false,
+					inHead: true,
+					options,
+				};
+
+				b.append("");
+				b.append("/* Head */");
+
+				buildServerNode(current.head, status, b);
+
+				flushOutput(status, b);
+			}
 		} else if (chunk.script === "/* @style */") {
 			//let userScript = script.substring(marker, i);
 			//if (/[^\s]/.test(userScript)) {

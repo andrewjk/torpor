@@ -9,6 +9,7 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+import flushOutput from "./flushOutput";
 
 export default function buildServerSwitchNode(
 	node: ControlNode,
@@ -19,10 +20,7 @@ export default function buildServerSwitchNode(
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 
 	// Build the switch statement
 	b.append(`${node.statement} {`);
@@ -50,10 +48,7 @@ function buildServerSwitchBranch(node: ControlNode, status: BuildServerStatus, b
 		buildServerNode(child, status, b);
 	}
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 
 	b.append("break;");
 	b.append("}");

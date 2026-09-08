@@ -10,6 +10,7 @@ import trimQuotes from "../../utils/trimQuotes";
 import nextVarName from "../utils/nextVarName";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+import flushOutput from "./flushOutput";
 
 export default function buildServerComponentNode(
 	node: ElementNode,
@@ -20,10 +21,7 @@ export default function buildServerComponentNode(
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 
 	// Props
 	const componentHasProps = node.attributes.length; // || root;
@@ -133,7 +131,7 @@ export default function buildServerComponentNode(
 	}
 	const componentResult = nextVarName("comp", status);
 	b.append(`const ${componentResult} = ${componentName}(${renderParams});`);
-	b.append(`t_body += ${componentResult}.body;`);
+	b.append(`${status.inHead ? "t_head" : "t_body"} += ${componentResult}.body;`);
 	b.append(`t_head += ${componentResult}.head;`);
 
 	// End the control statement

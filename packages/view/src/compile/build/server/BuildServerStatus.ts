@@ -6,5 +6,7 @@ export default interface BuildServerStatus {
 	styleHash: string;
 	varNames: Record<string, number>;
 	preserveWhitespace: boolean;
+	/** Whether the output is being built inside a @head block */
+	inHead?: boolean;
 	options?: BuildOptions;
 }

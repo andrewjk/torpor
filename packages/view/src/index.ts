@@ -32,6 +32,7 @@ import t_run_list from "./render/runList";
 import t_run_await from "./render/runAwait";
 import t_run_try from "./render/runTry";
 import t_save_hydration from "./render/saveHydration";
+import t_head_element from "./render/headElement";
 import t_attribute from "./render/setAttribute";
 import t_dynamic from "./render/setDynamicElement";
 import fromElement from "./stream/fromElement";
@@ -112,6 +113,7 @@ export {
 	t_run_try,
 	t_save_hydration,
 	t_restore_hydration,
+	t_head_element,
 	t_attribute,
 	t_dynamic,
 };

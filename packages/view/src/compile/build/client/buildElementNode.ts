@@ -138,11 +138,14 @@ function buildTitleNode(node: ElementNode, status: BuildStatus, b: Builder) {
 
 function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	status.imports.add("$run");
-	// TODO: dedupe e.g. <meta name="x"> or on special key
+	status.imports.add("t_head_element");
+	// Look for an existing element to reuse, so that hydrating server rendered
+	// tags (or revisiting a page with the same tags) doesn't add duplicates
+	// to the head. The title is handled separately, in buildTitleNode
+	const selector = headElementSelector(node);
 	b.append("$run(() => {");
 	b.append(`
-			const t_head_el = document.createElement("${node.tagName}");
-			document.getElementsByTagName("head")[0].appendChild(t_head_el);`);
+			const t_head_el = t_head_element("${node.tagName}", ${JSON.stringify(selector)});`);
 	for (let { name, value, span } of node.attributes) {
 		if (value != null) {
 			status.imports.add("t_attribute");
@@ -151,6 +154,23 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 		}
 	}
 	b.append(`}${status.options.dev === true ? `, "runHead"` : ""});`);
+}
+
+/**
+ * Builds a selector that finds an equivalent element in the head, from the
+ * attributes that identify it (e.g. `meta[name="description"]`). Returns an
+ * empty string when the element has no identifying attributes, in which case
+ * a new element is always created.
+ */
+function headElementSelector(node: ElementNode): string {
+	const identityAttributes = ["name", "property", "rel", "charset", "http-equiv", "itemprop"];
+	const parts: string[] = [];
+	for (let { name, value, reactive } of node.attributes) {
+		if (!identityAttributes.includes(name) || value == null || reactive) continue;
+		const attributeValue = trimQuotes(value).replaceAll("\\", "\\\\").replaceAll('"', '\\"');
+		parts.push(`[${name}="${attributeValue}"]`);
+	}
+	return parts.length ? node.tagName + parts.join("") : "";
 }
 
 function buildElementAttributes(

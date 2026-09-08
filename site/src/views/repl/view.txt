@@ -1798,6 +1798,15 @@ function runTry(region, anchor, renderTry, renderCatch, name) {
 		if (context.hydrationNode !== null && anchor !== null) context.hydrationNode = anchor;
 	}, name);
 }
+function headElement(tagName, selector) {
+	if (selector) {
+		const existing = document.head.querySelector(selector);
+		if (existing) return existing;
+	}
+	const element = document.createElement(tagName);
+	document.head.appendChild(element);
+	return element;
+}
 function setAttribute(el, name, value) {
 	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
 	else el.setAttribute(name, value);
@@ -2010,6 +2019,7 @@ let t_first_inside = firstInsideNode;
 let t_fmt = formatText;
 let t_fragment = getFragment;
 let t_fragment_el = getElementFragment;
+let t_head_element = headElement;
 let t_list_item = newListItem;
 let t_next = nodeNext;
 let t_pop_region = popRegion;

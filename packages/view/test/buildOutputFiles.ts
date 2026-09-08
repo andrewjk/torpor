@@ -157,6 +157,8 @@ const importsMap: Record<string, string> = {
 		'import t_apply_props from "../../../../src/render/applyProps";',
 	'import { t_attribute } from "@torpor/view";':
 		'import t_attribute from "../../../../src/render/setAttribute";',
+	'import { t_head_element } from "@torpor/view";':
+		'import t_head_element from "../../../../src/render/headElement";',
 	'import { t_class } from "@torpor/view";':
 		'import t_class from "../../../../src/render/buildClasses";',
 	'import { t_style } from "@torpor/view";':

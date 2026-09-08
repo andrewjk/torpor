@@ -38,7 +38,8 @@ export default function buildServerElementNode(
 }
 
 function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
-	let needsClass = node.scopeStyles;
+	// Elements in a @head block never get the scoped class name
+	let needsClass = node.scopeStyles && !status.inHead;
 	let attributes: string[] = [];
 	for (let { name, value, reactive, fullyReactive } of node.attributes) {
 		if (name === "self" && node.tagName === "@element") {
@@ -96,7 +97,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			} else if (name === "class") {
 				status.imports.add("t_class");
 				let params = [value];
-				if (node.scopeStyles) {
+				if (node.scopeStyles && !status.inHead) {
 					params.push(`"torp-${status.styleHash}"`);
 					needsClass = false;
 				}
@@ -121,7 +122,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 			attributes.push(
 				`${name}="${trimQuotes(value).replaceAll("{", "${t_attr(").replaceAll("}", ")}")}"`,
 			);
-		} else if (name === "class" && node.scopeStyles) {
+		} else if (name === "class" && node.scopeStyles && !status.inHead) {
 			value = value
 				? `"${trimQuotes(value)} torp-${status.styleHash}"`
 				: `"torp-${status.styleHash}"`;

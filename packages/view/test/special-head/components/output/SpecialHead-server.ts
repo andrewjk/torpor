@@ -8,5 +8,8 @@ export default function Head(
 	let t_body = "";
 	let t_head = "";
 
+	/* Head */
+	t_head += `<title>Hello</title> <meta name="description" content="A test">`;
+
 	return { body: t_body, head: t_head };
 }

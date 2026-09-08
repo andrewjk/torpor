@@ -8,6 +8,7 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import type BuildServerStatus from "./BuildServerStatus";
 import buildServerNode from "./buildServerNode";
+import flushOutput from "./flushOutput";
 
 export default function buildServerAwaitNode(
 	node: ControlNode,
@@ -18,10 +19,7 @@ export default function buildServerAwaitNode(
 	// can skip to the end to set the anchor node when hydrating
 	status.output += HYDRATION_START_COMMENT;
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 
 	// On the server, render the `with` branch (the pending state) since the
 	// promise hasn't resolved yet. The client will hydrate and swap to content
@@ -44,8 +42,5 @@ function buildServerAwaitBranch(node: ControlNode, status: BuildServerStatus, b:
 		buildServerNode(child, status, b);
 	}
 
-	if (status.output) {
-		b.append(`t_body += \`${status.output}\`;`);
-		status.output = "";
-	}
+	flushOutput(status, b);
 }

@@ -10,6 +10,7 @@ import type PageEndPoint from "../types/PageEndPoint.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
 import type ServerRequest from "../types/ServerRequest.ts";
+import mergeHead from "./mergeHead.ts";
 import {
 	ERROR_ROUTE,
 	HOOK_ROUTE,
@@ -419,7 +420,7 @@ async function loadView(
 			}
 
 			styles += head;
-			html = template.replace("%COMPONENT_BODY%", body).replace("%COMPONENT_HEAD%", styles);
+			html = mergeHead(template, styles).replace("%COMPONENT_BODY%", body);
 		} catch (error) {
 			// TODO: Show a proper Error component
 			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";

@@ -9,6 +9,7 @@ import buildServerReplaceNode from "./buildServerReplaceNode";
 import buildServerScriptNode from "./buildServerScriptNode";
 import buildServerSwitchNode from "./buildServerSwitchNode";
 import buildServerTryNode from "./buildServerTryNode";
+import flushOutput from "./flushOutput";
 
 export default function buildServerControlNode(
 	node: ControlNode,
@@ -76,19 +77,13 @@ export default function buildServerControlNode(
 			break;
 		}
 		case "@const": {
-			if (status.output) {
-				b.append(`t_body += \`${status.output}\`;`);
-				status.output = "";
-			}
+			flushOutput(status, b);
 			buildServerScriptNode(node, b);
 			break;
 		}
 		case "@function":
 		case "@async function": {
-			if (status.output) {
-				b.append(`t_body += \`${status.output}\`;`);
-				status.output = "";
-			}
+			flushOutput(status, b);
 			//b.append("/* eslint-disable */");
 			b.append("");
 			buildServerScriptNode(node, b);
