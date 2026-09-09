@@ -51,13 +51,15 @@ function buildStyles(value) {
 	}
 }
 function gatherStyles(value, styles) {
-	if (value) if (Array.isArray(value)) for (let v of value) gatherStyles(v, styles);
-	else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
-		if (v === null || v === void 0) continue;
-		const key = n.replace(CAMEL_TO_DASH, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
-		styles.push(`${key}: ${v}`);
+	if (value) {
+		if (Array.isArray(value)) for (let v of value) gatherStyles(v, styles);
+		else if (typeof value === "object") for (let [n, v] of Object.entries(value)) {
+			if (v === null || v === void 0) continue;
+			const key = n.replace(CAMEL_TO_DASH, (char, i) => (i > 0 ? "-" : "") + char.toLowerCase());
+			styles.push(`${key}: ${v}`);
+		}
+		else styles.push(String(value));
 	}
-	else styles.push(String(value));
 }
 function formatText(value) {
 	if (value === void 0 || value === null) return "";
@@ -208,9 +210,11 @@ function checkComputed(computed) {
 }
 function checkSources(target) {
 	let haveComputed = false;
-	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc) if (sourceSub.source.type === 0) return true;
-	else if (sourceSub.source.recalc) haveComputed = true;
-	else return true;
+	for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc) {
+		if (sourceSub.source.type === 0) return true;
+		else if (sourceSub.source.recalc) haveComputed = true;
+		else return true;
+	}
 	if (haveComputed) {
 		for (let sourceSub = target.firstSource; sourceSub !== null; sourceSub = sourceSub.nextSource) if (sourceSub.recalc && sourceSub.source.type === 1 && sourceSub.source.recalc) {
 			const oldActiveTarget = context.activeTarget;
@@ -595,13 +599,15 @@ function addFragment(fragment, parent, before, endNode, startNode) {
 }
 function applyProps(el, props, propNamesUsed) {
 	if (props !== void 0) {
-		for (let [name, value] of Object.entries(props)) if (!propNamesUsed.includes(name)) if (name.startsWith("on")) {
-			const eventName = name.substring(2);
-			if (isDelegatedEventType(eventName)) attachDelegatedEvent(el, eventName, value);
-			else el.addEventListener(eventName, value);
-		} else $run(function setAttribute() {
-			el.setAttribute(name, value);
-		});
+		for (let [name, value] of Object.entries(props)) if (!propNamesUsed.includes(name)) {
+			if (name.startsWith("on")) {
+				const eventName = name.substring(2);
+				if (isDelegatedEventType(eventName)) attachDelegatedEvent(el, eventName, value);
+				else el.addEventListener(eventName, value);
+			} else $run(function setAttribute() {
+				el.setAttribute(name, value);
+			});
+		}
 	}
 }
 function clearRegion(region) {
@@ -746,28 +752,32 @@ function firstInsideNode(anchor) {
 	return firstInsideNodes.get(anchor);
 }
 function getFragment(document, array, index, html, ns) {
-	if (array[index] === void 0) if (ns === true) {
-		const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
-		template.innerHTML = html;
-		const fragment = new DocumentFragment();
-		fragment.append(...template.childNodes);
-		array[index] = fragment;
-	} else {
-		const template = document.createElement("template");
-		template.innerHTML = html;
-		array[index] = template.content;
+	if (array[index] === void 0) {
+		if (ns === true) {
+			const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
+			template.innerHTML = html;
+			const fragment = new DocumentFragment();
+			fragment.append(...template.childNodes);
+			array[index] = fragment;
+		} else {
+			const template = document.createElement("template");
+			template.innerHTML = html;
+			array[index] = template.content;
+		}
 	}
 	return array[index].cloneNode(true);
 }
 function getElementFragment(document, array, index, html, ns) {
-	if (array[index] === void 0) if (ns === true) {
-		const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
-		template.innerHTML = html;
-		array[index] = template.firstElementChild;
-	} else {
-		const template = document.createElement("template");
-		template.innerHTML = html;
-		array[index] = template.content.firstElementChild;
+	if (array[index] === void 0) {
+		if (ns === true) {
+			const template = document.createElementNS("http://www.w3.org/2000/svg", "template");
+			template.innerHTML = html;
+			array[index] = template.firstElementChild;
+		} else {
+			const template = document.createElement("template");
+			template.innerHTML = html;
+			array[index] = template.content.firstElementChild;
+		}
 	}
 	return array[index].cloneNode(true);
 }
@@ -1728,10 +1738,12 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 			const targetIndex = suspended ? 1 : 0;
 			if (targetIndex !== index) {
 				if (targetIndex === 0) attemptContent();
-				else if (!hasContent) if (renderWith !== null) renderBranch(1, renderWith);
-				else {
-					runControlBranch(region, index, 1);
-					index = 1;
+				else if (!hasContent) {
+					if (renderWith !== null) renderBranch(1, renderWith);
+					else {
+						runControlBranch(region, index, 1);
+						index = 1;
+					}
 				}
 			}
 		}

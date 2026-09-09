@@ -1,5 +1,27 @@
 # @torpor/build
 
+## 1.1.0
+
+<sub>2026-09-09</sub>
+
+- _(minor)_
+  Feat: when a site doesn't set an adapter, one is resolved automatically at
+  build/preview time -- a deployment environment (e.g. `CF_PAGES` for
+  Cloudflare Pages) picks the platform's adapter when installed, an installed
+  `@torpor/adapter-*` package is used otherwise (preferring node), and as a
+  last resort preview serves the built output on the current runtime (Bun or
+  Deno natively; node needs `@torpor/adapter-node`). The chosen adapter is
+  logged, and `serve` may now be async.
+- _(patch)_ Fix: build head element in SSR
+- _(patch)_
+  Fix: a form re-render no longer fails the load query validation when the
+  action url drops query params (form errors render instead of an error
+  redirect), and the action name is read from the `?/name` query key so forms
+  work on urls that already carry a query string. Also fixed: a `+server`
+  route's server hook can short-circuit the request again (an enter response
+  was being ignored), and the test harness now runs the same request handlers
+  as the site server.
+
 ## 1.0.2
 
 <sub>2026-09-08</sub>

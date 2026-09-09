@@ -1,5 +1,102 @@
 # @torpor/ui
 
+## 1.1.0
+
+<sub>2026-09-09</sub>
+
+- _(minor)_
+  Feat: split Slider into subcomponents
+
+  The `Slider` is now composed of `SliderRange` (the filled portion) and
+  `SliderHandle` (the thumb, carrying `role="slider"` and the keyboard
+  interaction), each with its own props and styling. With no children the
+  range and handle are still rendered automatically, so existing usage is
+  unchanged.
+
+- _(minor)_
+  Feat: split Progress into subcomponents
+
+  The `Progress` is now composed of a `ProgressIndicator` (the bar that
+  fills the track), with its own props and styling. With no children the
+  indicator is still rendered automatically, so existing usage is unchanged.
+
+- _(minor)_
+  Feat: split Rating into subcomponents
+
+  The `Rating` is now composed of `RatingStar` components (one radio-button
+  star each, with their own props, styling and slot content for custom
+  glyphs). With no children the stars are still rendered automatically, so
+  existing usage is unchanged.
+
+- _(minor)_
+  Feat: split TimePicker into subcomponents
+
+  The `TimePicker` is now composed of `TimePickerPart` components (the hour,
+  minute and second spinbutton segments) and a `TimePickerPeriod` (the AM/PM
+  toggle in 12-hour mode), each with its own props and styling. With no
+  children the segments are still rendered automatically, so existing usage
+  is unchanged.
+
+- _(minor)_
+  Feat: split TagInput into subcomponents
+
+  The `TagInput` is now composed of `TagInputTag` (one chip each, with their
+  own props and styling), `TagInputField` (the text field) and
+  `TagInputSuggestions` (the loader-backed suggestion list). With no children
+  everything is still rendered automatically, so existing usage is unchanged.
+
+- _(minor)_
+  Feat: split CommandPalette into subcomponents
+
+  The `CommandPalette` is now composed of a `CommandPaletteInput` (the search
+  field), a `CommandPaletteList` (the filtered listbox) and
+  `CommandPaletteItem` rows (label plus shortcut, with slot content for custom
+  rows), each with their own props and styling. With no children everything is
+  still rendered automatically, so existing usage is unchanged.
+
+- _(minor)_
+  Feat: split DataGrid into subcomponents
+
+  The `DataGrid` table is now rendered from `DataGridColumnHeader` (one
+  sortable header cell each) and `DataGridCell` (one body cell each, carrying
+  the roving tabindex) subcomponents, each with their own props, styling and
+  slots. The cell template, sorting, paging, loading and keyboard APIs are
+  unchanged.
+
+- _(minor)_
+  Feat: split DatePicker into subcomponents
+
+  The `DatePicker` is now composed of a `DatePickerTrigger` (the display
+  button, with slot content for custom labels) and a `DatePickerContent`
+  (the calendar popout, rendering the selectable calendar by default), each
+  with their own props and styling. With no children everything is still
+  rendered automatically, so existing usage is unchanged.
+
+- _(minor)_
+  Feat: split DateRangePicker into subcomponents
+
+  The `DateRangePicker` is now composed of a `DateRangePickerTrigger` (the
+  display button, with slot content for custom labels) and a
+  `DateRangePickerContent` (the calendar popout, rendering the range calendar
+  by default), each with their own props and styling. With no children
+  everything is still rendered automatically, so existing usage is unchanged.
+
+- _(minor)_
+  Feat: split ColorPicker into subcomponents
+
+  The `ColorPicker` is now composed of its `ColorPalette` alongside a new
+  `ColorPickerInput` (the hex text field, with its own props and styling).
+  With no children everything is still rendered automatically, so existing
+  usage is unchanged.
+
+- _(patch)_
+  Fix: TimePicker segments keep updating after moving between parts
+
+  Stepping a segment with the arrow keys no longer freezes its displayed
+  text once another segment has been interacted with. The sync guard now
+  tracks uncommitted typing exactly (clearing the buffer on every commit)
+  instead of misreading a focused-but-unedited segment as being edited.
+
 ## 1.0.2
 
 <sub>2026-09-08</sub>

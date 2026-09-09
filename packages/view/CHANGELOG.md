@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 1.0.3
+
+<sub>2026-09-09</sub>
+
+- _(patch)_ Fix: build head element in SSR
+
 ## 1.0.2
 
 <sub>2026-09-08</sub>

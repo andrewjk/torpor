@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/language-server",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "A language server for Torpor, for use in any editor",
 	"type": "module",
 	"exports": {
