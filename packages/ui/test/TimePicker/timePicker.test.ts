@@ -218,4 +218,26 @@ describe("TimePicker (subcomponents)", () => {
 		expect(getHour(container)).toHaveAttribute("aria-valuenow", "11");
 		expect(onchange).toHaveBeenCalledWith("11:30");
 	});
+
+	it("arrow keys update the display after moving to another part", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TimePickerTest as any, { hour12: true, seconds: true });
+
+		const hour = getHour(container);
+		hour.focus();
+		fireEvent.keyDown(hour, { key: "ArrowUp" });
+		await tick();
+		expect(hour).toHaveValue("01");
+
+		// Moving to the minute part must not freeze its display: the state
+		// updates (aria-valuenow) and the shown text follows it
+		const minute = getMinute(container);
+		minute.focus();
+		fireEvent.keyDown(minute, { key: "ArrowUp" });
+		await tick();
+
+		expect(minute).toHaveAttribute("aria-valuenow", "1");
+		expect(minute).toHaveValue("01");
+	});
 });

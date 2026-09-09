@@ -122,7 +122,9 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 	let $state = $watch({
 		value: undefined as string | undefined,
 
-		// The text being typed in each segment; committed on completion
+		// The text being typed in each segment; committed on completion.
+		// Cleared by every commit, so a non-empty buffer always means
+		// uncommitted typing that sync must not overwrite.
 		hourText: "",
 		minuteText: "",
 		secondText: "",
@@ -247,13 +249,15 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 		if (sync) syncInputs();
 	}
 
-	// Keep segment inputs showing the committed values unless typing there
+	// Keep segment inputs showing the committed values. A segment with
+	// uncommitted typing keeps its text; the rest always sync, even when
+	// focused -- so moving between segments never freezes their display.
 	function syncInputs() {
 		const hourInput = partInputs.get("hour");
 		const minuteInput = partInputs.get("minute");
 		if (!hourInput || !minuteInput) return;
 		const editing = (el: HTMLInputElement, buffer: string) =>
-			document.activeElement === el && el.value !== buffer;
+			document.activeElement === el && buffer !== "";
 		if (!editing(hourInput, $state.hourText)) {
 			hourInput.value = partDisplay("hour");
 		}
@@ -283,6 +287,7 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 		// Two digits fills the segment; move on to the next one
 		if (text.length >= (PAD[partIndex(part)] ?? 2)) {
 			commitBuffer(part, text);
+			setBuffer(part, "");
 			focusNextSegment(part);
 		}
 	}
