@@ -1,0 +1,42 @@
+import { DataGridCell, DataGridColumnHeader } from "../../../src/DataGrid/index";
+import { type DataColumn, DataGridContextName } from "../../../src/DataGrid/DataGridTypes";
+
+/** Renders a header and a cell with a hand-made context, for unit testing */
+export default function DataGridSubcomponentsTest() {
+	$context[DataGridContextName] = {
+		toggleSort: () => {},
+		getAriaSort: (key: string) => (key === "name" ? "ascending" : undefined),
+		getAlignClass: (align: "start" | "center" | "end" | undefined) =>
+			align ? `torp-data-grid-align-${align}` : undefined,
+		getCellValue: (row: any, column: DataColumn) => row?.[column.key],
+		isActiveCell: (row: number, col: number) => row === 0 && col === 0,
+		getCellId: (row: number, col: number) => `${row}:${col}`,
+	};
+
+	@render {
+		<table>
+			<thead>
+				<tr>
+					<DataGridColumnHeader
+						column={{ key: "name", label: "Name", sortable: true, align: "start" }}
+						class="custom-header"
+					/>
+					<DataGridColumnHeader column={{ key: "role", label: "Role" }} />
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<DataGridCell
+						column={{ key: "name", align: "start" }}
+						rowIndex={0}
+						colIndex={0}
+						class="custom-cell"
+					>
+						custom content
+					</DataGridCell>
+					<DataGridCell rowIndex={1} colIndex={1} />
+				</tr>
+			</tbody>
+		</table>
+	}
+}

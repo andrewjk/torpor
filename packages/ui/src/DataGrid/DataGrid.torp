@@ -1,5 +1,7 @@
 import type { Bindable, ClassValue, StyleValue } from "@torpor/view";
-import { type DataColumn } from "./DataGridTypes";
+import { type DataColumn, type DataGridContext, DataGridContextName } from "./DataGridTypes";
+import DataGridCell from "./DataGridCell.torp";
+import DataGridColumnHeader from "./DataGridColumnHeader.torp";
 import type {
 	LoadRequest,
 	LoadResult,
@@ -63,7 +65,8 @@ interface DataGridProps {
  *
  * See [the WAI-ARIA guidelines for grids](https://www.w3.org/WAI/ARIA/apg/patterns/grid/).
  *
- * The structure of a DataGrid is:
+ * The structure of a DataGrid is a table of DataGridColumnHeaders and
+ * DataGridCells, rendered automatically from the columns and rows:
  *
  * ```
  * <DataGrid columns={columns} data={rows}>
@@ -386,6 +389,17 @@ export default function DataGrid($props: DataGridProps) {
 		return `max-height:${getViewportHeight()}px;overflow:auto;`;
 	}
 
+	// Set the context to pass down to the headers and cells
+	let context: DataGridContext = {
+		toggleSort,
+		getAriaSort: ariaSort,
+		getAlignClass: alignClass,
+		getCellValue: cellValue,
+		isActiveCell,
+		getCellId: cellId,
+	};
+	$context[DataGridContextName] = context;
+
 	@render {
 		@try {
 			@await {
@@ -418,20 +432,7 @@ export default function DataGrid($props: DataGridProps) {
 						<tr role="row">
 							@for (let entry of columnEntries) {
 								@key = entry.column.key
-								<th
-									scope="col"
-									role="columnheader"
-									class={[alignClass(entry.column.align), entry.column.sortable ? "torp-data-grid-sortable" : undefined]}
-									aria-sort={ariaSort(entry.column.key)}
-								>
-									@if (entry.column.sortable) {
-										<button type="button" onclick={() => toggleSort(entry.column)}>
-											{entry.column.label ?? entry.column.key}
-										</button>
-									} else {
-										<span>{entry.column.label ?? entry.column.key}</span>
-									}
-								</th>
+								<DataGridColumnHeader column={entry.column} />
 							}
 						</tr>
 					</thead>
@@ -453,11 +454,10 @@ export default function DataGrid($props: DataGridProps) {
 								<tr role="row">
 									@for (let entry of columnEntries) {
 										@key = entry.column.key
-										<td
-											role="gridcell"
-											class={alignClass(entry.column.align)}
-											data-cell={cellId(rowEntry.index, entry.index)}
-											tabindex={isActiveCell(rowEntry.index, entry.index) ? 0 : -1}
+										<DataGridCell
+											column={entry.column}
+											rowIndex={rowEntry.index}
+											colIndex={entry.index}
 										>
 											<slot
 												row={rowEntry.row}
@@ -466,7 +466,7 @@ export default function DataGrid($props: DataGridProps) {
 											>
 												{cellValue(rowEntry.row, entry.column)}
 											</slot>
-										</td>
+										</DataGridCell>
 									}
 								</tr>
 							}

@@ -1,6 +1,7 @@
 import DataGrid from "./DataGrid.torp";
+import DataGridCell from "./DataGridCell.torp";
+import DataGridColumnHeader from "./DataGridColumnHeader.torp";
 
-export { DataGrid };
+export { DataGrid, DataGridColumnHeader, DataGridCell };
+
 export type { DataColumn, DataGridCellSlot, DataGridLoadEvent } from "./DataGridTypes";
-export type { LoadRequest, LoadResult, Loader } from "../utils/loader";
-export { normalizeLoadResult } from "../utils/loader";

@@ -1,0 +1,44 @@
+import { DataGrid } from "@torpor/ui/DataGrid";
+
+const columns = [
+	{ key: "name", label: "Name", sortable: true },
+	{ key: "role", label: "Role" },
+];
+
+async function load() {
+	await new Promise((r) => setTimeout(r, 500));
+	return {
+		items: [
+			{ name: "Cara", role: "Designer" },
+			{ name: "Alice", role: "Engineer" },
+			{ name: "Bob", role: "Manager" },
+		],
+	};
+}
+
+export default function ExampleLoading() {
+	@render {
+		<DataGrid
+			class="example-data-grid"
+			columns={columns}
+			load={load}
+			ariaLabel="Team members"
+		>
+			<fill name="loading">Loading team members…</fill>
+		</DataGrid>
+	}
+
+	@style {
+		:global(.example-data-grid) {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		:global(.example-data-grid th),
+		:global(.example-data-grid td) {
+			border: 1px solid var(--border);
+			padding: 8px;
+			text-align: left;
+		}
+	}
+}

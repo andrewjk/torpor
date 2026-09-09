@@ -44,6 +44,7 @@ export const UI_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Contextual", href: "/ui/contextual" },
 	{ label: "DatePicker", href: "/ui/date-picker" },
 	{ label: "DateRangePicker", href: "/ui/date-range-picker" },
+	{ label: "DataGrid", href: "/ui/data-grid" },
 	{ label: "Dialog", href: "/ui/dialog" },
 	{ label: "Drawer", href: "/ui/drawer" },
 	{ label: "Form", href: "/ui/form" },

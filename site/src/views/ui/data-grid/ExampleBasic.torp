@@ -1,0 +1,43 @@
+import { DataGrid } from "@torpor/ui/DataGrid";
+
+const columns = [
+	{ key: "name", label: "Name", sortable: true },
+	{ key: "email", label: "Email" },
+];
+
+const rows = [
+	{ name: "Cara", email: "cara@example.com" },
+	{ name: "Alice", email: "alice@example.com" },
+	{ name: "Bob", email: "bob@example.com" },
+];
+
+export default function ExampleBasic() {
+	@render {
+		<DataGrid
+			class="example-data-grid"
+			columns={columns}
+			data={rows}
+			ariaLabel="Team members"
+		>
+			@if ($slot.column.key === "name") {
+				<strong>{$slot.value}</strong>
+			} else {
+				<span>{$slot.value}</span>
+			}
+		</DataGrid>
+	}
+
+	@style {
+		:global(.example-data-grid) {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		:global(.example-data-grid th),
+		:global(.example-data-grid td) {
+			border: 1px solid var(--border);
+			padding: 8px;
+			text-align: left;
+		}
+	}
+}

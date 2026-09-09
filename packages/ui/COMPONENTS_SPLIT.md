@@ -33,32 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### DataGrid
-
-**Current:** one file (496 lines), the biggest offender. The header cell +
-sort button (`DataGrid.torp:421`), body rows and cells (`DataGrid.torp:451`),
-spacer rows (virtualization), and the loading/error/empty states are all
-inline. Only the cell _content_ is slot-customizable; the cell/header _markup_
-is not.
-
-**Proposed:**
-
-```
-DataGrid/DataGrid.torp                  root: state (page/sort/load), keyboard nav, virtualization
-DataGrid/DataGridColumnHeader.torp      one th: label, sort button, aria-sort
-DataGrid/DataGridCell.torp              one td: role="gridcell", tabindex roving, default slot
-```
-
-Optional further splits, in descending value:
-
-- `DataGridRow` (tr + the per-row slot pass-through)
-- `DataGridEmpty` / `DataGridLoading` / `DataGridError` (the named-slot
-  regions, matching how `Notification` splits `NotificationContent`)
-
-The header/cell pair is the core split: those are the elements a theme has to
-target, and they carry the interesting attributes (`aria-sort`,
-`data-cell`, alignment classes).
-
 ### DatePicker
 
 **Current:** nearly compliant -- uses the `Calendar` subcomponents and has

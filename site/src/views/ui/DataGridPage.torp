@@ -1,0 +1,67 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./data-grid/ExampleBasic.torp";
+import ExampleBasicCode from "./data-grid/ExampleBasic.torp?raw";
+import ExampleLoading from "./data-grid/ExampleLoading.torp";
+import ExampleLoadingCode from "./data-grid/ExampleLoading.torp?raw";
+
+export default function DataGridPage() {
+	@head {
+		<title>DataGrid | Torpor</title>
+	}
+
+	@render {
+		<h1>DataGrid</h1>
+		<p>
+			A table of rows that supports sorting, paging and loading data from the network. Rows
+			and columns are rendered automatically as DataGridCells and DataGridColumnHeaders.
+		</p>
+		<p>
+			See{" "}
+			<a href="https://www.w3.org/WAI/ARIA/apg/patterns/grid/">
+				the WAI-ARIA guidelines for grids
+			</a>
+			.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<DataGrid columns={columns} data={rows}>
+	(cell content, using $slot.row / $slot.column / $slot.value)
+</DataGrid>
+`.trim()}</code></pre>
+		<p>
+			Cells render their value as text by default. Pass children to customize the cell
+			content; named slots provide the <code>loading</code>, <code>error</code> and{" "}
+			<code>empty</code> states.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Loading
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleLoading />
+					<fill name="code">
+						<CodePreview code={ExampleLoadingCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}
