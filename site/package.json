@@ -22,20 +22,20 @@
 		"@torpor/ui": "workspace:^",
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
-		"allmark": "^1.0.20",
+		"allmark": "^1.0.22",
 		"phosphor-torpor": "^1.0.2",
 		"sucrase": "^3.35.1",
-		"zod": "^4.4.3"
+		"zod": "^4.5.4"
 	},
 	"devDependencies": {
 		"@torpor/check": "workspace:^",
 		"@torpor/prettier": "workspace:^",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"shiki-codegen": "^4.4.1",
-		"tsx": "^4.23.5",
+		"shiki-codegen": "^4.4.3",
+		"tsx": "^4.23.13",
 		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:",
-		"wrangler": "^4.118.0"
+		"wrangler": "^4.129.1"
 	}
 }

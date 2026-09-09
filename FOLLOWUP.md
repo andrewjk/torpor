@@ -5,17 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### allmark splits the first paragraph after frontmatter at line breaks
-
-When a document starts with frontmatter, allmark's `parse` renders the first
-paragraph after it as one `<p>` per source line (soft breaks become paragraph
-breaks): `---\ntitle: T\n---\n\na\nb\n` renders `<p>a</p><p>b</p>` instead of
-`<p>a\nb</p>`. Without frontmatter the same source renders correctly. Suspect
-the block parser's line/blank-line state isn't reset properly when resuming
-after `extractFrontMatter` (`allmark` src/parse.ts). Worked around in the site
-by deriving post excerpts from the markdown source instead of the html
-(`site/src/lib/markdown/index.ts`).
-
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
