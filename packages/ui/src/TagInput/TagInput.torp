@@ -10,6 +10,10 @@ import FormValues from "../Form/FormValues.torp";
 import { type Loader, createItemLoader } from "../utils/loader";
 import getId from "../utils/getId";
 import createFormField from "../utils/formField";
+import TagInputField from "./TagInputField.torp";
+import TagInputSuggestions from "./TagInputSuggestions.torp";
+import TagInputTag from "./TagInputTag.torp";
+import { type TagInputContext, TagInputContextName } from "./TagInputTypes";
 
 interface TagInputProps {
 	/** An ID for the root element */
@@ -46,9 +50,21 @@ interface TagInputProps {
  * An input where the user enters multiple free-text values, each shown as a
  * tag that can be removed. Typing a value and pressing Enter or comma adds
  * it as a tag, and pressing Backspace in an empty field removes the last one.
+ *
+ * The structure of a TagInput is:
+ *
+ * ```
+ * <TagInput>
+ * 	<TagInputTag />
+ * 	<TagInputField />
+ * 	<TagInputSuggestions />
+ * </TagInput>
+ * ```
+ *
+ * With no children, the tags and suggestions are rendered automatically.
  */
 export default function TagInput($props: TagInputProps | undefined) {
-	let input: HTMLInputElement;
+	let input: HTMLInputElement | undefined;
 	let root: HTMLElement;
 
 	// Wire up the enclosing Form and Field, if any
@@ -116,9 +132,46 @@ export default function TagInput($props: TagInputProps | undefined) {
 		return `${defaultId}-suggestion-${index}`;
 	}
 
+	function listId(): string {
+		return `${defaultId}-suggestions`;
+	}
+
 	function suggestions(): any[] {
 		return $load ? $load.items : [];
 	}
+
+	// Set the context to pass down to the tags and suggestions
+	let context: TagInputContext = {
+		getDisabled,
+		removeTag,
+		getPlaceholder: () => $props?.placeholder,
+		getText: () => $state.text,
+		hasLoader: () => hasLoader,
+		isSuggestionsOpen: () => $state.suggestionsOpen,
+		getActiveSuggestionId: () =>
+			$state.activeSuggestion >= 0 ? suggestionId($state.activeSuggestion) : undefined,
+		handleFieldInput: handleInput,
+		handleFieldKey: handleKey,
+		registerField: (el) => {
+			input = el;
+		},
+		unregisterField: (el) => {
+			if (input === el) {
+				input = undefined;
+			}
+		},
+		getSuggestions: suggestions,
+		getSuggestionLabel: getLabel,
+		getSuggestionId: suggestionId,
+		isActiveSuggestion: (index) => $state.activeSuggestion === index,
+		setActiveSuggestion: (index) => {
+			$state.activeSuggestion = index;
+		},
+		pickSuggestion,
+		getListId: listId,
+		getAriaLabel: () => $props?.ariaLabel,
+	};
+	$context[TagInputContextName] = context;
 
 	// Dispatch the change event when the tags change
 	$handle((first) => {
@@ -271,79 +324,16 @@ export default function TagInput($props: TagInputProps | undefined) {
 				}
 			}}
 		>
-			<ul class="torp-tag-input-tags">
-				@for (let [index, tag] of $state.value.entries()) {
-					@key = index
-					<li class="torp-tag-input-tag">
-						<span class="torp-tag-input-tag-text">{tag}</span>
-						<button
-							type="button"
-							class="torp-tag-input-remove"
-							aria-label={`Remove ${tag}`}
-							disabled={getDisabled()}
-							onclick={() => removeTag(index)}
-						>
-							<slot>×</slot>
-						</button>
-					</li>
-				}
-			</ul>
-			<input
-				class="torp-tag-input-field"
-				type="text"
-				&ref={input}
-				value={$state.text}
-				placeholder={$props?.placeholder}
-				disabled={getDisabled()}
-				aria-label={$props?.ariaLabel}
-				role={hasLoader ? "combobox" : undefined}
-				aria-expanded={hasLoader ? ($state.suggestionsOpen ? "true" : "false") : undefined}
-				aria-controls={$state.suggestionsOpen ? `${defaultId}-suggestions` : undefined}
-				aria-autocomplete="list"
-				aria-activedescendant={$state.activeSuggestion >= 0 ? suggestionId($state.activeSuggestion) : undefined}
-				oninput={handleInput}
-				onkeydown={handleKey}
-			/>
-			@if ($state.suggestionsOpen) {
-				@try {
-					@await {
-						<ul
-							id={`${defaultId}-suggestions`}
-							class="torp-tag-input-suggestions"
-							role="listbox"
-							aria-label={$props?.ariaLabel}
-						>
-							@for (let [index, item] of suggestions().entries()) {
-								@key = getLabel(item)
-								<li
-									class="torp-tag-input-suggestion"
-									role="option"
-									id={suggestionId(index)}
-									aria-selected={$state.activeSuggestion === index ? "true" : "false"}
-									data-active={$state.activeSuggestion === index ? "active" : undefined}
-									onmouseenter={() => ($state.activeSuggestion = index)}
-									onmousedown={(e: MouseEvent) => {
-										// mousedown so the field doesn't blur first
-										e.preventDefault();
-										pickSuggestion(item);
-									}}
-								>
-									{getLabel(item)}
-								</li>
-							}
-							@if (suggestions().length === 0) {
-								<li class="torp-tag-input-empty" role="presentation">No matches.</li>
-							}
-						</ul>
-					} with {
-						<div class="torp-tag-input-loading" role="status">Loading…</div>
+			<slot>
+				<ul class="torp-tag-input-tags">
+					@for (let [index, tag] of $state.value.entries()) {
+						@key = index
+						<TagInputTag {index} {tag} />
 					}
-				} catch (err) {
-					<div class="torp-tag-input-error" role="alert">
-						{err instanceof Error ? err.message : String(err)}
-					</div>
-				}
-			}
+				</ul>
+				<TagInputField />
+				<TagInputSuggestions />
+			</slot>
 		</div>
 
 		<FormValues name={form.name} value={$state.value} />
@@ -362,17 +352,6 @@ export default function TagInput($props: TagInputProps | undefined) {
 			list-style: none;
 			margin: 0;
 			padding: 0;
-		}
-		.torp-tag-input-field {
-			flex: 1 1 auto;
-			min-width: 4em;
-		}
-		.torp-tag-input-suggestions {
-			position: absolute;
-			list-style: none;
-			margin: 0;
-			padding: 0;
-			z-index: 10;
 		}
 	}
 }

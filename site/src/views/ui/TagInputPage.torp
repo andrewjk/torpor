@@ -19,8 +19,16 @@ export default function TagInputPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<TagInput ariaLabel="Labels" placeholder="Add tag" />
+<TagInput>
+	<TagInputTag />
+	<TagInputField />
+	<TagInputSuggestions />
+</TagInput>
 `.trim()}</code></pre>
+		<p>
+			With no children, the tags, field and suggestions are rendered automatically. Compose
+			them explicitly to target each one with its own props and styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">

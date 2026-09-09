@@ -33,24 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### TagInput
-
-**Current:** one file (378 lines). Three discrete pieces are inline: the tag
-chips (`TagInput.torp:274`, li + text + remove button), the text field, and
-the async suggestion listbox (`TagInput.torp:307`).
-
-**Proposed:**
-
-```
-TagInput/TagInput.torp             root: tags state, add/remove logic, form field
-TagInput/TagInputTag.torp          one chip: text + remove button (the repeated unit)
-TagInput/TagInputSuggestions.torp  the loader-backed listbox (@await/@try region + options)
-```
-
-The plain text input can stay inline -- it's a bare `<input>` like `Form`'s
-`Input`, and there's nothing in it to swap. The two split pieces are where
-real markup/appearance lives.
-
 ### CommandPalette
 
 **Current:** one file. It composes `Modal`/`ModalOverlay`/`ModalContent`

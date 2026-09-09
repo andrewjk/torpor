@@ -1,0 +1,34 @@
+import {
+	TagInput,
+	TagInputField,
+	TagInputSuggestions,
+	TagInputTag,
+} from "../../../src/TagInput/index";
+
+export default function TagInputComposedTest($props: any) {
+	let $state = $watch({
+		value: ($props?.value ?? []) as string[],
+	});
+
+	@render {
+		<TagInput
+			&value={$state.value}
+			{$props?.disabled}
+			{$props?.name}
+			load={$props?.load}
+			placeholder={$props?.placeholder ?? "Add tag"}
+			ariaLabel={$props?.ariaLabel ?? "Tags"}
+			onchange={$props?.onchange}
+			onopen={$props?.onopen}
+		>
+			<ul class="torp-tag-input-tags">
+				@for (let [index, tag] of $state.value.entries()) {
+					@key = index
+					<TagInputTag {index} {tag} class={$props?.tagClass} />
+				}
+			</ul>
+			<TagInputField class={$props?.fieldClass} />
+			<TagInputSuggestions class={$props?.suggestionsClass} />
+		</TagInput>
+	}
+}
