@@ -1,14 +1,5 @@
 import { type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
 import {
-	Calendar,
-	CalendarDay,
-	CalendarDayHeader,
-	CalendarGrid,
-	CalendarGridHeader,
-	CalendarHeader,
-	CalendarHeaderTrigger,
-} from "../Calendar/index";
-import {
 	type FieldContext,
 	FieldContextName,
 	type FormContext,
@@ -18,7 +9,9 @@ import { formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
 import createFormField from "../utils/formField";
-import DatePickerHeader from "./DatePickerHeader.torp";
+import DatePickerContent from "./DatePickerContent.torp";
+import DatePickerTrigger from "./DatePickerTrigger.torp";
+import { type DatePickerContext, DatePickerContextName } from "./DatePickerTypes";
 
 interface DatePickerProps {
 	/** An ID for the root element */
@@ -47,12 +40,21 @@ interface DatePickerProps {
  * An input for selecting a date from a calendar popout.
  *
  * The structure of a DatePicker is a trigger button that displays the
- * selected date, with a selectable Calendar in a popout.
+ * selected date, with a selectable Calendar in a popout:
+ *
+ * ```
+ * <DatePicker>
+ * 	<DatePickerTrigger />
+ * 	<DatePickerContent />
+ * </DatePicker>
+ * ```
+ *
+ * With no children, the trigger and content are rendered automatically.
  */
 export default function DatePicker($props: DatePickerProps | undefined) {
 	let defaultId = getId();
 
-	let content: HTMLDivElement;
+	let content: HTMLDivElement | undefined;
 	let closeOnClick = false;
 
 	// Wire up the enclosing Form and Field, if any
@@ -96,6 +98,33 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 	function toggle() {
 		setVisible(!$state.visible);
 	}
+
+	// Set the context to pass down to the trigger and content
+	let context: DatePickerContext = {
+		getDisabled,
+		getTriggerId: () => $state.triggerId,
+		getContentId: () => $state.contentId,
+		isVisible: () => $state.visible,
+		toggle,
+		getDisplayText: displayText,
+		getAriaLabel: () => $props?.ariaLabel,
+		inField: () => form.inField,
+		valid: () => form.valid,
+		messageId: () => form.messageId,
+		handleBlur: () => form.handleBlur(),
+		getValue: () => $state.value,
+		selectDate: handleDate,
+		close: handleClose,
+		registerContent: (el) => {
+			content = el;
+		},
+		unregisterContent: (el) => {
+			if (content === el) {
+				content = undefined;
+			}
+		},
+	};
+	$context[DatePickerContextName] = context;
 
 	function setVisible(visible: boolean) {
 		$state.visible = visible;
@@ -154,69 +183,20 @@ export default function DatePicker($props: DatePickerProps | undefined) {
 		}
 	}
 
-	function handleClick(e: MouseEvent) {
-		// Don't close when the trigger itself is clicked
-		e.stopPropagation();
-		toggle();
-	}
-
 	@render {
 		<div
 			{$props?.id}
 			class={["torp-date-picker", getDisabled() ? "torp-date-picker-disabled" : undefined, $props?.class]}
 			{$props?.style}
 		>
-			<button
-				type="button"
-				id={$state.triggerId}
-				class="torp-date-picker-trigger"
-				aria-haspopup="dialog"
-				aria-expanded={$state.visible ? "true" : "false"}
-				aria-controls={$state.visible ? $state.contentId : undefined}
-				aria-label={$props?.ariaLabel}
-				data-valid={form.valid ? "valid" : "invalid"}
-				aria-describedby={form.messageId}
-				aria-invalid={form.inField && !form.valid ? "true" : undefined}
-				onblur={() => form.handleBlur()}
-				disabled={getDisabled()}
-				onclick={handleClick}
-			>
-				{displayText()}
-			</button>
-
-			<div
-				id={$state.contentId}
-				class={["torp-date-picker-content", $state.visible ? undefined : "hidden"]}
-				aria-hidden={$state.visible ? undefined : "true"}
-				&ref={content}
-			>
-				<Calendar selectable {$state.value} onchange={handleDate} onclose={handleClose}>
-					<CalendarHeader>
-						<CalendarHeaderTrigger type="previous" />
-						<DatePickerHeader class="torp-date-picker-header" />
-						<CalendarHeaderTrigger type="next" />
-					</CalendarHeader>
-					<CalendarGridHeader>
-						@for (let day of $slot.days) {
-							<CalendarDayHeader {day.dayName} {day.shortDayName} />
-						}
-					</CalendarGridHeader>
-					<CalendarGrid>
-						<CalendarDay date={$slot.day.date} muted={$slot.day.muted} active={$slot.day.active} />
-					</CalendarGrid>
-				</Calendar>
-			</div>
+			<slot>
+				<DatePickerTrigger />
+				<DatePickerContent />
+			</slot>
 		</div>
 
 		@if (form.name) {
 			<input type="hidden" name={form.name} value={$state.value ? formatDate($unwrap($state.value), "yyyy-MM-dd") : ""} />
-		}
-	}
-
-	@style {
-		/* Visibility only -- see SelectBoxContent */
-		.torp-date-picker-content.hidden {
-			display: none;
 		}
 	}
 }

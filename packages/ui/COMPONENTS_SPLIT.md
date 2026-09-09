@@ -33,23 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### DatePicker
-
-**Current:** nearly compliant -- uses the `Calendar` subcomponents and has
-`DatePickerHeader`, but the trigger button (`DatePicker.torp:169`) and the
-content div (`DatePicker.torp:187`) are hardcoded. `SelectBox` and `ComboBox`
--- the other trigger+popout components -- both split these out.
-
-**Proposed:**
-
-```
-DatePicker/DatePicker.torp            root: value, form field, popout open/close, focus management
-DatePicker/DatePickerTrigger.torp     the display button (aria-haspopup/expanded/controls)
-DatePicker/DatePickerContent.torp     the popout div (id, aria-hidden, hidden class)
-```
-
-(`DatePickerHeader` already exists.)
-
 ### DateRangePicker
 
 **Current:** same shape as `DatePicker` -- `DateRangePickerDay` exists, but

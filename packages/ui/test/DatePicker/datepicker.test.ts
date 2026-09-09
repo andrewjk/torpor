@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import DatePickerComposedTest from "./components/DatePickerComposedTest.torp";
 import DatePickerTest from "./components/DatePickerTest.torp";
 import { dayButton } from "./accessibility.test";
 
@@ -93,5 +94,49 @@ describe("DatePicker", () => {
 		expect(hidden.value).toBe(
 			`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-15`,
 		);
+	});
+});
+
+describe("DatePicker (subcomponents)", () => {
+	function setupComposed(props: Record<string, unknown> = {}) {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, DatePickerComposedTest, { ...props, onchange });
+
+		const trigger = within(container).getByRole("button", { name: "Start date" });
+		const content = container.getElementsByClassName("torp-date-picker-content")[0] as HTMLElement;
+		return { container, trigger, content, onchange };
+	}
+
+	it("renders the trigger and content automatically with no children", async () => {
+		const { container } = setup({});
+
+		expect(container.querySelector(".torp-date-picker-trigger")).toBeInTheDocument();
+		expect(container.querySelector(".torp-date-picker-content")).toHaveClass("hidden");
+	});
+
+	it("renders explicitly composed trigger and content with their own props", async () => {
+		const { trigger, content } = setupComposed({
+			triggerClass: "custom-trigger",
+			contentClass: "custom-content",
+		});
+
+		expect(trigger).toHaveClass("torp-date-picker-trigger", "custom-trigger");
+		expect(content).toHaveClass("torp-date-picker-content", "custom-content");
+	});
+
+	it("selects a date through the composed parts", async () => {
+		const { container, trigger, content, onchange } = setupComposed({});
+
+		fireEvent.click(trigger);
+		await new Promise((r) => setTimeout(r, 5));
+		expect(content).not.toHaveClass("hidden");
+
+		fireEvent.click(dayButton(container, 15));
+		await new Promise((r) => setTimeout(r, 5));
+
+		expect(onchange).toHaveBeenCalledTimes(1);
+		expect(content).toHaveClass("hidden");
 	});
 });

@@ -1,0 +1,22 @@
+import {
+	DatePicker,
+	DatePickerContent,
+	DatePickerTrigger,
+} from "../../../src/DatePicker/index";
+
+export default function DatePickerComposedTest($props: any) {
+	@render {
+		<DatePicker
+			{$props?.name}
+			{$props?.value}
+			{$props?.disabled}
+			{$props?.dateFormat}
+			placeholder={$props?.placeholder ?? "Pick a date"}
+			ariaLabel="Start date"
+			onchange={$props?.onchange}
+		>
+			<DatePickerTrigger class={$props?.triggerClass} />
+			<DatePickerContent class={$props?.contentClass} />
+		</DatePicker>
+	}
+}
