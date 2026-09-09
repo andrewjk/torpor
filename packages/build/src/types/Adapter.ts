@@ -16,5 +16,5 @@ export default interface Adapter {
 	 * Serve the built output (preview). Receives a torpor Server configured to
 	 * load the built server entry.
 	 */
-	serve: (server: Server, site: Site) => void;
+	serve: (server: Server, site: Site) => void | Promise<void>;
 }

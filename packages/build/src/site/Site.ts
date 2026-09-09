@@ -44,7 +44,14 @@ export default class Site {
 	 * Vite plugins to add to the client and server builds
 	 */
 	vitePlugins: Plugin[] = [];
-	// Is default adapter a bad idea?
+	/**
+	 * The site's adapter, e.g. from `@torpor/adapter-node` or
+	 * `@torpor/adapter-cloudflare`. When not set, one is resolved when it's
+	 * needed: a deployment environment (e.g. `CF_PAGES`) picks the platform's
+	 * adapter when installed, an installed adapter is used otherwise, and
+	 * preview falls back to serving on the current runtime. See
+	 * defaultAdapter.ts
+	 */
 	adapter: Adapter = defaultAdapter;
 	/**
 	 * Extra inputs, as absolute file paths, that will be compiled with the

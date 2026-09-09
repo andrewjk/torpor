@@ -80,5 +80,5 @@ export default async function runPreview(site: Site): Promise<void> {
 	process.env.PORT ??= "7059";
 
 	// Serve the site
-	site.adapter.serve(server, site);
+	await site.adapter.serve(server, site);
 }

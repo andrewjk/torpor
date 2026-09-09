@@ -109,12 +109,6 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
 - **The docs page loads Swagger UI from unpkg**: no offline/bundled UI
   option; a Scalar/self-hosted alternative could be added later.
 
-### Dead/duplicated code paths elsewhere
-
-- `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
-  default plugins are a good idea. Not a HACK to remove; flagged for the
-  framework's design discussion.
-
 ### DataGrid: known gaps from the first version
 
 Built with static `data` or a network `load` function (the shared loader shape
