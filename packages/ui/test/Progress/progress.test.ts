@@ -2,6 +2,7 @@ import { within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it } from "vite-plus/test";
+import ProgressComposedTest from "./components/ProgressComposedTest.torp";
 import ProgressTest from "./components/ProgressTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {
@@ -59,6 +60,24 @@ describe("Progress", () => {
 
 		const bar = container.querySelector(".torp-progress-bar")!;
 		expect(bar).toHaveAttribute("data-state", "determinate");
+		expect(bar.getAttribute("style")).toContain("width: 40%");
+	});
+
+	it("renders the indicator automatically with no children", async () => {
+		const { container } = setup({ value: 40 });
+
+		const bar = container.querySelector(".torp-progress-bar")!;
+		expect(bar).toBeInTheDocument();
+		expect(bar.getAttribute("style")).toContain("width: 40%");
+	});
+
+	it("renders an explicitly composed indicator with its own props", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ProgressComposedTest, { value: 40, indicatorClass: "custom-bar" });
+
+		const bar = container.querySelector(".torp-progress-bar")!;
+		expect(bar).toHaveClass("custom-bar");
 		expect(bar.getAttribute("style")).toContain("width: 40%");
 	});
 });

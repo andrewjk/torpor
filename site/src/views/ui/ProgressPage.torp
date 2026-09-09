@@ -27,8 +27,14 @@ export default function ProgressPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<Progress ariaLabel="Loading" value={40} />
+<Progress>
+	<ProgressIndicator />
+</Progress>
 `.trim()}</code></pre>
+		<p>
+			With no children, the indicator is rendered automatically. Compose it
+			explicitly to target it with its own props and styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">

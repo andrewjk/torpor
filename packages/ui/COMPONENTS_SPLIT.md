@@ -33,23 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### Progress
-
-**Current:** one file. The bar (`Progress.torp:65`, `.torp-progress-bar`,
-`data-state` + inline width) is inline in the root, which carries
-`role="progressbar"` and the aria value attributes.
-
-**Proposed:**
-
-```
-Progress/Progress.torp             root/track: role="progressbar", aria values, indeterminate state
-Progress/ProgressIndicator.torp    the bar: data-state + width style
-```
-
-`Indicator` matches `MenuIndicator`. Optional further split: `ProgressTrack`
-(the root's overflow/positioning wrapper), but the root already _is_ the
-track, so the two-file split is enough.
-
 ### Rating
 
 **Current:** one file. Each star (`Rating.torp:185`, `.torp-rating-star`,

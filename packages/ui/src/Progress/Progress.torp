@@ -1,4 +1,6 @@
 import type { ClassValue, StyleValue } from "@torpor/view";
+import { type ProgressContext, ProgressContextName } from "./ProgressTypes";
+import ProgressIndicator from "./ProgressIndicator.torp";
 
 interface ProgressProps {
 	/** An ID for the root element */
@@ -24,6 +26,16 @@ interface ProgressProps {
  * specific value or as indeterminate when the extent is unknown.
  *
  * See [the WAI ARIA guidelines for Progress Bars](https://www.w3.org/WAI/ARIA/apg/patterns/progressbar/).
+ *
+ * The structure of a Progress is:
+ *
+ * ```
+ * <Progress>
+ * 	<ProgressIndicator />
+ * </Progress>
+ * ```
+ *
+ * With no children, the indicator is rendered automatically.
  */
 export default function Progress($props: ProgressProps | undefined) {
 	function getMin(): number {
@@ -49,6 +61,13 @@ export default function Progress($props: ProgressProps | undefined) {
 		return ((getValue() - min) / (max - min)) * 100;
 	}
 
+	// Set the context to pass down to the indicator
+	let context: ProgressContext = {
+		isIndeterminate,
+		getPct,
+	};
+	$context[ProgressContextName] = context;
+
 	@render {
 		<div
 			{$props?.id}
@@ -62,27 +81,18 @@ export default function Progress($props: ProgressProps | undefined) {
 			aria-valuetext={$props?.valuetext}
 			data-state={isIndeterminate() ? "indeterminate" : "determinate"}
 		>
-			<div
-				class="torp-progress-bar"
-				data-state={isIndeterminate() ? "indeterminate" : "determinate"}
-				style={isIndeterminate() ? undefined : `width: ${getPct()}%;`}
-			/>
+			<slot>
+				<ProgressIndicator />
+			</slot>
 		</div>
 	}
 
 	@style {
-		/* Headless: layout only, so the bar fills the track proportionally.
-		   All appearance is up to the consuming theme */
+		/* Headless: layout only, so the indicator fills the track. All
+		   appearance is up to the consuming theme */
 		.torp-progress {
 			position: relative;
 			overflow: hidden;
-		}
-		.torp-progress-bar {
-			position: absolute;
-			inset: 0 auto 0 0;
-		}
-		.torp-progress-bar[data-state="indeterminate"] {
-			width: 100%;
 		}
 	}
 }

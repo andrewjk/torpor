@@ -1,0 +1,15 @@
+import { Progress, ProgressIndicator } from "../../../src/Progress/index";
+
+export default function ProgressComposedTest($props: any) {
+	@render {
+		<Progress
+			{$props?.min}
+			{$props?.max}
+			{$props?.value}
+			{$props?.valuetext}
+			ariaLabel={$props?.ariaLabel ?? "Loading"}
+		>
+			<ProgressIndicator class={$props?.indicatorClass} />
+		</Progress>
+	}
+}
