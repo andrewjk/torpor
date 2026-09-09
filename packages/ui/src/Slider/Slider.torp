@@ -8,6 +8,9 @@ import {
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
 import createFormField from "../utils/formField";
+import SliderHandle from "./SliderHandle.torp";
+import SliderRange from "./SliderRange.torp";
+import { type SliderContext, SliderContextName } from "./SliderTypes";
 
 interface SliderProps {
 	/** An ID for the root element */
@@ -41,10 +44,21 @@ interface SliderProps {
  * dragging a thumb along a track or by using the keyboard.
  *
  * See [the WAI ARIA guidelines for Sliders](https://www.w3.org/WAI/ARIA/apg/patterns/slider/).
+ *
+ * The structure of a Slider is:
+ *
+ * ```
+ * <Slider>
+ * 	<SliderRange />
+ * 	<SliderHandle />
+ * </Slider>
+ * ```
+ *
+ * With no children, the range and handle are rendered automatically.
  */
 export default function Slider($props: SliderProps | undefined) {
 	let track: HTMLElement;
-	let thumb: HTMLElement;
+	let handle: HTMLElement | undefined;
 
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
@@ -116,6 +130,32 @@ export default function Slider($props: SliderProps | undefined) {
 		return false;
 	}
 
+	// Set the context to pass down to the range and handle
+	let context: SliderContext = {
+		getMin,
+		getMax,
+		getStep,
+		getOrientation,
+		getDisabled,
+		getValue,
+		getPct,
+		setValue,
+		getAriaLabel: () => $props?.ariaLabel,
+		registerHandle: (el) => {
+			handle = el;
+		},
+		unregisterHandle: (el) => {
+			if (handle === el) {
+				handle = undefined;
+			}
+		},
+		inField: () => form.inField,
+		valid: () => form.valid,
+		messageId: () => form.messageId,
+		handleBlur: () => form.handleBlur(),
+	};
+	$context[SliderContextName] = context;
+
 	// Convert a pointer position into a value along the track
 	function valueFromPointer(e: { clientX: number; clientY: number }): number {
 		const rect = track.getBoundingClientRect();
@@ -141,7 +181,7 @@ export default function Slider($props: SliderProps | undefined) {
 		e.preventDefault();
 		dragging = true;
 		setValue(valueFromPointer(e));
-		thumb.focus();
+		handle?.focus();
 		addEventListener("mousemove", handleMouseMove);
 		addEventListener("mouseup", handleMouseUp);
 	}
@@ -162,45 +202,6 @@ export default function Slider($props: SliderProps | undefined) {
 		return () => removeDragListeners();
 	});
 
-	function handleKey(e: KeyboardEvent) {
-		if (getDisabled()) return;
-
-		switch (e.key) {
-			case "ArrowRight":
-			case "ArrowUp": {
-				e.preventDefault();
-				setValue($state.value + getStep());
-				break;
-			}
-			case "ArrowLeft":
-			case "ArrowDown": {
-				e.preventDefault();
-				setValue($state.value - getStep());
-				break;
-			}
-			case "PageUp": {
-				e.preventDefault();
-				setValue($state.value + getStep() * 10);
-				break;
-			}
-			case "PageDown": {
-				e.preventDefault();
-				setValue($state.value - getStep() * 10);
-				break;
-			}
-			case "Home": {
-				e.preventDefault();
-				setValue(getMin());
-				break;
-			}
-			case "End": {
-				e.preventDefault();
-				setValue(getMax());
-				break;
-			}
-		}
-	}
-
 	@render {
 		<div
 			{$props?.id}
@@ -209,34 +210,18 @@ export default function Slider($props: SliderProps | undefined) {
 			onmousedown={handleMouseDown}
 			&ref={track}
 		>
-			<div class="torp-slider-fill" style={`${getOrientation() === "vertical" ? "height" : "width"}: ${getPct()}%;`} />
-			<div
-				class="torp-slider-thumb"
-				style={`position: absolute; transform: translate(-50%, -50%); ${getOrientation() === "vertical" ? `top: ${getPct()}%; left: 50%` : `left: ${getPct()}%; top: 50%`};`}
-				role="slider"
-				tabindex={getDisabled() ? -1 : 0}
-				aria-orientation={getOrientation()}
-				aria-valuemin={getMin()}
-				aria-valuemax={getMax()}
-				aria-valuenow={getValue()}
-				aria-label={$props?.ariaLabel}
-				aria-disabled={getDisabled() ? "true" : undefined}
-				data-valid={form.valid ? "valid" : "invalid"}
-				aria-describedby={form.messageId}
-				aria-invalid={form.inField && !form.valid ? "true" : undefined}
-				onblur={form.handleBlur}
-				onkeydown={handleKey}
-				&ref={thumb}
-			/>
+			<slot>
+				<SliderRange />
+				<SliderHandle />
+			</slot>
 		</div>
 
 		<FormValues name={form.name} value={getValue()} />
 	}
 
 	@style {
-		/* Headless: all positioning is done with inline styles (so that theme
-		   CSS can't dislodge the thumb from the track). All appearance is up
-		   to the consuming theme */
+		/* Headless: layout only, so the range and handle position against the
+		   track. All appearance is up to the consuming theme */
 		.torp-slider {
 			position: relative;
 			touch-action: none;

@@ -1,0 +1,19 @@
+import { Slider, SliderHandle, SliderRange } from "../../../src/Slider/index";
+
+export default function SliderComposedTest($props: any) {
+	@render {
+		<Slider
+			{$props?.value}
+			{$props?.min}
+			{$props?.max}
+			{$props?.step}
+			{$props?.orientation}
+			{$props?.disabled}
+			ariaLabel={$props?.ariaLabel ?? "Volume"}
+			onchange={$props?.onchange}
+		>
+			<SliderRange class={$props?.rangeClass} />
+			<SliderHandle class={$props?.handleClass} ariaLabel={$props?.handleLabel} />
+		</Slider>
+	}
+}

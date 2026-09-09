@@ -29,31 +29,9 @@ Consistent with existing splits:
 
 ## Needs splitting
 
-Ordered roughly by priority: the first three are small, self-contained and
+Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
-
-### Slider (user-reported)
-
-**Current:** one file. The track (mousedown target, `Slider.torp:205`), the
-fill (`Slider.torp:212`, `.torp-slider-fill`) and the thumb
-(`Slider.torp:213`, `.torp-slider-thumb`, `role="slider"`) are all hardcoded
-in the template.
-
-**Proposed:**
-
-```
-Slider/Slider.torp          root: state, $bind, form field, keyboard + pointer logic
-Slider/SliderTrack.torp     the mousedown target that maps pointer position -> value
-Slider/SliderRange.torp     the filled portion (inline width/height style from getPct())
-Slider/SliderHandle.torp    the thumb (role="slider", all aria-* attrs, focus target)
-```
-
-`SliderHandle` matches `SplitterHandle`. If root + track staying merged feels
-cleaner (as with `Progress` below), the minimal split is
-`Slider` / `SliderRange` / `SliderHandle`. Splitting also unblocks multi-thumb
-range sliders later (a `Slider` rendering two `SliderHandle`s over one
-`SliderRange`).
 
 ### Progress
 

@@ -1,0 +1,7 @@
+import { SliderHandle } from "../../../src/Slider/index";
+
+export default function SliderOrphanTest() {
+	@render {
+		<SliderHandle />
+	}
+}

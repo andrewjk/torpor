@@ -1,0 +1,49 @@
+import { Slider, SliderHandle, SliderRange } from "@torpor/ui/Slider";
+
+export default function ExampleComposed() {
+	let $state = $watch({
+		value: 30,
+	});
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<Slider class="example-slider" ariaLabel="Volume" &value={$state.value}>
+			<SliderRange class="example-range" />
+			<SliderHandle class="example-handle" />
+		</Slider>
+	}
+
+	@style {
+		.example-slider {
+			border-radius: 4px;
+			height: 6px;
+			margin: 10px 0;
+			width: 240px;
+		}
+
+		:global(.example-slider) {
+			background-color: var(--code-back);
+		}
+
+		:global(.example-range) {
+			background-color: var(--accent);
+			border-radius: 4px;
+			height: 100%;
+		}
+
+		:global(.example-handle) {
+			all: unset;
+			background-color: var(--accent);
+			border-radius: 4px;
+			box-sizing: border-box;
+			cursor: default;
+			height: 16px;
+			width: 16px;
+		}
+
+		:global(.example-handle:focus-visible) {
+			box-shadow: black 0px 0px 0px 2px;
+		}
+	}
+}

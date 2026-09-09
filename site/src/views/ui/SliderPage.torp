@@ -4,6 +4,8 @@ import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./slider/ExampleBasic.torp";
 import ExampleBasicCode from "./slider/ExampleBasic.torp?raw";
+import ExampleComposed from "./slider/ExampleComposed.torp";
+import ExampleComposedCode from "./slider/ExampleComposed.torp?raw";
 import ExampleRange from "./slider/ExampleRange.torp";
 import ExampleRangeCode from "./slider/ExampleRange.torp?raw";
 
@@ -27,8 +29,16 @@ export default function SliderPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<Slider />
+<Slider>
+	<SliderRange />
+	<SliderHandle />
+</Slider>
 `.trim()}</code></pre>
+		<p>
+			With no children, the range and handle are rendered automatically.
+			Compose them explicitly to target each one with its own props and
+			styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
@@ -37,6 +47,9 @@ export default function SliderPage() {
 				</ExampleTabHeader>
 				<ExampleTabHeader>
 					Range
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Composed
 				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
@@ -52,6 +65,14 @@ export default function SliderPage() {
 					<ExampleRange />
 					<fill name="code">
 						<CodePreview code={ExampleRangeCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleComposed />
+					<fill name="code">
+						<CodePreview code={ExampleComposedCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
