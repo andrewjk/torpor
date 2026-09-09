@@ -3,6 +3,12 @@ import Modal from "../Modal/Modal.torp";
 import ModalContent from "../Modal/ModalContent.torp";
 import ModalOverlay from "../Modal/ModalOverlay.torp";
 import getId from "../utils/getId";
+import CommandPaletteInput from "./CommandPaletteInput.torp";
+import CommandPaletteList from "./CommandPaletteList.torp";
+import {
+	type CommandPaletteContext,
+	CommandPaletteContextName,
+} from "./CommandPaletteTypes";
 import type { Command } from "./CommandTypes";
 
 interface CommandPaletteProps {
@@ -36,11 +42,20 @@ interface CommandPaletteProps {
  * shortcut or programmatically.
  *
  * The structure of a CommandPalette is a Modal containing a search input and
- * a filtered list of commands.
+ * a filtered list of commands:
+ *
+ * ```
+ * <CommandPalette>
+ * 	<CommandPaletteInput />
+ * 	<CommandPaletteList />
+ * </CommandPalette>
+ * ```
+ *
+ * With no children, the input and list are rendered automatically.
  */
 export default function CommandPalette($props: CommandPaletteProps | undefined) {
 	let defaultId = getId();
-	let input: HTMLInputElement;
+	let input: HTMLInputElement | undefined;
 
 	function getDisabled(command: Command): boolean {
 		return command.disabled === true;
@@ -91,6 +106,10 @@ export default function CommandPalette($props: CommandPaletteProps | undefined) 
 		return filteredCommands()[$state.activeIndex];
 	}
 
+	function listId(): string {
+		return `${$props?.id ?? defaultId}-list`;
+	}
+
 	function optionId(index: number): string {
 		return `${$props?.id ?? defaultId}-option-${index}`;
 	}
@@ -101,6 +120,30 @@ export default function CommandPalette($props: CommandPaletteProps | undefined) 
 		command.run?.();
 		$props?.onrun?.(command);
 	}
+
+	// Set the context to pass down to the input, list and items
+	let context: CommandPaletteContext = {
+		getListId: listId,
+		getItemId: optionId,
+		getActiveItemId: () => optionId($state.activeIndex),
+		getPlaceholder: () => $props?.placeholder,
+		getAriaLabel: () => $props?.ariaLabel,
+		handleInput,
+		handleKey,
+		registerInput: (el) => {
+			input = el;
+		},
+		unregisterInput: (el) => {
+			if (input === el) {
+				input = undefined;
+			}
+		},
+		getFilteredCommands: filteredCommands,
+		isActiveCommand: (index) => $state.activeIndex === index,
+		runCommand,
+		getEmptyText: () => $props?.emptyText ?? "No results",
+	};
+	$context[CommandPaletteContextName] = context;
 
 	function handleInput(e: Event) {
 		$state.search = (e.currentTarget as HTMLInputElement).value;
@@ -162,46 +205,10 @@ export default function CommandPalette($props: CommandPaletteProps | undefined) 
 			<Modal {$state.visible}>
 				<ModalOverlay />
 				<ModalContent class="torp-command-palette-content">
-					<input
-						class="torp-command-palette-input"
-						type="text"
-						role="combobox"
-						aria-expanded="true"
-						aria-controls={`${$props?.id ?? defaultId}-list`}
-						aria-activedescendant={optionId($state.activeIndex)}
-						aria-autocomplete="list"
-						aria-label={$props?.ariaLabel}
-						placeholder={$props?.placeholder}
-						&ref={input}
-						oninput={handleInput}
-						onkeydown={handleKey}
-					/>
-					<ul class="torp-command-palette-list" role="listbox" id={`${$props?.id ?? defaultId}-list`}>
-						@for (let [index, command] of filteredCommands().entries()) {
-							@key = command.value
-							<li
-								class="torp-command-palette-item"
-								role="option"
-								id={optionId(index)}
-								aria-selected={$state.activeIndex === index ? "true" : "false"}
-								aria-disabled={getDisabled(command) ? "true" : undefined}
-								data-state={$state.activeIndex === index ? "active" : "inactive"}
-								onclick={() => runCommand(command)}
-							>
-								<span class="torp-command-palette-label">{command.label}</span>
-								@if (command.shortcut) {
-									<span class="torp-command-palette-shortcut" aria-hidden="true">
-										{command.shortcut}
-									</span>
-								}
-							</li>
-						}
-						@if (filteredCommands().length === 0) {
-							<li class="torp-command-palette-empty">
-								{$props?.emptyText ?? "No results"}
-							</li>
-						}
-					</ul>
+					<slot>
+						<CommandPaletteInput />
+						<CommandPaletteList />
+					</slot>
 				</ModalContent>
 			</Modal>
 		</div>
@@ -213,11 +220,6 @@ export default function CommandPalette($props: CommandPaletteProps | undefined) 
 		.torp-command-palette-content {
 			display: flex;
 			flex-direction: column;
-		}
-		.torp-command-palette-list {
-			list-style: none;
-			margin: 0;
-			padding: 0;
 		}
 	}
 }

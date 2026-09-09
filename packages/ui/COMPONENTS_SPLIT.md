@@ -33,25 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### CommandPalette
-
-**Current:** one file. It composes `Modal`/`ModalOverlay`/`ModalContent`
-(already-split components) but then hardcodes its own input, list, items and
-empty state (`CommandPalette.torp:165`-204).
-
-**Proposed:**
-
-```
-CommandPalette/CommandPalette.torp         root: hotkey, visibility, filter/active state
-CommandPalette/CommandPaletteInput.torp    the search input (role="combobox", aria-activedescendant)
-CommandPalette/CommandPaletteList.torp     the listbox (incl. empty state)
-CommandPalette/CommandPaletteItem.torp     one command row (role="option", label + shortcut)
-```
-
-Mirrors how `Modal` itself is split, and consistent with
-`ComboBox`/`ComboBoxInput`. The input is the piece most likely to need
-restyling (icons, kbd hints).
-
 ### DataGrid
 
 **Current:** one file (496 lines), the biggest offender. The header cell +

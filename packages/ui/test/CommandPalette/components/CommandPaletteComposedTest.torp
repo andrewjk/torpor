@@ -1,0 +1,37 @@
+import {
+	CommandPalette,
+	CommandPaletteInput,
+	CommandPaletteList,
+} from "../../../src/CommandPalette/index";
+
+const commands = [
+	{ value: "new", label: "New file", shortcut: "⌘N" },
+	{ value: "open", label: "Open file", keywords: "load" },
+	{ value: "save", label: "Save file", shortcut: "⌘S" },
+	{ value: "settings", label: "Open settings" },
+];
+
+export default function CommandPaletteComposedTest($props: any) {
+	let $state = $watch({ visible: false });
+
+	function toggle() {
+		$state.visible = !$state.visible;
+	}
+
+	@render {
+		<div>
+			<button type="button" onclick={toggle}>Toggle palette</button>
+			<CommandPalette
+				&visible={$state.visible}
+				commands={$props?.commands ?? commands}
+				placeholder={$props?.placeholder}
+				hotkey={$props?.hotkey}
+				onrun={$props?.onrun}
+			>
+				<CommandPaletteInput class={$props?.inputClass} />
+				<CommandPaletteList class={$props?.listClass} />
+			</CommandPalette>
+			<div id="visible-value">{$state.visible ? "open" : "closed"}</div>
+		</div>
+	}
+}

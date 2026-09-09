@@ -18,8 +18,15 @@ export default function CommandPalettePage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<CommandPalette hotkey="mod+k" commands={commands} />
+<CommandPalette>
+	<CommandPaletteInput />
+	<CommandPaletteList />
+</CommandPalette>
 `.trim()}</code></pre>
+		<p>
+			With no children, the input and list are rendered automatically. Compose them
+			explicitly to target each one with its own props and styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">

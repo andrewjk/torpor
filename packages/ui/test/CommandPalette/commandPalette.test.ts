@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import CommandPaletteComposedTest from "./components/CommandPaletteComposedTest.torp";
 import CommandPaletteTest from "./components/CommandPaletteTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {
@@ -97,5 +98,51 @@ describe("CommandPalette", () => {
 
 		expect(onrun).not.toHaveBeenCalled();
 		expect(options()[0]).toHaveAttribute("aria-disabled", "true");
+	});
+});
+
+describe("CommandPalette (subcomponents)", () => {
+	function setupComposed(props: Record<string, unknown> = {}) {
+		const onrun = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, CommandPaletteComposedTest, { ...props, onrun });
+		const toggle = () =>
+			fireEvent.click(within(container).getByRole("button", { name: "Toggle palette" }));
+		return {
+			container,
+			onrun,
+			open: async () => {
+				toggle();
+				await new Promise((r) => setTimeout(r, 5));
+			},
+			input: () => within(container).getByRole("combobox"),
+			options: () => within(container).getAllByRole("option"),
+		};
+	}
+
+	it("renders explicitly composed input and list with their own props", async () => {
+		const { container, open, options } = setupComposed({
+			inputClass: "custom-input",
+			listClass: "custom-list",
+		});
+
+		await open();
+
+		expect(options()).toHaveLength(4);
+		expect(within(container).getByRole("combobox")).toHaveClass("custom-input");
+		expect(container.querySelector(".torp-command-palette-list")).toHaveClass("custom-list");
+	});
+
+	it("filters and runs commands through the composed parts", async () => {
+		const { container, input, onrun, open, options } = setupComposed();
+
+		await open();
+		fireEvent.input(input(), { target: { value: "file" } });
+		expect(options()).toHaveLength(3);
+
+		fireEvent.click(within(container).getByRole("option", { name: "Save file" }));
+		expect(onrun).toHaveBeenCalledTimes(1);
+		expect(onrun.mock.calls[0][0].value).toBe("save");
 	});
 });
