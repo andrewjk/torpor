@@ -138,13 +138,15 @@ describe("runTest", () => {
 		expect(await res.json()).toEqual({ cookie: "abc" });
 	});
 
-	test("returns 404 for an unknown route", async () => {
+	test("redirects an unknown route to the error page", async () => {
 		const site = new Site();
 		site.root = tmpRoot;
 		await site.addRouteFolder("src/routes");
 
 		const res = await runTest(site, "/no-such-path");
-		expect(res.status).toBe(404);
+		expect(res.status).toBe(303);
+		expect(res.headers.get("location")).toContain("/_error?");
+		expect(res.headers.get("location")).toContain("status=404");
 	});
 
 	test("default `route` argument creates a server event when none is supplied", async () => {
@@ -202,7 +204,7 @@ describe("runTest", () => {
 
 		(globalThis as any).__hookCalls = [];
 		const res = await runTest(site, "/no-such-path");
-		expect(res.status).toBe(404);
+		expect(res.status).toBe(303);
 		expect((globalThis as any).__hookCalls).toEqual([]);
 	});
 

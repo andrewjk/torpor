@@ -4,6 +4,7 @@ import ServerEvent from "../src/server/ServerEvent";
 import Site from "../src/site/Site";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
 import type ServerEndPoint from "../src/types/ServerEndPoint";
+import type ServerLoadEvent from "../src/types/ServerLoadEvent";
 import type { StandardSchemaV1 } from "../src/types/StandardSchema";
 
 /**
@@ -180,7 +181,13 @@ function siteWithSchemaAction(): { site: Site; calls: number[] } {
 function formEvent(path: string, title?: string): ServerEvent {
 	const formData = new FormData();
 	if (title !== undefined) formData.append("title", title);
-	const req = new Request(`http://localhost${path}`, { method: "POST", body: formData });
+	const req = new Request(`http://localhost${path}`, {
+		method: "POST",
+		body: formData,
+		// Simulate a form submit from javascript, so the action's response is
+		// returned as-is rather than re-rendering the view
+		headers: { "X-Torpor-Form-Submit": "" },
+	});
 	return new ServerEvent(req);
 }
 
@@ -226,6 +233,7 @@ test("actions without a schema read the raw form record", async () => {
 	const req = new Request("http://localhost/plain/~server", {
 		method: "POST",
 		body: formData,
+		headers: { "X-Torpor-Form-Submit": "" },
 	});
 	const res = await runTest(site, "/plain/~server", new ServerEvent(req));
 
@@ -286,7 +294,9 @@ function siteWithParamsEndpoint(): { site: Site; calls: number[] } {
 			schema: {
 				params: paramsSchema,
 			},
-			get: async (ev) => {
+			// The event is loosely typed, so this endpoint can be added to a
+			// route in code (the route's param types aren't applied here)
+			get: async (ev: ServerLoadEvent) => {
 				calls.push(1);
 				return new Response(JSON.stringify(ev.params), {
 					headers: { "Content-Type": "application/json" },

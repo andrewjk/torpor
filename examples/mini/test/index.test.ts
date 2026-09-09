@@ -33,7 +33,12 @@ test("renders the counter page wrapped in the layout", async () => {
 test("server action returns a response", async () => {
 	const req = new Request("http://localhost/?set", {
 		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded",
+			// Simulate a form submit from javascript, so the action's response
+			// is returned as-is rather than re-rendering the view
+			"X-Torpor-Form-Submit": "",
+		},
 		body: "count=42",
 	});
 	const ev = new ServerEvent(req);

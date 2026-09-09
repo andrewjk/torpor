@@ -250,9 +250,10 @@ async function loadData(
 				}
 			}
 
-			// If there was no response returned from load (such as errors or a
+			// A hook's enter response short-circuits the request; otherwise, if
+			// there was no response returned from load (such as errors or a
 			// redirect), send an ok response
-			return (await handlerFn(serverParams)) || ok();
+			return enterResponse || (await handlerFn(serverParams)) || ok();
 		} finally {
 			// Run exit hooks in reverse order for hooks that were entered
 			while (entered > 0) {
@@ -479,14 +480,17 @@ async function runAction(
 	query: URLSearchParams,
 	template: string | undefined,
 ) {
-	// The action name rides in the query as a `?/name` key, so look for that
-	// rather than taking the first key -- the url may carry ordinary load
-	// query params as well (e.g. `?page=3&/like`, or a default action posted
-	// to a url that already has a query). A form without an action attribute
-	// calls the `default` action
-	const actionName = (
-		Array.from(query.keys()).find((key) => key.startsWith("/")) ?? "default"
-	).replace(/^\//, "");
+	// The action name rides in the query, so look for a `?/name` key rather
+	// than taking the first key -- the url may carry ordinary load query
+	// params as well (e.g. `?page=3&/like`, or a default action posted to a
+	// url that already has a query). A key that names a declared action also
+	// matches (e.g. `?set`), and a form without an action attribute calls the
+	// `default` action
+	const queryKeys = Array.from(query.keys());
+	const actionKey =
+		queryKeys.find((key) => key.startsWith("/")) ??
+		queryKeys.find((key) => !!serverEndPoint?.actions?.[key.replace(/^\//, "")]);
+	const actionName = (actionKey ?? "default").replace(/^\//, "");
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {

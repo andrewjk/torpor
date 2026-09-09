@@ -114,15 +114,6 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
   default plugins are a good idea. Not a HACK to remove; flagged for the
   framework's design discussion.
-- `src/test/runTest.ts` — the test harness is a copy of the site request
-  handlers (flagged in-file as a HACK). The handlers now live in
-  `src/site/serverHandlers.ts` (`createServerLoad(router)`), extracted from
-  `serverEntry.ts` precisely so they can be exercised without the virtual
-  `@torpor/build/manifest` module (see `test/formRerender.test.ts`); runTest
-  should be rewired onto it and the copy deleted. The copy has already
-  drifted: it lacks the no-JS form re-render path (actions just redirect) and
-  the form/`$page.form` handling, so none of the form flows were covered by
-  tests until `formRerender.test.ts`.
 
 ### DataGrid: known gaps from the first version
 
