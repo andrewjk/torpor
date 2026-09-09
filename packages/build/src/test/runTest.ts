@@ -382,7 +382,14 @@ async function runAction(
 	params: Record<string, any>,
 	query: URLSearchParams,
 ) {
-	const actionName = (Array.from(query.keys())[0] || "default").replace(/^\//, "");
+	// The action name rides in the query as a `?/name` key, so look for that
+	// rather than taking the first key -- the url may carry ordinary load
+	// query params as well (e.g. `?page=3&/like`, or a default action posted
+	// to a url that already has a query). A form without an action attribute
+	// calls the `default` action
+	const actionName = (
+		Array.from(query.keys()).find((key) => key.startsWith("/")) ?? "default"
+	).replace(/^\//, "");
 	if (serverEndPoint?.actions) {
 		const action = serverEndPoint.actions[actionName];
 		if (action) {

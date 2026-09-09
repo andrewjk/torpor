@@ -108,10 +108,16 @@ export default class PathTrie<T> {
 		}
 
 		if (node.param && segment !== "") {
-			const match = this.#matchNode(node.param.child, segments, i + 1, {
-				...params,
-				[node.param.name]: segment,
-			}, trailingSlash);
+			const match = this.#matchNode(
+				node.param.child,
+				segments,
+				i + 1,
+				{
+					...params,
+					[node.param.name]: segment,
+				},
+				trailingSlash,
+			);
 			if (match) return match;
 		}
 

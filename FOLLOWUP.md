@@ -5,16 +5,16 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Form re-render runs load query validation against the POST url (edge case)
+### allmark splits the first paragraph after frontmatter at line breaks
 
-When a form is submitted without javascript and the action returns a 4xx,
-`runAction` re-renders the view by calling `loadView` with the POST's URL
-(query preserved since this change). The load function's query schema is
-validated against that query. If the form action URL drops query params the
-load schema requires (e.g. a `?page=` param), the re-render fails validation
-and redirects to the error page instead of showing the form errors. A
-possible fix is skipping/satisfying load query validation during form
-re-renders, or rendering from cached load data.
+When a document starts with frontmatter, allmark's `parse` renders the first
+paragraph after it as one `<p>` per source line (soft breaks become paragraph
+breaks): `---\ntitle: T\n---\n\na\nb\n` renders `<p>a</p><p>b</p>` instead of
+`<p>a\nb</p>`. Without frontmatter the same source renders correctly. Suspect
+the block parser's line/blank-line state isn't reset properly when resuming
+after `extractFrontMatter` (`allmark` src/parse.ts). Worked around in the site
+by deriving post excerpts from the markdown source instead of the html
+(`site/src/lib/markdown/index.ts`).
 
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
@@ -114,6 +114,15 @@ UI page at `/docs`, plus a `tb --openapi` CLI command. Deliberately left out:
 - `src/site/Site.ts:33-35` — design TODOs about whether `defaultAdapter` and
   default plugins are a good idea. Not a HACK to remove; flagged for the
   framework's design discussion.
+- `src/test/runTest.ts` — the test harness is a copy of the site request
+  handlers (flagged in-file as a HACK). The handlers now live in
+  `src/site/serverHandlers.ts` (`createServerLoad(router)`), extracted from
+  `serverEntry.ts` precisely so they can be exercised without the virtual
+  `@torpor/build/manifest` module (see `test/formRerender.test.ts`); runTest
+  should be rewired onto it and the copy deleted. The copy has already
+  drifted: it lacks the no-JS form re-render path (actions just redirect) and
+  the form/`$page.form` handling, so none of the form flows were covered by
+  tests until `formRerender.test.ts`.
 
 ### DataGrid: known gaps from the first version
 
@@ -220,3 +229,43 @@ resubscribe, SSR-safe). Deliberately left out:
 - **Error channel**: a `StreamSource` has no `fail` callback. Current rule
   (documented in JSDoc): errors are values; sources own their reconnection.
   Revisit if wrapper sources (retry/backoff wrappers) become common.
+
+### Sanitizing rendered markdown
+
+The markdown pipeline (`site/src/lib/markdown`) renders allmark output
+straight into `@html(...)` without sanitizing it (see `createDoc` in
+`site/src/lib/markdown/index.ts`, the natural boundary). Fine today: content
+is authored in-repo and code-reviewed. Becomes mandatory before any
+user-submitted markdown exists (e.g. the CRM scenario, where item
+descriptions written by users get re-used across search, product pages,
+etc). allmark's README explicitly warns to sanitize its HTML output.
+Note: `sanitize-html` has been archived, so pick a maintained,
+worker-compatible alternative -- `rehype-sanitize` (unified ecosystem,
+allowlist schema, pure JS so it bundles for the Cloudflare adapter) or
+equivalent; DOMPurify needs a DOM/jsdom, which doesn't work in workers.
+
+### Interactive components in markdown (MDX-lite)
+
+The site's markdown pipeline (`site/src/lib/markdown`) renders content to
+static HTML; there's no way for a post to embed live Torpor components. Sketch
+for when it's actually needed: allmark's extensibility hooks (custom block
+rules + renderers) could add a `:::carousel` style fence rule whose renderer
+emits a placeholder like `<div data-torpor="Carousel"
+data-props='{...}'></div>`, and `PostPage.torp` would use `$onmount` to find
+placeholders and swap in real components client-side (`$watch`-wrapped props
+from the parsed JSON). Interacts with any future sanitization of the
+rendered html (see the sanitization entry) -- the `data-torpor`/`data-props`
+attributes would need allowlisting, or (better) placeholders are injected
+_after_ sanitization so component props never run through the tag filter.
+
+### Custom renderers for docs pages
+
+The docs section (`site/src/views/docs/*.torp`) is hand-written components;
+the markdown pipeline only backs the blog. allmark's renderer system could
+add a fenced-code renderer that emits the site's `CodePreview` markup
+(shiki-highlighted via `@torpor/shiki`, copy button), so
+`site/src/content/docs/*.md` files could eventually replace the hand-written
+docs pages while keeping the same look. Also needs heading-anchor generation
+and a TOC (frontmatter `title` ordering exists for blog posts; docs would
+want collection-level nav from the file tree, like `DOC_LINKS` in
+`site/src/utils/nav.ts` provides today).
