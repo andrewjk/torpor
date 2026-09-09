@@ -1,14 +1,5 @@
 import { type Bindable, type ClassValue, type StyleValue } from "@torpor/view";
 import {
-	Calendar,
-	CalendarDayHeader,
-	CalendarGrid,
-	CalendarGridHeader,
-	CalendarHeader,
-	CalendarHeaderTrigger,
-} from "../Calendar/index";
-import DatePickerHeader from "../DatePicker/DatePickerHeader.torp";
-import {
 	type FieldContext,
 	FieldContextName,
 	type FormContext,
@@ -18,8 +9,15 @@ import { areDatesEqual, formatDate } from "../utils/dateUtils";
 import { addDocumentEvent, removeDocumentEvent } from "../utils/documentEvents";
 import getId from "../utils/getId";
 import createFormField from "../utils/formField";
-import { type DateRange, type DateRangePickerContext, DateRangePickerContextName } from "./DateRangePickerTypes";
-import DateRangePickerDay from "./DateRangePickerDay.torp";
+import {
+	type DateRange,
+	type DateRangePickerContext,
+	DateRangePickerContextName,
+	type DateRangePickerShellContext,
+	DateRangePickerShellContextName,
+} from "./DateRangePickerTypes";
+import DateRangePickerContent from "./DateRangePickerContent.torp";
+import DateRangePickerTrigger from "./DateRangePickerTrigger.torp";
 
 interface DateRangePickerProps {
 	/** An ID for the root element */
@@ -51,12 +49,21 @@ interface DateRangePickerProps {
  * over.
  *
  * The structure of a DateRangePicker is a trigger button that displays the
- * selected range, with a selectable Calendar in a popout.
+ * selected range, with a selectable Calendar in a popout:
+ *
+ * ```
+ * <DateRangePicker>
+ * 	<DateRangePickerTrigger />
+ * 	<DateRangePickerContent />
+ * </DateRangePicker>
+ * ```
+ *
+ * With no children, the trigger and content are rendered automatically.
  */
 export default function DateRangePicker($props: DateRangePickerProps | undefined) {
 	let defaultId = getId();
 
-	let content: HTMLDivElement;
+	let content: HTMLDivElement | undefined;
 	let closeOnClick = false;
 
 	// Wire up the enclosing Form and Field, if any
@@ -138,6 +145,34 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 	function toggle() {
 		setVisible(!$state.visible);
 	}
+
+	// Set the context to pass down to the trigger and content
+	let shell: DateRangePickerShellContext = {
+		getDisabled,
+		getTriggerId: () => $state.triggerId,
+		getContentId: () => $state.contentId,
+		isVisible: () => $state.visible,
+		toggle,
+		getDisplayText: displayText,
+		getAriaLabel: () => $props?.ariaLabel,
+		inField: () => form.inField,
+		valid: () => form.valid,
+		messageId: () => form.messageId,
+		handleBlur: () => form.handleBlur(),
+		getStartValue: () => $state.start,
+		isDaySelected,
+		selectDay: handleDay,
+		close: handleClose,
+		registerContent: (el) => {
+			content = el;
+		},
+		unregisterContent: (el) => {
+			if (content === el) {
+				content = undefined;
+			}
+		},
+	};
+	$context[DateRangePickerShellContextName] = shell;
 
 	function setVisible(visible: boolean) {
 		$state.visible = visible;
@@ -224,12 +259,6 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 		}
 	}
 
-	function handleClick(e: MouseEvent) {
-		// Don't close when the trigger itself is clicked
-		e.stopPropagation();
-		toggle();
-	}
-
 	@render {
 		<div
 			{$props?.id}
@@ -240,56 +269,10 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 			]}
 			{$props?.style}
 		>
-			<button
-				type="button"
-				id={$state.triggerId}
-				class="torp-date-range-picker-trigger"
-				aria-haspopup="dialog"
-				aria-expanded={$state.visible ? "true" : "false"}
-				aria-controls={$state.visible ? $state.contentId : undefined}
-				aria-label={$props?.ariaLabel}
-				data-valid={form.valid ? "valid" : "invalid"}
-				aria-describedby={form.messageId}
-				aria-invalid={form.inField && !form.valid ? "true" : undefined}
-				onblur={() => form.handleBlur()}
-				disabled={getDisabled()}
-				onclick={handleClick}
-			>
-				{displayText()}
-			</button>
-
-			<div
-				id={$state.contentId}
-				class={["torp-date-range-picker-content", $state.visible ? undefined : "hidden"]}
-				aria-hidden={$state.visible ? undefined : "true"}
-				&ref={content}
-			>
-				<Calendar
-					selectable
-					value={$state.start}
-					isSelected={isDaySelected}
-					onchange={handleDay}
-					onclose={handleClose}
-				>
-					<CalendarHeader>
-						<CalendarHeaderTrigger type="previous" />
-						<DatePickerHeader class="torp-date-range-picker-header" />
-						<CalendarHeaderTrigger type="next" />
-					</CalendarHeader>
-					<CalendarGridHeader>
-						@for (let day of $slot.days) {
-							<CalendarDayHeader {day.dayName} {day.shortDayName} />
-						}
-					</CalendarGridHeader>
-					<CalendarGrid>
-						<DateRangePickerDay
-							date={$slot.day.date}
-							muted={$slot.day.muted}
-							active={$slot.day.active}
-						/>
-					</CalendarGrid>
-				</Calendar>
-			</div>
+			<slot>
+				<DateRangePickerTrigger />
+				<DateRangePickerContent />
+			</slot>
 		</div>
 
 		@if (form.name) {
@@ -303,13 +286,6 @@ export default function DateRangePicker($props: DateRangePickerProps | undefined
 				name={`${form.name}-end`}
 				value={$state.value?.end ? formatDate($unwrap($state.value.end), "yyyy-MM-dd") : ""}
 			/>
-		}
-	}
-
-	@style {
-		/* Visibility only -- see SelectBoxContent */
-		.torp-date-range-picker-content.hidden {
-			display: none;
 		}
 	}
 }

@@ -19,8 +19,15 @@ export default function DateRangePickerPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<DateRangePicker ariaLabel="Stay dates" />
+<DateRangePicker>
+	<DateRangePickerTrigger />
+	<DateRangePickerContent />
+</DateRangePicker>
 `.trim()}</code></pre>
+		<p>
+			With no children, the trigger and content are rendered automatically. Compose them
+			explicitly to target each one with its own props and styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">

@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import DateRangePickerComposedTest from "./components/DateRangePickerComposedTest.torp";
 import DateRangePickerTest from "./components/DateRangePickerTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {
@@ -145,5 +146,57 @@ describe("DateRangePicker", () => {
 		expect(onchange).toHaveBeenCalledTimes(1);
 		const start = container.querySelector('[data-range="start"]') as HTMLElement;
 		expect(start).toHaveTextContent("3");
+	});
+});
+
+describe("DateRangePicker (subcomponents)", () => {
+	function setupComposed(props: Record<string, unknown> = {}) {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, DateRangePickerComposedTest, { ...props, onchange });
+		return {
+			container,
+			onchange,
+			trigger: () => within(container).getByRole("button", { name: "Select dates" }),
+			open: async () => {
+				fireEvent.click(within(container).getByRole("button", { name: "Select dates" }));
+				await new Promise((r) => setTimeout(r, 5));
+			},
+			day: (dayNumber: number) => {
+				const now = new Date();
+				const date = new Date(now.getFullYear(), now.getMonth(), dayNumber);
+				const label = new Intl.DateTimeFormat("en-US", {
+					year: "numeric",
+					month: "long",
+					day: "numeric",
+				}).format(date);
+				return within(container).getByRole("button", { name: label });
+			},
+		};
+	}
+
+	it("renders explicitly composed trigger and content with their own props", async () => {
+		const { trigger, container } = setupComposed({
+			triggerClass: "custom-trigger",
+			contentClass: "custom-content",
+		});
+
+		expect(trigger()).toHaveClass("torp-date-range-picker-trigger", "custom-trigger");
+		expect(container.querySelector(".torp-date-range-picker-content")).toHaveClass(
+			"custom-content",
+		);
+	});
+
+	it("selects a range through the composed parts", async () => {
+		const { day, open, onchange } = setupComposed({});
+
+		await open();
+		fireEvent.click(day(5));
+		fireEvent.click(day(8));
+
+		const range = onchange.mock.calls[0][0];
+		expect(range.start.getDate()).toBe(5);
+		expect(range.end.getDate()).toBe(8);
 	});
 });

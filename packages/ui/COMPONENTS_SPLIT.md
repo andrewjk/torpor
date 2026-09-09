@@ -33,24 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### DateRangePicker
-
-**Current:** same shape as `DatePicker` -- `DateRangePickerDay` exists, but
-the trigger (`DateRangePicker.torp:243`) and content (`DateRangePicker.torp:261`)
-are hardcoded. The two files are otherwise near-copies of each other.
-
-**Proposed:**
-
-```
-DateRangePicker/DateRangePickerTrigger.torp
-DateRangePicker/DateRangePickerContent.torp
-```
-
-Splitting both pickers is also the natural moment to hoist the duplicated
-popout open/close/focus logic (setVisible/closeOnClick/focusTrigger is
-copy-pasted between `DatePicker.torp:100` and `DateRangePicker.torp:142`)
-into the shared `Trigger`/`Content` pair or a `utils/popoutContent` helper.
-
 ### ColorPicker
 
 **Current:** partially compliant -- `ColorPalette` is already split out, but
