@@ -1,0 +1,30 @@
+import { ColorPalette, ColorPicker, ColorPickerInput } from "../../../src/ColorPicker/index";
+import { defaultPalette } from "../../../src/utils/colorUtils";
+
+export default function ColorPickerComposedTest($props: any) {
+	let $state = $watch({
+		value: $props?.value as string | undefined,
+	});
+
+	@render {
+		<ColorPicker
+			&value={$state.value}
+			colors={$props.colors}
+			showInput={$props.showInput}
+			disabled={$props.disabled}
+			ariaLabel="Accent color"
+			onchange={$props.onchange}
+		>
+			<ColorPalette
+				class="custom-palette"
+				&value={$state.value}
+				colors={$props.colors ?? defaultPalette}
+				disabled={$props.disabled}
+				ariaLabel="Accent color"
+			/>
+			@if ($props.showInput) {
+				<ColorPickerInput class={$props?.inputClass} />
+			}
+		</ColorPicker>
+	}
+}

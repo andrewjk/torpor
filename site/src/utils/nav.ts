@@ -39,6 +39,7 @@ export const UI_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Calendar", href: "/ui/calendar" },
 	{ label: "Carousel", href: "/ui/carousel" },
 	{ label: "Charts", href: "/ui/charts" },
+	{ label: "ColorPicker", href: "/ui/color-picker" },
 	{ label: "CommandPalette", href: "/ui/command-palette" },
 	{ label: "ComboBox", href: "/ui/combo-box" },
 	{ label: "Contextual", href: "/ui/contextual" },

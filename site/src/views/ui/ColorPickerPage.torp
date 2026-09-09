@@ -1,0 +1,60 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./color-picker/ExampleBasic.torp";
+import ExampleBasicCode from "./color-picker/ExampleBasic.torp?raw";
+import ExampleInput from "./color-picker/ExampleInput.torp";
+import ExampleInputCode from "./color-picker/ExampleInput.torp?raw";
+
+export default function ColorPickerPage() {
+	@head {
+		<title>ColorPicker | Torpor</title>
+	}
+
+	@render {
+		<h1>ColorPicker</h1>
+		<p>
+			A color input: a ColorPalette with an optional hex text field, sharing a single bound
+			value.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<ColorPicker>
+	<ColorPalette />
+	<ColorPickerInput />
+</ColorPicker>
+`.trim()}</code></pre>
+		<p>
+			With no children, the palette and input are rendered automatically. Compose them
+			explicitly to target each one with its own props and styling.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Hex input
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleInput />
+					<fill name="code">
+						<CodePreview code={ExampleInputCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

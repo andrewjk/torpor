@@ -1,0 +1,43 @@
+import { ColorPalette, ColorPicker, ColorPickerInput } from "@torpor/ui/ColorPicker";
+
+export default function ExampleInput() {
+	let $state = $watch({ value: "#ff8800" });
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<ColorPicker
+			class="example-color-picker"
+			ariaLabel="Accent color"
+			showInput
+			&value={$state.value}
+		>
+			<ColorPalette class="example-palette" &value={$state.value} ariaLabel="Accent color" />
+			<ColorPickerInput class="example-input" />
+		</ColorPicker>
+	}
+
+	@style {
+		:global(.example-color-picker .torp-color-palette-swatch) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			height: 32px;
+			width: 32px;
+		}
+
+		:global(.example-color-picker .torp-color-palette-swatch[data-selected="selected"]) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+
+		:global(.example-color-picker .example-input) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			display: block;
+			font-size: 16px;
+			margin-top: 8px;
+			padding: 8px;
+			width: 120px;
+		}
+	}
+}

@@ -6,9 +6,11 @@ import {
 	FormContextName,
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
-import { defaultPalette, parseHex } from "../utils/colorUtils";
+import { defaultPalette } from "../utils/colorUtils";
 import createFormField from "../utils/formField";
 import ColorPalette from "./ColorPalette.torp";
+import ColorPickerInput from "./ColorPickerInput.torp";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
 
 interface ColorPickerProps {
 	/** An ID for the root element */
@@ -43,10 +45,19 @@ interface ColorPickerProps {
  * ```
  * <ColorPicker name="accent" showInput &value={$state.accent} />
  * ```
+ *
+ * The structure of a ColorPicker is:
+ *
+ * ```
+ * <ColorPicker>
+ * 	<ColorPalette />
+ * 	<ColorPickerInput />
+ * </ColorPicker>
+ * ```
+ *
+ * With no children, the palette and input are rendered automatically.
  */
 export default function ColorPicker($props: ColorPickerProps | undefined) {
-	let hexInput: HTMLInputElement;
-
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
 		$props?.name,
@@ -60,96 +71,46 @@ export default function ColorPicker($props: ColorPickerProps | undefined) {
 
 	let $state = $watch({
 		value: undefined as string | undefined,
-
-		// Text while the hex input is being typed into; committed on blur or
-		// Enter, invalid text reverting like NumberInput
-		text: "",
-		editing: false,
 	});
 
 	$bind($state, $props, "value");
 
-	function handleSelect(value: string | undefined) {
-		$state.text = value ?? "";
-		form.handleInput();
-		$props?.onchange?.(value);
-	}
-
-	function commit() {
-		$state.editing = false;
-		const next = parseHex($state.text);
-		if ($state.text.trim() !== "" && !next) {
-			// Not a color: revert to the last committed value
-			$state.text = $state.value ?? "";
-			return;
-		}
+	function commitValue(next: string | undefined) {
 		if (next !== $state.value) {
 			$state.value = next;
 			form.handleInput();
 			$props?.onchange?.(next);
 		}
-		$state.text = $state.value ?? "";
 	}
 
-	function handleInput(e: Event) {
-		const el = e.currentTarget as HTMLInputElement;
-		$state.editing = true;
-		$state.text = el.value;
+	function handleSelect(value: string | undefined) {
+		commitValue(value);
 	}
 
-	function handleKey(e: KeyboardEvent) {
-		if (e.key === "Enter") {
-			e.preventDefault();
-			commit();
-		}
-	}
-
-	function handleChange() {
-		commit();
-	}
-
-	// Keep the input's value in sync with the text; typing sets the
-	// property directly, so an attribute alone would not update it
-	function syncInput() {
-		if (hexInput && !$state.editing && hexInput.value !== $state.text) {
-			hexInput.value = $state.text;
-		}
-	}
-	$run(() => {
-		const text = $state.text;
-		const editing = $state.editing;
-		if (hexInput && !editing && hexInput.value !== text) {
-			hexInput.value = text;
-		}
-	});
-	$onmount(() => syncInput());
+	// Set the context to pass down to the input
+	let context: ColorPickerContext = {
+		getDisabled,
+		getValue: () => $state.value,
+		getAriaLabel: () => $props?.ariaLabel,
+		commitValue,
+	};
+	$context[ColorPickerContextName] = context;
 
 	@render {
 		<div class={["torp-color-picker", $props?.class]} {$props?.style}>
-			<ColorPalette
-				class="torp-color-picker-palette"
-				colors={$props?.colors ?? defaultPalette}
-				value={$state.value}
-				disabled={getDisabled()}
-				ariaLabel={$props?.ariaLabel}
-				onchange={handleSelect}
-			/>
-			@if ($props?.showInput) {
-				<input
-					&ref={hexInput}
-					type="text"
-					class="torp-color-picker-input"
-					spellcheck="false"
-					placeholder="#rrggbb"
-					aria-label={$props?.ariaLabel ? `${$props.ariaLabel} hex value` : "Hex value"}
-					value={$state.editing ? $state.text : $state.value ?? ""}
+			<slot>
+				<ColorPalette
+					class="torp-color-picker-palette"
+					colors={$props?.colors ?? defaultPalette}
+					value={$state.value}
 					disabled={getDisabled()}
-					oninput={handleInput}
-					onchange={handleChange}
-					onblur={handleChange}
-					onkeydown={handleKey}
+					ariaLabel={$props?.ariaLabel}
+					onchange={handleSelect}
 				/>
-			}
+				@if ($props?.showInput) {
+					<ColorPickerInput />
+				}
+			</slot>
 		</div>
 
 		<FormValues name={form.name} value={$state.value} />

@@ -7,8 +7,8 @@ free: the user composes the subcomponents they need and targets each one with
 its own props/classes, or swaps them out entirely.
 
 A lot of the newer components were written as single `.torp` files with the
-subcomponents hardcoded inline in the template. This is a survey of which
-components deviate, what should be split out of each, and which ones are
+subcomponents hardcoded inline in the template. All of them have now been
+split; what was done is recorded below, followed by the components that were
 genuinely fine as-is.
 
 ## Naming conventions already in use
@@ -27,25 +27,43 @@ Consistent with existing splits:
 
 ---
 
-## Needs splitting
+## Split (done)
 
-Ordered roughly by priority: the first two are small, self-contained and
-illustrate the pattern; the middle ones are more involved; `DataGrid` is the
-biggest job.
+Each root keeps working standalone -- with no children the subcomponents are
+rendered automatically -- with the subcomponents as the escape hatch. This
+matches how `SelectBox` auto-renders options when none are slotted.
 
-### ColorPicker
-
-**Current:** partially compliant -- `ColorPalette` is already split out, but
-the hex input (`ColorPicker.torp:138`, with its own commit/revert state
-machine) is inline.
-
-**Proposed:**
-
-```
-ColorPicker/ColorPickerInput.torp   the hex text field (sync/commit/revert logic moves with it)
-```
-
-Small, and it completes the palette/input pairing described in PLAN.md.
+- **Slider** -- `Slider` / `SliderRange` (fill) / `SliderHandle` (thumb with
+  `role="slider"` + keyboard). State and pointer math stay in the root and
+  are shared through a `SliderContext`.
+- **Progress** -- `Progress` / `ProgressIndicator` (bar). Matches
+  `MenuIndicator` naming.
+- **Rating** -- `Rating` / `RatingStar` (one radio-button star each, with a
+  slot for custom glyphs).
+- **TimePicker** -- `TimePicker` / `TimePickerPart` (hour/minute/second
+  spinbutton segments) / `TimePickerPeriod` (AM/PM toggle). This also gained
+  the missing site docs page.
+- **TagInput** -- `TagInput` / `TagInputTag` (chip) / `TagInputField` (text
+  field, a subcomponent so full composition stays wired) /
+  `TagInputSuggestions` (loader-backed listbox, self-gating on open state).
+- **CommandPalette** -- `CommandPalette` / `CommandPaletteInput` /
+  `CommandPaletteList` / `CommandPaletteItem` (label + shortcut, with a slot
+  for custom rows).
+- **DataGrid** -- `DataGrid` / `DataGridColumnHeader` (th + sort button) /
+  `DataGridCell` (td + roving tabindex). The root's cell template forwards
+  through the cell as its children, so `$slot.row` / `$slot.column` /
+  `$slot.value` keep working. This also gained the missing site docs page.
+- **DatePicker** -- `DatePicker` / `DatePickerTrigger` (display button, with
+  a slot for custom labels) / `DatePickerContent` (popout, rendering the
+  selectable calendar by default through context).
+- **DateRangePicker** -- `DateRangePicker` / `DateRangePickerTrigger` /
+  `DateRangePickerContent`. The trigger/content wiring lives in a
+  `DateRangePickerShellContext`, separate from the day-highlighting
+  `DateRangePickerContext`.
+- **ColorPicker** -- `ColorPicker` / `ColorPalette` (already existed) /
+  `ColorPickerInput` (hex field with its commit/revert state machine,
+  reading the shared value and reporting through context). This also gained
+  the missing site docs page.
 
 ---
 

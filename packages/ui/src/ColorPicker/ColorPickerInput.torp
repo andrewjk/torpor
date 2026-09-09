@@ -1,0 +1,122 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { parseHex } from "../utils/colorUtils";
+import { type ColorPickerContext, ColorPickerContextName } from "./ColorPickerTypes";
+
+interface ColorPickerInputProps {
+	/** An ID for the input element */
+	id?: string;
+	/** Classes for the input element */
+	class?: ClassValue;
+	/** Styles for the input element */
+	style?: StyleValue;
+	/** An accessible name for the input; falls back to the picker's ariaLabel */
+	ariaLabel?: string;
+	/** If set to true, the user cannot interact with this input */
+	disabled?: boolean;
+}
+
+/**
+ * The hex text field of a ColorPicker, for entering arbitrary colors as
+ * "#rrggbb". Values commit on blur or Enter, invalid text reverting like
+ * NumberInput.
+ */
+export default function ColorPickerInput($props: ColorPickerInputProps | undefined) {
+	let hexInput: HTMLInputElement | undefined;
+
+	// Get stuff out of the ColorPicker context
+	const context = $context[ColorPickerContextName] as ColorPickerContext;
+	if (!context) {
+		throw new Error("ColorPickerInput must be contained within a ColorPicker");
+	}
+
+	function getDisabled(): boolean {
+		return $props?.disabled === true || context.getDisabled();
+	}
+
+	function label(): string {
+		const base = $props?.ariaLabel ?? context.getAriaLabel();
+		return base ? `${base} hex value` : "Hex value";
+	}
+
+	let $state = $watch({
+		// Text while the hex input is being typed into; committed on blur or
+		// Enter, invalid text reverting like NumberInput
+		text: "",
+		editing: false,
+	});
+
+	function display(): string {
+		return $state.editing ? $state.text : context.getValue() ?? "";
+	}
+
+	function commit() {
+		$state.editing = false;
+		const next = parseHex($state.text);
+		if ($state.text.trim() !== "" && !next) {
+			// Not a color: revert to the last committed value
+			$state.text = context.getValue() ?? "";
+			return;
+		}
+		context.commitValue(next);
+		$state.text = context.getValue() ?? "";
+	}
+
+	function handleInput(e: Event) {
+		const el = e.currentTarget as HTMLInputElement;
+		$state.editing = true;
+		$state.text = el.value;
+	}
+
+	function handleKey(e: KeyboardEvent) {
+		if (e.key === "Enter") {
+			e.preventDefault();
+			commit();
+		}
+	}
+
+	function handleChange() {
+		commit();
+	}
+
+	// Keep the input's value in sync with the text; typing sets the
+	// property directly, so an attribute alone would not update it
+	function syncInput() {
+		if (hexInput && !$state.editing && hexInput.value !== display()) {
+			hexInput.value = display();
+		}
+	}
+	$run(() => {
+		const text = display();
+		const editing = $state.editing;
+		if (hexInput && !editing && hexInput.value !== text) {
+			hexInput.value = text;
+		}
+	});
+	$onmount(() => syncInput());
+
+	@render {
+		<input
+			{$props?.id}
+			type="text"
+			class={["torp-color-picker-input", $props?.class]}
+			{$props?.style}
+			spellcheck="false"
+			placeholder="#rrggbb"
+			aria-label={label()}
+			value={display()}
+			disabled={getDisabled()}
+			oninput={handleInput}
+			onchange={handleChange}
+			onblur={handleChange}
+			onkeydown={handleKey}
+			onmount={(el) => {
+				hexInput = el;
+				return () => {
+					if (hexInput === el) {
+						hexInput = undefined;
+					}
+				};
+			}}
+		/>
+	}
+}

@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import ColorPickerComposedTest from "./components/ColorPickerComposedTest.torp";
 import ColorPickerTest from "./components/ColorPickerTest.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
@@ -107,5 +108,44 @@ describe("ColorPicker", () => {
 
 		expect(document.activeElement).toBe(buttons[1]);
 		expect(buttons[1]).toHaveAttribute("aria-checked", "true");
+	});
+});
+
+describe("ColorPicker (subcomponents)", () => {
+	it("renders the palette and input automatically with no children", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerTest as any, { showInput: true });
+
+		expect(container.querySelector(".torp-color-picker-palette")).toBeInTheDocument();
+		expect(container.querySelector(".torp-color-picker-input")).toBeInTheDocument();
+	});
+
+	it("renders an explicitly composed input with its own props", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, ColorPickerComposedTest as any, {
+			showInput: true,
+			inputClass: "custom-input",
+			colors: ["#FFFFFF", "#00FF88"],
+			onchange,
+		});
+
+		const input = container.querySelector<HTMLInputElement>(".torp-color-picker-input")!;
+		expect(input).toHaveClass("custom-input");
+		expect(container.querySelector(".custom-palette")).toBeInTheDocument();
+
+		// Committing through the composed input updates the shared value
+		fireEvent.input(input, { target: { value: "#00ff88" } });
+		fireEvent.blur(input);
+		await tick();
+
+		expect(onchange).toHaveBeenCalledWith("#00ff88");
+		expect(input.value).toBe("#00ff88");
+
+		// The composed palette reflects the input's value
+		const selected = container.querySelector('[data-selected="selected"]')!;
+		expect(selected).toHaveAttribute("data-color", "#00FF88");
 	});
 });
