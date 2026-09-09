@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import RatingComposedTest from "./components/RatingComposedTest.torp";
 import RatingTest from "./components/RatingTest.torp";
 
 function setup(props: Record<string, unknown> = {}) {
@@ -92,5 +93,45 @@ describe("Rating", () => {
 		const { container } = setup({ value: 9 });
 
 		expect(stars(container)[4]).toHaveAttribute("aria-checked", "true");
+	});
+});
+
+describe("Rating (subcomponents)", () => {
+	function setupComposed(props: Record<string, unknown> = {}) {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, RatingComposedTest, { ...props, onchange });
+		return { container, onchange };
+	}
+
+	it("renders the stars automatically with no children", async () => {
+		const { container } = setup({ max: 3 });
+
+		expect(stars(container)).toHaveLength(3);
+	});
+
+	it("renders explicitly composed stars with their own props", async () => {
+		const { container } = setupComposed({ value: 2, starClass: "custom-star" });
+
+		const all = stars(container);
+		expect(all).toHaveLength(5);
+		expect(all[0]).toHaveClass("torp-rating-star", "custom-star");
+		expect(all[1]).toHaveAttribute("aria-checked", "true");
+	});
+
+	it("renders custom star content through the slot", async () => {
+		const { container } = setupComposed({ glyph: "♥" });
+
+		expect(stars(container)[0].textContent).toBe("♥");
+	});
+
+	it("clicking a composed star sets the value", async () => {
+		const { container, onchange } = setupComposed();
+
+		fireEvent.click(stars(container)[2]);
+
+		expect(stars(container)[2]).toHaveAttribute("aria-checked", "true");
+		expect(onchange).toHaveBeenCalledWith(3);
 	});
 });

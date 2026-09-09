@@ -1,0 +1,40 @@
+import { Rating, RatingStar } from "@torpor/ui/Rating";
+
+export default function ExampleCustom() {
+	let $state = $watch({ value: 3 });
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<Rating class="example-rating" ariaLabel="Rate this product" &value={$state.value}>
+			@for (let value of [1, 2, 3, 4, 5]) {
+				@key = value
+				<RatingStar {value}>
+					<span aria-hidden="true">♥</span>
+				</RatingStar>
+			}
+		</Rating>
+	}
+
+	@style {
+		:global(.example-rating .torp-rating-star) {
+			all: unset;
+			cursor: pointer;
+			font-size: 32px;
+			line-height: 1;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="filled"] span) {
+			color: crimson;
+		}
+
+		:global(.example-rating .torp-rating-star[data-state="empty"] span) {
+			color: var(--muted);
+		}
+
+		:global(.example-rating .torp-rating-star:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+	}
+}

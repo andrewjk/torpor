@@ -1,0 +1,21 @@
+import { Rating, RatingStar } from "../../../src/Rating/index";
+
+export default function RatingComposedTest($props: any) {
+	@render {
+		<Rating
+			{$props?.max}
+			{$props?.value}
+			{$props?.disabled}
+			{$props?.allowClear}
+			ariaLabel={$props?.ariaLabel ?? "Rating"}
+			onchange={$props?.onchange}
+		>
+			@for (let value of [1, 2, 3, 4, 5]) {
+				@key = value
+				<RatingStar {value} class={$props?.starClass}>
+					<span aria-hidden="true">{$props?.glyph ?? "★"}</span>
+				</RatingStar>
+			}
+		</Rating>
+	}
+}

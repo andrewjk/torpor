@@ -33,23 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### Rating
-
-**Current:** one file. Each star (`Rating.torp:185`, `.torp-rating-star`,
-`role="radio"`, filled/empty `data-state`, per-star slot with the `★`
-fallback) is generated inside an `@for` in the root template.
-
-**Proposed:**
-
-```
-Rating/Rating.torp       root: role="radiogroup", state, clamp/clear, roving tabindex, form field
-Rating/RatingStar.torp   one star button: role="radio", aria-checked, data-state, slot
-```
-
-The star is the piece users will want to style/replace (icon swaps, halves,
-hearts...). The root passes value/disabled/handlers via the existing slot-item
-style or context, like `StepperStep` does.
-
 ### TimePicker
 
 **Current:** one file (462 lines). The three spinbutton segments

@@ -8,6 +8,8 @@ import {
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
 import createFormField from "../utils/formField";
+import RatingStar from "./RatingStar.torp";
+import { type RatingContext, RatingContextName } from "./RatingTypes";
 
 interface RatingProps {
 	/** An ID for the root element */
@@ -40,6 +42,16 @@ interface RatingProps {
  * matching the current rating is checked, and arrow keys move the rating.
  *
  * See [the WAI ARIA guidelines for Rating](https://www.w3.org/WAI/ARIA/apg/patterns/rating/).
+ *
+ * The structure of a Rating is:
+ *
+ * ```
+ * <Rating>
+ * 	<RatingStar />
+ * </Rating>
+ * ```
+ *
+ * With no children, the stars are rendered automatically.
  */
 export default function Rating($props: RatingProps | undefined) {
 	let stars: (HTMLButtonElement | undefined)[] = [];
@@ -109,7 +121,29 @@ export default function Rating($props: RatingProps | undefined) {
 		return getDisabled() ? getValue() : Math.max(getValue(), $state.hover);
 	}
 
-	function handleClick(value: number) {
+	// Set the context to pass down to the stars
+	let context: RatingContext = {
+		getDisplayValue,
+		getDisabled,
+		isTabStop: (value) => value === ($state.value > 0 ? $state.value : 1),
+		isChecked: (value) => value === getValue(),
+		selectValue,
+		handleKey,
+		setHover: (value) => {
+			$state.hover = value;
+		},
+		registerStar: (value, el) => {
+			stars[value - 1] = el;
+		},
+		unregisterStar: (value, el) => {
+			if (stars[value - 1] === el) {
+				stars[value - 1] = undefined;
+			}
+		},
+	};
+	$context[RatingContextName] = context;
+
+	function selectValue(value: number) {
 		if (getDisabled()) return;
 		if (value === $state.value && ($props?.allowClear ?? true)) {
 			setValue(0);
@@ -159,12 +193,6 @@ export default function Rating($props: RatingProps | undefined) {
 		}
 	}
 
-	// Roving tabindex: the star matching the current rating (or the first
-	// star when there is no rating) is the single tab stop
-	function tabStop(value: number): boolean {
-		return value === ($state.value > 0 ? $state.value : 1);
-	}
-
 	@render {
 		<div
 			{$props?.id}
@@ -180,36 +208,12 @@ export default function Rating($props: RatingProps | undefined) {
 			onfocusout={handleFocusOut}
 			&ref={root}
 		>
-			@for (let value of $state.stars) {
-				@key = value
-				<button
-					type="button"
-					class="torp-rating-star"
-					role="radio"
-					tabindex={tabStop(value) ? 0 : -1}
-					aria-checked={value === getValue() ? "true" : "false"}
-					aria-label={`${value} ${value === 1 ? "star" : "stars"}`}
-					aria-disabled={getDisabled() ? "true" : undefined}
-					data-state={value <= getDisplayValue() ? "filled" : "empty"}
-					onmount={(el) => {
-						stars[value - 1] = el;
-						return () => {
-							if (stars[value - 1] === el) {
-								stars[value - 1] = undefined;
-							}
-						};
-					}}
-					onclick={() => handleClick(value)}
-					onkeydown={handleKey}
-					onmouseenter={() => {
-						if (!getDisabled()) $state.hover = value;
-					}}
-				>
-					<slot item={{ value: value, filled: value <= getDisplayValue() }}>
-						<span aria-hidden="true">★</span>
-					</slot>
-				</button>
-			}
+			<slot>
+				@for (let value of $state.stars) {
+					@key = value
+					<RatingStar {value} />
+				}
+			</slot>
 		</div>
 
 		<FormValues name={form.name} value={getValue() > 0 ? getValue() : undefined} />

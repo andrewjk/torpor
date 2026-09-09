@@ -4,6 +4,8 @@ import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
 import ExampleBasic from "./rating/ExampleBasic.torp";
 import ExampleBasicCode from "./rating/ExampleBasic.torp?raw";
+import ExampleCustom from "./rating/ExampleCustom.torp";
+import ExampleCustomCode from "./rating/ExampleCustom.torp?raw";
 import ExampleDisabled from "./rating/ExampleDisabled.torp";
 import ExampleDisabledCode from "./rating/ExampleDisabled.torp?raw";
 
@@ -24,8 +26,15 @@ export default function RatingPage() {
 		</p>
 		<h2>Structure</h2>
 		<pre><code>{`
-<Rating ariaLabel="Rate this product" />
+<Rating>
+	<RatingStar />
+</Rating>
 `.trim()}</code></pre>
+		<p>
+			With no children, the stars are rendered automatically. Compose them
+			explicitly (e.g. for custom glyphs) to target each one with its own
+			props and styling.
+		</p>
 		<h2>Demo</h2>
 		<TabGroup>
 			<TabList ariaLabel="Example tabs">
@@ -34,6 +43,9 @@ export default function RatingPage() {
 				</ExampleTabHeader>
 				<ExampleTabHeader>
 					Disabled
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Custom
 				</ExampleTabHeader>
 			</TabList>
 			<TabContent>
@@ -49,6 +61,14 @@ export default function RatingPage() {
 					<ExampleDisabled />
 					<fill name="code">
 						<CodePreview code={ExampleDisabledCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleCustom />
+					<fill name="code">
+						<CodePreview code={ExampleCustomCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
