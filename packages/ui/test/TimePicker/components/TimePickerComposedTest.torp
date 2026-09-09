@@ -1,0 +1,30 @@
+import { TimePicker, TimePickerPart, TimePickerPeriod } from "../../../src/TimePicker/index";
+
+/** A TimePicker with explicitly composed segments, taking all props through */
+export default function TimePickerComposedTest($props: any) {
+	@render {
+		<TimePicker
+			id={$props.id}
+			{$props?.value}
+			hour12={$props.hour12}
+			seconds={$props.seconds}
+			step={$props.step}
+			min={$props.min}
+			max={$props.max}
+			disabled={$props.disabled}
+			ariaLabel={$props.ariaLabel}
+			onchange={$props.onchange}
+		>
+			<TimePickerPart part="hour" class={$props?.partClass} />
+			<span class="torp-time-picker-separator">:</span>
+			<TimePickerPart part="minute" class={$props?.partClass} />
+			@if ($props?.seconds) {
+				<span class="torp-time-picker-separator">:</span>
+				<TimePickerPart part="second" class={$props?.partClass} />
+			}
+			@if ($props?.hour12) {
+				<TimePickerPeriod class={$props?.periodClass} />
+			}
+		</TimePicker>
+	}
+}

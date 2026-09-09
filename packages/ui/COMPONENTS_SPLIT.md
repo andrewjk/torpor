@@ -33,25 +33,6 @@ Ordered roughly by priority: the first two are small, self-contained and
 illustrate the pattern; the middle ones are more involved; `DataGrid` is the
 biggest job.
 
-### TimePicker
-
-**Current:** one file (462 lines). The three spinbutton segments
-(hour/minute/second, already parameterized by the internal `Part` type) and
-the AM/PM toggle button are hardcoded; the segment markup is duplicated three
-times.
-
-**Proposed:**
-
-```
-TimePicker/TimePicker.torp         root: role="group", value <-> parts parsing/formatting, form field
-TimePicker/TimePickerPart.torp     one spinbutton segment (input role="spinbutton", shared by all three)
-TimePicker/TimePickerPeriod.torp   the AM/PM toggle (only rendered in hour12 mode)
-```
-
-`TimePickerPart` matches the internal `Part` type name. This removes the
-triplicated segment markup and lets themes target the separator, segments and
-period independently.
-
 ### TagInput
 
 **Current:** one file (378 lines). Three discrete pieces are inline: the tag

@@ -7,6 +7,13 @@ import {
 } from "../Form/FormTypes";
 import FormValues from "../Form/FormValues.torp";
 import createFormField from "../utils/formField";
+import TimePickerPart from "./TimePickerPart.torp";
+import TimePickerPeriod from "./TimePickerPeriod.torp";
+import {
+	type Part,
+	type TimePickerContext,
+	TimePickerContextName,
+} from "./TimePickerTypes";
 
 interface TimePickerProps {
 	/** An ID for the root element */
@@ -40,8 +47,6 @@ interface TimePickerProps {
 	onchange?: (value: string | undefined) => void;
 }
 
-type Part = "hour" | "minute" | "second";
-
 const PAD = [2, 2, 2];
 
 /**
@@ -52,12 +57,23 @@ const PAD = [2, 2, 2];
  *
  * The value is always the canonical 24-hour form ("HH:mm" or "HH:mm:ss"),
  * regardless of display format.
+ *
+ * The structure of a TimePicker is:
+ *
+ * ```
+ * <TimePicker>
+ * 	<TimePickerPart part="hour" />
+ * 	<TimePickerPart part="minute" />
+ * 	<TimePickerPart part="second" /> (optional)
+ * 	<TimePickerPeriod /> (in 12-hour mode)
+ * </TimePicker>
+ * ```
+ *
+ * With no children, the segments are rendered automatically.
  */
 export default function TimePicker($props: TimePickerProps | undefined) {
-	let hourInput: HTMLInputElement;
-	let minuteInput: HTMLInputElement;
-	let secondInput: HTMLInputElement;
-	let periodButton: HTMLButtonElement;
+	const partInputs = new Map<Part, HTMLInputElement>();
+	let periodButton: HTMLButtonElement | undefined;
 
 	// Wire up the enclosing Form and Field, if any
 	const form = createFormField(
@@ -168,6 +184,13 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 		return format(n);
 	}
 
+	function getPartLabel(part: Part): string {
+		if (part === "hour") {
+			return $props?.hour12 ? "Hour (12-hour)" : "Hour";
+		}
+		return part === "minute" ? "Minute" : "Second";
+	}
+
 	function isPM(): boolean {
 		return parts().h >= 12;
 	}
@@ -226,6 +249,8 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 
 	// Keep segment inputs showing the committed values unless typing there
 	function syncInputs() {
+		const hourInput = partInputs.get("hour");
+		const minuteInput = partInputs.get("minute");
 		if (!hourInput || !minuteInput) return;
 		const editing = (el: HTMLInputElement, buffer: string) =>
 			document.activeElement === el && el.value !== buffer;
@@ -235,6 +260,7 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 		if (!editing(minuteInput, $state.minuteText)) {
 			minuteInput.value = partDisplay("minute");
 		}
+		const secondInput = partInputs.get("second");
 		if (secondInput && !editing(secondInput, $state.secondText)) {
 			secondInput.value = partDisplay("second");
 		}
@@ -333,9 +359,9 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 
 	function focusNextSegment(part: Part) {
 		if (part === "hour") {
-			minuteInput?.focus();
+			partInputs.get("minute")?.focus();
 		} else if (part === "minute" && getSeconds()) {
-			secondInput?.focus();
+			partInputs.get("second")?.focus();
 		} else if (part === "minute" && $props?.hour12) {
 			periodButton?.focus();
 		}
@@ -361,17 +387,49 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 		}
 	}
 
-	function ariaNow(part: Part): number {
+	function getPartValue(part: Part): number {
 		const p = parts();
 		return part === "hour" ? p.h : part === "minute" ? p.m : p.s;
 	}
 
-	function ariaText(part: Part): string {
+	function getPartText(part: Part): string {
 		if (part === "hour" && $props?.hour12) {
 			return `${partDisplay("hour")} ${isPM() ? "PM" : "AM"}`;
 		}
-		return String(ariaNow(part));
+		return String(getPartValue(part));
 	}
+
+	// Set the context to pass down to the segments and the period toggle
+	let context: TimePickerContext = {
+		getDisabled,
+		getPartLabel,
+		getPartValue,
+		getPartText,
+		partDisplay,
+		handleInput,
+		handleBlur,
+		handleSegmentKey,
+		registerPart: (part, el) => {
+			partInputs.set(part, el);
+		},
+		unregisterPart: (part, el) => {
+			if (partInputs.get(part) === el) {
+				partInputs.delete(part);
+			}
+		},
+		isPM,
+		togglePeriod,
+		handlePeriodKey,
+		registerPeriod: (el) => {
+			periodButton = el;
+		},
+		unregisterPeriod: (el) => {
+			if (periodButton === el) {
+				periodButton = undefined;
+			}
+		},
+	};
+	$context[TimePickerContextName] = context;
 
 	@render {
 		<div
@@ -383,78 +441,18 @@ export default function TimePicker($props: TimePickerProps | undefined) {
 			data-valid={form.valid ? "valid" : "invalid"}
 			aria-describedby={form.messageId}
 		>
-			<input
-				&ref={hourInput}
-				class="torp-time-picker-part"
-				type="text"
-				inputmode="numeric"
-				role="spinbutton"
-				value={partDisplay("hour")}
-				aria-label={$props?.hour12 ? "Hour (12-hour)" : "Hour"}
-				aria-valuemin={0}
-				aria-valuemax={23}
-				aria-valuenow={ariaNow("hour")}
-				aria-valuetext={ariaText("hour")}
-				disabled={getDisabled()}
-				tabindex={getDisabled() ? -1 : 0}
-				oninput={(e: Event) => handleInput("hour", e)}
-				onblur={(e: FocusEvent) => handleBlur("hour", e)}
-				onkeydown={(e: KeyboardEvent) => handleSegmentKey("hour", e)}
-			/>
-			<span class="torp-time-picker-separator">:</span>
-			<input
-				&ref={minuteInput}
-				class="torp-time-picker-part"
-				type="text"
-				inputmode="numeric"
-				role="spinbutton"
-				value={partDisplay("minute")}
-				aria-label="Minute"
-				aria-valuemin={0}
-				aria-valuemax={59}
-				aria-valuenow={ariaNow("minute")}
-				aria-valuetext={ariaText("minute")}
-				disabled={getDisabled()}
-				tabindex={getDisabled() ? -1 : 0}
-				oninput={(e: Event) => handleInput("minute", e)}
-				onblur={(e: FocusEvent) => handleBlur("minute", e)}
-				onkeydown={(e: KeyboardEvent) => handleSegmentKey("minute", e)}
-			/>
-			@if (getSeconds()) {
+			<slot>
+				<TimePickerPart part="hour" />
 				<span class="torp-time-picker-separator">:</span>
-				<input
-					&ref={secondInput}
-					class="torp-time-picker-part"
-					type="text"
-					inputmode="numeric"
-					role="spinbutton"
-					value={partDisplay("second")}
-					aria-label="Second"
-					aria-valuemin={0}
-					aria-valuemax={59}
-					aria-valuenow={ariaNow("second")}
-					aria-valuetext={ariaText("second")}
-					disabled={getDisabled()}
-					tabindex={getDisabled() ? -1 : 0}
-					oninput={(e: Event) => handleInput("second", e)}
-					onblur={(e: FocusEvent) => handleBlur("second", e)}
-					onkeydown={(e: KeyboardEvent) => handleSegmentKey("second", e)}
-				/>
-			}
-			@if ($props?.hour12) {
-				<button
-					&ref={periodButton}
-					type="button"
-					class="torp-time-picker-period"
-					disabled={getDisabled()}
-					tabindex={getDisabled() ? -1 : 0}
-					aria-label={isPM() ? "PM" : "AM"}
-					onclick={togglePeriod}
-					onkeydown={handlePeriodKey}
-				>
-					{isPM() ? "PM" : "AM"}
-				</button>
-			}
+				<TimePickerPart part="minute" />
+				@if (getSeconds()) {
+					<span class="torp-time-picker-separator">:</span>
+					<TimePickerPart part="second" />
+				}
+				@if ($props?.hour12) {
+					<TimePickerPeriod />
+				}
+			</slot>
 		</div>
 
 		<FormValues name={form.name} value={$state.value} />

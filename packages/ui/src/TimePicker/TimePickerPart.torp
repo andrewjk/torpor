@@ -1,0 +1,61 @@
+import type { ClassValue, StyleValue } from "@torpor/view";
+import { type Part, type TimePickerContext, TimePickerContextName } from "./TimePickerTypes";
+
+interface TimePickerPartProps {
+	/** An ID for the segment element */
+	id?: string;
+	/** Classes for the segment element */
+	class?: ClassValue;
+	/** Styles for the segment element */
+	style?: StyleValue;
+	/** Which segment this is: the hour, minute or second field */
+	part: Part;
+}
+
+/**
+ * One spinbutton segment of a TimePicker -- the hour, minute or second
+ * field. Each segment can be typed into or stepped with the arrow keys.
+ */
+export default function TimePickerPart($props: TimePickerPartProps | undefined) {
+	// Get stuff out of the TimePicker context
+	const context = $context[TimePickerContextName] as TimePickerContext;
+	if (!context) {
+		throw new Error("TimePickerPart must be contained within a TimePicker");
+	}
+
+	function getPart(): Part {
+		return $props?.part ?? "hour";
+	}
+
+	function getDisabled(): boolean {
+		return context.getDisabled();
+	}
+
+	@render {
+		<input
+			{$props?.id}
+			class={["torp-time-picker-part", $props?.class]}
+			{$props?.style}
+			type="text"
+			inputmode="numeric"
+			role="spinbutton"
+			value={context.partDisplay(getPart())}
+			aria-label={context.getPartLabel(getPart())}
+			aria-valuemin={0}
+			aria-valuemax={getPart() === "hour" ? 23 : 59}
+			aria-valuenow={context.getPartValue(getPart())}
+			aria-valuetext={context.getPartText(getPart())}
+			disabled={getDisabled()}
+			tabindex={getDisabled() ? -1 : 0}
+			oninput={(e: Event) => context.handleInput(getPart(), e)}
+			onblur={(e: FocusEvent) => context.handleBlur(getPart(), e)}
+			onkeydown={(e: KeyboardEvent) => context.handleSegmentKey(getPart(), e)}
+			onmount={(el) => {
+				context.registerPart(getPart(), el);
+				return () => {
+					context.unregisterPart(getPart(), el);
+				};
+			}}
+		/>
+	}
+}

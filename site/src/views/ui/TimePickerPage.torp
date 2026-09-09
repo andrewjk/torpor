@@ -1,0 +1,62 @@
+import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
+import CodePreview from "../CodePreview.torp";
+import ExampleTabGroup from "./ExampleTabGroup.torp";
+import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleBasic from "./time-picker/ExampleBasic.torp";
+import ExampleBasicCode from "./time-picker/ExampleBasic.torp?raw";
+import ExampleComposed from "./time-picker/ExampleComposed.torp";
+import ExampleComposedCode from "./time-picker/ExampleComposed.torp?raw";
+
+export default function TimePickerPage() {
+	@head {
+		<title>TimePicker | Torpor</title>
+	}
+
+	@render {
+		<h1>TimePicker</h1>
+		<p>
+			An input for entering a time of day, made of hour, minute and (optionally) second fields
+			that follow the WAI ARIA spinbutton pattern, plus an AM/PM toggle in 12-hour mode.
+		</p>
+		<h2>Structure</h2>
+		<pre><code>{`
+<TimePicker>
+	<TimePickerPart part="hour" />
+	<TimePickerPart part="minute" />
+	<TimePickerPart part="second" />
+	<TimePickerPeriod />
+</TimePicker>
+`.trim()}</code></pre>
+		<p>
+			With no children, the segments are rendered automatically. Compose them explicitly to
+			target each one with its own props and styling.
+		</p>
+		<h2>Demo</h2>
+		<TabGroup>
+			<TabList ariaLabel="Example tabs">
+				<ExampleTabHeader>
+					Basic
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Composed
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleBasic />
+					<fill name="code">
+						<CodePreview code={ExampleBasicCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleComposed />
+					<fill name="code">
+						<CodePreview code={ExampleComposedCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+	}
+}

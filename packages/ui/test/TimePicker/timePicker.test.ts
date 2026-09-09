@@ -2,6 +2,7 @@ import { fireEvent, within } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
+import TimePickerComposedTest from "./components/TimePickerComposedTest.torp";
 import TimePickerTest from "./components/TimePickerTest.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
@@ -175,5 +176,46 @@ describe("TimePicker", () => {
 		fireEvent.keyDown(getHour(container), { key: "ArrowUp" });
 		await tick();
 		expect(onchange).not.toHaveBeenCalled();
+	});
+});
+
+describe("TimePicker (subcomponents)", () => {
+	it("renders the segments automatically with no children", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TimePickerTest as any, { value: "09:05", hour12: true, seconds: true });
+
+		expect(getHour(container)).toHaveValue("09");
+		expect(getMinute(container)).toHaveValue("05");
+		expect(getSecond(container)).toHaveValue("00");
+		expect(container.querySelector(".torp-time-picker-period")).toHaveTextContent("AM");
+	});
+
+	it("renders explicitly composed segments with their own props", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TimePickerComposedTest as any, {
+			value: "09:05",
+			partClass: "custom-part",
+			periodClass: "custom-period",
+			hour12: true,
+		});
+
+		expect(getHour(container)).toHaveValue("09");
+		expect(getHour(container)).toHaveClass("torp-time-picker-part", "custom-part");
+		expect(container.querySelector(".torp-time-picker-period")).toHaveClass("custom-period");
+	});
+
+	it("composed segments step and commit like the default ones", async () => {
+		const onchange = vi.fn();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, TimePickerComposedTest as any, { value: "10:30", onchange });
+
+		fireEvent.keyDown(getHour(container), { key: "ArrowUp" });
+		await tick();
+
+		expect(getHour(container)).toHaveAttribute("aria-valuenow", "11");
+		expect(onchange).toHaveBeenCalledWith("11:30");
 	});
 });

@@ -65,6 +65,7 @@ export const UI_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Stepper", href: "/ui/stepper" },
 	{ label: "TabGroup", href: "/ui/tab-group" },
 	{ label: "TagInput", href: "/ui/tag-input" },
+	{ label: "TimePicker", href: "/ui/time-picker" },
 	{ label: "ToolBar", href: "/ui/tool-bar" },
 ];
 

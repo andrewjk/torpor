@@ -1,0 +1,51 @@
+import { TimePicker, TimePickerPart, TimePickerPeriod } from "@torpor/ui/TimePicker";
+
+export default function ExampleComposed() {
+	let $state = $watch({ value: "02:30:00" });
+
+	@render {
+		<p>Value: {$state.value}</p>
+
+		<TimePicker
+			class="example-time-picker"
+			ariaLabel="Start time"
+			hour12
+			seconds
+			&value={$state.value}
+		>
+			<TimePickerPart part="hour" class="example-part" />
+			<span class="torp-time-picker-separator">:</span>
+			<TimePickerPart part="minute" class="example-part" />
+			<span class="torp-time-picker-separator">:</span>
+			<TimePickerPart part="second" class="example-part" />
+			<TimePickerPeriod class="example-period" />
+		</TimePicker>
+	}
+
+	@style {
+		:global(.example-time-picker .example-part) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 16px;
+			padding: 8px;
+			width: 48px;
+		}
+
+		:global(.example-time-picker .example-part:focus-visible) {
+			outline: 2px solid var(--header);
+			outline-offset: 2px;
+		}
+
+		:global(.example-time-picker .torp-time-picker-separator) {
+			margin: 0 4px;
+		}
+
+		:global(.example-time-picker .example-period) {
+			border: 1px solid var(--border);
+			border-radius: 4px;
+			font-size: 16px;
+			margin-left: 8px;
+			padding: 8px;
+		}
+	}
+}
