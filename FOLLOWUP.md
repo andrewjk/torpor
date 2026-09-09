@@ -58,6 +58,20 @@ user focus events.
 
 ## Features
 
+### DataGrid: expose reload-pending state for loader grids
+
+A loader-backed DataGrid shows the `loading` slot on the first load, but a
+sort/page-triggered reload is silent: stale rows stay visible with no
+`aria-busy` and no indicator hook (`DataGrid.torp`, `runLoad` resolves
+through `$async` into the `@await` boundary, which doesn't re-trigger once
+content is shown). Consumers that own their `load` function can track
+pending state themselves (the site's DataGrid Loading example does this),
+but grids consuming a passed-in loader have no way to show reload feedback.
+Options: an `aria-busy` + `data-loading` attribute on the table while a
+reload is pending, an `onloadstart`-style event to pair with `onload`, or a
+`reloading` named slot. Seen while adding a loading indicator to the
+DataGrid docs example.
+
 ### Standard schema validation: remaining integration points
 
 Endpoints now support standard schemas for request bodies (`json()`), form

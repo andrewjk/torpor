@@ -5,30 +5,68 @@ const columns = [
 	{ key: "role", label: "Role" },
 ];
 
-async function load() {
-	await new Promise((r) => setTimeout(r, 500));
-	return {
-		items: [
-			{ name: "Cara", role: "Designer" },
-			{ name: "Alice", role: "Engineer" },
-			{ name: "Bob", role: "Manager" },
-		],
-	};
-}
+const allRows = [
+	{ name: "Cara", role: "Designer" },
+	{ name: "Alice", role: "Engineer" },
+	{ name: "Bob", role: "Manager" },
+];
 
 export default function ExampleLoading() {
+	let $state = $watch({ loading: false, loaded: false });
+
+	// With a loader, sorting (and paging) happens server-side: the grid
+	// passes sortBy/sortDirection in the request, and the loader returns the
+	// rows in the right order. The loader tracks its own pending state here
+	// so the example can show an indicator while a reload is in flight (the
+	// grid's own loading fill covers the initial load).
+	async function load(request: { sortBy?: string; sortDirection?: "asc" | "desc" }) {
+		$state.loading = true;
+		try {
+			await new Promise((r) => setTimeout(r, 500));
+			const items = [...allRows];
+			const sortBy = request.sortBy as "name" | "role" | undefined;
+			if (sortBy) {
+				const dir = request.sortDirection === "desc" ? -1 : 1;
+				items.sort((a, b) => a[sortBy].localeCompare(b[sortBy]) * dir);
+			}
+			return { items };
+		} finally {
+			$state.loaded = true;
+			$state.loading = false;
+		}
+	}
+
 	@render {
-		<DataGrid
-			class="example-data-grid"
-			columns={columns}
-			load={load}
-			ariaLabel="Team members"
-		>
-			<fill name="loading">Loading team members…</fill>
-		</DataGrid>
+		<div class="example-loading-wrap">
+			@if ($state.loading && $state.loaded) {
+				<div class="example-loading-indicator" role="status">Loading…</div>
+			}
+			<DataGrid
+				class="example-data-grid"
+				columns={columns}
+				load={load}
+				ariaLabel="Team members"
+			>
+				<fill name="loading">Loading team members…</fill>
+			</DataGrid>
+		</div>
 	}
 
 	@style {
+		.example-loading-wrap {
+			position: relative;
+		}
+
+		:global(.example-loading-wrap .example-loading-indicator) {
+			background-color: var(--code-back);
+			border-radius: 4px;
+			padding: 4px 12px;
+			position: absolute;
+			right: 8px;
+			top: 8px;
+			z-index: 1;
+		}
+
 		:global(.example-data-grid) {
 			border-collapse: collapse;
 			width: 100%;
