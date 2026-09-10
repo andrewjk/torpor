@@ -79,6 +79,7 @@ export const BUILD_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "API Endpoints", href: "/build/api-endpoints" },
 	{ label: "Hooks", href: "/build/hooks" },
 	{ label: "Environment", href: "/build/env" },
+	{ label: "Sessions", href: "/build/sessions" },
 	{ label: "Navigation", href: "/build/navigation" },
 ];
 

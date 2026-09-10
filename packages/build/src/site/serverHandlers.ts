@@ -686,6 +686,7 @@ function buildServerParams(
 				: Promise.resolve(searchParamsToRecord(url.searchParams)),
 		cookies: ev.cookies,
 		headers: ev.headers,
+		session: ev.session,
 		adapter: ev.adapter,
 	};
 }

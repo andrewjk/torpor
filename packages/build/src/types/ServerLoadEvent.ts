@@ -1,5 +1,6 @@
 import CookieHelper from "../server/CookieHelper";
 import HeaderHelper from "../server/HeaderHelper";
+import SessionHelper from "../server/SessionHelper";
 import type { RouteParamsOf } from "./ParseRouteParams";
 
 /**
@@ -71,6 +72,11 @@ export default interface ServerLoadEvent<
 	 * A helper for getting and setting cookie data.
 	 */
 	cookies: CookieHelper;
+	/**
+	 * A helper for reading and writing the signed session cookie. See
+	 * [Sessions](/build/sessions).
+	 */
+	session: SessionHelper;
 	/**
 	 * A helper for getting and setting headers.
 	 */

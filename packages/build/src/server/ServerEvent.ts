@@ -1,5 +1,6 @@
 import CookieHelper from "./CookieHelper";
 import HeaderHelper from "./HeaderHelper";
+import SessionHelper from "./SessionHelper";
 
 export default class ServerEvent {
 	request: Request;
@@ -17,6 +18,7 @@ export default class ServerEvent {
 
 	cookies: CookieHelper;
 	headers: HeaderHelper;
+	session: SessionHelper;
 
 	// Parsed once per request; Server.fetch passes the URL it already needed
 	// for matching so it isn't parsed twice
@@ -33,6 +35,7 @@ export default class ServerEvent {
 		this.#url = url;
 		this.cookies = new CookieHelper(request);
 		this.headers = new HeaderHelper(request);
+		this.session = new SessionHelper(this.cookies);
 
 		// Adapters may have added the `adapter` property to globalThis
 		// @ts-ignore

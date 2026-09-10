@@ -1,0 +1,138 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function SessionsPage() {
+	@head {
+		<title>Sessions | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Sessions</h1>
+		<p>
+			The <code>session</code> helper on server events reads and writes a
+			signed cookie. The value is signed with HMAC-SHA256 using the
+			<code>TORPOR_SESSION_SECRET</code> environment key, so it can't be forged
+			or tampered with. Add the secret to your environment &mdash; or to a
+			<code>.env</code> file in dev and preview:
+		</p>
+		<CodePreview
+			code={`
+TORPOR_SESSION_SECRET=some-long-random-string
+`}
+		/>
+
+		<h2>Reading and writing</h2>
+		<p>
+			A login action sets the session; logout destroys it. Use
+			<code>regenerate</code> at login &mdash; it mints a fresh session id, so a
+			cookie that was set before the privilege change can't be reused:
+		</p>
+		<CodePreview
+			code={`
+import { type PageServerEndPoint, ok } from "@torpor/build";
+
+export default {
+	actions: {
+		login: async (event) => {
+			const { email, password } = await readForm(event.request, {
+				email: "",
+				password: "",
+			});
+			const user = await checkPassword(email, password);
+			if (!user) return unauthorized();
+			await event.session.regenerate({ userId: user.id });
+			return ok();
+		},
+		logout: async (event) => {
+			await event.session.destroy();
+			return ok();
+		},
+	},
+} satisfies PageServerEndPoint;
+`}
+		/>
+		<p>
+			Reading a session returns its data, or <code>undefined</code> when there
+			is no cookie, the signature doesn't match, or the session has expired:
+		</p>
+		<CodePreview
+			code={`
+const session = await event.session.get();
+if (session) {
+	const userId = session.userId;
+}
+`}
+		/>
+
+		<h2>Checking users in a hook</h2>
+		<p>
+			Read the session in a root <code>_hook.server.ts</code> and store the user
+			on <code>appData</code>, so every layout, page and endpoint below it can
+			use it without reading the cookie again:
+		</p>
+		<CodePreview
+			code={`
+// routes/_hook.server.ts
+import { type ServerHook } from "@torpor/build";
+import { getUser } from "@/lib/auth";
+
+export default {
+	enter: async (event) => {
+		const session = await event.session.get();
+		if (session) {
+			event.appData.user = await getUser(session.userId);
+		}
+	},
+} satisfies ServerHook;
+`}
+		/>
+
+		<h2>Revocation with a database</h2>
+		<p>
+			Sessions live entirely in the cookie, so they can't be revoked
+			individually. When you need that, store the session's
+			<code>id</code> in your database, check it on each authed request, and
+			delete the row to revoke:
+		</p>
+		<CodePreview
+			code={`
+enter: async (event) => {
+	const session = await event.session.get();
+	if (session) {
+		const record = await db.sessions.find(session.id);
+		if (!record || record.revoked) {
+			await event.session.destroy();
+			return;
+		}
+		event.appData.user = record.user;
+	}
+},
+`}
+		/>
+		<p>
+			The id is stable across <code>set</code> calls, so it can be used as a
+			database key, and <code>regenerate</code> mints a new one &mdash; store
+			the new id at login.
+		</p>
+
+		<h2>Limits</h2>
+		<ul>
+			<li>
+				Session data must be JSON-safe, and small enough to fit in a cookie
+				(4KB) along with the id, expiry and signature
+			</li>
+			<li>
+				By default a session expires after 30 days; pass
+				<code>&#123; maxAge: seconds &#125;</code> to <code>set</code> or
+				<code>regenerate</code> to change it
+			</li>
+			<li>
+				The cookie is named <code>torpor-session</code>, and is
+				<code>HttpOnly</code>, <code>Secure</code> and <code>SameSite=Lax</code>
+			</li>
+			<li>
+				Rotating <code>TORPOR_SESSION_SECRET</code> invalidates all existing
+				sessions
+			</li>
+		</ul>
+	}
+}

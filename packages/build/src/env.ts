@@ -25,8 +25,8 @@ declare global {
 	 */
 	interface TorporEnv {
 		/**
-		 * Reserved for the (upcoming) session helper: the HMAC secret used to
-		 * sign session cookies. Not read by anything yet.
+		 * The HMAC secret used to sign session cookies -- see
+		 * [Sessions](/build/sessions). Required when `event.session` is used.
 		 */
 		TORPOR_SESSION_SECRET?: string;
 	}
