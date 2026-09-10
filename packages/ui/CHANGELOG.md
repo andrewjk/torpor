@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.1.1
+
+<sub>2026-09-10</sub>
+
+- _(patch)_ Updated dependency `@torpor/view` v1.1.0
+
 ## 1.1.0
 
 <sub>2026-09-09</sub>

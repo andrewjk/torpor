@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/build",
-	"version": "1.1.0",
+	"version": "1.2.0",
 	"description": "A framework for building sites and apps with Torpor",
 	"type": "module",
 	"exports": {
