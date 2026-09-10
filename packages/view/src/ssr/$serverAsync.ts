@@ -8,7 +8,7 @@ import {
 /**
  * Default number of milliseconds a `source: "server"` read may take before
  * its boundary degrades to the `with` branch and the client fetches instead
- * (ASYNC.md §7.10).
+ * (ASYNC.md → "Server rendering").
  */
 export const SERVER_ASYNC_TIMEOUT = 5000;
 
@@ -24,7 +24,7 @@ export const SERVER_ASYNC_TIMEOUT = 5000;
  * that would suspend on the client.
  *
  * With `{ source: "server" }` the getter participates in the server's
- * collect/render pass (ASYNC.md §7.10):
+ * collect/render pass (ASYNC.md → "Server rendering"):
  *
  * - **Collect pass** — calls the thunk (starting the fetch) and records the
  *   promise on the enclosing boundary, so sibling reads start in one wave.

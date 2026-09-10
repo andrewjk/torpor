@@ -106,7 +106,7 @@ function buildServerTemplate(
 
 	// Server components are async functions, so that a component containing a
 	// `source: "server"` `@await` boundary can await its fetches and its
-	// children can be awaited wherever they render (ASYNC.md §7.10). Find the
+	// children can be awaited wherever they render (ASYNC.md → "Server rendering"). Find the
 	// chunks holding each component's `function` declaration so they can be
 	// rewritten on the way out, without mutating the shared parse result.
 	const asyncChunks = new Set<number>();

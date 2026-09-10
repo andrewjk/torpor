@@ -143,7 +143,7 @@ function parseControlOpen(status: ParseStatus): ControlNode | null {
 		}
 
 		// The old `@await (promise) { … } then (v) { … } catch (e) { … }`
-		// control is removed (ASYNC.md §7.7 Stage C). The current `@await` is
+		// control is removed (ASYNC.md → "Roads not taken"). The current `@await` is
 		// the async boundary (formerly `@loading`): statement-less, with an
 		// optional `with { … }` branch for the pending state.
 		if (operation === "@await" && /^await\s*\(/.test(statement)) {

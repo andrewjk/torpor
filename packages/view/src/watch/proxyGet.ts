@@ -19,7 +19,7 @@ import trackSignal from "./trackSignal";
  * suspend up the cache chain by tainting the active reader, and notifies the
  * nearest `@await` boundary.
  *
- * Return value (stale-while-revalidate, ASYNC.md §6.2): on a refresh suspend
+ * Return value (ASYNC.md → "Stale-while-revalidate"): on a refresh suspend
  * (the computed has resolved before) returns the previously resolved value
  * held in `staleValue`, so readers keep displaying the old content instead of
  * a placeholder — an `@await` boundary thus keeps its content mounted
@@ -33,7 +33,7 @@ function suspendRead(signal: Computed): any {
 	// In peek mode (used by $pending), track the signal for subscription but
 	// don't taint the reader or notify the boundary. Record a "loud" hit only
 	// for non-quiet suspends — a silent refresh (suspendQuiet) stays quiet per
-	// ASYNC.md §7.4, so $pending returns false for it. The signal is still
+	// ASYNC.md → "Loud vs quiet"), so $pending returns false for it. The signal is still
 	// tracked above so $pending re-evaluates when the silent refresh resolves.
 	if (context.suspendPeek) {
 		if (!signal.suspendQuiet) {

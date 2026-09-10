@@ -10,7 +10,7 @@ import context from "../render/context";
  * subscription but don't propagate taint or notify a `@await` boundary.
  * This lets `$pending` return a plain boolean without itself suspending.
  *
- * Quiet-on-refresh semantics (ASYNC.md §7.4): a suspend is *quiet* — and
+ * Quiet-on-refresh semantics (ASYNC.md → "Loud vs quiet"): a suspend is *quiet* — and
  * therefore `$pending` returns `false` for it — when the computed has resolved
  * before and the re-fetch was a *silent* `$refresh(fn, { silent: true })` (a
  * bare refresh with no tracked dependency change, used for background

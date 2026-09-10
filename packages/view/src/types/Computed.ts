@@ -96,7 +96,7 @@ export default interface Computed<T = any> {
 	/**
 	 * True when the current suspend is a "bare refresh" — a re-fetch with no
 	 * tracked dependency change, i.e. a silent `$refresh(fn, { silent: true })`
-	 * (background revalidation), per ASYNC.md §7.4's quiet-on-refresh rule.
+	 * (background revalidation), per ASYNC.md → "Loud vs quiet")
 	 * `$pending` reads this to stay quiet (return `false`) on silent refreshes,
 	 * matching Solid's stale-while-revalidate default.
 	 *
@@ -111,7 +111,7 @@ export default interface Computed<T = any> {
 
 	/**
 	 * The previously resolved value, retained across a refresh suspend for
-	 * stale-while-revalidate (ASYNC.md §6.2). Maintained by `$async`'s
+	 * stale-while-revalidate (ASYNC.md → "Stale-while-revalidate"). Maintained by `$async`'s
 	 * generation-guarded settle handlers — set on resolve, cleared on
 	 * rejection — so it always holds the last RESOLVED value, never a
 	 * superseded run's in-flight promise (rapid prop changes would otherwise

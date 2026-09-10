@@ -23,7 +23,7 @@ export interface RefreshOptions {
 
 /**
  * Re-fetches the `$async` getters read inside `fn` without changing a
- * dependency. A companion to `$pending` (ASYNC.md §6.2): pull-to-refresh,
+ * dependency. A companion to `$pending` (ASYNC.md): pull-to-refresh,
  * refresh buttons, refetch-on-focus, polling, retry-after-error.
  *
  * `fn` is run in a tracking context that collects every `$async` computed it

@@ -49,10 +49,8 @@ test("$pending returns false for non-suspended values", () => {
 });
 
 test("$pending doesn't cause the calling effect to suspend", () => {
-	let _resolvePromise!: (v: string) => void;
-	const promise = new Promise<string>((resolve) => {
-		_resolvePromise = resolve;
-	});
+	// A promise that never resolves
+	const promise = new Promise<string>(() => {});
 
 	let $state = $watch({
 		get data() {
@@ -115,7 +113,7 @@ test("$pending re-evaluates on re-suspend", async () => {
 test("$pending: first load is loud, dependency-change refresh is loud", async () => {
 	// Regression guard for the quiet-on-refresh semantics: both the first
 	// load and a refresh triggered by a tracked dependency change must read
-	// as pending (ASYNC.md §7.4).
+	// as pending (ASYNC.md → "Loud vs quiet").
 	let resolveFirst!: (v: string) => void;
 	let resolveSecond!: (v: string) => void;
 

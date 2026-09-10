@@ -94,7 +94,7 @@ export default interface Context {
 	/**
 	 * Set by `suspendRead` when a suspended computed is read in peek mode, but
 	 * only for *loud* suspends (not bare refreshes — see `Computed.suspendQuiet`
-	 * and ASYNC.md §7.4). `$pending` resets this before running its tracking
+	 * and ASYNC.md → "Loud vs quiet"). `$pending` resets this before running its tracking
 	 * function and returns it as the result.
 	 */
 	suspendPeekHit: boolean;
@@ -102,7 +102,7 @@ export default interface Context {
 	/**
 	 * When non-null, `$refresh` is running its tracking function. Every
 	 * `$async` computed read during `fn` is appended here so `$refresh` can
-	 * re-run them as bare refreshes (ASYNC.md §7.4 / `$refresh`). `$cache`
+	 * re-run them as bare refreshes (ASYNC.md → "Loud vs quiet" / `$refresh`). `$cache`
 	 * computeds are never collected. Reading a computed in this mode does not
 	 * recalc, taint, or notify a  boundary — collection is a pure peek.
 	 */
@@ -159,7 +159,7 @@ export default interface Context {
 	 * boundary whose server HTML carries resolved `source: "server"` values
 	 * (the `<!--t-await:...-->` payload comment after the anchor); `$async`
 	 * consumes the values in read order to seed its computeds, so hydration
-	 * shows resolved content with no fallback flash (ASYNC.md §7.10).
+	 * shows resolved content with no fallback flash (ASYNC.md → "Server rendering").
 	 */
 	serverValues: { values: any[]; index: number } | null;
 }

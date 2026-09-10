@@ -5,7 +5,7 @@ export default interface AsyncOptions {
 	/**
 	 * Where the value comes from. The default (`"client"`) starts the fetch
 	 * after hydration; `"server"` fetches during SSR and ships the resolved
-	 * value embedded in the HTML (see ASYNC.md §7.10).
+	 * value embedded in the HTML (see ASYNC.md → "Server rendering").
 	 */
 	source?: "client" | "server";
 

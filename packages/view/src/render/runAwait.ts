@@ -14,7 +14,7 @@ import widenAncestorsAtAnchor from "./widenAncestorsAtAnchor";
 /**
  * Comment prefix marking the embedded `source: "server"` values that the
  * server writes after a resolved boundary's anchor (`<!--t-await:[...]-->`,
- * see ASYNC.md §7.10).
+ * see ASYNC.md → "Server rendering").
  */
 const SERVER_VALUES_PREFIX = "t-await:";
 
@@ -23,7 +23,7 @@ const SERVER_VALUES_PREFIX = "t-await:";
  * speculatively; if any read inside suspends (`didSuspend`), the boundary
  * discards the partial render and shows the `with` branch instead.
  *
- * Hydration of a server-resolved boundary (ASYNC.md §7.10): when the server
+ * Hydration of a server-resolved boundary (ASYNC.md → "Server rendering"): when the server
  * shipped resolved content, its values ride in a payload comment after the
  * anchor. The boundary renders the content branch *with* hydration enabled
  * and `$async` seeds its computeds from the payload, so the server's HTML is
@@ -39,7 +39,7 @@ const SERVER_VALUES_PREFIX = "t-await:";
  * non-suspend dependency changes inside content are left to the child
  * effects that read them — the boundary isn't re-run by them at all.
  *
- * Stale-while-revalidate (ASYNC.md §6.2): once content has been produced
+ * Stale-while-revalidate (ASYNC.md): once content has been produced
  * (`hasContent`), a subsequent suspend during a refresh does NOT switch to
  * the `with` branch — the boundary keeps the stale content mounted. `$async`
  * retains the previous resolved value (`Computed.staleValue`) and
@@ -183,7 +183,7 @@ export default function runAwait(
 					// First-load suspend (content never shown): show the
 					// with-branch. When hasContent, a refresh suspend keeps
 					// the stale content mounted instead of flashing the
-					// with-branch — stale-while-revalidate (ASYNC.md §6.2).
+					// with-branch — stale-while-revalidate (ASYNC.md).
 					// Child effects read the retained value via $async's
 					// staleValue and re-render with the new value when the
 					// promise resolves.

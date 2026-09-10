@@ -277,7 +277,7 @@ get user() {
 - Fetches parallelize within a boundary's render and down nested children;
   rejections surface on the client through `@try`/`@catch`.
 
-See `packages/view/ASYNC.md` §7.10 for the full design and trade-offs.
+See `packages/view/ASYNC.md` for the full design and trade-offs.
 
 ### `$pending(fn)` — is it loading?
 

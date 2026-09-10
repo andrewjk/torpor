@@ -17,7 +17,7 @@ import runComputed from "./runComputed";
  * over the computed object), so they fire on both the initial run and every
  * recalculation — `runComputed` and `checkComputed` are unchanged.
  *
- * Hydration seeding (ASYNC.md §7.10): while hydrating the content branch of
+ * Hydration seeding (ASYNC.md → "Server rendering"): while hydrating the content branch of
  * a boundary whose server HTML embedded resolved `source: "server"` values,
  * `context.serverValues` is set, and this read consumes the value at the
  * current position instead of suspending. The thunk still runs — once, in
@@ -68,14 +68,14 @@ export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions)
 	// "[object Promise]" — a superseded generation's value leaking into the
 	// UI. The settle handlers are generation-guarded, so `staleValue` is
 	// generation-safe by construction: the read-side token matching the
-	// resolve-side one (ASYNC.md §7.8, rapid prop changes).
+	// resolve-side one (ASYNC.md → "Generation guards").
 	computed.run = () => {
 		const value = fn();
 		if (value !== null && value !== undefined && typeof (value as any).then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
 			// Capture the quiet-on-refresh decision at suspend time
-			// (ASYNC.md §7.4). `recalc` is still true during a source-driven
+			// (ASYNC.md → "Loud vs quiet"). `recalc` is still true during a source-driven
 			// re-run — `checkComputed` clears it only after `runComputed`
 			// returns — so a suspend is quiet iff the computed has resolved
 			// before AND this run wasn't triggered by a dependency change
@@ -91,7 +91,7 @@ export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions)
 					computed.hasResolved = true;
 					computed.lastErrored = false;
 					// Retain the resolved value for the next refresh suspend
-					// (stale-while-revalidate, ASYNC.md §6.2)
+					// (stale-while-revalidate, ASYNC.md → "Stale-while-revalidate")
 					computed.staleValue = v;
 					batchStart();
 					propagateFromSignal(computed);

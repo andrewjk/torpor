@@ -211,7 +211,7 @@ export default function AwaitMultiPending() {
 
 test("single boundary with two pending reads stays on the with-branch until both resolve", async () => {
 	// A boundary commits content only when no read inside suspends (ASYNC.md
-	// §7.3). When the first promise resolves, the boundary must re-run,
+	// → "Stale-while-revalidate"). When the first promise resolves, the boundary must re-run,
 	// re-check its remaining pending read, and keep the with-branch — without
 	// losing its subscription to the still-pending computed (a no-op re-run
 	// deactivates all source subscriptions; they must be re-established or

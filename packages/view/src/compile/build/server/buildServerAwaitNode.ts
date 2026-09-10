@@ -7,7 +7,7 @@ import buildServerNode from "./buildServerNode";
 import flushOutput from "./flushOutput";
 
 /**
- * Builds an `@await` boundary for the server (ASYNC.md §7.10).
+ * Builds an `@await` boundary for the server (ASYNC.md → "Server rendering").
  *
  * Rather than inlining the `with` branch (the old shape), the boundary is
  * handed to the `t_await_server` runtime helper: content and `with` branches
