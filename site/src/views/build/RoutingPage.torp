@@ -7,6 +7,8 @@ export default function RoutingPage() {
 
 	@render {
 		<h1>Routing</h1>
+
+		<h2>File routing</h2>
 		<p>
 			Routes are defined by the folder structure of <code>src/routes</code>. Each
 			folder maps to a URL path, and each file within it handles a part of the
@@ -91,7 +93,7 @@ route("/posts/[id]"); // compile error: missing 'id'
 `}
 		/>
 
-		<h2>Routes in code</h2>
+		<h2>Code routing</h2>
 		<p>
 			For small sites, routes can be added in code instead of using the standard
 			file names. Each option maps to a file route type, and inline server code is
