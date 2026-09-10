@@ -35,18 +35,28 @@ export default function manifest(site: Site, server = false): Plugin {
 			if (id === moduleId) {
 				let serverRequest = server && !!viteOptions?.ssr;
 
-				// If there are inline endpoints, site plugins or an OpenAPI
-				// document, and we're building for the server, we need to import
-				// the config file to access them. On the client, the config file
-				// is never imported, keeping server code out of the client bundle.
+				// If there are inline endpoints, site plugins, an OpenAPI
+				// document or an env schema, and we're building for the server,
+				// we need to import the config file to access them. On the
+				// client, the config file is never imported, keeping server
+				// code out of the client bundle.
 				const hasInline = site.routes.some((r) => r.endPoint && !r.file);
 				const hasPlugins = site.plugins.length > 0;
 				const hasOpenApi = site.pluginState.has(OPEN_API_STATE_KEY);
+				const hasEnv = !!site.env;
 				const configImport =
-					hasInline || hasPlugins || hasOpenApi
+					hasInline || hasPlugins || hasOpenApi || hasEnv
 						? serverRequest && site.configFile
 							? `import __site from ${JSON.stringify(site.configFile)};`
 							: ""
+						: "";
+
+				// The env schema is handed to @torpor/build/env at startup, so
+				// that `env()` calls in route code can validate against it
+				const envGlue =
+					serverRequest && hasEnv && site.configFile
+						? `import { setEnvSchema } from "@torpor/build/env";
+setEnvSchema(__site.env);`
 						: "";
 
 				// Site plugins are run when the server starts up (in dev and in
@@ -79,6 +89,7 @@ export default function manifest(site: Site, server = false): Plugin {
 				return `
 ${!serverRequest ? "const load = { default: { load: true } };" : ""}
 ${configImport}
+${envGlue}
 ${pluginLoop}
 ${openApiGlue}
 export default {

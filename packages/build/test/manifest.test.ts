@@ -195,6 +195,39 @@ describe("manifest plugin", () => {
 		expect(code).not.toContain("import __site");
 	});
 
+	test("server build: hands the env schema to @torpor/build/env", () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.env = {
+			"~standard": {
+				version: 1,
+				vendor: "test",
+				validate: () => ({ value: {} }),
+			},
+		};
+		const plugin = manifest(site, true);
+		const code = (plugin.load as any).call({}, MODULE_ID, { ssr: true }) as string;
+		expect(code).toContain(`import __site from "${site.configFile}"`);
+		expect(code).toContain('from "@torpor/build/env"');
+		expect(code).toContain("setEnvSchema(__site.env)");
+	});
+
+	test("client build: does not emit the env schema glue", () => {
+		const site = buildSite();
+		site.configFile = path.join(site.root, "site.config.ts");
+		site.env = {
+			"~standard": {
+				version: 1,
+				vendor: "test",
+				validate: () => ({ value: {} }),
+			},
+		};
+		const plugin = manifest(site, false);
+		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
+		expect(code).not.toContain("@torpor/build/env");
+		expect(code).not.toContain("import __site");
+	});
+
 	test("server build: emits the OpenAPI document endpoint when the plugin is configured", async () => {
 		const site = buildSite();
 		site.configFile = path.join(site.root, "site.config.ts");

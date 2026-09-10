@@ -1,0 +1,84 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function EnvPage() {
+	@head {
+		<title>Environment | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Environment</h1>
+		<p>
+			Server code reads the environment with <code>env()</code> from
+			<code>&commat;torpor/build/env</code>. On Node it returns
+			<code>process.env</code>, with <code>.env</code> files loaded in dev and
+			preview; on Cloudflare it returns the platform environment, including
+			bindings such as KV namespaces and D1 databases:
+		</p>
+		<CodePreview
+			code={`
+import env from "@torpor/build/env";
+
+const { API_URL, DB } = env();
+`}
+		/>
+		<p>
+			It is server-only: <code>env()</code> is available in load functions,
+			actions, <code>+server.ts</code> endpoints and hooks, and it throws when
+			called outside a request.
+		</p>
+
+		<h2>Typing the environment</h2>
+		<p>
+			Declare your app's keys in an ambient <code>src/env.d.ts</code> file:
+		</p>
+		<CodePreview
+			code={`
+/// <reference types="@torpor/build/env" />
+declare global {
+	interface TorporEnv {
+		API_URL: string;
+		JWT_SECRET: string;
+		DB: D1Database;
+	}
+}
+`}
+		/>
+		<p>
+			Adapter packages add their platform's keys the same way &mdash; the
+			Cloudflare adapter declares the <code>ASSETS</code> binding, for example
+			&mdash; and framework keys (all optional) are reserved by
+			<code>&commat;torpor/build</code>.
+		</p>
+
+		<h2>Validating the environment</h2>
+		<p>
+			Types can drift from reality: a key can be declared but never set. Add a
+			Standard Schema (zod, valibot, arktype, etc) to <code>site.env</code> in
+			your config file, and <code>env()</code> validates the environment on
+			first use per request, throwing with the schema's issues instead of
+			passing <code>undefined</code> along:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+import { z } from "zod";
+import { Site } from "@torpor/build";
+
+const site = new Site();
+
+site.env = z.object({
+	API_URL: z.string().url(),
+	JWT_SECRET: z.string(),
+	DB: z.instanceof(D1Database),
+});
+
+export default site;
+`}
+		/>
+		<p>
+			The schema must validate synchronously &mdash; zod, valibot and arktype
+			all do. It also parses: whatever it returns (defaults, trimmed strings)
+			is what <code>env()</code> gives back.
+		</p>
+	}
+}

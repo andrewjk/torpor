@@ -13,6 +13,10 @@
 			"torpor:source": "./src/dev.ts",
 			"import": "./dist/dev.mjs"
 		},
+		"./env": {
+			"types": "./dist/env.d.mts",
+			"import": "./dist/env.mjs"
+		},
 		"./form": {
 			"types": "./dist/form.d.mts",
 			"import": "./dist/form.mjs"

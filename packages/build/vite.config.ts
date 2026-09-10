@@ -6,6 +6,7 @@ export default defineConfig({
 		// referenced by file name from site builds and the adapters)
 		entry: {
 			index: "src/index.ts",
+			env: "src/env.ts",
 			form: "src/form.ts",
 			nav: "src/nav.ts",
 			openapi: "src/openapi.ts",

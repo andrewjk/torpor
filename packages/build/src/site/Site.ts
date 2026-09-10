@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
+import type { StandardSchemaV1 } from "../types/StandardSchema";
 import type SitePlugin from "../types/SitePlugin";
 import type { InlineEndPoint } from "../types/Route";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
@@ -87,6 +88,15 @@ export default class Site {
 	 * instances, `Symbol()` ones are not.
 	 */
 	pluginState: Map<PropertyKey, unknown> = new Map();
+	/**
+	 * A Standard Schema (zod, valibot, arktype, etc) used to validate (and
+	 * parse) the server environment. When set, `env()` from
+	 * `@torpor/build/env` checks the environment on first use per request and
+	 * throws with the schema's issues -- so a missing or invalid key fails
+	 * immediately instead of passing `undefined` along. The schema must
+	 * validate synchronously.
+	 */
+	env?: StandardSchemaV1<unknown, TorporEnv>;
 	/**
 	 * Inline endpoints keyed by `"path:type"`. Populated by `addRoute` when
 	 * the user passes an inline endpoint object instead of a file path.
