@@ -39,7 +39,7 @@ export default function TryHeadDiscard($props: { danger: boolean }) {
 test("server @try discards head tags appended before the throw", async () => {
 	const serverComponent = await importComponent(import.meta.filename, trySource, "server");
 
-	const { body, head } = serverComponent({ danger: true });
+	const { body, head } = await serverComponent({ danger: true });
 
 	// The partial try output (including the child's style) was discarded
 	expect(head).not.toContain("<style");
@@ -50,7 +50,7 @@ test("server @try discards head tags appended before the throw", async () => {
 test("server @try keeps head tags when nothing throws", async () => {
 	const serverComponent = await importComponent(import.meta.filename, trySource, "server");
 
-	const { body, head } = serverComponent({ danger: false });
+	const { body, head } = await serverComponent({ danger: false });
 
 	expect(head).toContain("<style");
 	expect(body).toContain("styled");
@@ -93,7 +93,7 @@ export default function ErrorHeadDiscard($props: { danger: boolean }) {
 test("server @error discards head tags appended before the throw", async () => {
 	const serverComponent = await importComponent(import.meta.filename, errorSource, "server");
 
-	const { body, head } = serverComponent({ danger: true });
+	const { body, head } = await serverComponent({ danger: true });
 
 	expect(head).not.toContain("<style");
 	expect(body).not.toContain("styled");
@@ -103,7 +103,7 @@ test("server @error discards head tags appended before the throw", async () => {
 test("server @error keeps head tags when nothing throws", async () => {
 	const serverComponent = await importComponent(import.meta.filename, errorSource, "server");
 
-	const { body, head } = serverComponent({ danger: false });
+	const { body, head } = await serverComponent({ danger: false });
 
 	expect(head).toContain("<style");
 	expect(body).toContain("styled");

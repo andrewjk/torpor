@@ -33,7 +33,7 @@ test("hydrated try that throws keeps the catch branch hydratable", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, { danger: true });
+	await hydrateComponent(container, clientComponent, serverComponent, { danger: true });
 
 	// The catch branch must own the DOM exactly once — the server's node,
 	// hydrated (not a duplicate fresh build)
@@ -47,7 +47,7 @@ test("hydrated try that succeeds hydrates the try branch", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, { danger: false });
+	await hydrateComponent(container, clientComponent, serverComponent, { danger: false });
 
 	expect(queryByText(container, "ok")).not.toBeNull();
 	expect(container.querySelectorAll("p.error")).toHaveLength(0);
@@ -82,7 +82,7 @@ test("hydrated try with mismatched branch structure keeps the DOM consistent", a
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, mismatchedSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, mismatchedSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent, { danger: true });
+	await hydrateComponent(container, clientComponent, serverComponent, { danger: true });
 
 	const errors = Array.from(container.querySelectorAll("p.error"));
 	expect(errors).toHaveLength(1);

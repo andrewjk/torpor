@@ -43,7 +43,7 @@ test("for list sort -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(getItems(container)).toEqual(["banana", "apple", "cherry", "date"]);
 
@@ -73,7 +73,7 @@ test("for list insert at beginning -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(getItems(container)).toEqual(["b", "c"]);
 
@@ -98,7 +98,7 @@ test("for list insert in middle -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items = ["a", "b", "c"];
 	expect(getItems(container)).toEqual(["a", "b", "c"]);
@@ -121,7 +121,7 @@ test("for list remove from middle -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items = ["a", "c"];
 	expect(getItems(container)).toEqual(["a", "c"]);
@@ -144,7 +144,7 @@ test("for list complete replacement -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items = ["x", "y", "z", "w"];
 	expect(getItems(container)).toEqual(["x", "y", "z", "w"]);
@@ -173,7 +173,7 @@ test("for list grow and shrink -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items = ["1", "2", "3", "4", "5"];
 	expect(getItems(container)).toEqual(["1", "2", "3", "4", "5"]);

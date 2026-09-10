@@ -48,7 +48,7 @@ test("for template literal -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(labels(container)).toEqual(["Go to slide 1", "slide show", "Go to slide 2", "slide show"]);
 });

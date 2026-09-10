@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function Self(
+export default async function Self(
 	$props: { level: number },
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -16,7 +16,7 @@ export default function Self(
 		const t_props_1 = {
 			level: $props.level + 1,
 		};
-		const t_comp_1 = Self(t_props_1, $context);
+		const t_comp_1 = await Self(t_props_1, $context);
 		t_body += t_comp_1.body;
 		t_head += t_comp_1.head;
 		t_body += `<!]><!>`;

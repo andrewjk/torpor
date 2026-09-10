@@ -68,7 +68,7 @@ test("stream -- resubscribes when tracked state changes, hydrated", async () => 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	push("a", "before");
 	expect(queryByText(container, "before")).not.toBeNull();

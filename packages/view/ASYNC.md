@@ -1,16 +1,18 @@
 # Async data & the waterfall: analysis
 
-Notes on torpor's async story vs the other frameworks, grounded in the
-`async-waterfall` benchmark fixture (`benchmarks/async-waterfall`) and octane's
-runtime source (`node_modules/octane/dist/universal-core.js`).
+The design record for torpor's async story, written against the (now removed)
+`async-waterfall` benchmark fixture and octane's runtime source
+(`node_modules/octane/dist/universal-core.js`). Everything below shipped with
+the v1 release.
 
 Torpor's async model is shipped: `$async` getters, the `@await`/`with`
 boundary, `$pending`/`$refresh`, and `@try`/`@catch`/`@error` (§7). The old
 `@await (p) { … } then (v) { … } catch (e) { … }` control was removed (Stage C,
-§7.7). Torpor now lands at the `async-waterfall` parallel floor and passes the
-`async-composition` transition gate. §1–§3 are the historical analysis of the
-waterfall that motivated the change; §6 is the survey that reframed the choice;
-§7 is the shipped design.
+§7.7). Torpor lands at the `async-waterfall` parallel floor and passes the
+`async-composition` transition gate. Opt-in server-side fetching
+(`$async(fn, { source: "server" })`) shipped with v1 too (§7.10). §1–§3 are
+the historical analysis of the waterfall that motivated the change; §6 is the
+survey that reframed the choice; §7 is the shipped design.
 
 ---
 
@@ -280,7 +282,8 @@ obsoleted.
 track promises in the reactive graph, split the boundary from the value, and
 parallelize independent reads. This section is the design that shipped —
 four primitives plus one piece of hidden runtime machinery. The rollout
-(§7.7) is complete; §7.8 holds the questions that remain open.
+(§7.7) is complete; §7.8's open questions are resolved (measured, in the
+streaming-marker case, or answered by the §7.10 implementation).
 
 ### 7.1 The new surface
 
@@ -761,17 +764,22 @@ runtime:
    `get x() { return $async(() => p) }` + `@await {…x…}`). `$refresh` and the
    `with` branch shipped alongside.
 
-### 7.8 Open questions
+### 7.8 Open questions — resolved
 
 - **Taint propagation cost.** Every read of a suspended `Computed` flips
-  `didSuspend` on the active reader, up the cache chain. For deep cache
-  chains this is O(depth) per read. Probably fine (chains are shallow in
-  practice), but worth measuring on the `async-composition` fixture.
+  `didSuspend` on the active reader, up the cache chain — O(depth) per read.
+  Measured (v1): a `$cache` chain over a suspended `$async` base, one effect
+  re-run per iteration, flat at ~900–1000 ns from depth 1 through depth 100,
+  with suspended reads within ~5% of resolved ones. The flag flips are
+  unmeasurable against the normal reactive read, which is itself O(depth).
+  Repeatable as `packages/view/test/bench/suspendTaint.bench.ts`. Closed.
 - **Streaming delivery markers.** The hydration comments emitted by
-  `buildServerAwaitNode.ts` assume a single branch per boundary. The default
-  SSR path (client-fetch) keeps that scheme valid; multi-state markers are
-  needed only for `source: "server"` boundaries (once streaming delivery
-  lands, §7.10).
+  `buildServerAwaitNode.ts` assume a single branch per boundary, and that
+  still holds with `source: "server"` (§7.10): a resolved boundary ships its
+  content branch plus a `<!--t-await:[...]-->` payload comment after the
+  anchor; a degraded boundary ships only its `with` branch. Multi-state
+  markers (placeholder/patch protocol, streaming-capable adapters) are needed
+  only for streaming delivery, which remains future work.
 
 Resolved during the rollout: `$pending`'s "first-load" semantics (first load
 is per-computed via `hasResolved`; an `@if` branch that mounts and reads a
@@ -838,11 +846,11 @@ cache.set(key, fetch(...))`) coalesces overlapping reads and shares
 User-facing documentation: TORPOR_AGENTS.md, `$async` → "Re-fetch and promise
 identity".
 
-### 7.10 SSR strategy — decided
+### 7.10 SSR strategy — shipped (v1)
 
-**The default stays client-fetch (today's behavior): `$serverAsync` doesn't
-run the thunk, `@await` renders the `with` branch, and the fetch starts after
-hydration. Server-side fetching is opt-in per getter:**
+**The default stays client-fetch: `$serverAsync` doesn't run the thunk, the
+boundary renders its `with` branch, and the fetch starts after hydration.
+Server-side fetching is opt-in per getter:**
 
 ```torp
 get user() {
@@ -865,25 +873,75 @@ Why client-fetch as the default (not await-on-server):
 
 `source` (rather than `ssr`, following Solid's `ssrSource`) names where the
 value comes from — and deliberately not _how it travels_: delivery is a
-separate axis. `source: "server"` starts as await-and-embed; a streaming
+separate axis. `source: "server"` shipped as await-and-embed; a streaming
 delivery (render the `with` branch, patch replacements as promises resolve)
 can be added later without the option changing.
 
-What `source: "server"` requires when implemented:
+#### As implemented
 
-1. `$serverAsync(fn, { source: "server" })` calls the thunk and records the
-   promise on the boundary's context (the default stub still returns
-   `undefined` without calling the thunk).
-2. Server `@await` codegen goes two-pass for boundaries that recorded
-   promises — render content speculatively (which is what starts the
-   fetches, sibling reads in parallel, exactly like the client), await with
-   a timeout that **degrades to the `with` branch + client fetch** rather
-   than failing the page, then render resolved. Server component render
-   becomes async-capable (`loadView` composes a string today).
-3. Resolved values are embedded in the HTML and consulted by the client's
-   `$async` hydration path (no re-fetch, no fallback flash); `runAwait`
-   hydrates the content branch directly for these boundaries instead of the
-   speculative-render/hydrate-`with` dance.
-4. Streaming delivery comes later as the markers-v2 work (§7.8): placeholder
-   - swap protocol, streaming-capable adapters, and pre-flush status/redirect
-     decisions.
+`packages/view/src/ssr/runServerAwait.ts` (`t_await_server`),
+`serverSentinels.ts` (`t_server_flush`), `$serverAsync.ts`:
+
+1. **Server components are async.** Every compiled server component is an
+   `async function` returning `Promise<{ body, head }>`, and its render runs
+   inside `t_server_flush`. Child components and slot fills are awaited, so
+   any component can contain a server-async boundary (or a child that does).
+2. **Two-pass boundary render.** Each `@await` goes through a **collect
+   pass** — the content branch is rendered speculatively purely to invoke
+   its getters; every `source: "server"` read calls its thunk (starting the
+   fetch) and records the promise, so sibling reads start in one wave
+   exactly like the client's speculative render; the pass's output is
+   discarded. Then a **settle** (`Promise.race` against the recorded
+   timeout, per-getter via `options.timeout`, default 5000ms), then a
+   **render pass** — content is rendered again, consuming the settled values
+   through a cursor in read order without re-calling the thunks. The second
+   pass's output is what ships.
+3. **Detached lifecycle.** The boundary helper returns a sentinel comment
+   immediately (the collect pass must not block the enclosing render, or
+   sibling getters would start late); the boundary's collect/settle/render
+   runs concurrently, and the enclosing flush substitutes the sentinel with
+   the finished HTML at the end. Nested boundaries re-invoke the helper in
+   the enclosing boundary's render pass, which awaits the (already running)
+   nested lifecycle by occurrence key — no nested re-fetch.
+4. **Resolved delivery.** Resolved content ships wrapped in the boundary's
+   hydration markers plus a `<!--t-await:[...]-->` payload comment after the
+   anchor: the values as JSON, in read order, with `-->` escaped.
+5. **Degrade to `with` + client fetch** on any instability: the settle timed
+   out, the render pass doesn't replay the collect pass exactly (different
+   read count, unknown nested boundary — branch structure that depends on
+   the async values), the render pass touched a client-fetch `$async` getter
+   (recorded by the stub — the client would suspend on it, so content can't
+   ship), or a read rejected. The last one is deliberate: the boundary's
+   lifecycle runs detached from the enclosing render, so a rejection can't
+   propagate to the emitted `@try` positionally — instead the client re-runs
+   the getter, rejects there, and the client's `@try` renders the catch
+   branch. (Sync throws in the try branch still render server-side.)
+6. **Hydration.** `runAwait` reads the payload comment after the anchor and
+   removes it; while the content branch renders, `context.serverValues` is
+   set and `$async` seeds its computed with the value at the current
+   position — the server's HTML is adopted directly, so there's no fallback
+   flash and no blocking re-fetch. The thunk still runs once in the
+   background so the getter's dependencies are tracked (a later dependency
+   change re-fetches); that in-flight result is dropped by the generation
+   guard, so the seeded value wins and the UI never flickers.
+
+Constraints and known limits, as shipped:
+
+- **Values must be JSON-safe** (they travel in the payload comment).
+- **Server reads re-run per read**, like `$serverCache` — two interpolations
+  of the same getter start two fetches. Coalesce with a memoized promise in
+  the thunk (§7.9 point 5).
+- **The content render runs twice** (collect + render pass) — keep side
+  effects out of render, as anywhere.
+- **Dependency reads must be synchronous in the thunk** (the standard
+  `$async` rule — reads inside the promise itself are invisible to tracking,
+  so a dependency change wouldn't re-fetch).
+- **Sibling components serialize**: each component's flush awaits its own
+  boundaries before returning, so a fetch starting in a later sibling
+  component waits for the earlier one's fetches. Fetches parallelize within
+  a render and down the nested-children descent (the shape the waterfall
+  fixture measures); deferring component renders like boundaries are is the
+  streaming-adjacent follow-up.
+- **Streaming delivery is not shipped** — it needs the markers-v2 work
+  (§7.8): placeholder/patch protocol, streaming-capable adapters, and
+  pre-flush status/redirect decisions.

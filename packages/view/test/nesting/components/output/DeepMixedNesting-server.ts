@@ -1,10 +1,10 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function DeepMixed(
+export default async function DeepMixed(
 	$props: { a: boolean; b: boolean; c: boolean; d: boolean; e: boolean },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

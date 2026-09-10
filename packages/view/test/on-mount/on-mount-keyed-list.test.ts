@@ -62,7 +62,7 @@ test("onmount fires once per row lifetime on keyed update -- hydrated", async ()
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items = [
 		{ id: 1, value: "c" },
@@ -103,7 +103,7 @@ test("onmount fires again for genuinely new rows -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect((window as any).__mounts).toBe(1);
 

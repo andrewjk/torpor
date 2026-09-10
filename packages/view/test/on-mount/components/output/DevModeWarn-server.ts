@@ -3,11 +3,11 @@ import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function OnmountOnce(
+export default async function OnmountOnce(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -21,7 +21,6 @@ export default function OnmountOnce(
 	/* User interface */
 	t_body += `<p>Count: ${t_fmt($state.count)}</p> `;
 
-	// @ts-ignore
 	function increment() {
 		$state.count += 1
 	};

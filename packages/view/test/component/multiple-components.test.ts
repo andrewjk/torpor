@@ -57,7 +57,7 @@ test("multiple components in one file -- hydrated", async () => {
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
 	let $state = $watch({ label: "amy" });
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "outer 1")).not.toBeNull();
 	expect(queryByText(container, "inner amy")).not.toBeNull();

@@ -47,7 +47,7 @@ test("dynamic element renders correct tag -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source3, "client");
 	const serverComponent = await importComponent(import.meta.filename, source3, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	let el = container.querySelector("#target3");
 	expect(el?.tagName).toBe("DIV");
@@ -82,7 +82,7 @@ test("dynamic element preserves children when tag changes -- hydrated", async ()
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Content")).not.toBeNull();
 

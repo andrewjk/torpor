@@ -44,15 +44,11 @@ export default function buildServerSlotNode(
 	}
 
 	b.append(`if ($slots && $slots["${slotName}"]) {`);
+	// Slot fills are async (they may contain an @await boundary), so await
+	// the string they resolve to
 	b.append(
-		`${status.inHead ? "t_head" : "t_body"} += $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
+		`${status.inHead ? "t_head" : "t_body"} += await $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
 	);
-	////const slotResult = nextVarName("comp", status);
-	////b.append(
-	////	`const ${slotResult} = $slots["${slotName}"](${slotHasProps ? propsName : "undefined"}, $context);`,
-	////);
-	////b.append(`t_body += ${slotResult}.body;`);
-	////b.append(`t_head += ${slotResult}.head;`);
 
 	// TODO: Not if there's only a single space node -- maybe check in parse
 	const fill = node.children.find(

@@ -2,11 +2,11 @@ import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function UserProfileContextApp(
+export default async function UserProfileContextApp(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
@@ -22,7 +22,7 @@ export default function UserProfileContextApp(
 
 	/* User interface */
 	t_body += `<h1>Welcome back, ${t_fmt($user.username)}</h1> <![>`;
-	const t_comp_1 = UserProfileContext(undefined, $context);
+	const t_comp_1 = await UserProfileContext(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!>`;
@@ -30,11 +30,11 @@ export default function UserProfileContextApp(
 	return { body: t_body, head: t_head };
 }
 
-function UserProfileContext(
+async function UserProfileContext(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";

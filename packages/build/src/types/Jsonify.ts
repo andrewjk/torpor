@@ -13,8 +13,8 @@ export type Jsonify<T> = T extends string | number | boolean | null
 				? Array<Jsonify<Item>>
 				: T extends object
 					? {
-							[Key in keyof T as T[Key] extends undefined | ((...args: any[]) => any)
-								? never
-								: Key]: Jsonify<T[Key]>;
+							[
+								Key in keyof T as T[Key] extends undefined | ((...args: any[]) => any) ? never : Key
+							]: Jsonify<T[Key]>;
 						}
 					: T;

@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-function Styled2(
+async function Styled2(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -18,11 +18,11 @@ function Styled2(
 	return { body: t_body, head: t_head };
 }
 
-export default function ErrorHeadDiscard(
+export default async function ErrorHeadDiscard(
 	$props: { danger: boolean },
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -36,7 +36,7 @@ export default function ErrorHeadDiscard(
 	const t_try_head = t_head;
 	try {
 		t_body += `<![>`;
-		const t_comp_1 = Styled2(undefined, $context);
+		const t_comp_1 = await Styled2(undefined, $context);
 		t_body += t_comp_1.body;
 		t_head += t_comp_1.head;
 		t_body += `<!]><!> <![>`;

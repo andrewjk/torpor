@@ -43,6 +43,8 @@ const context: Context =
 		//	console.log(`set hydration ${printNode(value)}`);
 		//	this.hn = value;
 		//},
+
+		serverValues: null,
 	} satisfies Context);
 
 export default context;

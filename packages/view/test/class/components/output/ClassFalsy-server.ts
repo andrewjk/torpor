@@ -1,11 +1,11 @@
 import t_class from "../../../../src/render/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function ClassFalsy(
+export default async function ClassFalsy(
 	$props: { a: boolean; b: boolean; c: number; d: number; e: string; f: string },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

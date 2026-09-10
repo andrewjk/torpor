@@ -83,7 +83,7 @@ test("number input -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	let input = container.querySelector("input") as HTMLInputElement;
 	expect(input.value).toBe("42");

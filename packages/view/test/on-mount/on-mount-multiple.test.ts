@@ -37,7 +37,7 @@ test("onmount multiple elements -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	const input = container.getElementsByTagName("input")[0];
 	expect(input.value).toBe("set by onmount");

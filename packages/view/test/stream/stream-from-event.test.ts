@@ -45,7 +45,7 @@ test("stream -- fromElement with &ref, hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	click(container);
 

@@ -49,7 +49,7 @@ test("component mounts and unmounts via parent @if toggle -- hydrated", async ()
 		parentComponentSource,
 		"server",
 	);
-	hydrateComponent(container, clientComponent, serverComponent, $parentState);
+	await hydrateComponent(container, clientComponent, serverComponent, $parentState);
 
 	expect(queryByText(container, "Child A")).not.toBeNull();
 
@@ -106,7 +106,7 @@ test("component state resets when remounted -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, remountSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, remountSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	const incBtn = container.querySelector("#inc") as HTMLButtonElement;
 	incBtn.click();
@@ -171,7 +171,7 @@ test("switch between different components -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, switchSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, switchSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(container.querySelector("#a")).not.toBeNull();
 	expect(container.querySelector("#b")).toBeNull();

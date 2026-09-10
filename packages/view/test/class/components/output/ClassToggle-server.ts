@@ -1,11 +1,11 @@
 import t_class from "../../../../src/render/buildClasses";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function ClassToggle(
+export default async function ClassToggle(
 	$props: { active: boolean; emphasis: boolean },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

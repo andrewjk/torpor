@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function IfForSwitchCombo(
+export default async function IfForSwitchCombo(
 	$props: { todos: { text: string; done: boolean; priority: string }[]; filter: string; sort: string },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

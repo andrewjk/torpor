@@ -1,7 +1,7 @@
 import $run from "../../../../src/watch/$run";
-import { $stream } from "@torpor/view";
+import $stream from "../../../../src/watch/$stream";
 import $watch from "../../../../src/watch/$watch";
-import { fromElement } from "@torpor/view";
+import fromElement from "../../../../src/stream/fromElement";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_child from "../../../../src/render/nodeChild";
 import t_fmt from "../../../../src/render/formatText";

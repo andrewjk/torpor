@@ -3,11 +3,11 @@ import t_attr from "../../../../src/render/formatAttributeText";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function BindComponent(
+export default async function BindComponent(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -18,7 +18,7 @@ export default function BindComponent(
 	const t_props_1 = {
 		name: $state.name,
 	};
-	const t_comp_1 = BindText(t_props_1, $context);
+	const t_comp_1 = await BindText(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <p>Hello, ${t_fmt($state.name)}</p>`;
@@ -26,11 +26,11 @@ export default function BindComponent(
 	return { body: t_body, head: t_head };
 }
 
-function BindText(
+async function BindText(
 	$props: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

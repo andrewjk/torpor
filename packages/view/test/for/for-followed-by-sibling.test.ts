@@ -60,7 +60,7 @@ test("for followed by if -- fresh mount keeps every item and the sibling", async
 			mountComponent(container, component, $state);
 		} else {
 			const server = await importComponent(import.meta.filename, source, "server");
-			hydrateComponent(container, component, server, $state);
+			await hydrateComponent(container, component, server, $state);
 		}
 
 		check(container, ["a", "b", "c"], true);

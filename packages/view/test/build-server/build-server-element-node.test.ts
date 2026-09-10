@@ -1,7 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import buildHtml from "../buildHtml";
 
-test("build server element node", () => {
+test("build server element node", async () => {
 	const source = `
 export default function Component() {
 	@render {
@@ -9,12 +9,12 @@ export default function Component() {
 	}
 }`;
 
-	const html = buildHtml(source);
+	const html = await buildHtml(source);
 
 	expect(html).toBe("<p></p>");
 });
 
-test("build server element node with attributes", () => {
+test("build server element node with attributes", async () => {
 	const source = `
 export default function Component() {
 	@render {
@@ -22,12 +22,12 @@ export default function Component() {
 	}
 }`;
 
-	const html = buildHtml(source);
+	const html = await buildHtml(source);
 
 	expect(html).toBe(`<p class="big"></p>`);
 });
 
-test("build server element node with quoted attributes", () => {
+test("build server element node with quoted attributes", async () => {
 	const source = `
 export default function Component() {
 	let value = 'some "text"'
@@ -43,7 +43,7 @@ export default function Component() {
 	}
 }`;
 
-	const html = buildHtml(source);
+	const html = await buildHtml(source);
 	const expected =
 		'<p><input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot;"> <input value="some &quot;text&quot; extra"> <input value="some &quot;text&quot; extra"></p>';
 

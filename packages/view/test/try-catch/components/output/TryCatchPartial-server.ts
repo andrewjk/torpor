@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-function Thrower(
+async function Thrower(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -23,11 +23,11 @@ function Thrower(
 	return { body: t_body, head: t_head };
 }
 
-export default function TryCatchPartial(
+export default async function TryCatchPartial(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -37,7 +37,7 @@ export default function TryCatchPartial(
 	const t_try_head = t_head;
 	try {
 		t_body += `<p>First</p> <![>`;
-		const t_comp_1 = Thrower(undefined, $context);
+		const t_comp_1 = await Thrower(undefined, $context);
 		t_body += t_comp_1.body;
 		t_head += t_comp_1.head;
 		t_body += `<!]><!> <p>Third</p>`;

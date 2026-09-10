@@ -1,4 +1,5 @@
 import context from "../render/context";
+import type AsyncOptions from "../types/AsyncOptions";
 import type Computed from "../types/Computed";
 import { COMPUTED_TYPE } from "../types/constants";
 import batchEnd from "./batchEnd";
@@ -16,10 +17,20 @@ import runComputed from "./runComputed";
  * over the computed object), so they fire on both the initial run and every
  * recalculation — `runComputed` and `checkComputed` are unchanged.
  *
+ * Hydration seeding (ASYNC.md §7.10): while hydrating the content branch of
+ * a boundary whose server HTML embedded resolved `source: "server"` values,
+ * `context.serverValues` is set, and this read consumes the value at the
+ * current position instead of suspending. The thunk still runs — once, in
+ * the background — so the getter's dependencies are tracked and later
+ * dependency changes re-fetch; the embedded value wins the generation race,
+ * so there's no re-fetch wait and no fallback flash.
+ *
  * @param fn A thunk returning the Promise to await. Signal reads inside `fn`
  *   are tracked, so the fetch re-runs when dependencies change.
+ * @param _options Accepted so the same getter source compiles into client and
+ *   server builds (`source: "server"` fetches during SSR); ignored here.
  */
-export default function $async<T>(fn: () => Promise<T>): T {
+export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions): T {
 	if (context.registerComputed === null) {
 		throw new Error("$async must be used in a getter");
 	}
@@ -108,6 +119,21 @@ export default function $async<T>(fn: () => Promise<T>): T {
 	context.registerComputed(computed);
 
 	runComputed(computed);
+
+	// Hydration seeding: the server embedded a resolved value for this read.
+	// Bump the generation so the background fetch's settle is dropped as
+	// stale, and surface the embedded value instead — the reader sees the
+	// server's data immediately
+	const serverValues = context.serverValues;
+	if (serverValues !== null && serverValues.index < serverValues.values.length) {
+		computed.generation++;
+		computed.didSuspend = false;
+		computed.didError = false;
+		computed.hasResolved = true;
+		computed.lastErrored = false;
+		computed.value = serverValues.values[serverValues.index++];
+		computed.staleValue = computed.value;
+	}
 
 	return computed.value;
 }

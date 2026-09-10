@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function Parent(
+export default async function Parent(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
@@ -14,11 +14,11 @@ export default function Parent(
 
 	/* User interface */
 	t_body += `<![>`;
-	const t_comp_1 = ChildA(undefined, $context);
+	const t_comp_1 = await ChildA(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <![>`;
-	const t_comp_2 = ChildB(undefined, $context);
+	const t_comp_2 = await ChildB(undefined, $context);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;
 	t_body += `<!]><!>`;
@@ -26,11 +26,11 @@ export default function Parent(
 	return { body: t_body, head: t_head };
 }
 
-function ChildA(
+async function ChildA(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";
@@ -43,11 +43,11 @@ function ChildA(
 	return { body: t_body, head: t_head };
 }
 
-function ChildB(
+async function ChildB(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	$context = Object.assign({}, $context);
 	let t_body = "";
 	let t_head = "";

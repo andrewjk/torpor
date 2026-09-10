@@ -249,9 +249,35 @@ key or promise cache inside `$async`.
 - An older fetch that settles after a newer run started is discarded,
   including its error.
 
-`$async` runs on the client; SSR renders the `@await` `with` branch. A
-`source: "server"` opt-in (server-side fetch, await-or-stream delivery) is
-coming soon — see ASYNC.md §7.10 for the design.
+#### Server rendering (`source: "server"`)
+
+By default `$async` runs on the client: SSR renders the `@await` `with`
+branch and the fetch starts after hydration. With `source: "server"`, the
+server runs the getter during render and ships the resolved value with the
+page:
+
+```torp
+get user() {
+	return $async(() => fetchUser($props.id), { source: "server" });
+}
+```
+
+- The boundary's content ships resolved when every server read settles
+  within the timeout (`timeout: 5000` default, per getter) — the client
+  adopts the HTML directly, with no fallback flash. The thunk still runs
+  once on the client in the background so dependency changes re-fetch; that
+  first in-flight result is discarded, and the server's value wins.
+- On a timeout — or any instability (a client-fetch getter read inside the
+  boundary, a rejection, a render pass that doesn't replay the collect
+  pass) — the boundary ships its `with` branch and the client fetches, the
+  same as the default.
+- Values must be JSON-safe. Server reads re-run per read (like `$cache` on
+  the server), so coalesce shared fetches with a memoized promise in the
+  thunk.
+- Fetches parallelize within a boundary's render and down nested children;
+  rejections surface on the client through `@try`/`@catch`.
+
+See `packages/view/ASYNC.md` §7.10 for the full design and trade-offs.
 
 ### `$pending(fn)` — is it loading?
 
@@ -465,6 +491,9 @@ own block only, not the whole component):
   `with` branch.
 - Async rejections surface as errors — catch them with `@try`/`@catch` (or the
   top-level `@error`).
+- On the server, boundaries whose getters use `source: "server"` ship their
+  resolved content (see `$async` → "Server rendering"); the rest ship their
+  `with` branch.
 
 ### `@try` / `catch` — error boundary
 

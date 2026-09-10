@@ -36,7 +36,7 @@ test("CSS custom properties in style -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	const el = queryByText(container, "Colored text")!;
 	expect(el).toHaveStyle({ "--my-color": "#ff0000" });

@@ -125,9 +125,22 @@ function formatMap(source: string, result: BuildResult) {
 const importsMap: Record<string, string> = {
 	'import { $watch } from "@torpor/view";': 'import $watch from "../../../../src/watch/$watch";',
 	'import { $cache } from "@torpor/view";': 'import $cache from "../../../../src/watch/$cache";',
+	'import { $async } from "@torpor/view";': 'import $async from "../../../../src/watch/$async";',
+	'import { $pending } from "@torpor/view";':
+		'import $pending from "../../../../src/watch/$pending";',
+	'import { $refresh } from "@torpor/view";':
+		'import $refresh from "../../../../src/watch/$refresh";',
+	'import { $bind } from "@torpor/view";': 'import $bind from "../../../../src/watch/$bind";',
+	'import { $stream } from "@torpor/view";': 'import $stream from "../../../../src/watch/$stream";',
+	'import { fromElement } from "@torpor/view";':
+		'import fromElement from "../../../../src/stream/fromElement";',
+	'import { fromServer } from "@torpor/view";':
+		'import fromServer from "../../../../src/stream/fromServer";',
 	'import { $run } from "@torpor/view";': 'import $run from "../../../../src/watch/$run";',
 	'import { $onmount } from "@torpor/view";':
 		'import $onmount from "../../../../src/watch/$onmount";',
+	'import { t_run_await } from "@torpor/view";':
+		'import t_run_await from "../../../../src/render/runAwait";',
 	'import { $unwrap } from "@torpor/view";': 'import $unwrap from "../../../../src/watch/$unwrap";',
 	'import { $peek } from "@torpor/view";': 'import $peek from "../../../../src/watch/$peek";',
 	'import { $batch } from "@torpor/view";': 'import $batch from "../../../../src/watch/$batch";',
@@ -221,6 +234,10 @@ const importsMap: Record<string, string> = {
 		'import $pending from "../../../../src/ssr/$serverPending";',
 	'import { $refresh } from "@torpor/view/ssr";':
 		'import $refresh from "../../../../src/ssr/$serverRefresh";',
+	'import { t_server_flush } from "@torpor/view/ssr";':
+		'import { serverFlush as t_server_flush } from "../../../../src/ssr/serverSentinels";',
+	'import { t_await_server } from "@torpor/view/ssr";':
+		'import t_await_server from "../../../../src/ssr/runServerAwait";',
 	'import { t_fmt } from "@torpor/view/ssr";':
 		'import t_fmt from "../../../../src/ssr/formatText";',
 	'import { t_attr } from "@torpor/view/ssr";':

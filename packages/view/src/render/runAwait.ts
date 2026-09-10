@@ -4,6 +4,7 @@ import type Region from "../types/Region";
 import $run from "../watch/$run";
 import trackSignal from "../watch/trackSignal";
 import context from "./context";
+import isCommentNode from "./isCommentNode";
 import newRegion from "./newRegion";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
@@ -11,9 +12,23 @@ import runControlBranch from "./runControlBranch";
 import widenAncestorsAtAnchor from "./widenAncestorsAtAnchor";
 
 /**
+ * Comment prefix marking the embedded `source: "server"` values that the
+ * server writes after a resolved boundary's anchor (`<!--t-await:[...]-->`,
+ * see ASYNC.md §7.10).
+ */
+const SERVER_VALUES_PREFIX = "t-await:";
+
+/**
  * Renders an `@await` boundary. On the first run, content is rendered
  * speculatively; if any read inside suspends (`didSuspend`), the boundary
  * discards the partial render and shows the `with` branch instead.
+ *
+ * Hydration of a server-resolved boundary (ASYNC.md §7.10): when the server
+ * shipped resolved content, its values ride in a payload comment after the
+ * anchor. The boundary renders the content branch *with* hydration enabled
+ * and `$async` seeds its computeds from the payload, so the server's HTML is
+ * adopted directly — no speculative render, no `with`-branch dance, no
+ * fallback flash.
  *
  * Fine-grained updates: on subsequent runs the boundary only decides whether
  * to SWITCH branches. It does so from its `pending` set — the suspended
@@ -53,6 +68,21 @@ export default function runAwait(
 	let hasContent = false; // true once content has rendered without suspending
 	let theEffect: Effect | null = null;
 
+	// Resolved values embedded by the server for this boundary, read once
+	// during hydration
+	let serverValues: any[] | null = null;
+	if (context.hydrationNode !== null && anchor !== null) {
+		const next = anchor.nextSibling;
+		if (next !== null && isCommentNode(next) && next.data.startsWith(SERVER_VALUES_PREFIX)) {
+			try {
+				serverValues = JSON.parse(next.data.substring(SERVER_VALUES_PREFIX.length));
+			} catch {
+				serverValues = null;
+			}
+			next.remove();
+		}
+	}
+
 	const gen = (region.generation = (region.generation ?? 0) + 1);
 
 	$run(function runAwait() {
@@ -88,22 +118,28 @@ export default function runAwait(
 			context.awaitBoundary = boundary;
 			boundary.suspended = false;
 
-			// During hydration, the server rendered the with-branch (not
-			// content). Temporarily disable hydration so the speculative
-			// content render creates fresh nodes instead of reusing the
-			// server's with-branch nodes (which would be destroyed when
-			// content is cleared on suspend, leaving nothing for the
-			// with-branch to hydrate against).
+			// During hydration of a server-resolved boundary, the values
+			// embedded by the server are made available to `$async` while the
+			// content branch renders, and hydration stays enabled so the
+			// content adopts the server's nodes directly.
+			//
+			// Otherwise (a client-fetch boundary), hydration is temporarily
+			// disabled: the speculative content render creates fresh nodes
+			// instead of reusing the server's with-branch nodes (which would
+			// be destroyed when content is cleared on suspend, leaving
+			// nothing for the with-branch to hydrate against).
 			const savedHydration = context.hydrationNode;
-			if (savedHydration !== null) {
+			const savedServerValues = context.serverValues;
+			if (serverValues !== null && savedHydration !== null) {
+				context.serverValues = { values: serverValues, index: 0 };
+			} else if (savedHydration !== null) {
 				context.hydrationNode = null;
 			}
 
 			renderBranch(0, renderContent);
 
-			if (savedHydration !== null) {
-				context.hydrationNode = savedHydration;
-			}
+			context.hydrationNode = savedHydration;
+			context.serverValues = savedServerValues;
 
 			context.awaitBoundary = oldBoundary;
 

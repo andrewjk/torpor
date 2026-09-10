@@ -8,7 +8,11 @@ import type BuildResult from "../src/compile/types/BuildResult";
 
 const debugPrint = false;
 
-export default function buildHtml(source: string, state?: any, componentPath?: string): string {
+export default async function buildHtml(
+	source: string,
+	state?: any,
+	componentPath?: string,
+): Promise<string> {
 	// HACK: we may be running this from the top level, or from within the view folder
 	if (componentPath && !fs.existsSync(componentPath)) {
 		componentPath = path.join("view", componentPath);
@@ -62,7 +66,7 @@ ${template.components.find((t) => t.default)!.name};
 	}
 
 	// eslint-disable-next-line
-	const html = eval(code)(state).body.replaceAll(/\s+/g, " ");
+	const html = (await eval(code)(state)).body.replaceAll(/\s+/g, " ");
 	if (debugPrint) {
 		console.log("=== server html");
 		console.log(html);

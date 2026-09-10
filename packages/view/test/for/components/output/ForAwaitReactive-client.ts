@@ -12,7 +12,7 @@ import t_push_region from "../../../../src/render/pushRegion";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
-import { t_run_await } from "@torpor/view";
+import t_run_await from "../../../../src/render/runAwait";
 import t_run_list from "../../../../src/render/runList";
 import type ListItemSpec from "../../../../src/types/ListItemSpec";
 import type SlotRender from "../../../../src/types/SlotRender";

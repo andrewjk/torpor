@@ -104,7 +104,7 @@ test("keyed for with inner switch updates branches without chain corruption -- h
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(render(container)).toEqual(["on:1", "on:2", "on:3"]);
 	run(container, $state);

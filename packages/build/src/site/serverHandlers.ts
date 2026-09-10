@@ -405,11 +405,17 @@ async function loadView(
 		if (handler.layouts) {
 			let slotFunctions: ServerSlotRender[] = [];
 			// The last slot function will render the client component
-			slotFunctions[handler.layouts.length] = trackSlot(handler.layouts.length, (_, $context) => {
-				let { body, head } = (clientEndPoint.component as ServerComponent)($props, $context);
-				styles += head;
-				return body;
-			});
+			slotFunctions[handler.layouts.length] = trackSlot(
+				handler.layouts.length,
+				async (_, $context) => {
+					let { body, head } = await (clientEndPoint.component as ServerComponent)(
+						$props,
+						$context,
+					);
+					styles += head;
+					return body;
+				},
+			);
 			for (let i = handler.layouts.length - 1; i >= 0; i--) {
 				const layoutEndPoint: PageEndPoint | undefined = (await handler.layouts[i].endPoint())
 					?.default;
@@ -418,10 +424,14 @@ async function loadView(
 						component = layoutEndPoint.component as ServerComponent;
 						slots = { _: slotFunctions[i + 1] };
 					} else {
-						slotFunctions[i] = trackSlot(i, (_, $context) => {
-							let { body, head } = (layoutEndPoint.component as ServerComponent)($props, $context, {
-								_: slotFunctions[i + 1],
-							});
+						slotFunctions[i] = trackSlot(i, async (_, $context) => {
+							let { body, head } = await (layoutEndPoint.component as ServerComponent)(
+								$props,
+								$context,
+								{
+									_: slotFunctions[i + 1],
+								},
+							);
 							styles += head;
 							return body;
 						});
@@ -432,7 +442,7 @@ async function loadView(
 
 		let html;
 		try {
-			let { body, head } = component($props, undefined, slots);
+			let { body, head } = await component($props, undefined, slots);
 
 			// Put the form info in a hidden input so that it can be accessed on the client
 			if (form) {

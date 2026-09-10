@@ -1,11 +1,11 @@
 import $run from "../../../../src/ssr/$serverRun";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function CleanupIfInsideFor(
+export default async function CleanupIfInsideFor(
 	$props: { show: boolean; items: string[] },
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -15,7 +15,7 @@ export default function CleanupIfInsideFor(
 		t_body += `<!^><![>`;
 		if ($props.show) {
 			t_body += `<!^><![>`;
-			const t_comp_1 = CleanupTracker(undefined, $context);
+			const t_comp_1 = await CleanupTracker(undefined, $context);
 			t_body += t_comp_1.body;
 			t_head += t_comp_1.head;
 			t_body += `<!]><!>`;
@@ -27,11 +27,11 @@ export default function CleanupIfInsideFor(
 	return { body: t_body, head: t_head };
 }
 
-function CleanupTracker(
+async function CleanupTracker(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

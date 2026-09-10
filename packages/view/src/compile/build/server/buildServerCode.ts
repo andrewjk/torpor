@@ -1,8 +1,11 @@
 import type Template from "../../../types/Template";
 import type BuildOptions from "../../types/BuildOptions";
+import type ParentNode from "../../types/nodes/ParentNode";
+import type TemplateNode from "../../types/nodes/TemplateNode";
 import Builder from "../../utils/Builder";
 import { codeRanges } from "../../utils/codeScanner";
 import collectMarkupExpressions from "../../utils/collectMarkupExpressions";
+import isControlNode from "../../utils/isControlNode";
 import markupRendersComponent from "../../utils/markupRendersComponent";
 import buildStyles from "../client/buildStyles";
 import type BuildServerStatus from "./BuildServerStatus";
@@ -25,6 +28,8 @@ const importsMap: Record<string, string> = {
 	$unwrap: 'import { $unwrap } from "${folder}";',
 	$peek: 'import { $peek } from "${folder}";',
 	$batch: 'import { $batch } from "${folder}";',
+	t_server_flush: 'import { t_server_flush } from "${folder}";',
+	t_await_server: 'import { t_await_server } from "${folder}";',
 	t_fmt: 'import { t_fmt } from "${folder}";',
 	t_attr: 'import { t_attr } from "${folder}";',
 	t_class: 'import { t_class } from "${folder}";',
@@ -99,10 +104,22 @@ function buildServerTemplate(
 	if (/\$peek\b/.test(scriptCode)) imports.add("$peek");
 	if (/\$batch\b/.test(scriptCode)) imports.add("$batch");
 
+	// Server components are async functions, so that a component containing a
+	// `source: "server"` `@await` boundary can await its fetches and its
+	// children can be awaited wherever they render (ASYNC.md §7.10). Find the
+	// chunks holding each component's `function` declaration so they can be
+	// rewritten on the way out, without mutating the shared parse result.
+	const asyncChunks = new Set<number>();
+	for (let [i, chunk] of template.script.entries()) {
+		if (chunk.script === "/* @params */" && i > 0) {
+			asyncChunks.add(i - 1);
+		}
+	}
+
 	let currentIndex = 0;
 	let current = template.components[0];
 
-	for (let chunk of template.script) {
+	for (let [chunkIndex, chunk] of template.script.entries()) {
 		if (chunk.script === "/* @params */") {
 			// TODO: Support other params, like the user setting $context
 			let params = [
@@ -119,11 +136,23 @@ function buildServerTemplate(
 			];
 			b.append(params.join(",\n") + ",");
 		} else if (chunk.script === ") /* @return_type */ {") {
-			b.append("): { body: string; head: string } {");
+			b.append("): Promise<{ body: string; head: string }> {");
 		} else if (chunk.script === "/* @start */") {
 			// Redefine $context so that any newly added properties will only be passed to children
 			if (current.contextProps?.length) {
 				b.append(`$context = Object.assign({}, $context);`);
+			}
+
+			// A component with an `@await` boundary renders inside a flush,
+			// which starts its server fetches without blocking the render and
+			// substitutes the resolved boundaries at the end
+			const hasAwait =
+				containsAwaitGroup(current.markup) ||
+				containsAwaitGroup(current.error) ||
+				containsAwaitGroup(current.head);
+			if (hasAwait) {
+				imports.add("t_server_flush");
+				b.append(`return t_server_flush(async () => {`);
 			}
 
 			// Declare t_head and t_body
@@ -137,6 +166,7 @@ function buildServerTemplate(
 					styleHash: current.style?.hash || "",
 					varNames: {},
 					preserveWhitespace: false,
+					awaitCount: 0,
 					options,
 				};
 
@@ -167,6 +197,7 @@ function buildServerTemplate(
 					styleHash: current.style?.hash || "",
 					varNames: {},
 					preserveWhitespace: false,
+					awaitCount: 0,
 					options,
 				};
 
@@ -197,6 +228,7 @@ function buildServerTemplate(
 					varNames: {},
 					preserveWhitespace: false,
 					inHead: true,
+					awaitCount: 0,
 					options,
 				};
 
@@ -227,10 +259,54 @@ function buildServerTemplate(
 		} else if (chunk.script === "/* @end */") {
 			b.append(`return { body: t_body, head: t_head };`);
 
+			// Close the flush opened in @start
+			if (
+				containsAwaitGroup(current.markup) ||
+				containsAwaitGroup(current.error) ||
+				containsAwaitGroup(current.head)
+			) {
+				b.append(`});`);
+			}
+
 			currentIndex += 1;
 			current = template.components[currentIndex];
 		} else {
-			b.append(chunk.script);
+			// The component's `function` declaration chunk: make it async. A
+			// declaration the user already wrote as `async function` doesn't
+			// match (the lookbehind skips it), so it passes through unchanged.
+			// The name may carry generic parameters (`function Form<T>(`).
+			if (asyncChunks.has(chunkIndex)) {
+				b.append(
+					chunk.script.replace(
+						/(?<!async\s)function\s+([A-Za-z_$][\w$]*)((?:<(?:[^<>]|<[^<>]*>)*>)?)\s*\($/,
+						"async function $1$2(",
+					),
+				);
+			} else {
+				b.append(chunk.script);
+			}
 		}
 	}
+}
+
+/**
+ * Whether a markup tree contains an `@await` boundary, so the component's
+ * render must be wrapped in a flush.
+ */
+function containsAwaitGroup(node: TemplateNode | undefined | null): boolean {
+	if (node === undefined || node === null) {
+		return false;
+	}
+	if (isControlNode(node) && node.operation === "@await group") {
+		return true;
+	}
+	// Text and comment nodes have no children; everything else is a ParentNode
+	if (node.type !== "text" && node.type !== "comment") {
+		for (let child of (node as ParentNode).children) {
+			if (containsAwaitGroup(child)) {
+				return true;
+			}
+		}
+	}
+	return false;
 }

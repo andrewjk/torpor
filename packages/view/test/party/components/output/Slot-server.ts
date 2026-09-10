@@ -1,21 +1,21 @@
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function FunnyButtonApp(
+export default async function FunnyButtonApp(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
 	/* User interface */
 	t_body += `<![>`;
-	const t_comp_1 = FunnyButton(undefined, $context);
+	const t_comp_1 = await FunnyButton(undefined, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <![>`;
 	const t_slots_1: Record<string, ServerSlotRender> = {};
-	t_slots_1["_"] = (
+	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
 		// @ts-ignore
 		// eslint-disable-next-line no-unused-vars
@@ -25,7 +25,7 @@ export default function FunnyButtonApp(
 		t_body += `Click me!`;
 		return t_body;
 	}
-	const t_comp_2 = FunnyButton(undefined, $context, t_slots_1);
+	const t_comp_2 = await FunnyButton(undefined, $context, t_slots_1);
 	t_body += t_comp_2.body;
 	t_head += t_comp_2.head;
 	t_body += `<!]><!>`;
@@ -33,11 +33,11 @@ export default function FunnyButtonApp(
 	return { body: t_body, head: t_head };
 }
 
-function FunnyButton(
+async function FunnyButton(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -54,7 +54,7 @@ function FunnyButton(
 				outline: 0;
 			"><![>`;
 	if ($slots && $slots["_"]) {
-		t_body += $slots["_"](undefined, $context);
+		t_body += await $slots["_"](undefined, $context);
 	} else {
 		t_body += `<span>No content found</span>`;
 	}

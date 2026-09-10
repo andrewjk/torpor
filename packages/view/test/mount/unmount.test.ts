@@ -44,7 +44,7 @@ test("unmount clears the container and runs cleanups -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	expect(container.querySelector("#content")).not.toBeNull();
 	expect((window as any).__unmountLog).toContain("mount");
@@ -79,7 +79,7 @@ test("mounting again after unmount works -- hydrated then mounted", async () => 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 	unmount(container);
 
 	mountComponent(container, clientComponent);

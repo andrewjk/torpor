@@ -78,7 +78,7 @@ test("text renders various types correctly -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(container.querySelector("#str")).toHaveTextContent("hello");
 	expect(container.querySelector("#zero")).toHaveTextContent("0");

@@ -82,7 +82,7 @@ test("keyed for with inner if toggles without hanging -- hydrated", async () => 
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	const toggle = (done: boolean) => {
 		$state.todos = $state.todos.map((t: Todo) => ({ ...t, done }));

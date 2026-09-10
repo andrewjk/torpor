@@ -122,12 +122,44 @@ export default function Component() {
 
 		<h2>Server rendering</h2>
 		<p>
-			$async getters currently run on the client: the server renders the
+			By default $async getters run on the client: the server renders the
 			<code>&commat;await</code> <code>with</code> branch, and fetching starts
-			after the page hydrates. Coming soon: an opt-in
-			<code>source: "server"</code> mode, where the server fetches during
-			render and delivers the result with the page (by await-and-embed first,
-			with streaming delivery to follow).
+			after the page hydrates. Pass <code>&#123; source: "server" &#125;</code> to
+			fetch during the server render instead — the boundary's content then ships
+			resolved with the page, and the client adopts it directly with no fallback
+			flash:
+		</p>
+		<CodePreview
+			code={`
+export default function Component($props: { id: number }) {
+	let $state = $watch({
+		get user() {
+			return $async(() => fetchUser($props.id), {
+				source: "server",
+				timeout: 2000, // ms before the server gives up (default 5000)
+			})
+		}
+	})
+
+	@render {
+		@await {
+			<p>
+				Hello, {$state.user.name}!
+			</p>
+		} with {
+			<p>Loading...</p>
+		}
+	}
+}
+`}
+		/>
+		<p>
+			On a timeout (or a rejection, or a client-fetch getter inside the same
+			boundary) the server ships the <code>with</code> branch and the client
+			fetches, exactly like the default. Server-side values must be JSON-safe,
+			and the thunk still runs once on the client in the background so that
+			dependency changes re-fetch — its first result is discarded, so you never
+			see it.
 		</p>
 	}
 }

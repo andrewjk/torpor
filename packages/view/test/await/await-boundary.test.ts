@@ -77,7 +77,7 @@ test("@await hydrated shows the with-branch then content", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	// Server renders the with-branch; client hydrates and eventually shows content
 	const { waitFor } = await import("@testing-library/dom");

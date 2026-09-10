@@ -8,5 +8,7 @@ export default interface BuildServerStatus {
 	preserveWhitespace: boolean;
 	/** Whether the output is being built inside a @head block */
 	inHead?: boolean;
+	/** Counter for `@await` boundary site ids within this build chunk */
+	awaitCount: number;
 	options?: BuildOptions;
 }

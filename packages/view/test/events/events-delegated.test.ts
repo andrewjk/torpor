@@ -76,7 +76,7 @@ test("delegated click handler fires (hydrated)", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, clickSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, clickSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	const btn = container.querySelector("#btn")!;
 	await userEvent.click(btn);

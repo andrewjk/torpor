@@ -1,11 +1,11 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function Let(
+export default async function Let(
 	$props: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -16,7 +16,7 @@ export default function Let(
 	};
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	// @ts-ignore
-	t_slots_1["_"] = (
+	t_slots_1["_"] = async (
 		$slot: Record<PropertyKey, any>,
 		// @ts-ignore
 		// eslint-disable-next-line no-unused-vars
@@ -26,7 +26,7 @@ export default function Let(
 		t_body += ` ${t_fmt($slot.item.text)} `;
 		return t_body;
 	}
-	const t_comp_1 = List(t_props_1, $context, t_slots_1);
+	const t_comp_1 = await List(t_props_1, $context, t_slots_1);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!>`;
@@ -34,11 +34,11 @@ export default function Let(
 	return { body: t_body, head: t_head };
 }
 
-function List(
+async function List(
 	$props: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -49,7 +49,7 @@ function List(
 		const t_slot_props_1: any = {};
 		t_slot_props_1["item"] = item;
 		if ($slots && $slots["_"]) {
-			t_body += $slots["_"](t_slot_props_1, $context);
+			t_body += await $slots["_"](t_slot_props_1, $context);
 		}
 		t_body += `<!]><!></li>`;
 	}

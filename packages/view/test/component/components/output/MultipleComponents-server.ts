@@ -2,11 +2,11 @@ import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function MultiComponent(
+export default async function MultiComponent(
 	$props: { label: string },
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -17,7 +17,7 @@ export default function MultiComponent(
 	const t_props_1 = {
 		label: $props.label,
 	};
-	const t_comp_1 = Inner(t_props_1, $context);
+	const t_comp_1 = await Inner(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!></div>`;
@@ -32,11 +32,11 @@ interface InnerProps {
 /**
  * The inner component, in the same file.
  */
-function Inner(
+async function Inner(
 	$props: InnerProps,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

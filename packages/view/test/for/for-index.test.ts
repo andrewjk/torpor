@@ -41,7 +41,7 @@ test("for loop with index access -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Item 0: alpha")).not.toBeNull();
 	expect(queryByText(container, "Item 1: beta")).not.toBeNull();

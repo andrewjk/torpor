@@ -1,4 +1,4 @@
-import { $async } from "@torpor/view";
+import $async from "../../../../src/watch/$async";
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
 import t_add_element from "../../../../src/render/addElement";
@@ -13,7 +13,7 @@ import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
-import { t_run_await } from "@torpor/view";
+import t_run_await from "../../../../src/render/runAwait";
 import type SlotRender from "../../../../src/types/SlotRender";
 
 export default function AwaitRapid(

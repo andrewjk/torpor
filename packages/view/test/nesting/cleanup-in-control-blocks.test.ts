@@ -66,7 +66,7 @@ test("child component cleanup when @if becomes false -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceIfChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceIfChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Tracked")).not.toBeNull();
 	expect(window.__cleanupLog).toEqual(["effect"]);
@@ -131,7 +131,7 @@ test("child cleanup when nested outer @if becomes false -- hydrated", async () =
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceNestedChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceNestedChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Tracked")).not.toBeNull();
 	expect(window.__cleanupLog).toEqual(["effect"]);
@@ -165,7 +165,7 @@ test("child cleanup when nested inner @if becomes false -- hydrated", async () =
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceNestedChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceNestedChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Tracked")).not.toBeNull();
 	expect(window.__cleanupLog).toEqual(["effect"]);
@@ -223,7 +223,7 @@ test("child cleanup when @for list shrinks -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceForChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceForChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(window.__cleanupLog.filter((x) => x === "effect").length).toBe(3);
 
@@ -300,7 +300,7 @@ test("child cleanup when @switch case changes -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceSwitchChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceSwitchChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(window.__cleanupLog).toEqual(["effect"]);
 
@@ -375,7 +375,7 @@ test("child cleanup when top of 3-level @if becomes false -- hydrated", async ()
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceDeepChild, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceDeepChild, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(window.__cleanupLog).toEqual(["effect"]);
 
@@ -464,7 +464,7 @@ test("child cleanup when @if inside @for becomes false -- hydrated", async () =>
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, sourceIfInsideFor, "client");
 	const serverComponent = await importComponent(import.meta.filename, sourceIfInsideFor, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(window.__cleanupLog.filter((x) => x === "effect").length).toBe(3);
 

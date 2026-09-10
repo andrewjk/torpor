@@ -48,7 +48,7 @@ test("array push adds items reactively -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Count: 2")).not.toBeNull();
 	expect(queryByText(container, "Last: b")).not.toBeNull();
@@ -86,7 +86,7 @@ test("array splice removes and adds reactively -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Count: 4")).not.toBeNull();
 
@@ -116,7 +116,7 @@ test("array pop removes last reactively -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items.pop();
 	expect(queryByText(container, "Count: 2")).not.toBeNull();
@@ -142,7 +142,7 @@ test("array shift removes first reactively -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items.shift();
 	expect(queryByText(container, "Count: 2")).not.toBeNull();
@@ -172,7 +172,7 @@ test("array unshift adds to front reactively -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	$state.items.unshift("a");
 	expect(queryByText(container, "First: a")).not.toBeNull();
@@ -204,7 +204,7 @@ test("array length truncation -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	expect(queryByText(container, "Count: 5")).not.toBeNull();
 

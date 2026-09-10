@@ -14,9 +14,12 @@ import $run from "./ssr/$serverRun";
 import $stream from "./ssr/$serverStream";
 import $unwrap from "./ssr/$serverUnwrap";
 import $watch from "./ssr/$serverWatch";
+import runServerAwait from "./ssr/runServerAwait";
+import { serverFlush } from "./ssr/serverSentinels";
 import fromElement from "./stream/fromElement";
 import fromServer from "./stream/fromServer";
 import fromWebSocket from "./stream/fromWebSocket";
+import type AsyncOptions from "./types/AsyncOptions";
 import type ServerComponent from "./types/ServerComponent";
 import type ServerSlotRender from "./types/ServerSlotRender";
 import type StreamSource from "./types/StreamSource";
@@ -34,6 +37,8 @@ export {
 	$async,
 	$pending,
 	$refresh,
+	serverFlush as t_server_flush,
+	runServerAwait as t_await_server,
 	fromElement,
 	fromServer,
 	fromWebSocket,
@@ -43,4 +48,4 @@ export {
 	t_style,
 };
 
-export type { ServerComponent, ServerSlotRender, StreamSource };
+export type { AsyncOptions, ServerComponent, ServerSlotRender, StreamSource };

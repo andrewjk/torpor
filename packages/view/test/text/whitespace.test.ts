@@ -32,7 +32,7 @@ test("whitespace around interpolation is preserved -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	let div = container.querySelector("div");
 	expect(div?.textContent?.trim()).toBe("Hello World!");
@@ -147,7 +147,7 @@ test("whitespace trimmed identically on server and client (hydration)", async ()
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, wsSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, wsSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	let ul = container.querySelector("ul");
 	// Inter-child whitespace inside <ul> is insignificant — removed entirely
@@ -170,7 +170,7 @@ line3</pre>
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, preSource, "client");
 	const serverComponent = await importComponent(import.meta.filename, preSource, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	let pre = container.querySelector("pre");
 	// Newlines inside <pre> are preserved verbatim

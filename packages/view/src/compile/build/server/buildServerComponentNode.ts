@@ -97,7 +97,7 @@ export default function buildServerComponentNode(
 				// the required $slot param, which is not compatible with the
 				// optional $slot param of the ServerSlotRender type
 				b.append(
-					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = (\n${slotParams.join(",\n")}\n) => {`,
+					`${slot.hasSlotProps ? "// @ts-ignore\n" : ""}${slotsName}["${slotName}"] = async (\n${slotParams.join(",\n")}\n) => {`,
 				);
 				b.append(`let t_body = "";`);
 
@@ -124,13 +124,14 @@ export default function buildServerComponentNode(
 		}
 	}
 
-	// Render the component
+	// Render the component. Components are async functions (they may contain
+	// a `source: "server"` `@await` boundary), so await the result
 	let renderParams = `${propsName}, $context`;
 	if (slotsName !== "undefined") {
 		renderParams += `, ${slotsName}`;
 	}
 	const componentResult = nextVarName("comp", status);
-	b.append(`const ${componentResult} = ${componentName}(${renderParams});`);
+	b.append(`const ${componentResult} = await ${componentName}(${renderParams});`);
 	b.append(`${status.inHead ? "t_head" : "t_body"} += ${componentResult}.body;`);
 	b.append(`t_head += ${componentResult}.head;`);
 

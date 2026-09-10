@@ -8,11 +8,11 @@ interface Props {
 /**
  * A component with a switch statement in it.
  */
-export default function Switch(
+export default async function Switch(
 	$props: Props,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

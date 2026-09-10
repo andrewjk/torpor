@@ -25,7 +25,7 @@ test("server render escapes html in text interpolations", async () => {
 	const state = $watch({ code: CODE_SAMPLE });
 
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	const { body } = serverComponent(state);
+	const { body } = await serverComponent(state);
 
 	// The interpolated value must not be parseable as markup
 	expect(body).toContain("&lt;button");
@@ -42,7 +42,7 @@ test("hydrated component shows code sample as text", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, state);
+	await hydrateComponent(container, clientComponent, serverComponent, state);
 
 	const code = container.querySelector("code")!;
 	// No real elements may be created from the code sample

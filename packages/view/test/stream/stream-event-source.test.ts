@@ -53,7 +53,7 @@ test("stream -- server render never subscribes to the source", async () => {
 	FakeEventSource.instances.length = 0;
 
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	const { body } = serverComponent(undefined);
+	const { body } = await serverComponent(undefined);
 
 	expect(body).toContain("<button");
 	expect(FakeEventSource.instances.length).toBe(0);

@@ -42,7 +42,7 @@ test("try catch -- child error -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	expect(queryByText(container, "This is never rendered")).toBeNull();
 	expect(queryByText(container, "Caught: child boom")).not.toBeNull();

@@ -47,7 +47,7 @@ test("error -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $watch({ danger: true }));
+	await hydrateComponent(container, clientComponent, serverComponent, $watch({ danger: true }));
 
 	expect(queryByText(container, "All good")).toBeNull();
 	expect(queryByText(container, "Oops: boom")).not.toBeNull();
@@ -57,7 +57,7 @@ test("error -- hydrated when nothing throws", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $watch({ danger: false }));
+	await hydrateComponent(container, clientComponent, serverComponent, $watch({ danger: false }));
 
 	expect(queryByText(container, "All good")).not.toBeNull();
 	expect(queryByText(container, "Oops: boom")).toBeNull();

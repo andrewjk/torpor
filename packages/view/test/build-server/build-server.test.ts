@@ -7,7 +7,7 @@ import { expect, test } from "vite-plus/test";
 import build from "../../src/compile/build";
 import parse from "../../src/compile/parse";
 
-test("build for the server and render to HTML", () => {
+test("build for the server and render to HTML", async () => {
 	// This is just a simple test -- server building gets tested thoroughly when
 	// each test is run in hydration mode
 	const state = { counter: 8 };
@@ -28,7 +28,7 @@ IfNested;
 	code = transform(code, { transforms: ["typescript"] }).code;
 
 	// eslint-disable-next-line
-	const html = eval(code)(state).body;
+	const html = (await eval(code)(state)).body;
 
 	const container = document.createElement("div");
 	container.innerHTML = html;

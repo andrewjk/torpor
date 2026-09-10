@@ -2,11 +2,11 @@ import $watch from "../../../../src/ssr/$serverWatch";
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function AnswerButtonApp(
+export default async function AnswerButtonApp(
 	_$props?: Record<PropertyKey, any>,
 	$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 
@@ -28,7 +28,7 @@ export default function AnswerButtonApp(
 		onYes: onAnswerYes,
 		onNo: onAnswerNo,
 	};
-	const t_comp_1 = AnswerButton(t_props_1, $context);
+	const t_comp_1 = await AnswerButton(t_props_1, $context);
 	t_body += t_comp_1.body;
 	t_head += t_comp_1.head;
 	t_body += `<!]><!> <p style="font-size: 50px;">${t_fmt($state.isHappy ? "😀" : "😥")}</p>`;
@@ -36,11 +36,11 @@ export default function AnswerButtonApp(
 	return { body: t_body, head: t_head };
 }
 
-function AnswerButton(
+async function AnswerButton(
 	$props: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

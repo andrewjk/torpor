@@ -106,10 +106,12 @@ test("navigating between sections reuses the root layout and swaps the section l
 	};
 
 	// Build the SSR HTML the way serverEntry does: each layout composed into
-	// the default slot of its parent
-	const statePageSlot = (_, $context) => server.statePage({ count: 0 }, $context).body;
-	const docsSlot = (_, $context) => server.docs({ count: 0 }, $context, { _: statePageSlot }).body;
-	const { body } = server.root({ count: 0 }, undefined, { _: docsSlot });
+	// the default slot of its parent. Slots and components are async now
+	const statePageSlot = async (_, $context) =>
+		(await server.statePage({ count: 0 }, $context)).body;
+	const docsSlot = async (_, $context) =>
+		(await server.docs({ count: 0 }, $context, { _: statePageSlot })).body;
+	const { body } = await server.root({ count: 0 }, undefined, { _: docsSlot });
 	container.innerHTML = body;
 
 	// The client layout stack, mirroring navigate.ts: one entry per layout,

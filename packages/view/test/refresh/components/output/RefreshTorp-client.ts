@@ -1,6 +1,6 @@
-import { $async } from "@torpor/view";
-import { $pending } from "@torpor/view";
-import { $refresh } from "@torpor/view";
+import $async from "../../../../src/watch/$async";
+import $pending from "../../../../src/watch/$pending";
+import $refresh from "../../../../src/watch/$refresh";
 import $run from "../../../../src/watch/$run";
 import $watch from "../../../../src/watch/$watch";
 import t_add_fragment from "../../../../src/render/addFragment";

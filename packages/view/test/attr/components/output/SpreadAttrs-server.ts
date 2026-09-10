@@ -1,11 +1,11 @@
 import t_attr from "../../../../src/render/formatAttributeText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default function SpreadAttrs(
+export default async function SpreadAttrs(
 	$props: { collapsed: boolean },
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
-): { body: string; head: string } {
+): Promise<{ body: string; head: string }> {
 	let t_body = "";
 	let t_head = "";
 

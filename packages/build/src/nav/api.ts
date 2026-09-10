@@ -28,9 +28,11 @@ type ApiRequestBody<Handler> = Handler extends (event: infer Event) => any
 
 /** The callable methods of an endpoint, one per handler it defines. */
 export type ApiMethods<Endpoint extends object> = {
-	[Method in string & keyof Endpoint as NonNullable<Endpoint[Method]> extends (event: any) => any
-		? Method
-		: never]: (
+	[
+		Method in string & keyof Endpoint as NonNullable<Endpoint[Method]> extends (event: any) => any
+			? Method
+			: never
+	]: (
 		body?: ApiRequestBody<NonNullable<Endpoint[Method]>>,
 		init?: RequestInit,
 	) => Promise<ApiResult<NonNullable<Endpoint[Method]>>>;

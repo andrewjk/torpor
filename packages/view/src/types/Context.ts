@@ -152,4 +152,14 @@ export default interface Context {
 	/** The node that is actively being hydrated. */
 	hydrationNode: ChildNode | null;
 	////hn: ChildNode | null;
+
+	/**
+	 * The embedded server values for the boundary currently being hydrated,
+	 * or null. `runAwait` sets this while rendering the content branch of a
+	 * boundary whose server HTML carries resolved `source: "server"` values
+	 * (the `<!--t-await:...-->` payload comment after the anchor); `$async`
+	 * consumes the values in read order to seed its computeds, so hydration
+	 * shows resolved content with no fallback flash (ASYNC.md §7.10).
+	 */
+	serverValues: { values: any[]; index: number } | null;
 }

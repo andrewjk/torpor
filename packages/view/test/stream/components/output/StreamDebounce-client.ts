@@ -1,5 +1,5 @@
 import $run from "../../../../src/watch/$run";
-import { $stream } from "@torpor/view";
+import $stream from "../../../../src/watch/$stream";
 import $watch from "../../../../src/watch/$watch";
 import t_add_element from "../../../../src/render/addElement";
 import t_child from "../../../../src/render/nodeChild";

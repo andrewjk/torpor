@@ -39,7 +39,7 @@ test("special head -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent, $state);
+	await hydrateComponent(container, clientComponent, serverComponent, $state);
 
 	check(container, $state);
 });
@@ -50,7 +50,7 @@ test("special head -- server rendered", async () => {
 	});
 
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	const { head } = serverComponent($state);
+	const { head } = await serverComponent($state);
 
 	expect(head).toContain("<title>Hello</title>");
 	expect(head).toContain(`<meta name="description" content="A test">`);
@@ -63,7 +63,7 @@ test("special head -- hydrated with server rendered head does not duplicate", as
 
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	const { body, head } = serverComponent($state);
+	const { body, head } = await serverComponent($state);
 
 	// The earlier tests in this file already appended head elements to the
 	// shared document head, so start from a clean slate

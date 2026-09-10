@@ -117,7 +117,8 @@ const context = globalThis[CONTEXT_SYMBOL] ??= {
 	mountEffects: [],
 	stashedEvents: [],
 	stashedAnimations: [],
-	hydrationNode: null
+	hydrationNode: null,
+	serverValues: null
 };
 function addAnimation(el, entry, exit) {
 	context.stashedAnimations.push({
@@ -1691,6 +1692,7 @@ function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 		popRegion(oldRegion);
 	});
 }
+const SERVER_VALUES_PREFIX = "t-await:";
 function runAwait(region, anchor, renderContent, renderWith, name) {
 	const boundary = {
 		suspended: false,
@@ -1701,6 +1703,18 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 	let first = true;
 	let hasContent = false;
 	let theEffect = null;
+	let serverValues = null;
+	if (context.hydrationNode !== null && anchor !== null) {
+		const next = anchor.nextSibling;
+		if (next !== null && isCommentNode(next) && next.data.startsWith(SERVER_VALUES_PREFIX)) {
+			try {
+				serverValues = JSON.parse(next.data.substring(8));
+			} catch {
+				serverValues = null;
+			}
+			next.remove();
+		}
+	}
 	const gen = region.generation = (region.generation ?? 0) + 1;
 	$run(function runAwait() {
 		if (region.generation !== gen) return;
@@ -1721,9 +1735,15 @@ function runAwait(region, anchor, renderContent, renderWith, name) {
 			context.awaitBoundary = boundary;
 			boundary.suspended = false;
 			const savedHydration = context.hydrationNode;
-			if (savedHydration !== null) context.hydrationNode = null;
+			const savedServerValues = context.serverValues;
+			if (serverValues !== null && savedHydration !== null) context.serverValues = {
+				values: serverValues,
+				index: 0
+			};
+			else if (savedHydration !== null) context.hydrationNode = null;
 			renderBranch(0, renderContent);
-			if (savedHydration !== null) context.hydrationNode = savedHydration;
+			context.hydrationNode = savedHydration;
+			context.serverValues = savedServerValues;
 			context.awaitBoundary = oldBoundary;
 			if (boundary.suspended && renderWith !== null) renderBranch(1, renderWith);
 			else if (!boundary.suspended) hasContent = true;
@@ -1841,7 +1861,7 @@ function $batch(fn) {
 		batchEnd();
 	}
 }
-function $async(fn) {
+function $async(fn, _options) {
 	if (context.registerComputed === null) throw new Error("$async must be used in a getter");
 	const computed = {
 		type: 1,
@@ -1894,6 +1914,16 @@ function $async(fn) {
 	};
 	context.registerComputed(computed);
 	runComputed(computed);
+	const serverValues = context.serverValues;
+	if (serverValues !== null && serverValues.index < serverValues.values.length) {
+		computed.generation++;
+		computed.didSuspend = false;
+		computed.didError = false;
+		computed.hasResolved = true;
+		computed.lastErrored = false;
+		computed.value = serverValues.values[serverValues.index++];
+		computed.staleValue = computed.value;
+	}
 	return computed.value;
 }
 function $bind(state, props, ...keys) {

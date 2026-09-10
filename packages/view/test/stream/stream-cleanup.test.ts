@@ -53,7 +53,7 @@ test("stream -- region clear unsubscribes the source (hydrated)", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");
-	hydrateComponent(container, clientComponent, serverComponent);
+	await hydrateComponent(container, clientComponent, serverComponent);
 
 	push("a");
 	expect((window as any).__streamLog).toEqual(["a"]);
