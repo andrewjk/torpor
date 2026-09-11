@@ -18,6 +18,9 @@ access (`env()` with optional `site.env` schema validation and adapter-level
 entries for dynamic routes, error page as `404.html`), base path config
 (`site.basePath` strips the prefix from server requests, rewrites generated
 HTML attributes and redirect locations, and mirrors on the client router),
+view transitions with scroll restoration (navigations run inside
+`document.startViewTransition`; scroll is reset across pages, kept for
+same-page navigations, and restored from history state on back/forward),
 and ETag/Cache-Control support via `notModified`.
 
 ### High impact (table stakes in peers)
@@ -38,20 +41,17 @@ and ETag/Cache-Control support via `notModified`.
    support (adapter-node could do this).
 5. **SEO helpers** — no sitemap.xml / robots.txt generation, no meta/canonical
    conveniences beyond `@head` merging.
-6. **View transitions + scroll restoration** — neither `startViewTransition`
-   nor any scroll handling exists in `src/nav/navigate.ts` or
-   `src/site/clientEntry.ts`.
-7. **i18n / locale routing** — nothing.
-8. **Flash messages** — DIY via cookies today; a small helper after
+6. **i18n / locale routing** — nothing.
+7. **Flash messages** — DIY via cookies today; a small helper after
    redirects would round out the actions story.
 
 ### Lower / nice-to-have
 
-9. Image optimization / asset pipeline beyond Vite defaults
-10. Pagination helpers
-11. Rate-limiting primitives (fits naturally as a middleware/plugin)
-12. Cron / queues / background jobs (adapter-dependent)
-13. Dev toolbar / route inspector
+8. Image optimization / asset pipeline beyond Vite defaults
+9. Pagination helpers
+10. Rate-limiting primitives (fits naturally as a middleware/plugin)
+11. Cron / queues / background jobs (adapter-dependent)
+12. Dev toolbar / route inspector
 
 Top two if forced to choose: **caching and streaming SSR** — they come up in
 virtually every real project.

@@ -165,34 +165,56 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		}
 	}
 
-	try {
-		if (reused) {
-			// The layout is being reused — clear the old slot content, then
-			// call the slot function directly to fill it with the new page.
-			// We must not go through `mount` here: the slot's container still
-			// holds the layout's own children (e.g. a header), which `mount`
-			// refuses to mount into. Both the clear and the fill are inside
-			// the try so that a failure doesn't leave the slot half-cleared.
-			const slotRegion = layoutStack[reusedIndex].slotRegion;
-			parent = slotRegion.startNode!.parentNode as HTMLElement;
-			clearLayoutSlot(slotRegion);
-			component(parent, null);
-		} else if (withHydration) {
-			hydrate(parent, component, $props, slots);
-		} else {
-			// The layout chain changed (or there was no previous layout to
-			// reuse): tear down the previous UI entirely — disposing its
-			// region tree and clearing `#app` — so `mount` starts fresh.
-			// Without this, `mount` throws because `#app` still holds the
-			// previous render's children, and it would reuse a stale root
-			// region.
-			unmount(parent);
-			mount(parent, component, $props, slots);
+	// A definite alias, so that the render closure's type checks hold
+	let app: HTMLElement = parent;
+	// The DOM update, wrapped by the view transitions API when navigating
+	// (but not on the initial hydration)
+	const render = () => {
+		try {
+			if (reused) {
+				// The layout is being reused — clear the old slot content, then
+				// call the slot function directly to fill it with the new page.
+				// We must not go through `mount` here: the slot's container still
+				// holds the layout's own children (e.g. a header), which `mount`
+				// refuses to mount into. Both the clear and the fill are inside
+				// the try so that a failure doesn't leave the slot half-cleared.
+				const slotRegion = layoutStack[reusedIndex].slotRegion;
+				app = slotRegion.startNode!.parentNode as HTMLElement;
+				clearLayoutSlot(slotRegion);
+				component(app, null);
+			} else if (withHydration) {
+				hydrate(app, component, $props, slots);
+			} else {
+				// The layout chain changed (or there was no previous layout to
+				// reuse): tear down the previous UI entirely — disposing its
+				// region tree and clearing `#app` — so `mount` starts fresh.
+				// Without this, `mount` throws because `#app` still holds the
+				// previous render's children, and it would reuse a stale root
+				// region.
+				unmount(app);
+				mount(app, component, $props, slots);
+			}
+		} catch (error) {
+			// TODO: Show a proper Error component
+			app.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+			console.log(error);
 		}
-	} catch (error) {
-		// TODO: Show a proper Error component
-		parent.innerHTML = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
-		console.log(error);
+
+		if (!withHydration) {
+			// Scroll back to the top when moving to a different page; keep the
+			// scroll position for same-page navigations (query changes,
+			// re-renders after form actions)
+			const current = stripBaseFromUrl(new URL(document.location.href), getBasePath())?.pathname;
+			if (current !== path) {
+				window.scrollTo(0, 0);
+			}
+		}
+	};
+
+	if (!withHydration && typeof document.startViewTransition === "function") {
+		document.startViewTransition(render);
+	} else {
+		render();
 	}
 
 	// Reset prefetched data on each navigation

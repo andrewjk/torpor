@@ -34,7 +34,10 @@ window.addEventListener("click", async (e) => {
 		const url = new URL(href);
 
 		if (await navigate(url)) {
-			window.history.pushState(null, "", url);
+			// Save the scroll position of the outgoing page on the current
+			// history entry, so that going (or coming) back can restore it
+			window.history.replaceState({ scroll: window.scrollY }, "", document.location.href);
+			window.history.pushState({ scroll: 0 }, "", url);
 		} else {
 			window.location.href = href;
 		}
@@ -109,7 +112,16 @@ function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: MouseEvent | TouchEv
 // Listen for changes to the URL that occur when the user navigates using the
 // back or forward buttons
 window.addEventListener("popstate", async () => {
-	await navigateToLocation(document.location);
+	const navigated = await navigateToLocation(document.location);
+	if (!navigated) {
+		window.location.reload();
+		return;
+	}
+	// Restore the scroll position that was saved on the history entry
+	requestAnimationFrame(() => {
+		const state = window.history.state as { scroll?: number } | null;
+		window.scrollTo(0, state?.scroll ?? 0);
+	});
 });
 
 // Do the initial navigation and hydration

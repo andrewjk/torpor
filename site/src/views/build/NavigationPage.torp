@@ -61,5 +61,28 @@ import { $page } from "@torpor/build/state";
 			It is used by the sidebar of this very site to highlight the active link,
 			and by error pages to show the status.
 		</p>
+
+		<h2>View transitions and scrolling</h2>
+		<p>
+			Navigations use the view transitions API when the browser supports it,
+			so pages cross-fade by default, and can be animated with CSS. Scroll
+			position is reset when moving to another page, kept for same-page
+			navigations like query changes and form actions, and restored when
+			going back and forward.
+		</p>
+		<CodePreview
+			code={`
+/* in a stylesheet, to slow the page transition down */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.3s;
+}
+`}
+		/>
+		<p>
+			Pages that scroll inside their own container (like this site's sidebar
+			section) can reset that container themselves, e.g. with a
+			<code>$run</code> on <code>$page.url</code>.
+		</p>
 	}
 }
