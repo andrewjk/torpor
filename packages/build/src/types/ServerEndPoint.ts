@@ -1,4 +1,5 @@
 import type { RouteParamsOf } from "./ParseRouteParams";
+import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import type { FormDataRecord, QueryRecord } from "./ServerLoadEvent";
 import type { StandardSchemaV1 } from "./StandardSchema";
 import type ServerRequest from "./ServerRequest";
@@ -164,6 +165,13 @@ type ServerEndPoint<
 		SchemaQuery<Schemas, "head">,
 		ParamsOf<Schemas, Route>
 	>;
+	/**
+	 * Route middleware, run for this endpoint's handlers after the global
+	 * middleware (see `site.middleware`). `enter` may return a Response to
+	 * short-circuit; `exit` hooks run in reverse. Middleware see the raw
+	 * request url.
+	 */
+	middleware?: MiddlewareFunction[];
 };
 
 export default ServerEndPoint;

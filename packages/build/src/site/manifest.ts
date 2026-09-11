@@ -67,9 +67,10 @@ export default function manifest(site: Site, server = false): Plugin {
 				const hasPlugins = site.plugins.length > 0;
 				const hasOpenApi = site.pluginState.has(OPEN_API_STATE_KEY);
 				const hasEnv = !!site.env;
+				const hasMiddleware = site.middleware.length > 0;
 				const hasRuntimeSitemap = typeof site.sitemap === "object" && site.sitemap !== null;
 				const configImport =
-					hasInline || hasPlugins || hasOpenApi || hasEnv || hasRuntimeSitemap
+					hasInline || hasPlugins || hasOpenApi || hasEnv || hasRuntimeSitemap || hasMiddleware
 						? serverRequest && site.configFile
 							? `import __site from ${JSON.stringify(site.configFile)};`
 							: ""
@@ -137,6 +138,7 @@ ${openApiGlue}
 ${sitemapGlue}
 export default {
   base: ${JSON.stringify(base)},
+  ${serverRequest && hasMiddleware ? "middleware: __site.middleware ?? []," : ""}
   routes: [
     ${site.routes
 			.map((r) => {

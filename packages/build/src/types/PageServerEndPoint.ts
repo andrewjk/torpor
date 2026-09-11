@@ -1,6 +1,7 @@
 import type { RouteParamsOf } from "./ParseRouteParams";
 import type PageServerAction from "./PageServerAction";
 import type PageServerLoad from "./PageServerLoad";
+import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import type { FormDataRecord, QueryRecord } from "./ServerLoadEvent";
 import type { StandardSchemaV1 } from "./StandardSchema";
 
@@ -118,4 +119,11 @@ export default interface PageServerEndPoint<
 	 * as for a real GET.
 	 */
 	prerender?: boolean | { params: LoadParams<Schemas, Route>[] };
+	/**
+	 * Route middleware, run for this route's loads and actions after the
+	 * global middleware (see `site.middleware`) and before folder hooks.
+	 * `enter` may return a Response to short-circuit; `exit` hooks run in
+	 * reverse. Middleware see the raw request url.
+	 */
+	middleware?: MiddlewareFunction[];
 }

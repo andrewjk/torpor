@@ -33,7 +33,8 @@ export default class Server {
 		let ev = new ServerEvent(request, match?.params, url);
 
 		if (this.middleware.length) {
-			// TODO: Get middleware that applies to this route only?
+			// Route-scoped middleware is set on server endpoints (or globally on
+			// `site.middleware`); this list is the low-level, per-Server primitive
 			let entered = 0;
 			let response: Response | undefined = undefined;
 			let error: unknown = undefined;

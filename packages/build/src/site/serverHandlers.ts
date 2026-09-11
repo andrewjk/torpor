@@ -4,6 +4,7 @@ import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
 import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
+import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
 import type { HeadElement } from "../types/PageEndPoint.ts";
@@ -51,14 +52,22 @@ export type ServerLoad = (ev: ServerEvent, template?: string) => Promise<Respons
  * @param router The router, built from the site's routes
  * @param basePath The site's base path, stripped from incoming URLs before
  *   routing (see basePath.ts)
+ * @param middleware Global middleware (from `site.middleware`), run for
+ *   every request before routing -- including requests that won't match a
+ *   route
  * @returns The request handler, which takes the site template
  */
-export function createServerLoad(router: Router, basePath = ""): ServerLoad {
+export function createServerLoad(
+	router: Router,
+	basePath = "",
+	middleware: MiddlewareFunction[] = [],
+): ServerLoad {
 	// The base path is shared through module state, so that everything that
 	// generates URLs (HTML attributes, redirect locations) sees the same
 	// value the router strips
 	setBasePath(basePath);
-	return async function load(ev, template) {
+
+	const handle = async (ev: ServerEvent, template?: string): Promise<Response> => {
 		// The base is stripped before routing, so that everything below (route
 		// matching, params, user code reading `event.url`) is base-free.
 		// Requests that don't carry the base aren't ours
@@ -88,6 +97,19 @@ export function createServerLoad(router: Router, basePath = ""): ServerLoad {
 		const handler = route.handler;
 		const params = route.params || {};
 
+		// Route middleware, declared on the route's server endpoint
+		// (+page.server.ts / +server.ts). Runs after the global middleware and
+		// before folder hooks, so a guard can skip data loading entirely
+		const routeMiddleware: MiddlewareFunction[] = [];
+		const endPointModule = handler.serverEndPoint
+			? (await handler.serverEndPoint())?.default
+			: handler.type === PAGE_SERVER_ROUTE || handler.type === SERVER_ROUTE
+				? (await resolveModule(handler))?.default
+				: undefined;
+		if (Array.isArray(endPointModule?.middleware)) {
+			routeMiddleware.push(...endPointModule.middleware);
+		}
+
 		// Update $page before building the components
 		$page.url = url;
 		if (path.endsWith("/_error")) {
@@ -100,53 +122,104 @@ export function createServerLoad(router: Router, basePath = ""): ServerLoad {
 		// TODO: Hit the server hook out here
 		// We could maybe set up data loading as middleware on a route??????
 
-		switch (handler.type) {
-			case PAGE_ROUTE:
-			case LAYOUT_ROUTE: {
-				// It's a /+page.ts or /_layout.ts endpoint
-				if (ev.request.method === "GET") {
-					return handleResponse(await loadView(ev, url, handler, params, template));
-				} else if (ev.request.method === "POST") {
-					// The server end point comes from the sibling /+page.server.ts, if applicable
-					const serverEndPoint: PageServerEndPoint | undefined =
-						handler.serverEndPoint && (await handler.serverEndPoint()).default;
-					return handleResponse(
-						await runAction(ev, url, handler, serverEndPoint, params, query, template),
-						true,
-					);
+		// Run the route's middleware around the handler: enter hooks in order
+		// (a Response short-circuits the request), exit hooks in reverse
+		let enteredRoute = 0;
+		let routeResponse: Response | undefined = undefined;
+		try {
+			for (; enteredRoute < routeMiddleware.length && !routeResponse; enteredRoute++) {
+				const result = await routeMiddleware[enteredRoute].enter?.(ev);
+				if (result) {
+					routeResponse = result;
 				}
-				break;
 			}
-			case PAGE_SERVER_ROUTE:
-			case LAYOUT_SERVER_ROUTE: {
-				// It's a /+page.server.ts or /_layout.server.ts endpoint
-				if (ev.request.method === "GET") {
-					return await loadData(ev, url, handler, "load", params);
-				} else if (ev.request.method === "POST") {
-					const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
-						.default;
-					return handleResponse(
-						await runAction(ev, url, handler, serverEndPoint, params, query, template),
-						true,
-					);
+			if (routeResponse) {
+				return routeResponse;
+			}
+
+			switch (handler.type) {
+				case PAGE_ROUTE:
+				case LAYOUT_ROUTE: {
+					// It's a /+page.ts or /_layout.ts endpoint
+					if (ev.request.method === "GET") {
+						return handleResponse(await loadView(ev, url, handler, params, template));
+					} else if (ev.request.method === "POST") {
+						// The server end point comes from the sibling /+page.server.ts, if applicable
+						const serverEndPoint: PageServerEndPoint | undefined =
+							handler.serverEndPoint && (await handler.serverEndPoint()).default;
+						return handleResponse(
+							await runAction(ev, url, handler, serverEndPoint, params, query, template),
+							true,
+						);
+					}
+					break;
 				}
-				break;
+				case PAGE_SERVER_ROUTE:
+				case LAYOUT_SERVER_ROUTE: {
+					// It's a /+page.server.ts or /_layout.server.ts endpoint
+					if (ev.request.method === "GET") {
+						return await loadData(ev, url, handler, "load", params);
+					} else if (ev.request.method === "POST") {
+						const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
+							.default;
+						return handleResponse(
+							await runAction(ev, url, handler, serverEndPoint, params, query, template),
+							true,
+						);
+					}
+					break;
+				}
+				case SERVER_ROUTE: {
+					// It's a /+server.ts endpoint
+					const functionName = ev.request.method.toLowerCase().replace("delete", "del");
+					return await loadData(ev, url, handler, functionName, params);
+				}
+				case HOOK_ROUTE:
+				case HOOK_SERVER_ROUTE: {
+					break;
+				}
+				case ERROR_ROUTE: {
+					return await loadView(ev, url, handler, params, template);
+				}
 			}
-			case SERVER_ROUTE: {
-				// It's a /+server.ts endpoint
-				const functionName = ev.request.method.toLowerCase().replace("delete", "del");
-				return await loadData(ev, url, handler, functionName, params);
-			}
-			case HOOK_ROUTE:
-			case HOOK_SERVER_ROUTE: {
-				break;
-			}
-			case ERROR_ROUTE: {
-				return await loadView(ev, url, handler, params, template);
+		} finally {
+			while (enteredRoute > 0) {
+				enteredRoute--;
+				await routeMiddleware[enteredRoute].exit?.(ev);
 			}
 		}
 
 		return notFound();
+	};
+
+	return async function load(ev: ServerEvent, template?: string): Promise<Response> {
+		// Global middleware, from `site.middleware`: runs for every request
+		// before routing, including ones that won't match a route
+		// (maintenance mode, legacy url redirects, etc)
+		let entered = 0;
+		try {
+			let response: Response | undefined = undefined;
+			for (; entered < middleware.length && !response; entered++) {
+				const result = await middleware[entered].enter?.(ev);
+				if (result) {
+					response = result;
+				}
+			}
+			if (response) {
+				return response;
+			}
+			return await handle(ev, template);
+		} catch (error) {
+			// Middleware exits can inspect (and replace, in Server.fetch) the
+			// error via `ev.error`
+			ev.error = error;
+			throw error;
+		} finally {
+			while (entered > 0) {
+				entered--;
+				await middleware[entered].exit?.(ev);
+			}
+		}
 	};
 }
 

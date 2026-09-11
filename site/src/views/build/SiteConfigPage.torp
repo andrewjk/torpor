@@ -82,6 +82,11 @@ site.addRoute("/api/time", {
 				from <code>site.sitemap</code>. See <a href="/build/discovery">Discovery</a>
 			</li>
 			<li>
+				<code>site.middleware</code> &mdash; global middleware, run for every
+				request before routing. Server endpoints also take
+				<code>middleware</code> arrays for route-scoped guards
+			</li>
+			<li>
 				<code>site.plugins</code> &mdash; site plugins, which can add routes
 				and framework-level functionality when the site config is loaded or
 				the server starts up, e.g. <code>openApi()</code>

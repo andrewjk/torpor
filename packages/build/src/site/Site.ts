@@ -3,6 +3,7 @@ import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
 import type { SitemapOptions } from "../discovery/sitemap";
+import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import type { StandardSchemaV1 } from "../types/StandardSchema";
 import type SitePlugin from "../types/SitePlugin";
 import type { InlineEndPoint } from "../types/Route";
@@ -111,6 +112,18 @@ export default class Site {
 	 * take the host from.
 	 */
 	origin?: string;
+	/**
+	 * Global middleware, run for every request before routing -- including
+	 * requests that won't match a route (maintenance mode, legacy url
+	 * redirects, etc). Each middleware's `enter` runs in order and may
+	 * return a Response to short-circuit the request; `exit` hooks run in
+	 * reverse after the handler. Middleware see the raw request url.
+	 *
+	 * Route middleware (scoped to a single route) is set on the route's
+	 * server endpoint instead, e.g. `middleware: [...]` in
+	 * `+page.server.ts` or `+server.ts`.
+	 */
+	middleware: MiddlewareFunction[] = [];
 	/**
 	 * Writes a sitemap.xml listing the prerendered pages at build time
 	 * (see `prerender`). Pass a custom path (e.g. "/blog/sitemap.xml") or
