@@ -73,6 +73,7 @@ export const UI_LINKS: ReadonlyArray<SidebarLink> = [
 
 export const BUILD_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Overview", href: "/build" },
+	{ label: "Site Config", href: "/build/site-config" },
 	{ label: "Routing", href: "/build/routing" },
 	{ label: "Loading Data", href: "/build/loading-data" },
 	{ label: "Actions", href: "/build/actions" },
@@ -82,7 +83,6 @@ export const BUILD_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Sessions", href: "/build/sessions" },
 	{ label: "Navigation", href: "/build/navigation" },
 	{ label: "Prerendering", href: "/build/prerendering" },
-	{ label: "Base Path", href: "/build/base-path" },
 ];
 
 /** The site sections that have their own pages and sidebars */

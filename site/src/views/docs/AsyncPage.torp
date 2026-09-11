@@ -117,7 +117,7 @@ export default function Component() {
 		</p>
 		<p>
 			When an async value throws, the error can be caught with a
-			<code>&commat;try</code> statement — see <a href="/docs/errors">Errors</a>.
+			<code>&commat;try</code> statement. See <a href="/docs/errors">Errors</a>.
 		</p>
 
 		<h2>Server rendering</h2>

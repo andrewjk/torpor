@@ -46,7 +46,7 @@ export default function RoutingPage() {
 			</li>
 			<li>
 				<code>_hook.server.ts</code> &mdash; runs before and after every request
-				below it &mdash; see <a href="/build/hooks">Hooks</a>
+				below it. See <a href="/build/hooks">Hooks</a>
 			</li>
 		</ul>
 

@@ -1,0 +1,96 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function SiteConfigPage() {
+	@head {
+		<title>Site Config | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Site config</h1>
+		<p>
+			A site is configured in <code>site.config.ts</code> at the project root.
+			It creates a <code>Site</code> and exports it as the default:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+import { Site } from "@torpor/build";
+
+const site = new Site();
+
+await site.addRouteFolder("./src/routes");
+
+export default site;
+`}
+		/>
+
+		<h2>Routes</h2>
+		<p>
+			<code>addRouteFolder</code> adds every route file in a folder (see
+			<a href="/build/routing">Routing</a>). For small sites, routes can also
+			be added in code with <code>addRoute</code>, which takes a path and any
+			combination of <code>page</code>, <code>pageServer</code>,
+			<code>server</code>, <code>layout</code>, <code>hookServer</code> and
+			<code>error</code> options:
+		</p>
+		<CodePreview
+			code={`
+site.addRoute("/", {
+	page: "./src/views/Home.torp",
+	pageServer: { actions: { set: async ({ request }) => ok() } },
+});
+
+site.addRoute("/api/time", {
+	server: { get: async () => ok({ time: Date.now() }) },
+});
+`}
+		/>
+		<p>
+			<code>addRouteFile</code> adds a single file route, and routes can be
+			grouped with their own hooks by passing a <code>subFolder</code>.
+		</p>
+
+		<h2>Options</h2>
+		<ul>
+			<li>
+				<code>site.adapter</code> &mdash; the deployment adapter, e.g.
+				<code>&commat;torpor/adapter-node</code> or
+				<code>&commat;torpor/adapter-cloudflare</code>. When not set, one is
+				resolved from the environment or installed packages
+			</li>
+			<li>
+				<code>site.basePath</code> &mdash; the path the site is mounted
+				under, e.g. <code>"/app"</code>. Incoming requests without it aren't
+				served, and everything the framework generates (links, form actions,
+				redirects) gets it added automatically
+			</li>
+			<li>
+				<code>site.env</code> &mdash; a Standard Schema (zod, valibot,
+				arktype, etc) that validates the server environment, throwing with
+				the schema's issues when <code>env()</code> reads a missing or invalid
+				key. See <a href="/build/env">Environment</a>
+			</li>
+			<li>
+				<code>site.prerender</code> &mdash; a default for rendering routes to
+				static HTML at build time: a boolean, or a map of paths to flags for
+				large chunks of the site (e.g. <code>&#123; "/blog/**": true &#125;</code>).
+				See <a href="/build/prerendering">Prerendering</a>
+			</li>
+			<li>
+				<code>site.plugins</code> &mdash; site plugins, which can add routes
+				and framework-level functionality when the site config is loaded or
+				the server starts up, e.g. <code>openApi()</code>
+			</li>
+			<li>
+				<code>site.inputs</code> &mdash; extra file paths to include in the
+				compiled build output; files ending with <code>server.ts</code> only
+				end up in the server build
+			</li>
+			<li>
+				<code>site.vitePlugins</code> and <code>site.viteConfig</code> &mdash;
+				extra Vite plugins, and Vite config options to merge into the client
+				and server builds
+			</li>
+		</ul>
+	}
+}
