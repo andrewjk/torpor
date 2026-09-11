@@ -1,7 +1,7 @@
 import estorpor from "@torpor/unplugin/esbuild";
 import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import {
 	type AliasOptions,
@@ -38,6 +38,12 @@ export default async function runDev(site: Site): Promise<void> {
 	config.server ??= {};
 	config.server.host ??= "localhost";
 	config.server.port ??= 7059;
+	// Root-level host files (robots.txt, favicon.ico, etc) in src/public are
+	// served by Vite's middleware in dev and copied into the build output
+	const publicDir = path.resolve(site.root, "src/public");
+	if (existsSync(publicDir)) {
+		config.publicDir = publicDir;
+	}
 	// Resolve tsconfig path aliases (e.g. `@/*`). Previously provided by the
 	// default `vite-tsconfig-paths` plugin on Site; vite-plus handles it inline
 	config.resolve ??= {};

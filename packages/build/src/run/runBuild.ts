@@ -70,6 +70,13 @@ export default async function runBuild(site: Site): Promise<void> {
 	clientConfig.plugins = [manifest(site), torpor(), ...site.vitePlugins];
 	clientConfig.build ??= {};
 	clientConfig.build.outDir = clientFolder;
+	// Root-level host files (robots.txt, favicon.ico, .well-known/*, etc) in
+	// src/public are copied verbatim into the client output root, and served
+	// from the same folder by the dev server
+	const publicDir = path.resolve(site.root, "src/public");
+	if (existsSync(publicDir)) {
+		clientConfig.publicDir = publicDir;
+	}
 	clientConfig.build.rollupOptions ??= {};
 	clientConfig.build.rollupOptions.input = [
 		...(hasSiteHtml ? [siteHtml] : []),

@@ -75,8 +75,8 @@ site.sitemap = true; // or e.g. "/blog/sitemap.xml"
 
 		<h2>robots.txt</h2>
 		<p>
-			A plain static <code>robots.txt</code> on the host does the job &mdash;
-			add a <code>Sitemap:</code> line pointing at the sitemap:
+			Add a <code>robots.txt</code> file to <code>src/public</code>, where a
+			<code>Sitemap:</code> line can point at the sitemap:
 		</p>
 		<CodePreview
 			code={`
