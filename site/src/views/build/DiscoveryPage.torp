@@ -1,19 +1,20 @@
 import CodePreview from "../CodePreview.torp";
 
-export default function SeoPage() {
+export default function DiscoveryPage() {
 	@head {
-		<title>SEO | Build | Torpor</title>
+		<title>Discovery | Build | Torpor</title>
 	}
 
 	@render {
-		<h1>SEO</h1>
+		<h1>Discovery</h1>
 		<p>
-			Use the <code>seo()</code> helper to build the head for a page from its
+			Use the <code>seo()</code> helper from <code>&commat;torpor/build/discovery</code> to build the
+			head for a page from its
 			zones: a title, a description and a link to the page:
 		</p>
 		<CodePreview
 			code={`
-import { seo } from "@torpor/build/seo";
+import { seo } from "@torpor/build/discovery";
 
 export default {
 	component,

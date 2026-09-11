@@ -2,7 +2,7 @@ import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
-import type { SitemapOptions } from "../seo/sitemap";
+import type { SitemapOptions } from "../discovery/sitemap";
 import type { StandardSchemaV1 } from "../types/StandardSchema";
 import type SitePlugin from "../types/SitePlugin";
 import type { InlineEndPoint } from "../types/Route";

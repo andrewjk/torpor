@@ -79,7 +79,7 @@ site.addRoute("/api/time", {
 			<li>
 				<code>site.origin</code> &mdash; the site's absolute origin (e.g.
 				<code>"https://example.com"</code>), used by the build-time sitemap
-				from <code>site.sitemap</code>. See <a href="/build/seo">SEO</a>
+				from <code>site.sitemap</code>. See <a href="/build/discovery">Discovery</a>
 			</li>
 			<li>
 				<code>site.plugins</code> &mdash; site plugins, which can add routes

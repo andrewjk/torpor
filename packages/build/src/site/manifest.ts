@@ -117,7 +117,7 @@ setEnvSchema(__site.env);`
 				const sitemapGlue =
 					serverRequest && sitemapOptions && site.configFile
 						? `
-import { sitemapResponse } from "@torpor/build/seo";
+import { sitemapResponse } from "@torpor/build/discovery";
 async function __sitemapGet(event) {
 	return await sitemapResponse(__site.sitemap, ${JSON.stringify(base)}, event);
 }

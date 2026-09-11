@@ -16,7 +16,7 @@ export type SeoOptions = {
  * Graph / Twitter (property metas) when an image or url is included, e.g.
  *
  * ```ts
- * import { seo } from "@torpor/build/seo";
+ * import { seo } from "@torpor/build/discovery";
  *
  * export default {
  * 	component,

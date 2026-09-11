@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
-import { seo } from "../src/seo";
-import { sitemapResponse, sitemapXml, type SitemapOptions } from "../src/seo/sitemap";
+import { seo } from "../src/discovery";
+import { sitemapResponse, sitemapXml, type SitemapOptions } from "../src/discovery/sitemap";
 import { normalizeBasePath, normalizeOrigin } from "../src/site/basePath";
 import type { HeadElement } from "../src/types/PageEndPoint";
 

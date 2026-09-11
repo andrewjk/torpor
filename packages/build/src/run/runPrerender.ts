@@ -2,7 +2,7 @@ import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import ServerEvent from "../server/ServerEvent";
-import { sitemapXml } from "../seo/sitemap";
+import { sitemapXml } from "../discovery/sitemap";
 import prepareTemplate from "./prepareTemplate";
 import type Site from "../site/Site";
 import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, LAYOUT_ROUTE } from "../types/RouteType";

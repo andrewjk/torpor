@@ -23,13 +23,14 @@ view transitions with scroll restoration (navigations run inside
 same-page navigations, and restored from history state on back/forward),
 flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
 into `$page.flash` by the render pipeline), and ETag/Cache-Control support
-via `notModified`. SEO helpers exist too: `seo()` builds page head data
-(title, description, Open Graph/Twitter metas via a `{ property, content }`
-head variant), endpoint `head` data is now rendered at render time, and
-`site.sitemap` writes a build-time sitemap of the prerendered pages or
-serves one at runtime from a `{ get }` config (needing `site.origin`); and
-robots.txt stays a plain host file (with `src/public` files served in dev
-and copied into the build output).
+via `notModified`. Discovery helpers exist too: `seo()` (in
+`@torpor/build/discovery`) builds page head data (title, description,
+Open Graph/Twitter metas via a `{ property, content }` head variant),
+endpoint `head` data is now rendered at render time, and `site.sitemap`
+writes a build-time sitemap of the prerendered pages or serves one at
+runtime from a `{ get }` config (needing `site.origin`); and robots.txt
+stays a plain host file (with `src/public` files served in dev and copied
+into the build output).
 
 ### High impact (table stakes in peers)
 
