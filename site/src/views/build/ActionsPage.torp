@@ -123,5 +123,45 @@ export default function NewPost($props: { form?: { saved?: boolean } }) {
 			field types, and <code>seeOther</code> to redirect after a successful
 			submission.
 		</p>
+
+		<h2>Flash messages</h2>
+		<p>
+			An action can set a one-time message, typically before a
+			redirect, which the new page shows. It rides in a cookie
+			that is deleted when read, so it shows exactly once:
+		</p>
+		<CodePreview
+			code={`
+import { ok, seeOther } from "@torpor/build";
+
+actions: {
+	default: async (event) => {
+		await createPost(await event.form());
+		event.flash.set("Post created"); // { message: "Post created" }
+		return seeOther("/posts");
+	},
+},
+`}
+		/>
+		<p>
+			Since redirects only ask the browser for the next page, the values are
+			read by the framework into <code>$page.flash</code>, an object which
+			stays current until the next page load (see
+			<a href="/build/navigation">$page</a>). Custom values are allowed too,
+			for example &#123; error: "Import failed", retryable: true &#125; &mdash;
+			they must be JSON-safe and small enough to fit in the cookie:
+		</p>
+		<CodePreview
+			code={`
+// Anywhere on the redirected page
+@if ($page.flash?.message) {
+	<p class="message">{$page.flash.message}</p>
+}
+`}
+		/>
+		<p>
+			Flash messages require cookies. Without them (private browsing, blocked
+			cookies), the action still completes &mdash; only the message is skipped.
+		</p>
 	}
 }

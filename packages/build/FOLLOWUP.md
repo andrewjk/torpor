@@ -21,7 +21,9 @@ HTML attributes and redirect locations, and mirrors on the client router),
 view transitions with scroll restoration (navigations run inside
 `document.startViewTransition`; scroll is reset across pages, kept for
 same-page navigations, and restored from history state on back/forward),
-and ETag/Cache-Control support via `notModified`.
+flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
+into `$page.flash` by the render pipeline), and ETag/Cache-Control support
+via `notModified`.
 
 ### High impact (table stakes in peers)
 
@@ -42,16 +44,14 @@ and ETag/Cache-Control support via `notModified`.
 5. **SEO helpers** — no sitemap.xml / robots.txt generation, no meta/canonical
    conveniences beyond `@head` merging.
 6. **i18n / locale routing** — nothing.
-7. **Flash messages** — DIY via cookies today; a small helper after
-   redirects would round out the actions story.
 
 ### Lower / nice-to-have
 
-8. Image optimization / asset pipeline beyond Vite defaults
-9. Pagination helpers
-10. Rate-limiting primitives (fits naturally as a middleware/plugin)
-11. Cron / queues / background jobs (adapter-dependent)
-12. Dev toolbar / route inspector
+7. Image optimization / asset pipeline beyond Vite defaults
+8. Pagination helpers
+9. Rate-limiting primitives (fits naturally as a middleware/plugin)
+10. Cron / queues / background jobs (adapter-dependent)
+11. Dev toolbar / route inspector
 
 Top two if forced to choose: **caching and streaming SSR** — they come up in
 virtually every real project.

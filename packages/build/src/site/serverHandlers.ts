@@ -297,6 +297,12 @@ async function loadView(
 		return notFound();
 	}
 
+	// Consume the flash message when a page is rendered (but not for API
+	// requests), so that the following page -- and only that page -- can show
+	// it. For a form action that re-renders instead of redirecting, the
+	// message is set and read within this request
+	$page.flash = ev.flash.get();
+
 	// The template comes from site.html, which endpoints-only sites don't have
 	if (!template) {
 		throw new Error(
@@ -703,6 +709,7 @@ function buildServerParams(
 		cookies: ev.cookies,
 		headers: ev.headers,
 		session: ev.session,
+		flash: ev.flash,
 		adapter: ev.adapter,
 	};
 }

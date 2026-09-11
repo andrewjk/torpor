@@ -1,4 +1,5 @@
 import CookieHelper from "../server/CookieHelper";
+import FlashHelper from "../server/FlashHelper";
 import HeaderHelper from "../server/HeaderHelper";
 import SessionHelper from "../server/SessionHelper";
 import type { RouteParamsOf } from "./ParseRouteParams";
@@ -77,6 +78,11 @@ export default interface ServerLoadEvent<
 	 * [Sessions](/build/sessions).
 	 */
 	session: SessionHelper;
+	/**
+	 * A helper for setting one-time flash messages, shown on the next page
+	 * render as `$page.flash = { type, message }`.
+	 */
+	flash: FlashHelper;
 	/**
 	 * A helper for getting and setting headers.
 	 */

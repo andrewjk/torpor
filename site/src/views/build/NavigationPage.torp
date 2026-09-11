@@ -55,6 +55,11 @@ import { $page } from "@torpor/build/state";
 			<li><code>$page.url</code> &mdash; the current URL</li>
 			<li><code>$page.status</code> &mdash; the response status code</li>
 			<li><code>$page.form</code> &mdash; the result of the last form action</li>
+			<li>
+				<code>$page.flash</code> &mdash; one-item values set by the last
+				action, e.g. <code>&#123; message: "Post created" &#125;</code>.
+				See <a href="/build/actions">Actions</a>
+			</li>
 			<li><code>$page.error?.message</code> &mdash; the current error, if any</li>
 		</ul>
 		<p>

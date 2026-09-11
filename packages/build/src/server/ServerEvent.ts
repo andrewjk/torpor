@@ -1,5 +1,6 @@
 import { addBaseToPath, getBasePath } from "../site/basePath";
 import CookieHelper from "./CookieHelper";
+import FlashHelper from "./FlashHelper";
 import HeaderHelper from "./HeaderHelper";
 import SessionHelper from "./SessionHelper";
 
@@ -20,6 +21,7 @@ export default class ServerEvent {
 	cookies: CookieHelper;
 	headers: HeaderHelper;
 	session: SessionHelper;
+	flash: FlashHelper;
 
 	// Parsed once per request; Server.fetch passes the URL it already needed
 	// for matching so it isn't parsed twice
@@ -37,6 +39,7 @@ export default class ServerEvent {
 		this.cookies = new CookieHelper(request);
 		this.headers = new HeaderHelper(request);
 		this.session = new SessionHelper(this.cookies);
+		this.flash = new FlashHelper(this.cookies);
 
 		// Adapters may have added the `adapter` property to globalThis
 		// @ts-ignore

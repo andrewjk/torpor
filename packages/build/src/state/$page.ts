@@ -13,6 +13,7 @@ const $page: PageState =
 				status: 404,
 				url: new URL("http://localhost"),
 				form: undefined,
+				flash: undefined,
 				error: {
 					message: "",
 				},
