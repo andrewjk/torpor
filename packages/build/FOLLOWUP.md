@@ -26,8 +26,10 @@ into `$page.flash` by the render pipeline), and ETag/Cache-Control support
 via `notModified`. SEO helpers exist too: `seo()` builds page head data
 (title, description, Open Graph/Twitter metas via a `{ property, content }`
 head variant), endpoint `head` data is now rendered at render time, and
-`site.sitemap` writes a build-time sitemap of the prerendered pages
-(needing `site.origin`); robots.txt stays a plain host file.
+`site.sitemap` writes a build-time sitemap of the prerendered pages or
+serves one at runtime from a `{ get }` config (needing `site.origin`); and
+robots.txt stays a plain host file (with `src/public` files served in dev
+and copied into the build output).
 
 ### High impact (table stakes in peers)
 
@@ -74,11 +76,5 @@ virtually every real project.
 - **Concurrent prerendering** — render pages in a worker pool; today it is
   sequential, which keeps the module-global `$page` state safe but is slow
   for large sites.
-- **Dynamic sitemap endpoints** — a `sitemap.ts`-style runtime endpoint that
-  reads the database and generates the XML live, so sitemaps can keep up
-  with content that isn't prerendered (e.g. blog posts under `[slug]` on
-  this very site). A `@torpor/build/seo` based plugin that reads a user
-  function (`site.sitemap = { get: async () => urls }` shape?) and registers
-  the route like `openApi()` does.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.

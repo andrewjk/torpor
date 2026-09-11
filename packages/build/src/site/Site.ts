@@ -2,6 +2,7 @@ import { promises as fs } from "node:fs";
 import fpath from "node:path";
 import { type Plugin, type UserConfig } from "vite";
 import type Adapter from "../types/Adapter";
+import type { SitemapOptions } from "../seo/sitemap";
 import type { StandardSchemaV1 } from "../types/StandardSchema";
 import type SitePlugin from "../types/SitePlugin";
 import type { InlineEndPoint } from "../types/Route";
@@ -114,8 +115,13 @@ export default class Site {
 	 * Writes a sitemap.xml listing the prerendered pages at build time
 	 * (see `prerender`). Pass a custom path (e.g. "/blog/sitemap.xml") or
 	 * `true` for "/sitemap.xml"; requires `origin` to be set.
+	 *
+	 * For a runtime sitemap -- one that reads the database and keeps up with
+	 * content that isn't prerendered -- pass a config instead, e.g.
+	 * `sitemap = { get: async () => ["/posts/a", "/posts/b"] }`, which serves
+	 * the XML live at that path (customizable with `path`).
 	 */
-	sitemap?: boolean | string;
+	sitemap?: SitemapOptions | boolean | string;
 	/**
 	 * A Standard Schema (zod, valibot, arktype, etc) used to validate (and
 	 * parse) the server environment. When set, `env()` from

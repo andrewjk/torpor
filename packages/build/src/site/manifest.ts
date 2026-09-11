@@ -46,7 +46,13 @@ export default function manifest(site: Site, server = false): Plugin {
 				if (site.origin) {
 					normalizeOrigin(site.origin);
 				}
-				if (typeof site.sitemap === "string" && !site.sitemap.startsWith("/")) {
+				if (typeof site.sitemap === "object" && site.sitemap !== null) {
+					if (site.sitemap.path !== undefined && !site.sitemap.path.startsWith("/")) {
+						throw new Error(
+							`The sitemap path must be an absolute path (e.g. "/sitemap.xml"), got "${site.sitemap.path}"`,
+						);
+					}
+				} else if (typeof site.sitemap === "string" && !site.sitemap.startsWith("/")) {
 					throw new Error(
 						`The sitemap path must be an absolute path (e.g. "/sitemap.xml"), got "${site.sitemap}"`,
 					);
@@ -61,8 +67,9 @@ export default function manifest(site: Site, server = false): Plugin {
 				const hasPlugins = site.plugins.length > 0;
 				const hasOpenApi = site.pluginState.has(OPEN_API_STATE_KEY);
 				const hasEnv = !!site.env;
+				const hasRuntimeSitemap = typeof site.sitemap === "object" && site.sitemap !== null;
 				const configImport =
-					hasInline || hasPlugins || hasOpenApi || hasEnv
+					hasInline || hasPlugins || hasOpenApi || hasEnv || hasRuntimeSitemap
 						? serverRequest && site.configFile
 							? `import __site from ${JSON.stringify(site.configFile)};`
 							: ""
@@ -103,12 +110,31 @@ setEnvSchema(__site.env);`
 						? `{ path: ${JSON.stringify(openApiOptions.path)}, type: ${SERVER_ROUTE}, endPoint: () => Promise.resolve({ default: { get: __openApiGet } }), subFolder: undefined },`
 						: "";
 
+				// A runtime sitemap, when `site.sitemap` is a `{ get }` config:
+				// a server endpoint that reads urls and serves the XML
+				const sitemapOptions =
+					typeof site.sitemap === "object" && site.sitemap !== null ? site.sitemap : undefined;
+				const sitemapGlue =
+					serverRequest && sitemapOptions && site.configFile
+						? `
+import { sitemapResponse } from "@torpor/build/seo";
+async function __sitemapGet(event) {
+	return await sitemapResponse(__site.sitemap, ${JSON.stringify(base)}, event);
+}
+`
+						: "";
+				const sitemapRoute =
+					serverRequest && sitemapOptions
+						? `{ path: ${JSON.stringify(sitemapOptions.path ?? "/sitemap.xml")}, type: ${SERVER_ROUTE}, endPoint: () => Promise.resolve({ default: { get: __sitemapGet } }), subFolder: undefined },`
+						: "";
+
 				return `
 ${!serverRequest ? "const load = { default: { load: true } };" : ""}
 ${configImport}
 ${envGlue}
 ${pluginLoop}
 ${openApiGlue}
+${sitemapGlue}
 export default {
   base: ${JSON.stringify(base)},
   routes: [
@@ -152,6 +178,7 @@ export default {
 			})
 			.join("\n    ")}
     ${openApiRoute}
+    ${sitemapRoute}
   ],
 };
 `;

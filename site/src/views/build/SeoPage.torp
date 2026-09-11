@@ -68,9 +68,30 @@ site.sitemap = true; // or e.g. "/blog/sitemap.xml"
 			The pages listed are exactly the prerendered ones (the set that
 			serves statically) so a dynamic route (e.g. blog posts under
 			<code>[slug]</code>) needs params entries (see
-			<a href="/build/prerendering">Prerendering</a>) to be included. For
-			sites where the sitemap must keep up with the database, generate it at
-			runtime instead. See the follow-up notes.
+			<a href="/build/prerendering">Prerendering</a>) to be included.
+		</p>
+
+		<h2>A runtime sitemap</h2>
+		<p>
+			When the sitemap must keep up with the database &mdash; for content
+			that isn't prerendered (e.g. blog posts under <code>[slug]</code>) &mdash;
+			pass a config instead, and the xml generates live on each request:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+site.sitemap = {
+	get: async () => {
+		const posts = await db.posts.list();
+		return posts.map((p) => \`/posts/\${p.slug}\`);
+	},
+};
+`}
+		/>
+		<p>
+			The urls returned are base-free paths (like prerender params) with the
+			site origin added. Use <code>path</code> to serve it from somewhere
+			other than <code>/sitemap.xml</code>.
 		</p>
 
 		<h2>robots.txt</h2>

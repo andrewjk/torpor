@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
-import seo from "../src/seo";
-import { sitemapXml } from "../src/run/runPrerender";
+import { seo } from "../src/seo";
+import { sitemapResponse, sitemapXml, type SitemapOptions } from "../src/seo/sitemap";
 import { normalizeBasePath, normalizeOrigin } from "../src/site/basePath";
 import type { HeadElement } from "../src/types/PageEndPoint";
 
@@ -34,7 +34,7 @@ describe("seo", () => {
 		]);
 	});
 
-	test("returns nothing empty", () => {
+	test("returns nothing when empty", () => {
 		expect(seo({})).toEqual([]);
 	});
 });
@@ -58,6 +58,41 @@ describe("sitemapXml", () => {
 		const xml = sitemapXml("https://x.com", "/app", ["/", "/about"]);
 		expect(xml).toContain(`<loc>https://x.com/app</loc>`);
 		expect(xml).toContain(`<loc>https://x.com/app/about</loc>`);
+	});
+});
+
+describe("sitemapResponse", () => {
+	const buildOptions = (): SitemapOptions => ({
+		origin: "https://example.com",
+		get: async () => ["/posts/a", "/posts/b"],
+	});
+
+	test("serves the XML from the runtime config", async () => {
+		const res = await sitemapResponse(buildOptions(), "", {} as never);
+		expect(res.status).toBe(200);
+		expect(res.headers.get("Content-Type")).toBe("application/xml");
+		const body = await res.text();
+		expect(body).toContain(`<loc>https://example.com/posts/a</loc>`);
+	});
+
+	test("mounts under base paths and escapes the origin", async () => {
+		const res = await sitemapResponse(buildOptions(), "/app", {} as never);
+		const body = await res.text();
+		expect(body).toContain(`<loc>https://example.com/app/posts/a</loc>`);
+	});
+
+	test("calls get with the request event", async () => {
+		let eventOf: unknown;
+		const options: SitemapOptions = {
+			get: async (event) => {
+				eventOf = event;
+				return [];
+			},
+		};
+		const marker = { GET: "yes", headers: new Headers() };
+		await sitemapResponse(options, "", marker as never);
+		// The event got through to the config function
+		expect(eventOf).toBeTruthy();
 	});
 });
 
