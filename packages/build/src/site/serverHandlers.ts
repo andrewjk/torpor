@@ -6,6 +6,8 @@ import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import $page from "../state/$serverPage.ts";
 import type PageEndPoint from "../types/PageEndPoint.ts";
+import type { HeadElement } from "../types/PageEndPoint.ts";
+import type PageLoadEvent from "../types/PageLoadEvent.ts";
 import type PageServerEndPoint from "../types/PageServerEndPoint.ts";
 import type RouteHandler from "../types/RouteHandler.ts";
 import type ServerRequest from "../types/ServerRequest.ts";
@@ -463,6 +465,24 @@ async function loadView(
 		try {
 			let { body, head } = await component($props, undefined, slots);
 
+			// Render the page's (and its layouts') head element data, if the
+			// endpoint declared any. Layouts lose to the page (the nearest
+			// endpoint wins, as with @head content), and everything loses to
+			// the first title in the compiled head -- which mergeHead keeps
+			let headData = "";
+			const event = { url, params, data } as PageLoadEvent;
+			const layoutEndPoints = await Promise.all(
+				(handler.layouts ?? []).map(async (layout) => await layout.endPoint()),
+			);
+			const headPoints = [clientEndPoint, ...layoutEndPoints].reverse();
+			for (const endPoint of headPoints) {
+				const headElements =
+					typeof endPoint.head === "function" ? await endPoint.head(event) : endPoint.head;
+				if (headElements) {
+					headData += headElements.map((element: HeadElement) => markupOf(element)).join("");
+				}
+			}
+
 			// Put the form info in a hidden input so that it can be accessed on the client
 			if (form) {
 				body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
@@ -470,7 +490,7 @@ async function loadView(
 
 			styles += head;
 			html = rewriteBaseInHtml(
-				mergeHead(template, styles).replace("%COMPONENT_BODY%", body),
+				mergeHead(template, styles + headData).replace("%COMPONENT_BODY%", body),
 				getBasePath(),
 			);
 		} catch (error) {
@@ -712,4 +732,26 @@ function buildServerParams(
 		flash: ev.flash,
 		adapter: ev.adapter,
 	};
+}
+
+/**
+ * Renders a head element as markup. Attribute values are escaped, since
+ * they can come from user data (e.g. a post title passed to `seo()`).
+ */
+function markupOf(element: HeadElement): string {
+	if ("title" in element) {
+		return `<title>${escapeHtml(element.title)}</title>`;
+	}
+	if ("name" in element) {
+		return `<meta name="${escapeHtml(element.name)}" content="${escapeHtml(element.content)}" />`;
+	}
+	return `<meta property="${escapeHtml(element.property)}" content="${escapeHtml(element.content)}" />`;
+}
+
+function escapeHtml(value: string): string {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;");
 }

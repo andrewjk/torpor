@@ -105,6 +105,18 @@ export default class Site {
 	 */
 	prerender?: boolean | Record<string, boolean>;
 	/**
+	 * The site's absolute origin, e.g. "https://example.com". Required for
+	 * a build-time sitemap (see `sitemap`), since there is no request to
+	 * take the host from.
+	 */
+	origin?: string;
+	/**
+	 * Writes a sitemap.xml listing the prerendered pages at build time
+	 * (see `prerender`). Pass a custom path (e.g. "/blog/sitemap.xml") or
+	 * `true` for "/sitemap.xml"; requires `origin` to be set.
+	 */
+	sitemap?: boolean | string;
+	/**
 	 * A Standard Schema (zod, valibot, arktype, etc) used to validate (and
 	 * parse) the server environment. When set, `env()` from
 	 * `@torpor/build/env` checks the environment on first use per request and

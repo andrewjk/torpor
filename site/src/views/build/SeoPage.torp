@@ -1,0 +1,90 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function SeoPage() {
+	@head {
+		<title>SEO | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>SEO</h1>
+		<p>
+			Use the <code>seo()</code> helper to build the head for a page from its
+			zones: a title, a description and a link to the page:
+		</p>
+		<CodePreview
+			code={`
+import { seo } from "@torpor/build/seo";
+
+export default {
+	component,
+	head: (event) => seo({
+		title: post.title,
+		description: post.excerpt,
+		image: post.coverImage,
+		url: event.url.href,
+	}),
+} satisfies PageEndPoint;
+`}
+		/>
+		<p>
+			When an image is set, Open Graph and Twitter meta tags are included, so
+			links to the page unfurl nicely in social media. Values are escaped,
+			and rendered into the document <code>&lt;head&gt;</code> along with any
+			<code>&commat;head</code> markup in the component, which wins when both
+			provide a <code>&lt;title&gt;</code>, and beats any static
+			<code>&lt;title&gt;</code> in the site template.
+		</p>
+		<p>
+			Plain <code>&commat;head</code> markup is fine too, and you can use it (or a
+			<code>link rel="canonical"</code> tag, or JSON-LD in a
+			<code>script</code> tag) for anything <code>seo()</code> doesn't cover:
+		</p>
+		<CodePreview
+			code={`
+@head {
+	<title>My page</title>
+	<link rel="canonical" href="https://example.com/posts/1" />
+	<script type="application/ld+json">
+		{JSON.stringify({"@type": "BlogPosting", headline: post.title})}
+	</script>
+}
+`}
+		/>
+
+		<h2>A sitemap</h2>
+		<p>
+			Setting <code>site.sitemap</code> writes a <code>sitemap.xml</code>
+			listing the prerendered pages at build time, and needs
+			<code>site.origin</code> for the urls:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+site.origin = "https://example.com";
+site.sitemap = true; // or e.g. "/blog/sitemap.xml"
+`}
+		/>
+		<p>
+			The pages listed are exactly the prerendered ones (the set that
+			serves statically) so a dynamic route (e.g. blog posts under
+			<code>[slug]</code>) needs params entries (see
+			<a href="/build/prerendering">Prerendering</a>) to be included. For
+			sites where the sitemap must keep up with the database, generate it at
+			runtime instead. See the follow-up notes.
+		</p>
+
+		<h2>robots.txt</h2>
+		<p>
+			A plain static <code>robots.txt</code> on the host does the job &mdash;
+			add a <code>Sitemap:</code> line pointing at the sitemap:
+		</p>
+		<CodePreview
+			code={`
+User-agent: *
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml
+`}
+		/>
+	}
+}

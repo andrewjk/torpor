@@ -77,6 +77,11 @@ site.addRoute("/api/time", {
 				See <a href="/build/prerendering">Prerendering</a>
 			</li>
 			<li>
+				<code>site.origin</code> &mdash; the site's absolute origin (e.g.
+				<code>"https://example.com"</code>), used by the build-time sitemap
+				from <code>site.sitemap</code>. See <a href="/build/seo">SEO</a>
+			</li>
+			<li>
 				<code>site.plugins</code> &mdash; site plugins, which can add routes
 				and framework-level functionality when the site config is loaded or
 				the server starts up, e.g. <code>openApi()</code>

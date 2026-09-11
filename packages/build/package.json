@@ -37,6 +37,10 @@
 			"types": "./dist/schema.d.mts",
 			"import": "./dist/schema.mjs"
 		},
+		"./seo": {
+			"types": "./dist/seo.d.mts",
+			"import": "./dist/seo.mjs"
+		},
 		"./run": {
 			"types": "./dist/run.d.mts",
 			"import": "./dist/run.mjs"

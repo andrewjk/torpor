@@ -40,6 +40,37 @@ export function normalizeBasePath(value: string | undefined): string {
 }
 
 /**
+ * Normalizes a site origin value, throwing a descriptive error when it
+ * isn't an absolute http(s) origin without a path or spaces.
+ */
+export function normalizeOrigin(value: string | undefined): string {
+	const trimmed = (value ?? "").trim();
+	if (trimmed === "") {
+		throw new Error(`The site origin is empty (e.g. "https://example.com")`);
+	}
+	let url: URL;
+	try {
+		url = new URL(trimmed);
+	} catch {
+		throw new Error(
+			`The site origin must be an absolute url (e.g. "https://example.com"), got "${value}"`,
+		);
+	}
+	if (
+		(url.protocol !== "https:" && url.protocol !== "http:") ||
+		url.pathname !== "/" ||
+		/\s/.test(trimmed)
+	) {
+		throw new Error(
+			`The site origin must be an http(s) url without spaces or a path ` +
+				`(e.g. "https://example.com"), got "${value}"`,
+		);
+	}
+	// A trailing slash is allowed
+	return url.origin;
+}
+
+/**
  * Strips the base from a URL's pathname, copying the URL so it can be used
  * for routing without disturbing the request. Returns undefined when there
  * is a base and the URL doesn't carry it -- the caller should then return

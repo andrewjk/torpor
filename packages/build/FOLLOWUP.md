@@ -23,7 +23,11 @@ view transitions with scroll restoration (navigations run inside
 same-page navigations, and restored from history state on back/forward),
 flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
 into `$page.flash` by the render pipeline), and ETag/Cache-Control support
-via `notModified`.
+via `notModified`. SEO helpers exist too: `seo()` builds page head data
+(title, description, Open Graph/Twitter metas via a `{ property, content }`
+head variant), endpoint `head` data is now rendered at render time, and
+`site.sitemap` writes a build-time sitemap of the prerendered pages
+(needing `site.origin`); robots.txt stays a plain host file.
 
 ### High impact (table stakes in peers)
 
@@ -41,17 +45,15 @@ via `notModified`.
    right now it is global `use()` or per-folder hooks only.
 4. **WebSockets (server-side)** — SSE exists client-side, but no WS endpoint
    support (adapter-node could do this).
-5. **SEO helpers** — no sitemap.xml / robots.txt generation, no meta/canonical
-   conveniences beyond `@head` merging.
-6. **i18n / locale routing** — nothing.
+5. **i18n / locale routing** — nothing.
 
 ### Lower / nice-to-have
 
-7. Image optimization / asset pipeline beyond Vite defaults
-8. Pagination helpers
-9. Rate-limiting primitives (fits naturally as a middleware/plugin)
-10. Cron / queues / background jobs (adapter-dependent)
-11. Dev toolbar / route inspector
+6. Image optimization / asset pipeline beyond Vite defaults
+7. Pagination helpers
+8. Rate-limiting primitives (fits naturally as a middleware/plugin)
+9. Cron / queues / background jobs (adapter-dependent)
+10. Dev toolbar / route inspector
 
 Top two if forced to choose: **caching and streaming SSR** — they come up in
 virtually every real project.
@@ -72,5 +74,11 @@ virtually every real project.
 - **Concurrent prerendering** — render pages in a worker pool; today it is
   sequential, which keeps the module-global `$page` state safe but is slow
   for large sites.
+- **Dynamic sitemap endpoints** — a `sitemap.ts`-style runtime endpoint that
+  reads the database and generates the XML live, so sitemaps can keep up
+  with content that isn't prerendered (e.g. blog posts under `[slug]` on
+  this very site). A `@torpor/build/seo` based plugin that reads a user
+  function (`site.sitemap = { get: async () => urls }` shape?) and registers
+  the route like `openApi()` does.
 - **`adapter-github-pages`** — a thin adapter adding `.nojekyll` and
   `404.html` conventions on top of the prerendered output.

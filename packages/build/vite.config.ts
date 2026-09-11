@@ -13,6 +13,7 @@ export default defineConfig({
 			response: "src/response.ts",
 			run: "src/run.ts",
 			schema: "src/schema.ts",
+			seo: "src/seo.ts",
 			server: "src/server.ts",
 			state: "src/state.ts",
 			test: "src/test.ts",

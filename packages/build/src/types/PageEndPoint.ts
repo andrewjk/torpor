@@ -51,7 +51,7 @@ export default interface PageEndPoint<
 	head?: HeadElement[] | ((event: PageLoadEvent<Route>) => HeadElement[]);
 }
 
-type HeadElement = TitleElement | MetaElement;
+type HeadElement = TitleElement | MetaElement | PropertyMetaElement;
 
 interface TitleElement {
 	title: string;
@@ -61,3 +61,14 @@ interface MetaElement {
 	name: string;
 	content: string;
 }
+
+/**
+ * A meta element declared with the `property` attribute, used by Open Graph
+ * and Twitter (e.g. `og:title`). Created by the `seo()` helper.
+ */
+interface PropertyMetaElement {
+	property: string;
+	content: string;
+}
+
+export type { HeadElement };

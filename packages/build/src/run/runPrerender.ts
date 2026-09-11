@@ -2,6 +2,7 @@ import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import ServerEvent from "../server/ServerEvent";
+import { addBaseToPath } from "../site/basePath";
 import prepareTemplate from "./prepareTemplate";
 import type Site from "../site/Site";
 import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, LAYOUT_ROUTE } from "../types/RouteType";
@@ -176,7 +177,51 @@ export default async function runPrerender(site: Site): Promise<number> {
 		);
 	}
 
+	// The sitemap, if configured, lists the URLs that were just rendered:
+	// the set of pages that are actually static, which is exactly what a
+	// build-time sitemap can honestly represent
+	if (site.sitemap && site.origin && entries.length > 0) {
+		const base = site.basePath;
+		const sitemap = sitemapXml(
+			site.origin,
+			base,
+			entries.map((entry) => entry.path),
+		);
+		await fs.writeFile(
+			path.join(
+				clientFolder,
+				typeof site.sitemap === "string" ? site.sitemap.slice(1) : "sitemap.xml",
+			),
+			sitemap,
+		);
+	}
+
 	return written;
+}
+
+/**
+ * Builds the sitemap content: one `<url>` per rendered page, with the loc
+ * values being the site origin plus the base path plus the route path.
+ */
+export function sitemapXml(origin: string, base: string, paths: string[]): string {
+	const locs = paths.map((routePath) => {
+		const path = routePath === "/" ? base || "/" : addBaseToPath(routePath, base);
+		return `<loc>${escapeXml(origin)}${escapeXml(path)}</loc>`;
+	});
+	return (
+		`<?xml version="1.0" encoding="UTF-8"?>\n` +
+		`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+		locs.map((loc) => `  <url>\n    ${loc}\n  </url>`).join("\n") +
+		`\n</urlset>`
+	);
+}
+
+function escapeXml(value: string): string {
+	return value
+		.replaceAll("&", "&amp;")
+		.replaceAll("<", "&lt;")
+		.replaceAll(">", "&gt;")
+		.replaceAll('"', "&quot;");
 }
 
 /**

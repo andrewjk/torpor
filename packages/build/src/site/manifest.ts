@@ -3,7 +3,7 @@ import path from "node:path";
 import { Plugin } from "vite";
 import type { ResolvedOpenApiOptions } from "../openapi/types";
 import { OPEN_API_STATE_KEY } from "../openapi/plugin";
-import { normalizeBasePath } from "./basePath";
+import { normalizeBasePath, normalizeOrigin } from "./basePath";
 import Site from "./Site";
 import { SERVER_ROUTE } from "../types/RouteType";
 
@@ -36,8 +36,21 @@ export default function manifest(site: Site, server = false): Plugin {
 			if (id === moduleId) {
 				let serverRequest = server && !!viteOptions?.ssr;
 
-				// Validate here, so a bad site.basePath fails the build
+				// Validate here, so bad config fails the build
 				const base = normalizeBasePath(site.basePath);
+				if (site.sitemap && !site.origin) {
+					throw new Error(
+						`site.sitemap requires site.origin to be set (it is the host of the urls)`,
+					);
+				}
+				if (site.origin) {
+					normalizeOrigin(site.origin);
+				}
+				if (typeof site.sitemap === "string" && !site.sitemap.startsWith("/")) {
+					throw new Error(
+						`The sitemap path must be an absolute path (e.g. "/sitemap.xml"), got "${site.sitemap}"`,
+					);
+				}
 
 				// If there are inline endpoints, site plugins, an OpenAPI
 				// document or an env schema, and we're building for the server,
