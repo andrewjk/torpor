@@ -33,6 +33,14 @@ export default interface PageEndPoint<
 	 */
 	load?: (event: PageLoadEvent<Route>) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;
 	/**
+	 * Marks the page for prerendering: `tb build` renders it to a static HTML
+	 * file at build time. Layout flags apply to every route below them, and
+	 * `site.prerender` applies to everything, so `false` can opt a single
+	 * route (or section) back out. Dynamic routes need the params to build
+	 * with, e.g. `prerender: { params: [{ id: "1" }] }` under `/posts/[id]`.
+	 */
+	prerender?: boolean | { params: Record<string, unknown>[] };
+	/**
 	 * The component that is displayed for the page.
 	 */
 	component?: Component;

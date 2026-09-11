@@ -1,0 +1,106 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function PrerenderPage() {
+	@head {
+		<title>Prerendering | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Prerendering</h1>
+		<p>
+			Routes marked with <code>prerender</code> are rendered to static HTML
+			files at build time, and any static file host can then serve
+			<code>dist/client</code> directly &mdash; with no server required:
+		</p>
+		<CodePreview
+			code={`
+// routes/about/+page.ts
+import component from "@/views/About.torp";
+import { type PageEndPoint } from "@torpor/build";
+
+export default {
+	component,
+	prerender: true,
+} satisfies PageEndPoint;
+`}
+		/>
+		<p>
+			Layouts inherit the flag to every route below them, so a whole section
+			(or the whole site, via a top-level <code>_layout.ts</code>) can be
+			prerendered, and a single route can opt back out by setting
+			<code>prerender: false</code>. Interactivity is unaffected: the client
+			entry still hydrates each prerendered page. Take care, though: server
+			hooks and load functions run at build time with a synthetic request &mdash;
+			there are no cookies &mdash; so a hook that reads the session would bake
+			one user's data into the page for everyone. Keep personalization on
+			dynamic routes, or fetch it client-side.
+		</p>
+
+		<h2>Dynamic routes</h2>
+		<p>
+			A dynamic route needs params to build with. Declare them with
+			<code>params</code> entries &mdash; one entry per page to render &mdash;
+			typed by the route's annotation:
+		</p>
+		<CodePreview
+			code={`
+// routes/posts/[id]/+page.server.ts
+import { type PageServerEndPoint } from "@torpor/build";
+
+export default {
+	prerender: {
+		params: [{ id: "1" }, { id: "2" }, { id: "3" }],
+	},
+	load: async ({ params }) => ok(await getPost(params.id)),
+} satisfies PageServerEndPoint<"/posts/[id]">;
+`}
+		/>
+		<p>
+			Rest segments spread too: <code>&#123; path: "a/b" &#125;</code> under
+			<code>/docs/[...path]</code> renders <code>/docs/a/b</code>.
+		</p>
+
+		<h2>A site-level default</h2>
+		<p>
+			Set <code>site.prerender</code> in your config file to flag lots of
+			routes at once &mdash; a boolean, or a map of paths (exact, or
+			<code>/**</code> for a path and everything below it) with the most
+			specific match winning. Route and layout flags always take precedence:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+import { Site } from "@torpor/build";
+
+const site = new Site();
+site.prerender = {
+	"/blog/**": true, // including /blog/...
+	"/account": false, // stays dynamic
+};
+
+export default site;
+`}
+		/>
+		<p>
+			Any page route without its own flag and without a layout flag uses it.
+		</p>
+
+		<h2>Notes</h2>
+		<ul>
+			<li>
+				The <code>_error</code> page, if the site has one, is rendered to
+				<code>404.html</code> for static hosts to use
+			</li>
+			<li>
+				Navigation between a prerendered page and a dynamic one works
+				normally; if a page's data can't be loaded on the client (e.g. a
+				prerendered site with no server), the browser does a full page load
+				instead
+			</li>
+			<li>
+				For a static host like GitHub Pages, serve <code>dist/client</code>
+				directly, adding a <code>.nojekyll</code> file
+			</li>
+		</ul>
+	}
+}

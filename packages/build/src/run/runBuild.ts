@@ -9,6 +9,7 @@ import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import { siteEntryPaths } from "../utils/entryPaths";
+import runPrerender from "./runPrerender";
 
 // TODO: Don't cache index.html in dev?
 // TODO: Don't reload layouts during client routing
@@ -114,6 +115,15 @@ export default async function runBuild(site: Site): Promise<void> {
 			path.join(clientFolder, "site.html"),
 		);
 		await fs.rm(path.join(clientFolder, "src"), { recursive: true });
+	}
+
+	// Prerender routes marked with `prerender` -- including everything
+	// inherited from layouts and site.prerender -- to static HTML files in
+	// the client output, plus the error page as 404.html. Any static host
+	// can then serve dist/client directly
+	const prerendered = await runPrerender(site);
+	if (prerendered > 0) {
+		console.log(`[torpor] Prerendered ${prerendered} route${prerendered === 1 ? "" : "s"}`);
 	}
 
 	// HOOK: Postbuild

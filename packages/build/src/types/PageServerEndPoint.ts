@@ -107,4 +107,15 @@ export default interface PageServerEndPoint<
 	 * ```
 	 */
 	schema?: Schemas | undefined;
+	/**
+	 * Marks the page for prerendering. Set `true` for a static route, or
+	 * `params` entries letting `tb build` render it once per entry for a
+	 * dynamic route, e.g. `prerender: { params: [{ id: "1" }] }` under
+	 * `/posts/[id]`. Params are typed by the route annotation (or the
+	 * `params` schema), so the entries are checked.
+	 *
+	 * The load function runs at build time with a synthetic request, exactly
+	 * as for a real GET.
+	 */
+	prerender?: boolean | { params: LoadParams<Schemas, Route>[] };
 }

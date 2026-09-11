@@ -69,6 +69,13 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		clientEndPoint,
 		serverEndPoint,
 	);
+	if (data === undefined) {
+		// The data couldn't be loaded -- a load function returned an error
+		// response, or (on a prerendered site with no server) the ~server
+		// request got a 404. Leave the current page alone; the caller
+		// (e.g. the client entry) falls back to a full page load
+		return false;
+	}
 	// We may have form data in a hidden input -- not sure if this is the best
 	// way to do it
 	let formInput = document.getElementById("t-form-data") as HTMLInputElement;

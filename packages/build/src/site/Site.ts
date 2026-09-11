@@ -89,6 +89,15 @@ export default class Site {
 	 */
 	pluginState: Map<PropertyKey, unknown> = new Map();
 	/**
+	 * Prerendering, applied to every page route that doesn't have (or
+	 * inherit) a `prerender` flag of its own. `true` prerenders everything;
+	 * a `Record<string, boolean>` maps route paths -- exact (`/about`) or
+	 * prefix (`/blog/**` for a path and everything below it) -- to flags,
+	 * with the most specific matching key winning. Route endpoint and
+	 * layout flags always take precedence over this.
+	 */
+	prerender?: boolean | Record<string, boolean>;
+	/**
 	 * A Standard Schema (zod, valibot, arktype, etc) used to validate (and
 	 * parse) the server environment. When set, `env()` from
 	 * `@torpor/build/env` checks the environment on first use per request and
