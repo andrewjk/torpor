@@ -1,3 +1,4 @@
+import { addBaseToPath, getBasePath } from "../site/basePath";
 import CookieHelper from "./CookieHelper";
 import HeaderHelper from "./HeaderHelper";
 import SessionHelper from "./SessionHelper";
@@ -53,6 +54,19 @@ export default class ServerEvent {
 
 		for (let header of this.headers.headers.entries()) {
 			this.response.headers.append(header[0], header[1]);
+		}
+
+		// Redirect locations are written base-free, so that user code isn't
+		// aware of the base path
+		const base = getBasePath();
+		if (base) {
+			const location = this.response.headers.get("Location");
+			if (location) {
+				const rewritten = addBaseToPath(location, base);
+				if (rewritten !== location) {
+					this.response.headers.set("Location", rewritten);
+				}
+			}
 		}
 	}
 

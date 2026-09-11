@@ -31,6 +31,7 @@ import {
 	validationErrorResponse,
 } from "../validation/endpoint.ts";
 import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts";
+import { getBasePath, rewriteBaseInHtml, setBasePath, stripBaseFromUrl } from "./basePath.ts";
 import mergeHead from "./mergeHead.ts";
 import type Router from "./Router.ts";
 
@@ -46,11 +47,23 @@ export type ServerLoad = (ev: ServerEvent, template?: string) => Promise<Respons
  * builds), so that tests can exercise the handlers with their own routes.
  *
  * @param router The router, built from the site's routes
+ * @param basePath The site's base path, stripped from incoming URLs before
+ *   routing (see basePath.ts)
  * @returns The request handler, which takes the site template
  */
-export function createServerLoad(router: Router): ServerLoad {
+export function createServerLoad(router: Router, basePath = ""): ServerLoad {
+	// The base path is shared through module state, so that everything that
+	// generates URLs (HTML attributes, redirect locations) sees the same
+	// value the router strips
+	setBasePath(basePath);
 	return async function load(ev, template) {
-		const url = ev.url;
+		// The base is stripped before routing, so that everything below (route
+		// matching, params, user code reading `event.url`) is base-free.
+		// Requests that don't carry the base aren't ours
+		const url = stripBaseFromUrl(ev.url, basePath);
+		if (!url) {
+			return handleResponse(notFound());
+		}
 		const path = url.pathname;
 		const query = url.searchParams;
 
@@ -450,7 +463,10 @@ async function loadView(
 			}
 
 			styles += head;
-			html = mergeHead(template, styles).replace("%COMPONENT_BODY%", body);
+			html = rewriteBaseInHtml(
+				mergeHead(template, styles).replace("%COMPONENT_BODY%", body),
+				getBasePath(),
+			);
 		} catch (error) {
 			// TODO: Show a proper Error component
 			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";

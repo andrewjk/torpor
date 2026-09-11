@@ -15,8 +15,10 @@ access (`env()` with optional `site.env` schema validation and adapter-level
 `TorporEnv` key merging), a signed-cookie session helper (`ev.session` with
 `get`/`set`/`regenerate`/`destroy`), prerendering (route/layout/site
 `prerender` flags rendered by `runPrerender` into `dist/client`, params
-entries for dynamic routes, error page as `404.html`), and ETag/Cache-Control
-support via `notModified`.
+entries for dynamic routes, error page as `404.html`), base path config
+(`site.basePath` strips the prefix from server requests, rewrites generated
+HTML attributes and redirect locations, and mirrors on the client router),
+and ETag/Cache-Control support via `notModified`.
 
 ### High impact (table stakes in peers)
 
@@ -40,18 +42,16 @@ support via `notModified`.
    nor any scroll handling exists in `src/nav/navigate.ts` or
    `src/site/clientEntry.ts`.
 7. **i18n / locale routing** — nothing.
-8. **Base path config** — `Site` has no `basePath` option (root is always
-   `process.cwd()`), so mounting under a subpath is not supported.
-9. **Flash messages** — DIY via cookies today; a small helper after
+8. **Flash messages** — DIY via cookies today; a small helper after
    redirects would round out the actions story.
 
 ### Lower / nice-to-have
 
-10. Image optimization / asset pipeline beyond Vite defaults
-11. Pagination helpers
-12. Rate-limiting primitives (fits naturally as a middleware/plugin)
-13. Cron / queues / background jobs (adapter-dependent)
-14. Dev toolbar / route inspector
+9. Image optimization / asset pipeline beyond Vite defaults
+10. Pagination helpers
+11. Rate-limiting primitives (fits naturally as a middleware/plugin)
+12. Cron / queues / background jobs (adapter-dependent)
+13. Dev toolbar / route inspector
 
 Top two if forced to choose: **caching and streaming SSR** — they come up in
 virtually every real project.

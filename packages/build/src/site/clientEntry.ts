@@ -7,6 +7,9 @@ import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
 import Router from "./Router.ts";
+import { setBasePath } from "./basePath.ts";
+
+setBasePath(manifest.base);
 
 // Build the router from the Site object created by the user
 const router = new Router();

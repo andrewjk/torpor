@@ -1,0 +1,82 @@
+import CodePreview from "../CodePreview.torp";
+
+export default function BasePathPage() {
+	@head {
+		<title>Base Path | Build | Torpor</title>
+	}
+
+	@render {
+		<h1>Base path</h1>
+		<p>
+			Set <code>site.basePath</code> in your config file to mount the site
+			under a subpath (e.g. <code>/app</code>), so that the framework, and
+			not your code, deals with the prefix:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+import { Site } from "@torpor/build";
+
+const site = new Site();
+site.basePath = "/app";
+
+await site.addRouteFolder("./src/routes");
+
+export default site;
+`}
+		/>
+
+		<h2>Code stays base-free</h2>
+		<p>
+			The server strips the base from incoming URLs before routing, so
+			<code>event.url</code>, route params and <code>route()</code> calls
+			all work without it &mdash; and the same is true for markup: links,
+			form actions and image sources get the base added when the page is
+			rendered. Requests that don't carry the base aren't served (they get
+			the error page), because nothing under the site's mount point can
+			match them.
+		</p>
+		<CodePreview
+			code={`
+// In a load function, action or endpoint
+const { postId } = event.params; // /posts/[id] under /app/posts/5
+seeOther(route("/posts", { id: 5 })); // redirects to /app/posts/5
+`}
+		/>
+
+		<h2>Client navigation</h2>
+		<p>
+			The browser URL keeps the base, and the client router strips it
+			before matching, snippets like anchor clicks, prefetching, form
+			submits and back/forward navigation all keep working. The one thing
+			to avoid is hard-coding the base into markup yourself &mdash; an
+			attribute that already carries it is left alone, so double prefixes
+			can't happen, but consistent base-free markup is what keeps the
+			config the single source of truth.
+		</p>
+
+		<h2>Deploying under a subpath</h2>
+		<p>
+			How to put the site under the subpath depends on the host:
+		</p>
+		<ul>
+			<li>
+				<code>&commat;torpor/adapter-node</code> &mdash; serve the built app
+				behind a reverse proxy that forwards the subpath prefix (e.g.
+				<code>/app</code> &rarr; the node server)
+			</li>
+			<li>
+				A static host &mdash; with prerendering, deploy
+				<code>dist/client</code> to the subdirectory the base path points at
+				(e.g. the <code>app</code> folder of a GitHub Pages project)
+			</li>
+		</ul>
+		<p>
+			For a prerendered site, the generated files already have base-prefixed
+			links in them, so no extra build configuration is needed &mdash; though
+			asset URLs emitted by Vite itself are controlled by the
+			<code>base</code> option in <code>site.viteConfig</code>, which you
+			will also want to set when the assets are served under the subpath.
+		</p>
+	}
+}

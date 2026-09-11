@@ -89,6 +89,13 @@ export default class Site {
 	 */
 	pluginState: Map<PropertyKey, unknown> = new Map();
 	/**
+	 * The path the site is mounted under, e.g. "/app". Incoming server
+	 * requests that don't carry it are not found; everything the framework
+	 * generates (HTML attributes, redirect locations, paths from `route()`)
+	 * gets it added. Server code and markup stay base-free.
+	 */
+	basePath: string = "";
+	/**
 	 * Prerendering, applied to every page route that doesn't have (or
 	 * inherit) a `prerender` flag of its own. `true` prerenders everything;
 	 * a `Record<string, boolean>` maps route paths -- exact (`/about`) or

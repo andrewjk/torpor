@@ -1,3 +1,4 @@
+import { addBaseToPath, getBasePath } from "../site/basePath";
 import type { ExactRouteParams, ParseRouteParams } from "../types/ParseRouteParams";
 
 /**
@@ -23,16 +24,21 @@ export default function route<
 			: [params: Params & ExactRouteParams<Params, ParseRouteParams<Route>>]
 ): string {
 	const params = ((args as unknown[])[0] ?? {}) as Record<string, string>;
-	return path.replace(/\[(\.\.\.)?([^\]]+)\]/g, (_, splat: string | undefined, name: string) => {
-		const value = params[name];
-		if (value === undefined) {
-			throw new Error(`Missing param '${name}' for route '${path}'`);
-		}
-		return splat
-			? value
-					.split("/")
-					.map((segment) => encodeURIComponent(segment))
-					.join("/")
-			: encodeURIComponent(String(value));
-	});
+	const filled = path.replace(
+		/\[(\.\.\.)?([^\]]+)\]/g,
+		(_, splat: string | undefined, name: string) => {
+			const value = params[name];
+			if (value === undefined) {
+				throw new Error(`Missing param '${name}' for route '${path}'`);
+			}
+			return splat
+				? value
+						.split("/")
+						.map((segment) => encodeURIComponent(segment))
+						.join("/")
+				: encodeURIComponent(String(value));
+		},
+	);
+	// Links are written base-free; the router strips the base before matching
+	return addBaseToPath(filled, getBasePath());
 }

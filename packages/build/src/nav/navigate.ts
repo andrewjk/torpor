@@ -3,6 +3,7 @@ import { type Component, type SlotRender } from "@torpor/view";
 import { mount, unmount } from "@torpor/view";
 import $page from "../state/$page";
 import client from "../state/client";
+import { getBasePath, stripBaseFromUrl } from "../site/basePath";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
@@ -10,7 +11,7 @@ import formSubmit from "./formSubmit";
 import loadData from "./loadData";
 
 // @ts-ignore
-export default async function navigate(url: URL, withHydration = false): Promise<boolean> {
+export default async function navigate(rawUrl: URL, withHydration = false): Promise<boolean> {
 	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
@@ -18,6 +19,10 @@ export default async function navigate(url: URL, withHydration = false): Promise
 		return false;
 	}
 
+	// The base path is stripped before matching (routes are base-free), but
+	// kept in browser state: the caller pushes the original URL. When the
+	// url doesn't carry the base there will be no matching route anyway
+	const url = stripBaseFromUrl(rawUrl, getBasePath()) ?? rawUrl;
 	const path = url.pathname;
 	const query = url.searchParams;
 
@@ -35,8 +40,9 @@ export default async function navigate(url: URL, withHydration = false): Promise
 	if (path.endsWith("/_error")) {
 		$page.status = parseInt(query.get("status") ?? "404");
 		$page.error = { message: query.get("message") ?? "" };
-		// Make it look a bit classier by removing the query
-		window.history.replaceState({}, "", url.toString().split("?")[0]);
+		// Make it look a bit classier by removing the query -- keeping the
+		// original URL, so the base path stays in the address bar
+		window.history.replaceState({}, "", rawUrl.toString().split("?")[0]);
 	} else {
 		$page.status = 200;
 	}

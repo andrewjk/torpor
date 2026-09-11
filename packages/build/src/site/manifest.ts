@@ -3,6 +3,7 @@ import path from "node:path";
 import { Plugin } from "vite";
 import type { ResolvedOpenApiOptions } from "../openapi/types";
 import { OPEN_API_STATE_KEY } from "../openapi/plugin";
+import { normalizeBasePath } from "./basePath";
 import Site from "./Site";
 import { SERVER_ROUTE } from "../types/RouteType";
 
@@ -34,6 +35,9 @@ export default function manifest(site: Site, server = false): Plugin {
 		load(id, viteOptions) {
 			if (id === moduleId) {
 				let serverRequest = server && !!viteOptions?.ssr;
+
+				// Validate here, so a bad site.basePath fails the build
+				const base = normalizeBasePath(site.basePath);
 
 				// If there are inline endpoints, site plugins, an OpenAPI
 				// document or an env schema, and we're building for the server,
@@ -93,6 +97,7 @@ ${envGlue}
 ${pluginLoop}
 ${openApiGlue}
 export default {
+  base: ${JSON.stringify(base)},
   routes: [
     ${site.routes
 			.map((r) => {

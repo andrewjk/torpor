@@ -82,6 +82,7 @@ export const BUILD_LINKS: ReadonlyArray<SidebarLink> = [
 	{ label: "Sessions", href: "/build/sessions" },
 	{ label: "Navigation", href: "/build/navigation" },
 	{ label: "Prerendering", href: "/build/prerendering" },
+	{ label: "Base Path", href: "/build/base-path" },
 ];
 
 /** The site sections that have their own pages and sidebars */

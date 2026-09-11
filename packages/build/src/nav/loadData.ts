@@ -1,4 +1,5 @@
 import client from "../state/client";
+import { getBasePath } from "../site/basePath";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
@@ -36,7 +37,7 @@ export default async function loadData(
 					layout.serverEndPoint && (await layout.serverEndPoint())?.default;
 				const layoutResponse = await loadClientAndServerData(
 					stackLayout.data,
-					document.location.origin + layoutPath,
+					document.location.origin + getBasePath() + layoutPath,
 					query,
 					params,
 					layoutEndPoint,
@@ -52,7 +53,7 @@ export default async function loadData(
 	}
 	let endPointResponse = await loadClientAndServerData(
 		data,
-		document.location.origin + path,
+		document.location.origin + getBasePath() + path,
 		query,
 		params,
 		clientEndPoint,
