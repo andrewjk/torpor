@@ -1,5 +1,138 @@
 # @torpor/build
 
+## 1.3.0
+
+<sub>2026-09-14</sub>
+
+- _(minor)_
+  `readForm` can now read submitted files: use the `File` class as the spec's default to
+  get a single file (missing when no file was selected), or `[File]` to get every
+  submitted file as an array. Previously File values were stringified, so multipart
+  submissions could not be handled. Actions with a schema could already receive files --
+  `File` values pass through validation untouched -- and `+server.ts` endpoints read
+  multipart bodies natively via `request.formData()`.
+- _(minor)_
+  New `env()` in `@torpor/build/env` returns the server environment -- `process.env` on
+  Node (with `.env` files loaded by the CLI) and the platform environment, with bindings,
+  on Cloudflare. Its type comes from the `TorporEnv` global interface, declared in three
+  layers: `@torpor/build` reserves framework keys (`TORPOR_SESSION_SECRET`), adapters add
+  their platform's keys (the Cloudflare adapter declares `ASSETS`), and apps merge their
+  own in an ambient `src/env.d.ts`. For runtime checking, set a Standard Schema on
+  `site.env` in site.config.ts -- `env()` then validates on first use per request and
+  throws with the schema's issues, so a missing or invalid key fails immediately instead
+  of passing `undefined` along.
+- _(minor)_
+  Server events now have a `session` helper for reading and writing a signed cookie, in
+  load functions, actions, `+server.ts` endpoints and hooks. The value is signed with
+  HMAC-SHA256 (Web Crypto, so it works on Node and Cloudflare) using the
+  `TORPOR_SESSION_SECRET` environment key. The API is deliberately low-level and
+  storage-free: `get` verifies the signature and expiry and returns the data, `set`
+  writes it (keeping the session id stable), `regenerate` writes with a fresh id for
+  login and privilege changes, and `destroy` deletes the cookie. The stable `id` doubles
+  as a database key for apps that need revocation: store it server-side, check it on each
+  authed request, and delete the row to revoke. Session data must be JSON-safe and fit
+  in a cookie (~4KB); the default expiry is 30 days (`{ maxAge }` to change).
+- _(minor)_
+  Feat: prerendering routes to static HTML
+
+  Routes marked with `prerender` are now rendered at build time (`tb build`)
+  into static HTML files in `dist/client`, so any static host can serve them
+  with no server. The flag lives on the route's endpoint (`+page.ts` /
+  `+page.server.ts`) and is inherited from `_layout` endpoints, with
+  `site.prerender` as a site-level default: a boolean or a map of paths
+  (`/blog/**` prefixes) with the most specific match winning. Dynamic routes
+  declare `prerender: { params: [...] }` entries, rendered once each, and the
+  `_error` page ships as `404.html`. Rendering goes through the normal load
+  pipeline (hooks, layouts, load functions), so a failing prerender fails the
+  build, and client navigation falls back to a full page load when a
+  prerendered site's data can't be fetched.
+
+- _(minor)_
+  Feat: site base path
+
+  `site.basePath = "/app"` mounts the site under a subpath. The server strips
+  the prefix from incoming URLs before routing (requests that don't carry it
+  aren't served), and adds it back to generated HTML attributes (href, action,
+  src), redirect locations and paths built with `route()` -- so server code,
+  markup and params all stay base-free, with the config as the single source
+  of truth. The client router mirrors the server: it strips the base before
+  matching links on click, prefetch and back/forward navigation, and keeps it
+  in browser state and data fetches. Base path is inherited by prerendered
+  output (its links carry the prefix), and static deploys go to the
+  subdirectory the base path points at.
+
+- _(minor)_
+  Feat: view transitions and scroll restoration
+
+  Client navigations now run inside `document.startViewTransition` (where the
+  browser supports it), so pages cross-fade by default and can be animated
+  with `::view-transition-old/new` CSS. The initial hydration skips the
+  transition. Scroll position is reset when moving to a different page, kept
+  for same-page navigations (query changes, form action re-renders), and
+  restored on back/forward from the scroll saved into the history entry.
+
+- _(minor)_
+  Feat: flash messages
+
+  Actions can set a one-time values store that survives a redirect:
+  `event.flash.set("Project saved")` (stored as `{ message }`), or any
+  JSON-safe object (`event.flash.set({ error: "Import failed" })`). The
+  values ride in a session-lifetime cookie that is deleted when it is read,
+  so the redirected page shows them exactly once -- the render pipeline
+  consumes them into `$page.flash`, the same pattern as `$page.form`. No
+  signing: flash values are plain values to render as text, no secret is
+  needed, and reads/writes stay synchronous. Without cookies the action
+  still completes -- the banner is simply skipped.
+
+- _(minor)_
+  Feat: SEO helpers
+
+  `seo()` in `@torpor/build/discovery` builds a page's head from its values: a
+  title, a description and (when an image or url is included) Open Graph /
+  Twitter metas. Endpoint `head` data is now rendered at render time
+  (escaped, with layouts losing to the page and everything losing to the
+  first title in the compiled `@head` markup), which also activates the
+  previously-unused head property. For sitemaps, `site.sitemap = true` (or a
+  custom path) writes a build-time `sitemap.xml` listing the prerendered
+  pages, requiring `site.origin` for the urls. robots.txt stays a plain
+  static file on the host.
+
+- _(minor)_
+  Feat: public dir for static host files
+
+  Files in `src/public` are served by the dev server and copied verbatim
+  into the client build output root, so root-level host files (robots.txt,
+  favicon.ico, .well-known/*, ads.txt and friends) get deployed without
+  routing or extra configuration. A prerendered site's `dist/client` runs
+  them straight onto the host, so `robots.txt` can point at the sitemap.
+
+- _(minor)_
+  Feat: runtime sitemap endpoints
+
+  `site.sitemap` accepts a runtime config alongside the build-time boolean:
+  `sitemap = { get: async (event) => ["/posts/a", "/posts/b"] }` serves the
+  XML live on each request, reading the database (typically), so sitemaps
+  can keep up with content that isn't prerendered (blog posts under
+  `[slug]`, for example). The urls returned are base-free paths and the
+  site origin is added. The path defaults to `/sitemap.xml` and `origin`
+  can override `site.origin` for the file.
+
+- _(minor)_
+  Feat: route middleware
+
+  `site.middleware` sets global middleware, run for every request before
+  routing -- including requests that won't match a route, so maintenance
+  mode, legacy url redirects and custom error handling are expressible.
+  Server endpoints (`+page.server.ts`, `+server.ts`) take
+  `middleware: [...]` for route-scoped guards, which run after the global
+  middleware and before folder hooks, so a guard can skip data loading
+  entirely. Both use the same shape: `enter` runs in order and may return a
+  Response to short-circuit; `exit` runs in reverse and can inspect `ev.error`.
+  Middleware see the raw request url. The existing low-level `Server.use()`
+  is unchanged and stays internal -- packages can push middleware onto
+  `site.middleware` from a site plugin, which is how shippable cross-cutting
+  features (rate limiting, auth) should attach.
+
 ## 1.2.0
 
 <sub>2026-09-10</sub>
