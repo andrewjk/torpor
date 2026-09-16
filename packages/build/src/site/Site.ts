@@ -98,6 +98,13 @@ export default class Site {
 	 */
 	basePath: string = "";
 	/**
+	 * Wraps client-side navigations in the View Transitions API -- where the
+	 * browser supports it -- so pages cross-fade by default and can be
+	 * animated with `::view-transition-old/new` CSS. Opt-in: off unless set
+	 * to `true`. The initial hydration never transitions.
+	 */
+	viewTransitions?: boolean;
+	/**
 	 * Prerendering, applied to every page route that doesn't have (or
 	 * inherit) a `prerender` flag of its own. `true` prerenders everything;
 	 * a `Record<string, boolean>` maps route paths -- exact (`/about`) or

@@ -156,6 +156,21 @@ describe("manifest plugin", () => {
 		expect(code).toContain('subFolder: "/api"');
 	});
 
+	test("view transitions are opt-in and default to false", () => {
+		const site = buildSite();
+		const plugin = manifest(site, false);
+		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
+		expect(code).toContain("viewTransitions: false");
+	});
+
+	test("view transitions: emits true when the site opts in", () => {
+		const site = buildSite();
+		site.viewTransitions = true;
+		const plugin = manifest(site, false);
+		const code = (plugin.load as any).call({}, MODULE_ID, {}) as string;
+		expect(code).toContain("viewTransitions: true");
+	});
+
 	test("route types are emitted as numeric constants", () => {
 		const site = new Site();
 		site.root = tmpRoot;

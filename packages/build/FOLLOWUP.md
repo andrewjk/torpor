@@ -18,9 +18,10 @@ access (`env()` with optional `site.env` schema validation and adapter-level
 entries for dynamic routes, error page as `404.html`), base path config
 (`site.basePath` strips the prefix from server requests, rewrites generated
 HTML attributes and redirect locations, and mirrors on the client router),
-view transitions with scroll restoration (navigations run inside
-`document.startViewTransition`; scroll is reset across pages, kept for
-same-page navigations, and restored from history state on back/forward),
+view transitions with scroll restoration (`site.viewTransitions = true` opts
+navigations into running inside `document.startViewTransition`; scroll is
+always reset across pages, kept for same-page navigations, and restored from
+history state on back/forward),
 flash messages (`event.flash.set(...)` riding a one-read cookie, consumed
 into `$page.flash` by the render pipeline), route middleware (`site.middleware`
 runs globally for every request -- unmatched ones too -- and server endpoints

@@ -138,6 +138,7 @@ ${openApiGlue}
 ${sitemapGlue}
 export default {
   base: ${JSON.stringify(base)},
+  viewTransitions: ${!!site.viewTransitions},
   ${serverRequest && hasMiddleware ? "middleware: __site.middleware ?? []," : ""}
   routes: [
     ${site.routes

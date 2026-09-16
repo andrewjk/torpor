@@ -211,7 +211,11 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		}
 	};
 
-	if (!withHydration && typeof document.startViewTransition === "function") {
+	if (
+		!withHydration &&
+		client.viewTransitions &&
+		typeof document.startViewTransition === "function"
+	) {
 		document.startViewTransition(render);
 	} else {
 		render();

@@ -19,6 +19,7 @@ router.addPages(manifest.routes);
 // just import it to navigate because that gets built by tsdown, without Vite
 // and the manifest
 client.router = router;
+client.viewTransitions = manifest.viewTransitions ?? false;
 
 // Intercept clicks on links
 window.addEventListener("click", async (e) => {

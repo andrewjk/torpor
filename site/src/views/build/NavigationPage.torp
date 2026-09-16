@@ -69,12 +69,20 @@ import { $page } from "@torpor/build/state";
 
 		<h2>View transitions and scrolling</h2>
 		<p>
-			Navigations use the view transitions API when the browser supports it,
-			so pages cross-fade by default, and can be animated with CSS. Scroll
-			position is reset when moving to another page, kept for same-page
-			navigations like query changes and form actions, and restored when
-			going back and forward.
+			Scroll position is reset when moving to another page, kept for
+			same-page navigations like query changes and form actions, and
+			restored when going back and forward.
 		</p>
+		<p>
+			Navigations can run inside the view transitions API &mdash; so pages
+			cross-fade and can be animated with CSS &mdash; by opting in:
+		</p>
+		<CodePreview
+			code={`
+// site.config.ts
+site.viewTransitions = true;
+`}
+		/>
 		<CodePreview
 			code={`
 /* in a stylesheet, to slow the page transition down */
