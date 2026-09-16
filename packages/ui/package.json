@@ -168,7 +168,8 @@
 		"./motion": {
 			"types": "./dist/motion/index.d.ts",
 			"import": "./dist/motion/index.js"
-		}
+		},
+		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist"

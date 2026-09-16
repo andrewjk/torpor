@@ -17,6 +17,7 @@ beforeAll(() => {
 			dependencies: {
 				"fake-icons": "1.0.0",
 				"bool-icons": "1.0.0",
+				"hidden-icons": "1.0.0",
 				"plain-lib": "1.0.0",
 				"@scope/icons": "1.0.0",
 			},
@@ -44,6 +45,19 @@ beforeAll(() => {
 		}),
 	);
 	write("node_modules/bool-icons/index.js", "export default 1");
+
+	// A torpor package whose exports map has no "." or "./package.json"
+	// entry, so Node's resolver throws ERR_PACKAGE_PATH_NOT_EXPORTED for
+	// both `name/package.json` and `name` -- detected via node_modules paths
+	write(
+		"node_modules/hidden-icons/package.json",
+		JSON.stringify({
+			name: "hidden-icons",
+			torpor: true,
+			exports: { "./icons": "./icons.torp" },
+		}),
+	);
+	write("node_modules/hidden-icons/index.js", "export default 1");
 
 	// A torpor package one level down, detected by its `.torp` exports
 	write(
@@ -82,6 +96,7 @@ test("findTorporPackages -- detects torpor packages", () => {
 		"@scope/icons",
 		"bool-icons",
 		"fake-icons",
+		"hidden-icons",
 		"nested-icons",
 	]);
 });
@@ -98,12 +113,14 @@ test("addTorporPackageConfig -- sets optimizeDeps and ssr config", () => {
 		"@scope/icons",
 		"bool-icons",
 		"fake-icons",
+		"hidden-icons",
 		"nested-icons",
 	]);
 	expect(config.ssr.noExternal.sort()).toEqual([
 		"@scope/icons",
 		"bool-icons",
 		"fake-icons",
+		"hidden-icons",
 		"nested-icons",
 	]);
 });

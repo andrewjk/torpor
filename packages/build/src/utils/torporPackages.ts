@@ -136,8 +136,12 @@ function resolvePackageJson(name: string, require: NodeRequire): string | undefi
 		try {
 			entry = require.resolve(name);
 		} catch {
-			// Not resolvable from here (e.g. an optional peer), skip it
-			return undefined;
+			// Not resolvable through Node's resolver -- either the package
+			// isn't installed (e.g. an optional peer), or its `exports` map
+			// has no `.` or `./package.json` entry and both lookups above
+			// threw ERR_PACKAGE_PATH_NOT_EXPORTED. Try the standard
+			// node_modules lookup paths directly
+			return resolveFromNodeModules(name, require);
 		}
 		if (!path.isAbsolute(entry)) return undefined;
 		let dir = path.dirname(entry);
@@ -149,4 +153,18 @@ function resolvePackageJson(name: string, require: NodeRequire): string | undefi
 			dir = parent;
 		}
 	}
+}
+
+/**
+ * Finds a package's package.json by checking the standard node_modules
+ * lookup paths directly, for packages that Node's resolver can't load
+ * (`ERR_PACKAGE_PATH_NOT_EXPORTED`).
+ */
+function resolveFromNodeModules(name: string, require: NodeRequire): string | undefined {
+	for (const dir of require.resolve.paths(name) ?? []) {
+		if (!path.isAbsolute(dir)) continue;
+		const packageJson = path.join(dir, ...name.split("/"), "package.json");
+		if (existsSync(packageJson)) return packageJson;
+	}
+	return undefined;
 }
