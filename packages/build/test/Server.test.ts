@@ -326,6 +326,31 @@ describe("Server.fetch", () => {
 		const res = await s.fetch("https://example.com/x");
 		expect(res.headers.get("x-custom")).toBe("value");
 	});
+
+	test("addHeaders clones a fetched response with immutable headers", () => {
+		const ev = new ServerEvent(new Request("https://example.com/"));
+		ev.cookies.set("a", "1");
+		// Responses from fetch() (and Response.redirect/error) have immutable
+		// headers, so appending to them throws
+		ev.response = Response.redirect("https://example.com/x", 302);
+		ev.addHeaders();
+		const setCookies = ev.response.headers.getSetCookie?.() ?? [];
+		expect(setCookies.length).toBe(1);
+		expect(setCookies[0]).toMatch(/^a=1/);
+		expect(ev.response.headers.get("location")).toBe("https://example.com/x");
+	});
+
+	test("an endpoint returning a fetched Response doesn't crash on addHeaders", async () => {
+		const s = new Server();
+		s.add("/relay", async (ev) => {
+			const response = await fetch("data:text/plain,peer-error");
+			ev.headers.set("x-relay", "1");
+			return response;
+		});
+		const res = await s.fetch("https://example.com/relay");
+		expect(res.headers.get("x-relay")).toBe("1");
+		expect(await res.text()).toBe("peer-error");
+	});
 });
 
 describe("ServerEvent", () => {

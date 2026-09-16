@@ -51,23 +51,37 @@ export default class ServerEvent {
 			throw new Error("Response not created yet");
 		}
 
+		try {
+			this.#addHeaders();
+		} catch (e) {
+			// The headers of a Response obtained from `fetch()` are immutable,
+			// so an endpoint that returns a fetched Response directly would
+			// otherwise kill the whole request (and process) -- swap in a
+			// mutable clone and write the headers to that instead
+			if (!(e instanceof TypeError)) throw e;
+			this.response = new Response(this.response.body, this.response);
+			this.#addHeaders();
+		}
+	}
+
+	#addHeaders(): void {
 		for (let cookie of this.cookies.cookies.values()) {
-			this.response.headers.append("set-cookie", cookie);
+			this.response!.headers.append("set-cookie", cookie);
 		}
 
 		for (let header of this.headers.headers.entries()) {
-			this.response.headers.append(header[0], header[1]);
+			this.response!.headers.append(header[0], header[1]);
 		}
 
 		// Redirect locations are written base-free, so that user code isn't
 		// aware of the base path
 		const base = getBasePath();
 		if (base) {
-			const location = this.response.headers.get("Location");
+			const location = this.response!.headers.get("Location");
 			if (location) {
 				const rewritten = addBaseToPath(location, base);
 				if (rewritten !== location) {
-					this.response.headers.set("Location", rewritten);
+					this.response!.headers.set("Location", rewritten);
 				}
 			}
 		}
