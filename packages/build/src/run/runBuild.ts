@@ -1,4 +1,5 @@
 import torpor from "@torpor/unplugin/vite";
+import { configDotenv } from "dotenv";
 import { existsSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { build, defineConfig, type AliasOptions } from "vite";
@@ -16,6 +17,11 @@ import runPrerender from "./runPrerender";
 // TODO: Call the correct +page and +server routes when in the same folder
 
 export default async function runBuild(site: Site): Promise<void> {
+	// Load environment variables from a `.env` file, with defaults if not
+	// set -- prerendering goes through the full load pipeline, so route
+	// `load` functions can hit the database at build time
+	configDotenv();
+
 	// Check route type annotations and makeApi calls against the routes
 	// derived from file locations, and check that layouts render their slot;
 	// errors fail the build before anything is written
