@@ -1,5 +1,55 @@
 # @torpor/build
 
+## 1.4.0
+
+<sub>2026-09-16</sub>
+
+- _(minor)_
+  Feat: `invokeHook` for calling server hooks in-process
+
+  `@torpor/build/server` now exports `invokeHook(hook, event)`, which runs a
+  server hook's `enter` function and returns its `Response` (or undefined),
+  so code that invokes endpoints in-process can honor a hook's short-circuit
+  response. A hook declared with `satisfies ServerHook<"...">` keeps its
+  implementation's inferred return type -- usually `void` -- so calling
+  `hook.enter(event)` directly doesn't type the result as `Response | void`;
+  `invokeHook` accepts any `ServerHook` and preserves the widened signature.
+
+- _(patch)_
+  Fix: load .env when building
+
+  `runBuild` now calls `configDotenv()` at startup, matching `runDev` and
+  `runPreview`. Build-time prerendering goes through the full load pipeline
+  (including the `_error` page), so route `load` functions can hit the
+  database or otherwise depend on environment variables from `.env` files.
+
+- _(patch)_
+  Fix: view transitions are opt-in
+
+  Client navigations no longer run inside `document.startViewTransition` by
+  default, so pages no longer cross-fade when navigating. Set
+  `site.viewTransitions = true` in site.config.ts to opt in; pages then
+  cross-fade and can be animated with `::view-transition-old/new` CSS. The
+  initial hydration still skips the transition, and scroll restoration is
+  unaffected.
+
+- _(patch)_
+  Fix: dep optimizer gets a rolldown-shaped plugin
+
+  The dev server's dep optimizer is a rolldown build, but it was given the
+  esbuild-shaped plugin from `@torpor/unplugin/esbuild` -- whose `setup(build)`
+  hooks rolldown silently ignores -- so `.torp` files in optimized dependencies
+  were parsed as plain JavaScript and failed. It now gets the vite/rolldown
+  export, which rolldown understands.
+
+  Also declares a `torpor` field in `@torpor/ui`'s package.json so
+  `findTorporPackages` detects it: registry installs are then excluded from dep
+  optimization (rolldown's optimizer can't bundle the css that compiled
+  components emit) and bundled for SSR automatically, without sites having to
+  configure `optimizeDeps.exclude`/`ssr.noExternal` themselves. The `torpor`
+  field can now be `"torpor": true` as well as a path, for packages that ship
+  compiled output and just want to mark themselves as torpor packages.
+
 ## 1.3.0
 
 <sub>2026-09-14</sub>
