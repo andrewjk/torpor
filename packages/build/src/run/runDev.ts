@@ -1,4 +1,3 @@
-import estorpor from "@torpor/unplugin/esbuild";
 import torpor from "@torpor/unplugin/vite";
 import { configDotenv } from "dotenv";
 import { existsSync, readFileSync } from "node:fs";
@@ -81,13 +80,14 @@ export default async function runDev(site: Site): Promise<void> {
 
 	// HACK: To be able to import `.torp` files from barrel files in
 	// node_modules, we need to add their libraries to `ssr.noExternal` in
-	// site.config.ts, and let esbuild know how to compile them here
+	// site.config.ts, and let the dep optimizer know how to compile them
+	// here. The optimizer is a rolldown build, so it needs a rolldown-shaped
+	// plugin (the vite export) -- an esbuild-shaped one is silently ignored
 	config.optimizeDeps ??= {};
 	config.optimizeDeps.extensions ??= [];
 	config.optimizeDeps.extensions.push(".torp");
 	config.optimizeDeps.rolldownOptions ??= {};
-	config.optimizeDeps.rolldownOptions.plugins ??= [estorpor()];
-	// TODO: config.optimizeDeps.rolldownOptions.plugins.push(estorpor());
+	config.optimizeDeps.rolldownOptions.plugins ??= [torpor()];
 
 	// Packages that ship `.torp` files (e.g. icon libraries) need the torpor
 	// compiler: dep optimization would parse them as plain JavaScript and
