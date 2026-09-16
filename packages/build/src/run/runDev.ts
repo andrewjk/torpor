@@ -36,7 +36,6 @@ export default async function runDev(site: Site): Promise<void> {
 	config.appType = "custom";
 	config.server ??= {};
 	config.server.host ??= "localhost";
-	config.server.port ??= 7059;
 	// Root-level host files (robots.txt, favicon.ico, etc) in src/public are
 	// served by Vite's middleware in dev and copied into the build output
 	const publicDir = path.resolve(site.root, "src/public");
@@ -111,6 +110,13 @@ export default async function runDev(site: Site): Promise<void> {
 	process.env.PROTOCOL ??= "http:";
 	process.env.HOST ??= "localhost";
 	process.env.PORT ??= "7059";
+
+	// Honor PORT (env or .env) for the dev server port, matching --preview;
+	// fall back to the default when it doesn't parse to a number
+	const envPort = parseInt(process.env.PORT);
+	if (!Number.isNaN(envPort)) {
+		config.server.port ??= envPort;
+	}
 
 	const connectingUrl = `${process.env.PROTOCOL}//${process.env.HOST}:${process.env.PORT}`;
 	console.log(`\nConnecting to ${connectingUrl}`);
