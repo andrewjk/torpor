@@ -136,6 +136,7 @@ export default async function runPrerender(site: Site): Promise<number> {
 	globalThis.adapter ??= { env: process.env };
 
 	const failures: string[] = [];
+	const skipped: string[] = [];
 	let written = 0;
 	for (const entry of entries) {
 		const url = `http://torpor.build${entry.path}`;
@@ -143,6 +144,13 @@ export default async function runPrerender(site: Site): Promise<number> {
 		const serverEvent = new ServerEvent(request, entry.params, new URL(url));
 		const response = await serverEntry.load(serverEvent, template);
 
+		if (isRedirect(response)) {
+			// Load functions redirect for auth and first-run setup, which is
+			// expected on a fresh site -- skip the page rather than failing
+			// the build, so a site can ship before it's initialized
+			skipped.push(`${entry.path} (status ${response.status})`);
+			continue;
+		}
 		if (response.status < 200 || response.status > 299) {
 			failures.push(`${entry.path} (status ${await responseStatus(response)})`);
 			continue;
@@ -163,11 +171,24 @@ export default async function runPrerender(site: Site): Promise<number> {
 		const url = "http://torpor.build/_error?status=404";
 		const serverEvent = new ServerEvent(new Request(url), undefined, new URL(url));
 		const response = await serverEntry.load(serverEvent, template);
-		if (response.ok && response.headers.get("Content-Type")?.includes("text/html")) {
+		if (isRedirect(response)) {
+			// The layout may redirect before the error page renders (e.g. to
+			// a setup page on a fresh site) -- skip it; the host's default
+			// 404 page is used instead
+			skipped.push(`/_error (status ${response.status})`);
+		} else if (response.ok && response.headers.get("Content-Type")?.includes("text/html")) {
 			await fs.writeFile(path.join(clientFolder, "404.html"), await response.text());
 		} else {
 			failures.push(`/_error (status ${await responseStatus(response)})`);
 		}
+	}
+
+	if (skipped.length) {
+		console.log(
+			`Skipped prerendering ${skipped.length} route${skipped.length === 1 ? "" : "s"} ` +
+				`(redirected):\n` +
+				skipped.map((s) => `  - ${s}`).join("\n"),
+		);
 	}
 
 	if (failures.length) {
@@ -289,6 +310,10 @@ export function expandPath(routePath: string, entry: Record<string, unknown>): s
 		}
 		return String(entry[key]);
 	});
+}
+
+function isRedirect(response: Response): boolean {
+	return response.status >= 300 && response.status < 400;
 }
 
 async function responseStatus(response: Response): Promise<string> {
