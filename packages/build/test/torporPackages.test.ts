@@ -16,6 +16,7 @@ beforeAll(() => {
 			name: "test-site",
 			dependencies: {
 				"fake-icons": "1.0.0",
+				"bool-icons": "1.0.0",
 				"plain-lib": "1.0.0",
 				"@scope/icons": "1.0.0",
 			},
@@ -32,6 +33,17 @@ beforeAll(() => {
 		}),
 	);
 	write("node_modules/fake-icons/index.js", "export default 1");
+
+	// A torpor package, detected by a boolean `torpor` marker
+	write(
+		"node_modules/bool-icons/package.json",
+		JSON.stringify({
+			name: "bool-icons",
+			torpor: true,
+			dependencies: { "nested-icons": "1.0.0" },
+		}),
+	);
+	write("node_modules/bool-icons/index.js", "export default 1");
 
 	// A torpor package one level down, detected by its `.torp` exports
 	write(
@@ -66,7 +78,12 @@ afterAll(() => {
 });
 
 test("findTorporPackages -- detects torpor packages", () => {
-	expect(findTorporPackages(root).sort()).toEqual(["@scope/icons", "fake-icons", "nested-icons"]);
+	expect(findTorporPackages(root).sort()).toEqual([
+		"@scope/icons",
+		"bool-icons",
+		"fake-icons",
+		"nested-icons",
+	]);
 });
 
 test("findTorporPackages -- no site package.json", () => {
@@ -79,10 +96,16 @@ test("addTorporPackageConfig -- sets optimizeDeps and ssr config", () => {
 
 	expect(config.optimizeDeps.exclude.sort()).toEqual([
 		"@scope/icons",
+		"bool-icons",
 		"fake-icons",
 		"nested-icons",
 	]);
-	expect(config.ssr.noExternal.sort()).toEqual(["@scope/icons", "fake-icons", "nested-icons"]);
+	expect(config.ssr.noExternal.sort()).toEqual([
+		"@scope/icons",
+		"bool-icons",
+		"fake-icons",
+		"nested-icons",
+	]);
 });
 
 test("addTorporPackageConfig -- merges with existing config", () => {

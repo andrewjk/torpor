@@ -5,7 +5,7 @@ import type { UserConfig } from "vite";
 
 export type PackageJson = {
 	name?: string;
-	torpor?: string;
+	torpor?: string | boolean;
 	exports?: unknown;
 	dependencies?: Record<string, string>;
 	devDependencies?: Record<string, string>;
@@ -23,8 +23,10 @@ export type PackageJson = {
  * leave raw `.torp` imports that neither Node nor workerd can load.
  *
  * A package is a torpor package when it declares a `torpor` entry in its
- * package.json (e.g. `"torpor": "./lib/index.js"`, mirroring the `svelte`
- * field convention), or when any of its export targets is a `.torp` file.
+ * package.json, or when any of its export targets is a `.torp` file. The
+ * entry is usually a path (`"torpor": "./lib/index.js"`, mirroring the
+ * `svelte` field convention), but packages that ship compiled output can
+ * just mark themselves with `"torpor": true`.
  *
  * @param siteRoot The root folder of the site
  * @returns The names of the torpor packages found (may be empty)
@@ -110,7 +112,7 @@ function collectTorporPackage(
 }
 
 function isTorporPackage(pkg: PackageJson): boolean {
-	if (typeof pkg.torpor === "string") return true;
+	if (pkg.torpor === true || typeof pkg.torpor === "string") return true;
 	return exportsIncludeTorp(pkg.exports);
 }
 
