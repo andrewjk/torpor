@@ -23,7 +23,7 @@ import { checkLayoutSlot, checkLayoutSlots } from "../site/checkLayoutSlots";
 import { LAYOUT_ROUTE } from "../types/RouteType";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
-import { detectSourceMode } from "../utils/entryPaths";
+import { detectSourceMode, siteEntryPaths } from "../utils/entryPaths";
 import devPlugin from "./devPlugin.ts";
 import { clearStaleDepCache } from "./depCache";
 import { reportStaleTorpCopies } from "./staleTorpCopies";
@@ -122,12 +122,39 @@ export default async function runDev(site: Site): Promise<void> {
 	console.log(`\nConnecting to ${connectingUrl}`);
 
 	const vite = await createViteServer(config);
+
+	// Load the SSR entry once before binding the listener: it triggers Vite's
+	// first dependency optimization, which otherwise settles down (reloading
+	// the server) right after "Listening on ..." -- dropping any request in
+	// flight at that moment, so clients see an empty reply
+	await warmServerEntry(vite, site, sourceMode);
+
 	await vite.listen();
 
 	watchRouteTypes(site, vite);
 
 	const listeningUrl = vite.resolvedUrls?.local?.[0] ?? connectingUrl;
 	console.log(`Listening on ${listeningUrl}\n`);
+}
+
+/**
+ * Loads the SSR entry so the first dependency optimization (and any
+ * optimizer-driven server reload) happens before the listener is bound,
+ * rather than on the first real request.
+ */
+async function warmServerEntry(
+	vite: ViteDevServer,
+	site: Site,
+	sourceMode: boolean,
+): Promise<void> {
+	try {
+		const { serverEntry } = siteEntryPaths(site.root, sourceMode);
+		await vite.ssrLoadModule(serverEntry);
+	} catch (e) {
+		// Never block startup over warmup -- the first real request surfaces
+		// errors as before
+		if (process.env.TORPOR_DEBUG_WARMUP) throw e;
+	}
 }
 
 /**
