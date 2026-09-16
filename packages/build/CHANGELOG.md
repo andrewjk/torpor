@@ -1,5 +1,50 @@
 # @torpor/build
 
+## 1.4.2
+
+<sub>2026-09-16</sub>
+
+- _(patch)_
+  Fix: `--dev` honors the `PORT` env var
+
+  The dev server always bound port 7059 (auto-incremented by vite when
+  busy) -- `process.env.PORT` was only used for the "Connecting to" log
+  line, so anything scripting dev servers had to parse the "Listening
+  on ..." output to learn the actual port. `runDev` now applies `PORT`
+  to the vite server port, matching `--preview`.
+
+- _(patch)_
+  Fix: skipped redirects don't fail prerendering
+
+  Prerendering rendered `/_error?status=404` through the root layout
+  whenever an `_error` route exists, and on an empty database the
+  layout's load redirects to a setup page -- the 303 counted as a
+  prerender failure, so a site could never be built before its first
+  user existed. Redirect responses are now treated as skips (the page
+  isn't shipped, the skip is logged) instead of failures, for both
+  prerendered pages and the error page.
+
+- _(patch)_
+  Fix: warm the dev server before listening
+
+  The dev server performed its first dependency optimization right
+  after printing "Listening on ...", reloading and resetting any
+  in-flight connections -- clients saw an empty reply until it
+  settled. `runDev` now loads the SSR entry before binding the
+  listener, so the first optimization (and the optimizer-driven
+  reload) completes before the port is open.
+
+- _(patch)_
+  Fix: endpoints can return fetched Responses
+
+  `addHeaders` appended set-cookie/CORS headers directly to the
+  response, but the headers of a Response obtained from `fetch()` are
+  immutable in undici -- an endpoint relaying a peer's Response (e.g.
+  returning the error response from a cross-site fetch) threw an
+  unhandled `TypeError: immutable` that killed the whole node process.
+  `addHeaders` now catches the TypeError, swaps in a mutable clone of
+  the response, and writes the headers to that instead.
+
 ## 1.4.1
 
 <sub>2026-09-16</sub>
