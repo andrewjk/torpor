@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.7
+
+<sub>2026-09-16</sub>
+
+- _(patch)_ Updated dependency `@torpor/build` v1.4.1
+
 ## 1.0.6
 
 <sub>2026-09-16</sub>
