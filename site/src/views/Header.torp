@@ -73,7 +73,9 @@ export default function Header() {
 												class={{ "drawer-sublink": true, active: $page.url.pathname === link.href }}
 												onclick={closeDrawer}
 											>
-												{link.label}
+												<span class="nav-label" data-label={link.label}>
+													<span>{link.label}</span>
+												</span>
 											</a>
 										}
 									</div>
@@ -97,19 +99,19 @@ export default function Header() {
 			</a>
 			<NavMenu class="site-nav" ariaLabel="Site sections">
 				<NavMenuLink href="/docs" class={["nav-link", { active: isActive("/docs") }]}>
-					Docs
+					<span class="nav-label" data-label="Docs"><span>Docs</span></span>
 				</NavMenuLink>
 				<NavMenuLink href="/ui" class={["nav-link", { active: isActive("/ui") }]}>
-					Components
+					<span class="nav-label" data-label="Components"><span>Components</span></span>
 				</NavMenuLink>
 				<NavMenuLink href="/build" class={["nav-link", { active: isActive("/build") }]}>
-					Build
+					<span class="nav-label" data-label="Build"><span>Build</span></span>
 				</NavMenuLink>
 				<NavMenuLink href="/blog" class={["nav-link", { active: isActive("/blog") }]}>
-					Blog
+					<span class="nav-label" data-label="Blog"><span>Blog</span></span>
 				</NavMenuLink>
 				<NavMenuLink href="/playground" class={["nav-link", { active: isActive("/playground") }]}>
-					Playground
+					<span class="nav-label" data-label="Playground"><span>Playground</span></span>
 				</NavMenuLink>
 			</NavMenu>
 			<div class="actions">
@@ -166,6 +168,7 @@ export default function Header() {
 			color: var(--text);
 			display: inline-block;
 			padding: 0.2rem 0.6rem;
+			text-align: center;
 			text-decoration: none;
 			white-space: nowrap;
 		}
@@ -179,6 +182,25 @@ export default function Header() {
 			background: var(--panel-back);
 			color: var(--header);
 			font-weight: 600;
+		}
+
+		/* Reserve the width of the bold (active) label, so that activating a
+		 * link doesn't shift its neighbours: the label and a hidden bold copy
+		 * share one grid cell, which is therefore always as wide as the bold
+		 * text */
+		.nav-label {
+			display: inline-grid;
+		}
+
+		.nav-label > span,
+		.nav-label::before {
+			grid-area: 1 / 1;
+		}
+
+		.nav-label::before {
+			content: attr(data-label);
+			font-weight: 600;
+			visibility: hidden;
 		}
 
 		.actions {
