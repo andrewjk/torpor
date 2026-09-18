@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.4.3
+
+<sub>2026-09-18</sub>
+
+- _(patch)_ Fix: form error re-rendering 401 on authenticated pages
+
 ## 1.4.2
 
 <sub>2026-09-16</sub>

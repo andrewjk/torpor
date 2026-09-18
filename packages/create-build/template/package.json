@@ -12,8 +12,8 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/adapter-node": "^1.0.8",
-		"@torpor/build": "^1.4.2",
+		"@torpor/adapter-node": "^1.0.9",
+		"@torpor/build": "^1.4.3",
 		"@torpor/unplugin": "^1.0.4",
 		"@torpor/view": "^1.1.0"
 	},
