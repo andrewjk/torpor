@@ -365,6 +365,9 @@ async function loadView(
 	formStatus?: number,
 	form?: Record<string, string | number>,
 	fromForm?: boolean,
+	// The appData that the server hooks populated around the form action,
+	// passed through so the re-render's loads see the same data
+	appData?: Record<string, any>,
 ) {
 	// There must be a client endpoint with a component
 	const clientEndPoint: PageEndPoint | undefined = (await resolveModule(handler)).default;
@@ -424,8 +427,10 @@ async function loadView(
 	}
 
 	// Maybe hit the server hooks -- unless they already ran for this request,
-	// which is the case when the view is re-rendered after a form action
-	const serverParams = buildServerParams(ev, url, params, query ? { query } : {});
+	// which is the case when the view is re-rendered after a form action. In
+	// that case the hooks' appData is passed through, so that the loads below
+	// see the same data (e.g. the user set by an auth hook) as the action did
+	const serverParams = buildServerParams(ev, url, params, query ? { query } : {}, appData);
 	const serverHooks = fromForm ? [] : await loadServerHooks(handler);
 	let entered = 0;
 	let enterResponse: Response | undefined = undefined;
@@ -639,6 +644,10 @@ async function runAction(
 			}
 
 			let result: Response | undefined | void;
+			// The event that the hooks and action run with. It's kept around so
+			// that the view re-render below can pass its appData (populated by
+			// the hooks' enter functions) through to the loads
+			let serverParams: ServerLoadEvent | undefined = undefined;
 			try {
 				// If the endpoint declares a schema for this action, validate the
 				// submitted form data up front and reject with 422 if it fails
@@ -647,7 +656,7 @@ async function runAction(
 					? await validate(schema, await formDataToRecord(ev.request))
 					: undefined;
 
-				const serverParams = buildServerParams(ev, url, params, form ? { form } : {});
+				serverParams = buildServerParams(ev, url, params, form ? { form } : {});
 
 				const serverHooks = await loadServerHooks(handler);
 				let entered = 0;
@@ -698,8 +707,10 @@ async function runAction(
 			) {
 				// If the form was submitted without javascript, and there was
 				// no result, an ok result, or a 4xx error, re-render the view
-				// with the form result. The server hook already ran around the
-				// action, so it is not run again here
+				// with the form result. The server hooks already ran around the
+				// action, so they are not run again here -- but their appData
+				// is passed through, so that loads guarding on it (e.g. an
+				// auth hook's user) re-render the page instead of erroring
 				// Keep the query string, so that loads validating the query see
 				// the same values as the original GET. If the form action
 				// dropped params that the load schema requires, loadView falls
@@ -720,7 +731,17 @@ async function runAction(
 				// object with whatever info you need
 				$page.form!.status ??= formStatus ?? 0;
 				$page.form!.message ??= formMessage ?? "";
-				return await loadView(ev, newUrl, handler, params, template, formStatus, $page.form, true);
+				return await loadView(
+					ev,
+					newUrl,
+					handler,
+					params,
+					template,
+					formStatus,
+					$page.form,
+					true,
+					serverParams?.appData,
+				);
 			} else {
 				// If the form was submitted without javascript and there was a
 				// redirect or server error, just return the result to handle it
@@ -781,11 +802,12 @@ function buildServerParams(
 	url: URL,
 	params: Record<string, any>,
 	values: { json?: unknown; form?: unknown; query?: unknown } = {},
+	appData: Record<string, any> = {},
 ): ServerLoadEvent {
 	return {
 		url,
 		params,
-		appData: {},
+		appData,
 		request: ev.request,
 		// The inputs may have been validated already, in which case the request
 		// body has been consumed and the parsed values are returned instead.

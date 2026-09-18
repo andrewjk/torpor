@@ -1,11 +1,14 @@
 import { expect, test } from "vite-plus/test";
+import unauthorized from "../src/response/unauthorized";
 import ok from "../src/response/ok";
 import ServerEvent from "../src/server/ServerEvent";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
-import { PAGE_ROUTE, PAGE_SERVER_ROUTE } from "../src/types/RouteType";
+import { HOOK_SERVER_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE } from "../src/types/RouteType";
 import type PageServerAction from "../src/types/PageServerAction";
 import type PageServerEndPoint from "../src/types/PageServerEndPoint";
+import type ServerHook from "../src/types/ServerHook";
+import type ServerLoadEvent from "../src/types/ServerLoadEvent";
 import type { StandardSchemaV1 } from "../src/types/StandardSchema";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import unprocessable from "../src/response/unprocessable";
@@ -163,4 +166,97 @@ test("a get with an invalid load query is still rejected", async () => {
 	expect(res.status).toBe(303);
 	expect(res.headers.get("Location")).toContain("/_error?");
 	expect(res.headers.get("Location")).toContain("status=422");
+});
+
+/**
+ * A hook that authenticates the user, like a root `_hook.server.ts` setting
+ * `appData.user` from the session cookie.
+ */
+const authHook = {
+	enter: ({ appData }: { appData: Record<string, any> }) => {
+		hookEnters.push(1);
+		appData.user = { name: "test" };
+	},
+} satisfies ServerHook;
+
+/**
+ * The number of times the auth hook's enter has run. The hooks must run once
+ * around a form action, and not again for the view re-render.
+ */
+let hookEnters: number[] = [];
+
+/**
+ * A page server endpoint whose load requires a user from `appData` (set by
+ * the auth hook), and whose action fails validation.
+ */
+const guardedServer = {
+	load: async (ev: ServerLoadEvent) => {
+		if (!ev.appData.user) {
+			return unauthorized();
+		}
+		return Response.json({ user: ev.appData.user });
+	},
+	actions: {
+		default: async () => unprocessable({ message: "email is invalid" }),
+	},
+} satisfies PageServerEndPoint;
+
+/**
+ * A site with an auth hook, and a page whose load guards on the hook's
+ * `appData.user`.
+ */
+function guardedSite() {
+	hookEnters = [];
+	const routes: ManifestRoute[] = [
+		{
+			path: "/_hook/~server",
+			type: HOOK_SERVER_ROUTE,
+			endPoint: () => Promise.resolve({ default: authHook }),
+			subFolder: undefined,
+		},
+		{
+			path: "/profile",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component } }),
+			subFolder: undefined,
+		},
+		{
+			path: "/profile/~server",
+			type: PAGE_SERVER_ROUTE,
+			endPoint: () => Promise.resolve({ default: guardedServer }),
+			subFolder: undefined,
+		},
+	];
+	return createServerLoad(new Router().addPages(routes));
+}
+
+test("a load that guards on the hook's appData renders when the hook ran", async () => {
+	const guardedLoad = guardedSite();
+	const res = await guardedLoad(new ServerEvent(new Request("http://localhost/profile")), template);
+
+	expect(res.status).toBe(200);
+	const html = await res.text();
+	expect(html).toContain(JSON.stringify({ user: { name: "test" } }));
+});
+
+test("a 4xx form action re-renders with the hook's appData instead of erroring", async () => {
+	const guardedLoad = guardedSite();
+
+	// A no-javascript form post: the action returns 422, so the view is
+	// re-rendered. The re-render skips the hooks (they already ran around the
+	// action), so its loads used to see an empty appData and the guarded load
+	// returned a bare 401
+	const res = await guardedLoad(postEvent("/profile"), template);
+
+	expect(res.status).toBe(422);
+	expect(res.headers.get("Content-Type")).toContain("text/html");
+	const html = await res.text();
+	// The form errors were rendered into the page ...
+	expect(html).toContain("t-form-data");
+	expect(html).toContain("email is invalid");
+	// ... and the load saw the user the hook put in appData, instead of
+	// rejecting the request with 401
+	expect(html).toContain(JSON.stringify({ user: { name: "test" } }));
+	// The hooks ran once around the action, and not again for the re-render
+	expect(hookEnters).toHaveLength(1);
 });
