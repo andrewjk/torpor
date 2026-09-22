@@ -1,6 +1,6 @@
 import context from "./context";
 import { setFirstInsideNode } from "./firstInsideNode";
-import { HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
+import { HYDRATION_BREAK, HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
 import isCommentNode from "./isCommentNode";
 import nodeNext from "./nodeNext";
 
@@ -30,8 +30,25 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 			// block (after any leading branch-break marker), which becomes the
 			// active region's start node.
 			let currentNode: ChildNode | null = nodeNext(node);
-			const firstInside: ChildNode | null = currentNode;
 			node.remove();
+
+			// An empty control block can emit one branch-break marker per
+			// non-taken branch (e.g. an `@if`/`else if` where no branch
+			// matched), and `nodeNext` only strips the first. Skip any that
+			// remain: they are server-only artifacts, not content, and must not
+			// become the region's start node.
+			while (
+				currentNode !== null &&
+				isCommentNode(currentNode) &&
+				currentNode.data === HYDRATION_BREAK
+			) {
+				const next: ChildNode | null = currentNode.nextSibling;
+				currentNode.remove();
+				currentNode = next;
+				context.hydrationNode = currentNode;
+			}
+
+			const firstInside: ChildNode | null = currentNode;
 
 			// Go through nodes in document order until we get to the end.
 			// We use document order (descending into child elements) rather
@@ -58,13 +75,23 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 								context.hydrationNode = endNode;
 							}
 
+							// If the first node inside the block is the end
+							// marker itself, the block has no content (only
+							// markers). `firstInside` would then point at a node
+							// that's about to be removed, leaving the region's
+							// start node detached and its clear walk running past
+							// into preceding siblings.
+							const firstContent = firstInside === currentNode ? null : firstInside;
+
 							// Set the active region's start node to the first
 							// node inside the block. This mirrors mounting,
 							// where the start node is the fragment's first
 							// child — the actual content — rather than a marker.
+							// For an empty block, mounting captures the anchor
+							// comment as both bounds, so match that.
 							const region = context.activeRegion;
-							if (region.startNode === null && firstInside !== null) {
-								region.startNode = firstInside;
+							if (region.startNode === null) {
+								region.startNode = firstContent ?? endNode;
 							}
 
 							// Stash the first node inside the block, keyed by
@@ -72,7 +99,7 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 							// for `@html`) reads it back to adopt the
 							// server-rendered nodes, since the markers that
 							// bounded them have now been removed.
-							setFirstInsideNode(endNode!, firstInside);
+							setFirstInsideNode(endNode!, firstContent);
 
 							// NOTE: We know this is not null as it is being
 							// called from generated code

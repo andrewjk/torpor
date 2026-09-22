@@ -60,54 +60,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### Hydration: switching an `@if` branch whose SSR output is empty wipes adjacent siblings
-
-Found in redraft's post editor: on a hydrated page, toggling the "article"
-button on (`@if (post.isArticle) ... else if (post.isEvent) ... else ...`)
-removed the _preceding_ siblings -- the post text field and several hidden
-inputs -- instead of just replacing the else branch. Works fine with a plain
-client-side `mount()`; only hydration is affected.
-
-Trigger: the else branch contains only **empty nested control blocks** (an
-`@if/else if` where both conditions are false), so its SSR output is just
-anchor comments (`<!> <![><!^><![><!]><!>` style, including the `<!^>`
-empty-fragment marker). After hydration, clearing that branch and mounting the
-new one uses wrong region boundaries -- the new branch content lands where the
-preceding siblings were, and those siblings are removed.
-
-Minimal repro (all client-rendered except the root component, which is server
-rendered then hydrated):
-
-```torp
-<!-- Parent.torp -->
-export default function Parent($props: { on?: boolean }) {
-	let $state = $watch({ on: $props.on ?? false, hasImage: false, hasLink: false });
-	@render {
-		<div class="sibling">sibling content</div>
-		@if ($state.on) {
-			<div class="branch">branch content</div>
-		} else {
-			@if ($state.hasImage) {
-				<div>image</div>
-			} else if ($state.hasLink) {
-				<div>link</div>
-			}
-		}
-		<button onclick={() => $state.on = !$state.on}>toggle</button>
-	}
-}
-```
-
-Server render + `hydrate()`, click toggle: `.sibling` is removed. Keeping a
-real element (e.g. `<div style="display:none"></div>`) anywhere in the else
-branch makes the boundaries come out right, so the empty-fragment markers are
-what throw off the hydrated region's start/end anchor resolution. Likely the
-`<!^>` (empty fragment) case isn't accounted for when restoring hydration
-cursors for a branch that contains no elements.
-
-Site-side workaround for now: an invisible placeholder element first inside
-the else branch (PostInputFields.torp).
-
 ### @torpor/ui form components don't apply a changed `name` prop to their input
 
 The `name` of `Field` is captured once per component instance and then never
