@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { expect, test } from "vite-plus/test";
+import hydrate from "../../src/render/hydrate";
+import mount from "../../src/render/mount";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
@@ -33,6 +35,23 @@ test("mount -- hydrated", async () => {
 	await hydrateComponent(container, clientComponent, serverComponent);
 
 	await check(container);
+});
+
+test("mount -- SSR component throws", async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "server");
+
+	expect(() => mount(container, component)).toThrow(/compiled for SSR/);
+	expect(container.childElementCount).toBe(0);
+	expect(container.firstChild).toBe(null);
+});
+
+test("hydrate -- SSR component throws", async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "server");
+
+	expect(() => hydrate(container, component)).toThrow(/compiled for SSR/);
+	expect(container.firstChild).toBe(null);
 });
 
 async function check(container: HTMLElement) {

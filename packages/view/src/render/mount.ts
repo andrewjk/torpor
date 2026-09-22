@@ -1,6 +1,7 @@
 import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
+import isServerComponent from "./isServerComponent";
 import context from "./context";
 import newRegion from "./newRegion";
 import pushRegion from "./pushRegion";
@@ -18,6 +19,12 @@ export default function mount(
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
 ): void {
+	if (isServerComponent(component)) {
+		throw new Error(
+			"The component was compiled for SSR (it renders to an HTML string) and cannot be mounted in the browser. Import the client build instead, e.g. with the '?client' import query",
+		);
+	}
+
 	// The parent node must have no child elements, so that we can hydrate
 	// without worrying about where to start
 	if (parent.childElementCount > 0) {

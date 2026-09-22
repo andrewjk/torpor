@@ -2,6 +2,7 @@ import devContext from "../dev/devContext";
 import type Component from "../types/Component";
 import type SlotRender from "../types/SlotRender";
 import flushMountEffects from "../watch/flushMountEffects";
+import isServerComponent from "./isServerComponent";
 import context from "./context";
 import newRegion from "./newRegion";
 import pushRegion from "./pushRegion";
@@ -18,6 +19,12 @@ export default function hydrate(
 	props?: Record<string, any>,
 	slots?: Record<string, SlotRender>,
 ): void {
+	if (isServerComponent(component)) {
+		throw new Error(
+			"The component was compiled for SSR (it renders to an HTML string) and cannot be hydrated in the browser. Import the client build instead, e.g. with the '?client' import query",
+		);
+	}
+
 	// When mounting, the parent must have no child elements, so  we can just set
 	// the hydration node to the first child node
 	context.hydrationNode = parent.firstChild;

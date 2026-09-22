@@ -60,17 +60,15 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### `mount()` fails silently (plus an unhandled rejection) with an SSR-compiled component
+### Missing `await` on hydrateComponent in the on-mount $run test
 
-Mounting a component that was compiled with `{ server: true }` renders nothing
-into the parent and doesn't throw; the test process also got an unhandled
-rejection from `serverFlush`/`withServerAwait` (dist/ssr.mjs). This bites with
-the unplugin's `test: true` option (redraft uses it so page tests can call
-components as functions and assert on the HTML): every `.torp` import in that
-project is SSR-compiled, and `mount()` then appears to no-op. The two shapes
-are distinguishable -- SSR components take `(props)` and return `{ body }`,
-client components take `(parent, anchor, props, context, slots)` -- so `mount`
-could throw a clear "component was compiled for SSR" error.
+`test/on-mount/mount-with-run.ts` (view package) calls
+`hydrateComponent(...)` without `await` (oxlint `no-floating-promises`), so
+the hydration path's assertions run before the SSR HTML is guaranteed to be
+in the container. The test currently passes because the source component has
+no async boundaries, but adding the `await` may expose latent timing
+assumptions in the sibling assertions, so it needs a proper look rather than
+a drive-by fix.
 
 ## Features
 
