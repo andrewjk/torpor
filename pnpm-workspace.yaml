@@ -1,6 +1,7 @@
 packages:
   - packages/*
   - packages/adapters/*
+  - packages/unplugin/test/fixtures/*
   - site
   - examples/*
   - benchmarks/*

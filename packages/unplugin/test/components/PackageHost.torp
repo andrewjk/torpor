@@ -1,0 +1,11 @@
+import { Progress } from "@torpor/ui/Progress";
+import { Widget } from "torp-lib/Widget";
+
+export default function PackageHost($props: {} | undefined) {
+	@render {
+		<div class="package-host">
+			<Widget label="From package" />
+			<Progress value={42} />
+		</div>
+	}
+}

@@ -604,6 +604,9 @@ importers:
       '@nuxt/schema':
         specifier: ^4.5.1
         version: 4.5.1
+      '@torpor/ui':
+        specifier: workspace:^
+        version: link:../ui
       '@types/node':
         specifier: ^26.1.2
         version: 26.1.2
@@ -637,6 +640,9 @@ importers:
       rollup:
         specifier: ^4.62.4
         version: 4.62.4
+      torp-lib:
+        specifier: workspace:*
+        version: link:test/fixtures/torp-lib
       typescript:
         specifier: ^7.0.2
         version: 7.0.2
@@ -646,6 +652,12 @@ importers:
       webpack:
         specifier: ^5.109.2
         version: 5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)
+
+  packages/unplugin/test/fixtures/torp-lib:
+    dependencies:
+      '@torpor/view':
+        specifier: workspace:^
+        version: link:../../../../view
 
   packages/view:
     devDependencies:

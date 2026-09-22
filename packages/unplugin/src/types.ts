@@ -13,7 +13,10 @@ export default interface Options {
 	 * and assert on the rendered HTML. To mount a component client-side in
 	 * the same test project, import it with a `?client` query (e.g.
 	 * `Component.torp?client`); the override is passed on to any components
-	 * it imports. A `?server` query does the reverse.
+	 * it imports, including components from packages that ship `.torp` files
+	 * (e.g. `@torpor/ui/*` or `phosphor-torpor/*`), whose re-export barrels
+	 * get the query passed through as well. A `?server` query does the
+	 * reverse.
 	 */
 	test?: boolean;
 	/**

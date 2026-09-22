@@ -1,0 +1,24 @@
+{
+	"name": "torp-lib",
+	"version": "1.0.0",
+	"description": "Test fixture: a torpor package with a re-export barrel (like @torpor/ui) and a direct .torp export (like phosphor-torpor)",
+	"type": "module",
+	"torpor": true,
+	"exports": {
+		"./Widget": {
+			"types": "./dist/Widget/index.d.ts",
+			"import": "./dist/Widget/index.js"
+		},
+		"./Solo": {
+			"types": "./dist/Solo.torp.d.ts",
+			"import": "./dist/Solo.torp"
+		},
+		"./package.json": "./package.json"
+	},
+	"files": [
+		"dist"
+	],
+	"dependencies": {
+		"@torpor/view": "workspace:^"
+	}
+}
