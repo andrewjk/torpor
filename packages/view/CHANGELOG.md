@@ -1,5 +1,57 @@
 # @torpor/view
 
+## 1.1.2
+
+<sub>2026-09-22</sub>
+
+- _(patch)_
+  Fix: hydration of an empty `@if`/`@else` branch wiped adjacent siblings
+
+  An empty control block (its SSR output is only markers, e.g. a nested
+  `@if`/`else if` where no branch matched) emitted one `<!^>` branch-break marker
+  per non-taken branch. `nodeAnchor` stripped only the first, so the active
+  region captured a marker — or, when there were none, the `<!]>` end marker —
+  as its `startNode`. The end marker is then removed, leaving the region with a
+  detached start node, and a later `clearRegion` walked backwards past the
+  block and removed preceding siblings. `nodeAnchor` now skips all leading
+  branch-break markers and, for a block with no content, sets the region's
+  bounds to the anchor (matching `mount`).
+
+- _(patch)_
+  Fix: warn about duplicate `@key` values in keyed `@for` lists
+
+  `runListItems` matches old and new rows by key first-match-wins, so duplicate
+  `@key` values (e.g. two rows with `id: -1`) make updates and removals hit the
+  wrong regions and silently desync the DOM from the data. A dev-mode warning
+  now reports each duplicate key once per list (gated by `devContext.enabled`,
+  so it is a no-op in production builds), and unkeyed lists — which the
+  reconciler matches positionally — are ignored.
+
+- _(patch)_
+  Fix: `mount()`/`hydrate()` now throw on SSR-compiled components
+
+  Passing a component compiled with `{ server: true }` (e.g. every `.torp`
+  import under the unplugin's `test: true` option) to `mount()` rendered
+  nothing and didn't throw -- the component ran its server render to an HTML
+  string that went nowhere, with any failure surfacing only as an unhandled
+  rejection from `serverFlush`. SSR components are always emitted as
+  `async function`s, so `mount` and `hydrate` now check for that shape up
+  front (via the intrinsic `AsyncFunction` constructor, which survives
+  minification) and throw a clear "compiled for SSR" error pointing at the
+  `?client` import query. The check runs once per mount call, not in any
+  per-node render path.
+
+- _(patch)_
+  Fix: add missing `await` on `hydrateComponent` in the on-mount `$run` test
+
+  `test/on-mount/mount-with-run.ts` called `hydrateComponent(...)` without
+  `await`, so the hydration assertions could run before the SSR HTML was
+  guaranteed to be in the container. Also renamed the file to
+  `mount-with-run.test.ts` -- it had been added without the `.test.ts`
+  suffix, so vitest's include pattern never picked it up and neither test
+  in it was actually running. Both tests pass with the `await` and the
+  rename in place.
+
 ## 1.1.1
 
 <sub>2026-09-22</sub>

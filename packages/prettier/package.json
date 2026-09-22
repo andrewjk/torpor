@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/prettier",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "A Prettier plugin for Torpor files",
 	"type": "module",
 	"exports": {

@@ -782,7 +782,11 @@ function getElementFragment(document, array, index, html, ns) {
 	}
 	return array[index].cloneNode(true);
 }
+function isServerComponent(component) {
+	return component.constructor?.name === "AsyncFunction";
+}
 function hydrate(parent, component, props, slots) {
+	if (isServerComponent(component)) throw new Error("The component was compiled for SSR (it renders to an HTML string) and cannot be hydrated in the browser. Import the client build instead, e.g. with the '?client' import query");
 	context.hydrationNode = parent.firstChild;
 	context.rootRegion = newRegion(devContext.enabled ? "Root" : void 0);
 	context.previousRegion = context.rootRegion;
@@ -792,6 +796,7 @@ function hydrate(parent, component, props, slots) {
 	flushMountEffects();
 }
 function mount(parent, component, props, slots) {
+	if (isServerComponent(component)) throw new Error("The component was compiled for SSR (it renders to an HTML string) and cannot be mounted in the browser. Import the client build instead, e.g. with the '?client' import query");
 	if (parent.childElementCount > 0) throw new Error("The parent node must have no child elements");
 	while (parent.firstChild !== null) parent.firstChild.remove();
 	if (context.rootRegion === null) {
@@ -857,8 +862,14 @@ function nodeAnchor(node) {
 		if (isCommentNode(node) && node.data === "[") {
 			const startParent = node.parentNode;
 			let currentNode = nodeNext(node);
-			const firstInside = currentNode;
 			node.remove();
+			while (currentNode !== null && isCommentNode(currentNode) && currentNode.data === "^") {
+				const next = currentNode.nextSibling;
+				currentNode.remove();
+				currentNode = next;
+				context.hydrationNode = currentNode;
+			}
+			const firstInside = currentNode;
 			let level = 1;
 			while (currentNode !== null) {
 				if (isCommentNode(currentNode)) {
@@ -869,9 +880,10 @@ function nodeAnchor(node) {
 							const endNode = currentNode.nextSibling;
 							currentNode.remove();
 							if (context.hydrationNode === currentNode) context.hydrationNode = endNode;
+							const firstContent = firstInside === currentNode ? null : firstInside;
 							const region = context.activeRegion;
-							if (region.startNode === null && firstInside !== null) region.startNode = firstInside;
-							setFirstInsideNode(endNode, firstInside);
+							if (region.startNode === null) region.startNode = firstContent ?? endNode;
+							setFirstInsideNode(endNode, firstContent);
 							return endNode;
 						}
 					}
@@ -1007,6 +1019,36 @@ function runControlBranch(region, oldIndex, index) {
 	}
 	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
+}
+const warnedByRegion = /* @__PURE__ */ new WeakMap();
+function checkListKeys(region, specs) {
+	let seen;
+	for (let i = 0; i < specs.length; i++) {
+		const key = specs[i].key;
+		if (key === void 0 || key === null) continue;
+		if (seen === void 0) seen = /* @__PURE__ */ new Set();
+		if (!seen.has(key)) {
+			seen.add(key);
+			continue;
+		}
+		let warned = warnedByRegion.get(region);
+		if (warned === void 0) {
+			warned = /* @__PURE__ */ new Set();
+			warnedByRegion.set(region, warned);
+		}
+		if (!warned.has(key)) {
+			warned.add(key);
+			console.warn(`[torpor] Duplicate @key value ${formatKey(key)} in a keyed @for list. Keys must be unique, or updates and removals will affect the wrong rows.`);
+		}
+	}
+}
+function formatKey(key) {
+	try {
+		const json = JSON.stringify(key);
+		return json === void 0 ? String(key) : json;
+	} catch {
+		return String(key);
+	}
 }
 const proxyCache = /* @__PURE__ */ new WeakMap();
 function deepWrap(value) {
@@ -1687,6 +1729,7 @@ function runList(region, parent, anchor, buildItems, create, update, noWatch) {
 		const oldRegion = pushRegion(region, first);
 		first = false;
 		const newSpecs = buildItems();
+		if (devContext.enabled) checkListKeys(region, newSpecs);
 		context.activeTarget = null;
 		listItems = runListItems(region, parent, anchor, listItems, newSpecs, create, update, noWatch);
 		popRegion(oldRegion);

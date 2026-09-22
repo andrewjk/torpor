@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.4.5
+
+<sub>2026-09-22</sub>
+
+- _(patch)_ Updated dependency `@torpor/unplugin` v1.1.0
+
 ## 1.4.4
 
 <sub>2026-09-22</sub>
