@@ -1,0 +1,16 @@
+import CountLabel from "./CountLabel.torp";
+
+export default function Counter($props: { start?: number } | undefined) {
+	let $state = $watch({ count: $props?.start ?? 0 });
+
+	function increment() {
+		$state.count += 1;
+	}
+
+	@render {
+		<div>
+			<CountLabel count={$state.count} />
+			<button onclick={increment}>Increment</button>
+		</div>
+	}
+}

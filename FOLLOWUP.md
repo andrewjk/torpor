@@ -45,6 +45,123 @@ guard armed right before hide. Any future focus-to-open component needs the same
 guard; alternatively the runtime could distinguish script-driven refocus from real
 user focus events.
 
+### Plain `let` initialized from `$props` is a silent stale-capture trap in keyed lists
+
+Found in redraft's PostInputFields.torp (multi-part post editor). A component
+instantiated from a keyed `@for` gets its props updated in place on list
+reconciliation -- the compiler emits a `$watch`ed props bag plus a
+`forVarMask`-tagged effect that writes the new `i`/item values into it, and
+`t_rerun_region_effects` re-runs matching effects -- so reads of `$props.i` in
+template expressions track correctly. But `let prefix = \`children[${$props.i}]\``in the component body is evaluated once at setup: template effects reading`prefix` never re-run, so after children were spliced out the surviving
+components kept the *previous* child's form field names (`children[1]...`instead of`children[0]...`) and the submitted form data was silently wrong.
+By design a plain `let`isn't reactive, but the combination "keyed list keeps
+the component instance alive AND updates its props" makes the non-reactivity
+surprising and the failure invisible. Options: a compiler warning when a
+template expression references a plain`let`whose initializer reads`$props`
+(detectable syntactically), and/or a note in the reactivity docs.
+
+### Hydration: switching an `@if` branch whose SSR output is empty wipes adjacent siblings
+
+Found in redraft's post editor: on a hydrated page, toggling the "article"
+button on (`@if (post.isArticle) ... else if (post.isEvent) ... else ...`)
+removed the _preceding_ siblings -- the post text field and several hidden
+inputs -- instead of just replacing the else branch. Works fine with a plain
+client-side `mount()`; only hydration is affected.
+
+Trigger: the else branch contains only **empty nested control blocks** (an
+`@if/else if` where both conditions are false), so its SSR output is just
+anchor comments (`<!> <![><!^><![><!]><!>` style, including the `<!^>`
+empty-fragment marker). After hydration, clearing that branch and mounting the
+new one uses wrong region boundaries -- the new branch content lands where the
+preceding siblings were, and those siblings are removed.
+
+Minimal repro (all client-rendered except the root component, which is server
+rendered then hydrated):
+
+```torp
+<!-- Parent.torp -->
+export default function Parent($props: { on?: boolean }) {
+	let $state = $watch({ on: $props.on ?? false, hasImage: false, hasLink: false });
+	@render {
+		<div class="sibling">sibling content</div>
+		@if ($state.on) {
+			<div class="branch">branch content</div>
+		} else {
+			@if ($state.hasImage) {
+				<div>image</div>
+			} else if ($state.hasLink) {
+				<div>link</div>
+			}
+		}
+		<button onclick={() => $state.on = !$state.on}>toggle</button>
+	}
+}
+```
+
+Server render + `hydrate()`, click toggle: `.sibling` is removed. Keeping a
+real element (e.g. `<div style="display:none"></div>`) anywhere in the else
+branch makes the boundaries come out right, so the empty-fragment markers are
+what throw off the hydrated region's start/end anchor resolution. Likely the
+`<!^>` (empty fragment) case isn't accounted for when restoring hydration
+cursors for a branch that contains no elements.
+
+Site-side workaround for now: an invisible placeholder element first inside
+the else branch (PostInputFields.torp).
+
+### @torpor/ui form components don't apply a changed `name` prop to their input
+
+The `name` of `Field` is captured once per component instance and then never
+updated: `Field` builds `let context: FieldContext = { name: $props.name, ... }`
+at setup, and `Input`/`TextArea`/`Select`/`File`/`CheckBox` each do
+`let name = $props?.name; ... name ??= fieldContext.name;` before rendering
+`<textarea {name} />` etc. So when a `Field`'s `name` prop changes after mount,
+the rendered input keeps the old `name` attribute. (`Hidden` is fine -- it
+applies its name reactively. `Field`'s `valid`/`message` getters are fine too --
+they read `$props.name` inside tracked getters.)
+
+Concrete failure in redraft's multi-part post editor: each child post is a
+component whose form fields are named `children[${i}]...`. Removing a child
+shifts the following children's indexes; their hidden inputs renamed correctly
+but the `<Field><TextArea name=...>` kept the _old_ index, so the submitted
+form contained `children[1]` (id etc.) plus a phantom `children[2]text` --
+valibot then reported `Invalid key: Expected "id" but received undefined` and
+`Text is required` on save. Site-side workaround for now: the child loop keys
+by `i + "_" + child.id` so a child whose position changed remounts with fresh
+field names.
+
+Suggested fix: make the name a computed value that reads the prop and the
+field context reactively (e.g. a getter on the component's `$watch` state:
+`get name() { return $props?.name ?? fieldContext?.name; }`), or an `$run`
+effect that sets the attribute. Same for `Field`'s captured context object --
+store the context name in `$state` (or use a getter) so downstream
+Label/Input/Message consumers see updates. This is the `@torpor/ui` instance
+of the "plain `let` initialized from `$props`" compiler footgun above -- but
+fixing it in the components is worthwhile regardless, since a changed `name`
+prop is a reasonable thing for consumers to expect.
+
+### Keyed `@for` silently misbehaves on duplicate keys
+
+`runListItems` matches old/new items by key first-match-wins. With duplicate
+key values in the data, updates and clears can hit the wrong regions and the
+DOM desyncs from the data. Hit in redraft: two "new post" children both had
+`id: -1` (generated independently by two component instances), and removing
+the first cleared the _second_ child's region while showing the first's
+content. A dev-mode warning on duplicate keys (where `newSpecs` is built, or
+in `runListItems`) would surface this immediately. (The data bug was fixed on
+the app side by generating unique ids.)
+
+### `mount()` fails silently (plus an unhandled rejection) with an SSR-compiled component
+
+Mounting a component that was compiled with `{ server: true }` renders nothing
+into the parent and doesn't throw; the test process also got an unhandled
+rejection from `serverFlush`/`withServerAwait` (dist/ssr.mjs). This bites with
+the unplugin's `test: true` option (redraft uses it so page tests can call
+components as functions and assert on the HTML): every `.torp` import in that
+project is SSR-compiled, and `mount()` then appears to no-op. The two shapes
+are distinguishable -- SSR components take `(props)` and return `{ body }`,
+client components take `(parent, anchor, props, context, slots)` -- so `mount`
+could throw a clear "component was compiled for SSR" error.
+
 ## Features
 
 ### DataGrid: expose reload-pending state for loader grids

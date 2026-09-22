@@ -26,34 +26,48 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 	},
 	// @ts-ignore
 	transform(code, id, viteOptions) {
+		// Copy the factory options instead of mutating them, so that the
+		// per-request dev/server overrides below don't stick around and
+		// surprise the next request
+		let transformOptions: Options = { ...options };
+
 		// We may be in dev mode
 		if (viteOptions && viteOptions.dev !== undefined) {
-			options ??= {};
-			options.dev = viteOptions.dev;
+			transformOptions.dev = viteOptions.dev;
 		}
 
-		// Vite can override user server options
-		if (viteOptions && viteOptions.ssr !== undefined) {
-			options ??= {};
-			options.server = viteOptions.ssr;
-		}
+		// An explicit ?client or ?server query on the import overrides
+		// everything else -- e.g. importing `Component.torp?client` in a test
+		// run compiles the component for the client, so that it can be
+		// mounted, while other components stay SSR-compiled
+		const query = getQuery(id);
+		if (query?.has("client")) {
+			transformOptions.server = false;
+		} else if (query?.has("server")) {
+			transformOptions.server = true;
+		} else {
+			// Vite can override user server options
+			if (viteOptions && viteOptions.ssr !== undefined) {
+				transformOptions.server = viteOptions.ssr;
+			}
 
-		// But when testing we always generate for the server
-		if (options?.test) {
-			options.server = true;
+			// But when testing we always generate for the server
+			if (transformOptions.test) {
+				transformOptions.server = true;
+			}
 		}
 
 		// Try to parse the code
 		let parsed = parse(code);
 		if (parsed.ok && parsed.template) {
 			// Transform for server or client
-			return transform(parsed.template, id, options);
+			return transform(parsed.template, id, transformOptions);
 		} else {
 			// Show an error component
 			let name = id
 				.split(/[\\/]/)
 				.at(-1)
-				.replace(/\.torp$/, "")!;
+				.replace(/\.torp.*$/, "")!;
 			let errorMessages = parsed.errors.map(
 				(e) => `${e.startLine + 1},${e.startChar}: ${e.message}`,
 			);
@@ -73,7 +87,7 @@ export default function Error() {
 }`;
 			let errorParsed = parse(errorCode);
 			if (errorParsed.ok && errorParsed.template) {
-				return transform(errorParsed.template, id, options);
+				return transform(errorParsed.template, id, transformOptions);
 			}
 			// This should never be reached, but just in case...
 			throw new Error(`Parse failed for ${id}, ${errorMessages.join("\n")}`);
@@ -81,9 +95,28 @@ export default function Error() {
 	},
 });
 
+/**
+ * Gets the query string of a module id (e.g. `client` for `Foo.torp?client`)
+ */
+function getQuery(id: string): URLSearchParams | undefined {
+	const queryStart = id.lastIndexOf("?");
+	if (queryStart === -1) {
+		return undefined;
+	}
+	return new URLSearchParams(id.substring(queryStart + 1));
+}
+
 function transform(template: Template, id: string, options?: Options) {
 	const built = build(template, options);
 	let transformed = built.code;
+
+	// When a component is compiled for the client in a test run, any child
+	// components it imports must also be compiled for the client -- otherwise
+	// mounting the parent would try to render SSR children (which don't show
+	// anything). Pass the ?client query on to imported components
+	if (options?.test && options.server === false) {
+		transformed = transformed.replace(/(from\s*['"])([^'"]+\.torp)(['"])/g, "$1$2?client$3");
+	}
 
 	if (built.styles) {
 		for (let style of built.styles) {

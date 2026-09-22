@@ -1,0 +1,5 @@
+export default function CountLabel($props: { count: number } | undefined) {
+	@render {
+		<span class="count-label">Count: {$props?.count}</span>
+	}
+}
