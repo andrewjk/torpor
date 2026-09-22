@@ -184,23 +184,33 @@ function buildElementAttributes(
 
 	// TODO: Add an error if any reactive attributes are used non-reactively
 
-	for (let { name, value, reactive, fullyReactive, span } of node.attributes) {
+	// Pair up &-bindings with user event handlers for the same event, so a
+	// single t_event can be emitted for both -- delegated event handlers are
+	// last-write-wins per element and type, so a second t_event would clobber
+	// the binding's state write
+	const combinedHandlers = combinedEventHandlers(node, status);
+	const consumedHandlers = new Set(Array.from(combinedHandlers.values(), (c) => c.index));
+
+	for (let [index, { name, value, reactive, fullyReactive, span }] of node.attributes.entries()) {
 		if (name === "self" && node.tagName === "@element") {
 			// Ignore this special attribute
 		} else if (name === "&ref") {
 			// Ignore this one, it should have been done already, above
 		} else if (value != null && fullyReactive) {
 			if (name === "&group") {
-				buildBindGroupAttribute(node, varName, value, status, b);
+				buildBindGroupAttribute(node, varName, value, status, b, combinedHandlers.get(index));
 			} else if (name === "&value" || name === "&checked") {
-				buildBindAttribute(node, varName, name, value, status, b);
+				buildBindAttribute(node, varName, name, value, status, b, combinedHandlers.get(index));
 			} else if (name === "onmount") {
 				// The onmount event is faked by us by creating an $onmount. This
 				// also means that you can have unmount functionality by
 				// returning a cleanup function
 				buildMount("elMount", `return (${trimEnd(value.trim(), ";")})(${varName});`, status, b);
 			} else if (name.startsWith("on")) {
-				buildEventAttribute(varName, name, value, span, status, b);
+				// Skip handlers that were combined with a &-binding above
+				if (!consumedHandlers.has(index)) {
+					buildEventAttribute(varName, name, value, span, status, b);
+				}
 			} else if (name.startsWith("transition")) {
 				buildTransitionAttribute(node, varName, name, value, status, b);
 			} else if (name === "class") {
@@ -305,6 +315,7 @@ function buildBindGroupAttribute(
 	value: string,
 	status: BuildStatus,
 	b: Builder,
+	combined?: CombinedHandler,
 ) {
 	value = replaceForVarNames(value, status);
 
@@ -317,10 +328,17 @@ function buildBindGroupAttribute(
 	const setAttribute = `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
-	status.imports.add("t_event");
-	b.append(`t_event(${varName}, "${eventName}", (e) => {
-			if (e.target.${propName}) ${value} = ${inputValue};
-		});`);
+	emitBindEvent(
+		varName,
+		eventName,
+		`(e) => {
+				if (e.target.${propName}) ${value} = ${inputValue};
+			}`,
+		`if (e.target.${propName}) ${value} = ${inputValue};`,
+		combined,
+		status,
+		b,
+	);
 }
 
 function buildBindAttribute(
@@ -330,12 +348,12 @@ function buildBindAttribute(
 	value: string,
 	status: BuildStatus,
 	b: Builder,
+	combined?: CombinedHandler,
 ) {
 	value = replaceForVarNames(value, status);
 
 	// Automatically add an event to bind the value
-	// TODO: Need to check the element to find out what type of event to add
-	let eventName = "input";
+	let eventName = bindEventName(node, name);
 	let defaultValue = '""';
 	let inputValue = "e.target.value";
 	if (node.tagName === "input") {
@@ -352,15 +370,9 @@ function buildBindAttribute(
 					inputValue = "e.target.checked";
 					break;
 				}
-				case "radio": {
-					eventName = "change";
-					inputValue = "e.target.value";
-					break;
-				}
 			}
 		}
 	} else if (node.tagName === "select") {
-		eventName = "change";
 		// <select multiple> binds an array of selected option values
 		let multipleAttribute = node.attributes.find((a) => a.name === "multiple");
 		if (multipleAttribute) {
@@ -370,9 +382,14 @@ function buildBindAttribute(
 				status,
 				b,
 			);
-			status.imports.add("t_event");
-			b.append(
-				`t_event(${varName}, "change", (e) => ${value} = Array.from(e.target.selectedOptions).map((opt) => opt.value));`,
+			emitBindEvent(
+				varName,
+				eventName,
+				`(e) => ${value} = Array.from(e.target.selectedOptions).map((opt) => opt.value)`,
+				`${value} = Array.from(e.target.selectedOptions).map((opt) => opt.value);`,
+				combined,
+				status,
+				b,
 			);
 			return;
 		}
@@ -387,8 +404,117 @@ function buildBindAttribute(
 			: `${varName}.${propName} = ${set}`;
 	buildRun("setBinding", `${setAttribute};`, status, b);
 	// TODO: Add a parseInput method that handles NaN etc
+	emitBindEvent(
+		varName,
+		eventName,
+		`(e) => ${value} = ${inputValue}`,
+		`${value} = ${inputValue};`,
+		combined,
+		status,
+		b,
+	);
+}
+
+/**
+ * Gets the name of the event that a &-binding attribute uses to write the
+ * element's state back to the bound value
+ */
+function bindEventName(node: ElementNode, name: string): string {
+	if (name === "&group") return "change";
+	if (node.tagName === "select") return "change";
+	if (node.tagName === "input") {
+		let typeAttribute = node.attributes.find((a) => a.name === "type");
+		if (typeAttribute?.value && trimQuotes(typeAttribute.value) === "radio") {
+			return "change";
+		}
+	}
+	return "input";
+}
+
+/**
+ * A user `on<event>` handler that competes with a &-binding for the same
+ * event type on an element. Both must share a single t_event call, because
+ * delegated event handlers are last-write-wins per element and type.
+ */
+interface CombinedHandler {
+	/** Attribute index of the user handler */
+	index: number;
+	/** The handler expression, with loop vars replaced */
+	value: string;
+	/** Source span of the handler expression, for source maps */
+	span: SourceSpan;
+	/** Whether the handler is called before the binding write (source order) */
+	first: boolean;
+}
+
+/**
+ * Pairs &-binding attributes (&value, &checked, &group) with user `on<event>`
+ * handler attributes listening to the same event. Both would emit their own
+ * t_event call for the element, but the second registration would clobber
+ * the first -- typically the binding's state write -- so the pair is emitted
+ * as one t_event that calls the binding write and the user handler in source
+ * order. Returns a map from binding attribute index to the combined handler.
+ */
+function combinedEventHandlers(
+	node: ElementNode,
+	status: BuildStatus,
+): Map<number, CombinedHandler> {
+	const bindings = new Map<string, number>();
+	const handlers = new Map<string, number>();
+	for (let [index, { name, value, fullyReactive }] of node.attributes.entries()) {
+		if (value == null || !fullyReactive) continue;
+		if (name === "&value" || name === "&checked" || name === "&group") {
+			bindings.set(bindEventName(node, name), index);
+		} else if (name.startsWith("on")) {
+			handlers.set(name.substring(2), index);
+		}
+	}
+	const combined = new Map<number, CombinedHandler>();
+	for (let [eventName, bindingIndex] of bindings) {
+		const handlerIndex = handlers.get(eventName);
+		if (handlerIndex === undefined) continue;
+		const handler = node.attributes[handlerIndex];
+		combined.set(bindingIndex, {
+			index: handlerIndex,
+			value: replaceForVarNames(handler.value!, status),
+			span: handler.span,
+			first: handlerIndex < bindingIndex,
+		});
+	}
+	return combined;
+}
+
+/**
+ * Emits the t_event call for a &-binding, optionally combined with a user
+ * `on<event>` handler for the same event (which is called after -- or, when
+ * it appeared first in source, before -- the binding write)
+ */
+function emitBindEvent(
+	varName: string,
+	eventName: string,
+	listener: string,
+	body: string,
+	combined: CombinedHandler | undefined,
+	status: BuildStatus,
+	b: Builder,
+): void {
 	status.imports.add("t_event");
-	b.append(`t_event(${varName}, "${eventName}", (e) => ${value} = ${inputValue});`);
+	if (!combined) {
+		b.append(`t_event(${varName}, "${eventName}", ${listener});`);
+		return;
+	}
+	b.append(`t_event(${varName}, "${eventName}", (e) => {`);
+	// NOTE: The cast is needed because the handler may not take an event
+	// parameter, and an optional call would otherwise not typecheck
+	const handlerCall = `((${combined.value}) as ((e: any) => any) | undefined)?.(e);`;
+	if (combined.first) {
+		addMappedText("", handlerCall, "", combined.span, status, b);
+		b.append(body);
+	} else {
+		b.append(body);
+		addMappedText("", handlerCall, "", combined.span, status, b);
+	}
+	b.append("});");
 }
 
 function buildEventAttribute(
