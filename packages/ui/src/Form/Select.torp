@@ -36,16 +36,11 @@ interface SelectProps {
 export default function Select($props: SelectProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name;
-
 	let blurred = false;
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// Use the FieldContext's state, or create a new one
 	let $state =
@@ -87,7 +82,7 @@ export default function Select($props: SelectProps | undefined) {
 			id={$props?.id ?? defaultId}
 			class={["torp-select", $props?.class]}
 			{$props?.style}
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			&value={$state.value}
 			{$props?.placeholder}
 			{$props?.readonly}

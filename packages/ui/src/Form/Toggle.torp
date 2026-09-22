@@ -36,16 +36,11 @@ interface ToggleProps {
 export default function Toggle($props: ToggleProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name;
-
 	let blurred = false;
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// Use the FieldContext's state, or create a new one
 	let $state =
@@ -93,7 +88,7 @@ export default function Toggle($props: ToggleProps | undefined) {
 			class={["torp-toggle", $props?.class]}
 			type="checkbox"
 			role="switch"
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			&checked={$state.value}
 			aria-checked={$state.value === true ? "true" : "false"}
 			disabled={$props?.disabled}

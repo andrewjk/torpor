@@ -1,0 +1,15 @@
+import { Field, Input, Label, TextArea } from "../../../src/Form/index";
+
+export default function FieldNameChangeTest() {
+	let $state = $watch({ name: "first", value: "" });
+
+	@render {
+		<Field name={$state.name} &value={$state.value}>
+			<Label>Name:</Label>
+			<Input id="name-id" placeholder="Name..." />
+			<TextArea id="bio-id" placeholder="Bio..." />
+		</Field>
+		<Input name={$state.name} &value={$state.value} placeholder="Direct..." />
+		<button onclick={() => $state.name = "second"}>rename</button>
+	}
+}

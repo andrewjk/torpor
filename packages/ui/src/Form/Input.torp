@@ -43,16 +43,12 @@ export default function Input($props: InputProps | undefined) {
 	let defaultId = getId();
 
 	let type = $props?.type ?? "text";
-	let name = $props?.name;
 
 	let blurred = false;
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// Use the FieldContext's state, or create a new one
 	let $state =
@@ -100,7 +96,7 @@ export default function Input($props: InputProps | undefined) {
 			class={["torp-input", $props?.class]}
 			{$props?.style}
 			{type}
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			&value={$state.value}
 			{$props?.placeholder}
 			{$props?.readonly}

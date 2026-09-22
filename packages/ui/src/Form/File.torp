@@ -38,16 +38,11 @@ interface FileProps {
 export default function File($props: FileProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name;
-
 	let blurred = false;
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// This will change the form's enctype to `multipart/form-data`
 	if (formContext) {
@@ -94,7 +89,7 @@ export default function File($props: FileProps | undefined) {
 			class={["torp-file", $props?.class]}
 			{$props?.style}
 			type="file"
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			{$props?.accept}
 			{$props?.placeholder}
 			{$props?.readonly}

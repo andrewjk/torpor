@@ -39,8 +39,6 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	let inputId = `${$props?.id ?? defaultId}-input`;
 	let input: HTMLInputElement;
 
-	let name = $props?.name;
-
 	let blurred = false;
 
 	function getDisabled(): boolean {
@@ -50,9 +48,6 @@ export default function FileDrop($props: FileDropProps | undefined) {
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// This will change the form's enctype to `multipart/form-data`
 	if (formContext) {
@@ -166,7 +161,7 @@ export default function FileDrop($props: FileDropProps | undefined) {
 			id={inputId}
 			class="torp-file-drop-input"
 			type="file"
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			aria-hidden="true"
 			tabindex={-1}
 			multiple={$props?.multiple}

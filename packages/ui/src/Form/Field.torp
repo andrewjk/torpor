@@ -53,9 +53,12 @@ export default function Field($props: FieldProps) {
 		});
 	}
 
-	// Set the context to pass down to Labels, Inputs and Messages
+	// Set the context to pass down to Labels, Inputs and Messages. `name` is a
+	// getter so that consumers see updates if the prop changes after mount.
 	let context: FieldContext = {
-		name: $props.name,
+		get name() {
+			return $props.name;
+		},
 		state: $state,
 		validate: handleValidate,
 	};

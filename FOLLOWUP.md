@@ -60,37 +60,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### @torpor/ui form components don't apply a changed `name` prop to their input
-
-The `name` of `Field` is captured once per component instance and then never
-updated: `Field` builds `let context: FieldContext = { name: $props.name, ... }`
-at setup, and `Input`/`TextArea`/`Select`/`File`/`CheckBox` each do
-`let name = $props?.name; ... name ??= fieldContext.name;` before rendering
-`<textarea {name} />` etc. So when a `Field`'s `name` prop changes after mount,
-the rendered input keeps the old `name` attribute. (`Hidden` is fine -- it
-applies its name reactively. `Field`'s `valid`/`message` getters are fine too --
-they read `$props.name` inside tracked getters.)
-
-Concrete failure in redraft's multi-part post editor: each child post is a
-component whose form fields are named `children[${i}]...`. Removing a child
-shifts the following children's indexes; their hidden inputs renamed correctly
-but the `<Field><TextArea name=...>` kept the _old_ index, so the submitted
-form contained `children[1]` (id etc.) plus a phantom `children[2]text` --
-valibot then reported `Invalid key: Expected "id" but received undefined` and
-`Text is required` on save. Site-side workaround for now: the child loop keys
-by `i + "_" + child.id` so a child whose position changed remounts with fresh
-field names.
-
-Suggested fix: make the name a computed value that reads the prop and the
-field context reactively (e.g. a getter on the component's `$watch` state:
-`get name() { return $props?.name ?? fieldContext?.name; }`), or an `$run`
-effect that sets the attribute. Same for `Field`'s captured context object --
-store the context name in `$state` (or use a getter) so downstream
-Label/Input/Message consumers see updates. This is the `@torpor/ui` instance
-of the "plain `let` initialized from `$props`" compiler footgun above -- but
-fixing it in the components is worthwhile regardless, since a changed `name`
-prop is a reasonable thing for consumers to expect.
-
 ### Keyed `@for` silently misbehaves on duplicate keys
 
 `runListItems` matches old/new items by key first-match-wins. With duplicate

@@ -32,16 +32,11 @@ interface CheckBoxProps {
 export default function CheckBox($props: CheckBoxProps | undefined) {
 	let defaultId = getId();
 
-	let name = $props?.name;
-
 	let blurred = false;
 
 	// Get stuff out of the FormContext and FieldContext
 	const formContext = $context[FormContextName] as FormContext;
 	const fieldContext = $context[FieldContextName] as FieldContext;
-	if (fieldContext) {
-		name ??= fieldContext.name;
-	}
 
 	// Use the FieldContext's state, or create a new one
 	let $state =
@@ -88,7 +83,7 @@ export default function CheckBox($props: CheckBoxProps | undefined) {
 			id={$props?.id ?? defaultId}
 			class={["torp-check-box", $props?.class]}
 			type="checkbox"
-			{name}
+			name={$props?.name ?? fieldContext?.name}
 			&checked={$state.value}
 			aria-label={$props?.ariaLabel}
 			data-valid={$state.valid ? "valid" : "invalid"}
