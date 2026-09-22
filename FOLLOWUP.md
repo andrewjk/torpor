@@ -60,17 +60,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### Keyed `@for` silently misbehaves on duplicate keys
-
-`runListItems` matches old/new items by key first-match-wins. With duplicate
-key values in the data, updates and clears can hit the wrong regions and the
-DOM desyncs from the data. Hit in redraft: two "new post" children both had
-`id: -1` (generated independently by two component instances), and removing
-the first cleared the _second_ child's region while showing the first's
-content. A dev-mode warning on duplicate keys (where `newSpecs` is built, or
-in `runListItems`) would surface this immediately. (The data bug was fixed on
-the app side by generating unique ids.)
-
 ### `mount()` fails silently (plus an unhandled rejection) with an SSR-compiled component
 
 Mounting a component that was compiled with `{ server: true }` renders nothing

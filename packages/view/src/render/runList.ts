@@ -1,7 +1,9 @@
+import devContext from "../dev/devContext";
 import type ListItem from "../types/ListItem";
 import type ListItemSpec from "../types/ListItemSpec";
 import type Region from "../types/Region";
 import $run from "../watch/$run";
+import checkListKeys from "./checkListKeys";
 import context from "./context";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
@@ -43,6 +45,12 @@ export default function runList(
 
 		// Build the array of lightweight {key, data} specs for the new data
 		const newSpecs = buildItems();
+
+		// DEV: surface duplicate keys, which the reconciler matches
+		// first-match-wins and would otherwise silently desync the DOM.
+		if (devContext.enabled) {
+			checkListKeys(region, newSpecs);
+		}
 
 		// Do NOT re-run the list for properties accessed while updating its
 		// items. E.g. we want to re-run the list for `@for (item of $items)`
