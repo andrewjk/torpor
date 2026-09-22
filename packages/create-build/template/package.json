@@ -12,9 +12,9 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@torpor/adapter-node": "^1.0.11",
-		"@torpor/build": "^1.4.5",
-		"@torpor/unplugin": "^1.1.0",
+		"@torpor/adapter-node": "^1.0.12",
+		"@torpor/build": "^1.4.6",
+		"@torpor/unplugin": "^1.2.0",
 		"@torpor/view": "^1.1.2"
 	},
 	"devDependencies": {

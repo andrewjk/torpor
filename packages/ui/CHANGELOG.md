@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.1.6
+
+<sub>2026-09-22</sub>
+
+- _(patch)_ Updated dependency `@torpor/unplugin` v1.2.0
+
 ## 1.1.5
 
 <sub>2026-09-22</sub>
