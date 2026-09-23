@@ -66,5 +66,19 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 			$page.form = await response.json();
 		}
 		await reload();
+	} else if (response.status >= 500) {
+		// A server error: like a no-javascript submit, the response is the
+		// error page rendered at this url with the error status. Swap the
+		// document for it -- the url stays, so a transient failure can be
+		// retried with a refresh. Without an error page, reload, which will
+		// show the raw error response instead
+		if (response.headers.get("Content-Type")?.includes("text/html")) {
+			const html = await response.text();
+			document.open();
+			document.write(html);
+			document.close();
+		} else {
+			window.location.reload();
+		}
 	}
 }

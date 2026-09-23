@@ -5,16 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### 5xx responses from JS form submits are silently ignored
-
-`nav/formSubmit.ts` handles a form POST's response for 2xx (render/download) and
-4xx (fill `$page.form`, reload), but a 5xx response matches no branch -- the
-submit just does nothing, with no error page and no message. Server-side, a
-no-JS submit with a 5xx action result now renders the error page at the form's
-url (see `handleResponse` in site/serverHandlers.ts), so the no-JS case is
-covered; the JS case would want formSubmit to detect the 5xx and trigger the
-same error-page render (or at least a `$page.form` message) client-side.
-
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression

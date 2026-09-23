@@ -1,6 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import notFound from "../src/response/notFound";
 import ok from "../src/response/ok";
+import serverError from "../src/response/serverError";
 import ServerEvent from "../src/server/ServerEvent";
 import $page from "../src/state/$serverPage";
 import Router from "../src/site/Router";
@@ -58,6 +59,12 @@ const boomServer: PageServerEndPoint = {
 
 const okServer: PageServerEndPoint = {
 	load: async () => ok({ hello: "world" }),
+};
+
+const saveServer: PageServerEndPoint = {
+	actions: {
+		default: async () => serverError({ message: "db boom" }),
+	},
 };
 
 const apiEndPoint: ServerEndPoint = {
@@ -119,6 +126,18 @@ const routes: ManifestRoute[] = [
 		path: "/api",
 		type: SERVER_ROUTE,
 		endPoint: () => Promise.resolve({ default: apiEndPoint }),
+		subFolder: undefined,
+	},
+	{
+		path: "/save",
+		type: PAGE_ROUTE,
+		endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+		subFolder: undefined,
+	},
+	{
+		path: "/save/~server",
+		type: PAGE_SERVER_ROUTE,
+		endPoint: () => Promise.resolve({ default: saveServer }),
 		subFolder: undefined,
 	},
 	{
@@ -190,6 +209,24 @@ test("a thrown exception from an api endpoint is not turned into a page", async 
 	await expect(
 		load(new ServerEvent(new Request("http://localhost/api")), template),
 	).rejects.toThrow("api boom");
+});
+
+test("a js form submit with a 5xx result gets the error page", async () => {
+	// A form submitted from javascript (the `X-Torpor-Form-Submit` header):
+	// like a no-javascript submit, the error page is rendered at the form's
+	// url, so the client can show it without a reload
+	const req = new Request("http://localhost/save", {
+		method: "POST",
+		headers: { "X-Torpor-Form-Submit": "" },
+		body: new FormData(),
+	});
+	const res = await load(new ServerEvent(req), template);
+
+	expect(res.status).toBe(500);
+	expect(res.headers.get("Content-Type")).toContain("text/html");
+	const html = await res.text();
+	expect(html).toContain("error status=500");
+	expect(html).toContain("error message=db boom");
 });
 
 test("the nearest error route wins", async () => {
