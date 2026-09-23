@@ -5,6 +5,16 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
+### 5xx responses from JS form submits are silently ignored
+
+`nav/formSubmit.ts` handles a form POST's response for 2xx (render/download) and
+4xx (fill `$page.form`, reload), but a 5xx response matches no branch -- the
+submit just does nothing, with no error page and no message. Server-side, a
+no-JS submit with a 5xx action result now renders the error page at the form's
+url (see `handleResponse` in site/serverHandlers.ts), so the no-JS case is
+covered; the JS case would want formSubmit to detect the 5xx and trigger the
+same error-page render (or at least a `$page.form` message) client-side.
+
 ### replaceForVarNames is textual rewriting with known blind spots (view compiler)
 
 Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
@@ -61,6 +71,30 @@ template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
 ## Features
+
+### Client-side error page rendering for failed loads during navigation
+
+Error handling no longer redirects: the server renders the nearest `_error`
+page at the requested url with the real status code (`renderErrorPage` in
+packages/build/src/site/serverHandlers.ts), and client-side navigation renders
+it in place when no route matches (nav/navigate.ts, via the shared
+findErrorRoute.ts). The remaining gap: when a route _does_ match but its data
+load fails (a transient 500, say), `loadData` throws away the failing
+response's status/message and returns undefined, so `navigate` bails and the
+caller falls back to a full page load -- correct (the server then renders the
+error page at the right url) but with a visible reload flash. Propagating the
+failed response into navigate would let the error page render in place, no
+reload. Needs loadData to return the status/message instead of bare undefined,
+plus an error-route render path through the layout-reuse machinery.
+
+### Error prerendering only writes 404.html
+
+`runPrerender.ts` renders `/_error?status=404` and writes it as `404.html` for
+static hosts. Hosts that support per-status error files (e.g. Cloudflare
+Pages also matches `5xx.html`/`502.html` on some plans) can't get a 500-style
+error page yet; rendering a couple of extra statuses (500, 503) would cover
+it. The server-side renderer already supports any status via the `?status=`
+query.
 
 ### DataGrid: expose reload-pending state for loader grids
 

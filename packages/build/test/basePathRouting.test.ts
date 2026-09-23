@@ -2,7 +2,7 @@ import { expect, test } from "vite-plus/test";
 import ServerEvent from "../src/server/ServerEvent";
 import Router from "../src/site/Router";
 import { createServerLoad } from "../src/site/serverHandlers";
-import { PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
+import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import seeOther from "../src/response/seeOther";
 import notFound from "../src/response/notFound";
@@ -14,6 +14,15 @@ import ok from "../src/response/ok";
  */
 const component = ($props: { data: any }) => ({
 	body: `<a href="/posts">all posts</a><p>path=${$props.data?.path}</p>`,
+	head: "",
+});
+
+/**
+ * An error page component, so the tests can check that the error page got
+ * rendered (rather than the raw not-found body).
+ */
+const errorComponent = () => ({
+	body: `<p>error page</p>`,
 	head: "",
 });
 
@@ -46,6 +55,12 @@ const routes: ManifestRoute[] = [
 		endPoint: () => Promise.resolve({ default: apiEndPoint }),
 		subFolder: undefined,
 	},
+	{
+		path: "/_error",
+		type: ERROR_ROUTE,
+		endPoint: () => Promise.resolve({ default: { component: errorComponent } }),
+		subFolder: undefined,
+	},
 ];
 
 const template = `<html><head></head><body><div id="app">%COMPONENT_BODY%</div></body></html>`;
@@ -72,12 +87,16 @@ test("requests under the base path route to the base-free routes", async () => {
 	expect(html).toContain('href="/app/posts"');
 });
 
-test("requests without the base path are not our routes", async () => {
+test("requests without the base path get the error page at the requested url", async () => {
 	// A request not under the mount point can't be routed; like any error it
-	// is redirected to the site's error page
+	// renders the site's error page, but at the requested url and with the
+	// not-found status rather than a redirect
 	const res = await handle(new ServerEvent(new Request("http://localhost/posts")));
-	expect(res.status).toBe(303);
-	expect(res.headers.get("Location")).toMatch(/^\/app\/_error\?status=404/);
+	expect(res.status).toBe(404);
+	expect(res.headers.get("Content-Type")).toContain("text/html");
+	const html = await res.text();
+	expect(html).toContain("error page");
+	expect(res.headers.get("Location")).toBeNull();
 });
 
 test("redirect locations for base-free paths get the base added", async () => {

@@ -29,9 +29,8 @@ test("renders the counter page", async () => {
 	expect(queryByText(div, "The count is 0.")).not.toBeNull();
 });
 
-test("unknown routes redirect to the error page", async () => {
+test("unknown routes return not found", async () => {
 	const response = await runTest(site, "/nope");
-	expect(response.status).toBe(303);
-	expect(response.headers.get("location")).toContain("/_error?");
-	expect(response.headers.get("location")).toContain("status=404");
+	// This site has no error page, so the raw response is returned
+	expect(response.status).toBe(404);
 });

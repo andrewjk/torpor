@@ -162,10 +162,10 @@ test("a get with an invalid load query is still rejected", async () => {
 	const res = await load(new ServerEvent(new Request("http://localhost/posts")), template);
 
 	// The form re-render fallback must not leak into plain page loads: the
-	// failed validation redirects to the error page like any other load failure
-	expect(res.status).toBe(303);
-	expect(res.headers.get("Location")).toContain("/_error?");
-	expect(res.headers.get("Location")).toContain("status=422");
+	// failed validation is passed through like any other load failure (this
+	// site has no error page, so the raw response is returned)
+	expect(res.status).toBe(422);
+	expect(res.headers.get("Location")).toBeNull();
 });
 
 /**

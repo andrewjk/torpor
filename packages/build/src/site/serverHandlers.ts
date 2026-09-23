@@ -2,7 +2,6 @@ import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import formDataToRecord from "../form/formDataToRecord.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
-import seeOther from "../response/seeOther.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import $page from "../state/$serverPage.ts";
@@ -35,6 +34,7 @@ import {
 } from "../validation/endpoint.ts";
 import { findMissingSlotLayout, warnMissingSlotContent } from "./layoutSlots.ts";
 import { getBasePath, rewriteBaseInHtml, setBasePath, stripBaseFromUrl } from "./basePath.ts";
+import findErrorRoute from "./findErrorRoute.ts";
 import mergeHead from "./mergeHead.ts";
 import type Router from "./Router.ts";
 
@@ -67,18 +67,73 @@ export function createServerLoad(
 	// value the router strips
 	setBasePath(basePath);
 
+	/**
+	 * Finalizes the response of a load or action. Successful responses and
+	 * redirects pass through; an error response gets the site's error page
+	 * rendered at the requested url, with the error's status code -- the
+	 * address bar keeps the url the user asked for, so a transient failure
+	 * (a random db hiccup, say) can be refreshed, and a typo in the path can
+	 * be seen and fixed.
+	 */
+	async function handleResponse(
+		ev: ServerEvent,
+		url: URL,
+		template: string | undefined,
+		response: Response,
+		fromForm = false,
+	): Promise<Response> {
+		// Success codes and redirect codes are acceptable
+		if (response.status >= 200 && response.status <= 399) {
+			return response;
+		}
+
+		// 4xx error codes are acceptable from form actions
+		if (fromForm && response.status >= 400 && response.status <= 499) {
+			return response;
+		}
+
+		let message = await response.text();
+		if (response.headers.get("Content-Type")?.includes("application/json")) {
+			try {
+				const data = JSON.parse(message);
+				message = data.message ?? message;
+			} catch {
+				// Not actually json, so show the raw body
+			}
+		}
+		const rendered = await renderErrorPage(ev, url, template, router, response.status, message);
+		// No error page (or rendering it failed), so the response is passed
+		// through as-is
+		return rendered ?? response;
+	}
+
 	const handle = async (ev: ServerEvent, template?: string): Promise<Response> => {
 		// The base is stripped before routing, so that everything below (route
 		// matching, params, user code reading `event.url`) is base-free.
 		// Requests that don't carry the base aren't ours
 		const url = stripBaseFromUrl(ev.url, basePath);
 		if (!url) {
-			return handleResponse(notFound());
+			// Like any other error, the error page is rendered at the
+			// requested url rather than redirecting into the site
+			$page.url = ev.url;
+			const response = await renderErrorPage(ev, ev.url, template, router, 404, "Not found");
+			return response ?? notFound();
 		}
 		const path = url.pathname;
 		const query = url.searchParams;
 
 		//console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
+
+		// Update $page before routing, so that a request that doesn't match
+		// any route (and gets the error page) still sees this url
+		$page.url = url;
+		if (path.endsWith("/_error")) {
+			$page.status = parseInt(query.get("status") ?? "404");
+			$page.error = { message: query.get("message") ?? "" };
+		} else {
+			$page.status = 200;
+			$page.error = { message: "" };
+		}
 
 		let route = router.match(path, query);
 		if (!route) {
@@ -92,11 +147,10 @@ export function createServerLoad(
 			}
 		}
 		if (!route) {
-			return handleResponse(notFound());
+			return handleResponse(ev, url, template, notFound());
 		}
 		const handler = route.handler;
 		const params = route.params || {};
-
 		// Route middleware, declared on the route's server endpoint
 		// (+page.server.ts / +server.ts). Runs after the global middleware and
 		// before folder hooks, so a guard can skip data loading entirely
@@ -108,15 +162,6 @@ export function createServerLoad(
 				: undefined;
 		if (Array.isArray(endPointModule?.middleware)) {
 			routeMiddleware.push(...endPointModule.middleware);
-		}
-
-		// Update $page before building the components
-		$page.url = url;
-		if (path.endsWith("/_error")) {
-			$page.status = parseInt(query.get("status") ?? "404");
-			$page.error = { message: query.get("message") ?? "" };
-		} else {
-			$page.status = 200;
 		}
 
 		// TODO: Hit the server hook out here
@@ -142,12 +187,20 @@ export function createServerLoad(
 				case LAYOUT_ROUTE: {
 					// It's a /+page.ts or /_layout.ts endpoint
 					if (ev.request.method === "GET") {
-						return handleResponse(await loadView(ev, url, handler, params, template));
+						return handleResponse(
+							ev,
+							url,
+							template,
+							await loadView(ev, url, handler, params, template),
+						);
 					} else if (ev.request.method === "POST") {
 						// The server end point comes from the sibling /+page.server.ts, if applicable
 						const serverEndPoint: PageServerEndPoint | undefined =
 							handler.serverEndPoint && (await handler.serverEndPoint()).default;
 						return handleResponse(
+							ev,
+							url,
+							template,
 							await runAction(ev, url, handler, serverEndPoint, params, query, template),
 							true,
 						);
@@ -163,6 +216,9 @@ export function createServerLoad(
 						const serverEndPoint: PageServerEndPoint | undefined = (await resolveModule(handler))
 							.default;
 						return handleResponse(
+							ev,
+							url,
+							template,
 							await runAction(ev, url, handler, serverEndPoint, params, query, template),
 							true,
 						);
@@ -179,7 +235,11 @@ export function createServerLoad(
 					break;
 				}
 				case ERROR_ROUTE: {
-					return await loadView(ev, url, handler, params, template);
+					// A direct request for the error page (e.g. a bookmark of
+					// the url it used to be redirected to, or the prerender
+					// writing 404.html). It responds with the requested status
+					// rather than 200
+					return await loadView(ev, url, handler, params, template, $page.status);
 				}
 			}
 		} finally {
@@ -213,6 +273,25 @@ export function createServerLoad(
 			// Middleware exits can inspect (and replace, in Server.fetch) the
 			// error via `ev.error`
 			ev.error = error;
+			// A thrown exception (a load or component crashing, say) gets the
+			// error page rendered at the requested url, like an error response
+			// would -- unless the request was for an api endpoint (json in,
+			// json out), or there is no error page, or rendering it failed, in
+			// which case the error is rethrown for the server adapters
+			try {
+				const url = stripBaseFromUrl(ev.url, basePath) ?? ev.url;
+				const match = router.match(url.pathname, url.searchParams);
+				if (match?.handler.type !== SERVER_ROUTE) {
+					$page.url = url;
+					const message = error instanceof Error ? error.message : String(error);
+					const response = await renderErrorPage(ev, url, template, router, 500, message);
+					if (response) {
+						return response;
+					}
+				}
+			} catch {
+				// Fall through to the rethrow
+			}
 			throw error;
 		} finally {
 			while (entered > 0) {
@@ -239,40 +318,53 @@ async function loadServerHooks(handler: RouteHandler): Promise<ServerHook[]> {
 	));
 }
 
-async function handleResponse(response: Response, fromForm = false): Promise<Response> {
-	$page.status = response.status;
-
-	// Success codes and redirect codes are acceptable
-	if (response.status >= 200 && response.status <= 399) {
-		return response;
+/**
+ * Renders the site's nearest error page for a url, with the given status
+ * code and message, at the url itself. Returns undefined when the site has
+ * no matching error route, or when rendering the error page failed -- the
+ * caller passes the original response or error through instead.
+ *
+ * The error page runs through the normal view pipeline, so it is rendered
+ * inside the layouts of its route (e.g. the root `/_error` gets the root
+ * `_layout`).
+ */
+async function renderErrorPage(
+	ev: ServerEvent,
+	url: URL,
+	template: string | undefined,
+	router: Router,
+	status: number,
+	message: string,
+): Promise<Response | undefined> {
+	const errorPath = findErrorRoute(router, url.pathname);
+	if (!errorPath) {
+		return undefined;
+	}
+	// Matched (rather than picked off `router.routes`) so that the error
+	// route's layouts, server endpoint and hooks get loaded
+	const errorRoute = router.match(errorPath, new URLSearchParams());
+	if (!errorRoute) {
+		return undefined;
 	}
 
-	// 4xx error codes are acceptable from form actions
-	if (fromForm && response.status >= 400 && response.status <= 499) {
-		return response;
-	}
+	$page.status = status;
+	$page.error = { message };
 
-	// It's an error, so redirect to the error page
-	// We're just pushing the status and message in the URL, but maybe there's a
-	// more sophisticated way to do this?
-	// TODO: Should be returning loadView rather than redirecting
-	// TODO: Should be returning the NEAREST error page to this path, including layouts
-	let params = new URLSearchParams();
-	params.append("status", $page.status.toString());
-	let message = await response.text();
-	if (response.headers.get("Content-Type")?.includes("application/json")) {
-		const data = JSON.parse(message);
-		message = data.message ?? message;
-	}
-	if (message) {
-		if ($page.error) {
-			$page.error.message = message;
-		} else {
-			$page.error = { message };
+	try {
+		const response = await loadView(ev, url, errorRoute.handler, {}, template, status);
+		// A load or layout of the error page can itself fail -- loadView
+		// returns its response, which (unlike a rendered error page) won't
+		// be html. The caller passes the original response through instead
+		if (response.headers.get("Content-Type")?.includes("text/html")) {
+			return response;
 		}
-		params.append("message", message);
+		return undefined;
+	} catch (error) {
+		// The error page itself blew up; the caller's original response or
+		// error is the better fallback
+		console.log(error);
+		return undefined;
 	}
-	return seeOther(`/_error?${params.toString()}`);
 }
 
 async function loadData(
@@ -362,7 +454,9 @@ async function loadView(
 	handler: RouteHandler,
 	params: Record<string, any>,
 	template: string | undefined,
-	formStatus?: number,
+	// The status to respond with: a form action's result status, or an
+	// error page's status (404, 500, ...). Defaults to 200
+	status?: number,
 	form?: Record<string, string | number>,
 	fromForm?: boolean,
 	// The appData that the server hooks populated around the form action,
@@ -587,7 +681,7 @@ async function loadView(
 		}
 
 		return new Response(html, {
-			status: formStatus ?? 200,
+			status: status ?? 200,
 			headers: {
 				"Content-Type": "text/html",
 			},

@@ -4,6 +4,7 @@ import { mount, unmount } from "@torpor/view";
 import $page from "../state/$page";
 import client from "../state/client";
 import { getBasePath, stripBaseFromUrl } from "../site/basePath";
+import findErrorRoute from "../site/findErrorRoute";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
@@ -28,23 +29,37 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 
 	//console.log(`navigating to '${path}'${query.size ? ` with ${query}` : ""}`);
 
-	const route = client.router.match(path, query);
-	if (!route) {
-		// TODO: 404
-		console.log("404");
-		return false;
-	}
+	let route = client.router.match(path, query);
 
 	// Update $page before building the components
 	$page.url = url;
-	if (path.endsWith("/_error")) {
-		$page.status = parseInt(query.get("status") ?? "404");
-		$page.error = { message: query.get("message") ?? "" };
-		// Make it look a bit classier by removing the query -- keeping the
-		// original URL, so the base path stays in the address bar
-		window.history.replaceState({}, "", rawUrl.toString().split("?")[0]);
+	if (route) {
+		if (path.endsWith("/_error")) {
+			// A direct visit to the error page (e.g. a bookmark of the url it
+			// used to be redirected to). Make it look a bit classier by
+			// stripping the query, which carries the status and message
+			$page.status = parseInt(query.get("status") ?? "404");
+			$page.error = { message: query.get("message") ?? "" };
+			window.history.replaceState({}, "", rawUrl.toString().split("?")[0]);
+		} else {
+			$page.status = 200;
+			$page.error = { message: "" };
+		}
 	} else {
-		$page.status = 200;
+		// There's no page at this url -- render the nearest error page at it,
+		// so the address bar keeps the url the user asked for: a transient
+		// failure can be refreshed, and a typo can be seen and fixed
+		const errorPath = findErrorRoute(client.router, path);
+		const errorRoute = errorPath && client.router.match(errorPath, query);
+		if (!errorRoute) {
+			// Leave the current page alone; the caller falls back to a full
+			// page load, and the server renders the error page (or passes the
+			// raw response through, when it has no error page)
+			return false;
+		}
+		route = errorRoute;
+		$page.status = 404;
+		$page.error = { message: "Not found" };
 	}
 	const handler = route.handler;
 	const params = route.params || {};

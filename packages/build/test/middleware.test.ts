@@ -63,10 +63,10 @@ describe("global middleware", () => {
 
 		const res = await load(new ServerEvent(new Request("http://localhost/posts")), template);
 		expect(res.status).toBe(200);
-		// Also for a request that matches nothing (which becomes the
-		// error-page redirect)
+		// Also for a request that matches nothing (which gets the not-found
+		// response, since this site has no error page)
 		const missing = await load(new ServerEvent(new Request("http://localhost/nope")), template);
-		expect(missing.status).toBe(303);
+		expect(missing.status).toBe(404);
 		expect(log).toEqual(["m.enter", "m.exit", "m.enter", "m.exit"]);
 	});
 

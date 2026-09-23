@@ -59,8 +59,9 @@ test("+server endpoint returns JSON", async () => {
 	expect(typeof json.time).toBe("number");
 });
 
-test("error page renders with status and message", async () => {
+test("the error page responds with its status when requested directly", async () => {
 	const response = await runTest(site, "/_error?status=404&message=Not+found");
+	expect(response.status).toBe(404);
 	const html = await response.text();
 
 	const div = document.createElement("div");
@@ -68,4 +69,17 @@ test("error page renders with status and message", async () => {
 
 	expect(queryByText(div, "Error 404")).not.toBeNull();
 	expect(queryByText(div, "Not found")).not.toBeNull();
+});
+
+test("unknown routes get the error page at the requested url", async () => {
+	const response = await runTest(site, "/nope");
+	expect(response.status).toBe(404);
+	expect(response.headers.get("Content-Type")).toContain("text/html");
+	expect(response.headers.get("location")).toBeNull();
+	const html = await response.text();
+
+	const div = document.createElement("div");
+	div.innerHTML = html;
+
+	expect(queryByText(div, "Error 404")).not.toBeNull();
 });
