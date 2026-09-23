@@ -5,6 +5,19 @@ import type PageEndPoint from "../types/PageEndPoint";
 import type PageServerEndPoint from "../types/PageServerEndPoint";
 import type RouteHandler from "../types/RouteHandler";
 
+/**
+ * The result of loading a route's data. `error` is set when a load function
+ * returned an error response (redirects excluded) -- the caller renders the
+ * error page instead of the route.
+ */
+export type LoadDataResult = {
+	data: Record<string, any>;
+	error?: {
+		status: number;
+		message: string;
+	};
+};
+
 export default async function loadData(
 	handler: RouteHandler,
 	params: Record<string, string>,
@@ -14,7 +27,7 @@ export default async function loadData(
 	clientEndPoint: PageEndPoint | undefined,
 	serverEndPoint: PageServerEndPoint | undefined,
 	prefetch = false,
-): Promise<Record<string, string> | void> {
+): Promise<LoadDataResult | void> {
 	let data = {};
 	if (handler.layouts) {
 		let layoutStack = client.layoutStack;
@@ -44,7 +57,12 @@ export default async function loadData(
 					layoutServerEndPoint,
 				);
 				if (layoutResponse?.ok === false) {
-					return;
+					if (isRedirect(layoutResponse)) {
+						// A redirect isn't ours to follow client-side; the
+						// caller's full page load will
+						return;
+					}
+					return { data, error: await errorOf(layoutResponse) };
 				}
 				Object.assign(data, stackLayout.data);
 				newLayoutStack.push(stackLayout);
@@ -60,9 +78,39 @@ export default async function loadData(
 		serverEndPoint,
 	);
 	if (endPointResponse?.ok === false) {
-		return;
+		if (isRedirect(endPointResponse)) {
+			return;
+		}
+		return { data, error: await errorOf(endPointResponse) };
 	}
-	return data;
+	return { data };
+}
+
+function isRedirect(response: Response): boolean {
+	return response.status >= 300 && response.status < 400;
+}
+
+/**
+ * The status and message of a failed load response. The body only becomes
+ * the message when it's a `message`-carrying json body or plain text -- an
+ * html body is a whole page (e.g. a static host's 404), not a message.
+ */
+async function errorOf(response: Response): Promise<{ status: number; message: string }> {
+	let message = "";
+	const type = response.headers.get("Content-Type");
+	if (type?.includes("application/json")) {
+		try {
+			const data = await response.json();
+			if (typeof data.message === "string") {
+				message = data.message;
+			}
+		} catch {
+			// Not actually json
+		}
+	} else if (type?.includes("text/plain")) {
+		message = await response.text();
+	}
+	return { status: response.status, message: message || response.statusText };
 }
 
 async function loadClientAndServerData(

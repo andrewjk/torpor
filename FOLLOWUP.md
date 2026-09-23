@@ -62,21 +62,6 @@ template expression references a plain`let`whose initializer reads`$props`
 
 ## Features
 
-### Client-side error page rendering for failed loads during navigation
-
-Error handling no longer redirects: the server renders the nearest `_error`
-page at the requested url with the real status code (`renderErrorPage` in
-packages/build/src/site/serverHandlers.ts), and client-side navigation renders
-it in place when no route matches (nav/navigate.ts, via the shared
-findErrorRoute.ts). The remaining gap: when a route _does_ match but its data
-load fails (a transient 500, say), `loadData` throws away the failing
-response's status/message and returns undefined, so `navigate` bails and the
-caller falls back to a full page load -- correct (the server then renders the
-error page at the right url) but with a visible reload flash. Propagating the
-failed response into navigate would let the error page render in place, no
-reload. Needs loadData to return the status/message instead of bare undefined,
-plus an error-route render path through the layout-reuse machinery.
-
 ### Error prerendering only writes 404.html
 
 `runPrerender.ts` renders `/_error?status=404` and writes it as `404.html` for

@@ -61,11 +61,11 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		$page.status = 404;
 		$page.error = { message: "Not found" };
 	}
-	const handler = route.handler;
-	const params = route.params || {};
+	let handler = route.handler;
+	let params = route.params || {};
 
 	// There must be a client endpoint with a component
-	const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
+	let clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
 	if (!clientEndPoint?.component) {
 		// TODO: 404
 		console.log("404");
@@ -73,7 +73,7 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 	}
 
 	// There may be a server endpoint
-	const serverEndPoint: PageServerEndPoint | undefined =
+	let serverEndPoint: PageServerEndPoint | undefined =
 		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
 	let newLayoutStack: LayoutPath[] = [];
@@ -81,7 +81,7 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed
 	// to us, somehow...
-	const data = await loadData(
+	const result = await loadData(
 		handler,
 		params,
 		path,
@@ -90,12 +90,61 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		clientEndPoint,
 		serverEndPoint,
 	);
-	if (data === undefined) {
-		// The data couldn't be loaded -- a load function returned an error
-		// response, or (on a prerendered site with no server) the ~server
-		// request got a 404. Leave the current page alone; the caller
-		// (e.g. the client entry) falls back to a full page load
+	if (result === undefined) {
+		// A load redirected, or (on a prerendered site with no server) the
+		// ~server request couldn't be made. Leave the current page alone;
+		// the caller (e.g. the client entry) falls back to a full page load,
+		// which follows the redirect
 		return false;
+	}
+	let data = result.data;
+	if (result.error) {
+		if (withHydration) {
+			// The server rendered this page fine moments ago -- keep its
+			// markup rather than hydrating an error page over it
+			return false;
+		}
+		// The load failed -- render the nearest error page at this url, so
+		// the address bar keeps the url the user asked for: a transient
+		// failure (a random db hiccup, say) can be retried with a refresh
+		const errorPath = findErrorRoute(client.router, path);
+		const errorRoute = errorPath && client.router.match(errorPath, query);
+		if (!errorRoute) {
+			// No error page -- the caller falls back to a full page load,
+			// where the server passes the error response through
+			return false;
+		}
+		route = errorRoute;
+		handler = errorRoute.handler;
+		params = errorRoute.params || {};
+		clientEndPoint = (await handler.endPoint()).default;
+		if (!clientEndPoint?.component) {
+			return false;
+		}
+		serverEndPoint = handler.serverEndPoint && (await handler.serverEndPoint())?.default;
+
+		$page.status = result.error.status;
+		$page.error = { message: result.error.message };
+
+		// The error page starts fresh: drop the layouts collected for the
+		// route that failed (the error route's own layouts are loaded into
+		// the empty stack, reusing whatever the current page shares)
+		newLayoutStack.length = 0;
+		const errorResult = await loadData(
+			handler,
+			params,
+			path,
+			query,
+			newLayoutStack,
+			clientEndPoint,
+			serverEndPoint,
+		);
+		if (errorResult === undefined || errorResult.error) {
+			// The error page's own load failed too -- fall back to a full
+			// page load
+			return false;
+		}
+		data = errorResult.data;
 	}
 	// We may have form data in a hidden input -- not sure if this is the best
 	// way to do it
