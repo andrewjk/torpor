@@ -1,6 +1,10 @@
-import { describe, expect, test } from "vite-plus/test";
-import { expandPath, resolvePrerenderPaths } from "../src/run/runPrerender";
+import { promises as fs } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterAll, beforeAll, describe, expect, test } from "vite-plus/test";
+import runPrerender, { expandPath, resolvePrerenderPaths } from "../src/run/runPrerender";
 import Router from "../src/site/Router";
+import Site from "../src/site/Site";
 import { ERROR_ROUTE, LAYOUT_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE } from "../src/types/RouteType";
 
 // Mirrors serverEntry's routes export
@@ -162,5 +166,88 @@ describe("resolvePrerenderPaths", () => {
 		router.addPage("/_error", ERROR_ROUTE, pageFlag(true));
 		const result = await resolvePrerenderPaths(routesOf(router), true);
 		expect(result).toEqual([]);
+	});
+});
+
+/**
+ * Sets up a fake built site (dist/server/serverEntry.js plus the template
+ * and assets runPrerender expects), with the error page served by the given
+ * handler.
+ */
+async function writeFakeDist(root: string, errorLoad: string): Promise<void> {
+	await fs.mkdir(path.join(root, "dist", "server"), { recursive: true });
+	await fs.mkdir(path.join(root, "dist", "client", "assets"), { recursive: true });
+	await fs.writeFile(path.join(root, "dist", "client", "assets", "clientEntry-abc123.js"), "");
+	await fs.writeFile(
+		path.join(root, "dist", "client", "site.html"),
+		'<html><head></head><body><div id="app"></div></body></html>',
+	);
+	await fs.writeFile(
+		path.join(root, "dist", "server", "serverEntry.js"),
+		`
+		export const router = {
+			routes: [{ path: "/_error", handler: { path: "/_error", type: 8 } }],
+		};
+		export async function load(ev, template) {
+			const url = new URL(ev.request.url);
+			if (url.pathname !== "/_error") {
+				return new Response("<p>page</p>", { headers: { "Content-Type": "text/html" } });
+			}
+			${errorLoad}
+		}
+		`,
+	);
+}
+
+describe("runPrerender error pages", () => {
+	let tmpRoot = "";
+
+	beforeAll(async () => {
+		tmpRoot = await fs.mkdtemp(path.join(tmpdir(), "torpor-build-prerender-test-"));
+	});
+
+	afterAll(async () => {
+		if (tmpRoot) await fs.rm(tmpRoot, { recursive: true, force: true });
+	});
+
+	test("writes 404.html and 500.html when the site has an error page", async () => {
+		const root = path.join(tmpRoot, "writes");
+		await writeFakeDist(
+			root,
+			`const status = parseInt(url.searchParams.get("status") ?? "404");
+			 return new Response("<p>error " + status + "</p>", { status, headers: { "Content-Type": "text/html" } });`,
+		);
+		const site = new Site();
+		site.root = root;
+
+		const written = await runPrerender(site);
+
+		// Page entries and error pages are counted separately
+		expect(written).toBe(0);
+		expect(await fs.readFile(path.join(root, "dist", "client", "404.html"), "utf-8")).toContain(
+			"error 404",
+		);
+		expect(await fs.readFile(path.join(root, "dist", "client", "500.html"), "utf-8")).toContain(
+			"error 500",
+		);
+	});
+
+	test("skips both error pages when the layout redirects", async () => {
+		const root = path.join(tmpRoot, "redirects");
+		await writeFakeDist(
+			root,
+			`return new Response(null, { status: 303, headers: { location: "/setup" } });`,
+		);
+		const site = new Site();
+		site.root = root;
+
+		await runPrerender(site);
+
+		await expect(
+			fs.readFile(path.join(root, "dist", "client", "404.html"), "utf-8"),
+		).rejects.toThrow();
+		await expect(
+			fs.readFile(path.join(root, "dist", "client", "500.html"), "utf-8"),
+		).rejects.toThrow();
 	});
 });

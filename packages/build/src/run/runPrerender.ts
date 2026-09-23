@@ -165,26 +165,31 @@ export default async function runPrerender(site: Site): Promise<number> {
 	}
 
 	// The error page is useful on every static host, so render it whenever
-	// the site has one, even when nothing else is prerendered. Requesting it
-	// with the status in the query yields a 404 response -- that's the page
-	// rendering correctly, not a failure
+	// the site has one, even when nothing else is prerendered: 404.html for
+	// missing pages, and 500.html for the hosts that match error pages by
+	// status. Requesting each with its status in the query yields that
+	// status -- that's the page rendering correctly, not a failure
 	const errorRoute = routes.find((r) => r.type === ERROR_ROUTE);
 	if (errorRoute && template !== undefined) {
-		const url = "http://torpor.build/_error?status=404";
-		const serverEvent = new ServerEvent(new Request(url), undefined, new URL(url));
-		const response = await serverEntry.load(serverEvent, template);
-		if (isRedirect(response)) {
-			// The layout may redirect before the error page renders (e.g. to
-			// a setup page on a fresh site) -- skip it; the host's default
-			// 404 page is used instead
-			skipped.push(`/_error (status ${response.status})`);
-		} else if (
-			response.status === 404 &&
-			response.headers.get("Content-Type")?.includes("text/html")
-		) {
-			await fs.writeFile(path.join(clientFolder, "404.html"), await response.text());
-		} else {
-			failures.push(`/_error (status ${await responseStatus(response)})`);
+		for (const status of [404, 500]) {
+			const url = `http://torpor.build/_error?status=${status}`;
+			const serverEvent = new ServerEvent(new Request(url), undefined, new URL(url));
+			const response = await serverEntry.load(serverEvent, template);
+			if (isRedirect(response)) {
+				// The layout may redirect before the error page renders (e.g.
+				// to a setup page on a fresh site) -- skip it; the host's
+				// default error page is used instead
+				skipped.push(`/_error (status ${response.status})`);
+				break;
+			}
+			if (
+				response.status === status &&
+				response.headers.get("Content-Type")?.includes("text/html")
+			) {
+				await fs.writeFile(path.join(clientFolder, `${status}.html`), await response.text());
+			} else {
+				failures.push(`/_error (status ${await responseStatus(response)})`);
+			}
 		}
 	}
 

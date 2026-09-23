@@ -62,15 +62,6 @@ template expression references a plain`let`whose initializer reads`$props`
 
 ## Features
 
-### Error prerendering only writes 404.html
-
-`runPrerender.ts` renders `/_error?status=404` and writes it as `404.html` for
-static hosts. Hosts that support per-status error files (e.g. Cloudflare
-Pages also matches `5xx.html`/`502.html` on some plans) can't get a 500-style
-error page yet; rendering a couple of extra statuses (500, 503) would cover
-it. The server-side renderer already supports any status via the `?status=`
-query.
-
 ### DataGrid: expose reload-pending state for loader grids
 
 A loader-backed DataGrid shows the `loading` slot on the first load, but a
