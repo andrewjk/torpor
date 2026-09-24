@@ -140,6 +140,15 @@ see [TORPOR_AGENTS.md](TORPOR_AGENTS.md).
 - Enable debug modes with environment flags
 - Source maps for debugging generated code
 
+### Bump files
+
+- User-facing changes get a bump file in `.bumpy/` (see its README), added in
+  the same commit as the change (`pnpm bump:add`, or by hand)
+- The body is a **one-line** summary with a `Fix:`/`Feat:` prefix -- the same
+  text as the commit's subject line
+- Longer context belongs in commit discussions, docs, or `FOLLOWUP.md`, not
+  the bump file
+
 #### Follow-Ups
 
 - When you decide **not** to fix a bug or issue inline (e.g. it's out of scope
