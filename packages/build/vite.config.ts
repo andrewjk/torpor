@@ -18,6 +18,7 @@ export default defineConfig({
 			state: "src/state.ts",
 			test: "src/test.ts",
 			dev: "src/dev.ts",
+			nodeDev: "src/nodeDev.ts",
 			// Subfolder key: a flat "Server" entry would collide with the
 			// existing "server" entry on case-insensitive filesystems
 			"server/Server": "src/server/Server.ts",

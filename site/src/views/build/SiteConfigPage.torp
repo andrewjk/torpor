@@ -54,8 +54,9 @@ site.addRoute("/api/time", {
 		<ul>
 			<li>
 				<code>site.adapter</code> &mdash; the deployment adapter, e.g.
-				<code>&commat;torpor/adapter-node</code> or
-				<code>&commat;torpor/adapter-cloudflare</code>. When not set, one is
+				<code>&commat;torpor/adapter-node</code>,
+				<code>&commat;torpor/adapter-cloudflare</code> or
+				<code>&commat;torpor/adapter-electron</code>. When not set, one is
 				resolved from the environment or installed packages
 			</li>
 			<li>

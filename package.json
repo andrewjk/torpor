@@ -36,6 +36,7 @@
 		"benchmarks/*",
 		"benchmarks/build/servers/torpor",
 		"packages/adapters/adapter-cloudflare",
+		"packages/adapters/adapter-electron",
 		"packages/adapters/adapter-node",
 		"packages/build",
 		"packages/check",

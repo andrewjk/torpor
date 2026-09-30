@@ -48,8 +48,9 @@ export default class Site {
 	 */
 	vitePlugins: Plugin[] = [];
 	/**
-	 * The site's adapter, e.g. from `@torpor/adapter-node` or
-	 * `@torpor/adapter-cloudflare`. When not set, one is resolved when it's
+	 * The site's adapter, e.g. from `@torpor/adapter-node`,
+	 * `@torpor/adapter-cloudflare` or `@torpor/adapter-electron`. When not set,
+	 * one is resolved when it's
 	 * needed: a deployment environment (e.g. `CF_PAGES`) picks the platform's
 	 * adapter when installed, an installed adapter is used otherwise, and
 	 * preview falls back to serving on the current runtime. See

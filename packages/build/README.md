@@ -27,8 +27,9 @@ npm run dev
   - `tb --preview` -- preview the production build
   - `tb --openapi [outFile]` -- generate an OpenAPI document
 - Adapters for deployment targets -- see
-  [@torpor/adapter-node](../adapters/adapter-node) and
-  [@torpor/adapter-cloudflare](../adapters/adapter-cloudflare)
+  [@torpor/adapter-node](../adapters/adapter-node),
+  [@torpor/adapter-cloudflare](../adapters/adapter-cloudflare) and
+  [@torpor/adapter-electron](../adapters/adapter-electron)
 - Schema validation for endpoints (`@torpor/build/schema`)
 - Form helpers (`@torpor/build/form`) and client side navigation helpers
   (`@torpor/build/nav`)

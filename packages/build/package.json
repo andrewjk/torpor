@@ -13,6 +13,11 @@
 			"torpor:source": "./src/dev.ts",
 			"import": "./dist/dev.mjs"
 		},
+		"./node-dev": {
+			"types": "./dist/nodeDev.d.mts",
+			"torpor:source": "./src/nodeDev.ts",
+			"import": "./dist/nodeDev.mjs"
+		},
 		"./env": {
 			"types": "./dist/env.d.mts",
 			"import": "./dist/env.mjs"
