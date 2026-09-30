@@ -1,0 +1,49 @@
+export default function App() {
+	let $state = $watch({
+		platform: "browser",
+		electron: "not installed",
+		node: "",
+		pid: 0,
+	});
+
+	// The preload script exposes a tiny, read-only bridge (see
+	// @torpor/adapter-electron's preload.cjs). This only exists in the Electron
+	// renderer, so fall back to "browser" when running in dev in a web browser
+	$onmount(() => {
+		$state.platform = window.electronAPI?.platform ?? "browser";
+		$state.electron = window.electronAPI?.versions.electron ?? "not installed";
+
+		fetch("/api/info")
+			.then((response) => response.json())
+			.then((info) => {
+				$state.node = info.node;
+				$state.pid = info.pid;
+			});
+	});
+
+	@render {
+		<h2>Hello from Torpor</h2>
+		<p>
+			This window is served by the site's own Node server running in the Electron main
+			process.
+		</p>
+
+		<ul>
+			<li>Platform: {$state.platform}</li>
+			<li>Electron: {$state.electron}</li>
+			@if ($state.node) {
+				<li>Server: Node {$state.node} (pid {$state.pid})</li>
+			}
+		</ul>
+	}
+
+	@style {
+		h2 {
+			margin-bottom: 0.25rem;
+		}
+
+		ul {
+			line-height: 1.8;
+		}
+	}
+}

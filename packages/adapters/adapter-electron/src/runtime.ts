@@ -1,7 +1,6 @@
 import { createNodeServer } from "@torpor/adapter-node";
 import { Server } from "@torpor/build/server";
 import { existsSync, promises as fs } from "node:fs";
-import type { Server as NodeServer } from "node:http";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import contentType from "./contentType";
@@ -78,7 +77,7 @@ export async function startServer(
 	(globalThis as { adapter?: { env: NodeJS.ProcessEnv } }).adapter = { env: process.env };
 
 	const handler = await createRequestHandler(root);
-	const server: NodeServer = createNodeServer(handler);
+	const server = createNodeServer(handler);
 
 	const host = options.host ?? "127.0.0.1";
 	const port = options.port ?? 0;
@@ -97,7 +96,12 @@ export async function startServer(
 		port: boundPort,
 		close: () =>
 			new Promise<void>((resolve, reject) => {
+				// Force-destroy any remaining sockets (keep-alive, SSE from
+				// `$stream`, etc). `close()` alone waits for connections to end,
+				// so a long-lived one would keep it from calling back and hang
+				// the app's shutdown
 				server.close((error) => (error ? reject(error) : resolve()));
+				server.closeAllConnections();
 			}),
 	};
 }

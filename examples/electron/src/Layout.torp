@@ -1,0 +1,24 @@
+export default function Layout() {
+	@render {
+		<main>
+			<header>
+				<img class="logo" src="/src/torpor.svg" alt="Torpor" />
+				<h1>Torpor Desktop</h1>
+			</header>
+			<slot />
+		</main>
+	}
+
+	@style {
+		header {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.logo {
+			height: 3rem;
+			width: 3rem;
+		}
+	}
+}

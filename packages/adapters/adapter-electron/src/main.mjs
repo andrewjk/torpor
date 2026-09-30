@@ -62,14 +62,26 @@ app.on("window-all-closed", () => {
 	if (process.platform !== "darwin") app.quit();
 });
 
-// Flush cookies (so the session survives) and stop the server before quitting
+// Flush cookies (so the session survives) and stop the server before quitting.
+// A stuck flush or socket must never stop the app from quitting, so the
+// shutdown work is raced against a short timeout
 let shuttingDown = false;
 app.on("before-quit", (event) => {
 	if (shuttingDown) return;
 	event.preventDefault();
 	shuttingDown = true;
-	void Promise.all([
-		session.fromPartition(partition).cookies.flushStore(),
-		server?.close(),
-	]).finally(() => app.quit());
+
+	let timer;
+	const timeout = new Promise((resolve) => {
+		timer = setTimeout(resolve, 1500);
+	});
+	void Promise.race([
+		Promise.all([session.fromPartition(partition).cookies.flushStore(), server?.close()]),
+		timeout,
+	])
+		.catch(() => {})
+		.finally(() => {
+			clearTimeout(timer);
+			app.quit();
+		});
 });

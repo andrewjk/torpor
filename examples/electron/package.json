@@ -1,0 +1,32 @@
+{
+	"name": "@torpor/examples-electron",
+	"version": "0.0.1",
+	"description": "An Electron desktop app built with torpor/build",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "tb --dev",
+		"check": "tsgo --noEmit && pnpm dlx oxlint --type-aware",
+		"build": "tsgo --noEmit && tb --build",
+		"preview": "tb --preview",
+		"test": "vp test"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@torpor/adapter-electron": "workspace:^",
+		"@torpor/build": "workspace:^",
+		"@torpor/unplugin": "workspace:^",
+		"@torpor/view": "workspace:^"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^7.0.0",
+		"@typescript/native-preview": "7.0.0-dev.20260707.2",
+		"happy-dom": "^20.11.1",
+		"typescript": "^7.0.2",
+		"vite": "catalog:",
+		"vite-plus": "catalog:"
+	}
+}

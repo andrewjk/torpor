@@ -20,8 +20,9 @@ export default function electronDev(site: Site, options: ElectronOptions): Plugi
 
 function electronLauncher(site: Site, options: ElectronOptions): Plugin {
 	let child: ChildProcess | undefined;
+	let quitting = false;
 
-	const stop = (): void => {
+	const stopChild = (): void => {
 		child?.kill();
 		child = undefined;
 	};
@@ -34,8 +35,21 @@ function electronLauncher(site: Site, options: ElectronOptions): Plugin {
 			const start = (): void => {
 				const url = devServerUrl(server);
 				if (!url) return;
-				stop();
-				child = launch(site, url, options);
+				stopChild();
+				quitting = false;
+
+				const proc = launch(site, url, options);
+				child = proc;
+
+				// When the user quits the app (Cmd+Q, or closing the window),
+				// stop the dev server too, so `tb --dev` exits with the desktop
+				// app. A failed launch emits "error", not "exit", so browser-only
+				// dev is unaffected
+				proc.once("exit", () => {
+					if (quitting) return;
+					quitting = true;
+					void server.close();
+				});
 			};
 
 			const httpServer = server.httpServer;
@@ -44,7 +58,15 @@ function electronLauncher(site: Site, options: ElectronOptions): Plugin {
 			} else {
 				httpServer?.once("listening", start);
 			}
-			httpServer?.once("close", stop);
+
+			// Vite is shutting down (Ctrl+C, a restart, or close() from the
+			// handler above): kill the window without re-closing the server
+			httpServer?.once("close", () => {
+				quitting = true;
+				stopChild();
+			});
+
+			process.once("exit", stopChild);
 		},
 	};
 }
@@ -79,7 +101,6 @@ function launch(site: Site, url: string, options: ElectronOptions): ChildProcess
 		}
 	});
 
-	process.once("exit", () => child.kill());
 	return child;
 }
 
