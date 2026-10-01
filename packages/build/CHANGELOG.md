@@ -1,5 +1,18 @@
 # @torpor/build
 
+## 1.5.0
+
+<sub>2026-10-01</sub>
+
+- _(minor)_ Feat: add an Electron adapter for desktop apps
+- _(patch)_ Fix: error pages now show the original url
+- _(patch)_ Fix: 5xx form submits show the error page instead of doing nothing
+- _(patch)_ Fix: failed loads render the error page in place during client navigation
+- _(patch)_ Feat: prerender 500.html alongside 404.html
+- _(patch)_ Fix: client navigation follows server-load redirects (e.g. an auth hook)
+- _(patch)_ Fix: client navigation loads page and layout data in one request, so hooks see the page url and pages hydrate
+- _(patch)_ Fix: links to server-only routes (e.g. /logout) fall back to a full page load instead of throwing
+
 ## 1.4.6
 
 <sub>2026-09-22</sub>

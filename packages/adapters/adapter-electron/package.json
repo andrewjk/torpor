@@ -1,6 +1,6 @@
 {
 	"name": "@torpor/adapter-electron",
-	"version": "1.0.0",
+	"version": "1.1.0",
 	"description": "A @torpor/build adapter for building desktop apps with Electron",
 	"type": "module",
 	"exports": {

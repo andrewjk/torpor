@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.1.7
+
+<sub>2026-10-01</sub>
+
+- _(patch)_ Fix: Form validation prevents the native submit synchronously
+
 ## 1.1.6
 
 <sub>2026-09-22</sub>

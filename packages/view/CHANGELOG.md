@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 1.1.3
+
+<sub>2026-10-01</sub>
+
+- _(patch)_ Fix: `.torp` scripts with a capitalised `const` object literal now compile
+
 ## 1.1.2
 
 <sub>2026-09-22</sub>

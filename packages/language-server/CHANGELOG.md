@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+<sub>2026-10-01</sub>
+
+- _(patch)_ Updated dependency `@torpor/view` v1.1.3
+
 ## 1.0.6
 
 <sub>2026-09-22</sub>

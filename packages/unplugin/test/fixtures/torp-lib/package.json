@@ -1,6 +1,6 @@
 {
 	"name": "torp-lib",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Test fixture: a torpor package with a re-export barrel (like @torpor/ui) and a direct .torp export (like phosphor-torpor)",
 	"type": "module",
 	"torpor": true,
