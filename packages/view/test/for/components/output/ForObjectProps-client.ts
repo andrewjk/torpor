@@ -57,7 +57,8 @@ export default function ForObjectProps(
 			const t_if_region_1 = t_region();
 			let t_if_index_1 = -1;
 			t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
-				if (t_item_1.data.item.active) {
+				const item = t_item_1.data.item;
+				if (item.active) {
 					if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
@@ -76,7 +77,8 @@ export default function ForObjectProps(
 			});
 
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item_1.data.item.name);
+				const item = t_item_1.data.item;
+				t_text_1.textContent = t_fmt(item.name);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

@@ -8,6 +8,7 @@ import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings } from "./forVars";
 
 export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName ?? "null";
@@ -30,6 +31,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"await"` : ""});
 		t_run_await(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
+	appendForVarBindings(b, status);
 
 	// Content branch children
 	if (awaitBranch !== undefined && awaitBranch.children.length > 0) {
@@ -45,6 +47,7 @@ export default function buildAwaitNode(node: ControlNode, status: BuildStatus, b
 	// Close content callback; open with-branch (or pass null)
 	if (withBranch !== undefined) {
 		b.append(`}, (${status.inHead ? "" : "t_before"}) => {`);
+		appendForVarBindings(b, status);
 		if (withBranch.children.length > 0) {
 			buildFragment(withBranch, status, b, parentName, "t_before");
 			status.fragmentStack.push({ fragment: withBranch.fragment, path: "" });

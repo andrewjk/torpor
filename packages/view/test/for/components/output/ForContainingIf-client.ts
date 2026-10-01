@@ -59,7 +59,8 @@ export default function ForContainingIf(
 			const t_if_region_1 = t_region();
 			let t_if_index_1 = -1;
 			t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
-				if (t_item_1.data.i > 2) {
+				const i = t_item_1.data.i;
+				if (i > 2) {
 					if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
@@ -68,7 +69,8 @@ export default function ForContainingIf(
 					const t_p_1 = t_root_2 as HTMLElement;
 					const t_text_1 = t_child(t_p_1);
 					$run(() => {
-						t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)} `;
+						const i = t_item_1.data.i;
+						t_text_1.textContent = ` ${t_fmt(i)} `;
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_p_1, t_fragment_1, t_before);
 					t_next(t_p_1);

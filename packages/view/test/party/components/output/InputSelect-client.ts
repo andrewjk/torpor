@@ -67,9 +67,10 @@ export default function ColorSelect(
 			const t_option_1 = t_root_1 as HTMLOptionElement;
 			const t_text_2 = t_child(t_option_1);
 			$run(() => {
-				t_attribute(t_option_1, "value", t_item_1.data.id);
-				t_attribute(t_option_1, "disabled", t_item_1.data.isDisabled);
-				t_text_2.textContent = ` ${t_fmt(t_item_1.data.text)} `;
+				const color = t_item_1.data;
+				t_attribute(t_option_1, "value", color.id);
+				t_attribute(t_option_1, "disabled", color.isDisabled);
+				t_text_2.textContent = ` ${t_fmt(color.text)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_option_1, t_select_1, t_before_1);
 			t_next(t_option_1);

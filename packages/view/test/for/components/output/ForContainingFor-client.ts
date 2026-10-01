@@ -74,7 +74,9 @@ export default function ForContainingFor(
 					const t_p_1 = t_root_2 as HTMLElement;
 					const t_text_1 = t_child(t_p_1);
 					$run(() => {
-						t_text_1.textContent = ` ${t_fmt(t_item_1.data.i)}-${t_fmt(t_item_2.data)} `;
+						const i = t_item_1.data.i;
+						const j = t_item_2.data;
+						t_text_1.textContent = ` ${t_fmt(i)}-${t_fmt(j)} `;
 					}, undefined, { forVarMask: 3 });
 					t_add_element(t_p_1, t_fragment_1, t_before_2);
 					t_next(t_p_1);

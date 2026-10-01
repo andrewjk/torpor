@@ -48,7 +48,8 @@ export default function ForNoProxy(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item_1.data.label);
+				const row = t_item_1.data;
+				t_text_1.textContent = t_fmt(row.label);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

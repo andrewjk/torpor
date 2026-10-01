@@ -48,7 +48,8 @@ export default function ArrayIndexes(
 			const t_span_1 = t_root_1 as HTMLSpanElement;
 			const t_text_1 = t_child(t_span_1);
 			$run(() => {
-				t_text_1.textContent = ` ${t_fmt(t_item_1.data > 0 ? ", " : "")} ${t_fmt($props.items[t_item_1.data].text)} `;
+				const i = t_item_1.data;
+				t_text_1.textContent = ` ${t_fmt(i > 0 ? ", " : "")} ${t_fmt($props.items[i].text)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_span_1, t_section_1, t_before_1);
 			t_next(t_span_1);

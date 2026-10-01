@@ -54,14 +54,18 @@ export default function ForComment(
 			const t_button_1 = t_child(t_li_1) as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
 			t_event(t_button_1, "click", (e: MouseEvent) => {
+				const item = t_item_1.data.item;
+
 				// The field doesn't blur first, so mousedown it is
 				e.preventDefault();
 				$state.selected = item;
 			});
 			$run(() => {
-				t_attribute(t_button_1, "data-testid", t_item_1.data.item);
-				t_attribute(t_button_1, "data-selected", $state.selected === t_item_1.data.item ? "" : undefined);
-				t_text_1.textContent = ` ${t_fmt(t_item_1.data.index)}: ${t_fmt(t_item_1.data.item)} `;
+				const index = t_item_1.data.index;
+				const item = t_item_1.data.item;
+				t_attribute(t_button_1, "data-testid", item);
+				t_attribute(t_button_1, "data-selected", $state.selected === item ? "" : undefined);
+				t_text_1.textContent = ` ${t_fmt(index)}: ${t_fmt(item)} `;
 			}, undefined, { forVarMask: 3 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

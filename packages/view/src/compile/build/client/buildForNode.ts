@@ -3,6 +3,8 @@ import Builder from "../../utils/Builder";
 import isControlNode from "../../utils/isControlNode";
 import isForBodyLeafSafe from "../../utils/isForBodyLeafSafe";
 import isForBodyNoProxySafe from "../../utils/isForBodyNoProxySafe";
+import { forVarsReassignedIn } from "../../utils/forVarsWrittenIn";
+import forVarsReadDirectlyIn from "../../utils/forVarsReadDirectlyIn";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
@@ -12,6 +14,7 @@ import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings, appendForVarBindingsFor } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
@@ -83,6 +86,15 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		status.imports.add("t_rerun_region_effects");
 	}
 
+	// Loop vars whose binding is never reassigned resolve through per-scope
+	// shadow bindings (see `forVarBindings`), so references are left alone.
+	// Reassigned vars keep the textual substitution to their live data path.
+	// Property/index writes (`row.name = …`) don't reassign the binding, so
+	// they still shadow — the write mutates the row object through the
+	// shadowed reference. `noWatch` implies no writes at all, so every var in
+	// that path is read-only.
+	const reassignedForVars = forVarsReassignedIn(node.children, forVarNames);
+
 	// Single-loop-var specialization of the no-proxy path: when the body
 	// binds exactly one loop variable, the per-row spec can store it
 	// directly (`data: row`) instead of wrapping it (`data: { row }`). This
@@ -90,9 +102,9 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// `removeFirst` click on a 1000-row list allocates 999 `{ row }`
 	// wrappers today, all to be GC'd moments later — and turns the
 	// `updateListItem` per-field compare into a single reference check. The
-	// body's loop-var access flips from `item.data.<var>.x` to
-	// `item.data.x` (the substitution below maps `<var>` → `item.data`
-	// rather than `item.data.<var>`).
+	// body's loop-var access flips from `item.data.<var>.x` to `item.data.x`
+	// (the shadow binding maps `<var>` to `item.data` rather than
+	// `item.data.<var>`).
 	const singleVar = noWatch && forVarNames.length === 1;
 
 	// Detect "leaf-row safe" @for body: when the body has no nested control
@@ -126,6 +138,10 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		${anchorName},
 		${status.options.dev === true ? "function createNewItems() {" : "() => {"}
 			let ${listItemsName}: ListItemSpec[] = [];`);
+	// Loop vars from enclosing @for loops resolve through shadow bindings here,
+	// so the loop header expression (and key expression below) see them. Only
+	// bind the ones those expressions actually read.
+	appendForVarBindings(b, status, `${node.statement}\n${keyStatement}`);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
@@ -152,24 +168,30 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	b.append(`},
 		${status.options.dev === true ? `function createListItem(${itemName}, ${beforeName}) {` : `(${itemName}, ${beforeName}) => {`}`);
 
-	let oldForVarNames = status.forVarNames;
+	let oldForVars = status.forVars;
 	// The bit base for this loop's for-vars in `forVarMask`. Outer for-loops
-	// (if any) occupy lower bit positions in `status.forVarNames`; this
-	// loop's vars start at `oldForVarNames.length`. Captured before the body
-	// is built so `forVarsReadIn` and `t_changed_mask` use the same index
-	// space.
-	const forVarBitBase = oldForVarNames.length;
-	status.forVarNames = [
-		...status.forVarNames,
+	// (if any) occupy lower bit positions in `status.forVars`; this loop's
+	// vars start at `oldForVars.length`. Captured before the body is built so
+	// `forVarsReadIn` and `t_changed_mask` use the same index space.
+	const forVarBitBase = oldForVars.length;
+	status.forVars = [
+		...oldForVars,
 		// singleVar stores the loop var directly as `data`, so the body
-		// reads it as `item.data.<x>`; otherwise it's wrapped as
-		// `data: { <var> }` and the body reads `item.data.<var>.<x>`.
-		...(singleVar
-			? forVarNames.map((v) => [v, `${itemName}.data`])
-			: forVarNames.map((v) => [v, `${itemName}.data.${v}`])),
+		// reads it as `item.data`; otherwise it's wrapped as
+		// `data: { <var> }` and the body reads `item.data.<var>`.
+		...forVarNames.map((v) => ({
+			name: v,
+			path: singleVar ? `${itemName}.data` : `${itemName}.data.${v}`,
+			shadow: !reassignedForVars.has(v),
+		})),
 	];
+	// Shadow-bind the read-only vars this row callback's directly-evaluated
+	// code reads (component props, @const, &ref, …). Effects, handlers and
+	// nested callbacks emitted inside get their own bindings as needed, so
+	// binding every var here would leave lines nothing uses.
+	appendForVarBindingsFor(b, status, forVarsReadDirectlyIn(node.children, status.forVars));
 	buildForItem(node, status, b, parentName, beforeName, itemName, leafRow);
-	status.forVarNames = oldForVarNames;
+	status.forVars = oldForVars;
 
 	b.append(`},
 ${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item) {" : "(t_old_item, t_new_item) => {"}`);
@@ -184,7 +206,7 @@ ${status.options.dev === true ? "function updateListItem(t_old_item, t_new_item)
 		// We OR the changed for-var positions into `t_changed_mask` (a
 		// bitmask). Bit positions are offset by `forVarBitBase` to match
 		// the indices `forVarsReadIn` used when annotating effects (which
-		// iterates over the full `status.forVarNames`, including outer
+		// iterates over the full `status.forVars`, including outer
 		// loops). `t_rerun_region_effects` then uses each effect's
 		// `forVarMask & changedMask` to skip unrelated effects.
 		b.append(`let t_changed_mask = 0;`);

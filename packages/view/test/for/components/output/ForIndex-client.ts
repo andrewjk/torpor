@@ -48,7 +48,8 @@ export default function ForIndex(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
-				t_text_1.textContent = `Item ${t_fmt(t_item_1.data)}: ${t_fmt($props.list[t_item_1.data])}`;
+				const i = t_item_1.data;
+				t_text_1.textContent = `Item ${t_fmt(i)}: ${t_fmt($props.list[i])}`;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

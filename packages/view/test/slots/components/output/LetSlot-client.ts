@@ -95,15 +95,17 @@ function List(
 			return t_new_items_1;
 		},
 		(t_item_1, t_before_1) => {
+			const item = t_item_1.data;
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><!></li>`);
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_li_1 = t_root_1 as HTMLElement;
 			let t_slot_anchor_1 = t_anchor(t_child(t_li_1)) as HTMLElement;
 			const t_slot_props_1 = $watch({
-				item: t_item_1.data,
+				item: item,
 			});
 			$run(() => {
-				t_slot_props_1["item"] = t_item_1.data;
+				const item = t_item_1.data;
+				t_slot_props_1["item"] = item;
 			}, undefined, { forVarMask: 1 });
 			if ($slots && $slots["_"]) {
 				$slots["_"](t_li_1, t_slot_anchor_1, t_slot_props_1, $context)

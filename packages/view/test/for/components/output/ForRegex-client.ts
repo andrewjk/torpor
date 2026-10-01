@@ -49,10 +49,11 @@ export default function ForRegex(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
-				t_attribute(t_li_1, "data-testid", t_item_1.data);
-				t_attribute(t_li_1, "data-starts-a", /^a/.test(t_item_1.data) ? "" : undefined);
-				t_attribute(t_li_1, "data-label", t_item_1.data.replace(/\b[a-z]/g, (c) => c.toUpperCase()));
-				t_text_1.textContent = ` ${t_fmt(t_item_1.data.replace(/\d+/g, ""))} `;
+				const item = t_item_1.data;
+				t_attribute(t_li_1, "data-testid", item);
+				t_attribute(t_li_1, "data-starts-a", /^a/.test(item) ? "" : undefined);
+				t_attribute(t_li_1, "data-label", item.replace(/\b[a-z]/g, (c) => c.toUpperCase()));
+				t_text_1.textContent = ` ${t_fmt(item.replace(/\d+/g, ""))} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

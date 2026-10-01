@@ -51,9 +51,13 @@ export default function ForLeafRow(
 			const t_button_1 = t_next(t_next(t_child(t_li_1), true)) as HTMLButtonElement;
 			/* @const */
 			const suffix = "!";
-			t_event(t_button_1, "click", () => $props.onSelect(t_item_1.data));
+			t_event(t_button_1, "click", () => {
+				const row = t_item_1.data;
+				return $props.onSelect(row)
+			});
 			$run(() => {
-				t_text_1.textContent = `${t_fmt(t_item_1.data.label)}${t_fmt(suffix)}`;
+				const row = t_item_1.data;
+				t_text_1.textContent = `${t_fmt(row.label)}${t_fmt(suffix)}`;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

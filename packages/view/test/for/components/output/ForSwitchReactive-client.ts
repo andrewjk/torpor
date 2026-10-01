@@ -59,7 +59,8 @@ export default function ForSwitchReactive(
 			const t_switch_region_1 = t_region();
 			let t_switch_index_1 = -1;
 			t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
-				switch (t_item_1.data.item.status) {
+				const item = t_item_1.data.item;
+				switch (item.status) {
 					case "on": {
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 						const t_new_region = t_region();
@@ -69,7 +70,8 @@ export default function ForSwitchReactive(
 						const t_li_1 = t_root_2 as HTMLElement;
 						const t_text_1 = t_child(t_li_1);
 						$run(() => {
-							t_text_1.textContent = t_fmt(t_item_1.data.item.id);
+							const item = t_item_1.data.item;
+							t_text_1.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_1, t_fragment_1, t_before);
 						t_next(t_li_1);
@@ -86,7 +88,8 @@ export default function ForSwitchReactive(
 						const t_li_2 = t_root_3 as HTMLElement;
 						const t_text_2 = t_child(t_li_2);
 						$run(() => {
-							t_text_2.textContent = t_fmt(t_item_1.data.item.id);
+							const item = t_item_1.data.item;
+							t_text_2.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_2, t_fragment_1, t_before);
 						t_next(t_li_2);
@@ -103,7 +106,8 @@ export default function ForSwitchReactive(
 						const t_li_3 = t_root_4 as HTMLElement;
 						const t_text_3 = t_child(t_li_3);
 						$run(() => {
-							t_text_3.textContent = t_fmt(t_item_1.data.item.id);
+							const item = t_item_1.data.item;
+							t_text_3.textContent = t_fmt(item.id);
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_li_3, t_fragment_1, t_before);
 						t_next(t_li_3);

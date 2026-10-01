@@ -92,7 +92,8 @@ export default function AdjacentIfsFor(
 					const t_li_1 = t_root_3 as HTMLElement;
 					const t_text_1 = t_child(t_li_1);
 					$run(() => {
-						t_text_1.textContent = `B${t_fmt(t_item_1.data)}`;
+						const i = t_item_1.data;
+						t_text_1.textContent = `B${t_fmt(i)}`;
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_li_1, t_ul_1, t_before_1);
 					t_next(t_li_1);

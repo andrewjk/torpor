@@ -82,7 +82,8 @@ export default function IfForSwitchCombo(
 					const t_if_region_2 = t_region();
 					let t_if_index_2 = -1;
 					t_run_control(t_if_region_2, t_if_anchor_2, (t_before) => {
-						if ($props.filter === "all" || ($props.filter === "done" && t_item_1.data.todo.done) || ($props.filter === "pending" && !t_item_1.data.todo.done)) {
+						const todo = t_item_1.data.todo;
+						if ($props.filter === "all" || ($props.filter === "done" && todo.done) || ($props.filter === "pending" && !todo.done)) {
 							if (!t_run_branch(t_if_region_2, t_if_index_2, 0)) return;
 							const t_new_region = t_region();
 							const t_old_region = t_push_region(t_new_region, true);
@@ -95,7 +96,8 @@ export default function IfForSwitchCombo(
 							const t_switch_region_1 = t_region();
 							let t_switch_index_1 = -1;
 							t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
-								switch (t_item_1.data.todo.priority) {
+								const todo = t_item_1.data.todo;
+								switch (todo.priority) {
 									case "high": {
 										if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 										const t_new_region = t_region();
@@ -105,7 +107,8 @@ export default function IfForSwitchCombo(
 										const t_strong_1 = t_root_5 as HTMLElement;
 										const t_text_1 = t_child(t_strong_1);
 										$run(() => {
-											t_text_1.textContent = `[HIGH] ${t_fmt(t_item_1.data.todo.text)}`;
+											const todo = t_item_1.data.todo;
+											t_text_1.textContent = `[HIGH] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_strong_1, t_li_1, t_before);
 										t_next(t_strong_1);
@@ -122,7 +125,8 @@ export default function IfForSwitchCombo(
 										const t_em_1 = t_root_6 as HTMLElement;
 										const t_text_2 = t_child(t_em_1);
 										$run(() => {
-											t_text_2.textContent = `[low] ${t_fmt(t_item_1.data.todo.text)}`;
+											const todo = t_item_1.data.todo;
+											t_text_2.textContent = `[low] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_em_1, t_li_1, t_before);
 										t_next(t_em_1);
@@ -139,7 +143,8 @@ export default function IfForSwitchCombo(
 										const t_span_1 = t_root_7 as HTMLSpanElement;
 										const t_text_3 = t_child(t_span_1);
 										$run(() => {
-											t_text_3.textContent = `[med] ${t_fmt(t_item_1.data.todo.text)}`;
+											const todo = t_item_1.data.todo;
+											t_text_3.textContent = `[med] ${t_fmt(todo.text)}`;
 										}, undefined, { forVarMask: 1 });
 										t_add_element(t_span_1, t_li_1, t_before);
 										t_next(t_span_1);

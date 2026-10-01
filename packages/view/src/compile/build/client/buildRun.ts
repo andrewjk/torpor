@@ -3,6 +3,7 @@ import forVarsReadIn from "../../utils/forVarsReadIn";
 import type BuildStatus from "./BuildStatus";
 import addPopDevBoundary from "./addPopDevBoundary";
 import addPushDevBoundary from "./addPushDevBoundary";
+import forVarBindings from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildRun(
@@ -16,7 +17,8 @@ export default function buildRun(
 	addPushDevBoundary("run", functionName, status, b);
 
 	let forVarMask =
-		status.forVarNames.length > 0 ? forVarsReadIn(functionBody, status.forVarNames) : undefined;
+		status.forVars.length > 0 ? forVarsReadIn(functionBody, status.forVars) : undefined;
+	functionBody = forVarBindings(status, functionBody) + functionBody;
 	let trailing = "";
 	if (status.options.dev === true) {
 		trailing = `, "${functionName}"`;

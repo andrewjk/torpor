@@ -67,7 +67,8 @@ export default function ForNestedKeyed(
 				t_for_anchor_2,
 				() => {
 					let t_new_items_2: ListItemSpec[] = [];
-					for (let it of t_item_1.data.g.items) {
+					const g = t_item_1.data.g;
+					for (let it of g.items) {
 						t_new_items_2.push({ data: it, key:
 						it.id });
 					}
@@ -79,7 +80,8 @@ export default function ForNestedKeyed(
 					const t_li_1 = t_root_2 as HTMLElement;
 					const t_text_2 = t_child(t_li_1);
 					$run(() => {
-						t_text_2.textContent = t_fmt(t_item_2.data.label);
+						const it = t_item_2.data;
+						t_text_2.textContent = t_fmt(it.label);
 					}, undefined, { forVarMask: 2 });
 					t_add_element(t_li_1, t_for_parent_2, t_before_2);
 					t_next(t_li_1);
@@ -96,7 +98,8 @@ export default function ForNestedKeyed(
 			);
 
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item_1.data.g.id);
+				const g = t_item_1.data.g;
+				t_text_1.textContent = t_fmt(g.id);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_section_1, t_for_parent_1, t_before_1);
 			t_next(t_section_1);

@@ -60,6 +60,7 @@ export default function ForSwitchFor(
 			const t_switch_region_1 = t_region();
 			let t_switch_index_1 = -1;
 			t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
+				const row = t_item_1.data.row;
 				switch ($props.operation) {
 					case "sum": {
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
@@ -70,7 +71,8 @@ export default function ForSwitchFor(
 						const t_p_1 = t_root_2 as HTMLElement;
 						const t_text_1 = t_child(t_p_1);
 						$run(() => {
-							t_text_1.textContent = t_fmt(t_item_1.data.row.reduce((a, b) => a + b, 0));
+							const row = t_item_1.data.row;
+							t_text_1.textContent = t_fmt(row.reduce((a, b) => a + b, 0));
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_1, t_div_1, t_before);
 						t_next(t_p_1);
@@ -87,7 +89,8 @@ export default function ForSwitchFor(
 						const t_p_2 = t_root_3 as HTMLElement;
 						const t_text_2 = t_child(t_p_2);
 						$run(() => {
-							t_text_2.textContent = t_fmt(Math.max(...t_item_1.data.row));
+							const row = t_item_1.data.row;
+							t_text_2.textContent = t_fmt(Math.max(...row));
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_p_2, t_div_1, t_before);
 						t_next(t_p_2);
@@ -111,7 +114,8 @@ export default function ForSwitchFor(
 							t_for_anchor_2,
 							() => {
 								let t_new_items_2: ListItemSpec[] = [];
-								for (let cell of t_item_1.data.row) {
+								const row = t_item_1.data.row;
+								for (let cell of row) {
 									t_new_items_2.push({ data: cell, key:
 									undefined });
 								}
@@ -123,7 +127,8 @@ export default function ForSwitchFor(
 								const t_span_1 = t_root_5 as HTMLSpanElement;
 								const t_text_3 = t_child(t_span_1);
 								$run(() => {
-									t_text_3.textContent = `${t_fmt(t_item_2.data)} `;
+									const cell = t_item_2.data;
+									t_text_3.textContent = `${t_fmt(cell)} `;
 								}, undefined, { forVarMask: 2 });
 								t_add_element(t_span_1, t_fragment_4, t_before_2);
 								t_next(t_span_1);

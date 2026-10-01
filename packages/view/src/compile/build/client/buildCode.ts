@@ -272,7 +272,7 @@ function makeStatus(
 		map,
 		varNames: {},
 		fragmentStack: [],
-		forVarNames: [],
+		forVars: [],
 		ns: false,
 		preserveWhitespace: false,
 		inHead: false,

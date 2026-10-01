@@ -10,6 +10,7 @@ import addMappedText from "./addMappedText";
 import buildMount from "./buildMount";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
+import { appendForVarBindings, injectForVarHandler } from "./forVars";
 import getAttributeOffsets from "./getAttributeOffsets";
 import replaceForVarNames from "./replaceForVarNames";
 import stashRun from "./stashRun";
@@ -500,10 +501,18 @@ function emitBindEvent(
 ): void {
 	status.imports.add("t_event");
 	if (!combined) {
-		b.append(`t_event(${varName}, "${eventName}", ${listener});`);
+		// The binding listener is created once per row but invoked later, so
+		// any shadow-bound loop var it writes through must be re-read inside
+		// the handler (a row-scope binding would be stale after keyed
+		// reconciliation replaces the row's data).
+		b.append(`t_event(${varName}, "${eventName}", ${injectForVarHandler(listener, status)});`);
 		return;
 	}
 	b.append(`t_event(${varName}, "${eventName}", (e) => {`);
+	// Re-create the loop-var shadow bindings on every event, so the combined
+	// user handler resolves them live (the handler is invoked later, after
+	// any keyed reconciliation).
+	appendForVarBindings(b, status, combined.value);
 	// NOTE: The cast is needed because the handler may not take an event
 	// parameter, and an optional call would otherwise not typecheck
 	const handlerCall = `((${combined.value}) as ((e: any) => any) | undefined)?.(e);`;
@@ -526,6 +535,7 @@ function buildEventAttribute(
 	b: Builder,
 ) {
 	value = replaceForVarNames(value, status);
+	value = injectForVarHandler(value, status);
 
 	// Add an event listener, after the fragment has been added
 	const eventName = name.substring(2);
@@ -542,6 +552,7 @@ function buildTransitionAttribute(
 	b: Builder,
 ) {
 	value = replaceForVarNames(value, status);
+	value = injectForVarHandler(value, status);
 
 	status.imports.add("t_animate");
 
@@ -558,7 +569,7 @@ function buildTransitionAttribute(
 	} else if (name === "transition-in") {
 		let outAttribute = node.attributes.find((a) => a.name === "transition-out");
 		if (outAttribute && outAttribute.value && outAttribute.fullyReactive) {
-			let outValue = outAttribute.value;
+			let outValue = injectForVarHandler(replaceForVarNames(outAttribute.value, status), status);
 			b.append(`const ${entryVarName} = (${value})(${varName});`);
 			b.append(`const ${exitVarName} = (${outValue})(${varName});`);
 			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);

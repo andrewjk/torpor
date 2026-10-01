@@ -4,6 +4,7 @@ import type RootNode from "../../types/nodes/RootNode";
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import addMappedTextWithOffsets from "./addMappedTextWithOffsets";
+import { appendForVarBindings } from "./forVars";
 
 export default function buildAddFragment(
 	node: RootNode | ControlNode | ElementNode,
@@ -32,6 +33,10 @@ export default function buildAddFragment(
 				trailing = `, undefined, { forVarMask: ${forVarMask} }`;
 			}
 			b.append("$run(() => {");
+			// Shadow-bind only the loop vars this fragment's effects read, so
+			// their references resolve lexically instead of being textually
+			// substituted.
+			appendForVarBindings(b, status, fragment.effects.map((e) => e.functionBody).join("\n"));
 			if (status.options.mapped === true) {
 				for (let effect of fragment.effects) {
 					addMappedTextWithOffsets(

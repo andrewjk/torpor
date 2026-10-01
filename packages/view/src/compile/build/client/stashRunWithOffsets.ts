@@ -31,7 +31,7 @@ export default function stashRunWithOffsets(
 	}
 
 	let forVarMask =
-		status.forVarNames.length > 0 ? forVarsReadIn(functionBody, status.forVarNames) : undefined;
+		status.forVars.length > 0 ? forVarsReadIn(functionBody, status.forVars) : undefined;
 
 	fragment.effects.push({
 		functionBody,

@@ -48,7 +48,8 @@ export default function ForAfterFor(
 			const t_p_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_p_1);
 			$run(() => {
-				t_text_1.textContent = ` ${t_fmt(t_item_1.data)} `;
+				const i = t_item_1.data;
+				t_text_1.textContent = ` ${t_fmt(i)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_p_1, t_section_1, t_before_1);
 			t_next(t_p_1);
@@ -86,7 +87,8 @@ export default function ForAfterFor(
 			const t_p_2 = t_root_2 as HTMLElement;
 			const t_text_2 = t_child(t_p_2);
 			$run(() => {
-				t_text_2.textContent = ` ${t_fmt(t_item_2.data)} `;
+				const i = t_item_2.data;
+				t_text_2.textContent = ` ${t_fmt(i)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_p_2, t_section_1, t_before_2);
 			t_next(t_p_2);

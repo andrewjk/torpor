@@ -56,7 +56,8 @@ export default function SwitchInFor(
 			const t_switch_region_1 = t_region();
 			let t_switch_index_1 = -1;
 			t_run_control(t_switch_region_1, t_switch_anchor_1, (t_before) => {
-				switch (t_item_1.data.item.type) {
+				const item = t_item_1.data.item;
+				switch (item.type) {
 					case "admin": {
 						if (!t_run_branch(t_switch_region_1, t_switch_index_1, 0)) return;
 						const t_new_region = t_region();
@@ -66,7 +67,8 @@ export default function SwitchInFor(
 						const t_strong_1 = t_root_2 as HTMLElement;
 						const t_text_1 = t_child(t_strong_1);
 						$run(() => {
-							t_text_1.textContent = `${t_fmt(t_item_1.data.item.name)} (admin)`;
+							const item = t_item_1.data.item;
+							t_text_1.textContent = `${t_fmt(item.name)} (admin)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_strong_1, t_li_1, t_before);
 						t_next(t_strong_1);
@@ -83,7 +85,8 @@ export default function SwitchInFor(
 						const t_span_1 = t_root_3 as HTMLSpanElement;
 						const t_text_2 = t_child(t_span_1);
 						$run(() => {
-							t_text_2.textContent = `${t_fmt(t_item_1.data.item.name)} (user)`;
+							const item = t_item_1.data.item;
+							t_text_2.textContent = `${t_fmt(item.name)} (user)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_span_1, t_li_1, t_before);
 						t_next(t_span_1);
@@ -100,7 +103,8 @@ export default function SwitchInFor(
 						const t_em_1 = t_root_4 as HTMLElement;
 						const t_text_3 = t_child(t_em_1);
 						$run(() => {
-							t_text_3.textContent = `${t_fmt(t_item_1.data.item.name)} (unknown)`;
+							const item = t_item_1.data.item;
+							t_text_3.textContent = `${t_fmt(item.name)} (unknown)`;
 						}, undefined, { forVarMask: 1 });
 						t_add_element(t_em_1, t_li_1, t_before);
 						t_next(t_em_1);

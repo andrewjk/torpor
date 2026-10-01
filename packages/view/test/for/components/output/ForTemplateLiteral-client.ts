@@ -52,7 +52,8 @@ export default function ForTemplateLiteral(
 			const t_p_1 = t_root_1 as HTMLElement;
 			const t_p_2 = t_next(t_next(t_p_1, true)) as HTMLElement;
 			$run(() => {
-				t_attribute(t_p_1, "aria-label", `Go to t_item_1.data ${t_item_1.data.index + 1}`);
+				const slide = t_item_1.data;
+				t_attribute(t_p_1, "aria-label", `Go to slide ${slide.index + 1}`);
 				t_attribute(t_p_2, "aria-label", `slide show`);
 			}, undefined, { forVarMask: 1 });
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_p_2, t_root_1);

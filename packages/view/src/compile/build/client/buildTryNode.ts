@@ -10,6 +10,7 @@ import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildTryNode(node: ControlNode, status: BuildStatus, b: Builder): void {
@@ -34,6 +35,7 @@ export default function buildTryNode(node: ControlNode, status: BuildStatus, b: 
 	b.append(`
 		const ${regionName} = t_region(${status.options.dev === true ? `"try"` : ""});
 		t_run_try(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
+	appendForVarBindings(b, status);
 
 	buildTryBranchBody(tryBranch, status, b, parentName);
 
@@ -51,6 +53,7 @@ export default function buildTryNode(node: ControlNode, status: BuildStatus, b: 
 			status,
 			b,
 		);
+		appendForVarBindings(b, status);
 		buildTryBranchBody(catchBranch, status, b, parentName);
 		b.append(`}${status.options.dev === true ? `, "runTry"` : ""});`);
 	} else {

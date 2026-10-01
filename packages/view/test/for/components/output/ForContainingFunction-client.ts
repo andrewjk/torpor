@@ -56,7 +56,8 @@ export default function ForContainingIf(
 			};
 
 			$run(() => {
-				t_text_1.textContent = `do it ${t_fmt(t_item_1.data)}`;
+				const i = t_item_1.data;
+				t_text_1.textContent = `do it ${t_fmt(i)}`;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_button_1, t_section_1, t_before_1);
 			t_next(t_button_1);

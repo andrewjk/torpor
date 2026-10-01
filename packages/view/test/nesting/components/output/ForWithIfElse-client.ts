@@ -59,7 +59,8 @@ export default function ForWithIfElse(
 			const t_if_region_1 = t_region();
 			let t_if_index_1 = -1;
 			t_run_control(t_if_region_1, t_if_anchor_1, (t_before) => {
-				if (t_item_1.data.tab === $props.activeTab) {
+				const tab = t_item_1.data.tab;
+				if (tab === $props.activeTab) {
 					if (!t_run_branch(t_if_region_1, t_if_index_1, 0)) return;
 					const t_new_region = t_region();
 					const t_old_region = t_push_region(t_new_region, true);
@@ -68,7 +69,8 @@ export default function ForWithIfElse(
 					const t_button_1 = t_root_2 as HTMLButtonElement;
 					const t_text_1 = t_child(t_button_1);
 					$run(() => {
-						t_text_1.textContent = t_fmt(t_item_1.data.tab);
+						const tab = t_item_1.data.tab;
+						t_text_1.textContent = t_fmt(tab);
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_button_1, t_fragment_1, t_before);
 					t_next(t_button_1);
@@ -84,7 +86,8 @@ export default function ForWithIfElse(
 					const t_button_2 = t_root_3 as HTMLButtonElement;
 					const t_text_2 = t_child(t_button_2);
 					$run(() => {
-						t_text_2.textContent = t_fmt(t_item_1.data.tab);
+						const tab = t_item_1.data.tab;
+						t_text_2.textContent = t_fmt(tab);
 					}, undefined, { forVarMask: 1 });
 					t_add_element(t_button_2, t_fragment_1, t_before);
 					t_next(t_button_2);

@@ -51,10 +51,11 @@ export default function ForOptionalChaining(
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_li_1);
 			$run(() => {
-				t_attribute(t_li_1, "data-testid", t_item_1.data?.name);
-				t_attribute(t_li_1, "data-selected", t_item_1.data?.hasChildren === true ? "" : undefined);
-				t_attribute(t_li_1, "data-fallback", "x" ?? t_item_1.data?.name);
-				t_text_1.textContent = ` ${t_fmt(t_item_1.data?.name)} `;
+				const item = t_item_1.data;
+				t_attribute(t_li_1, "data-testid", item?.name);
+				t_attribute(t_li_1, "data-selected", item?.hasChildren === true ? "" : undefined);
+				t_attribute(t_li_1, "data-fallback", "x" ?? item?.name);
+				t_text_1.textContent = ` ${t_fmt(item?.name)} `;
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_li_1, t_ul_1, t_before_1);
 			t_next(t_li_1);

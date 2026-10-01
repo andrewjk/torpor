@@ -9,6 +9,7 @@ import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder): void {
@@ -47,6 +48,9 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 		const ${regionName} = t_region(${status.options.dev === true ? `"switch"` : ""});
 		let ${indexName} = -1;
 		t_run_control(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
+	// Shadow-bind enclosing loop vars so the switch expression and any code
+	// emitted directly in this callback resolve lexically.
+	appendForVarBindings(b, status);
 
 	// TODO: replaceForVarNames is going to throw mapping out
 	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);

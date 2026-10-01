@@ -1,4 +1,5 @@
 import type BuildOptions from "../../types/BuildOptions";
+import type ForVar from "../../types/ForVar";
 import type SourceMapping from "../../types/SourceMapping";
 import type Fragment from "../../types/nodes/Fragment";
 
@@ -14,7 +15,7 @@ export default interface BuildStatus {
 		fragment?: Fragment;
 		path: string;
 	}[];
-	forVarNames: string[][];
+	forVars: ForVar[];
 	ns: boolean;
 	preserveWhitespace: boolean;
 	inHead: boolean;

@@ -60,7 +60,8 @@ export default function ForNested3(
 				t_for_anchor_2,
 				() => {
 					let t_new_items_2: ListItemSpec[] = [];
-					for (let cell of t_item_1.data.row) {
+					const row = t_item_1.data.row;
+					for (let cell of row) {
 						t_new_items_2.push({ data: cell, key:
 						undefined });
 					}
@@ -72,8 +73,9 @@ export default function ForNested3(
 					const t_td_1 = t_root_2 as HTMLElement;
 					const t_text_1 = t_child(t_td_1);
 					$run(() => {
-						t_td_1.className = t_class({ active: t_item_2.data === $props.highlight });
-						t_text_1.textContent = ` ${t_fmt(t_item_2.data)} `;
+						const cell = t_item_2.data;
+						t_td_1.className = t_class({ active: cell === $props.highlight });
+						t_text_1.textContent = ` ${t_fmt(cell)} `;
 					}, undefined, { forVarMask: 2 });
 					t_add_element(t_td_1, t_tr_1, t_before_2);
 					t_next(t_td_1);

@@ -1,11 +1,15 @@
 import $onmount from "../../../../src/watch/$onmount";
+import $run from "../../../../src/watch/$run";
+import $watch from "../../../../src/watch/$watch";
 import t_add_element from "../../../../src/render/addElement";
+import t_child from "../../../../src/render/nodeChild";
+import t_fmt from "../../../../src/render/formatText";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import type SlotRender from "../../../../src/types/SlotRender";
 
-export default function MultiMount(
+export default function MountCleanupReturn(
 	$parent: ParentNode,
 	$anchor: Node | null,
 	_$props?: Record<PropertyKey, any>,
@@ -13,22 +17,26 @@ export default function MultiMount(
 	_$slots?: Record<string, SlotRender>,
 ): void {
 
+	let $state = $watch({ mounted: false })
+
 	$onmount(() => {
-		window.__mountLog.push("first")
-	})
-	$onmount(() => {
-		window.__mountLog.push("second")
-	})
-	$onmount(() => {
-		window.__mountLog.push("third")
+		$state.mounted = true
+		window.__mountLog.push("mount")
+		return () => {
+			window.__mountLog.push("cleanup")
+		}
 	})
 
 	/* User interface */
 	const t_fragment_els: Element[] = [];
 
-	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p>Multi</p>`);
+	const t_fragment_0 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 0, `<p>#</p>`);
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_p_1 = t_root_0 as HTMLElement;
+	const t_text_1 = t_child(t_p_1);
+	$run(() => {
+		t_text_1.textContent = `Mounted: ${t_fmt($state.mounted)}`;
+	});
 	t_add_element(t_p_1, $parent, $anchor);
 	t_next(t_p_1);
 

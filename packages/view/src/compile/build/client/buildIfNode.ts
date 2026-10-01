@@ -9,6 +9,7 @@ import addPushDevBoundary from "./addPushDevBoundary";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: Are there too many branches for ifs etc?
@@ -49,6 +50,9 @@ export default function buildIfNode(node: ControlNode, status: BuildStatus, b: B
 		const ${regionName} = t_region(${status.options.dev === true ? `"if"` : ""});
 		let ${indexName} = -1;
 		t_run_control(${regionName}, ${anchorName}, (${status.inHead ? "" : "t_before"}) => {`);
+	// Shadow-bind enclosing loop vars so the branch conditions and any code
+	// emitted directly in this callback resolve lexically.
+	appendForVarBindings(b, status);
 
 	let index = 0;
 	for (let branch of branches) {

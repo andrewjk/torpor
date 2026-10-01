@@ -4,6 +4,7 @@ import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
+import { appendForVarBindings } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: type checking
@@ -26,6 +27,7 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	b.append(`let ${firstNodeVar}: ChildNode | null = null;`);
 	b.append(`let ${lastNodeVar}: ChildNode | null = null;`);
 	b.append(`t_run_control(t_region(), ${htmlAnchorName}, (t_before) => {`);
+	appendForVarBindings(b, status);
 
 	// Read the html expression (for reactivity tracking)
 	b.append(`${replaceForVarNames(node.statement, status)};`);

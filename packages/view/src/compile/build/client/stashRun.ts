@@ -14,8 +14,7 @@ export default function stashRun(
 ): void {
 	value = replaceForVarNames(value, status);
 	let functionBody = functionStart + value + functionEnd;
-	let forVarMask =
-		status.forVarNames.length > 0 ? forVarsReadIn(value, status.forVarNames) : undefined;
+	let forVarMask = status.forVars.length > 0 ? forVarsReadIn(value, status.forVars) : undefined;
 	fragment.effects.push({
 		functionBody,
 		spans: [span],

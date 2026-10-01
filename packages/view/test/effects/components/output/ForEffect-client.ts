@@ -51,7 +51,8 @@ export default function For(
 			const t_p_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_p_1);
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item_1.data.text);
+				const item = t_item_1.data;
+				t_text_1.textContent = t_fmt(item.text);
 			}, undefined, { forVarMask: 1 });
 			t_add_element(t_p_1, t_fragment_0, t_before_1);
 			t_next(t_p_1);

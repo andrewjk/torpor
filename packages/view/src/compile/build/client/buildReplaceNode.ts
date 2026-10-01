@@ -5,6 +5,7 @@ import type BuildStatus from "./BuildStatus";
 import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
+import { appendForVarBindings } from "./forVars";
 import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: type checking
@@ -28,6 +29,7 @@ export default function buildReplaceNode(node: ControlNode, status: BuildStatus,
 	/* @replace */
 	const ${replaceRegionName} = t_region(${status.options.dev === true ? `"replace"` : ""});
 	t_run_control(${replaceRegionName}, ${replaceAnchorName}, (t_before) => {`);
+	appendForVarBindings(b, status);
 
 	buildReplaceBranch(node, status, b, replaceParentName, replaceRegionName);
 

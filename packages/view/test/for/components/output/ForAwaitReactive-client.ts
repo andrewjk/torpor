@@ -57,22 +57,26 @@ export default function ForAwaitReactive(
 			/* @await */
 			const t_await_region_1 = t_region();
 			t_run_await(t_await_region_1, t_await_anchor_1, (t_before) => {
+				const id = t_item_1.data.id;
 				const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<li class="ok">#</li>`);
 				const t_root_2 = t_root_el(t_fragment_2);
 				const t_li_1 = t_root_2 as HTMLElement;
 				const t_text_1 = t_child(t_li_1);
 				$run(() => {
-					t_text_1.textContent = `${t_fmt(t_item_1.data.id)} ${t_fmt($props.loaded)}`;
+					const id = t_item_1.data.id;
+					t_text_1.textContent = `${t_fmt(id)} ${t_fmt($props.loaded)}`;
 				}, undefined, { forVarMask: 1 });
 				t_add_element(t_li_1, t_fragment_1, t_before);
 				t_next(t_li_1);
 			}, (t_before) => {
+				const id = t_item_1.data.id;
 				const t_fragment_3 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 3, `<li class="loading">#</li>`);
 				const t_root_3 = t_root_el(t_fragment_3);
 				const t_li_2 = t_root_3 as HTMLElement;
 				const t_text_2 = t_child(t_li_2);
 				$run(() => {
-					t_text_2.textContent = `${t_fmt(t_item_1.data.id)} loading`;
+					const id = t_item_1.data.id;
+					t_text_2.textContent = `${t_fmt(id)} loading`;
 				}, undefined, { forVarMask: 1 });
 				t_add_element(t_li_2, t_fragment_1, t_before);
 				t_next(t_li_2);
