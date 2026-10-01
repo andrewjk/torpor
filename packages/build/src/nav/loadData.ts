@@ -87,7 +87,9 @@ export default async function loadData(
 }
 
 function isRedirect(response: Response): boolean {
-	return response.status >= 300 && response.status < 400;
+	// A `redirect: "manual"` fetch surfaces a cross-navigation redirect as an
+	// opaque ("opaqueredirect") response in browsers, with status 0
+	return (response.status >= 300 && response.status < 400) || response.type === "opaqueredirect";
 }
 
 /**
@@ -158,7 +160,10 @@ async function loadClientAndServerData(
 			for (let [name, value] of query) {
 				serverUrl.searchParams.append(name, value);
 			}
-			const serverResponse = await fetch(serverUrl);
+			// Don't follow redirects: a server load can redirect (e.g. an auth
+			// hook), which isn't ours to follow client-side -- returning here
+			// lets the caller fall back to a full page load, which follows it
+			const serverResponse = await fetch(serverUrl, { redirect: "manual" });
 			if (serverResponse) {
 				if (serverResponse.ok) {
 					if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
