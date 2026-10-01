@@ -8,6 +8,7 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { expect, test } from "vite-plus/test";
+import AsyncFormTest from "./components/AsyncFormTest.torp";
 import Form from "./components/FormTest.torp";
 
 test("Form", async () => {
@@ -31,4 +32,41 @@ test("Form", async () => {
 	// After submitting, validation should fire on input
 	await userEvent.type(getByPlaceholderText(container, "Name..."), "G");
 	expect(queryByText(container, "Name is required!")).toBeNull();
+});
+
+test("Invalid submit is prevented synchronously", async () => {
+	const container = document.createElement("div");
+	document.body.appendChild(container);
+	mount(container, Form);
+
+	let prevented: boolean | undefined;
+	const listener = (e: Event) => {
+		prevented = e.defaultPrevented;
+	};
+	document.addEventListener("submit", listener);
+
+	await userEvent.click(getByText(container, "Submit"));
+
+	document.removeEventListener("submit", listener);
+	expect(prevented).toBe(true);
+});
+
+test("Invalid async submit is prevented synchronously", async () => {
+	const container = document.createElement("div");
+	document.body.appendChild(container);
+	mount(container, AsyncFormTest);
+
+	let prevented: boolean | undefined;
+	const listener = (e: Event) => {
+		prevented = e.defaultPrevented;
+	};
+	document.addEventListener("submit", listener);
+
+	await userEvent.click(getByText(container, "Submit"));
+
+	document.removeEventListener("submit", listener);
+	expect(prevented).toBe(true);
+	// The async validation resolves and shows the field error
+	await Promise.resolve();
+	expect(queryByText(container, "Name is required!")).not.toBeNull();
 });

@@ -54,33 +54,56 @@ export default function Form<Data = Record<string, any>>($props: FormProps<Data>
 
 	$context[FormContextName] = context;
 
-	async function validate() {
-		if ($props?.schema) {
-			const validator = $props.schema["~standard"];
-			let result = validator.validate($props.data);
-			if (result instanceof Promise) {
-				result = await result;
-			}
-			let issues: ValidationIssue[] = [];
-			if (result.issues) {
-				for (let issue of result.issues) {
-					if (issue.path) {
-						// TODO: arrays with `[0]` etc
-						issues.push({
-							// @ts-ignore
-							path: issue.path.map((p) => p.key ?? p).join("."),
-							message: issue.message,
-						});
-					}
+	function applyIssues(result: StandardSchemaV1.Result<any> | undefined) {
+		let issues: ValidationIssue[] = [];
+		if (result?.issues) {
+			for (let issue of result.issues) {
+				if (issue.path) {
+					// TODO: arrays with `[0]` etc
+					issues.push({
+						// @ts-ignore
+						path: issue.path.map((p) => p.key ?? p).join("."),
+						message: issue.message,
+					});
 				}
 			}
-			$state.issues = issues;
 		}
+		$state.issues = issues;
+	}
+
+	/**
+	 * Validates the form's data. Returns synchronously for synchronous schemas,
+	 * or a promise that must be awaited for asynchronous ones.
+	 */
+	function validate(): void | Promise<void> {
+		if (!$props?.schema) {
+			return;
+		}
+		const result = $props.schema["~standard"].validate($props.data);
+		if (result instanceof Promise) {
+			return result.then(applyIssues);
+		}
+		applyIssues(result);
 	}
 
 	async function handleSubmit(e: SubmitEvent) {
-		// Validate, and proceed with submission if there are no errors
-		await validate();
+		// Run validation. A synchronous schema is fully resolved by this point,
+		// but an async one returns a promise -- and if we awaited it we'd only
+		// call `preventDefault` after the browser had already started its own
+		// submission (loading the action's response as a full page). So stop the
+		// native submit up front and carry on once validation resolves.
+		const validation = validate();
+		if (validation instanceof Promise) {
+			e.preventDefault();
+			await validation;
+			await finishSubmit(e, true);
+		} else {
+			await finishSubmit(e, false);
+		}
+	}
+
+	async function finishSubmit(e: SubmitEvent, prePrevented: boolean) {
+		// Validation has run: proceed if there are no errors
 		let proceed = $state.valid;
 
 		// Changing inputs from now on will cause revalidation
@@ -98,7 +121,10 @@ export default function Form<Data = Record<string, any>>($props: FormProps<Data>
 			if (userSubmit instanceof Promise) {
 				userSubmit = await userSubmit;
 			}
-			proceed = userSubmit !== false && !e.defaultPrevented;
+			// When the default was already prevented (async validation) we
+			// can't use `defaultPrevented` to see if the handler opted out, so
+			// only its return value counts
+			proceed = userSubmit !== false && (prePrevented || !e.defaultPrevented);
 		}
 
 		// If the user handled the submit, don't continue
@@ -107,23 +133,26 @@ export default function Form<Data = Record<string, any>>($props: FormProps<Data>
 			return false;
 		}
 
-		// If there's a @torpor/build context, call its submit event
+		// If there's a @torpor/build context, it handles the submission itself
+		// (it posts the form and prevents the native submit)
 		let buildContext = $context?.["TorporBuildContext"];
 		if (buildContext?.onformsubmit) {
 			let buildSubmit = buildContext.onformsubmit(e);
 			if (buildSubmit instanceof Promise) {
 				buildSubmit = await buildSubmit;
 			}
-			proceed = buildSubmit !== false && !e.defaultPrevented;
-		}
-
-		// If @torpor/build handled the submit, don't continue
-		if (!proceed) {
-			e.preventDefault();
+			if (buildSubmit === false) {
+				e.preventDefault();
+			}
 			return false;
 		}
 
-		// Otherwise just let normal form submission go ahead...
+		// Nothing handled the submit. When validation was synchronous the
+		// browser's own submission is still pending, so let it happen.
+		// Otherwise it was already prevented, so submit the form ourselves.
+		if (prePrevented) {
+			(e.target as HTMLFormElement).submit();
+		}
 	}
 
 	async function handleValidate() {

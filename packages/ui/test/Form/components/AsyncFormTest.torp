@@ -1,0 +1,33 @@
+import { Field, Form, Input, Label, Message } from "../../../src/Form/index";
+
+const schema = {
+	"~standard": {
+		version: 1 as const,
+		vendor: "test",
+		async validate(value: Record<string, unknown>) {
+			await Promise.resolve();
+			return value.name
+				? { value }
+				: { issues: [{ path: ["name"], message: "Name is required!" }] };
+		},
+	},
+};
+
+export default function AsyncFormTest() {
+	let $state = $watch({
+		data: {
+			name: "",
+		},
+	});
+
+	@render {
+		<Form data={$state.data} {schema}>
+			<Field name="name" &value={$state.data.name}>
+				<Label>Name:</Label>
+				<Input placeholder="Name..." />
+				<Message />
+			</Field>
+			<button>Submit</button>
+		</Form>
+	}
+}
