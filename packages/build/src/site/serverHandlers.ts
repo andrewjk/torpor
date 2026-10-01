@@ -1,4 +1,5 @@
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
+import { DATA_REUSE_HEADER, DATA_REQUEST_HEADER } from "../dataRequest.ts";
 import formDataToRecord from "../form/formDataToRecord.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
@@ -121,6 +122,31 @@ export function createServerLoad(
 		}
 		const path = url.pathname;
 		const query = url.searchParams;
+
+		// A client data request: one GET to `<page url>/~server` returns the
+		// server data for the page and all of its layouts, with hooks running
+		// once against the page url. It doesn't need a registered `~server`
+		// route (a page may have no `+page.server.ts` but still have layouts
+		// with server loads)
+		if (
+			ev.request.method === "GET" &&
+			ev.request.headers.has(DATA_REQUEST_HEADER) &&
+			path.endsWith("/~server")
+		) {
+			const pagePath = path.slice(0, -"/~server".length) || "/";
+			const pageUrl = new URL(pagePath + url.search, url);
+			const pageRoute = router.match(pagePath, query);
+			if (pageRoute) {
+				$page.url = pageUrl;
+				return await loadPageData(
+					ev,
+					pageUrl,
+					pageRoute.handler,
+					pageRoute.params ?? {},
+					reusedLayoutPaths(ev),
+				);
+			}
+		}
 
 		//console.log(`handling ${ev.request.method} for '${path}'${query.size ? ` with ${query}` : ""}`);
 
@@ -446,6 +472,138 @@ async function loadData(
 		if (response) return response;
 		throw error;
 	}
+}
+
+/**
+ * Handles a client data request (see `DATA_REQUEST_HEADER`). Runs the folder
+ * hooks once against the page url, then loads the server data for each layout
+ * (root to leaf) and the page, returning `{ loads: [...] }` -- one entry per
+ * layout plus the page, in the same order as `handler.layouts`. The client
+ * runs its own load functions and merges the server entries in.
+ *
+ * A load that redirects or fails short-circuits the whole request, so the
+ * client can fall back to a full page load (redirect) or render the error
+ * page (failure), exactly as it would with a single page load.
+ */
+async function loadPageData(
+	ev: ServerEvent,
+	pageUrl: URL,
+	handler: RouteHandler,
+	params: Record<string, any>,
+	reusedLayouts: Set<string>,
+): Promise<Response> {
+	const serverEndPoint: PageServerEndPoint | undefined =
+		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
+
+	// Validate params and the load query against the page's server endpoint
+	// schemas, mirroring a normal page render. Params come from the url, so a
+	// failed params validation means the resource doesn't exist
+	let query: unknown;
+	if (serverEndPoint) {
+		try {
+			params = await validateEndpointParams(serverEndPoint, params);
+		} catch (error) {
+			if (error instanceof ValidationError) return notFound();
+			throw error;
+		}
+		const loadSchema = endpointSchema(serverEndPoint, "load");
+		if (loadSchema) {
+			try {
+				query = await validate(loadSchema, searchParamsToRecord(pageUrl.searchParams));
+			} catch (error) {
+				const response = validationErrorResponse(error);
+				if (response) return response;
+				throw error;
+			}
+		}
+	}
+
+	const serverParams = buildServerParams(ev, pageUrl, params, query ? { query } : {});
+	const serverHooks = await loadServerHooks(handler);
+	// Route middleware, declared on the page's server endpoint. Runs before
+	// the folder hooks, like it does for a normal request
+	const routeMiddleware = Array.isArray(serverEndPoint?.middleware)
+		? serverEndPoint.middleware
+		: [];
+
+	// One entry per layout (root to leaf) followed by the page itself
+	const loads: (Record<string, any> | null)[] = [];
+
+	let enteredMiddleware = 0;
+	let entered = 0;
+	let enterResponse: Response | undefined = undefined;
+	try {
+		for (; enteredMiddleware < routeMiddleware.length && !enterResponse; enteredMiddleware++) {
+			const middlewareResult = await routeMiddleware[enteredMiddleware].enter?.(ev);
+			if (middlewareResult) {
+				enterResponse = middlewareResult;
+			}
+		}
+
+		// Hooks run from the root down; a hook's enter can return a Response
+		// to short-circuit the request (e.g. an auth redirect)
+		for (; entered < serverHooks.length && !enterResponse; entered++) {
+			const hookResult = await serverHooks[entered].enter?.(serverParams);
+			if (hookResult) {
+				enterResponse = hookResult;
+			}
+		}
+		if (enterResponse) {
+			return enterResponse;
+		}
+
+		for (const layout of handler.layouts ?? []) {
+			// A reused layout keeps its cached data on the client, so skip its
+			// load (and any side effects) but keep the slot aligned
+			if (reusedLayouts.has(layout.path)) {
+				loads.push(null);
+				continue;
+			}
+			const layoutServerEndPoint: PageServerEndPoint | undefined =
+				layout.serverEndPoint && (await layout.serverEndPoint())?.default;
+			const result = await loadRouteServerData(layoutServerEndPoint, serverParams);
+			if (result instanceof Response) return result;
+			loads.push(result);
+		}
+
+		const pageResult = await loadRouteServerData(serverEndPoint, serverParams);
+		if (pageResult instanceof Response) return pageResult;
+		loads.push(pageResult);
+
+		return new Response(JSON.stringify({ loads }), {
+			headers: { "Content-Type": "application/json" },
+		});
+	} finally {
+		// Run exit hooks in reverse order for hooks that were entered
+		while (entered > 0) {
+			entered--;
+			await serverHooks[entered].exit?.(serverParams);
+		}
+		while (enteredMiddleware > 0) {
+			enteredMiddleware--;
+			await routeMiddleware[enteredMiddleware].exit?.(ev);
+		}
+	}
+}
+
+/**
+ * Runs a single route's server load (if any) as part of a data request.
+ * Returns the loaded data, `null` when the route has no load, or the raw
+ * Response when the load redirected or failed.
+ */
+async function loadRouteServerData(
+	serverEndPoint: PageServerEndPoint | undefined,
+	serverParams: ServerLoadEvent,
+): Promise<Record<string, any> | null | Response> {
+	if (!serverEndPoint?.load) return null;
+	const response = await serverEndPoint.load(serverParams);
+	if (!response || response.ok) {
+		if (response?.headers.get("Content-Type")?.includes("application/json")) {
+			return await response.json();
+		}
+		return null;
+	}
+	return response;
 }
 
 async function loadView(
@@ -891,6 +1049,38 @@ function buildClientParams(url: URL, params: Record<string, any>, data: Record<s
 	};
 }
 
+/**
+ * The layout paths a data request asked to reuse, from the `X-Torpor-Reuse`
+ * header (a JSON array). A malformed header is ignored rather than failing the
+ * request -- the client just gets the layouts loaded again.
+ */
+function reusedLayoutPaths(ev: ServerEvent): Set<string> {
+	const header = ev.request.headers.get(DATA_REUSE_HEADER);
+	if (!header) return new Set();
+	try {
+		const paths = JSON.parse(header) as unknown;
+		if (Array.isArray(paths)) {
+			return new Set(paths.filter((p): p is string => typeof p === "string"));
+		}
+	} catch {
+		// Not valid json
+	}
+	return new Set();
+}
+
+/**
+ * The url user code (hooks, loads, actions, `@head`) should see. Client-side
+ * data fetches append `/~server` to the page url, but that suffix is an
+ * internal detail: without stripping it, `event.url.pathname` would differ
+ * between the server-rendered page and its `~server` request, so a hook
+ * guarding on the path (e.g. `path !== "/setup"`) would misfire.
+ */
+function requestUrl(url: URL): URL {
+	if (!url.pathname.endsWith("/~server")) return url;
+	const path = url.pathname.slice(0, -"/~server".length) || "/";
+	return new URL(path + url.search, url);
+}
+
 function buildServerParams(
 	ev: ServerEvent,
 	url: URL,
@@ -898,8 +1088,9 @@ function buildServerParams(
 	values: { json?: unknown; form?: unknown; query?: unknown } = {},
 	appData: Record<string, any> = {},
 ): ServerLoadEvent {
+	const logicalUrl = requestUrl(url);
 	return {
-		url,
+		url: logicalUrl,
 		params,
 		appData,
 		request: ev.request,
@@ -914,7 +1105,7 @@ function buildServerParams(
 		query: (): Promise<any> =>
 			values.query !== undefined
 				? Promise.resolve(values.query)
-				: Promise.resolve(searchParamsToRecord(url.searchParams)),
+				: Promise.resolve(searchParamsToRecord(logicalUrl.searchParams)),
 		cookies: ev.cookies,
 		headers: ev.headers,
 		session: ev.session,

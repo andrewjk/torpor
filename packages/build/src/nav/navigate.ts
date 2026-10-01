@@ -7,7 +7,6 @@ import { getBasePath, stripBaseFromUrl } from "../site/basePath";
 import findErrorRoute from "../site/findErrorRoute";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
-import type PageServerEndPoint from "../types/PageServerEndPoint";
 import formSubmit from "./formSubmit";
 import loadData from "./loadData";
 
@@ -72,24 +71,12 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		return false;
 	}
 
-	// There may be a server endpoint
-	let serverEndPoint: PageServerEndPoint | undefined =
-		handler.serverEndPoint && (await handler.serverEndPoint())?.default;
-
 	let newLayoutStack: LayoutPath[] = [];
 
 	// Pass the data into $props
 	// TODO: Don't load if this is the first time -- it should have been passed
 	// to us, somehow...
-	const result = await loadData(
-		handler,
-		params,
-		path,
-		query,
-		newLayoutStack,
-		clientEndPoint,
-		serverEndPoint,
-	);
+	const result = await loadData(handler, params, path, query, newLayoutStack, clientEndPoint);
 	if (result === undefined) {
 		// A load redirected, or (on a prerendered site with no server) the
 		// ~server request couldn't be made. Leave the current page alone;
@@ -121,7 +108,6 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		if (!clientEndPoint?.component) {
 			return false;
 		}
-		serverEndPoint = handler.serverEndPoint && (await handler.serverEndPoint())?.default;
 
 		$page.status = result.error.status;
 		$page.error = { message: result.error.message };
@@ -137,7 +123,6 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 			query,
 			newLayoutStack,
 			clientEndPoint,
-			serverEndPoint,
 		);
 		if (errorResult === undefined || errorResult.error) {
 			// The error page's own load failed too -- fall back to a full

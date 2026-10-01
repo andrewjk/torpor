@@ -5,7 +5,6 @@ import $page from "../state/$page.ts";
 import client from "../state/client";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
-import type PageServerEndPoint from "../types/PageServerEndPoint";
 import Router from "./Router.ts";
 import { setBasePath } from "./basePath.ts";
 
@@ -70,14 +69,10 @@ async function maybePrefetch(e: MouseEvent | TouchEvent) {
 			// There should be a client endpoint
 			const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
 
-			// There may be a server endpoint
-			const serverEndPoint: PageServerEndPoint | undefined =
-				handler.serverEndPoint && (await handler.serverEndPoint())?.default;
-
 			// Just dummy this up
 			let newStack: LayoutPath[] = [];
 
-			await loadData(handler, params, path, query, newStack, clientEndPoint, serverEndPoint, true);
+			await loadData(handler, params, path, query, newStack, clientEndPoint, true);
 		}
 	}
 }

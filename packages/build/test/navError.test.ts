@@ -12,11 +12,13 @@ vi.mock("@torpor/view", () => ({
 	unmount: vi.fn(),
 }));
 
+import { DATA_REUSE_HEADER } from "../src/dataRequest";
 import loadData from "../src/nav/loadData";
 import navigate from "../src/nav/navigate";
 import $page from "../src/state/$page";
 import client from "../src/state/client";
 import Router from "../src/site/Router";
+import type LayoutPath from "../src/types/LayoutPath";
 import type RouteHandler from "../src/types/RouteHandler";
 import type ManifestRoute from "../src/types/ManifestRoute";
 import { ERROR_ROUTE, PAGE_ROUTE } from "../src/types/RouteType";
@@ -74,17 +76,9 @@ describe("loadData", () => {
 			type: PAGE_ROUTE,
 			endPoint: () => Promise.resolve({ default: { load: failingLoad } }),
 		};
-		const result = await loadData(
-			handler,
-			{},
-			"/posts",
-			new URLSearchParams(),
-			[],
-			{
-				load: failingLoad,
-			} as any,
-			undefined,
-		);
+		const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {
+			load: failingLoad,
+		} as any);
 
 		expect(result?.error).toEqual({ status: 500, message: "db boom" });
 	});
@@ -95,17 +89,9 @@ describe("loadData", () => {
 			type: PAGE_ROUTE,
 			endPoint: () => Promise.resolve({ default: { load: redirectingLoad } }),
 		};
-		const result = await loadData(
-			handler,
-			{},
-			"/posts",
-			new URLSearchParams(),
-			[],
-			{
-				load: redirectingLoad,
-			} as any,
-			undefined,
-		);
+		const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {
+			load: redirectingLoad,
+		} as any);
 
 		expect(result).toBeUndefined();
 	});
@@ -128,14 +114,77 @@ describe("loadData", () => {
 				endPoint: () => Promise.resolve({ default: {} }),
 				serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
 			};
-			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, {
-				load: async () => {},
-			} as any);
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
 
 			expect(result?.error?.status).toBe(404);
 			// The html body is not used as the message (statusText is the
 			// fallback, which Node's Response leaves empty)
 			expect(result?.error?.message ?? "").not.toContain("host 404 page");
+		} finally {
+			vi.unstubAllGlobals();
+		}
+	});
+});
+
+describe("layout reuse", () => {
+	test("a reused layout's data and client load are not re-fetched or re-run", async () => {
+		const layoutLoads: number[] = [];
+		const layoutEndpoint = {
+			load: async () => {
+				layoutLoads.push(1);
+				return Response.json({ layoutLoad: layoutLoads.length });
+			},
+		};
+		const pageLoad = async () => Response.json({ pageLoad: true });
+
+		const handler: RouteHandler = {
+			path: "/dashboard",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+			layouts: [
+				{
+					path: "/_layout",
+					endPoint: () => Promise.resolve({ default: layoutEndpoint }),
+					serverEndPoint: () =>
+						Promise.resolve({ default: { load: async () => Response.json({ user: "alice" }) } }),
+				},
+			],
+		};
+
+		const fetchMock = vi.fn(async (_url: unknown, init?: RequestInit) => {
+			const reuse = (init?.headers as Record<string, string> | undefined)?.[DATA_REUSE_HEADER];
+			// A reused layout's slot comes back null
+			return Response.json({ loads: reuse ? [null, null] : [{ user: "alice" }, null] });
+		});
+		vi.stubGlobal("fetch", fetchMock);
+
+		try {
+			// First navigation: the layout is new, so its client load runs and
+			// its server data is merged
+			const first: LayoutPath[] = [];
+			const result1 = await loadData(handler, {}, "/dashboard", new URLSearchParams(), first, {
+				load: pageLoad,
+			});
+			expect(layoutLoads).toEqual([1]);
+			expect(result1?.data).toEqual({ layoutLoad: 1, user: "alice", pageLoad: true });
+
+			// Second navigation within the same layout: it is reused, so its
+			// client load does not run again and its cached data is kept
+			client.layoutStack = first;
+			const second: LayoutPath[] = [];
+			const result2 = await loadData(handler, {}, "/dashboard", new URLSearchParams(), second, {
+				load: pageLoad,
+			});
+			expect(layoutLoads).toEqual([1]);
+			expect(second[0].reuse).toBe(true);
+			expect(second[0].slotRegion).toBe(first[0].slotRegion);
+			expect(result2?.data).toEqual({ layoutLoad: 1, user: "alice", pageLoad: true });
+
+			// The client told the server to skip the reused layout's load
+			const init = fetchMock.mock.calls[1][1];
+			expect((init?.headers as Record<string, string>)[DATA_REUSE_HEADER]).toBe(
+				JSON.stringify(["/_layout"]),
+			);
 		} finally {
 			vi.unstubAllGlobals();
 		}
