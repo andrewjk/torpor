@@ -66,8 +66,14 @@ async function maybePrefetch(e: MouseEvent | TouchEvent) {
 			const handler = route.handler;
 			const params = route.params || {};
 
-			// There should be a client endpoint
-			const clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
+			// A route with no client endpoint (a pure `+server` route) has
+			// nothing to prefetch
+			const clientEndPoint: PageEndPoint | undefined = handler.endPoint
+				? (await handler.endPoint())?.default
+				: undefined;
+			if (!clientEndPoint?.component) {
+				return;
+			}
 
 			// Just dummy this up
 			let newStack: LayoutPath[] = [];

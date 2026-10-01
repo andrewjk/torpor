@@ -63,11 +63,13 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 	let handler = route.handler;
 	let params = route.params || {};
 
-	// There must be a client endpoint with a component
-	let clientEndPoint: PageEndPoint | undefined = (await handler.endPoint()).default;
+	// There must be a client endpoint with a component. Routes with no client
+	// component (a pure `+server` route like `/logout`) can't be rendered
+	// client-side, so return false and let the caller do a full page load
+	let clientEndPoint: PageEndPoint | undefined = handler.endPoint
+		? (await handler.endPoint())?.default
+		: undefined;
 	if (!clientEndPoint?.component) {
-		// TODO: 404
-		console.log("404");
 		return false;
 	}
 
@@ -104,7 +106,7 @@ export default async function navigate(rawUrl: URL, withHydration = false): Prom
 		route = errorRoute;
 		handler = errorRoute.handler;
 		params = errorRoute.params || {};
-		clientEndPoint = (await handler.endPoint()).default;
+		clientEndPoint = handler.endPoint ? (await handler.endPoint())?.default : undefined;
 		if (!clientEndPoint?.component) {
 			return false;
 		}

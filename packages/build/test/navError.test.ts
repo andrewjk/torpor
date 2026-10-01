@@ -21,7 +21,7 @@ import Router from "../src/site/Router";
 import type LayoutPath from "../src/types/LayoutPath";
 import type RouteHandler from "../src/types/RouteHandler";
 import type ManifestRoute from "../src/types/ManifestRoute";
-import { ERROR_ROUTE, PAGE_ROUTE } from "../src/types/RouteType";
+import { ERROR_ROUTE, PAGE_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
 
 const mountMock = vi.mocked(mount);
 
@@ -181,8 +181,8 @@ describe("layout reuse", () => {
 			expect(result2?.data).toEqual({ layoutLoad: 1, user: "alice", pageLoad: true });
 
 			// The client told the server to skip the reused layout's load
-			const init = fetchMock.mock.calls[1][1];
-			expect((init?.headers as Record<string, string>)[DATA_REUSE_HEADER]).toBe(
+			const init = fetchMock.mock.calls[1][1]!;
+			expect((init.headers as Record<string, string>)[DATA_REUSE_HEADER]).toBe(
 				JSON.stringify(["/_layout"]),
 			);
 		} finally {
@@ -235,6 +235,25 @@ describe("navigate", () => {
 		expect(mountMock.mock.calls[0][1]).toBe(errorComponent);
 		expect($page.status).toBe(404);
 		expect($page.error?.message).toBe("Not found");
+	});
+
+	test("a server-only route falls back to a full page load", async () => {
+		// e.g. a `/logout` +server route: there's no client component, so the
+		// client can't render it -- navigate must return false (not throw) so
+		// the click handler does a full page load and hits the server route
+		client.router.addPages([
+			{
+				path: "/logout",
+				type: SERVER_ROUTE,
+				endPoint: undefined as any,
+				subFolder: undefined,
+			},
+		]);
+
+		const navigated = await navigate(new URL("http://localhost/logout"));
+
+		expect(navigated).toBe(false);
+		expect(mountMock).not.toHaveBeenCalled();
 	});
 
 	test("a successful navigation still renders the page", async () => {
