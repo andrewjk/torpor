@@ -74,7 +74,14 @@ export default function parseCode(source: string): ParseResult {
 						if (accept("(", status, false)) {
 							status.i = start;
 							parseComponentStart(status);
+						} else {
+							// Not a component (e.g. a capitalised const assigned
+							// an object literal): rewind so the main loop scans
+							// the initializer and balances its braces
+							status.i = start;
 						}
+					} else {
+						status.i = start;
 					}
 				} else {
 					// Unconsume the last space

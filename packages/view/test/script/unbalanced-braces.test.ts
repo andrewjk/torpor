@@ -50,6 +50,51 @@ export default function Test() {
 	expect(output.errors[0].startChar).toBe(0);
 });
 
+test("capitalised const object literal at module level parses ok", () => {
+	const input = `
+const EMPTY = {
+	first: "",
+	last: "",
+};
+
+export default function Test() {
+	@render {
+		<div>{EMPTY.first}</div>
+	}
+}
+`;
+	const output = parse(input);
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+});
+
+test("capitalised const object literal inside a component parses ok", () => {
+	const input = `
+export default function Test() {
+	const Config = { open: true, chars: "{}" };
+	@render {
+		<div>{Config.chars}</div>
+	}
+}
+`;
+	const output = parse(input);
+	expect(output.ok).toBe(true);
+	expect(output.errors).toEqual([]);
+});
+
+test("capitalised const arrow function is still a component", () => {
+	const input = `
+export const Foo = () => {
+	@render {
+		<div />
+	}
+}
+`;
+	const output = parse(input);
+	expect(output.ok).toBe(true);
+	expect(output.template?.components.length).toBe(1);
+});
+
 test("balanced braces in script parse ok", () => {
 	const input = `
 export default function Test() {
