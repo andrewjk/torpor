@@ -22,6 +22,8 @@ export interface ComboBoxContext extends PopoutContext {
 	handleBlur?: () => void;
 	/** Returns the items loaded from the network loader, when one is set */
 	getLoadedItems?: () => any[];
+	/** The loader refetch debounce in milliseconds, when set */
+	debounceMs?: number;
 	/** Extracts the display text for a loaded item */
 	getItemLabel?: (item: any) => any;
 	/** Extracts the value for a loaded item */

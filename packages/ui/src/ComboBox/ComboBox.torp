@@ -31,6 +31,12 @@ interface ComboBoxProps {
 	 * options are rendered automatically.
 	 */
 	load?: Loader;
+	/**
+	 * Delays loader refetches while the user types: with a loader set, the
+	 * fetch fires this many milliseconds after the last keystroke instead of
+	 * on every keystroke. Only used together with `load`.
+	 */
+	debounceMs?: number;
 	/** Called after each successful load with the normalized result */
 	onload?: (result: LoadResult) => void;
 	/** Extracts the display text for a loaded item (defaults to `label ?? text ?? item`) */
@@ -119,9 +125,12 @@ export default function ComboBox($props: ComboBoxProps | undefined) {
 		get name() {
 			return $props?.name;
 		},
-		get multiple() {
-			return $props?.multiple === true;
-		},
+	get multiple() {
+		return $props?.multiple === true;
+	},
+	get debounceMs() {
+		return $props?.debounceMs;
+	},
 		inField: () => form.inField,
 		valid: () => form.valid,
 		messageId: () => form.messageId,

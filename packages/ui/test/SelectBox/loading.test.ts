@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { afterEach, assert, describe, expect, it, vi } from "vite-plus/test";
-import type { LoadResult } from "../../../src/SelectBox/index";
+import type { LoadResult } from "../../src/SelectBox/index";
 import LoaderSelectBox from "./components/LoaderSelectBox.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));

@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
-import type { LoadResult } from "../../../src/ComboBox/index";
+import type { LoadResult } from "../../src/utils/loader";
 import LoaderComboBox from "./components/LoaderComboBox.torp";
 
 const tick = () => new Promise((r) => setTimeout(r));
@@ -90,6 +90,40 @@ describe("ComboBox - Loading options from a network loader", () => {
 		deferred.resolveNext({ items: [{ id: 1, text: "Cat" }] });
 		await tick();
 
+		expect(queryByText(container, "Cat")).toBeInTheDocument();
+	});
+
+	it("debounces refetches when debounceMs is set", async () => {
+		const deferred = createDeferredLoader();
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, LoaderComboBox as any, {
+			value: null,
+			load: deferred.load,
+			debounceMs: 50,
+		});
+
+		deferred.resolveNext();
+		await tick();
+		expect(deferred.requests.length).toBe(1);
+
+		const input = getInput(container);
+		await userEvent.click(input);
+		await userEvent.type(input, "ca");
+
+		// The popout opens immediately, but the fetch is still pending
+		expect(input.getAttribute("aria-expanded")).toBe("true");
+		await tick();
+		expect(deferred.requests.length).toBe(1);
+
+		// One fetch fires after typing settles, with the last search text
+		await new Promise((r) => setTimeout(r, 80));
+		await tick();
+		expect(deferred.requests.length).toBe(2);
+		expect(deferred.requests.at(-1)).toMatchObject({ searchText: "ca" });
+
+		deferred.resolveNext({ items: [{ id: 1, text: "Cat" }] });
+		await tick();
 		expect(queryByText(container, "Cat")).toBeInTheDocument();
 	});
 

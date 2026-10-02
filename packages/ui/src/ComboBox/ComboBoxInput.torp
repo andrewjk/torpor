@@ -48,6 +48,25 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 	// Set the trigger ID so that it can be used with aria-labelledby
 	$state.triggerId = $props?.id ?? defaultId;
 
+	// When a loader is set with a debounceMs, keystrokes are pushed into a
+	// stream whose debounced handler writes the search text (which drives the
+	// loader's fetch). The stream owns the timer and drops pending calls on
+	// unmount; without a debounceMs, handleInput writes the search text
+	// directly and no stream is wired up.
+	let pushSearchText: ((value: string) => void) | undefined;
+	const debounceMs = context.getLoadedItems ? context.debounceMs : undefined;
+	if (debounceMs) {
+		$stream(
+			(push) => {
+				pushSearchText = push;
+			},
+			(value) => {
+				$state.searchText = value;
+			},
+			{ debounce: debounceMs },
+		);
+	}
+
 	function focusInput() {
 		input.focus();
 	}
@@ -72,9 +91,14 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 
 	function handleInput(e: InputEvent) {
 		if (context.getLoadedItems) {
-			// Loaded from a network loader: refetch with the current text
-			$state.searchText = input.value;
+			// Loaded from a network loader: open the popout right away, and
+			// refetch with the current text (debounced when debounceMs is set)
 			$state.visible = true;
+			if (pushSearchText) {
+				pushSearchText(input.value);
+			} else {
+				$state.searchText = input.value;
+			}
 		} else if (context.searchItems) {
 			context.searchText = input.value;
 			const found = context.searchItems(context.searchText);

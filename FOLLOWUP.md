@@ -182,9 +182,6 @@ ComboBox and SelectBox now accept the shared `load` prop (utils/loader.ts
 `createItemLoader`) and auto-render a ListBox of loaded options when no
 content is slotted in. Left out deliberately:
 
-- No built-in debounce for ComboBox typing -- every keystroke starts a fetch.
-  Consumers wrap their loader if they need it; a shared `debounceMs` option
-  would be the nicer API (needs timer handling inside the reactive getter).
 - Stale-response ordering relies on `$async`'s generation guard; no
   AbortSignal is passed to loaders yet, so cancelled fetches still run to
   completion over the wire.

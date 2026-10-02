@@ -6,6 +6,7 @@ export default function LoaderComboBox($props: any) {
 		<ComboBox
 			&value={$props.value}
 			load={$props.load}
+			debounceMs={$props.debounceMs}
 			onload={$props.onload}
 			onchange={$props.onchange}
 			getItemLabel={$props.getItemLabel}
