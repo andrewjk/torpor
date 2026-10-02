@@ -8,15 +8,15 @@ import mountComponent from "../mountComponent";
 
 const source = `
 export default function ForEscape() {
-	let things = ["a", "b", "c", "d", "e"]
+	let $state = $watch({ things: ["a", "b", "c", "d", "e"] })
 	@render {
 		<section>
-			@for (let i = 0; i < 5; i++) {
-				<p>{i}</p>
+			@for (let i = 0; i < $state.things.length; i++) {
+				<p>{$state.things[i]}</p>
 				<div data-testid="input1-{i}" name={i} />
 				<div data-testid="input2-{i}" name="{i}" />
-				<div data-testid="input3-{i}" name={things[i]} />
-				<input &value={i} name="{i}" />
+				<div data-testid="input3-{i}" name={$state.things[i]} />
+				<input &value={$state.things[i]} name="{i}" />
 			}
 		</section>
 	}

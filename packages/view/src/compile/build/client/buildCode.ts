@@ -1,6 +1,7 @@
 import type Template from "../../../types/Template";
 import type TemplateComponent from "../../../types/TemplateComponent";
 import type BuildOptions from "../../types/BuildOptions";
+import type CompileError from "../../types/CompileError";
 import type SourceMapping from "../../types/SourceMapping";
 import Builder from "../../utils/Builder";
 import { codeRanges } from "../../utils/codeScanner";
@@ -79,6 +80,7 @@ export default function buildCode(
 	template: Template,
 	map: SourceMapping[],
 	options?: BuildOptions,
+	errors: CompileError[] = [],
 ): string {
 	let b = new Builder(options?.mapped);
 
@@ -87,7 +89,7 @@ export default function buildCode(
 	imports.add("SlotRender");
 
 	// Build the component
-	buildTemplate(template, map, imports, b, options);
+	buildTemplate(template, map, imports, b, options, errors);
 
 	let startSize = b.toString().length;
 
@@ -122,6 +124,7 @@ function buildTemplate(
 	imports: Set<string>,
 	b: Builder,
 	options?: BuildOptions,
+	errors: CompileError[] = [],
 ) {
 	// TODO: Do this while looping chunks
 	let script = template.script.map((s) => s.script).join("\n");
@@ -161,14 +164,14 @@ function buildTemplate(
 
 	let currentIndex = 0;
 	let current = template.components[0];
-	let status: BuildStatus = makeStatus(imports, map, current, options);
+	let status: BuildStatus = makeStatus(imports, map, current, options, errors);
 	let first = true;
 
 	for (let chunk of template.script) {
 		if (chunk.script === "/* @params */") {
 			// Reset the status for each new function body
 			if (!first) {
-				status = makeStatus(imports, map, current, options);
+				status = makeStatus(imports, map, current, options, errors);
 			}
 			first = false;
 
@@ -262,6 +265,7 @@ function makeStatus(
 	map: SourceMapping[],
 	current?: TemplateComponent,
 	options?: BuildOptions,
+	errors: CompileError[] = [],
 ): BuildStatus {
 	return {
 		imports,
@@ -277,5 +281,6 @@ function makeStatus(
 		preserveWhitespace: false,
 		inHead: false,
 		options: options ?? {},
+		errors,
 	};
 }

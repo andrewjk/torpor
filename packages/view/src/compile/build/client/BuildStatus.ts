@@ -1,4 +1,5 @@
 import type BuildOptions from "../../types/BuildOptions";
+import type CompileError from "../../types/CompileError";
 import type ForVar from "../../types/ForVar";
 import type SourceMapping from "../../types/SourceMapping";
 import type Fragment from "../../types/nodes/Fragment";
@@ -20,4 +21,5 @@ export default interface BuildStatus {
 	preserveWhitespace: boolean;
 	inHead: boolean;
 	options: BuildOptions;
+	errors: CompileError[];
 }

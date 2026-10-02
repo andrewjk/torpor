@@ -5,7 +5,6 @@ import type BuildStatus from "./BuildStatus";
 import addMappedText from "./addMappedText";
 import buildAddFragment from "./buildAddFragment";
 import { appendForVarBindings } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: type checking
 
@@ -30,7 +29,7 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	appendForVarBindings(b, status);
 
 	// Read the html expression (for reactivity tracking)
-	b.append(`${replaceForVarNames(node.statement, status)};`);
+	b.append(`${node.statement};`);
 
 	// Clear previously rendered content
 	b.append(`if (${firstNodeVar} !== null && ${lastNodeVar} !== null) {`);
@@ -47,17 +46,9 @@ export default function buildHtmlNode(node: ControlNode, status: BuildStatus, b:
 	const templateName = nextVarName("template", status);
 	const fragmentName = `t_fragment_${node.fragment!.number}`;
 	b.append(`let ${templateName} = document.createElement("template");`);
-	// TODO: replaceForVarNames is going to throw mapping out
 	node.span.start += "html(".length;
 	node.span.end -= 2;
-	addMappedText(
-		"",
-		`${templateName}.innerHTML = ${replaceForVarNames(node.statement, status)};`,
-		"",
-		node.span,
-		status,
-		b,
-	);
+	addMappedText("", `${templateName}.innerHTML = ${node.statement};`, "", node.span, status, b);
 	b.append(`let ${fragmentName} = ${templateName}.content.cloneNode(true) as DocumentFragment;`);
 	b.append(`${firstNodeVar} = ${fragmentName}.firstChild;`);
 	b.append(`${lastNodeVar} = ${fragmentName}.lastChild;`);

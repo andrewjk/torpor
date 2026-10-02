@@ -6,7 +6,6 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: type checking
 
@@ -46,7 +45,7 @@ function buildReplaceBranch(
 ) {
 	status.imports.add("t_run_branch");
 
-	b.append(`${replaceForVarNames(node.statement, status)};`);
+	b.append(`${node.statement};`);
 	b.append(`if (!t_run_branch(${regionName}, 0, -1)) return;`);
 
 	b.append(`

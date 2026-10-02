@@ -24,15 +24,15 @@ export default function forVarsWrittenIn(children: TemplateNode[], forVars: stri
 }
 
 /**
- * Returns the set of `forVars` that are *reassigned* in `children` — i.e. the
- * loop-variable binding itself is replaced (`row = …`, `row += …`, `row++`) or
- * destructured into (`[row] = …`, `{row} = …`).
+ * Returns the set of `forVars` whose *binding* is written in `children` — i.e.
+ * the loop variable itself is assigned (`row = …`, `row += …`, `row++`), bound
+ * as a two-way target (`&value={row}`), or destructured into (`[row] = …`,
+ * `{row} = …`).
  *
- * Used to decide which loop vars can use a per-scope shadow binding: a write
- * to the binding must propagate through the row's data bag (substitution),
- * while a write to a *property* (`row.name = …`) or *index* (`row[i] = …`)
- * mutates the row object in place and works through the shadowed reference, so
- * it does not force substitution.
+ * Loop variables are read-only (a `@for` extracts a copy of each element), so
+ * `buildForNode` reports each name in this set as a compile error. A write to
+ * a *property* (`row.name = …`) or *index* (`row[i] = …`) mutates the row
+ * object through the shadowed reference and is not included.
  */
 export function forVarsReassignedIn(children: TemplateNode[], forVars: string[]): Set<string> {
 	return scan(
@@ -63,9 +63,11 @@ function scan(
 			// `[forVar] =` or `{forVar} =` or `{forVar: …} =` — array / object
 			// destructuring assignment targets. The trailing `=` is required so
 			// we don't match `{forVar}` text interpolations or `arr[forVar]`
-			// indexed reads.
-			`\\[\\s*${escaped}\\s*\\]\\s*=(?![=>])|` +
-				`\\{\\s*${escaped}\\s*(:[^}]+)?\\}\\s*=(?![=>])|` +
+			// indexed reads. The leading boundary on `[` stops a *different*
+			// array's index write (`labels[i] =`) from counting as an array
+			// destructuring target for `i`.
+			`(?<![\\w$.\\])\\)])\\[\\s*${escaped}\\s*\\]\\s*=(?![=>])|` +
+				`(?<![\\w$.\\])\\)])\\{\\s*${escaped}\\s*(:[^}]+)?\\}\\s*=(?![=>])|` +
 				bareWritePattern(escaped) +
 				`|` +
 				// prefix ++/--

@@ -10,7 +10,6 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 // TODO: Are there too many branches for ifs etc?
 
@@ -75,8 +74,7 @@ function buildIfBranch(
 	indexName: string,
 	index: number,
 ) {
-	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
+	addMappedText("", `${node.statement}`, " {", node.span, status, b);
 	b.append(`if (!t_run_branch(${regionName}, ${indexName}, ${index})) return;`);
 
 	if (node.children.length > 0) {

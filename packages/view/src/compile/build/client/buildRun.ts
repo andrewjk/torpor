@@ -4,7 +4,6 @@ import type BuildStatus from "./BuildStatus";
 import addPopDevBoundary from "./addPopDevBoundary";
 import addPushDevBoundary from "./addPushDevBoundary";
 import forVarBindings from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildRun(
 	functionName: string,
@@ -12,8 +11,6 @@ export default function buildRun(
 	status: BuildStatus,
 	b: Builder,
 ): void {
-	functionBody = replaceForVarNames(functionBody, status);
-
 	addPushDevBoundary("run", functionName, status, b);
 
 	let forVarMask =

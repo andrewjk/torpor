@@ -12,7 +12,6 @@ import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 import { appendForVarBindings, injectForVarHandler } from "./forVars";
 import getAttributeOffsets from "./getAttributeOffsets";
-import replaceForVarNames from "./replaceForVarNames";
 import stashRun from "./stashRun";
 import stashRunWithOffsets from "./stashRunWithOffsets";
 
@@ -150,7 +149,6 @@ function buildHeadNode(node: ElementNode, status: BuildStatus, b: Builder) {
 	for (let { name, value, span } of node.attributes) {
 		if (value != null) {
 			status.imports.add("t_attribute");
-			value = replaceForVarNames(value, status);
 			addMappedText(`t_attribute(t_head_el, "${name}", `, value, ");", span, status, b);
 		}
 	}
@@ -189,7 +187,7 @@ function buildElementAttributes(
 	// single t_event can be emitted for both -- delegated event handlers are
 	// last-write-wins per element and type, so a second t_event would clobber
 	// the binding's state write
-	const combinedHandlers = combinedEventHandlers(node, status);
+	const combinedHandlers = combinedEventHandlers(node);
 	const consumedHandlers = new Set(Array.from(combinedHandlers.values(), (c) => c.index));
 
 	for (let [index, { name, value, reactive, fullyReactive, span }] of node.attributes.entries()) {
@@ -318,8 +316,6 @@ function buildBindGroupAttribute(
 	b: Builder,
 	combined?: CombinedHandler,
 ) {
-	value = replaceForVarNames(value, status);
-
 	// Automatically add an event to bind the value
 	// TODO: Only tested this with radio buttons
 	let eventName = "change";
@@ -351,8 +347,6 @@ function buildBindAttribute(
 	b: Builder,
 	combined?: CombinedHandler,
 ) {
-	value = replaceForVarNames(value, status);
-
 	// Automatically add an event to bind the value
 	let eventName = bindEventName(node, name);
 	let defaultValue = '""';
@@ -456,10 +450,7 @@ interface CombinedHandler {
  * as one t_event that calls the binding write and the user handler in source
  * order. Returns a map from binding attribute index to the combined handler.
  */
-function combinedEventHandlers(
-	node: ElementNode,
-	status: BuildStatus,
-): Map<number, CombinedHandler> {
+function combinedEventHandlers(node: ElementNode): Map<number, CombinedHandler> {
 	const bindings = new Map<string, number>();
 	const handlers = new Map<string, number>();
 	for (let [index, { name, value, fullyReactive }] of node.attributes.entries()) {
@@ -477,7 +468,7 @@ function combinedEventHandlers(
 		const handler = node.attributes[handlerIndex];
 		combined.set(bindingIndex, {
 			index: handlerIndex,
-			value: replaceForVarNames(handler.value!, status),
+			value: handler.value!,
 			span: handler.span,
 			first: handlerIndex < bindingIndex,
 		});
@@ -534,7 +525,6 @@ function buildEventAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
-	value = replaceForVarNames(value, status);
 	value = injectForVarHandler(value, status);
 
 	// Add an event listener, after the fragment has been added
@@ -551,7 +541,6 @@ function buildTransitionAttribute(
 	status: BuildStatus,
 	b: Builder,
 ) {
-	value = replaceForVarNames(value, status);
 	value = injectForVarHandler(value, status);
 
 	status.imports.add("t_animate");
@@ -569,7 +558,7 @@ function buildTransitionAttribute(
 	} else if (name === "transition-in") {
 		let outAttribute = node.attributes.find((a) => a.name === "transition-out");
 		if (outAttribute && outAttribute.value && outAttribute.fullyReactive) {
-			let outValue = injectForVarHandler(replaceForVarNames(outAttribute.value, status), status);
+			let outValue = injectForVarHandler(outAttribute.value, status);
 			b.append(`const ${entryVarName} = (${value})(${varName});`);
 			b.append(`const ${exitVarName} = (${outValue})(${varName});`);
 			b.append(`t_animate(${varName}, ${entryVarName}, ${exitVarName});`);

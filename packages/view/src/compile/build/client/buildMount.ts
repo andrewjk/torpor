@@ -1,7 +1,6 @@
 import Builder from "../../utils/Builder";
 import type BuildStatus from "./BuildStatus";
 import forVarBindings from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildMount(
 	// TODO: like in buildRun
@@ -10,8 +9,6 @@ export default function buildMount(
 	status: BuildStatus,
 	b: Builder,
 ): void {
-	functionBody = replaceForVarNames(functionBody, status);
-
 	status.imports.add("$onmount");
 	// Ignore errors if the user hasn't returned a cleanup function
 	b.append("// @ts-ignore\n$onmount(() => {");

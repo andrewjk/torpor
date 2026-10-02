@@ -30,4 +30,10 @@ export default interface BuildOptions {
 	 * space. Whitespace inside `pre`, `textarea`, and `code` is always kept.
 	 */
 	preserveWhitespace?: boolean;
+	/**
+	 * The original component source, used to compute line/char positions for
+	 * build-time diagnostics. Optional: when omitted, errors still carry
+	 * `startIndex`/`endIndex` but line/char default to 0.
+	 */
+	source?: string;
 }

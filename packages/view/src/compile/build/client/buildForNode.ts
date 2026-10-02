@@ -8,6 +8,7 @@ import forVarsReadDirectlyIn from "../../utils/forVarsReadDirectlyIn";
 import trimMatched from "../../utils/trimMatched";
 import nextVarName from "../utils/nextVarName";
 import type BuildStatus from "./BuildStatus";
+import addBuildError from "./addBuildError";
 import addMappedText from "./addMappedText";
 import addPopDevBoundary from "./addPopDevBoundary";
 import addPushDevBoundary from "./addPushDevBoundary";
@@ -15,7 +16,6 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings, appendForVarBindingsFor } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 const forLoopRegex = /for\s*\((.+?);.*?;.*?\)/;
 const forLoopVarsRegex = /(?:let\s+|var\s+){0,1}([^\s,;+=]+)(?:\s*=\s*[^,;]+){0,1}/g;
@@ -86,14 +86,29 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		status.imports.add("t_rerun_region_effects");
 	}
 
-	// Loop vars whose binding is never reassigned resolve through per-scope
-	// shadow bindings (see `forVarBindings`), so references are left alone.
-	// Reassigned vars keep the textual substitution to their live data path.
-	// Property/index writes (`row.name = …`) don't reassign the binding, so
-	// they still shadow — the write mutates the row object through the
-	// shadowed reference. `noWatch` implies no writes at all, so every var in
-	// that path is read-only.
+	// Loop variables are read-only: they resolve through per-scope shadow
+	// bindings (see `forVarBindings`), and a bare write to the binding in the
+	// body is a compile error. A `@for` extracts a *copy* of each element, so
+	// writing the binding cannot update the source. Property writes
+	// (`row.name = …`) are unaffected: they mutate the row object through the
+	// shadowed reference. Report each offending binding once, at the loop
+	// header.
+	//
+	// The hint deliberately avoids naming an exact source expression: the
+	// loop may iterate anything (array, Map, Set, a materialised iterable, a
+	// destructuring pattern), so there is no single `items[i] = …` form that
+	// is correct in general.
 	const reassignedForVars = forVarsReassignedIn(node.children, forVarNames);
+	for (const name of reassignedForVars) {
+		addBuildError(
+			status,
+			`Cannot assign to loop variable "${name}": a @for loop variable is read-only. ` +
+				`Assign to a property of the item (\`${name}.foo = …\`) instead, or mutate ` +
+				`the source collection directly.`,
+			node.span.start,
+			node.span.end,
+		);
+	}
 
 	// Single-loop-var specialization of the no-proxy path: when the body
 	// binds exactly one loop variable, the per-row spec can store it
@@ -143,8 +158,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 	// bind the ones those expressions actually read.
 	appendForVarBindings(b, status, `${node.statement}\n${keyStatement}`);
 
-	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
+	addMappedText("", `${node.statement}`, " {", node.span, status, b);
 
 	// Push a lightweight {key, data} spec per row. The reconciler reuses old
 	// ListItems for survivors and only mounts fresh ones for genuinely new
@@ -182,7 +196,7 @@ export default function buildForNode(node: ControlNode, status: BuildStatus, b: 
 		...forVarNames.map((v) => ({
 			name: v,
 			path: singleVar ? `${itemName}.data` : `${itemName}.data.${v}`,
-			shadow: !reassignedForVars.has(v),
+			shadow: true,
 		})),
 	];
 	// Shadow-bind the read-only vars this row callback's directly-evaluated

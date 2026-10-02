@@ -10,7 +10,6 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildSwitchNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName ?? "null";
@@ -52,8 +51,7 @@ export default function buildSwitchNode(node: ControlNode, status: BuildStatus, 
 	// emitted directly in this callback resolve lexically.
 	appendForVarBindings(b, status);
 
-	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
+	addMappedText("", `${node.statement}`, " {", node.span, status, b);
 
 	let index = 0;
 	for (let branch of branches) {
@@ -77,8 +75,7 @@ function buildSwitchBranch(
 	indexName: string,
 	index: number,
 ) {
-	// TODO: replaceForVarNames is going to throw mapping out
-	addMappedText("", `${replaceForVarNames(node.statement, status)}`, " {", node.span, status, b);
+	addMappedText("", `${node.statement}`, " {", node.span, status, b);
 
 	b.append(`if (!t_run_branch(${regionName}, ${indexName}, ${index})) return;`);
 

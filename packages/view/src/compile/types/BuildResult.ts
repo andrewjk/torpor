@@ -1,3 +1,4 @@
+import type CompileError from "./CompileError";
 import type SourceMapping from "./SourceMapping";
 
 export default interface BuildResult {
@@ -7,4 +8,5 @@ export default interface BuildResult {
 		hash: string;
 	}[];
 	map: SourceMapping[];
+	errors: CompileError[];
 }

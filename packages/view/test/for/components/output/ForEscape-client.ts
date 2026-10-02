@@ -1,4 +1,5 @@
 import $run from "../../../../src/watch/$run";
+import $watch from "../../../../src/watch/$watch";
 import t_add_element from "../../../../src/render/addElement";
 import t_add_fragment from "../../../../src/render/addFragment";
 import t_anchor from "../../../../src/render/nodeAnchor";
@@ -10,6 +11,7 @@ import t_fragment from "../../../../src/render/getFragment";
 import t_fragment_el from "../../../../src/render/getElementFragment";
 import t_next from "../../../../src/render/nodeNext";
 import t_region from "../../../../src/render/newRegion";
+import t_rerun_region_effects from "../../../../src/render/rerunRegionEffects";
 import t_root from "../../../../src/render/nodeRoot";
 import t_root_el from "../../../../src/render/nodeRootElement";
 import t_run_list from "../../../../src/render/runList";
@@ -24,7 +26,7 @@ export default function ForEscape(
 	_$slots?: Record<string, SlotRender>,
 ): void {
 
-	let things = ["a", "b", "c", "d", "e"]
+	let $state = $watch({ things: ["a", "b", "c", "d", "e"] })
 
 	/* User interface */
 	const t_fragments: DocumentFragment[] = [];
@@ -43,8 +45,8 @@ export default function ForEscape(
 		t_for_anchor_1,
 		() => {
 			let t_new_items_1: ListItemSpec[] = [];
-			for (let i = 0; i < 5; i++) {
-				t_new_items_1.push({ data: { i }, key:
+			for (let i = 0; i < $state.things.length; i++) {
+				t_new_items_1.push({ data: i, key:
 				undefined });
 			}
 			return t_new_items_1;
@@ -58,25 +60,36 @@ export default function ForEscape(
 			const t_div_3 = t_next(t_next(t_div_2, true)) as HTMLDivElement;
 			const t_input_1 = t_next(t_next(t_div_3, true)) as HTMLInputElement;
 			$run(() => {
-				t_input_1.value = String(t_item_1.data.i || "");
+				const i = t_item_1.data;
+				t_input_1.value = String($state.things[i] || "");
 			}, undefined, { forVarMask: 1 });
-			t_event(t_input_1, "input", (e) => t_item_1.data.i = e.target.value);
+			t_event(t_input_1, "input", (e) => {
+				const i = t_item_1.data;
+				return $state.things[i] = e.target.value
+			});
 			$run(() => {
-				t_text_1.textContent = t_fmt(t_item_1.data.i);
-				t_attribute(t_div_1, "data-testid", `input1-${t_item_1.data.i}`);
-				t_attribute(t_div_1, "name", t_item_1.data.i);
-				t_attribute(t_div_2, "data-testid", `input2-${t_item_1.data.i}`);
-				t_attribute(t_div_2, "name", `${t_item_1.data.i}`);
-				t_attribute(t_div_3, "data-testid", `input3-${t_item_1.data.i}`);
-				t_attribute(t_div_3, "name", things[t_item_1.data.i]);
-				t_attribute(t_input_1, "name", `${t_item_1.data.i}`);
+				const i = t_item_1.data;
+				t_text_1.textContent = t_fmt($state.things[i]);
+				t_attribute(t_div_1, "data-testid", `input1-${i}`);
+				t_attribute(t_div_1, "name", i);
+				t_attribute(t_div_2, "data-testid", `input2-${i}`);
+				t_attribute(t_div_2, "name", `${i}`);
+				t_attribute(t_div_3, "data-testid", `input3-${i}`);
+				t_attribute(t_div_3, "name", $state.things[i]);
+				t_attribute(t_input_1, "name", `${i}`);
 			}, undefined, { forVarMask: 1 });
 			t_add_fragment(t_fragment_1, t_section_1, t_before_1, t_input_1, t_root_1);
 			t_next(t_input_1);
 		},
 		(t_old_item, t_new_item) => {
-			t_old_item.data.i = t_new_item.data.i;
-		}
+			let t_changed_mask = 0;
+			if (t_old_item.data !== t_new_item.data) {
+				t_old_item.data = t_new_item.data;
+				t_changed_mask = 1;
+			}
+			if (t_changed_mask) t_rerun_region_effects(t_old_item, t_changed_mask);
+		},
+		true
 	);
 
 	t_add_element(t_section_1, $parent, $anchor);

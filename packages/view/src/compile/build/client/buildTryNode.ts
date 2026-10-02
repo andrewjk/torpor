@@ -11,7 +11,6 @@ import buildAddFragment from "./buildAddFragment";
 import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import { appendForVarBindings } from "./forVars";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildTryNode(node: ControlNode, status: BuildStatus, b: Builder): void {
 	const anchorName = node.varName ?? "null";
@@ -47,7 +46,7 @@ export default function buildTryNode(node: ControlNode, status: BuildStatus, b: 
 	if (catchBranch && catchVar) {
 		addMappedText(
 			"},",
-			`(${status.inHead ? "" : "t_before"}, ${replaceForVarNames(catchVar, status)}) => {`,
+			`(${status.inHead ? "" : "t_before"}, ${catchVar}) => {`,
 			"",
 			catchBranch.span,
 			status,

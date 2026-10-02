@@ -13,7 +13,6 @@ import buildFragment from "./buildFragment";
 import buildNode from "./buildNode";
 import buildRun from "./buildRun";
 import getAttributeOffsets from "./getAttributeOffsets";
-import replaceForVarNames from "./replaceForVarNames";
 
 export default function buildComponentNode(
 	node: ElementNode,
@@ -134,7 +133,7 @@ export default function buildComponentNode(
 		// Set the props, runs and binding runs that we gathered
 		b.append(`let ${propsName} = $watch({`);
 		for (let p of props) {
-			let value = replaceForVarNames(p.value, status);
+			let value = p.value;
 			p.preText ??= "";
 			p.postText ??= "";
 			if (p.spans.length === 1) {
@@ -162,10 +161,10 @@ export default function buildComponentNode(
 		b.append("});");
 		// TODO: Map these things:
 		if (runs.length) {
-			buildRun("setProps", replaceForVarNames(runs.join("\n"), status), status, b);
+			buildRun("setProps", runs.join("\n"), status, b);
 		}
 		if (bindingRuns.length) {
-			buildRun("setBindings", replaceForVarNames(bindingRuns.join("\n"), status), status, b);
+			buildRun("setBindings", bindingRuns.join("\n"), status, b);
 		}
 
 		// PERF: Does this have much of an impact??

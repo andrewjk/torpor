@@ -4,6 +4,7 @@ import buildStyles from "./build/client/buildStyles";
 import buildServerCode from "./build/server/buildServerCode";
 import type BuildOptions from "./types/BuildOptions";
 import type BuildResult from "./types/BuildResult";
+import type CompileError from "./types/CompileError";
 import type SourceMapping from "./types/SourceMapping";
 import trimWhitespace from "./utils/trimWhitespace";
 
@@ -27,9 +28,10 @@ export default function build(template: Template, options?: BuildOptions): Build
 	}
 
 	let map: SourceMapping[] = [];
+	let errors: CompileError[] = [];
 	let code = options?.server
 		? buildServerCode(template, options)
-		: buildCode(template, map, options);
+		: buildCode(template, map, options, errors);
 	let styles = template.components
 		.map((c) =>
 			c.style ? { style: buildStyles(c.style, c.style.hash), hash: c.style.hash } : undefined,
@@ -39,5 +41,6 @@ export default function build(template: Template, options?: BuildOptions): Build
 		code,
 		styles,
 		map,
+		errors,
 	};
 }
