@@ -60,7 +60,7 @@ export default function ComboBoxInput($props: ComboBoxInputProps | undefined) {
 			(push) => {
 				pushSearchText = push;
 			},
-			(value) => {
+			(value: string) => {
 				$state.searchText = value;
 			},
 			{ debounce: debounceMs },

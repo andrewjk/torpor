@@ -233,6 +233,17 @@ resubscribe, SSR-safe). Deliberately left out:
   (documented in JSDoc): errors are values; sources own their reconnection.
   Revisit if wrapper sources (retry/backoff wrappers) become common.
 
+### torp-check compiles with the packed @torpor/view dist, which goes stale
+
+`packages/check` compiles `.torp` files through `@torpor/view/compile`, which
+resolves to the packed `packages/view/dist` -- so after changing
+`packages/view/src` without rebuilding, torp-check reports errors (e.g. ~50
+phantom "'x' is declared but its value is never read" in `@for`-heavy
+components, from a mid-development compiler state) that no longer match
+current compiler output. Hit on 2026-10-02: a rebuild of packages/view made
+all 50 vanish. Options: torp-check could warn when view/dist is older than
+view/src, or the check scripts could depend on a fresh build.
+
 ### Sanitizing rendered markdown
 
 The markdown pipeline (`site/src/lib/markdown`) renders allmark output
