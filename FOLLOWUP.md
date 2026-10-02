@@ -5,34 +5,86 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### replaceForVarNames is textual rewriting with known blind spots (view compiler)
+### Committed test output fixtures can be left stale by the temp cache (view tests)
 
-Loop-var rewriting in `@for` bodies is a boundary-class regex over raw expression
-text, not AST-based. Recently hardened: string/template-literal contents are
-skipped; `?` is a boundary so `item?.x` and `a ?? item` rewrite; comments are
-skipped (an apostrophe inside a `//` comment used to swallow the rest of the
-expression as an unterminated string, which broke TagInput's suggestion
-clicks); regex literals are skipped too. The string/template/comment/regex
-skipping itself now lives in one shared scanner (`compile/utils/codeScanner.ts`,
-with unit tests) used by the parse and build phases. The rewriting approach
-still has inherent blind spots:
+`test/buildOutputFiles.ts` writes the committed `components/output/*-client.ts`
+fixture only when it also creates that code's content-hashed
+`components/temp/*-<hash>.ts` file (`maybeWriteFile`). If the temp file for the
+current code already exists, the output file is left untouched — so a compiler
+change made after a test run can leave the committed fixture one revision
+behind. This bit the shadow-binding change: a blank line it briefly emitted
+after `t_run_control(...) => {` (and similar scope opens) survived in ~128
+fixtures even after the compiler stopped emitting it, because those outputs
+weren't rewritten. Regenerating required deleting `test/**/components/temp/`
+and re-running the suite. A `if (!exists(outputFile) || read(outputFile) !== code) write`
+check in `maybeWriteFile` would make the fixtures self-healing.
 
-- **Shadowing**: a nested function's param/`let` with the same name as a loop var
-  gets wrongly rewritten -- `.filter(child => child.ok)` inside a `@for` body
-  rewrites the arrow param into `t_item_1.data` (broken). Scopes are invisible to
-  a text scan; needs an AST pass (e.g. acorn walk renaming resolvable
-  `Identifier` nodes) to fix properly.
-- **No-space operator styles**: `x=child`, `a+b`, `a&&b` etc. aren't caught --
-  the operator characters aren't boundary chars. Usual spaced formatting is fine.
-- **Regex-vs-division disambiguation is a lexical heuristic** (previous
-  significant token + keyword list), not a real parse -- exotic ASI cases
-  (`a = b\n/c/`) could still fool it.
+### for-replace-regression test times out under full-suite load
 
-Object-literal keys that share a loop var's name are safe only by accident (no
-`:` in the follower class -- adding it would break keys). The same textual
-limitation family exists in the `@for` header parsing (`forLoopVarsRegex` has a
-"Handle destructuring, quotes, comments etc" TODO) and in `isForBodyNoProxySafe`'s
-write detection.
+`test/for/for-replace-regression.test.ts` (view package): the "replace
+same-size then shrink does not leak items" test takes ~10s in isolation but
+hit the default 5s `testTimeout` (after 16.5s) when the whole suite ran in
+parallel, failing spuriously. Passes consistently on its own and on retry.
+Either the test needs an explicit timeout, or its setup should be profiled
+for why one list-replace case is an order of magnitude slower than its
+siblings.
+
+### Loop-var resolution in @for bodies: read-only bindings (view compiler)
+
+Loop vars are read-only. The compiler emits a per-scope shadow binding
+(`const <var> = <dataPath>;`) at the top of every reactive scope it generates
+inside the `@for` body — each `$run`/`t_run` effect (`forVarBindings` /
+`appendForVarBindings`), control-node callbacks (`@if`, `@switch`, `@replace`,
+`@html`, `@try`, `@await`), the row-create and `createNewItems` callbacks,
+`@function` bodies, and event/transition handlers (the bindings are injected
+into the handler's own body — or, for a handler that isn't a plain
+arrow/function, into a passthrough wrapper — so they are created per
+invocation, not captured from the row scope). Because resolution is lexical,
+**shadowing** (`arr.filter(child => child.ok)`) and **no-space operator
+styles** (`a&&b`, `x===child`) work. The binding is re-read on every scope
+invocation, so reads stay live; `forVarMask` is computed from the bare var
+names (`compile/utils/forVarsReadIn.ts`).
+
+A `@for` extracts a **copy** of each element, so writing the binding cannot
+update the source. `buildForNode` reports a bare write (`x = …`, `x++`,
+`x += …`, destructuring, or an `&`-binding on the var — `compile/utils/
+forVarsWrittenIn.ts`'s `forVarsReassignedIn`) as a compile **error**, collected
+on `BuildStatus.errors` and surfaced on `BuildResult.errors`. There is no
+textual substitution left: `replaceForVarNames` is gone. A **property/index
+write** (`row.name = …`, `row[i] = …`, e.g. `&checked={task.done}`) still
+mutates the row object through the shadowed reference and is fine;
+`forVarsWrittenIn` (the conservative any-write-target scan) remains the gate for
+`isForBodyNoProxySafe`.
+
+Open points:
+
+- **The error hint is container-agnostic on purpose** ("assign to a property of
+  the item, or mutate the source collection directly"): there is no single
+  `source[i] = …` form that is correct for every iterable (Map needs `.set`,
+  `entries()` destructures an index that isn't the source, `{ name }` isn't
+  addressable). If we want per-form hints, the loop header has to be parsed
+  more richly.
+- **`forVarsReassignedIn` recurses into nested `@for` bodies**, so an inner loop
+  that reuses an outer var's name and writes it could misattribute the error to
+  the outer binding. Pre-existing scanner behavior.
+- **The `@for` header parser** (`forLoopVarsRegex`'s "Handle destructuring,
+  quotes, comments etc" TODO) is still heuristic.
+- **Code is still generated for an erroring program** (it just assigns a `const`
+  at runtime) so the user can inspect output. Emitting nothing — or a
+  not-compiled stub — would be a follow-up.
+
+Binding placement is optimised to avoid unused lines. Effect bodies, handlers,
+`@function` bodies and `$onmount` bind only the vars their own code reads
+(`forVarBindings(status, source)`). The row-create callback binds only the vars
+its _directly-evaluated_ code reads — component initial props, `<slot>`/`fill`
+prop expressions, `@const`, `&ref`, interpolated `@element` self — via
+`compile/utils/forVarsReadDirectlyIn.ts`; nested scopes inside the row bind
+their own. The `createNewItems` header binds only the vars its loop
+header/`@key` read. `forVarsReadDirectlyIn` is heuristic and deliberately
+conservative (an extra binding is harmless, a missing one is a
+`ReferenceError`); it must treat fill/slot prop values as live in the row
+scope. Control-node callbacks still bind every var in scope, which could be
+tightened if it shows up in profiles.
 
 ### refocusAnchorOnHide focuses whatever component anchors the content
 
