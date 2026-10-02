@@ -3,7 +3,7 @@ import "@testing-library/jest-dom/vitest";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { DataGrid } from "../../src/DataGrid/index";
-import type { DataColumn, LoadResult } from "../../src/DataGrid/index";
+import type { DataColumn, DataGridLoadEvent } from "../../src/DataGrid/index";
 import LoaderGrid from "./components/LoaderGrid.torp";
 import PagedGrid from "./components/PagedGrid.torp";
 import userEvent from "@testing-library/user-event";
@@ -96,9 +96,9 @@ describe("DataGrid - Sorting", () => {
 
 	it("passes sort fields to the loader request", async () => {
 		const requests: any[] = [];
-		let resolve!: (value: LoadResult) => void;
+		let resolve!: (value: DataGridLoadEvent) => void;
 		const load = (request: any) =>
-			new Promise<LoadResult>((r) => {
+			new Promise<DataGridLoadEvent>((r) => {
 				requests.push(request);
 				resolve = r;
 			});
@@ -143,9 +143,9 @@ describe("DataGrid - Pagination", () => {
 
 	it("passes page and pageSize to the loader request", async () => {
 		const requests: any[] = [];
-		let resolve!: (value: LoadResult) => void;
+		let resolve!: (value: DataGridLoadEvent) => void;
 		const load = (request: any) =>
-			new Promise<LoadResult>((r) => {
+			new Promise<DataGridLoadEvent>((r) => {
 				requests.push(request);
 				resolve = r;
 			});

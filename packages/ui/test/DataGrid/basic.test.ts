@@ -1,9 +1,10 @@
 import { queryAllByRole, queryByRole, queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
+import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { describe, expect, it, vi } from "vite-plus/test";
 import { DataGrid } from "../../src/DataGrid/index";
-import type { DataColumn, LoadResult } from "../../src/DataGrid/index";
+import type { DataColumn, DataGridLoadEvent } from "../../src/DataGrid/index";
 import LoaderGrid from "./components/LoaderGrid.torp";
 import StaticGrid from "./components/StaticGrid.torp";
 
@@ -90,9 +91,9 @@ describe("DataGrid - Basic", () => {
 	});
 
 	it("shows the empty slot when there are no rows", async () => {
-		let resolve!: (value: LoadResult) => void;
+		let resolve!: (value: DataGridLoadEvent) => void;
 		const load = () =>
-			new Promise<LoadResult>((r) => {
+			new Promise<DataGridLoadEvent>((r) => {
 				resolve = r;
 			});
 		const container = document.createElement("div");
@@ -118,9 +119,9 @@ describe("DataGrid - Basic", () => {
 
 describe("DataGrid - Loading from a loader function", () => {
 	it("shows a loading state, then renders rows and reports the total", async () => {
-		let resolve!: (value: LoadResult) => void;
+		let resolve!: (value: DataGridLoadEvent) => void;
 		const load = () =>
-			new Promise<LoadResult>((r) => {
+			new Promise<DataGridLoadEvent>((r) => {
 				resolve = r;
 			});
 		const onload = vi.fn();
@@ -144,9 +145,9 @@ describe("DataGrid - Loading from a loader function", () => {
 	});
 
 	it("sets aria-rowcount from the loader total", async () => {
-		let resolve!: (value: LoadResult) => void;
+		let resolve!: (value: DataGridLoadEvent) => void;
 		const load = () =>
-			new Promise<LoadResult>((r) => {
+			new Promise<DataGridLoadEvent>((r) => {
 				resolve = r;
 			});
 		const container = mountGrid({ columns: [{ key: "name" }], load });
@@ -173,10 +174,53 @@ describe("DataGrid - Loading from a loader function", () => {
 		expect(onload).toHaveBeenCalledWith({ items: [{ name: "Alice" }] });
 	});
 
+	it("sets aria-busy and data-loading while a reload is pending", async () => {
+		const resolvers: ((value: DataGridLoadEvent) => void)[] = [];
+		const load = () =>
+			new Promise<DataGridLoadEvent>((r) => {
+				resolvers.push(r);
+			});
+		const onloadstart = vi.fn();
+		const container = mountGrid({
+			columns: [{ key: "name", label: "Name", sortable: true }],
+			load,
+			onloadstart,
+		});
+
+		// The first load is pending: onloadstart fired, table not shown yet
+		expect(onloadstart).toHaveBeenCalledTimes(1);
+		expect(queryByRole(container, "grid")).not.toBeInTheDocument();
+
+		resolvers.shift()!({ items: [{ name: "Alice" }, { name: "Bob" }] });
+		await tick();
+
+		let table = queryByRole(container, "grid")!;
+		expect(table).not.toHaveAttribute("aria-busy");
+		expect(table).not.toHaveAttribute("data-loading");
+
+		// A sort triggers a reload: stale rows stay visible under the flag
+		await userEvent.click(queryByRole(container, "button", { name: "Name" })!);
+		await tick();
+
+		table = queryByRole(container, "grid")!;
+		expect(onloadstart).toHaveBeenCalledTimes(2);
+		expect(table).toHaveAttribute("aria-busy", "true");
+		expect(table).toHaveAttribute("data-loading", "true");
+		expect(queryByText(container, "Alice")).toBeInTheDocument();
+
+		// Resolving the reload clears the flag and reports the result
+		resolvers.shift()!({ items: [{ name: "Alice" }, { name: "Bob" }] });
+		await tick();
+
+		table = queryByRole(container, "grid")!;
+		expect(table).not.toHaveAttribute("aria-busy");
+		expect(table).not.toHaveAttribute("data-loading");
+	});
+
 	it("shows an error message when the load fails", async () => {
 		let reject!: (err: Error) => void;
 		const load = () =>
-			new Promise<LoadResult>((_, rj) => {
+			new Promise<DataGridLoadEvent>((_, rj) => {
 				reject = rj;
 			});
 		const container = mountGrid({ columns: [{ key: "name" }], load });

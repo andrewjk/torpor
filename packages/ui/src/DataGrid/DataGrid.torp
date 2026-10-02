@@ -55,6 +55,8 @@ interface DataGridProps {
 	ariaLabelledBy?: string;
 	/** Called after each successful load with the normalized result (including `total`) */
 	onload?: (result: LoadResult) => void;
+	/** Called when a load starts, including reloads triggered by sorting or paging */
+	onloadstart?: () => void;
 	/** Called when the user sorts by a column */
 	onsortchange?: (sortBy: string | undefined, sortDirection: "asc" | "desc") => void;
 }
@@ -116,6 +118,10 @@ export default function DataGrid($props: DataGridProps) {
 		sortBy: $props.sortBy,
 		sortDirection: $props.sortDirection ?? "asc",
 		activeCell: { row: 0, col: 0 },
+
+		// True while a loader request is in flight, so reloads (which keep the
+		// stale rows visible) can flag the table with aria-busy / data-loading
+		reloading: false,
 
 		// The result of the current load. Suspends while pending when read,
 		// which drives the @await boundary in the template.
@@ -219,6 +225,10 @@ export default function DataGrid($props: DataGridProps) {
 		};
 	}
 
+	// Incremented on every load; only the latest load's settle updates
+	// the pending flag
+	let loadGeneration = 0;
+
 	function runLoad(): Promise<LoadResult> {
 		const request: LoadRequest = {};
 		if ($props.pageSize) {
@@ -229,10 +239,28 @@ export default function DataGrid($props: DataGridProps) {
 			request.sortBy = $state.sortBy;
 			request.sortDirection = $state.sortDirection;
 		}
+		// Flag the load as pending (and notify the consumer) before awaiting;
+		// only the latest load's settle clears the flag, so a reload that
+		// overtakes an older request doesn't drop the indicator early
+		const generation = ++loadGeneration;
+		$state.reloading = true;
+		$props.onloadstart?.();
 		const result = Promise.resolve(($props.load as Loader)(request)).then(normalizeLoadResult);
 		// Report successful loads to the consumer; failures surface through
 		// the component's error boundary, not this notification chain
-		result.then((r) => $props.onload?.(r), () => {});
+		result.then(
+			(r) => {
+				if (generation === loadGeneration) {
+					$state.reloading = false;
+				}
+				$props.onload?.(r);
+			},
+			() => {
+				if (generation === loadGeneration) {
+					$state.reloading = false;
+				}
+			},
+		);
 		return result;
 	}
 
@@ -422,6 +450,8 @@ export default function DataGrid($props: DataGridProps) {
 					aria-label={$props.ariaLabel}
 					aria-labelledby={$props.ariaLabelledBy}
 					aria-rowcount={hasLoader || isVirtual() ? $state.totalCount : undefined}
+					aria-busy={$state.reloading ? "true" : undefined}
+					data-loading={$state.reloading ? "true" : undefined}
 					onkeydown={handleKeydown}
 					onfocusin={handleFocusin}
 				>
