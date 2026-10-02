@@ -5,20 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### Committed test output fixtures can be left stale by the temp cache (view tests)
-
-`test/buildOutputFiles.ts` writes the committed `components/output/*-client.ts`
-fixture only when it also creates that code's content-hashed
-`components/temp/*-<hash>.ts` file (`maybeWriteFile`). If the temp file for the
-current code already exists, the output file is left untouched — so a compiler
-change made after a test run can leave the committed fixture one revision
-behind. This bit the shadow-binding change: a blank line it briefly emitted
-after `t_run_control(...) => {` (and similar scope opens) survived in ~128
-fixtures even after the compiler stopped emitting it, because those outputs
-weren't rewritten. Regenerating required deleting `test/**/components/temp/`
-and re-running the suite. A `if (!exists(outputFile) || read(outputFile) !== code) write`
-check in `maybeWriteFile` would make the fixtures self-healing.
-
 ### for-replace-regression test times out under full-suite load
 
 `test/for/for-replace-regression.test.ts` (view package): the "replace

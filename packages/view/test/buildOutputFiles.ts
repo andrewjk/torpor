@@ -65,14 +65,18 @@ async function maybeWriteFile(file: string, code: string, suffix: string): Promi
 
 		// Create the hashed cache file
 		await fs.writeFile(tempFile, code);
+	}
 
-		// Create the importable output file
-		const outputFile = file
-			.replace("/components/", "/components/output/")
-			.replace(".torp", `-${suffix}.ts`);
-		if (!existsSync(path.dirname(outputFile))) {
-			await fs.mkdir(path.dirname(outputFile), { recursive: true });
-		}
+	// Create the importable output file. Check it even when the temp cache is
+	// warm — a compiler change after a test run can leave the committed output
+	// file one revision behind the hashed cache files.
+	const outputFile = file
+		.replace("/components/", "/components/output/")
+		.replace(".torp", `-${suffix}.ts`);
+	if (!existsSync(path.dirname(outputFile))) {
+		await fs.mkdir(path.dirname(outputFile), { recursive: true });
+	}
+	if (!existsSync(outputFile) || (await fs.readFile(outputFile, "utf8")) !== code) {
 		await fs.writeFile(outputFile, code);
 	}
 

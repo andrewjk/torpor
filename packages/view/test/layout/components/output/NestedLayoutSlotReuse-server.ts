@@ -1,7 +1,7 @@
 import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default async function BindingsPage(
+export default async function StatePage(
 	$props: any,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -10,7 +10,7 @@ export default async function BindingsPage(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<h1>Bindings</h1> <p>Bindings page count ${t_fmt($props.count)}</p>`;
+	t_body += `<h1>State</h1> <p>State page count ${t_fmt($props.count)}</p>`;
 
 	return { body: t_body, head: t_head };
 }
