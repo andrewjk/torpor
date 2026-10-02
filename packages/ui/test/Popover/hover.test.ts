@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { mount } from "@torpor/view";
 import { afterEach, describe, expect, it } from "vite-plus/test";
 import PopoverHoverPress from "./components/PopoverHoverTest.torp";
+import PopoverHoverContentTest from "./components/PopoverHoverContentTest.torp";
 
 //const tick = () => new Promise((r) => setTimeout(r));
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -97,6 +98,30 @@ describe("Popover - hover trigger", () => {
 		await wait(50);
 
 		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+	});
+
+	it("a scripted refocus on hide does not re-open the popout", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		await userEvent.click(trigger); // opens and focuses the trigger
+		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+
+		// Move focus into the content
+		const contentButton = container.querySelector(".torp-popover-content button")!;
+		await userEvent.click(contentButton);
+		expect(document.activeElement).toBe(contentButton);
+
+		// An outside click hides the content, and `refocusAnchorOnHide`
+		// drops focus back onto the trigger. That scripted refocus is not
+		// user intent, so it must not re-open the popout
+		await userEvent.click(document.body);
+		await wait(50);
+
+		expect(queryByText(container, "Inside content")).not.toBeInTheDocument();
+		expect(document.activeElement).toBe(trigger);
 	});
 
 	it("the press trigger still works alongside", async () => {

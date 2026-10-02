@@ -1,0 +1,16 @@
+import { Popover, PopoverContent, PopoverHover, PopoverTrigger } from "../../../src/Popover/index";
+
+/** A Popover with a hover trigger whose content contains a focusable button */
+export default function PopoverHoverContentTest($props: any) {
+	@render {
+		<Popover visible={$props.visible}>
+			<PopoverTrigger>Open</PopoverTrigger>
+			<PopoverHover hoverDelay={$props.hoverDelay} exitGrace={$props.exitGrace}>
+				Hover area
+			</PopoverHover>
+			<PopoverContent>
+				<button type="button">Inside content</button>
+			</PopoverContent>
+		</Popover>
+	}
+}

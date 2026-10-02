@@ -10,6 +10,8 @@
  *   cancels a pending close entirely
  */
 
+import { consumeFocusOpenSuppress } from "./suppressFocusOpen";
+
 export interface HoverRevealOptions {
 	/** Shows the popout */
 	show: () => void;
@@ -51,7 +53,6 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 
 	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
-	let suppressFocusOpen = false;
 
 	function clearTimers() {
 		if (openTimer !== undefined) {
@@ -78,10 +79,9 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 		closeTimer = setTimeout(() => {
 			closeTimer = undefined;
 			stopListening();
-			// The content hides with `refocusAnchorOnHide`, which drops
-			// focus back onto this trigger -- that is not user intent,
-			// so swallow the one focus-driven open that follows
-			suppressFocusOpen = true;
+			// The content hides with `refocusAnchorOnHide`, which drops focus
+			// back onto this trigger; the popout machinery arms the scripted-
+			// focus guard before it does, so handleFocus ignores it
 			hide();
 		}, exitGrace);
 
@@ -164,8 +164,10 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 		handleFocus() {
 			if (disabled()) return;
 
-			if (suppressFocusOpen) {
-				suppressFocusOpen = false;
+			// The content just hid and refocused this trigger
+			// (`refocusAnchorOnHide` + the scripted-focus guard); that
+			// refocus is not user intent, so don't re-open
+			if (consumeFocusOpenSuppress()) {
 				return;
 			}
 

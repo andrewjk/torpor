@@ -1,6 +1,7 @@
 import { addDocumentEvent, removeDocumentEvent } from "./documentEvents";
 import getScrollParent from "./getScrollParent";
 import setPopoverPosition from "./setPopoverPosition";
+import { suppressFocusOpen } from "./suppressFocusOpen";
 
 export interface PopoutContentOptions {
 	/** Resolves the element to position the content against */
@@ -128,7 +129,13 @@ export function createPopoutContent(options: PopoutContentOptions): {
 				document.activeElement === document.body
 			) {
 				const el = options.getAnchor();
-				el?.focus?.();
+				if (el) {
+					// The refocus is script-driven, not user intent: arm the
+					// guard so focus-to-open triggers (e.g. hover popovers)
+					// don't immediately re-open
+					suppressFocusOpen();
+					el.focus();
+				}
 			}
 		}
 	}

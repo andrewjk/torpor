@@ -62,17 +62,6 @@ conservative (an extra binding is harmless, a missing one is a
 scope. Control-node callbacks still bind every var in scope, which could be
 tightened if it shows up in profiles.
 
-### refocusAnchorOnHide focuses whatever component anchors the content
-
-When popout content hides, `createPopoutContent` (utils/popoutContent.ts) returns
-focus to `context.anchorElement` -- which is now sometimes a component that opens on
-focus, not just a passive trigger. PopoverHover/ContextualHover hit this: hiding
-refocused their hover div, whose focus-to-open handler immediately reopened in a
-loop. utils/hoverReveal.ts works around it with a one-shot `suppressFocusOpen`
-guard armed right before hide. Any future focus-to-open component needs the same
-guard; alternatively the runtime could distinguish script-driven refocus from real
-user focus events.
-
 ### Plain `let` initialized from `$props` is a silent stale-capture trap in keyed lists
 
 Found in redraft's PostInputFields.torp (multi-part post editor). A component
