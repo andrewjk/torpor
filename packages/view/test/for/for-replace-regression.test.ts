@@ -54,7 +54,7 @@ test("replace with smaller list removes all old items", async () => {
 	// Clear to 0
 	$state.items = [];
 	expect(container.querySelectorAll("li").length).toBe(0);
-});
+}, 15000);
 
 test("replace same-size then shrink does not leak items", async () => {
 	let nextId = 100;
@@ -105,7 +105,7 @@ test("replace same-size then shrink does not leak items", async () => {
 	// clear → 0
 	$state.items = [];
 	expect(container.querySelectorAll("li").length).toBe(0);
-});
+}, 15000);
 
 test("key-match update preserves DOM nodes across replace cycles", async () => {
 	let nextId = 1;

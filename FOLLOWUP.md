@@ -5,16 +5,6 @@ Each entry should describe what was seen, where, and any relevant context.
 
 ## Bugs
 
-### for-replace-regression test times out under full-suite load
-
-`test/for/for-replace-regression.test.ts` (view package): the "replace
-same-size then shrink does not leak items" test takes ~10s in isolation but
-hit the default 5s `testTimeout` (after 16.5s) when the whole suite ran in
-parallel, failing spuriously. Passes consistently on its own and on retry.
-Either the test needs an explicit timeout, or its setup should be profiled
-for why one list-replace case is an order of magnitude slower than its
-siblings.
-
 ### Loop-var resolution in @for bodies: read-only bindings (view compiler)
 
 Loop vars are read-only. The compiler emits a per-scope shadow binding
