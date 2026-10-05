@@ -1,0 +1,11 @@
+export default function Styled() {
+	@render {
+		<div class="styled">Styled</div>
+	}
+
+	@style {
+		.styled {
+			color: red;
+		}
+	}
+}

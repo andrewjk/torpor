@@ -1,5 +1,5 @@
 import { type Template, build, parse } from "@torpor/view/compile";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { type UnpluginFactory, type UnpluginInstance } from "unplugin";
@@ -7,7 +7,20 @@ import { createUnplugin } from "unplugin";
 import { transformWithOxc } from "vite";
 import type Options from "./types";
 
+/**
+ * The scoped-style registry: `<hash>.css` -> CSS text. Populated as a side
+ * effect of transforming a `.torp`, but `load` can also rebuild an entry from
+ * source (see rebuildStyle) so that a request arriving in a fresh module graph
+ * -- e.g. after Vite's optimizer invalidates everything and reloads -- is
+ * still served instead of 404ing.
+ */
 const styles = new Map<string, string>();
+
+/**
+ * Scoped-style hashes that were looked up but not found in any source, so a
+ * genuinely missing style isn't re-scanned on every request.
+ */
+const missing = new Set<string>();
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => ({
 	name: "unplugin-torpor",
@@ -15,10 +28,18 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		if (styles.has(id)) {
 			return id;
 		}
+		// A request for a scoped style we haven't compiled this session: recover
+		// its CSS from the source file instead of letting Vite 404 it
+		if (SCOPED_CSS_RE.test(id) && rebuildStyle(id, options)) {
+			return id;
+		}
 		return undefined;
 	},
 	load(id) {
 		if (styles.has(id)) {
+			return styles.get(id);
+		}
+		if (SCOPED_CSS_RE.test(id) && rebuildStyle(id, options)) {
 			return styles.get(id);
 		}
 		return undefined;
@@ -149,6 +170,124 @@ function getOverride(query: URLSearchParams | undefined): "client" | "server" | 
  */
 function cleanId(id: string): string {
 	return id.replace(/[?#].*$/, "");
+}
+
+/**
+ * Matches a scoped-style virtual module id (e.g. `/@id/1bapgxs.css`).
+ */
+const SCOPED_CSS_RE = /(?:^|\/)([a-z0-9]+)\.css$/;
+
+/**
+ * Populates the style registry from disk for `id`, returning whether the
+ * entry is now present. This makes the CSS loadable even when the owning
+ * `.torp` was compiled in an earlier module graph (whose transform side
+ * effects are gone). It mirrors how vite-plugin-svelte's virtual-CSS `load`
+ * re-derives content rather than trusting a transform-populated cache.
+ */
+function rebuildStyle(id: string, options: Options | undefined): boolean {
+	const hash = id.match(SCOPED_CSS_RE)?.[1];
+	if (hash === undefined) {
+		return false;
+	}
+	if (missing.has(hash)) {
+		return false;
+	}
+	// The project's own components are the common case, so look there first and
+	// only fall back to installed torpor packages if the hash isn't found
+	const found = findStyleIn([...projectTorpRoots(), ...packageTorpRoots()], hash, options);
+	if (!found) {
+		missing.add(hash);
+	}
+	return found;
+}
+
+/**
+ * Searches each root in turn for the `.torp` whose `@style` block hashes to
+ * `hash`, registering it when found. Stops at the first hit, so the (rarer)
+ * package scan only runs when the app source doesn't own the style.
+ */
+function findStyleIn(roots: string[], hash: string, options: Options | undefined): boolean {
+	for (const root of roots) {
+		for (const file of torpFilesUnder(root)) {
+			try {
+				const template = parse(readFileSync(file, "utf8"));
+				if (!template.ok || !template.template) {
+					continue;
+				}
+				const built = build(template.template, { ...options, server: false });
+				if (!built.styles) {
+					continue;
+				}
+				for (const style of built.styles) {
+					if (style.hash === hash) {
+						styles.set(style.hash + ".css", style.style);
+						return true;
+					}
+				}
+			} catch {
+				// A broken component is reported when it's actually rendered
+			}
+		}
+	}
+	return false;
+}
+
+/** The site's own source, walked as one root (excluding `node_modules`). */
+function projectTorpRoots(): string[] {
+	return [process.cwd()];
+}
+
+/**
+ * The `dist` folders of installed torpor packages, where their `.torp` files
+ * ship (e.g. `@torpor/ui`). Read from the site's `node_modules` links rather
+ * than walking the whole store, which can be huge.
+ */
+function packageTorpRoots(): string[] {
+	const roots: string[] = [];
+	const torporScope = path.join(process.cwd(), "node_modules", "@torpor");
+	let entries;
+	try {
+		entries = readdirSync(torporScope, { withFileTypes: true });
+	} catch {
+		return roots;
+	}
+	for (const entry of entries) {
+		const dist = path.join(torporScope, entry.name, "dist");
+		if (existsSync(dist)) {
+			roots.push(dist);
+		}
+	}
+	return roots;
+}
+
+/**
+ * Every `.torp` file under `folder`, recursing but skipping `.git` and
+ * `node_modules` (package roots are supplied separately by packageTorpRoots).
+ */
+function torpFilesUnder(folder: string): string[] {
+	const files: string[] = [];
+	const stack = [folder];
+	while (stack.length > 0) {
+		const dir = stack.pop()!;
+		let entries;
+		try {
+			entries = readdirSync(dir, { withFileTypes: true });
+		} catch {
+			continue;
+		}
+		for (const entry of entries) {
+			if (entry.name === ".git" || entry.name === "node_modules") {
+				continue;
+			}
+			const full = path.join(dir, entry.name);
+			if (entry.isDirectory()) {
+				stack.push(full);
+			} else if (entry.isFile() && entry.name.endsWith(".torp")) {
+				files.push(full);
+			}
+		}
+	}
+	return files;
 }
 
 function transform(
