@@ -10,7 +10,6 @@ import manifest from "../site/manifest.ts";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import { siteEntryPaths } from "../utils/entryPaths";
-import ssrViewAlias from "../utils/ssrViewAlias";
 import runPrerender from "./runPrerender";
 
 // TODO: Don't cache index.html in dev?
@@ -106,7 +105,7 @@ export default async function runBuild(site: Site): Promise<void> {
 		...asAliasArray(serverConfig.resolve.alias),
 		...tsconfigAliases(site.root),
 	];
-	serverConfig.plugins = [manifest(site, true), torpor(), ssrViewAlias(), ...site.vitePlugins];
+	serverConfig.plugins = [manifest(site, true), torpor(), ...site.vitePlugins];
 	serverConfig.build ??= {};
 	serverConfig.build.outDir = serverFolder;
 	// Bundle packages that ship `.torp` files into the server build, as they

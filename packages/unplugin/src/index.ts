@@ -24,7 +24,32 @@ const missing = new Set<string>();
 
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => ({
 	name: "unplugin-torpor",
-	resolveId(id /*, importer, options*/) {
+	enforce: "pre",
+	resolveId(id, importer, resolveOptions) {
+		// On the server, resolve the main `@torpor/view` entry to the server
+		// runtime, so shared `.ts`/`.js` helpers (e.g. @torpor/ui's compiled
+		// modules) use `$serverCache`/`$serverWatch`/`$serverRun` instead of
+		// the client primitives. The `.torp` compiler already emits
+		// `@torpor/view/ssr` directly; this covers plain modules it doesn't
+		// touch. Only the exact specifier is rewritten (`/ssr`, `/dev` etc.
+		// are left alone).
+		//
+		// `ssr` and `this.resolve` are Vite's (unplugin calls this hook with
+		// Vite's plugin context, but doesn't type them)
+		if (id === "@torpor/view" && (resolveOptions as { ssr?: boolean } | undefined)?.ssr) {
+			return (
+				this as unknown as {
+					resolve(
+						source: string,
+						importer?: string,
+						options?: Record<string, unknown>,
+					): Promise<{ id: string } | null>;
+				}
+			).resolve("@torpor/view/ssr", importer, {
+				skipSelf: true,
+				...resolveOptions,
+			});
+		}
 		if (styles.has(id)) {
 			return id;
 		}
@@ -49,12 +74,12 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 		if (/\.torp([?#]|$)/.test(id)) {
 			return true;
 		}
-		// Also plain-JS modules that are imported with an override query --
+		// Also plain-JS modules that are imported with a `?client` query --
 		// re-export barrels from torpor packages (e.g. the `index.js` files
 		// that `@torpor/ui/*` resolves to), which need to pass the query on
 		// to the `.torp` files they re-export
 		const query = getQuery(id);
-		if (query?.has("client") || query?.has("server")) {
+		if (query?.has("client")) {
 			return /\.(js|mjs|cjs|ts|mts|cts|jsx|tsx)$/.test(cleanId(id));
 		}
 		return false;
@@ -71,15 +96,13 @@ export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) =
 			transformOptions.dev = viteOptions.dev;
 		}
 
-		// An explicit ?client or ?server query on the import overrides
-		// everything else -- e.g. importing `Component.torp?client` in a test
-		// run compiles the component for the client, so that it can be
-		// mounted, while other components stay SSR-compiled
+		// An explicit `?client` query on the import overrides everything else
+		// -- e.g. importing `Component.torp?client` in a test run compiles the
+		// component for the client, so that it can be mounted, while other
+		// components stay SSR-compiled
 		const override = getOverride(getQuery(id));
 		if (override === "client") {
 			transformOptions.server = false;
-		} else if (override === "server") {
-			transformOptions.server = true;
 		} else {
 			// Vite can override user server options
 			if (viteOptions && viteOptions.ssr !== undefined) {
@@ -153,14 +176,11 @@ function getQuery(id: string): URLSearchParams | undefined {
 }
 
 /**
- * Gets the client/server override from a module id's query, if any
+ * Gets the `?client` override from a module id's query, if any
  */
-function getOverride(query: URLSearchParams | undefined): "client" | "server" | undefined {
+function getOverride(query: URLSearchParams | undefined): "client" | undefined {
 	if (query?.has("client")) {
 		return "client";
-	}
-	if (query?.has("server")) {
-		return "server";
 	}
 	return undefined;
 }
@@ -290,17 +310,12 @@ function torpFilesUnder(folder: string): string[] {
 	return files;
 }
 
-function transform(
-	template: Template,
-	id: string,
-	options?: Options,
-	override?: "client" | "server",
-) {
+function transform(template: Template, id: string, options?: Options, override?: "client") {
 	const built = build(template, options);
 	let transformed = built.code;
 
-	// When a component is compiled with a ?client/?server override in a test
-	// run, any child components it imports must be compiled the same way --
+	// When a component is compiled with a `?client` override in a test run,
+	// any child components it imports must be compiled the same way --
 	// otherwise mounting the parent would try to render SSR children (which
 	// don't show anything). Pass the override on to imported components:
 	// relative `.torp` imports, and bare imports into packages that ship
@@ -329,7 +344,7 @@ function transform(
 
 /**
  * Rewrites a component's imports so that the components it imports get the
- * same `?client`/`?server` override:
+ * same `?client` override:
  *
  * - relative `.torp` imports get the query appended
  * - bare package imports that resolve into a torpor package (one that ships
@@ -338,11 +353,7 @@ function transform(
  *   they resolve to `.torp` files (directly or through plain-JS re-export
  *   barrels), so without the query they'd be compiled for the default side
  */
-function propagateOverride(
-	code: string,
-	override: "client" | "server",
-	importerDir: string,
-): string {
+function propagateOverride(code: string, override: "client", importerDir: string): string {
 	let result = code;
 
 	// Relative (or bare-but-.torp-suffixed) imports without an existing query

@@ -1,5 +1,5 @@
 ---
-"@torpor/build": patch
+"@torpor/unplugin": patch
 "@torpor/view": patch
 ---
 
