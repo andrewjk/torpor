@@ -13,7 +13,7 @@ export default async function ForWrite(
 	/* User interface */
 	t_body += `<ul><![>`;
 	for (let row of $props.rows) {
-		t_body += `<!^><li ${row.label ? `data-testid="${t_attr(row.label)}"` : ""}><input type="checkbox" checked="${row.done || false}"> ${t_fmt(row.done ? "done" : "todo")}:${t_fmt(row.label)} </li>`;
+		t_body += `<!^><li ${(row.label) ? `data-testid="${t_attr(row.label)}"` : ""}><input type="checkbox" checked="${(row.done) || false}"> ${t_fmt(row.done ? "done" : "todo")}:${t_fmt(row.label)} </li>`;
 	}
 	t_body += `<!]><!></ul>`;
 

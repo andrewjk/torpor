@@ -91,7 +91,7 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 					value = `t_attr(${value})`;
 					defaultValue = '""';
 				}
-				let valueOrDefault = `${value} || ${defaultValue}`;
+				let valueOrDefault = `(${value}) || ${defaultValue}`;
 				const propName = name.substring(1);
 				attributes.push(`${propName}="\${${valueOrDefault}}"`);
 			} else if (name === "class") {
@@ -114,7 +114,10 @@ function buildElementAttributes(node: ElementNode, status: BuildServerStatus) {
 				// Only set the attribute if the value is truthy
 				// e.g. `... ${className ? `class="${className}"` : ''} ...`
 				status.imports.add("t_attr");
-				attributes.push(`\${${value} ? \`${name}="\${t_attr(${value})}"\` : ""}`);
+				// Parenthesise the value: it can be any expression (e.g. a
+				// ternary), and `a ? b : c ? x : y` parses as `a ? b : (c ? x : y)`,
+				// which drops the attribute for the truthy branch
+				attributes.push(`\${(${value}) ? \`${name}="\${t_attr(${value})}"\` : ""}`);
 			}
 		} else if (value != null && reactive) {
 			// TODO: Match braces, don't replace braces inside code

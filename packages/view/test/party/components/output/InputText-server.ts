@@ -16,7 +16,7 @@ export default async function InputHello(
 	});
 
 	/* User interface */
-	t_body += `<p>${t_fmt($state.text)}</p> <input value="${t_attr($state.text) || ""}">`;
+	t_body += `<p>${t_fmt($state.text)}</p> <input value="${(t_attr($state.text)) || ""}">`;
 
 	return { body: t_body, head: t_head };
 }

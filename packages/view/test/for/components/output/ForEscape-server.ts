@@ -16,7 +16,7 @@ export default async function ForEscape(
 	/* User interface */
 	t_body += `<section><![>`;
 	for (let i = 0; i < $state.things.length; i++) {
-		t_body += `<!^><p>${t_fmt($state.things[i])}</p> <div data-testid="input1-${t_attr(i)}" ${i ? `name="${t_attr(i)}"` : ""}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${$state.things[i] ? `name="${t_attr($state.things[i])}"` : ""}></div> <input value="${t_attr($state.things[i]) || ""}" name="${t_attr(i)}">`;
+		t_body += `<!^><p>${t_fmt($state.things[i])}</p> <div data-testid="input1-${t_attr(i)}" ${(i) ? `name="${t_attr(i)}"` : ""}></div> <div data-testid="input2-${t_attr(i)}" name="${t_attr(i)}"></div> <div data-testid="input3-${t_attr(i)}" ${($state.things[i]) ? `name="${t_attr($state.things[i])}"` : ""}></div> <input value="${(t_attr($state.things[i])) || ""}" name="${t_attr(i)}">`;
 	}
 	t_body += `<!]><!></section>`;
 

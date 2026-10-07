@@ -35,7 +35,7 @@ async function BindText(
 	let t_head = "";
 
 	/* User interface */
-	t_body += `<input value="${t_attr($props.name) || ""}">`;
+	t_body += `<input value="${(t_attr($props.name)) || ""}">`;
 
 	return { body: t_body, head: t_head };
 }

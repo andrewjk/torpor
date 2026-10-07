@@ -18,7 +18,7 @@ export default async function HtmlTextarea(
 	});
 
 	/* User interface */
-	t_body += `<div class="card"><textarea value="${t_attr($state.text) || ""}"></textarea> <div class="output"><![>${$state.output}<!]><!></div></div>`;
+	t_body += `<div class="card"><textarea value="${(t_attr($state.text)) || ""}"></textarea> <div class="output"><![>${$state.output}<!]><!></div></div>`;
 
 	return { body: t_body, head: t_head };
 }

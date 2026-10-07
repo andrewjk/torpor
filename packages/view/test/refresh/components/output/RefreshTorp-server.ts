@@ -27,7 +27,7 @@ export default async function SelfDisablingRefresh(
 	});
 
 	/* User interface */
-	t_body += `<p>Users: ${t_fmt($state.users)}</p> <button ${$pending(() => $state.users) ? `disabled="${t_attr($pending(() => $state.users))}"` : ""}> refresh </button>`;
+	t_body += `<p>Users: ${t_fmt($state.users)}</p> <button ${($pending(() => $state.users)) ? `disabled="${t_attr($pending(() => $state.users))}"` : ""}> refresh </button>`;
 
 	return { body: t_body, head: t_head };
 }

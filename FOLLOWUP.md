@@ -283,3 +283,25 @@ docs pages while keeping the same look. Also needs heading-anchor generation
 and a TOC (frontmatter `title` ordering exists for blog posts; docs would
 want collection-level nav from the file tree, like `DOC_LINKS` in
 `site/src/utils/nav.ts` provides today).
+
+### `@if` branches aren't reconciled when server and client conditions diverge
+
+Hydration adopts the server's DOM but doesn't detect that the client picked a
+different `@if` branch, so the server's static branch content is left in place
+and the UI is silently wrong (no error). Reproduced in
+`packages/view/test/run/run-writes-render-state.test.ts` (`test.fails`): a
+`.torp` whose `$run` writes state read by an `@if` renders the `else` branch on
+the server (`$run` is a no-op there), the client's first run takes the `if`
+branch, and the hydrated DOM still shows the server's branch text.
+
+This matters because server renders no-op effects (`$serverRun`), and because
+`@torpor/build`'s ssr-view plugin now resolves `@torpor/view` to the server
+runtime in SSR -- so shared `.ts` helpers no-op their `$run` too. Any
+server/client divergence in a condition (effects, `localStorage`, `Date`,
+random) can show stale content. Dynamic text/attributes self-correct (the
+client's `$run` sets `textContent`/attributes during hydration), and `@for`
+re-runs from client data, but a structurally-identical `@if` branch keeps the
+server's content.
+
+Fix direction: emit/read a branch identity marker during hydration so a
+mismatched branch is cleared and re-rendered, rather than adopted.

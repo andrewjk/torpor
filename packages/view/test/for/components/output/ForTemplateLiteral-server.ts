@@ -12,7 +12,7 @@ export default async function ForTemplateLiteral(
 	/* User interface */
 	t_body += `<section><![>`;
 	for (let slide of $props.slides) {
-		t_body += `<!^><p ${`Go to slide ${slide.index + 1}` ? `aria-label="${t_attr(`Go to slide ${slide.index + 1}`)}"` : ""}>Slide</p> <p ${`slide show` ? `aria-label="${t_attr(`slide show`)}"` : ""}>Constant</p>`;
+		t_body += `<!^><p ${(`Go to slide ${slide.index + 1}`) ? `aria-label="${t_attr(`Go to slide ${slide.index + 1}`)}"` : ""}>Slide</p> <p ${(`slide show`) ? `aria-label="${t_attr(`slide show`)}"` : ""}>Constant</p>`;
 	}
 	t_body += `<!]><!></section>`;
 

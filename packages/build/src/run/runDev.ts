@@ -23,6 +23,7 @@ import { checkLayoutSlot, checkLayoutSlots } from "../site/checkLayoutSlots";
 import { LAYOUT_ROUTE } from "../types/RouteType";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
+import ssrViewAlias from "../utils/ssrViewAlias";
 import { detectSourceMode, siteEntryPaths } from "../utils/entryPaths";
 import devPlugin from "./devPlugin.ts";
 import { clearStaleDepCache } from "./depCache";
@@ -80,6 +81,7 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	config.plugins = [
 		manifest(site, true),
 		torpor({ dev: true }),
+		ssrViewAlias(),
 		...devPlugins,
 		...site.vitePlugins,
 	];
