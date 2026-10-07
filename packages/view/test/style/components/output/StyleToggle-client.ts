@@ -21,7 +21,7 @@ export default function StyleToggle(
 	const t_root_0 = t_root_el(t_fragment_0);
 	const t_div_1 = t_root_0 as HTMLDivElement;
 	$run(() => {
-		t_div_1.style.cssText += t_style({ color: $props.active ? "green" : "red" });
+		t_div_1.style.cssText = t_style({ color: $props.active ? "green" : "red" });
 	});
 	t_add_element(t_div_1, $parent, $anchor);
 	t_next(t_div_1);

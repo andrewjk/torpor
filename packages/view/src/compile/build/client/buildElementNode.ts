@@ -230,7 +230,11 @@ function buildElementAttributes(
 				);
 			} else if (name === "style") {
 				status.imports.add("t_style");
-				stashRun(fragment, `${varName}.style.cssText += t_style(`, value, ");", span, status);
+				// Replace, don't append: the style attribute is omitted from the
+				// fragment when it is dynamic, so this binding owns the whole
+				// inline style. Appending would leave removed properties set (and
+				// accumulate duplicates) when a value goes back to undefined
+				stashRun(fragment, `${varName}.style.cssText = t_style(`, value, ");", span, status);
 			} else if (name.includes("-")) {
 				// Handle data-, aria- etc
 				status.imports.add("t_attribute");
@@ -265,9 +269,10 @@ function buildElementAttributes(
 				);
 			} else if (name === "style") {
 				status.imports.add("t_style");
+				// Replace, not append -- see the fully-reactive branch above
 				stashRunWithOffsets(
 					fragment,
-					`${varName}.style.cssText += t_style(`,
+					`${varName}.style.cssText = t_style(`,
 					value,
 					");",
 					spans,
