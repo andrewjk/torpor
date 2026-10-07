@@ -18,7 +18,7 @@ import {
 	type RouteCheckIssue,
 	reportRouteIssues,
 } from "../site/checkRoutes";
-import manifest from "../site/manifest.ts";
+import manifest, { MANIFEST_MODULE_ID } from "../site/manifest.ts";
 import { checkLayoutSlot, checkLayoutSlots } from "../site/checkLayoutSlots";
 import { LAYOUT_ROUTE } from "../types/RouteType";
 import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
@@ -26,9 +26,16 @@ import { addTorporPackageConfig } from "../utils/torporPackages";
 import { detectSourceMode, siteEntryPaths } from "../utils/entryPaths";
 import devPlugin from "./devPlugin.ts";
 import { clearStaleDepCache } from "./depCache";
+import { configDependencyFiles, loadSite } from "./loadSite.ts";
 import { reportStaleTorpCopies } from "./staleTorpCopies";
 
-export default async function runDev(site: Site): Promise<void> {
+/**
+ * @param configVite The Vite server used to load the site config (see
+ * `loadSite`). Its module graph tells the dev server which files the config
+ * imports, so `addRoute` calls in those files (e.g. a `routes.ts`) trigger a
+ * route reload too. Without it, only file-based routes are reloaded.
+ */
+export default async function runDev(site: Site, configVite?: ViteDevServer): Promise<void> {
 	// Create the Vite dev server. Unlike the previous middleware-mode setup, we
 	// let Vite own the HTTP server (so HMR/websockets work natively) and let the
 	// adapter's `dev()` plugin(s) handle SSR via configureServer.
@@ -131,7 +138,7 @@ export default async function runDev(site: Site): Promise<void> {
 
 	await vite.listen();
 
-	watchRouteTypes(site, vite);
+	watchRoutes(site, vite, configVite);
 
 	const listeningUrl = vite.resolvedUrls?.local?.[0] ?? connectingUrl;
 	console.log(`Listening on ${listeningUrl}\n`);
@@ -161,8 +168,15 @@ async function warmServerEntry(
  * Reports route type issues at startup, then re-checks route files and
  * `makeApi` calls as they change so annotation problems surface during
  * development without failing the dev server.
+ *
+ * Also watches the config's import graph and the registered route folders,
+ * re-loading the site config when route definitions change (edits to
+ * `site.config.ts` or a `routes.ts` it imports) or when route files are added
+ * or removed. The re-loaded state is swapped onto the live site, the generated
+ * manifest invalidated, and a full client reload triggered, so the running
+ * server picks up the change without a restart.
  */
-function watchRouteTypes(site: Site, vite: ViteDevServer): void {
+function watchRoutes(site: Site, vite: ViteDevServer, configVite?: ViteDevServer): void {
 	reportRouteIssues(checkRoutes(site));
 	reportRouteIssues(checkApiCalls(site));
 	reportRouteIssues(checkLayoutSlots(site));
@@ -170,13 +184,15 @@ function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 	// Map absolute route file paths to their manifest entries, so changed
 	// files can be re-checked against their derived route. Layout route files
 	// are included for their slot check (a .torp layout is its own component)
-	const routeFiles = new Map(
-		site.routes
-			.filter(
-				(r) => r.file?.endsWith(".ts") || (r.file?.endsWith(".torp") && r.type === LAYOUT_ROUTE),
-			)
-			.map((r) => [path.resolve(site.root, r.file!), r]),
-	);
+	const buildRouteFiles = (): Map<string, (typeof site.routes)[number]> =>
+		new Map(
+			site.routes
+				.filter(
+					(r) => r.file?.endsWith(".ts") || (r.file?.endsWith(".torp") && r.type === LAYOUT_ROUTE),
+				)
+				.map((r) => [path.resolve(site.root, r.file!), r]),
+		);
+	let routeFiles = buildRouteFiles();
 	const apiCheck = createApiCallCheck(site);
 	// Only report when a file's issues change, to avoid repeating the same
 	// warnings on every save
@@ -208,8 +224,80 @@ function watchRouteTypes(site: Site, vite: ViteDevServer): void {
 		report(file, checkApiCallSource(source, file, apiCheck));
 	};
 
-	vite.watcher.on("change", recheck);
-	vite.watcher.on("add", recheck);
+	// Files that affect the route table: the config's import graph (addRoute
+	// definitions, plugins, inline endpoints) and the route folders (route
+	// files are read from disk by addRouteFolder, not imported). Recomputed
+	// after each reload, since the config may start importing new files.
+	let configDeps =
+		configVite && site.configFile
+			? configDependencyFiles(configVite, site.root)
+			: new Set<string>();
+	const inRouteFolder = (file: string): boolean =>
+		site.routeFolders.some((f) => isInside(path.resolve(site.root, f.folder), file));
+
+	// Re-load the site config and swap its route state onto the live site.
+	// Serialized so concurrent add/unlink events (e.g. a folder rename) can't
+	// interleave, and guarded so a bad config save doesn't crash the server
+	let pending = Promise.resolve();
+	const reload = (): void => {
+		if (!site.configFile) return;
+		pending = pending
+			.then(async () => {
+				// Load the config on a fresh server rather than re-loading it
+				// through the one that first read it: doing that from inside
+				// its own watcher cycle deadlocks
+				const { site: fresh, vite: freshVite } = await loadSite(site.root);
+				try {
+					configDeps = configDependencyFiles(freshVite, site.root);
+					if (!site.applyRouteState(fresh)) return;
+				} finally {
+					await freshVite.close();
+				}
+				routeFiles = buildRouteFiles();
+				reportRouteIssues(checkRoutes(site));
+				reportRouteIssues(checkApiCalls(site));
+				reportRouteIssues(checkLayoutSlots(site));
+				invalidateManifest(vite);
+				vite.ws.send({ type: "full-reload", path: "*" });
+			})
+			.catch((e) => console.error(e));
+	};
+
+	// Route-file edits are `change` events and are handled by `recheck`/HMR
+	// (the route path is derived from the filename, so an edit doesn't change
+	// the route table); only file-set events and config-dependency edits need
+	// a reload
+	vite.watcher.on("change", (file) => {
+		recheck(file);
+		if (configDeps.has(file)) reload();
+	});
+	vite.watcher.on("add", (file) => {
+		recheck(file);
+		if (configDeps.has(file) || inRouteFolder(file)) reload();
+	});
+	const onRemove = (file: string) => {
+		if (configDeps.has(file) || inRouteFolder(file)) reload();
+	};
+	vite.watcher.on("unlink", onRemove);
+	vite.watcher.on("addDir", onRemove);
+	vite.watcher.on("unlinkDir", onRemove);
+}
+
+function isInside(dir: string, file: string): boolean {
+	const rel = path.relative(dir, file);
+	return rel === "" || (!rel.startsWith("..") && !path.isAbsolute(rel));
+}
+
+/**
+ * Invalidates the generated `@torpor/build/manifest` module in every
+ * environment, so the server entry re-runs with the rebuilt route table on the
+ * next request and the client gets the new manifest on reload.
+ */
+function invalidateManifest(vite: ViteDevServer): void {
+	for (const env of Object.values(vite.environments)) {
+		const mod = env.moduleGraph.getModuleById(MANIFEST_MODULE_ID);
+		if (mod) env.moduleGraph.invalidateModule(mod);
+	}
 }
 
 function normalizePlugins(plugins: Plugin | Plugin[] | void): Plugin[] {

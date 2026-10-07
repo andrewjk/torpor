@@ -34,7 +34,7 @@ export default function DialogHeader($props: DialogHeaderProps | undefined) {
 	}
 
 	@render {
-		<div id={$props?.id ?? defaultId} class={["torp-dialog-footer", $props?.class]} {$props?.style}>
+		<div id={$props?.id ?? defaultId} class={["torp-dialog-header", $props?.class]} {$props?.style}>
 			<slot />
 		</div>
 	}

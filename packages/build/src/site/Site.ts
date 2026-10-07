@@ -37,6 +37,12 @@ export default class Site {
 	root: string;
 	routes: Route[] = [];
 	/**
+	 * Route folders registered with `addRouteFolder`, in registration order.
+	 * The dev server uses these to know which directories hold route files, so
+	 * adding or removing one can rebuild the route table without a restart.
+	 */
+	routeFolders: { folder: string; subFolder?: string }[] = [];
+	/**
 	 * Torpor site plugins, run when the site config is loaded (for dev and
 	 * build) and when the server starts up. Use these to register extra
 	 * routes (e.g. `openApi()` from `@torpor/build/openapi`) or add other
@@ -176,6 +182,11 @@ export default class Site {
 		if (subFolder !== undefined && !subFolder.startsWith("/")) {
 			subFolder = "/" + subFolder;
 		}
+		// Remember the folder so dev can tell which directories hold route
+		// files and rebuild the route table when one is added or removed
+		if (!this.routeFolders.some((f) => f.folder === folder && f.subFolder === subFolder)) {
+			this.routeFolders.push({ folder, subFolder });
+		}
 		for (let file of routeFiles) {
 			// The file must start with `+` or `_` and end with `.js` or `.ts`
 			if (/^(\+|_).+(\.js|\.ts)$/.test(fpath.basename(file))) {
@@ -194,6 +205,34 @@ export default class Site {
 			}
 		}
 		this.#sortRoutes();
+	}
+
+	/**
+	 * Copies the runtime route state from a freshly loaded Site (produced by
+	 * re-reading the site config) onto this one, so the running dev server can
+	 * pick up route and config changes without a restart.
+	 *
+	 * Only route-relevant state is copied; Vite-config-level fields (`adapter`,
+	 * `vitePlugins`, `viteConfig`, `inputs`) are left alone, since changing
+	 * those needs a restart anyway.
+	 *
+	 * Returns true when the route table changed.
+	 */
+	applyRouteState(other: Site): boolean {
+		const changed = !routesEqual(this.routes, other.routes);
+		this.routes = other.routes;
+		this.routeFolders = other.routeFolders;
+		this.inlineEndPoints = other.inlineEndPoints;
+		this.plugins = other.plugins;
+		this.pluginState = other.pluginState;
+		this.env = other.env;
+		this.middleware = other.middleware;
+		this.basePath = other.basePath;
+		this.viewTransitions = other.viewTransitions;
+		this.prerender = other.prerender;
+		this.sitemap = other.sitemap;
+		this.origin = other.origin;
+		return changed;
 	}
 
 	/**
@@ -457,4 +496,26 @@ export default class Site {
 			return a.path.length - b.path.length;
 		});
 	}
+}
+
+/**
+ * Whether two route tables are equivalent for the purpose of deciding
+ * whether a route-file change actually changed the router. Compares the
+ * identifying fields of each route, in order.
+ */
+function routesEqual(a: Route[], b: Route[]): boolean {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) {
+		const x = a[i];
+		const y = b[i];
+		if (
+			x.path !== y.path ||
+			x.type !== y.type ||
+			x.file !== y.file ||
+			x.subFolder !== y.subFolder
+		) {
+			return false;
+		}
+	}
+	return true;
 }

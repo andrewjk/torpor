@@ -7,7 +7,9 @@ import { normalizeBasePath, normalizeOrigin } from "./basePath";
 import Site from "./Site";
 import { SERVER_ROUTE } from "../types/RouteType";
 
-const moduleId = "@torpor/build/manifest";
+export const MANIFEST_MODULE_ID = "@torpor/build/manifest";
+
+const moduleId = MANIFEST_MODULE_ID;
 
 const LOAD_EXPORT_RE =
 	/[{,]\s*load\s*[:(]|\bexport\s+(?:async\s+)?(?:function|const|let|var)\s+load\b|\bexport\s*\{[^}]*\bload\b/;
