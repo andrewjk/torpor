@@ -89,7 +89,7 @@
 		"@torpor/unplugin": "workspace:^",
 		"@torpor/view": "workspace:^",
 		"cookie": "^2.0.1",
-		"dotenv": "^17.4.2",
+		"dotenv": "^18.0.6",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
 	},

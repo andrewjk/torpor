@@ -30,7 +30,7 @@
 	"license": "ISC",
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"tsx": "^4.23.5",
+		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:",

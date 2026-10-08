@@ -31,16 +31,16 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"@typescript/vfs": "^1.6.4",
+		"@typescript/vfs": "^1.6.5",
 		"typescript": "6.0.3",
-		"vscode-css-languageservice": "^6.3.8",
-		"vscode-html-languageservice": "^5.6.0",
+		"vscode-css-languageservice": "^6.3.10",
+		"vscode-html-languageservice": "^5.6.2",
 		"vscode-languageserver": "^9.0.1",
-		"vscode-languageserver-textdocument": "^1.0.12"
+		"vscode-languageserver-textdocument": "^1.0.15"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"tsx": "^4.23.5",
+		"tsx": "^4.23.15",
 		"vite-plus": "catalog:"
 	}
 }

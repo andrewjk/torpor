@@ -27,11 +27,11 @@
 	"license": "ISC",
 	"dependencies": {
 		"@torpor/view": "workspace:^",
-		"prettier": "^3.9.6"
+		"prettier": "^3.9.9"
 	},
 	"devDependencies": {
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"tsx": "^4.23.5",
+		"tsx": "^4.23.15",
 		"vite": "catalog:",
 		"vite-plus": "catalog:"
 	}

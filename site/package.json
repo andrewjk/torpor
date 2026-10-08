@@ -25,17 +25,17 @@
 		"allmark": "^1.0.22",
 		"phosphor-torpor": "^1.0.2",
 		"sucrase": "^3.35.1",
-		"zod": "^4.5.4"
+		"zod": "^4.6.5"
 	},
 	"devDependencies": {
 		"@torpor/check": "workspace:^",
 		"@torpor/prettier": "workspace:^",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"shiki-codegen": "^4.4.3",
-		"tsx": "^4.23.13",
+		"shiki-codegen": "^4.5.0",
+		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
 		"vite": "catalog:",
 		"vite-plus": "catalog:",
-		"wrangler": "^4.129.1"
+		"wrangler": "^4.148.0"
 	}
 }

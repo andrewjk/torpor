@@ -62,17 +62,17 @@
 	},
 	"dependencies": {
 		"@torpor/language-server": "workspace:^",
-		"typescript": "6.0.3",
-		"vscode-languageclient": "^9.0.1"
+		"typescript": "7.0.2",
+		"vscode-languageclient": "^10.1.2"
 	},
 	"devDependencies": {
 		"@torpor/textmate": "workspace:^",
-		"@types/node": "^26.1.2",
-		"@types/vscode": "^1.105.0",
+		"@types/node": "^26.6.4",
+		"@types/vscode": "^1.140.0",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
-		"@vscode/vsce": "^3.9.2",
-		"esbuild": "^0.28.1",
-		"tsx": "^4.23.5",
+		"@vscode/vsce": "^4.0.0",
+		"esbuild": "^0.28.2",
+		"tsx": "^4.23.15",
 		"vite-plus": "catalog:"
 	}
 }

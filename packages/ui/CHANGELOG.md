@@ -25,7 +25,7 @@
   input with the old attribute (e.g. a keyed list whose indexes shifted after a
   removal submitted the wrong form keys). The `Field` context name is now a
   getter, and the inputs bind `name` straight from `$props?.name ??
-fieldContext?.name` so the attribute updates reactively.
+  fieldContext?.name` so the attribute updates reactively.
 
 ## 1.1.4
 
