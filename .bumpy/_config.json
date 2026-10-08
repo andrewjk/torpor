@@ -10,7 +10,11 @@
 	"include": ["torpor"],
 	"packages": {
 		"torpor": {
-			"publishCommand": "vsce publish --no-dependencies",
+			// Run the extension's own devDependency (vsce 4.x) rather than
+			// whatever `vsce` is on PATH: older global installs (3.x) scan
+			// secrets through @secretlint/secretlint-formatter-sarif, which
+			// pnpm's isolated node_modules can't resolve.
+			"publishCommand": "pnpm --filter torpor exec vsce publish --no-dependencies",
 			"skipNpmPublish": true,
 			// the TextMate grammar is copied from @torpor/textmate into the
 			// extension at build time, so its releases must republish the ext
