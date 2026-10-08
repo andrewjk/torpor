@@ -1,5 +1,13 @@
 # @torpor/ui
 
+## 1.2.0
+
+<sub>2026-10-08</sub>
+
+- _(minor)_ Feat: add debounceMs prop to ComboBox for debounced loader refetches
+- _(minor)_ Feat: expose DataGrid reload-pending state
+- _(patch)_ Fix: hoist suppressFocusOpen guard into popout machinery
+
 ## 1.1.7
 
 <sub>2026-10-01</sub>

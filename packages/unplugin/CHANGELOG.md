@@ -1,5 +1,12 @@
 # @torpor/unplugin
 
+## 1.2.2
+
+<sub>2026-10-08</sub>
+
+- _(patch)_ Fix: re-derive scoped-style CSS from source so a cold module graph serves it instead of 404ing
+- _(patch)_ Fix: use the server runtime for shared modules during SSR
+
 ## 1.2.1
 
 <sub>2026-10-01</sub>

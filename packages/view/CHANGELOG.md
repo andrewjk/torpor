@@ -1,5 +1,16 @@
 # @torpor/view
 
+## 1.2.0
+
+<sub>2026-10-08</sub>
+
+- _(minor)_ Feat: make @for loop variables read-only (bare assignment is now a compile error)
+- _(patch)_ Fix: resolve read-only @for loop vars via per-scope lexical bindings (shadowing, no-space operators)
+- _(patch)_ Fix: self-heal stale view test output fixtures
+- _(patch)_ Fix: server-render ternary-valued attributes with their names
+- _(patch)_ Fix: use the server runtime for shared modules during SSR
+- _(patch)_ Fix: clear removed properties in dynamic style bindings
+
 ## 1.1.3
 
 <sub>2026-10-01</sub>

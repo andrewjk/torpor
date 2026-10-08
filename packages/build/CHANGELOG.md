@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.6.0
+
+<sub>2026-10-08</sub>
+
+- _(minor)_ Feat: rebuild routes in dev when route files or route definitions change
+
 ## 1.5.0
 
 <sub>2026-10-01</sub>
