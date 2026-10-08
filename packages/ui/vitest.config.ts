@@ -20,6 +20,10 @@ export default defineConfig(({ mode }) => {
 						name: "ssr",
 						environment: "./test/ssr-dom-env.ts",
 						include: ssrTests,
+						// Reuse each worker's DOM environment across files while
+						// still giving every file a fresh window (isolate must
+						// stay on: some tests leak focus/popout state).
+						pool: "vmThreads",
 					},
 				},
 				{
@@ -30,6 +34,7 @@ export default defineConfig(({ mode }) => {
 						environment: "jsdom",
 						include: ["test/**/*.test.ts"],
 						exclude: ssrTests,
+						pool: "vmThreads",
 					},
 				},
 			],

@@ -13,7 +13,7 @@
 		"bump:publish": "bumpy publish",
 		"sync:template": "node packages/build/scripts/sync-template.ts",
 		"test": "vp test run",
-		"test:watch": "vp test",
+		"test:watch": "vp test --fsModuleCache",
 		"format": "vp fmt .",
 		"prepare": "vp config"
 	},
