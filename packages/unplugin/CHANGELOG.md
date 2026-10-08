@@ -1,5 +1,11 @@
 # @torpor/unplugin
 
+## 1.2.3
+
+<sub>2026-10-08</sub>
+
+- _(patch)_ Fix: inline @torpor/view for SSR in unplugin
+
 ## 1.2.2
 
 <sub>2026-10-08</sub>
