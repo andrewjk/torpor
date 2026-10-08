@@ -25,6 +25,29 @@ const missing = new Set<string>();
 export const unpluginFactory: UnpluginFactory<Options | undefined> = (options) => ({
 	name: "unplugin-torpor",
 	enforce: "pre",
+	vite: {
+		config(config) {
+			// `resolveId` below rewrites the client `@torpor/view` entry to the
+			// server runtime for shared `.ts`/`.js` helpers shipped by torpor
+			// packages (e.g. @torpor/ui's createItemGroup). That rewrite only
+			// runs for modules Vite resolves; an SSR-externalized `@torpor/view`
+			// bypasses the plugin pipeline and the helper keeps the client
+			// primitives, throwing "$cache must be used in a getter". Inline the
+			// runtime so the rewrite can run. (Torpor's own site doesn't need
+			// this only because it links @torpor/view as a workspace package,
+			// which Vite inlines for SSR already.)
+			const ssr = (config.ssr ??= {});
+			const noExternal = ssr.noExternal;
+			if (noExternal === undefined) {
+				ssr.noExternal = ["@torpor/view"];
+			} else if (noExternal !== true) {
+				ssr.noExternal = [
+					...(Array.isArray(noExternal) ? noExternal : [noExternal]),
+					"@torpor/view",
+				];
+			}
+		},
+	},
 	resolveId(id, importer, resolveOptions) {
 		// On the server, resolve the main `@torpor/view` entry to the server
 		// runtime, so shared `.ts`/`.js` helpers (e.g. @torpor/ui's compiled
