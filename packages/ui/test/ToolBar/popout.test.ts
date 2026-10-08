@@ -7,6 +7,7 @@ import ToolBarPopoutTest from "./components/ToolBarPopoutTest.torp";
 
 describe("ToolBarPopout", () => {
 	it("Popout opens on trigger click", async () => {
+		const user = userEvent.setup();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, ToolBarPopoutTest);
@@ -15,27 +16,29 @@ describe("ToolBarPopout", () => {
 
 		expect(queryByText(container, "Item 1.1")).not.toBeInTheDocument();
 
-		await userEvent.click(trigger);
+		await user.click(trigger);
 
 		expect(queryByText(container, "Item 1.1")).toBeInTheDocument();
 	});
 
 	it("Popout closes when clicking outside", async () => {
+		const user = userEvent.setup();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, ToolBarPopoutTest);
 
 		const trigger = getByText(container, "Popout 1");
 
-		await userEvent.click(trigger);
+		await user.click(trigger);
 		expect(queryByText(container, "Item 1.1")).toBeInTheDocument();
 
-		await userEvent.click(document.body);
+		await user.click(document.body);
 
 		expect(queryByText(container, "Item 1.1")).not.toBeInTheDocument();
 	});
 
 	it("Disabled trigger doesn't open popout", async () => {
+		const user = userEvent.setup();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, ToolBarPopoutTest);
@@ -44,12 +47,13 @@ describe("ToolBarPopout", () => {
 
 		expect(queryByText(container, "Disabled Item")).not.toBeInTheDocument();
 
-		await userEvent.click(disabledTrigger);
+		await user.click(disabledTrigger);
 
 		expect(queryByText(container, "Disabled Item")).not.toBeInTheDocument();
 	});
 
 	it("Multiple popouts can exist in toolbar", async () => {
+		const user = userEvent.setup();
 		const container = document.createElement("div");
 		document.body.appendChild(container);
 		mount(container, ToolBarPopoutTest);
@@ -57,11 +61,11 @@ describe("ToolBarPopout", () => {
 		const trigger1 = getByText(container, "Popout 1");
 		const trigger2 = getByText(container, "Popout 2");
 
-		await userEvent.click(trigger1);
+		await user.click(trigger1);
 		expect(queryByText(container, "Item 1.1")).toBeInTheDocument();
 		expect(queryByText(container, "Item 2.1")).not.toBeInTheDocument();
 
-		await userEvent.click(trigger2);
+		await user.click(trigger2);
 		expect(queryByText(container, "Item 1.1")).not.toBeInTheDocument();
 		expect(queryByText(container, "Item 2.1")).toBeInTheDocument();
 	});

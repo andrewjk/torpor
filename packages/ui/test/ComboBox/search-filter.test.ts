@@ -5,6 +5,15 @@ import { mount } from "@torpor/view";
 import { assert, describe, expect, it } from "vite-plus/test";
 import ComboBoxKeyboard from "./components/ComboBoxKeyboard.torp";
 
+// jsdom only allows focusing elements that are actually rendered, so the
+// options (inside the `hidden` content) can't be focused until the ComboBox is
+// opened. Open it first, the same way a user would (ArrowDown on the input).
+function open(container: HTMLElement) {
+	const input = container.getElementsByTagName("input")[0];
+	assert(input, "input not found");
+	fireEvent(input, new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }));
+}
+
 describe("ComboBox", () => {
 	it("Typing filters items (case-insensitive)", async () => {
 		const container = document.createElement("div");
@@ -14,7 +23,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("c");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
@@ -34,7 +43,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("C");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
@@ -51,7 +60,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("ca");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
@@ -74,7 +83,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("c");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
@@ -94,7 +103,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("xyz");
 
@@ -112,7 +121,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("ca");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));
@@ -133,7 +142,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("ca");
 		fireEvent(
@@ -152,7 +161,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("ca");
 
@@ -161,6 +170,10 @@ describe("ComboBox", () => {
 			new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
 		);
 
+		// Escape closes the popup, so reopen it before typing again. The search
+		// text was cleared, so "d" searches for "d" (and lands on Dog) rather
+		// than "cad" (which would match nothing).
+		open(container);
 		await userEvent.keyboard("d");
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
 	});
@@ -195,7 +208,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("d");
 		expect(document.activeElement).toBe(queryByText(container, "Dog"));
@@ -209,7 +222,7 @@ describe("ComboBox", () => {
 		const button = container.getElementsByTagName("button")[0];
 		assert(button, "button not found");
 
-		button.focus();
+		open(container);
 
 		await userEvent.keyboard("c");
 		expect(document.activeElement).toBe(queryByText(container, "Cat"));

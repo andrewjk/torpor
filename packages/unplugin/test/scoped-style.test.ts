@@ -5,7 +5,7 @@ import type { UnpluginOptions } from "unplugin";
 import { expect, test } from "vite-plus/test";
 import { unpluginFactory } from "../src/index";
 
-const source = readFileSync(path.resolve("test/components/Styled.torp"), "utf8");
+const source = readFileSync(path.join(import.meta.dirname, "components/Styled.torp"), "utf8");
 const parsed = parse(source);
 const built = build(parsed.template!, { server: false });
 const style = built.styles[0];

@@ -156,7 +156,7 @@ export default function AwaitStale() {
 				// run in an untracked context).
 				const version = $state.version;
 				return new Promise((resolve) => {
-					setTimeout(() => resolve("loaded v" + version), 10);
+					setTimeout(() => resolve("loaded v" + version), 100);
 				});
 			});
 		},
