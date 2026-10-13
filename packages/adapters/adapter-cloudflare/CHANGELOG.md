@@ -1,5 +1,13 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.16
+
+<sub>2026-10-13</sub>
+
+- _(patch)_ `cloudflareDev` now accepts a `main` option so adapters can point dev mode at their own worker entry
+
+- _(patch)_ `cloudflareDev` excludes `@torpor/build` from the workerd `ssr` environment's dependency optimizer
+
 ## 1.0.15
 
 <sub>2026-10-08</sub>
