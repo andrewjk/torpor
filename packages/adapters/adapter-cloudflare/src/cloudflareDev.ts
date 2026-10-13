@@ -17,9 +17,28 @@ const RESOLVED_TEMPLATE_ID = `\0${TEMPLATE_ID}`;
  * template through a virtual module (since `transformIndexHtml` has to run
  * Node-side but the template is consumed inside workerd).
  */
-export default function cloudflareDev(site: Site): Plugin[] {
+export default function cloudflareDev(site: Site, options: { main?: string } = {}): Plugin[] {
 	let viteServer: ViteDevServer | undefined;
 	let templatePromise: Promise<string | undefined> | undefined;
+
+	// The workerd SSR environment runs its own dependency optimizer, which
+	// can't resolve torpor's virtual modules (e.g. `@torpor/build/manifest`, a
+	// subpath that isn't a real export). Exclude the framework package so those
+	// imports go through the normal Vite pipeline instead of being prebundled
+	const optimizeDepsPlugin: Plugin = {
+		name: "torpor-cloudflare-optimize-deps",
+		config() {
+			return {
+				environments: {
+					ssr: {
+						optimizeDeps: {
+							exclude: ["@torpor/build"],
+						},
+					},
+				},
+			};
+		},
+	};
 
 	const templatePlugin: Plugin = {
 		name: "torpor-cloudflare-template",
@@ -39,11 +58,11 @@ export default function cloudflareDev(site: Site): Plugin[] {
 	const cfPlugins = cloudflare({
 		viteEnvironment: { name: "ssr" },
 		config: {
-			main: "./node_modules/@torpor/adapter-cloudflare/dist/_worker.dev.ts",
+			main: options.main ?? "./node_modules/@torpor/adapter-cloudflare/dist/_worker.dev.ts",
 		},
 	});
 
-	return [templatePlugin, ...cfPlugins];
+	return [templatePlugin, optimizeDepsPlugin, ...cfPlugins];
 }
 
 async function buildDevTemplate(vite: ViteDevServer, site: Site): Promise<string | undefined> {

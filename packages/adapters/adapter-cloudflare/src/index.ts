@@ -1,6 +1,7 @@
 import cloudflare from "./adapter";
+import cloudflareDev from "./cloudflareDev";
 
-export { cloudflare };
+export { cloudflare, cloudflareDev };
 
 declare global {
 	interface TorporEnv {
