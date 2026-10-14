@@ -12,7 +12,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 
 	// Perform a POST fetch to the form's action location
 	const form = e.target as HTMLFormElement;
-	const button = e.submitter as HTMLButtonElement;
+	const button = e.submitter as HTMLButtonElement | null;
 	// HACK: submit buttons have their formAction set to the current page if not
 	// set, so we can't just check whether it's empty and fallback to form action
 	//const action = button?.formAction ?? form.action;
@@ -21,7 +21,7 @@ export default async function formSubmit(e: SubmitEvent): Promise<void> {
 		action = button.formAction;
 	}
 	const options = {
-		body: new FormData(form),
+		body: button ? new FormData(form, button) : new FormData(form),
 		method: "POST",
 		mode: "cors",
 		credentials: "same-origin",
