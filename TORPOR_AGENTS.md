@@ -267,6 +267,23 @@ get user() {
   adopts the HTML directly, with no fallback flash. The thunk still runs
   once on the client in the background so dependency changes re-fetch; that
   first in-flight result is discarded, and the server's value wins.
+- The client's first (hydration) run of the thunk **receives the
+  server-resolved value as its argument**; later runs (a dependency change,
+  `$refresh`, or a client-side navigation with no server value) receive
+  `undefined`. Return it unchanged to skip expensive work the server already
+  did without dropping the dependency tracking the background run performs:
+
+  ```torp
+  get formatted() {
+  	return $async(async (server): Promise<string> => {
+  		const code = this.code.trim(); // read inputs first, so changes re-run
+  		if (server !== undefined) return server;
+  		const { codeToHtml } = await import("@torpor/shiki");
+  		return codeToHtml(code, { lang: "torpor" });
+  	}, { source: "server" });
+  }
+  ```
+
 - On a timeout — or any instability (a client-fetch getter read inside the
   boundary, a rejection, a render pass that doesn't replay the collect
   pass) — the boundary ships its `with` branch and the client fetches, the

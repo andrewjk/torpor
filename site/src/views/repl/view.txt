@@ -1924,8 +1924,12 @@ function $async(fn, _options) {
 		staleValue: void 0,
 		rollback: null
 	};
+	const serverValues = context.serverValues;
+	const serverValue = serverValues !== null && serverValues.index < serverValues.values.length ? serverValues.values[serverValues.index] : void 0;
+	let firstRun = true;
 	computed.run = () => {
-		const value = fn();
+		const value = fn(firstRun ? serverValue : void 0);
+		firstRun = false;
 		if (value !== null && value !== void 0 && typeof value.then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
@@ -1957,7 +1961,6 @@ function $async(fn, _options) {
 	};
 	context.registerComputed(computed);
 	runComputed(computed);
-	const serverValues = context.serverValues;
 	if (serverValues !== null && serverValues.index < serverValues.values.length) {
 		computed.generation++;
 		computed.didSuspend = false;

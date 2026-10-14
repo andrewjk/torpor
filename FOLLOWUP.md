@@ -284,6 +284,60 @@ and a TOC (frontmatter `title` ordering exists for blog posts; docs would
 want collection-level nav from the file tree, like `DOC_LINKS` in
 `site/src/utils/nav.ts` provides today).
 
+### Template markup is shipped twice: JS bundle and SSR HTML (resumability experiment parked)
+
+Static markup in a `.torp` template is emitted into the client JS as the
+`t_fragment`/`t_fragment_el` template-literal strings
+(`packages/view/src/compile/build/client/buildFragmentText.ts`) _and_ into the
+SSR HTML. For an `@if`/`@switch`, the JS carries every branch while the HTML
+carries the one that rendered (e.g.
+`packages/view/test/if/components/output/IfElseTrue-client.ts:40,52` vs
+`...-server.ts:12-19`), and during hydration the DOM already has the nodes yet
+`t_fragment` still builds the template via `innerHTML` (`getFragment.ts`'s
+"if we're hydrating we probably don't want to create and return a fragment"
+TODO).
+
+Measured on the site's production build (home route, 2026-10): first-load JS
+was 281,880 B raw / 93,274 B gzip over 26 files; ~20,620 B of that was markup
+templates (7%), but only ~905 B gzip was markup that _actually appears_ in the
+HTML. The layout chunk is 57% markup yet only ~20% of it rendered on `/` (the
+rest is untaken branches). Aggregate over all 123 client chunks was 507 KB of
+markup templates (30.8%), dominated by lazy chunks (the REPL playground, the
+full UI-library bundle), not first paint.
+
+So the duplication is real but small here, because the site's content is
+markdown-as-data — inline static prose would be the worst case, not the best.
+The dominant first-load cost was unrelated: `CodePreview`/shiki (165 KB raw /
+54 KB gzip, 58% of first-load gzip) statically imported by `HomePage.torp` for a
+sample the server already highlights, addressed separately (next entry).
+
+Idea for later, if a content-heavy static page ever appears: ship only the HTML
+and resume from it (Qwik-style), so static markup is never in the JS — the JS
+would fetch markup only when it must re-render a branch that wasn't
+server-rendered. Requires a hydration path that never builds the `t_fragment`
+templates, plus a markup transport. A substantial redesign; not worth it for
+the numbers above. The ambiguous variant ("mine rendered text back into
+state") is a non-starter — `t_fmt` interpolation isn't invertible (multiple
+placeholders per node, HTML escaping, merged text nodes, no type info), and
+data used only in attributes/conditions never appears as text.
+
+### `source: "server"` embeds resolved values in the HTML, duplicating large payloads
+
+A resolved `source: "server"` boundary ships its value twice: once as the
+rendered markup, and again as JSON in the `<!--t-await:[...]-->` payload
+comment (`payloadComment` in `packages/view/src/ssr/runServerAwait.ts`). The
+payload is what lets `$async` seed its computeds on hydration without
+re-fetching, so it can't just be dropped — but when a value's rendered form is
+the value itself (an `@html(...)` result, e.g. `CodePreview.torp`'s highlighted
+HTML), the two copies are near-identical and the comment roughly doubles that
+content's HTML cost (the home page's HTML grew ~0.58 KB gzip when the code
+sample started shipping server-highlighted, most of it the duplicated payload).
+
+Not worth changing while the values are small. If a boundary ever ships a large
+JSON value that also renders verbatim, possible directions: reconstruct the
+value from the adopted DOM instead of embedding it (only works when the
+rendering is lossless), or embed a compact reference into a per-boundary map.
+
 ### `@if` branches aren't reconciled when server and client conditions diverge
 
 Hydration adopts the server's DOM but doesn't detect that the client picked a

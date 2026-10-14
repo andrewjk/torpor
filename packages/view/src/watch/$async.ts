@@ -26,11 +26,19 @@ import runComputed from "./runComputed";
  * so there's no re-fetch wait and no fallback flash.
  *
  * @param fn A thunk returning the Promise to await. Signal reads inside `fn`
- *   are tracked, so the fetch re-runs when dependencies change.
+ *   are tracked, so the fetch re-runs when dependencies change. With
+ *   `source: "server"`, the thunk receives the server-resolved value (if any)
+ *   as its argument on the client's first (hydration) run, so it can return it
+ *   unchanged to skip expensive work the server already did. Later runs (a
+ *   dependency change, a `$refresh`, or a client-side navigation with no
+ *   server value) receive `undefined`. Reads still have to happen before any
+ *   early return for their changes to be tracked. Annotate the thunk's return
+ *   type (e.g. `async (server): Promise<string> => …`) when the result type
+ *   isn't inferable from the thunk's body alone.
  * @param _options Accepted so the same getter source compiles into client and
  *   server builds (`source: "server"` fetches during SSR); ignored here.
  */
-export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions): T {
+export default function $async<T>(fn: (serverValue?: T) => Promise<T>, _options?: AsyncOptions): T {
 	if (context.registerComputed === null) {
 		throw new Error("$async must be used in a getter");
 	}
@@ -54,6 +62,20 @@ export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions)
 		rollback: null,
 	};
 
+	// During hydration of a `source: "server"` boundary, this read's resolved
+	// value has already been shipped by the server. Peek it before the first
+	// run so the thunk can return it unchanged and skip expensive work the
+	// server has already done (a syntax highlighter, say). The thunk still
+	// runs, so its dependencies are still tracked; only the first run receives
+	// the value — later runs (a dependency change, `$refresh`, or a
+	// client-side navigation with no server value) receive `undefined`.
+	const serverValues = context.serverValues;
+	const serverValue: T | undefined =
+		serverValues !== null && serverValues.index < serverValues.values.length
+			? (serverValues.values[serverValues.index] as T)
+			: undefined;
+	let firstRun = true;
+
 	// The runner wraps the user's thunk: call fn(), and if the result is a
 	// thenable, set didSuspend + wire the resolve/reject handlers. This runs
 	// inside runComputed (with activeTarget set for dep tracking) on both the
@@ -70,7 +92,8 @@ export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions)
 	// generation-safe by construction: the read-side token matching the
 	// resolve-side one (ASYNC.md → "Generation guards").
 	computed.run = () => {
-		const value = fn();
+		const value = fn(firstRun ? serverValue : undefined);
+		firstRun = false;
 		if (value !== null && value !== undefined && typeof (value as any).then === "function") {
 			const gen = ++computed.generation;
 			computed.didSuspend = true;
@@ -124,7 +147,6 @@ export default function $async<T>(fn: () => Promise<T>, _options?: AsyncOptions)
 	// Bump the generation so the background fetch's settle is dropped as
 	// stale, and surface the embedded value instead — the reader sees the
 	// server's data immediately
-	const serverValues = context.serverValues;
 	if (serverValues !== null && serverValues.index < serverValues.values.length) {
 		computed.generation++;
 		computed.didSuspend = false;

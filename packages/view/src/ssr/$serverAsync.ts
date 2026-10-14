@@ -40,7 +40,10 @@ export const SERVER_ASYNC_TIMEOUT = 5000;
  * `source: "server"` read returns `undefined` without fetching — the same
  * undefined-then-recover contract the client has for un-boundaried reads.
  */
-export default function $serverAsync<T>(fn: () => Promise<T>, options?: AsyncOptions): T {
+export default function $serverAsync<T>(
+	fn: (serverValue?: T) => Promise<T>,
+	options?: AsyncOptions,
+): T {
 	const state = currentServerAwait();
 
 	if (state === null || state.isRoot || options?.source !== "server") {
