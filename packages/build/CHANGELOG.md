@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.6.2
+
+<sub>2026-10-14</sub>
+
+- _(patch)_ Fix: include form submitter in request body
+
 ## 1.6.1
 
 <sub>2026-10-08</sub>
