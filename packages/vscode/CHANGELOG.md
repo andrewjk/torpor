@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.9
+
+<sub>2026-10-14</sub>
+
+- _(patch)_ Fix: prevent code action hang on save
+
 ## 1.0.8
 
 <sub>2026-10-08</sub>
