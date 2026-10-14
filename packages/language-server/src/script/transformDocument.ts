@@ -141,11 +141,13 @@ function importComponentFiles(
 				}
 			}
 
-			// Create the virtual file for the component
-			if (!vts.virtualFiles.has(typeFile) && fs.existsSync(typeFile)) {
+			// Create the virtual file for the component. The virtual file map is
+			// keyed by the `.ts` name, so check that key (not the `.torp` path),
+			// otherwise every request re-reads and recompiles every import.
+			const key = typeFile.replace(/\.torp$/, ".ts");
+			if (!vts.virtualFiles.has(key) && fs.existsSync(typeFile)) {
 				const typeSource = fs.readFileSync(typeFile, "utf8");
 				const { content } = transformDocument(vts, typeFile, typeSource);
-				const key = typeFile.replace(/\.torp$/, ".ts");
 				vts.virtualFiles.set(key, content);
 				vts.env.createFile(key, content);
 			}

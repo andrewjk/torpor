@@ -1,4 +1,9 @@
-import { type CodeAction, type CodeActionContext, type Range } from "vscode-languageserver";
+import {
+	CodeActionKind,
+	type CodeAction,
+	type CodeActionContext,
+	type Range,
+} from "vscode-languageserver";
 import { type TextDocument } from "vscode-languageserver-textdocument";
 import { loadDocument } from "./loadDocument";
 import sourceSpanFromSourceRange from "./sourceSpanFromSourceRange";
@@ -9,6 +14,23 @@ export default function doCodeAction(
 	context: CodeActionContext,
 ): CodeAction[] {
 	try {
+		// We only produce quick fixes, so bail out early for any other request
+		// (e.g. `source.fixAll` on save) before running the expensive compile
+		// path. This keeps saves responsive.
+		if (
+			context.only &&
+			context.only.length > 0 &&
+			!context.only.some((kind) => kind === CodeActionKind.QuickFix)
+		) {
+			return [];
+		}
+
+		// No diagnostics in range means there is nothing to quick-fix, so skip
+		// loading and type checking the document entirely.
+		if (context.diagnostics.length === 0) {
+			return [];
+		}
+
 		const transformed = loadDocument(document);
 		if (!transformed.ok) {
 			return [];

@@ -1,5 +1,6 @@
 import { TextDocument } from "vscode-languageserver-textdocument";
 import {
+	CodeActionKind,
 	CompletionList,
 	Diagnostic,
 	InitializeParams,
@@ -55,7 +56,13 @@ export function start(): void {
 						labelDetailsSupport: true,
 					},
 				},
-				codeActionProvider: true,
+				// We only produce quick fixes (TypeScript code fixes), so restrict
+				// the kinds we advertise. Without this, clients treat us as a
+				// general provider and ask for `source.fixAll*` actions on every
+				// save, which triggers the expensive synchronous compile path.
+				codeActionProvider: {
+					codeActionKinds: [CodeActionKind.QuickFix],
+				},
 				hoverProvider: true,
 				definitionProvider: true,
 				implementationProvider: true,
