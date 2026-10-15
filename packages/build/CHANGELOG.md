@@ -1,5 +1,14 @@
 # @torpor/build
 
+## 1.7.0
+
+<sub>2026-10-15</sub>
+
+- _(minor)_ Feat: embed server data for first hydration
+- _(minor)_ Feat: add site.output for a per-app build folder
+- _(patch)_ Feat: guide caching for embedded server data
+- _(patch)_ Fix: pass through error response with intact body
+
 ## 1.6.2
 
 <sub>2026-10-14</sub>

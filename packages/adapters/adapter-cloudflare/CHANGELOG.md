@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.18
+
+<sub>2026-10-15</sub>
+
+- _(patch)_ Feat: add site.output for a per-app build folder
+
 ## 1.0.17
 
 <sub>2026-10-14</sub>

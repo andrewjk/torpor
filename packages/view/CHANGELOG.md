@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 1.2.1
+
+<sub>2026-10-15</sub>
+
+- _(patch)_ Fix: lazy-load shiki via server value
+
 ## 1.2.0
 
 <sub>2026-10-08</sub>

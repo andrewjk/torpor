@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.5
+
+<sub>2026-10-15</sub>
+
+- _(patch)_ Feat: add site.output for a per-app build folder
+
 ## 1.1.4
 
 <sub>2026-10-14</sub>
