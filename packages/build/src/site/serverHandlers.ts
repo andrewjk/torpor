@@ -124,7 +124,10 @@ export function createServerLoad(
 			return response;
 		}
 
-		let message = await response.text();
+		// Read a clone, not the response itself: when the error page can't
+		// render (e.g. its own load redirects), the original response is
+		// returned below and its body must still be readable
+		let message = await response.clone().text();
 		if (response.headers.get("Content-Type")?.includes("application/json")) {
 			try {
 				const data = JSON.parse(message);

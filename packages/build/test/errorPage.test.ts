@@ -1,6 +1,7 @@
 import { expect, test } from "vite-plus/test";
 import notFound from "../src/response/notFound";
 import ok from "../src/response/ok";
+import seeOther from "../src/response/seeOther";
 import serverError from "../src/response/serverError";
 import ServerEvent from "../src/server/ServerEvent";
 import $page from "../src/state/$serverPage";
@@ -250,6 +251,46 @@ test("the error page responds with its status when requested directly", async ()
 	// Without a status in the query, it defaults to 404
 	const bare = await load(new ServerEvent(new Request("http://localhost/_error")), template);
 	expect(bare.status).toBe(404);
+});
+
+test("an error response survives when the error page itself can't render", async () => {
+	// A matched route whose load fails, and an error page whose own load
+	// redirects (so it can't render html) -- the original 404 is passed
+	// through, and its body must still be readable. Regression: the body was
+	// consumed while reading the error message, so streaming it threw
+	// "ReadableStream is locked" (and the dev server returned a 500).
+	const fallbackRoutes: ManifestRoute[] = [
+		{
+			path: "/posts",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+			subFolder: undefined,
+		},
+		{
+			path: "/posts/~server",
+			type: PAGE_SERVER_ROUTE,
+			endPoint: () => Promise.resolve({ default: postsServer }),
+			subFolder: undefined,
+		},
+		{
+			path: "/_error",
+			type: ERROR_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: errorComponent } }),
+			subFolder: undefined,
+		},
+		{
+			path: "/_error/~server",
+			type: PAGE_SERVER_ROUTE,
+			endPoint: () => Promise.resolve({ default: { load: async () => seeOther("/login") } }),
+			subFolder: undefined,
+		},
+	];
+	const fallbackLoad = createServerLoad(new Router().addPages(fallbackRoutes));
+
+	const res = await fallbackLoad(new ServerEvent(new Request("http://localhost/posts")), template);
+
+	expect(res.status).toBe(404);
+	expect(await res.text()).toBe("post not found");
 });
 
 test("the error state is reset between requests", async () => {
