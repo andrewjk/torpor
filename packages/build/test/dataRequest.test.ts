@@ -195,3 +195,37 @@ test("a plain ~server request (no data header) is unchanged", async () => {
 	// The page's own server load response, not the combined data payload
 	expect(await res.json()).toEqual({ page: true, user: "alice" });
 });
+
+test("a page render embeds the server data so the first hydration skips the refetch", async () => {
+	const load = createServerLoad(new Router().addPages(siteRoutes(true)));
+
+	const res = await load(
+		new ServerEvent(new Request("http://localhost/dashboard")),
+		"%COMPONENT_BODY%",
+	);
+
+	expect(res.status).toBe(200);
+	const html = await res.text();
+	expect(html).toContain('id="t-server-data"');
+	expect(html).toContain('{"loads":[{"layout":true,"user":"alice"},{"page":true,"user":"alice"}]}');
+});
+
+test("a page with no server data embeds no payload", async () => {
+	const routes: ManifestRoute[] = [
+		{
+			path: "/plain",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component } }),
+			subFolder: undefined,
+		},
+	];
+	const load = createServerLoad(new Router().addPages(routes));
+
+	const res = await load(
+		new ServerEvent(new Request("http://localhost/plain")),
+		"%COMPONENT_BODY%",
+	);
+
+	expect(res.status).toBe(200);
+	expect(await res.text()).not.toContain("t-server-data");
+});

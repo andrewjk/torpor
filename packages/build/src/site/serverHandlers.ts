@@ -704,6 +704,9 @@ async function loadView(
 		// NOTE: We're loading data from top to bottom, overriding as we go, and I'm
 		// not sure if this is the best way to go
 		let data = {};
+		// Each route's server-only data (root layout to page), embedded into
+		// the HTML so the first hydration doesn't refetch it (nav/loadData.ts)
+		const loads: (Record<string, any> | null)[] = [];
 		if (handler.layouts) {
 			for (let layout of handler.layouts) {
 				const layoutEndPoint: PageEndPoint | undefined = (await layout.endPoint())?.default;
@@ -716,6 +719,7 @@ async function loadView(
 					data,
 					layoutEndPoint,
 					layoutServerEndPoint,
+					loads,
 				);
 				if (layoutResponse?.ok === false) {
 					return layoutResponse;
@@ -729,6 +733,7 @@ async function loadView(
 			data,
 			clientEndPoint,
 			serverEndPoint,
+			loads,
 		);
 		if (endPointResponse?.ok === false) {
 			return endPointResponse;
@@ -816,6 +821,17 @@ async function loadView(
 			// Put the form info in a hidden input so that it can be accessed on the client
 			if (form) {
 				body += `\n<input type="hidden" id="t-form-data" value='${JSON.stringify(form).replaceAll("'", "\\'")}' />`;
+			}
+
+			// Embed the routes' server-only data as json so the client's first
+			// hydration reads it instead of making a `/~server` round trip
+			// (nav/loadData.ts consumes it once and removes it). The condition
+			// mirrors the client's `hasServerData`, so a route with only hooks or
+			// actions still ships an all-null array that saves the refetch. `<`
+			// is escaped so the json can't close the script early
+			if (routeHasServerData(handler)) {
+				const json = JSON.stringify({ loads }).replaceAll("<", "\\u003c");
+				body += `\n<script type="application/json" id="t-server-data">${json}</script>`;
 			}
 
 			styles += head;
@@ -1006,6 +1022,19 @@ async function runAction(
 	return notFound();
 }
 
+/**
+ * Whether the route has any server-side code to run (a page or layout server
+ * endpoint, or a folder hook) — the same condition the client uses to decide
+ * whether to make a `/~server` request (nav/loadData.ts's `hasServerData`).
+ * When it holds, the render embeds a server-data payload so the first
+ * hydration skips that request.
+ */
+function routeHasServerData(handler: RouteHandler): boolean {
+	if (handler.serverHooks && handler.serverHooks.length > 0) return true;
+	if (handler.serverEndPoint) return true;
+	return (handler.layouts ?? []).some((layout) => !!layout.serverEndPoint);
+}
+
 async function loadClientAndServerData(
 	url: URL,
 	params: Record<string, any>,
@@ -1013,6 +1042,7 @@ async function loadClientAndServerData(
 	data: Record<string, any>,
 	clientEndPoint?: PageEndPoint,
 	serverEndPoint?: PageServerEndPoint,
+	loads?: (Record<string, any> | null)[],
 ) {
 	if (clientEndPoint?.load) {
 		const clientParams = buildClientParams(url, params, data);
@@ -1027,18 +1057,23 @@ async function loadClientAndServerData(
 			}
 		}
 	}
+	let serverData: Record<string, any> | null = null;
 	if (serverEndPoint?.load) {
 		const serverResponse = await serverEndPoint.load(serverParams);
 		if (serverResponse) {
 			if (serverResponse.ok) {
 				if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
-					Object.assign(data, await serverResponse.json());
+					serverData = await serverResponse.json();
+					Object.assign(data, serverData);
 				}
 			} else {
 				return serverResponse;
 			}
 		}
 	}
+	// Record this route's server-only data, aligned with the page and its
+	// layouts (root to leaf), so the render can embed it for hydration
+	loads?.push(serverData);
 }
 
 function buildClientParams(url: URL, params: Record<string, any>, data: Record<string, any>) {

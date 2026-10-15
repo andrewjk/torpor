@@ -46,6 +46,14 @@ export default function Posts($props: { data: { posts: Post[] } }) {
 `}
 		/>
 
+		<p>
+			A server load runs during the first render, and its data is embedded in
+			the HTML, so the browser doesn't fetch it again when it hydrates. A
+			<a href="/build/prerendering">prerendered</a> page with a server load
+			can therefore hydrate with its data on a static host, with no server at
+			all.
+		</p>
+
 		<h2>Client loads</h2>
 		<p>
 			Put <code>load</code> in <code>+page.ts</code> to run it in the browser

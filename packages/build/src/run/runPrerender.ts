@@ -142,6 +142,9 @@ export default async function runPrerender(site: Site): Promise<number> {
 		const url = `http://torpor.build${entry.path}`;
 		const request = new Request(url);
 		const serverEvent = new ServerEvent(request, entry.params, new URL(url));
+		// A page render embeds its server data as a `t-server-data` script (see
+		// serverHandlers.loadView), so a prerendered page with a server load
+		// hydrates with that data on a static host, with no `~server` request
 		const response = await serverEntry.load(serverEvent, template);
 
 		if (isRedirect(response)) {

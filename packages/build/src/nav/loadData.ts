@@ -128,6 +128,15 @@ async function loadServerData(
 	query: URLSearchParams,
 	reusedLayouts: string[],
 ): Promise<ServerData | { error: { status: number; message: string } } | undefined> {
+	// The server embeds the first render's data in the HTML (see the render
+	// path in site/serverHandlers.ts), so the initial hydration can read it
+	// instead of making a round trip. The element is consumed once, so later
+	// navigations use the fetch below
+	const embedded = takeEmbeddedServerData();
+	if (embedded !== undefined) {
+		return embedded;
+	}
+
 	if (!hasServerData(handler)) {
 		return {};
 	}
@@ -160,6 +169,24 @@ async function loadServerData(
 		return {};
 	}
 	return (await response.json()) as ServerData;
+}
+
+/**
+ * Reads and removes the server data the initial render embedded in the HTML
+ * (a `t-server-data` script tag), or `undefined` when there is none (a later
+ * navigation, or a page with no server data).
+ */
+function takeEmbeddedServerData(): ServerData | undefined {
+	const element = document.getElementById("t-server-data");
+	if (element === null) {
+		return undefined;
+	}
+	element.remove();
+	try {
+		return JSON.parse(element.textContent ?? "") as ServerData;
+	} catch {
+		return undefined;
+	}
 }
 
 /**
