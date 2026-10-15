@@ -12,7 +12,7 @@ export default async function runPreview(site: Site): Promise<void> {
 	// Build the site
 	await runBuild(site);
 
-	const distFolder = path.resolve(site.root, "dist");
+	const distFolder = site.outputFolder;
 	const clientFolder = path.join(distFolder, "client");
 	const serverFolder = path.join(distFolder, "server");
 
@@ -42,7 +42,7 @@ export default async function runPreview(site: Site): Promise<void> {
 	server.add("/assets/*", async (ev) => {
 		try {
 			const url = new URL(ev.request.url);
-			const file = path.join(site.root, "dist", "client", url.pathname);
+			const file = path.join(clientFolder, url.pathname);
 			if (existsSync(file)) {
 				const body = await fs.readFile(file);
 				return new Response(body, {

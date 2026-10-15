@@ -25,16 +25,19 @@ export function loadEnv(root: string): void {
 }
 
 /**
- * Builds a Fetch API handler for a built site: it serves everything under
- * `dist/client` statically and routes the rest through `dist/server`'s
- * `serverEntry.load`. Replaces `runPreview`'s Server setup, which isn't
- * exported from @torpor/build.
+ * Builds a Fetch API handler for a built site: it serves everything under the
+ * output folder's `client/` statically and routes the rest through its
+ * `server/`'s `serverEntry.load`. Replaces `runPreview`'s Server setup, which
+ * isn't exported from @torpor/build.
+ *
+ * @param outputFolder The site's build output folder (the parent of
+ *   `client/`, `server/` and `electron/`)
  */
 export async function createRequestHandler(
-	root: string,
+	outputFolder: string,
 ): Promise<(request: Request) => Promise<Response>> {
-	const clientFolder = path.join(root, "dist", "client");
-	const serverFolder = path.join(root, "dist", "server");
+	const clientFolder = path.join(outputFolder, "client");
+	const serverFolder = path.join(outputFolder, "server");
 	const template = await loadTemplate(clientFolder);
 	const serverEntry = pathToFileURL(path.join(serverFolder, "serverEntry.js")).href;
 
@@ -65,18 +68,21 @@ export async function createRequestHandler(
  * the Electron main process (Node), so cookies, sessions and redirects behave
  * exactly as they do on a normal Node server -- Chromium's session cookie
  * store handles persistence across launches.
+ *
+ * @param outputFolder The site's build output folder (see
+ *   `createRequestHandler`). `.env` is loaded from its parent.
  */
 export async function startServer(
-	root: string,
+	outputFolder: string,
 	options: StartServerOptions = {},
 ): Promise<RunningServer> {
-	loadEnv(root);
+	loadEnv(path.dirname(outputFolder));
 
 	// Adapters may have added the `adapter` property to globalThis; torpor's
 	// env() reads it (see @torpor/build/env)
 	(globalThis as { adapter?: { env: NodeJS.ProcessEnv } }).adapter = { env: process.env };
 
-	const handler = await createRequestHandler(root);
+	const handler = await createRequestHandler(outputFolder);
 	const server = createNodeServer(handler);
 
 	const host = options.host ?? "127.0.0.1";

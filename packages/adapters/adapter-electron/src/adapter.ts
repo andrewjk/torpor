@@ -31,7 +31,7 @@ export default function electron(options: ElectronOptions = {}): Adapter {
 }
 
 function serve(site: Site): void {
-	const appFolder = path.join(site.root, "dist", "electron");
+	const appFolder = path.join(site.outputFolder, "electron");
 	if (!existsSync(path.join(appFolder, "main.mjs"))) {
 		throw new Error(
 			"Electron output not found. Run a build first (dist/electron/main.mjs is missing).",

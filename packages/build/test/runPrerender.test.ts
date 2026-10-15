@@ -170,20 +170,20 @@ describe("resolvePrerenderPaths", () => {
 });
 
 /**
- * Sets up a fake built site (dist/server/serverEntry.js plus the template
- * and assets runPrerender expects), with the error page served by the given
- * handler.
+ * Sets up a fake built site (`<output>/server/serverEntry.js` plus the
+ * template and assets runPrerender expects), with the error page served by
+ * the given handler.
  */
-async function writeFakeDist(root: string, errorLoad: string): Promise<void> {
-	await fs.mkdir(path.join(root, "dist", "server"), { recursive: true });
-	await fs.mkdir(path.join(root, "dist", "client", "assets"), { recursive: true });
-	await fs.writeFile(path.join(root, "dist", "client", "assets", "clientEntry-abc123.js"), "");
+async function writeFakeDist(root: string, errorLoad: string, output = "dist"): Promise<void> {
+	await fs.mkdir(path.join(root, output, "server"), { recursive: true });
+	await fs.mkdir(path.join(root, output, "client", "assets"), { recursive: true });
+	await fs.writeFile(path.join(root, output, "client", "assets", "clientEntry-abc123.js"), "");
 	await fs.writeFile(
-		path.join(root, "dist", "client", "site.html"),
+		path.join(root, output, "client", "site.html"),
 		'<html><head></head><body><div id="app"></div></body></html>',
 	);
 	await fs.writeFile(
-		path.join(root, "dist", "server", "serverEntry.js"),
+		path.join(root, output, "server", "serverEntry.js"),
 		`
 		export const router = {
 			routes: [{ path: "/_error", handler: { path: "/_error", type: 8 } }],
@@ -230,6 +230,29 @@ describe("runPrerender error pages", () => {
 		expect(await fs.readFile(path.join(root, "dist", "client", "500.html"), "utf-8")).toContain(
 			"error 500",
 		);
+	});
+
+	test("writes to a custom site.output folder", async () => {
+		const root = path.join(tmpRoot, "custom-output");
+		await writeFakeDist(
+			root,
+			`const status = parseInt(url.searchParams.get("status") ?? "404");
+			 return new Response("<p>error " + status + "</p>", { status, headers: { "Content-Type": "text/html" } });`,
+			"build",
+		);
+		const site = new Site();
+		site.root = root;
+		site.output = "build";
+
+		await runPrerender(site);
+
+		// Output lands in site.output, and the default `dist` is left alone
+		expect(await fs.readFile(path.join(root, "build", "client", "404.html"), "utf-8")).toContain(
+			"error 404",
+		);
+		await expect(
+			fs.readFile(path.join(root, "dist", "client", "404.html"), "utf-8"),
+		).rejects.toThrow();
 	});
 
 	test("skips both error pages when the layout redirects", async () => {

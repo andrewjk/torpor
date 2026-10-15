@@ -10,7 +10,7 @@ const RUNTIME_FILES = ["main.mjs", "preload.cjs"];
 
 export default async function postbuild(site: Site, options: ElectronOptions): Promise<void> {
 	const sourceFolder = path.dirname(fileURLToPath(import.meta.url));
-	const outputFolder = path.join(site.root, "dist", "electron");
+	const outputFolder = path.join(site.outputFolder, "electron");
 
 	await fs.mkdir(outputFolder, { recursive: true });
 	for (const file of RUNTIME_FILES) {

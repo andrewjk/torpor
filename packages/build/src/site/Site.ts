@@ -35,6 +35,16 @@ import defaultAdapter from "./defaultAdapter";
  */
 export default class Site {
 	root: string;
+	/**
+	 * The directory the build is written to: an absolute path, or a path
+	 * relative to `root`. Defaults to `"dist"`.
+	 *
+	 * Set it to give an app its own output when several apps share one source
+	 * root -- e.g. a web and an Electron app that both build from the same
+	 * package via `addRouteFolder`. Without it they'd both write to
+	 * `<root>/dist` and clobber each other.
+	 */
+	output?: string;
 	routes: Route[] = [];
 	/**
 	 * Route folders registered with `addRouteFolder`, in registration order.
@@ -166,6 +176,11 @@ export default class Site {
 
 	constructor() {
 		this.root = process.cwd();
+	}
+
+	/** The absolute output directory: `output` resolved against `root`, or `<root>/dist`. */
+	get outputFolder(): string {
+		return fpath.resolve(this.root, this.output ?? "dist");
 	}
 
 	/**

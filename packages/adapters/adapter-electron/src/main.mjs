@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 import { startServer } from "@torpor/adapter-electron/runtime";
 
 const dir = path.dirname(fileURLToPath(import.meta.url));
-const root = path.resolve(dir, "..", "..");
+// This file is copied to <output>/electron, so the build output folder is its
+// parent (the layout no longer assumes the folder is named "dist")
+const output = path.resolve(dir, "..");
 const config = JSON.parse(readFileSync(path.join(dir, "electron.json"), "utf-8"));
 const partition = config.partition ?? "persist:torpor";
 
@@ -45,7 +47,7 @@ async function createWindow() {
 app
 	.whenReady()
 	.then(async () => {
-		server = await startServer(root, { host: config.host, port: config.port });
+		server = await startServer(output, { host: config.host, port: config.port });
 		origin = server.url;
 		await createWindow();
 

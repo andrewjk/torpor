@@ -14,7 +14,7 @@ export default {
 	serve: (_server, site: Site) => {
 		// Preview the built Cloudflare worker (from postbuild) with `wrangler dev`
 		// rather than a Node server, so preview matches production (workerd).
-		const configPath = path.join(site.root, "dist", "wrangler.toml");
+		const configPath = path.join(site.outputFolder, "wrangler.toml");
 		const args = ["dev", "--config", configPath];
 
 		// Resolve the wrangler bin from the consuming site's node_modules; fall
@@ -38,7 +38,7 @@ async function postbuild(site: Site): Promise<void> {
 	// Build _worker.js as per
 	// https://developers.cloudflare.com/pages/functions/advanced-mode/
 
-	const distFolder = path.resolve(site.root, "dist");
+	const distFolder = site.outputFolder;
 	const clientFolder = path.join(distFolder, "client");
 	const serverFolder = path.join(distFolder, "server");
 	const tempFolder = path.join(distFolder, "temp");

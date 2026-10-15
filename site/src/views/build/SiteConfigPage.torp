@@ -66,6 +66,12 @@ site.addRoute("/api/time", {
 				redirects) gets it added automatically
 			</li>
 			<li>
+				<code>site.output</code> &mdash; the build output folder, relative
+				to the project root (or absolute). Defaults to <code>"dist"</code>.
+				Set it when several apps build from the same source root, so they
+				don't clobber each other's output
+			</li>
+			<li>
 				<code>site.env</code> &mdash; a Standard Schema (zod, valibot,
 				arktype, etc) that validates the server environment, throwing with
 				the schema's issues when <code>env()</code> reads a missing or invalid

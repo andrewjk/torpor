@@ -105,8 +105,8 @@ function paramsEntriesOf(flag: PrerenderFlag | undefined): Record<string, unknow
  * @returns The number of HTML files written
  */
 export default async function runPrerender(site: Site): Promise<number> {
-	const serverFolder = path.join(site.root, "dist", "server");
-	const clientFolder = path.join(site.root, "dist", "client");
+	const serverFolder = path.join(site.outputFolder, "server");
+	const clientFolder = path.join(site.outputFolder, "client");
 	const serverEntryPath = path.join(serverFolder, "serverEntry.js");
 
 	// Load the built server entry, with its routes baked in

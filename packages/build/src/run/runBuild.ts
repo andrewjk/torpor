@@ -34,8 +34,8 @@ export default async function runBuild(site: Site): Promise<void> {
 		);
 	}
 
-	// Delete the dist folder if it exists
-	const distFolder = path.resolve(site.root, "dist");
+	// Delete the output folder if it exists
+	const distFolder = site.outputFolder;
 	if (existsSync(distFolder)) {
 		await fs.rm(distFolder, { recursive: true });
 	}
