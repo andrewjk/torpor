@@ -115,6 +115,37 @@ export default {
 `}
 		/>
 
+		<h2>Caching</h2>
+		<p>
+			Server load data is embedded in the rendered HTML so the browser can
+			hydrate without a second request. If that data is specific to the
+			signed-in user, a shared cache (a CDN, or a proxy) must not store the
+			page — otherwise it can serve one user's data to the next. Set
+			<code>Cache-Control</code> on the response from a load or hook:
+		</p>
+		<CodePreview
+			code={`
+// routes/account/+page.server.ts
+import { ok } from "@torpor/build";
+import { type PageServerEndPoint } from "@torpor/build";
+
+export default {
+	load: async ({ headers }) => {
+		headers.set("Cache-Control", "private, no-cache");
+		return ok(await getAccount());
+	},
+} satisfies PageServerEndPoint;
+`}
+		/>
+		<p>
+			Use <code>private</code> (or <code>no-store</code> for anything more
+			sensitive) on user-specific pages, and <code>public</code> with a
+			<code>max-age</code> on pages that are the same for everyone. In dev,
+			a page that embeds data without setting <code>Cache-Control</code>
+			logs a one-time reminder, and setting it — any value, including
+			<code>public</code> — silences it.
+		</p>
+
 		<h2>Redirects and errors</h2>
 		<p>
 			Loads may return any response instead of data: use

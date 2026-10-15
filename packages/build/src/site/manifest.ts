@@ -22,7 +22,7 @@ export function hasLoadExport(source: string): boolean {
  * A Vite plugin that provides information about the app to both clientEntry and
  * serverEntry.
  */
-export default function manifest(site: Site, server = false): Plugin {
+export default function manifest(site: Site, server = false, dev = false): Plugin {
 	return {
 		name: "torpor-manifest",
 		resolveId: {
@@ -141,6 +141,7 @@ ${sitemapGlue}
 export default {
   base: ${JSON.stringify(base)},
   viewTransitions: ${!!site.viewTransitions},
+  dev: ${!!dev},
   ${serverRequest && hasMiddleware ? "middleware: __site.middleware ?? []," : ""}
   routes: [
     ${site.routes

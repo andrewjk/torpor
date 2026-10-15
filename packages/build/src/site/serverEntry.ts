@@ -13,4 +13,9 @@ router.addPages(manifest.routes);
 
 //console.log(`routes:\n  ${router.routes.map((r) => r.path).join("\n  ")}`);
 
-export const load: ServerLoad = createServerLoad(router, manifest.base, manifest.middleware ?? []);
+export const load: ServerLoad = createServerLoad(
+	router,
+	manifest.base,
+	manifest.middleware ?? [],
+	manifest.dev ?? false,
+);

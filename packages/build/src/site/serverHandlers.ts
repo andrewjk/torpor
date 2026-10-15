@@ -44,6 +44,35 @@ import type Router from "./Router.ts";
  */
 export type ServerLoad = (ev: ServerEvent, template?: string) => Promise<Response>;
 
+/** Whether the site is running under `tb --dev` (set by `createServerLoad`). */
+let devMode = false;
+
+/** Route paths already reminded about embedded-data caching, so it warns once. */
+const warnedEmbedRoutes = new Set<string>();
+
+/**
+ * Dev-only reminder for a page that embeds its server data in the HTML (so a
+ * shared cache could serve one user's data to another) without an explicit
+ * `Cache-Control`. Setting any `Cache-Control` — `private`/`no-store` for
+ * user-specific data, `public` for pages that are safe to share — silences it.
+ * Warns once per route path.
+ */
+function warnUncachedEmbeddedData(ev: ServerEvent, path: string): void {
+	if (!devMode || warnedEmbedRoutes.has(path)) return;
+	// Only an explicitly-set response header counts; header names are
+	// case-insensitive, so scan rather than a single map lookup
+	for (const name of ev.headers.headers.keys()) {
+		if (name.toLowerCase() === "cache-control") return;
+	}
+	warnedEmbedRoutes.add(path);
+	console.warn(
+		`[torpor] The page at "${path}" embeds its server load data in the HTML but sets no ` +
+			`Cache-Control, so a shared cache could serve one user's data to another. Set it on ` +
+			`the response from a load or hook — "private, no-cache" (or "no-store") for ` +
+			`user-specific data, or "public" if the page is safe to share.`,
+	);
+}
+
 /**
  * Creates the site's request handler for the given router. This is kept
  * separate from serverEntry, which imports the virtual
@@ -62,11 +91,13 @@ export function createServerLoad(
 	router: Router,
 	basePath = "",
 	middleware: MiddlewareFunction[] = [],
+	dev = false,
 ): ServerLoad {
 	// The base path is shared through module state, so that everything that
 	// generates URLs (HTML attributes, redirect locations) sees the same
 	// value the router strips
 	setBasePath(basePath);
+	devMode = dev;
 
 	/**
 	 * Finalizes the response of a load or action. Successful responses and
@@ -832,6 +863,11 @@ async function loadView(
 			if (routeHasServerData(handler)) {
 				const json = JSON.stringify({ loads }).replaceAll("<", "\\u003c");
 				body += `\n<script type="application/json" id="t-server-data">${json}</script>`;
+				// Nudge towards an explicit cache policy only when real data
+				// was embedded (a payload of only nulls carries nothing)
+				if (loads.some((load) => load !== null)) {
+					warnUncachedEmbeddedData(ev, handler.path);
+				}
 			}
 
 			styles += head;

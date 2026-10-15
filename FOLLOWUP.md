@@ -338,17 +338,13 @@ JSON value that also renders verbatim, possible directions: reconstruct the
 value from the adopted DOM instead of embedding it (only works when the
 rendering is lossless), or embed a compact reference into a per-boundary map.
 
-### Embedded server data is now part of the (cacheable) HTML
+### Embedded server data is part of the (cacheable) HTML
 
-The first render embeds each route's server-only data as a `t-server-data`
-script (`loadView` in `serverHandlers.ts`, consumed once by `nav/loadData.ts`)
-so the client skips its first `/~server` request. The full server data is now
-in the HTML, not just the subset the template rendered, so a response cache
-that keys a page by URL alone can serve one user's data to another. The
-`~server` endpoint was never cached, so this is a new surface. Sites embedding
-user-specific data need per-user cache keys (or `Cache-Control: private`) —
-the same requirement SSR already has when the data renders into the markup,
-but the payload can carry values the markup never showed.
+`loadView` embeds each route's _full_ server-load result as a `t-server-data`
+script, not just the subset the template rendered, so a cache that keys a page
+by URL alone can expose values the markup never showed. A dev-only reminder
+prompts for an explicit `Cache-Control` (and any value silences it), but that's
+a nudge, not enforcement — the requirement is on the site's cache config.
 
 ### `@if` branches aren't reconciled when server and client conditions diverge
 

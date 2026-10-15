@@ -78,7 +78,7 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	const devPlugins = normalizePlugins(adapterDev ?? devPlugin(site, sourceMode));
 
 	config.plugins = [
-		manifest(site, true),
+		manifest(site, true, true),
 		torpor({ dev: true }),
 		...devPlugins,
 		...site.vitePlugins,

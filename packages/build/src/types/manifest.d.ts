@@ -6,6 +6,8 @@ declare const manifest: {
 	viewTransitions?: boolean;
 	middleware?: MiddlewareFunction[];
 	routes: ManifestRoute[];
+	/** True when running under the dev server (`tb --dev`). */
+	dev?: boolean;
 };
 
 export default manifest;
