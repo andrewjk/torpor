@@ -88,10 +88,15 @@ async function postbuild(site: Site): Promise<void> {
 	cloudflareConfig.build.outDir = cloudflareFolder;
 	cloudflareConfig.build.rollupOptions ??= {};
 	cloudflareConfig.build.rollupOptions.input = [workerFile, ...site.inputs];
+	// Keep the worker entry at the Cloudflare folder root -- wrangler configs
+	// point `main` at `./cloudflare/_worker.js` -- and nest the rest of the
+	// server bundle under `_server/`. That frees the folder root for the
+	// client's public files and prerendered HTML (see the copy below), which
+	// share this directory because it doubles as `assets.directory`
 	cloudflareConfig.build.rollupOptions.output = {
-		entryFileNames: `[name].js`,
-		chunkFileNames: `[name].js`,
-		assetFileNames: `[name].[ext]`,
+		entryFileNames: (chunk) => (chunk.name === "_worker" ? "_worker.js" : `_server/[name].js`),
+		chunkFileNames: `_server/[name].js`,
+		assetFileNames: `_server/[name].[ext]`,
 	};
 	cloudflareConfig.build.rollupOptions.preserveEntrySignatures = "strict";
 	// HACK: We don't need to minify as the worker isn't downloaded?
@@ -101,14 +106,13 @@ async function postbuild(site: Site): Promise<void> {
 	cloudflareConfig.build.ssr = true;
 	await build(defineConfig(cloudflareConfig));
 
-	// Copy the client assets into the Cloudflare folder
-	await fs.mkdir(path.join(cloudflareFolder, "assets"));
-	for (let file of await fs.readdir(path.join(clientFolder, "assets"))) {
-		await fs.copyFile(
-			path.join(clientFolder, "assets", file),
-			path.join(cloudflareFolder, "assets", file),
-		);
-	}
+	// Copy the client output into the Cloudflare folder. The hashed bundle
+	// goes under `assets/`; everything the build wrote at the client root --
+	// public files from `src/public`, prerendered HTML, `sitemap.xml` -- is
+	// copied to the matching root paths, since this folder doubles as
+	// `assets.directory` and Cloudflare serves assets before the worker.
+	// (`site.html` and Vite's `.vite` cache aren't needed at runtime.)
+	await copyClientOutput(clientFolder, cloudflareFolder);
 
 	// Build a wrangler.toml file for running with `wrangler dev`
 	const wranglerConfig = `
@@ -125,23 +129,52 @@ binding = "ASSETS"
 
 	// Build a .assetsignore file.
 	//
-	// Everything the adapter writes into `cloudflareFolder` outside of
-	// `assets/` is server code: `_worker.js` and the flat server bundle
-	// (`serverEntry.js`, `_page-*.js`, db chunks, ...). Since `wrangler` uses
-	// this same folder as `assets.directory`, and Cloudflare serves assets
-	// before the worker, those server-only modules would be downloadable from
-	// the site root. Ignore the whole root and re-include just the client's
-	// `assets/` folder, matching the worker, which only delegates `/assets/`
-	// to the ASSETS binding.
+	// The only server code in `cloudflareFolder` outside `_server/` is the
+	// `_worker.js` entry. Everything else at the root is client output
+	// (public files, prerendered HTML, `assets/`) that Cloudflare should
+	// serve, so the worker's own output is all that gets ignored.
 	const assetsIgnore = `
 **/node_modules
 **/.DS_Store
 **/.git
-/*
-!assets
+_worker.js
+_server
 `;
 	const assetsIgnoreFile = path.join(cloudflareFolder, ".assetsignore");
 	await fs.writeFile(assetsIgnoreFile, assetsIgnore);
 
 	await fs.rm(tempFolder, { recursive: true });
+}
+
+/** Client-output entries that aren't copied into the Cloudflare folder. */
+const SKIP_CLIENT_ROOT = new Set(["assets", "site.html", ".vite", ".DS_Store"]);
+
+/** Cloudflare-folder paths reserved for the adapter's own worker output. */
+const RESERVED_CLOUDFLARE_PATHS = ["_worker.js", "_server"];
+
+async function copyClientOutput(clientFolder: string, cloudflareFolder: string): Promise<void> {
+	for (const reserved of RESERVED_CLOUDFLARE_PATHS) {
+		if (existsSync(path.join(clientFolder, reserved))) {
+			throw new Error(
+				`The client output contains "${reserved}", which is reserved by ` +
+					`@torpor/adapter-cloudflare for the Cloudflare worker's own output`,
+			);
+		}
+	}
+	await copyDir(path.join(clientFolder, "assets"), path.join(cloudflareFolder, "assets"));
+	await copyDir(clientFolder, cloudflareFolder, SKIP_CLIENT_ROOT);
+}
+
+async function copyDir(from: string, to: string, skip: Set<string> = new Set()): Promise<void> {
+	await fs.mkdir(to, { recursive: true });
+	for (const entry of await fs.readdir(from, { withFileTypes: true })) {
+		if (skip.has(entry.name)) continue;
+		const src = path.join(from, entry.name);
+		const dest = path.join(to, entry.name);
+		if (entry.isDirectory()) {
+			await copyDir(src, dest);
+		} else {
+			await fs.copyFile(src, dest);
+		}
+	}
 }
