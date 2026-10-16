@@ -77,44 +77,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### `navigate()` crashes on the layout-reuse path when a slot region was already cleared
-
-**Where:** `packages/build/src/nav/navigate.ts:233` (`slotRegion.startNode!`),
-`packages/build/src/nav/navigate.ts:250` (the "Script syntax error" fallback),
-`packages/view/src/render/clearRegion.ts:123` (`startNode = null`).
-
-Clicking quickly between sections throws:
-
-```
-Script syntax error
-TypeError: Cannot read properties of null (reading 'parentNode')
-```
-
-`navigate.ts:233` does `app = slotRegion.startNode!.parentNode`, but
-`Region.startNode` is `ChildNode | null` and `clearRegion` nulls it when a
-region is released. The non-null assertion hides that invariant, so a
-`slotRegion` that has already been cleared reaches the reuse branch and throws.
-The catch then paints `<span>Script syntax error</span>` into `app` (line 250)
-and logs the error — which is all the user sees.
-
-Why "quickly" matters: `navigate()` is async and has no in-flight guard —
-`clientEntry` does `if (await navigate(url))` on every same-origin click, and
-the awaited `loadData` / layout `endPoint()` / view-transition work leaves a
-window in which a second click starts a second navigation. The two run
-concurrently against the shared `client.layoutStack` and the live DOM, so one
-navigation can clear a slot region (`clearLayoutSlot` -> `clearRegion` ->
-`startNode = null`) that the other is about to reuse. Compounding it, the reuse
-branch clears and refills the region but never stores a fresh region back for
-that `layoutStack` entry, so after a reuse there is no live region/anchor there
-for the next reuse.
-
-**Fix direction:** stop asserting — if `slotRegion?.startNode` is null (or its
-`parentNode` is null, i.e. detached) fall back to the unmount+mount path; and/or
-serialize navigations (ignore or queue a click while one is in flight), since
-`client.layoutStack` and the rendered DOM are shared mutable state. Keeping the
-region `fillLayoutSlot` returns on the reused entry would also leave a live
-anchor for the next reuse.
-
 ## Features
 
 ### Standard schema validation: remaining integration points

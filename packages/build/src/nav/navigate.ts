@@ -10,8 +10,26 @@ import type PageEndPoint from "../types/PageEndPoint";
 import formSubmit from "./formSubmit";
 import loadData from "./loadData";
 
+/**
+ * Navigations run one at a time. Each mutates shared client state
+ * (`client.layoutStack`) and the live DOM, so two in flight at once can have
+ * one clear a layout's slot region that the other is about to reuse (the
+ * `slotRegion.startNode!` in `render` then throws). Requests are chained, so a
+ * rapid second click -- or a popstate while a form submit reloads -- waits for
+ * the first to finish instead of interleaving.
+ */
+let pendingNavigation: Promise<unknown> = Promise.resolve();
+
 // @ts-ignore
-export default async function navigate(rawUrl: URL, withHydration = false): Promise<boolean> {
+export default function navigate(rawUrl: URL, withHydration = false): Promise<boolean> {
+	const result = pendingNavigation.then(() => navigateNow(rawUrl, withHydration));
+	// Keep the chain alive even when a navigation fails, so one bad navigation
+	// can't wedge every later one
+	pendingNavigation = result.catch(() => {});
+	return result;
+}
+
+async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<boolean> {
 	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500

@@ -274,4 +274,47 @@ describe("navigate", () => {
 		expect(mountMock.mock.calls[0][1]).toBe(pageComponent);
 		expect($page.status).toBe(200);
 	});
+
+	test("overlapping navigations are serialized", async () => {
+		const events: string[] = [];
+		let releaseFirst!: () => void;
+		const firstGate = new Promise<void>((resolve) => (releaseFirst = resolve));
+		const firstLoad = async () => {
+			events.push("first:start");
+			await firstGate;
+			events.push("first:end");
+			return Response.json({});
+		};
+		const secondLoad = async () => {
+			events.push("second:start");
+			return Response.json({});
+		};
+		client.router.addPages([
+			{
+				path: "/first",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent, load: firstLoad } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/second",
+				type: PAGE_ROUTE,
+				endPoint: () =>
+					Promise.resolve({ default: { component: pageComponent, load: secondLoad } }),
+				subFolder: undefined,
+			},
+		]);
+
+		const first = navigate(new URL("http://localhost/first"));
+		const second = navigate(new URL("http://localhost/second"));
+
+		// Give the second navigation time to run if it were not serialized; it
+		// must still be waiting on the first (whose load is gated)
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		expect(events).toEqual(["first:start"]);
+
+		releaseFirst();
+		await Promise.all([first, second]);
+		expect(events).toEqual(["first:start", "first:end", "second:start"]);
+	});
 });
