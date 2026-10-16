@@ -1,5 +1,12 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.19
+
+<sub>2026-10-16</sub>
+
+- _(patch)_ Fix: stop serving the Cloudflare server bundle as static assets
+- _(patch)_ Fix: serve public files and prerendered HTML on Cloudflare
+
 ## 1.0.18
 
 <sub>2026-10-15</sub>
