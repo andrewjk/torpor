@@ -77,6 +77,21 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
+### Cloudflare adapter drops `src/public` files (and prerendered HTML)
+
+Noticed while fixing the server-bundle-as-static-assets leak. The adapter's
+postbuild copies only `dist/client/assets/*` into `dist/cloudflare/assets`, so
+root-level public files (`src/public/robots.txt`, `favicon.ico`, `.well-known/*`,
+...) that `runBuild` writes to the client output root never reach the deployed
+assets directory; requests for them fall through to the worker and 404 unless a
+route handles them. The same is true of the prerendered `404.html`/`500.html`
+and route HTML written by `runPrerender` to the client root. Serving public
+files at their real root URLs wants them at the assets-directory root, which
+currently also holds the worker and server bundle (the leak fixed by the
+`.assetsignore` `/*` + `!assets` patterns in adapter-cloudflare) -- so this
+probably wants a real layout split (worker entry outside `assets.directory`)
+rather than more `.assetsignore` rules.
+
 ## Features
 
 ### Standard schema validation: remaining integration points

@@ -123,12 +123,22 @@ binding = "ASSETS"
 	const wranglerFile = path.join(distFolder, "wrangler.toml");
 	await fs.writeFile(wranglerFile, wranglerConfig);
 
-	// Build a .assetsignore file
+	// Build a .assetsignore file.
+	//
+	// Everything the adapter writes into `cloudflareFolder` outside of
+	// `assets/` is server code: `_worker.js` and the flat server bundle
+	// (`serverEntry.js`, `_page-*.js`, db chunks, ...). Since `wrangler` uses
+	// this same folder as `assets.directory`, and Cloudflare serves assets
+	// before the worker, those server-only modules would be downloadable from
+	// the site root. Ignore the whole root and re-include just the client's
+	// `assets/` folder, matching the worker, which only delegates `/assets/`
+	// to the ASSETS binding.
 	const assetsIgnore = `
 **/node_modules
 **/.DS_Store
 **/.git
-_worker.js
+/*
+!assets
 `;
 	const assetsIgnoreFile = path.join(cloudflareFolder, ".assetsignore");
 	await fs.writeFile(assetsIgnoreFile, assetsIgnore);
