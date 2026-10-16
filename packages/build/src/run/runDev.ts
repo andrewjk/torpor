@@ -228,9 +228,16 @@ function watchRoutes(site: Site, vite: ViteDevServer, configVite?: ViteDevServer
 	// definitions, plugins, inline endpoints) and the route folders (route
 	// files are read from disk by addRouteFolder, not imported). Recomputed
 	// after each reload, since the config may start importing new files.
+	//
+	// The config and the modules it imports live beside the config file, which
+	// can sit outside `site.root` once the config reassigns it (e.g. Mallet
+	// points `site.root` at a subpackage). Reload and watch from that folder,
+	// not the mutable `site.root`, so a route change doesn't throw
+	// "site.config file not found" and leave the client stale.
+	const configFolder = site.configFile ? path.dirname(site.configFile) : site.root;
 	let configDeps =
 		configVite && site.configFile
-			? configDependencyFiles(configVite, site.root)
+			? configDependencyFiles(configVite, configFolder)
 			: new Set<string>();
 	const inRouteFolder = (file: string): boolean =>
 		site.routeFolders.some((f) => isInside(path.resolve(site.root, f.folder), file));
@@ -246,9 +253,9 @@ function watchRoutes(site: Site, vite: ViteDevServer, configVite?: ViteDevServer
 				// Load the config on a fresh server rather than re-loading it
 				// through the one that first read it: doing that from inside
 				// its own watcher cycle deadlocks
-				const { site: fresh, vite: freshVite } = await loadSite(site.root);
+				const { site: fresh, vite: freshVite } = await loadSite(configFolder);
 				try {
-					configDeps = configDependencyFiles(freshVite, site.root);
+					configDeps = configDependencyFiles(freshVite, configFolder);
 					if (!site.applyRouteState(fresh)) return;
 				} finally {
 					await freshVite.close();
