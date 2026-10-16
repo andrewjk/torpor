@@ -35,10 +35,11 @@
 		"typescript": "6.0.3",
 		"vscode-css-languageservice": "^6.3.10",
 		"vscode-html-languageservice": "^5.6.2",
-		"vscode-languageserver": "^9.0.1",
+		"vscode-languageserver": "^10.1.2",
 		"vscode-languageserver-textdocument": "^1.0.15"
 	},
 	"devDependencies": {
+		"@types/node": "^26.6.5",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"tsx": "^4.23.15",
 		"vite-plus": "catalog:"

@@ -10,7 +10,7 @@ import {
 	TextDocumentSyncKind,
 	TextDocuments,
 	createConnection,
-} from "vscode-languageserver/node.js";
+} from "vscode-languageserver/node";
 //import { getSemanticTokensLegend } from "./getSemanticTokensLegend";
 import { LanguageModes, getLanguageModes } from "./languageModes";
 import getDocumentSymbols from "./script/getDocumentSymbols";

@@ -9,8 +9,8 @@ packages:
 
 catalogs:
   default:
-    vite: npm:@voidzero-dev/vite-plus-core@1.1.0
-    vite-plus: 1.1.0
+    vite: npm:@voidzero-dev/vite-plus-core@1.2.0
+    vite-plus: 1.2.0
     vitest: 5.0.3
 
 overrides:
@@ -34,6 +34,14 @@ allowBuilds:
 
 onlyBuiltDependencies:
   - esbuild
+
+# @torpor/ui lists @torpor/unplugin as a dependency (it's imported by ui's
+# vitest.config), and @torpor/unplugin devDepends on @torpor/ui for its tests.
+# Neither `build` script needs the other (both tsconfigs only include `src`,
+# and ui's vite.config doesn't import the unplugin), but the package-level
+# cycle is real, so pnpm 11.25+/12 refuses to order the recursive build. Let
+# the two tasks run unordered rather than break a deliberate test dependency.
+ignoreWorkspaceCycles: true
 
 minimumReleaseAgeExclude:
   - allmark@1.0.22
