@@ -48,8 +48,13 @@ window.addEventListener("click", async (e) => {
 // TODO: settings e.g. <a href="" data-tb-prefetch="eager"/"visible"/"hover"/"touch">
 window.addEventListener("mouseover", maybePrefetch);
 window.addEventListener("touchstart", maybePrefetch);
+// Keyboard focus, and the press-down that precedes a click (a fast click can
+// land before any hover), warm the target too, so the navigation can await the
+// same in-flight request rather than starting its own
+window.addEventListener("focusin", maybePrefetch);
+window.addEventListener("pointerdown", maybePrefetch);
 
-async function maybePrefetch(e: MouseEvent | TouchEvent) {
+async function maybePrefetch(e: Event) {
 	const link = getLink(e.target);
 	if (link) {
 		if (ignoreAnchorMouseEvent(link, e)) {
@@ -60,25 +65,34 @@ async function maybePrefetch(e: MouseEvent | TouchEvent) {
 		const url = new URL(href);
 
 		const path = url.pathname;
+		// Nothing to warm for the page we're already on
+		if (path === document.location.pathname) {
+			return;
+		}
+
 		const query = url.searchParams;
 		const route = router.match(path, query);
 		if (route) {
 			const handler = route.handler;
 			const params = route.params || {};
 
-			// A route with no client endpoint (a pure `+server` route) has
-			// nothing to prefetch
-			const clientEndPoint: PageEndPoint | undefined = handler.endPoint
-				? (await handler.endPoint())?.default
-				: undefined;
-			if (!clientEndPoint?.component) {
-				return;
+			try {
+				// A route with no client endpoint (a pure `+server` route) has
+				// nothing to prefetch
+				const clientEndPoint: PageEndPoint | undefined = handler.endPoint
+					? (await handler.endPoint())?.default
+					: undefined;
+				if (!clientEndPoint?.component) {
+					return;
+				}
+
+				// Just dummy this up
+				let newStack: LayoutPath[] = [];
+
+				await loadData(handler, params, path, query, newStack, clientEndPoint, true);
+			} catch {
+				// A prefetch is best-effort: the real navigation retries
 			}
-
-			// Just dummy this up
-			let newStack: LayoutPath[] = [];
-
-			await loadData(handler, params, path, query, newStack, clientEndPoint, true);
 		}
 	}
 }
@@ -93,17 +107,18 @@ function getLink(target: EventTarget | null): HTMLAnchorElement | undefined {
 	return (link as HTMLAnchorElement) ?? undefined;
 }
 
-function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: MouseEvent | TouchEvent) {
+function ignoreAnchorMouseEvent(link: HTMLAnchorElement, e: Event) {
 	// Ignore the event if it was already handled (e.g. a user handler calling
 	// preventDefault), a modifier key is pressed, the target is not "_self"
 	// (e.g. "_blank"), rel="external", it's a download link, or it's in a
 	// contenteditable region
+	const mouse = e as MouseEvent;
 	return (
 		e.defaultPrevented ||
-		e.altKey ||
-		e.ctrlKey ||
-		e.metaKey ||
-		e.shiftKey ||
+		mouse.altKey ||
+		mouse.ctrlKey ||
+		mouse.metaKey ||
+		mouse.shiftKey ||
 		(link.target && link.target !== "_self") ||
 		link.rel === "external" ||
 		link.hasAttribute("download") ||

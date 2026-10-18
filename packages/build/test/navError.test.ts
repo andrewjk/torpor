@@ -63,6 +63,7 @@ beforeEach(() => {
 	client.router = new Router();
 	client.layoutStack = [];
 	client.prefetchedData = {};
+	client.prefetchedServerData = {};
 	document.body.innerHTML = '<div id="app"></div>';
 	vi.spyOn(window, "scrollTo").mockImplementation(() => {});
 	vi.mocked(mount).mockClear();
@@ -316,5 +317,80 @@ describe("navigate", () => {
 		releaseFirst();
 		await Promise.all([first, second]);
 		expect(events).toEqual(["first:start", "first:end", "second:start"]);
+	});
+});
+
+describe("prefetch", () => {
+	const serverHandler = (): RouteHandler => ({
+		path: "/posts",
+		type: PAGE_ROUTE,
+		endPoint: () => Promise.resolve({ default: {} }),
+		serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+	});
+
+	test("a prefetched server request is reused by the navigation that follows", async () => {
+		const fetchMock = vi.fn(async () => Response.json({ loads: [{ pageLoad: true }] }));
+		vi.stubGlobal("fetch", fetchMock);
+		try {
+			const handler = serverHandler();
+
+			// Hovering (or focusing) the link warms the page's server data ...
+			await loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, true);
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+
+			// ... and the navigation consumes it, with no second request
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+			expect(result?.data).toEqual({ pageLoad: true });
+		} finally {
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("a navigation that lands mid-prefetch awaits the same request", async () => {
+		let releaseFetch!: (response: Response) => void;
+		const fetchMock = vi.fn(
+			() =>
+				new Promise<Response>((resolve) => {
+					releaseFetch = resolve;
+				}),
+		);
+		vi.stubGlobal("fetch", fetchMock);
+		try {
+			const handler = serverHandler();
+
+			const prefetch = loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, true);
+			const navigation = loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
+			expect(fetchMock).toHaveBeenCalledTimes(1);
+
+			releaseFetch(Response.json({ loads: [{ pageLoad: true }] }));
+			await prefetch;
+			expect((await navigation)?.data).toEqual({ pageLoad: true });
+		} finally {
+			vi.unstubAllGlobals();
+		}
+	});
+
+	test("a failed prefetch is not cached, so the navigation retries", async () => {
+		let attempt = 0;
+		const fetchMock = vi.fn(async () => {
+			attempt += 1;
+			if (attempt === 1) throw new TypeError("network down");
+			return Response.json({ loads: [{ pageLoad: true }] });
+		});
+		vi.stubGlobal("fetch", fetchMock);
+		try {
+			const handler = serverHandler();
+
+			await expect(
+				loadData(handler, {}, "/posts", new URLSearchParams(), [], {}, true),
+			).rejects.toThrow(TypeError);
+
+			const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], {});
+			expect(fetchMock).toHaveBeenCalledTimes(2);
+			expect(result?.data).toEqual({ pageLoad: true });
+		} finally {
+			vi.unstubAllGlobals();
+		}
 	});
 });

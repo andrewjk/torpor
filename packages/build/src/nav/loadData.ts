@@ -57,6 +57,7 @@ export default async function loadData(
 		path,
 		query,
 		layouts.filter((l) => l.reuse).map((l) => l.layoutPath),
+		prefetch,
 	);
 	if (server === undefined) {
 		// A load redirected: the client can't follow it through fetch, so the
@@ -119,14 +120,21 @@ type ServerData = {
 };
 
 /**
- * Fetches the page's combined server data. Returns `undefined` when a load
- * redirected, or an `error` result when a load failed.
+ * Fetches the page's combined server data for a navigation, reusing a prefetch
+ * when there is one.
+ *
+ * A prefetch warms this request for the navigation that follows, and a
+ * navigation consumes it (once). So a hover costs one request, a click that
+ * lands while the prefetch is still in flight awaits the same promise instead
+ * of issuing a second one, and a prefetched response is never served to more
+ * than the one navigation it was loaded for (no stale data on later visits).
  */
 async function loadServerData(
 	handler: RouteHandler,
 	path: string,
 	query: URLSearchParams,
 	reusedLayouts: string[],
+	prefetch: boolean,
 ): Promise<ServerData | { error: { status: number; message: string } } | undefined> {
 	// The server embeds the first render's data in the HTML (see the render
 	// path in site/serverHandlers.ts), so the initial hydration can read it
@@ -141,6 +149,47 @@ async function loadServerData(
 		return {};
 	}
 
+	const key = serverDataKey(path, query);
+
+	if (prefetch) {
+		const cached = client.prefetchedServerData[key];
+		if (cached) return cached;
+
+		const pending = requestServerData(path, query, reusedLayouts);
+		client.prefetchedServerData[key] = pending;
+		// A failed prefetch mustn't poison the navigation that follows it
+		void pending.catch(() => {
+			if (client.prefetchedServerData[key] === pending) {
+				delete client.prefetchedServerData[key];
+			}
+		});
+		return pending;
+	}
+
+	const prefetched = client.prefetchedServerData[key];
+	if (prefetched) {
+		delete client.prefetchedServerData[key];
+		return prefetched;
+	}
+
+	return requestServerData(path, query, reusedLayouts);
+}
+
+/** The `/~server` request cache key: the page path and its query. */
+function serverDataKey(path: string, query: URLSearchParams): string {
+	return path + (query.size > 0 ? `?${query}` : "");
+}
+
+/**
+ * The posted data request: `GET <page url>/~server` carrying the data header,
+ * which the server answers with the page's and its layouts' server data as one
+ * JSON body.
+ */
+async function requestServerData(
+	path: string,
+	query: URLSearchParams,
+	reusedLayouts: string[],
+): Promise<ServerData | { error: { status: number; message: string } } | undefined> {
 	const url = new URL(
 		document.location.origin + getBasePath() + path.replace(/\/$/, "") + "/~server",
 	);

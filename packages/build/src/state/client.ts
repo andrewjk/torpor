@@ -10,6 +10,7 @@ const client: ClientState =
 		layoutStack: [],
 		// TODO: Probably expire after 30 seconds or something?
 		prefetchedData: {},
+		prefetchedServerData: {},
 		viewTransitions: false,
 	});
 
