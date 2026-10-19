@@ -461,6 +461,55 @@ describe("prefetch", () => {
 		}
 	});
 
+	test("a navigation that lands mid-prefetch awaits the same client load", async () => {
+		let calls = 0;
+		let release!: () => void;
+		const gate = new Promise<void>((resolve) => (release = resolve));
+		const load = async () => {
+			calls += 1;
+			await gate;
+			return Response.json({ loaded: true });
+		};
+		const handler: RouteHandler = {
+			path: "/posts",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: pageComponent, load } }),
+		};
+
+		const prefetch = loadData(handler, {}, "/posts", new URLSearchParams(), [], { load }, true);
+		const navigation = loadData(handler, {}, "/posts", new URLSearchParams(), [], { load });
+		// Let both reach their client loads; the second must join the first
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		expect(calls).toBe(1);
+
+		release();
+		await prefetch;
+		expect((await navigation)?.data).toEqual({ loaded: true });
+		expect(calls).toBe(1);
+	});
+
+	test("a failed in-flight client load is not cached, so the navigation retries", async () => {
+		let calls = 0;
+		const load = async () => {
+			calls += 1;
+			if (calls === 1) throw new TypeError("network down");
+			return Response.json({ loaded: true });
+		};
+		const handler: RouteHandler = {
+			path: "/posts",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: pageComponent, load } }),
+		};
+
+		await expect(
+			loadData(handler, {}, "/posts", new URLSearchParams(), [], { load }, true),
+		).rejects.toThrow(TypeError);
+
+		const result = await loadData(handler, {}, "/posts", new URLSearchParams(), [], { load });
+		expect(calls).toBe(2);
+		expect(result?.data).toEqual({ loaded: true });
+	});
+
 	test("a prefetch skips layouts already on screen without adopting their slots", async () => {
 		let layoutLoads = 0;
 		const handler: RouteHandler = {

@@ -95,6 +95,7 @@ export default async function loadData(
 				query,
 				params,
 				stackLayout.data,
+				prefetch,
 			);
 			if (response) {
 				if (isRedirect(response)) return;
@@ -109,7 +110,14 @@ export default async function loadData(
 	}
 
 	// The page's client load, then its server data
-	const response = await runClientLoad(clientEndPoint, clientLocation(path), query, params, data);
+	const response = await runClientLoad(
+		clientEndPoint,
+		clientLocation(path),
+		query,
+		params,
+		data,
+		prefetch,
+	);
 	if (response) {
 		if (isRedirect(response)) return;
 		return { data, error: await errorOf(response) };
@@ -254,8 +262,24 @@ function hasServerData(handler: RouteHandler): boolean {
 }
 
 /**
+ * The result of running a route's client load: the json it returned (if any),
+ * or the non-ok Response the caller should turn into an error page. Cached as
+ * a whole because a Response body can only be read once.
+ */
+type ClientLoadResult = {
+	data?: Record<string, any>;
+	response?: Response;
+};
+
+/**
  * Runs a route's client-side load, merging its json data into `data`. Returns
  * a non-ok Response for the caller to turn into an error page.
+ *
+ * A prefetch caches the in-flight promise, not its resolved value, so a
+ * navigation that lands while the load is still running continues the same
+ * request instead of running it a second time. The navigation that follows
+ * consumes (and clears) the entry; a failed promise is dropped so the
+ * navigation retries.
  */
 async function runClientLoad(
 	endPoint: PageEndPoint | undefined,
@@ -263,32 +287,64 @@ async function runClientLoad(
 	query: URLSearchParams,
 	params: Record<string, string>,
 	data: Record<string, any>,
+	prefetch: boolean,
 ): Promise<Response | undefined> {
 	if (!endPoint?.load) return;
 
 	const clientKey = location + (query.size > 0 ? `?${query}` : "");
 	const prefetchedData = client.prefetchedData;
-	if (prefetchedData[clientKey]) {
-		Object.assign(data, prefetchedData[clientKey]);
-		return;
+	let pending = prefetchedData[clientKey] as Promise<ClientLoadResult> | undefined;
+
+	if (!pending) {
+		// Only a prefetch warms the cache. A navigation runs its own load
+		// directly, so a result is never left behind for a later visit.
+		if (!prefetch) {
+			const result = await loadClientResponse(endPoint.load, query, params, data);
+			return mergeClientLoad(result, data);
+		}
+
+		const promise = loadClientResponse(endPoint.load, query, params, data);
+		prefetchedData[clientKey] = promise;
+		pending = promise;
+		// A failed prefetch mustn't poison the navigation that follows it
+		void promise.catch(() => {
+			if (prefetchedData[clientKey] === promise) {
+				delete prefetchedData[clientKey];
+			}
+		});
+	} else if (!prefetch) {
+		// The navigation consumes the warm entry
+		delete prefetchedData[clientKey];
 	}
 
+	return mergeClientLoad(await pending, data);
+}
+
+async function loadClientResponse(
+	load: NonNullable<PageEndPoint["load"]>,
+	query: URLSearchParams,
+	params: Record<string, string>,
+	data: Record<string, any>,
+): Promise<ClientLoadResult> {
 	const clientUrl = new URL(document.location.href);
 	for (let [name, value] of query) {
 		clientUrl.searchParams.append(name, value);
 	}
-	const clientResponse = await endPoint.load({ url: clientUrl, params, data });
-	if (clientResponse) {
-		if (clientResponse.ok) {
-			if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
-				const clientData = await clientResponse.json();
-				Object.assign(data, clientData);
-				prefetchedData[clientKey] = clientData;
-			}
-		} else {
-			return clientResponse;
-		}
+	const response = await load({ url: clientUrl, params, data });
+	if (!response) return {};
+	if (!response.ok) return { response };
+	if (response.headers.get("Content-Type")?.includes("application/json")) {
+		return { data: await response.json() };
 	}
+	return {};
+}
+
+function mergeClientLoad(
+	result: ClientLoadResult,
+	data: Record<string, any>,
+): Response | undefined {
+	if (result.data) Object.assign(data, result.data);
+	return result.response;
 }
 
 function clientLocation(path: string): string {

@@ -4,6 +4,12 @@ import type LayoutPath from "./LayoutPath";
 export default interface ClientState {
 	router: Router;
 	layoutStack: LayoutPath[];
+	/**
+	 * Client-load results a prefetch has warmed, keyed by route path (+ query).
+	 * Each value is the in-flight (or resolved) promise, so a navigation that
+	 * lands mid-prefetch continues the same request. The navigation that
+	 * follows consumes its entry.
+	 */
 	prefetchedData: Record<string, any>;
 	/**
 	 * Server-data requests a prefetch has warmed, keyed by page path (+ query).

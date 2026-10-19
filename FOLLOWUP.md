@@ -77,22 +77,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### A prefetched client load isn't shared while it's in flight
-
-**Where:** `packages/build/src/nav/loadData.ts` (`runClientLoad`)
-
-Server data is prefetched as a promise and awaited by the following
-navigation, but a client `+page.ts`/`_layout.ts` `load` result is cached in
-`client.prefetchedData[clientKey]` only _after_ it resolves. A click that lands
-while the prefetch's load is still running calls `endPoint.load` a second time
-and waits for that, rather than continuing the in-flight request.
-
-**Repro:** make a `+page.ts` `load` take 1s, hover a link, click 100ms later →
-the load runs twice.
-
-**Fix direction:** cache the in-flight promise (like `prefetchedServerData`)
-and clear it once consumed/failed, rather than the resolved value.
-
 ### `adapter-node` doesn't stream response bodies or handle upgrades
 
 **Where:** `packages/adapters/adapter-node/src/responseToNodeResponse.ts`,
