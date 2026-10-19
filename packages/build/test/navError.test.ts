@@ -21,7 +21,7 @@ import Router from "../src/site/Router";
 import type LayoutPath from "../src/types/LayoutPath";
 import type RouteHandler from "../src/types/RouteHandler";
 import type ManifestRoute from "../src/types/ManifestRoute";
-import { ERROR_ROUTE, PAGE_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
+import { ERROR_ROUTE, PAGE_ROUTE, PAGE_SERVER_ROUTE, SERVER_ROUTE } from "../src/types/RouteType";
 
 const mountMock = vi.mocked(mount);
 
@@ -224,6 +224,73 @@ describe("navigate", () => {
 
 		expect(navigated).toBe(false);
 		expect(mountMock).not.toHaveBeenCalled();
+	});
+
+	test("a failed route-module import falls back and restores $page", async () => {
+		client.router.addPages([
+			{
+				path: "/broken",
+				type: PAGE_ROUTE,
+				endPoint: () =>
+					Promise.reject(new TypeError("Failed to fetch dynamically imported module")),
+				subFolder: undefined,
+			},
+		]);
+		const current = new URL("http://localhost/current");
+		$page.url = current;
+		$page.status = 200;
+		$page.error = { message: "" };
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/broken"));
+
+			// The caller falls back to a full page load instead of the click
+			// rejecting with the import error
+			expect(navigated).toBe(false);
+			expect(mountMock).not.toHaveBeenCalled();
+			// The tab bar/active-link state points at the page still on screen
+			expect($page.url).toBe(current);
+			expect($page.status).toBe(200);
+		} finally {
+			consoleError.mockRestore();
+		}
+	});
+
+	test("a failed data request falls back and restores $page", async () => {
+		client.router.addPages([
+			{
+				path: "/posts",
+				type: PAGE_ROUTE,
+				endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+				subFolder: undefined,
+			},
+			{
+				path: "/posts/~server",
+				type: PAGE_SERVER_ROUTE,
+				endPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+				subFolder: undefined,
+			},
+		]);
+		vi.stubGlobal(
+			"fetch",
+			vi.fn(async () => {
+				throw new TypeError("network down");
+			}),
+		);
+		const current = new URL("http://localhost/current");
+		$page.url = current;
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+
+		try {
+			const navigated = await navigate(new URL("http://localhost/posts"));
+
+			expect(navigated).toBe(false);
+			expect($page.url).toBe(current);
+		} finally {
+			consoleError.mockRestore();
+			vi.unstubAllGlobals();
+		}
 	});
 
 	test("an unmatched url renders the error page at it", async () => {

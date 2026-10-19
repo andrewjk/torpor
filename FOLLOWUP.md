@@ -77,7 +77,137 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
+### Two Torpor apps sharing `site.root` share Vite's dep cache
+
+**Where:** `packages/build/src/run/runDev.ts` (no `cacheDir` is set),
+`packages/build/src/run/depCache.ts` (`siteRoot/node_modules/.vite`)
+
+A site's `site.root` is also Vite's `root`, so Vite's default dep cache
+(`<root>/node_modules/.vite`) is shared by every app whose config points at the
+same root — the documented pattern when a workspace package owns the views
+(e.g. Mallet: both `apps/electron` and `apps/web` call `addMallet`, which moves
+both `site.root` and Vite's `root` to `packages/core`). Two apps with different
+configs (aliases, plugins, adapter) optimize different dep graphs into the same
+directory: whichever runs last rewrites `_metadata.json`/`deps`, and the other
+server keeps serving module URLs with its now-stale `?v=` browser hash, which
+Vite answers with **504 Outdated Optimize Dep** — surfacing as the
+dynamic-import failure above. When its fingerprint changes,
+`clearStaleDepCache` also deletes that shared directory at one app's startup,
+which can wipe a running sibling's cache.
+
+**Repro:** `tb --dev` app A from one config (root = shared package), then
+`tb --dev` app B from another config with the same root (or start any second
+dev server against that root). Back in A's open window, reload/click: deps
+requests return 504 and route imports fail. `rm -rf
+<packages/core>/node_modules/.vite` + restart fixes it.
+
+**Fix direction:** default `cacheDir` to a per-config location (e.g.
+`node_modules/.vite/<config-name-or-hash>` derived from `site.configFile`, or
+under `site.output`), and make `clearStaleDepCache` operate on that same
+per-config directory. At minimum, warn at startup when another dev server is
+using the same cache dir.
+
+### Prefetch re-runs every layout's server load
+
+**Where:** `packages/build/src/nav/loadData.ts`
+
+`const reuse = !prefetch && previous?.path === layoutPath` disables reuse for
+prefetches, so `reusedLayouts` is empty and the `~server` request runs **all**
+layout loads (and hooks) on every hover/pointerdown. For a layout that loads a
+session or a sidebar config, hovering a link costs the same server work as a
+navigation, every time — in cloud mode that's an extra auth round trip plus
+queries per hover.
+
+**Repro:** log from `_layout.server.ts`'s load; hover an in-app link (no
+click) → the log fires for each hover. On click the same layout is reused, so
+the hover work was wasted.
+
+**Fix direction:** keep the client-side `reuse` off (a prefetch must not adopt
+the live slot regions) but still send `X-Torpor-Reuse` for layouts already in
+`client.layoutStack`, so the server skips their loads.
+
+### A prefetched client load isn't shared while it's in flight
+
+**Where:** `packages/build/src/nav/loadData.ts` (`runClientLoad`)
+
+Server data is prefetched as a promise and awaited by the following
+navigation, but a client `+page.ts`/`_layout.ts` `load` result is cached in
+`client.prefetchedData[clientKey]` only _after_ it resolves. A click that lands
+while the prefetch's load is still running calls `endPoint.load` a second time
+and waits for that, rather than continuing the in-flight request.
+
+**Repro:** make a `+page.ts` `load` take 1s, hover a link, click 100ms later →
+the load runs twice.
+
+**Fix direction:** cache the in-flight promise (like `prefetchedServerData`)
+and clear it once consumed/failed, rather than the resolved value.
+
+### `adapter-node` doesn't stream response bodies or handle upgrades
+
+**Where:** `packages/adapters/adapter-node/src/responseToNodeResponse.ts`,
+`packages/adapters/adapter-node/src/createNodeServer.ts`
+
+`responseToNodeResponse` handles string/bytes/Blob/ArrayBuffer/FormData bodies
+and then falls through to `outgoing.end()` for anything else — so a
+`ReadableStream` body is sent empty. There's also no `upgrade` listener, so a
+WebSocket handshake never reaches the fetch handler. This blocks SSE and
+WebSockets on Electron/self-host (Mallet's realtime sync has to have the
+desktop connect straight to the Cloudflare worker instead, cross-origin, with
+the session token in the query).
+
+**Repro:** a `+server.ts` `get` returning
+`new Response(new ReadableStream({ start(c) { c.enqueue(...); c.close(); } }), { headers: { "content-type": "text/event-stream" } })`
+served through the Node/Electron adapter arrives with an empty body; a
+`WebSocket("ws://localhost:<port>/...")` just fails to connect.
+
+**Fix direction:** `Readable.fromWeb(body).pipe(outgoing)` (and flush headers
+before the first chunk) for stream bodies, and wire `server.on("upgrade", ...)`
+to a fetch handler that can return a 101 pair.
+
 ## Features
+
+### No supported way to render a page before its data
+
+**Where:** `packages/build/src/nav/navigate.ts` (awaits `loadData` before
+mounting), `packages/build/src/nav/loadData.ts` (`hasServerData`)
+
+Every client navigation awaits the `~server` response before the component
+mounts, and there's no route-level opt-out. `hasServerData` returns true
+whenever a folder hook exists (even when all layouts are reused and the page has
+no server load), so the request — and the mount — always wait on the network.
+That makes it impossible to show a section shell immediately and fill it in
+afterwards, which is the difference between a snappy app and a spinner on every
+tab switch in a remote-storage setup.
+
+The workaround Mallet uses today is brittle: hardcode the framework's internal
+`X-Torpor-Data` header, return `{}` from the page's `+page.server.ts` on data
+requests, and fetch the data client-side after mount. It works, but the header
+names aren't exported (below) and the behaviour is undocumented.
+
+**Fix direction:** either
+
+- export the data-request markers and add an `isDataRequest(event)` helper, plus
+  docs for the "defer on client navigation" pattern; or
+- first-class deferred data: a route flag / `load` return that lets the router
+  mount with pending data and stream the result in (SvelteKit-style), including
+  a way for a route with only reused layouts to skip the `~server` request.
+
+### The client data-request headers aren't exported
+
+**Where:** `packages/build/src/dataRequest.ts`; `packages/build/package.json`
+exports
+
+`DATA_REQUEST_HEADER` and `DATA_REUSE_HEADER` are `export const`s inside the
+package, but no export map entry exposes them (`./nav` exports only
+`load`/`makeApi`/`reload`/`route`). App/server code that needs to distinguish a
+client navigation from a full render (see the deferral entry) has to hardcode
+`"X-Torpor-Data"` / `"X-Torpor-Reuse"`.
+
+**Repro:** `import { DATA_REQUEST_HEADER } from "@torpor/build/nav"` (or
+`@torpor/build`) fails to resolve.
+
+**Fix direction:** export them (a `./data` or `./nav` export), or expose a
+server helper like `isDataRequest(event)` / `reusedLayouts(event)`.
 
 ### Standard schema validation: remaining integration points
 

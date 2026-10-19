@@ -33,7 +33,15 @@ window.addEventListener("click", async (e) => {
 		const href = link.href;
 		const url = new URL(href);
 
-		if (await navigate(url)) {
+		let navigated = false;
+		try {
+			navigated = await navigate(url);
+		} catch (error) {
+			// `navigate` already catches its own failures, but never let an
+			// unexpected throw swallow the full-page fallback
+			console.error(error);
+		}
+		if (navigated) {
 			// Save the scroll position of the outgoing page on the current
 			// history entry, so that going (or coming) back can restore it
 			window.history.replaceState({ scroll: window.scrollY }, "", document.location.href);

@@ -30,6 +30,26 @@ export default function navigate(rawUrl: URL, withHydration = false): Promise<bo
 }
 
 async function navigateNow(rawUrl: URL, withHydration: boolean): Promise<boolean> {
+	// A failed route-module import (e.g. a stale dev dep hash) or a throwing
+	// load must not reject the click handler's promise: the caller's full-page
+	// fallback would never run and the link would appear dead. Restore $page to
+	// the page that is still on screen and return false so the caller reloads,
+	// which picks up the new modules.
+	const previousUrl = $page.url;
+	const previousStatus = $page.status;
+	const previousError = $page.error;
+	try {
+		return await renderNavigation(rawUrl, withHydration);
+	} catch (error) {
+		$page.url = previousUrl;
+		$page.status = previousStatus;
+		$page.error = previousError;
+		console.error(error);
+		return false;
+	}
+}
+
+async function renderNavigation(rawUrl: URL, withHydration: boolean): Promise<boolean> {
 	let parent = document.getElementById("app");
 	if (!parent) {
 		// TODO: 500
