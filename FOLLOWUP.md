@@ -77,28 +77,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### `adapter-node` doesn't stream response bodies or handle upgrades
-
-**Where:** `packages/adapters/adapter-node/src/responseToNodeResponse.ts`,
-`packages/adapters/adapter-node/src/createNodeServer.ts`
-
-`responseToNodeResponse` handles string/bytes/Blob/ArrayBuffer/FormData bodies
-and then falls through to `outgoing.end()` for anything else — so a
-`ReadableStream` body is sent empty. There's also no `upgrade` listener, so a
-WebSocket handshake never reaches the fetch handler. This blocks SSE and
-WebSockets on Electron/self-host (Mallet's realtime sync has to have the
-desktop connect straight to the Cloudflare worker instead, cross-origin, with
-the session token in the query).
-
-**Repro:** a `+server.ts` `get` returning
-`new Response(new ReadableStream({ start(c) { c.enqueue(...); c.close(); } }), { headers: { "content-type": "text/event-stream" } })`
-served through the Node/Electron adapter arrives with an empty body; a
-`WebSocket("ws://localhost:<port>/...")` just fails to connect.
-
-**Fix direction:** `Readable.fromWeb(body).pipe(outgoing)` (and flush headers
-before the first chunk) for stream bodies, and wire `server.on("upgrade", ...)`
-to a fetch handler that can return a 101 pair.
-
 ## Features
 
 ### No supported way to render a page before its data

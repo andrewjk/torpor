@@ -63,7 +63,7 @@ export function defaultDepCacheDir(siteRoot: string, configFile?: string): strin
  */
 export function clearStaleDepCache(
 	siteRoot: string,
-	cacheDir = path.join(siteRoot, "node_modules", ".vite"),
+	cacheDir: string = path.join(siteRoot, "node_modules", ".vite"),
 	log?: (message: string) => void,
 ): boolean {
 	try {
