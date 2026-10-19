@@ -77,25 +77,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### Prefetch re-runs every layout's server load
-
-**Where:** `packages/build/src/nav/loadData.ts`
-
-`const reuse = !prefetch && previous?.path === layoutPath` disables reuse for
-prefetches, so `reusedLayouts` is empty and the `~server` request runs **all**
-layout loads (and hooks) on every hover/pointerdown. For a layout that loads a
-session or a sidebar config, hovering a link costs the same server work as a
-navigation, every time — in cloud mode that's an extra auth round trip plus
-queries per hover.
-
-**Repro:** log from `_layout.server.ts`'s load; hover an in-app link (no
-click) → the log fires for each hover. On click the same layout is reused, so
-the hover work was wasted.
-
-**Fix direction:** keep the client-side `reuse` off (a prefetch must not adopt
-the live slot regions) but still send `X-Torpor-Reuse` for layouts already in
-`client.layoutStack`, so the server skips their loads.
-
 ### A prefetched client load isn't shared while it's in flight
 
 **Where:** `packages/build/src/nav/loadData.ts` (`runClientLoad`)

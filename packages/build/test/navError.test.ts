@@ -460,4 +460,68 @@ describe("prefetch", () => {
 			vi.unstubAllGlobals();
 		}
 	});
+
+	test("a prefetch skips layouts already on screen without adopting their slots", async () => {
+		let layoutLoads = 0;
+		const handler: RouteHandler = {
+			path: "/posts",
+			type: PAGE_ROUTE,
+			endPoint: () => Promise.resolve({ default: { component: pageComponent } }),
+			layouts: [
+				{
+					path: "/_layout",
+					endPoint: () =>
+						Promise.resolve({
+							default: {
+								load: async () => {
+									layoutLoads += 1;
+									return Response.json({ layoutLoad: layoutLoads });
+								},
+							},
+						}),
+					serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+				},
+			],
+			serverEndPoint: () => Promise.resolve({ default: { load: async () => {} } }),
+		};
+
+		const fetchMock = vi.fn(async (_url: unknown, init?: RequestInit) => {
+			const reuse = (init?.headers as Record<string, string> | undefined)?.[DATA_REUSE_HEADER];
+			return Response.json({ loads: reuse ? [null, { pageServer: true }] : [{}, {}] });
+		});
+		vi.stubGlobal("fetch", fetchMock);
+
+		try {
+			// The layout is on screen, with live data and a slot region
+			const liveSlot = {} as any;
+			client.layoutStack = [
+				{ path: "/_layout", data: { layoutLoad: 1 }, reuse: false, slotRegion: liveSlot },
+			];
+
+			const stack: LayoutPath[] = [];
+			const result = await loadData(
+				handler,
+				{},
+				"/posts",
+				new URLSearchParams(),
+				stack,
+				{ load: async () => Response.json({ pageLoad: true }) },
+				true,
+			);
+
+			// The server was told to skip the layout's load ...
+			const init = fetchMock.mock.calls[0][1]!;
+			expect((init.headers as Record<string, string>)[DATA_REUSE_HEADER]).toBe(
+				JSON.stringify(["/_layout"]),
+			);
+			// ... and the prefetch didn't run its client load or adopt its slot
+			expect(layoutLoads).toBe(0);
+			expect(stack[0].reuse).toBe(false);
+			expect(stack[0].slotRegion).toBeNull();
+			expect(stack[0].data).toEqual({ layoutLoad: 1 });
+			expect(result?.data).toEqual({ layoutLoad: 1, pageServer: true, pageLoad: true });
+		} finally {
+			vi.unstubAllGlobals();
+		}
+	});
 });

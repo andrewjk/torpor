@@ -38,8 +38,10 @@ export default async function loadData(
 ): Promise<LoadDataResult | void> {
 	let data = {};
 
-	// Work out up front which layouts are already rendered (their data and UI
-	// are reused), so the data request can skip loading them
+	// Work out up front which layouts are already rendered (their data is
+	// reused), so the data request can skip loading them. A prefetch also skips
+	// their server loads (they're already in the client stack) but must not
+	// adopt their live slot regions: it may never be followed by a navigation
 	const layoutStack = client.layoutStack;
 	const layouts = (handler.layouts ?? []).map((layout, index) => {
 		let layoutPath = layout.path;
@@ -47,8 +49,9 @@ export default async function loadData(
 			layoutPath = layoutPath.replace(`[${key}]`, params[key]);
 		}
 		const previous = layoutStack.at(index);
-		const reuse = !prefetch && previous?.path === layoutPath;
-		return { layout, index, layoutPath, previous, reuse };
+		const rendered = previous?.path === layoutPath;
+		const reuse = !prefetch && rendered;
+		return { layout, index, layoutPath, previous, rendered, reuse };
 	});
 
 	// One request for all the (non-reused) server data
@@ -56,7 +59,7 @@ export default async function loadData(
 		handler,
 		path,
 		query,
-		layouts.filter((l) => l.reuse).map((l) => l.layoutPath),
+		layouts.filter((l) => l.rendered).map((l) => l.layoutPath),
 		prefetch,
 	);
 	if (server === undefined) {
@@ -68,7 +71,7 @@ export default async function loadData(
 		return { data, error: server.error };
 	}
 
-	for (const { layout, index, layoutPath, previous, reuse } of layouts) {
+	for (const { layout, index, layoutPath, previous, rendered, reuse } of layouts) {
 		const stackLayout: LayoutPath = {
 			path: layoutPath,
 			data: {},
@@ -76,9 +79,11 @@ export default async function loadData(
 			slotRegion: null,
 		};
 
-		if (reuse && previous) {
-			// The layout is already rendered: keep its data and slot region
-			stackLayout.slotRegion = previous.slotRegion;
+		if (rendered && previous) {
+			// The layout is already rendered: keep its data. Only a real
+			// navigation reuses its slot region; a prefetch must leave it alone
+			// (and not run its client load again)
+			if (reuse) stackLayout.slotRegion = previous.slotRegion;
 			Object.assign(stackLayout.data, previous.data);
 		} else {
 			// A new layout: run its client load (its server data already
