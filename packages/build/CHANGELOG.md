@@ -1,5 +1,15 @@
 # @torpor/build
 
+## 1.8.0
+
+<sub>2026-10-19</sub>
+
+- _(minor)_ Feat: stream deferred route data
+- _(patch)_ Fix: fall back when a route import fails
+- _(patch)_ Fix: give each config its own Vite dep cache
+- _(patch)_ Fix: skip reused layout loads on prefetch
+- _(patch)_ Fix: share in-flight prefetched client loads
+
 ## 1.7.1
 
 <sub>2026-10-19</sub>
