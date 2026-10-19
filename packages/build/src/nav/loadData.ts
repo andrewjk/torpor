@@ -1,4 +1,6 @@
+import { type DeferredMeta, setAtPath } from "../deferred.ts";
 import { DATA_REUSE_HEADER, DATA_REQUEST_HEADER } from "../dataRequest.ts";
+import { readResponseBody } from "../response/read.ts";
 import { getBasePath } from "../site/basePath";
 import type LayoutPath from "../types/LayoutPath";
 import type PageEndPoint from "../types/PageEndPoint";
@@ -54,14 +56,24 @@ export default async function loadData(
 		return { layout, index, layoutPath, previous, rendered, reuse };
 	});
 
+	// A page can opt out of the data request when it has no server load of its
+	// own and every layout is already rendered (e.g. a tab switch under a
+	// session hook that doesn't gate access). Its client load still runs.
+	const skipServerData =
+		clientEndPoint?.serverData === false &&
+		!handler.serverEndPoint &&
+		layouts.every((layout) => layout.rendered);
+
 	// One request for all the (non-reused) server data
-	const server = await loadServerData(
-		handler,
-		path,
-		query,
-		layouts.filter((l) => l.rendered).map((l) => l.layoutPath),
-		prefetch,
-	);
+	const server = skipServerData
+		? {}
+		: await loadServerData(
+				handler,
+				path,
+				query,
+				layouts.filter((l) => l.rendered).map((l) => l.layoutPath),
+				prefetch,
+			);
 	if (server === undefined) {
 		// A load redirected: the client can't follow it through fetch, so the
 		// caller falls back to a full page load
@@ -130,7 +142,80 @@ export default async function loadData(
 
 type ServerData = {
 	loads?: (Record<string, any> | null)[];
+	/** Promise-valued properties streamed after the critical loads. */
+	deferred?: DeferredMeta[];
 };
+
+type ServerDataFrame = {
+	type?: string;
+	id?: string;
+	value?: unknown;
+	message?: string;
+} & ServerData;
+
+/**
+ * A request-local registry of deferred promises. Values arrive after the first
+ * frame (client navigation) or in inline scripts (initial hydration), and
+ * resolve the promises already placed in the page's `data`.
+ */
+class DeferredStore {
+	#entries = new Map<
+		string,
+		{
+			promise: Promise<unknown>;
+			resolve: (value: unknown) => void;
+			reject: (error: unknown) => void;
+		}
+	>();
+
+	get(id: string): Promise<unknown> {
+		let entry = this.#entries.get(id);
+		if (!entry) {
+			let resolve!: (value: unknown) => void;
+			let reject!: (error: unknown) => void;
+			const promise = new Promise<unknown>((res, rej) => {
+				resolve = res;
+				reject = rej;
+			});
+			// A prefetch (or a navigation the user leaves) may never read the
+			// promise; don't let its rejection surface as unhandled
+			promise.catch(() => {});
+			entry = { promise, resolve, reject };
+			this.#entries.set(id, entry);
+		}
+		return entry.promise;
+	}
+
+	resolve(id: string, value: unknown): void {
+		const entry = this.#entries.get(id);
+		if (!entry) return;
+		this.#entries.delete(id);
+		entry.resolve(value);
+	}
+
+	reject(id: string, error: unknown): void {
+		const entry = this.#entries.get(id);
+		if (!entry) return;
+		this.#entries.delete(id);
+		entry.reject(error instanceof Error ? error : new Error(String(error)));
+	}
+
+	rejectAll(error: unknown): void {
+		for (const id of this.#entries.keys()) {
+			this.reject(id, error);
+		}
+	}
+
+	/** Places a promise for each deferred entry into the load that owns it. */
+	attach(server: ServerData, get: (id: string) => Promise<unknown>): ServerData {
+		for (const entry of server.deferred ?? []) {
+			const load = server.loads?.[entry.index];
+			if (!load) continue;
+			setAtPath(load, entry.path, get(entry.id));
+		}
+		return server;
+	}
+}
 
 /**
  * Fetches the page's combined server data for a navigation, reusing a prefetch
@@ -155,7 +240,7 @@ async function loadServerData(
 	// navigations use the fetch below
 	const embedded = takeEmbeddedServerData();
 	if (embedded !== undefined) {
-		return embedded;
+		return attachEmbeddedDeferred(embedded);
 	}
 
 	if (!hasServerData(handler)) {
@@ -227,10 +312,92 @@ async function requestServerData(
 	}
 	// A site without a server (e.g. a static host) responds with the page's
 	// html rather than json; there's nothing to merge
-	if (!response.headers.get("Content-Type")?.includes("application/json")) {
+	const type = response.headers.get("Content-Type");
+	if (type?.includes("application/x-ndjson")) {
+		return await readServerDataStream(response);
+	}
+	if (!type?.includes("application/json")) {
 		return {};
 	}
 	return (await response.json()) as ServerData;
+}
+
+/**
+ * Reads a streamed data response: the first frame carries the critical loads
+ * and the list of deferred paths, later frames resolve those promises. The
+ * function returns as soon as the first frame is read, so a navigation mounts
+ * before slow values arrive.
+ */
+async function readServerDataStream(response: Response): Promise<ServerData> {
+	const reader = response.body?.getReader();
+	if (!reader) return {};
+
+	const decoder = new TextDecoder();
+	let buffer = "";
+	const readFrame = async (): Promise<ServerDataFrame | undefined> => {
+		while (true) {
+			const newline = buffer.indexOf("\n");
+			if (newline >= 0) {
+				const line = buffer.slice(0, newline).trim();
+				buffer = buffer.slice(newline + 1);
+				if (line) return JSON.parse(line) as ServerDataFrame;
+				continue;
+			}
+			const { done, value } = await reader.read();
+			if (done) {
+				const line = buffer.trim();
+				buffer = "";
+				return line ? (JSON.parse(line) as ServerDataFrame) : undefined;
+			}
+			buffer += decoder.decode(value, { stream: true });
+		}
+	};
+
+	const first = await readFrame();
+	if (!first) return {};
+	if (first.loads === undefined) return {};
+	const store = new DeferredStore();
+	const server = store.attach(first, (id) => store.get(id));
+
+	// Keep reading in the background. The view is already mounted; values
+	// resolve their promises as the frames arrive.
+	void (async () => {
+		try {
+			for (;;) {
+				const frame = await readFrame();
+				if (!frame) break;
+				if (frame.type === "value" && frame.id !== undefined) {
+					store.resolve(frame.id, frame.value);
+				} else if (frame.type === "error" && frame.id !== undefined) {
+					store.reject(frame.id, frame.message ?? "Deferred data failed");
+				}
+			}
+			store.rejectAll(new Error("The deferred data stream ended before a value arrived"));
+		} catch (error) {
+			store.rejectAll(error);
+		}
+	})();
+
+	return server;
+}
+
+/**
+ * Recreates the promises for a page's embedded server data. The server emits
+ * a bootstrap store before the inline resolve scripts, so by the time this
+ * runs a value may already be resolved (or still be in flight).
+ */
+function attachEmbeddedDeferred(server: ServerData): ServerData {
+	if (!server.deferred?.length) return server;
+	const globalStore = (
+		globalThis as {
+			__torporDeferred?: { get(id: string): Promise<unknown> };
+		}
+	).__torporDeferred;
+	// The bootstrap is only emitted with a deferred payload; fall back to
+	// never-resolving promises rather than throwing if it is missing
+	const store = new DeferredStore();
+	const get = globalStore ? (id: string) => globalStore.get(id) : (id: string) => store.get(id);
+	return store.attach(server, get);
 }
 
 /**
@@ -333,10 +500,8 @@ async function loadClientResponse(
 	const response = await load({ url: clientUrl, params, data });
 	if (!response) return {};
 	if (!response.ok) return { response };
-	if (response.headers.get("Content-Type")?.includes("application/json")) {
-		return { data: await response.json() };
-	}
-	return {};
+	const body = await readResponseBody(response);
+	return body ? { data: body } : {};
 }
 
 function mergeClientLoad(

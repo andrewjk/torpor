@@ -79,49 +79,6 @@ template expression references a plain`let`whose initializer reads`$props`
 
 ## Features
 
-### No supported way to render a page before its data
-
-**Where:** `packages/build/src/nav/navigate.ts` (awaits `loadData` before
-mounting), `packages/build/src/nav/loadData.ts` (`hasServerData`)
-
-Every client navigation awaits the `~server` response before the component
-mounts, and there's no route-level opt-out. `hasServerData` returns true
-whenever a folder hook exists (even when all layouts are reused and the page has
-no server load), so the request — and the mount — always wait on the network.
-That makes it impossible to show a section shell immediately and fill it in
-afterwards, which is the difference between a snappy app and a spinner on every
-tab switch in a remote-storage setup.
-
-The workaround Mallet uses today is brittle: hardcode the framework's internal
-`X-Torpor-Data` header, return `{}` from the page's `+page.server.ts` on data
-requests, and fetch the data client-side after mount. It works, but the header
-names aren't exported (below) and the behaviour is undocumented.
-
-**Fix direction:** either
-
-- export the data-request markers and add an `isDataRequest(event)` helper, plus
-  docs for the "defer on client navigation" pattern; or
-- first-class deferred data: a route flag / `load` return that lets the router
-  mount with pending data and stream the result in (SvelteKit-style), including
-  a way for a route with only reused layouts to skip the `~server` request.
-
-### The client data-request headers aren't exported
-
-**Where:** `packages/build/src/dataRequest.ts`; `packages/build/package.json`
-exports
-
-`DATA_REQUEST_HEADER` and `DATA_REUSE_HEADER` are `export const`s inside the
-package, but no export map entry exposes them (`./nav` exports only
-`load`/`makeApi`/`reload`/`route`). App/server code that needs to distinguish a
-client navigation from a full render (see the deferral entry) has to hardcode
-`"X-Torpor-Data"` / `"X-Torpor-Reuse"`.
-
-**Repro:** `import { DATA_REQUEST_HEADER } from "@torpor/build/nav"` (or
-`@torpor/build`) fails to resolve.
-
-**Fix direction:** export them (a `./data` or `./nav` export), or expose a
-server helper like `isDataRequest(event)` / `reusedLayouts(event)`.
-
 ### Standard schema validation: remaining integration points
 
 Endpoints now support standard schemas for request bodies (`json()`), form

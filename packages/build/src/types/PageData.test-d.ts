@@ -88,7 +88,32 @@ const props: PageProps<PageData<PostsServer>> = null as never;
 export const posts: { title: string }[] = props.data.posts;
 export const form: Record<string, any> | undefined = props.form;
 
-// --- Layout data ---
+// --- Deferred (promise-valued) data ---
+
+// A promise value stays a promise in the client-visible data, while the
+// endpoint's Data annotation describes that client shape
+interface DeferredServer {
+	load: () => Promise<TypedResponse<{ posts: Post[]; comments: Promise<string[]> }>>;
+}
+
+export const deferredServer: DeferredServer = {
+	load: async () => ok({ posts: [{ title: "Hello" }], comments: Promise.resolve(["a"]) }),
+};
+
+export type D05 = Expect<
+	Equals<PageData<DeferredServer>, { posts: Post[]; comments: Promise<string[]> }>
+>;
+
+export const checkedDeferred: PageServerEndPoint<
+	"/posts",
+	{ posts: Post[]; comments: Promise<string[]> }
+> = {
+	load: async () => ok({ posts: [{ title: "Hello" }], comments: Promise.resolve(["a"]) }),
+};
+
+// The page component sees the deferred value as a promise
+const deferredProps: PageProps<PageData<DeferredServer>> = null as never;
+export const deferredComments: Promise<string[]> = deferredProps.data.comments;
 
 // A layout endpoint with its own typed load
 interface LayoutServer {

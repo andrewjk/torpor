@@ -84,6 +84,100 @@ export default {
 			<code>$props.data</code>.
 		</p>
 
+		<h2>Deferred data</h2>
+		<p>
+			A load can return a promise-valued property. The page renders as soon as
+			the awaited (critical) values are ready; promise values keep resolving in
+			the background, so slow sections don't block the whole navigation or the
+			first paint:
+		</p>
+		<CodePreview
+			code={`
+// routes/posts/[slug]/+page.server.ts
+import { ok, type PageServerEndPoint } from "@torpor/build";
+import { getComments, getPost } from "@/lib/db";
+
+export default {
+	load: async ({ params }) => {
+		const post = await getPost(params.slug);
+		// Not awaited: this becomes a promise in $props.data and streams in
+		return ok({ post, comments: getComments(params.slug) });
+	},
+} satisfies PageServerEndPoint<
+	"/posts/[slug]",
+	{ post: Post; comments: Promise<Comment[]> }
+>;
+`}
+		/>
+		<p>
+			Read the deferred value through <code>$async</code> inside an
+			<code>&#64;await</code> boundary. The boundary shows its <code>with</code>
+			branch until the promise resolves (and keeps stale content on later
+			refreshes). A first-load <code>$async</code> read is <code>undefined</code>,
+			so guard a loop over it with <code>?? []</code> (or wrap the
+			<code>&#64;for</code> in an <code>&#64;if</code>):
+		</p>
+		<CodePreview
+			code={`
+// views/Post.torp
+export default function Post($props: {
+	data: { post: Post; comments: Promise<Comment[]> };
+}) {
+	let $state = $watch({
+		get comments() {
+			return $async(() => $props.data.comments);
+		},
+	});
+
+	@render {
+		<h1>{$props.data.post.title}</h1>
+		@await {
+			@for (let comment of $state.comments ?? []) {
+				<p>{comment.text}</p>
+			}
+		} with {
+			<p>Loading comments…</p>
+		}
+	}
+}
+`}
+		/>
+		<p>
+			On a client-side navigation the route mounts with the promise already in
+			<code>$props.data</code>. On a first page load the server sends the HTML
+			immediately and settles the promise with a small inline script, so
+			hydration doesn't wait for it. A deferred promise that rejects follows the
+			normal async error path (<code>&#64;try</code>/<code>&#64;catch</code>). Redirects
+			and error responses still belong to the critical part of the load — once
+			the response has started streaming, its status can't change.
+		</p>
+		<p>
+			Client loads can defer values the same way. Client loads aren't streamed
+			from the server, so their promises simply resolve in the browser after the
+			component mounts.
+		</p>
+
+		<h2>Skipping the data request</h2>
+		<p>
+			A client navigation normally asks the server for data even when every
+			layout is already on screen, because folder hooks may need to run. A page
+			with no server load of its own can opt out with
+			<code>serverData: false</code> when its hooks don't gate access:
+		</p>
+		<CodePreview
+			code={`
+// routes/settings/+page.ts
+export default {
+	component: Settings,
+	serverData: false,
+} satisfies PageEndPoint;
+`}
+		/>
+		<p>
+			The flag only skips the request when all layouts are reused and the page
+			has no <code>+page.server.ts</code> load; client loads still run.
+		</p>
+
 		<h2>The load event</h2>
 		<p>
 			Server loads receive an event with <code>url</code>, <code>params</code>,

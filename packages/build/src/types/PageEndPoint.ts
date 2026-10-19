@@ -29,6 +29,13 @@ export default interface PageEndPoint<
 			: [params?: Record<string, string>]
 	) => string;
 	/**
+	 * Set to `false` on a page endpoint whose layouts are already rendered and
+	 * whose page has no server load, to skip the `~server` request on
+	 * client-side navigation. Folder hooks don't run for that navigation, so
+	 * only use it when they don't gate access.
+	 */
+	serverData?: boolean;
+	/**
 	 * Loads data for the page.
 	 */
 	load?: (event: PageLoadEvent<Route>) => PageLoadReturn<Data> | Promise<PageLoadReturn<Data>>;

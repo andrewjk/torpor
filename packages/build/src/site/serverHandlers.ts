@@ -1,8 +1,10 @@
 import { type ServerComponent, type ServerSlotRender } from "@torpor/view/ssr";
 import { DATA_REUSE_HEADER, DATA_REQUEST_HEADER } from "../dataRequest.ts";
+import { type DeferredMeta, jsonForScript, splitDeferred } from "../deferred.ts";
 import formDataToRecord from "../form/formDataToRecord.ts";
 import notFound from "../response/notFound.ts";
 import ok from "../response/ok.ts";
+import { readResponseBody } from "../response/read.ts";
 import ServerEvent from "../server/ServerEvent.ts";
 import type MiddlewareFunction from "../server/types/MiddlewareFunction";
 import $page from "../state/$serverPage.ts";
@@ -604,9 +606,7 @@ async function loadPageData(
 		if (pageResult instanceof Response) return pageResult;
 		loads.push(pageResult);
 
-		return new Response(JSON.stringify({ loads }), {
-			headers: { "Content-Type": "application/json" },
-		});
+		return serverDataResponse(loads);
 	} finally {
 		// Run exit hooks in reverse order for hooks that were entered
 		while (entered > 0) {
@@ -620,6 +620,102 @@ async function loadPageData(
 	}
 }
 
+type LoadDeferredEntry = {
+	id: string;
+	meta: DeferredMeta;
+	promise: PromiseLike<unknown>;
+};
+
+/**
+ * Splits each route's server data into critical values and deferred entries,
+ * assigning ids in response order. Both the streaming data response and the
+ * SSR-embedded payload use this so their ids/paths line up.
+ */
+function splitLoads(loads: (Record<string, any> | null)[]): {
+	criticalLoads: (Record<string, any> | null)[];
+	entries: LoadDeferredEntry[];
+} {
+	const entries: LoadDeferredEntry[] = [];
+	const criticalLoads = loads.map((load, index) => {
+		if (load === null) return null;
+		const { critical, entries: splitEntries } = splitDeferred(load);
+		for (const entry of splitEntries) {
+			const id = `d${entries.length}`;
+			entries.push({
+				id,
+				meta: { id, index, path: entry.path },
+				promise: entry.promise,
+			});
+		}
+		return critical as Record<string, any>;
+	});
+	return { criticalLoads, entries };
+}
+
+/**
+ * Serializes a data request's loads. Critical (non-promise) values go in the
+ * first frame as one JSON object per route; promise-valued properties are
+ * announced in the same frame and then streamed as NDJSON frames, so a
+ * navigation can mount as soon as the critical data arrives.
+ */
+function serverDataResponse(loads: (Record<string, any> | null)[]): Response {
+	const { criticalLoads, entries } = splitLoads(loads);
+
+	if (entries.length === 0) {
+		return new Response(JSON.stringify({ loads: criticalLoads }), {
+			headers: { "Content-Type": "application/json" },
+		});
+	}
+
+	const first = {
+		type: "data",
+		loads: criticalLoads,
+		deferred: entries.map((entry) => entry.meta),
+	};
+	const encoder = new TextEncoder();
+	let cancelled = false;
+	const stream = new ReadableStream<Uint8Array>({
+		start(controller) {
+			const write = (frame: object) => {
+				if (cancelled) return;
+				try {
+					controller.enqueue(encoder.encode(JSON.stringify(frame) + "\n"));
+				} catch {
+					// The client went away; the promise handlers below finish
+					// without anything left to write to
+				}
+			};
+			write(first);
+			void Promise.all(
+				entries.map(async (entry) => {
+					try {
+						write({ type: "value", id: entry.id, value: await entry.promise });
+					} catch (error) {
+						write({ type: "error", id: entry.id, message: errorMessage(error) });
+					}
+				}),
+			).finally(() => {
+				if (cancelled) return;
+				try {
+					controller.close();
+				} catch {
+					// Already closed by an aborted stream
+				}
+			});
+		},
+		cancel() {
+			cancelled = true;
+		},
+	});
+	return new Response(stream, {
+		headers: { "Content-Type": "application/x-ndjson" },
+	});
+}
+
+function errorMessage(error: unknown): string {
+	return error instanceof Error ? error.message : String(error);
+}
+
 /**
  * Runs a single route's server load (if any) as part of a data request.
  * Returns the loaded data, `null` when the route has no load, or the raw
@@ -631,13 +727,9 @@ async function loadRouteServerData(
 ): Promise<Record<string, any> | null | Response> {
 	if (!serverEndPoint?.load) return null;
 	const response = await serverEndPoint.load(serverParams);
-	if (!response || response.ok) {
-		if (response?.headers.get("Content-Type")?.includes("application/json")) {
-			return await response.json();
-		}
-		return null;
-	}
-	return response;
+	if (!response) return null;
+	if (!response.ok) return response;
+	return (await readResponseBody(response)) ?? null;
 }
 
 async function loadView(
@@ -720,6 +812,9 @@ async function loadView(
 	const serverHooks = fromForm ? [] : await loadServerHooks(handler);
 	let entered = 0;
 	let enterResponse: Response | undefined = undefined;
+	// Promise-valued server data, streamed to the client after the critical
+	// data (see the embedding block below)
+	let deferredEntries: LoadDeferredEntry[] = [];
 	try {
 		// Hooks run from the root down; a hook's enter can return a Response
 		// to short-circuit the request
@@ -861,10 +956,20 @@ async function loadView(
 			// hydration reads it instead of making a `/~server` round trip
 			// (nav/loadData.ts consumes it once and removes it). The condition
 			// mirrors the client's `hasServerData`, so a route with only hooks or
-			// actions still ships an all-null array that saves the refetch. `<`
-			// is escaped so the json can't close the script early
+			// actions still ships an all-null array that saves the refetch.
+			// Promise values are left out and streamed as small scripts after
+			// the page, so the render doesn't wait for them.
 			if (routeHasServerData(handler)) {
-				const json = JSON.stringify({ loads }).replaceAll("<", "\\u003c");
+				const { criticalLoads, entries } = splitLoads(loads);
+				deferredEntries = entries;
+				const payload: {
+					loads: (Record<string, any> | null)[];
+					deferred?: DeferredMeta[];
+				} = { loads: criticalLoads };
+				if (entries.length > 0) {
+					payload.deferred = entries.map((entry) => entry.meta);
+				}
+				const json = JSON.stringify(payload).replaceAll("<", "\\u003c");
 				body += `\n<script type="application/json" id="t-server-data">${json}</script>`;
 				// Nudge towards an explicit cache policy only when real data
 				// was embedded (a payload of only nulls carries nothing)
@@ -881,6 +986,7 @@ async function loadView(
 		} catch (error) {
 			// TODO: Show a proper Error component
 			html = '<span style="color: red">Script syntax error</span><p>' + error + "</p>";
+			deferredEntries = [];
 			console.log(error);
 		}
 
@@ -891,6 +997,10 @@ async function loadView(
 			if (missingLayout !== undefined) {
 				warnMissingSlotContent(missingLayout);
 			}
+		}
+
+		if (deferredEntries.length > 0) {
+			return streamHtmlResponse(html, status ?? 200, deferredEntries);
 		}
 
 		return new Response(html, {
@@ -906,6 +1016,80 @@ async function loadView(
 			await serverHooks[entered].exit?.(serverParams);
 		}
 	}
+}
+
+/**
+ * Streams a rendered page whose server data contained deferred values. The
+ * page HTML (with skeletons/`with` branches) is sent immediately, then each
+ * deferred value arrives as a tiny script that resolves its promise in the
+ * client's hydration store. This is not component streaming: the SSR markup
+ * for deferred values comes from the client's `$async`/`@await` boundaries.
+ */
+function streamHtmlResponse(html: string, status: number, entries: LoadDeferredEntry[]): Response {
+	const encoder = new TextEncoder();
+	const bodyEnd = html.lastIndexOf("</body>");
+	const before = bodyEnd === -1 ? html : html.slice(0, bodyEnd);
+	const after = bodyEnd === -1 ? "" : html.slice(bodyEnd);
+	let cancelled = false;
+	const stream = new ReadableStream<Uint8Array>({
+		start(controller) {
+			const write = (text: string) => {
+				if (cancelled) return;
+				try {
+					controller.enqueue(encoder.encode(text));
+				} catch {
+					// Client disconnected
+				}
+			};
+			write(before + deferredBootstrapScript());
+			void Promise.all(
+				entries.map(async (entry) => {
+					try {
+						write(deferredScript(entry.id, await entry.promise, false));
+					} catch (error) {
+						write(deferredScript(entry.id, errorMessage(error), true));
+					}
+				}),
+			).finally(() => {
+				write(after);
+				if (cancelled) return;
+				try {
+					controller.close();
+				} catch {
+					// Already closed
+				}
+			});
+		},
+		cancel() {
+			cancelled = true;
+		},
+	});
+	return new Response(stream, {
+		status,
+		headers: { "Content-Type": "text/html" },
+	});
+}
+
+/**
+ * Creates the client-side deferred store before the inline resolve scripts
+ * run. Guarded so a page with multiple deferred payloads doesn't replace a
+ * store that still holds pending promises.
+ */
+function deferredBootstrapScript(): string {
+	return (
+		"<script>(()=>{const g=globalThis;if(g.__torporDeferred)return;" +
+		"const e=new Map();const get=id=>{let x=e.get(id);if(!x){let resolve,reject;" +
+		"const promise=new Promise((res,rej)=>{resolve=res;reject=rej});promise.catch(()=>{});" +
+		"x={promise,resolve,reject};e.set(id,x)}return x};" +
+		"g.__torporDeferred={get,resolve:(id,v)=>get(id).resolve(v)," +
+		"reject:(id,m)=>get(id).reject(m instanceof Error?m:new Error(String(m)))}})()</script>"
+	);
+}
+
+/** A script that settles one deferred entry in the hydration store. */
+function deferredScript(id: string, value: unknown, rejected: boolean): string {
+	const payload = rejected ? JSON.stringify(String(value)) : jsonForScript(value);
+	return `<script>__torporDeferred.${rejected ? "reject" : "resolve"}(${JSON.stringify(id)},${payload})</script>`;
 }
 
 async function runAction(
@@ -1088,9 +1272,8 @@ async function loadClientAndServerData(
 		const clientResponse = await clientEndPoint.load(clientParams);
 		if (clientResponse) {
 			if (clientResponse.ok) {
-				if (clientResponse.headers.get("Content-Type")?.includes("application/json")) {
-					Object.assign(data, await clientResponse.json());
-				}
+				const clientData = await readResponseBody(clientResponse);
+				if (clientData) Object.assign(data, clientData);
 			} else {
 				return clientResponse;
 			}
@@ -1101,10 +1284,8 @@ async function loadClientAndServerData(
 		const serverResponse = await serverEndPoint.load(serverParams);
 		if (serverResponse) {
 			if (serverResponse.ok) {
-				if (serverResponse.headers.get("Content-Type")?.includes("application/json")) {
-					serverData = await serverResponse.json();
-					Object.assign(data, serverData);
-				}
+				serverData = (await readResponseBody(serverResponse)) ?? null;
+				if (serverData) Object.assign(data, serverData);
 			} else {
 				return serverResponse;
 			}
