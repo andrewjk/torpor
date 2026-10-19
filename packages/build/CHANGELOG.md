@@ -1,5 +1,13 @@
 # @torpor/build
 
+## 1.7.1
+
+<sub>2026-10-19</sub>
+
+- _(patch)_ Fix: reload dev server from the config folder
+- _(patch)_ Fix: serialize client navigations
+- _(patch)_ Fix: prefetch loads server data
+
 ## 1.7.0
 
 <sub>2026-10-15</sub>
