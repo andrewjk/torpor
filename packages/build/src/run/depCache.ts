@@ -33,15 +33,43 @@ import type { PackageJson } from "../utils/torporPackages";
 const STORE_NAME = ".torpor-dev-cache.json";
 
 /**
- * Clears site/node_modules/.vite when workspace packages changed since the
- * last dev run. Returns true when the cache was removed.
+ * The dep cache a dev server should use: Vite's default
+ * (`<siteRoot>/node_modules/.vite`) would be shared by every app whose
+ * `site.root` is the same -- e.g. a workspace package that owns the views and
+ * is used by both a web and an Electron app. Those apps have different configs
+ * (aliases, plugins, adapter), so they optimize different dep graphs; sharing
+ * one directory makes each rewrite the other's `_metadata.json` (browser
+ * hashes go stale, Vite answers 504) and lets one app's startup clear the
+ * other's running cache. Derive a directory from the config file instead.
  */
-export function clearStaleDepCache(siteRoot: string, log?: (message: string) => void): boolean {
+export function defaultDepCacheDir(siteRoot: string, configFile?: string): string {
+	const base = path.join(siteRoot, "node_modules", ".vite");
+	if (!configFile) return base;
+	const absolute = path.resolve(configFile);
+	const name = path
+		.basename(absolute)
+		.replace(/\.[^.]+$/, "")
+		.replace(/[^\w.-]+/g, "-");
+	const hash = createHash("sha1").update(absolute).digest("hex").slice(0, 8);
+	return path.join(base, `${name}-${hash}`);
+}
+
+/**
+ * Clears the dev dep cache when workspace packages changed since the last dev
+ * run. Returns true when the cache was removed.
+ *
+ * @param cacheDir The Vite cache directory (see `defaultDepCacheDir`). Defaults
+ *   to `<siteRoot>/node_modules/.vite`.
+ */
+export function clearStaleDepCache(
+	siteRoot: string,
+	cacheDir = path.join(siteRoot, "node_modules", ".vite"),
+	log?: (message: string) => void,
+): boolean {
 	try {
 		const workspaceRoot = findWorkspaceRoot(siteRoot);
 		if (!workspaceRoot) return false;
 
-		const cacheDir = path.join(siteRoot, "node_modules", ".vite");
 		const storePath = path.join(siteRoot, "node_modules", STORE_NAME);
 
 		const fingerprint = fingerprintWorkspacePackages(siteRoot, workspaceRoot);

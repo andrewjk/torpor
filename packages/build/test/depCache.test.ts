@@ -12,7 +12,7 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, test } from "vite-plus/test";
-import { clearStaleDepCache } from "../src/run/depCache";
+import { clearStaleDepCache, defaultDepCacheDir } from "../src/run/depCache";
 
 let root: string;
 let site: string;
@@ -57,6 +57,22 @@ function makeCache() {
 	writeFileSync(path.join(deps, "chunk.js"), "// cached");
 }
 
+describe("defaultDepCacheDir", () => {
+	test("derives a stable per-config directory", () => {
+		const web = path.join(root, "apps", "web", "site.config.ts");
+		const electron = path.join(root, "apps", "electron", "site.config.ts");
+
+		const webCache = defaultDepCacheDir(site, web);
+		expect(webCache).toBe(defaultDepCacheDir(site, web));
+		expect(webCache).not.toBe(defaultDepCacheDir(site, electron));
+		expect(webCache.startsWith(path.join(site, "node_modules", ".vite"))).toBe(true);
+	});
+
+	test("falls back to Vite's default when there is no config file", () => {
+		expect(defaultDepCacheDir(site)).toBe(path.join(site, "node_modules", ".vite"));
+	});
+});
+
 describe("clearStaleDepCache", () => {
 	test("clears the cache on the first run and writes the store", () => {
 		makeCache();
@@ -66,6 +82,21 @@ describe("clearStaleDepCache", () => {
 		expect(cleared).toBe(true);
 		expect(existsSync(path.join(site, "node_modules", ".vite"))).toBe(false);
 		expect(existsSync(path.join(site, "node_modules", ".torpor-dev-cache.json"))).toBe(true);
+	});
+
+	test("only clears the cache directory it is given", () => {
+		// A sibling app's default cache (another config sharing site.root)
+		makeCache();
+
+		const cacheDir = defaultDepCacheDir(site, path.join(root, "apps", "web", "site.config.ts"));
+		mkdirSync(path.join(cacheDir, "deps"), { recursive: true });
+		writeFileSync(path.join(cacheDir, "deps", "chunk.js"), "// cached");
+
+		const cleared = clearStaleDepCache(site, cacheDir);
+
+		expect(cleared).toBe(true);
+		expect(existsSync(cacheDir)).toBe(false);
+		expect(existsSync(path.join(site, "node_modules", ".vite", "deps", "chunk.js"))).toBe(true);
 	});
 
 	test("leaves the cache alone when nothing changed", () => {

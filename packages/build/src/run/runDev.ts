@@ -25,7 +25,7 @@ import tsconfigAliases, { type AliasEntry } from "../utils/tsconfigAliases";
 import { addTorporPackageConfig } from "../utils/torporPackages";
 import { detectSourceMode, siteEntryPaths } from "../utils/entryPaths";
 import devPlugin from "./devPlugin.ts";
-import { clearStaleDepCache } from "./depCache";
+import { clearStaleDepCache, defaultDepCacheDir } from "./depCache";
 import { configDependencyFiles, loadSite } from "./loadSite.ts";
 import { reportStaleTorpCopies } from "./staleTorpCopies";
 
@@ -43,6 +43,14 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	config.appType = "custom";
 	config.server ??= {};
 	config.server.host ??= "localhost";
+	// Give each site config its own dep cache. Vite's default lives under
+	// `site.root`, which several apps may share (e.g. a web and an Electron app
+	// that both build from the same views package); sharing it lets them
+	// rewrite each other's optimized deps and clear each other's cache
+	const cacheDir = config.cacheDir
+		? path.resolve(site.root, config.cacheDir)
+		: defaultDepCacheDir(site.root, site.configFile);
+	config.cacheDir = cacheDir;
 	// Root-level host files (robots.txt, favicon.ico, etc) in src/public are
 	// served by Vite's middleware in dev and copied into the build output
 	const publicDir = path.resolve(site.root, "src/public");
@@ -103,8 +111,9 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	addTorporPackageConfig(site.root, config);
 
 	// Workspace packages may have been rebuilt since the last dev run; drop
-	// Vite's dep cache so SSR never executes stale prebundled modules
-	clearStaleDepCache(site.root, (message) => console.log(`\n${message}`));
+	// this config's Vite dep cache so SSR never executes stale prebundled
+	// modules
+	clearStaleDepCache(site.root, cacheDir, (message) => console.log(`\n${message}`));
 
 	// A workspace package with dist .torp copies (e.g. @torpor/ui) whose src
 	// changed without a rebuild serves OLD components to the site, silently;

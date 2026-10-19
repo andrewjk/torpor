@@ -77,36 +77,6 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
-### Two Torpor apps sharing `site.root` share Vite's dep cache
-
-**Where:** `packages/build/src/run/runDev.ts` (no `cacheDir` is set),
-`packages/build/src/run/depCache.ts` (`siteRoot/node_modules/.vite`)
-
-A site's `site.root` is also Vite's `root`, so Vite's default dep cache
-(`<root>/node_modules/.vite`) is shared by every app whose config points at the
-same root — the documented pattern when a workspace package owns the views
-(e.g. Mallet: both `apps/electron` and `apps/web` call `addMallet`, which moves
-both `site.root` and Vite's `root` to `packages/core`). Two apps with different
-configs (aliases, plugins, adapter) optimize different dep graphs into the same
-directory: whichever runs last rewrites `_metadata.json`/`deps`, and the other
-server keeps serving module URLs with its now-stale `?v=` browser hash, which
-Vite answers with **504 Outdated Optimize Dep** — surfacing as the
-dynamic-import failure above. When its fingerprint changes,
-`clearStaleDepCache` also deletes that shared directory at one app's startup,
-which can wipe a running sibling's cache.
-
-**Repro:** `tb --dev` app A from one config (root = shared package), then
-`tb --dev` app B from another config with the same root (or start any second
-dev server against that root). Back in A's open window, reload/click: deps
-requests return 504 and route imports fail. `rm -rf
-<packages/core>/node_modules/.vite` + restart fixes it.
-
-**Fix direction:** default `cacheDir` to a per-config location (e.g.
-`node_modules/.vite/<config-name-or-hash>` derived from `site.configFile`, or
-under `site.output`), and make `clearStaleDepCache` operate on that same
-per-config directory. At minimum, warn at startup when another dev server is
-using the same cache dir.
-
 ### Prefetch re-runs every layout's server load
 
 **Where:** `packages/build/src/nav/loadData.ts`
