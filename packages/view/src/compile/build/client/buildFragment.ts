@@ -332,6 +332,18 @@ function declareControlFragmentVars(
 			break;
 		}
 		default: {
+			// Non-rendering control nodes (`@const`, `@console`, `@debugger`,
+			// `@function`) emit plain code in source order. Build them here,
+			// during the declaration pass, because group controls
+			// (`@if`, `@await`, …) are built immediately by
+			// `declareParentAndAnchorFragmentVars`. Emitting them later in the
+			// normal node loop would put a `@const` *after* a following control
+			// that reads it, causing a TDZ error on the first render.
+			if (SCRIPT_OPERATIONS.has(node.operation)) {
+				buildNode(node, status, b, parentName, anchorName);
+				node.handled = true;
+				break;
+			}
 			for (let [i, child] of node.children.entries()) {
 				declareFragmentVars(
 					fragment,
@@ -350,6 +362,14 @@ function declareControlFragmentVars(
 		}
 	}
 }
+
+const SCRIPT_OPERATIONS = new Set([
+	"@const",
+	"@console",
+	"@debugger",
+	"@function",
+	"@async function",
+]);
 
 function declareComponentFragmentVars(
 	fragment: Fragment,

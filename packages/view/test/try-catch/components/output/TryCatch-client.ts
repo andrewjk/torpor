@@ -39,10 +39,10 @@ export default function TryCatch(
 	t_run_try(t_try_region_1, t_try_anchor_1, (t_before) => {
 		const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<p>#</p>`);
 		const t_root_1 = t_root_el(t_fragment_1);
-		const t_p_1 = t_root_1 as HTMLElement;
-		const t_text_1 = t_child(t_p_1);
 		/* @const */
 		const value = maybeThrow();
+		const t_p_1 = t_root_1 as HTMLElement;
+		const t_text_1 = t_child(t_p_1);
 		$run(() => {
 			t_text_1.textContent = `Value: ${t_fmt(value)}`;
 		});

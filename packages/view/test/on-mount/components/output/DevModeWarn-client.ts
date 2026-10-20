@@ -31,13 +31,13 @@ export default function OnmountOnce(
 	const t_fragment_0 = t_fragment($parent.ownerDocument!, t_fragments, 0, `<p>#</p> <button id="inc">+</button>`);
 	const t_root_0 = t_root(t_fragment_0);
 	const t_text_1 = t_child(t_root_0);
-	const t_button_1 = t_next(t_next(t_root_0, true)) as HTMLButtonElement;
 
 	/* @function */
 	function increment() {
 		$state.count += 1
 	};
 
+	const t_button_1 = t_next(t_next(t_root_0, true)) as HTMLButtonElement;
 	t_event(t_button_1, "click", increment);
 	$run(() => {
 		t_text_1.textContent = `Count: ${t_fmt($state.count)}`;

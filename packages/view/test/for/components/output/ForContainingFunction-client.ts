@@ -48,13 +48,13 @@ export default function ForContainingIf(
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_button_1 = t_root_1 as HTMLButtonElement;
 			const t_text_1 = t_child(t_button_1);
-			t_event(t_button_1, "click", doit);
 
 			/* @function */
 			function doit() {
 				// it just needs to exist...
 			};
 
+			t_event(t_button_1, "click", doit);
 			$run(() => {
 				const i = t_item_1.data;
 				t_text_1.textContent = `do it ${t_fmt(i)}`;

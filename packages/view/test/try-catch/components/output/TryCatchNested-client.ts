@@ -45,9 +45,9 @@ export default function TryCatchNested(
 		t_run_try(t_try_region_2, t_try_anchor_2, (t_before) => {
 			const t_fragment_2 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 2, `<p>Inner ok</p>`);
 			const t_root_2 = t_root_el(t_fragment_2);
-			const t_p_1 = t_root_2 as HTMLElement;
 			/* @const */
 			const x = boom();
+			const t_p_1 = t_root_2 as HTMLElement;
 			t_add_element(t_p_1, t_fragment_1, t_before);
 			t_next(t_p_1);
 		},(t_before, inner) => {

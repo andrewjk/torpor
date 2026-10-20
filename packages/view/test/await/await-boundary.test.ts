@@ -46,6 +46,28 @@ test("@await shows the with-branch then content -- mounted", async () => {
 	expect(queryByText(container, "Loading...")).toBeNull();
 });
 
+test("@const in @await content is emitted before the controls that read it", async () => {
+	const constSource = `
+	export default function AwaitConst() {
+		let $state = $watch({ a: 1 });
+
+		@render {
+			@await {
+				@const x = $state.a
+				@if (x) { <p>Const: {x}</p> }
+			} with {
+				<p>Loading...</p>
+			}
+		}
+	}
+	`;
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, constSource, "client");
+	mountComponent(container, component);
+
+	expect(queryByText(container, "Const: 1")).not.toBeNull();
+});
+
 test("@await without a with-branch shows nothing while suspended", async () => {
 	const sourceNoFallback = `
 	export default function AwaitNoWith() {

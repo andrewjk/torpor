@@ -46,11 +46,11 @@ export default function ForSingleRoot(
 		(t_item_1, t_before_1) => {
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<li><span class="label">#</span> <button class="select">select</button></li>`);
 			const t_root_1 = t_root_el(t_fragment_1);
+			/* @const */
+			const suffix = "!";
 			const t_li_1 = t_root_1 as HTMLElement;
 			const t_text_1 = t_child(t_child(t_li_1));
 			const t_button_1 = t_next(t_next(t_child(t_li_1), true)) as HTMLButtonElement;
-			/* @const */
-			const suffix = "!";
 			t_event(t_button_1, "click", () => {
 				const row = t_item_1.data;
 				return $props.onSelect(row)

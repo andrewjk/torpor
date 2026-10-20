@@ -41,13 +41,13 @@ export default function IfContainingIf(
 			const t_fragment_1 = t_fragment_el($parent.ownerDocument!, t_fragment_els, 1, `<button>do it</button>`);
 			const t_root_1 = t_root_el(t_fragment_1);
 			const t_button_1 = t_root_1 as HTMLButtonElement;
-			t_event(t_button_1, "click", doit);
 
 			/* @function */
 			function doit() {
 				// it just needs to exist...
 			};
 
+			t_event(t_button_1, "click", doit);
 			t_add_element(t_button_1, t_fragment_0, t_before);
 			t_next(t_button_1);
 			t_pop_region(t_old_region);
