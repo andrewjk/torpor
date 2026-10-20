@@ -240,8 +240,9 @@ not an oversight:
    speculatively purely to invoke its getters — every `source: "server"` read
    calls its thunk and records the promise, so siblings start in one wave; the
    pass's output is discarded. After a settle (per-getter `timeout`, default
-   5000ms), a render pass re-renders content consuming the settled values
-   through a cursor in read order, without re-calling the thunks.
+   5000ms), a render pass re-renders content looking the settled values up by
+   getter identity, without re-calling the thunks. The render pass may read a
+   getter any number of times, so markup can branch on the resolved value.
 2. **Detached lifecycle.** The boundary helper returns a sentinel comment
    immediately (blocking the enclosing render would serialize sibling
    getters); the flush substitutes the finished HTML at the end. Nested
@@ -249,14 +250,13 @@ not an oversight:
    the already-running nested lifecycle by occurrence key — no nested
    re-fetch.
 3. **Resolved delivery.** Content ships wrapped in the boundary's hydration
-   markers plus a `<!--t-await:[...]-->` payload (the values as JSON, in read
-   order, `-->` escaped).
+   markers plus a `<!--t-await:[...]-->` payload (the values as JSON, in the
+   order the render pass first read them, `-->` escaped).
 4. **Degrade to `with` + client fetch** on any instability: settle timed out,
-   the render pass doesn't replay the collect pass exactly (different read
-   count, unknown nested boundary — branch structure that depends on the
-   async values), a client-fetch getter was read (the client would suspend on
-   it), or a read rejected. Degradation is the honest output, not a failure —
-   it is exactly the default path.
+   the render pass reads a `source: "server"` getter the collect pass never
+   touched (the value can't be resolved without a fetch), a client-fetch getter
+   was read (the client would suspend on it), or a read rejected. Degradation
+   is the honest output, not a failure — it is exactly the default path.
 5. **Hydration.** `runAwait` reads the payload after the anchor; `$async`
    seeds its computed from it — the server's HTML is adopted directly, no
    fallback flash, no blocking re-fetch. The thunk still runs once in the

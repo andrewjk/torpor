@@ -367,31 +367,3 @@ server's content.
 
 Fix direction: emit/read a branch identity marker during hydration so a
 mismatched branch is cleared and re-rendered, rather than adopted.
-
-### `source: "server"` getters must be read exactly once per boundary render
-
-A `source: "server"` `$async` getter is read positionally: the boundary's
-collect pass records each read, then the render pass consumes them in the same
-order (`runServerAwait`). The collect pass runs with the value `undefined`, so
-if the markup branches on the value (`@if ($state.doc) { ... }`), the render
-pass reads it in branches the collect pass skipped, runs past the recorded
-reads, and the whole boundary **silently degrades to the `with` branch** --
-full renders then show the loading branch even though the data was resolved
-server-side.
-
-So a deferred page must read the getter once and use a plain local for the rest.
-`@const` was the natural binding, but it is broken in `@await` (entry above), so
-Mallet uses a non-default component in the same file:
-
-```torp
-@await {
-	<DocDetail doc={$state.doc ?? null} />
-} with {
-	<div class="empty">Loading document…</div>
-}
-```
-
-The prop expression is the single read; the child reads a plain prop. Worth
-either making the collect/render passes tolerate differing reads (e.g. record
-by getter identity rather than position) or documenting the one-read rule
-explicitly in the async docs.

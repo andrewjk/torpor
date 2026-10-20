@@ -1,4 +1,6 @@
 import type AsyncOptions from "../types/AsyncOptions";
+import { currentServerReadSite } from "./$serverWatch";
+import type ServerAwaitState from "./serverAwaitState";
 import {
 	currentServerAwait,
 	ServerAwaitMisaligned,
@@ -28,13 +30,16 @@ export const SERVER_ASYNC_TIMEOUT = 5000;
  *
  * - **Collect pass** — calls the thunk (starting the fetch) and records the
  *   promise on the enclosing boundary, so sibling reads start in one wave.
- *   Returns `undefined`; the speculative pass's output is discarded.
- * - **Render pass** — returns the settled value from the recorded promise at
- *   the same position in read order, without calling the thunk again. A
- *   rejection is re-thrown here so `@try`/`@error` handles it like any other
- *   render error. Running past the recorded reads throws a sentinel that
- *   degrades the boundary (the render pass no longer matches the collect
- *   pass, so the shipped HTML can't be trusted).
+ *   The read is keyed by getter identity (watched object + property key), so
+ *   reading the same getter again reuses the recorded fetch. Returns
+ *   `undefined`; the speculative pass's output is discarded.
+ * - **Render pass** — returns the settled value for the same getter identity,
+ *   without calling the thunk again. The pass may read a getter any number of
+ *   times, so markup may branch on the resolved value. A rejection is
+ *   re-thrown here so `@try`/`@error` handles it like any other render error.
+ *   Reading a getter the collect pass never touched throws a sentinel that
+ *   degrades the boundary (its value can't be resolved without fetching, and
+ *   the shipped HTML can't be trusted).
  *
  * Outside any `@await` boundary (including in a `with` branch) a
  * `source: "server"` read returns `undefined` without fetching — the same
@@ -55,35 +60,49 @@ export default function $serverAsync<T>(
 		return undefined as T;
 	}
 
+	// Identity captured before the thunk runs: reads inside the thunk (e.g.
+	// `$state.id`) must not be mistaken for the getter being read here
+	const site = currentServerReadSite();
+	const owner = site?.owner ?? null;
+	const key = site?.key ?? fn.toString();
+
 	if (state.phase === "collect") {
-		const entry: ServerPromiseEntry = {
-			promise: fn(),
-			timeout: options.timeout ?? SERVER_ASYNC_TIMEOUT,
-		};
-		// Record the outcome as soon as it settles — this both captures the
-		// value/error for the render pass and consumes the rejection, so a
-		// boundary that degrades (timeout) or a superseded fetch can never
-		// surface as an unhandled rejection
-		entry.promise.then(
-			(value) => {
-				entry.result = { ok: true, value };
-			},
-			(error) => {
-				entry.result = { ok: false, error };
-			},
-		);
-		state.promises.push(entry);
+		// A repeated read of the same getter shares the first fetch
+		const existing = findEntry(state, owner, key);
+		if (existing === undefined) {
+			const entry: ServerPromiseEntry = {
+				owner,
+				key,
+				promise: fn(),
+				timeout: options.timeout ?? SERVER_ASYNC_TIMEOUT,
+			};
+			// Record the outcome as soon as it settles — this both captures the
+			// value/error for the render pass and consumes the rejection, so a
+			// boundary that degrades (timeout) or a superseded fetch can never
+			// surface as an unhandled rejection
+			entry.promise.then(
+				(value) => {
+					entry.result = { ok: true, value };
+				},
+				(error) => {
+					entry.result = { ok: false, error };
+				},
+			);
+			state.promises.push(entry);
+		}
 		return undefined as T;
 	}
 
-	// Render pass: consume the recorded read at this position
-	const index = state.cursor;
-	if (index >= state.promises.length) {
+	// Render pass: look the recorded read up by getter identity
+	const entry = findEntry(state, owner, key);
+	if (entry === undefined) {
 		throw new ServerAwaitMisaligned();
 	}
-	state.cursor++;
-	state.renderReads++;
-	const result = state.promises[index].result;
+	if (!state.renderSeen.has(entry)) {
+		state.renderSeen.add(entry);
+		state.renderEntries.push(entry);
+	}
+	const result = entry.result;
 	if (result === undefined) {
 		// Not settled — only possible when the boundary already blew its
 		// timeout, which degrades before rendering; treat as misaligned
@@ -93,4 +112,17 @@ export default function $serverAsync<T>(
 		return result.value as T;
 	}
 	throw result.error;
+}
+
+function findEntry(
+	state: ServerAwaitState,
+	owner: object | null,
+	key: PropertyKey | string,
+): ServerPromiseEntry | undefined {
+	for (const entry of state.promises) {
+		if (entry.owner === owner && entry.key === key) {
+			return entry;
+		}
+	}
+	return undefined;
 }

@@ -71,6 +71,80 @@ test("a dependency change after hydration re-fetches", async () => {
 	await waitFor(() => expect(queryByText(container, "Result: data v4")).not.toBeNull());
 });
 
+const branchSource = `
+export default function ServerAsyncBranch() {
+	let $state = $watch({
+		get doc() {
+			return $async(() => Promise.resolve({ title: "Hello" }), { source: "server" });
+		},
+	});
+
+	@render {
+		@await {
+			@if ($state.doc) {
+				<p>Doc: {$state.doc.title}</p>
+			} else {
+				<p>No doc</p>
+			}
+		} with {
+			<p>Loading branch...</p>
+		}
+	}
+}
+`;
+
+test("markup may branch on a server value and read the getter more than once", async () => {
+	const serverComponent = await importComponent(import.meta.filename, branchSource, "server");
+	const { body } = await serverComponent(undefined);
+
+	// The collect pass saw `undefined` (so it took the else branch); the
+	// render pass takes the if branch and reads the same getter again. Reads
+	// are matched by getter identity, not position, so this still ships
+	// resolved content.
+	expect(body).toContain("Doc: Hello");
+	expect(body).not.toContain("No doc");
+	expect(body).not.toContain("Loading branch");
+	expect(body).toContain(`<!--t-await:[{"title":"Hello"}]-->`);
+});
+
+test("hydration adopts content whose markup branches on the server value", async () => {
+	const container = document.createElement("div");
+	const clientComponent = await importComponent(import.meta.filename, branchSource, "client");
+	const serverComponent = await importComponent(import.meta.filename, branchSource, "server");
+	await hydrateComponent(container, clientComponent, serverComponent);
+
+	expect(queryByText(container, "Loading branch...")).toBeNull();
+	expect(queryByText(container, "Doc: Hello")).not.toBeNull();
+});
+
+const repeatedReadSource = `
+export default function ServerAsyncRepeated() {
+	let $state = $watch({
+		get doc() {
+			return $async(() => Promise.resolve("same"), { source: "server" });
+		},
+	});
+
+	@render {
+		@await {
+			<p>{$state.doc} and {$state.doc}</p>
+		} with {
+			<p>Loading repeated...</p>
+		}
+	}
+}
+`;
+
+test("repeated reads of one getter share a fetch and ship one payload value", async () => {
+	const serverComponent = await importComponent(import.meta.filename, repeatedReadSource, "server");
+	const { body } = await serverComponent(undefined);
+
+	expect(body).toContain("same and same");
+	// The client seeds one computed per getter, so the payload must not
+	// repeat the value for each template read
+	expect(body).toContain(`<!--t-await:["same"]-->`);
+});
+
 const slowSource = `
 export default function ServerAsyncSlow() {
 	let $state = $watch({

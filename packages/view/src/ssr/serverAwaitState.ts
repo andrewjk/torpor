@@ -10,8 +10,10 @@
  *   here. Sibling reads in the same pass therefore start in one wave, exactly
  *   like the client's speculative render.
  * - **Render phase** — after the recorded promises settle, the content is
- *   rendered again; getter reads consume the settled values through a cursor
- *   in record order. The second pass's output is what ships.
+ *   rendered again; getter reads look up the settled value by getter identity
+ *   (watched object + property key), so the pass may read a getter a different
+ *   number of times than the collect pass did. The second pass's output is
+ *   what ships.
  *
  * `current` is only ever read synchronously (inside a helper's render
  * segments), so concurrent requests interleave safely: each helper captures
@@ -22,22 +24,22 @@ export default interface ServerAwaitState {
 	phase: "collect" | "render";
 
 	/**
-	 * Recorded `source: "server"` reads, in read order. Each entry holds the
-	 * promise, its per-getter timeout, and — once settled — the fulfilled
-	 * value or rejection.
+	 * Recorded `source: "server"` reads, in first-read order. Each entry holds
+	 * the getter identity, the promise, its per-getter timeout, and — once
+	 * settled — the fulfilled value or rejection. A getter read more than once
+	 * is recorded once, so repeated reads share one fetch.
 	 */
 	promises: ServerPromiseEntry[];
 
-	/** How many values the render phase has consumed (the payload cursor). */
-	cursor: number;
-
 	/**
-	 * `source: "server"` reads made during the render pass. Pass 1 and pass 2
-	 * must read the same getters in the same order; a count mismatch at the
-	 * end of pass 2 means the render isn't stable, so the boundary degrades
-	 * to the `with` branch + client fetch.
+	 * Recorded reads made during the render pass, in first-read order. This is
+	 * the order the client will read the getters during hydration, so it also
+	 * determines the payload's value order.
 	 */
-	renderReads: number;
+	renderEntries: ServerPromiseEntry[];
+
+	/** Entries in `renderEntries`, for O(1) dedup while rendering. */
+	renderSeen: Set<ServerPromiseEntry>;
 
 	/**
 	 * Client-fetch `$async` reads made during the render pass (the server
@@ -77,10 +79,14 @@ export default interface ServerAwaitState {
 }
 
 /**
- * A recorded `source: "server"` read: the promise returned by the getter's
- * thunk, and the settled outcome once it arrives.
+ * A recorded `source: "server"` read: the getter identity, the promise
+ * returned by the getter's thunk, and the settled outcome once it arrives.
  */
 export interface ServerPromiseEntry {
+	/** The watched object (or null for an untracked getter). */
+	owner: object | null;
+	/** The property key on `owner` (or the thunk source when untracked). */
+	key: PropertyKey | string;
 	promise: Promise<any>;
 	timeout: number;
 	/** Set by the settle handler: `{ ok: true, value }` or `{ ok: false, error }`. */
@@ -88,8 +94,8 @@ export interface ServerPromiseEntry {
 }
 
 /**
- * The sentinel thrown when the render pass hits a boundary state that the
- * collect pass didn't create (or a cursor that ran past the recorded reads).
+ * The sentinel thrown when the render pass reads a `source: "server"` getter
+ * that the collect pass never recorded (or one whose value hasn't settled).
  * Only this error degrades the boundary; real render errors propagate.
  */
 export class ServerAwaitMisaligned extends Error {
@@ -129,8 +135,8 @@ export function newServerAwaitState(): ServerAwaitState {
 	return {
 		phase: "collect",
 		promises: [],
-		cursor: 0,
-		renderReads: 0,
+		renderEntries: [],
+		renderSeen: new Set(),
 		clientReads: 0,
 		children: new Map(),
 		counters: new Map(),

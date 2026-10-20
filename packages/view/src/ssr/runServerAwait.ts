@@ -35,12 +35,13 @@ function nextSentinel(): string {
  *
  * The lifecycle: render content once to start the `source: "server"` fetches
  * (discarding the output), wait for them with a per-getter timeout, then
- * render again with the settled values. The second pass ships wrapped in
- * hydration markers plus a `<!--t-await:...-->` comment carrying the values
- * for the client's `$async` hydration path. Any instability — timeout, a
- * render pass that reads a different set of getters, a client-fetch read —
- * degrades to the `with` branch + client fetch, exactly the pre-`source`
- * behavior.
+ * render again with the settled values. Reads are matched by getter identity,
+ * so the render pass may read a getter more than once (e.g. branch on it).
+ * The second pass ships wrapped in hydration markers plus a
+ * `<!--t-await:...-->` comment carrying the values for the client's `$async`
+ * hydration path. Any instability — timeout, a render pass that reads a getter
+ * the collect pass never touched, a client-fetch read — degrades to the `with`
+ * branch + client fetch, exactly the pre-`source` behavior.
  *
  * @param id The boundary's site id (unique per `@await` in the component)
  * @param renderContent Renders the content branch (may read `$async` getters)
@@ -128,10 +129,12 @@ async function renderBoundary(
 		new Promise<false>((resolve) => setTimeout(resolve, timeout, false)),
 	]);
 
-	// Render pass: same reads, now consuming settled values through the
-	// cursor. The pass must replay the collect pass exactly — a different
-	// read count, an unknown nested boundary, or a client-fetch read all
-	// mean the content can't be trusted, and the boundary degrades.
+	// Render pass: same reads, now looking settled values up by getter
+	// identity. The pass may read a getter more than once (markup can branch
+	// on its value), but every read must have been recorded by the collect
+	// pass. A read the collect pass never touched, a client-fetch read, or a
+	// render error means the content can't be trusted, and the boundary
+	// degrades.
 	//
 	// A rejection (or any render error) also degrades: the boundary's
 	// lifecycle runs detached from the enclosing render (which has already
@@ -143,13 +146,13 @@ async function renderBoundary(
 	let content: { body: string; head: string } | undefined;
 	if (!degraded) {
 		state.phase = "render";
-		state.cursor = 0;
-		state.renderReads = 0;
+		state.renderEntries.length = 0;
+		state.renderSeen.clear();
 		state.clientReads = 0;
 		state.counters.clear();
 		try {
 			content = await withServerAwait(state, renderContent);
-			if (state.cursor !== state.promises.length || state.clientReads > 0) {
+			if (state.clientReads > 0) {
 				degraded = true;
 			}
 		} catch {
@@ -172,8 +175,8 @@ async function renderBoundary(
 	// Rejections never reach here — the render pass consumes them and
 	// degrades — but guard anyway so a bad entry can't ship as `undefined`
 	const values: any[] = [];
-	for (let i = 0; i < state.cursor; i++) {
-		const result = state.promises[i].result;
+	for (const entry of state.renderEntries) {
+		const result = entry.result;
 		if (result === undefined) {
 			degraded = true;
 			break;
@@ -192,8 +195,9 @@ async function renderBoundary(
 
 /**
  * The `<!--t-await:...-->` comment carrying the boundary's resolved values,
- * in read order, for the client's `$async` hydration path. `-->` inside the
- * JSON is escaped so the comment can't terminate early.
+ * in the order the render pass first read them, for the client's `$async`
+ * hydration path. `-->` inside the JSON is escaped so the comment can't
+ * terminate early.
  */
 function payloadComment(values: any[]): string {
 	const json = JSON.stringify(values).replaceAll("-->", "--\\u003E");
