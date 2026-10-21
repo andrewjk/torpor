@@ -125,11 +125,18 @@ try {
 	}
 
 	function textAreaMount(e: HTMLTextAreaElement) {
-		// HACK: Something is out of order somewhere
-		setTimeout(() => {
+		const resize = () => {
+			e.style.height = "auto";
 			e.style.height = e.scrollHeight + "px";
-			e.style.overflowY = "hidden";
-		}, 1);
+		};
+		resize();
+		e.style.overflowY = "hidden";
+		// The value is applied around mount time, and web fonts can change the
+		// metrics after the first layout -- resize again once both have settled
+		requestAnimationFrame(resize);
+		if (document.fonts) {
+			void document.fonts.ready.then(resize);
+		}
 	}
 
 	function textAreaInput(this: Element) {
