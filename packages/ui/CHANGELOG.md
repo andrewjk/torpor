@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.2.3
+
+<sub>2026-10-21</sub>
+
+- _(patch)_ Fix: render Option label slot
+
 ## 1.2.2
 
 <sub>2026-10-15</sub>

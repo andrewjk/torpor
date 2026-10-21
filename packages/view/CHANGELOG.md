@@ -1,5 +1,13 @@
 # @torpor/view
 
+## 1.2.2
+
+<sub>2026-10-21</sub>
+
+- _(patch)_ Fix: emit @const before controls that read it
+- _(patch)_ Fix: read server async getters by identity
+- _(patch)_ Fix: suspend @await content on pending reads
+
 ## 1.2.1
 
 <sub>2026-10-15</sub>

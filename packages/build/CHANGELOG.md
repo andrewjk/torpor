@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.8.1
+
+<sub>2026-10-21</sub>
+
+- _(patch)_ Fix: exclude torpor packages from SSR optimizer
+
 ## 1.8.0
 
 <sub>2026-10-19</sub>
