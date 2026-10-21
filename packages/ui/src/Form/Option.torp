@@ -27,6 +27,8 @@ export default function Option($props: OptionProps | undefined) {
 			class={["torp-option", $props?.class]}
 			{$props?.style}
 			&value={$state.value}
-		/>
+		>
+			<slot />
+		</option>
 	}
 }

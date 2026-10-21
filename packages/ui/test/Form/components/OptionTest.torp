@@ -1,0 +1,16 @@
+import { Option, Select } from "../../../src/Form/index";
+
+export default function OptionTest() {
+	let $state = $watch({
+		data: {
+			color: "red",
+		},
+	});
+
+	@render {
+		<Select &value={$state.data.color}>
+			<Option value="red">Red</Option>
+			<Option value="blue">Blue</Option>
+		</Select>
+	}
+}
