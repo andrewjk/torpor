@@ -3,6 +3,7 @@ import type Computed from "../types/Computed";
 import type Effect from "../types/Effect";
 import type ProxyData from "../types/ProxyData";
 import { COMPUTED_TYPE, EFFECT_TYPE, SIGNAL_TYPE } from "../types/constants";
+import { AwaitSuspend } from "../render/AwaitSuspend";
 import batchEnd from "./batchEnd";
 import batchStart from "./batchStart";
 import checkComputed from "./checkComputed";
@@ -23,10 +24,13 @@ import trackSignal from "./trackSignal";
  * (the computed has resolved before) returns the previously resolved value
  * held in `staleValue`, so readers keep displaying the old content instead of
  * a placeholder — an `@await` boundary thus keeps its content mounted
- * rather than flashing the `with` branch. On a first load (`staleValue` is
- * undefined) returns `undefined`, which the boundary replaces with its
- * `with` branch. In peek mode (used by `$pending`) always returns `undefined`
- * — the value isn't needed, only the subscription.
+ * rather than flashing the `with` branch. On a first load (or a retry after a
+ * rejection, both of which have no stale value), inside an `@await` boundary,
+ * throws `AwaitSuspend` to abort the speculative content render so the
+ * boundary can show its `with` branch — a direct `undefined` return would
+ * make user code that dereferences the value throw a `TypeError` first. In
+ * peek mode (used by `$pending`) always returns `undefined` — the value isn't
+ * needed, only the subscription.
  */
 function suspendRead(signal: Computed): any {
 	trackSignal(signal);
@@ -69,6 +73,13 @@ function suspendRead(signal: Computed): any {
 			context.activeTarget = boundaryEffect;
 			trackSignal(signal);
 			context.activeTarget = oldActive;
+		}
+		// First load (or a retry after a rejection, which clears the stale
+		// value): there is no value to display, and returning `undefined`
+		// would let dereferences throw before the boundary can switch
+		// branches. Abort the speculative render instead.
+		if (!signal.hasResolved || signal.lastErrored) {
+			throw new AwaitSuspend();
 		}
 	}
 	return signal.staleValue;

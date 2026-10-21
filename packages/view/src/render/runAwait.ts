@@ -3,6 +3,7 @@ import type AwaitBoundary from "../types/AwaitBoundary";
 import type Region from "../types/Region";
 import $run from "../watch/$run";
 import trackSignal from "../watch/trackSignal";
+import { AwaitSuspend } from "./AwaitSuspend";
 import context from "./context";
 import isCommentNode from "./isCommentNode";
 import newRegion from "./newRegion";
@@ -21,7 +22,11 @@ const SERVER_VALUES_PREFIX = "t-await:";
 /**
  * Renders an `@await` boundary. On the first run, content is rendered
  * speculatively; if any read inside suspends (`didSuspend`), the boundary
- * discards the partial render and shows the `with` branch instead.
+ * discards the partial render and shows the `with` branch instead. If the
+ * content dereferences a first-load pending value before the boundary can
+ * check, `suspendRead` throws `AwaitSuspend`; it is caught here so the partial
+ * render is cleared and the fallback is shown instead of surfacing a
+ * `TypeError`.
  *
  * Hydration of a server-resolved boundary (ASYNC.md → "Server rendering"): when the server
  * shipped resolved content, its values ride in a payload comment after the
@@ -106,8 +111,13 @@ export default function runAwait(
 			context.previousRegion = region;
 			const branchRegion = newRegion(targetIndex === 0 ? "await_content" : "await_with");
 			const oldR = pushRegion(branchRegion, true);
-			fn(anchor);
-			popRegion(oldR);
+			try {
+				fn(anchor);
+			} finally {
+				// A first-load suspend aborts the content render mid-way, so
+				// the branch region must be popped on the way out
+				popRegion(oldR);
+			}
 			index = targetIndex;
 		};
 
@@ -136,15 +146,32 @@ export default function runAwait(
 				context.hydrationNode = null;
 			}
 
-			renderBranch(0, renderContent);
-
-			context.hydrationNode = savedHydration;
-			context.serverValues = savedServerValues;
-
-			context.awaitBoundary = oldBoundary;
+			let aborted = false;
+			try {
+				renderBranch(0, renderContent);
+			} catch (error) {
+				// A first-load pending read dereferenced by the content: there
+				// is no value to display, so discard the partial render and
+				// fall through to the `with` branch. Teach `runControlBranch`
+				// that the partial content was the previous branch so the
+				// fallback (or an empty branch) clears it.
+				if (!(error instanceof AwaitSuspend)) {
+					throw error;
+				}
+				aborted = true;
+				index = 0;
+			} finally {
+				context.hydrationNode = savedHydration;
+				context.serverValues = savedServerValues;
+				context.awaitBoundary = oldBoundary;
+			}
 
 			if (boundary.suspended && renderWith !== null) {
 				renderBranch(1, renderWith);
+			} else if (boundary.suspended && aborted) {
+				// No with-branch: clear the aborted partial content
+				runControlBranch(region, index, 1);
+				index = 1;
 			} else if (!boundary.suspended) {
 				// Content rendered without suspending — mark it so a later
 				// refresh suspend keeps showing stale content (§6.2).

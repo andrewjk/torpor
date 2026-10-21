@@ -65,10 +65,14 @@ from the value.
 
 The piece of hidden machinery everything else stands on: a `didSuspend` flag on
 the `Computed` that `$async` creates. The proxy get trap reads it beside the
-existing `didError`/`recalc` indicators; a read that hits it returns a
-placeholder, taints the active reader up the cache chain, and notifies the
-nearest `@await` boundary through `context.awaitBoundary` — the same
-set-flag-and-drain-through-the-graph shape as `$onmount`'s mount effects.
+existing `didError`/`recalc` indicators; a read that hits it taints the active
+reader up the cache chain and notifies the nearest `@await` boundary through
+`context.awaitBoundary` — the same set-flag-and-drain-through-the-graph shape as
+`$onmount`'s mount effects. A refresh suspend returns the retained stale value.
+A first-load suspend has no value to return, so inside a boundary the read
+throws an internal abort sentinel: the boundary discards the speculative content
+render and shows its `with` branch, instead of letting a dereference or call on
+the missing value throw a `TypeError`.
 
 **Suspend is data, not control flow.** The alternative — throwing a
 `PromiseNotReady` and catching it at the boundary — reuses the error cache for
@@ -76,7 +80,10 @@ free, but puts an exception on every reactive read of a pending promise:
 pause-on-exceptions trips constantly in the debugger, V8 throw overhead lands
 on the hot path, and user code under `@await` needs fragile `instanceof`
 checks. With the flag, suspend and error never meet at the same throw site:
-`@try` catches errors, `@await` catches suspends.
+`@try` catches errors, `@await` catches suspends. The first-load abort sentinel
+is the one exception, and it is strictly internal: it unwinds a speculative
+render that already read a missing value, never reaches user code, and does not
+carry suspension state.
 
 - **`$cache` and `$async` are peers** — one or the other per getter, never both.
   There is no static check (the template compiler emits expressions verbatim; a
@@ -87,7 +94,8 @@ checks. With the flag, suspend and error never meet at the same throw site:
   resolved value (refresh) — the undefined-then-recover contract. It's
   load-bearing: `$refresh`-driven views and plain template reads work without a
   wrapper because of it. The rule that comes with it: don't use a first-load
-  read's value as data — gate on it, use `$pending`, or put it in a boundary.
+  read's value as data — gate on it, use `$pending`, or put it in a boundary
+  (where a dereference now suspends instead of crashing).
 - **Effects don't suspend.** Deferring an effect body until resolve was
   rejected: side effects can't be speculatively run and rolled back the way a
   boundary's render can. A crashed effect re-subscribes through

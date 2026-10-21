@@ -68,6 +68,81 @@ test("@const in @await content is emitted before the controls that read it", asy
 	expect(queryByText(container, "Const: 1")).not.toBeNull();
 });
 
+const dereferenceSource = `
+export default function AwaitDereference() {
+	let $state = $watch({
+		get data() {
+			return $async(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve({ rows: [{ id: 1 }, { id: 2 }] }), 10);
+					}),
+			);
+		},
+	});
+
+	@render {
+		@await {
+			@for (let row of $state.data.rows) {
+				<p>Row {row.id}</p>
+			}
+		} with {
+			<p>Loading rows...</p>
+		}
+	}
+}
+`;
+
+test("@await content that dereferences a pending value suspends to the with branch", async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, dereferenceSource, "client");
+	mountComponent(container, component);
+
+	// The speculative content render reads `$state.data.rows` while `data` is
+	// pending. It must abort and show the with-branch, not throw a TypeError.
+	expect(queryByText(container, "Loading rows...")).not.toBeNull();
+
+	const { waitFor } = await import("@testing-library/dom");
+	await waitFor(() => expect(queryByText(container, "Row 1")).not.toBeNull());
+	expect(queryByText(container, "Row 2")).not.toBeNull();
+	expect(queryByText(container, "Loading rows...")).toBeNull();
+});
+
+const noWithDereferenceSource = `
+export default function AwaitDereferenceNoWith() {
+	let $state = $watch({
+		get data() {
+			return $async(
+				() =>
+					new Promise((resolve) => {
+						setTimeout(() => resolve({ rows: ["A"] }), 10);
+					}),
+			);
+		},
+	});
+
+	@render {
+		@await {
+			@for (let row of $state.data.rows) {
+				<p>Row {row}</p>
+			}
+		}
+	}
+}
+`;
+
+test("@await without a with-branch clears content aborted by a pending dereference", async () => {
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, noWithDereferenceSource, "client");
+	mountComponent(container, component);
+
+	// Nothing for the aborted content should remain
+	expect(container.textContent?.trim()).toBe("");
+
+	const { waitFor } = await import("@testing-library/dom");
+	await waitFor(() => expect(queryByText(container, "Row A")).not.toBeNull());
+});
+
 test("@await without a with-branch shows nothing while suspended", async () => {
 	const sourceNoFallback = `
 	export default function AwaitNoWith() {
