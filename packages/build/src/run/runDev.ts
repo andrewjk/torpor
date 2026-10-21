@@ -6,6 +6,7 @@ import {
 	type AliasOptions,
 	createServer as createViteServer,
 	type Plugin,
+	type UserConfig,
 	type ViteDevServer,
 } from "vite";
 import Site from "../site/Site.ts";
@@ -97,11 +98,7 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	// site.config.ts, and let the dep optimizer know how to compile them
 	// here. The optimizer is a rolldown build, so it needs a rolldown-shaped
 	// plugin (the vite export) -- an esbuild-shaped one is silently ignored
-	config.optimizeDeps ??= {};
-	config.optimizeDeps.extensions ??= [];
-	config.optimizeDeps.extensions.push(".torp");
-	config.optimizeDeps.rolldownOptions ??= {};
-	config.optimizeDeps.rolldownOptions.plugins ??= [torpor()];
+	addTorpOptimizerSettings((config.optimizeDeps ??= {}));
 
 	// Packages that ship `.torp` files (e.g. icon libraries) need the torpor
 	// compiler: dep optimization would parse them as plain JavaScript and
@@ -109,6 +106,13 @@ export default async function runDev(site: Site, configVite?: ViteDevServer): Pr
 	// Node/workerd can't load. Exclude them from optimization and mark them
 	// for SSR bundling so they go through the torpor plugin
 	addTorporPackageConfig(site.root, config);
+
+	// The SSR environment optimizer has its own settings; mirror the compiler
+	// setup there too. Without this, a cold dep cache still prebundles torpor
+	// packages (and parses their `.torp` files as JS) even though the root
+	// optimizer excludes them.
+	addTorpOptimizerSettings(((config.ssr ??= {}).optimizeDeps ??= {}));
+	addTorpOptimizerSettings((((config.environments ??= {}).ssr ??= {}).optimizeDeps ??= {}));
 
 	// Workspace packages may have been rebuilt since the last dev run; drop
 	// this config's Vite dep cache so SSR never executes stale prebundled
@@ -327,4 +331,19 @@ function asAliasArray(alias: AliasOptions | undefined): AliasEntry[] {
 	if (!alias) return [];
 	if (Array.isArray(alias)) return alias;
 	return Object.entries(alias).map(([find, replacement]) => ({ find, replacement }));
+}
+
+/**
+ * Teaches a dep optimizer how to compile `.torp` files. The optimizer is a
+ * rolldown build, so it needs a rolldown-shaped plugin (the vite export) — an
+ * esbuild-shaped one is silently ignored. Applied to the root optimizer and
+ * to each SSR optimizer, which keeps its own settings.
+ */
+function addTorpOptimizerSettings(optimizeDeps: NonNullable<UserConfig["optimizeDeps"]>): void {
+	optimizeDeps.extensions ??= [];
+	if (!optimizeDeps.extensions.includes(".torp")) {
+		optimizeDeps.extensions.push(".torp");
+	}
+	optimizeDeps.rolldownOptions ??= {};
+	optimizeDeps.rolldownOptions.plugins ??= [torpor()];
 }

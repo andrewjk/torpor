@@ -50,13 +50,20 @@ export default function findTorporPackages(siteRoot: string): string[] {
  * Adds `optimizeDeps.exclude` and `ssr.noExternal` entries for packages that
  * ship `.torp` files, so that they are served/bundled through the torpor
  * compiler instead.
+ *
+ * The exclusions are mirrored into the SSR optimizer too: Vite's SSR
+ * environment optimizer has its own `optimizeDeps` settings, and without the
+ * mirror it still prebundles the package and parses its raw `.torp` files as
+ * JavaScript. That only shows up on a cold dep cache (a warm cache from before
+ * the package was installed masks it), so the root-level exclusion is not
+ * enough.
  */
 export function addTorporPackageConfig(siteRoot: string, config: UserConfig): void {
 	const packages = findTorporPackages(siteRoot);
 	if (packages.length === 0) return;
 
 	config.optimizeDeps ??= {};
-	config.optimizeDeps.exclude = [...(config.optimizeDeps.exclude ?? []), ...packages];
+	config.optimizeDeps.exclude = mergeUnique(config.optimizeDeps.exclude, packages);
 
 	config.ssr ??= {};
 	const noExternal = config.ssr.noExternal;
@@ -67,6 +74,26 @@ export function addTorporPackageConfig(siteRoot: string, config: UserConfig): vo
 	}
 	// For `true` (bundle everything) or string/regex values there is nothing
 	// sensible to merge, and they already bundle more than we need
+
+	// The SSR dep optimizer has its own config (the legacy `ssr.optimizeDeps`
+	// form and the environment-scoped form used by Vite's environment API).
+	// Mirror the exclusions into both so a cold start doesn't parse `.torp`
+	// files as JS.
+	config.ssr.optimizeDeps ??= {};
+	config.ssr.optimizeDeps.exclude = mergeUnique(config.ssr.optimizeDeps.exclude, packages);
+
+	config.environments ??= {};
+	config.environments.ssr ??= {};
+	config.environments.ssr.optimizeDeps ??= {};
+	config.environments.ssr.optimizeDeps.exclude = mergeUnique(
+		config.environments.ssr.optimizeDeps.exclude,
+		packages,
+	);
+}
+
+/** Appends values to an exclusion list without introducing duplicates. */
+function mergeUnique(existing: string[] | undefined, values: string[]): string[] {
+	return [...new Set([...(existing ?? []), ...values])];
 }
 
 function dependencyNames(pkg: PackageJson): string[] {

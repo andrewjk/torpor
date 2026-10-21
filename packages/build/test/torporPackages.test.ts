@@ -109,26 +109,24 @@ test("addTorporPackageConfig -- sets optimizeDeps and ssr config", () => {
 	const config: Record<string, any> = {};
 	addTorporPackageConfig(root, config as any);
 
-	expect(config.optimizeDeps.exclude.sort()).toEqual([
-		"@scope/icons",
-		"bool-icons",
-		"fake-icons",
-		"hidden-icons",
-		"nested-icons",
-	]);
-	expect(config.ssr.noExternal.sort()).toEqual([
-		"@scope/icons",
-		"bool-icons",
-		"fake-icons",
-		"hidden-icons",
-		"nested-icons",
-	]);
+	const expected = ["@scope/icons", "bool-icons", "fake-icons", "hidden-icons", "nested-icons"];
+	expect(config.optimizeDeps.exclude.sort()).toEqual(expected);
+	expect(config.ssr.noExternal.sort()).toEqual(expected);
+	// The SSR dep optimizer has its own config in both legacy and
+	// environment-scoped forms; both must exclude the torpor packages or a
+	// cold start prebundles and parses their `.torp` files as JS
+	expect(config.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
+	expect(config.environments.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
 });
 
 test("addTorporPackageConfig -- merges with existing config", () => {
 	const config: Record<string, any> = {
 		optimizeDeps: { exclude: ["other-dep"] },
-		ssr: { noExternal: ["another-dep"] },
+		ssr: {
+			noExternal: ["another-dep"],
+			optimizeDeps: { exclude: ["ssr-other-dep"] },
+		},
+		environments: { ssr: { optimizeDeps: { exclude: ["env-other-dep"] } } },
 	};
 	addTorporPackageConfig(root, config as any);
 
@@ -136,6 +134,16 @@ test("addTorporPackageConfig -- merges with existing config", () => {
 	expect(config.optimizeDeps.exclude).toContain("fake-icons");
 	expect(config.ssr.noExternal).toContain("another-dep");
 	expect(config.ssr.noExternal).toContain("fake-icons");
+	expect(config.ssr.optimizeDeps.exclude).toContain("ssr-other-dep");
+	expect(config.ssr.optimizeDeps.exclude).toContain("fake-icons");
+	expect(config.environments.ssr.optimizeDeps.exclude).toContain("env-other-dep");
+	expect(config.environments.ssr.optimizeDeps.exclude).toContain("fake-icons");
+
+	// Applying the config twice must not duplicate entries
+	addTorporPackageConfig(root, config as any);
+	expect(config.environments.ssr.optimizeDeps.exclude).toHaveLength(
+		new Set(config.environments.ssr.optimizeDeps.exclude).size,
+	);
 });
 
 function write(relativePath: string, content: string) {
