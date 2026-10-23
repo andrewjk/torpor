@@ -31,6 +31,12 @@ export default function fillLayoutSlot(
 ): Region {
 	const region = newRegion(devContext.enabled ? "Layout slot" : undefined);
 	const oldRegion = pushRegion(region, true);
+	// The router fills slots imperatively, outside any render/effect context,
+	// so `context.activeRegion` can be the root region (or whatever the last
+	// effect left). `pushRegion` would then rank this region against the wrong
+	// parent: `clearLayoutSlot` chains it after `previousRegion` (the layout's
+	// own region), so its depth must be derived from that region instead.
+	region.depth = region.previousRegion === null ? 0 : region.previousRegion.depth + 1;
 
 	component(parent, anchor, $props, $context, {
 		_: slot,
