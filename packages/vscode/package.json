@@ -68,7 +68,7 @@
 	"devDependencies": {
 		"@torpor/textmate": "workspace:^",
 		"@types/node": "^26.6.5",
-		"@types/vscode": "^1.140.0",
+		"@types/vscode": "1.105.0",
 		"@typescript/native-preview": "7.0.0-dev.20260707.2",
 		"@vscode/vsce": "^4.0.0",
 		"esbuild": "^0.28.2",
