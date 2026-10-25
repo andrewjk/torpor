@@ -1,0 +1,18 @@
+import { Chart, ChartLegend, ChartLines, ChartGrid, ChartXAxis, ChartYAxis } from "../../../src/Charts/index";
+
+/**
+ * A hand-composed chart with a legend, which reserves a strip along the
+ * bottom that the marks stay out of
+ */
+export default function LegendChartTest($props: any) {
+	@render {
+		<Chart ariaLabel="Legend" height={200} width={400} maxValue={100} stepCount={2} stepValue={50} series={$props.series}>
+			<ChartYAxis />
+			<ChartGrid />
+			<ChartXAxis />
+			<ChartLegend />
+			<ChartLines seriesIndex={0} />
+			<ChartLines seriesIndex={1} />
+		</Chart>
+	}
+}

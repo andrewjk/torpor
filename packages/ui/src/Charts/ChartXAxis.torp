@@ -12,6 +12,10 @@ interface ChartXAxisProps {
  * the bottom with each series' label centered under its slot; for
  * horizontal marks (bars) it becomes the value scale, with a tick for each
  * step along the bottom.
+ *
+ * Adding it to a Chart reserves a strip along the bottom for its labels
+ * (and its title, when there is one): marks and other layers draw only in
+ * the space left over.
  */
 export default function ChartXAxis($props?: ChartXAxisProps) {
 	const context = $context[ChartContextName] as ChartContext;
@@ -29,16 +33,25 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 		return xLabel();
 	}
 
-	function plotWidth(): number {
-		return layout.calculatedWidth - layout.chartLeft;
+	// Reserve a strip along the bottom: one row for the labels, plus one
+	// more for the title when there is one
+	$run(() => {
+		const size = layout.textHeight * (title() ? 2 : 1);
+		layout.reserve("xaxis", "bottom", size);
+		return () => layout.release("xaxis");
+	});
+
+	// The top edge of the strip reserved by this axis, where the plot ends
+	function plotBottom(): number {
+		return layout.plotY + layout.plotHeight;
 	}
 
 	function unitWidth(): number {
-		return plotWidth() / Math.max(1, layout.maxValue);
+		return layout.plotWidth / Math.max(1, layout.maxValue);
 	}
 
 	function tickX(i: number): number {
-		return layout.chartLeft + i * layout.stepValue * unitWidth();
+		return layout.plotX + i * layout.stepValue * unitWidth();
 	}
 
 	function tickY(): number {
@@ -48,7 +61,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 	@render {
 		<svg>
 			@if (showAxis()) {
-				<line x1={layout.chartLeft} y1={layout.chartBottom} x2={layout.calculatedWidth} y2={layout.chartBottom} stroke="currentcolor" />
+				<line x1={layout.plotX} y1={plotBottom()} x2={layout.plotX + layout.plotWidth} y2={plotBottom()} stroke="currentcolor" />
 			}
 			@if (!horizontal()) {
 				@if (title()) {
@@ -56,7 +69,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
-						x={layout.calculatedWidth - (layout.calculatedWidth - layout.chartLeft) / 2}
+						x={layout.plotX + layout.plotWidth / 2}
 						y={layout.calculatedHeight}
 					>
 						{title()}
@@ -67,7 +80,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 						fill="currentcolor"
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
-						x={layout.chartLeft + layout.itemWidth * i + layout.itemWidth / 2}
+						x={layout.plotX + layout.itemWidth * i + layout.itemWidth / 2}
 						y={tickY()}
 					>
 						{label}

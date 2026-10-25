@@ -77,6 +77,36 @@ surprising and the failure invisible. Options: a compiler warning when a
 template expression references a plain`let`whose initializer reads`$props`
 (detectable syntactically), and/or a note in the reactivity docs.
 
+### Adding a key to a `$watch`ed object doesn't invalidate effects that iterated it
+
+Found while building the chart layout reservations
+(packages/ui/src/utils/chartLayout.ts). `Object.keys/values/entries` on a
+`$watch`ed object read through the proxy fine, but _adding_ a property after
+an effect has iterated it does not re-run that effect (no `ownKeys`
+trigger on add/delete). Reads outside effects see the new key, so it slips
+past naive testing: the values are "there", they just never notify. The
+chart layout works around it by bumping a plain `claimsVersion` counter
+field on the same watched object whenever its claims map gains or loses a
+key, and having the dependent getters read the counter. Options: make the
+proxy trigger on ownKeys-affecting mutations (add/delete), or document the
+gap alongside the "Symbol keys and Object.keys/values/entries work" note in
+the reactivity docs.
+
+### ChartLines/ChartPoints x positions overflow the plot for multi-value series
+
+Pre-existing (visible before the reservation work, unchanged by it). Line
+and point marks place value `j` at `plotX + j * itemWidth + itemWidth/2`,
+where `itemWidth = plotWidth / labels.length` and `labels` are the _series
+names_ -- so with 2 series of 3 values each, the third point lands at
+`plotX + 2.5 * plotWidth/2`, past the right edge of the svg. The layered
+model currently conflates "series" (one per color) with "categories" (the
+x slots): ChartColumns/ChartBars treat each series as a category slot
+holding grouped values, while ChartLines treats data indexes as shared
+categories scaled by the series count. Fixing it properly wants the
+point-based data model (x per point or a shared category array), which was
+deferred when the reservation work landed -- see the DataSeries note in the
+Charts plan.
+
 ## Features
 
 ### Standard schema validation: remaining integration points

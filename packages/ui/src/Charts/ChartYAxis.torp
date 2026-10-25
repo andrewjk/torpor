@@ -1,4 +1,5 @@
 import { type ChartContext, ChartContextName } from "./ChartTypes";
+import { calculateTickLabelWidth } from "../utils/chartUtils";
 
 interface ChartYAxisProps {
 	/** Whether to draw the axis line itself (default true) */
@@ -15,8 +16,9 @@ interface ChartYAxisProps {
  * between 0 and the maximum value. For horizontal marks (bars) it carries
  * the category labels, one per band down the left.
  *
- * Drawing it on either side does not change the plot geometry; overlaying
- * an axis is purely presentational.
+ * Adding it to a Chart reserves a strip on its side of the plot: wide enough
+ * for its ticks (or the category names), plus the title when one is drawn.
+ * Marks and other layers draw only in the space left over.
  */
 export default function ChartYAxis($props?: ChartYAxisProps) {
 	const context = $context[ChartContextName] as ChartContext;
@@ -38,28 +40,43 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 		return yLabel();
 	}
 
-	function bandHeight(): number {
-		const count = Math.max(1, layout.labels.length);
-		return (layout.chartBottom - topPad()) / count;
+	function maxNameWidth(): number {
+		const maxLength = layout.labels.reduce((a, b) => Math.max(a, b.length), 0);
+		return maxLength * layout.textWidth;
 	}
+
+	// Reserve a strip on this axis's side: the tick labels plus a gap (and
+	// the rotated title's width on the left, where it is drawn)
+	$run(() => {
+		const gap = layout.textHeight / (side() === "left" ? 2 : 4);
+		const labelWidth = horizontal()
+			? maxNameWidth()
+			: calculateTickLabelWidth(layout.stepLabels, layout.textWidth);
+		const titleWidth = side() === "left" && title() ? layout.textHeight : 0;
+		layout.reserve("yaxis", side(), gap + labelWidth + titleWidth);
+		return () => layout.release("yaxis");
+	});
 
 	function topPad(): number {
 		return layout.textHeight / 3;
 	}
 
-	function bandCenter(i: number): number {
-		return topPad() + i * bandHeight() + bandHeight() / 2;
+	function bandHeight(): number {
+		const count = Math.max(1, layout.labels.length);
+		return (layout.plotHeight - topPad()) / count;
 	}
 
+	function bandCenter(i: number): number {
+		return layout.plotY + topPad() + i * bandHeight() + bandHeight() / 2;
+	}
+
+	// The axis line runs down the edge of the plot on this axis's side
 	function axisX(): number {
-		return side() === "left" ? layout.chartLeft : layout.calculatedWidth;
+		return side() === "left" ? layout.plotX : layout.plotX + layout.plotWidth;
 	}
 
 	function tickX(): number {
-		if (side() === "left") {
-			return layout.chartLeft - layout.textHeight / 4;
-		}
-		return layout.calculatedWidth + layout.textHeight / 4;
+		return side() === "left" ? axisX() - layout.textHeight / 4 : axisX() + layout.textHeight / 4;
 	}
 
 	function anchor(): string {
@@ -69,15 +86,15 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 	@render {
 		<svg>
 			@if (showAxis()) {
-				<line x1={axisX()} y1={layout.chartBottom} x2={axisX()} y2={0} stroke="currentcolor" />
+				<line x1={axisX()} y1={layout.plotY + layout.plotHeight} x2={axisX()} y2={layout.plotY} stroke="currentcolor" />
 			}
 			@if (horizontal()) {
 				@for (let [i, label] of layout.labels.entries()) {
 					<text
 						fill="currentcolor"
-						text-anchor="end"
+						text-anchor={anchor()}
 						dominant-baseline="middle"
-						x={layout.chartLeft - layout.textHeight / 4}
+						x={tickX()}
 						y={bandCenter(i)}
 					>
 						{label}
@@ -90,14 +107,19 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 						text-anchor="middle"
 						dominant-baseline="hanging"
 						x={0}
-						y={layout.chartBottom / 2}
-						transform={`rotate(-90, 0, ${layout.chartBottom / 2})`}
+						y={layout.plotY + layout.plotHeight / 2}
+						transform={`rotate(-90, 0, ${layout.plotY + layout.plotHeight / 2})`}
 					>
 						{title()}
 					</text>
 				}
 				@for (let [i, label] of layout.stepLabels.entries()) {
-					<text text-anchor={anchor()} dominant-baseline="middle" x={tickX()} y={layout.chartBottom - i * layout.stepValue * layout.valueHeight}>
+					<text
+						text-anchor={anchor()}
+						dominant-baseline="middle"
+						x={tickX()}
+						y={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
+					>
 						{label}
 					</text>
 				}

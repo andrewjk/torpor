@@ -1,0 +1,16 @@
+import { Chart, ChartLines, ChartPoints } from "../../../src/Charts/index";
+
+/**
+ * A chart with no axes: the marks use the whole svg, since nothing has
+ * reserved space
+ */
+export default function NoAxisChartTest($props: any) {
+	@render {
+		<Chart ariaLabel="No axis" height={200} width={400} maxValue={100} stepCount={2} stepValue={50} series={$props.series}>
+			<ChartLines seriesIndex={0} />
+			@for (let i of $props.series.map((_, i) => i)) {
+				<ChartPoints seriesIndex={i} radius={3} />
+			}
+		</Chart>
+	}
+}

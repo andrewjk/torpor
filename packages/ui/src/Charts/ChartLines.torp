@@ -36,8 +36,8 @@ export default function ChartLines($props?: ChartLinesProps) {
 	function points(): { x: number; y: number }[] {
 		const data = current()?.data ?? [];
 		return data.map((value, j) => ({
-			x: +(layout.chartLeft + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
-			y: +(layout.chartBottom - value * layout.valueHeight).toFixed(2),
+			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
+			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
 		}));
 	}
 

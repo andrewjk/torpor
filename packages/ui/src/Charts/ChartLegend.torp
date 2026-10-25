@@ -1,0 +1,110 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+
+interface ChartLegendProps {
+	/** Which side of the plot to reserve (default "bottom") */
+	side?: "top" | "bottom";
+}
+
+/**
+ * A legend for a Chart: one color swatch and name per series.
+ *
+ * Like the axes, it reserves a strip on its side of the plot -- wide enough
+ * for the names, wrapping onto more rows when they don't fit one row --
+ * and marks and other layers draw only in the space left over.
+ */
+export default function ChartLegend($props?: ChartLegendProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("ChartLegend must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+
+	function side(): "top" | "bottom" {
+		return $props?.side ?? "bottom";
+	}
+
+	function entries(): { name: string; color: string }[] {
+		return series().map((s, i) => ({ name: s.name, color: colorAt(i) }));
+	}
+
+	// Rough width of an entry: swatch + gap + the name's measured width +
+	// a gap before the next entry
+	function entryWidth(name: string): number {
+		return layout.textHeight / 3 + layout.textHeight / 6 + name.length * layout.textWidth + layout.textHeight / 3;
+	}
+
+	function rowHeight(): number {
+		return layout.textHeight * 1.5;
+	}
+
+	// The entries laid out into rows that fit the plot width, each row
+	// centered in the reserved strip
+	function rows(): { entries: { name: string; color: string; x: number }[]; y: number }[] {
+		const width = layout.plotWidth;
+		const lines: { name: string; color: string }[][] = [[]];
+		for (const entry of entries()) {
+			const line = lines[lines.length - 1];
+			const used = line.reduce((a, b) => a + entryWidth(b.name), 0);
+			if (line.length && used + entryWidth(entry.name) > width) {
+				lines.push([entry]);
+			} else {
+				line.push(entry);
+			}
+		}
+
+		const stripHeight = side() === "bottom" ? layout.reservedBottom : layout.reservedTop;
+		const stripTop = side() === "bottom" ? layout.calculatedHeight - stripHeight : 0;
+		const startY = stripTop + Math.max(0, (stripHeight - lines.length * rowHeight()) / 2);
+
+		return lines.map((line, r) => {
+			const lineWidth = line.reduce((a, b) => a + entryWidth(b.name), 0);
+			let x = layout.plotX + Math.max(0, (width - lineWidth) / 2);
+			return {
+				entries: line.map((e) => {
+					const positioned = { name: e.name, color: e.color, x };
+					x += entryWidth(e.name);
+					return positioned;
+				}),
+				y: startY + r * rowHeight() + rowHeight() / 2,
+			};
+		});
+	}
+
+	// Reserve one row of strips per line the entries need. Reading the plot
+	// width keeps the wrap up to date; the sides it reserves on don't
+	// affect the plot width, so this settles.
+	$run(() => {
+		const rowCount = Math.max(1, rows().length);
+		layout.reserve("legend", side(), rowCount * rowHeight());
+		return () => layout.release("legend");
+	});
+
+	function swatchSize(): number {
+		return layout.textHeight / 3;
+	}
+
+	@render {
+		<svg>
+			@for (let row of rows()) {
+				@for (let entry of row.entries) {
+					<rect
+						x={entry.x}
+						y={row.y - swatchSize() / 2}
+						width={swatchSize()}
+						height={swatchSize()}
+						rx="2"
+						fill={entry.color}
+					/>
+					<text
+						fill="currentcolor"
+						dominant-baseline="middle"
+						x={entry.x + swatchSize() + layout.textHeight / 6}
+						y={row.y}
+					>
+						{entry.name}
+					</text>
+				}
+			}
+		</svg>
+	}
+}

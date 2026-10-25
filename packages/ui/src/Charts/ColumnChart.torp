@@ -25,6 +25,8 @@ interface ColumnChartProps {
 	stepValue?: number;
 	showHLines?: boolean;
 	showVLines?: boolean;
+	/** Stacks the values in each slot into one column per label */
+	stacked?: boolean;
 }
 
 /**
@@ -64,7 +66,7 @@ export default function ColumnChart($props: ColumnChartProps) {
 			<ChartYAxis />
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
 			<ChartXAxis />
-			<ChartColumns />
+			<ChartColumns stacked={$props.stacked === true} />
 		</Chart>
 	}
 }

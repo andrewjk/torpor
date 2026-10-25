@@ -38,17 +38,42 @@ export function calculateStepLabels(stepCount: number, stepValue: number): numbe
 	return newStepLabels;
 }
 
-export function calculateItemWidth(width: number, chartLeft: number, labels: string[]): number {
-	return (width - chartLeft) / labels.length;
+export function calculateItemWidth(plotWidth: number, labels: string[]): number {
+	return plotWidth / labels.length;
 }
 
 export function calculateValueHeight(
-	chartBottom: number,
+	plotHeight: number,
 	textHeight: number,
 	stepValue: number,
 	stepCount: number,
 ): number {
-	return (chartBottom - textHeight) / (stepValue * stepCount);
+	// A little headroom above the tallest mark
+	return (plotHeight - textHeight) / (stepValue * stepCount);
+}
+
+/**
+ * The width needed by a row of numeric tick labels, approximated from the
+ * measured width of a "0" character.
+ */
+export function calculateTickLabelWidth(stepLabels: number[], textWidth: number): number {
+	const maxLabelLength = stepLabels.reduce((a, b) => Math.max(a, b.toString().length), 0);
+	return maxLabelLength * textWidth;
+}
+
+/**
+ * The domain top needed by stacked marks: the largest sum of the values in
+ * one slot across all series.
+ */
+export function calculateStackMax(series: DataSeries[]): number {
+	let max = 0;
+	for (const s of series) {
+		const total = s.data.reduce((a, b) => a + b, 0);
+		if (total > max) {
+			max = total;
+		}
+	}
+	return max;
 }
 
 export function calculateChartBottom(xLabel: string, height: number, textHeight: number): number {

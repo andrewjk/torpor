@@ -33,7 +33,7 @@ export default function ChartBars($props?: ChartBarsProps) {
 	// The vertical band each series occupies within the plot
 	function bandHeight(): number {
 		const count = Math.max(1, layout.labels.length);
-		return (layout.chartBottom - topPad()) / count;
+		return (layout.plotHeight - topPad()) / count;
 	}
 
 	// A little space above for breathing room, matching ChartXAxis's labels
@@ -46,14 +46,14 @@ export default function ChartBars($props?: ChartBarsProps) {
 	}
 
 	function valueWidth(value: number): number {
-		const plotWidth = layout.calculatedWidth - layout.chartLeft;
 		const max = Math.max(1, layout.maxValue);
-		return Math.max(1, (value / max) * plotWidth);
+		return Math.max(1, (value / max) * layout.plotWidth);
 	}
 
 	function barY(i: number): number {
 		const count = series().length || 1;
 		return (
+			layout.plotY +
 			topPad() +
 			i * bandHeight() +
 			(bandHeight() - barHeight(count)) / 2
@@ -64,7 +64,7 @@ export default function ChartBars($props?: ChartBarsProps) {
 		<svg>
 			@for (let i of indexes()) {
 				<rect
-					x={layout.chartLeft}
+					x={layout.plotX}
 					y={barY(i)}
 					width={valueWidth(series()[i].data[0])}
 					height={barHeight(Math.max(1, series().length))}

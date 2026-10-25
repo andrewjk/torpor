@@ -1,0 +1,17 @@
+import { ColumnChart } from "../../../src/Charts/index";
+
+/** A column chart whose `stacked` prop is passed in, for grouped vs stacked */
+export default function StackedChartTest($props: any) {
+	@render {
+		<ColumnChart
+			height={200}
+			width={400}
+			ariaLabel="Stacked chart"
+			stacked={$props.stacked === true}
+			series={[
+				{ name: "Q1", color: "", data: [50, 30] },
+				{ name: "Q2", color: "", data: [40, 20, 60] },
+			]}
+		/>
+	}
+}

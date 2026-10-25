@@ -9,7 +9,8 @@ interface ChartGridProps {
 
 /**
  * Grid lines for a Chart: horizontal lines at each value step and/or
- * vertical lines through each category slot.
+ * vertical lines through each category slot. Drawn only within the plot
+ * area, inside the space reserved by the axes.
  */
 export default function ChartGrid($props?: ChartGridProps) {
 	const context = $context[ChartContextName] as ChartContext;
@@ -30,10 +31,10 @@ export default function ChartGrid($props?: ChartGridProps) {
 			@if (hLines()) {
 				@for (let [i] of layout.stepLabels.entries()) {
 					<line
-						x1={layout.chartLeft}
-						y1={layout.chartBottom - i * layout.stepValue * layout.valueHeight}
-						x2={layout.calculatedWidth}
-						y2={layout.chartBottom - i * layout.stepValue * layout.valueHeight}
+						x1={layout.plotX}
+						y1={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
+						x2={layout.plotX + layout.plotWidth}
+						y2={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
 						stroke="currentcolor"
 					/>
 				}
@@ -41,10 +42,10 @@ export default function ChartGrid($props?: ChartGridProps) {
 			@if (vLines()) {
 				@for (let [i] of layout.labels.entries()) {
 					<line
-						x1={layout.chartLeft + i * layout.itemWidth + layout.itemWidth / 2}
-						y1={layout.chartBottom}
-						x2={layout.chartLeft + i * layout.itemWidth + layout.itemWidth / 2}
-						y2={0}
+						x1={layout.plotX + i * layout.itemWidth + layout.itemWidth / 2}
+						y1={layout.plotY}
+						x2={layout.plotX + i * layout.itemWidth + layout.itemWidth / 2}
+						y2={layout.plotY + layout.plotHeight}
 						stroke="currentcolor"
 					/>
 				}

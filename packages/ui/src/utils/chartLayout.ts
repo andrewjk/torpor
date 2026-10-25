@@ -1,14 +1,15 @@
 import { $watch } from "@torpor/view";
 import type DataSeries from "../Charts/DataSeries";
 import {
-	calculateChartBottom,
-	calculateChartLeft,
 	calculateItemWidth,
 	calculateMaxValue,
 	calculateStepLabels,
 	calculateStepValue,
 	calculateValueHeight,
 } from "./chartUtils";
+
+/** The sides of a chart that space can be reserved on */
+export type ChartSide = "top" | "right" | "bottom" | "left";
 
 export interface ChartLayoutOptions {
 	/** The named series to lay out */
@@ -17,10 +18,6 @@ export interface ChartLayoutOptions {
 	height?: () => number | undefined;
 	/** Fixed width, if any (default 400 or the container's client width) */
 	width?: () => number | undefined;
-	/** Label under the x axis */
-	xLabel?: () => string | undefined;
-	/** Label beside the y axis */
-	yLabel?: () => string | undefined;
 	/** The value at the top of the chart, instead of the series' maximum */
 	maxValue?: () => number | undefined;
 	/** The number of steps between 0 and the maximum value (default 2) */
@@ -32,20 +29,33 @@ export interface ChartLayoutOptions {
 }
 
 /**
- * The shared layout scaffold behind the cartesian charts (Bar, Column,
- * Line): measures the chart's text so labels can be sized, and calculates
- * the plot geometry -- maximum value, step sizes, slot widths and the
- * left/bottom margins -- reactively from the series and axis props.
+ * A claim on space along one side of the chart, made by an axis, legend or
+ * other furniture layer via `reserve`.
+ */
+interface SpaceClaim {
+	side: ChartSide;
+	size: number;
+}
+
+/**
+ * The shared layout scaffold behind the layered charts: measures the chart's
+ * text so labels can be sized, and calculates the scales and the plot
+ * geometry reactively from the series and the space reserved by layers.
  *
- * Charts render only their own marks; call `measure` from `$onmount` with the
- * hidden `<text>` element they render for that purpose.
+ * Furniture layers (axes, legends) claim the space they need with `reserve`;
+ * the plot rect is whatever is left over, and mark layers draw only into
+ * that, overlapping each other freely. Aggregated marks (stacks) raise the
+ * domain with `announceMax`.
+ *
+ * Charts render only their own marks; call `measureChartText` from
+ * `$onmount` with the hidden `<text>` element they render for that purpose.
  *
  * ```
  * let $layout = createChartLayout({
  * 	series: () => $props.series,
  * 	getContainer: () => container,
  * });
- * $onmount(() => setTimeout(() => measure($layout, measurer), 1));
+ * $onmount(() => setTimeout(() => measureChartText($layout, measurer), 1));
  * ```
  */
 export interface ChartLayout {
@@ -57,20 +67,44 @@ export interface ChartLayout {
 	readonly labels: string[];
 	readonly calculatedHeight: number;
 	readonly calculatedWidth: number;
-	/** The largest value across all series, unless overridden */
+	/** The largest value across all series and announced stacks, unless overridden */
 	readonly maxValue: number;
 	/** The size of one y axis step */
 	readonly stepValue: number;
 	/** The labels for each step, 0 through max */
 	readonly stepLabels: number[];
-	/** The width of one category slot */
+	/** The width of one category slot in the plot */
 	readonly itemWidth: number;
 	/** The pixel height of one unit of value */
 	readonly valueHeight: number;
-	/** The bottom edge of the plot area */
-	readonly chartBottom: number;
+	/** The space reserved along the top edge (e.g. a legend) */
+	readonly reservedTop: number;
+	/** The space reserved along the right edge (e.g. a right y axis) */
+	readonly reservedRight: number;
+	/** The space reserved along the bottom edge (e.g. an x axis) */
+	readonly reservedBottom: number;
+	/** The space reserved along the left edge (e.g. a left y axis) */
+	readonly reservedLeft: number;
 	/** The left edge of the plot area */
-	readonly chartLeft: number;
+	readonly plotX: number;
+	/** The top edge of the plot area */
+	readonly plotY: number;
+	/** The width of the plot area */
+	readonly plotWidth: number;
+	/** The height of the plot area */
+	readonly plotHeight: number;
+	/**
+	 * Claims space on a side of the plot, keyed by layer. Per side, the
+	 * largest claim wins; no-ops when the claim is unchanged.
+	 */
+	reserve(id: string, side: ChartSide, size: number): void;
+	/** Gives back the space claimed by `reserve` */
+	release(id: string): void;
+	/**
+	 * Announces the domain top that an aggregated mark layer (a stack)
+	 * needs, keyed by layer. No-ops when the value is unchanged.
+	 */
+	announceMax(id: string, value: number): void;
 	setTextSize(width: number, height: number): void;
 }
 
@@ -83,6 +117,16 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 		textWidth: 0,
 		textHeight: 0,
 
+		// Space claimed by furniture layers (axes, legends), keyed by layer id
+		claims: {} as Record<string, SpaceClaim>,
+		// Domain tops announced by aggregated mark layers, keyed by layer id
+		maxClaims: {} as Record<string, number>,
+		// Bumped whenever the claims change: adding a key to a watched
+		// object doesn't notify on its own, so getters that iterate them
+		// read this to stay up to date
+		claimsVersion: 0,
+		maxVersion: 0,
+
 		get labels() {
 			return options.series().map((s) => s.name);
 		},
@@ -93,7 +137,14 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			return options.width?.() || options.getContainer?.()?.clientWidth || defaultWidth;
 		},
 		get maxValue() {
-			return options.maxValue?.() || calculateMaxValue(options.series());
+			void this.maxVersion;
+			return (
+				options.maxValue?.() ||
+				Math.max(
+					calculateMaxValue(options.series()),
+					...Object.values(this.maxClaims as Record<string, number>),
+				)
+			);
 		},
 		get stepValue() {
 			return options.stepValue?.() || calculateStepValue(this.maxValue, options.stepCount?.());
@@ -102,26 +153,63 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			return calculateStepLabels(getStepCount(), this.stepValue);
 		},
 		get itemWidth() {
-			return calculateItemWidth(this.calculatedWidth, this.chartLeft, this.labels);
+			return calculateItemWidth(this.plotWidth, this.labels);
 		},
 		get valueHeight() {
-			return calculateValueHeight(
-				this.chartBottom,
-				this.textHeight,
-				this.stepValue,
-				getStepCount(),
-			);
+			return calculateValueHeight(this.plotHeight, this.textHeight, this.stepValue, getStepCount());
 		},
-		get chartBottom() {
-			return calculateChartBottom(options.xLabel?.() ?? "", this.calculatedHeight, this.textHeight);
+
+		// The reserved strips, one per side: the largest claim on that side
+		get reservedTop() {
+			void this.claimsVersion;
+			return reservedSize(this.claims as Record<string, SpaceClaim>, "top");
 		},
-		get chartLeft() {
-			return calculateChartLeft(
-				this.stepLabels,
-				options.yLabel?.() ?? "",
-				this.textHeight,
-				this.textWidth,
-			);
+		get reservedRight() {
+			void this.claimsVersion;
+			return reservedSize(this.claims as Record<string, SpaceClaim>, "right");
+		},
+		get reservedBottom() {
+			void this.claimsVersion;
+			return reservedSize(this.claims as Record<string, SpaceClaim>, "bottom");
+		},
+		get reservedLeft() {
+			void this.claimsVersion;
+			return reservedSize(this.claims as Record<string, SpaceClaim>, "left");
+		},
+
+		// The plot rect: whatever is left over after reservations. Mark
+		// layers draw into this and overlap each other freely.
+		get plotX() {
+			return this.reservedLeft;
+		},
+		get plotY() {
+			return this.reservedTop;
+		},
+		get plotWidth() {
+			return Math.max(0, this.calculatedWidth - this.reservedLeft - this.reservedRight);
+		},
+		get plotHeight() {
+			return Math.max(0, this.calculatedHeight - this.reservedTop - this.reservedBottom);
+		},
+
+		reserve(id: string, side: ChartSide, size: number) {
+			const claims = this.claims as Record<string, SpaceClaim>;
+			const current = claims[id];
+			if (current && current.side === side && current.size === size) return;
+			claims[id] = { side, size };
+			this.claimsVersion++;
+		},
+		release(id: string) {
+			const claims = this.claims as Record<string, SpaceClaim>;
+			if (!claims[id]) return;
+			delete claims[id];
+			this.claimsVersion++;
+		},
+		announceMax(id: string, value: number) {
+			const claims = this.maxClaims as Record<string, number>;
+			if (claims[id] === value) return;
+			claims[id] = value;
+			this.maxVersion++;
 		},
 
 		setTextSize(width: number, height: number) {
@@ -129,6 +217,20 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 			this.textHeight = height * 1.5;
 		},
 	});
+}
+
+/**
+ * The total space reserved on one side: the largest of the claims made
+ * against it.
+ */
+function reservedSize(claims: Record<string, SpaceClaim>, side: ChartSide): number {
+	let max = 0;
+	for (const claim of Object.values(claims)) {
+		if (claim.side === side && claim.size > max) {
+			max = claim.size;
+		}
+	}
+	return max;
 }
 
 /**

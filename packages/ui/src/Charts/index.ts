@@ -1,9 +1,13 @@
+import AreaChart from "./AreaChart.torp";
 import BarChart from "./BarChart.torp";
 import Chart from "./Chart.torp";
+import ChartArea from "./ChartArea.torp";
 import ChartBars from "./ChartBars.torp";
 import ChartColumns from "./ChartColumns.torp";
 import ChartGrid from "./ChartGrid.torp";
+import ChartLegend from "./ChartLegend.torp";
 import ChartLines from "./ChartLines.torp";
+import ChartPoints from "./ChartPoints.torp";
 import ChartXAxis from "./ChartXAxis.torp";
 import ChartYAxis from "./ChartYAxis.torp";
 import ColumnChart from "./ColumnChart.torp";
@@ -21,11 +25,15 @@ export {
 	ChartXAxis,
 	ChartYAxis,
 	ChartGrid,
+	ChartLegend,
 	ChartColumns,
 	ChartBars,
 	ChartLines,
+	ChartArea,
+	ChartPoints,
 
 	// Presets
+	AreaChart,
 	BarChart,
 	ColumnChart,
 	LineChart,

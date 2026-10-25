@@ -1,4 +1,5 @@
 import { type ChartContext, ChartContextName } from "./ChartTypes";
+import { calculateStackMax } from "../utils/chartUtils";
 
 interface ChartColumnsProps {
 	/**
@@ -6,11 +7,16 @@ interface ChartColumnsProps {
 	 * reading different series. Defaults to all series.
 	 */
 	seriesIndex?: number;
+	/** Stacks the values in each slot into one column, instead of side by side */
+	stacked?: boolean;
 }
 
 /**
  * Vertical column marks for a Chart: every value in the chosen series is
  * drawn as a vertical column, grouped under its label.
+ *
+ * With `stacked`, the values in each slot are piled into a single column
+ * instead, and the Chart's value domain grows to fit the largest total.
  *
  * For one thick bar per series, use ChartBars -- those run horizontally.
  */
@@ -19,7 +25,7 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 	if (!context) {
 		throw new Error("This layer must be contained within a Chart");
 	}
-	const { layout, series, colorAt } = context;
+	const { layout, series, colorAt, registerMax } = context;
 	context.registerMark("vertical");
 
 	function indexes(): number[] {
@@ -27,6 +33,55 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 			return [$props.seriesIndex];
 		}
 		return series().map((_, i) => i);
+	}
+
+	function stacked(): boolean {
+		return $props?.stacked === true;
+	}
+
+	// Stacked columns reach higher than any single value, so raise the
+	// domain to the largest total (released when this layer unmounts or
+	// stops stacking)
+	$run(() => {
+		if (stacked()) {
+			registerMax("columns", calculateStackMax(series()));
+		}
+		return () => registerMax("columns", 0);
+	});
+
+	// The x/y/width/height of every rect in slot i: sub-columns side by
+	// side, or the slot's values stacked into one centered column
+	function rects(i: number): { x: number; y: number; width: number; height: number; value: number }[] {
+		const bottom = plotBottom();
+		if (stacked()) {
+			const width = columnWidth(1);
+			const x = slotX(i) + (layout.itemWidth - width) / 2;
+			return segments(i).map((s) => ({
+				x,
+				width,
+				y: bottom - (s.below + s.value) * layout.valueHeight,
+				height: Math.max(1, s.value * layout.valueHeight),
+				value: s.value,
+			}));
+		}
+		const count = series()[i].data.length;
+		const width = columnWidth(count);
+		return series()[i].data.map((value, j) => ({
+			x: slotX(i) + columnGap(count) + j * width,
+			width,
+			y: bottom - Math.max(1, value * layout.valueHeight),
+			height: Math.max(1, value * layout.valueHeight),
+			value,
+		}));
+	}
+
+	// The bottom edge of the plot, where columns start
+	function plotBottom(): number {
+		return layout.plotY + layout.plotHeight;
+	}
+
+	function slotX(i: number): number {
+		return layout.plotX + i * layout.itemWidth;
 	}
 
 	function columnWidth(count: number): number {
@@ -37,27 +92,22 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 		return (layout.itemWidth - columnWidth(count) * count) / (count + 1);
 	}
 
-	function columnX(i: number, j: number): number {
-		return (
-			layout.chartLeft +
-			i * layout.itemWidth +
-			columnGap(series()[i].data.length) +
-			j * columnWidth(series()[i].data.length)
-		);
+	// The values of slot i with the sum of the values below each
+	function segments(i: number): { value: number; below: number }[] {
+		let below = 0;
+		return series()[i].data.map((value) => {
+			const segment = { value, below };
+			below += value;
+			return segment;
+		});
 	}
 
 	@render {
 		<svg>
 			@for (let i of indexes()) {
-				@for (let [j, value] of series()[i].data.entries()) {
-					<rect
-						x={columnX(i, j)}
-						y={layout.chartBottom - Math.max(1, value * layout.valueHeight)}
-						width={columnWidth(series()[i].data.length)}
-						height={Math.max(1, value * layout.valueHeight)}
-						fill={colorAt(i)}
-					>
-						<title>{`${[layout.labels[i], value].filter(Boolean).join("\n")}`}</title>
+				@for (let r of rects(i)) {
+					<rect x={r.x} y={r.y} width={r.width} height={r.height} fill={colorAt(i)}>
+						<title>{`${[layout.labels[i], r.value].filter(Boolean).join("\n")}`}</title>
 					</rect>
 				}
 			}

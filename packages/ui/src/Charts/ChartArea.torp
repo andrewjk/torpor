@@ -1,0 +1,73 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+import type DataSeries from "./DataSeries";
+
+interface ChartAreaProps {
+	/** The index of the series to draw (default 0) */
+	seriesIndex?: number;
+	/** The color to draw with, instead of the series' own */
+	color?: string;
+	/** The fill opacity (default 0.25) */
+	opacity?: number;
+}
+
+/**
+ * Area marks for a Chart: fills the region between the chosen series' line
+ * and the bottom of the plot. Add a ChartLines layer with the same
+ * seriesIndex to draw the line itself.
+ */
+export default function ChartArea($props?: ChartAreaProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+	context.registerMark("vertical");
+
+	function index(): number {
+		return $props?.seriesIndex ?? 0;
+	}
+
+	function current(): DataSeries | undefined {
+		return series()[index()];
+	}
+
+	function points(): { x: number; y: number }[] {
+		const data = current()?.data ?? [];
+		return data.map((value, j) => ({
+			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
+			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
+		}));
+	}
+
+	// The line's points, closed along the bottom of the plot
+	function polygon(): string {
+		const pts = points();
+		if (!pts.length) {
+			return "";
+		}
+		const bottom = layout.plotY + layout.plotHeight;
+		return [
+			...pts,
+			{ x: pts[pts.length - 1].x, y: bottom },
+			{ x: pts[0].x, y: bottom },
+		]
+			.map((p) => `${p.x},${p.y}`)
+			.join(" ");
+	}
+
+	function fill(): string {
+		return $props?.color || colorAt(index());
+	}
+
+	function opacity(): number {
+		return $props?.opacity ?? 0.25;
+	}
+
+	@render {
+		<svg>
+			@if (points().length) {
+				<polygon points={polygon()} fill={fill()} fill-opacity={opacity()} stroke="none" />
+			}
+		</svg>
+	}
+}

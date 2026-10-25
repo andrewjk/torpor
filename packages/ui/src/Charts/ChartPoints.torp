@@ -1,0 +1,66 @@
+import { type ChartContext, ChartContextName } from "./ChartTypes";
+import type DataSeries from "./DataSeries";
+
+interface ChartPointsProps {
+	/** The index of the series to draw (default 0) */
+	seriesIndex?: number;
+	/** The color to draw with, instead of the series' own */
+	color?: string;
+	/** The radius of each point in pixels (default 4) */
+	radius?: number;
+}
+
+/**
+ * Point marks for a Chart: one circle per value, centered in its category
+ * slot. On its own it is a scatter-style layer; with ChartLines it draws
+ * the line's markers.
+ */
+export default function ChartPoints($props?: ChartPointsProps) {
+	const context = $context[ChartContextName] as ChartContext;
+	if (!context) {
+		throw new Error("This layer must be contained within a Chart");
+	}
+	const { layout, series, colorAt } = context;
+	context.registerMark("vertical");
+
+	function index(): number {
+		return $props?.seriesIndex ?? 0;
+	}
+
+	function current(): DataSeries | undefined {
+		return series()[index()];
+	}
+
+	function points(): { x: number; y: number }[] {
+		const data = current()?.data ?? [];
+		return data.map((value, j) => ({
+			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
+			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
+		}));
+	}
+
+	function stroke(): string {
+		return $props?.color || colorAt(index());
+	}
+
+	function radius(): number {
+		return $props?.radius ?? 4;
+	}
+
+	@render {
+		<svg>
+			@for (let [j, point] of points().entries()) {
+				<circle
+					cx={point.x}
+					cy={point.y}
+					r={radius()}
+					stroke={stroke()}
+					stroke-width="2"
+					fill="white"
+				>
+					<title>{`${[current()?.name, layout.labels[j], current()?.data[j]].filter(Boolean).join("\n")}`}</title>
+				</circle>
+			}
+		</svg>
+	}
+}

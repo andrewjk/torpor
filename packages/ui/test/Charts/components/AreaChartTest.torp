@@ -1,0 +1,17 @@
+import { AreaChart } from "../../../src/Charts/index";
+
+export default function AreaChartTest($props: any) {
+	@render {
+		<AreaChart
+			height={200}
+			width={400}
+			ariaLabel="Area chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			series={[
+				{ name: "A", color: "#ff0000", data: [10, 30, 70] },
+			]}
+		/>
+	}
+}
