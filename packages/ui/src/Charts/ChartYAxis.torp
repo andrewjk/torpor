@@ -70,9 +70,10 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 		return layout.plotY + topPad() + i * bandHeight() + bandHeight() / 2;
 	}
 
-	// The axis line runs down the edge of the plot on this axis's side
+	// The axis line runs down the edge of the plot on this axis's side,
+	// just outside it so marks don't paint over it
 	function axisX(): number {
-		return side() === "left" ? layout.plotX : layout.plotX + layout.plotWidth;
+		return side() === "left" ? layout.plotX - 0.5 : layout.plotX + layout.plotWidth + 0.5;
 	}
 
 	function tickX(): number {
@@ -83,10 +84,22 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 		return side() === "left" ? "end" : "start";
 	}
 
+	// The bottom and top ticks turn inside so they don't hang past the
+	// plot's corners
+	function tickBaseline(i: number): string {
+		if (i === 0) return "auto";
+		if (i === layout.stepLabels.length - 1) return "hanging";
+		return "middle";
+	}
+
+	function tickY(i: number): number {
+		return layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight;
+	}
+
 	@render {
 		<svg>
 			@if (showAxis()) {
-				<line x1={axisX()} y1={layout.plotY + layout.plotHeight} x2={axisX()} y2={layout.plotY} stroke="currentcolor" />
+				<line x1={axisX()} y1={layout.plotY + layout.plotHeight + 0.5} x2={axisX()} y2={layout.plotY - 0.5} stroke="currentcolor" />
 			}
 			@if (horizontal()) {
 				@for (let [i, label] of layout.labels.entries()) {
@@ -114,12 +127,7 @@ export default function ChartYAxis($props?: ChartYAxisProps) {
 					</text>
 				}
 				@for (let [i, label] of layout.stepLabels.entries()) {
-					<text
-						text-anchor={anchor()}
-						dominant-baseline="middle"
-						x={tickX()}
-						y={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
-					>
+					<text text-anchor={anchor()} dominant-baseline={tickBaseline(i)} x={tickX()} y={tickY(i)}>
 						{label}
 					</text>
 				}

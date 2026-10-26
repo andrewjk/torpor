@@ -14,12 +14,13 @@ import YAxis from "./YAxis.torp";
 interface Pair {
 	x: number;
 	y: number;
-	label: string;
+	/** An extra label for the point's tooltip */
+	label?: string;
 }
 
 interface DataSeries {
 	name: string;
-	color: string;
+	color?: string;
 	data: Pair[];
 }
 

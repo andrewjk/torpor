@@ -28,6 +28,8 @@ interface AreaChartProps {
 	showVLines?: boolean;
 	/** The opacity of each area's fill (default 0.25) */
 	opacity?: number;
+	/** Stacks each series on top of the one below it */
+	stacked?: boolean;
 }
 
 /**
@@ -47,7 +49,7 @@ interface AreaChartProps {
  * ```
  *
  * Compose those directly to customize -- e.g. a line for a second series
- * overlaid on the first's area.
+ * overlaid on the first's area, or `stacked` to pile the series up.
  */
 export default function AreaChart($props: AreaChartProps) {
 	@render {
@@ -69,8 +71,8 @@ export default function AreaChart($props: AreaChartProps) {
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
 			<ChartXAxis />
 			@for (let i of $props.series.map((_, i) => i)) {
-				<ChartArea seriesIndex={i} opacity={$props.opacity} />
-				<ChartLines seriesIndex={i} />
+				<ChartArea seriesIndex={i} opacity={$props.opacity} stacked={$props.stacked === true} />
+				<ChartLines seriesIndex={i} stacked={$props.stacked === true} />
 			}
 		</Chart>
 	}

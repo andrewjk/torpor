@@ -2,8 +2,14 @@ import { TabContent, TabGroup, TabList } from "@torpor/ui/TabGroup";
 import CodePreview from "../CodePreview.torp";
 import ExampleTabGroup from "./ExampleTabGroup.torp";
 import ExampleTabHeader from "./ExampleTabHeader.torp";
+import ExampleAreaChart from "./charts/ExampleAreaChart.torp";
+import ExampleAreaChartCode from "./charts/ExampleAreaChart.torp?raw";
 import ExampleBarChart from "./charts/ExampleBarChart.torp";
 import ExampleBarChartCode from "./charts/ExampleBarChart.torp?raw";
+import ExampleColumnChart from "./charts/ExampleColumnChart.torp";
+import ExampleColumnChartCode from "./charts/ExampleColumnChart.torp?raw";
+import ExampleLayeredChart from "./charts/ExampleLayeredChart.torp";
+import ExampleLayeredChartCode from "./charts/ExampleLayeredChart.torp?raw";
 import ExampleLineChart from "./charts/ExampleLineChart.torp";
 import ExampleLineChartCode from "./charts/ExampleLineChart.torp?raw";
 import ExamplePieChart from "./charts/ExamplePieChart.torp";
@@ -12,6 +18,10 @@ import ExampleScatterChart from "./charts/ExampleScatterChart.torp";
 import ExampleScatterChartCode from "./charts/ExampleScatterChart.torp?raw";
 import ExampleSparkLine from "./charts/ExampleSparkLine.torp";
 import ExampleSparkLineCode from "./charts/ExampleSparkLine.torp?raw";
+import ExampleStackedAreaChart from "./charts/ExampleStackedAreaChart.torp";
+import ExampleStackedAreaChartCode from "./charts/ExampleStackedAreaChart.torp?raw";
+import ExampleStackedChart from "./charts/ExampleStackedChart.torp";
+import ExampleStackedChartCode from "./charts/ExampleStackedChart.torp?raw";
 
 export default function ChartPage() {
 	@head {
@@ -21,31 +31,95 @@ export default function ChartPage() {
 	@render {
 		<h1>Charts</h1>
 		<p>
-			Various simple charts.
+			Charts come in two forms. The presets &mdash; AreaChart, BarChart, ColumnChart, LineChart,
+			PieChart, ScatterChart and SparkLine &mdash; cover the common cases. Underneath them sits
+			a set of layer components that you compose inside a <code>Chart</code> container when you
+			want something the presets don't do.
 		</p>
+
 		<h2>Structure</h2>
 		<pre><code>{`
-<Chart>
-	<ChartHeader>
-		<ChartTrigger />
-	</ChartHeader>
-	<ChartContent />
+<Chart series={series}>
+	<ChartLegend />
+	<ChartYAxis side="right" />
+	<ChartGrid />
+	<ChartXAxis />
+	<ChartColumns />
+	<ChartLines seriesIndex={1} showPoints />
 </Chart>
 `.trim()}</code></pre>
-		<h2>Demo</h2>
+		<p>
+			Each layer <strong>reserves the space it needs</strong> from the Chart: adding a
+			<code>ChartXAxis</code> claims a strip along the bottom, a <code>ChartYAxis</code> claims
+			a strip on its side, a <code>ChartLegend</code> claims a strip for itself. The marks
+			&mdash; columns, bars, lines, areas, points &mdash; draw only into the space left over,
+			overlapping each other freely.
+		</p>
+
+		<h2>Layers</h2>
+		<ul>
+			<li>
+				<code>ChartXAxis</code> / <code>ChartYAxis</code> &mdash; the axes. The y axis takes a
+				<code>side</code> of <code>"left"</code> or <code>"right"</code>, plus an optional
+				<code>label</code>
+			</li>
+			<li>
+				<code>ChartGrid</code> &mdash; grid lines at each value step (<code>hLines</code>) and
+				category slot (<code>vLines</code>)
+			</li>
+			<li>
+				<code>ChartLegend</code> &mdash; a swatch and name per series, reserving
+				<code>"top"</code> or <code>"bottom"</code>
+			</li>
+			<li>
+				<code>ChartColumns</code> &mdash; vertical columns, grouped per slot, or
+				<code>stacked</code>
+			</li>
+			<li>
+				<code>ChartBars</code> &mdash; horizontal bars, grouped per band, or <code>stacked</code>
+			</li>
+			<li>
+				<code>ChartLines</code> &mdash; connected lines, with optional points, or
+				<code>stacked</code>
+			</li>
+			<li>
+				<code>ChartArea</code> &mdash; the region under a line, or <code>stacked</code>
+			</li>
+			<li>
+				<code>ChartPoints</code> &mdash; one circle per value
+			</li>
+		</ul>
+		<p>
+			Every layer reads the same series (layers reference them by <code>seriesIndex</code>),
+			and colors come from each series' own <code>color</code> or the palette.
+		</p>
+
+		<h2>Presets</h2>
 		<TabGroup>
-			<TabList ariaLabel="Example tabs">
+			<TabList ariaLabel="Chart type tabs">
 				<ExampleTabHeader>
-					Bar Chart
+					Area
 				</ExampleTabHeader>
 				<ExampleTabHeader>
-					Line Chart
+					Bar
 				</ExampleTabHeader>
 				<ExampleTabHeader>
-					Pie Chart
+					Column
 				</ExampleTabHeader>
 				<ExampleTabHeader>
-					Scatter Chart
+					Stacked columns
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Stacked area
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Line
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Pie
+				</ExampleTabHeader>
+				<ExampleTabHeader>
+					Scatter
 				</ExampleTabHeader>
 				<ExampleTabHeader>
 					Sparkline
@@ -53,9 +127,41 @@ export default function ChartPage() {
 			</TabList>
 			<TabContent>
 				<ExampleTabGroup>
+					<ExampleAreaChart />
+					<fill name="code">
+						<CodePreview code={ExampleAreaChartCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
 					<ExampleBarChart />
 					<fill name="code">
 						<CodePreview code={ExampleBarChartCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleColumnChart />
+					<fill name="code">
+						<CodePreview code={ExampleColumnChartCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleStackedChart />
+					<fill name="code">
+						<CodePreview code={ExampleStackedChartCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleStackedAreaChart />
+					<fill name="code">
+						<CodePreview code={ExampleStackedAreaChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>
@@ -88,6 +194,28 @@ export default function ChartPage() {
 					<ExampleSparkLine />
 					<fill name="code">
 						<CodePreview code={ExampleSparkLineCode} />
+					</fill>
+				</ExampleTabGroup>
+			</TabContent>
+		</TabGroup>
+
+		<h2>Composing layers</h2>
+		<p>
+			The layered components can be mixed freely: columns with a line overlaid, an axis on
+			either side, only a y axis with no x axis -- a preset like LineChart is just one such
+			combination.
+		</p>
+		<TabGroup>
+			<TabList ariaLabel="Composed chart tabs">
+				<ExampleTabHeader>
+					Columns + line + legend
+				</ExampleTabHeader>
+			</TabList>
+			<TabContent>
+				<ExampleTabGroup>
+					<ExampleLayeredChart />
+					<fill name="code">
+						<CodePreview code={ExampleLayeredChartCode} />
 					</fill>
 				</ExampleTabGroup>
 			</TabContent>

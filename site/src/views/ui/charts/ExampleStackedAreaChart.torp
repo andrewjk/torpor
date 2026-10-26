@@ -1,0 +1,24 @@
+import { AreaChart } from "@torpor/ui/Charts";
+
+export default function ExampleStackedAreaChart() {
+	@render {
+		<AreaChart
+			height={200}
+			width={400}
+			ariaLabel="Page views by month, stacked"
+			xLabel={"Month"}
+			stacked={true}
+			series={[
+				{ name: "Jan", data: [35, 40, 25] },
+				{ name: "Feb", data: [25, 45, 60] },
+				{ name: "Mar", data: [45, 30, 10] },
+			]}
+		/>
+	}
+
+	@style {
+		svg line {
+			stroke: var(--text);
+		}
+	}
+}

@@ -4,14 +4,19 @@ import { chartColors } from "../utils/chartColors";
 interface PieData {
 	name: string;
 	value: number;
-	color: string;
+	/** The color to draw the slice with (default: the next palette color) */
+	color?: string;
 }
 
 interface SegmentData {
 	name: string;
 	value: number;
-	color: string;
+	color?: string;
 	path: string;
+	/** The angle the slice spans, in degrees */
+	angle: number;
+	/** The angle the slice starts at, in degrees */
+	startAngle: number;
 }
 
 interface PieChartProps {
@@ -27,6 +32,10 @@ interface PieChartProps {
 	size?: number;
 	radius?: number;
 	cutout?: number;
+	/** Draws each slice's name and value on the slice (skips thin slices) */
+	labels?: boolean;
+	/** Draws an inset key down the right of the chart, with the pie shifted left */
+	legend?: boolean;
 }
 
 export default function PieChart($props: PieChartProps) {
@@ -37,25 +46,53 @@ export default function PieChart($props: PieChartProps) {
 	// NOTE: Take two pixels off the radius so that the stroke doesn't go outside the border
 	let $state = $watch({
 		get radius() {
-			return ($props.radius! / 100) * $props.size! - 2;
+			// With a legend, keep the pie clear of the key
+			const percent = $props.legend ? Math.min($props.radius!, 26) : $props.radius!;
+			return (percent / 100) * $props.size! - 2;
 		},
 		get cutout() {
 			return ($props.cutout! / 100) * $props.size! - 2;
 		},
+		get centerX() {
+			return $props.legend ? $props.size! * 0.32 : $props.size! / 2;
+		},
+		get centerY() {
+			return $props.size! / 2;
+		},
 		get segments() {
-			return buildSegments($props.size!, $props.data, $props.radius!, $props.cutout!);
+			return buildSegments(this.centerX, this.centerY, $props.data, this.radius, this.cutout);
+		},
+		get labels() {
+			// The name and value at the middle of each slice, when the slice
+			// is big enough to carry a label
+			return this.segments
+				.filter((s: SegmentData) => s.angle >= 20)
+				.map((s: SegmentData) => {
+					const r = this.radius * 0.62;
+					const a = (Math.PI * (s.startAngle - s.angle / 2)) / 180;
+					return {
+						x: +(this.centerX + r * Math.sin(a)).toFixed(2),
+						y: +(this.centerY + r * Math.cos(a)).toFixed(2),
+						text: `${s.name} ${s.value}`,
+					};
+				});
+		},
+		get key() {
+			return $props.data.map((d, i) => ({
+				name: d.name,
+				color: d.color || chartColors[i % chartColors.length],
+			}));
 		},
 	});
 
 	function buildSegments(
-		theSize: number,
+		centerX: number,
+		centerY: number,
 		theData: PieData[],
 		theRadiusSize: number,
 		theCutoutSize: number,
 	): SegmentData[] {
 		const segments = [];
-		const x = theSize / 2;
-		const y = theSize / 2;
 		const totalValue = theData.reduce((a, b) => a + b.value, 0);
 
 		// Start at the top of the chart, at 180 + 360 so that we don't have to
@@ -69,7 +106,9 @@ export default function PieChart($props: PieChartProps) {
 				name: theData[i].name,
 				value: theData[i].value,
 				color: theData[i].color,
-				path: buildPath(x, y, theRadiusSize, theCutoutSize, startAngle, endAngle, largeArc),
+				startAngle,
+				angle: startAngle - endAngle,
+				path: buildPath(centerX, centerY, theRadiusSize, theCutoutSize, startAngle, endAngle, largeArc),
 			});
 			startAngle = endAngle;
 		}
@@ -92,7 +131,7 @@ export default function PieChart($props: PieChartProps) {
 
 		// Use some trig to find the points on the circumference at the start and end angles
 		const startx = x + theRadiusSize * Math.sin((Math.PI * startAngle) / 180);
-		const starty = x + theRadiusSize * Math.cos((Math.PI * startAngle) / 180);
+		const starty = y + theRadiusSize * Math.cos((Math.PI * startAngle) / 180);
 
 		const endx = x + theRadiusSize * Math.sin((Math.PI * endAngle) / 180);
 		const endy = y + theRadiusSize * Math.cos((Math.PI * endAngle) / 180);
@@ -100,7 +139,7 @@ export default function PieChart($props: PieChartProps) {
 		if ($props.cutout) {
 			// Use some trig to find the points on the cutout at the start and end angles
 			const cutoutstartx = x + theCutoutSize * Math.sin((Math.PI * startAngle) / 180);
-			const cutoutstarty = x + theCutoutSize * Math.cos((Math.PI * startAngle) / 180);
+			const cutoutstarty = y + theCutoutSize * Math.cos((Math.PI * startAngle) / 180);
 
 			const cutoutendx = x + theCutoutSize * Math.sin((Math.PI * endAngle) / 180);
 			const cutoutendy = y + theCutoutSize * Math.cos((Math.PI * endAngle) / 180);
@@ -123,6 +162,15 @@ A${theCutoutSize},${theCutoutSize} 0 ${largeArc} 0 ${cutoutstartx},${cutoutstart
 		}
 	}
 
+	function keyX(): number {
+		return $props.size! * 0.58;
+	}
+
+	function keyRowY(i: number): number {
+		const rowHeight = 18;
+		return $props.size! / 2 - ($props.data.length * rowHeight) / 2 + i * rowHeight;
+	}
+
 	@render {
 		<div {$props?.id} class={["torp-pie-chart", $props?.class]} {$props?.style}>
 			<svg role={$props?.ariaLabel ? "img" : undefined} aria-label={$props?.ariaLabel} version="1.1" width={$props.size} height={$props.size}>
@@ -131,6 +179,28 @@ A${theCutoutSize},${theCutoutSize} 0 ${largeArc} 0 ${cutoutstartx},${cutoutstart
 						<path d={segment.path} fill={segment.color || chartColors[i % chartColors.length]}>
 							<title>{`${segment.name}\n${segment.value}`}</title>
 						</path>
+					}
+					@if ($props.labels) {
+						@for (let label of $state.labels) {
+							<text
+								x={label.x}
+								y={label.y}
+								text-anchor="middle"
+								dominant-baseline="middle"
+								fill="white"
+								style="paint-order: stroke; stroke: currentcolor; stroke-width: 3px; stroke-opacity: 0.2;"
+							>
+								{label.text}
+							</text>
+						}
+					}
+					@if ($props.legend) {
+						@for (let [i, entry] of $state.key.entries()) {
+							<rect x={keyX()} y={keyRowY(i) + 4} width={10} height={10} rx="2" fill={entry.color} />
+							<text fill="currentcolor" dominant-baseline="middle" x={keyX() + 14} y={keyRowY(i) + 9}>
+								{entry.name}
+							</text>
+						}
 					}
 				</g>
 			</svg>

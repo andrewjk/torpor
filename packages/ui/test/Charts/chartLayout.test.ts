@@ -39,21 +39,21 @@ describe("chart layout", () => {
 		expect(seen).toEqual([0, 36, 36, 0]);
 	});
 
-	it("per side, the largest claim wins", () => {
+	it("claims on a side stack up", () => {
 		const layout = createChartLayout({
 			series: () => [{ name: "A", color: "", data: [5] }],
 		});
 
 		layout.reserve("a", "left", 10);
 		layout.reserve("b", "left", 30);
-		expect(layout.reservedLeft).toBe(30);
+		expect(layout.reservedLeft).toBe(40);
 
-		// A smaller claim doesn't shrink the side, and no-ops don't notify
-		layout.reserve("c", "left", 20);
-		expect(layout.reservedLeft).toBe(30);
+		// Re-claiming the same space doesn't stack a second time
+		layout.reserve("a", "left", 10);
+		expect(layout.reservedLeft).toBe(40);
 
 		layout.release("b");
-		expect(layout.reservedLeft).toBe(20);
+		expect(layout.reservedLeft).toBe(10);
 	});
 
 	it("announceMax raises the value domain", () => {

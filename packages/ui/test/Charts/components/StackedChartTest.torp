@@ -7,6 +7,7 @@ export default function StackedChartTest($props: any) {
 			height={200}
 			width={400}
 			ariaLabel="Stacked chart"
+			xLabel={"Quarter"}
 			stacked={$props.stacked === true}
 			series={[
 				{ name: "Q1", color: "", data: [50, 30] },

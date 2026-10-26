@@ -1,0 +1,19 @@
+import { AreaChart } from "../../../src/Charts/index";
+
+export default function StackedAreaChartTest($props: any) {
+	@render {
+		<AreaChart
+			height={200}
+			width={400}
+			ariaLabel="Stacked area chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			stacked={true}
+			series={[
+				{ name: "A", color: "#ff0000", data: [30, 10] },
+				{ name: "B", color: "#00ff00", data: [20, 30] },
+			]}
+		/>
+	}
+}

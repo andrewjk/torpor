@@ -94,8 +94,8 @@ export interface ChartLayout {
 	/** The height of the plot area */
 	readonly plotHeight: number;
 	/**
-	 * Claims space on a side of the plot, keyed by layer. Per side, the
-	 * largest claim wins; no-ops when the claim is unchanged.
+	 * Claims space on a side of the plot, keyed by layer. Claims on the
+	 * same side stack up; no-ops when the claim is unchanged.
 	 */
 	reserve(id: string, side: ChartSide, size: number): void;
 	/** Gives back the space claimed by `reserve` */
@@ -220,17 +220,17 @@ export function createChartLayout(options: ChartLayoutOptions): ChartLayout {
 }
 
 /**
- * The total space reserved on one side: the largest of the claims made
- * against it.
+ * The total space reserved on one side: claims on the same side stack up,
+ * so an x axis and a legend each keep their own band along the bottom.
  */
 function reservedSize(claims: Record<string, SpaceClaim>, side: ChartSide): number {
-	let max = 0;
+	let total = 0;
 	for (const claim of Object.values(claims)) {
-		if (claim.side === side && claim.size > max) {
-			max = claim.size;
+		if (claim.side === side) {
+			total += claim.size;
 		}
 	}
-	return max;
+	return total;
 }
 
 /**

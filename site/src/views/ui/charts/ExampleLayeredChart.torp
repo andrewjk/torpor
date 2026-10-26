@@ -1,0 +1,34 @@
+import { Chart, ChartColumns, ChartGrid, ChartLegend, ChartLines, ChartXAxis, ChartYAxis } from "@torpor/ui/Charts";
+
+export default function ExampleLayeredChart() {
+	@render {
+		<Chart
+			height={240}
+			width={400}
+			ariaLabel="Sales by quarter, with average"
+			xLabel={"Quarter"}
+			maxValue={80}
+			stepCount={2}
+			series={[
+				{ name: "Q1", data: [35, 50] },
+				{ name: "Q2", data: [60, 45] },
+				{ name: "Q3", data: [42, 67] },
+			]}
+		>
+			<!-- Every layer reserves the space it needs from the Chart; the
+				marks draw into whatever is left over -->
+			<ChartLegend />
+			<ChartYAxis side="right" />
+			<ChartGrid />
+			<ChartXAxis />
+			<ChartColumns />
+			<ChartLines seriesIndex={0} showPoints />
+		</Chart>
+	}
+
+	@style {
+		svg line {
+			stroke: var(--text);
+		}
+	}
+}

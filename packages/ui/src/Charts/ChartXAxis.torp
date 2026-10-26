@@ -22,7 +22,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 	if (!context) {
 		throw new Error("ChartXAxis must be contained within a Chart");
 	}
-	const { layout, xLabel, horizontal } = context;
+	const { layout, xLabel, horizontal, vertical, linear } = context;
 
 	function showAxis(): boolean {
 		return $props?.showAxis !== false;
@@ -54,14 +54,56 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 		return layout.plotX + i * layout.stepValue * unitWidth();
 	}
 
+	// Labels hang just under the axis line, with a small buffer, at the top
+	// of the strip; the title sits at the bottom of the strip, under the
+	// labels
 	function tickY(): number {
-		return layout.calculatedHeight - layout.textHeight / 3;
+		return plotBottom() + layout.textHeight * (2 / 3) + 4;
+	}
+
+	function titleY(): number {
+		return plotBottom() + layout.textHeight * 2;
+	}
+
+	// The x of label i. Charts with slot marks (columns) center each label
+	// in its slot; charts with only point marks (lines, areas, points)
+	// spread the labels across the plot, matching where the marks are
+	function labelX(i: number): number {
+		if (horizontal()) {
+			return tickX(i);
+		}
+		const count = layout.labels.length;
+		if (linear() && !vertical()) {
+			if (count <= 1) {
+				return layout.plotX + layout.plotWidth / 2;
+			}
+			return layout.plotX + (i / (count - 1)) * layout.plotWidth;
+		}
+		return layout.plotX + layout.itemWidth * i + layout.itemWidth / 2;
+	}
+
+	// Edge ticks and labels turn inward so they don't hang past the plot
+	function tickAnchor(i: number, count: number): string {
+		if (i === 0) return "start";
+		if (i === count - 1) return "end";
+		return "middle";
+	}
+
+	function labelAnchor(i: number): string {
+		if (horizontal()) {
+			return tickAnchor(i, layout.stepLabels.length);
+		}
+		const count = layout.labels.length;
+		if (linear() && !vertical() && count > 1) {
+			return tickAnchor(i, count);
+		}
+		return "middle";
 	}
 
 	@render {
 		<svg>
 			@if (showAxis()) {
-				<line x1={layout.plotX} y1={plotBottom()} x2={layout.plotX + layout.plotWidth} y2={plotBottom()} stroke="currentcolor" />
+				<line x1={layout.plotX} y1={plotBottom() + 0.5} x2={layout.plotX + layout.plotWidth} y2={plotBottom() + 0.5} stroke="currentcolor" />
 			}
 			@if (!horizontal()) {
 				@if (title()) {
@@ -70,7 +112,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 						text-anchor="middle"
 						dominant-baseline="text-after-edge"
 						x={layout.plotX + layout.plotWidth / 2}
-						y={layout.calculatedHeight}
+						y={titleY()}
 					>
 						{title()}
 					</text>
@@ -78,9 +120,9 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 				@for (let [i, label] of layout.labels.entries()) {
 					<text
 						fill="currentcolor"
-						text-anchor="middle"
+						text-anchor={labelAnchor(i)}
 						dominant-baseline="text-after-edge"
-						x={layout.plotX + layout.itemWidth * i + layout.itemWidth / 2}
+						x={labelX(i)}
 						y={tickY()}
 					>
 						{label}
@@ -88,7 +130,7 @@ export default function ChartXAxis($props?: ChartXAxisProps) {
 				}
 			} else {
 				@for (let [i, label] of layout.stepLabels.entries()) {
-					<text text-anchor="middle" dominant-baseline="text-after-edge" x={tickX(i)} y={tickY()}>
+					<text text-anchor={tickAnchor(i, layout.stepLabels.length)} dominant-baseline="text-after-edge" x={tickX(i)} y={tickY()}>
 						{label}
 					</text>
 				}

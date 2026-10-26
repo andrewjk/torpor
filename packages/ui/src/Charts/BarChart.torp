@@ -25,12 +25,14 @@ interface BarChartProps {
 	stepValue?: number;
 	showHLines?: boolean;
 	showVLines?: boolean;
+	/** Stacks the values in each band into one bar per series */
+	stacked?: boolean;
 }
 
 /**
- * A bar chart: one thick horizontal bar per series, drawn from the left
- * edge towards its first value, with category labels down the side and the
- * value scale along the bottom.
+ * A bar chart: horizontal bars drawn from the left edge towards their
+ * values, with category labels down the side and the value scale along the
+ * bottom.
  *
  * This is a preset over the layered chart components:
  *
@@ -64,7 +66,7 @@ export default function BarChart($props: BarChartProps) {
 			<ChartYAxis />
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
 			<ChartXAxis />
-			<ChartBars />
+			<ChartBars stacked={$props.stacked === true} />
 		</Chart>
 	}
 }

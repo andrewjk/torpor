@@ -60,14 +60,15 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 				x,
 				width,
 				y: bottom - (s.below + s.value) * layout.valueHeight,
-				height: Math.max(1, s.value * layout.valueHeight),
+				// A small gap between the segments, so the stack reads
+				height: Math.max(1, s.value * layout.valueHeight - 2),
 				value: s.value,
 			}));
 		}
 		const count = series()[i].data.length;
 		const width = columnWidth(count);
 		return series()[i].data.map((value, j) => ({
-			x: slotX(i) + columnGap(count) + j * width,
+			x: columnX(i, j, count),
 			width,
 			y: bottom - Math.max(1, value * layout.valueHeight),
 			height: Math.max(1, value * layout.valueHeight),
@@ -90,6 +91,12 @@ export default function ChartColumns($props?: ChartColumnsProps) {
 
 	function columnGap(count: number): number {
 		return (layout.itemWidth - columnWidth(count) * count) / (count + 1);
+	}
+
+	// The x of sub-column j of `count` within slot i: the columns are
+	// separated from each other and from the slot edges by the same gap
+	function columnX(i: number, j: number, count: number): number {
+		return slotX(i) + columnGap(count) + j * (columnWidth(count) + columnGap(count));
 	}
 
 	// The values of slot i with the sum of the values below each

@@ -6,6 +6,7 @@ export default function ExamplePieChart() {
 			size={200}
 			radius={50}
 			cutout={10}
+			legend={true}
 			data={[
 				{ name: "Item1", value: 35 },
 				{ name: "Item2", value: 25 },

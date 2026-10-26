@@ -24,8 +24,12 @@ export interface ChartContext {
 	yLabel: () => string;
 	/** Whether the chart draws horizontal marks (bars), set by the mark layers */
 	horizontal: () => boolean;
+	/** Whether the chart draws slot marks (columns), set by the mark layers */
+	vertical: () => boolean;
+	/** Whether the chart draws point marks (lines, areas, points), set by the mark layers */
+	linear: () => boolean;
 	/** Called by mark layers to announce their orientation */
-	registerMark: (orientation: "horizontal" | "vertical") => void;
+	registerMark: (orientation: "horizontal" | "vertical" | "linear") => void;
 	/** Called by aggregated mark layers (stacks) to raise the value domain */
 	registerMax: (id: string, value: number) => void;
 	/** The color to draw series i with, from its own color or the palette */

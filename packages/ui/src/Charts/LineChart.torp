@@ -26,6 +26,8 @@ interface LineChartProps {
 	showPoints?: boolean;
 	showHLines?: boolean;
 	showVLines?: boolean;
+	/** Stacks each series on top of the one below it */
+	stacked?: boolean;
 }
 
 /**
@@ -66,7 +68,7 @@ export default function LineChart($props: LineChartProps) {
 			<ChartGrid hLines={$props.showHLines === true} vLines={$props.showVLines === true} />
 			<ChartXAxis />
 			@for (let i of $props.series.map((_, i) => i)) {
-				<ChartLines seriesIndex={i} showPoints={$props.showPoints} />
+				<ChartLines seriesIndex={i} showPoints={$props.showPoints} stacked={$props.stacked === true} />
 			}
 		</Chart>
 	}

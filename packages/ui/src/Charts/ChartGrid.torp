@@ -10,7 +10,8 @@ interface ChartGridProps {
 /**
  * Grid lines for a Chart: horizontal lines at each value step and/or
  * vertical lines through each category slot. Drawn only within the plot
- * area, inside the space reserved by the axes.
+ * area, inside the space reserved by the axes. The baseline (value 0) is
+ * left to the axis line.
  */
 export default function ChartGrid($props?: ChartGridProps) {
 	const context = $context[ChartContextName] as ChartContext;
@@ -30,13 +31,15 @@ export default function ChartGrid($props?: ChartGridProps) {
 		<svg>
 			@if (hLines()) {
 				@for (let [i] of layout.stepLabels.entries()) {
-					<line
-						x1={layout.plotX}
-						y1={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
-						x2={layout.plotX + layout.plotWidth}
-						y2={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
-						stroke="currentcolor"
-					/>
+					@if (i > 0) {
+						<line
+							x1={layout.plotX}
+							y1={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
+							x2={layout.plotX + layout.plotWidth}
+							y2={layout.plotY + layout.plotHeight - i * layout.stepValue * layout.valueHeight}
+							stroke="currentcolor"
+						/>
+					}
 				}
 			}
 			@if (vLines()) {

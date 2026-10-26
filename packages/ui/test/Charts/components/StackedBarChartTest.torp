@@ -1,0 +1,19 @@
+import { BarChart } from "../../../src/Charts/index";
+
+export default function StackedBarChartTest($props: any) {
+	@render {
+		<BarChart
+			height={200}
+			width={400}
+			ariaLabel="Stacked bar chart"
+			maxValue={100}
+			stepCount={2}
+			stepValue={50}
+			stacked={true}
+			series={[
+				{ name: "Q1", data: [35, 50] },
+				{ name: "Q2", data: [60, 45] },
+			]}
+		/>
+	}
+}

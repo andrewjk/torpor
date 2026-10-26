@@ -1,5 +1,6 @@
 import { type ChartContext, ChartContextName } from "./ChartTypes";
 import type DataSeries from "./DataSeries";
+import { calculateCrossStackMax } from "../utils/chartUtils";
 
 interface ChartLinesProps {
 	/** The index of the series to draw (default 0) */
@@ -8,36 +9,71 @@ interface ChartLinesProps {
 	color?: string;
 	/** Draws a point at each value (default false) */
 	showPoints?: boolean;
+	/** Stacks this line on top of the ones below it, instead of from the baseline */
+	stacked?: boolean;
 }
 
 /**
  * Line marks for a Chart: draws the chosen series as a connected line
- * across the category slots.
+ * across the plot.
  *
  * Add alongside ChartColumns or ChartBars for overlaid layers -- or use two
  * ChartLines with different `seriesIndex` to compare series.
+ *
+ * With `stacked`, each line sits on top of the stacked series below it --
+ * give every stacked line the same treatment and the Chart's value domain
+ * grows to fit the largest total.
  */
 export default function ChartLines($props?: ChartLinesProps) {
 	const context = $context[ChartContextName] as ChartContext;
 	if (!context) {
 		throw new Error("This layer must be contained within a Chart");
 	}
-	const { layout, series, colorAt } = context;
-	context.registerMark("vertical");
+	const { layout, series, colorAt, registerMax } = context;
+	context.registerMark("linear");
 
 	function index(): number {
 		return $props?.seriesIndex ?? 0;
 	}
 
+	function stacked(): boolean {
+		return $props?.stacked === true;
+	}
+
+	// Stacked lines reach higher than any single series, so raise the
+	// domain to the largest stack total (released when this layer unmounts
+	// or stops stacking)
+	$run(() => {
+		if (stacked()) {
+			registerMax("line-" + index(), calculateCrossStackMax(series()));
+		}
+		return () => registerMax("line-" + index(), 0);
+	});
+
 	function current(): DataSeries | undefined {
 		return series()[index()];
 	}
 
+	// The sum of the series below this one, at point j
+	function below(j: number): number {
+		if (!stacked()) {
+			return 0;
+		}
+		let total = 0;
+		for (let i = 0; i < index(); i++) {
+			total += series()[i]?.data[j] ?? 0;
+		}
+		return total;
+	}
+
 	function points(): { x: number; y: number }[] {
 		const data = current()?.data ?? [];
+		// Points are spread by their index across the full plot width, from
+		// the left edge to the right
+		const step = data.length > 1 ? layout.plotWidth / (data.length - 1) : 0;
 		return data.map((value, j) => ({
-			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
-			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
+			x: +(layout.plotX + (data.length > 1 ? j * step : layout.plotWidth / 2)).toFixed(2),
+			y: +(layout.plotY + layout.plotHeight - (below(j) + value) * layout.valueHeight).toFixed(2),
 		}));
 	}
 

@@ -1,5 +1,6 @@
 import { type ChartContext, ChartContextName } from "./ChartTypes";
 import type DataSeries from "./DataSeries";
+import { calculateCrossStackMax } from "../utils/chartUtils";
 
 interface ChartAreaProps {
 	/** The index of the series to draw (default 0) */
@@ -8,42 +9,87 @@ interface ChartAreaProps {
 	color?: string;
 	/** The fill opacity (default 0.25) */
 	opacity?: number;
+	/** Stacks this series on top of the ones below it, instead of from the baseline */
+	stacked?: boolean;
 }
 
 /**
  * Area marks for a Chart: fills the region between the chosen series' line
  * and the bottom of the plot. Add a ChartLines layer with the same
  * seriesIndex to draw the line itself.
+ *
+ * With `stacked`, each area sits on top of the stacked series below it --
+ * give every stacked area the same treatment and the Chart's value domain
+ * grows to fit the largest total.
  */
 export default function ChartArea($props?: ChartAreaProps) {
 	const context = $context[ChartContextName] as ChartContext;
 	if (!context) {
 		throw new Error("This layer must be contained within a Chart");
 	}
-	const { layout, series, colorAt } = context;
-	context.registerMark("vertical");
+	const { layout, series, colorAt, registerMax } = context;
+	context.registerMark("linear");
 
 	function index(): number {
 		return $props?.seriesIndex ?? 0;
 	}
 
+	function stacked(): boolean {
+		return $props?.stacked === true;
+	}
+
+	// Stacked areas reach higher than any single series, so raise the
+	// domain to the largest stack total (released when this layer unmounts
+	// or stops stacking)
+	$run(() => {
+		if (stacked()) {
+			registerMax("area-" + index(), calculateCrossStackMax(series()));
+		}
+		return () => registerMax("area-" + index(), 0);
+	});
+
 	function current(): DataSeries | undefined {
 		return series()[index()];
 	}
 
+	// The sum of the series below this one, at point j
+	function below(j: number): number {
+		if (!stacked()) {
+			return 0;
+		}
+		let total = 0;
+		for (let i = 0; i < index(); i++) {
+			total += series()[i]?.data[j] ?? 0;
+		}
+		return total;
+	}
+
 	function points(): { x: number; y: number }[] {
 		const data = current()?.data ?? [];
+		// Points are spread by their index across the full plot width, from
+		// the left edge to the right
+		const step = data.length > 1 ? layout.plotWidth / (data.length - 1) : 0;
 		return data.map((value, j) => ({
-			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
-			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
+			x: +(layout.plotX + (data.length > 1 ? j * step : layout.plotWidth / 2)).toFixed(2),
+			y: +(layout.plotY + layout.plotHeight - (below(j) + value) * layout.valueHeight).toFixed(2),
 		}));
 	}
 
-	// The line's points, closed along the bottom of the plot
+	// The polygon: out along the top edge, back along the stack below (or
+	// the bottom of the plot for the first series)
 	function polygon(): string {
 		const pts = points();
 		if (!pts.length) {
 			return "";
+		}
+		if (stacked()) {
+			const lower = pts
+				.map((p, j) => ({
+					x: p.x,
+					y: +(layout.plotY + layout.plotHeight - below(j) * layout.valueHeight).toFixed(2),
+				}))
+				.reverse();
+			return [...pts, ...lower].map((p) => `${p.x},${p.y}`).join(" ");
 		}
 		const bottom = layout.plotY + layout.plotHeight;
 		return [

@@ -87,6 +87,8 @@ export default function Chart($props: ChartProps | undefined) {
 
 	let $chartState = $watch({
 		horizontal: false,
+		vertical: false,
+		linear: false,
 	});
 
 	const context: ChartContext = {
@@ -95,9 +97,15 @@ export default function Chart($props: ChartProps | undefined) {
 		xLabel: () => $props?.xLabel ?? "",
 		yLabel: () => $props?.yLabel ?? "",
 		horizontal: () => $chartState.horizontal,
+		vertical: () => $chartState.vertical,
+		linear: () => $chartState.linear,
 		registerMark: (orientation) => {
 			if (orientation === "horizontal") {
 				$chartState.horizontal = true;
+			} else if (orientation === "vertical") {
+				$chartState.vertical = true;
+			} else {
+				$chartState.linear = true;
 			}
 		},
 		registerMax: (id, value) => {

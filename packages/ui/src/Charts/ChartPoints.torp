@@ -21,7 +21,7 @@ export default function ChartPoints($props?: ChartPointsProps) {
 		throw new Error("This layer must be contained within a Chart");
 	}
 	const { layout, series, colorAt } = context;
-	context.registerMark("vertical");
+	context.registerMark("linear");
 
 	function index(): number {
 		return $props?.seriesIndex ?? 0;
@@ -33,8 +33,11 @@ export default function ChartPoints($props?: ChartPointsProps) {
 
 	function points(): { x: number; y: number }[] {
 		const data = current()?.data ?? [];
+		// Points are spread by their index across the full plot width, from
+		// the left edge to the right
+		const step = data.length > 1 ? layout.plotWidth / (data.length - 1) : 0;
 		return data.map((value, j) => ({
-			x: +(layout.plotX + j * layout.itemWidth + layout.itemWidth / 2).toFixed(2),
+			x: +(layout.plotX + (data.length > 1 ? j * step : layout.plotWidth / 2)).toFixed(2),
 			y: +(layout.plotY + layout.plotHeight - value * layout.valueHeight).toFixed(2),
 		}));
 	}

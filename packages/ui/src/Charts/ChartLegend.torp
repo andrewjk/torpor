@@ -52,9 +52,10 @@ export default function ChartLegend($props?: ChartLegendProps) {
 			}
 		}
 
-		const stripHeight = side() === "bottom" ? layout.reservedBottom : layout.reservedTop;
-		const stripTop = side() === "bottom" ? layout.calculatedHeight - stripHeight : 0;
-		const startY = stripTop + Math.max(0, (stripHeight - lines.length * rowHeight()) / 2);
+		// Rows anchor to the outer edge of the strip: an axis sharing the
+		// side anchors to the plot edge instead, so the two stack without
+		// overlapping
+		const startY = side() === "bottom" ? layout.calculatedHeight - lines.length * rowHeight() : 0;
 
 		return lines.map((line, r) => {
 			const lineWidth = line.reduce((a, b) => a + entryWidth(b.name), 0);

@@ -62,8 +62,28 @@ export function calculateTickLabelWidth(stepLabels: number[], textWidth: number)
 }
 
 /**
- * The domain top needed by stacked marks: the largest sum of the values in
- * one slot across all series.
+ * The domain top needed by marks that stack the series on top of each
+ * other (stacked areas, stacked lines): the largest sum across all series
+ * at one point.
+ */
+export function calculateCrossStackMax(series: DataSeries[]): number {
+	const count = Math.max(0, ...series.map((s) => s.data.length));
+	let max = 0;
+	for (let j = 0; j < count; j++) {
+		let total = 0;
+		for (const s of series) {
+			total += s.data[j] ?? 0;
+		}
+		if (total > max) {
+			max = total;
+		}
+	}
+	return max;
+}
+
+/**
+ * The domain top needed by stacked marks (stacked columns, stacked bars):
+ * the largest sum of the values in one slot across all series.
  */
 export function calculateStackMax(series: DataSeries[]): number {
 	let max = 0;

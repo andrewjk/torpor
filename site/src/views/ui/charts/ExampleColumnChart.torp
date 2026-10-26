@@ -1,0 +1,25 @@
+import { ColumnChart } from "@torpor/ui/Charts";
+
+export default function ExampleColumnChart() {
+	@render {
+		<ColumnChart
+			height={200}
+			width={400}
+			ariaLabel="Sales by quarter"
+			xLabel={"Quarter"}
+			maxValue={80}
+			stepCount={2}
+			series={[
+				{ name: "Q1", data: [35, 50] },
+				{ name: "Q2", data: [60, 45] },
+				{ name: "Q3", data: [42, 67] },
+			]}
+		/>
+	}
+
+	@style {
+		svg line {
+			stroke: var(--text);
+		}
+	}
+}

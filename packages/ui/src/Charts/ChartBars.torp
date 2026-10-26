@@ -1,4 +1,5 @@
 import { type ChartContext, ChartContextName } from "./ChartTypes";
+import { calculateStackMax } from "../utils/chartUtils";
 
 interface ChartBarsProps {
 	/**
@@ -6,11 +7,17 @@ interface ChartBarsProps {
 	 * reading different series. Defaults to all series.
 	 */
 	seriesIndex?: number;
+	/** Stacks the values in each band into one bar, instead of side by side */
+	stacked?: boolean;
 }
 
 /**
- * Horizontal bar marks for a Chart: one thick horizontal bar per series,
- * drawn from the left edge of the plot towards its value.
+ * Horizontal bar marks for a Chart: every value in the chosen series is
+ * drawn as a horizontal bar, grouped within its band down the left.
+ *
+ * With `stacked`, the values in each band are laid end to end into a
+ * single bar instead, and the Chart's value domain grows to fit the
+ * largest total.
  *
  * For a column per value grouped under each label, use ChartColumns --
  * those run vertically.
@@ -20,7 +27,7 @@ export default function ChartBars($props?: ChartBarsProps) {
 	if (!context) {
 		throw new Error("This layer must be contained within a Chart");
 	}
-	const { layout, series, colorAt } = context;
+	const { layout, series, colorAt, registerMax } = context;
 	context.registerMark("horizontal");
 
 	function indexes(): number[] {
@@ -30,48 +37,89 @@ export default function ChartBars($props?: ChartBarsProps) {
 		return series().map((_, i) => i);
 	}
 
-	// The vertical band each series occupies within the plot
-	function bandHeight(): number {
-		const count = Math.max(1, layout.labels.length);
-		return (layout.plotHeight - topPad()) / count;
+	function stacked(): boolean {
+		return $props?.stacked === true;
 	}
+
+	// Stacked bars reach further than any single value, so raise the
+	// domain to the largest total (released when this layer unmounts or
+	// stops stacking)
+	$run(() => {
+		if (stacked()) {
+			registerMax("bars", calculateStackMax(series()));
+		}
+		return () => registerMax("bars", 0);
+	});
 
 	// A little space above for breathing room, matching ChartXAxis's labels
 	function topPad(): number {
 		return layout.textHeight / 3;
 	}
 
-	function barHeight(count: number): number {
+	// The vertical band each series occupies within the plot
+	function bandHeight(): number {
+		const count = Math.max(1, layout.labels.length);
+		return (layout.plotHeight - topPad()) / count;
+	}
+
+	function bandY(i: number): number {
+		return layout.plotY + topPad() + i * bandHeight();
+	}
+
+	function barThickness(count: number): number {
 		return Math.max(1, (bandHeight() / count) * 0.7);
 	}
 
-	function valueWidth(value: number): number {
-		const max = Math.max(1, layout.maxValue);
-		return Math.max(1, (value / max) * layout.plotWidth);
+	function barGap(count: number): number {
+		return (bandHeight() - barThickness(count) * count) / (count + 1);
 	}
 
-	function barY(i: number): number {
-		const count = series().length || 1;
-		return (
-			layout.plotY +
-			topPad() +
-			i * bandHeight() +
-			(bandHeight() - barHeight(count)) / 2
-		);
+	function unitWidth(): number {
+		return layout.plotWidth / Math.max(1, layout.maxValue);
+	}
+
+	// The values of band i with the sum of the values before each
+	function segments(i: number): { value: number; before: number }[] {
+		let before = 0;
+		return series()[i].data.map((value) => {
+			const segment = { value, before };
+			before += value;
+			return segment;
+		});
+	}
+
+	// The x/y/width/height of every bar in band i: sub-bars grouped within
+	// the band, or the band's values laid end to end into one bar
+	function rects(i: number): { x: number; y: number; width: number; height: number; value: number }[] {
+		if (stacked()) {
+			const height = barThickness(1);
+			const y = bandY(i) + (bandHeight() - height) / 2;
+			return segments(i).map((s) => ({
+				x: layout.plotX + s.before * unitWidth(),
+				y,
+				width: Math.max(1, s.value * unitWidth()),
+				height,
+				value: s.value,
+			}));
+		}
+		const count = series()[i].data.length;
+		return series()[i].data.map((value, j) => ({
+			x: layout.plotX,
+			y: bandY(i) + barGap(count) + j * (barThickness(count) + barGap(count)),
+			width: Math.max(1, value * unitWidth()),
+			height: barThickness(count),
+			value,
+		}));
 	}
 
 	@render {
 		<svg>
 			@for (let i of indexes()) {
-				<rect
-					x={layout.plotX}
-					y={barY(i)}
-					width={valueWidth(series()[i].data[0])}
-					height={barHeight(Math.max(1, series().length))}
-					fill={colorAt(i)}
-				>
-					<title>{`${[layout.labels[i], series()[i].data[0]].filter(Boolean).join("\n")}`}</title>
-				</rect>
+				@for (let r of rects(i)) {
+					<rect x={r.x} y={r.y} width={r.width} height={r.height} fill={colorAt(i)}>
+						<title>{`${[layout.labels[i], r.value].filter(Boolean).join("\n")}`}</title>
+					</rect>
+				}
 			}
 		</svg>
 	}
