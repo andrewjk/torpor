@@ -12,19 +12,19 @@ export default async function SwitchString(
 	t_body += `<![>`;
 	switch ($props.status) {
 		case "loading": {
-			t_body += `<!^><p>Loading...</p>`;
+			t_body += `<!^0><p>Loading...</p>`;
 			break;
 		}
 		case "success": {
-			t_body += `<!^><p>Loaded!</p>`;
+			t_body += `<!^1><p>Loaded!</p>`;
 			break;
 		}
 		case "error": {
-			t_body += `<!^><p>Error occurred</p>`;
+			t_body += `<!^2><p>Error occurred</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^><p>Idle</p>`;
+			t_body += `<!^3><p>Idle</p>`;
 			break;
 		}
 	}

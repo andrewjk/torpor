@@ -11,9 +11,9 @@ export default async function IfSingleIf(
 	/* User interface */
 	t_body += `<div><![>`;
 	if ($props.outer) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		if ($props.inner) {
-			t_body += `<!^><p>both</p>`;
+			t_body += `<!^0><p>both</p>`;
 		}
 		t_body += `<!]><!>`;
 	}

@@ -15,15 +15,15 @@ export default async function ForSwitchReactive(
 		t_body += `<!^><![>`;
 		switch (item.status) {
 			case "on": {
-				t_body += `<!^><li class="on">${t_fmt(item.id)}</li>`;
+				t_body += `<!^0><li class="on">${t_fmt(item.id)}</li>`;
 				break;
 			}
 			case "off": {
-				t_body += `<!^><li class="off">${t_fmt(item.id)}</li>`;
+				t_body += `<!^1><li class="off">${t_fmt(item.id)}</li>`;
 				break;
 			}
 			default: {
-				t_body += `<!^><li class="unknown">${t_fmt(item.id)}</li>`;
+				t_body += `<!^2><li class="unknown">${t_fmt(item.id)}</li>`;
 				break;
 			}
 		}

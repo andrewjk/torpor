@@ -11,11 +11,11 @@ export default async function IfAfterIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 10) {
-		t_body += `<!^><p> It's true! </p>`;
+		t_body += `<!^0><p> It's true! </p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.counter > 5) {
-		t_body += `<!^><p> It's also true! </p>`;
+		t_body += `<!^0><p> It's also true! </p>`;
 	}
 	t_body += `<!]><!>`;
 

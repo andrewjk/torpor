@@ -36,10 +36,10 @@ async function Card(
 	/* User interface */
 	t_body += `<div><h2>${t_fmt($props.title)}</h2> <h3>${t_fmt($props.subtitle)}</h3> <p>Count: ${t_fmt($props.count)}</p> <![>`;
 	if ($props.active) {
-		t_body += `<!^><span>Active</span>`;
+		t_body += `<!^0><span>Active</span>`;
 	}
 	else {
-		t_body += `<!^><span>Inactive</span>`;
+		t_body += `<!^1><span>Inactive</span>`;
 	}
 	t_body += `<!]><!></div>`;
 

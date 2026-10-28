@@ -11,10 +11,10 @@ export default async function If(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 5) {
-		t_body += `<!^><p>It's big</p>`;
+		t_body += `<!^0><p>It's big</p>`;
 	}
 	else {
-		t_body += `<!^><p>It's small</p>`;
+		t_body += `<!^1><p>It's small</p>`;
 	}
 	t_body += `<!]><!>`;
 

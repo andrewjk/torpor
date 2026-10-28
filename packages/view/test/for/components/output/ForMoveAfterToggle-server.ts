@@ -14,7 +14,7 @@ export default async function ForMoveAfterToggle(
 	for (let t of $props.todos) {
 		t_body += `<!^><![>`;
 		if (t.done) {
-			t_body += `<!^><li>${t_fmt(t.id)}</li>`;
+			t_body += `<!^0><li>${t_fmt(t.id)}</li>`;
 		}
 		t_body += `<!]><!>`;
 	}

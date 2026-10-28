@@ -1,7 +1,14 @@
+import { setBranchIndex } from "./branchIndex";
 import context from "./context";
 import { setFirstInsideNode } from "./firstInsideNode";
-import { HYDRATION_BREAK, HYDRATION_END, HYDRATION_START } from "./hydrationMarkers";
+import {
+	HYDRATION_END,
+	HYDRATION_START,
+	hydrationBreakIndex,
+	isHydrationBreak,
+} from "./hydrationMarkers";
 import isCommentNode from "./isCommentNode";
+import isTextNode from "./isTextNode";
 import nodeNext from "./nodeNext";
 
 /**
@@ -25,6 +32,21 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 			// stop walking up the tree during document-order traversal
 			const startParent = node.parentNode;
 
+			// The server writes the branch it rendered into the leading
+			// branch-break marker (`<!^2>`). `nodeNext` below strips that
+			// marker without looking at it, so read the index off it here
+			// first. It gets stashed on the anchor at the end, so `runControl`
+			// can recreate the block when the client picks a different branch
+			// than the server rendered.
+			let branchIndex: number | undefined = undefined;
+			let peek: ChildNode | null = node.nextSibling;
+			while (peek !== null && isTextNode(peek) && (peek.textContent ?? "").trim() === "") {
+				peek = peek.nextSibling;
+			}
+			if (peek !== null && isCommentNode(peek) && isHydrationBreak(peek.data)) {
+				branchIndex = hydrationBreakIndex(peek.data);
+			}
+
 			// Skip and remove the start node, setting the hydration node in
 			// nodeNext. The node returned here is the first node inside the
 			// block (after any leading branch-break marker), which becomes the
@@ -40,8 +62,11 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 			while (
 				currentNode !== null &&
 				isCommentNode(currentNode) &&
-				currentNode.data === HYDRATION_BREAK
+				isHydrationBreak(currentNode.data)
 			) {
+				if (branchIndex === undefined) {
+					branchIndex = hydrationBreakIndex(currentNode.data);
+				}
 				const next: ChildNode | null = currentNode.nextSibling;
 				currentNode.remove();
 				currentNode = next;
@@ -100,6 +125,12 @@ export default function nodeAnchor(node: ChildNode): ChildNode {
 							// server-rendered nodes, since the markers that
 							// bounded them have now been removed.
 							setFirstInsideNode(endNode!, firstContent);
+
+							// Stash the server-rendered branch index alongside
+							// it, for the same reason (see branchIndex.ts)
+							if (branchIndex !== undefined) {
+								setBranchIndex(endNode!, branchIndex);
+							}
 
 							// NOTE: We know this is not null as it is being
 							// called from generated code

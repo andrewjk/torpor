@@ -15,7 +15,7 @@ export default async function Page(
 	/* User interface */
 	t_body += `<p>The count is ${t_fmt($props.count)}.</p> <button>Increment</button> <form><input type="number" name="count"> <button type="submit">Set via server</button></form> <![>`;
 	if ($props?.form?.message) {
-		t_body += `<!^><p style="color: green">${t_fmt($props.form.message)}</p>`;
+		t_body += `<!^0><p style="color: green">${t_fmt($props.form.message)}</p>`;
 	}
 	t_body += `<!]><!>`;
 

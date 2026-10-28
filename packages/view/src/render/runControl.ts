@@ -1,5 +1,6 @@
 import type Region from "../types/Region";
 import $run from "../watch/$run";
+import takeBranchIndex from "./branchIndex";
 import context from "./context";
 import popRegion from "./popRegion";
 import pushRegion from "./pushRegion";
@@ -16,6 +17,22 @@ export default function runControl(
 	name?: string,
 ): void {
 	let first = true;
+
+	// While hydrating, `nodeAnchor` may have stashed the branch index the
+	// server rendered for this control (from the block's `<!^2>` break marker;
+	// see branchIndex.ts), along with the anchor that ends the block.
+	// `runControlBranch` compares the index with the branch the client picks
+	// here: server and client conditions can legitimately differ (browser-only
+	// state, effects that no-op on the server), and a branch the server
+	// rendered but the client didn't pick must be recreated rather than
+	// adopted.
+	if (context.hydrationNode !== null && anchor !== null) {
+		(region as any).ssrBranchAnchor = anchor;
+		const ssrBranchIndex = takeBranchIndex(anchor);
+		if (ssrBranchIndex !== undefined) {
+			(region as any).ssrBranchIndex = ssrBranchIndex;
+		}
+	}
 
 	// Use a generation counter so stale effects (created by previous
 	// runControl calls for the same region) can detect they're no longer
@@ -54,7 +71,15 @@ export default function runControl(
 		// (at the last nested node), but the parent fragment needs a stable
 		// end node — the anchor persists until the parent clears it, so it is
 		// safe to capture.
-		if (context.hydrationNode !== null && anchor !== null) {
+		//
+		// A branch mismatch recreated the branch with hydration disabled (see
+		// runControlBranch); restore the cursor to the anchor in that case as
+		// well, so the parent resumes hydrating the nodes that follow.
+		if (
+			anchor !== null &&
+			(context.hydrationNode !== null || (region as any).ssrBranchRecreated === true)
+		) {
+			(region as any).ssrBranchRecreated = undefined;
 			context.hydrationNode = anchor as ChildNode;
 		}
 	}, name);

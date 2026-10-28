@@ -1,5 +1,5 @@
 import context from "./context";
-import { HYDRATION_BREAK, HYDRATION_START } from "./hydrationMarkers";
+import { HYDRATION_START, isHydrationBreak } from "./hydrationMarkers";
 import isCommentNode from "./isCommentNode";
 import isTextNode from "./isTextNode";
 
@@ -24,7 +24,7 @@ export default function walkHydrationRoot(): ChildNode {
 	// real content.
 	while (rootNode !== null && isSkippable(rootNode)) {
 		const next: ChildNode | null = rootNode.nextSibling;
-		if (isCommentNode(rootNode) && rootNode.data === HYDRATION_BREAK) {
+		if (isCommentNode(rootNode) && isHydrationBreak(rootNode.data)) {
 			rootNode.remove();
 		}
 		rootNode = next;
@@ -61,7 +61,7 @@ function isSkippable(node: ChildNode): boolean {
 	if (isCommentNode(node)) {
 		// Skip branch-break markers and empty anchor comments. Control-start
 		// (`[`) and control-end (`]`) markers are NOT skipped.
-		return node.data === HYDRATION_BREAK || node.data === "";
+		return isHydrationBreak(node.data) || node.data === "";
 	}
 	return false;
 }

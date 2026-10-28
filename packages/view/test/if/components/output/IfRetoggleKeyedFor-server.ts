@@ -16,7 +16,7 @@ export default async function IfRetoggle(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.mounted && tabs().length > 1) {
-		t_body += `<!^><ul><![>`;
+		t_body += `<!^0><ul><![>`;
 		for (let tab of tabs()) {
 			t_body += `<!^><li>${t_fmt(tab.text)}</li>`;
 		}

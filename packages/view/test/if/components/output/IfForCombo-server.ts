@@ -12,14 +12,14 @@ export default async function IfContainingFor(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.show) {
-		t_body += `<!^><ul><![>`;
+		t_body += `<!^0><ul><![>`;
 		for (let item of $props.items) {
 			t_body += `<!^><li>${t_fmt(item)}</li>`;
 		}
 		t_body += `<!]><!></ul>`;
 	}
 	else {
-		t_body += `<!^><p>Nothing to show</p>`;
+		t_body += `<!^1><p>Nothing to show</p>`;
 	}
 	t_body += `<!]><!>`;
 

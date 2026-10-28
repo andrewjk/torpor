@@ -14,7 +14,7 @@ export default async function ForObjectProps(
 	for (let item of $props.items) {
 		t_body += `<!^><li><span>${t_fmt(item.name)}</span> <![>`;
 		if (item.active) {
-			t_body += `<!^><strong>*</strong>`;
+			t_body += `<!^0><strong>*</strong>`;
 		}
 		t_body += `<!]><!></li>`;
 	}

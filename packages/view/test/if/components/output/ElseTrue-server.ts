@@ -11,13 +11,13 @@ export default async function IfElseIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 10) {
-		t_body += `<!^><p> It's over ten! </p>`;
+		t_body += `<!^0><p> It's over ten! </p>`;
 	}
 	else if ($props.counter > 5) {
-		t_body += `<!^><p> It's over five! </p>`;
+		t_body += `<!^1><p> It's over five! </p>`;
 	}
 	else {
-		t_body += `<!^><p> It's not there yet </p>`;
+		t_body += `<!^2><p> It's not there yet </p>`;
 	}
 	t_body += `<!]><!>`;
 

@@ -12,7 +12,7 @@ export default async function IfContainingIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.condition) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		for (let i = 0; i < $props.counter; i++) {
 			t_body += `<!^><p>${t_fmt(i)}!</p>`;
 		}

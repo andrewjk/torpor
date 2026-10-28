@@ -23,7 +23,7 @@ export default async function ControlInSlot(
 		for (let item of $props.items) {
 			t_body += `<!^><![>`;
 			if (item.visible) {
-				t_body += `<!^><p>${t_fmt(item.name)}</p>`;
+				t_body += `<!^0><p>${t_fmt(item.name)}</p>`;
 			}
 			t_body += `<!]><!>`;
 		}

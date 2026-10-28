@@ -14,7 +14,7 @@ export default async function ForIfLeadingContent(
 	for (let t of $props.todos) {
 		t_body += `<!^><li>${t_fmt(t.id)}</li> <![>`;
 		if (t.done) {
-			t_body += `<!^><b class="mark">${t_fmt(t.id)}</b>`;
+			t_body += `<!^0><b class="mark">${t_fmt(t.id)}</b>`;
 		}
 		t_body += `<!]><!>`;
 	}

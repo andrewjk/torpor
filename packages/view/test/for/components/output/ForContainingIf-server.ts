@@ -14,7 +14,7 @@ export default async function ForContainingIf(
 	for (let i = 0; i < 5; i++) {
 		t_body += `<!^><![>`;
 		if (i > 2) {
-			t_body += `<!^><p> ${t_fmt(i)} </p>`;
+			t_body += `<!^0><p> ${t_fmt(i)} </p>`;
 		}
 		t_body += `<!]><!>`;
 	}

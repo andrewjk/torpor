@@ -11,15 +11,15 @@ export default async function DeepMixed(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.a) {
-		t_body += `<!^><p>Level 1</p> <![>`;
+		t_body += `<!^0><p>Level 1</p> <![>`;
 		if ($props.b) {
-			t_body += `<!^><p>Level 2</p> <![>`;
+			t_body += `<!^0><p>Level 2</p> <![>`;
 			if ($props.c) {
-				t_body += `<!^><p>Level 3</p> <![>`;
+				t_body += `<!^0><p>Level 3</p> <![>`;
 				if ($props.d) {
-					t_body += `<!^><p>Level 4</p> <![>`;
+					t_body += `<!^0><p>Level 4</p> <![>`;
 					if ($props.e) {
-						t_body += `<!^><p>Level 5</p>`;
+						t_body += `<!^0><p>Level 5</p>`;
 					}
 					t_body += `<!]><!>`;
 				}
@@ -31,7 +31,7 @@ export default async function DeepMixed(
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.a && $props.e) {
-		t_body += `<!^><p>A+E</p>`;
+		t_body += `<!^0><p>A+E</p>`;
 	}
 	t_body += `<!]><!>`;
 

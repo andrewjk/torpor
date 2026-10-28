@@ -44,12 +44,12 @@ test("$run writing render state -- server render", async () => {
 	expect(body).toContain("off");
 });
 
-// KNOWN GAP: the client's first run applies the effect during hydration, but
-// an `@if` whose server and client conditions differ is not reconciled -- the
-// client adopts the server's branch element and its static content stays
-// stale. `test.fails` documents this so it starts passing when the branch
-// mismatch is handled.
-test.fails("$run writing render state -- hydrated", async () => {
+// The client's first run applies the effect during hydration, so the `@if`
+// picks the `on` branch while the server rendered the `off` branch.
+// Hydration detects the branch mismatch (the server records the branch it
+// rendered in the block's hydration marker) and recreates the branch, so
+// the DOM ends up showing the client values.
+test("$run writing render state -- hydrated", async () => {
 	const container = document.createElement("div");
 	const clientComponent = await importComponent(import.meta.filename, source, "client");
 	const serverComponent = await importComponent(import.meta.filename, source, "server");

@@ -12,33 +12,33 @@ export default async function SwitchInsideIfInsideSwitch(
 	t_body += `<![>`;
 	switch ($props.level) {
 		case "top": {
-			t_body += `<!^><![>`;
+			t_body += `<!^0><![>`;
 			if ($props.kind === "a") {
-				t_body += `<!^><![>`;
+				t_body += `<!^0><![>`;
 				switch ($props.kind) {
 					case "a": {
-						t_body += `<!^><p>Top A1</p>`;
+						t_body += `<!^0><p>Top A1</p>`;
 						break;
 					}
 					default: {
-						t_body += `<!^><p>Top A-default</p>`;
+						t_body += `<!^1><p>Top A-default</p>`;
 						break;
 					}
 				}
 				t_body += `<!]><!>`;
 			}
 			else {
-				t_body += `<!^><p>Top other</p>`;
+				t_body += `<!^1><p>Top other</p>`;
 			}
 			t_body += `<!]><!>`;
 			break;
 		}
 		case "bottom": {
-			t_body += `<!^><p>Bottom</p>`;
+			t_body += `<!^1><p>Bottom</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^><p>Fallback</p>`;
+			t_body += `<!^2><p>Fallback</p>`;
 			break;
 		}
 	}

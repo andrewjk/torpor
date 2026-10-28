@@ -11,12 +11,12 @@ export default async function NestedIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.condition) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		if ($props.counter > 5) {
-			t_body += `<!^><p>It's big</p>`;
+			t_body += `<!^0><p>It's big</p>`;
 		}
 		else {
-			t_body += `<!^><p>It's small</p>`;
+			t_body += `<!^1><p>It's small</p>`;
 		}
 		t_body += `<!]><!>`;
 	}

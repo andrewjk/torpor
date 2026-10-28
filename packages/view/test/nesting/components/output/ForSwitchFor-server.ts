@@ -15,15 +15,15 @@ export default async function ForSwitchFor(
 		t_body += `<!^><div class="row"><![>`;
 		switch ($props.operation) {
 			case "sum": {
-				t_body += `<!^><p>${t_fmt(row.reduce((a, b) => a + b, 0))}</p>`;
+				t_body += `<!^0><p>${t_fmt(row.reduce((a, b) => a + b, 0))}</p>`;
 				break;
 			}
 			case "max": {
-				t_body += `<!^><p>${t_fmt(Math.max(...row))}</p>`;
+				t_body += `<!^1><p>${t_fmt(Math.max(...row))}</p>`;
 				break;
 			}
 			case "items": {
-				t_body += `<!^><![>`;
+				t_body += `<!^2><![>`;
 				for (let cell of row) {
 					t_body += `<!^><span>${t_fmt(cell)} </span>`;
 				}
@@ -31,7 +31,7 @@ export default async function ForSwitchFor(
 				break;
 			}
 			default: {
-				t_body += `<!^><p>Unknown op</p>`;
+				t_body += `<!^3><p>Unknown op</p>`;
 				break;
 			}
 		}

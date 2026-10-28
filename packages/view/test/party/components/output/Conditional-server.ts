@@ -25,13 +25,13 @@ export default async function TrafficLight(
 	/* User interface */
 	t_body += `<button>Next light</button> <p>Light is: ${t_fmt($state.light)}</p> <p> You must <![>`;
 	if ($state.light === "red") {
-		t_body += `<!^><span>STOP</span>`;
+		t_body += `<!^0><span>STOP</span>`;
 	}
 	else if ($state.light === "orange") {
-		t_body += `<!^><span>SLOW DOWN</span>`;
+		t_body += `<!^1><span>SLOW DOWN</span>`;
 	}
 	else if ($state.light === "green") {
-		t_body += `<!^><span>GO</span>`;
+		t_body += `<!^2><span>GO</span>`;
 	}
 	t_body += `<!]><!></p>`;
 

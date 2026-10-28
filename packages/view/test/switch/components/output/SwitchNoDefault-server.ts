@@ -20,11 +20,11 @@ export default async function Switch(
 	t_body += `<![>`;
 	switch ($props.value) {
 		case 1: {
-			t_body += `<!^><p> A small value. </p>`;
+			t_body += `<!^0><p> A small value. </p>`;
 			break;
 		}
 		case 100: {
-			t_body += `<!^><p> A large value. </p>`;
+			t_body += `<!^1><p> A large value. </p>`;
 			break;
 		}
 	}

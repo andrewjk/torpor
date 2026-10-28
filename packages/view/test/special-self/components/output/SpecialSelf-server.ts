@@ -12,7 +12,7 @@ export default async function Self(
 	/* User interface */
 	t_body += `<p>Level ${t_fmt($props.level)}</p> <![>`;
 	if ($props.level < 3) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		const t_props_1 = {
 			level: $props.level + 1,
 		};

@@ -13,7 +13,7 @@ export default async function ForInSwitch(
 	t_body += `<![>`;
 	switch ($props.choice) {
 		case "list": {
-			t_body += `<!^><ul><![>`;
+			t_body += `<!^0><ul><![>`;
 			for (let item of $props.items) {
 				t_body += `<!^><li>${t_fmt(item)}</li>`;
 			}
@@ -21,11 +21,11 @@ export default async function ForInSwitch(
 			break;
 		}
 		case "count": {
-			t_body += `<!^><p>Count: ${t_fmt($props.items.length)}</p>`;
+			t_body += `<!^1><p>Count: ${t_fmt($props.items.length)}</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^><p>Nothing</p>`;
+			t_body += `<!^2><p>Nothing</p>`;
 			break;
 		}
 	}

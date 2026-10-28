@@ -16,7 +16,7 @@ export default async function ForFollowedByIf(
 	}
 	t_body += `<!]><!></ul> <![>`;
 	if ($props.show) {
-		t_body += `<!^><p>after</p>`;
+		t_body += `<!^0><p>after</p>`;
 	}
 	t_body += `<!]><!>`;
 

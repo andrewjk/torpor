@@ -15,15 +15,15 @@ export default async function SwitchInFor(
 		t_body += `<!^><li><![>`;
 		switch (item.type) {
 			case "admin": {
-				t_body += `<!^><strong>${t_fmt(item.name)} (admin)</strong>`;
+				t_body += `<!^0><strong>${t_fmt(item.name)} (admin)</strong>`;
 				break;
 			}
 			case "user": {
-				t_body += `<!^><span>${t_fmt(item.name)} (user)</span>`;
+				t_body += `<!^1><span>${t_fmt(item.name)} (user)</span>`;
 				break;
 			}
 			default: {
-				t_body += `<!^><em>${t_fmt(item.name)} (unknown)</em>`;
+				t_body += `<!^2><em>${t_fmt(item.name)} (unknown)</em>`;
 				break;
 			}
 		}

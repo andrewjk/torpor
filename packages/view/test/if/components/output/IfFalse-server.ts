@@ -11,7 +11,7 @@ export default async function IfFalse(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 7) {
-		t_body += `<!^><p> It's true! </p>`;
+		t_body += `<!^0><p> It's true! </p>`;
 	}
 	t_body += `<!]><!>`;
 

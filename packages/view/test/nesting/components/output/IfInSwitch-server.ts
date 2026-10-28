@@ -12,22 +12,22 @@ export default async function IfInSwitch(
 	t_body += `<![>`;
 	switch ($props.status) {
 		case "active": {
-			t_body += `<!^><![>`;
+			t_body += `<!^0><![>`;
 			if ($props.show) {
-				t_body += `<!^><p>Active and visible</p>`;
+				t_body += `<!^0><p>Active and visible</p>`;
 			}
 			else {
-				t_body += `<!^><p>Active but hidden</p>`;
+				t_body += `<!^1><p>Active but hidden</p>`;
 			}
 			t_body += `<!]><!>`;
 			break;
 		}
 		case "inactive": {
-			t_body += `<!^><p>Inactive</p>`;
+			t_body += `<!^1><p>Inactive</p>`;
 			break;
 		}
 		default: {
-			t_body += `<!^><p>Unknown status</p>`;
+			t_body += `<!^2><p>Unknown status</p>`;
 			break;
 		}
 	}

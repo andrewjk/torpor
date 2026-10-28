@@ -11,17 +11,17 @@ export default async function IfNested(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 5) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		if ($props.counter > 10) {
-			t_body += `<!^><p> It's both true! </p>`;
+			t_body += `<!^0><p> It's both true! </p>`;
 		}
 		else {
-			t_body += `<!^><p> The second is not true! </p>`;
+			t_body += `<!^1><p> The second is not true! </p>`;
 		}
 		t_body += `<!]><!>`;
 	}
 	else {
-		t_body += `<!^><p> The first is not true! </p>`;
+		t_body += `<!^1><p> The first is not true! </p>`;
 	}
 	t_body += `<!]><!>`;
 

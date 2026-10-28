@@ -14,10 +14,10 @@ export default async function ForWithIfElse(
 	for (let tab of $props.tabs) {
 		t_body += `<!^><![>`;
 		if (tab === $props.activeTab) {
-			t_body += `<!^><button class="active">${t_fmt(tab)}</button>`;
+			t_body += `<!^0><button class="active">${t_fmt(tab)}</button>`;
 		}
 		else {
-			t_body += `<!^><button>${t_fmt(tab)}</button>`;
+			t_body += `<!^1><button>${t_fmt(tab)}</button>`;
 		}
 		t_body += `<!]><!>`;
 	}

@@ -11,10 +11,10 @@ export default async function IfElse(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.counter > 7) {
-		t_body += `<!^><p> It's true! </p> <p> That's right </p>`;
+		t_body += `<!^0><p> It's true! </p> <p> That's right </p>`;
 	}
 	else {
-		t_body += `<!^><p> It's not true... </p>`;
+		t_body += `<!^1><p> It's not true... </p>`;
 	}
 	t_body += `<!]><!>`;
 

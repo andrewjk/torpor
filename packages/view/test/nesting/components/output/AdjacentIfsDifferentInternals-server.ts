@@ -12,11 +12,11 @@ export default async function AdjacentIfsFor(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.a) {
-		t_body += `<!^><p>A</p>`;
+		t_body += `<!^0><p>A</p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.b) {
-		t_body += `<!^><ul><![>`;
+		t_body += `<!^0><ul><![>`;
 		for (let i = 0; i < 3; i++) {
 			t_body += `<!^><li>B${t_fmt(i)}</li>`;
 		}
@@ -24,10 +24,10 @@ export default async function AdjacentIfsFor(
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.c) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		switch (1) {
 			case 1: {
-				t_body += `<!^><p>C-on</p>`;
+				t_body += `<!^0><p>C-on</p>`;
 				break;
 			}
 		}

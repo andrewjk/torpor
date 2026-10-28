@@ -12,13 +12,13 @@ export default async function ReplaceInIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.show) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		$props.counter;
 		t_body += `<p>Replaced: ${t_fmt($props.counter)}</p>`;
 		t_body += `<!]><!>`;
 	}
 	else {
-		t_body += `<!^><p>Hidden</p>`;
+		t_body += `<!^1><p>Hidden</p>`;
 	}
 	t_body += `<!]><!>`;
 

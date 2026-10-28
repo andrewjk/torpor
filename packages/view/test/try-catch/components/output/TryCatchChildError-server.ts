@@ -16,7 +16,7 @@ async function Thrower(
 	/* User interface */
 	t_body += `<![>`;
 	if (boom()) {
-		t_body += `<!^><p>This is never rendered</p>`;
+		t_body += `<!^0><p>This is never rendered</p>`;
 	}
 	t_body += `<!]><!>`;
 

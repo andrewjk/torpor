@@ -20,7 +20,7 @@ export default async function ErrorRecovery(
 	try {
 		t_body += `<![>`;
 		if (maybeThrow()) {
-			t_body += `<!^><p>All good</p>`;
+			t_body += `<!^0><p>All good</p>`;
 		}
 		t_body += `<!]><!>`;
 

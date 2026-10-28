@@ -41,7 +41,7 @@ export default async function ErrorHeadDiscard(
 		t_head += t_comp_1.head;
 		t_body += `<!]><!> <![>`;
 		if (boom()) {
-			t_body += `<!^><p>All good</p>`;
+			t_body += `<!^0><p>All good</p>`;
 		}
 		t_body += `<!]><!>`;
 

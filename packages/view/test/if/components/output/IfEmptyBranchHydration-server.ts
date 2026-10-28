@@ -14,15 +14,15 @@ export default async function IfEmptyBranchHydration(
 	/* User interface */
 	t_body += `<div class="sibling">sibling content</div> <![>`;
 	if ($state.on) {
-		t_body += `<!^><div class="branch">branch content</div>`;
+		t_body += `<!^0><div class="branch">branch content</div>`;
 	}
 	else {
-		t_body += `<!^><![>`;
+		t_body += `<!^1><![>`;
 		if ($state.hasImage) {
-			t_body += `<!^><div>image</div>`;
+			t_body += `<!^0><div>image</div>`;
 		}
 		else if ($state.hasLink) {
-			t_body += `<!^><div>link</div>`;
+			t_body += `<!^1><div>link</div>`;
 		}
 		t_body += `<!]><!>`;
 	}

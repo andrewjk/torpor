@@ -11,16 +11,16 @@ export default async function IfElseIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.count < 0) {
-		t_body += `<!^><p>Negative</p>`;
+		t_body += `<!^0><p>Negative</p>`;
 	}
 	else if ($props.count === 0) {
-		t_body += `<!^><p>Zero</p>`;
+		t_body += `<!^1><p>Zero</p>`;
 	}
 	else if ($props.count < 10) {
-		t_body += `<!^><p>Small positive</p>`;
+		t_body += `<!^2><p>Small positive</p>`;
 	}
 	else {
-		t_body += `<!^><p>Large positive</p>`;
+		t_body += `<!^3><p>Large positive</p>`;
 	}
 	t_body += `<!]><!>`;
 

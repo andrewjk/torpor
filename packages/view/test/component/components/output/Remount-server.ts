@@ -12,15 +12,15 @@ export default async function SwitchComponent(
 	t_body += `<![>`;
 	switch ($props.mode) {
 		case "a": {
-			t_body += `<!^><div id="a">Mode A</div>`;
+			t_body += `<!^0><div id="a">Mode A</div>`;
 			break;
 		}
 		case "b": {
-			t_body += `<!^><div id="b">Mode B</div>`;
+			t_body += `<!^1><div id="b">Mode B</div>`;
 			break;
 		}
 		default: {
-			t_body += `<!^><div id="default">Default</div>`;
+			t_body += `<!^2><div id="default">Default</div>`;
 			break;
 		}
 	}

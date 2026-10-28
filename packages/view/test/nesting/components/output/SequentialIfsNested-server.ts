@@ -11,11 +11,11 @@ export default async function SeqIfsNested(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.a) {
-		t_body += `<!^><p>A on</p> <![>`;
+		t_body += `<!^0><p>A on</p> <![>`;
 		if ($props.b) {
-			t_body += `<!^><p>A+B on</p> <![>`;
+			t_body += `<!^0><p>A+B on</p> <![>`;
 			if ($props.c) {
-				t_body += `<!^><p>A+B+C on</p>`;
+				t_body += `<!^0><p>A+B+C on</p>`;
 			}
 			t_body += `<!]><!>`;
 		}
@@ -23,7 +23,7 @@ export default async function SeqIfsNested(
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.b) {
-		t_body += `<!^><p>B only section</p>`;
+		t_body += `<!^0><p>B only section</p>`;
 	}
 	t_body += `<!]><!>`;
 

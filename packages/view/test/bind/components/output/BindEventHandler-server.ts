@@ -16,7 +16,7 @@ export default async function BindEventHandler(
 	/* User interface */
 	t_body += `<input value="${(t_attr($state.name)) || ""}"> <p>Hello, ${t_fmt($state.name)}</p> <![>`;
 	if ($state.typed) {
-		t_body += `<!^><p>Handler ran</p>`;
+		t_body += `<!^0><p>Handler ran</p>`;
 	}
 	t_body += `<!]><!>`;
 

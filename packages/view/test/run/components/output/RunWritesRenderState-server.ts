@@ -20,10 +20,10 @@ export default async function RunWritesRenderState(
 	/* User interface */
 	t_body += `<p class="b">${t_fmt($state.b)}</p> <![>`;
 	if ($state.on) {
-		t_body += `<!^><div class="branch">on</div>`;
+		t_body += `<!^0><div class="branch">on</div>`;
 	}
 	else {
-		t_body += `<!^><div class="branch">off</div>`;
+		t_body += `<!^1><div class="branch">off</div>`;
 	}
 	t_body += `<!]><!>`;
 

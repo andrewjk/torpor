@@ -14,10 +14,10 @@ export default async function ForIfElseReactive(
 	for (let t of $props.todos) {
 		t_body += `<!^><![>`;
 		if (t.done) {
-			t_body += `<!^><li class="done">${t_fmt(t.id)}</li>`;
+			t_body += `<!^0><li class="done">${t_fmt(t.id)}</li>`;
 		}
 		else {
-			t_body += `<!^><li class="todo">${t_fmt(t.id)}</li>`;
+			t_body += `<!^1><li class="todo">${t_fmt(t.id)}</li>`;
 		}
 		t_body += `<!]><!>`;
 	}

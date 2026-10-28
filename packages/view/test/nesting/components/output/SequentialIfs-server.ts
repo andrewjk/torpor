@@ -11,15 +11,15 @@ export default async function SeqIfs(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.a) {
-		t_body += `<!^><p>A on</p>`;
+		t_body += `<!^0><p>A on</p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.b) {
-		t_body += `<!^><p>B on</p>`;
+		t_body += `<!^0><p>B on</p>`;
 	}
 	t_body += `<!]><!> <![>`;
 	if ($props.c) {
-		t_body += `<!^><p>C on</p>`;
+		t_body += `<!^0><p>C on</p>`;
 	}
 	t_body += `<!]><!>`;
 

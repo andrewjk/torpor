@@ -14,7 +14,7 @@ export default async function CleanupIfInsideFor(
 	for (let item of $props.items) {
 		t_body += `<!^><![>`;
 		if ($props.show) {
-			t_body += `<!^><![>`;
+			t_body += `<!^0><![>`;
 			const t_comp_1 = await CleanupTracker(undefined, $context);
 			t_body += t_comp_1.body;
 			t_head += t_comp_1.head;

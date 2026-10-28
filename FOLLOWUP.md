@@ -107,8 +107,6 @@ point-based data model (x per point or a shared category array), which was
 deferred when the reservation work landed -- see the DataSeries note in the
 Charts plan.
 
-## Features
-
 ### Standard schema validation: remaining integration points
 
 Endpoints now support standard schemas for request bodies (`json()`), form
@@ -375,25 +373,3 @@ script, not just the subset the template rendered, so a cache that keys a page
 by URL alone can expose values the markup never showed. A dev-only reminder
 prompts for an explicit `Cache-Control` (and any value silences it), but that's
 a nudge, not enforcement — the requirement is on the site's cache config.
-
-### `@if` branches aren't reconciled when server and client conditions diverge
-
-Hydration adopts the server's DOM but doesn't detect that the client picked a
-different `@if` branch, so the server's static branch content is left in place
-and the UI is silently wrong (no error). Reproduced in
-`packages/view/test/run/run-writes-render-state.test.ts` (`test.fails`): a
-`.torp` whose `$run` writes state read by an `@if` renders the `else` branch on
-the server (`$run` is a no-op there), the client's first run takes the `if`
-branch, and the hydrated DOM still shows the server's branch text.
-
-This matters because server renders no-op effects (`$serverRun`), and because
-`@torpor/build`'s ssr-view plugin now resolves `@torpor/view` to the server
-runtime in SSR -- so shared `.ts` helpers no-op their `$run` too. Any
-server/client divergence in a condition (effects, `localStorage`, `Date`,
-random) can show stale content. Dynamic text/attributes self-correct (the
-client's `$run` sets `textContent`/attributes during hydration), and `@for`
-re-runs from client data, but a structurally-identical `@if` branch keeps the
-server's content.
-
-Fix direction: emit/read a branch identity marker during hydration so a
-mismatched branch is cleared and re-rendered, rather than adopted.

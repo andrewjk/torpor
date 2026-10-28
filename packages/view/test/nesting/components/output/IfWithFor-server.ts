@@ -12,14 +12,14 @@ export default async function SwitchInIf(
 	/* User interface */
 	t_body += `<![>`;
 	if ($props.toggle) {
-		t_body += `<!^><![>`;
+		t_body += `<!^0><![>`;
 		for (let item of $props.items) {
 			t_body += `<!^><p>${t_fmt(item)}</p>`;
 		}
 		t_body += `<!]><!>`;
 	}
 	else {
-		t_body += `<!^><p>Off</p>`;
+		t_body += `<!^1><p>Off</p>`;
 	}
 	t_body += `<!]><!>`;
 
