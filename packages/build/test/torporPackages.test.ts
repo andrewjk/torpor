@@ -20,6 +20,7 @@ beforeAll(() => {
 				"hidden-icons": "1.0.0",
 				"plain-lib": "1.0.0",
 				"@scope/icons": "1.0.0",
+				"torpor-with-deps": "1.0.0",
 			},
 		}),
 	);
@@ -30,10 +31,34 @@ beforeAll(() => {
 		JSON.stringify({
 			name: "fake-icons",
 			torpor: "./index.js",
-			dependencies: { "nested-icons": "1.0.0" },
+			dependencies: { "nested-icons": "1.0.0", "plain-dep": "1.0.0" },
 		}),
 	);
 	write("node_modules/fake-icons/index.js", "export default 1");
+
+	// A plain dependency of a torpor package. The torpor package is bundled
+	// into the SSR build (`ssr.noExternal`), and its bare import of this
+	// package would stay externalized -- unresolvable at runtime from the
+	// build output under pnpm's strict node_modules layout -- so it must be
+	// bundled too
+	write(
+		"node_modules/plain-dep/package.json",
+		JSON.stringify({
+			name: "plain-dep",
+			exports: { ".": "./index.js" },
+			dependencies: { "deep-plain": "1.0.0" },
+		}),
+	);
+	write("node_modules/plain-dep/index.js", "export default 6");
+
+	// A plain dependency of a plain dependency. Once `plain-dep` is bundled,
+	// its own imports resolve (and inline) at build time, so this one does
+	// NOT need to be bundled
+	write(
+		"node_modules/deep-plain/package.json",
+		JSON.stringify({ name: "deep-plain", exports: { ".": "./index.js" } }),
+	);
+	write("node_modules/deep-plain/index.js", "export default 7");
 
 	// A torpor package, detected by a boolean `torpor` marker
 	write(
@@ -79,6 +104,20 @@ beforeAll(() => {
 	);
 	write("node_modules/@scope/icons/icon.torp", "export default 3");
 
+	// Another torpor package sharing the same plain dependency, to cover the
+	// visited-order case: `plain-dep` may be reached first through a plain
+	// path (where bundling isn't forced) and must still be picked up through
+	// this torpor one
+	write(
+		"node_modules/torpor-with-deps/package.json",
+		JSON.stringify({
+			name: "torpor-with-deps",
+			torpor: true,
+			dependencies: { "plain-dep": "1.0.0" },
+		}),
+	);
+	write("node_modules/torpor-with-deps/index.js", "export default 8");
+
 	// A plain package, which should not be detected
 	write(
 		"node_modules/plain-lib/package.json",
@@ -98,6 +137,7 @@ test("findTorporPackages -- detects torpor packages", () => {
 		"fake-icons",
 		"hidden-icons",
 		"nested-icons",
+		"torpor-with-deps",
 	]);
 });
 
@@ -109,14 +149,27 @@ test("addTorporPackageConfig -- sets optimizeDeps and ssr config", () => {
 	const config: Record<string, any> = {};
 	addTorporPackageConfig(root, config as any);
 
-	const expected = ["@scope/icons", "bool-icons", "fake-icons", "hidden-icons", "nested-icons"];
+	const expected = [
+		"@scope/icons",
+		"bool-icons",
+		"fake-icons",
+		"hidden-icons",
+		"nested-icons",
+		"torpor-with-deps",
+	];
 	expect(config.optimizeDeps.exclude.sort()).toEqual(expected);
-	expect(config.ssr.noExternal.sort()).toEqual(expected);
+	expect(config.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
+	expect(config.environments.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
+
+	// `ssr.noExternal` also bundles the plain direct dependencies of the
+	// torpor packages: an externalized import in a bundled package can't be
+	// resolved at runtime from the build output under pnpm's strict layout.
+	// Transitive plain deps (below an already-bundled plain dep) resolve at
+	// build time and are NOT bundled
+	expect(config.ssr.noExternal.sort()).toEqual([...expected, "plain-dep"].sort());
 	// The SSR dep optimizer has its own config in both legacy and
 	// environment-scoped forms; both must exclude the torpor packages or a
 	// cold start prebundles and parses their `.torp` files as JS
-	expect(config.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
-	expect(config.environments.ssr.optimizeDeps.exclude.sort()).toEqual(expected);
 });
 
 test("addTorporPackageConfig -- merges with existing config", () => {

@@ -32,18 +32,42 @@ export type PackageJson = {
  * @returns The names of the torpor packages found (may be empty)
  */
 export default function findTorporPackages(siteRoot: string): string[] {
+	const { torporPackages } = collectPackages(siteRoot);
+	return [...torporPackages];
+}
+
+/**
+ * Walks the site's dependency tree, collecting:
+ *
+ * - `torporPackages`: packages that ship `.torp` files and so need the torpor
+ *   compiler (they can't be externalized or prebundled as JavaScript)
+ * - `plainDeps`: plain (non-torpor) direct dependencies of those packages.
+ *   Once a torpor package is bundled into the SSR build, its bare imports of
+ *   plain dependencies stay in the emitted bundle as external imports -- and
+ *   under pnpm's strict node_modules layout the app can't resolve them at
+ *   runtime (they're only linked inside the torpor package's own
+ *   node_modules), so they must be bundled too. Dependencies *of* a bundled
+ *   plain package don't need this: they resolve (and inline) at build time
+ *   from the package's own location.
+ */
+function collectPackages(siteRoot: string): {
+	torporPackages: Set<string>;
+	plainDeps: Set<string>;
+} {
+	const torporPackages = new Set<string>();
+	const plainDeps = new Set<string>();
+
 	const sitePackageJson = path.resolve(siteRoot, "package.json");
-	if (!existsSync(sitePackageJson)) return [];
+	if (!existsSync(sitePackageJson)) return { torporPackages, plainDeps };
 
 	const pkg: PackageJson = JSON.parse(readFileSync(sitePackageJson, "utf8"));
-	const packages = new Set<string>();
 	const visited = new Set<string>();
 
 	const rootRequire = createRequire(sitePackageJson);
 	for (const name of dependencyNames(pkg)) {
-		collectTorporPackage(name, rootRequire, packages, visited);
+		collectPackage(name, rootRequire, torporPackages, plainDeps, visited, false);
 	}
-	return [...packages];
+	return { torporPackages, plainDeps };
 }
 
 /**
@@ -59,18 +83,22 @@ export default function findTorporPackages(siteRoot: string): string[] {
  * enough.
  */
 export function addTorporPackageConfig(siteRoot: string, config: UserConfig): void {
-	const packages = findTorporPackages(siteRoot);
-	if (packages.length === 0) return;
+	const { torporPackages, plainDeps } = collectPackages(siteRoot);
+	if (torporPackages.size === 0) return;
 
 	config.optimizeDeps ??= {};
-	config.optimizeDeps.exclude = mergeUnique(config.optimizeDeps.exclude, packages);
+	config.optimizeDeps.exclude = mergeUnique(config.optimizeDeps.exclude, [...torporPackages]);
 
 	config.ssr ??= {};
 	const noExternal = config.ssr.noExternal;
+	// Plain dependencies of torpor packages go through the normal pipelines in
+	// the browser/optimizer; they only must not be left external in the SSR
+	// build (see collectPackages)
+	const bundlePackages = [...torporPackages, ...plainDeps];
 	if (noExternal === undefined) {
-		config.ssr.noExternal = packages;
+		config.ssr.noExternal = bundlePackages;
 	} else if (Array.isArray(noExternal)) {
-		noExternal.push(...packages);
+		noExternal.push(...bundlePackages);
 	}
 	// For `true` (bundle everything) or string/regex values there is nothing
 	// sensible to merge, and they already bundle more than we need
@@ -80,14 +108,16 @@ export function addTorporPackageConfig(siteRoot: string, config: UserConfig): vo
 	// Mirror the exclusions into both so a cold start doesn't parse `.torp`
 	// files as JS.
 	config.ssr.optimizeDeps ??= {};
-	config.ssr.optimizeDeps.exclude = mergeUnique(config.ssr.optimizeDeps.exclude, packages);
+	config.ssr.optimizeDeps.exclude = mergeUnique(config.ssr.optimizeDeps.exclude, [
+		...torporPackages,
+	]);
 
 	config.environments ??= {};
 	config.environments.ssr ??= {};
 	config.environments.ssr.optimizeDeps ??= {};
 	config.environments.ssr.optimizeDeps.exclude = mergeUnique(
 		config.environments.ssr.optimizeDeps.exclude,
-		packages,
+		[...torporPackages],
 	);
 }
 
@@ -105,19 +135,26 @@ function dependencyNames(pkg: PackageJson): string[] {
 	];
 }
 
-function collectTorporPackage(
+function collectPackage(
 	name: string,
 	require: NodeRequire,
-	packages: Set<string>,
+	torporPackages: Set<string>,
+	plainDeps: Set<string>,
 	visited: Set<string>,
+	belowTorpor: boolean,
 ): void {
 	// Some packages shadow Node builtins (e.g. a dependency literally named
 	// "path"), and builtins can't contain .torp files
 	if (isBuiltin(name)) return;
 
 	const packageJsonPath = resolvePackageJson(name, require);
-	if (!packageJsonPath || visited.has(packageJsonPath)) return;
-	visited.add(packageJsonPath);
+	if (!packageJsonPath) return;
+	// A package can be reached both through a plain path (where nothing needs
+	// bundling) and through a torpor package (where it does), so the visited
+	// key includes the path's bundling state
+	const visitKey = `${packageJsonPath}\n${belowTorpor}`;
+	if (visited.has(visitKey)) return;
+	visited.add(visitKey);
 
 	let pkg: PackageJson;
 	try {
@@ -126,15 +163,22 @@ function collectTorporPackage(
 		return;
 	}
 
-	if (isTorporPackage(pkg)) {
-		packages.add(pkg.name ?? name);
+	const isTorpor = isTorporPackage(pkg);
+	if (isTorpor) {
+		torporPackages.add(pkg.name ?? name);
+	} else if (belowTorpor) {
+		// A plain dependency of a package that gets bundled into the SSR build
+		plainDeps.add(pkg.name ?? name);
 	}
 
 	// Recurse into the package's own dependencies, resolved relative to it
-	// (pnpm keeps transitive deps out of the site's top-level node_modules)
+	// (pnpm keeps transitive deps out of the site's top-level node_modules).
+	// Only the direct dependencies of a bundled (torpor) package are forced
+	// into the SSR bundle; below a bundled plain package everything resolves
+	// at build time
 	const depRequire = createRequire(packageJsonPath);
 	for (const depName of dependencyNames(pkg)) {
-		collectTorporPackage(depName, depRequire, packages, visited);
+		collectPackage(depName, depRequire, torporPackages, plainDeps, visited, isTorpor);
 	}
 }
 
