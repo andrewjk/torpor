@@ -89,3 +89,40 @@ test("setAttribute transitions from false to value", () => {
 	setAttribute(el, "disabled", "disabled");
 	expect(el.getAttribute("disabled")).toBe("disabled");
 });
+
+test("setAttribute sets the value property on a form control", () => {
+	let select = document.createElement("select");
+	select.append(
+		Object.assign(document.createElement("option"), { value: "a", textContent: "A" }),
+		Object.assign(document.createElement("option"), { value: "b", textContent: "B" }),
+	);
+	setAttribute(select, "value", "b");
+	expect(select.value).toBe("b");
+	expect(select.hasAttribute("value")).toBe(false);
+
+	let input = document.createElement("input");
+	setAttribute(input, "value", "hello");
+	expect(input.value).toBe("hello");
+
+	let textarea = document.createElement("textarea");
+	setAttribute(textarea, "value", "hello");
+	expect(textarea.value).toBe("hello");
+});
+
+test("setAttribute sets an attribute value on non-form elements", () => {
+	let option = document.createElement("option");
+	setAttribute(option, "value", "b");
+	expect(option.value).toBe("b");
+	expect(option.getAttribute("value")).toBe("b");
+
+	let div = makeEl();
+	setAttribute(div, "value", "x");
+	expect(div.getAttribute("value")).toBe("x");
+});
+
+test("setAttribute with false clears a form control's value", () => {
+	let input = document.createElement("input");
+	setAttribute(input, "value", "hello");
+	setAttribute(input, "value", false);
+	expect(input.value).toBe("");
+});
