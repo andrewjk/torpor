@@ -1,8 +1,7 @@
 import $watch from "../../../../src/ssr/$serverWatch";
-import t_fmt from "../../../../src/ssr/formatText";
 import type ServerSlotRender from "../../../../src/types/ServerSlotRender";
 
-export default async function CurrentTargetTest(
+export default async function DetachedClick(
 	_$props?: Record<PropertyKey, any>,
 	_$context?: Record<PropertyKey, any>,
 	_$slots?: Record<string, ServerSlotRender>,
@@ -10,10 +9,14 @@ export default async function CurrentTargetTest(
 	let t_body = "";
 	let t_head = "";
 
-	let $state = $watch({ currentTag: "" });
+	let $state = $watch({ fired: false });
 
 	/* User interface */
-	t_body += `<button id="btn"><span>click</span></button> <p>Current: ${t_fmt($state.currentTag)}</p>`;
+	t_body += `<button id="btn"> Click </button> <![>`;
+	if ($state.fired) {
+		t_body += `<!^0><p>Fired!</p>`;
+	}
+	t_body += `<!]><!>`;
 
 	return { body: t_body, head: t_head };
 }

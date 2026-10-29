@@ -2,6 +2,7 @@ import { queryByText } from "@testing-library/dom";
 import "@testing-library/jest-dom/vitest";
 import userEvent from "@testing-library/user-event";
 import { afterEach, expect, test, vi } from "vite-plus/test";
+import mount from "../../src/render/mount";
 import hydrateComponent from "../hydrateComponent";
 import importComponent from "../importComponent";
 import mountComponent from "../mountComponent";
@@ -164,4 +165,42 @@ test("delegated handler sees correct currentTarget", async () => {
 	await userEvent.click(span);
 
 	expect(queryByText(container, "Current: BUTTON")).not.toBeNull();
+});
+
+test("delegated handlers need a connected container", async () => {
+	// Delegated event types are handled by one listener on `document`, so a
+	// component mounted into a DETACHED container never sees them -- the
+	// event has no path to the document. Attach the container (or mount into
+	// a connected node) for delegated events to fire. Non-delegated events
+	// (direct addEventListener) work either way.
+	const source = `
+		export default function DetachedClick() {
+			let $state = $watch({ fired: false });
+
+			@render {
+				<button id="btn" onclick={() => { $state.fired = true; }}>
+					Click
+				</button>
+				@if ($state.fired) {
+					<p>Fired!</p>
+				}
+			}
+		}
+	`;
+
+	const container = document.createElement("div");
+	const component = await importComponent(import.meta.filename, source, "client");
+
+	// Mount into the detached container directly (not via mountComponent,
+	// which attaches it to the body)
+	mount(container, component);
+
+	const btn = container.querySelector("#btn") as HTMLButtonElement;
+	btn.click();
+	expect(queryByText(container, "Fired!")).toBeNull();
+
+	// Connecting the container makes the delegated handler fire
+	document.body.appendChild(container);
+	btn.click();
+	expect(queryByText(container, "Fired!")).not.toBeNull();
 });

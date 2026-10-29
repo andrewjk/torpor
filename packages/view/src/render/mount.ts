@@ -9,6 +9,12 @@ import pushRegion from "./pushRegion";
 /**
  * Mounts a component into a DOM node
  *
+ * The parent should be connected to the document: delegated events (click,
+ * input, keydown, ...) are handled by a single listener per event type on
+ * `document`, so events raised inside a detached container never reach their
+ * handlers. (`hydrate` mounts into server-rendered markup, which is already
+ * connected.)
+ *
  * @param parent The node to mount the component into
  * @param component The component to mount
  * @param props An object containing component props
