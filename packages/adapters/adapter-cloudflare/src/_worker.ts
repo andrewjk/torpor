@@ -28,11 +28,12 @@ server.add("*", async (ev: any) => {
 });
 
 export default {
-	async fetch(request: Request, env: any): Promise<any> {
+	async fetch(request: Request, env: any, ctx: any): Promise<any> {
 		// Put adapter-specific functionality in the `adapter` property of
-		// globalThis for now
+		// globalThis for now. `ctx` is the execution context, so handlers can
+		// schedule background work with `globalThis.adapter.ctx.waitUntil(...)`
 		// @ts-ignore
-		globalThis.adapter = { env };
+		globalThis.adapter = { env, ctx };
 
 		const url = new URL(request.url);
 

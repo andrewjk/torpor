@@ -25,11 +25,13 @@ server.add("*", async (ev: any) => {
 });
 
 export default {
-	async fetch(request: Request, env: any): Promise<Response> {
+	async fetch(request: Request, env: any, ctx: any): Promise<Response> {
 		// Put adapter-specific functionality in the `adapter` property of
-		// globalThis for now, matching the production _worker.ts
+		// globalThis for now, matching the production _worker.ts. `ctx` is the
+		// execution context, so handlers can schedule background work with
+		// `globalThis.adapter.ctx.waitUntil(...)`
 		// @ts-ignore
-		globalThis.adapter = { env };
+		globalThis.adapter = { env, ctx };
 		return await server.fetch(request);
 	},
 };
