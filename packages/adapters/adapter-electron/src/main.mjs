@@ -2,7 +2,7 @@
 // It serves the built site over a loopback HTTP server and shows it in a
 // BrowserWindow. Requests run here, in the main process, so cookies, sessions
 // and redirects behave exactly as on a Node server.
-import { app, BrowserWindow, session, shell } from "electron";
+import { app, BrowserWindow, dialog, session, shell } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -38,6 +38,21 @@ async function createWindow() {
 	win.webContents.setWindowOpenHandler(({ url }) => {
 		if (/^https?:/.test(url) && !url.startsWith(origin)) void shell.openExternal(url);
 		return { action: "deny" };
+	});
+
+	// A renderer `beforeunload` handler that prevents unload would otherwise
+	// leave the window permanently unclosable: Electron suppresses Chromium's
+	// "leave site?" prompt, so ask about it here instead
+	win.webContents.on("will-prevent-unload", (event) => {
+		const choice = dialog.showMessageBoxSync(win, {
+			type: "warning",
+			buttons: ["Discard changes", "Cancel"],
+			defaultId: 1,
+			cancelId: 1,
+			message: "Unsaved Changes",
+			detail: "There are unsaved changes on this page. What would you like to do with them?",
+		});
+		if (choice === 0) event.preventDefault(); // allow the unload
 	});
 
 	win.once("ready-to-show", () => win.show());

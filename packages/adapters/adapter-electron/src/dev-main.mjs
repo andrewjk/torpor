@@ -1,7 +1,7 @@
 // The dev counterpart of main.mjs: opens a window against the Vite dev server
 // (which the framework's Node dev plugin serves) instead of a built output, so
 // HMR works. Launched by the adapter's dev plugin with TORPOR_ELECTRON_URL set.
-import { app, BrowserWindow, session, shell } from "electron";
+import { app, BrowserWindow, dialog, session, shell } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -33,6 +33,21 @@ function createWindow() {
 	win.webContents.setWindowOpenHandler(({ url: target }) => {
 		if (/^https?:/.test(target) && !target.startsWith(origin)) void shell.openExternal(target);
 		return { action: "deny" };
+	});
+
+	// A renderer `beforeunload` handler that prevents unload would otherwise
+	// leave the window permanently unclosable: Electron suppresses Chromium's
+	// "leave site?" prompt, so ask about it here instead
+	win.webContents.on("will-prevent-unload", (event) => {
+		const choice = dialog.showMessageBoxSync(win, {
+			type: "warning",
+			buttons: ["Discard changes", "Cancel"],
+			defaultId: 1,
+			cancelId: 1,
+			message: "Unsaved Changes",
+			detail: "There are unsaved changes on this page. What would you like to do with them?",
+		});
+		if (choice === 0) event.preventDefault(); // allow the unload
 	});
 
 	win.once("ready-to-show", () => win.show());
