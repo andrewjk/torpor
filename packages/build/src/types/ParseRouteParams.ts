@@ -23,13 +23,16 @@ type ParseSegment<Segment extends string, Params> = Segment extends `[...${infer
 
 /**
  * Resolves the params for a route annotation: the parsed params for a literal
- * route path, or a loose record when no route (or a non-literal string) is
- * given.
+ * route path (or a loose record when the route has no dynamic segments, so an
+ * annotated static route stays interchangeable with an unannotated one), or a
+ * loose record when no route (or a non-literal string) is given.
  */
 export type RouteParamsOf<Route extends string | undefined> = string extends Route
 	? Record<string, string>
 	: Route extends string
-		? ParseRouteParams<Route>
+		? [keyof ParseRouteParams<Route>] extends [never]
+			? Record<string, string>
+			: ParseRouteParams<Route>
 		: Record<string, string>;
 
 /**

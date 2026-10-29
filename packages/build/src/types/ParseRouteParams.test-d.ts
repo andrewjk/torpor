@@ -2,6 +2,7 @@ import type PageEndPoint from "./PageEndPoint";
 import type PageLoadEvent from "./PageLoadEvent";
 import type PageServerEndPoint from "./PageServerEndPoint";
 import type { ParseRouteParams, RouteArgs, RouteParamsOf } from "./ParseRouteParams";
+import type ServerEndPoint from "./ServerEndPoint";
 import type ServerLoadEvent from "./ServerLoadEvent";
 import route from "../nav/route";
 
@@ -35,6 +36,10 @@ export const missingParam: ParseRouteParams<"/posts/[id]"> = {};
 export type T08 = Expect<Equals<RouteParamsOf<undefined>, Record<string, string>>>;
 export type T09 = Expect<Equals<RouteParamsOf<string>, Record<string, string>>>;
 export type T10 = Expect<Equals<RouteParamsOf<"/posts/[id]">, { id: string }>>;
+// A static route has no params, so it resolves to the same loose record as an
+// unannotated route -- `satisfies ServerEndPoint<"/static">` and a bare
+// `satisfies ServerEndPoint` stay interchangeable (in both directions)
+export type T10a = Expect<Equals<RouteParamsOf<"/about">, Record<string, string>>>;
 
 // --- RouteArgs ---
 
@@ -63,6 +68,29 @@ export const badServer: PageServerEndPoint<"/posts/[id]"> = { load: (ev) => void
 export const page: PageEndPoint<"/posts/[id]"> = {
 	load: (ev) => void ev.params.id,
 };
+
+// --- Interchangeable static-path annotations ---
+
+// A helper typed with the default ServerEndPoint (no path generic), as apps
+// use for shared CRUD helpers
+declare function registerEndPoint(endPoint: ServerEndPoint): void;
+
+// An endpoint annotated with a static route path
+const staticAiEndPoint = {
+	get: async (event) => new Response(`params: ${JSON.stringify(event.params)}`),
+} satisfies ServerEndPoint<"/api/admin/ai">;
+
+registerEndPoint(staticAiEndPoint);
+
+// And the reverse: an unannotated endpoint used where a static path is
+// expected
+declare function registerStaticAi(endPoint: ServerEndPoint<"/api/admin/ai">): void;
+
+const unannotatedEndPoint = {
+	get: async (_event) => new Response("ok"),
+} satisfies ServerEndPoint;
+
+registerStaticAi(unannotatedEndPoint);
 
 // --- Typed link builder ---
 
