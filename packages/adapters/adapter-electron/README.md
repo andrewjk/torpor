@@ -66,6 +66,7 @@ site.adapter = electron({
 	partition: "persist:torpor", // session partition (cookies/web storage)
 	host: "127.0.0.1", // loopback host for the server
 	port: 0, // 0 = ephemeral; pin a port to keep web storage stable
+	theme: "system", // "system" (default), "light" or "dark"
 	window: { width: 1280, height: 800, title: "Flub" },
 	dev: true, // set false to skip the desktop window in dev
 });
@@ -74,6 +75,23 @@ site.adapter = electron({
 Cookies persist across launches regardless of the port. Web storage
 (`localStorage`, `IndexedDB`) is origin-scoped, so pin `port` if the app relies
 on it staying put.
+
+## Native theme
+
+The `theme` option sets Electron's `nativeTheme.themeSource` before the window
+is created, so the title bar and window chrome follow the app's light/dark
+mode, and picks a matching window background color (no white flash in dark
+mode). An explicit `window.backgroundColor` always wins.
+
+For runtime changes -- say a light/dark toggle inside the app -- call the
+preload's `setNativeTheme` from the renderer:
+
+```javascript
+await window.electronAPI?.setNativeTheme("dark");
+```
+
+This changes the native chrome only; styling the app's own content is the
+renderer's job (e.g. a `data-theme` attribute on `<html>`).
 
 ## Packaging
 

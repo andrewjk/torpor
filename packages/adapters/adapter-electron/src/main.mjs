@@ -2,7 +2,7 @@
 // It serves the built site over a loopback HTTP server and shows it in a
 // BrowserWindow. Requests run here, in the main process, so cookies, sessions
 // and redirects behave exactly as on a Node server.
-import { app, BrowserWindow, dialog, session, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, session, shell } from "electron";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,16 +14,24 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const output = path.resolve(dir, "..");
 const config = JSON.parse(readFileSync(path.join(dir, "electron.json"), "utf-8"));
 const partition = config.partition ?? "persist:torpor";
+const theme = config.theme ?? "system";
 
 let server;
 let origin = "";
 
 async function createWindow() {
+	// Follow the app's theme before the window is created, and pick a
+	// background color that matches it: avoids a white flash in dark mode
+	// before the renderer's stylesheet applies
+	nativeTheme.themeSource = theme;
+	const backgroundColor =
+		config.window?.backgroundColor ?? (nativeTheme.shouldUseDarkColors ? "#000000" : "#ffffff");
+
 	const win = new BrowserWindow({
 		width: 1100,
 		height: 800,
 		show: false,
-		backgroundColor: "#ffffff",
+		backgroundColor,
 		...config.window,
 		webPreferences: {
 			preload: path.join(dir, "preload.cjs"),
@@ -62,6 +70,14 @@ async function createWindow() {
 app
 	.whenReady()
 	.then(async () => {
+		// Runtime theme changes from the renderer
+		// (`window.electronAPI.setNativeTheme(mode)` in the preload)
+		ipcMain.handle("torpor:set-native-theme", (_event, mode) => {
+			if (mode === "system" || mode === "light" || mode === "dark") {
+				nativeTheme.themeSource = mode;
+			}
+		});
+
 		server = await startServer(output, { host: config.host, port: config.port });
 		origin = server.url;
 		await createWindow();

@@ -21,6 +21,7 @@ export default async function postbuild(site: Site, options: ElectronOptions): P
 		host: options.host ?? "127.0.0.1",
 		port: options.port ?? 0,
 		partition: options.partition ?? "persist:torpor",
+		theme: options.theme ?? "system",
 		window: options.window ?? {},
 	};
 	await fs.writeFile(path.join(outputFolder, "electron.json"), JSON.stringify(config, null, "\t"));

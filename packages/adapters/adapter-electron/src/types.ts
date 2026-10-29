@@ -24,6 +24,17 @@ export interface ElectronWindowOptions {
 
 export interface ElectronOptions {
 	/**
+	 * The native theme mode the window starts in: `"system"` (follow the OS,
+	 * the default), `"light"` or `"dark"`. Sets Electron's `nativeTheme.themeSource`
+	 * before the window is created, so the title bar and window chrome follow
+	 * the app's light/dark mode, and picks a matching background color so there
+	 * is no white flash before the renderer's stylesheet applies.
+	 *
+	 * For runtime changes (e.g. a light/dark toggle in the app), call
+	 * `window.electronAPI?.setNativeTheme(mode)` from the renderer.
+	 */
+	theme?: "system" | "light" | "dark";
+	/**
 	 * Options merged into every `new BrowserWindow(...)`. The adapter's own
 	 * secure defaults (`contextIsolation`, `sandbox`, no `nodeIntegration`)
 	 * always win over `webPreferences` passed here, which cannot be set.

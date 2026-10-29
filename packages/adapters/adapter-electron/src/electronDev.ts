@@ -77,6 +77,7 @@ function launch(site: Site, url: string, options: ElectronOptions): ChildProcess
 
 	const config = {
 		partition: options.partition ?? "persist:torpor",
+		theme: options.theme ?? "system",
 		window: options.window ?? {},
 	};
 

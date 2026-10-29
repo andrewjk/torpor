@@ -19,5 +19,7 @@ interface Window {
 	electronAPI?: {
 		platform: string;
 		versions: { chrome: string; electron: string; node: string };
+		/** `"system"`, `"light"` or `"dark"`. */
+		setNativeTheme(mode: "system" | "light" | "dark"): Promise<void>;
 	};
 }

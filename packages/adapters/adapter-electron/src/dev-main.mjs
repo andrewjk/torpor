@@ -1,7 +1,7 @@
 // The dev counterpart of main.mjs: opens a window against the Vite dev server
 // (which the framework's Node dev plugin serves) instead of a built output, so
 // HMR works. Launched by the adapter's dev plugin with TORPOR_ELECTRON_URL set.
-import { app, BrowserWindow, dialog, session, shell } from "electron";
+import { app, BrowserWindow, dialog, ipcMain, nativeTheme, session, shell } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,14 +11,22 @@ const config = process.env.TORPOR_ELECTRON_CONFIG
 	? JSON.parse(process.env.TORPOR_ELECTRON_CONFIG)
 	: {};
 const partition = config.partition ?? "persist:torpor";
+const theme = config.theme ?? "system";
 const origin = new URL(url).origin;
 
 function createWindow() {
+	// Follow the app's theme before the window is created, and pick a
+	// background color that matches it: avoids a white flash in dark mode
+	// before the renderer's stylesheet applies
+	nativeTheme.themeSource = theme;
+	const backgroundColor =
+		config.window?.backgroundColor ?? (nativeTheme.shouldUseDarkColors ? "#000000" : "#ffffff");
+
 	const win = new BrowserWindow({
 		width: 1100,
 		height: 800,
 		show: false,
-		backgroundColor: "#ffffff",
+		backgroundColor,
 		...config.window,
 		webPreferences: {
 			preload: path.join(dir, "preload.cjs"),
@@ -69,7 +77,17 @@ async function loadWithRetry(win) {
 
 app
 	.whenReady()
-	.then(createWindow)
+	.then(() => {
+		// Runtime theme changes from the renderer
+		// (`window.electronAPI.setNativeTheme(mode)` in the preload)
+		ipcMain.handle("torpor:set-native-theme", (_event, mode) => {
+			if (mode === "system" || mode === "light" || mode === "dark") {
+				nativeTheme.themeSource = mode;
+			}
+		});
+
+		return createWindow();
+	})
 	.catch((error) => {
 		console.error("[torpor] Failed to start:", error);
 		app.quit();
