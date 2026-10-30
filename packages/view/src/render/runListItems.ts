@@ -52,6 +52,7 @@ function mountSpec(
 	spec: ListItemSpec,
 	region: Region,
 	before: Node | null,
+	anchor: Node | null,
 	create: (item: ListItem, before: Node | null) => void,
 	noWatch?: boolean,
 ): ListItem {
@@ -62,7 +63,22 @@ function mountSpec(
 	if (noWatch !== true) {
 		item.data = $watch(item.data, SHALLOW_WATCH_OPTIONS);
 	}
+	// While hydrating, a row only has server markup to adopt while the
+	// hydration cursor is before the list's trailing anchor. Once the cursor
+	// reaches the anchor, every server-rendered row has been adopted (e.g. the
+	// server list was empty, or the client has more items) and any remaining
+	// rows must be mounted from their cloned template. Leaving hydration on
+	// would make `nodeRoot`/`nodeRootElement` walk past the anchor into a null
+	// node, and the row's generated `nodeChild` call would throw.
+	const suspendHydration = context.hydrationNode !== null && context.hydrationNode === anchor;
+	const savedHydrationNode = context.hydrationNode;
+	if (suspendHydration) {
+		context.hydrationNode = null;
+	}
 	create(item, before);
+	if (suspendHydration) {
+		context.hydrationNode = savedHydrationNode;
+	}
 	context.activeRegion = savedActiveRegion;
 	return item;
 }
@@ -195,7 +211,7 @@ export default function runListItems(
 	if (oldStart > oldEnd && newStart <= newEnd) {
 		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1]!.startNode : anchor;
 		for (let i = newStart; i <= newEnd; i++) {
-			newItems[i] = mountSpec(newSpecs[i]!, region, before, create, noWatch);
+			newItems[i] = mountSpec(newSpecs[i]!, region, before, anchor, create, noWatch);
 		}
 		chainNeedsRelink = true;
 	}
@@ -233,7 +249,7 @@ export default function runListItems(
 				clearRegion(oldItems[i]!);
 			}
 			for (let i = newStart; i <= newEnd; i++) {
-				newItems[i] = mountSpec(newSpecs[i]!, region, before, create, noWatch);
+				newItems[i] = mountSpec(newSpecs[i]!, region, before, anchor, create, noWatch);
 				before = newItems[i]!.endNode!.nextSibling;
 			}
 			chainNeedsRelink = true;
@@ -269,7 +285,7 @@ export default function runListItems(
 				const before = newIdx + 1 < newSpecs.length ? newItems[newIdx + 1]!.startNode : anchor;
 				if (newIndexToOld[i] === 0) {
 					// No matching old item → mount.
-					newItems[newIdx] = mountSpec(newSpecs[newIdx]!, region, before, create, noWatch);
+					newItems[newIdx] = mountSpec(newSpecs[newIdx]!, region, before, anchor, create, noWatch);
 					chainNeedsRelink = true;
 				} else if (j < 0 || i !== seq[j]) {
 					// Not in the LIS → move to its new position.
