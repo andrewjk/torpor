@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.2.0
+
+<sub>2026-10-30</sub>
+
+- _(minor)_ Feat: Electron adapter theme option and setNativeTheme
+- _(patch)_ Fix: Electron prompt for blocked beforeunload
+
 ## 1.1.8
 
 <sub>2026-10-21</sub>

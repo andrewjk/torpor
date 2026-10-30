@@ -1,5 +1,12 @@
 # @torpor/build
 
+## 1.8.2
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Fix: bundle plain deps of torpor packages in SSR build
+- _(patch)_ Fix: static route paths resolve loose params, not unknown
+
 ## 1.8.1
 
 <sub>2026-10-21</sub>

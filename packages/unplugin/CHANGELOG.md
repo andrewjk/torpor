@@ -1,5 +1,11 @@
 # @torpor/unplugin
 
+## 1.2.6
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Updated dependency `@torpor/view` v1.2.3
+
 ## 1.2.5
 
 <sub>2026-10-21</sub>

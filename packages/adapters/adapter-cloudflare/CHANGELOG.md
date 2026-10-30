@@ -1,5 +1,11 @@
 # @torpor/adapter-cloudflare
 
+## 1.0.23
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Fix: expose Cloudflare execution context on globalThis.adapter
+
 ## 1.0.22
 
 <sub>2026-10-21</sub>

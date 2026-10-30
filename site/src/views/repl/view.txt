@@ -741,6 +741,7 @@ function pushRegion(region, toParent = false) {
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
 	const region = newRegion(devContext.enabled ? "Layout slot" : void 0);
 	const oldRegion = pushRegion(region, true);
+	region.depth = region.previousRegion === null ? 0 : region.previousRegion.depth + 1;
 	component(parent, anchor, $props, $context, { _: slot });
 	popRegion(oldRegion);
 	return region;
@@ -829,6 +830,24 @@ function newListItem(data, key, name) {
 		effects: []
 	};
 }
+const branchIndexes = /* @__PURE__ */ new WeakMap();
+function setBranchIndex(anchor, index) {
+	branchIndexes.set(anchor, index);
+}
+function takeBranchIndex(anchor) {
+	const index = branchIndexes.get(anchor);
+	if (index !== void 0) branchIndexes.delete(anchor);
+	return index;
+}
+const HYDRATION_BREAK_REGEX = /^\^(?:\d+)?$/;
+function isHydrationBreak(data) {
+	return HYDRATION_BREAK_REGEX.test(data);
+}
+function hydrationBreakIndex(data) {
+	if (!data.startsWith("^") || data.length === 1) return;
+	const index = Number(data.slice(1));
+	return Number.isNaN(index) ? void 0 : index;
+}
 function isCommentNode(node) {
 	return node.nodeType === 8;
 }
@@ -836,7 +855,7 @@ function isTextNode(node) {
 	return node.nodeType === 3;
 }
 function nodeCheckHydrationBreak(node) {
-	if (node !== null && isCommentNode(node) && node.data === "^") {
+	if (node !== null && isCommentNode(node) && isHydrationBreak(node.data)) {
 		let comment = node;
 		node = node.nextSibling;
 		comment.remove();
@@ -861,9 +880,14 @@ function nodeAnchor(node) {
 	if (context.hydrationNode !== null) {
 		if (isCommentNode(node) && node.data === "[") {
 			const startParent = node.parentNode;
+			let branchIndex = void 0;
+			let peek = node.nextSibling;
+			while (peek !== null && isTextNode(peek) && (peek.textContent ?? "").trim() === "") peek = peek.nextSibling;
+			if (peek !== null && isCommentNode(peek) && isHydrationBreak(peek.data)) branchIndex = hydrationBreakIndex(peek.data);
 			let currentNode = nodeNext(node);
 			node.remove();
-			while (currentNode !== null && isCommentNode(currentNode) && currentNode.data === "^") {
+			while (currentNode !== null && isCommentNode(currentNode) && isHydrationBreak(currentNode.data)) {
+				if (branchIndex === void 0) branchIndex = hydrationBreakIndex(currentNode.data);
 				const next = currentNode.nextSibling;
 				currentNode.remove();
 				currentNode = next;
@@ -884,6 +908,7 @@ function nodeAnchor(node) {
 							const region = context.activeRegion;
 							if (region.startNode === null) region.startNode = firstContent ?? endNode;
 							setFirstInsideNode(endNode, firstContent);
+							if (branchIndex !== void 0) setBranchIndex(endNode, branchIndex);
 							return endNode;
 						}
 					}
@@ -914,7 +939,7 @@ function walkHydrationRoot() {
 	let rootNode = context.hydrationNode;
 	while (rootNode !== null && isSkippable(rootNode)) {
 		const next = rootNode.nextSibling;
-		if (isCommentNode(rootNode) && rootNode.data === "^") rootNode.remove();
+		if (isCommentNode(rootNode) && isHydrationBreak(rootNode.data)) rootNode.remove();
 		rootNode = next;
 		context.hydrationNode = rootNode;
 	}
@@ -929,7 +954,7 @@ function walkHydrationRoot() {
 }
 function isSkippable(node) {
 	if (isTextNode(node) && (node.textContent ?? "").trim() === "") return true;
-	if (isCommentNode(node)) return node.data === "^" || node.data === "";
+	if (isCommentNode(node)) return isHydrationBreak(node.data) || node.data === "";
 	return false;
 }
 function nodeRootElement(node) {
@@ -993,6 +1018,11 @@ function widenAncestorsAtAnchor(region, anchor) {
 }
 function runControl(region, anchor, create, name) {
 	let first = true;
+	if (context.hydrationNode !== null && anchor !== null) {
+		region.ssrBranchAnchor = anchor;
+		const ssrBranchIndex = takeBranchIndex(anchor);
+		if (ssrBranchIndex !== void 0) region.ssrBranchIndex = ssrBranchIndex;
+	}
 	const gen = region.generation = (region.generation ?? 0) + 1;
 	$run(function runControl() {
 		if (region.generation !== gen) return;
@@ -1002,12 +1032,26 @@ function runControl(region, anchor, create, name) {
 		create(anchor);
 		popRegion(oldRegion);
 		widenAncestorsAtAnchor(region, anchor);
-		if (context.hydrationNode !== null && anchor !== null) context.hydrationNode = anchor;
+		if (anchor !== null && (context.hydrationNode !== null || region.ssrBranchRecreated === true)) {
+			region.ssrBranchRecreated = void 0;
+			context.hydrationNode = anchor;
+		}
 	}, name);
 }
 function runControlBranch(region, oldIndex, index) {
 	const recreate = region.recreate;
 	if (recreate) region.recreate = false;
+	const anchor = region.ssrBranchAnchor;
+	if (anchor !== void 0) {
+		region.ssrBranchAnchor = void 0;
+		const ssrBranchIndex = region.ssrBranchIndex;
+		region.ssrBranchIndex = void 0;
+		const hydrationNode = context.hydrationNode;
+		if (hydrationNode !== null && (ssrBranchIndex !== void 0 && ssrBranchIndex !== index || ssrBranchIndex === void 0 && hydrationNode === anchor)) {
+			region.ssrBranchRecreated = true;
+			clearServerBranch(region, hydrationNode, anchor);
+		}
+	}
 	const firstRender = region.hasRenderedBranch !== true;
 	region.hasRenderedBranch = true;
 	if (oldIndex === index) {
@@ -1019,6 +1063,22 @@ function runControlBranch(region, oldIndex, index) {
 	}
 	if (!firstRender && region.nextRegion !== null && region.nextRegion.depth > region.depth) clearRegion(region.nextRegion);
 	return true;
+}
+function clearServerBranch(region, removedFirst, anchor) {
+	let ancestor = region.previousRegion;
+	let ancestorDepth = region.depth;
+	while (ancestor !== null && ancestor.depth < ancestorDepth) {
+		if (ancestor.startNode === removedFirst) ancestor.startNode = anchor;
+		ancestorDepth = ancestor.depth;
+		ancestor = ancestor.previousRegion;
+	}
+	context.hydrationNode = null;
+	let node = removedFirst;
+	while (node !== null && node !== anchor) {
+		const next = node.nextSibling;
+		node.remove();
+		node = next;
+	}
 }
 const warnedByRegion = /* @__PURE__ */ new WeakMap();
 function checkListKeys(region, specs) {
@@ -1904,17 +1964,15 @@ function headElement(tagName, selector) {
 	return element;
 }
 function setAttribute(el, name, value) {
-	if (value === false || value === void 0 || value === null) el.removeAttribute(name);
-	else el.setAttribute(name, value);
-}
-function setDynamicElement(el, tag) {
-	if (context.hydrationNode !== null) return el;
-	let newElement = el.ownerDocument.createElement(tag);
-	for (const attr of el.attributes) newElement.setAttributeNS(null, attr.name, attr.value);
-	copyEventListeners(el, newElement);
-	newElement.replaceChildren(...el.childNodes.values());
-	el.replaceWith(newElement);
-	return newElement;
+	if (value === false || value === void 0 || value === null) {
+		el.removeAttribute(name);
+		if (name === "value") setValueProperty(el, "");
+		return;
+	}
+	if (name === "value") {
+		if (setValueProperty(el, String(value))) return;
+	}
+	el.setAttribute(name, value);
 }
 function $batch(fn) {
 	if (context.batch > 0) return fn();

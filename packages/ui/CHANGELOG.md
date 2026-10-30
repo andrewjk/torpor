@@ -1,5 +1,19 @@
 # @torpor/ui
 
+## 1.3.0
+
+<sub>2026-10-30</sub>
+
+- _(minor)_ Feat: add ChartArea, ChartPoints and ChartLegend layers plus an AreaChart preset
+- _(minor)_ Feat: make the chart series color optional, falling back to the palette
+- _(minor)_ Feat: add labels and legend options to PieChart
+- _(minor)_ Feat: add stacked columns, bars, lines and areas
+- _(patch)_ Fix: chart axis lines stay clear of the marks, with edge ticks and labels kept inside the plot
+- _(patch)_ Fix: grouped chart columns are separated by gaps
+- _(patch)_ Fix: chart axis titles, tick labels and legends no longer overlap each other
+- _(patch)_ Fix: chart lines and areas span the full plot, with the x labels lined up with the points
+- _(patch)_ Fix: ChartBars draws every value in a series, not just the first
+
 ## 1.2.3
 
 <sub>2026-10-21</sub>

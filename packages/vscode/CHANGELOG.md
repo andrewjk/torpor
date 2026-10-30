@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.12
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Updated dependency `@torpor/language-server` v1.0.12
+
 ## 1.0.11
 
 <sub>2026-10-21</sub>

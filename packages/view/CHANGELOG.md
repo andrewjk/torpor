@@ -1,5 +1,13 @@
 # @torpor/view
 
+## 1.2.3
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Fix: layout slot refill region depth
+- _(patch)_ Fix: hydrate the branch the client picked
+- _(patch)_ Fix: set form control value as property, not attribute
+
 ## 1.2.2
 
 <sub>2026-10-21</sub>
