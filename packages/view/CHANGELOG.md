@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 1.2.4
+
+<sub>2026-10-30</sub>
+
+- _(patch)_ Fix: hydrate list rows beyond server markup
+
 ## 1.2.3
 
 <sub>2026-10-30</sub>

@@ -1653,13 +1653,17 @@ function moveRegion(parent, region, before) {
 	}
 }
 const SHALLOW_WATCH_OPTIONS = { shallow: true };
-function mountSpec(spec, region, before, create, noWatch) {
+function mountSpec(spec, region, before, anchor, create, noWatch) {
 	const item = newListItem(spec.data, spec.key);
 	const savedActiveRegion = context.activeRegion;
 	item.depth = region.depth + 1;
 	context.activeRegion = item;
 	if (noWatch !== true) item.data = $watch(item.data, SHALLOW_WATCH_OPTIONS);
+	const suspendHydration = context.hydrationNode !== null && context.hydrationNode === anchor;
+	const savedHydrationNode = context.hydrationNode;
+	if (suspendHydration) context.hydrationNode = null;
 	create(item, before);
+	if (suspendHydration) context.hydrationNode = savedHydrationNode;
 	context.activeRegion = savedActiveRegion;
 	return item;
 }
@@ -1707,7 +1711,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 	} else break;
 	if (oldStart > oldEnd && newStart <= newEnd) {
 		const before = newEnd + 1 < newSpecs.length ? newItems[newEnd + 1].startNode : anchor;
-		for (let i = newStart; i <= newEnd; i++) newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
+		for (let i = newStart; i <= newEnd; i++) newItems[i] = mountSpec(newSpecs[i], region, before, anchor, create, noWatch);
 		chainNeedsRelink = true;
 	} else if (newStart > newEnd) for (let i = oldStart; i <= oldEnd; i++) clearRegion(oldItems[i]);
 	else {
@@ -1722,7 +1726,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 			let before = oldItems[oldEnd]?.endNode?.nextSibling ?? anchor;
 			for (let i = oldEnd; i >= oldStart; i--) clearRegion(oldItems[i]);
 			for (let i = newStart; i <= newEnd; i++) {
-				newItems[i] = mountSpec(newSpecs[i], region, before, create, noWatch);
+				newItems[i] = mountSpec(newSpecs[i], region, before, anchor, create, noWatch);
 				before = newItems[i].endNode.nextSibling;
 			}
 			chainNeedsRelink = true;
@@ -1744,7 +1748,7 @@ function runListItems(region, parent, anchor, oldItems, newSpecs, create, update
 				const newIdx = newStart + i;
 				const before = newIdx + 1 < newSpecs.length ? newItems[newIdx + 1].startNode : anchor;
 				if (newIndexToOld[i] === 0) {
-					newItems[newIdx] = mountSpec(newSpecs[newIdx], region, before, create, noWatch);
+					newItems[newIdx] = mountSpec(newSpecs[newIdx], region, before, anchor, create, noWatch);
 					chainNeedsRelink = true;
 				} else if (j < 0 || i !== seq[j]) {
 					moveRegion(parent, newItems[newIdx], before);
