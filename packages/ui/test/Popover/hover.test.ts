@@ -110,6 +110,29 @@ describe("Popover - hover trigger", () => {
 		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
+	it("closes when the pointer leaves the content without a trigger leave", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		await userEvent.hover(trigger);
+		await wait(10);
+
+		const content = document.querySelector(".torp-popover-content") as HTMLElement;
+		expect(content).toBeTruthy();
+
+		// Hover the content directly: this covers the content opening under
+		// the pointer, where no trigger mouseleave was observed
+		await userEvent.hover(content);
+		await wait(10);
+		expect(document.querySelector(".torp-popover-content")).toBeTruthy();
+
+		await userEvent.unhover(content);
+		await wait(50);
+		expect(document.querySelector(".torp-popover-content")).toBeNull();
+	});
+
 	it("focus opens immediately and blur closes after the grace period", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);

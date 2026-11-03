@@ -61,6 +61,18 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 	// entered.
 	let watchedContent: HTMLElement | null = null;
 
+	/**
+	 * Shows the popout and starts watching its content. Watching from the
+	 * moment it opens (rather than only after a trigger-leave close is
+	 * canceled) means leaving the content still closes it if the trigger
+	 * never received a leave event, e.g. when the content opens under the
+	 * pointer.
+	 */
+	function reveal() {
+		show();
+		watchContent();
+	}
+
 	function clearTimers() {
 		if (openTimer !== undefined) {
 			clearTimeout(openTimer);
@@ -182,13 +194,13 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 			if (isVisible()) return;
 
 			if (hoverDelay <= 0) {
-				show();
+				reveal();
 				return;
 			}
 			if (openTimer === undefined) {
 				openTimer = setTimeout(() => {
 					openTimer = undefined;
-					show();
+					reveal();
 				}, hoverDelay);
 			}
 		},
@@ -223,7 +235,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 				unwatchContent();
 			}
 			if (!isVisible()) {
-				show();
+				reveal();
 			}
 		},
 
