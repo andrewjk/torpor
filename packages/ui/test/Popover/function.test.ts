@@ -12,10 +12,13 @@ describe("Prompt", () => {
 		mount(container, PopoverFunction);
 
 		// By default, the prompt shouldn't be shown
-		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).not.toBeInTheDocument();
 
 		// Clicking the button should show the prompt
 		await userEvent.click(getByText(container, "Show the prompt"));
-		expect(queryByText(container, "Which color do you prefer?")).toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).toBeInTheDocument();
+
+		// The popover is mounted in the portal root, not beside the anchor
+		expect(document.querySelector(".torp-popover")!.parentElement).toBe(document.body);
 	});
 });

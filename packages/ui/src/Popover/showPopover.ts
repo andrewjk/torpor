@@ -18,7 +18,10 @@ export default function showPopover(
 	// Add the anchor element to the properties
 	const allProps = Object.assign({}, props, { anchor });
 
-	// Create the popover
+	// Create the popover in the portal root by default: fixed-positioned
+	// content must not stay inside the anchor's ancestors (transforms, filters
+	// and `contain` capture fixed descendants, and `overflow`/stacking
+	// contexts can clip it).
 	// TODO: This needs to clean up after itself, like the mount methods do
-	popover(target || anchor.parentElement || document.body, null, allProps);
+	popover(target || document.body, null, allProps);
 }

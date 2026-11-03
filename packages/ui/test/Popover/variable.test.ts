@@ -12,16 +12,16 @@ describe("Prompt", () => {
 		mount(container, PopoverVariable);
 
 		// By default, the prompt shouldn't be shown
-		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).not.toBeInTheDocument();
 		expect(queryByText(container, "Your favorite color is blue?!")).not.toBeInTheDocument();
 
 		// Clicking the button should show the prompt
 		await userEvent.click(getByText(container, "Show the prompt"));
-		expect(queryByText(container, "Which color do you prefer?")).toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).toBeInTheDocument();
 
 		// Clicking the blue button should hide the prompt and set the value
-		await userEvent.click(getByText(container, "Blue"));
-		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();
+		await userEvent.click(getByText(document.body, "Blue"));
+		expect(queryByText(document.body, "Which color do you prefer?")).not.toBeInTheDocument();
 		expect(queryByText(container, "Your favorite color is blue?!")).toBeInTheDocument();
 	});
 });

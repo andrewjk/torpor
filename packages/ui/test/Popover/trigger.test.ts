@@ -12,16 +12,31 @@ describe("Prompt", () => {
 		mount(container, PopoverTrigger);
 
 		// By default, the prompt shouldn't be shown
-		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).not.toBeInTheDocument();
 		expect(queryByText(container, "Your favorite color is blue?!")).not.toBeInTheDocument();
 
 		// Clicking the button should show the prompt
 		await userEvent.click(getByText(container, "Show the prompt"));
-		expect(queryByText(container, "Which color do you prefer?")).toBeInTheDocument();
+		expect(queryByText(document.body, "Which color do you prefer?")).toBeInTheDocument();
 
 		// Clicking the blue button should hide the prompt and set the value
-		await userEvent.click(getByText(container, "Blue"));
-		expect(queryByText(container, "Which color do you prefer?")).not.toBeInTheDocument();
+		await userEvent.click(getByText(document.body, "Blue"));
+		expect(queryByText(document.body, "Which color do you prefer?")).not.toBeInTheDocument();
 		expect(queryByText(container, "Your favorite color is blue?!")).toBeInTheDocument();
+	});
+
+	it("portals the content out of its original ancestors", async () => {
+		const container = document.createElement("div");
+		// A transform makes the ancestor the containing block for fixed
+		// descendants; the popover content must not stay inside it
+		container.style.transform = "translateY(10px)";
+		document.body.appendChild(container);
+		mount(container, PopoverTrigger);
+
+		await userEvent.click(getByText(container, "Show the prompt"));
+
+		const content = document.querySelector(".torp-popover-content")!;
+		expect(content.parentElement).toBe(document.body);
+		expect(container.contains(content)).toBe(false);
 	});
 });

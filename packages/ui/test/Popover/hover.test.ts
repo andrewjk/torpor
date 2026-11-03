@@ -23,16 +23,16 @@ describe("Popover - hover trigger", () => {
 		document.body.appendChild(container);
 		mount(container, PopoverHoverPress as any, { hoverDelay: 20, exitGrace: 20 });
 
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 
 		getTrigger(container).dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
 
 		// Not yet -- intent delay hasn't elapsed
 		await wait(5);
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 
 		await wait(30);
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 	});
 
 	it("a quick pass-over does not open", async () => {
@@ -45,7 +45,7 @@ describe("Popover - hover trigger", () => {
 		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
 		await wait(80);
 
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
 	it("stays open when the pointer moves into the content", async () => {
@@ -56,17 +56,17 @@ describe("Popover - hover trigger", () => {
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
 		await wait(10);
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 
 		// Leaving the trigger arms the close timer...
 		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
 
 		// ...but entering the content cancels it
-		const content = container.querySelector(".torp-popover-content")!;
+		const content = document.querySelector(".torp-popover-content")!;
 		content.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 		await wait(70);
 
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 	});
 
 	it("closes after the exit grace period", async () => {
@@ -77,12 +77,12 @@ describe("Popover - hover trigger", () => {
 		const trigger = getTrigger(container);
 		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
 		await wait(10);
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 
 		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
 		await wait(50);
 
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
 	it("closes after the pointer leaves the content", async () => {
@@ -95,11 +95,11 @@ describe("Popover - hover trigger", () => {
 		await wait(10);
 
 		// Move from the trigger into the content
-		const content = container.querySelector(".torp-popover-content")!;
+		const content = document.querySelector(".torp-popover-content")!;
 		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
 		content.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
 		await wait(10);
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 
 		// Then leave the content entirely
 		content.dispatchEvent(
@@ -107,7 +107,7 @@ describe("Popover - hover trigger", () => {
 		);
 		await wait(50);
 
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
 	it("focus opens immediately and blur closes after the grace period", async () => {
@@ -117,12 +117,12 @@ describe("Popover - hover trigger", () => {
 
 		const trigger = getTrigger(container);
 		await userEvent.click(trigger); // focus
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 
 		trigger.blur();
 		await wait(50);
 
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
 	it("closes after focus leaves the content", async () => {
@@ -132,18 +132,18 @@ describe("Popover - hover trigger", () => {
 
 		const trigger = getTrigger(container);
 		trigger.focus(); // opens immediately
-		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Inside content")).toBeInTheDocument();
 
 		// Move focus into the content; the trigger's close timer is canceled
-		const contentButton = container.querySelector(".torp-popover-content button") as HTMLElement;
+		const contentButton = document.querySelector(".torp-popover-content button") as HTMLElement;
 		contentButton.focus();
 		await wait(50);
-		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Inside content")).toBeInTheDocument();
 
 		// And leaving the content closes it after the grace period
 		contentButton.blur();
 		await wait(50);
-		expect(queryByText(container, "Inside content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Inside content")).not.toBeInTheDocument();
 	});
 
 	it("a scripted refocus on hide does not re-open the popout", async () => {
@@ -153,10 +153,10 @@ describe("Popover - hover trigger", () => {
 
 		const trigger = getTrigger(container);
 		await userEvent.click(trigger); // opens and focuses the trigger
-		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Inside content")).toBeInTheDocument();
 
 		// Move focus into the content
-		const contentButton = container.querySelector(".torp-popover-content button")!;
+		const contentButton = document.querySelector(".torp-popover-content button")!;
 		await userEvent.click(contentButton);
 		expect(document.activeElement).toBe(contentButton);
 
@@ -166,7 +166,7 @@ describe("Popover - hover trigger", () => {
 		await userEvent.click(document.body);
 		await wait(50);
 
-		expect(queryByText(container, "Inside content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Inside content")).not.toBeInTheDocument();
 		expect(document.activeElement).toBe(trigger);
 	});
 
@@ -176,9 +176,9 @@ describe("Popover - hover trigger", () => {
 		mount(container, PopoverHoverPress as any, {});
 
 		await userEvent.click(container.querySelector("button.torp-popout-trigger")!);
-		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
 
 		await userEvent.click(container.querySelector("button.torp-popout-trigger")!);
-		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 });

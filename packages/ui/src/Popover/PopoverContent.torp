@@ -46,6 +46,19 @@ export default function PopoverContent($props?: PopoverContentProps | undefined)
 
 	let div: HTMLDivElement;
 
+	/**
+	 * The content is fixed-positioned with viewport coordinates, so it must
+	 * not stay inside an ancestor that can capture fixed descendants (a
+	 * transform/filter/contain, or an `overflow`/stacking context). Moving it
+	 * to the body also keeps its links out of the trigger's link context.
+	 */
+	function portal(el: HTMLElement) {
+		const root = el.ownerDocument.body;
+		if (root !== null && el.parentNode !== root) {
+			root.appendChild(el);
+		}
+	}
+
 	$run(() => {
 		if (!$state.visible) {
 			popout.hide();
@@ -59,7 +72,10 @@ export default function PopoverContent($props?: PopoverContentProps | undefined)
 				class={["torp-popover-content", $props?.class]}
 				{$props?.style}
 				&ref={div}
-				onmount={(_el) => popout.show()}
+				onmount={(el) => {
+					portal(el);
+					popout.show();
+				}}
 			>
 				<slot />
 			</div>
