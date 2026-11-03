@@ -4,10 +4,15 @@ export default function setPopoverPosition(
 	side: "top" | "right" | "bottom" | "left",
 	alignment: "start" | "center" | "end",
 ): void {
+	// Take the content out of flow BEFORE measuring it. A fixed-position
+	// element with `auto` width shrink-wraps its contents, while the same
+	// element in normal flow (especially once portaled to `body`) can measure
+	// as a full-width block. Measuring first makes the centering/clamping math
+	// use that inflated width and clamp the popover to the viewport edge.
+	content.style.position = "fixed";
+
 	var anchorRect = anchor.getBoundingClientRect();
 	var contentRect = content.getBoundingClientRect();
-
-	content.style.position = "fixed";
 
 	// Check that we there is enough room to show the content on the side requested
 	// Otherwise, if there is enough room on the other side, show it there instead
