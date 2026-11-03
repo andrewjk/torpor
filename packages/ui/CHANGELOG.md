@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.3.3
+
+<sub>2026-11-03</sub>
+
+- _(patch)_ Fix: only refocus popovers that had focus
+
 ## 1.3.2
 
 <sub>2026-11-03</sub>
