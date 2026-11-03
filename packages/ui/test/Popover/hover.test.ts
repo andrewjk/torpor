@@ -85,6 +85,25 @@ describe("Popover - hover trigger", () => {
 		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
 	});
 
+	it("does not focus the trigger when a hover popover closes", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		// A mouse-opened popover never takes focus
+		expect(document.activeElement).toBe(document.body);
+
+		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+		await wait(10);
+		expect(queryByText(document.body, "Popover content")).toBeInTheDocument();
+
+		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+		await wait(50);
+		expect(queryByText(document.body, "Popover content")).not.toBeInTheDocument();
+		expect(document.activeElement).not.toBe(trigger);
+	});
+
 	it("closes after the pointer leaves the content", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);

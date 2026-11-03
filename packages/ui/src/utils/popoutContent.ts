@@ -43,6 +43,10 @@ export function createPopoutContent(options: PopoutContentOptions): {
 } {
 	let shown = false;
 	let closeOnClick = false;
+	// Whether focus ever moved into the popout while it was shown. A
+	// mouse-opened popover never takes focus, so it must not yank focus back to
+	// its anchor when it hides.
+	let hadFocus = false;
 
 	function setPosition() {
 		const anchor = options.getAnchor();
@@ -83,12 +87,21 @@ export function createPopoutContent(options: PopoutContentOptions): {
 		options.close(e);
 	}
 
+	function handleDocumentFocusIn(e: FocusEvent) {
+		const content = options.getContent();
+		if (content && content.contains(e.target as Node)) {
+			hadFocus = true;
+		}
+	}
+
 	function show() {
 		shown = true;
 
 		closeOnClick = false;
+		hadFocus = false;
 		addDocumentEvent("mousedown", handleDocumentMouseDown);
 		addDocumentEvent("click", handleDocumentClick);
+		addDocumentEvent("focusin", handleDocumentFocusIn);
 		if (options.closeOnEscape) {
 			addDocumentEvent("keydown", handleDocumentKeyDown);
 		}
@@ -110,6 +123,7 @@ export function createPopoutContent(options: PopoutContentOptions): {
 
 		removeDocumentEvent("mousedown", handleDocumentMouseDown);
 		removeDocumentEvent("click", handleDocumentClick);
+		removeDocumentEvent("focusin", handleDocumentFocusIn);
 		removeDocumentEvent("keydown", handleDocumentKeyDown);
 		removeEventListener("resize", setPosition);
 		const anchor = options.getAnchor();
@@ -117,17 +131,18 @@ export function createPopoutContent(options: PopoutContentOptions): {
 			getScrollParent(anchor).removeEventListener("scroll", setPosition);
 		}
 
-		// Focus the anchor element again, per the WAI guidelines, unless focus
-		// has already moved elsewhere (e.g. to an adjacent menubar item's menu).
-		// If the focused element was removed with the content, focus has fallen
-		// back to the body, and the anchor is focused again
+		// Focus the anchor element again, per the WAI guidelines, when the
+		// popout itself had focus. A mouse-opened hover popover never does, so
+		// closing it must not steal focus (and show a focus ring). Focus that
+		// has already moved elsewhere (e.g. to an adjacent menubar item's
+		// menu) is left alone; focus that fell back to the body when the
+		// focused content was removed still returns to the anchor.
 		if (options.refocusAnchorOnHide) {
 			const content = options.getContent();
-			if (
-				!content ||
-				content.contains(document.activeElement) ||
-				document.activeElement === document.body
-			) {
+			const active = document.activeElement;
+			const focusInContent = content !== undefined && active !== null && content.contains(active);
+			const focusFellBack = hadFocus && (active === null || active === document.body);
+			if (focusInContent || focusFellBack) {
 				const el = options.getAnchor();
 				if (el) {
 					// The refocus is script-driven, not user intent: arm the
