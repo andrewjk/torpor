@@ -422,6 +422,113 @@ function runMountCallback(fn) {
 	}
 	return result;
 }
+function parseNumber(value) {
+	if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[a-z%]+)?$/i.test(value.trim())) return null;
+	return Number.parseFloat(value);
+}
+function isZero(value) {
+	return parseNumber(value) === 0;
+}
+function isOne(value) {
+	return parseNumber(value) === 1;
+}
+function all(args, expected, test) {
+	return args.length === expected && args.every(test);
+}
+function isIdentityFunction(name, args) {
+	switch (name) {
+		case "matrix": {
+			const numbers = args.map(parseNumber);
+			return numbers.length === 6 && numbers[0] === 1 && numbers[1] === 0 && numbers[2] === 0 && numbers[3] === 1 && numbers[4] === 0 && numbers[5] === 0;
+		}
+		case "matrix3d": {
+			const numbers = args.map(parseNumber);
+			const identity = [
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				0,
+				1,
+				0,
+				0,
+				0,
+				0,
+				1
+			];
+			return numbers.length === 16 && numbers.every((value, i) => value === identity[i]);
+		}
+		case "translate": return args.length >= 1 && args.length <= 2 && args.every(isZero);
+		case "translatex":
+		case "translatey":
+		case "translatez": return all(args, 1, isZero);
+		case "translate3d": return all(args, 3, isZero);
+		case "scale": return args.length >= 1 && args.length <= 2 && args.every(isOne);
+		case "scalex":
+		case "scaley":
+		case "scalez": return all(args, 1, isOne);
+		case "scale3d": return all(args, 3, isOne);
+		case "rotate":
+		case "rotatex":
+		case "rotatey":
+		case "rotatez":
+		case "skewx":
+		case "skewy": return all(args, 1, isZero);
+		case "rotate3d": return args.length === 4 && isZero(args[3]);
+		case "skew": return args.length >= 1 && args.length <= 2 && args.every(isZero);
+		default: return false;
+	}
+}
+function isIdentityTransform(value) {
+	const transform = value.trim().toLowerCase();
+	if (transform === "" || transform === "none") return true;
+	let rest = transform;
+	while (rest.length > 0) {
+		const match = /^([a-z0-9]+)\(([^()]*)\)/.exec(rest);
+		if (!match) return false;
+		const args = match[2].split(",").map((arg) => arg.trim());
+		if (!isIdentityFunction(match[1], args)) return false;
+		rest = rest.slice(match[0].length).trim();
+	}
+	return true;
+}
+function withoutFinalIdentityTransform(keyframes) {
+	if (keyframes === null) return null;
+	if (Array.isArray(keyframes)) {
+		let index = keyframes.length - 1;
+		while (index >= 0 && keyframes[index] == null) index--;
+		if (index < 0) return keyframes;
+		const last = keyframes[index];
+		if (typeof last.transform !== "string" || !isIdentityTransform(last.transform)) return keyframes;
+		const next = keyframes.slice();
+		next[index] = {
+			...last,
+			transform: "none"
+		};
+		return next;
+	}
+	const transform = keyframes.transform;
+	if (Array.isArray(transform)) {
+		const last = transform[transform.length - 1];
+		if (typeof last !== "string" || !isIdentityTransform(last)) return keyframes;
+		const values = transform.slice();
+		values[values.length - 1] = "none";
+		return {
+			...keyframes,
+			transform: values
+		};
+	}
+	if (typeof transform === "string" && isIdentityTransform(transform)) return {
+		...keyframes,
+		transform: "none"
+	};
+	return keyframes;
+}
 async function animate(el, enter, keyframes, options) {
 	let animationOptions = Object.assign({
 		direction: enter ? "normal" : "reverse",
@@ -429,7 +536,9 @@ async function animate(el, enter, keyframes, options) {
 		easing: "ease-in-out",
 		fill: "forwards"
 	}, options);
-	const animation = el.animate(keyframes, animationOptions);
+	const persisted = animationOptions.fill === "forwards" || animationOptions.fill === "both";
+	const effectiveKeyframes = enter === true && persisted ? withoutFinalIdentityTransform(keyframes) : keyframes;
+	const animation = el.animate(effectiveKeyframes, animationOptions);
 	setTimeout(() => {
 		animation.timeline = el.ownerDocument.timeline;
 	}, 1);

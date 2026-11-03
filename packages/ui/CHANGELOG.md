@@ -1,5 +1,12 @@
 # @torpor/ui
 
+## 1.3.2
+
+<sub>2026-11-03</sub>
+
+- _(patch)_ Fix: close hover popovers after leaving content
+- _(patch)_ Fix: portal popover content to the body
+
 ## 1.3.1
 
 <sub>2026-10-30</sub>

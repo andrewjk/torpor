@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.8.4
+
+<sub>2026-11-03</sub>
+
+- _(patch)_ Updated dependency `@torpor/view` v1.2.5
+
 ## 1.8.3
 
 <sub>2026-10-30</sub>

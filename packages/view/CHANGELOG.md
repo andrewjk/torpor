@@ -1,5 +1,11 @@
 # @torpor/view
 
+## 1.2.5
+
+<sub>2026-11-03</sub>
+
+- _(patch)_ Fix: end identity animations on none
+
 ## 1.2.4
 
 <sub>2026-10-30</sub>
