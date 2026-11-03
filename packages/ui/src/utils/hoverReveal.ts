@@ -54,6 +54,13 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
+	// The content element currently watched for pointer/focus leaving it. It
+	// is attached once the pointer or focus enters the content (which cancels
+	// the trigger's close timer), so that leaving the content arms a close
+	// timer of its own -- otherwise the popout never closes after being
+	// entered.
+	let watchedContent: HTMLElement | null = null;
+
 	function clearTimers() {
 		if (openTimer !== undefined) {
 			clearTimeout(openTimer);
@@ -79,6 +86,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 		closeTimer = setTimeout(() => {
 			closeTimer = undefined;
 			stopListening();
+			unwatchContent();
 			// The content hides with `refocusAnchorOnHide`, which drops focus
 			// back onto this trigger; the popout machinery arms the scripted-
 			// focus guard before it does, so handleFocus ignores it
@@ -104,6 +112,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 			clearTimeout(closeTimer);
 			closeTimer = undefined;
 			stopListening();
+			watchContent();
 		}
 	}
 
@@ -116,6 +125,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 			clearTimeout(closeTimer);
 			closeTimer = undefined;
 			document.removeEventListener("mouseover", handleDocumentOver);
+			watchContent();
 		}
 	}
 
@@ -123,6 +133,40 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 		const content = getContent();
 		if (!content || !target) return false;
 		return content === target || content.contains(target as Node);
+	}
+
+	function watchContent() {
+		const content = getContent();
+		if (!content || content === watchedContent) return;
+		unwatchContent();
+		watchedContent = content;
+		content.addEventListener("mouseleave", handleContentLeave);
+		content.addEventListener("focusout", handleContentFocusOut);
+	}
+
+	function unwatchContent() {
+		if (watchedContent === null) return;
+		watchedContent.removeEventListener("mouseleave", handleContentLeave);
+		watchedContent.removeEventListener("focusout", handleContentFocusOut);
+		watchedContent = null;
+	}
+
+	function handleContentLeave(e: MouseEvent) {
+		if (!isVisible()) {
+			unwatchContent();
+			return;
+		}
+		if (insideContent(e.relatedTarget)) return;
+		scheduleClose();
+	}
+
+	function handleContentFocusOut(e: FocusEvent) {
+		if (!isVisible()) {
+			unwatchContent();
+			return;
+		}
+		if (insideContent(e.relatedTarget)) return;
+		scheduleClose();
 	}
 
 	return {
@@ -133,6 +177,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 				clearTimeout(closeTimer);
 				closeTimer = undefined;
 				stopListening();
+				unwatchContent();
 			}
 			if (isVisible()) return;
 
@@ -175,6 +220,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 				clearTimeout(closeTimer);
 				closeTimer = undefined;
 				stopListening();
+				unwatchContent();
 			}
 			if (!isVisible()) {
 				show();
@@ -191,6 +237,7 @@ export function createHoverReveal(options: HoverRevealOptions): HoverRevealHandl
 		dispose() {
 			clearTimers();
 			stopListening();
+			unwatchContent();
 		},
 	};
 }

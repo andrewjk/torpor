@@ -85,6 +85,31 @@ describe("Popover - hover trigger", () => {
 		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
 	});
 
+	it("closes after the pointer leaves the content", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverPress as any, { hoverDelay: 0, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		trigger.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+		await wait(10);
+
+		// Move from the trigger into the content
+		const content = container.querySelector(".torp-popover-content")!;
+		trigger.dispatchEvent(new MouseEvent("mouseleave", { bubbles: true }));
+		content.dispatchEvent(new MouseEvent("mouseover", { bubbles: true }));
+		await wait(10);
+		expect(queryByText(container, "Popover content")).toBeInTheDocument();
+
+		// Then leave the content entirely
+		content.dispatchEvent(
+			new MouseEvent("mouseleave", { bubbles: false, relatedTarget: document.body }),
+		);
+		await wait(50);
+
+		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+	});
+
 	it("focus opens immediately and blur closes after the grace period", async () => {
 		const container = document.createElement("div");
 		document.body.appendChild(container);
@@ -98,6 +123,27 @@ describe("Popover - hover trigger", () => {
 		await wait(50);
 
 		expect(queryByText(container, "Popover content")).not.toBeInTheDocument();
+	});
+
+	it("closes after focus leaves the content", async () => {
+		const container = document.createElement("div");
+		document.body.appendChild(container);
+		mount(container, PopoverHoverContentTest as any, { hoverDelay: 0, exitGrace: 20 });
+
+		const trigger = getTrigger(container);
+		trigger.focus(); // opens immediately
+		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+
+		// Move focus into the content; the trigger's close timer is canceled
+		const contentButton = container.querySelector(".torp-popover-content button") as HTMLElement;
+		contentButton.focus();
+		await wait(50);
+		expect(queryByText(container, "Inside content")).toBeInTheDocument();
+
+		// And leaving the content closes it after the grace period
+		contentButton.blur();
+		await wait(50);
+		expect(queryByText(container, "Inside content")).not.toBeInTheDocument();
 	});
 
 	it("a scripted refocus on hide does not re-open the popout", async () => {
