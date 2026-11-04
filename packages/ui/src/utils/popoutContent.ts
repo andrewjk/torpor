@@ -47,6 +47,7 @@ export function createPopoutContent(options: PopoutContentOptions): {
 	// mouse-opened popover never takes focus, so it must not yank focus back to
 	// its anchor when it hides.
 	let hadFocus = false;
+	let resizeObserver: ResizeObserver | null = null;
 
 	function setPosition() {
 		const anchor = options.getAnchor();
@@ -58,6 +59,22 @@ export function createPopoutContent(options: PopoutContentOptions): {
 		} else {
 			setPopoverPosition(anchor, content, options.side ?? "bottom", options.alignment ?? "start");
 		}
+	}
+
+	/**
+	 * Content often renders before its data (or images/layout) arrive, which
+	 * changes the size the placement was computed from. Watch the content and
+	 * reposition whenever it resizes while open.
+	 */
+	function observeContent() {
+		if (typeof ResizeObserver === "undefined") return;
+		const content = options.getContent();
+		if (!content) return;
+		resizeObserver ??= new ResizeObserver(() => {
+			if (shown) setPosition();
+		});
+		resizeObserver.disconnect();
+		resizeObserver.observe(content);
 	}
 
 	function handleDocumentMouseDown() {
@@ -108,6 +125,7 @@ export function createPopoutContent(options: PopoutContentOptions): {
 
 		// Set the position and listen for window resize and scroll to reset the position
 		setPosition();
+		observeContent();
 		addEventListener("resize", setPosition);
 		const anchor = options.getAnchor();
 		if (anchor) {
@@ -125,6 +143,7 @@ export function createPopoutContent(options: PopoutContentOptions): {
 		removeDocumentEvent("click", handleDocumentClick);
 		removeDocumentEvent("focusin", handleDocumentFocusIn);
 		removeDocumentEvent("keydown", handleDocumentKeyDown);
+		resizeObserver?.disconnect();
 		removeEventListener("resize", setPosition);
 		const anchor = options.getAnchor();
 		if (anchor) {

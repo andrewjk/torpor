@@ -54,22 +54,26 @@ export default function setPopoverPosition(
 
 	switch (calculatedSide) {
 		case "top": {
-			content.style.top = anchorRect.top - contentRect.height + "px";
+			// Clamp the axis the placement chose too: when neither side has
+			// enough room, the requested side is kept and must stay on screen.
+			content.style.top =
+				clamp(anchorRect.top - contentRect.height, window.innerHeight - contentRect.height) + "px";
 			setVerticalAlignment(content, anchorRect, contentRect, alignment);
 			break;
 		}
 		case "right": {
-			content.style.left = anchorRect.right + "px";
+			content.style.left = clamp(anchorRect.right, window.innerWidth - contentRect.width) + "px";
 			setHorizontalAlignment(content, anchorRect, contentRect, alignment);
 			break;
 		}
 		case "bottom": {
-			content.style.top = anchorRect.bottom + "px";
+			content.style.top = clamp(anchorRect.bottom, window.innerHeight - contentRect.height) + "px";
 			setVerticalAlignment(content, anchorRect, contentRect, alignment);
 			break;
 		}
 		case "left": {
-			content.style.left = anchorRect.left - contentRect.width + "px";
+			content.style.left =
+				clamp(anchorRect.left - contentRect.width, window.innerWidth - contentRect.width) + "px";
 			setHorizontalAlignment(content, anchorRect, contentRect, alignment);
 			break;
 		}
@@ -78,6 +82,11 @@ export default function setPopoverPosition(
 			throw new Error(`Invalid MenuPopout side: ${side}`);
 		}
 	}
+}
+
+/** Clamps a position to the viewport, keeping it non-negative. */
+function clamp(value: number, max: number): number {
+	return Math.max(Math.min(value, max), 0);
 }
 
 function setVerticalAlignment(
@@ -107,10 +116,7 @@ function setVerticalAlignment(
 	}
 
 	// Try to make sure the content is entirely on the screen horizontally
-	left = Math.min(left, window.innerWidth - contentRect.width);
-	left = Math.max(left, 0);
-
-	content.style.left = left + "px";
+	content.style.left = clamp(left, window.innerWidth - contentRect.width) + "px";
 }
 
 function setHorizontalAlignment(
@@ -140,8 +146,5 @@ function setHorizontalAlignment(
 	}
 
 	// Try to make sure the content is entirely on the screen vertically
-	top = Math.min(top, window.innerHeight - contentRect.height);
-	top = Math.max(top, 0);
-
-	content.style.top = top + "px";
+	content.style.top = clamp(top, window.innerHeight - contentRect.height) + "px";
 }
