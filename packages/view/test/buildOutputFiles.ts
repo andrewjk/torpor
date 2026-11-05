@@ -170,8 +170,6 @@ const importsMap: Record<string, string> = {
 		'import t_add_fragment from "../../../../src/render/addFragment";',
 	'import { t_add_element } from "@torpor/view";':
 		'import t_add_element from "../../../../src/render/addElement";',
-	'import { t_apply_props } from "@torpor/view";':
-		'import t_apply_props from "../../../../src/render/applyProps";',
 	'import { t_attribute } from "@torpor/view";':
 		'import t_attribute from "../../../../src/render/setAttribute";',
 	'import { t_head_element } from "@torpor/view";':
