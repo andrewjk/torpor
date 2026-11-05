@@ -2,7 +2,7 @@ import { hydrate } from "@torpor/view";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedHandle from "../types/EmbedHandle";
 import type EmbedOptions from "../types/EmbedOptions";
-import { handle, prepare } from "./prepare";
+import { embedProps, handle, prepare } from "./prepare";
 
 /**
  * Evaluates an embed artifact's client code and hydrates server-rendered
@@ -20,6 +20,6 @@ export default function hydrateEmbed(
 	options?: EmbedOptions,
 ): EmbedHandle {
 	const component = prepare(artifact, options);
-	hydrate(target, component as never, props, options?.slots);
+	hydrate(target, component as never, embedProps(artifact, props, options), options?.slots);
 	return handle(artifact, target);
 }

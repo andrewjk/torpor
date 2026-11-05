@@ -2,7 +2,7 @@ import { mount } from "@torpor/view";
 import type EmbedArtifact from "../types/EmbedArtifact";
 import type EmbedHandle from "../types/EmbedHandle";
 import type EmbedOptions from "../types/EmbedOptions";
-import { handle, prepare } from "./prepare";
+import { embedProps, handle, prepare } from "./prepare";
 
 /**
  * Compiles (evaluates) an embed artifact's client code and mounts it into an
@@ -22,6 +22,6 @@ export default function mountEmbed(
 	options?: EmbedOptions,
 ): EmbedHandle {
 	const component = prepare(artifact, options);
-	mount(target, component as never, props, options?.slots);
+	mount(target, component as never, embedProps(artifact, props, options), options?.slots);
 	return handle(artifact, target);
 }

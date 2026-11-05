@@ -1,4 +1,5 @@
 import type { SlotRender } from "@torpor/view";
+import type EmbedBridge from "./EmbedBridge";
 
 /**
  * Options for mounting or hydrating an embed.
@@ -8,6 +9,15 @@ export default interface EmbedOptions {
 	 * Slots to pass to the embed's components.
 	 */
 	slots?: Record<string, SlotRender>;
+
+	/**
+	 * The bridge the embed uses to emit events and call host APIs. It is
+	 * scoped to this mount (calls are stamped with the artifact id) and
+	 * injected as the reserved `$embed` prop, unless props already contain
+	 * `$embed`. When omitted, a default bridge that warns on first use is
+	 * injected, so unwired embeds fail loudly in the console.
+	 */
+	bridge?: EmbedBridge;
 
 	/**
 	 * The version of @torpor/view that is running. When set, it is checked

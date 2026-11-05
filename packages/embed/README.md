@@ -43,15 +43,55 @@ assertRunnable(artifact, getRuntimeVersion()); // throws if it needs a recompile
 Render (client side):
 
 ```ts
-import { mountEmbed, hydrateEmbed } from "@torpor/embed";
+import { createBridge, mountEmbed, hydrateEmbed } from "@torpor/embed";
+
+// One bridge can serve every embed on the page; handlers learn which
+// artifact called from `source`
+const bridge = createBridge({
+	onEvent: (type, detail, source) => track(source.artifactId, type, detail),
+	invoke: async (method, payload, source) => {
+		// Data flows through your backend, authenticated as the current user
+		return api.call(method, { payload, embedId: source.artifactId });
+	},
+});
 
 // Client-rendered
-const handle = mountEmbed(target, artifact, { sectionId: 42 });
+const handle = mountEmbed(target, artifact, { sectionId: 42 }, { bridge });
 handle.unmount();
 
 // Or hydrate markup that the server rendered from the same artifact + props
-hydrateEmbed(target, artifact, { sectionId: 42 });
+hydrateEmbed(target, artifact, { sectionId: 42 }, { bridge });
 ```
+
+## The bridge
+
+Embeds receive the bridge as a reserved `$embed` prop:
+
+```ts
+export default function FeedbackSection($props: { $embed: any }) {
+	let reply = $watch("");
+	async function submit() {
+		reply.value = await $props.$embed.invoke("save-feedback", { text: "..." });
+		$props.$embed.emit("submitted", { ok: true });
+	}
+	@render {
+		<button onclick={submit}>Send</button>
+	}
+}
+```
+
+- `emit(type, detail)` is fire-and-forget: analytics, notifications.
+- `invoke(method, payload)` is request/response: form submissions, tenant
+  data. Values or promises the host handler returns are handed back to the
+  embed.
+
+If a host mounts an embed without a bridge, a default bridge is injected
+that warns on first use -- unwired embeds fail loudly in the console
+instead of silently doing nothing. Embeds can also be given a bridge
+explicitly through props (a `$embed` prop wins over `options.bridge`).
+
+For sandboxed embeds (see trust model below), the same interface is what a
+postMessage-based bridge will implement; embed code doesn't change.
 
 ## Version policy
 
@@ -82,8 +122,8 @@ strictest model and loosen deliberately:
   authority) before rendering embeds from authors you don't fully trust.
 
 Props in, events out: hosts pass data as props (per user/tenant -- never in
-module scope) and embeds can communicate back through a host-provided
-`context` prop.
+module scope) and embeds talk back through the `$embed` bridge (see above),
+whose handlers the host controls.
 
 ## `@torpor/view/runtime`
 
@@ -103,6 +143,6 @@ run compiled code against.
 ## Roadmap
 
 - Server-side render sandbox for untrusted authors
-- Import-map mode for artifacts (real ES modules instead of injected globals)
-- A host↔embed bridge API (typed events, data submission) for business-form
+- PostMessage bridge (same `EmbedBridge` interface) for sandboxed-iframe
   embeds
+- Import-map mode for artifacts (real ES modules instead of injected globals)
