@@ -135,6 +135,43 @@ function addEvent(el, type, listener) {
 		listener
 	});
 }
+function isTextNode(node) {
+	return node.nodeType === 3;
+}
+const HYDRATION_BREAK_REGEX = /^\^(?:\d+)?$/;
+function isHydrationBreak(data) {
+	return HYDRATION_BREAK_REGEX.test(data);
+}
+function hydrationBreakIndex(data) {
+	if (!data.startsWith("^") || data.length === 1) return;
+	const index = Number(data.slice(1));
+	return Number.isNaN(index) ? void 0 : index;
+}
+function isCommentNode(node) {
+	return node.nodeType === 8;
+}
+function nodeCheckHydrationBreak(node) {
+	if (node !== null && isCommentNode(node) && isHydrationBreak(node.data)) {
+		let comment = node;
+		node = node.nextSibling;
+		comment.remove();
+	}
+	context.hydrationNode = node;
+	return node;
+}
+function nodeNext(node, text = false) {
+	if (context.hydrationNode !== null) {
+		if (text && isTextNode(node)) return node;
+		let next = nodeCheckHydrationBreak(node.nextSibling);
+		while (!text && next !== null && isTextNode(next) && next.textContent?.trim() === "") next = nodeCheckHydrationBreak(next.nextSibling);
+		if (!text && next !== null && next.nodeName === "TBODY" && next.firstChild && isTextNode(node)) {
+			next = next.firstChild;
+			context.hydrationNode = next;
+		}
+		return next;
+	}
+	return node.nextSibling;
+}
 function clearSources(target) {
 	let previousSub = null;
 	for (let clearSub = target.firstSource; clearSub !== null; clearSub = clearSub.nextSource) if (target.didError || !clearSub.active) {
@@ -692,6 +729,7 @@ function addElement(node, parent, before) {
 	parent = before?.parentNode ?? parent;
 	if (hydrationNode === null) parent.insertBefore(node, before);
 	runMountSideEffects(parent, activeRegion, hydrationNode);
+	if (hydrationNode !== null) nodeNext(node);
 }
 function addFragment(fragment, parent, before, endNode, startNode) {
 	const activeRegion = context.activeRegion;
@@ -706,6 +744,7 @@ function addFragment(fragment, parent, before, endNode, startNode) {
 	parent = before?.parentNode ?? parent;
 	if (hydrationNode === null) parent.insertBefore(fragment, before);
 	runMountSideEffects(parent, activeRegion, hydrationNode);
+	if (hydrationNode !== null && endNode !== void 0) nodeNext(endNode);
 }
 function applyProps(el, props, propNamesUsed) {
 	if (props !== void 0) {
@@ -811,10 +850,6 @@ function releaseRegion(region) {
 	}
 	region.effects.length = 0;
 }
-function clearLayoutSlot(region) {
-	context.previousRegion = region.previousRegion;
-	clearRegion(region);
-}
 function newRegion(name) {
 	return {
 		startNode: null,
@@ -847,13 +882,27 @@ function pushRegion(region, toParent = false) {
 	devContext.onRegionPushed(region, toParent);
 	return activeRegion;
 }
+const refillDepths = /* @__PURE__ */ new WeakMap();
+function rememberSlotRefillDepth(parent, depth) {
+	refillDepths.set(parent, depth);
+}
 function fillLayoutSlot(component, slot, parent, anchor, $props, $context) {
 	const region = newRegion(devContext.enabled ? "Layout slot" : void 0);
 	const oldRegion = pushRegion(region, true);
-	region.depth = region.previousRegion === null ? 0 : region.previousRegion.depth + 1;
+	const refillDepth = refillDepths.get(parent);
+	if (refillDepth !== void 0) {
+		region.depth = refillDepth;
+		refillDepths.delete(parent);
+	}
 	component(parent, anchor, $props, $context, { _: slot });
 	popRegion(oldRegion);
 	return region;
+}
+function clearLayoutSlot(region) {
+	context.previousRegion = region.previousRegion;
+	const parent = region.startNode?.parentNode;
+	if (parent) rememberSlotRefillDepth(parent, region.depth);
+	clearRegion(region);
 }
 const firstInsideNodes = /* @__PURE__ */ new WeakMap();
 function setFirstInsideNode(anchor, node) {
@@ -947,43 +996,6 @@ function takeBranchIndex(anchor) {
 	const index = branchIndexes.get(anchor);
 	if (index !== void 0) branchIndexes.delete(anchor);
 	return index;
-}
-const HYDRATION_BREAK_REGEX = /^\^(?:\d+)?$/;
-function isHydrationBreak(data) {
-	return HYDRATION_BREAK_REGEX.test(data);
-}
-function hydrationBreakIndex(data) {
-	if (!data.startsWith("^") || data.length === 1) return;
-	const index = Number(data.slice(1));
-	return Number.isNaN(index) ? void 0 : index;
-}
-function isCommentNode(node) {
-	return node.nodeType === 8;
-}
-function isTextNode(node) {
-	return node.nodeType === 3;
-}
-function nodeCheckHydrationBreak(node) {
-	if (node !== null && isCommentNode(node) && isHydrationBreak(node.data)) {
-		let comment = node;
-		node = node.nextSibling;
-		comment.remove();
-	}
-	context.hydrationNode = node;
-	return node;
-}
-function nodeNext(node, text = false) {
-	if (context.hydrationNode !== null) {
-		if (text && isTextNode(node)) return node;
-		let next = nodeCheckHydrationBreak(node.nextSibling);
-		while (!text && next !== null && isTextNode(next) && next.textContent?.trim() === "") next = nodeCheckHydrationBreak(next.nextSibling);
-		if (!text && next !== null && next.nodeName === "TBODY" && next.firstChild && isTextNode(node)) {
-			next = next.firstChild;
-			context.hydrationNode = next;
-		}
-		return next;
-	}
-	return node.nextSibling;
 }
 function nodeAnchor(node) {
 	if (context.hydrationNode !== null) {

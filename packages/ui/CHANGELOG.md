@@ -1,5 +1,11 @@
 # @torpor/ui
 
+## 1.3.4
+
+<sub>2026-11-05</sub>
+
+- _(patch)_ Fix: reposition and clamp resized popovers
+
 ## 1.3.3
 
 <sub>2026-11-03</sub>

@@ -1,5 +1,16 @@
 # @torpor/view
 
+## 1.2.6
+
+<sub>2026-11-05</sub>
+
+- _(patch)_ Fix: emit single-line @for item pushes
+- _(patch)_ Fix: single server class/style attr calls
+- _(patch)_ Fix: server class/style in ssr folder
+- _(patch)_ Fix: drop slot param suppression comments
+- _(patch)_ Fix: fold hydration cursor advance into mount
+- _(patch)_ Fix: rank layout slot regions by parent depth
+
 ## 1.2.5
 
 <sub>2026-11-03</sub>

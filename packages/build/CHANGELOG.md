@@ -1,5 +1,11 @@
 # @torpor/build
 
+## 1.8.5
+
+<sub>2026-11-05</sub>
+
+- _(patch)_ Fix: navigate when reused layout slot is dead
+
 ## 1.8.4
 
 <sub>2026-11-03</sub>
