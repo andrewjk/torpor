@@ -16,8 +16,6 @@ export default async function Element(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";

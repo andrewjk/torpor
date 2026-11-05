@@ -18,8 +18,6 @@ export default async function Let(
 	// @ts-ignore
 	t_slots_1["_"] = async (
 		$slot: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";

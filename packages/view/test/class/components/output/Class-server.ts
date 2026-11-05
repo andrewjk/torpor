@@ -17,8 +17,6 @@ export default async function Class(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
@@ -35,8 +33,6 @@ export default async function Class(
 	const t_slots_2: Record<string, ServerSlotRender> = {};
 	t_slots_2["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
@@ -53,8 +49,6 @@ export default async function Class(
 	const t_slots_3: Record<string, ServerSlotRender> = {};
 	t_slots_3["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";

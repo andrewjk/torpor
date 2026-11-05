@@ -91,7 +91,7 @@ export default function buildServerComponentNode(
 					slot.hasSlotProps
 						? "$slot: Record<PropertyKey, any>"
 						: "_$slot?: Record<PropertyKey, any>",
-					"// @ts-ignore\n// eslint-disable-next-line no-unused-vars\n$context?: Record<PropertyKey, any>",
+					"$context?: Record<PropertyKey, any>",
 				];
 				// NOTE: The @ts-ignore suppresses the assignability error from
 				// the required $slot param, which is not compatible with the

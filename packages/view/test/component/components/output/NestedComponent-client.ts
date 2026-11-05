@@ -40,8 +40,6 @@ export default function NestedComponent(
 		$sparent: ParentNode,
 		$sanchor: Node | null,
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		const t_fragment_2 = t_fragment($parent.ownerDocument!, t_fragments, 2, `<!>`);

@@ -13,8 +13,6 @@ export default async function Named(
 	const t_slots_1: Record<string, ServerSlotRender> = {};
 	t_slots_1["_"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
@@ -23,8 +21,6 @@ export default async function Named(
 	}
 	t_slots_1["header"] = async (
 		_$slot?: Record<PropertyKey, any>,
-		// @ts-ignore
-		// eslint-disable-next-line no-unused-vars
 		$context?: Record<PropertyKey, any>
 	) => {
 		let t_body = "";
