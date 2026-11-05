@@ -222,12 +222,52 @@ strictest model and loosen deliberately:
   reasonable, but pass only vetted data through props, and gate what the
   embed can reach on the server.
 - **Server-side rendering of embeds executes author code on your
-  infrastructure.** Sandbox it (isolated context, timeouts, no ambient
-  authority) before rendering embeds from authors you don't fully trust.
+  infrastructure.** Contain it before rendering embeds from authors you
+  don't fully trust (see the render service below).
 
 Props in, events out: hosts pass data as props (per user/tenant -- never in
 module scope) and embeds talk back through the `$embed` bridge (see above),
 whose handlers the host controls.
+
+## Render service
+
+`isolate: true` renders in a worker thread, which is **fault isolation,
+not a security boundary** -- workers share the process's memory and Node
+builtins. The real boundary is a separate container, and
+`@torpor/embed/server` ships the protocol for exactly that:
+
+```ts
+// render-service.mjs -- runs in the container, nothing else
+import { startRenderServer } from "@torpor/embed/server";
+
+await startRenderServer({ port: 8080, token: process.env.RENDER_TOKEN });
+```
+
+```ts
+// your app -- a drop-in replacement for renderEmbed
+import { createServiceRenderer } from "@torpor/embed/server";
+
+const render = createServiceRenderer({
+	url: "http://render-pool.internal:8080",
+	token: process.env.RENDER_TOKEN,
+});
+const { body, head } = await render(artifact, { props, timeout: 5000 });
+```
+
+The container is the security boundary -- lock it down accordingly:
+non-root user, read-only root filesystem, **no network egress** (your app
+calls it; it never calls out), memory and CPU limits, and a minimal image.
+The service binds loopback by default and requires a bearer token when one
+is configured.
+
+Notes:
+
+- Slots and the host bridge are functions and cannot cross the service
+  boundary -- pass data as props; requests carrying slots are rejected.
+- The service runs its own runtime version and rejects artifacts it can't
+  run with 409 -- recompile them from `artifact.source` (or query
+  `GET /version` from your deploy script to detect drift).
+- Run a pool of these behind your orchestrator; renders are stateless.
 
 ## `@torpor/view/runtime`
 
@@ -246,6 +286,7 @@ run compiled code against.
 
 ## Roadmap
 
-- Stronger server-side isolation for untrusted authors (separate
-  process/subruntime per render; worker isolation is fault isolation only --
-  see FOLLOWUP.md)
+- Single-process isolation research: a WASM engine (e.g. QuickJS) running
+  the SSR runtime with no Node builtins, as an alternative to the
+  container-based render service. Unverified whether torpor's async SSR
+  drains correctly there; the render service is the supported path today.

@@ -471,3 +471,17 @@ Before rendering genuinely untrusted embeds server-side, move to a stronger
 boundary: a separate process/subruntime per render (e.g. isolates or a
 container pool), or skip server rendering for untrusted tiers entirely and
 use sandboxed iframes client-side.
+
+**Resolution (render service shipped):** `@torpor/embed/server` now ships
+`startRenderServer` (a tiny HTTP render service) and `createServiceRenderer`
+(a drop-in `renderEmbed` replacement that calls it). Running the service in
+a locked-down container (non-root, read-only fs, no egress, resource caps)
+is the supported strong-isolation path -- the container is the boundary,
+the library ships the protocol. A child-process-per-render isolator was
+considered and rejected: embed code has full Node builtins in a child
+process too, so it adds fault isolation only -- no privilege boundary over
+worker threads, at real complexity cost. The remaining research path is
+single-process WASM isolation (QuickJS running the SSR runtime with no Node
+builtins); unverified whether torpor's async SSR (`@await` boundaries,
+promise draining) works there, so it stays on the README roadmap as
+research rather than a built feature.

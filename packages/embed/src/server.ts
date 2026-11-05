@@ -3,8 +3,16 @@ export { default as compileEmbed } from "./server/compileEmbed";
 export { default as assertRunnable } from "./server/assertRunnable";
 export { default as getRuntimeVersion } from "./server/getRuntimeVersion";
 export { default as renderEmbed } from "./server/renderEmbed";
+export { default as startRenderServer } from "./server/service/startRenderServer";
+export { default as createServiceRenderer } from "./server/service/createServiceRenderer";
 export type { CompileEmbedOptions } from "./server/compileEmbed";
 export type { RenderEmbedOptions } from "./server/renderEmbed";
+export type { RenderServer, RenderServerOptions } from "./server/service/startRenderServer";
+export type {
+	ServiceRenderer,
+	ServiceRendererOptions,
+	ServiceRenderOptions,
+} from "./server/service/createServiceRenderer";
 
 // Re-exported for hosts that only import from @torpor/embed/server
 export { default as EmbedCompileError } from "./types/EmbedCompileError";
